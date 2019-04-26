@@ -73,7 +73,11 @@ void WindowManager::processNextStep( WalletWindowAction action ) {
         switch (wnd->getChoice() ){
             case NewWallet::NewWalletChoice::NEW_SEED: {
                 // Generate a new seed from the wallet
-                auto seed = mwcWallet->createNewSeed();
+                //auto seed = mwcWallet->createNewSeed();
+                auto seed = QVector<QString>{"local", "donor", "often", "upon", "copper", "minimum",
+                                        "message", "gossip", "vendor", "route", "rival", "brick",
+                                        "suffer", "gravity", "mom", "daring", "else", "exile",
+                                        "brush", "mansion", "shift", "load", "harbor", "close"};
                 switchToWindow( new NewSeed(WalletWindowType::NEW_SEED, mainWindow, seed ));
                 break;
             }

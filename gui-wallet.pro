@@ -26,7 +26,7 @@ CONFIG += c++11
 
 macx {
     CONFIG += app_bundle
-    ICON = mw-logo256.icns
+    ICON = mw-logo.icns
 
 #mySetOfExtraFiles.files = $$PWD/imagesFolder
 #mySetOfExtraFiles.path = Contents/Resources
@@ -133,3 +133,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES += \
+    mw-logo.icns

@@ -11,9 +11,9 @@ int main(int argc, char *argv[])
 
     WalletData data;
 
-    MockWallet wallet;
+    //MockWallet wallet;
 
-    WindowManager wndManager(data, &wallet, mainWnd.getMainWindow() );
+    WindowManager wndManager(data, nullptr, mainWnd.getMainWindow() );
 
     mainWnd.show();
     wndManager.start();

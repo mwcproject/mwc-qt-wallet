@@ -184,7 +184,7 @@ public:
 
     // sign output commitment utxo. Hash must be provivded by party that want to verify the signature.
     // Late this signature can be used for verification of ounewship
-    virtual WalletUtxoSignature sign_utxo( const QString & utxo, const QString & hash );
+    virtual WalletUtxoSignature sign_utxo( const QString & utxo, const QString & hash ) = 0;
 
 
 };

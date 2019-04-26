@@ -31,12 +31,6 @@ private:
     int      port = 0;
 };
 
-class WalletInfo {
-public:
-    QString walletName;
-    QString path2wallet;
-};
-
 class SessionPassword {
 public:
     long      hash;  // permanent
@@ -51,13 +45,9 @@ public:
 
     SessionPassword * getSessionPswd() {return &sessionPswd;}
     NodeConnection * getNodeConnection() {return &nodeCon;}
-    WalletInfo     * getWalletInfo() {return &walletInfo;}
 private:
     SessionPassword sessionPswd;
     NodeConnection  nodeCon;
-    WalletInfo      walletInfo;
-
-
 };
 
 #endif // WALLETDATA_H

@@ -9,7 +9,7 @@ public:
     MockWallet();
     virtual ~MockWallet() override;
 
-    virtual QVector<QString> createNewSeed() override;
+    //virtual QVector<QString> createNewSeed() override;
 
 };
 

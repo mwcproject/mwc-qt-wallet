@@ -8,8 +8,6 @@ namespace Ui {
 class ChooseWallet;
 }
 
-class WalletInfo;
-
 class ChooseWallet : public WalletWindow
 {
     Q_OBJECT
