@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>img/mw-logo.png</file>
+        <file>img/network.png</file>
+        <file>img/blue-question-mark.png</file>
+        <file>img/seed.jpg</file>
+        <file>img/lock.png</file>
+    </qresource>
+</RCC>
