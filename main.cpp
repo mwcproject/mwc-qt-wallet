@@ -1,25 +1,33 @@
-#include "wnd_core/mainwindow.h"
+#include "core/mainwindow.h"
 #include <QApplication>
-#include "data/walletdata.h"
-#include "wnd_core/windowmanager.h"
-#include "mwc_wallet/mockwallet.h"
+#include "core/windowmanager.h"
+#include "wallet/mockwallet.h"
+#include "state/state.h"
+#include "state/statemachine.h"
+#include "core/appcontext.h"
+#include "util/ioutils.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    MainWindow mainWnd;
 
-    WalletData data;
+    core::AppContext appContext;
 
-    //MockWallet wallet;
+    //main window has delete on close flag. That is why need to
+    // create dynamically. Window will be deleted on close
+    core::MainWindow * mainWnd = new core::MainWindow(nullptr);
 
-    WindowManager wndManager(data, nullptr, mainWnd.getMainWindow() );
+    wallet::MockWallet wallet;
 
-    mainWnd.show();
-    wndManager.start();
+    core::WindowManager wndManager( mainWnd->getMainWindow() );
 
-    QObject::connect( &mainWnd, SIGNAL(processNextStep(WalletWindowAction)),
-             &wndManager, SLOT(processNextStep(WalletWindowAction)) );
+    mainWnd->show();
+
+    state::StateContext context( &appContext, &wallet, &wndManager, mainWnd );
+
+    state::StateMachine machine(context);
+    mainWnd->setStateMachine(&machine);
+    machine.start();
 
     return app.exec();
 }

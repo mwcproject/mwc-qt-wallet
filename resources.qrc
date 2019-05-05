@@ -5,5 +5,20 @@
         <file>img/blue-question-mark.png</file>
         <file>img/seed.jpg</file>
         <file>img/lock.png</file>
+        <file>img/accounts.png</file>
+        <file>img/airdrop.png</file>
+        <file>img/airdrop2.png</file>
+        <file>img/notifications.png</file>
+        <file>img/contacts.png</file>
+        <file>img/transaction.png</file>
+        <file>img/config.png</file>
+        <file>img/hodl.png</file>
+        <file>img/listening.png</file>
+        <file>img/node_status.png</file>
+        <file>img/outputs.png</file>
+        <file>img/send_coins.png</file>
+        <file>img/transaction_file.png</file>
+        <file>img/send_coins_file.png</file>
+        <file>img/loader.gif</file>
     </qresource>
 </RCC>

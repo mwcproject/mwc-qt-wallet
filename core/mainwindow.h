@@ -1,0 +1,54 @@
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+#include <QTimer>
+
+namespace Ui {
+class MainWindow;
+}
+
+namespace state {
+    class StateMachine;
+}
+
+namespace core {
+
+class WindowManager;
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
+
+    void setStateMachine(state::StateMachine * stateMachine);
+
+    QWidget * getMainWindow();
+
+    // Update tb & menu actions
+    void updateActionStates();
+
+private slots:
+    void on_actionVersion_triggered();
+    void updateClock();
+
+    void on_actionAccount_triggered();
+    void on_actionEvents_triggered();
+    void on_actionHODL_triggered();
+private:
+private:
+    Ui::MainWindow *ui;
+    QTimer *clockTimer = nullptr;
+    state::StateMachine * stateMachine = nullptr;
+
+    QAction * actionAccounts;
+    QAction * actionEvents;
+    QAction * actionHodl;
+};
+
+}
+
+#endif // MAINWINDOW_H
