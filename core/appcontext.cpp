@@ -45,7 +45,7 @@ bool AppContext::loadData() {
 
      int id = 0;
      in >> id;
-     if (id<0x6546 || id>0x6547)
+     if (id<0x6546 || id>0x6548)
          return false;
 
      in >> passHash;
@@ -55,6 +55,10 @@ bool AppContext::loadData() {
          int st;
          in >> st;
          st = activeWndState;
+     }
+
+     if (id>0x6548) {
+         sendCoinsParams.loadData(in);
      }
 
      return true;
@@ -76,10 +80,12 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_12);
 
-    out << 0x6547;
+    out << 0x6548;
     out << passHash;
     out << network;
     out << int(activeWndState);
+
+    sendCoinsParams.saveData(out);
 }
 
 

@@ -63,12 +63,12 @@ void MainWindow::updateActionStates() {
     ui->actionEvents->setChecked( state == state::STATE::EVENTS ) ;
     ui->actionHODL->setChecked( state == state::STATE::HODL ) ;
     //ui->actionAirdrop;
-    //ui->actionNode_status;
+    ui->actionNode_status->setChecked( state == state::STATE::NODE_STATUS ) ;
     //ui->actionConnect_to_node;
     //ui->actionContacts;
     //ui->actionConfig;
     //ui->actionListening_Status;
-    //ui->actionSend_coins;
+    ui->actionSend_coins->setChecked( state == state::STATE::SEND_COINS );
     //ui->actionSend_recieve_offline;
     //ui->actionTransactions;
     //ui->actionOutputs;
@@ -101,4 +101,15 @@ void MainWindow::on_actionHODL_triggered()
     stateMachine->setActionWindow( state::STATE::HODL );
 }
 
+void MainWindow::on_actionSend_coins_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::SEND_COINS );
 }
+
+void MainWindow::on_actionNode_status_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::NODE_STATUS );
+}
+
+}
+

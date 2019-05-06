@@ -53,6 +53,10 @@ void Accounts::updateUiState()
 
     int curAccountIdx = accounts.indexOf(info.accountName);
     ui->accountList->setCurrentRow( curAccountIdx );
+    currentAccountName = info.accountName;
+
+    ui->selectButton->setEnabled(false);
+
 }
 
 void Accounts::startWaiting() {
@@ -100,25 +104,57 @@ void Accounts::on_accountList_itemActivated(QListWidgetItem *item)
     if (!item)
         return;
 
-    startWaiting();
 
     QString account = item->text();
 
-    wallet::WalletInfo info = state->getWalletInfo();
-    if (account==info.accountName) {
-        stopWaiting();
-        return; // already selected
+    if (account == currentAccountName) {
+        return;
     }
 
+    selectNewAccount(account);
+}
+
+void Accounts::selectNewAccount(QString account) {
+    startWaiting();
     // Need to select an account
     state->activateAccount(account);
 
     updateUiState();
     stopWaiting();
+
+}
+
+
+QString Accounts::getSelectedAccount() {
+    QListWidgetItem * item = ui->accountList->currentItem();
+    if (item == nullptr)
+        return "";
+
+    return item->text();
+}
+
+void Accounts::on_accountList_itemSelectionChanged()
+{
+    QString newAcc = getSelectedAccount();
+    if (newAcc.length()==0)
+        return;
+
+    ui->selectButton->setEnabled( newAcc != currentAccountName );
+}
+
+void Accounts::on_selectButton_clicked()
+{
+    QString newAcc = getSelectedAccount();
+    if (newAcc.length()==0)
+        return;
+
+    selectNewAccount(newAcc);
 }
 
 
 }
+
+
 
 
 

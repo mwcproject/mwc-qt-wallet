@@ -40,12 +40,14 @@ SOURCES += \
     state/createwithseed.cpp \
     state/events.cpp \
     state/hodl.cpp \
+    state/nodestatus.cpp \
+    state/sendcoins.cpp \
     windows/accounts_w.cpp \
     windows/confirmseed.cpp \
     windows/connect2server.cpp \
     windows/events_w.cpp \
     windows/hodl_w.cpp \
-    windows/nodestatus.cpp \
+    windows/nodestatus_w.cpp \
     windows/passwordforseed.cpp \
     core/mainwindow.cpp \
     core/versiondialog.cpp \
@@ -56,9 +58,11 @@ SOURCES += \
     windows/fromseedfile.cpp \
     windows/nodemanually.cpp \
     windows/listening.cpp \
-    windows/sendcoins.cpp \
     windows/filetransactions.cpp \
     windows/outputs.cpp \
+    windows/selectcontact.cpp \
+    windows/sendcoins_w.cpp \
+    windows/sendcoinsparamsdialog.cpp \
     windows/transactions.cpp \
     windows/contacts.cpp \
     windows/claiming.cpp \
@@ -88,12 +92,14 @@ HEADERS += \
     state/createwithseed.h \
     state/events.h \
     state/hodl.h \
+    state/nodestatus.h \
+    state/sendcoins.h \
     windows/accounts_w.h \
     windows/confirmseed.h \
     windows/connect2server.h \
     windows/events_w.h \
     windows/hodl_w.h \
-    windows/nodestatus.h \
+    windows/nodestatus_w.h \
     windows/passwordforseed.h \
     core/mainwindow.h \
     core/versiondialog.h \
@@ -104,9 +110,11 @@ HEADERS += \
     windows/fromseedfile.h \
     windows/nodemanually.h \
     windows/listening.h \
-    windows/sendcoins.h \
     windows/filetransactions.h \
     windows/outputs.h \
+    windows/selectcontact.h \
+    windows/sendcoins_w.h \
+    windows/sendcoinsparamsdialog.h \
     windows/transactions.h \
     windows/contacts.h \
     windows/claiming.h \
@@ -145,9 +153,11 @@ FORMS += \
     windows/nodemanually.ui \
     windows/listening.ui \
     windows/events.ui \
+    windows/selectcontact.ui \
     windows/sendcoins.ui \
     windows/filetransactions.ui \
     windows/outputs.ui \
+    windows/sendcoinsparamsdialog.ui \
     windows/transactions.ui \
     windows/contacts.ui \
     windows/hodl.ui \

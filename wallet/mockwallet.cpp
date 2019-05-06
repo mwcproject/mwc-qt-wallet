@@ -6,6 +6,7 @@
 #include <QDataStream>
 #include <QMessageBox>
 #include <QThread>
+#include <QTime>
 
 namespace wallet {
 
@@ -26,6 +27,42 @@ MockWallet::MockWallet()
     WalletContact cnt;
     cnt.setData("bob", "43596834659876323897658564253876538");
     contacts.push_back(cnt);
+
+    { // init transactions with some default values
+        WalletTransaction wt;
+        wt.setData(4,
+           WalletTransaction::SEND,
+           "8454935873498593487",
+           "xd7auPddUmmEzSte48a2aZ9tWkjjCppgn41pemUfcVSqjxHHZ6cT",
+           "Apr 26 18:55:00",
+           false,
+           "",
+           1000000000L * 9,
+           true);
+        transactions.push_back(wt);
+
+        wt.setData(5,
+           WalletTransaction::RECIEVE,
+           "8454935873498593487",
+           "xd7546UmmEzSte48a2aZ9tWkjjCppgn41pemUfcVSqjxHHZ6cT",
+           "Apr 26 19:58:11",
+           true,
+           "",
+           1000000000L * 10,
+           true);
+        transactions.push_back(wt);
+
+        wt.setData(6,
+           WalletTransaction::RECIEVE,
+           "8454935873498593487",
+           "xd7auPdkfjsld;fkfsld;jjCppgn41pemUfcVSqjxHHZ6cT",
+           "Apr 27 19:01:02",
+           true,
+           "",
+           1000000000L * 12,
+           true);
+        transactions.push_back(wt);
+    }
 
     loadData();
 }
@@ -153,15 +190,19 @@ QPair<bool, QString> MockWallet::createAccount( const QString & accountName )
 
 // Switch to different account
 QPair<bool, QString> MockWallet::switchAccount(const QString & accountName) {
-    if (std::count_if( accounts.begin(), accounts.end(), [&](QString acc) {return acc==accountName;} )>0)
+    int idx = accounts.indexOf(accountName);
+
+    if (idx>=0) {
+        selectedAccount = idx;
         return QPair<bool, QString>(true, "");
+    }
 
     return QPair<bool, QString>(false, "Account doesn't exist");
 }
 
 // Check and repair the wallet. Will take a while
 void MockWallet::check() {
-    QThread::sleep(5);
+    //QThread::sleep(5);
 }
 
 // Get current configuration of the wallet.
@@ -175,12 +216,20 @@ bool MockWallet::setWalletConfig(const WalletConfig & cfg) {
     return true;
 }
 
+NodeStatus MockWallet::getNodeStatus() {
+    NodeStatus status;
+    status.setData(17, "Ready", 73264, 9352984);
+    return status;
+}
+
+
 // Get wallet balance
 WalletInfo MockWallet::getWalletBalance() {
-    QThread::sleep(3);
+    //QThread::sleep(3);
     long coin = 1000000000L;
     WalletInfo wi;
-    wi.setData("default", 20*coin, 2*coin, 1*coin, 17*coin);
+    wi.setData( accounts[selectedAccount], (20+selectedAccount)*coin,
+                (2+selectedAccount)*coin, (1+selectedAccount)*coin, (17+selectedAccount)*coin);
     return wi;
 
 }
@@ -255,6 +304,20 @@ QPair<bool, QString>  MockWallet::sendTo( long coinNano, const QString & address
     Q_UNUSED(message);
     Q_UNUSED(inputConfirmationNumber);
     Q_UNUSED(changeOutputs);
+
+    WalletTransaction wt;
+    // last is expected
+    wt.setData(transactions.back().txIdx + 1,
+       WalletTransaction::SEND,
+       QString::number( transactions.size()*189765 ),
+       address,
+       QTime::currentTime().toString(),
+       false,
+       "",
+       coinNano,
+       false);
+    transactions.push_back(wt);
+
     return QPair<bool, QString> (true,"");
 }
 
@@ -286,48 +349,9 @@ QVector<WalletOutput> MockWallet::getOutputs() noexcept(false) {
 }
 
 // Show all transactions for account
-QVector<WalletTransaction> MockWallet::getTransactions() {
-    QVector<WalletTransaction>  result;
-
-    WalletTransaction wt;
-    wt.setData(4,
-       WalletTransaction::SEND,
-       "8454935873498593487",
-       "xd7auPddUmmEzSte48a2aZ9tWkjjCppgn41pemUfcVSqjxHHZ6cT",
-       "Apr 26 18:55:00",
-       false,
-       "",
-       1000000000L * 9,
-       true);
-
-    result.push_back(wt);
-
-    wt.setData(5,
-       WalletTransaction::RECIEVE,
-       "8454935873498593487",
-       "xd7546UmmEzSte48a2aZ9tWkjjCppgn41pemUfcVSqjxHHZ6cT",
-       "Apr 26 19:58:11",
-       true,
-       "",
-       1000000000L * 10,
-       true);
-
-    result.push_back(wt);
-
-
-    wt.setData(6,
-       WalletTransaction::RECIEVE,
-       "8454935873498593487",
-       "xd7auPdkfjsld;fkfsld;jjCppgn41pemUfcVSqjxHHZ6cT",
-       "Apr 27 19:01:02",
-       true,
-       "",
-       1000000000L * 12,
-       true);
-
-    result.push_back(wt);
-
-    return result;
+QVector<WalletTransaction> MockWallet::getTransactions(int numOfTransactions) {
+    Q_UNUSED(numOfTransactions);
+    return transactions;
 }
 
 // Get the contacts
@@ -386,7 +410,7 @@ void MockWallet::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_12);
 
-    out << 0x57667;
+    out << 0x57668;
 
     out << blockchainNetwork;
     out << isInit;
@@ -397,6 +421,7 @@ void MockWallet::saveData() const {
     for ( const QString & acc : accounts )
         out << acc;
 
+    out << selectedAccount;
 
     config.saveData(out);
 
@@ -419,7 +444,7 @@ bool MockWallet::loadData() {
 
      int id = 0;
      in >> id;
-     if (id!=0x57667)
+     if (id<0x57667 && id>0x57668)
          return false;
 
      in >> blockchainNetwork;
@@ -435,6 +460,9 @@ bool MockWallet::loadData() {
      accounts.resize(size);
      for ( QString & acc : accounts )
          in >> acc;
+
+     if (id>=0x57668)
+         in >> selectedAccount;
 
      if (!config.loadData(in))
          return false;

@@ -1,4 +1,4 @@
-#include "state/hodl.h"
+#include "hodl.h"
 #include "../wallet/wallet.h"
 #include "../windows/hodl_w.h"
 #include "../core/windowmanager.h"
@@ -31,6 +31,7 @@ QVector<wallet::WalletTransaction> Hodl::getTransactions() {
 
 void Hodl::submitForHodl( const QVector<QString> & transactions ) {
     // starting  a long proces of submitting transactions that we will define later.
+    Q_UNUSED(transactions);
 }
 
 

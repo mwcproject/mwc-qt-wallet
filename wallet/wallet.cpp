@@ -41,6 +41,16 @@ bool WalletConfig::loadData( QDataStream & in) {
     return true;
 }
 
+void NodeStatus::setData(int   _connection,
+                            QString _tip,
+                            long _height,
+                            long _total_difficulty)
+{
+    connection = _connection;
+    tip = _tip;
+    height = _height;
+    total_difficulty = _total_difficulty;
+}
 
 
 void WalletProofInfo::setData(long _coinsNano,

@@ -29,6 +29,9 @@ enum STATE {
     ACCOUNTS,
     EVENTS,
     HODL,
+    SEND_COINS,
+    NODE_STATUS,
+    NODE_CHANGE,
 
 };
 

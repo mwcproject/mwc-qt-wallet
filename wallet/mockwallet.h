@@ -54,6 +54,9 @@ public:
     WalletConfig getWalletConfig() noexcept(false) override;
     bool setWalletConfig(const WalletConfig & config) noexcept(false) override;
 
+    // Status of the node
+    NodeStatus getNodeStatus() noexcept(false) override;
+
     // -------------- Transactions
     WalletInfo getWalletBalance() noexcept(false) override;
     bool cancelTransacton(QString transactionID) noexcept(false) override;
@@ -68,7 +71,8 @@ public:
     QPair<bool, QString> sendTo( long coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs ) noexcept(false) override;
 
     QVector<WalletOutput> getOutputs() noexcept(false) override;
-    QVector<WalletTransaction> getTransactions() noexcept(false) override;
+    // numOfTransactions - transaction limit to return. <=0 - get all transactions
+    QVector<WalletTransaction> getTransactions(int numOfTransactions=-1) noexcept(false) override;
 
     // -------------- Contacts
 
@@ -90,9 +94,12 @@ private:
     QString walletPassword; // password that encrypt the seed
 
     QVector<QString> accounts;
+    int selectedAccount = 0;
     WalletConfig config;
 
     QVector<WalletContact> contacts;
+
+    QVector<WalletTransaction> transactions;
 
     bool listenMwcBox = false;
     bool listenKeystone = false;

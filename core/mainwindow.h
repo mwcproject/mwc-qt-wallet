@@ -38,6 +38,10 @@ private slots:
     void on_actionAccount_triggered();
     void on_actionEvents_triggered();
     void on_actionHODL_triggered();
+    void on_actionSend_coins_triggered();
+
+    void on_actionNode_status_triggered();
+
 private:
 private:
     Ui::MainWindow *ui;

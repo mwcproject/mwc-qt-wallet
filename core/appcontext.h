@@ -3,6 +3,7 @@
 
 #include <QMap>
 #include "../state/state.h"
+#include "../state/sendcoins.h"
 
 
 namespace core {
@@ -37,6 +38,10 @@ public:
     state::STATE getActiveWndState() const {return activeWndState;}
     void setActiveWndState(state::STATE  state) {activeWndState=state;}
 
+    // Send coins params.
+    state::SendCoinsParams getSendCoinsParams() const {return sendCoinsParams;}
+    void setSendCoinsParams(state::SendCoinsParams params) { sendCoinsParams=params; }
+
 private:
     bool loadData();
     void saveData() const;
@@ -51,6 +56,9 @@ private:
 
     // Active window that is visible
     state::STATE activeWndState = state::STATE::ACCOUNTS;
+
+    // Send coins params.
+    state::SendCoinsParams sendCoinsParams;
 };
 
 template <class T>

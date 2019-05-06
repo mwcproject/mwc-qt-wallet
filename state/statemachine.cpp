@@ -11,6 +11,8 @@
 #include "accounts.h"
 #include "events.h"
 #include "hodl.h"
+#include "sendcoins.h"
+#include "nodestatus.h"
 
 namespace state {
 
@@ -32,6 +34,9 @@ StateMachine::StateMachine(StateContext & context) :
     states[ STATE::ACCOUNTS ]       = new Accounts(context);
     states[ STATE::EVENTS ]         = new Events(context);
     states[ STATE::HODL ]           = new Hodl(context);
+    states[ STATE::SEND_COINS ]     = new SendCoins(context);
+    states[ STATE::NODE_STATUS]     = new NodeStatus(context);
+    //states[ STATE::NODE_CHANGE]     = new NodeChange(context);
 }
 
 StateMachine::~StateMachine() {

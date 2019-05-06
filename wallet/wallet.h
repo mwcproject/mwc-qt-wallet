@@ -27,12 +27,24 @@ struct WalletInfo {
 struct WalletConfig {
     QString dataPath;
     QString mwcboxDomain;
-    int mwcboxPort;
+    int     mwcboxPort;
     QString mwcNodeURI;
     QString mwcNodeSecret;
 
     void saveData( QDataStream & out) const;
     bool loadData( QDataStream & in);
+};
+
+struct NodeStatus {
+    int     connection; // current number of connections
+    QString tip; // Status og the current fork tip
+    long    height; // Height of the tip
+    long    total_difficulty; // Total difficulty accumulated on that fork since genesis block
+
+    void setData(int   connection,
+        QString tip,
+        long height,
+        long total_difficulty);
 };
 
 struct WalletContact {
@@ -98,7 +110,8 @@ struct WalletTransaction {
 
         return expandStrR( QString::number(txIdx), 3) +
                 expandStrR(nano2one(coinNano), 8) +
-                string2shortStrR(txid, 12);
+                expandStrR( string2shortStrR(txid, 12), 12) +
+                " " + creationTime;
     }
 };
 
@@ -204,9 +217,11 @@ public:
 
     // Get current configuration of the wallet.
     virtual WalletConfig getWalletConfig() noexcept(false) = 0;
-
     // Update wallet config. Will be updated with non empty fields
     virtual bool setWalletConfig(const WalletConfig & config) noexcept(false) = 0;
+
+    // Status of the node
+    virtual NodeStatus getNodeStatus() noexcept(false) = 0;
 
     // -------------- Transactions
 
@@ -236,7 +251,7 @@ public:
     // Show outputs for the wallet
     virtual QVector<WalletOutput> getOutputs() noexcept(false) = 0;
     // Show all transactions for account
-    virtual QVector<WalletTransaction> getTransactions() noexcept(false) = 0;
+    virtual QVector<WalletTransaction> getTransactions(int numOfTransactions=-1) noexcept(false) = 0;
 
     // -------------- Contacts
 

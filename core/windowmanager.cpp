@@ -5,7 +5,7 @@
 #include <QApplication>
 #include "../windows/connect2server.h"
 #include "../windows/nodemanually.h"
-#include "../windows/nodestatus.h"
+#include "../windows/nodestatus_w.h"
 #include "../windows/newwallet_w.h"
 #include "../windows/passwordforseed.h"
 #include "../windows/newseed_w.h"
