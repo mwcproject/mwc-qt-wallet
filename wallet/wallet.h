@@ -238,10 +238,10 @@ public:
 
     // Init send transaction with file output
     // return file name
-    virtual QString sendFile( long coinNano, QString fileTx ) noexcept(false) = 0;
+    virtual QPair<bool, QString> sendFile( long coinNano, QString fileTx ) noexcept(false) = 0;
     // Recieve transaction. Will generate *.response file in the same dir
     // return file name
-    virtual QString receiveFile( QString fileTx ) noexcept(false) = 0;
+    virtual QPair<bool, QString> receiveFile( QString fileTx, QString responseFileName ) noexcept(false) = 0;
     // finalize transaction and broadcast it
     virtual QPair<bool, QString> finalizeFile( QString fileTxResponse ) noexcept(false) = 0;
 

@@ -42,6 +42,8 @@ private slots:
 
     void on_actionNode_status_triggered();
 
+    void on_actionSend_recieve_offline_triggered();
+
 private:
 private:
     Ui::MainWindow *ui;

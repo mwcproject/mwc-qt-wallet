@@ -6,6 +6,7 @@
 #include "../state/statemachine.h"
 #include <QMessageBox>
 #include <QRandomGenerator>
+#include "../core/testseedtask.h"
 
 namespace state {
 
@@ -28,20 +29,7 @@ NextStateRespond NewSeed::execute() {
     QVector<QString> seed = context.wallet->init();
     context.appContext->pushCookie< QVector<QString> >("seed2verify", seed);
 
-    // Generate tasks. Need to review the words one by one
-    QVector< QPair<int,QString> > words;
-    for ( int i=0;i<seed.size();i++ )
-        words.push_back( QPair<int,QString>(i+1, seed[i]) );
-
-    QVector< QPair<int,QString> > confirmTasks;
-    QRandomGenerator * rand = QRandomGenerator::global();
-
-    while( words.size()>0 ) {
-        int idx = rand->bounded( words.size() );
-        confirmTasks.push_back( words[idx] );
-        words.remove(idx);
-    }
-    context.appContext->pushCookie< QVector< QPair<int,QString> > >("seedTasks", confirmTasks);
+    context.appContext->pushCookie< QVector<core::TestSeedTask> >("seedTasks", core::generateSeedTasks( seed ) );
 
     return NextStateRespond(NextStateRespond::RESULT::DONE);
 }

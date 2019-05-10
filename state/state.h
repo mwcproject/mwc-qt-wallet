@@ -20,19 +20,20 @@ class StateMachine;
 enum STATE {
     NONE,
     STATE_INIT, // first run. Creating the password for a wallet
-    INPUT_PASSWORD,
-    NEW_WALLET,
-    GENERATE_NEW_SEED,
-    SHOW_NEW_SEED,
-    TEST_NEW_SEED,
-    CREATE_WITH_SEED,
-    ACCOUNTS,
-    EVENTS,
-    HODL,
-    SEND_COINS,
-    NODE_STATUS,
-    NODE_CHANGE,
-
+    INPUT_PASSWORD, // Input password from the wallet
+    NEW_WALLET,     // Select how to init the wallet (first run)
+    GENERATE_NEW_SEED, // Init a new wallet, generate a new seed
+    SHOW_NEW_SEED,  // Show the new seed
+    TEST_NEW_SEED,  // Test a word from the seed
+    CREATE_WITH_SEED,// Init wallet with exist seed
+    ACCOUNTS,       // Wallet accounts
+    EVENTS,         // Wallet events (logs)
+    HODL,           // Hodl program.
+    SEND_COINS,     // Send coins
+    NODE_STATUS,    // Cgeck node status
+    CONNECT_2_NODE, // connection to the MWC nodes
+    NODE_MANUALY,   // input URI to the custom node
+    FILE_TRANSACTIONS, // Transactions for files
 };
 
 struct NextStateRespond {

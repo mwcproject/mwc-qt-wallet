@@ -4,9 +4,9 @@
 namespace util {
 
 const int PASS_MIN_LEN      = 10;
-const int PASS_MIN_NON_LETTER = 2;
-const int PASS_MIN_CAPITAL  = 2;
-const int PASS_MIN_LOWCASE  = 2;
+const int PASS_MIN_NON_LETTER = 1;
+const int PASS_MIN_CAPITAL  = 1;
+const int PASS_MIN_LOWCASE  = 1;
 
 PasswordAnalyser::PasswordAnalyser(const QString & password) :
     pass2check(password)

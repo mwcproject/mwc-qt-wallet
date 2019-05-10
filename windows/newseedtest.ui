@@ -64,7 +64,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../resources.qrc">:/img/img/seed.jpg</pixmap>
+          <pixmap resource="../resources.qrc">:/img/seed.jpg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>

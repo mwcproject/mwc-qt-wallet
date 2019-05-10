@@ -34,6 +34,7 @@ void NodeStatus::updateNodeStatus() {
 
     ui->blocksLabel->setText( QString::number(status.height) + " blocks" );
     ui->statusLabel->setText( status.tip );
+    ui->connectionsLabel->setText( QString::number(status.connection) );
     ui->difficultyLabel->setText( QString::number( status.total_difficulty ) );
 }
 

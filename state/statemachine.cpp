@@ -13,6 +13,9 @@
 #include "hodl.h"
 #include "sendcoins.h"
 #include "nodestatus.h"
+#include "connect2node.h"
+#include "nodemanually.h"
+#include "filetransactions.h"
 
 namespace state {
 
@@ -36,7 +39,9 @@ StateMachine::StateMachine(StateContext & context) :
     states[ STATE::HODL ]           = new Hodl(context);
     states[ STATE::SEND_COINS ]     = new SendCoins(context);
     states[ STATE::NODE_STATUS]     = new NodeStatus(context);
-    //states[ STATE::NODE_CHANGE]     = new NodeChange(context);
+    states[ STATE::CONNECT_2_NODE ] = new Connect2Node(context);
+    states[ STATE::NODE_MANUALY]    = new NodeManually(context);
+    states[ STATE::FILE_TRANSACTIONS] = new FileTransactions(context);
 }
 
 StateMachine::~StateMachine() {
@@ -78,9 +83,9 @@ void StateMachine::executeFrom( STATE nextState ) {
     }
 }
 
-bool StateMachine::setActionWindow( STATE actionWindowState ) {
-    if ( !isActionWindowMode() )
-        return false;
+bool StateMachine::setActionWindow( STATE actionWindowState, bool enforce ) {
+    if (!enforce && !isActionWindowMode() )
+            return false;
 
     appContext->setActiveWndState(actionWindowState);
     executeFrom(STATE::NONE);

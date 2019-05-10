@@ -64,8 +64,8 @@ public:
     WalletProofInfo  generateMwcBoxTransactionProof( int transactionId, QString resultingFileName ) noexcept(false) override;
     WalletProofInfo  verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) override;
 
-    QString sendFile( long coinNano, QString fileTx ) noexcept(false) override;
-    QString receiveFile( QString fileTx ) noexcept(false) override;
+    QPair<bool, QString> sendFile( long coinNano, QString fileTx ) noexcept(false) override;
+    QPair<bool, QString> receiveFile( QString fileTx, QString responseFileName ) noexcept(false) override;
     QPair<bool, QString> finalizeFile( QString fileTxResponse ) noexcept(false) override;
 
     QPair<bool, QString> sendTo( long coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs ) noexcept(false) override;

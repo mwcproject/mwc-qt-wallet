@@ -4,6 +4,7 @@
 #include "state.h"
 #include <QString>
 #include <QPair>
+#include "../core/testseedtask.h"
 
 namespace state {
 
@@ -18,7 +19,7 @@ public:
 protected:
     virtual NextStateRespond execute() override;
 private:
-    QPair<int,QString> currentTask;
+    core::TestSeedTask currentTask;
 };
 
 }

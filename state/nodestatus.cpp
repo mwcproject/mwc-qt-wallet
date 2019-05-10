@@ -1,4 +1,4 @@
-#include "state/nodestatus.h"
+#include "nodestatus.h"
 
 #include "../wallet/wallet.h"
 #include "../windows/nodestatus_w.h"
@@ -36,7 +36,7 @@ NextStateRespond NodeStatus::execute() {
 
 void NodeStatus::requestToChangeTheNode() {
     context.appContext->pushCookie<QString>("ChangeNode", "yes");
-    context.stateMachine->executeFrom(STATE::NODE_CHANGE);
+    context.stateMachine->executeFrom(STATE::CONNECT_2_NODE);
 }
 
 

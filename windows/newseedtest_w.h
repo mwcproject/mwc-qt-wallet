@@ -7,6 +7,8 @@ namespace Ui {
 class NewSeedTest;
 }
 
+class QCompleter;
+
 namespace state {
     class NewSeedTest;
 }
@@ -27,6 +29,7 @@ private slots:
 private:
     Ui::NewSeedTest *ui;
     state::NewSeedTest *state;
+    QCompleter *completer = nullptr;
 };
 
 }

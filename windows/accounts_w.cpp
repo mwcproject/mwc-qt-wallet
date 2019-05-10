@@ -19,7 +19,7 @@ Accounts::Accounts(QWidget *parent, state::Accounts * _state) :
 
 
     QLabel *lbl = ui->waitingPlaceholder;
-    QMovie *movie = new QMovie(":/img/img/loader.gif", QByteArray(), this);
+    QMovie *movie = new QMovie(":/img/loader.gif", QByteArray(), this);
     lbl->setMovie(movie);
     lbl->hide();
 
@@ -46,10 +46,10 @@ void Accounts::updateUiState()
 
     wallet::WalletInfo info = state->getWalletInfo();
 
-    ui->totalAmount->setText( util::nano2one( info.total ) );
-    ui->lockedByPrevTrans->setText( util::nano2one( info.lockedByPrevTransaction ) );
-    ui->awaitingConfirmation->setText( util::nano2one( info.awaitingConfirmation ) );
-    ui->currentlySpendable->setText( util::nano2one( info.currentlySpendable ) );
+    ui->totalAmount->setText( util::nano2one( info.total ) + " MWC" );
+    ui->lockedByPrevTrans->setText( util::nano2one( info.lockedByPrevTransaction ) + " MWC" );
+    ui->awaitingConfirmation->setText( util::nano2one( info.awaitingConfirmation ) + " MWC" );
+    ui->currentlySpendable->setText( util::nano2one( info.currentlySpendable ) + " MWC" );
 
     int curAccountIdx = accounts.indexOf(info.accountName);
     ui->accountList->setCurrentRow( curAccountIdx );
@@ -60,13 +60,16 @@ void Accounts::updateUiState()
 }
 
 void Accounts::startWaiting() {
-   ui->waitingPlaceholder->show();
-    QApplication::processEvents();
+ //  ui->waitingPlaceholder->show();
+ //   QApplication::processEvents();
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 }
 
 void Accounts::stopWaiting() {
-    ui->waitingPlaceholder->hide();
-    QApplication::processEvents();
+ //   ui->waitingPlaceholder->hide();
+ //   QApplication::processEvents();
+     QApplication::restoreOverrideCursor();
 }
 
 

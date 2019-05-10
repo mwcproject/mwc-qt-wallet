@@ -42,6 +42,11 @@ public:
     state::SendCoinsParams getSendCoinsParams() const {return sendCoinsParams;}
     void setSendCoinsParams(state::SendCoinsParams params) { sendCoinsParams=params; }
 
+    // Get last path state. Default: Home dir
+    QString getPathFor( QString name ) const;
+    // update path state
+    void updatePathFor( QString name, QString path );
+
 private:
     bool loadData();
     void saveData() const;
@@ -59,6 +64,9 @@ private:
 
     // Send coins params.
     state::SendCoinsParams sendCoinsParams;
+
+    // Current Path dirs
+    QMap<QString,QString> pathStates;
 };
 
 template <class T>

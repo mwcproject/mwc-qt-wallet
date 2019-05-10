@@ -51,6 +51,21 @@ QString nano2one( long nano ) {
     return myNumber;
 }
 
+// convert string representing double into nano
+QPair<bool,long> one2nano(QString str) {
+    if (str.length()==0)
+        return QPair<bool,long>(false, 0);
+
+    bool ok = false;
+    double dbl = str.toDouble(&ok);
+    if (!ok)
+        return QPair<bool,long>(false, 0);
+
+    long nano = long(dbl * 1000000000.0 + 0.5);
+    return QPair<bool,long>(true, nano);
+}
+
+
 // convert long strign into shorter version
 // abcdefgh  => abc...
 QString string2shortStrR( QString str, int lenLimit ) {

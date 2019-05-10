@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>365</width>
+    <width>465</width>
     <height>313</height>
    </rect>
   </property>
@@ -21,7 +21,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
+       <layout class="QGridLayout" name="gridLayout" columnstretch="1,1" columnminimumwidth="0,0">
         <item row="3" column="1">
          <widget class="QLabel" name="blocksLabel">
           <property name="text">

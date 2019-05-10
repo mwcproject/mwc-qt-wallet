@@ -4,7 +4,7 @@
 #include <QMessageBox>
 #include <QApplication>
 #include "../windows/connect2server.h"
-#include "../windows/nodemanually.h"
+#include "../windows/nodemanually_w.h"
 #include "../windows/nodestatus_w.h"
 #include "../windows/newwallet_w.h"
 #include "../windows/passwordforseed.h"

@@ -47,7 +47,7 @@ void MainWindow::updateActionStates() {
 
     ui->actionAccount->setEnabled(enabled);
     ui->actionEvents->setEnabled(enabled);
-    ui->actionHODL->setEnabled(enabled);
+    ui->actionHODL->setEnabled( false);//  enabled);
     ui->actionAirdrop->setEnabled(enabled);
     ui->actionNode_status->setEnabled(enabled);
     ui->actionConnect_to_node->setEnabled(enabled);
@@ -111,5 +111,9 @@ void MainWindow::on_actionNode_status_triggered()
     stateMachine->setActionWindow( state::STATE::NODE_STATUS );
 }
 
+void MainWindow::on_actionSend_recieve_offline_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::FILE_TRANSACTIONS );
 }
 
+}

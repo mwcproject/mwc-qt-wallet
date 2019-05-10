@@ -268,27 +268,26 @@ WalletProofInfo  MockWallet::verifyMwcBoxTransactionProof( QString proofFileName
 }
 
 // Init send transaction with file output
-QString MockWallet::sendFile( long coinNano, QString fileTx ) noexcept(false) {
+QPair<bool, QString> MockWallet::sendFile( long coinNano, QString fileTx ) noexcept(false) {
     QFile file( fileTx );
     if ( file.open(QIODevice::ReadWrite) )
     {
         QTextStream stream( &file );
         stream << "Send stransaction for nano " << coinNano << "coins: " << endl;
     }
-    return fileTx;
+    return QPair<bool, QString>(true,"");
 }
 
 // Recieve transaction. Will generate *.response file in the same dir
-QString MockWallet::receiveFile( QString fileTx )
+QPair<bool, QString> MockWallet::receiveFile( QString fileTx, QString responseFileName )
 {
-    QString newFn = fileTx + ".response";
-    QFile file( newFn );
+    QFile file( responseFileName );
     if ( file.open(QIODevice::ReadWrite) )
     {
         QTextStream stream( &file );
         stream << "response for file " << fileTx << endl;
     }
-    return newFn;
+    return QPair<bool, QString>(true, "");
 }
 
 // finalize transaction and broadcast it

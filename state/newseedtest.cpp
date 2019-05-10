@@ -6,6 +6,7 @@
 #include "../state/statemachine.h"
 #include <QMessageBox>
 #include <QVector>
+#include "../core/testseedtask.h"
 
 
 namespace state {
@@ -21,8 +22,8 @@ NewSeedTest::~NewSeedTest() {
 
 NextStateRespond NewSeedTest::execute() {
 
-    QVector< QPair<int,QString> > task =
-            context.appContext->getCookie< QVector< QPair<int,QString> > >("seedTasks");
+    QVector< core::TestSeedTask > task =
+            context.appContext->getCookie< QVector<core::TestSeedTask> >("seedTasks");
 
     if (task.size()==0) {
         QVector<QString> seed = context.appContext->getCookie< QVector<QString> >("seed2verify");
@@ -41,25 +42,40 @@ NextStateRespond NewSeedTest::execute() {
     // Show verify dialog
     currentTask = task.last();
     task.pop_back();
-    context.appContext->pushCookie< QVector< QPair<int,QString> > >("seedTasks", task);
+    context.appContext->pushCookie< QVector< core::TestSeedTask > >("seedTasks", task);
 
     context.wndManager->switchToWindow(
-                new wnd::NewSeedTest( context.wndManager->getInWndParent(), this, currentTask.first ) );
+                new wnd::NewSeedTest( context.wndManager->getInWndParent(), this, currentTask.getWordIndex() ) );
 
     return NextStateRespond(NextStateRespond::RESULT::WAIT_FOR_ACTION);
 }
 
 
 void NewSeedTest::submit(QString word) {
-    if (word==currentTask.second) {
+    if (currentTask.applyInputResults(word)) {
         // ok case
         context.stateMachine->executeFrom(STATE::TEST_NEW_SEED);
         return;
     }
 
     QMessageBox::information(nullptr, "Wrong word",
-              "The word number " + QString::number(currentTask.first) + " was typed incorrectly. " +
+              "The word number " + QString::number(currentTask.getWordIndex()) + " was typed incorrectly. " +
               "Please review your passphrase.");
+
+    // regenerate if totally failed
+    if (currentTask.isTestCompletelyFailed()) {
+        // generate a new seed for a new wallet
+        QVector<QString> seed = context.appContext->getCookie< QVector<QString> >("seed2verify");
+        context.appContext->pushCookie< QVector<core::TestSeedTask> >("seedTasks", core::generateSeedTasks( seed ) );
+    }
+    else {
+        // add to the Q
+        QVector< core::TestSeedTask > task =
+                context.appContext->getCookie< QVector<core::TestSeedTask> >("seedTasks");
+        task.push_front(currentTask);
+        context.appContext->pushCookie< QVector< core::TestSeedTask > >("seedTasks", task);
+    }
+
     context.stateMachine->executeFrom(STATE::SHOW_NEW_SEED);
 }
 

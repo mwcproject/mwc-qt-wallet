@@ -7,6 +7,10 @@ namespace Ui {
 class connect2server;
 }
 
+namespace state {
+    class Connect2Node;
+}
+
 namespace wnd {
 
 class ConnectToServer : public QWidget
@@ -14,13 +18,17 @@ class ConnectToServer : public QWidget
     Q_OBJECT
 
 public:
-    explicit ConnectToServer(QWidget *parent);
+    explicit ConnectToServer(QWidget *parent, state::Connect2Node * state);
     virtual ~ConnectToServer() override;
 
-protected:
-    bool validateData();
+private slots:
+    void on_submitButton_clicked();
+
+    void on_cancelButton_clicked();
+
 private:
     Ui::connect2server *ui;
+    state::Connect2Node * state;
 };
 
 }

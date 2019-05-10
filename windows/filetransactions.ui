@@ -37,7 +37,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="coinsEdit">
+         <widget class="QLineEdit" name="sendCoinsEdit">
           <property name="maximumSize">
            <size>
             <width>100</width>
@@ -59,7 +59,7 @@
            <enum>Qt::Horizontal</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Expanding</enum>
+           <enum>QSizePolicy::Minimum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -70,7 +70,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="generateSendCoinsFileButton">
           <property name="text">
            <string>Generate file</string>
           </property>
@@ -95,7 +95,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="signTransactionButton">
         <property name="text">
          <string>Sign transactions</string>
         </property>
@@ -121,9 +121,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="processResponceFileButton">
         <property name="text">
-         <string>Open response file</string>
+         <string>Process response file</string>
         </property>
        </widget>
       </item>

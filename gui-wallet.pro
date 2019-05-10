@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui widgets
+requires(qtConfig(completer))
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -35,18 +36,24 @@ macx {
 
 
 SOURCES += \
+    core/testseedtask.cpp \
     main.cpp \
     state/accounts.cpp \
+    state/connect2node.cpp \
     state/createwithseed.cpp \
     state/events.cpp \
+    state/filetransactions.cpp \
     state/hodl.cpp \
+    state/nodemanually.cpp \
     state/nodestatus.cpp \
     state/sendcoins.cpp \
     windows/accounts_w.cpp \
     windows/confirmseed.cpp \
     windows/connect2server.cpp \
     windows/events_w.cpp \
+    windows/filetransactions_w.cpp \
     windows/hodl_w.cpp \
+    windows/nodemanually_w.cpp \
     windows/nodestatus_w.cpp \
     windows/passwordforseed.cpp \
     core/mainwindow.cpp \
@@ -56,9 +63,7 @@ SOURCES += \
     wallet/mockwallet.cpp \
     windows/enterseed.cpp \
     windows/fromseedfile.cpp \
-    windows/nodemanually.cpp \
     windows/listening.cpp \
-    windows/filetransactions.cpp \
     windows/outputs.cpp \
     windows/selectcontact.cpp \
     windows/sendcoins_w.cpp \
@@ -88,17 +93,23 @@ SOURCES += \
     windows/newseedtest_w.cpp
 
 HEADERS += \
+    core/testseedtask.h \
     state/accounts.h \
+    state/connect2node.h \
     state/createwithseed.h \
     state/events.h \
+    state/filetransactions.h \
     state/hodl.h \
+    state/nodemanually.h \
     state/nodestatus.h \
     state/sendcoins.h \
     windows/accounts_w.h \
     windows/confirmseed.h \
     windows/connect2server.h \
     windows/events_w.h \
+    windows/filetransactions_w.h \
     windows/hodl_w.h \
+    windows/nodemanually_w.h \
     windows/nodestatus_w.h \
     windows/passwordforseed.h \
     core/mainwindow.h \
@@ -108,9 +119,7 @@ HEADERS += \
     wallet/mockwallet.h \
     windows/enterseed.h \
     windows/fromseedfile.h \
-    windows/nodemanually.h \
     windows/listening.h \
-    windows/filetransactions.h \
     windows/outputs.h \
     windows/selectcontact.h \
     windows/sendcoins_w.h \

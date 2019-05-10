@@ -84,7 +84,7 @@
    </widget>
    <widget class="QMenu" name="menuMWC_bonus">
     <property name="title">
-     <string>MWC bonus</string>
+     <string>MWC claims</string>
     </property>
     <addaction name="actionAirdrop"/>
     <addaction name="actionHODL"/>
@@ -140,7 +140,7 @@
   <action name="actionVersion">
    <property name="icon">
     <iconset>
-     <normalon>:/img/img/mw-logo.png</normalon>
+     <normalon>:/img/mw-logo.png</normalon>
     </iconset>
    </property>
    <property name="text">
@@ -153,7 +153,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/img/accounts.png</normaloff>:/img/img/accounts.png</iconset>
+     <normaloff>:/img/accounts.png</normaloff>:/img/accounts.png</iconset>
    </property>
    <property name="text">
     <string>Accounts</string>
@@ -168,7 +168,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/img/notifications.png</normaloff>:/img/img/notifications.png</iconset>
+     <normaloff>:/img/notifications.png</normaloff>:/img/notifications.png</iconset>
    </property>
    <property name="text">
     <string>Events</string>
@@ -180,7 +180,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/img/hodl.png</normaloff>:/img/img/hodl.png</iconset>
+     <normaloff>:/img/hodl.png</normaloff>:/img/hodl.png</iconset>
    </property>
    <property name="text">
     <string>HODL</string>
@@ -195,7 +195,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/img/airdrop.png</normaloff>:/img/img/airdrop.png</iconset>
+     <normaloff>:/img/airdrop.png</normaloff>:/img/airdrop.png</iconset>
    </property>
    <property name="text">
     <string>Airdrop</string>
@@ -210,7 +210,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/img/node_status.png</normaloff>:/img/img/node_status.png</iconset>
+     <normaloff>:/img/node_status.png</normaloff>:/img/node_status.png</iconset>
    </property>
    <property name="text">
     <string>Node status</string>
@@ -233,7 +233,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/img/contacts.png</normaloff>:/img/img/contacts.png</iconset>
+     <normaloff>:/img/contacts.png</normaloff>:/img/contacts.png</iconset>
    </property>
    <property name="text">
     <string>Contacts</string>
@@ -248,7 +248,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/img/config.png</normaloff>:/img/img/config.png</iconset>
+     <normaloff>:/img/config.png</normaloff>:/img/config.png</iconset>
    </property>
    <property name="text">
     <string>Config</string>
@@ -263,7 +263,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/img/listening.png</normaloff>:/img/img/listening.png</iconset>
+     <normaloff>:/img/listening.png</normaloff>:/img/listening.png</iconset>
    </property>
    <property name="text">
     <string>Listening</string>
@@ -278,7 +278,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/img/send_coins.png</normaloff>:/img/img/send_coins.png</iconset>
+     <normaloff>:/img/send_coins.png</normaloff>:/img/send_coins.png</iconset>
    </property>
    <property name="text">
     <string>Send coints</string>
@@ -293,7 +293,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/img/send_coins_file.png</normaloff>:/img/img/send_coins_file.png</iconset>
+     <normaloff>:/img/send_coins_file.png</normaloff>:/img/send_coins_file.png</iconset>
    </property>
    <property name="text">
     <string>Send/recieve offline</string>
@@ -308,7 +308,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/img/transaction.png</normaloff>:/img/img/transaction.png</iconset>
+     <normaloff>:/img/transaction.png</normaloff>:/img/transaction.png</iconset>
    </property>
    <property name="text">
     <string>Transactions</string>
@@ -320,7 +320,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/img/outputs.png</normaloff>:/img/img/outputs.png</iconset>
+     <normaloff>:/img/outputs.png</normaloff>:/img/outputs.png</iconset>
    </property>
    <property name="text">
     <string>Outputs</string>

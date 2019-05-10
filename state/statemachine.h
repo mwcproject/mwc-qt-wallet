@@ -18,7 +18,7 @@ public:
     void executeFrom( STATE nextState );
 
     // set current action winodow if possible
-    bool setActionWindow( STATE actionWindowState );
+    bool setActionWindow( STATE actionWindowState, bool enforce = false );
     // get current action window
     STATE getActionWindow() const;
 

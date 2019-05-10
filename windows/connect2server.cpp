@@ -1,12 +1,14 @@
 #include "connect2server.h"
 #include "ui_connect2server.h"
 #include <QMessageBox>
+#include  "../state/connect2node.h"
 
 namespace wnd {
 
-ConnectToServer::ConnectToServer(QWidget *parent) :
+ConnectToServer::ConnectToServer(QWidget *parent, state::Connect2Node * _state) :
     QWidget(parent),
-    ui(new Ui::connect2server)
+    ui(new Ui::connect2server),
+    state(_state)
 {
     ui->setupUi(this);
 }
@@ -16,23 +18,29 @@ ConnectToServer::~ConnectToServer()
     delete ui;
 }
 
-bool ConnectToServer::validateData() {
+void ConnectToServer::on_submitButton_clicked()
+{
     if (ui->radioSelectManually->isChecked()) {
-//        data->setNode( NodeConnection::SELECTED );
+        state->applyChoice( state::Connect2Node::NODE_MANUAL);
     }
     else if (ui->radioStandalone->isChecked()) {
-  //      data->setNode( NodeConnection::LOCAL );
+        state->applyChoice( state::Connect2Node::NODE_LOCAL);
     }
     else if (ui->radioAutoConnect->isChecked()) {
-    //    data->setNode( NodeConnection::WMC_POOL );
+        state->applyChoice( state::Connect2Node::NODE_POOL);
     }
     else {
-        QMessageBox::critical(this, "Connecto to server",
+        QMessageBox::critical(this, "Connecto to MWC node",
                               "Please select the connection type to your server");
-        return false;
     }
 
-    return true;
 }
 
+void ConnectToServer::on_cancelButton_clicked()
+{
+    state->cancel();
 }
+
+
+}
+

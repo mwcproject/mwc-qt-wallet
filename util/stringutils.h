@@ -10,6 +10,9 @@ QVector<QString> parsePhrase2Words( QString phrase );
 // convert nano items to dtirng that represent that fraction as a double
 QString nano2one( long nano );
 
+// convert string representing double into nano
+QPair<bool,long> one2nano(QString str);
+
 // convert long strign into shorter version
 // abcdefgh  => abc...
 QString string2shortStrR( QString str, int lenLimit );
