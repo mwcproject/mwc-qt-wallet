@@ -39,10 +39,11 @@ private slots:
     void on_actionEvents_triggered();
     void on_actionHODL_triggered();
     void on_actionSend_coins_triggered();
-
     void on_actionNode_status_triggered();
-
     void on_actionSend_recieve_offline_triggered();
+    void on_actionListening_Status_triggered();
+
+    void on_actionTransactions_triggered();
 
 private:
 private:

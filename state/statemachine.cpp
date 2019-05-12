@@ -16,6 +16,8 @@
 #include "connect2node.h"
 #include "nodemanually.h"
 #include "filetransactions.h"
+#include "listening.h"
+#include "transactions.h"
 
 namespace state {
 
@@ -42,6 +44,8 @@ StateMachine::StateMachine(StateContext & context) :
     states[ STATE::CONNECT_2_NODE ] = new Connect2Node(context);
     states[ STATE::NODE_MANUALY]    = new NodeManually(context);
     states[ STATE::FILE_TRANSACTIONS] = new FileTransactions(context);
+    states[ STATE::LISTENING ]      = new Listening(context);
+    states[ STATE::TRANSACTIONS ]   = new Transactions(context);
 }
 
 StateMachine::~StateMachine() {

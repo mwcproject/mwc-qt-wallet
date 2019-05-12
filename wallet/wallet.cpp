@@ -53,18 +53,26 @@ void NodeStatus::setData(int   _connection,
 }
 
 
-void WalletProofInfo::setData(long _coinsNano,
+void WalletProofInfo::setDataSuccess(long _coinsNano,
                             QString _fromAddress,
                             QString _toAddress,
                             QString _output,
                             QString _kernel)
 {
+    successed = true;
+    errorMessage = "";
     coinsNano = _coinsNano;
     fromAddress = _fromAddress;
     toAddress = _toAddress;
     output = _output;
     kernel = _kernel;
 }
+
+void WalletProofInfo::setDataFailure(QString _errorMessage) {
+    successed = false;
+    errorMessage = _errorMessage;
+}
+
 
 void WalletTransaction::setData(long _txIdx,
     uint    _transactionType,

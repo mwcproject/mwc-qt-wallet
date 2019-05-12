@@ -12,8 +12,8 @@ namespace state {
 Accounts::Accounts(const StateContext & context) :
     State(context, STATE::ACCOUNTS)
 {
-
 }
+
 Accounts::~Accounts() {}
 
 NextStateRespond Accounts::execute() {

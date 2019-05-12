@@ -34,6 +34,8 @@ enum STATE {
     CONNECT_2_NODE, // connection to the MWC nodes
     NODE_MANUALY,   // input URI to the custom node
     FILE_TRANSACTIONS, // Transactions for files
+    LISTENING,      // Listening API setting/status
+    TRANSACTIONS    // Transactions dialog
 };
 
 struct NextStateRespond {

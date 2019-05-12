@@ -47,6 +47,10 @@ public:
     // update path state
     void updatePathFor( QString name, QString path );
 
+    // IO for Int vectors
+    QVector<int> getIntVectorFor( QString name ) const;
+    void updateIntVectorFor( QString name, const QVector<int> & data );
+
 private:
     bool loadData();
     void saveData() const;
@@ -67,6 +71,7 @@ private:
 
     // Current Path dirs
     QMap<QString,QString> pathStates;
+    QMap<QString,QVector<int> > intVectorStates;
 };
 
 template <class T>

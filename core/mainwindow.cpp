@@ -67,9 +67,9 @@ void MainWindow::updateActionStates() {
     //ui->actionConnect_to_node;
     //ui->actionContacts;
     //ui->actionConfig;
-    //ui->actionListening_Status;
+    ui->actionListening_Status->setChecked( state == state::STATE::LISTENING );
     ui->actionSend_coins->setChecked( state == state::STATE::SEND_COINS );
-    //ui->actionSend_recieve_offline;
+    ui->actionSend_recieve_offline->setChecked( state == state::STATE::FILE_TRANSACTIONS );
     //ui->actionTransactions;
     //ui->actionOutputs;
 
@@ -116,4 +116,16 @@ void MainWindow::on_actionSend_recieve_offline_triggered()
     stateMachine->setActionWindow( state::STATE::FILE_TRANSACTIONS );
 }
 
+void MainWindow::on_actionListening_Status_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::LISTENING );
 }
+
+void MainWindow::on_actionTransactions_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::TRANSACTIONS );
+}
+
+}
+
+

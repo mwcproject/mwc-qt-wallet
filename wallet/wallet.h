@@ -105,6 +105,23 @@ struct WalletTransaction {
         long    coinNano,
         bool    proof);
 
+    QString getTypeAsStr() const {
+        QString res;
+
+        if ( transactionType & TRANSACTION_TYPE::SEND )
+            res += "Send";
+        if ( transactionType & TRANSACTION_TYPE::RECIEVE )
+            res += "Recieve";
+
+        if ( transactionType & TRANSACTION_TYPE::CANCELLED ) {
+            if (!res.isEmpty())
+                res += ", ";
+            res += "Cancelled";
+        }
+
+        return res;
+    }
+
     QString toStringShort() {
         using namespace util;
 
@@ -116,17 +133,21 @@ struct WalletTransaction {
 };
 
 struct WalletProofInfo {
-    long coinsNano = 0;
+    bool    successed = false;
+    QString errorMessage;
+    long    coinsNano = 0;
     QString fromAddress;
     QString toAddress;
     QString output;
     QString kernel;
 
-    void setData(long coinsNano,
+    void setDataSuccess(long coinsNano,
         QString fromAddress,
         QString toAddress,
         QString output,
         QString kernel);
+
+    void setDataFailure(QString errorMessage);
 };
 
 struct WalletUtxoSignature {
@@ -182,7 +203,7 @@ public:
     virtual QPair<bool, QString> startListening(ListenState lstnState) noexcept(false) = 0;
 
     // Stop listening through services
-    virtual bool stopListening(ListenState lstnState) noexcept(false) = 0;
+    virtual QPair<bool, QString> stopListening(ListenState lstnState) noexcept(false) = 0;
 
     // Get MWC box <address, index in the chain>
     virtual QPair<QString,int> getMwcBoxAddress() noexcept(false) = 0;
@@ -191,13 +212,19 @@ public:
     //    index = -1  - generates the next address.
     virtual void changeMwcBoxAddress(int idx) noexcept(false) = 0;
 
+    // Generate next box address
+    virtual void nextBoxAddress() noexcept(false) = 0;
+
+
     // --------------- Foreign API
 
     // Check if foregn API is running
     virtual bool isForegnApiRunning() noexcept(false) = 0;
 
     // Setup foregn API. Needed to recieve money though HTTP. Start that service
-    virtual bool startForegnAPI(int port, QString foregnApiSecret) noexcept(false) = 0;
+    virtual QPair<bool,QString> startForegnAPI(int port, QString foregnApiSecret) noexcept(false) = 0;
+
+    virtual QPair<bool,QString> stopForeignAPI() noexcept(false) = 0;
 
     // -------------- Accounts
 

@@ -12,7 +12,6 @@ namespace state {
 FileTransactions::FileTransactions(const StateContext & context) :
          State(context, STATE::FILE_TRANSACTIONS)
 {
-
 }
 
 FileTransactions::~FileTransactions() {}

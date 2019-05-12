@@ -44,15 +44,18 @@ SOURCES += \
     state/events.cpp \
     state/filetransactions.cpp \
     state/hodl.cpp \
+    state/listening.cpp \
     state/nodemanually.cpp \
     state/nodestatus.cpp \
     state/sendcoins.cpp \
+    state/transactions.cpp \
     windows/accounts_w.cpp \
     windows/confirmseed.cpp \
     windows/connect2server.cpp \
     windows/events_w.cpp \
     windows/filetransactions_w.cpp \
     windows/hodl_w.cpp \
+    windows/listening_w.cpp \
     windows/nodemanually_w.cpp \
     windows/nodestatus_w.cpp \
     windows/passwordforseed.cpp \
@@ -63,15 +66,15 @@ SOURCES += \
     wallet/mockwallet.cpp \
     windows/enterseed.cpp \
     windows/fromseedfile.cpp \
-    windows/listening.cpp \
     windows/outputs.cpp \
     windows/selectcontact.cpp \
     windows/sendcoins_w.cpp \
     windows/sendcoinsparamsdialog.cpp \
-    windows/transactions.cpp \
     windows/contacts.cpp \
     windows/claiming.cpp \
     windows/claimchallendge.cpp \
+    windows/showproofdialog.cpp \
+    windows/transactions_w.cpp \
     windows/walletconfig.cpp \
     util/ioutils.cpp \
     util/passwordanalyser.cpp \
@@ -100,15 +103,18 @@ HEADERS += \
     state/events.h \
     state/filetransactions.h \
     state/hodl.h \
+    state/listening.h \
     state/nodemanually.h \
     state/nodestatus.h \
     state/sendcoins.h \
+    state/transactions.h \
     windows/accounts_w.h \
     windows/confirmseed.h \
     windows/connect2server.h \
     windows/events_w.h \
     windows/filetransactions_w.h \
     windows/hodl_w.h \
+    windows/listening_w.h \
     windows/nodemanually_w.h \
     windows/nodestatus_w.h \
     windows/passwordforseed.h \
@@ -119,15 +125,15 @@ HEADERS += \
     wallet/mockwallet.h \
     windows/enterseed.h \
     windows/fromseedfile.h \
-    windows/listening.h \
     windows/outputs.h \
     windows/selectcontact.h \
     windows/sendcoins_w.h \
     windows/sendcoinsparamsdialog.h \
-    windows/transactions.h \
     windows/contacts.h \
     windows/claiming.h \
     windows/claimchallendge.h \
+    windows/showproofdialog.h \
+    windows/transactions_w.h \
     windows/walletconfig.h \
     util/passwordanalyser.h \
     util/ioutils.h \
@@ -167,6 +173,7 @@ FORMS += \
     windows/filetransactions.ui \
     windows/outputs.ui \
     windows/sendcoinsparamsdialog.ui \
+    windows/showproofdialog.ui \
     windows/transactions.ui \
     windows/contacts.ui \
     windows/hodl.ui \

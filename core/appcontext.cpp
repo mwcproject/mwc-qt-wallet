@@ -44,6 +44,17 @@ void AppContext::updatePathFor( QString name, QString path ) {
     pathStates[name] = path;
 }
 
+QVector<int> AppContext::getIntVectorFor( QString name ) const {
+    if ( !intVectorStates.contains(name) )
+        return QVector<int>();
+
+    return intVectorStates[name];
+}
+
+void AppContext::updateIntVectorFor( QString name, const QVector<int> & data ) {
+    intVectorStates[name] = data;
+}
+
 
 bool AppContext::loadData() {
     QString dataPath = ioutils::initAppDataPath("context");
@@ -71,12 +82,13 @@ bool AppContext::loadData() {
          st = activeWndState;
      }
 
-     if (id>=0x6548) {
-         sendCoinsParams.loadData(in);
-     }
-
      if (id>=0x6549) {
          in >> pathStates;
+         in >> intVectorStates;
+     }
+
+     if (id>=0x6548) {
+         sendCoinsParams.loadData(in);
      }
 
      return true;
@@ -103,6 +115,7 @@ void AppContext::saveData() const {
     out << network;
     out << int(activeWndState);
     out << pathStates;
+    out << intVectorStates;
 
     sendCoinsParams.saveData(out);
 }

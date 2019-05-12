@@ -27,13 +27,16 @@ public:
     //--------------- Listening
     uint getListeningStatus() noexcept(false) override;
     QPair<bool, QString> startListening(ListenState lstnState) noexcept(false) override;
-    bool stopListening(ListenState lstnState) noexcept(false) override;
+    QPair<bool, QString> stopListening(ListenState lstnState) noexcept(false) override;
     QPair<QString,int> getMwcBoxAddress() noexcept(false) override;
     void changeMwcBoxAddress(int idx) noexcept(false) override;
+    void nextBoxAddress() noexcept(false) override;
+
 
     // --------------- Foreign API
     bool isForegnApiRunning() noexcept(false) override;
-    bool startForegnAPI(int port, QString foregnApiSecret) noexcept(false) override;
+    QPair<bool,QString> startForegnAPI(int port, QString foregnApiSecret) noexcept(false) override;
+    QPair<bool,QString> stopForeignAPI() noexcept(false) override;
 
     // -------------- Accounts
 
@@ -100,6 +103,8 @@ private:
     QVector<WalletContact> contacts;
 
     QVector<WalletTransaction> transactions;
+
+    int currentAddressIdx = 0;
 
     bool listenMwcBox = false;
     bool listenKeystone = false;

@@ -18,6 +18,12 @@ static QVector<QString> MockWalletSeed{"local", "donor", "often", "upon", "coppe
 
 const static QString settingsFileName("mwcwallet.dat");
 
+static QVector<QString> boxAddresses{
+    "jkh2jhv88y7yWdo7nWtzYiCwHmFbbLxJyA5jbPr2HeTH",
+    "kdfjiewuyrqwieudkj387423942jkkdjsfgsd938iufd",
+    "eriweriutyreity43985ieujhgfdsjh43057qpojlkdj",
+    "587634ijkdhgfjkdhgvqo87rt562974qrdjfkgfsdhfg"};
+
 MockWallet::MockWallet()
 {
     dataPath = ioutils::initAppDataPath("mockwallet");
@@ -138,40 +144,50 @@ QPair<bool, QString> MockWallet::startListening(ListenState lstnState) {
     throw core::MwcException("get Unknown ListenState value: " + QString::number(lstnState));
 }
 
-bool MockWallet::stopListening(ListenState lstnState) {
+QPair<bool, QString> MockWallet::stopListening(ListenState lstnState) {
     if (!lstnState)
-        return true;
+        return QPair<bool, QString>(true,"");
 
     if (lstnState & ListenState::LISTEN_MWCBOX) {
         listenMwcBox = false;
-        return true;
+        return QPair<bool, QString>(true,"");
     }
     if (lstnState & ListenState::LISTEN_KEYSTONE) {
         listenKeystone = false;
-        return true;
+        return QPair<bool, QString>(true,"");
     }
 
-    return true;
+    return QPair<bool, QString>(true,"");
 }
 
 QPair<QString,int> MockWallet::getMwcBoxAddress() {
-    return QPair<QString, int>("jkh2jhv88y7yWdo7nWtzYiCwHmFbbLxJyA5jbPr2HeTH6NamyxUr", 0);
+    return QPair<QString, int>( boxAddresses[ currentAddressIdx % boxAddresses.size() ], currentAddressIdx);
 }
 
 void MockWallet::changeMwcBoxAddress(int idx) {
-    idx=-1;
+    currentAddressIdx = std::max(0, idx);
     return;
 }
+
+void MockWallet::nextBoxAddress() {
+    currentAddressIdx++;
+}
+
 
 bool MockWallet::isForegnApiRunning() {
     return listenFogeignApi;
 }
 
-bool MockWallet::startForegnAPI(int port, QString foregnApiSecret) {
+QPair<bool,QString> MockWallet::startForegnAPI(int port, QString foregnApiSecret) {
     Q_UNUSED(port);
     Q_UNUSED(foregnApiSecret);
-    return true;
+    return QPair<bool,QString>(true,"");
 }
+
+QPair<bool,QString> MockWallet::stopForeignAPI() {
+    return QPair<bool,QString>(true,"");
+}
+
 
 //  Get list of open account
 QVector<QString> MockWallet::getAccountList() {
@@ -246,7 +262,7 @@ WalletProofInfo  MockWallet::generateMwcBoxTransactionProof( int transactionId, 
     Q_UNUSED(resultingFileName);
 
     WalletProofInfo pi;
-    pi.setData(1000000000L * 4,
+    pi.setDataSuccess(1000000000L * 4,
                "xd7auPddUmmEzSte48a2aZ9tWkjjCppgn41pemUfcVSqjxHHZ6cT",
                "xd7sCQ9bQuQXp4yCn8GSELcuSxnpcPrPoEWJzvPBc5vxyXPQz6PJ",
                "08710be0b3fffa79b9423f8e007709a815f237dcfd31340cfa1fdfefd823dca30e",
@@ -259,7 +275,7 @@ WalletProofInfo  MockWallet::verifyMwcBoxTransactionProof( QString proofFileName
     Q_UNUSED(proofFileName);
 
     WalletProofInfo pi;
-    pi.setData(1000000000L * 4,
+    pi.setDataSuccess(1000000000L * 4,
                "xd7auPddUmmEzSte48a2aZ9tWkjjCppgn41pemUfcVSqjxHHZ6cT",
                "xd7sCQ9bQuQXp4yCn8GSELcuSxnpcPrPoEWJzvPBc5vxyXPQz6PJ",
                "08710be0b3fffa79b9423f8e007709a815f237dcfd31340cfa1fdfefd823dca30e",
@@ -409,7 +425,7 @@ void MockWallet::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_12);
 
-    out << 0x57668;
+    out << 0x57669;
 
     out << blockchainNetwork;
     out << isInit;
@@ -427,6 +443,8 @@ void MockWallet::saveData() const {
     out << int(contacts.size());
     for ( const WalletContact & wltCont : contacts )
         wltCont.saveData(out);
+
+    out << currentAddressIdx;
 }
 
 
@@ -443,7 +461,7 @@ bool MockWallet::loadData() {
 
      int id = 0;
      in >> id;
-     if (id<0x57667 && id>0x57668)
+     if (id<0x57667 || id>0x57669)
          return false;
 
      in >> blockchainNetwork;
@@ -478,6 +496,9 @@ bool MockWallet::loadData() {
              return false;
          }
      }
+
+     if (id>=0x57669)
+         in >> currentAddressIdx;
 
      return true;
  }
