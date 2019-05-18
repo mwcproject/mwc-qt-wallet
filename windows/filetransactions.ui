@@ -123,7 +123,7 @@
       <item>
        <widget class="QPushButton" name="processResponceFileButton">
         <property name="text">
-         <string>Process response file</string>
+         <string>FInalize transaction that you initiated and publish it to the MWC network</string>
         </property>
        </widget>
       </item>

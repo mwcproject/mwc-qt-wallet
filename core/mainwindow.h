@@ -45,6 +45,16 @@ private slots:
 
     void on_actionTransactions_triggered();
 
+    void on_actionOutputs_triggered();
+
+    void on_actionContacts_triggered();
+
+    void on_actionConfig_triggered();
+
+    void on_actionAirdrop_triggered();
+
+    void on_actionRecieve_coins_triggered();
+
 private:
 private:
     Ui::MainWindow *ui;

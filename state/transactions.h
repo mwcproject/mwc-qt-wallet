@@ -15,6 +15,8 @@ public:
     // Current transactions that wallet has
     QVector<wallet::WalletTransaction> getTransactions();
 
+    QString getCurrentAccountName() const;
+
     // Proofs
     wallet::WalletProofInfo  generateMwcBoxTransactionProof( int transactionId, QString resultingFileName );
     wallet::WalletProofInfo  verifyMwcBoxTransactionProof( QString proofFileName );

@@ -138,6 +138,7 @@ void WindowManager::switchToWindow( QWidget * newWindow ) {
         return;
 
     currentWnd = newWindow;
+    currentWnd->setAttribute( Qt::WA_DeleteOnClose );
     mainWindow->layout()->addWidget(currentWnd);
     currentWnd->show();
 }

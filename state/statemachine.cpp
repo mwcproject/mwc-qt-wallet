@@ -12,12 +12,17 @@
 #include "events.h"
 #include "hodl.h"
 #include "sendcoins.h"
+#include "receivecoins.h"
 #include "nodestatus.h"
 #include "connect2node.h"
 #include "nodemanually.h"
 #include "filetransactions.h"
 #include "listening.h"
 #include "transactions.h"
+#include "outputs.h"
+#include "contacts.h"
+#include "walletconfig.h"
+#include "airdrop.h"
 
 namespace state {
 
@@ -35,17 +40,21 @@ StateMachine::StateMachine(StateContext & context) :
     states[ STATE::SHOW_NEW_SEED ]     = new NewSeedShow(context);
     states[ STATE::TEST_NEW_SEED ]     = new NewSeedTest(context);
     states[ STATE::CREATE_WITH_SEED ]  = new CreateWithSeed(context);
-
     states[ STATE::ACCOUNTS ]       = new Accounts(context);
     states[ STATE::EVENTS ]         = new Events(context);
     states[ STATE::HODL ]           = new Hodl(context);
     states[ STATE::SEND_COINS ]     = new SendCoins(context);
+    states[ STATE::RECIEVE_COINS ]  = new ReceiveCoins(context);
     states[ STATE::NODE_STATUS]     = new NodeStatus(context);
     states[ STATE::CONNECT_2_NODE ] = new Connect2Node(context);
     states[ STATE::NODE_MANUALY]    = new NodeManually(context);
     states[ STATE::FILE_TRANSACTIONS] = new FileTransactions(context);
     states[ STATE::LISTENING ]      = new Listening(context);
     states[ STATE::TRANSACTIONS ]   = new Transactions(context);
+    states[ STATE::OUTPUTS ]        = new Outputs(context);
+    states[ STATE::CONTACTS ]       = new Contacts(context);
+    states[ STATE::WALLET_CONFIG ]  = new WalletConfig(context);
+    states[ STATE::AIRDRDOP_MAIN ]  = new Airdrop(context);
 }
 
 StateMachine::~StateMachine() {

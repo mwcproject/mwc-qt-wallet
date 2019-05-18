@@ -24,6 +24,11 @@ NextStateRespond Transactions::execute() {
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 };
 
+QString Transactions::getCurrentAccountName() const {
+    return context.wallet->getWalletBalance().accountName;
+}
+
+
 // Current transactions that wallet has
 QVector<wallet::WalletTransaction> Transactions::getTransactions() {
     return context.wallet->getTransactions();

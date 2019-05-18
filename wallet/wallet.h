@@ -25,11 +25,11 @@ struct WalletInfo {
 };
 
 struct WalletConfig {
-    QString dataPath;
-    QString mwcboxDomain;
-    int     mwcboxPort;
-    QString mwcNodeURI;
-    QString mwcNodeSecret;
+    QString dataPath = "wallet";
+    QString mwcboxDomain = "mwcbox.mwc.mw";
+    int     mwcboxPort = 12456;
+    QString mwcNodeURI = "127.0.0.1:5432";
+    QString mwcNodeSecret = "3257683476";
 
     void saveData( QDataStream & out) const;
     bool loadData( QDataStream & in);
@@ -63,7 +63,7 @@ struct WalletOutput {
 
     QString outputCommitment;
     long    MMRIndex;
-    long    mlockHeight;
+    long    lockHeight;
     bool    lockedUntil;
     STATUS  status;
     bool    coinbase;
@@ -73,13 +73,16 @@ struct WalletOutput {
 
     void setData(QString outputCommitment,
             long    MMRIndex,
-            long    mlockHeight,
+            long    lockHeight,
             bool    lockedUntil,
             STATUS  status,
             bool    coinbase,
             long    numOfConfirms,
             long    valueNano,
             long    txIdx);
+
+    // return status value as a string
+    QString getStatusStr() const;
 };
 
 struct WalletTransaction {
@@ -245,7 +248,7 @@ public:
     // Get current configuration of the wallet.
     virtual WalletConfig getWalletConfig() noexcept(false) = 0;
     // Update wallet config. Will be updated with non empty fields
-    virtual bool setWalletConfig(const WalletConfig & config) noexcept(false) = 0;
+    virtual QPair<bool, QString> setWalletConfig(const WalletConfig & config) noexcept(false) = 0;
 
     // Status of the node
     virtual NodeStatus getNodeStatus() noexcept(false) = 0;
@@ -285,9 +288,9 @@ public:
     // Get the contacts
     virtual QVector<WalletContact> getContacts() noexcept(false) = 0;
     // Add new contact
-    virtual void addContact( const WalletContact & contact ) noexcept(false) = 0;
+    virtual QPair<bool, QString> addContact( const WalletContact & contact ) noexcept(false) = 0;
     // Remove contact. return false if not found
-    virtual bool deleteContact( const QString & name ) noexcept(false) = 0;
+    virtual QPair<bool, QString> deleteContact( const QString & name ) noexcept(false) = 0;
 
     // ----------- HODL
     // https://github.com/mimblewimble/grin/pull/2374

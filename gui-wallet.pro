@@ -39,7 +39,9 @@ SOURCES += \
     core/testseedtask.cpp \
     main.cpp \
     state/accounts.cpp \
+    state/airdrop.cpp \
     state/connect2node.cpp \
+    state/contacts.cpp \
     state/createwithseed.cpp \
     state/events.cpp \
     state/filetransactions.cpp \
@@ -47,17 +49,25 @@ SOURCES += \
     state/listening.cpp \
     state/nodemanually.cpp \
     state/nodestatus.cpp \
+    state/outputs.cpp \
+    state/receivecoins.cpp \
     state/sendcoins.cpp \
     state/transactions.cpp \
+    state/walletconfig.cpp \
     windows/accounts_w.cpp \
+    windows/airdrop_w.cpp \
+    windows/airdropforbtc_w.cpp \
     windows/confirmseed.cpp \
     windows/connect2server.cpp \
+    windows/contacteditdlg.cpp \
+    windows/contacts_w.cpp \
     windows/events_w.cpp \
     windows/filetransactions_w.cpp \
     windows/hodl_w.cpp \
     windows/listening_w.cpp \
     windows/nodemanually_w.cpp \
     windows/nodestatus_w.cpp \
+    windows/outputs_w.cpp \
     windows/passwordforseed.cpp \
     core/mainwindow.cpp \
     core/versiondialog.cpp \
@@ -66,16 +76,13 @@ SOURCES += \
     wallet/mockwallet.cpp \
     windows/enterseed.cpp \
     windows/fromseedfile.cpp \
-    windows/outputs.cpp \
+    windows/receivecoins_w.cpp \
     windows/selectcontact.cpp \
     windows/sendcoins_w.cpp \
     windows/sendcoinsparamsdialog.cpp \
-    windows/contacts.cpp \
-    windows/claiming.cpp \
     windows/claimchallendge.cpp \
     windows/showproofdialog.cpp \
     windows/transactions_w.cpp \
-    windows/walletconfig.cpp \
     util/ioutils.cpp \
     util/passwordanalyser.cpp \
     util/stringutils.cpp \
@@ -93,12 +100,15 @@ SOURCES += \
     windows/newseed_w.cpp \
     state/newseedshow.cpp \
     state/newseedtest.cpp \
-    windows/newseedtest_w.cpp
+    windows/newseedtest_w.cpp \
+    windows/walletconfig_w.cpp
 
 HEADERS += \
     core/testseedtask.h \
     state/accounts.h \
+    state/airdrop.h \
     state/connect2node.h \
+    state/contacts.h \
     state/createwithseed.h \
     state/events.h \
     state/filetransactions.h \
@@ -106,17 +116,25 @@ HEADERS += \
     state/listening.h \
     state/nodemanually.h \
     state/nodestatus.h \
+    state/outputs.h \
+    state/receivecoins.h \
     state/sendcoins.h \
     state/transactions.h \
+    state/walletconfig.h \
     windows/accounts_w.h \
+    windows/airdrop_w.h \
+    windows/airdropforbtc_w.h \
     windows/confirmseed.h \
     windows/connect2server.h \
+    windows/contacteditdlg.h \
+    windows/contacts_w.h \
     windows/events_w.h \
     windows/filetransactions_w.h \
     windows/hodl_w.h \
     windows/listening_w.h \
     windows/nodemanually_w.h \
     windows/nodestatus_w.h \
+    windows/outputs_w.h \
     windows/passwordforseed.h \
     core/mainwindow.h \
     core/versiondialog.h \
@@ -125,16 +143,13 @@ HEADERS += \
     wallet/mockwallet.h \
     windows/enterseed.h \
     windows/fromseedfile.h \
-    windows/outputs.h \
+    windows/receivecoins_w.h \
     windows/selectcontact.h \
     windows/sendcoins_w.h \
     windows/sendcoinsparamsdialog.h \
-    windows/contacts.h \
-    windows/claiming.h \
     windows/claimchallendge.h \
     windows/showproofdialog.h \
     windows/transactions_w.h \
-    windows/walletconfig.h \
     util/passwordanalyser.h \
     util/ioutils.h \
     util/stringutils.h \
@@ -152,11 +167,15 @@ HEADERS += \
     windows/newseed_w.h \
     state/newseedshow.h \
     state/newseedtest.h \
-    windows/newseedtest_w.h
+    windows/newseedtest_w.h \
+    windows/walletconfig_w.h
 
 FORMS += \
+    windows/airdrop.ui \
+    windows/airdropforbtc.ui \
     windows/confirmseed.ui \
     windows/connect2server.ui \
+    windows/contacteditdlg.ui \
     windows/newseed.ui \
     windows/newwallet.ui \
     windows/nodestatus.ui \
@@ -168,6 +187,7 @@ FORMS += \
     windows/nodemanually.ui \
     windows/listening.ui \
     windows/events.ui \
+    windows/receivecoins.ui \
     windows/selectcontact.ui \
     windows/sendcoins.ui \
     windows/filetransactions.ui \
@@ -177,7 +197,6 @@ FORMS += \
     windows/transactions.ui \
     windows/contacts.ui \
     windows/hodl.ui \
-    windows/claiming.ui \
     windows/claimchallendge.ui \
     windows/accounts.ui \
     windows/walletconfig.ui \

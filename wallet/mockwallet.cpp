@@ -227,9 +227,9 @@ WalletConfig MockWallet::getWalletConfig() {
 }
 
 // Update wallet config. Will be updated with non empty fields
-bool MockWallet::setWalletConfig(const WalletConfig & cfg) {
+QPair<bool, QString> MockWallet::setWalletConfig(const WalletConfig & cfg) {
     config = cfg;
-    return true;
+    return QPair<bool, QString>(true,"");
 }
 
 NodeStatus MockWallet::getNodeStatus() {
@@ -374,27 +374,28 @@ QVector<WalletContact> MockWallet::getContacts() {
     return contacts;
 }
 
-void MockWallet::addContact( const WalletContact & contact ) {
+QPair<bool, QString>  MockWallet::addContact( const WalletContact & contact ) {
     // check if exist first
     for (auto & cnt : contacts) {
         if (cnt.name == contact.name) {
             cnt = contact;
-            return;
+            return QPair<bool, QString>(false, "Contact for " + contact.name + " allready exist.");
         }
     }
     // add new if doesn't exist
     contacts.push_back(contact);
+    return QPair<bool, QString>(true, "");
 }
 
-bool MockWallet::deleteContact( const QString & name ) {
+QPair<bool, QString>  MockWallet::deleteContact( const QString & name ) {
     for (auto ci = contacts.begin(); ci!=contacts.end(); ci++ ) {
         if (ci->name == name) {
             contacts.erase(ci);
-            return true;
+            return QPair<bool, QString>(true, "");
         }
     }
     // contact not found
-    return false;
+    return QPair<bool, QString>(false, "Not found contact '" + name + "' to delete.");
 }
 
 WalletUtxoSignature MockWallet::sign_utxo( const QString & utxo, const QString & hash ) {

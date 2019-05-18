@@ -55,6 +55,7 @@ void MainWindow::updateActionStates() {
     ui->actionConfig->setEnabled(enabled);
     ui->actionListening_Status->setEnabled(enabled);
     ui->actionSend_coins->setEnabled(enabled);
+    ui->actionRecieve_coins->setEnabled(enabled);
     ui->actionSend_recieve_offline->setEnabled(enabled);
     ui->actionTransactions->setEnabled(enabled);
     ui->actionOutputs->setEnabled(enabled);
@@ -62,16 +63,17 @@ void MainWindow::updateActionStates() {
     ui->actionAccount->setChecked( state == state::STATE::ACCOUNTS ) ;
     ui->actionEvents->setChecked( state == state::STATE::EVENTS ) ;
     ui->actionHODL->setChecked( state == state::STATE::HODL ) ;
-    //ui->actionAirdrop;
+    ui->actionAirdrop->setChecked( state == state::STATE::AIRDRDOP_MAIN ) ;
     ui->actionNode_status->setChecked( state == state::STATE::NODE_STATUS ) ;
     //ui->actionConnect_to_node;
-    //ui->actionContacts;
-    //ui->actionConfig;
+    ui->actionContacts->setChecked( state == state::STATE::CONTACTS );
+    ui->actionConfig->setChecked( state == state::STATE::WALLET_CONFIG );
     ui->actionListening_Status->setChecked( state == state::STATE::LISTENING );
     ui->actionSend_coins->setChecked( state == state::STATE::SEND_COINS );
+    ui->actionRecieve_coins->setChecked( state == state::STATE::RECIEVE_COINS );
     ui->actionSend_recieve_offline->setChecked( state == state::STATE::FILE_TRANSACTIONS );
-    //ui->actionTransactions;
-    //ui->actionOutputs;
+    ui->actionTransactions->setChecked( state == state::STATE::TRANSACTIONS );
+    ui->actionOutputs->setChecked( state == state::STATE::OUTPUTS );
 
 }
 
@@ -81,9 +83,8 @@ void MainWindow::updateClock() {
 
 void MainWindow::on_actionVersion_triggered()
 {
-    VersionDialog * verDlg = new VersionDialog(this);
-    verDlg->setModal(true);
-    verDlg->exec();
+    VersionDialog verDlg(this);
+    verDlg.exec();
 }
 
 void MainWindow::on_actionAccount_triggered()
@@ -106,6 +107,11 @@ void MainWindow::on_actionSend_coins_triggered()
     stateMachine->setActionWindow( state::STATE::SEND_COINS );
 }
 
+void MainWindow::on_actionRecieve_coins_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::RECIEVE_COINS );
+}
+
 void MainWindow::on_actionNode_status_triggered()
 {
     stateMachine->setActionWindow( state::STATE::NODE_STATUS );
@@ -126,6 +132,28 @@ void MainWindow::on_actionTransactions_triggered()
     stateMachine->setActionWindow( state::STATE::TRANSACTIONS );
 }
 
+void MainWindow::on_actionOutputs_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::OUTPUTS );
 }
+
+void MainWindow::on_actionContacts_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::CONTACTS );
+}
+
+void MainWindow::on_actionConfig_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::WALLET_CONFIG );
+}
+
+void core::MainWindow::on_actionAirdrop_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::AIRDRDOP_MAIN );
+}
+
+
+}
+
 
 

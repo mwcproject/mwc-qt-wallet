@@ -1,4 +1,4 @@
-<RCC version="1.0">
+<RCC>
     <qresource prefix="/">
         <file>img/mw-logo.png</file>
         <file>img/network.png</file>
@@ -21,6 +21,6 @@
         <file>img/send_coins_file.png</file>
         <file>img/loader.gif</file>
         <file>txt/bip39_words.txt</file>
+        <file>img/receive_coins.png</file>
     </qresource>
-
 </RCC>

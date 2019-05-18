@@ -98,7 +98,7 @@ void WalletTransaction::setData(long _txIdx,
 
 void WalletOutput::setData(QString _outputCommitment,
         long    _MMRIndex,
-        long    _mlockHeight,
+        long    _lockHeight,
         bool    _lockedUntil,
         STATUS  _status,
         bool    _coinbase,
@@ -108,7 +108,7 @@ void WalletOutput::setData(QString _outputCommitment,
 {
     outputCommitment = _outputCommitment;
     MMRIndex = _MMRIndex;
-    mlockHeight = _mlockHeight;
+    lockHeight = _lockHeight;
     lockedUntil = _lockedUntil;
     status = _status;
     coinbase = _coinbase;
@@ -116,6 +116,20 @@ void WalletOutput::setData(QString _outputCommitment,
     valueNano = _valueNano;
     txIdx = _txIdx;
 }
+
+// return status value as a string
+QString WalletOutput::getStatusStr() const {
+    switch (status) {
+    case Unconfirmed:
+        return "Unconfirmed";
+    case Confirmed:
+        return "Confirmed";
+    default:
+        Q_ASSERT(false);
+        return "Unknown";
+    }
+}
+
 
 void WalletContact::setData(QString _name,
     QString _address)

@@ -55,7 +55,7 @@ public:
     void check() noexcept(false) override;
 
     WalletConfig getWalletConfig() noexcept(false) override;
-    bool setWalletConfig(const WalletConfig & config) noexcept(false) override;
+    QPair<bool, QString> setWalletConfig(const WalletConfig & config) noexcept(false) override;
 
     // Status of the node
     NodeStatus getNodeStatus() noexcept(false) override;
@@ -81,8 +81,8 @@ public:
 
     // Get the contacts
     QVector<WalletContact> getContacts() noexcept(false) override;
-    void addContact( const WalletContact & contact ) noexcept(false) override;
-    bool deleteContact( const QString & name ) noexcept(false) override;
+    virtual QPair<bool, QString> addContact( const WalletContact & contact ) noexcept(false) override;
+    virtual QPair<bool, QString> deleteContact( const QString & name ) noexcept(false) override;
 
     // ----------- HODL
     WalletUtxoSignature sign_utxo( const QString & utxo, const QString & hash ) override;

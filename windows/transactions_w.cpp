@@ -15,6 +15,8 @@ Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
 {
     ui->setupUi(this);
 
+    ui->transactionsBox->setTitle("Transactions for account " + state->getCurrentAccountName());
+
     initTableHeaders();
 
     updateTransactionTable();
@@ -129,8 +131,8 @@ void Transactions::on_validateProofButton_clicked()
         return;
     }
 
-    ShowProofDialog * showProofDlg = new ShowProofDialog(this, fileName, proofInfo);
-    showProofDlg->exec();
+    ShowProofDialog showProofDlg(this, fileName, proofInfo);
+    showProofDlg.exec();
 }
 
 void Transactions::on_generateProofButton_clicked()
@@ -162,8 +164,8 @@ void Transactions::on_generateProofButton_clicked()
         return;
     }
 
-    ShowProofDialog * showProofDlg = new ShowProofDialog(this, fileName, resultProof);
-    showProofDlg->exec();
+    ShowProofDialog showProofDlg(this, fileName, resultProof);
+    showProofDlg.exec();
 }
 
 void Transactions::on_transactionTable_itemSelectionChanged()

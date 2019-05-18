@@ -15,13 +15,64 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="outputGroupBox">
      <property name="title">
       <string>Outputs for account XXXX</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QListWidget" name="outputsList"/>
+       <widget class="QTableWidget" name="outputsTable">
+        <column>
+         <property name="text">
+          <string>#</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>txIdx</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Status</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>MWC</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Confirms</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Coinbase</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Commitment</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>MMR idx</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Lock Height</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>locked until</string>
+         </property>
+        </column>
+       </widget>
       </item>
      </layout>
     </widget>

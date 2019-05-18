@@ -30,12 +30,17 @@ enum STATE {
     EVENTS,         // Wallet events (logs)
     HODL,           // Hodl program.
     SEND_COINS,     // Send coins
+    RECIEVE_COINS,   // Recieve coins
     NODE_STATUS,    // Cgeck node status
     CONNECT_2_NODE, // connection to the MWC nodes
     NODE_MANUALY,   // input URI to the custom node
     FILE_TRANSACTIONS, // Transactions for files
     LISTENING,      // Listening API setting/status
-    TRANSACTIONS    // Transactions dialog
+    TRANSACTIONS,   // Transactions dialog
+    OUTPUTS,        // Outputs for this wallet
+    CONTACTS,       // Contact page. COntacts supported by wallet713
+    WALLET_CONFIG,  // Wallet config
+    AIRDRDOP_MAIN  // Starting airdrop page
 };
 
 struct NextStateRespond {
