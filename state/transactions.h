@@ -18,7 +18,7 @@ public:
     QString getCurrentAccountName() const;
 
     // Proofs
-    wallet::WalletProofInfo  generateMwcBoxTransactionProof( int transactionId, QString resultingFileName );
+    wallet::WalletProofInfo  generateMwcBoxTransactionProof( long transactionId, QString resultingFileName );
     wallet::WalletProofInfo  verifyMwcBoxTransactionProof( QString proofFileName );
 
     // IO for columns widhts

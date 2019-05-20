@@ -36,6 +36,7 @@ macx {
 
 
 SOURCES += \
+    control/listwithcolumns.cpp \
     core/testseedtask.cpp \
     main.cpp \
     state/accounts.cpp \
@@ -104,6 +105,7 @@ SOURCES += \
     windows/walletconfig_w.cpp
 
 HEADERS += \
+    control/listwithcolumns.h \
     core/testseedtask.h \
     state/accounts.h \
     state/airdrop.h \

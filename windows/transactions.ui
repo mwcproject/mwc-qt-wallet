@@ -27,7 +27,7 @@
        <number>12</number>
       </property>
       <item>
-       <widget class="QTableWidget" name="transactionTable">
+       <widget class="ListWithColumns" name="transactionTable">
         <column>
          <property name="text">
           <string>#</string>
@@ -118,6 +118,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ListWithColumns</class>
+   <extends>QTableWidget</extends>
+   <header>control/listwithcolumns.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

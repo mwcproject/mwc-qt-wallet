@@ -27,27 +27,18 @@ Outputs::~Outputs()
 void Outputs::initTableHeaders() {
 
     // Disabling to show the grid
-    ui->outputsTable->setShowGrid(false);
-
     // Creatign columns
     QVector<int> widths = state->getColumnsWidhts();
-    if ( widths.size() != 10 ) {
-        widths = QVector<int>{10,10,30,30,30,30,100,30,30,30};
+    if ( widths.size() != 9 ) {
+        widths = QVector<int>{30,90,50,60,50,200,70,90,90};
     }
-    Q_ASSERT( widths.size() == 10 );
-    Q_ASSERT( ui->outputsTable->columnCount() == widths.size() );
+    Q_ASSERT( widths.size() == 9 );
 
-    for (int u=0;u<widths.size();u++)
-        ui->outputsTable->setColumnWidth(u,widths[u]);
+    ui->outputsTable->setColumnWidths(widths);
 }
 
 void Outputs::saveTableHeaders() {
-    int cc = ui->outputsTable->columnCount();
-    QVector<int> widths(cc);
-    for (int t=0;t<cc;t++)
-        widths[t] = ui->outputsTable->columnWidth(t);
-
-    state->updateColumnsWidhts(widths);
+    state->updateColumnsWidhts( ui->outputsTable->getColumnWidths() );
 }
 
 void Outputs::updateOutputsTable() {
@@ -55,27 +46,22 @@ void Outputs::updateOutputsTable() {
     QVector<wallet::WalletOutput> outputs = state->getOutputs();
     int rowNum = outputs.size();
 
-    QTableWidget * tt = ui->outputsTable;
-
-    tt->clearContents();
-    tt->setRowCount(rowNum);
-
-    Q_ASSERT( ui->outputsTable->columnCount() == 10 );
-    tt->setSortingEnabled(false);
+    ui->outputsTable->clearData();
 
     for ( int i=0; i<rowNum; i++ ) {
         auto & out = outputs[i];
 
-        tt->setItem( i, 0, new QTableWidgetItem(QString::number(i+1) ));
-        tt->setItem( i, 1, new QTableWidgetItem( QString::number(out.txIdx) ) );
-        tt->setItem( i, 2, new QTableWidgetItem( out.getStatusStr() ) );
-        tt->setItem( i, 3, new QTableWidgetItem( util::nano2one(out.valueNano) ) );
-        tt->setItem( i, 4, new QTableWidgetItem( QString::number( out.numOfConfirms) ) );
-        tt->setItem( i, 5, new QTableWidgetItem( out.coinbase ? "Yes":"No" ) );
-        tt->setItem( i, 6, new QTableWidgetItem( out.outputCommitment ) );
-        tt->setItem( i, 7, new QTableWidgetItem( QString::number( out.MMRIndex) ) );
-        tt->setItem( i, 8, new QTableWidgetItem( QString::number( out.lockHeight )));
-        tt->setItem( i, 9, new QTableWidgetItem( QString::number( out.lockedUntil )));
+        ui->outputsTable->appendRow( QVector<QString>{
+                                         QString::number(out.txIdx),
+                                         out.getStatusStr(),
+                                         util::nano2one(out.valueNano),
+                                         QString::number( out.numOfConfirms),
+                                         out.coinbase ? "Yes":"No",
+                                         out.outputCommitment,
+                                         QString::number( out.MMRIndex),
+                                         QString::number( out.lockHeight ),
+                                         QString::number( out.lockedUntil )
+                                     } );
     }
 }
 

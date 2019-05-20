@@ -21,15 +21,10 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QTableWidget" name="outputsTable">
+       <widget class="ListWithColumns" name="outputsTable">
         <column>
          <property name="text">
-          <string>#</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>txIdx</string>
+          <string>tx #</string>
          </property>
         </column>
         <column>
@@ -79,6 +74,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ListWithColumns</class>
+   <extends>QTableWidget</extends>
+   <header>control/listwithcolumns.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

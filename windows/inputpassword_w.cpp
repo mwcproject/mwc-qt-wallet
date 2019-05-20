@@ -38,3 +38,4 @@ void InputPassword::on_submitButton_clicked()
 }
 
 }
+

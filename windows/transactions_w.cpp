@@ -31,59 +31,42 @@ Transactions::~Transactions()
 void Transactions::initTableHeaders() {
 
     // Disabling to show the grid
-    ui->transactionTable->setShowGrid(false);
-
     // Creatign columns
     QVector<int> widths = state->getColumnsWidhts();
     if ( widths.size() != 9 ) {
-        widths = QVector<int>{10,30,50,100,50,10,50,30,30};
+        widths = QVector<int>{30,90,150,200,100,50,100,50,50};
     }
     Q_ASSERT( widths.size() == 9 );
-    Q_ASSERT( ui->transactionTable->columnCount() == widths.size() );
 
-    for (int u=0;u<widths.size();u++)
-        ui->transactionTable->setColumnWidth(u,widths[u]);
+    ui->transactionTable->setColumnWidths( widths );
 }
 
 void Transactions::saveTableHeaders() {
-    int cc = ui->transactionTable->columnCount();
-    QVector<int> widths( cc );
-    for (int t=0;t<cc;t++)
-        widths[t] = ui->transactionTable->columnWidth(t);
-
-    state->updateColumnsWidhts(widths);
+    state->updateColumnsWidhts(ui->transactionTable->getColumnWidths());
 }
 
 
 void Transactions::updateTransactionTable() {
 
     transactions = state->getTransactions();
-    int rowNum = transactions.size();
 
-    QTableWidget * tt = ui->transactionTable;
+    ui->transactionTable->clearData();
 
-    tt->clearContents();
-    tt->setRowCount(rowNum);
-
-    Q_ASSERT( ui->transactionTable->columnCount() == 9 );
-    tt->setSortingEnabled(false);
-
-    for ( int i=0; i<rowNum; i++ ) {
-        auto & trans = transactions[i];
-
-        tt->setItem( i, 0, new QTableWidgetItem(QString::number(i+1) ));
-        tt->setItem( i, 1, new QTableWidgetItem(trans.getTypeAsStr()) );
-        tt->setItem( i, 2, new QTableWidgetItem(trans.txid ) );
-        tt->setItem( i, 3, new QTableWidgetItem(trans.address ) );
-        tt->setItem( i, 4, new QTableWidgetItem(trans.creationTime ) );
-        tt->setItem( i, 5, new QTableWidgetItem(trans.confirmed ? "Yes":"No" ) );
-        tt->setItem( i, 6, new QTableWidgetItem(trans.confirmationTime ) );
-        tt->setItem( i, 7, new QTableWidgetItem(util::nano2one(trans.coinNano) ) );
-        tt->setItem( i, 8, new QTableWidgetItem(trans.proof ? "Yes":"No" ) );
+    for (const wallet::WalletTransaction & trans : transactions) {
+        ui->transactionTable->appendRow( QVector<QString>{
+                                             QString::number(  trans.txIdx ),
+                                             trans.getTypeAsStr(),
+                                             trans.txid,
+                                             trans.address,
+                                             trans.creationTime,
+                                             (trans.confirmed ? "Yes":"No"),
+                                             trans.confirmationTime,
+                                             util::nano2one(trans.coinNano),
+                                             (trans.proof ? "Yes":"No")
+                                         } );
     }
 
     updateProofState();
-
 }
 
 // return null if nothing was selected

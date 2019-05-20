@@ -262,7 +262,7 @@ public:
     virtual bool cancelTransacton(QString transactionID) noexcept(false) = 0;
 
     // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
-    virtual WalletProofInfo  generateMwcBoxTransactionProof( int transactionId, QString resultingFileName ) noexcept(false) = 0;
+    virtual WalletProofInfo  generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) = 0;
     // Verify the proof for transaction
     virtual WalletProofInfo  verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) = 0;
 

@@ -41,7 +41,8 @@ public:
 
     QPair<bool, QString> sendCoins( long nanoCoins, QString address, QString message );
 
-
+    QVector<int> getColumnsWidhts() const;
+    void updateColumnsWidhts(const QVector<int> & widths);
 protected:
     virtual NextStateRespond execute() override;
 

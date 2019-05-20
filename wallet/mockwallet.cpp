@@ -257,7 +257,7 @@ bool MockWallet::cancelTransacton(QString transactionID) {
 }
 
 // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
-WalletProofInfo  MockWallet::generateMwcBoxTransactionProof( int transactionId, QString resultingFileName ) {
+WalletProofInfo  MockWallet::generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) {
     Q_UNUSED(transactionId);
     Q_UNUSED(resultingFileName);
 

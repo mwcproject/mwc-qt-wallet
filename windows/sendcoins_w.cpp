@@ -13,11 +13,21 @@ SendCoins::SendCoins(QWidget *parent, state::SendCoins * _state) :
     state(_state)
 {
     ui->setupUi(this);
+
+    QVector<int> widths = state->getColumnsWidhts();
+    if ( widths.size() != 6 ) {
+        widths = QVector<int>{30,60,60,250,60,100};
+    }
+    Q_ASSERT( widths.size() == 6 );
+
+    ui->transactionTable->setColumnWidths(widths);
     updateTransactionList();
 }
 
 SendCoins::~SendCoins()
 {
+    state->updateColumnsWidhts( ui->transactionTable->getColumnWidths() );
+
     delete ui;
 }
 
@@ -38,10 +48,18 @@ void SendCoins::on_fromContactButton_clicked()
 void SendCoins::updateTransactionList() {
     QVector<wallet::WalletTransaction> transactions = state->getTransactions(10);
 
-    ui->transactionsListWidget->clear();
+    ui->transactionTable->clearData();
 
     for ( auto ti=transactions.rbegin(); ti!=transactions.rend(); ti++ ) {
-        ui->transactionsListWidget->addItem( ti->toStringShort() );
+
+        ui->transactionTable->appendRow(QVector<QString>{
+                    QString::number( ti->txIdx ),
+                    ti->getTypeAsStr(),
+                    util::nano2one(ti->coinNano),
+                    ti->address,
+                    ti->confirmed ? "Yes":"No",
+                    ti->confirmationTime
+                    });
     }
 }
 

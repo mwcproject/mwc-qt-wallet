@@ -35,7 +35,7 @@ QVector<wallet::WalletTransaction> Transactions::getTransactions() {
 }
 
 // Proofs
-wallet::WalletProofInfo Transactions::generateMwcBoxTransactionProof( int transactionId, QString resultingFileName ) {
+wallet::WalletProofInfo Transactions::generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) {
     return context.wallet->generateMwcBoxTransactionProof(transactionId, resultingFileName);
 }
 

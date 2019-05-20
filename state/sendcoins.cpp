@@ -65,7 +65,13 @@ QPair<bool, QString> SendCoins::sendCoins( long nanoCoins, QString address, QStr
     return context.wallet->sendTo(nanoCoins, address, message, params.inputConfirmationNumber, params.changeOutputs );
 }
 
+QVector<int> SendCoins::getColumnsWidhts() const {
+    return context.appContext->getIntVectorFor("SendTblColWidth");
+}
 
+void SendCoins::updateColumnsWidhts(const QVector<int> & widths) {
+    context.appContext->updateIntVectorFor("SendTblColWidth", widths);
+}
 
 
 }

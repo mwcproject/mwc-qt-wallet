@@ -35,47 +35,30 @@ void Contacts::updateButtons() {
 void Contacts::initTableHeaders() {
 
     // Disabling to show the grid
-    ui->contactsTable->setShowGrid(false);
-
     // Creatign columns
     QVector<int> widths = state->getColumnsWidhts();
     if ( widths.size() != 3 ) {
-        widths = QVector<int>{20,50,150};
+        widths = QVector<int>{30,10,250};
     }
     Q_ASSERT( widths.size() == 3 );
-    Q_ASSERT( ui->contactsTable->columnCount() == widths.size() );
-
-    for (int u=0;u<widths.size();u++)
-        ui->contactsTable->setColumnWidth(u,widths[u]);
+    ui->contactsTable->setColumnWidths( widths );
 }
 
 void Contacts::saveTableHeaders() {
-    int cc = ui->contactsTable->columnCount();
-    QVector<int> widths( cc );
-    for (int t=0;t<cc;t++)
-        widths[t] = ui->contactsTable->columnWidth(t);
-
-    state->updateColumnsWidhts(widths);
+    state->updateColumnsWidhts( ui->contactsTable->getColumnWidths() );
 }
 
 void Contacts::updateContactTable() {
     contacts = state->getContacts();
-    int rowNum = contacts.size();
 
-    QTableWidget * tt = ui->contactsTable;
-
-    tt->clearContents();
-    tt->setRowCount(rowNum);
-
-    Q_ASSERT( tt->columnCount() == 3 );
-    tt->setSortingEnabled(false);
-
-    for ( int i=0; i<rowNum; i++ ) {
-        auto & cont = contacts[i];
-
-        tt->setItem( i, 0, new QTableWidgetItem(QString::number(i+1) ));
-        tt->setItem( i, 1, new QTableWidgetItem( cont.name ));
-        tt->setItem( i, 2, new QTableWidgetItem( cont.address ));
+    ui->contactsTable->clearData();
+    int idx = 0;
+    for ( const wallet::WalletContact & cont : contacts ) {
+        ui->contactsTable->appendRow( QVector<QString>{
+                                          QString::number(++idx),
+                                          cont.name,
+                                          cont.address
+                                      } );
     }
 }
 

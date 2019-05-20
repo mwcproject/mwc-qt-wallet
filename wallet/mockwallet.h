@@ -64,7 +64,7 @@ public:
     WalletInfo getWalletBalance() noexcept(false) override;
     bool cancelTransacton(QString transactionID) noexcept(false) override;
 
-    WalletProofInfo  generateMwcBoxTransactionProof( int transactionId, QString resultingFileName ) noexcept(false) override;
+    WalletProofInfo  generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) override;
     WalletProofInfo  verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) override;
 
     QPair<bool, QString> sendFile( long coinNano, QString fileTx ) noexcept(false) override;
