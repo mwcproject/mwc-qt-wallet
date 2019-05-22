@@ -42,7 +42,7 @@ void Contacts::initTableHeaders() {
     // Creatign columns
     QVector<int> widths = state->getColumnsWidhts();
     if ( widths.size() != 3 ) {
-        widths = QVector<int>{30,10,250};
+        widths = QVector<int>{30,100,300};
     }
     Q_ASSERT( widths.size() == 3 );
     ui->contactsTable->setColumnWidths( widths );

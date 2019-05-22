@@ -7,9 +7,7 @@
 #include "../windows/nodemanually_w.h"
 #include "../windows/nodestatus_w.h"
 #include "../windows/newwallet_w.h"
-#include "../windows/passwordforseed.h"
 #include "../windows/newseed_w.h"
-#include "../windows/confirmseed.h"
 #include "../windows/enterseed.h"
 
 namespace core {

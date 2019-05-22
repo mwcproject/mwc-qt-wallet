@@ -9,6 +9,8 @@ requires(qtConfig(completer))
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.12
+
 TARGET = gui-wallet
 TEMPLATE = app
 

@@ -329,6 +329,9 @@
    </property>
   </action>
   <action name="actionRecieve_coins">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
      <normaloff>:/img/receive_coins.png</normaloff>:/img/receive_coins.png</iconset>

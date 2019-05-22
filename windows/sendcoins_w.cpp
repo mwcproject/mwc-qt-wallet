@@ -18,7 +18,7 @@ SendCoins::SendCoins(QWidget *parent, state::SendCoins * _state) :
 
     QVector<int> widths = state->getColumnsWidhts();
     if ( widths.size() != 6 ) {
-        widths = QVector<int>{30,60,60,250,60,100};
+        widths = QVector<int>{30,60,60,300,60,130};
     }
     Q_ASSERT( widths.size() == 6 );
 

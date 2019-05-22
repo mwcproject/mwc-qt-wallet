@@ -124,7 +124,7 @@ void ReceiveCoins::initTableHeaders() {
     // Creatign columns
     QVector<int> widths = transactionsState->getColumnsWidhts();
     if ( widths.size() != 9 ) {
-        widths = QVector<int>{10,30,50,100,50,10,50,30,30};
+        widths = QVector<int>{10,70,150,200,130,50,130,45,40};
     }
     Q_ASSERT( widths.size() == 9 );
 
