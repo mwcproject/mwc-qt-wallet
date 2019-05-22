@@ -14,6 +14,8 @@ SendCoins::SendCoins(QWidget *parent, state::SendCoins * _state) :
 {
     ui->setupUi(this);
 
+    state->setWindowTitle("Send MWC");
+
     QVector<int> widths = state->getColumnsWidhts();
     if ( widths.size() != 6 ) {
         widths = QVector<int>{30,60,60,250,60,100};
@@ -22,6 +24,8 @@ SendCoins::SendCoins(QWidget *parent, state::SendCoins * _state) :
 
     ui->transactionTable->setColumnWidths(widths);
     updateTransactionList();
+
+    ui->sendEdit->setFocus();
 }
 
 SendCoins::~SendCoins()

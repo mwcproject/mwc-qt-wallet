@@ -24,12 +24,27 @@ ReceiveCoins::ReceiveCoins(QWidget *parent,
     Q_ASSERT(fileTransactionsState);
     Q_ASSERT(transactionsState);
 
+    listeningState->setWindowTitle("Recieve MWC");
+
+    // Hide it from UI
+    ui->mwcBoxConnectBtn->hide();
+
     updateBoxState();
 
     // transactions
     ui->transactionsBox->setTitle("Transactions for account " + transactionsState->getCurrentAccountName());
     initTableHeaders();
     updateTransactionTable();
+
+    // Start listening
+    QPair<bool, QString> status = listeningState->getBoxListeningStatus();
+    if (!status.first) {
+        // start listening
+        QPair<bool, QString> res = listeningState->startBoxListeningStatus();
+        if (!res.first)
+            QMessageBox::critical(this,"Listening error", "Unable to process sart listening request. Error: " + res.second);
+    }
+    updateBoxState();
 
 }
 
@@ -39,7 +54,7 @@ ReceiveCoins::~ReceiveCoins()
     delete ui;
 }
 
-void ReceiveCoins::on_mwcBoxConnectBtn_clicked()
+/*void ReceiveCoins::on_mwcBoxConnectBtn_clicked()
 {
     QPair<bool, QString> status = listeningState->getBoxListeningStatus();
     if (status.first) {
@@ -56,7 +71,7 @@ void ReceiveCoins::on_mwcBoxConnectBtn_clicked()
     }
 
     updateBoxState();
-}
+}*/
 
 void ReceiveCoins::on_processResponceFileButton_clicked()
 {

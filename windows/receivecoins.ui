@@ -67,8 +67,14 @@
           </item>
           <item>
            <widget class="QPushButton" name="mwcBoxConnectBtn">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="text">
              <string>Start</string>
+            </property>
+            <property name="autoDefault">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -139,8 +145,14 @@
       </item>
       <item>
        <widget class="QPushButton" name="processResponceFileButton">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
         <property name="text">
          <string>Process response file</string>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -234,8 +246,14 @@
         </item>
         <item>
          <widget class="QPushButton" name="refreshButton">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
           <property name="text">
            <string>Refresh</string>
+          </property>
+          <property name="autoDefault">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -253,6 +271,13 @@
    <header>control/listwithcolumns.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>mwcBoxConnectBtn</tabstop>
+  <tabstop>mwcBoxAddress</tabstop>
+  <tabstop>processResponceFileButton</tabstop>
+  <tabstop>transactionTable</tabstop>
+  <tabstop>refreshButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

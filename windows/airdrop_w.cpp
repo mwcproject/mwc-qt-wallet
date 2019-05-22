@@ -13,11 +13,17 @@ Airdrop::Airdrop(QWidget *parent, state::Airdrop * _state) :
 {
     ui->setupUi(this);
 
+    state->setWindowTitle("Claim MWC for your Airdrop account");
+
+    initTableHeaders();
     updateClaimStatus();
+
+    ui->btcAddressEdit->setFocus();
 }
 
 Airdrop::~Airdrop()
 {
+    saveTableHeaders();
     delete ui;
 }
 
@@ -42,6 +48,21 @@ void wnd::Airdrop::on_refreshClaimsButton_clicked()
     updateClaimStatus();
 }
 
+void Airdrop::initTableHeaders() {
+
+    // Disabling to show the grid
+    // Creatign columns
+    QVector<int> widths = state->getColumnsWidhts();
+    if ( widths.size() != 4 ) {
+        widths = QVector<int>{30,250,100,50};
+    }
+    Q_ASSERT( widths.size() == 4 );
+    ui->claimsTable->setColumnWidths( widths );
+}
+
+void Airdrop::saveTableHeaders() {
+    state->updateColumnsWidhts( ui->claimsTable->getColumnWidths() );
+}
 
 void Airdrop::updateClaimStatus() {
     QTableWidget * tt = ui->claimsTable;

@@ -6,6 +6,7 @@
 #include <QStringListModel>
 #include <QTreeView>
 #include <QStandardItemModel>
+#include "../util/widgetutils.h"
 
 namespace wnd {
 
@@ -15,6 +16,8 @@ NewSeedTest::NewSeedTest(QWidget *parent, state::NewSeedTest *_state, int wordNu
     state(_state)
 {
     ui->setupUi(this);
+
+    state->setWindowTitle("Verify your seed");
 
     ui->wordLabelHi->setText("<b>Please Confirm word number " +
                              QString::number(wordNumber) + " for your passphrase</b>");
@@ -48,6 +51,9 @@ NewSeedTest::NewSeedTest(QWidget *parent, state::NewSeedTest *_state, int wordNu
         ui->wordEdit->setCompleter(completer);
     }
 
+    ui->wordEdit->setFocus();
+
+    utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()) );
 }
 
 NewSeedTest::~NewSeedTest()

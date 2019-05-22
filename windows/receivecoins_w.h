@@ -27,7 +27,7 @@ public:
     ~ReceiveCoins();
 
 private slots:
-    void on_mwcBoxConnectBtn_clicked();
+    //void on_mwcBoxConnectBtn_clicked();
 
     void on_processResponceFileButton_clicked();
 

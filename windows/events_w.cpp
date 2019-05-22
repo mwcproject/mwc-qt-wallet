@@ -1,5 +1,6 @@
 #include "events_w.h"
 #include "ui_events.h"
+#include "../state/events.h"
 
 namespace wnd {
 
@@ -9,6 +10,10 @@ Events::Events(QWidget *parent, state::Events * _state) :
     state(_state)
 {
     ui->setupUi(this);
+
+    state->setWindowTitle("Events");
+
+    ui->notifications->setFocus();
 }
 
 Events::~Events()

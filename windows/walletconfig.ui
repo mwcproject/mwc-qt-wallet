@@ -87,8 +87,14 @@
             </item>
             <item>
              <widget class="QPushButton" name="updateButton">
+              <property name="focusPolicy">
+               <enum>Qt::StrongFocus</enum>
+              </property>
               <property name="text">
                <string>Update</string>
+              </property>
+              <property name="autoDefault">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -139,6 +145,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>walletFolder</tabstop>
+  <tabstop>mwcboxHost</tabstop>
+  <tabstop>mwcboxPort</tabstop>
+  <tabstop>updateButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

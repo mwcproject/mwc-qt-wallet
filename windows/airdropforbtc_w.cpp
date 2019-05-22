@@ -12,10 +12,14 @@ AirdropForBTC::AirdropForBTC(QWidget *parent, state::Airdrop * _state) :
 {
     ui->setupUi(this);
 
+    state->setWindowTitle("Proof your BTC ownership");
+
     state::AirdropChallendge currentClaim = state->getLastAirdropChallendge();
 
     ui->btcEdit->setText(currentClaim.btcAddress);
     ui->challengeEdit->setText(currentClaim.challendge);
+
+    ui->signatureEdit->setFocus();
 }
 
 AirdropForBTC::~AirdropForBTC()

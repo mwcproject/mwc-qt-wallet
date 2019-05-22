@@ -74,8 +74,14 @@
          <height>120</height>
         </size>
        </property>
+       <property name="tabChangesFocus">
+        <bool>true</bool>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
        <property name="plainText">
-        <string>garlic tornado waste artist soldier topple sand spirit warrior render because benefit</string>
+        <string/>
        </property>
       </widget>
      </item>
@@ -125,8 +131,14 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QPushButton" name="submitButton">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>OK</string>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

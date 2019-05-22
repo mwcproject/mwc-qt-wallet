@@ -110,8 +110,14 @@
          <height>0</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>Back</string>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -123,8 +129,14 @@
          <height>0</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>Claim</string>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -145,6 +157,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>btcEdit</tabstop>
+  <tabstop>challengeEdit</tabstop>
+  <tabstop>signatureEdit</tabstop>
+  <tabstop>backButton</tabstop>
+  <tabstop>claimButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

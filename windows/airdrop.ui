@@ -126,8 +126,14 @@
           </item>
           <item>
            <widget class="QPushButton" name="nextButton">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="text">
              <string>Next</string>
+            </property>
+            <property name="autoDefault">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -160,7 +166,7 @@
        <number>5</number>
       </property>
       <item>
-       <widget class="QTableWidget" name="claimsTable">
+       <widget class="ListWithColumns" name="claimsTable">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -206,8 +212,14 @@
         </item>
         <item>
          <widget class="QPushButton" name="refreshClaimsButton">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
           <property name="text">
            <string>Refresh</string>
+          </property>
+          <property name="autoDefault">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -218,6 +230,19 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ListWithColumns</class>
+   <extends>QTableWidget</extends>
+   <header>control/listwithcolumns.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>btcAddressEdit</tabstop>
+  <tabstop>nextButton</tabstop>
+  <tabstop>claimsTable</tabstop>
+  <tabstop>refreshClaimsButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

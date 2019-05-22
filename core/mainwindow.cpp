@@ -75,6 +75,11 @@ void MainWindow::updateActionStates() {
     ui->actionTransactions->setChecked( state == state::STATE::TRANSACTIONS );
     ui->actionOutputs->setChecked( state == state::STATE::OUTPUTS );
 
+    if (!enabled)
+        ui->mainToolBar->hide();
+    else
+        ui->mainToolBar->show();
+
 }
 
 void MainWindow::updateClock() {

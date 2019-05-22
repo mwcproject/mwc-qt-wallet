@@ -13,6 +13,8 @@ Hodl::Hodl(QWidget *parent, state::Hodl * _state) :
 {
     ui->setupUi(this);
 
+    state->setWindowTitle("HODL");
+
     ui->transactionsListWidget->setSelectionMode( QAbstractItemView::ExtendedSelection );
 
     // fill transaction list with transactions

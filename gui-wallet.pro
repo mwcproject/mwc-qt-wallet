@@ -55,10 +55,10 @@ SOURCES += \
     state/sendcoins.cpp \
     state/transactions.cpp \
     state/walletconfig.cpp \
+    util/widgetutils.cpp \
     windows/accounts_w.cpp \
     windows/airdrop_w.cpp \
     windows/airdropforbtc_w.cpp \
-    windows/confirmseed.cpp \
     windows/connect2server.cpp \
     windows/contacteditdlg.cpp \
     windows/contacts_w.cpp \
@@ -69,19 +69,16 @@ SOURCES += \
     windows/nodemanually_w.cpp \
     windows/nodestatus_w.cpp \
     windows/outputs_w.cpp \
-    windows/passwordforseed.cpp \
     core/mainwindow.cpp \
     core/versiondialog.cpp \
     core/windowmanager.cpp \
     wallet/wallet.cpp \
     wallet/mockwallet.cpp \
     windows/enterseed.cpp \
-    windows/fromseedfile.cpp \
     windows/receivecoins_w.cpp \
     windows/selectcontact.cpp \
     windows/sendcoins_w.cpp \
     windows/sendcoinsparamsdialog.cpp \
-    windows/claimchallendge.cpp \
     windows/showproofdialog.cpp \
     windows/transactions_w.cpp \
     util/ioutils.cpp \
@@ -123,10 +120,10 @@ HEADERS += \
     state/sendcoins.h \
     state/transactions.h \
     state/walletconfig.h \
+    util/widgetutils.h \
     windows/accounts_w.h \
     windows/airdrop_w.h \
     windows/airdropforbtc_w.h \
-    windows/confirmseed.h \
     windows/connect2server.h \
     windows/contacteditdlg.h \
     windows/contacts_w.h \
@@ -137,19 +134,16 @@ HEADERS += \
     windows/nodemanually_w.h \
     windows/nodestatus_w.h \
     windows/outputs_w.h \
-    windows/passwordforseed.h \
     core/mainwindow.h \
     core/versiondialog.h \
     core/windowmanager.h \
     wallet/wallet.h \
     wallet/mockwallet.h \
     windows/enterseed.h \
-    windows/fromseedfile.h \
     windows/receivecoins_w.h \
     windows/selectcontact.h \
     windows/sendcoins_w.h \
     windows/sendcoinsparamsdialog.h \
-    windows/claimchallendge.h \
     windows/showproofdialog.h \
     windows/transactions_w.h \
     util/passwordanalyser.h \
@@ -175,17 +169,14 @@ HEADERS += \
 FORMS += \
     windows/airdrop.ui \
     windows/airdropforbtc.ui \
-    windows/confirmseed.ui \
     windows/connect2server.ui \
     windows/contacteditdlg.ui \
     windows/newseed.ui \
     windows/newwallet.ui \
     windows/nodestatus.ui \
-    windows/passwordforseed.ui \
     core/mainwindow.ui \
     core/versiondialog.ui \
     windows/enterseed.ui \
-    windows/fromseedfile.ui \
     windows/nodemanually.ui \
     windows/listening.ui \
     windows/events.ui \
@@ -199,7 +190,6 @@ FORMS += \
     windows/transactions.ui \
     windows/contacts.ui \
     windows/hodl.ui \
-    windows/claimchallendge.ui \
     windows/accounts.ui \
     windows/walletconfig.ui \
     windows/initaccount.ui \

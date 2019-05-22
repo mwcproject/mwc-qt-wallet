@@ -101,8 +101,14 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="refreshButton">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>Refresh</string>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -121,8 +127,14 @@
      </item>
      <item>
       <widget class="QPushButton" name="changeNodeButton">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>Change MWC Node</string>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

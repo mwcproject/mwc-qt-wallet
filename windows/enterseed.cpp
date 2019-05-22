@@ -3,6 +3,7 @@
 #include "../util/stringutils.h"
 #include <QMessageBox>
 #include "../state/createwithseed.h"
+#include "../util/widgetutils.h"
 
 namespace wnd {
 
@@ -11,13 +12,27 @@ EnterSeed::EnterSeed(QWidget *parent, state::CreateWithSeed * _state) :
     ui(new Ui::EnterSeed),
     state(_state)
 {
+    state->setWindowTitle("Recover wallet from a Passphrase");
+
     ui->setupUi(this);
+
+    ui->seedTextEdit->setFocus(Qt::OtherFocusReason);
+
+    utils::defineDefaultButtonSlot(this, SLOT(on_Enter()) );
 }
 
 EnterSeed::~EnterSeed()
 {
     delete ui;
 }
+
+void EnterSeed::on_Enter() {
+    if ( ui->seedTextEdit->hasFocus() )
+        return;
+
+    on_submitButton_clicked();
+}
+
 
 void EnterSeed::on_submitButton_clicked()
 {

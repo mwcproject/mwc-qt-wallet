@@ -12,10 +12,15 @@ Outputs::Outputs(QWidget *parent, state::Outputs * _state) :
 {
     ui->setupUi(this);
 
-    ui->outputGroupBox->setTitle("Outputs for account " + state->getCurrentAccountName());
+
+    QString title = "Outputs for account " + state->getCurrentAccountName();
+    state->setWindowTitle(title);
+    ui->outputGroupBox->setTitle(title);
 
     initTableHeaders();
     updateOutputsTable();
+
+    ui->outputsTable->setFocus();
 }
 
 Outputs::~Outputs()

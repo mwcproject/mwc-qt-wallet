@@ -12,6 +12,8 @@ WalletConfig::WalletConfig(QWidget *parent, state::WalletConfig * _state) :
 {
     ui->setupUi(this);
 
+    state->setWindowTitle("Wallet config");
+
     wallet::WalletConfig cfg = state->getWalletConfig();
 
     ui->walletFolder->setText( cfg.dataPath );

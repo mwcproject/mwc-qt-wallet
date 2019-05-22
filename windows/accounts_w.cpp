@@ -15,6 +15,8 @@ Accounts::Accounts(QWidget *parent, state::Accounts * _state) :
 {
     ui->setupUi(this);
 
+    state->setWindowTitle("Accounts");
+
     wallet::WalletInfo info = state->getWalletInfo();
 
 
@@ -22,6 +24,8 @@ Accounts::Accounts(QWidget *parent, state::Accounts * _state) :
     QMovie *movie = new QMovie(":/img/loader.gif", QByteArray(), this);
     lbl->setMovie(movie);
     lbl->hide();
+
+    ui->accountList->setFocus();
 
     startWaiting();
 

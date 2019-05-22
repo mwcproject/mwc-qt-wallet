@@ -12,9 +12,13 @@ Contacts::Contacts(QWidget *parent, state::Contacts * _state) :
     state(_state)
 {
     ui->setupUi(this);
+
+    state->setWindowTitle("Contacts");
+
     initTableHeaders();
     updateContactTable();
 
+    ui->contactsTable->setFocus();
 }
 
 Contacts::~Contacts()

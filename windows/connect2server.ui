@@ -52,6 +52,9 @@
        <height>25</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
+     </property>
      <property name="text">
       <string>Run standalone MWC node</string>
      </property>
@@ -65,6 +68,9 @@
        <height>25</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
+     </property>
      <property name="text">
       <string>Auto connect</string>
      </property>
@@ -77,6 +83,9 @@
        <width>0</width>
        <height>25</height>
       </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
      </property>
      <property name="text">
       <string>Select node manually</string>
@@ -100,15 +109,27 @@
      </item>
      <item>
       <widget class="QPushButton" name="cancelButton">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>Cancel</string>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="submitButton">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>Submit</string>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

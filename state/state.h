@@ -1,6 +1,8 @@
 #ifndef STATE_H
 #define STATE_H
 
+#include <QString>
+
 namespace core {
     class WalletWindow;
     class WindowManager;
@@ -82,6 +84,8 @@ protected:
 public:
     State(const StateContext & context, STATE stateId);
     virtual ~State();
+
+    void setWindowTitle( QString title );
 
     // process/verify the state
     virtual NextStateRespond execute() = 0;

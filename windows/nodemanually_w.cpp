@@ -11,6 +11,10 @@ NodeManually::NodeManually(QWidget *parent, state::NodeManually * _state) :
     state(_state)
 {
     ui->setupUi(this);
+
+    state->setWindowTitle("MWC node to connect");
+
+    ui->hostEdit->setFocus();
 }
 
 NodeManually::~NodeManually()

@@ -1,4 +1,5 @@
-#include "state/state.h"
+#include "state.h"
+#include  "../core/mainwindow.h"
 
 namespace state {
 
@@ -7,5 +8,9 @@ State::State(const StateContext & _context, STATE _stateId) :
 {}
 
 State::~State() {}
+
+void State::setWindowTitle( QString title ) {
+    context.mainWnd->setWindowTitle(title);
+}
 
 }

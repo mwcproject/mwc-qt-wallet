@@ -29,6 +29,8 @@ private slots:
 private:
     void updateClaimStatus();
 
+    void initTableHeaders();
+    void saveTableHeaders();
 private:
     Ui::Airdrop *ui;
     state::Airdrop * state;

@@ -2,6 +2,7 @@
 #include "ui_newwallet.h"
 #include "../state/newwallet.h"
 #include <QMessageBox>
+#include "../util/widgetutils.h"
 
 namespace wnd {
 
@@ -12,8 +13,14 @@ NewWallet::NewWallet(QWidget *parent, state::NewWallet * _state) :
 {
     ui->setupUi(this);
 
+    state->setWindowTitle("Init your wallet");
+
     ui->radioCreateNew->setChecked(true);
     updateControls();
+
+    ui->radioCreateNew->setFocus();
+
+    utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()) );
 }
 
 NewWallet::~NewWallet()

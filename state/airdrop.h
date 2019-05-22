@@ -51,6 +51,9 @@ public:
 
     QPair<bool, QString> refreshStatus();
 
+    QVector<int> getColumnsWidhts();
+    void updateColumnsWidhts(QVector<int> widths);
+
     void backToMainAirDropPage();
 protected:
 

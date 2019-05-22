@@ -52,15 +52,27 @@
      </property>
      <item>
       <widget class="QPushButton" name="addButton">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>Add</string>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="editButton">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>Edit</string>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -82,8 +94,14 @@
      </item>
      <item>
       <widget class="QPushButton" name="removeButton">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>Remove</string>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -98,6 +116,12 @@
    <header>control/listwithcolumns.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>contactsTable</tabstop>
+  <tabstop>addButton</tabstop>
+  <tabstop>editButton</tabstop>
+  <tabstop>removeButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -10,6 +10,9 @@
     <height>306</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::NoFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -93,6 +96,9 @@
          <height>120</height>
         </size>
        </property>
+       <property name="tabChangesFocus">
+        <bool>true</bool>
+       </property>
        <property name="overwriteMode">
         <bool>false</bool>
        </property>
@@ -117,8 +123,14 @@
      </item>
      <item>
       <widget class="QPushButton" name="submitButton">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>Submit</string>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

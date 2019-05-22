@@ -71,8 +71,14 @@
      </item>
      <item row="3" column="4">
       <widget class="QPushButton" name="fromContactButton">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>From Contacts</string>
+       </property>
+       <property name="autoDefault">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -83,15 +89,27 @@
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QPushButton" name="settingsButton">
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="text">
           <string>Settings</string>
+         </property>
+         <property name="autoDefault">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="sendButton">
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="text">
           <string>Submit</string>
+         </property>
+         <property name="autoDefault">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -184,6 +202,15 @@
    <header>control/listwithcolumns.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>sendEdit</tabstop>
+  <tabstop>sendToAddress</tabstop>
+  <tabstop>fromContactButton</tabstop>
+  <tabstop>messageEdit</tabstop>
+  <tabstop>settingsButton</tabstop>
+  <tabstop>sendButton</tabstop>
+  <tabstop>transactionTable</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

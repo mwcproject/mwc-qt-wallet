@@ -59,15 +59,27 @@
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QPushButton" name="nextAddressButton">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="text">
              <string>Next address</string>
+            </property>
+            <property name="autoDefault">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="mwcAddressFromIndexButton">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="text">
              <string>To Index</string>
+            </property>
+            <property name="autoDefault">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -110,8 +122,14 @@
           </item>
           <item>
            <widget class="QPushButton" name="mwcBoxConnectBtn">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="text">
              <string>Start</string>
+            </property>
+            <property name="autoDefault">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -125,7 +143,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Keystone</string>
+      <string>Keybase</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
@@ -159,8 +177,14 @@
         </item>
         <item row="0" column="3">
          <widget class="QPushButton" name="keystoneConnectBtn">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
           <property name="text">
            <string>Start</string>
+          </property>
+          <property name="autoDefault">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -227,6 +251,9 @@
            <widget class="QPushButton" name="foreignConnectBtn">
             <property name="text">
              <string>Start</string>
+            </property>
+            <property name="autoDefault">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -309,6 +336,17 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>mwcBoxConnectBtn</tabstop>
+  <tabstop>mwcBoxAddress</tabstop>
+  <tabstop>nextAddressButton</tabstop>
+  <tabstop>mwcAddressFromIndexButton</tabstop>
+  <tabstop>keystoneConnectBtn</tabstop>
+  <tabstop>foreignConnectBtn</tabstop>
+  <tabstop>foreignPort</tabstop>
+  <tabstop>foreignSecret</tabstop>
+  <tabstop>url2reciveEdit</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

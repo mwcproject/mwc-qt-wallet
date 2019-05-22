@@ -10,6 +10,9 @@ NodeStatus::NodeStatus(QWidget *parent, state::NodeStatus * _state) :
     state(_state)
 {
     ui->setupUi(this);
+
+    state->setWindowTitle("Node status");
+
     ui->serverLabel->setText( state->getWalletConfig().mwcNodeURI );
     updateNodeStatus();
 }

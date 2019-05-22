@@ -118,5 +118,14 @@ void Airdrop::backToMainAirDropPage() {
     context.stateMachine->executeFrom(STATE::AIRDRDOP_MAIN);
 }
 
+QVector<int> Airdrop::getColumnsWidhts() {
+    return context.appContext->getIntVectorFor("AirdropTblWidth");
+}
+
+void Airdrop::updateColumnsWidhts(QVector<int> widths) {
+    context.appContext->updateIntVectorFor("AirdropTblWidth", widths);
+}
+
+
 
 }

@@ -13,6 +13,7 @@ FileTransactions::FileTransactions(QWidget *parent, state::FileTransactions * _s
     state(_state)
 {
     ui->setupUi(this);
+    state->setWindowTitle("Send/Recieve MWC offline");
 }
 
 FileTransactions::~FileTransactions()

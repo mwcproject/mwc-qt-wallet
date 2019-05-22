@@ -79,6 +79,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="cancelButton">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>Cancel</string>
        </property>
@@ -86,8 +89,14 @@
      </item>
      <item>
       <widget class="QPushButton" name="okButton">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>OK</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -95,6 +104,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>inputsConfEdit</tabstop>
+  <tabstop>changeOutputsEdit</tabstop>
+  <tabstop>cancelButton</tabstop>
+  <tabstop>okButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

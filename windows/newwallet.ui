@@ -10,6 +10,9 @@
     <height>394</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::NoFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -29,7 +32,7 @@
       </size>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keystore&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Init your wallet&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
@@ -60,6 +63,9 @@
       </property>
       <item>
        <widget class="QRadioButton" name="radioCreateNew">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
         <property name="text">
          <string>Create a new Seed for your wallet</string>
         </property>
@@ -67,6 +73,9 @@
       </item>
       <item>
        <widget class="QRadioButton" name="radioHaveSeed">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
         <property name="text">
          <string>Recover wallet from a Passphrase</string>
         </property>
@@ -92,11 +101,14 @@
      </item>
      <item>
       <widget class="QPushButton" name="submitButton">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>Submit</string>
        </property>
        <property name="autoDefault">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="default">
         <bool>false</bool>

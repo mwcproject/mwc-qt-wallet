@@ -71,8 +71,14 @@
         </item>
         <item>
          <widget class="QPushButton" name="generateSendCoinsFileButton">
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
           <property name="text">
            <string>Generate file</string>
+          </property>
+          <property name="autoDefault">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -96,8 +102,14 @@
       </item>
       <item>
        <widget class="QPushButton" name="signTransactionButton">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
         <property name="text">
          <string>Sign transactions</string>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -122,8 +134,14 @@
       </item>
       <item>
        <widget class="QPushButton" name="processResponceFileButton">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
         <property name="text">
          <string>FInalize transaction that you initiated and publish it to the MWC network</string>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -145,6 +163,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>sendCoinsEdit</tabstop>
+  <tabstop>generateSendCoinsFileButton</tabstop>
+  <tabstop>signTransactionButton</tabstop>
+  <tabstop>processResponceFileButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

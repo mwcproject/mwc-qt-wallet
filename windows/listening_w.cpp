@@ -15,6 +15,8 @@ Listening::Listening(QWidget *parent, state::Listening * _state) :
 
     ui->httpGroupBox->hide();
 
+    state->setWindowTitle("Listening");
+
     updateBoxState();
     updateKeystoneState();
     updateHttpForeignApiState();

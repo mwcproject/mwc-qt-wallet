@@ -11,6 +11,10 @@ ConnectToServer::ConnectToServer(QWidget *parent, state::Connect2Node * _state) 
     state(_state)
 {
     ui->setupUi(this);
+
+    state->setWindowTitle("Connect to MWC node");
+
+    ui->cancelButton->setFocus();
 }
 
 ConnectToServer::~ConnectToServer()
