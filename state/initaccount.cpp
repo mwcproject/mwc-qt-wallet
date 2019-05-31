@@ -17,7 +17,8 @@ InitAccount::~InitAccount() {
 }
 
 NextStateRespond InitAccount::execute() {
-    if ( context.appContext->getCookie<QString>(COOKIE_PASSWORD).length()==0 && context.wallet->isVeryFirstRun() ) {
+    if ( context.wallet->getWalletStatus() == wallet::Wallet::InitWalletStatus::NEED_INIT &&
+        context.appContext->getCookie<QString>(COOKIE_PASSWORD).length()==0 ) {
         // Show window to input password
 
         context.wndManager->switchToWindow(
@@ -32,7 +33,7 @@ NextStateRespond InitAccount::execute() {
 
 void InitAccount::setPassword(const QString & password) {
     context.appContext->pushCookie<QString>(COOKIE_PASSWORD, password);
-    context.appContext->setPassHash(password);
+//    context.appContext->setPassHash(password);
 
     context.stateMachine->executeFrom(STATE::STATE_INIT);
 }

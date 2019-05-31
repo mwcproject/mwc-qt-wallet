@@ -34,29 +34,20 @@ void NewWallet::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice) {
 }
 
 NextStateRespond NewWallet::execute() {
-    QString pass = context.appContext->getCookie<QString>(COOKIE_PASSWORD);
-    Q_ASSERT(pass.length()>0);
-
     using namespace wallet;
 
-    Wallet::InitWalletStatus status = context.wallet->open( context.appContext->getNetwork(), pass);
-    if (status == Wallet::InitWalletStatus::OK)
-        return NextStateRespond(NextStateRespond::RESULT::DONE);
-    else if (status == Wallet::InitWalletStatus::WRONG_PASSWORD) {
-        QMessageBox::critical( nullptr, "Wrong password", "Your password was rejected by the wallet. If you restored you files, please use the password that match your restored data");
-        context.appContext->pullCookie<QString>(COOKIE_PASSWORD);
-        context.appContext->setPassHash(""); // reset hash
+    if ( context.wallet->getWalletStatus() == Wallet::InitWalletStatus::NEED_INIT ) {
+        // Password expected to be entered
+        QString pass = context.appContext->getCookie<QString>(COOKIE_PASSWORD);
+        Q_ASSERT(pass.length()>0);
 
-        return NextStateRespond(NextStateRespond::RESULT::NEXT_STATE, STATE::INPUT_PASSWORD);
-    }
-    else if (status == Wallet::InitWalletStatus::NEED_INIT ) {
+
         context.wndManager->switchToWindow(
                     new wnd::NewWallet( context.wndManager->getInWndParent(), this ) );
 
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
     }
 
-    Q_ASSERT(false);
     return NextStateRespond(NextStateRespond::RESULT::DONE);
 }
 

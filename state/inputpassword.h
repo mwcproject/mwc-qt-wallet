@@ -2,22 +2,34 @@
 #define INPUTPASSWORD_H
 
 #include "state.h"
-#include <QString>
+#include <QObject>
+#include "../wallet/wallet.h"
+
+namespace wnd {
+    class InputPassword;
+}
 
 namespace state {
 
-class InputPassword : public State
+class InputPassword : public QObject, public State
 {
+    Q_OBJECT
 public:
     InputPassword(const StateContext & context);
     virtual ~InputPassword() override;
 
-    bool checkPassword(const QString & password);
-
+    // Async call to submit the password. This state migth get back to UI if password is incorrect
     void submitPassword(const QString & password);
 
 protected:
     virtual NextStateRespond execute() override;
+
+protected slots:
+    void onInitWalletStatus( wallet::Wallet::InitWalletStatus  status );
+
+private:
+    wnd::InputPassword * wnd = nullptr;
+    QMetaObject::Connection slotConn;
 };
 
 }

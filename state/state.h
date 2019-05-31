@@ -21,6 +21,7 @@ class StateMachine;
 
 enum STATE {
     NONE,
+    START_WALLET, // Start backed mwc713. Check what it want and then delegate control to the next state
     STATE_INIT, // first run. Creating the password for a wallet
     INPUT_PASSWORD, // Input password from the wallet
     NEW_WALLET,     // Select how to init the wallet (first run)

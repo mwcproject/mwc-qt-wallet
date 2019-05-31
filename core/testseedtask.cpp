@@ -1,6 +1,5 @@
 #include "testseedtask.h"
 #include <QVector>
-#include <QRandomGenerator>
 
 namespace core {
 
@@ -35,10 +34,11 @@ QVector<core::TestSeedTask> generateSeedTasks( const QVector<QString> & seed ) {
         words.push_back( QPair<int,QString>(i+1, seed[i]) );
 
     QVector<core::TestSeedTask> confirmTasks;
-    QRandomGenerator * rand = QRandomGenerator::global();
+
+    srand (time(nullptr));
 
     while( words.size()>0 ) {
-        int idx = rand->bounded( words.size() );
+        int idx = rand() % words.size();
         confirmTasks.push_back( core::TestSeedTask( words[idx].first, words[idx].second) );
         words.remove(idx);
     }

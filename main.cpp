@@ -2,15 +2,15 @@
 #include <QApplication>
 #include "core/windowmanager.h"
 #include "wallet/mockwallet.h"
+#include "wallet/mwc713.h"
 #include "state/state.h"
 #include "state/statemachine.h"
 #include "core/appcontext.h"
 #include "util/ioutils.h"
 
+
 int main(int argc, char *argv[])
 {
-    //Q_INIT_RESOURCE(completer);
-
     QApplication app(argc, argv);
 
     core::AppContext appContext;
@@ -19,7 +19,9 @@ int main(int argc, char *argv[])
     // create dynamically. Window will be deleted on close
     core::MainWindow * mainWnd = new core::MainWindow(nullptr);
 
-    wallet::MockWallet wallet;
+    wallet::MWC713 wallet("/mw/grin/wallet713/target/debug/mwc713");
+
+    //wallet::MockWallet wallet;
 
     core::WindowManager wndManager( mainWnd->getMainWindow() );
 
@@ -33,3 +35,4 @@ int main(int argc, char *argv[])
 
     return app.exec();
 }
+

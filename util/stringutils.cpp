@@ -38,11 +38,11 @@ QString nano2one( long nano ) {
         myNumber = "0" + myNumber;
 
     myNumber.insert( myNumber.length()-9, '.' );
-    while( myNumber.back() == '0' ) {
+    while( myNumber[myNumber.length()-1] == '0' ) {
         myNumber.remove(myNumber.length()-1,1);
     }
 
-    if (myNumber.back() == '.')
+    if (myNumber[myNumber.length()-1] == '.')
         myNumber.remove(myNumber.length()-1,1);
 
     if (nano<0)

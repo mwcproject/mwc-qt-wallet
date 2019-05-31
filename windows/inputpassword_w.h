@@ -21,6 +21,11 @@ public:
     explicit InputPassword(QWidget *parent, state::InputPassword * state);
     ~InputPassword();
 
+    void startWaiting();
+    void stopWaiting();
+
+    void reportWrongPassword();
+
 private slots:
     void on_submitButton_clicked();
 

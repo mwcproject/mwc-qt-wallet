@@ -6,6 +6,8 @@
 #include "../core/mwcexception.h"
 #include "../util/ioutils.h"
 #include "../util/stringutils.h"
+#include <QDateTime>
+#include <QObject>
 
 namespace wallet {
 
@@ -166,27 +168,48 @@ struct WalletUtxoSignature {
 };
 
 
+struct WalletNotificationMessages {
+    enum LEVEL {ERROR, WARNING, INFO, DEBUG};
+    LEVEL level=DEBUG;
+    QString message;
+    QDateTime time;
+
+    WalletNotificationMessages() {time=QDateTime::currentDateTime();}
+    WalletNotificationMessages(LEVEL _level, QString _message) : level(_level), message(_message) {time=QDateTime::currentDateTime();}
+    WalletNotificationMessages(const WalletNotificationMessages&) = default;
+    WalletNotificationMessages &operator=(const WalletNotificationMessages&) = default;
+};
+
 // Interface to wallet functionality
 // can throw MwcException to signal errors
-class Wallet
+class Wallet : public QObject
 {
+    Q_OBJECT
 public:
     // network: main | floo
     Wallet();
     virtual ~Wallet();
 
-    // return true is it s a first run for the wallet
-    virtual bool isVeryFirstRun() noexcept(false) = 0;
+    // Generic. Reporting fatal error that somebody will process and exit app
+    virtual void reportFatalError( QString message ) noexcept(false) = 0;
 
-    // Open the wallet
-    enum InitWalletStatus {OK, NEED_INIT, WRONG_PASSWORD};
-    virtual InitWalletStatus open(QString network, const QString & password) noexcept(false)  = 0;
+
+    // Get all notification messages
+    virtual const QVector<WalletNotificationMessages> & getWalletNotificationMessages() noexcept(false) = 0;
+    // Check signal: onNewNotificationMessage
+
+    // ---- Wallet Init Phase
+    enum InitWalletStatus {NONE, NEED_PASSWORD, NEED_INIT, WRONG_PASSWORD, READY};
+    virtual void start(QString network) noexcept(false)  = 0;
+    virtual void loginWithPassword(QString password, QString account) noexcept(false)  = 0;
+    // Check signal: onInitWalletStatus
+    virtual InitWalletStatus getWalletStatus() noexcept(false) = 0;
 
     // Close the wallet and release the process
     virtual bool close() noexcept(false) = 0;
 
     // Create the wallet, generate the seed. Return the words to recover the wallet
-    virtual QVector<QString> init() noexcept(false) = 0;
+    virtual QVector<QString> generateSeedForNewAccount() noexcept(false) = 0;
 
     // Confirm that user write the passphase
     virtual void confirmNewSeed() noexcept(false) = 0;
@@ -299,7 +322,16 @@ public:
     // Late this signature can be used for verification of ounewship
     virtual WalletUtxoSignature sign_utxo( const QString & utxo, const QString & hash ) = 0;
 
+private:
+signals:
+    // Notification/error message
+    void onNewNotificationMessage(WalletNotificationMessages::LEVEL level, QString message);
 
+    // Update of the wallet status
+    void onInitWalletStatus(InitWalletStatus status);
+
+    // Get MWC updated address. Normally you don't need that
+    void onMwcAddress(QString mwcAddress);
 };
 
 }

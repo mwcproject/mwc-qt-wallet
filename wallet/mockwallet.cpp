@@ -77,30 +77,35 @@ MockWallet::~MockWallet() {
     saveData();
 }
 
-// return true is it s a first run for the wallet
-bool MockWallet::isVeryFirstRun() {
-    return walletPassword.length()==0;
-}
 
-Wallet::InitWalletStatus MockWallet::open(QString network, const QString & password) {
-    if (! isInit ) {
-        walletPassword = password;
-        return Wallet::InitWalletStatus::NEED_INIT;
-    }
-
-    if ( walletPassword != QString(password) )
-        return Wallet::InitWalletStatus::WRONG_PASSWORD;
-
+void MockWallet::start(QString network) noexcept(false) {
     blockchainNetwork = network;
-
-    return Wallet::InitWalletStatus::OK;
+    if (isInit ) {
+        initStatus = InitWalletStatus::NEED_INIT;
+    }
+    else {
+        initStatus = InitWalletStatus::NEED_PASSWORD;
+    }
+    emit onInitWalletStatus(initStatus);
 }
+
+void MockWallet::loginWithPassword(QString password, QString account) noexcept(false) {
+    if ( walletPassword == QString(password) ) {
+        initStatus = InitWalletStatus::NEED_PASSWORD;
+    }
+    else {
+        initStatus = InitWalletStatus::WRONG_PASSWORD;
+    }
+    emit onInitWalletStatus(initStatus);
+}
+
+
 
 bool MockWallet::close() {
     return true;
 }
 
-QVector<QString> MockWallet::init() {
+QVector<QString> MockWallet::generateSeedForNewAccount() {
     // init a new wallet, generate a new seed.
     return MockWalletSeed;
 }
@@ -424,7 +429,7 @@ void MockWallet::saveData() const {
     }
 
     QDataStream out(&file);
-    out.setVersion(QDataStream::Qt_5_12);
+    out.setVersion(QDataStream::Qt_5_7);
 
     out << 0x57669;
 
@@ -458,7 +463,7 @@ bool MockWallet::loadData() {
      }
 
      QDataStream in(&file);
-     in.setVersion(QDataStream::Qt_5_12);
+     in.setVersion(QDataStream::Qt_5_7);
 
      int id = 0;
      in >> id;

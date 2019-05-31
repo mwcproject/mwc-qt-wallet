@@ -9,6 +9,8 @@ namespace ioutils {
 // return path value
 QString initAppDataPath(QString localPath = "")  noexcept(false);
 
+QByteArray FilterEscSymbols( const QByteArray & data );
+
 }
 
 #endif // IOUTILS_H

@@ -2,7 +2,6 @@
 #include "ui_accounts.h"
 #include "../state/accounts.h"
 #include "../util/stringutils.h"
-#include <QMovie>
 #include <QInputDialog>
 #include <QMessageBox>
 
@@ -18,12 +17,6 @@ Accounts::Accounts(QWidget *parent, state::Accounts * _state) :
     state->setWindowTitle("Accounts");
 
     wallet::WalletInfo info = state->getWalletInfo();
-
-
-    QLabel *lbl = ui->waitingPlaceholder;
-    QMovie *movie = new QMovie(":/img/loader.gif", QByteArray(), this);
-    lbl->setMovie(movie);
-    lbl->hide();
 
     ui->accountList->setFocus();
 

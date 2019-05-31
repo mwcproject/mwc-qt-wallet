@@ -17,10 +17,14 @@ InputPassword::~InputPassword() {
 }
 
 NextStateRespond InputPassword::execute() {
-    if ( context.appContext->getCookie<QString>(COOKIE_PASSWORD).length()==0) {
+    auto status = context.wallet->getWalletStatus();
+    if ( status == wallet::Wallet::InitWalletStatus::NEED_PASSWORD ||
+            status == wallet::Wallet::InitWalletStatus::WRONG_PASSWORD )
+    {
+        wnd = new wnd::InputPassword( context.wndManager->getInWndParent(), this );
+        context.wndManager->switchToWindow(wnd);
 
-        context.wndManager->switchToWindow(
-                    new wnd::InputPassword( context.wndManager->getInWndParent(), this ) );
+        slotConn = QObject::connect( context.wallet, &wallet::Wallet::onInitWalletStatus, this, &InputPassword::onInitWalletStatus );
 
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
     }
@@ -29,16 +33,32 @@ NextStateRespond InputPassword::execute() {
     return NextStateRespond( NextStateRespond::RESULT::DONE );
 }
 
-bool InputPassword::checkPassword(const QString & password) {
-    return context.appContext->checkPassHash(password);
-}
-
 void InputPassword::submitPassword(const QString & password) {
-    // no needs ti update the hash
-    context.appContext->pushCookie<QString>(COOKIE_PASSWORD, password);
+    Q_ASSERT(wnd != nullptr);
+    if (wnd) {
+        wnd->startWaiting();
+    }
 
-    context.stateMachine->executeFrom(STATE::INPUT_PASSWORD);
+    context.wallet->loginWithPassword(password, context.appContext->getCurrentAccount());
 }
 
+void InputPassword::onInitWalletStatus( wallet::Wallet::InitWalletStatus  status ) {
+    if (status == wallet::Wallet::InitWalletStatus::WRONG_PASSWORD ) {
+        Q_ASSERT(wnd != nullptr);
+        if (wnd) {
+            wnd->stopWaiting();
+            wnd->reportWrongPassword();
+        }
+    } else if (status == wallet::Wallet::InitWalletStatus::READY ) {
+        // Great, login is done. Now we can use the wallet
+        Q_ASSERT(context.wallet->getWalletStatus() == wallet::Wallet::InitWalletStatus::READY);
+        QObject::disconnect(slotConn);
+        context.stateMachine->executeFrom(STATE::INPUT_PASSWORD);
+    }
+    else {
+        // seems like fatal error. Unknown state
+        context.wallet->reportFatalError("Internal error. Wallet Password verification invalid state.");
+    }
+}
 
 }

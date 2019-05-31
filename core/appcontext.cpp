@@ -18,7 +18,7 @@ AppContext::~AppContext() {
     saveData();
 }
 
-void AppContext::setPassHash(const QString & pass) {
+/*void AppContext::setPassHash(const QString & pass) {
     if (pass.length()==0) {
         passHash = -1;
         return;
@@ -29,7 +29,7 @@ void AppContext::setPassHash(const QString & pass) {
 
 bool AppContext::checkPassHash(const QString & pass) const {
     return passHash == qHash(pass) % 0xFFFF;
-}
+}*/
 
 // Get last path state. Default: Home dir
 QString AppContext::getPathFor( QString name ) const {
@@ -66,30 +66,23 @@ bool AppContext::loadData() {
      }
 
      QDataStream in(&file);
-     in.setVersion(QDataStream::Qt_5_12);
+     in.setVersion(QDataStream::Qt_5_7);
 
      int id = 0;
      in >> id;
-     if (id<0x6546 || id>0x6549)
+     if (id!=0x4780)
          return false;
 
-     in >> passHash;
-     in >> network;
+     in >> currentAccount;
 
-     if (id>=0x6547) {
-         int st;
-         in >> st;
-         st = activeWndState;
-     }
+     int st;
+     in >> st;
+     activeWndState = (state::STATE)st;
 
-     if (id>=0x6549) {
-         in >> pathStates;
-         in >> intVectorStates;
-     }
+     in >> pathStates;
+     in >> intVectorStates;
 
-     if (id>=0x6548) {
-         sendCoinsParams.loadData(in);
-     }
+     sendCoinsParams.loadData(in);
 
      return true;
 }
@@ -108,11 +101,10 @@ void AppContext::saveData() const {
     }
 
     QDataStream out(&file);
-    out.setVersion(QDataStream::Qt_5_12);
+    out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x6549;
-    out << passHash;
-    out << network;
+    out << 0x4780;
+    out << currentAccount;
     out << int(activeWndState);
     out << pathStates;
     out << intVectorStates;

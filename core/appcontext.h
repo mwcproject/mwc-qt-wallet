@@ -30,9 +30,10 @@ public:
     template <class T>
     T getCookie(QString key);
 
-    void setPassHash(const QString & pass);
-    bool checkPassHash(const QString & pass) const;
+//    void setPassHash(const QString & pass);
+//    bool checkPassHash(const QString & pass) const;
 
+    // Set network need to be done from the command line
     QString getNetwork() const {return network;}
 
     state::STATE getActiveWndState() const {return activeWndState;}
@@ -51,6 +52,9 @@ public:
     QVector<int> getIntVectorFor( QString name ) const;
     void updateIntVectorFor( QString name, const QVector<int> & data );
 
+    QString getCurrentAccount() const {return currentAccount;}
+    void setCurrentAccount(QString account) {currentAccount = account;}
+
 private:
     bool loadData();
     void saveData() const;
@@ -58,10 +62,12 @@ private:
 private:
     // 16 bit hash from the password. Can be used for the password verification
     // Don't use many bits because we don't want it be much usable for attacks.
-    int passHash = -1;
+//    int passHash = -1;
 
-    // Network. Normally it is alleways 'main'
-    QString network = "main";
+    // Network. Normally it is 'main'. Need to be changable from arg list
+    QString network = "floonet";  // Let's keep floonet for testing. We are not ready for main
+
+    QString currentAccount = ""; // Selected account
 
     // Active window that is visible
     state::STATE activeWndState = state::STATE::ACCOUNTS;

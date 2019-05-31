@@ -5,7 +5,6 @@
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include <QMessageBox>
-#include <QRandomGenerator>
 
 namespace state {
 

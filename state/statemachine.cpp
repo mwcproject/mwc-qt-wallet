@@ -23,6 +23,7 @@
 #include "contacts.h"
 #include "walletconfig.h"
 #include "airdrop.h"
+#include "StartWallet.h"
 
 namespace state {
 
@@ -33,6 +34,7 @@ StateMachine::StateMachine(StateContext & context) :
     context.setStateMachine(this);
     Q_ASSERT(appContext);
 
+    states[ STATE::START_WALLET ]   = new StartWallet(context);
     states[ STATE::STATE_INIT ]     = new InitAccount(context);
     states[ STATE::INPUT_PASSWORD ] = new InputPassword(context);
     states[ STATE::NEW_WALLET ]     = new NewWallet(context);

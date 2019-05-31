@@ -5,7 +5,6 @@
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include <QMessageBox>
-#include <QRandomGenerator>
 #include "../core/testseedtask.h"
 
 namespace state {
@@ -26,7 +25,7 @@ NextStateRespond NewSeed::execute() {
     }
 
     // generate a new seed for a new wallet
-    QVector<QString> seed = context.wallet->init();
+    QVector<QString> seed = context.wallet->generateSeedForNewAccount();
     context.appContext->pushCookie< QVector<QString> >("seed2verify", seed);
 
     context.appContext->pushCookie< QVector<core::TestSeedTask> >("seedTasks", core::generateSeedTasks( seed ) );
@@ -36,6 +35,5 @@ NextStateRespond NewSeed::execute() {
 
 void NewSeed::submit() {
 }
-
 
 }

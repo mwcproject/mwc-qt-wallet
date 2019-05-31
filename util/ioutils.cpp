@@ -20,4 +20,23 @@ QString initAppDataPath(QString localPath )
      return dataPath;
 }
 
+QByteArray FilterEscSymbols( const QByteArray & data ) {
+    QByteArray res;
+
+    bool inEsc = false;
+    for (char d : data) {
+        if (d==27)
+            inEsc = true;
+
+        if (!inEsc)
+            res.append( d );
+
+        if (d=='m')
+            inEsc=false;
+    }
+
+    return res;
+}
+
+
 }
