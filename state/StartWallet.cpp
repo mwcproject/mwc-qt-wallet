@@ -46,7 +46,7 @@ void StartWallet::onInitWalletStatus(wallet::Wallet::InitWalletStatus status) {
         case wallet::Wallet::InitWalletStatus::NEED_INIT:
         case wallet::Wallet::InitWalletStatus::NEED_PASSWORD: {
             QObject::disconnect(slotConn);
-            context.stateMachine->executeFrom(STATE::INPUT_PASSWORD);
+            context.stateMachine->executeFrom(STATE::STATE_INIT);
             return;
         }
         default: {

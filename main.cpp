@@ -19,9 +19,9 @@ int main(int argc, char *argv[])
     // create dynamically. Window will be deleted on close
     core::MainWindow * mainWnd = new core::MainWindow(nullptr);
 
-    wallet::MWC713 wallet("/mw/grin/wallet713/target/debug/mwc713");
+    //wallet::MWC713 wallet("/mw/grin/wallet713/target/debug/mwc713");
 
-    //wallet::MockWallet wallet;
+    wallet::MockWallet wallet;
 
     core::WindowManager wndManager( mainWnd->getMainWindow() );
 

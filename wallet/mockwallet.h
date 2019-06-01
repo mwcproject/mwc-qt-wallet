@@ -13,6 +13,13 @@ public:
     MockWallet();
     virtual ~MockWallet() override;
 
+    // Generic. Reporting fatal error that somebody will process and exit app
+    virtual void reportFatalError( QString message ) noexcept(false) override;
+
+    // Get all notification messages
+    virtual const QVector<WalletNotificationMessages> & getWalletNotificationMessages() noexcept(false) override;
+
+
     virtual void start(QString network) noexcept(false) override;
     virtual void loginWithPassword(QString password, QString account) noexcept(false) override;
 
@@ -113,6 +120,7 @@ private:
     bool listenFogeignApi = false;
     InitWalletStatus initStatus = InitWalletStatus::NONE;
 
+    QVector<WalletNotificationMessages> notificationMessages;
 private:
     bool loadData();
     void saveData() const;

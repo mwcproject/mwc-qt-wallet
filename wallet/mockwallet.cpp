@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QThread>
 #include <QTime>
+#include <QApplication>
 
 namespace wallet {
 
@@ -75,6 +76,19 @@ MockWallet::MockWallet()
 
 MockWallet::~MockWallet() {
     saveData();
+}
+
+
+// Generic. Reporting fatal error that somebody will process and exit app
+void MockWallet::reportFatalError( QString message ) noexcept(false) {
+    QMessageBox::critical(nullptr, "Critical Error", "We get a ritical error from underneath layer and need to close appclication.\nError: " + message);
+    QApplication::quit();
+}
+
+// Get all notification messages
+const QVector<WalletNotificationMessages> & MockWallet::getWalletNotificationMessages()
+{
+    return notificationMessages;
 }
 
 
