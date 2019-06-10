@@ -3,7 +3,7 @@
 #include "../state/filetransactions.h"
 #include <QFileDialog>
 #include "../util/stringutils.h"
-#include <QMessageBox>
+#include "../control/messagebox.h"
 
 namespace wnd {
 
@@ -26,7 +26,7 @@ void FileTransactions::on_generateSendCoinsFileButton_clicked()
     QString mwc2sendStr = ui->sendCoinsEdit->text();
     auto res = util::one2nano( mwc2sendStr );
     if (!res.first) {
-        QMessageBox::critical(this, "MWC coints input", "Please input number of MWC coins that you want to send");
+        control::MessageBox::message(this, "Verification Error", "Please input number of MWC coins that you want to send");
         return;
     }
     long nanoCoins = res.second;
@@ -45,7 +45,7 @@ void FileTransactions::on_generateSendCoinsFileButton_clicked()
 
     QPair<bool, QString> sendRes = state->generateSendCoinsFile(nanoCoins, fileName);
     if (sendRes.first) {
-        QMessageBox::information(this, "Send MWC coins",
+        control::MessageBox::message(this, "Success",
                  "You sucessfully created a initial transaction file that send " +
                  mwc2sendStr + " MWC. The resulting file is located at " + flInfo.absoluteFilePath() );
 
@@ -53,8 +53,8 @@ void FileTransactions::on_generateSendCoinsFileButton_clicked()
         return;
     }
     else {
-        QMessageBox::critical(this, "Send MWC coins",
-                 "Unable to create initial transaction file. Error: " + sendRes.second );
+        control::MessageBox::message(this, "Error",
+                 "Unable to create initial transaction file.\nError: " + sendRes.second );
         return;
     }
 
@@ -77,14 +77,14 @@ void FileTransactions::on_signTransactionButton_clicked()
 
     QPair<bool, QString> sendRes = state->signTransaction(fileName, resultFileName);
     if (sendRes.first) {
-        QMessageBox::information(this, "Sign transaction",
+        control::MessageBox::message(this, "Success",
                  "You sucessfully signed transaction from sender. "
                  "The response file is located at " + resultFileName );
         return;
     }
     else {
-        QMessageBox::critical(this, "Sign transaction",
-                 "Sign transaction was failed. Error: " + sendRes.second );
+        control::MessageBox::message(this, "Error",
+                 "Sign transaction was failed.\nError: " + sendRes.second );
         return;
     }
 }
@@ -104,13 +104,13 @@ void FileTransactions::on_processResponceFileButton_clicked()
 
     QPair<bool, QString> sendRes = state->processResponseFile(fileName);
     if (sendRes.first) {
-        QMessageBox::information(this, "Process transaction",
+        control::MessageBox::message(this, "Success",
                  "You sucessfully process and publish transaction from " + fileName );
         return;
     }
     else {
-        QMessageBox::critical(this, "Process transaction",
-                 "Transaction processing was failed. Error: " + sendRes.second );
+        control::MessageBox::message(this, "Error",
+                 "Transaction processing was failed.\nError: " + sendRes.second );
         return;
     }
 }

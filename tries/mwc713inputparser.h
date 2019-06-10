@@ -36,7 +36,10 @@ private:
     void initNeedUnlock();
     void initPasswordError(); // notification about the wrong password.
     void initBoxListener();
-    void initUnlockMwcAddress();
+    void initMwcMqAddress();
+    void initInitWalletWorkflow();
+    void initListening();
+    void initRecovery();
 
     void initGenericError(); // All error messages
 

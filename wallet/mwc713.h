@@ -3,8 +3,7 @@
 
 #include "wallet.h"
 #include <QObject>
-
-class QProcess;
+#include <QProcess>
 
 namespace tries {
     class Mwc713InputParser;
@@ -16,7 +15,6 @@ namespace wallet {
 const QString WMC_713_VERSION("2.0.0");
 
 class Mwc713State;
-class Mwc713reader;
 class Mwc713EventManager;
 
 class MWC713 : public Wallet
@@ -25,7 +23,7 @@ class MWC713 : public Wallet
 public:
 
 public:
-    MWC713(QString mwc713path);
+    MWC713(QString mwc713path, QString mwc713configPath);
     virtual ~MWC713() override;
 
     // Generic. Reporting fatal error that somebody will process and exit app
@@ -36,26 +34,56 @@ public:
     // Check signal: onNewNotificationMessage
 
     // ---- Wallet Init Phase
-    virtual void start(QString network) noexcept(false) override;
+    virtual void start() noexcept(false) override;
     virtual void loginWithPassword(QString password, QString account) noexcept(false) override;
     // Check signal: onInitWalletStatus
     virtual InitWalletStatus getWalletStatus() noexcept(false) override {return initStatus;}
 
 
     virtual bool close() noexcept(false) override {return true;}
-    virtual QVector<QString> generateSeedForNewAccount() noexcept(false) override {return QVector<QString>();}
-    // Confirm that user write the passphase
-    virtual void confirmNewSeed() noexcept(false) override {}
+    virtual void generateSeedForNewAccount(QString password) noexcept(false) override;
+    // Check signal: onNewSeed( seed [] )
 
-    virtual QPair<bool, QString> recover(const QVector<QString> & seed) noexcept(false) override {return QPair<bool, QString>(true,"");}
+    // Confirm that user write the passphase
+    virtual void confirmNewSeed() noexcept(false) override;
+
+    // Recover the wallet with a mnemonic phrase
+    // recover wallet with a passphrase:
+    // NOTE: Expected that listen is stopped for both - mwc MQ & keybase
+    // Recover with percentage
+    // NOTE: Expected that listening will be started
+    virtual void recover(const QVector<QString> & seed, QString password) noexcept(false) override;
+    // Check Signals: onRecoverProgress( int progress, int maxVal );
+    // Check Signals: onRecoverResult(bool ok, QString newAddress );
 
     //--------------- Listening
-    virtual uint getListeningStatus() noexcept(false) override {return 0;}
-    virtual QPair<bool, QString> startListening(ListenState lstnState) noexcept(false) override  {return QPair<bool, QString>(true,"");}
-    virtual QPair<bool, QString> stopListening(ListenState lstnState) noexcept(false) override  {return QPair<bool, QString>(true,"");}
-    virtual QPair<QString,int> getMwcBoxAddress() noexcept(false) override  {return QPair<QString,int>("",0);}
-    virtual void changeMwcBoxAddress(int idx) noexcept(false) override {}
-    virtual void nextBoxAddress() noexcept(false) override {}
+
+    // Checking if wallet is listening through services
+    // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
+    virtual QPair<bool,bool> getListeningStatus() noexcept(false) override;
+
+    // Start listening through services
+    virtual void listeningStart(bool startMq, bool startKb) noexcept(false) override;
+    // Check Signal: onStartListening
+
+    // Stop listening through services
+    virtual void listeningStop(bool stopMq, bool stopKb) noexcept(false) override;
+    // Check signal: onListeningStopResult
+
+    // Get latest Mwc MQ address that we see
+    virtual QString getLastKnownMwcBoxAddress() noexcept(false) override;
+
+    // Get MWC box <address, index in the chain>
+    virtual void getMwcBoxAddress() noexcept(false) override;
+    // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
+
+    // Change MWC box address to another from the chain. idx - index in the chain.
+    virtual void changeMwcBoxAddress(int idx) noexcept(false) override;
+    // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
+
+    // Generate next box address
+    virtual void nextBoxAddress() noexcept(false) override;
+    // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
 
 
     // --------------- Foreign API
@@ -121,7 +149,7 @@ public:
 public:
     // Task Reporting methods
     enum MESSAGE_LEVEL { FATAL_ERROR, CRITICAL, WARNING, INFO, DEBUG };
-    enum MESSAGE_ID {INIT_ERROR, GENERIC, TASK_TIMEOUT };
+    enum MESSAGE_ID {INIT_ERROR, GENERIC, MWC7113_ERROR, TASK_TIMEOUT };
     void appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QString message );
 
     // Wallet init status
@@ -129,12 +157,38 @@ public:
     void setInitStatus( INIT_STATUS  initStatus );
 
     void setMwcAddress( QString mwcAddress ); // Set active MWC address. Listener might be offline
+    void setMwcAddressWithIndex( QString mwcAddress, int idx );
+
+    void setNewSeed( QVector<QString> seed );
+
+    void setListeningStartResults( bool mqTry, bool kbTry, // what we try to start
+            QStringList errorMessages );
+
+    void setListeningStopResult(bool mqTry, bool kbTry, // what we try to stop
+                                QStringList errorMessages );
+
+    void setMwcMqListeningStatus(bool online);
+    void setKeybaseListeningStatus(bool online);
+
+
+    void setRecoveryResults( bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages );
+    void setRecoveryProgress( long progress, long limit );
+
 private:
+    void mwc713connect();
+    void mwc713disconnect();
+
+private slots:
+    // mwc713 Process IOs
+    void	mwc713errorOccurred(QProcess::ProcessError error);
+    void	mwc713finished(int exitCode, QProcess::ExitStatus exitStatus);
+    void	mwc713readyReadStandardError();
+    void	mwc713readyReadStandardOutput();
 
 private:
     QString mwc713Path; // path to the backed binary
+    QString mwc713configPath; // config file for mwc713
     QProcess * mwc713process = nullptr;
-    Mwc713reader * reader = nullptr;
     tries::Mwc713InputParser * inputParser = nullptr; // Parser will generate bunch of signals that wallet will listem on
 
     Mwc713EventManager * eventCollector = nullptr;
@@ -146,6 +200,13 @@ private:
     QVector<WalletNotificationMessages> notificationMessages;
 
     QString mwcAddress; // Address from mwc listener
+
+    // listening statuses
+    bool mwcMqOnline = false;
+    bool keybaseOnline = false;
+
+    // Connections to mwc713process
+    QVector< QMetaObject::Connection > mwc713connections; // open connection to mwc713
 };
 
 }

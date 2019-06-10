@@ -1,6 +1,6 @@
 #include "connect2server.h"
 #include "ui_connect2server.h"
-#include <QMessageBox>
+#include "../control/messagebox.h"
 #include  "../state/connect2node.h"
 
 namespace wnd {
@@ -34,7 +34,7 @@ void ConnectToServer::on_submitButton_clicked()
         state->applyChoice( state::Connect2Node::NODE_POOL);
     }
     else {
-        QMessageBox::critical(this, "Connecto to MWC node",
+        control::MessageBox::message(this, "Error",
                               "Please select the connection type to your server");
     }
 

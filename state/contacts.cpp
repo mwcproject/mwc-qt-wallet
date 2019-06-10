@@ -3,7 +3,6 @@
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
-#include <QMessageBox>
 
 namespace state {
 

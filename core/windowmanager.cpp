@@ -1,14 +1,13 @@
 #include "windowmanager.h"
 #include "../wallet/wallet.h"
 #include <QDebug>
-#include <QMessageBox>
 #include <QApplication>
 #include "../windows/connect2server.h"
 #include "../windows/nodemanually_w.h"
 #include "../windows/nodestatus_w.h"
-#include "../windows/newwallet_w.h"
-#include "../windows/newseed_w.h"
-#include "../windows/enterseed.h"
+#include "../windows/c_newwallet_w.h"
+#include "../windows/c_newseed_w.h"
+#include "../windows/c_enterseed.h"
 
 namespace core {
 

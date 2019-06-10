@@ -1,0 +1,44 @@
+QDialog {
+    color: #3600C9;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+
+    background-color: white
+}
+
+QLabel {
+    color: #3600C9;
+}
+
+
+QLineEdit {
+    color: #3600C9;
+    background: rgba(111, 0, 214, 0.2);;
+    selection-background-color: rgba(111, 0, 214, 0.4);
+}
+
+QLineEdit:focus {
+    border: 2px solid #CCFF33;
+    background: rrgba(111, 0, 214, 0.3);
+}
+
+QPushButton
+{
+    color: #6F00D6;
+
+    border: 2px solid #6F00D6;
+    border-radius: 6px;
+}
+
+QPushButton:focus {
+    background: #9E00E7;
+    color: white;
+    border: 2px solid #6F00D6;
+}
+
+QPushButton:disabled {
+    border: 2px solid gray;
+    color: gray;
+}
+

@@ -7,7 +7,7 @@ namespace wallet {
 
     class TaskUnlock : public Mwc713Task {
     public:
-        const static long TIMEOUT = 10000;
+        const static long TIMEOUT = 5000;
 
         TaskUnlock( MWC713 * wallet713, QString password, QString account ) :
                     Mwc713Task("Unlocking", buildWalletRequest(password, account), wallet713) {}

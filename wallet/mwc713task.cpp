@@ -29,7 +29,7 @@ QString printEvents(const QVector<WEvent> & events) {
         if (res.length()>0)
             res += ", ";
 
-        res += "Evt(T=" + QString::number(e.event) + ", msg=" + e.message + ")";
+        res += "Evt(T=" + toString(e.event) + ", msg=" + e.message + ")";
     }
     return res;
 }

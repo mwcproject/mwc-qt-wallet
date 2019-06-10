@@ -1,9 +1,9 @@
 #include "receivecoins_w.h"
 #include "ui_receivecoins.h"
-#include "../state/listening.h"
+#include "../state/e_listening.h"
 #include "../state/filetransactions.h"
 #include "../state/transactions.h"
-#include <QMessageBox>
+#include "../control/messagebox.h"
 #include <QFileDialog>
 
 namespace wnd {
@@ -37,13 +37,13 @@ ReceiveCoins::ReceiveCoins(QWidget *parent,
     updateTransactionTable();
 
     // Start listening
-    QPair<bool, QString> status = listeningState->getBoxListeningStatus();
+/*    QPair<bool, QString> status = listeningState->getBoxListeningStatus();
     if (!status.first) {
         // start listening
         QPair<bool, QString> res = listeningState->startBoxListeningStatus();
         if (!res.first)
-            QMessageBox::critical(this,"Listening error", "Unable to process sart listening request. Error: " + res.second);
-    }
+            control::MessageBox::message(this,"Listening error", "Unable to process sart listening request. Error: " + res.second);
+    }*/
     updateBoxState();
 
 }
@@ -61,13 +61,13 @@ ReceiveCoins::~ReceiveCoins()
         // stop listening
         QPair<bool, QString> res = listeningState->stopBoxListeningStatus();
         if (!res.first)
-            QMessageBox::critical(this,"Listening error", "Unable to process stop listening request. Error: " + res.second);
+            control::MessageBox::message(this,"Listening error", "Unable to process stop listening request. Error: " + res.second);
     }
     else {
         // start listening
         QPair<bool, QString> res = listeningState->startBoxListeningStatus();
         if (!res.first)
-            QMessageBox::critical(this,"Listening error", "Unable to process satrt listening request. Error: " + res.second);
+            control::MessageBox::message(this,"Listening error", "Unable to process satrt listening request. Error: " + res.second);
     }
 
     updateBoxState();
@@ -88,19 +88,19 @@ void ReceiveCoins::on_processResponceFileButton_clicked()
 
     QPair<bool, QString> sendRes = fileTransactionsState->processResponseFile(fileName);
     if (sendRes.first) {
-        QMessageBox::information(this, "Process transaction",
+        control::MessageBox::message(this, "Success",
                  "You sucessfully process and publish transaction from " + fileName );
         return;
     }
     else {
-        QMessageBox::critical(this, "Process transaction",
-                 "Transaction processing was failed. Error: " + sendRes.second );
+        control::MessageBox::message(this, "Error",
+                 "Transaction processing was failed.\nError: " + sendRes.second );
         return;
     }
 }
 
 void ReceiveCoins::updateBoxState() {
-    QPair<bool, QString> status = listeningState->getBoxListeningStatus();
+/*    QPair<bool, QString> status = listeningState->getBoxListeningStatus();
     if (status.first) {
         ui->mwcBoxStatus->setText( "Online" +  (status.second.length()==0 ? "" : (", "+ status.second)));
         ui->mwcBoxConnectBtn->setText( "Stop" );
@@ -113,7 +113,7 @@ void ReceiveCoins::updateBoxState() {
         ui->mwcBoxConnectBtn->setText( "Start" );
         ui->mwcBoxStatus->setText( "Offline" );
         ui->mwcBoxAddress->setText("N/A");
-    }
+    }*/
 }
 
 

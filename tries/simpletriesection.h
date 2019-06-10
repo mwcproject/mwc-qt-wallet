@@ -6,9 +6,9 @@
 namespace tries {
 
 // Parsing the fixed phrase
-class TriePhaseSection : public BaseTrieSection {
+class TriePhraseSection : public BaseTrieSection {
 public:
-    TriePhaseSection(QString phrase, int accumulateId=-1);
+    TriePhraseSection(QString phrase, int accumulateId=-1);
 
     virtual uint32_t processChar(TrieContext & context, QChar ch) override;
 protected:

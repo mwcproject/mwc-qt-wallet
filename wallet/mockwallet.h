@@ -20,25 +20,53 @@ public:
     virtual const QVector<WalletNotificationMessages> & getWalletNotificationMessages() noexcept(false) override;
 
 
-    virtual void start(QString network) noexcept(false) override;
+    virtual void start() noexcept(false) override;
     virtual void loginWithPassword(QString password, QString account) noexcept(false) override;
 
     virtual InitWalletStatus getWalletStatus() noexcept(false) override {return initStatus;}
 
     virtual bool close() noexcept(false) override;
-    virtual QVector<QString> generateSeedForNewAccount() noexcept(false) override;
+
+    virtual void generateSeedForNewAccount(QString password) noexcept(false) override;
+    // Check signal: onNewSeed( seed [] )
+
     // Confirm that user write the passphase
     virtual void confirmNewSeed() noexcept(false) override;
 
-    virtual QPair<bool, QString> recover(const QVector<QString> & seed) noexcept(false) override;
+    // Recover the wallet with a mnemonic phrase
+    // recover wallet with a passphrase:
+    virtual void recover(const QVector<QString> & seed, QString password) noexcept(false) override;
+    // Check Signals: onRecoverProgress( int progress, int maxVal );
+    // Check Signals: onRecoverResult(bool ok, QString newAddress );
 
     //--------------- Listening
-    virtual uint getListeningStatus() noexcept(false) override;
-    virtual QPair<bool, QString> startListening(ListenState lstnState) noexcept(false) override;
-    virtual QPair<bool, QString> stopListening(ListenState lstnState) noexcept(false) override;
-    virtual QPair<QString,int> getMwcBoxAddress() noexcept(false) override;
+
+    // Checking if wallet is listening through services
+    // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
+    virtual QPair<bool,bool> getListeningStatus() noexcept(false) override;
+
+    // Start listening through services
+    virtual void listeningStart(bool startMq, bool startKb) noexcept(false) override;
+    // Check Signal: onStartListening
+
+    // Stop listening through services
+    virtual void listeningStop(bool stopMq, bool stopKb) noexcept(false) override;
+    // Check signal: onListeningStopResult
+
+    // Get latest Mwc MQ address that we see
+    virtual QString getLastKnownMwcBoxAddress() noexcept(false) override;
+
+    // Get MWC box <address, index in the chain>
+    virtual void getMwcBoxAddress() noexcept(false) override;
+    // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
+
+    // Change MWC box address to another from the chain. idx - index in the chain.
     virtual void changeMwcBoxAddress(int idx) noexcept(false) override;
+    // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
+
+    // Generate next box address
     virtual void nextBoxAddress() noexcept(false) override;
+    // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
 
 
     // --------------- Foreign API
@@ -99,8 +127,6 @@ private:
     // data
     QString dataPath;
 
-    QString blockchainNetwork;
-
     bool isInit = false;// true is init
     QString walletPassword; // password that encrypt the seed
 
@@ -116,7 +142,7 @@ private:
 
     // Runtime data
     bool listenMwcBox = false;
-    bool listenKeystone = false;
+    bool listenKeybase = false;
     bool listenFogeignApi = false;
     InitWalletStatus initStatus = InitWalletStatus::NONE;
 

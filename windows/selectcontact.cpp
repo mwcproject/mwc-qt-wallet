@@ -2,7 +2,7 @@
 #include "ui_selectcontact.h"
 #include "../util/stringutils.h"
 #include <QListWidgetItem>
-#include <QMessageBox>
+#include "../control/messagebox.h"
 
 namespace wnd {
 
@@ -37,7 +37,7 @@ void SelectContact::on_selectButton_clicked()
 {
     QListWidgetItem * itm = ui->contactsListWidget->currentItem();
     if (itm==nullptr) {
-        QMessageBox::information(this, "Contact selection", "Please select a contact that you are going to use");
+        control::MessageBox::message(this, "Need info", "Please select a contact that you are going to use");
         return;
     }
 

@@ -3,7 +3,7 @@
 #include "../state/accounts.h"
 #include "../util/stringutils.h"
 #include <QInputDialog>
-#include <QMessageBox>
+#include "../control/messagebox.h"
 
 namespace wnd {
 
@@ -85,7 +85,7 @@ void Accounts::on_addAccountButton_clicked()
     stopWaiting();
 
     if (!newAccResult.first) {
-        QMessageBox::critical(this, "Unable to add an account", "Wallet unable to add a new account. Error: " + newAccResult.second);
+        control::MessageBox::message(this, "Error", "Wallet unable to add a new account.\nError: " + newAccResult.second);
     }
 }
 

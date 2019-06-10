@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include "../state/state.h"
+#include "../wallet/wallet.h"
 
 namespace Ui {
 class MainWindow;
@@ -25,15 +27,17 @@ public:
     ~MainWindow();
 
     void setStateMachine(state::StateMachine * stateMachine);
+    void setWallet(wallet::Wallet * wallet);
 
     QWidget * getMainWindow();
 
     // Update tb & menu actions
-    void updateActionStates();
+    void updateActionStates(state::STATE actionState);
+
+    void updateLeftBar(bool show);
 
 private slots:
     void on_actionVersion_triggered();
-    void updateClock();
 
     void on_actionAccount_triggered();
     void on_actionEvents_triggered();
@@ -49,15 +53,15 @@ private slots:
     void on_actionAirdrop_triggered();
     void on_actionRecieve_coins_triggered();
 
-private:
+private slots:
+    void onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message);
+
+
 private:
     Ui::MainWindow *ui;
-    QTimer *clockTimer = nullptr;
     state::StateMachine * stateMachine = nullptr;
 
-    QAction * actionAccounts;
-    QAction * actionEvents;
-    QAction * actionHodl;
+    bool leftBarShown = true;
 };
 
 }

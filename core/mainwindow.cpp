@@ -3,6 +3,8 @@
 #include <QTime>
 #include "versiondialog.h"
 #include "../state/statemachine.h"
+#include "util/widgetutils.h"
+#include <QMessageBox>
 
 namespace core {
 
@@ -12,12 +14,13 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->statusBar->addPermanentWidget(ui->currentTime);
-    ui->statusBar->showMessage("Can show any message here");
+    ui->statusBar->addPermanentWidget(ui->helpButton);
+    ui->statusBar->addPermanentWidget(ui->btnSpacerLabel1);
+    ui->statusBar->addPermanentWidget(ui->connectionStatusLabel);
+    ui->statusBar->addPermanentWidget(ui->rightestSpacerLabel);
 
-    clockTimer = new QTimer(this);
-    connect(clockTimer, SIGNAL(timeout()), this, SLOT(updateClock()) );
-    clockTimer->start(1000);
+    //ui->statusBar->showMessage("Can show any message here", 2000);
+
 
     // Want to delete children when they close
     setAttribute( Qt::WA_DeleteOnClose, true );
@@ -29,19 +32,69 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::setWallet(wallet::Wallet * wallet) {
+    QObject::connect(wallet, &wallet::Wallet::onNewNotificationMessage,
+                                         this, &MainWindow::onNewNotificationMessage, Qt::QueuedConnection);
+}
+
+void MainWindow::onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message) {
+
+    using namespace wallet;
+
+    QString prefix;
+    int timeout = 3000;
+    switch(level) {
+    case WalletNotificationMessages::ERROR:
+        prefix = "Error: ";
+        timeout = 7000;
+        break;
+    case WalletNotificationMessages::WARNING:
+        prefix = "Warning: ";
+        timeout = 7000;
+        break;
+    case WalletNotificationMessages::INFO:
+        prefix = "Info: ";
+        timeout = 4000;
+        break;
+    case WalletNotificationMessages::DEBUG:
+        prefix = "Debug: ";
+        timeout = 2000;
+        break;
+    }
+
+    ui->statusBar->showMessage( prefix + message, timeout);
+}
+
+
+void MainWindow::updateLeftBar(bool show) {
+    if (leftBarShown == show)
+        return;
+
+    if (show) {
+        ui->leftTb->show();
+        ui->statusBar->show();
+    }
+    else {
+        ui->leftTb->hide();
+        ui->statusBar->hide();
+    }
+    leftBarShown = show;
+}
+
 void MainWindow::setStateMachine(state::StateMachine * _stateMachine) {
     stateMachine = _stateMachine;
     Q_ASSERT(stateMachine);
 }
 
-
 QWidget * MainWindow::getMainWindow() {
     return ui->mainWindowFrame;
 }
 
-void MainWindow::updateActionStates() {
+void MainWindow::updateActionStates(state::STATE actionState) {
 
     state::STATE state = stateMachine->getActionWindow();
+
+    updateLeftBar( actionState >= state::STATE::ACCOUNTS );
 
     bool enabled = stateMachine->isActionWindowMode();
 
@@ -75,15 +128,11 @@ void MainWindow::updateActionStates() {
     ui->actionTransactions->setChecked( state == state::STATE::TRANSACTIONS );
     ui->actionOutputs->setChecked( state == state::STATE::OUTPUTS );
 
-    if (!enabled)
+/*    if (!enabled)
         ui->mainToolBar->hide();
     else
         ui->mainToolBar->show();
-
-}
-
-void MainWindow::updateClock() {
-    ui->currentTime->setText( QTime::currentTime().toString("hh:mm:ss") );
+*/
 }
 
 void MainWindow::on_actionVersion_triggered()
@@ -159,6 +208,4 @@ void core::MainWindow::on_actionAirdrop_triggered()
 
 
 }
-
-
 

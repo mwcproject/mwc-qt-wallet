@@ -4,10 +4,11 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDataStream>
-#include <QMessageBox>
 #include <QThread>
 #include <QTime>
 #include <QApplication>
+#include "../util/Log.h"
+#include "../control/messagebox.h"
 
 namespace wallet {
 
@@ -27,7 +28,7 @@ static QVector<QString> boxAddresses{
 
 MockWallet::MockWallet()
 {
-    dataPath = ioutils::initAppDataPath("mockwallet");
+    dataPath = ioutils::getAppDataPath("mockwallet");
 
     accounts.push_back("default");
 
@@ -81,7 +82,7 @@ MockWallet::~MockWallet() {
 
 // Generic. Reporting fatal error that somebody will process and exit app
 void MockWallet::reportFatalError( QString message ) noexcept(false) {
-    QMessageBox::critical(nullptr, "Critical Error", "We get a ritical error from underneath layer and need to close appclication.\nError: " + message);
+    control::MessageBox::message(nullptr, "Critical Error", "We get a ritical error from underneath layer and need to close appclication.\nError: " + message);
     QApplication::quit();
 }
 
@@ -92,24 +93,26 @@ const QVector<WalletNotificationMessages> & MockWallet::getWalletNotificationMes
 }
 
 
-void MockWallet::start(QString network) noexcept(false) {
-    blockchainNetwork = network;
+void MockWallet::start() noexcept(false) {
     if (isInit ) {
-        initStatus = InitWalletStatus::NEED_INIT;
-    }
-    else {
         initStatus = InitWalletStatus::NEED_PASSWORD;
     }
+    else {
+        initStatus = InitWalletStatus::NEED_INIT;
+    }
+    log::logEmit("mockWallet", "onInitWalletStatus", toString(initStatus) );
     emit onInitWalletStatus(initStatus);
 }
 
 void MockWallet::loginWithPassword(QString password, QString account) noexcept(false) {
+    Q_UNUSED(account);
     if ( walletPassword == QString(password) ) {
         initStatus = InitWalletStatus::NEED_PASSWORD;
     }
     else {
         initStatus = InitWalletStatus::WRONG_PASSWORD;
     }
+    log::logEmit("mockWallet", "onInitWalletStatus", toString(initStatus) );
     emit onInitWalletStatus(initStatus);
 }
 
@@ -119,9 +122,11 @@ bool MockWallet::close() {
     return true;
 }
 
-QVector<QString> MockWallet::generateSeedForNewAccount() {
+void MockWallet::generateSeedForNewAccount(QString password) {
+    Q_UNUSED(password);
+
     // init a new wallet, generate a new seed.
-    return MockWalletSeed;
+    emit onNewSeed(MockWalletSeed);
 }
 
 void MockWallet::confirmNewSeed() {
@@ -129,69 +134,78 @@ void MockWallet::confirmNewSeed() {
 }
 
 
-QPair<bool, QString> MockWallet::recover(const QVector<QString> & seed ) {
-    if (MockWalletSeed == seed) {
-        isInit = true;
-        return QPair<bool, QString>(true, "");
-    }
+// Recover the wallet with a mnemonic phrase
+// recover wallet with a passphrase:
+// Check Signals: onRecoverProgress( int progress, int maxVal );
+// Check Signals: onRecoverResult(bool ok, QString newAddress );
+void MockWallet::recover(const QVector<QString> & seed, QString password) noexcept(false) {
+    Q_UNUSED(seed);
+    Q_UNUSED(password);
+    emit onRecoverProgress(10,1000);
+    emit onRecoverProgress(100,1000);
+    emit onRecoverProgress(900,1000);
+    emit onRecoverProgress(1000,1000);
 
-    return QPair<bool, QString>(false, "Unable to recover the wallet with provivded seed");
+    emit onRecoverResult(true, true, "new_mwcmq_addres_ieurqkf320847hgfjhg", QStringList() );
 }
 
-uint MockWallet::getListeningStatus() {
-    uint status = ListenState::LISTEN_OFFLINE;
-    if (listenMwcBox)
-        status |= ListenState::LISTEN_MWCBOX;
-    if (listenKeystone)
-        status |= ListenState::LISTEN_KEYSTONE;
+//--------------- Listening
 
-    return status;
+// Checking if wallet is listening through services
+// return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
+QPair<bool,bool> MockWallet::getListeningStatus() noexcept(false) {
+    return QPair<bool,bool>(listenMwcBox, listenKeybase);
 }
 
-QPair<bool, QString> MockWallet::startListening(ListenState lstnState) {
-    if (!lstnState)
-        return QPair<bool, QString>(true,"");
-
-    if (lstnState & ListenState::LISTEN_MWCBOX) {
+// Start listening through services
+// Check Signal: onStartListening
+void MockWallet::listeningStart(bool startMq, bool startKb) noexcept(false) {
+    if (startMq)
         listenMwcBox = true;
-        return QPair<bool, QString>(true,"");
-    }
-    if (lstnState & ListenState::LISTEN_KEYSTONE) {
-        return QPair<bool, QString>(false, "Please start your keytone app first. Then retry to start listener");
-    }
+    if (startKb)
+        listenKeybase = true;
 
-    throw core::MwcException("get Unknown ListenState value: " + QString::number(lstnState));
+    emit onListeningStartResults( startMq, startKb, // what we try to start
+            QStringList() );
 }
 
-QPair<bool, QString> MockWallet::stopListening(ListenState lstnState) {
-    if (!lstnState)
-        return QPair<bool, QString>(true,"");
-
-    if (lstnState & ListenState::LISTEN_MWCBOX) {
+// Stop listening through services
+// Check signal: onListeningStopResult
+void MockWallet::listeningStop(bool stopMq, bool stopKb) noexcept(false) {
+    if (stopMq)
         listenMwcBox = false;
-        return QPair<bool, QString>(true,"");
-    }
-    if (lstnState & ListenState::LISTEN_KEYSTONE) {
-        listenKeystone = false;
-        return QPair<bool, QString>(true,"");
-    }
+    if (stopKb)
+        listenKeybase = false;
 
-    return QPair<bool, QString>(true,"");
+    emit onListeningStopResult(stopMq, stopKb, // what we try to start
+                                  QStringList() );
 }
 
-QPair<QString,int> MockWallet::getMwcBoxAddress() {
-    return QPair<QString, int>( boxAddresses[ currentAddressIdx % boxAddresses.size() ], currentAddressIdx);
+
+// Get latest Mwc MQ address that we see
+QString MockWallet::getLastKnownMwcBoxAddress() noexcept(false) {
+    return boxAddresses[ currentAddressIdx % boxAddresses.size() ];
 }
 
-void MockWallet::changeMwcBoxAddress(int idx) {
+// Get MWC box <address, index in the chain>
+// Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
+void MockWallet::getMwcBoxAddress() noexcept(false) {
+    emit onMwcAddressWithIndex( boxAddresses[ currentAddressIdx % boxAddresses.size() ], currentAddressIdx );
+}
+
+// Change MWC box address to another from the chain. idx - index in the chain.
+// Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
+void MockWallet::changeMwcBoxAddress(int idx) noexcept(false) {
     currentAddressIdx = std::max(0, idx);
-    return;
+    emit onMwcAddressWithIndex( boxAddresses[ currentAddressIdx % boxAddresses.size() ], currentAddressIdx );
 }
 
-void MockWallet::nextBoxAddress() {
+// Generate next box address
+// Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
+void MockWallet::nextBoxAddress() noexcept(false) {
     currentAddressIdx++;
+    emit onMwcAddressWithIndex( boxAddresses[ currentAddressIdx % boxAddresses.size() ], currentAddressIdx );
 }
-
 
 bool MockWallet::isForegnApiRunning() {
     return listenFogeignApi;
@@ -435,19 +449,18 @@ void MockWallet::saveData() const {
     QString filePath = dataPath + "/" + settingsFileName;
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
-        QMessageBox::information(nullptr,
-              "Unable to save settings",
+        control::MessageBox::message(nullptr,
+              "Error",
               "Unable to save MockWallet settings to " + filePath +
-              " Error: " + file.errorString());
+              "\nError: " + file.errorString());
         return;
     }
 
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x57669;
+    out << 0x57670;
 
-    out << blockchainNetwork;
     out << isInit;
     // It is mock test wallet, that is why we can store the password
     out << walletPassword;
@@ -481,10 +494,9 @@ bool MockWallet::loadData() {
 
      int id = 0;
      in >> id;
-     if (id<0x57667 || id>0x57669)
+     if (id!=0x57670)
          return false;
 
-     in >> blockchainNetwork;
      in >> isInit;
      // It is mock test wallet, that is why we can store the password
      in >> walletPassword;

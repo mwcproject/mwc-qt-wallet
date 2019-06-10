@@ -33,9 +33,6 @@ public:
 //    void setPassHash(const QString & pass);
 //    bool checkPassHash(const QString & pass) const;
 
-    // Set network need to be done from the command line
-    QString getNetwork() const {return network;}
-
     state::STATE getActiveWndState() const {return activeWndState;}
     void setActiveWndState(state::STATE  state) {activeWndState=state;}
 
@@ -64,13 +61,10 @@ private:
     // Don't use many bits because we don't want it be much usable for attacks.
 //    int passHash = -1;
 
-    // Network. Normally it is 'main'. Need to be changable from arg list
-    QString network = "floonet";  // Let's keep floonet for testing. We are not ready for main
-
     QString currentAccount = ""; // Selected account
 
     // Active window that is visible
-    state::STATE activeWndState = state::STATE::ACCOUNTS;
+    state::STATE activeWndState = state::STATE::LISTENING;
 
     // Send coins params.
     state::SendCoinsParams sendCoinsParams;

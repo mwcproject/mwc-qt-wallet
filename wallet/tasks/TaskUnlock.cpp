@@ -29,6 +29,8 @@ namespace wallet {
         }
 
         wallet713->setMwcAddress(address);
+        wallet713->setInitStatus( MWC713::INIT_STATUS::READY );
+        wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::WARNING, MWC713::MESSAGE_ID::GENERIC,"Sucessfully logged in into the wallet");
         return true;
     }
 

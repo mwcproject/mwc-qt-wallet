@@ -1,26 +1,21 @@
 <RCC>
     <qresource prefix="/">
-        <file>img/mw-logo.png</file>
-        <file>img/network.png</file>
-        <file>img/blue-question-mark.png</file>
-        <file>img/seed.jpg</file>
-        <file>img/lock.png</file>
-        <file>img/accounts.png</file>
-        <file>img/airdrop.png</file>
-        <file>img/airdrop2.png</file>
-        <file>img/notifications.png</file>
-        <file>img/contacts.png</file>
-        <file>img/transaction.png</file>
-        <file>img/config.png</file>
-        <file>img/hodl.png</file>
-        <file>img/listening.png</file>
-        <file>img/node_status.png</file>
-        <file>img/outputs.png</file>
-        <file>img/send_coins.png</file>
-        <file>img/transaction_file.png</file>
-        <file>img/send_coins_file.png</file>
-        <file>img/loader.gif</file>
         <file>txt/bip39_words.txt</file>
-        <file>img/receive_coins.png</file>
+        <file>resource/mwcwallet_style.css</file>
+        <file>img/Receive.png</file>
+        <file>img/Send.png</file>
+        <file>img/Transactions.png</file>
+        <file>img/Airdrop.png</file>
+        <file>img/HODL.png</file>
+        <file>img/TBLogo.png</file>
+        <file>img/StatusFail.png</file>
+        <file>img/StatusOk.png</file>
+        <file>img/HelpBtn.png</file>
+        <file>img/BigLogo.png</file>
+        <file>resource/dialogs_style.css</file>
+        <file>img/loading.gif</file>
+        <file>resource/mwc-gui-wallet.conf</file>
+        <file>resource/wallet713.toml</file>
+        <file>img/StatusEmpty.png</file>
     </qresource>
 </RCC>

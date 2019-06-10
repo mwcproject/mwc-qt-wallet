@@ -4,9 +4,8 @@
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
-#include <QMessageBox>
 #include "transactions.h"
-#include "listening.h"
+#include "e_listening.h"
 #include "filetransactions.h"
 
 namespace state {

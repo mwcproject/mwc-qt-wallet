@@ -3,8 +3,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDataStream>
-#include <QMessageBox>
 #include <QDir>
+#include "../control/messagebox.h"
 
 namespace core {
 
@@ -57,7 +57,7 @@ void AppContext::updateIntVectorFor( QString name, const QVector<int> & data ) {
 
 
 bool AppContext::loadData() {
-    QString dataPath = ioutils::initAppDataPath("context");
+    QString dataPath = ioutils::getAppDataPath("context");
 
     QFile file(dataPath + "/" + settingsFileName);
     if ( !file.open(QIODevice::ReadOnly) ) {
@@ -88,15 +88,15 @@ bool AppContext::loadData() {
 }
 
 void AppContext::saveData() const {
-    QString dataPath = ioutils::initAppDataPath("context");
+    QString dataPath = ioutils::getAppDataPath("context");
 
     QString filePath = dataPath + "/" + settingsFileName;
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
-        QMessageBox::information(nullptr,
-              "Unable to save settings",
+        control::MessageBox::message(nullptr,
+              "ERROR",
               "Unable to save gui-wallet settings to " + filePath +
-              " Error: " + file.errorString());
+              "\nError: " + file.errorString());
         return;
     }
 

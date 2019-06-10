@@ -17,14 +17,48 @@ class MWC713;
 // Wallet event codes
 enum WALLET_EVENTS {
     S_READY=1, // Wallet ready and waiting for intoput
-    S_WELCOME=2, // Welcome string.                       Message: version
+    S_WELCOME=2, // Welcome string.                         Message: version
     S_INIT=3,    // Init choice request. Wallet need seed
     S_PASSWORD_ERROR=4, // Incorrect password error
     S_NEED2UNLOCK=5, // Need to unlock with password and optional account
-    S_BOX_LISTENER=6, // BOX listenet is up               Message: address
-    S_GENERIC_ERROR=7, // error printed by wallet         Message: error
-    S_YOUR_MWC_ADDRESS=8, // Respond to Unlock with box address   Message: address
+    S_BOX_LISTENER=6, // BOX listener is up                 Message: address
+    S_GENERIC_ERROR=7, // error printed by wallet           Message: error
+    S_GENERIC_WARNING=8, // error printed by wallet           Message: error
+    S_GENERIC_INFO=9, // error printed by wallet           Message: error
+    S_ERROR         = 10, // error: keybase not fo...        Message: error
+    S_YOUR_MWC_ADDRESS=11, // Your mwc address/Your mwcmq address:...  Message: address
+    S_MWC_ADDRESS_INDEX = 12, // Derived with index [7]     Message: index
+
+    S_INIT_IN_PROGRESS=13, // "Initialising a new wallet"
+    S_PASSWORD_EXPECTED=14, // Password:
+    S_PASS_PHRASE=15, // Passphrase from inti process
+    S_INIT_WANT_ENTER=16, // Press ENTER when you have done so
+
+    // Listening
+    S_LISTENER_MQ_STARTING = 20, // starting mwcmq listener...
+    S_LISTENER_KB_STARTING = 21, // starting keybase listener...
+    S_LISTENER_MQ_ON = 22, // listener started for [XXXXXXX]       Message: address
+    S_LISTENER_KB_ON = 23, // listener started for [keybase]
+    S_LISTENER_MQ_STOPPING = 24, // stopping mwcmq listener...
+    S_LISTENER_KB_STOPPING = 25, // stopping keybase listener...
+    S_LISTENER_MQ_OFF = 26, // listener [XXXXXXX] stopped
+    S_LISTENER_KB_OFF = 27, // listener [keybase] stopped
+
+    S_LISTENER_MQ_LOST_CONNECTION = 28, // WARNING: listener [XXXX] lost connection. it will...
+    S_LISTENER_MQ_GET_CONNECTION = 29, // INFO: listener [XXXXX] reestablished connection.  Message: address
+
+    // Recovery
+    // from init wallet
+    S_RECOVERY_STARTING = 30, // recovering... please wait as this could take a few minutes to complete
+    S_RECOVERY_DONE = 31,     // wallet restoration done!
+    S_RECOVERY_PROGRESS = 33, // Checking 1000 outputs, up to index 13433. (Highest index: 10235)   Message:  13433|10235
+    // for fresh wallet
+    S_RECOVERY_MNEMONIC = 34, // Recovering from mnemonic => Mnemonic:
+
+    // Address
+
 };
+QString toString(WALLET_EVENTS event);
 
 // Timeout values for the Tasks
 const int TASK_STARTING_TO = 5000;
@@ -102,7 +136,7 @@ private:
     QVector<WEvent> events;
 
     bool readyState = false; // Can start a new task only from ready state
-    qint64 taskExecutionTimeLimit = 0; // Timeout valur for the task
+    volatile qint64 taskExecutionTimeLimit = 0; // Timeout valur for the task
 };
 
 }

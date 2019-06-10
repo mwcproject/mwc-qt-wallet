@@ -1,7 +1,7 @@
 #include "airdrop_w.h"
 #include "ui_airdrop.h"
 #include "../state/airdrop.h"
-#include <QMessageBox>
+#include "../control/messagebox.h"
 #include "../util/stringutils.h"
 
 namespace wnd {
@@ -32,13 +32,13 @@ void Airdrop::on_nextButton_clicked()
     QString address = ui->btcAddressEdit->text();
 
     if (address.length()==0) {
-        QMessageBox::critical(this, "MWC claim", "Please input your BTC address that you registered at airdrop");
+        control::MessageBox::message(this, "Error", "Please input your BTC address that you registered at airdrop");
         return;
     }
 
     QPair<bool, QString> res = state->claimBtcAddress(address);
     if (!res.first) {
-        QMessageBox::critical(this, "MWC claim", "You claim for MWC was failed. Error: " + res.second );
+        control::MessageBox::message(this, "Claim failure", "You claim for MWC was failed.\nError: " + res.second );
         return;
     }
 }

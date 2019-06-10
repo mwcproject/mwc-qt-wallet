@@ -1,7 +1,7 @@
 #include "walletconfig_w.h"
 #include "ui_walletconfig.h"
 #include "../state/walletconfig.h"
-#include <QMessageBox>
+#include "../control/messagebox.h"
 
 namespace wnd {
 
@@ -36,19 +36,19 @@ void wnd::WalletConfig::on_updateButton_clicked()
     int boxPort = boxPortStr.toInt(&ok);
 
     if ( folder.length()==0 ) {
-        QMessageBox::critical(this, "Incorrect wallet config",
+        control::MessageBox::message(this, "Need info",
                               "Please specify non empty folder name for wallet data");
         return;
     }
 
     if ( boxDomain.length()==0 ) {
-        QMessageBox::critical(this, "Incorrect wallet config",
+        control::MessageBox::message(this, "Need info",
                               "Please specify non empty MWC box domain name");
         return;
     }
 
     if (!( ok && boxPort>0 && boxPort<65535 )) {
-        QMessageBox::critical(this, "Incorrect wallet config",
+        control::MessageBox::message(this, "Need info",
                               "Please specify valid port number for MWC box");
         return;
     }
@@ -62,7 +62,7 @@ void wnd::WalletConfig::on_updateButton_clicked()
     QPair<bool, QString> res = state->setWalletConfig(cfg);
 
     if (!res.first) {
-        QMessageBox::critical(this, "Wallet Config", "Unable to update Wallet Config. Error: " + res.second);
+        control::MessageBox::message(this, "Error", "Unable to update Wallet Config.\nError: " + res.second);
         return;
     }
 }

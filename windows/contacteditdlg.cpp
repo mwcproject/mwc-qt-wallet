@@ -1,6 +1,6 @@
 #include "windows/contacteditdlg.h"
 #include "ui_contacteditdlg.h"
-#include <QMessageBox>
+#include "../control/messagebox.h"
 
 namespace wnd {
 
@@ -33,20 +33,20 @@ void ContactEditDlg::on_applyButton_clicked()
 
     if ( contact.name.isEmpty() )
     {
-        QMessageBox::critical(this, "Name", "Please specify a name for your contact");
+        control::MessageBox::message(this, "Need Info", "Please specify a name for your contact");
         return;
     }
 
     if ( contact.address.isEmpty() )
     {
-        QMessageBox::critical(this, "Name", "Please specify an address for your contact");
+        control::MessageBox::message(this, "Need info", "Please specify an address for your contact");
         return;
     }
 
     if (!editMode) {
         for ( auto & cnt : contactList ) {
             if (cnt.name == contact.name) {
-                QMessageBox::critical(this, "Names collision", "Contact with a name "+contact.name+
+                control::MessageBox::message(this, "Names collision", "Contact with a name "+contact.name+
                                       " allready exist. Please specify unique name for your contact");
                 return;
             }

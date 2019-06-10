@@ -6,11 +6,18 @@
 namespace ioutils {
 
 // init the directory to store app data
-QString initAppDataPath(QString localPath )
+QString getAppDataPath(QString localPath )
 {
-    auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#ifdef Q_WS_WIN
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     if (path.isEmpty())
         throw core::MwcException("Qt error. Cannot determine app data location");
+#else
+    QString path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    if (path.isEmpty())
+        throw core::MwcException("Qt error. Cannot determine home dir location.");
+    path += "/.mwc-gui-wallet/";
+#endif
 
      QDir d(path);
      QString dataPath = d.absolutePath() + "/" + localPath;

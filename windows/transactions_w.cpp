@@ -3,7 +3,7 @@
 #include "../state/transactions.h"
 #include "../util/stringutils.h"
 #include <QFileDialog>
-#include <QMessageBox>
+#include "../control/messagebox.h"
 #include "showproofdialog.h"
 
 namespace wnd {
@@ -111,8 +111,8 @@ void Transactions::on_validateProofButton_clicked()
 
     wallet::WalletProofInfo proofInfo = state->verifyMwcBoxTransactionProof(fileName);
     if (!proofInfo.successed) {
-        QMessageBox::critical(this, "MWC Transaction Proof",
-                              "Unable to verify this proof of the transaction. Error: " + proofInfo.errorMessage);
+        control::MessageBox::message(this, "Error",
+                              "Unable to verify this proof of the transaction.\nError: " + proofInfo.errorMessage);
         return;
     }
 
@@ -125,7 +125,7 @@ void Transactions::on_generateProofButton_clicked()
     wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
 
     if (! ( selected!=nullptr && selected->proof ) ) {
-        QMessageBox::information(this, "MWC Transaction Proof",
+        control::MessageBox::message(this, "Need info",
                               "Please select qualify transaction to generate a proof.");
         return;
     }
@@ -144,8 +144,8 @@ void Transactions::on_generateProofButton_clicked()
     wallet::WalletProofInfo resultProof = state->generateMwcBoxTransactionProof( selected->txIdx, fileName );
 
     if (!resultProof.successed) {
-        QMessageBox::critical(this, "MWC Transaction Proof",
-                              "Unable to generate proof for this transaction. Error: " + resultProof.errorMessage);
+        control::MessageBox::message(this, "Error",
+                              "Unable to generate proof for this transaction.\nError: " + resultProof.errorMessage);
         return;
     }
 

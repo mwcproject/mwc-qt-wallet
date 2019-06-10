@@ -1,7 +1,7 @@
 #include "hodl_w.h"
 #include "ui_hodl.h"
 #include "../state/hodl.h"
-#include <QMessageBox>
+#include "../control/messagebox.h"
 #include <QAbstractItemView>
 
 namespace wnd {
@@ -41,8 +41,10 @@ Hodl::~Hodl()
 
 void Hodl::on_submitAllTransactionsButton_clicked()
 {
-    QMessageBox::warning(this, "Transactions",
-                         "You are submitting all your MWC to HODL program. Those funds will be moved to your new account. This process might take some time. Please press 'Submit' to start processing", "Process", "Cancel");
+    control::MessageBox::RETURN_CODE res = control::MessageBox::question(this, "Warning",
+                         "You are submitting all your MWC to HODL program. Those funds will be moved to your new account. This process might take some time. Please press 'Process' to start processing", "Process", "Cancel", false, true);
+    if (res!=control::MessageBox::BTN1)
+        return;
 
     // Check what is submitted
     QVector<QString> submittedTransactions;
@@ -56,8 +58,8 @@ void Hodl::on_submitSelectedTransactionsButton_clicked()
 {
     QList<QListWidgetItem *> selectedItems = ui->transactionsListWidget->selectedItems();
     if (selectedItems.size()==0) {
-        QMessageBox::warning(this, "Transactions",
-                             "Please select transactions that you want to submit to HODL program.", "OK");
+        control::MessageBox::message(this, "Need info",
+                             "Please select transactions that you want to submit to HODL program.");
         return;
     }
 
@@ -71,10 +73,11 @@ void Hodl::on_submitSelectedTransactionsButton_clicked()
         totalAmount += transactions[idx].coinNano;
     }
 
-    int res = QMessageBox::warning(this, "Transactions",
-                         "You are submitting " + util::nano2one(totalAmount)  + " MWC to HODL program. Those funds will be moved to your new account. This process might take some time. Please press 'Submit' to start processing", "Process", "Cancel");
+    control::MessageBox::RETURN_CODE res = control::MessageBox::question(this, "Transactions",
+                         "You are submitting " + util::nano2one(totalAmount)  + " MWC to HODL program. Those funds will be moved to your new account. This process might take some time. Please press 'Process' to start processing",
+                                             "Process", "Cancel", false, true);
 
-    if (res == 0) {
+    if (res == control::MessageBox::BTN1) {
         state->submitForHodl(submittedTransactions);
     }
 }

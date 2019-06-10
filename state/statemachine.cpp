@@ -1,11 +1,11 @@
 #include "statemachine.h"
-#include "initaccount.h"
-#include "inputpassword.h"
-#include "newwallet.h"
-#include "newseed.h"
-#include "newseedtest.h"
-#include "newseedshow.h"
-#include "createwithseed.h"
+#include "a_initaccount.h"
+#include "a_inputpassword.h"
+#include "c_newwallet.h"
+#include "c_newseed.h"
+#include "c_newseedtest.h"
+#include "c_newseedshow.h"
+#include "c_createwithseed.h"
 #include "../core/appcontext.h"
 #include "../core/mainwindow.h"
 #include "accounts.h"
@@ -17,13 +17,13 @@
 #include "connect2node.h"
 #include "nodemanually.h"
 #include "filetransactions.h"
-#include "listening.h"
+#include "e_listening.h"
 #include "transactions.h"
 #include "outputs.h"
 #include "contacts.h"
 #include "walletconfig.h"
 #include "airdrop.h"
-#include "StartWallet.h"
+#include "a_StartWallet.h"
 
 namespace state {
 
@@ -75,7 +75,7 @@ void StateMachine::start() {
             continue;
 
         currentState = it.key();
-        mainWindow->updateActionStates();
+        mainWindow->updateActionStates(currentState);
         break;
     }
 }
@@ -93,7 +93,7 @@ void StateMachine::executeFrom( STATE nextState ) {
             continue;
 
         currentState = it.key();
-        mainWindow->updateActionStates();
+        mainWindow->updateActionStates(currentState);
         break;
     }
 }

@@ -4,11 +4,11 @@ namespace tries {
 
 
 // Parsing the fixed phrase
-TriePhaseSection::TriePhaseSection(QString _phrase, int accumulateId) :
+TriePhraseSection::TriePhraseSection(QString _phrase, int accumulateId) :
     BaseTrieSection(accumulateId), phrase(_phrase)
 {}
 
-uint32_t TriePhaseSection::processChar(TrieContext & context, QChar ch) {
+uint32_t TriePhraseSection::processChar(TrieContext & context, QChar ch) {
     Q_ASSERT( context.pos>=0 );
     Q_ASSERT( context.pos < phrase.length() );
 

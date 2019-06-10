@@ -7,7 +7,7 @@ namespace ioutils {
 
 // init the directory to store app data
 // return path value
-QString initAppDataPath(QString localPath = "")  noexcept(false);
+QString getAppDataPath(QString localPath = "")  noexcept(false);
 
 QByteArray FilterEscSymbols( const QByteArray & data );
 

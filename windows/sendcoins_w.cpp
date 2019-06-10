@@ -2,7 +2,7 @@
 #include "ui_sendcoins.h"
 #include "../state/sendcoins.h"
 #include "selectcontact.h"
-#include <QMessageBox>
+#include "../control/messagebox.h"
 #include "sendcoinsparamsdialog.h"
 
 namespace wnd {
@@ -76,12 +76,12 @@ void SendCoins::on_sendButton_clicked()
     double coinDbl = coinStr.toDouble(&ok);
 
     if (!ok) {
-        QMessageBox::critical(this, "Parsing error", "Unable to parse the number of coins to send");
+        control::MessageBox::message(this, "Parsing error", "Unable to parse the number of coins to send");
         return;
     }
 
     if (coinDbl<=0.0) {
-        QMessageBox::critical(this, "Parsing error", "Please input correct positive number of MWC to send");
+        control::MessageBox::message(this, "Parsing error", "Please input correct positive number of MWC to send");
         return;
     }
     // to nanos
@@ -90,7 +90,7 @@ void SendCoins::on_sendButton_clicked()
     // Address to send MWC
     QString address = ui->sendToAddress->text();
     if ( address.length() == 0 ) {
-        QMessageBox::critical(this, "Parsing error", "Please define address where to send MWC");
+        control::MessageBox::message(this, "Parsing error", "Please define address where to send MWC");
         return;
     }
 
@@ -103,7 +103,7 @@ void SendCoins::on_sendButton_clicked()
     updateTransactionList();
 
     if (res.first) {
-        QMessageBox::information(this, "Send MWC coins", "You was able sucessfully send " + coinStr + " MWC to address " + address);
+        control::MessageBox::message(this, "MWC coins are sent", "You was able sucessfully send " + coinStr + " MWC to address " + address);
         // Let's clean up all fields
         ui->sendEdit->clear();
         ui->sendToAddress->clear();
@@ -111,7 +111,7 @@ void SendCoins::on_sendButton_clicked()
         return;
     }
     else {
-        QMessageBox::critical(this, "Send MWC coins", "Wallet wasn't be able to send " + coinStr + " MWC to address " + address + " due error: " + res.second);
+        control::MessageBox::message(this, "Error", "Wallet wasn't be able to send " + coinStr + " MWC to address " + address + " due error: " + res.second);
         return;
     }
 
