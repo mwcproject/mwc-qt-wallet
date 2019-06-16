@@ -33,7 +33,7 @@ NextStateRespond NewSeed::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
     }
 
-    log::logConnect("NewSeed", "onNewSeed" );
+    logger::logConnect("NewSeed", "onNewSeed" );
     slotConn = QObject::connect( context.wallet, &wallet::Wallet::onNewSeed, this, &NewSeed::onNewSeed, Qt::QueuedConnection );
 
     // generate a new seed for a new wallet
@@ -47,7 +47,7 @@ NextStateRespond NewSeed::execute() {
 
 void NewSeed::onNewSeed(QVector<QString> seed) {
 
-    log::logDisconnect("NewSeed", "onNewSeed" );
+    logger::logDisconnect("NewSeed", "onNewSeed" );
     QObject::disconnect(slotConn);
 
     // Get the seed, continue processing

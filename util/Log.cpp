@@ -10,7 +10,7 @@
 // 1 MB is a reasonable size limit.
 #define LOG_SIZE_LIMIT  1000000
 
-namespace log {
+namespace logger {
 
 static LogSender *   logClient = nullptr;
 static LogReciever * logServer = nullptr;
@@ -20,7 +20,7 @@ class LogInit {
 public:
     LogInit() {
         logClient = new LogSender(true);
-        logServer = new LogReciever("mwcwallet.log");
+        logServer = new LogReciever("mwcwallet.logger");
 
         bool connected = QObject::connect( logClient, &LogSender::doAppend2logs, logServer, &LogReciever::onAppend2logs, Qt::QueuedConnection );
         Q_ASSERT(connected);
@@ -48,7 +48,7 @@ void LogSender::log(bool addDate, const QString & prefix, const QString & line) 
     }
 }
 
-// Create log file with some simplest rotation
+// Create logger file with some simplest rotation
 LogReciever::LogReciever(const QString & filename) {
     QString logPath = ioutils::getAppDataPath("logs");
 
@@ -67,7 +67,7 @@ LogReciever::LogReciever(const QString & filename) {
 
     logFile = new QFile( logFn );
     if (! logFile->open( QFile::WriteOnly | QFile::Append ) ) {
-        control::MessageBox::message(nullptr, "Critical Error", "Unable to open the log file: " + logPath );
+        control::MessageBox::message(nullptr, "Critical Error", "Unable to open the logger file: " + logPath );
         QApplication::quit();
         return;
     }

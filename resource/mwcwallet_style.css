@@ -40,6 +40,10 @@ QToolButton:pressed {
     background-color: #5300CF;
 }
 
+QToolButton:checked {
+    background-color: white;
+}
+
 QToolButton::disabled {
     background-color: #E2CCF7;
 }

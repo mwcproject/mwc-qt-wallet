@@ -97,7 +97,7 @@ void Mwc713EventManager::processNextTask() {
         qDebug() << "Executing the task: " + task.task->toDbgString();
         task.wasProcessed = true; // reset state first, then process
 
-        log::logTask( "Mwc713EventManager", task.task, "Starting..." );
+        logger::logTask( "Mwc713EventManager", task.task, "Starting..." );
 
         if (!task.task->getInputStr().isEmpty()) {
             mwc713wallet->executeMwc713command(task.task->getInputStr());
@@ -165,7 +165,7 @@ void Mwc713EventManager::slRecieveEvent( WALLET_EVENTS event, QString message) {
     taskExecutionTimeLimit = 0; // stopping timeout
     qDebug() << "Processing task '" << task.task->getTaskName() << "'";
 
-    log::logTask("Mwc713EventManager", task.task, "Executing");
+    logger::logTask("Mwc713EventManager", task.task, "Executing");
 
     task.task->processTask(events);
     events.clear();

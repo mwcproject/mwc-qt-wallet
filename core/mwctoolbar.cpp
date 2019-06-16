@@ -12,6 +12,7 @@ MwcToolbar::MwcToolbar(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->recieveToolButton->setChecked( true);
     //setAutoFillBackground(true);
     //setStyleSheet("background-color: #6F00D6;");
 }
@@ -24,7 +25,7 @@ MwcToolbar::~MwcToolbar()
 void MwcToolbar::updateButtonsState( state::STATE state ) {
     ui->airdropToolButton->setChecked(state==state::AIRDRDOP_MAIN);
     ui->sendToolButton->setChecked(state==state::SEND_COINS);
-    ui->recieveToolButton->setChecked(state==state::RECIEVE_COINS);
+    ui->recieveToolButton->setChecked( true);//  state==state::RECIEVE_COINS);
     ui->transactionToolButton->setChecked(state==state::TRANSACTIONS);
     ui->hodlToolButton->setChecked(state==state::HODL);
 }

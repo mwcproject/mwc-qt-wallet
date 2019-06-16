@@ -13,7 +13,7 @@ namespace wallet {
 // Note, logging is not generic. This logging tracks very specific action that most critical
 // for wallet interraction.
 // For generic logs we are using qDebug
-namespace log {
+namespace logger {
 
     class LogSender : public QObject {
         Q_OBJECT

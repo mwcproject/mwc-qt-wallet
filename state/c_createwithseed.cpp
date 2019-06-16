@@ -48,15 +48,15 @@ void CreateWithSeed::createWalletWithSeed( QVector<QString> seed ) {
     context.wndManager->switchToWindow(progressWnd);
 
     // Creating connections...
-    log::logConnect("CreateWithSeed", "onListeningStopResult");
+    logger::logConnect("CreateWithSeed", "onListeningStopResult");
     connListeningStopResult = QObject::connect(context.wallet, &wallet::Wallet::onListeningStopResult,
                                                this, &CreateWithSeed::onListeningStopResult, Qt::QueuedConnection);
 
-    log::logConnect("CreateWithSeed", "onRecoverProgress");
+    logger::logConnect("CreateWithSeed", "onRecoverProgress");
     connRecoverProgress = QObject::connect(context.wallet, &wallet::Wallet::onRecoverProgress,
                                            this, &CreateWithSeed::onRecoverProgress, Qt::QueuedConnection);
 
-    log::logConnect("CreateWithSeed", "onRecoverResult");
+    logger::logConnect("CreateWithSeed", "onRecoverResult");
     connRecoverResult = QObject::connect(context.wallet, &wallet::Wallet::onRecoverResult,
                                          this, &CreateWithSeed::onRecoverResult, Qt::QueuedConnection);
 
@@ -102,13 +102,13 @@ void CreateWithSeed::onRecoverResult(bool started, bool finishedWithSuccess, QSt
         context.wallet->listeningStart( false, true );
 
     // Removing connections...
-    log::logDisconnect("CreateWithSeed", "onListeningStopResult");
+    logger::logDisconnect("CreateWithSeed", "onListeningStopResult");
     QObject::disconnect(connListeningStopResult);
 
-    log::logDisconnect("CreateWithSeed", "onRecoverProgress");
+    logger::logDisconnect("CreateWithSeed", "onRecoverProgress");
     QObject::disconnect(connRecoverProgress);
 
-    log::logDisconnect("CreateWithSeed", "onRecoverResult");
+    logger::logDisconnect("CreateWithSeed", "onRecoverResult");
     QObject::disconnect(connRecoverResult);
 
     if (finishedWithSuccess)

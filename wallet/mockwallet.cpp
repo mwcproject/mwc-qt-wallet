@@ -100,7 +100,7 @@ void MockWallet::start() noexcept(false) {
     else {
         initStatus = InitWalletStatus::NEED_INIT;
     }
-    log::logEmit("mockWallet", "onInitWalletStatus", toString(initStatus) );
+    logger::logEmit("mockWallet", "onInitWalletStatus", toString(initStatus) );
     emit onInitWalletStatus(initStatus);
 }
 
@@ -112,7 +112,7 @@ void MockWallet::loginWithPassword(QString password, QString account) noexcept(f
     else {
         initStatus = InitWalletStatus::WRONG_PASSWORD;
     }
-    log::logEmit("mockWallet", "onInitWalletStatus", toString(initStatus) );
+    logger::logEmit("mockWallet", "onInitWalletStatus", toString(initStatus) );
     emit onInitWalletStatus(initStatus);
 }
 

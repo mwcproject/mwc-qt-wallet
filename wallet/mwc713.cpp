@@ -198,7 +198,7 @@ void MWC713::nextBoxAddress() noexcept(false) {
 // Feed the command to mwc713 process
 void MWC713::executeMwc713command(QString cmd) {
     Q_ASSERT(mwc713process);
-    log::logMwc713in(cmd);
+    logger::logMwc713in(cmd);
     mwc713process->write( (cmd + "\n").toLocal8Bit() );
 }
 
@@ -231,7 +231,7 @@ void MWC713::appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QStr
     while(notificationMessages.size()>MESSAGE_SIZE_LIMIT)
         notificationMessages.pop_front();
 
-    log::logEmit( "MWC713", "onNewNotificationMessage", msg.toString() );
+    logger::logEmit( "MWC713", "onNewNotificationMessage", msg.toString() );
     emit onNewNotificationMessage(msg.level, msg.message);
 }
 
@@ -255,39 +255,39 @@ void MWC713::setInitStatus( INIT_STATUS  status ) {
             initStatus = InitWalletStatus::NONE;
             break;
     }
-    log::logEmit("MWC713", "onInitWalletStatus", toString(initStatus) );
+    logger::logEmit("MWC713", "onInitWalletStatus", toString(initStatus) );
     emit onInitWalletStatus(initStatus);
 }
 
 void MWC713::setMwcAddress( QString _mwcAddress ) { // Set active MWC address. Listener might be offline
     mwcAddress = _mwcAddress;
-    log::logEmit("MWC713", "onMwcAddress", mwcAddress );
+    logger::logEmit("MWC713", "onMwcAddress", mwcAddress );
     emit onMwcAddress(mwcAddress);
 }
 
 void MWC713::setMwcAddressWithIndex( QString _mwcAddress, int idx ) {
     mwcAddress = _mwcAddress;
-    log::logEmit("MWC713", "setMwcAddressWithIndex", mwcAddress + ", idx=" + QString::number(idx) );
+    logger::logEmit("MWC713", "setMwcAddressWithIndex", mwcAddress + ", idx=" + QString::number(idx) );
     emit onMwcAddress(mwcAddress);
     emit onMwcAddressWithIndex(mwcAddress, idx);
 }
 
 
 void MWC713::setNewSeed( QVector<QString> seed ) {
-    log::logEmit("MWC713", "onNewSeed", "????" );
+    logger::logEmit("MWC713", "onNewSeed", "????" );
     emit onNewSeed(seed);
 }
 
 void MWC713::setListeningStartResults( bool mqTry, bool kbTry, // what we try to start
                                QStringList errorMessages ) {
-    log::logEmit("MWC713", "onListeningStartResults", QString("mqTry=") + QString::number(mqTry) +
+    logger::logEmit("MWC713", "onListeningStartResults", QString("mqTry=") + QString::number(mqTry) +
             " kbTry=" + QString::number(kbTry) + " errorMessages size " + QString::number(errorMessages.size()) );
     emit onListeningStartResults(mqTry, kbTry,errorMessages);
 }
 
 void MWC713::setListeningStopResult(bool mqTry, bool kbTry, // what we try to stop
                             QStringList errorMessages ) {
-    log::logEmit("MWC713", "onListeningStopResult", QString("mqTry=") + QString::number(mqTry) +
+    logger::logEmit("MWC713", "onListeningStopResult", QString("mqTry=") + QString::number(mqTry) +
              " kbTry=" + QString::number(kbTry) + " errorMessages size " + QString::number(errorMessages.size()) );
     emit onListeningStopResult(mqTry, kbTry,errorMessages);
 
@@ -295,18 +295,18 @@ void MWC713::setListeningStopResult(bool mqTry, bool kbTry, // what we try to st
 
 void MWC713::setMwcMqListeningStatus(bool online) {
     mwcMqOnline = online;
-    log::logEmit("MWC713", "onMwcMqListenerStatus", QString("online=") + QString::number(online));
+    logger::logEmit("MWC713", "onMwcMqListenerStatus", QString("online=") + QString::number(online));
     emit onMwcMqListenerStatus(online);
 
 }
 void MWC713::setKeybaseListeningStatus(bool online) {
     keybaseOnline = online;
-    log::logEmit("MWC713", "onKeybaseListenerStatus", QString("online=") + QString::number(online));
+    logger::logEmit("MWC713", "onKeybaseListenerStatus", QString("online=") + QString::number(online));
     emit onKeybaseListenerStatus(online);
 }
 
 void MWC713::setRecoveryResults( bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages ) {
-    log::logEmit("MWC713", "onRecoverResult", QString("started=") + QString::number(started) +
+    logger::logEmit("MWC713", "onRecoverResult", QString("started=") + QString::number(started) +
            " finishedWithSuccess=" + QString::number(finishedWithSuccess) +
            " newAddress=" + newAddress + " errorMessages size " + QString::number(errorMessages.size()) );
 
@@ -323,7 +323,7 @@ void MWC713::setRecoveryResults( bool started, bool finishedWithSuccess, QString
 }
 
 void MWC713::setRecoveryProgress( long progress, long limit ) {
-    log::logEmit("MWC713", "onRecoverProgress", QString("progress=") + QString::number(progress) +
+    logger::logEmit("MWC713", "onRecoverProgress", QString("progress=") + QString::number(progress) +
                                               " limit=" + QString::number(limit) );
     emit onRecoverProgress( int(progress), int(limit) );
 }
@@ -354,7 +354,7 @@ void MWC713::mwc713disconnect() {
 }
 
 void MWC713::mwc713errorOccurred(QProcess::ProcessError error) {
-    log::logMwc713out("ERROR OCCURRED. Error = " + QString::number(error)  );
+    logger::logMwc713out("ERROR OCCURRED. Error = " + QString::number(error)  );
 
     qDebug() << "ERROR OCCURRED. Error = " << error;
 
@@ -369,7 +369,7 @@ void MWC713::mwc713errorOccurred(QProcess::ProcessError error) {
 }
 
 void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
-    log::logMwc713out("Exit with exit code " + QString::number(exitCode) + ", Exit status:" + QString::number(exitStatus) );
+    logger::logMwc713out("Exit with exit code " + QString::number(exitCode) + ", Exit status:" + QString::number(exitStatus) );
 
     qDebug() << "mwc713 is exiting with exit code " << exitCode << ", exitStatus=" << exitStatus;
 
@@ -396,7 +396,7 @@ void MWC713::mwc713readyReadStandardError() {
 void MWC713::mwc713readyReadStandardOutput() {
     QString str( ioutils::FilterEscSymbols( mwc713process->readAllStandardOutput() ) );
     qDebug() << "Get output:" << str;
-    log::logMwc713out(str);
+    logger::logMwc713out(str);
     inputParser->processInput(str);
 }
 

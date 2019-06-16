@@ -28,7 +28,7 @@ NextStateRespond StartWallet::execute() {
                 new wnd::WaitingWnd( context.wndManager->getInWndParent(),
                         "Starting mwc713", "Please wait for mwc713 process starting..." ) );
 
-        log::logConnect("StartWallet", "onInitWalletStatus" );
+        logger::logConnect("StartWallet", "onInitWalletStatus" );
         slotConn = QObject::connect( context.wallet, &wallet::Wallet::onInitWalletStatus, this, &StartWallet::onInitWalletStatus, Qt::QueuedConnection );
 
         context.wallet->start();
@@ -42,7 +42,7 @@ NextStateRespond StartWallet::execute() {
 
 
 void StartWallet::onInitWalletStatus(wallet::InitWalletStatus status) {
-    log::logRecieve("StartWallet", "onInitWalletStatus", toString(status) );
+    logger::logRecieve("StartWallet", "onInitWalletStatus", toString(status) );
     // Listen for the changes...
 
     switch (status) {
@@ -50,7 +50,7 @@ void StartWallet::onInitWalletStatus(wallet::InitWalletStatus status) {
         case wallet::InitWalletStatus::NEED_INIT:
         case wallet::InitWalletStatus::NEED_PASSWORD: {
             QObject::disconnect(slotConn);
-            log::logDisconnect("StartWallet", "onInitWalletStatus" );
+            logger::logDisconnect("StartWallet", "onInitWalletStatus" );
             context.stateMachine->executeFrom(STATE::STATE_INIT);
             return;
         }

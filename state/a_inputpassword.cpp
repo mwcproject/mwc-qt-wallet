@@ -24,7 +24,7 @@ NextStateRespond InputPassword::execute() {
         wnd = new wnd::InputPassword( context.wndManager->getInWndParent(), this );
         context.wndManager->switchToWindow(wnd);
 
-        log::logConnect("InputPassword", "onInitWalletStatus" );
+        logger::logConnect("InputPassword", "onInitWalletStatus" );
         slotConn = QObject::connect( context.wallet, &wallet::Wallet::onInitWalletStatus, this, &InputPassword::onInitWalletStatus, Qt::QueuedConnection );
 
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
@@ -44,7 +44,7 @@ void InputPassword::submitPassword(const QString & password) {
 }
 
 void InputPassword::onInitWalletStatus( wallet::InitWalletStatus  status ) {
-    log::logRecieve("InputPassword", "onInitWalletStatus", toString(status) );
+    logger::logRecieve("InputPassword", "onInitWalletStatus", toString(status) );
 
     if (status == wallet::InitWalletStatus::WRONG_PASSWORD ) {
         Q_ASSERT(wnd != nullptr);
@@ -55,7 +55,7 @@ void InputPassword::onInitWalletStatus( wallet::InitWalletStatus  status ) {
     } else if (status == wallet::InitWalletStatus::READY ) {
         // Great, login is done. Now we can use the wallet
         Q_ASSERT(context.wallet->getWalletStatus() == wallet::InitWalletStatus::READY);
-        log::logDisconnect("InputPassword", "onInitWalletStatus" );
+        logger::logDisconnect("InputPassword", "onInitWalletStatus" );
         QObject::disconnect(slotConn);
         context.stateMachine->executeFrom(STATE::INPUT_PASSWORD);
     }

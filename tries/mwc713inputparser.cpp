@@ -43,7 +43,7 @@ void Mwc713InputParser::processInput(QString message) {
 
         wallet::WALLET_EVENTS evt = (wallet::WALLET_EVENTS) res.parserId;
 
-        log::logParsingEvent( evt, message );
+        logger::logParsingEvent( evt, message );
 
         emit sgGenericEvent( evt, message);
     }
