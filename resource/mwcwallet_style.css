@@ -41,7 +41,7 @@ QToolButton:pressed {
 }
 
 QToolButton:checked {
-    background-color: white;
+    background-color: #5800dd;
 }
 
 QToolButton::disabled {

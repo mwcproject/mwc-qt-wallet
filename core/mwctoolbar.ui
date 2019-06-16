@@ -194,6 +194,9 @@ color: #FFFFFF;</string>
          <height>38</height>
         </size>
        </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextUnderIcon</enum>
        </property>
@@ -231,6 +234,9 @@ color: #FFFFFF;</string>
          <width>120</width>
          <height>38</height>
         </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -270,6 +276,9 @@ color: #FFFFFF;</string>
          <height>38</height>
         </size>
        </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextUnderIcon</enum>
        </property>
@@ -308,6 +317,9 @@ color: #FFFFFF;</string>
          <height>38</height>
         </size>
        </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextUnderIcon</enum>
        </property>
@@ -345,6 +357,9 @@ color: #FFFFFF;</string>
          <width>150</width>
          <height>38</height>
         </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextUnderIcon</enum>
