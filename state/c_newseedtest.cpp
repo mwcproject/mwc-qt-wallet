@@ -32,7 +32,7 @@ NextStateRespond NewSeedTest::execute() {
             context.appContext->pullCookie< QVector<QString> >("seed2verify");
             context.wallet->confirmNewSeed();
 
-            control::MessageBox::message(nullptr, "Congratulations!", "Thank you for confirming all words from your seed. Your wallet was successfully created");
+            control::MessageBox::message(nullptr, "Congratulations!", "Thank you for confirming all words from your passphrase. Your wallet was successfully created");
         }
 
         return NextStateRespond(NextStateRespond::RESULT::DONE);

@@ -131,7 +131,7 @@ void CreateWithSeed::onRecoverResult(bool started, bool finishedWithSuccess, QSt
     }
     else {
         success = true;
-        control::MessageBox::message(nullptr, "Success", "Your account was successfully recovered from the seed." + errorMsg);
+        control::MessageBox::message(nullptr, "Success", "Your account was successfully recovered from the passphrase." + errorMsg);
     }
 
     if (success) {
