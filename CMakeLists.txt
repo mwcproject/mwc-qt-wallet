@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(gui-wallet)
+project(mwc-qt-wallet)
 set(CMAKE_CXX_STANDARD 14)
 
 # Please specify here path to your QT installation

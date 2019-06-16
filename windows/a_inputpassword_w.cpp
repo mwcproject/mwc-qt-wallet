@@ -48,8 +48,7 @@ void InputPassword::stopWaiting() {
 }
 
 void InputPassword::reportWrongPassword() {
-    control::MessageBox::message(this, "Password", "Password doesn't match our records. Please input correct password.");
-
+    control::MessageBox::message(this, "Password", "Password supplied was incorrect. Please input correct password.");
 
     QThread::sleep(1); // sleep to prevent brute force attack.
     // Note, we are using small hash, so the brute force attach will likely

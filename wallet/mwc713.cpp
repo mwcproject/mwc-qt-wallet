@@ -71,14 +71,14 @@ void MWC713::start() noexcept(false) {
 
     mwc713process = new QProcess();
     mwc713process->setWorkingDirectory( QDir::homePath() );
-    mwc713process->start(mwc713Path, {"--config", mwc713configPath}, QProcess::Unbuffered | QProcess::ReadWrite );
+    mwc713process->start(mwc713Path, {"--config", mwc713configPath, "-r", mwc::PROMPTS_MWC713 }, QProcess::Unbuffered | QProcess::ReadWrite );
 
     bool startOk = mwc713process->waitForStarted(10000);
     if (!startOk) {
         switch (mwc713process->error())
         {
             case QProcess::FailedToStart:
-                appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::INIT_ERROR, "mwc713 failed to start mwc713 loacated at " + mwc713Path );
+                appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::INIT_ERROR, "mwc713 failed to start mwc713 located at " + mwc713Path );
                 return;
             case QProcess::Crashed:
                 appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::INIT_ERROR, "mwc713 crashed during start" );

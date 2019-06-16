@@ -13,6 +13,9 @@ namespace wallet {
         virtual ~TaskStarting() override {}
 
         virtual bool processTask(const QVector<WEvent> & events) override;
+
+        virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_NEED2UNLOCK, WALLET_EVENTS::S_INIT, WALLET_EVENTS::S_READY };}
+
     private:
     };
 

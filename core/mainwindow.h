@@ -5,6 +5,7 @@
 #include <QTimer>
 #include "../state/state.h"
 #include "../wallet/wallet.h"
+#include "appcontext.h"
 
 namespace Ui {
 class MainWindow;
@@ -37,21 +38,7 @@ public:
     void updateLeftBar(bool show);
 
 private slots:
-    void on_actionVersion_triggered();
-
-    void on_actionAccount_triggered();
-    void on_actionEvents_triggered();
-    void on_actionHODL_triggered();
-    void on_actionSend_coins_triggered();
-    void on_actionNode_status_triggered();
-    void on_actionSend_recieve_offline_triggered();
-    void on_actionListening_Status_triggered();
-    void on_actionTransactions_triggered();
-    void on_actionOutputs_triggered();
-    void on_actionContacts_triggered();
-    void on_actionConfig_triggered();
-    void on_actionAirdrop_triggered();
-    void on_actionRecieve_coins_triggered();
+    //void on_actionVersion_triggered();
 
 private slots:
     void onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message);

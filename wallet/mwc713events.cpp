@@ -90,15 +90,12 @@ void Mwc713EventManager::processNextTask() {
 
     // Check if we can perform the first task
     taskInfo task = taskQ.front();
+    if (!task.wasProcessed) {
 
-    if ( readyState ) {
-        // can execute the task
-
-        // Clearning events first. Command normally process it's own massages, not what we have in buffer
         events.clear();
 
         qDebug() << "Executing the task: " + task.task->toDbgString();
-        readyState = false; // reset state first, then process
+        task.wasProcessed = true; // reset state first, then process
 
         log::logTask( "Mwc713EventManager", task.task, "Starting..." );
 
@@ -106,6 +103,7 @@ void Mwc713EventManager::processNextTask() {
             mwc713wallet->executeMwc713command(task.task->getInputStr());
         }
         taskExecutionTimeLimit = QDateTime::currentMSecsSinceEpoch() + task.timeout;
+
     }
 }
 
@@ -140,66 +138,42 @@ void Mwc713EventManager::slRecieveEvent( WALLET_EVENTS event, QString message) {
     // Preprocess event with listeners
     {
         QVector<WEvent> evt;
-        evt.push_back( WEvent(event,message) );
+        evt.push_back(WEvent(event, message));
 
-        for ( Mwc713Task* t : listeners ) {
+        for (Mwc713Task *t : listeners) {
             if (t->processTask(evt)) {
-                qDebug() << "Mwc713EventManager::sRecieveEvent was preprocessed. event=" << event << " msg='" << message << "'";
+                qDebug() << "Mwc713EventManager::sRecieveEvent was preprocessed. event=" << event << " msg='" << message
+                         << "'";
             }
         }
     }
+
+    if (taskQ.isEmpty())
+        return;
 
     events.push_back(WEvent(event, message));
     qDebug() << "Mwc713EventManager::sRecieveEvent adding Event into the list. event=" << event << " msg='"
              << message << "'  New size:" << events.size();
 
-    switch (event) {
-        case S_RECOVERY_MNEMONIC:
-        case S_INIT_WANT_ENTER: // Almost like ready
-        case S_PASSWORD_EXPECTED: // Almost like ready
-        case S_INIT: // Init is not followed by READ. So it is a ready state as well
-        case S_READY: // Wallet ready and waiting for input
-        {
-            // We can prccess the current task
-            if (!readyState) {
-                taskExecutionTimeLimit = 0; // stopping timeout
-                if (taskQ.empty()) {
-                    qDebug() << "INTERNAL ERROR readyState at ready without a task. Nothing to execute";
-                    taskExecutionTimeLimit = 0;
-                    Q_ASSERT(false);
-                    return;
-                }
-                taskInfo task = taskQ.takeFirst();
-                qDebug() << "Mwc713EventManager::sRecieveEvent S_READY. Processing task '" << task.task->getTaskName()
-                         << "'";
 
-                log::logTask( "Mwc713EventManager", task.task, "Executing" );
+    if (!taskQ.front().task->getReadyEvents().contains(event))
+        return; // still waiting for events
 
-                task.task->processTask(events);
-                events.clear();
-                delete task.task;
-            }
-            else {
-                qDebug() << "Mwc713EventManager::sRecieveEvent S_READY. No task to process";
-            }
-            readyState = true;
-            // can process next task if it is in the Q
-            processNextTask();
+    taskInfo task = taskQ.takeFirst();
 
-            break;
-        }
-        default: {
-        }
-    }
+    // Got the acceptable final event
+    taskExecutionTimeLimit = 0; // stopping timeout
+    qDebug() << "Processing task '" << task.task->getTaskName() << "'";
 
+    log::logTask("Mwc713EventManager", task.task, "Executing");
 
-    if (event == WALLET_EVENTS::S_INIT) // Init is not followed by READ. So it is a ready state as well
-    {
-        return slRecieveEvent( WALLET_EVENTS::S_READY , "");
-    }
+    task.task->processTask(events);
+    events.clear();
+    delete task.task;
 
-
+    processNextTask();
 }
+
 
 
 }

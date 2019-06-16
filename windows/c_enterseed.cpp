@@ -4,6 +4,7 @@
 #include "../control/messagebox.h"
 #include "../state/c_createwithseed.h"
 #include "../util/widgetutils.h"
+#include "../util/Dictionary.h"
 
 namespace wnd {
 
@@ -56,6 +57,23 @@ void EnterSeed::on_continueButton_clicked()
     if (seed.size()!=24) {
         control::MessageBox::message(this, "Verification error",
                              "Your phrase should contain 24 words. You entered " + QString::number(seed.size()) +  " words." );
+        return;
+    }
+
+    const QSet<QString> & words = util::getBip39words();
+    QString nonDictWord;
+
+    for ( auto & s : seed ) {
+        if ( !words.contains(s) ) {
+            if (!nonDictWord.isEmpty())
+                nonDictWord += ", ";
+            nonDictWord += s;
+        }
+    }
+
+    if (!nonDictWord.isEmpty()) {
+        control::MessageBox::message(this, "Verification error",
+                                     "Your phrase contains non dictionary words: " + nonDictWord );
         return;
     }
 

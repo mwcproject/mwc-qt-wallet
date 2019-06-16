@@ -21,6 +21,8 @@ public:
 
     virtual bool processTask(const QVector<WEvent> & events) override;
 
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+
 private:
     QString calcCommandLine( bool genNext, int idx ) const;
 };

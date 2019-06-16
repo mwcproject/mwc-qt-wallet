@@ -3,6 +3,7 @@
 
 #include <QString>
 #include "mwc713events.h"
+#include <QSet>
 
 namespace wallet {
 
@@ -17,6 +18,8 @@ public:
     virtual ~Mwc713Task();
 
     const QString & getTaskName() const {return taskName;}
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() = 0; // Set of final events that can trigger task execution and completion
 
     // Will be called from 'Ready' for normal tasks
     // Or in order as events coming for filtering tasks

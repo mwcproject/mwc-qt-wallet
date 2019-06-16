@@ -15,6 +15,9 @@ namespace wallet {
         virtual ~TaskUnlock() override {}
 
         virtual bool processTask(const QVector<WEvent> & events) override;
+
+        virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_PASSWORD_ERROR, WALLET_EVENTS::S_READY };}
+
     private:
         static QString buildWalletRequest(QString password, QString account);
     };

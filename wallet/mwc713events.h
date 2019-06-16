@@ -78,6 +78,7 @@ struct WEvent {
 
 struct taskInfo {
     Mwc713Task* task = nullptr; // task
+    bool        wasProcessed = false;
     int         timeout = -1; // timeout for this task
 
     taskInfo() = default;
@@ -135,7 +136,6 @@ private:
     // Events for a new task
     QVector<WEvent> events;
 
-    bool readyState = false; // Can start a new task only from ready state
     volatile qint64 taskExecutionTimeLimit = 0; // Timeout valur for the task
 };
 

@@ -2,6 +2,7 @@
 #include "simpletriesection.h"
 #include <QDebug>
 #include <QMetaMethod>
+#include <core/global.h>
 #include "../util/Log.h"
 
 namespace tries {
@@ -51,8 +52,7 @@ void Mwc713InputParser::processInput(QString message) {
 void Mwc713InputParser::initWalletReady() {
     parser.appendLineParser( new TrieLineParser( wallet::WALLET_EVENTS::S_READY,
           QVector<BaseTrieSection*>{
-                new TrieNewLineSection(),
-                new TriePhraseSection("wallet713>")} ));
+                new TriePhraseSection( mwc::PROMPTS_MWC713)} ));
 }
 
 // Register callbacks for event that we are going to process:

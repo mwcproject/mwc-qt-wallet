@@ -5,6 +5,7 @@
 #include "../state/state.h"
 #include "../state/sendcoins.h"
 
+class QAction;
 
 namespace core {
 
