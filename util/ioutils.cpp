@@ -8,7 +8,7 @@ namespace ioutils {
 // init the directory to store app data
 QString getAppDataPath(QString localPath )
 {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
     QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     if (path.isEmpty())
         throw core::MwcException("Qt error. Cannot determine app data location");

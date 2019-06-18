@@ -1,6 +1,10 @@
 #include "testseedtask.h"
 #include <QVector>
 
+#ifdef Q_OS_WIN
+#include <time.h>
+#endif
+
 namespace core {
 
 TestSeedTask::TestSeedTask() :
