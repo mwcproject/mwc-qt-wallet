@@ -36,7 +36,7 @@ TrieVersionSection::TrieVersionSection(int accumulateId) :
 uint32_t TrieVersionSection::processChar(TrieContext & context, QChar ch) {
     // we don't case about the context. Just accept digits and '.'
 
-    bool ok = (ch.isDigit() || (ch == QChar('.')));
+    bool ok = (ch.isDigit() || (ch == QChar('.')) || (ch == QChar('-')) || (ch.isLetter()));
 
     if (ok) {
         context.pos++;
