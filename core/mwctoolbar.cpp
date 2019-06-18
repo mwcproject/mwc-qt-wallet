@@ -1,6 +1,7 @@
 #include "core/mwctoolbar.h"
 #include "ui_mwctoolbar.h"
 #include <QPainter>
+#include <QStyleOption>
 #include "appcontext.h"
 #include "../state/statemachine.h"
 
