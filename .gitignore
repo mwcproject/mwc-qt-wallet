@@ -1,0 +1,8 @@
+.vs/
+CMakeFiles/
+out/
+VS/
+
+.qmake.stash
+CMakeSettings.json
+mwc-qt-wallet.pro.user
