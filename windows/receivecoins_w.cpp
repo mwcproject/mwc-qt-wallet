@@ -1,7 +1,6 @@
 #include "receivecoins_w.h"
 #include "ui_receivecoins.h"
 #include "../state/e_listening.h"
-#include "../state/filetransactions.h"
 #include "../state/transactions.h"
 #include "../control/messagebox.h"
 #include <QFileDialog>
@@ -10,18 +9,15 @@ namespace wnd {
 
 ReceiveCoins::ReceiveCoins(QWidget *parent,
                            state::Listening * _listeningState,
-                           state::FileTransactions * _fileTransactionsState,
                            state::Transactions * _transactionsState) :
     QWidget(parent),
     ui(new Ui::ReceiveCoins),
     listeningState(_listeningState),
-    fileTransactionsState(_fileTransactionsState),
     transactionsState(_transactionsState)
 {
     ui->setupUi(this);
 
     Q_ASSERT(listeningState);
-    Q_ASSERT(fileTransactionsState);
     Q_ASSERT(transactionsState);
 
     listeningState->setWindowTitle("Recieve MWC");
@@ -75,8 +71,8 @@ ReceiveCoins::~ReceiveCoins()
 
 void ReceiveCoins::on_processResponceFileButton_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open your response file"),
-                                                          fileTransactionsState->getFileGenerationPath(),
+    /*QString fileName = QFileDialog::getOpenFileName(this, tr("Open your response file"),
+                                                          "",
                                                             tr("MWC response (*.response)"));
 
     if (fileName.length()==0)
@@ -84,7 +80,7 @@ void ReceiveCoins::on_processResponceFileButton_clicked()
 
     // Update path
     QFileInfo flInfo(fileName);
-    fileTransactionsState->updateFileGenerationPath( flInfo.path() );
+
 
     QPair<bool, QString> sendRes = fileTransactionsState->processResponseFile(fileName);
     if (sendRes.first) {
@@ -96,7 +92,7 @@ void ReceiveCoins::on_processResponceFileButton_clicked()
         control::MessageBox::message(this, "Error",
                  "Transaction processing was failed.\nError: " + sendRes.second );
         return;
-    }
+    }*/
 }
 
 void ReceiveCoins::updateBoxState() {

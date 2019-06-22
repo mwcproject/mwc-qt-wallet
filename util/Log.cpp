@@ -15,12 +15,14 @@ namespace logger {
 static LogSender *   logClient = nullptr;
 static LogReciever * logServer = nullptr;
 
+static bool logMwc713outBlocked = false;
+
 // Manager of the global instances
 class LogInit {
 public:
     LogInit() {
         logClient = new LogSender(true);
-        logServer = new LogReciever("mwcwallet.logger");
+        logServer = new LogReciever("mwcwallet.log");
 
         bool connected = QObject::connect( logClient, &LogSender::doAppend2logs, logServer, &LogReciever::onAppend2logs, Qt::QueuedConnection );
         Q_ASSERT(connected);
@@ -89,8 +91,18 @@ void LogReciever::onAppend2logs(bool addDate, QString prefix, QString line ) {
 
 // Global methods that do logging
 
+void blockLogMwc713out(bool blockOutput) {
+    logMwc713outBlocked = blockOutput;
+}
+
+
 // mwc713 IOs
 void logMwc713out(QString str) {
+    if (logMwc713outBlocked) {
+        logClient->doAppend2logs(true, "mwc713>>", "CENSORED");
+        return;
+    }
+
     auto lns = str.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
     for (auto & l: lns) {
         logClient->doAppend2logs(true, "mwc713>>", l);
@@ -126,6 +138,11 @@ void logDisconnect(QString who, QString event) {
 }
 
 void logParsingEvent(wallet::WALLET_EVENTS event, QString message ) {
+    if (logMwc713outBlocked) { // Skipping event during block pahse as well
+        logClient->doAppend2logs(true, "Event>", "CENSORED" );
+        return;
+    }
+
     logClient->doAppend2logs(true, "Event>", toString(event) + " [" + message + "]" );
 }
 

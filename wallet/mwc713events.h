@@ -55,7 +55,21 @@ enum WALLET_EVENTS {
     // for fresh wallet
     S_RECOVERY_MNEMONIC = 34, // Recovering from mnemonic => Mnemonic:
 
-    // Address
+    // Accounts
+    S_ACCOUNTS_TITLE = 40,
+    S_ACCOUNTS_INFO_SUM = 41, // All coound info. Pretty large payload, has 6 message items
+
+    // Send
+    S_FILE_TRANS_CREATED = 50,
+    S_FILE_RECEIVED = 51,
+    S_FILE_TRANS_FINALIZED = 52,
+
+    S_SLATE_WAS_SENT = 55,
+    S_SLATE_WAS_RECEIVED = 56,
+    S_SLATE_WAS_FINALIZED = 57,
+
+    // TABLE lines
+    S_TABLE_LINE2 = 100
 
 };
 QString toString(WALLET_EVENTS event);
@@ -104,6 +118,7 @@ public:
 
     // Add task (single wallet action) to perform.
     // This tale ownership of object
+    // Note:  if timeout <= 0, task will be executed immediately
     void addTask( Mwc713Task * task, long timeout );
 
 //    void addEvent(WALLET_EVENTS event) { events.push_back(WEvent(event)); }
@@ -121,6 +136,9 @@ private:
 
     // Process next task
     void processNextTask();
+
+    // Execute this task and start the next one
+    void executeTask(taskInfo task);
 
 private:
     // Wallet

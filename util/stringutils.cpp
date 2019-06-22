@@ -51,6 +51,27 @@ QString nano2one( long nano ) {
     return myNumber;
 }
 
+// 1.0100000 => 1.01   or 0001.0000000 => 1
+QString zeroDbl2Dbl(QString  dbl) {
+    QString res = dbl.trimmed();
+    // remove leading chars
+    while( res.length()>0 && res[0]=='0' )
+        res = res.mid(1);
+
+    int ptIdx = res.indexOf('.');
+    if (ptIdx>0) {
+        while( res.length()>ptIdx && res[res.length()-1]=='0' )
+            res = res.left(res.length()-1);
+
+        if (res[res.length()-1]=='.')
+            res = res.left(res.length()-1);
+    }
+
+    return res;
+}
+
+
+
 // convert string representing double into nano
 QPair<bool,long> one2nano(QString str) {
     if (str.length()==0)
@@ -103,6 +124,35 @@ QString expandStrM(QString str, int len, QChar filler ) {
     }
     return str;
 }
+
+
+// Filter Error message: "error: Not enough funds."   =>  "Not enough funds."
+QString trimErrorMessage(QString errorMsg) {
+    errorMsg = errorMsg.trimmed();
+    if ( errorMsg.startsWith("error:", Qt::CaseInsensitive) )
+        return errorMsg.mid( strlen("error:") ).trimmed();
+
+    if ( errorMsg.startsWith("warning:", Qt::CaseInsensitive) )
+        return errorMsg.mid( strlen("warning:") ).trimmed();
+
+    if ( errorMsg.startsWith("info:", Qt::CaseInsensitive) )
+        return errorMsg.mid( strlen("info:") ).trimmed();
+
+    return errorMsg;
+}
+
+// Format bunch of error messages to be ready pronted one by one
+QString formatErrorMessages(QStringList messages) {
+    QString errMsg;
+    for (auto & err : messages) {
+        if (errMsg.size()>0)
+            errMsg += "\n";
+
+        errMsg += util::trimErrorMessage(err);
+    }
+    return errMsg;
+}
+
 
 }
 

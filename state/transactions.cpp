@@ -24,7 +24,7 @@ NextStateRespond Transactions::execute() {
 };
 
 QString Transactions::getCurrentAccountName() const {
-    return context.wallet->getWalletBalance().accountName;
+    return context.wallet->getCurrentAccountName();
 }
 
 

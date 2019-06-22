@@ -9,18 +9,12 @@
 #include "tasks/TaskStarting.h"
 #include "tasks/TaskUnlock.h"
 #include "tasks/TaskInit.h"
-#include "tasks/TaskInitPassphrase.h"
-#include "tasks/TaskInitConfirm.h"
-#include "tasks/TaskListeningStart.h"
-#include "tasks/TaskListeningStop.h"
-#include "tasks/TaskRecoverFull.h"
-#include "tasks/TaskRecover1Type.h"
-#include "tasks/TaskRecover2Mnenonic.h"
-#include "tasks/TaskRecover3Password.h"
-#include "tasks/TaskRecoverProgressListener.h"
+#include "tasks/TaskListening.h"
+#include "tasks/TaskRecover.h"
 #include "tasks/TaskErrWrnInfoListener.h"
-#include "tasks/TaskListeningListener.h"
 #include "tasks/TaskMwcMqAddress.h"
+#include "tasks/TaskAccount.h"
+#include "tasks/TaskSend.h"
 #include "../util/Log.h"
 #include "../core/global.h"
 #include "../control/messagebox.h"
@@ -105,16 +99,20 @@ void MWC713::start() noexcept(false) {
     eventCollector->addListener( new TaskRecoverProgressListener(this) );
     eventCollector->addListener( new TaskErrWrnInfoListener(this) );
     eventCollector->addListener( new TaskListeningListener(this) );
+    eventCollector->addListener( new TaskSlatesListener(this) );
 
     // And eventing magic should begin...
 }
 
 
 void MWC713::loginWithPassword(QString password, QString account) noexcept(false) {
+    walletPassword = password;
     eventCollector->addTask( new TaskUnlock(this, password, account), TaskUnlock::TIMEOUT );
 }
 
 void MWC713::generateSeedForNewAccount(QString password) noexcept(false) {
+    walletPassword = password;
+
     eventCollector->addTask( new TaskInit(this), TaskInit::TIMEOUT );
     eventCollector->addTask( new TaskInitPassphrase(this, password), TaskInitPassphrase::TIMEOUT );
 }
@@ -128,6 +126,7 @@ void MWC713::confirmNewSeed() noexcept(false) {
 
 
 void MWC713::recover(const QVector<QString> & seed, QString password) noexcept(false) {
+    walletPassword = password;
 
     if ( initStatus==InitWalletStatus::READY )
     {
@@ -192,13 +191,75 @@ void MWC713::nextBoxAddress() noexcept(false) {
     eventCollector->addTask( new TaskMwcMqAddress(this,true, -1), TaskMwcMqAddress::TIMEOUT );
 }
 
+// Request Wallet balance update. It is a multistep operation
+// Check signal: onWalletBalanceUpdated
+//          onWalletBalanceProgress
+void MWC713::updateWalletBalance() noexcept(false) {
+    // Steps:
+    // 1 - list accounts (this call)
+    // 2 - for every account get info ( see updateAccountList call )
+    // 3 - restore back current account
+
+    eventCollector->addTask( new TaskAccountList(this), TaskAccountList::TIMEOUT );
+}
+
+// Create another account, note no delete exist for accounts
+// Check Signal:  onAccountCreated
+void MWC713::createAccount( const QString & accountName ) noexcept(false) {
+    eventCollector->addTask( new TaskAccountCreate(this, accountName), TaskAccountInfo::TIMEOUT );
+
+}
+
+// Switch to different account
+// Check Signal: onAccountSwitched
+void MWC713::switchAccount(const QString & accountName) noexcept(false) {
+    // Expected that account is in the list
+    eventCollector->addTask( new TaskAccountSwitch(this, accountName, walletPassword), TaskAccountSwitch::TIMEOUT );
+}
+
+// Send some coins to address.
+// Before send, wallet always do the switch to account to make it active
+// Check signal:  onSend
+void MWC713::sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs ) noexcept(false) {
+    // switch account first
+    eventCollector->addTask( new TaskAccountSwitch(this, account.accountName, walletPassword), TaskAccountSwitch::TIMEOUT );
+    // If listening, strting...
+
+    eventCollector->addTask( new TaskSendMwc(this, coinNano, address, message, inputConfirmationNumber, changeOutputs), TaskSendMwc::TIMEOUT );
+    // Set some funds
+
+}
+
+
+// Init send transaction with file output
+// Check signal:  onSendFile
+void MWC713::sendFile( long coinNano, QString fileTx ) noexcept(false) {
+    eventCollector->addTask( new TaskSendFile(this, coinNano, fileTx ), TaskSendFile::TIMEOUT );
+}
+
+// Recieve transaction. Will generate *.response file in the same dir
+// Check signal:  onReceiveFile
+void MWC713::receiveFile( QString fileTx) noexcept(false) {
+    eventCollector->addTask( new TaskReceiveFile(this, fileTx), TaskReceiveFile::TIMEOUT );
+}
+
+// finalize transaction and broadcast it
+// Check signal:  onFinalizeFile
+void MWC713::finalizeFile( QString fileTxResponse ) noexcept(false) {
+    eventCollector->addTask( new TaskFinalizeFile(this, fileTxResponse), TaskFinalizeFile::TIMEOUT );
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Feed the command to mwc713 process
-void MWC713::executeMwc713command(QString cmd) {
+void MWC713::executeMwc713command(QString cmd, QString shadowStr) {
     Q_ASSERT(mwc713process);
-    logger::logMwc713in(cmd);
+    if (shadowStr.size()==0)
+        logger::logMwc713in(cmd);
+    else
+        logger::logMwc713in( "CENSORED: " + shadowStr );
+
     mwc713process->write( (cmd + "\n").toLocal8Bit() );
 }
 
@@ -328,6 +389,90 @@ void MWC713::setRecoveryProgress( long progress, long limit ) {
     emit onRecoverProgress( int(progress), int(limit) );
 }
 
+// Apply accout list. Explory what does wallet has
+void MWC713::updateAccountList( QVector<QString> accounts ) {
+    collectedAccountInfo.clear();
+    int idx = 0;
+    for (QString acc : accounts) {
+        eventCollector->addTask( new TaskAccountSwitch(this, acc, walletPassword), TaskAccountSwitch::TIMEOUT );
+        eventCollector->addTask( new TaskAccountInfo(this), TaskAccountInfo::TIMEOUT );
+        eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1 ); // Updating the progress
+    }
+    eventCollector->addTask( new TaskAccountListFinal(this, currentAccount), -1 ); // Finalize the task
+    // Final will switch back to current account
+}
+
+void MWC713::updateAccountProgress(int accountIdx, int totalAccounts) {
+    emit onWalletBalanceProgress( accountIdx, totalAccounts );
+}
+
+void MWC713::updateAccountFinalize(QString prevCurrentAccount) {
+    accountInfo = collectedAccountInfo;
+    emit onWalletBalanceUpdated();
+
+    // Set back the current account
+    bool isDefaultFound = false;
+    for (auto & acc : accountInfo) {
+        if (acc.accountName == prevCurrentAccount) {
+            isDefaultFound = true;
+            break;
+        }
+    }
+
+    if (!isDefaultFound && accountInfo.size()>0) {
+        prevCurrentAccount = accountInfo[0].accountName;
+    }
+
+    eventCollector->addTask( new TaskAccountSwitch(this, prevCurrentAccount, walletPassword), TaskAccountSwitch::TIMEOUT );
+}
+
+void MWC713::createNewAccount( QString newAccountName ) {
+    // Add new account info into the list. New account is allways empty
+    AccountInfo acc;
+    acc.setData(newAccountName,0,0,0,0,0,false);
+    accountInfo.push_back( acc );
+
+    emit onAccountCreated(newAccountName);
+    emit onWalletBalanceUpdated();
+}
+
+void MWC713::switchToAccount( QString switchAccountName ) {
+    emit onAccountSwitched(switchAccountName);
+}
+
+// Update with account info
+void MWC713::infoResults( QString currentAccountName, long height,
+                  long totalNano, long waitingConfNano, long lockedNano, long spendableNano, bool mwcServerBroken ) {
+    AccountInfo acc;
+    acc.setData(currentAccountName,
+                totalNano,
+                waitingConfNano,
+                lockedNano,
+                spendableNano,
+                height,
+                mwcServerBroken);
+
+    updateAccountInfo( acc, collectedAccountInfo, true );
+    updateAccountInfo( acc, accountInfo, false );
+}
+
+void MWC713::setSendResults(bool success, QStringList errors) {
+    emit onSend( success, errors );
+}
+
+void MWC713::setSendFileResult( bool success, QStringList errors, QString fileName ) {
+    emit onSendFile(success, errors, fileName);
+}
+
+void MWC713::setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn ) {
+    emit onReceiveFile( success, errors, inFileName, outFn );
+}
+
+void MWC713::setFinalizeFile( bool success, QStringList errors, QString fileName ) {
+    emit onFinalizeFile( success, errors, fileName);
+}
+
+
 /////////////////////////////////////////////////////////////////////////////////
 //      mwc713  IOs
 
@@ -398,6 +543,24 @@ void MWC713::mwc713readyReadStandardOutput() {
     qDebug() << "Get output:" << str;
     logger::logMwc713out(str);
     inputParser->processInput(str);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//      Utils
+
+// Update acc value at collection accounts. If account is not founf, we can add it (addIfNotFound) or skip
+void MWC713::updateAccountInfo( const AccountInfo & acc, QVector<AccountInfo> & accounts, bool addIfNotFound ) const {
+
+    for (auto & a : accounts) {
+        if (a.accountName == acc.accountName) {
+            a = acc;
+            return;
+        }
+    }
+
+    if (addIfNotFound)
+        accounts.push_back(acc);
+
 }
 
 

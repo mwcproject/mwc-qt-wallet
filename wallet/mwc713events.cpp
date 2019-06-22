@@ -43,6 +43,20 @@ QString toString(WALLET_EVENTS event) {
         case S_LISTENER_MQ_LOST_CONNECTION:  return "S_LISTENER_MQ_LOST_CONNECTION";
         case S_LISTENER_MQ_GET_CONNECTION: return "S_LISTENER_MQ_GET_CONNECTION";
 
+        case S_ACCOUNTS_TITLE: return "S_ACCOUNTS_TITLE";
+        case S_ACCOUNTS_INFO_SUM: return "S_ACCOUNTS_INFO_SUM";
+
+        case S_FILE_TRANS_CREATED: return "S_FILE_TRANS_CREATED";
+        case S_FILE_RECEIVED:      return "S_FILE_RECEIVED";
+        case S_FILE_TRANS_FINALIZED: return "S_FILE_TRANS_FINALIZED";
+
+        case S_SLATE_WAS_SENT:      return "S_SLATE_WAS_SENT";
+        case S_SLATE_WAS_RECEIVED:  return "S_SLATE_WAS_RECEIVED";
+        case S_SLATE_WAS_FINALIZED: return "S_SLATE_WAS_FINALIZED";
+
+
+        case S_TABLE_LINE2:         return "S_TABLE_LINE2";
+
         default: Q_ASSERT(false); return "Unknown";
     }
 }
@@ -74,6 +88,7 @@ void Mwc713EventManager::connectWith(tries::Mwc713InputParser * inputParser) {
 
 // Add task (single wallet action) to perform.
 // This tale ownership of object
+// Note:  if timeout <= 0, task will be executed immediately
 void Mwc713EventManager::addTask( Mwc713Task * task, long timeout ) {
     taskQ.push_back(taskInfo(task,timeout));
     processNextTask();
@@ -89,7 +104,7 @@ void Mwc713EventManager::processNextTask() {
         return; // Nothing to process
 
     // Check if we can perform the first task
-    taskInfo task = taskQ.front();
+    taskInfo & task = taskQ.front();
     if (!task.wasProcessed) {
 
         events.clear();
@@ -98,12 +113,19 @@ void Mwc713EventManager::processNextTask() {
         task.wasProcessed = true; // reset state first, then process
 
         logger::logTask( "Mwc713EventManager", task.task, "Starting..." );
+        task.task->onStarted();
 
-        if (!task.task->getInputStr().isEmpty()) {
-            mwc713wallet->executeMwc713command(task.task->getInputStr());
+        if (task.timeout > 0) {
+            // schedule the task for execution
+            if (!task.task->getInputStr().isEmpty()) {
+                mwc713wallet->executeMwc713command(task.task->getInputStr(), task.task->getShadowStr());
+            }
+            taskExecutionTimeLimit = QDateTime::currentMSecsSinceEpoch() + task.timeout;
         }
-        taskExecutionTimeLimit = QDateTime::currentMSecsSinceEpoch() + task.timeout;
-
+        else {
+            // execute the task now. Next task will be started
+            executeTask(taskQ.takeFirst());
+        }
     }
 }
 
@@ -159,8 +181,10 @@ void Mwc713EventManager::slRecieveEvent( WALLET_EVENTS event, QString message) {
     if (!taskQ.front().task->getReadyEvents().contains(event))
         return; // still waiting for events
 
-    taskInfo task = taskQ.takeFirst();
+    executeTask(taskQ.takeFirst());
+}
 
+void Mwc713EventManager::executeTask(taskInfo task) {
     // Got the acceptable final event
     taskExecutionTimeLimit = 0; // stopping timeout
     qDebug() << "Processing task '" << task.task->getTaskName() << "'";
@@ -173,7 +197,6 @@ void Mwc713EventManager::slRecieveEvent( WALLET_EVENTS event, QString message) {
 
     processNextTask();
 }
-
 
 
 }

@@ -40,6 +40,8 @@ private:
     void initInitWalletWorkflow();
     void initListening();
     void initRecovery();
+    void initAccount();
+    void initSend();
 
     void initGenericError(); // All error messages
 

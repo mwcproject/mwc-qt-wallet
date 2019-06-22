@@ -32,12 +32,15 @@ enum STATE {
     ACCOUNTS,       // Wallet accounts
     EVENTS,         // Wallet events (logs)
     HODL,           // Hodl program.
-    SEND_COINS,     // Send coins
+
+    SEND_ONLINE_OFFLINE, // PAGE_HOW_TO_SEND
+    SEND_ONLINE,  // Amount for online
+    SEND_OFFLINE, // Account for online
+
     RECIEVE_COINS,   // Recieve coins
     NODE_STATUS,    // Cgeck node status
     CONNECT_2_NODE, // connection to the MWC nodes
     NODE_MANUALY,   // input URI to the custom node
-    FILE_TRANSACTIONS, // Transactions for files
     LISTENING,      // Listening API setting/status
     TRANSACTIONS,   // Transactions dialog
     OUTPUTS,        // Outputs for this wallet

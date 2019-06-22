@@ -9,7 +9,7 @@ namespace wallet {
     public:
         const static long TIMEOUT = 8000;
 
-        TaskStarting( MWC713 * wallet713 ) : Mwc713Task("Starting", "", wallet713) {}
+        TaskStarting( MWC713 * wallet713 ) : Mwc713Task("Starting", "", wallet713,"") {}
         virtual ~TaskStarting() override {}
 
         virtual bool processTask(const QVector<WEvent> & events) override;

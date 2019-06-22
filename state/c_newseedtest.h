@@ -5,11 +5,13 @@
 #include <QString>
 #include <QPair>
 #include "../core/testseedtask.h"
+#include <QObject>
 
 namespace state {
 
-class NewSeedTest : public State
+class NewSeedTest : public QObject, public State
 {
+    Q_OBJECT
 public:
     NewSeedTest(const StateContext & context);
     virtual ~NewSeedTest() override;
@@ -18,8 +20,13 @@ public:
 
 protected:
     virtual NextStateRespond execute() override;
+
+private slots:
+    void onWalletBalanceUpdated();
+
 private:
     core::TestSeedTask currentTask;
+    QMetaObject::Connection slotConn;
 };
 
 }

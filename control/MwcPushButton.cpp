@@ -55,4 +55,23 @@ MwcPushButtonTiny::~MwcPushButtonTiny()
 {}
 
 
+// -----------------   MwcPushButtonTinyUnderline  -----------------------
+
+MwcPushButtonTinyUnderline::MwcPushButtonTinyUnderline(QWidget *parent) :
+        QPushButton(parent)
+{}
+
+MwcPushButtonTinyUnderline::MwcPushButtonTinyUnderline(const QString &text, QWidget *parent ) :
+        QPushButton(text,parent)
+{}
+
+MwcPushButtonTinyUnderline::MwcPushButtonTinyUnderline(const QIcon &icon, const QString &text, QWidget *parent) :
+        QPushButton(icon,text,parent)
+{}
+
+MwcPushButtonTinyUnderline::~MwcPushButtonTinyUnderline()
+{}
+
+
+
 }

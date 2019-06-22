@@ -136,7 +136,18 @@ void CreateWithSeed::onRecoverResult(bool started, bool finishedWithSuccess, QSt
 
     if (success) {
         // Great, we are done here.
-        context.stateMachine->executeFrom(STATE::CREATE_WITH_SEED);
+        // Must wait for balance update
+
+        // Start Balance update
+        logger::logConnect("CreateWithSeed", "onWalletBalanceUpdated");
+        connWalletBalanceUpdated = QObject::connect(context.wallet, &wallet::Wallet::onWalletBalanceUpdated,
+                                                    this, &CreateWithSeed::onWalletBalanceUpdated, Qt::QueuedConnection);
+
+        context.wallet->updateWalletBalance();
+
+        progressWnd->updateProgress(0,"");
+        progressWnd->setMsgPlus("Recovering your wallet...");
+
         return;
     }
     else {
@@ -147,9 +158,18 @@ void CreateWithSeed::onRecoverResult(bool started, bool finishedWithSuccess, QSt
     }
 }
 
+// Account info is updated
+void CreateWithSeed::onWalletBalanceUpdated() {
+    logger::logDisconnect("InputPassword", "onWalletBalanceUpdated" );
+    QObject::disconnect(connWalletBalanceUpdated);
+
+    context.stateMachine->executeFrom(STATE::CREATE_WITH_SEED);
+}
+
 void CreateWithSeed::cancel() {
     context.stateMachine->executeFrom(STATE::NEW_WALLET);
 }
+
 
 
 }

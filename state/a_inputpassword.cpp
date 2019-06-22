@@ -57,12 +57,30 @@ void InputPassword::onInitWalletStatus( wallet::InitWalletStatus  status ) {
         Q_ASSERT(context.wallet->getWalletStatus() == wallet::InitWalletStatus::READY);
         logger::logDisconnect("InputPassword", "onInitWalletStatus" );
         QObject::disconnect(slotConn);
-        context.stateMachine->executeFrom(STATE::INPUT_PASSWORD);
+
+        // Start listening, no feedback interested
+        context.wallet->listeningStart(true, false);
+        context.wallet->listeningStart(false, true);
+
+        // Updating the wallet balance
+        logger::logConnect("InputPassword", "onWalletBalanceUpdated" );
+        slotConn = QObject::connect( context.wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &InputPassword::onWalletBalanceUpdated, Qt::QueuedConnection );
+        context.wallet->updateWalletBalance();
+
     }
     else {
         // seems like fatal error. Unknown state
         context.wallet->reportFatalError("Internal error. Wallet Password verification invalid state.");
     }
 }
+
+// Account info is updated
+void InputPassword::onWalletBalanceUpdated() {
+    logger::logDisconnect("InputPassword", "onWalletBalanceUpdated" );
+    QObject::disconnect(slotConn);
+
+    context.stateMachine->executeFrom(STATE::INPUT_PASSWORD);
+}
+
 
 }

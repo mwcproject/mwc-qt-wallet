@@ -27,8 +27,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void setStateMachine(state::StateMachine * stateMachine);
-    void setWallet(wallet::Wallet * wallet);
+    void setAppEnvironment(state::StateMachine * stateMachine, wallet::Wallet * wallet);
 
     QWidget * getMainWindow();
 
@@ -38,15 +37,20 @@ public:
     void updateLeftBar(bool show);
 
 private slots:
-    //void on_actionVersion_triggered();
-
-private slots:
     void onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message);
 
+    void on_connectionStatusButton_clicked();
+    void on_helpButton_clicked();
+
+    void updateListenerStatus(bool online);
+
+private:
+    void updateListenerBtn();
 
 private:
     Ui::MainWindow *ui;
     state::StateMachine * stateMachine = nullptr;
+    wallet::Wallet * wallet = nullptr;
 
     bool leftBarShown = true;
 };

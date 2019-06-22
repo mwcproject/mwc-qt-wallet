@@ -24,7 +24,7 @@ private:
     // That is why we can delegate functionality to them
     Transactions * transactionsState;
     Listening * listeningState;
-    FileTransactions * fileTransactionsState;
+    //FileTransactions * fileTransactionsState;
 };
 
 }

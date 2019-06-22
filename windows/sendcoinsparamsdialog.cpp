@@ -4,7 +4,7 @@
 
 namespace wnd {
 
-SendCoinsParamsDialog::SendCoinsParamsDialog(QWidget *parent, const state::SendCoinsParams & _params) :
+SendCoinsParamsDialog::SendCoinsParamsDialog(QWidget *parent, const core::SendCoinsParams & _params) :
     QDialog(parent),
     ui(new Ui::SendCoinsParamsDialog),
     params(_params)

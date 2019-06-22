@@ -148,14 +148,12 @@ int main(int argc, char *argv[])
 
     core::WindowManager wndManager( mainWnd->getMainWindow() );
 
-    mainWnd->setWallet(&wallet);
-
     mainWnd->show();
 
     state::StateContext context( &appContext, &wallet, &wndManager, mainWnd );
 
     state::StateMachine machine(context);
-    mainWnd->setStateMachine(&machine);
+    mainWnd->setAppEnvironment(&machine, &wallet);
     machine.start();
 
     app.exec();

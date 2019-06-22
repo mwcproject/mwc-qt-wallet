@@ -36,13 +36,17 @@ class TrieAnySection : public BaseTrieSection {
 public:
     // lenLimit - max length of the phrase
     enum PROCESS { NUMBERS=0x0001, LOW_CASE=0x0002, UPPER_CASE=0x0004, SPACES=0x0008,
-                   ANY_UNTIL_NEW_LINE = 0x0010,
-                   NEW_LINE=0x0100, BRACKETS=0x0200 };
-    TrieAnySection(int lenLimit, uint32_t processMask, int accumulateId=-1 );
+                   NOT_NEW_LINE = 0x0010, NOT_SPACES=0x0020,
+                   NEW_LINE=0x0100,
+                   START_NEXT_EVERY_TRY=0x1000 };
+    // acceptSymbols & stopSymbols are char sets. If strings are empty, will be ignored
+    TrieAnySection(int lenLimit, uint32_t processMask, QString acceptSymbols, QString stopSymbols, int accumulateId=-1 );
     virtual uint32_t processChar(TrieContext & context, QChar ch) override;
 protected:
     int lenLimit;
     uint32_t processMask;
+    QString acceptSymbols;
+    QString stopSymbols;
 };
 
 

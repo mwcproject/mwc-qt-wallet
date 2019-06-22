@@ -48,7 +48,7 @@
     <enum>QFrame::Sunken</enum>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;GUI MWC wallet &lt;/span&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;v 0.1&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;This app is intended to show the gui MWC wallet design. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;GUI mwc wallet &lt;/span&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;v 0.1&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;This app is intended to show the gui MWC wallet design. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignHCenter|Qt::AlignTop</set>

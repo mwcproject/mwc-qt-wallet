@@ -22,7 +22,6 @@ class ReceiveCoins : public QWidget
 public:
     explicit ReceiveCoins(QWidget *parent,
                           state::Listening * listeningState,
-                          state::FileTransactions * fileTransactionsState,
                           state::Transactions * transactionsState);
     ~ReceiveCoins();
 
@@ -42,7 +41,6 @@ private:
 private:
     Ui::ReceiveCoins *ui;
     state::Listening * listeningState;
-    state::FileTransactions * fileTransactionsState;
     state::Transactions * transactionsState;
 };
 

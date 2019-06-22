@@ -31,7 +31,7 @@ QVector<wallet::WalletOutput> Outputs::getOutputs() {
 }
 
 QString Outputs::getCurrentAccountName() const {
-    return context.wallet->getWalletBalance().accountName;
+    return context.wallet->getCurrentAccountName();
 }
 
 // IO for columns widhts

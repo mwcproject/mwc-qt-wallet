@@ -28,18 +28,21 @@ QString WalletNotificationMessages::toString() const {
     return ( "NotifMsg(level=" + levelStr + ", message="+message + ")" );
 }
 
-
-void WalletInfo::setData(QString account,
+void AccountInfo::setData(QString account,
                         long _total,
                         long _awaitingConfirmation,
                         long _lockedByPrevTransaction,
-                        long _currentlySpendable)
+                        long _currentlySpendable,
+                        long _mwcNodeHeight,
+                        bool _mwcServerBroken)
 {
     accountName = account;
     total = _total;
     awaitingConfirmation = _awaitingConfirmation;
     lockedByPrevTransaction = _lockedByPrevTransaction;
     currentlySpendable = _currentlySpendable;
+    mwcNodeHeight = _mwcNodeHeight;
+    mwcServerBroken = _mwcServerBroken;
 }
 
 void WalletConfig::saveData( QDataStream & out) const {

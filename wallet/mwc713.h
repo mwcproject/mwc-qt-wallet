@@ -4,6 +4,7 @@
 #include "wallet.h"
 #include <QObject>
 #include <QProcess>
+#include "../core/global.h"
 
 namespace tries {
     class Mwc713InputParser;
@@ -86,21 +87,29 @@ public:
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
 
 
-    // --------------- Foreign API
-    virtual bool isForegnApiRunning() noexcept(false) override {return false;}
-    virtual QPair<bool,QString> startForegnAPI(int port, QString foregnApiSecret) noexcept(false) override {return QPair<bool, QString>(true,"");}
-    virtual QPair<bool,QString> stopForeignAPI() noexcept(false) override {return QPair<bool, QString>(true,"");}
-
     // -------------- Accounts
 
-    //  Get list of open account
-    virtual QVector<QString> getAccountList() noexcept(false) override {return QVector<QString>();}
+    // Get all accounts with balances. Expected that Wallet allways maintain them in a cache.
+    // This info needed in many cases and we don't want spend time every time for that.
+    virtual QVector<AccountInfo>  getWalletBalance() noexcept(false) override {return accountInfo;}
+
+    virtual QString getCurrentAccountName() noexcept(false) override {return currentAccount;}
+
+
+    // Request Wallet balance update. It is a multistep operation
+    virtual void updateWalletBalance() noexcept(false) override;
+    // Check signal: onWalletBalanceUpdated
+    //          onWalletBalanceProgress
+
 
     // Create another account, note no delete exist for accounts
-    virtual QPair<bool, QString> createAccount( const QString & accountName ) noexcept(false) override  {return QPair<bool, QString>(true,"");}
+    virtual void createAccount( const QString & accountName ) noexcept(false) override;
+    // Check Signal:  onAccountCreated
 
     // Switch to different account
-    virtual QPair<bool, QString> switchAccount(const QString & accountName) noexcept(false) override  {return QPair<bool, QString>(true,"");}
+    virtual void switchAccount(const QString & accountName) noexcept(false) override;
+    // Check Signal: onAccountSwitched
+
 
     // -------------- Maintaince
 
@@ -114,17 +123,26 @@ public:
     virtual NodeStatus getNodeStatus() noexcept(false) override {return NodeStatus();}
 
     // -------------- Transactions
-    virtual WalletInfo getWalletBalance() noexcept(false) override {return WalletInfo();}
     virtual bool cancelTransacton(QString transactionID) noexcept(false) override {return true;}
 
     virtual WalletProofInfo  generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) override {return WalletProofInfo();}
     virtual WalletProofInfo  verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) override {return WalletProofInfo();}
 
-    virtual QPair<bool, QString> sendFile( long coinNano, QString fileTx ) noexcept(false) override  {return QPair<bool, QString>(true,"");}
-    virtual QPair<bool, QString> receiveFile( QString fileTx, QString responseFileName ) noexcept(false) override  {return QPair<bool, QString>(true,"");}
-    virtual QPair<bool, QString> finalizeFile( QString fileTxResponse ) noexcept(false) override  {return QPair<bool, QString>(true,"");}
+    // Init send transaction with file output
+    // Check signal:  onSendFile
+    virtual void sendFile( long coinNano, QString fileTx ) noexcept(false) override;
+    // Recieve transaction. Will generate *.response file in the same dir
+    // Check signal:  onReceiveFile
+    virtual void receiveFile( QString fileTx) noexcept(false) override;
+    // finalize transaction and broadcast it
+    // Check signal:  onFinalizeFile
+    virtual void finalizeFile( QString fileTxResponse ) noexcept(false) override;
 
-    virtual QPair<bool, QString> sendTo( long coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs ) noexcept(false) override  {return QPair<bool, QString>(true,"");}
+
+    // Send some coins to address.
+    // Before send, wallet always do the switch to account to make it active
+    // Check signal:  onSend
+    virtual void sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message="", int inputConfirmationNumber=-1, int changeOutputs=-1 ) noexcept(false) override;
 
     virtual QVector<WalletOutput> getOutputs() noexcept(false) override {return QVector<WalletOutput>();}
     // numOfTransactions - transaction limit to return. <=0 - get all transactions
@@ -145,7 +163,7 @@ public:
     tries::Mwc713InputParser * getInputParser() const { return inputParser;}
 
     // Feed the command to mwc713 process
-    void executeMwc713command(QString cmd);
+    void executeMwc713command( QString cmd, QString shadowStr);
 public:
     // Task Reporting methods
     enum MESSAGE_LEVEL { FATAL_ERROR, CRITICAL, WARNING, INFO, DEBUG };
@@ -174,9 +192,29 @@ public:
     void setRecoveryResults( bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages );
     void setRecoveryProgress( long progress, long limit );
 
+    // Update account feedback
+    void updateAccountList( QVector<QString> accounts );
+    void updateAccountProgress(int accountIdx, int totalAccounts);
+    void updateAccountFinalize(QString prevCurrentAccount);
+    void createNewAccount( QString newAccountName );
+    void switchToAccount( QString switchAccountName );
+
+    void infoResults( QString currentAccountName, long height,
+           long totalNano, long waitingConfNano, long lockedNano, long spendableNano,
+                      bool mwcServerBroken );
+
+    void setSendResults(bool success, QStringList errors);
+
+    void setSendFileResult( bool success, QStringList errors, QString fileName );
+    void setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
+    void setFinalizeFile( bool success, QStringList errors, QString fileName );
+
 private:
     void mwc713connect();
     void mwc713disconnect();
+
+    // Update acc value at collection accounts. If account is not founf, we can add it (addIfNotFound) or skip
+    void updateAccountInfo( const AccountInfo & acc, QVector<AccountInfo> & accounts, bool addIfNotFound ) const;
 
 private slots:
     // mwc713 Process IOs
@@ -207,6 +245,16 @@ private:
 
     // Connections to mwc713process
     QVector< QMetaObject::Connection > mwc713connections; // open connection to mwc713
+
+    // Accounts with balances info
+    QVector<AccountInfo> accountInfo;
+    QString currentAccount = "default"; // Keep current account by name. It fit better to mwc713 interactions.
+
+private:
+    // Temprary values, local values for states
+    QString walletPassword;
+
+    QVector<AccountInfo> collectedAccountInfo;
 };
 
 }

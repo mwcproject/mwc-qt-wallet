@@ -3,14 +3,32 @@
 
 #include <QMap>
 #include "../state/state.h"
-#include "../state/sendcoins.h"
 
 class QAction;
 
 namespace core {
 
 #define COOKIE_PASSWORD "pswd"
-#define ACTIVE_WND "activeWnd"
+
+struct SendCoinsParams {
+    int inputConfirmationNumber;
+    int changeOutputs;
+
+    SendCoinsParams() :
+            inputConfirmationNumber(-1), changeOutputs(-1) {}
+
+    SendCoinsParams( int _inputConfirmationNumber, int _changeOutputs) :
+            inputConfirmationNumber(_inputConfirmationNumber), changeOutputs(_changeOutputs) {}
+
+    void setData(int _inputConfirmationNumber, int _changeOutputs) {
+        inputConfirmationNumber = _inputConfirmationNumber;
+        changeOutputs = _changeOutputs;
+    }
+
+    void saveData(QDataStream & out) const;
+    bool loadData(QDataStream & in);
+};
+
 
 // State that applicable to all application.
 class AppContext
@@ -38,8 +56,8 @@ public:
     void setActiveWndState(state::STATE  state) {activeWndState=state;}
 
     // Send coins params.
-    state::SendCoinsParams getSendCoinsParams() const {return sendCoinsParams;}
-    void setSendCoinsParams(state::SendCoinsParams params) { sendCoinsParams=params; }
+    SendCoinsParams getSendCoinsParams() const {return sendCoinsParams;}
+    void setSendCoinsParams(SendCoinsParams params) { sendCoinsParams=params; }
 
     // Get last path state. Default: Home dir
     QString getPathFor( QString name ) const;
@@ -68,7 +86,7 @@ private:
     state::STATE activeWndState = state::STATE::LISTENING;
 
     // Send coins params.
-    state::SendCoinsParams sendCoinsParams;
+    SendCoinsParams sendCoinsParams;
 
     // Current Path dirs
     QMap<QString,QString> pathStates;

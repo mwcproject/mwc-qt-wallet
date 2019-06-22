@@ -103,7 +103,7 @@ void Listening::onListeningStartResults( bool mqTry, bool kbTry, // what we try 
     if (wnd && !errorMessages.empty()) {
         QString msg;
         for (auto & s : errorMessages)
-            msg += s + "/n";
+            msg += s + '\n';
         wnd->showMessage("Start listening Error", msg);
     }
 }

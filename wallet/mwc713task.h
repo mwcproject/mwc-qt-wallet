@@ -14,12 +14,15 @@ class WalletEventCollector;
 class Mwc713Task
 {
 public:
-    Mwc713Task(QString taskName, QString inputStr, MWC713 * wallet713);
+    // shadowStr - specify if data in this task is private. That string will be used into the logs.
+    Mwc713Task(QString taskName, QString inputStr, MWC713 * wallet713, QString shadowStr);
     virtual ~Mwc713Task();
 
     const QString & getTaskName() const {return taskName;}
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() = 0; // Set of final events that can trigger task execution and completion
+
+    virtual void onStarted() {}
 
     // Will be called from 'Ready' for normal tasks
     // Or in order as events coming for filtering tasks
@@ -31,15 +34,22 @@ public:
     bool hasInput() const {return !inputStr.isEmpty();}
 
     const QString & getInputStr() const {return inputStr;}
+    const QString & getShadowStr() const {return shadowStr;}
 
-    virtual QString toDbgString() const { return "Mwc713Task(name="+taskName + ", Input="+inputStr+")"; }
+    virtual QString toDbgString() const {
+        if (shadowStr.isEmpty())
+            return "Mwc713Task(name="+taskName + (inputStr.isEmpty()?"":", Input="+inputStr)+")";
+        else
+            return "Mwc713Task("+shadowStr+")";
+    }
+
 protected:
     QString taskName;
 
     // wallet to call back regarding the state change
     MWC713 * wallet713;
-
     QString inputStr; // string (command) to feed to a wallet
+    QString shadowStr; // If difined, will represend this task into the logs
 };
 
 // Some event utils

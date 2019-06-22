@@ -10,7 +10,7 @@ namespace wallet {
         const static long TIMEOUT = 5000;
 
         TaskUnlock( MWC713 * wallet713, QString password, QString account ) :
-                    Mwc713Task("Unlocking", buildWalletRequest(password, account), wallet713) {}
+                    Mwc713Task("Unlocking", buildWalletRequest(password, account), wallet713, "unlock") {}
 
         virtual ~TaskUnlock() override {}
 

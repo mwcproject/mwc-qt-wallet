@@ -69,21 +69,20 @@ public:
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
 
 
-    // --------------- Foreign API
-    virtual bool isForegnApiRunning() noexcept(false) override;
-    virtual QPair<bool,QString> startForegnAPI(int port, QString foregnApiSecret) noexcept(false) override;
-    virtual QPair<bool,QString> stopForeignAPI() noexcept(false) override;
-
     // -------------- Accounts
+    virtual QString getCurrentAccountName() noexcept(false) override {return "default";}
+
+    // Request Wallet balance update. It is a multistep operation
+    // Check signal: onWalletBalanceUpdated
+    //          onWalletBalanceProgress
+    virtual void updateWalletBalance() noexcept(false) override {emit onWalletBalanceUpdated();}
 
     //  Get list of open account
-    virtual QVector<QString> getAccountList() noexcept(false) override;
-
     // Create another account, note no delete exist for accounts
-    virtual QPair<bool, QString> createAccount( const QString & accountName ) noexcept(false) override;
+    virtual void createAccount( const QString & accountName ) noexcept(false) override;
 
     // Switch to different account
-    virtual QPair<bool, QString> switchAccount(const QString & accountName) noexcept(false) override;
+    virtual void switchAccount(const QString & accountName) noexcept(false) override;
 
     // -------------- Maintaince
 
@@ -97,17 +96,27 @@ public:
     virtual NodeStatus getNodeStatus() noexcept(false) override;
 
     // -------------- Transactions
-    virtual WalletInfo getWalletBalance() noexcept(false) override;
+    virtual QVector<AccountInfo> getWalletBalance() noexcept(false) override;
     virtual bool cancelTransacton(QString transactionID) noexcept(false) override;
 
     virtual WalletProofInfo  generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) override;
     virtual WalletProofInfo  verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) override;
 
-    virtual QPair<bool, QString> sendFile( long coinNano, QString fileTx ) noexcept(false) override;
-    virtual QPair<bool, QString> receiveFile( QString fileTx, QString responseFileName ) noexcept(false) override;
-    virtual QPair<bool, QString> finalizeFile( QString fileTxResponse ) noexcept(false) override;
+    // Init send transaction with file output
+    // Check signal:  onSendFile
+    virtual void sendFile( long coinNano, QString fileTx ) noexcept(false) override;
+    // Recieve transaction. Will generate *.response file in the same dir
+    // Check signal:  onReceiveFile
+    virtual void receiveFile( QString fileTx) noexcept(false) override;
+    // finalize transaction and broadcast it
+    // Check signal:  onFinalizeFile
+    virtual void finalizeFile( QString fileTxResponse ) noexcept(false) override;
 
-    virtual QPair<bool, QString> sendTo( long coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs ) noexcept(false) override;
+    // Send some coins to address.
+    // Before send, wallet always do the switch to account to make it active
+    virtual void sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message="",
+                int inputConfirmationNumber=-1, int changeOutputs=-1 ) noexcept(false) override;
+    // Check signal:  onSend
 
     virtual QVector<WalletOutput> getOutputs() noexcept(false) override;
     // numOfTransactions - transaction limit to return. <=0 - get all transactions

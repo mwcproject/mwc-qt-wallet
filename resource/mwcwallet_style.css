@@ -7,6 +7,12 @@ core--MwcToolbar {
     background-color: #6F00D6;
 }
 
+control--MwcFrameWithBorder {
+    border: 2px solid #FFFFFF;
+    border-radius: 6px;
+    background: transparent;
+}
+
 QStatusBar {
     background-color: qlineargradient(x1: 1, y1: 0, x2: 1, y2: 0,
                                   stop: 0 #6F00D6, stop: 0.3 #6F00D6, stop: 0.9 #9E00E7, stop: 1 #9E00E7);
@@ -136,7 +142,7 @@ QTextEdit {
 
     font-size: 18px;
     border-radius: 6px;
-    padding: 16px;
+    padding: 10px 6px 10px 15px;
 }
 
 QPushButton
@@ -163,6 +169,12 @@ control--MwcPushButtonTiny {
     font-size: 9px;
 }
 
+control--MwcPushButtonTinyUnderline {
+    font-size: 12px;
+    text-decoration: underline;
+    border: none;
+}
+
 QPushButton:focus {
     background: #FFFFFF;
     color: #6F00D6;
@@ -171,6 +183,10 @@ QPushButton:focus {
 QPushButton:disabled {
     border: 2px solid gray;
     color: gray;
+}
+
+QPushButton:pressed {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 /* ------------------ Scroll bars ------------------------ */
@@ -199,9 +215,9 @@ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical, QScrollBar::up-a
 
 /* -------------- Progress bar ---------------- */
 QProgressBar {
-    border: 3px solid white;
-    border-radius: 20px;
-    background: white
+    border: 2px solid white;
+    border-radius: 6px;
+    background: white;
 }
 
 QProgressBar::chunk {
@@ -209,3 +225,94 @@ QProgressBar::chunk {
     width: 1px;
 }
 
+/* ----------- Frame with a white border -----------------*/
+
+MwcFrameWithBorder {
+    background: transparent;
+    border: 2px solid #FFFFFF;
+    border-radius: 6px;
+}
+
+/* ------------  QComboBox ------- */
+
+QComboBox
+{
+   border: transparent;
+   border-radius: 6px;
+   padding: 0px 1px 0px 20px;
+
+    background-color: rgba(255, 255, 255, 0.2);
+    selection-background-color: rgba(255, 255, 255, 0.3);
+    selection-color: yellow;
+
+    color: white;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 15px;
+
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+
+/*    border-style: solid;
+    border: 1px solid #1e1e1e;
+    border-radius: 5;
+    padding: 1px 0px 1px 20px;*/
+}
+
+
+QComboBox:on
+{
+    padding-top: 0px;
+    padding-left: 0px;
+    color: white;
+    selection-background-color: rgba(255, 255, 255, 0.5);
+}
+
+QComboBox:!on
+{
+    color: white;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: bottom right;
+    width: 30px;
+
+    background: transparent; /*  rgba(255, 255, 255, 0.25);*/
+    border: transparent;
+
+/*    border-left-width: 1px;*/
+/*    border-left-color: darkgray;*/
+/*    border-left-style: solid;*/ /* just a single line */
+    border-top-right-radius: 3px; /* same radius as the QComboBox */
+    border-bottom-right-radius: 3px;
+}
+
+QComboBox::down-arrow {
+    image: url(:/img/ComboBoxArrow.png);
+    border: transparent;
+}
+
+/* ----------  QRadioButton  ------------*/
+QRadioButton {
+    color: white;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 15px;
+    spacing: 10px;
+}
+
+QRadioButton::indicator {
+    width: 18px;
+    height: 18px;
+}
+
+QRadioButton::indicator:unchecked {
+    image: url(:/img/RadioOff.png);
+}
+
+QRadioButton::indicator:checked {
+    image: url(:/img/RadioOn.png);
+}

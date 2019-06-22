@@ -18,6 +18,8 @@ InputPassword::InputPassword(QWidget *parent, state::InputPassword * _state) :
 {
     ui->setupUi(this);
 
+    ui->progress->initLoader(false);
+
     state->setWindowTitle( mwc::VERSION + " " + mwc::APP_NAME );
 
     setFocusPolicy(Qt::StrongFocus);
@@ -40,11 +42,11 @@ void InputPassword::on_submitButton_clicked() {
 }
 
 void InputPassword::startWaiting() {
-    //ui->progress->show();
+    ui->progress->show();
 }
 
 void InputPassword::stopWaiting() {
-    //ui->progress->hide();
+    ui->progress->hide();
 }
 
 void InputPassword::reportWrongPassword() {

@@ -10,6 +10,25 @@ namespace core {
 
 const static QString settingsFileName("context.dat");
 
+
+void SendCoinsParams::saveData(QDataStream & out) const {
+    out << int(0x348A4);
+    out << inputConfirmationNumber;
+    out << changeOutputs;
+}
+
+bool SendCoinsParams::loadData(QDataStream & in) {
+    int id = -1;
+    in >> id;
+    if ( id!=0x348A4 )
+        return false;
+
+    in >> inputConfirmationNumber;
+    in >> changeOutputs;
+    return true;
+}
+
+
 AppContext::AppContext() {
     loadData();
 }

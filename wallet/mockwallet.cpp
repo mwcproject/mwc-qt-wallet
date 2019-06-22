@@ -82,7 +82,7 @@ MockWallet::~MockWallet() {
 
 // Generic. Reporting fatal error that somebody will process and exit app
 void MockWallet::reportFatalError( QString message ) noexcept(false) {
-    control::MessageBox::message(nullptr, "Critical Error", "We get a ritical error from underneath layer and need to close appclication.\nError: " + message);
+    control::MessageBox::message(nullptr, "Critical Error", "We get a critical error from underneath layer and need to close appclication.\nError: " + message);
     QApplication::quit();
 }
 
@@ -107,7 +107,7 @@ void MockWallet::start() noexcept(false) {
 void MockWallet::loginWithPassword(QString password, QString account) noexcept(false) {
     Q_UNUSED(account);
     if ( walletPassword == QString(password) ) {
-        initStatus = InitWalletStatus::NEED_PASSWORD;
+        initStatus = InitWalletStatus::READY;
     }
     else {
         initStatus = InitWalletStatus::WRONG_PASSWORD;
@@ -145,6 +145,8 @@ void MockWallet::recover(const QVector<QString> & seed, QString password) noexce
     emit onRecoverProgress(100,1000);
     emit onRecoverProgress(900,1000);
     emit onRecoverProgress(1000,1000);
+
+    isInit = true;
 
     emit onRecoverResult(true, true, "new_mwcmq_addres_ieurqkf320847hgfjhg", QStringList() );
 }
@@ -207,46 +209,16 @@ void MockWallet::nextBoxAddress() noexcept(false) {
     emit onMwcAddressWithIndex( boxAddresses[ currentAddressIdx % boxAddresses.size() ], currentAddressIdx );
 }
 
-bool MockWallet::isForegnApiRunning() {
-    return listenFogeignApi;
-}
-
-QPair<bool,QString> MockWallet::startForegnAPI(int port, QString foregnApiSecret) {
-    Q_UNUSED(port);
-    Q_UNUSED(foregnApiSecret);
-    return QPair<bool,QString>(true,"");
-}
-
-QPair<bool,QString> MockWallet::stopForeignAPI() {
-    return QPair<bool,QString>(true,"");
-}
-
-
-//  Get list of open account
-QVector<QString> MockWallet::getAccountList() {
-    return accounts;
-}
 
 // Create another account, note no delete exist for accounts
-QPair<bool, QString> MockWallet::createAccount( const QString & accountName )
+void MockWallet::createAccount( const QString & accountName )
 {
-    if (std::count_if( accounts.begin(), accounts.end(), [&](QString acc) {return acc==accountName;} )>0)
-        return QPair<bool, QString>(false, "Account with this name already exist");
-
-    accounts.push_back(accountName);
-    return QPair<bool, QString>(true, "");
+    emit onAccountCreated(accountName);
 }
 
 // Switch to different account
-QPair<bool, QString> MockWallet::switchAccount(const QString & accountName) {
-    int idx = accounts.indexOf(accountName);
-
-    if (idx>=0) {
-        selectedAccount = idx;
-        return QPair<bool, QString>(true, "");
-    }
-
-    return QPair<bool, QString>(false, "Account doesn't exist");
+void MockWallet::switchAccount(const QString & accountName) {
+    emit onAccountSwitched(accountName);
 }
 
 // Check and repair the wallet. Will take a while
@@ -273,14 +245,37 @@ NodeStatus MockWallet::getNodeStatus() {
 
 
 // Get wallet balance
-WalletInfo MockWallet::getWalletBalance() {
+QVector<AccountInfo> MockWallet::getWalletBalance() {
     //QThread::sleep(3);
-    long coin = 1000000000L;
-    WalletInfo wi;
-    wi.setData( accounts[selectedAccount], (20+selectedAccount)*coin,
-                (2+selectedAccount)*coin, (1+selectedAccount)*coin, (17+selectedAccount)*coin);
-    return wi;
 
+    long m1 = 1000000000L;
+
+    AccountInfo acc1;
+    acc1.setData( "default",
+            m1 * 7,
+            m1, m1, m1*5, 1234, false);
+
+    AccountInfo acc2;
+    acc2.setData( "account 1",
+            m1 * 7,
+            m1, m1, m1*5, 1234, false);
+
+    AccountInfo acc3;
+    acc3.setData( "one more account",
+            m1 * 7,
+            m1, m1, m1*5, 1234, false);
+
+    AccountInfo acc4;
+    acc4.setData( "additional account",
+            m1 * 7,
+            m1, m1, m1*5, 1234, false);
+
+    AccountInfo acc5;
+    acc5.setData( "HODL-1",
+            m1 * 7,
+            m1, m1, m1*5, 1234, false);
+
+    return QVector<AccountInfo>{acc1, acc2, acc3, acc4, acc5};
 }
 
 // Cancel transaction
@@ -316,37 +311,30 @@ WalletProofInfo  MockWallet::verifyMwcBoxTransactionProof( QString proofFileName
     return pi;
 }
 
+
 // Init send transaction with file output
-QPair<bool, QString> MockWallet::sendFile( long coinNano, QString fileTx ) noexcept(false) {
-    QFile file( fileTx );
-    if ( file.open(QIODevice::ReadWrite) )
-    {
-        QTextStream stream( &file );
-        stream << "Send stransaction for nano " << coinNano << "coins: " << endl;
-    }
-    return QPair<bool, QString>(true,"");
+// Check signal:  onSendFile
+void MockWallet::sendFile( long coinNano, QString fileTx ) noexcept(false) {
+    emit onSendFile(true, QStringList(), fileTx);
 }
 
 // Recieve transaction. Will generate *.response file in the same dir
-QPair<bool, QString> MockWallet::receiveFile( QString fileTx, QString responseFileName )
-{
-    QFile file( responseFileName );
-    if ( file.open(QIODevice::ReadWrite) )
-    {
-        QTextStream stream( &file );
-        stream << "response for file " << fileTx << endl;
-    }
-    return QPair<bool, QString>(true, "");
+// Check signal:  onReceiveFile
+void MockWallet::receiveFile( QString fileTx) noexcept(false) {
+    emit onReceiveFile( true, QStringList(), fileTx, fileTx+".response"  );
 }
 
 // finalize transaction and broadcast it
-QPair<bool, QString> MockWallet::finalizeFile( QString fileTxResponse ) {
-    Q_UNUSED(fileTxResponse);
-    return QPair<bool, QString>(true, "");
+// Check signal:  onFinalizeFile
+void MockWallet::finalizeFile( QString fileTxResponse ) noexcept(false) {
+    emit onFinalizeFile( true, QStringList(), fileTxResponse );
 }
 
 // Send some coins to address.
-QPair<bool, QString>  MockWallet::sendTo( long coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs ) noexcept(false) {
+// Before send, wallet always do the switch to account to make it active
+// Check signal:  onSend
+void MockWallet::sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message,
+                     int inputConfirmationNumber, int changeOutputs ) noexcept(false) {
     Q_UNUSED(coinNano);
     Q_UNUSED(address);
     Q_UNUSED(message);
@@ -356,18 +344,18 @@ QPair<bool, QString>  MockWallet::sendTo( long coinNano, const QString & address
     WalletTransaction wt;
     // last is expected
     wt.setData(transactions.back().txIdx + 1,
-       WalletTransaction::SEND,
-       QString::number( transactions.size()*189765 ),
-       address,
-       QTime::currentTime().toString(),
-       false,
-       "",
-       coinNano,
-       false);
+               WalletTransaction::SEND,
+               QString::number( transactions.size()*189765 ),
+               address,
+               QTime::currentTime().toString(),
+               false,
+               "",
+               coinNano,
+               false);
     transactions.push_back(wt);
-
-    return QPair<bool, QString> (true,"");
+    emit onSend( true, QStringList() );
 }
+
 
 // Show outputs for the wallet
 QVector<WalletOutput> MockWallet::getOutputs() noexcept(false) {

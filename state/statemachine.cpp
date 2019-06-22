@@ -11,12 +11,10 @@
 #include "accounts.h"
 #include "events.h"
 #include "hodl.h"
-#include "sendcoins.h"
 #include "receivecoins.h"
 #include "nodestatus.h"
 #include "connect2node.h"
 #include "nodemanually.h"
-#include "filetransactions.h"
 #include "e_listening.h"
 #include "transactions.h"
 #include "outputs.h"
@@ -24,6 +22,9 @@
 #include "walletconfig.h"
 #include "airdrop.h"
 #include "a_StartWallet.h"
+#include "send1_OnlineOffline.h"
+#include "send2_Online.h"
+#include "send3_Offline.h"
 
 namespace state {
 
@@ -45,12 +46,15 @@ StateMachine::StateMachine(StateContext & context) :
     states[ STATE::ACCOUNTS ]       = new Accounts(context);
     states[ STATE::EVENTS ]         = new Events(context);
     states[ STATE::HODL ]           = new Hodl(context);
-    states[ STATE::SEND_COINS ]     = new SendCoins(context);
+
+    states[ STATE::SEND_ONLINE_OFFLINE ] = new SendOnlineOffline(context);
+    states[ STATE::SEND_ONLINE ]    = new SendOnline(context);
+    states[ STATE::SEND_OFFLINE ]   = new SendOffline(context);
+
     states[ STATE::RECIEVE_COINS ]  = new ReceiveCoins(context);
     states[ STATE::NODE_STATUS]     = new NodeStatus(context);
     states[ STATE::CONNECT_2_NODE ] = new Connect2Node(context);
     states[ STATE::NODE_MANUALY]    = new NodeManually(context);
-    states[ STATE::FILE_TRANSACTIONS] = new FileTransactions(context);
     states[ STATE::LISTENING ]      = new Listening(context);
     states[ STATE::TRANSACTIONS ]   = new Transactions(context);
     states[ STATE::OUTPUTS ]        = new Outputs(context);
@@ -103,7 +107,7 @@ bool StateMachine::setActionWindow( STATE actionWindowState, bool enforce ) {
             return false;
 
     appContext->setActiveWndState(actionWindowState);
-    executeFrom(STATE::NONE);
+    executeFrom(actionWindowState);
     return currentState==actionWindowState;
 }
 

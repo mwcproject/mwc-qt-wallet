@@ -134,7 +134,7 @@ line-height: 35px;
 color: #FFFFFF;</string>
        </property>
        <property name="text">
-        <string>278 mwc</string>
+        <string>mwc</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

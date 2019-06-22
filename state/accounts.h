@@ -15,19 +15,15 @@ public:
     virtual ~Accounts() override;
 
     // get balance for current account
-    wallet::WalletInfo getWalletInfo();
+    QVector<wallet::AccountInfo> getWalletInfo();
 
-    // resync (update) account
-    wallet::WalletInfo resync();
-
-    // Get account list
-    QVector<QString> getAccounts();
+    void resync();
 
     // Make this account current
-    QPair<bool, QString> activateAccount(QString account);
+    void switchAccount(QString account);
 
     // add new account
-    QPair<bool, QString> addAccount(QString account);
+    void createAccount(QString account);
 protected:
     virtual NextStateRespond execute() override;
 };

@@ -62,14 +62,16 @@ uint32_t TrieNewLineSection::processChar(TrieContext & context, QChar ch) {
         return PROCESS_RESULT::FAIL;
 }
 
-TrieAnySection::TrieAnySection(int _lenLimit, uint32_t _processMask, int accumulateId ) :
+TrieAnySection::TrieAnySection(int _lenLimit, uint32_t _processMask,
+        QString _acceptSymbols, QString _stopSymbols,
+        int accumulateId ) :
     BaseTrieSection( accumulateId ),
     lenLimit(_lenLimit),
-    processMask(_processMask)
+    processMask(_processMask),
+    acceptSymbols(_acceptSymbols),
+    stopSymbols(_stopSymbols)
 {
 }
-
-const static QSet<QChar> BRACKETS_CHAR{ QChar('['), QChar(']'), QChar('{'), QChar('}'), QChar('('), QChar(')') };
 
 inline bool isNewLine(QChar ch) {
     return ch==QChar::LineSeparator || ch==QChar::LineFeed || ch==QChar::CarriageReturn;
@@ -89,18 +91,29 @@ uint32_t TrieAnySection::processChar(TrieContext & context, QChar ch) {
     if (processMask & PROCESS::SPACES)
         ok = ok || ch.isSpace();
 
-    if (processMask & PROCESS::ANY_UNTIL_NEW_LINE)
+    if (processMask & PROCESS::NOT_SPACES)
+        ok = ok || !ch.isSpace();
+
+    if (processMask & PROCESS::NOT_NEW_LINE)
         ok = ok || !isNewLine(ch);
 
     if (processMask & PROCESS::NEW_LINE)
         ok = ok || isNewLine(ch);
 
-    if (processMask & PROCESS::BRACKETS)
-        ok = ok || BRACKETS_CHAR.contains(ch);
+    ok = ok || acceptSymbols.contains(ch);
+
+    // stop must be the last
+    if (stopSymbols.contains(ch))
+        ok = false;
+
+    uint32_t startNextMask = 0;
+    if (processMask & START_NEXT_EVERY_TRY){
+        startNextMask = PROCESS_RESULT::START_NEXT;
+    }
 
     if (ok) {
         context.pos++;
-        return PROCESS_RESULT::KEEP;
+        return PROCESS_RESULT::KEEP | startNextMask;
     }
 
     if (context.pos==0)

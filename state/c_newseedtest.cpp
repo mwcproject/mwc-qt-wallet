@@ -7,6 +7,7 @@
 #include <QVector>
 #include "../core/testseedtask.h"
 #include "../control/messagebox.h"
+#include "../util/Log.h"
 
 namespace state {
 
@@ -33,6 +34,14 @@ NextStateRespond NewSeedTest::execute() {
             context.wallet->confirmNewSeed();
 
             control::MessageBox::message(nullptr, "Congratulations!", "Thank you for confirming all words from your passphrase. Your wallet was successfully created");
+
+            // Updating the wallet balance
+            logger::logConnect("InputPassword", "onWalletBalanceUpdated" );
+            slotConn = QObject::connect( context.wallet, &wallet::Wallet::onWalletBalanceUpdated,
+                    this, &NewSeedTest::onWalletBalanceUpdated, Qt::QueuedConnection );
+            context.wallet->updateWalletBalance();
+
+            return NextStateRespond(NextStateRespond::RESULT::WAIT_FOR_ACTION);
         }
 
         return NextStateRespond(NextStateRespond::RESULT::DONE);
@@ -47,6 +56,14 @@ NextStateRespond NewSeedTest::execute() {
                 new wnd::NewSeedTest( context.wndManager->getInWndParent(), this, currentTask.getWordIndex() ) );
 
     return NextStateRespond(NextStateRespond::RESULT::WAIT_FOR_ACTION);
+}
+
+// Account info is updated
+void NewSeedTest::onWalletBalanceUpdated() {
+    logger::logDisconnect("InputPassword", "onWalletBalanceUpdated" );
+    QObject::disconnect(slotConn);
+
+    context.stateMachine->executeFrom(STATE::TEST_NEW_SEED);
 }
 
 

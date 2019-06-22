@@ -4,7 +4,7 @@
 #include "versiondialog.h"
 #include "../state/statemachine.h"
 #include "util/widgetutils.h"
-#include <QMessageBox>
+#include "../control/messagebox.h"
 
 namespace core {
 
@@ -16,24 +16,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->statusBar->addPermanentWidget(ui->helpButton);
     ui->statusBar->addPermanentWidget(ui->btnSpacerLabel1);
-    ui->statusBar->addPermanentWidget(ui->connectionStatusLabel);
+    ui->statusBar->addPermanentWidget(ui->connectionStatusButton);
     ui->statusBar->addPermanentWidget(ui->rightestSpacerLabel);
 
     //ui->statusBar->showMessage("Can show any message here", 2000);
 
     // Want to delete children when they close
     setAttribute( Qt::WA_DeleteOnClose, true );
-
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-void MainWindow::setWallet(wallet::Wallet * wallet) {
-    QObject::connect(wallet, &wallet::Wallet::onNewNotificationMessage,
-                                         this, &MainWindow::onNewNotificationMessage, Qt::QueuedConnection);
 }
 
 void MainWindow::onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message) {
@@ -80,11 +74,24 @@ void MainWindow::updateLeftBar(bool show) {
     leftBarShown = show;
 }
 
-void MainWindow::setStateMachine(state::StateMachine * _stateMachine) {
+void MainWindow::setAppEnvironment(state::StateMachine * _stateMachine, wallet::Wallet * _wallet) {
     stateMachine = _stateMachine;
     Q_ASSERT(stateMachine);
+    wallet = _wallet;
+    Q_ASSERT(wallet);
 
-    ui->leftTb->setStateMachine(stateMachine);
+    ui->leftTb->setAppEnvironment(stateMachine, wallet);
+
+    QObject::connect(wallet, &wallet::Wallet::onNewNotificationMessage,
+                     this, &MainWindow::onNewNotificationMessage, Qt::QueuedConnection);
+
+
+    QObject::connect(wallet, &wallet::Wallet::onMwcMqListenerStatus,
+                     this, &MainWindow::updateListenerStatus, Qt::QueuedConnection);
+    QObject::connect(wallet, &wallet::Wallet::onMwcMqListenerStatus,
+                     this, &MainWindow::updateListenerStatus, Qt::QueuedConnection);
+
+    updateListenerBtn();
 }
 
 QWidget * MainWindow::getMainWindow() {
@@ -92,8 +99,6 @@ QWidget * MainWindow::getMainWindow() {
 }
 
 void MainWindow::updateActionStates(state::STATE actionState) {
-
-    state::STATE state = stateMachine->getActionWindow();
 
     bool isLeftBarVisible = (actionState >= state::STATE::ACCOUNTS);
 
@@ -103,9 +108,37 @@ void MainWindow::updateActionStates(state::STATE actionState) {
         ui->leftTb->updateButtonsState(actionState);
     }
 
-    bool enabled = stateMachine->isActionWindowMode();
+//    bool enabled = stateMachine->isActionWindowMode();
 
 }
+
+void MainWindow::on_connectionStatusButton_clicked()
+{
+    stateMachine->setActionWindow( state::STATE::LISTENING );
+}
+
+void MainWindow::on_helpButton_clicked()
+{
+    control::MessageBox::message(this, "Help", "Here is we suppose provide some help." );
+}
+
+void MainWindow::updateListenerStatus(bool online) {
+    Q_UNUSED(online);
+
+    updateListenerBtn();
+}
+
+void MainWindow::updateListenerBtn() {
+
+    QPair<bool,bool> listStatus = wallet->getListeningStatus();
+
+    bool listening = listStatus.first | listStatus.second;
+
+    QPixmap pixmap( listening ? ":/img/StatusOk.png" : ":/img/StatusFail.png" );
+    QIcon ButtonIcon(pixmap);
+    ui->connectionStatusButton->setIcon( ButtonIcon );
+}
+
 
 /*void MainWindow::on_actionVersion_triggered()
 {

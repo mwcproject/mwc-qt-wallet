@@ -24,7 +24,7 @@ public:
     explicit MwcToolbar(QWidget *parent);
     ~MwcToolbar() override;
 
-    void setStateMachine(state::StateMachine * _stateMachine ) {stateMachine = _stateMachine;}
+    void setAppEnvironment(state::StateMachine * stateMachine, wallet::Wallet * wallet );
 
     void updateButtonsState( state::STATE state );
 
@@ -42,8 +42,11 @@ private slots:
 
     void on_hodlToolButton_clicked();
 
+    void onWalletBalanceUpdated();
+
 private:
     Ui::MwcToolbar *ui;
+    wallet::Wallet      * wallet = nullptr;
     state::StateMachine * stateMachine = nullptr;
 };
 

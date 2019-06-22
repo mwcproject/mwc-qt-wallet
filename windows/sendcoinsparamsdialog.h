@@ -2,7 +2,7 @@
 #define SENDCOINSPARAMSDIALOG_H
 
 #include <QDialog>
-#include "../state/sendcoins.h"
+#include "../core/appcontext.h"
 
 namespace Ui {
 class SendCoinsParamsDialog;
@@ -15,10 +15,10 @@ class SendCoinsParamsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit SendCoinsParamsDialog(QWidget *parent, const state::SendCoinsParams & params);
+    explicit SendCoinsParamsDialog(QWidget *parent, const core::SendCoinsParams & params);
     virtual ~SendCoinsParamsDialog() override;
 
-    state::SendCoinsParams getSendCoinsParams() const {return params;}
+    core::SendCoinsParams getSendCoinsParams() const {return params;}
 
 private slots:
     void on_okButton_clicked();
@@ -26,7 +26,7 @@ private slots:
 
 private:
     Ui::SendCoinsParamsDialog *ui;
-    state::SendCoinsParams params;
+    core::SendCoinsParams params;
 };
 
 }

@@ -27,29 +27,23 @@ NextStateRespond Accounts::execute() {
 
 
 // get balance for current account
-wallet::WalletInfo Accounts::getWalletInfo() {
+QVector<wallet::AccountInfo> Accounts::getWalletInfo() {
     return context.wallet->getWalletBalance();
 }
 
 // resync (update) account
-wallet::WalletInfo Accounts::resync() {
-    context.wallet->check();
-    return context.wallet->getWalletBalance();
-}
-
-// Get account list
-QVector<QString> Accounts::getAccounts() {
-    return context.wallet->getAccountList();
+void Accounts::resync() {
+    // TODO
 }
 
 // Make this account current
-QPair<bool, QString> Accounts::activateAccount(QString account) {
-    return context.wallet->switchAccount( account );
+void Accounts::switchAccount(QString account) {
+    // TODO
 }
 
 // add new account
-QPair<bool, QString> Accounts::addAccount(QString account) {
-    return context.wallet->createAccount(account);
+void Accounts::createAccount(QString account) {
+    // TODO
 }
 
 }

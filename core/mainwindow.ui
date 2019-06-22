@@ -71,8 +71,7 @@
        <enum>Qt::NoFocus</enum>
       </property>
       <property name="styleSheet">
-       <string notr="true">border: none;
-</string>
+       <string notr="true">border: none;</string>
       </property>
       <property name="text">
        <string/>
@@ -112,26 +111,36 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="connectionStatusLabel">
-      <property name="minimumSize">
-       <size>
-        <width>20</width>
-        <height>20</height>
-       </size>
+     <widget class="QPushButton" name="connectionStatusButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
       <property name="maximumSize">
        <size>
-        <width>20</width>
-        <height>20</height>
+        <width>22</width>
+        <height>22</height>
        </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border: none;</string>
       </property>
       <property name="text">
        <string/>
       </property>
-      <property name="pixmap">
-       <pixmap resource="../resources.qrc">:/img/StatusFail.png</pixmap>
+      <property name="icon">
+       <iconset resource="../resources.qrc">
+        <normaloff>:/img/StatusFail.png</normaloff>:/img/StatusFail.png</iconset>
       </property>
-      <property name="scaledContents">
+      <property name="iconSize">
+       <size>
+        <width>22</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="flat">
        <bool>true</bool>
       </property>
      </widget>

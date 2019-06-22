@@ -26,6 +26,7 @@ protected:
 
 protected slots:
     void onInitWalletStatus( wallet::InitWalletStatus  status );
+    void onWalletBalanceUpdated();
 
 private:
     wnd::InputPassword * wnd = nullptr;

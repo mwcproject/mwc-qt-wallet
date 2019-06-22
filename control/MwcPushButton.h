@@ -32,6 +32,16 @@ public:
     virtual ~MwcPushButtonTiny() override;
 };
 
+class MwcPushButtonTinyUnderline : public QPushButton {
+Q_OBJECT
+public:
+    explicit MwcPushButtonTinyUnderline(QWidget *parent = Q_NULLPTR);
+    explicit MwcPushButtonTinyUnderline(const QString &text, QWidget *parent = Q_NULLPTR);
+    MwcPushButtonTinyUnderline(const QIcon &icon, const QString &text, QWidget *parent = Q_NULLPTR);
+    virtual ~MwcPushButtonTinyUnderline() override;
+};
+
+
 }
 
 #endif //GUI_WALLET_MWCPUSHBUTTON_H

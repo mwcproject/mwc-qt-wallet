@@ -16,7 +16,7 @@ Accounts::Accounts(QWidget *parent, state::Accounts * _state) :
 
     state->setWindowTitle("Accounts");
 
-    wallet::WalletInfo info = state->getWalletInfo();
+    QVector<wallet::AccountInfo> info = state->getWalletInfo();
 
     ui->accountList->setFocus();
 
@@ -37,7 +37,7 @@ void Accounts::updateUiState()
 {
     // update the list with accounts
     ui->accountList->clear();
-    QVector<QString> accounts( state->getAccounts() );
+/*    QVector<QString> accounts( state->getAccounts() );
     for (auto & acc : accounts)
         ui->accountList->addItem(acc);
 
@@ -52,7 +52,7 @@ void Accounts::updateUiState()
     ui->accountList->setCurrentRow( curAccountIdx );
     currentAccountName = info.accountName;
 
-    ui->selectButton->setEnabled(false);
+    ui->selectButton->setEnabled(false);*/
 
 }
 
@@ -80,13 +80,13 @@ void Accounts::on_addAccountButton_clicked()
         return;
 
     startWaiting();
-    QPair<bool, QString> newAccResult = state->addAccount(accountName);
-    updateUiState();
+    state->createAccount(accountName);
+/*    updateUiState();
     stopWaiting();
 
     if (!newAccResult.first) {
         control::MessageBox::message(this, "Error", "Wallet unable to add a new account.\nError: " + newAccResult.second);
-    }
+    }*/
 }
 
 void Accounts::on_refreshButton_clicked()
@@ -117,7 +117,7 @@ void Accounts::on_accountList_itemActivated(QListWidgetItem *item)
 void Accounts::selectNewAccount(QString account) {
     startWaiting();
     // Need to select an account
-    state->activateAccount(account);
+    state->switchAccount(account);
 
     updateUiState();
     stopWaiting();

@@ -75,7 +75,7 @@ void Listening::on_mwcMqToIndex_clicked()
 {
     bool ok = false;
     QString index = QInputDialog::getText(this, tr("Select MWX box address by index"),
-                                            tr("Please specify index of select that MWC box address"), QLineEdit::Normal,
+                                            tr("Please specify index of mwc mq address"), QLineEdit::Normal,
                                             "", &ok);
     if (!ok || index.isEmpty())
         return;

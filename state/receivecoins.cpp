@@ -6,7 +6,6 @@
 #include "../state/statemachine.h"
 #include "transactions.h"
 #include "e_listening.h"
-#include "filetransactions.h"
 
 namespace state {
 
@@ -15,13 +14,13 @@ ReceiveCoins::ReceiveCoins(const StateContext & context) :
 {
     transactionsState = new Transactions(context);
     listeningState = new Listening(context);
-    fileTransactionsState = new FileTransactions(context);
+    //fileTransactionsState = new FileTransactions(context);
 }
 
 ReceiveCoins::~ReceiveCoins() {
     delete transactionsState;
     delete listeningState;
-    delete fileTransactionsState;
+    //delete fileTransactionsState;
 }
 
 NextStateRespond ReceiveCoins::execute() {
@@ -29,7 +28,7 @@ NextStateRespond ReceiveCoins::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     context.wndManager->switchToWindow(
-                new wnd::ReceiveCoins( context.wndManager->getInWndParent(), listeningState, fileTransactionsState, transactionsState ) );
+                new wnd::ReceiveCoins( context.wndManager->getInWndParent(), listeningState, transactionsState ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }

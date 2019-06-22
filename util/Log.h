@@ -44,6 +44,7 @@ namespace logger {
 
 
     // mwc713 IOs
+    void blockLogMwc713out(bool blockOutput);
     void logMwc713out(QString str); //
     void logMwc713in(QString str); //
 

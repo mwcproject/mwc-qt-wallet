@@ -36,11 +36,14 @@ private slots:
     void onRecoverProgress( int progress, int maxVal );
     void onRecoverResult(bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages);
 
+    void onWalletBalanceUpdated();
+
 private:
     wnd::ProgressWnd * progressWnd = nullptr; // Active progress Wnd
     QMetaObject::Connection connListeningStopResult;
     QMetaObject::Connection connRecoverProgress;
     QMetaObject::Connection connRecoverResult;
+    QMetaObject::Connection connWalletBalanceUpdated;
 
     bool mwcMqOriginalState = false;
     bool keybaseOriginalState = false;

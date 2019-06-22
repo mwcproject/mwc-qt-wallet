@@ -17,5 +17,13 @@
         <file>resource/mwc-gui-wallet.conf</file>
         <file>resource/wallet713.toml</file>
         <file>img/StatusEmpty.png</file>
+        <file>img/SendOffline.png</file>
+        <file>img/SendOnline.png</file>
+        <file>img/ComboBoxArrow.png</file>
+        <file>img/SendReceive.png</file>
+        <file>img/SendSend.png</file>
+        <file>img/File.png</file>
+        <file>img/RadioOff.png</file>
+        <file>img/RadioOn.png</file>
     </qresource>
 </RCC>

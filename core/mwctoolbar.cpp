@@ -3,6 +3,8 @@
 #include <QPainter>
 #include "appcontext.h"
 #include "../state/statemachine.h"
+#include "../wallet/wallet.h"
+#include <QDebug>
 
 namespace core {
 
@@ -21,9 +23,22 @@ MwcToolbar::~MwcToolbar()
     delete ui;
 }
 
+void MwcToolbar::setAppEnvironment(state::StateMachine * _stateMachine, wallet::Wallet * _wallet ) {
+    stateMachine = _stateMachine;
+    wallet = _wallet;
+    Q_ASSERT(stateMachine);
+    Q_ASSERT(wallet);
+
+    QObject::connect( wallet, &wallet::Wallet::onWalletBalanceUpdated,
+                                 this, &MwcToolbar::onWalletBalanceUpdated, Qt::QueuedConnection );
+
+}
+
+
 void MwcToolbar::updateButtonsState( state::STATE state ) {
-    ui->airdropToolButton->setChecked(state==state::AIRDRDOP_MAIN);
-    ui->sendToolButton->setChecked(state==state::SEND_COINS);
+    ui->airdropToolButton->setChecked( state==state::AIRDRDOP_MAIN );
+    ui->sendToolButton->setChecked( state==state::SEND_ONLINE_OFFLINE || state==state::SEND_ONLINE ||
+                  state==state::SEND_OFFLINE);
     ui->recieveToolButton->setChecked( state==state::RECIEVE_COINS);
     ui->transactionToolButton->setChecked(state==state::TRANSACTIONS);
     ui->hodlToolButton->setChecked(state==state::HODL);
@@ -44,7 +59,7 @@ void MwcToolbar::on_airdropToolButton_clicked()
 
 void MwcToolbar::on_sendToolButton_clicked()
 {
-    stateMachine->setActionWindow( state::STATE::SEND_COINS );
+    stateMachine->setActionWindow( state::STATE::SEND_ONLINE_OFFLINE );
 }
 
 void MwcToolbar::on_recieveToolButton_clicked()
@@ -61,6 +76,20 @@ void MwcToolbar::on_transactionToolButton_clicked()
 void MwcToolbar::on_hodlToolButton_clicked()
 {
     stateMachine->setActionWindow( state::STATE::HODL );
+}
+
+// Account info is updated
+void MwcToolbar::onWalletBalanceUpdated() {
+    qDebug() << "get onWalletBalanceUpdated. Updating the balance";
+
+    QVector<wallet::AccountInfo> balance = wallet->getWalletBalance();
+
+    long mwcSum = 0;
+    for ( const auto & ai : balance ) {
+        mwcSum += ai.total;
+    }
+
+    ui->totalMwc->setText( util::nano2one(mwcSum) + " mwc" );
 }
 
 
