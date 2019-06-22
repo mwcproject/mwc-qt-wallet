@@ -90,14 +90,14 @@ bool readConfig(QApplication & app) {
 
     if (wallet713_path == "build in") {
         wallet713_path = QCoreApplication::applicationDirPath() + "/" + "mwc713";
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
         wallet713_path += ".exe";
 #endif
     }
 
     if (mwc_path == "build in") {
         mwc_path = QCoreApplication::applicationDirPath() + "/" + "mwc";
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
         mwc_path += ".exe";
 #endif
     }
