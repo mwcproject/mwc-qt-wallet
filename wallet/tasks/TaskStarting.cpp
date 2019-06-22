@@ -25,9 +25,9 @@ bool TaskStarting::processTask(const QVector<WEvent> & events) {
             break;
 
         // check version of the wallet
-        if (welcome[0].message != WMC_713_VERSION) {
+        if (welcome[0].message != mwc::WMC_713_VERSION) {
             wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::GENERIC,
-                    "Backed wallet713 has incorrect error. Expected v" + WMC_713_VERSION + ", but found v" + welcome[0].message);
+                    "Backed wallet713 has incorrect error. Expected v" + mwc::WMC_713_VERSION + ", but found v" + welcome[0].message);
             return true;
         }
 

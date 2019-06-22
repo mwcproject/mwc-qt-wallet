@@ -12,9 +12,6 @@ namespace tries {
 
 namespace wallet {
 
-// MWC version that we are expecting to ship
-const QString WMC_713_VERSION("2.0.0");
-
 class Mwc713State;
 class Mwc713EventManager;
 

@@ -17,7 +17,6 @@ Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
 
     QString title = "Transactions for account " + state->getCurrentAccountName();
     state->setWindowTitle(title);
-    ui->transactionsBox->setTitle(title);
 
     initTableHeaders();
 
