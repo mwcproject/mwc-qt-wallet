@@ -42,7 +42,7 @@ void SendOffline::prepareSendMwcOffline( const wallet::AccountInfo & account, QS
     // Switching the account async, we don't really need the response
     context.wallet->switchAccount( account.accountName );
 
-    sendFilesWnd = new wnd::SendOfflineFiles( context.wndManager->getInWndParent(), this );
+    sendFilesWnd = new wnd::SendOfflineFiles( context.wndManager->getInWndParent(), account, this );
     context.wndManager->switchToWindow( sendFilesWnd );
 }
 

@@ -8,7 +8,7 @@ project(mwc-qt-wallet)
 # Qt configuration
 # Please specify here path to your Qt installation
 #
-#set (Qt5_DIR "~/Qt/5.9/clang_64/lib/cmake/Qt5")
+set (Qt5_DIR "~/Qt/5.9/clang_64/lib/cmake/Qt5")
 #set (Qt5_DIR "C:/Qt/5.9.8/msvc2015_64/lib/cmake/Qt5")
 
 find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)

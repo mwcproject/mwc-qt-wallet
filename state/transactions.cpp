@@ -17,8 +17,8 @@ NextStateRespond Transactions::execute() {
     if (context.appContext->getActiveWndState() != STATE::TRANSACTIONS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context.wndManager->switchToWindow(
-                new wnd::Transactions( context.wndManager->getInWndParent(), this ) );
+    wnd = new wnd::Transactions( context.wndManager->getInWndParent(), this );
+    context.wndManager->switchToWindow( wnd );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 };
@@ -29,8 +29,11 @@ QString Transactions::getCurrentAccountName() const {
 
 
 // Current transactions that wallet has
-QVector<wallet::WalletTransaction> Transactions::getTransactions() {
-    return context.wallet->getTransactions();
+void Transactions::requestTransactions() {
+
+//    connect ....
+
+    context.wallet->getTransactions();
 }
 
 // Proofs
@@ -58,6 +61,9 @@ void Transactions::updateProofFilesPath(QString path) {
     context.appContext->updatePathFor("Transactions", path);
 }
 
+QVector<wallet::AccountInfo> Transactions::getWalletBalance() {
+    return context.wallet->getWalletBalance();
+}
 
 
 }

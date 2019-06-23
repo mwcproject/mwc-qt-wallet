@@ -13,6 +13,7 @@
 #include <QMessageBox>
 #include "core/global.h"
 #include "util/ioutils.h"
+#include "util/Log.h"
 #include "core/Config.h"
 #include "util/ConfigReader.h"
 #include <QFileDevice>
@@ -110,6 +111,8 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    logger::initLogger();
+
     if (!deployFilesFromResources() ) {
         QMessageBox::critical(nullptr, "Error", "Unable to provision or verify resource files during the first run");
         return 1;
@@ -143,8 +146,8 @@ int main(int argc, char *argv[])
 
     mwc::setApplication(&app, mainWnd);
 
-    wallet::MWC713 wallet( core::Config::getWallet713path(), core::Config::getMwc713conf() );
-    //wallet::MockWallet wallet;
+    //wallet::MWC713 wallet( core::Config::getWallet713path(), core::Config::getMwc713conf() );
+    wallet::MockWallet wallet;
 
     core::WindowManager wndManager( mainWnd->getMainWindow() );
 

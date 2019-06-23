@@ -134,7 +134,7 @@ void ReceiveCoins::saveTableHeaders() {
 
 void ReceiveCoins::updateTransactionTable() {
 
-    QVector<wallet::WalletTransaction> transactions = transactionsState->getTransactions();
+/*    QVector<wallet::WalletTransaction> transactions = transactionsState->getTransactions();
     int rowNum = transactions.size();
 
     ListWithColumns * tt = ui->transactionTable;
@@ -153,7 +153,7 @@ void ReceiveCoins::updateTransactionTable() {
                                      util::nano2one(trans.coinNano),
                                      trans.proof ? "Yes":"No"
                         });
-    }
+    }*/
 }
 
 void ReceiveCoins::on_refreshButton_clicked()

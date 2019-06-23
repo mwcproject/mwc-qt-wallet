@@ -26,13 +26,15 @@ void ListWithColumns::setListLook() {
 
     verticalHeader()->setVisible(false);
     // Decrease slightly horizontally size
-    verticalHeader()->setMinimumSectionSize(verticalHeader()->minimumSectionSize()*5/6);
-    verticalHeader()->setDefaultSectionSize(verticalHeader()->minimumSectionSize());
+    verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    //verticalHeader()->setMinimumSectionSize(verticalHeader()->minimumSectionSize()*5/6);
+    verticalHeader()->setDefaultSectionSize(30);
     // Increase V size so
 
-    horizontalHeader()->setMinimumSectionSize( horizontalHeader()->minimumSectionSize()*3/2 );
+    horizontalHeader()->setFixedHeight( 30 );
 
     // Setup some colors
+    /*  System color
     bkColor1 = QApplication::palette().color(QPalette::Base); // Normally it is white
     bkColor2 = bkColor1;
     qreal r,g,b;
@@ -42,7 +44,11 @@ void ListWithColumns::setListLook() {
         bkColor2.setRgbF( std::min(1.0,r+d), std::min(1.0,g+d), std::min(1.0,b+d) );
     else
         bkColor2.setRgbF( std::max(0.0,r-d), std::max(0.0,g-d), std::max(0.0,b-d) );
+*/
 
+    // MWC palette
+    bkColor1 = QColor(255,255,255,0);
+    bkColor2 = QColor(255,255,255,20);
 }
 
 void ListWithColumns::setColumnWidths(QVector<int> widths) {

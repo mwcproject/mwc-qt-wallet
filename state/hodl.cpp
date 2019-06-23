@@ -25,7 +25,8 @@ NextStateRespond Hodl::execute() {
 }
 
 QVector<wallet::WalletTransaction> Hodl::getTransactions() {
-    return context.wallet->getTransactions();
+    return QVector<wallet::WalletTransaction>();
+    //return context.wallet->getTransactions();
 }
 
 void Hodl::submitForHodl( const QVector<QString> & transactions ) {

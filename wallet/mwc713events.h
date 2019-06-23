@@ -34,6 +34,8 @@ enum WALLET_EVENTS {
     S_PASS_PHRASE=15, // Passphrase from inti process
     S_INIT_WANT_ENTER=16, // Press ENTER when you have done so
 
+    S_LINE=17,   // Just a line of output data as it is
+
     // Listening
     S_LISTENER_MQ_STARTING = 20, // starting mwcmq listener...
     S_LISTENER_KB_STARTING = 21, // starting keybase listener...
@@ -67,6 +69,8 @@ enum WALLET_EVENTS {
     S_SLATE_WAS_SENT = 55,
     S_SLATE_WAS_RECEIVED = 56,
     S_SLATE_WAS_FINALIZED = 57,
+
+    S_TRANSACTION_LOG = 60,
 
     // TABLE lines
     S_TABLE_LINE2 = 100

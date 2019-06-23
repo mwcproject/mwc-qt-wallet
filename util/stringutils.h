@@ -35,6 +35,9 @@ QString trimErrorMessage(QString errorMsg);
 // Format bunch of error messages to be ready printed one by one
 QString formatErrorMessages(QStringList messages);
 
+// Get safely substring from the string. If indexes out of range, return emoty string
+QString getSubString(const QString & str, int idx1, int idx2);
+
 }
 
 #endif // STRINGUTILS_H

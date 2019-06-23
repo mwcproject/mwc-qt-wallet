@@ -41,7 +41,8 @@ namespace logger {
         QFile * logFile;
     };
 
-
+    // Must be call before first log usage
+    void initLogger();
 
     // mwc713 IOs
     void blockLogMwc713out(bool blockOutput);

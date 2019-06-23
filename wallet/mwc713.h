@@ -142,8 +142,10 @@ public:
     virtual void sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message="", int inputConfirmationNumber=-1, int changeOutputs=-1 ) noexcept(false) override;
 
     virtual QVector<WalletOutput> getOutputs() noexcept(false) override {return QVector<WalletOutput>();}
-    // numOfTransactions - transaction limit to return. <=0 - get all transactions
-    virtual QVector<WalletTransaction> getTransactions(int numOfTransactions=-1) noexcept(false) override {return QVector<WalletTransaction>();}
+
+    // Show all transactions for current account
+    // Check Signal: onTransactions( QString account, long height, QVector<WalletTransaction> Transactions)
+    virtual void getTransactions() noexcept(false) override;
 
     // -------------- Contacts
 
@@ -205,6 +207,10 @@ public:
     void setSendFileResult( bool success, QStringList errors, QString fileName );
     void setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
     void setFinalizeFile( bool success, QStringList errors, QString fileName );
+
+    // Transactions
+    void setTransactions( QString account, long height, QVector<WalletTransaction> Transactions);
+
 
 private:
     void mwc713connect();

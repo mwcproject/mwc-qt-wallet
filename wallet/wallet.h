@@ -94,7 +94,7 @@ struct WalletOutput {
 };
 
 struct WalletTransaction {
-    enum TRANSACTION_TYPE {SEND=1, RECIEVE=2, CANCELLED=0x8000};
+    enum TRANSACTION_TYPE { NONE=0, SEND=1, RECIEVE=2, CANCELLED=0x8000};
 
     long    txIdx;
     uint    transactionType;
@@ -115,6 +115,11 @@ struct WalletTransaction {
         QString confirmationTime,
         long    coinNano,
         bool    proof);
+
+    // mark transaction as cancelled
+    void cancelled() {
+        transactionType |= TRANSACTION_TYPE::CANCELLED;
+    }
 
     QString getTypeAsStr() const {
         QString res;
@@ -328,8 +333,9 @@ public:
 
     // Show outputs for the wallet
     virtual QVector<WalletOutput> getOutputs() noexcept(false) = 0;
-    // Show all transactions for account
-    virtual QVector<WalletTransaction> getTransactions(int numOfTransactions=-1) noexcept(false) = 0;
+    // Show all transactions for current account
+    virtual void getTransactions() noexcept(false) = 0;
+    // Check Signal: onTransactions( QString account, long height, QVector<WalletTransaction> Transactions)
 
     // -------------- Contacts
 
@@ -390,6 +396,9 @@ signals:
     void onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
     void onFinalizeFile( bool success, QStringList errors, QString fileName );
 
+    // Transactions
+    void onTransactions( QString account, long height, QVector<WalletTransaction> Transactions);
+
     // Listener status listeners...
     void onMwcMqListenerStatus(bool online);
     void onKeybaseListenerStatus(bool online);
@@ -399,5 +408,6 @@ signals:
 
 Q_DECLARE_METATYPE(wallet::WalletNotificationMessages::LEVEL);
 Q_DECLARE_METATYPE(wallet::InitWalletStatus);
+Q_DECLARE_METATYPE(wallet::WalletTransaction);
 
 #endif // MWCWALLET_H

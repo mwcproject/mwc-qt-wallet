@@ -4,6 +4,10 @@
 #include "state.h"
 #include "../wallet/wallet.h"
 
+namespace wnd {
+class Transactions;
+}
+
 namespace state {
 
 class Transactions : public State
@@ -12,8 +16,10 @@ public:
     Transactions(const StateContext & context);
     virtual ~Transactions() override;
 
+    void resetWnd() {wnd = nullptr;}
+
     // Current transactions that wallet has
-    QVector<wallet::WalletTransaction> getTransactions();
+    void requestTransactions();
 
     QString getCurrentAccountName() const;
 
@@ -28,8 +34,13 @@ public:
     QString getProofFilesPath() const;
     void updateProofFilesPath(QString path);
 
+    QVector<wallet::AccountInfo> getWalletBalance();
+
 protected:
     virtual NextStateRespond execute() override;
+
+private:
+    wnd::Transactions * wnd = nullptr;
 };
 
 }

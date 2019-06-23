@@ -1,4 +1,5 @@
 #include "send4_offlinefiles_w.h"
+#include "send2_online_w.h"
 #include "ui_send4_offlinefiles.h"
 #include "../util/stringutils.h"
 #include "../control/messagebox.h"
@@ -7,10 +8,11 @@
 
 namespace wnd {
 
-SendOfflineFiles::SendOfflineFiles(QWidget *parent, state::SendOffline * _state) :
+SendOfflineFiles::SendOfflineFiles(QWidget *parent, const wallet::AccountInfo & _account, state::SendOffline * _state) :
     QWidget(parent),
     ui(new Ui::SendOfflineFiles),
-    state(_state)
+    state(_state),
+    account(_account)
 {
     ui->setupUi(this);
     ui->progress->initLoader(false);
@@ -25,12 +27,24 @@ SendOfflineFiles::~SendOfflineFiles()
 void SendOfflineFiles::on_generateFileButton_clicked()
 {
     QString mwc2sendStr = ui->amountEdit->text();
-    auto res = util::one2nano( mwc2sendStr );
-    if (!res.first) {
+    auto mwcAmount = util::one2nano( mwc2sendStr );
+    if (!mwcAmount.first) {
         control::MessageBox::message(this, "Verification Error", "Please input number of MWC coins that you want to send");
         return;
     }
-    long nanoCoins = res.second;
+
+
+    if ( mwcAmount.second > account.currentlySpendable ) {
+
+        QString msg2print = generateAmountErrorMsg( mwcAmount.second, account, state->getSendCoinsParams() );
+
+        control::MessageBox::message(this, "Incorrect Input",
+                                     msg2print );
+        ui->amountEdit->setFocus();
+        return;
+    }
+
+    long nanoCoins = mwcAmount.second;
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Create initial transaction file"),
                                                           state->getFileGenerationPath(),

@@ -24,6 +24,8 @@ QString toString(WALLET_EVENTS event) {
         case S_PASS_PHRASE:     return "S_PASS_PHRASE";
         case S_INIT_WANT_ENTER: return "S_INIT_WANT_ENTER";
         case S_ERROR:           return "S_ERROR";
+        case S_LINE:            return "S_LINE";
+
         case S_LISTENER_MQ_STARTING: return "S_LISTENER_MQ_STARTING";
         case S_LISTENER_KB_STARTING: return "S_LISTENER_KB_STARTING";
         case S_LISTENER_MQ_ON:  return "S_LISTENER_MQ_ON";
@@ -54,6 +56,7 @@ QString toString(WALLET_EVENTS event) {
         case S_SLATE_WAS_RECEIVED:  return "S_SLATE_WAS_RECEIVED";
         case S_SLATE_WAS_FINALIZED: return "S_SLATE_WAS_FINALIZED";
 
+        case S_TRANSACTION_LOG:     return "S_TRANSACTION_LOG";
 
         case S_TABLE_LINE2:         return "S_TABLE_LINE2";
 

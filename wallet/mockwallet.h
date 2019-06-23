@@ -119,8 +119,10 @@ public:
     // Check signal:  onSend
 
     virtual QVector<WalletOutput> getOutputs() noexcept(false) override;
-    // numOfTransactions - transaction limit to return. <=0 - get all transactions
-    virtual QVector<WalletTransaction> getTransactions(int numOfTransactions=-1) noexcept(false) override;
+
+    // Show all transactions for current account
+    // Check Signal: onTransactions( QString account, long height, QVector<WalletTransaction> Transactions)
+    virtual void getTransactions() noexcept(false) override;
 
     // -------------- Contacts
 

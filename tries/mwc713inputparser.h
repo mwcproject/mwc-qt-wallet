@@ -42,6 +42,7 @@ private:
     void initRecovery();
     void initAccount();
     void initSend();
+    void initTransactions();
 
     void initGenericError(); // All error messages
 

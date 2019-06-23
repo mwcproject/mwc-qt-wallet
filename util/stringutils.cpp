@@ -33,6 +33,9 @@ QString nano2one( long nano ) {
     if (nano == 0)
         return "0";
 
+    if (nano<0)
+        return "-" + nano2one(nano);
+
     QString myNumber = QString::number( std::abs(nano),10);
     while (myNumber.length()<9+1)
         myNumber = "0" + myNumber;
@@ -82,8 +85,14 @@ QPair<bool,long> one2nano(QString str) {
     if (!ok)
         return QPair<bool,long>(false, 0);
 
+    long s = 1;
+    if ( dbl < 0.0 ) {
+        s = -1;
+        dbl = -dbl;
+    }
+
     long nano = long(dbl * 1000000000.0 + 0.5);
-    return QPair<bool,long>(true, nano);
+    return QPair<bool,long>( true, nano*s );
 }
 
 
@@ -152,6 +161,17 @@ QString formatErrorMessages(QStringList messages) {
     }
     return errMsg;
 }
+
+// Get safely substring from the string. If indexes out of range, return emoty string
+QString getSubString(const QString & str, int idx1, int idx2) {
+    idx2 = std::max(idx2, str.length());
+
+    if (idx2<=idx1 || idx1>=str.length())
+        return "";
+
+    return str.mid(idx1, idx2-idx1).trimmed();
+}
+
 
 
 }

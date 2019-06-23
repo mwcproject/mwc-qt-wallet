@@ -7,6 +7,27 @@
 
 namespace wnd {
 
+QString generateAmountErrorMsg( long mwcAmount, const wallet::AccountInfo & acc, const core::SendCoinsParams & sendParams ) {
+        QString msg2print = "You are trying to send " + util::nano2one(mwcAmount) + " wmc, but you only have " +
+                            util::nano2one(acc.currentlySpendable) + " spendable wmc.";
+        if (acc.awaitingConfirmation > 0)
+            msg2print += " " + util::nano2one(acc.awaitingConfirmation) + " coins are awaiting confirmation.";
+
+        if (acc.lockedByPrevTransaction > 0)
+            msg2print += " " + util::nano2one(acc.lockedByPrevTransaction) + " coins are locked.";
+
+        if (acc.awaitingConfirmation > 0 || acc.lockedByPrevTransaction > 0) {
+            if (sendParams.inputConfirmationNumber != 1) {
+                if (sendParams.inputConfirmationNumber < 0)
+                    msg2print += " You can modify settings to spend wmc with less than 10 confirmations (wallet default value).";
+                else
+                    msg2print += " You can modify settings to spend wmc with less than " +
+                                 QString::number(sendParams.inputConfirmationNumber) + " confirmations.";
+            }
+        }
+        return msg2print;
+}
+
 SendOnline::SendOnline(QWidget *parent, state::SendOnline * _state ) :
     QWidget(parent),
     ui(new Ui::SendOnline),
@@ -76,8 +97,9 @@ void SendOnline::on_sendButton_clicked()
     }
 
     if ( mwcAmount.second > acc.currentlySpendable ) {
+        QString msg2print = generateAmountErrorMsg( mwcAmount.second, acc, state->getSendCoinsParams() );
         control::MessageBox::message(this, "Incorrect Input",
-                                     "Please specify correct number of MWC to send. You can't send more than your spendable amount of " + util::nano2one(acc.currentlySpendable) + " mwc" );
+                                     msg2print );
         ui->amountEdit->setFocus();
         return;
     }

@@ -19,7 +19,7 @@ Mwc713InputParser::Mwc713InputParser() {
     initInitWalletWorkflow();
     initAccount();
     initSend();
-
+    initTransactions();
 
     initListening();
     initRecovery();
@@ -392,10 +392,26 @@ void Mwc713InputParser::initSend() {
                                                         new TriePhraseSection("] finalized successfully"),
                                                         new TrieNewLineSection()
                                                 }));
-
-
 }
 
+void Mwc713InputParser::initTransactions() {
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_TRANSACTION_LOG,
+                                                QVector<BaseTrieSection*>{
+                                                        new TrieNewLineSection(),
+                                                        new TriePhraseSection("Transaction Log - Account '"),
+                                                        new TrieAnySection(200, TrieAnySection::NOT_NEW_LINE, "","'", 1),
+                                                        new TriePhraseSection("' - Block Height: "),
+                                                        new TrieAnySection(30, TrieAnySection::NUMBERS, "","", 2),
+                                                        new TrieNewLineSection()
+                                                }));
+
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LINE,
+                                                QVector<BaseTrieSection*>{
+                                                        new TrieNewLineSection(),
+                                                        new TrieAnySection(512, TrieAnySection::NOT_NEW_LINE, "", "", 1),
+                                                        new TrieNewLineSection()
+                                                }));
+}
 
 
 }

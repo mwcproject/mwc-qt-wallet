@@ -12,6 +12,10 @@ namespace state {
 class SendOnline;
 }
 
+namespace core {
+class SendCoinsParams;
+}
+
 namespace wnd {
 
 class SendOnline : public QWidget
@@ -37,6 +41,9 @@ private:
     QVector<wallet::AccountInfo> accountInfo;
     QVector<wallet::WalletContact> contacts;
 };
+
+QString generateAmountErrorMsg( long mwcAmount, const wallet::AccountInfo & acc, const core::SendCoinsParams & sendParams );
+
 
 }
 

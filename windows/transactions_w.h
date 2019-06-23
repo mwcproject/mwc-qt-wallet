@@ -31,6 +31,8 @@ private slots:
 
     void on_transactionTable_itemSelectionChanged();
 
+    void on_accountComboBox_activated(int index);
+
 private:
     // return null if nothing was selected
     wallet::WalletTransaction * getSelectedTransaction();
@@ -44,6 +46,7 @@ private:
 private:
     Ui::Transactions *ui;
     state::Transactions * state;
+    QVector<wallet::AccountInfo> accountInfo;
     QVector<wallet::WalletTransaction> transactions;
 };
 

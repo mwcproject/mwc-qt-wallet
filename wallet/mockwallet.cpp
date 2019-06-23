@@ -36,6 +36,7 @@ MockWallet::MockWallet()
     cnt.setData("bob", "43596834659876323897658564253876538");
     contacts.push_back(cnt);
 
+    for (int t=0; t<10;t++)
     { // init transactions with some default values
         WalletTransaction wt;
         wt.setData(4,
@@ -384,10 +385,10 @@ QVector<WalletOutput> MockWallet::getOutputs() noexcept(false) {
     return result;
 }
 
-// Show all transactions for account
-QVector<WalletTransaction> MockWallet::getTransactions(int numOfTransactions) {
-    Q_UNUSED(numOfTransactions);
-    return transactions;
+// Show all transactions for current account
+// Check Signal: onTransactions( QString account, long height, QVector<WalletTransaction> Transactions)
+void MockWallet::getTransactions() noexcept(false) {
+    emit onTransactions( "default", 1234, transactions );
 }
 
 // Get the contacts

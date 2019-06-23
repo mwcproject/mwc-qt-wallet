@@ -2,6 +2,7 @@
 #define SEND4_OFFLINEFILES_H
 
 #include <QWidget>
+#include "../wallet/wallet.h"
 
 namespace Ui {
 class SendOfflineFiles;
@@ -18,7 +19,7 @@ class SendOfflineFiles : public QWidget
     Q_OBJECT
 
 public:
-    explicit SendOfflineFiles(QWidget *parent, state::SendOffline * state);
+    explicit SendOfflineFiles(QWidget *parent, const wallet::AccountInfo & account, state::SendOffline * state);
     virtual ~SendOfflineFiles() override;
 
     void onTransactionActionIsFinished( bool success, QString message );
@@ -30,6 +31,7 @@ private slots:
 private:
     Ui::SendOfflineFiles *ui;
     state::SendOffline * state;
+    wallet::AccountInfo account;
 };
 
 }

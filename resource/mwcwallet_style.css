@@ -316,3 +316,53 @@ QRadioButton::indicator:unchecked {
 QRadioButton::indicator:checked {
     image: url(:/img/RadioOn.png);
 }
+
+/* ------------ ListWithColumns ----------------- */
+
+ListWithColumns
+{
+    color: white;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
+
+    border: 2px solid #FFFFFF;
+    border-radius: 6px;
+
+    padding: 5px;
+
+    background: transparent; /*rgba(255, 255, 255, 0.05);*/
+}
+
+ListWithColumns::hover
+{
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+ListWithColumns::item:selected:active
+{
+    background-color: mediumpurple;
+}
+/* header for table view */
+QHeaderView
+{
+    background: transparent;
+}
+
+QHeaderView::section {
+    background-color: transparent;
+
+    color: white;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
+
+    border: none;
+    border-bottom: 1px solid #ffffff;
+
+/*    padding-left: 4px;
+    border: 1px solid white;*/
+}

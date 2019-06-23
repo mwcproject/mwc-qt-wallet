@@ -18,6 +18,13 @@ Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
     QString title = "Transactions for account " + state->getCurrentAccountName();
     state->setWindowTitle(title);
 
+    accountInfo = state->getWalletBalance();
+
+    int idx=0;
+    for (auto & info : accountInfo) {
+        ui->accountComboBox->addItem( util::expandStrR(info.accountName, 25) + "  " + util::nano2one(info.currentlySpendable) + " of " + util::nano2one(info.total) + " mwc", QVariant(idx++) );
+    }
+
     initTableHeaders();
 
     updateTransactionTable();
@@ -25,6 +32,7 @@ Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
 
 Transactions::~Transactions()
 {
+    state->resetWnd();
     saveTableHeaders();
     delete ui;
 }
@@ -49,7 +57,7 @@ void Transactions::saveTableHeaders() {
 
 void Transactions::updateTransactionTable() {
 
-    transactions = state->getTransactions();
+/*    transactions = state->getTransactions();
 
     ui->transactionTable->clearData();
 
@@ -67,7 +75,7 @@ void Transactions::updateTransactionTable() {
                                          } );
     }
 
-    updateProofState();
+    updateProofState();*/
 }
 
 // return null if nothing was selected
@@ -157,5 +165,12 @@ void Transactions::on_transactionTable_itemSelectionChanged()
     updateProofState();
 }
 
+void Transactions::on_accountComboBox_activated(int index)
+{
+
 }
+
+
+}
+
 

@@ -17,29 +17,16 @@ static LogReciever * logServer = nullptr;
 
 static bool logMwc713outBlocked = false;
 
-// Manager of the global instances
-class LogInit {
-public:
-    LogInit() {
-        logClient = new LogSender(true);
-        logServer = new LogReciever("mwcwallet.log");
+void initLogger() {
+    logClient = new LogSender(true);
+    logServer = new LogReciever("mwcwallet.log");
 
-        bool connected = QObject::connect( logClient, &LogSender::doAppend2logs, logServer, &LogReciever::onAppend2logs, Qt::QueuedConnection );
-        Q_ASSERT(connected);
-        Q_UNUSED(connected);
+    bool connected = QObject::connect( logClient, &LogSender::doAppend2logs, logServer, &LogReciever::onAppend2logs, Qt::QueuedConnection );
+    Q_ASSERT(connected);
+    Q_UNUSED(connected);
 
-        logClient->doAppend2logs(true, "", "mwc-wallet is started..." );
-    }
-
-    ~LogInit() {
-        delete logClient;
-        logClient = nullptr;
-        delete logServer;
-        logServer = nullptr;
-    }
-};
-
-static LogInit init;
+    logClient->doAppend2logs(true, "", "mwc-wallet is started..." );
+}
 
 void LogSender::log(bool addDate, const QString & prefix, const QString & line) {
     if (asyncLogging) {
@@ -98,6 +85,8 @@ void blockLogMwc713out(bool blockOutput) {
 
 // mwc713 IOs
 void logMwc713out(QString str) {
+    Q_ASSERT(logClient); // call initLogger first
+
     if (logMwc713outBlocked) {
         logClient->doAppend2logs(true, "mwc713>>", "CENSORED");
         return;
@@ -110,11 +99,13 @@ void logMwc713out(QString str) {
 }
 
 void logMwc713in(QString str) {
+    Q_ASSERT(logClient); // call initLogger first
     logClient->doAppend2logs(true, "mwc713<<", str);
 }
 
 // Tasks to excecute on wmc713
 void logTask( QString who, wallet::Mwc713Task * task, QString comment ) {
+    Q_ASSERT(logClient); // call initLogger first
     if (task == nullptr)
         return;
     logClient->doAppend2logs(true, who, "Task " + task->toDbgString() + "  "+comment );
@@ -122,22 +113,27 @@ void logTask( QString who, wallet::Mwc713Task * task, QString comment ) {
 
 // Events activity
 void logEmit(QString who, QString event, QString params) {
+    Q_ASSERT(logClient); // call initLogger first
     logClient->doAppend2logs(true, who, "emit " + event + (params.length()==0 ? "" : (" with "+params)) );
 }
 
 void logRecieve(QString who, QString event, QString params) {
+    Q_ASSERT(logClient); // call initLogger first
     logClient->doAppend2logs(true, who, "recieve " + event + (params.length()==0 ? "" : (" with "+params)) );
 }
 
 void logConnect(QString who, QString event) {
+    Q_ASSERT(logClient); // call initLogger first
     logClient->doAppend2logs(true, who, "connect to " + event);
 }
 
 void logDisconnect(QString who, QString event) {
+    Q_ASSERT(logClient); // call initLogger first
     logClient->doAppend2logs(true, who, "disconnect from " + event);
 }
 
 void logParsingEvent(wallet::WALLET_EVENTS event, QString message ) {
+    Q_ASSERT(logClient); // call initLogger first
     if (logMwc713outBlocked) { // Skipping event during block pahse as well
         logClient->doAppend2logs(true, "Event>", "CENSORED" );
         return;

@@ -15,6 +15,7 @@
 #include "tasks/TaskMwcMqAddress.h"
 #include "tasks/TaskAccount.h"
 #include "tasks/TaskSend.h"
+#include "tasks/TaskTransaction.h"
 #include "../util/Log.h"
 #include "../core/global.h"
 #include "../control/messagebox.h"
@@ -249,6 +250,12 @@ void MWC713::finalizeFile( QString fileTxResponse ) noexcept(false) {
     eventCollector->addTask( new TaskFinalizeFile(this, fileTxResponse), TaskFinalizeFile::TIMEOUT );
 }
 
+void MWC713::getTransactions() noexcept(false) {
+    eventCollector->addTask( new TaskTransactions(this), TaskTransactions::TIMEOUT );
+}
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -470,6 +477,11 @@ void MWC713::setReceiveFile( bool success, QStringList errors, QString inFileNam
 
 void MWC713::setFinalizeFile( bool success, QStringList errors, QString fileName ) {
     emit onFinalizeFile( success, errors, fileName);
+}
+
+// Transactions
+void MWC713::setTransactions( QString account, long height, QVector<WalletTransaction> Transactions ) {
+    emit onTransactions( account, height, Transactions );
 }
 
 
