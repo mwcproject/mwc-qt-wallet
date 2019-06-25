@@ -254,6 +254,25 @@ void MWC713::getTransactions() noexcept(false) {
     eventCollector->addTask( new TaskTransactions(this), TaskTransactions::TIMEOUT );
 }
 
+// -------------- Transactions
+// Cancel transaction
+// Check Signal:  onCancelTransacton
+void MWC713::cancelTransacton(long transactionID) noexcept(false) {
+    eventCollector->addTask( new TaskTransCancel(this, transactionID), TaskTransCancel::TIMEOUT );
+}
+
+
+// Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
+// Check Signal: onExportProof( bool success, QString fn, QString msg );
+void MWC713::generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) {
+    eventCollector->addTask( new TaskTransExportProof(this, resultingFileName, transactionId), TaskTransExportProof::TIMEOUT );
+}
+
+// Verify the proof for transaction
+// Check Signal: onVerifyProof( bool success, QString msg );
+void MWC713::verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) {
+    eventCollector->addTask( new TaskTransVerifyProof(this, proofFileName), TaskTransExportProof::TIMEOUT );
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -402,7 +421,7 @@ void MWC713::updateAccountList( QVector<QString> accounts ) {
     int idx = 0;
     for (QString acc : accounts) {
         eventCollector->addTask( new TaskAccountSwitch(this, acc, walletPassword), TaskAccountSwitch::TIMEOUT );
-        eventCollector->addTask( new TaskAccountInfo(this), TaskAccountInfo::TIMEOUT );
+        eventCollector->addTask( new TaskAccountInfo(this, idx>0), TaskAccountInfo::TIMEOUT );
         eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1 ); // Updating the progress
     }
     eventCollector->addTask( new TaskAccountListFinal(this, currentAccount), -1 ); // Finalize the task
@@ -484,6 +503,17 @@ void MWC713::setTransactions( QString account, long height, QVector<WalletTransa
     emit onTransactions( account, height, Transactions );
 }
 
+void MWC713::setExportProofResults( bool success, QString fn, QString msg ) {
+    emit onExportProof( success, fn, msg );
+}
+
+void MWC713::setVerifyProofResults( bool success, QString fn, QString msg ) {
+    emit onVerifyProof(success, fn, msg);
+}
+
+void MWC713::setTransCancelResult( bool success, long transId, QString errMsg ) {
+    emit onCancelTransacton(success, transId, errMsg);
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 //      mwc713  IOs

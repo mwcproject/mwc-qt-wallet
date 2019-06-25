@@ -4,7 +4,7 @@
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
-#include "transactions.h"
+#include "e_transactions.h"
 #include "e_listening.h"
 
 namespace state {

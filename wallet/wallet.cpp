@@ -1,7 +1,9 @@
 #include "wallet/wallet.h"
 #include <QDataStream>
+#include <QDateTime>
 
 namespace wallet {
+
 
 QString toString(InitWalletStatus status) {
     switch (status) {
@@ -81,27 +83,6 @@ void NodeStatus::setData(int   _connection,
 }
 
 
-void WalletProofInfo::setDataSuccess(long _coinsNano,
-                            QString _fromAddress,
-                            QString _toAddress,
-                            QString _output,
-                            QString _kernel)
-{
-    successed = true;
-    errorMessage = "";
-    coinsNano = _coinsNano;
-    fromAddress = _fromAddress;
-    toAddress = _toAddress;
-    output = _output;
-    kernel = _kernel;
-}
-
-void WalletProofInfo::setDataFailure(QString _errorMessage) {
-    successed = false;
-    errorMessage = _errorMessage;
-}
-
-
 void WalletTransaction::setData(long _txIdx,
     uint    _transactionType,
     QString _txid,
@@ -122,6 +103,15 @@ void WalletTransaction::setData(long _txIdx,
     coinNano = _coinNano;
     proof = _proof;
 }
+
+// return transaction age (time interval from creation moment) in Seconds.
+long WalletTransaction::calculateTransactionAge( const QDateTime & current ) const {
+    // Example: 2019-06-22 05:44:53
+    QDateTime setTime = QDateTime::fromString (creationTime, "yyyy-MM-dd hh:mm:ss" );
+    setTime.setOffsetFromUtc(0);
+    return setTime.secsTo(current);
+}
+
 
 
 void WalletOutput::setData(QString _outputCommitment,

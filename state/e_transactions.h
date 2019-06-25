@@ -10,8 +10,9 @@ class Transactions;
 
 namespace state {
 
-class Transactions : public State
+class Transactions : public QObject, public State
 {
+    Q_OBJECT
 public:
     Transactions(const StateContext & context);
     virtual ~Transactions() override;
@@ -21,11 +22,15 @@ public:
     // Current transactions that wallet has
     void requestTransactions();
 
+    void switchCurrentAccount(const wallet::AccountInfo & account);
+
     QString getCurrentAccountName() const;
 
+    void cancelTransaction(const wallet::WalletTransaction & transaction);
+
     // Proofs
-    wallet::WalletProofInfo  generateMwcBoxTransactionProof( long transactionId, QString resultingFileName );
-    wallet::WalletProofInfo  verifyMwcBoxTransactionProof( QString proofFileName );
+    void generateMwcBoxTransactionProof( long transactionId, QString resultingFileName );
+    void verifyMwcBoxTransactionProof( QString proofFileName );
 
     // IO for columns widhts
     QVector<int> getColumnsWidhts() const;
@@ -39,8 +44,18 @@ public:
 protected:
     virtual NextStateRespond execute() override;
 
+private slots:
+    void updateTransactions( QString account, long height, QVector<wallet::WalletTransaction> Transactions);
+
+    void onCancelTransacton( bool success, long trIdx, QString errMessage );
+    void onWalletBalanceUpdated();
+
+    void updateExportProof( bool success, QString fn, QString msg );
+    void updateVerifyProof( bool success, QString fn, QString msg );
+
 private:
     wnd::Transactions * wnd = nullptr;
+    QMetaObject::Connection slotConn;
 };
 
 }

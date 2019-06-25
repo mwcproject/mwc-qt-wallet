@@ -16,7 +16,7 @@
 #include "connect2node.h"
 #include "nodemanually.h"
 #include "e_listening.h"
-#include "transactions.h"
+#include "e_transactions.h"
 #include "outputs.h"
 #include "contacts.h"
 #include "walletconfig.h"

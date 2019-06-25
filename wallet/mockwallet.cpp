@@ -280,38 +280,19 @@ QVector<AccountInfo> MockWallet::getWalletBalance() {
 }
 
 // Cancel transaction
-bool MockWallet::cancelTransacton(QString transactionID) {
-    Q_UNUSED(transactionID);
-    return true;
+
+// Cancel transaction
+// Check Signal:  onCancelTransacton
+void MockWallet::cancelTransacton(long transactionID) noexcept(false) {
+    emit onCancelTransacton(true, transactionID, "OK");
 }
 
-// Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
-WalletProofInfo  MockWallet::generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) {
-    Q_UNUSED(transactionId);
-    Q_UNUSED(resultingFileName);
-
-    WalletProofInfo pi;
-    pi.setDataSuccess(1000000000L * 4,
-               "xd7auPddUmmEzSte48a2aZ9tWkjjCppgn41pemUfcVSqjxHHZ6cT",
-               "xd7sCQ9bQuQXp4yCn8GSELcuSxnpcPrPoEWJzvPBc5vxyXPQz6PJ",
-               "08710be0b3fffa79b9423f8e007709a815f237dcfd31340cfa1fdfefd823dca30e",
-               "099c8a166acd426481c1b09707b9e6cdabb69718ee3ca86694579bf98a42c0c80d");
-    return pi;
+void MockWallet::generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) {
+    emit onExportProof(true, resultingFileName, "Placeholder for what this transaction mean");
 }
-
-// Verify the proof for transaction
-WalletProofInfo  MockWallet::verifyMwcBoxTransactionProof( QString proofFileName ) {
-    Q_UNUSED(proofFileName);
-
-    WalletProofInfo pi;
-    pi.setDataSuccess(1000000000L * 4,
-               "xd7auPddUmmEzSte48a2aZ9tWkjjCppgn41pemUfcVSqjxHHZ6cT",
-               "xd7sCQ9bQuQXp4yCn8GSELcuSxnpcPrPoEWJzvPBc5vxyXPQz6PJ",
-               "08710be0b3fffa79b9423f8e007709a815f237dcfd31340cfa1fdfefd823dca30e",
-               "099c8a166acd426481c1b09707b9e6cdabb69718ee3ca86694579bf98a42c0c80d");
-    return pi;
+void MockWallet::verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false)  {
+    emit onVerifyProof(true, proofFileName, "Placeholder for what this transaction mean");
 }
-
 
 // Init send transaction with file output
 // Check signal:  onSendFile

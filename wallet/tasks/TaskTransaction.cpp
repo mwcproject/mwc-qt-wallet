@@ -4,6 +4,8 @@
 
 namespace wallet {
 
+// ------------------------------------ TaskTransactions -------------------------------------------
+
 struct TransactionIdxLayout {
     int posId = -1;
     int posType = -1;
@@ -44,7 +46,7 @@ bool parseTransactionLine( QString str, const TransactionIdxLayout & tl,
         return false;
 
     WalletTransaction::TRANSACTION_TYPE tansType = WalletTransaction::TRANSACTION_TYPE::NONE;
-    if (strType.startsWith("Sent"))
+    if (strType.startsWith("Sent") || strType.startsWith("Send"))
         tansType = WalletTransaction::TRANSACTION_TYPE::SEND;
     else if (strType.startsWith("Received"))
         tansType = WalletTransaction::TRANSACTION_TYPE::RECIEVE;
@@ -113,6 +115,7 @@ bool TaskTransactions::processTask(const QVector<WEvent> & events) {
                 tl.posProof = str.indexOf("Proof?", tl.posNetDiff);
 
                 if ( tl.isDefined() ) {
+                    curEvt++;
                     break;
                 }
                 Q_ASSERT(false); // There is a small chance, but it is really not likely it is ok
@@ -124,8 +127,10 @@ bool TaskTransactions::processTask(const QVector<WEvent> & events) {
     for ( ; curEvt < events.size(); curEvt++ ) {
         if (events[curEvt].event == WALLET_EVENTS::S_LINE) {
             auto &str = events[curEvt].message;
-            if (str.startsWith("=============="))
+            if (str.startsWith("==============")) {
+                curEvt++; // skipping this
                 break;
+            }
         }
     }
 
@@ -160,6 +165,113 @@ bool TaskTransactions::processTask(const QVector<WEvent> & events) {
         trVector.push_back( trItem );
 
     wallet713->setTransactions( account, height, trVector );
+    return true;
+}
+
+// ------------------------- TaskTransCancel ---------------------------
+
+bool TaskTransCancel::processTask(const QVector<WEvent> & events) {
+    QVector< WEvent > errors = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    if (errors.isEmpty()) {
+        wallet713->setTransCancelResult( true, transactionId, "" );
+    }
+    else {
+        QStringList messages;
+        for (auto & e : errors)
+            messages.push_back(e.message);
+        wallet713->setTransCancelResult( false, transactionId, util::formatErrorMessages(messages) );
+    }
+    return true;
+}
+
+// ------------------------------------ TaskTransExportProof -------------------------------------------
+
+bool TaskTransExportProof::processTask(const QVector<WEvent> & events) {
+    QVector< WEvent > errors = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    if (!errors.isEmpty()) {
+        QStringList messages;
+        for (auto & e : errors)
+            messages.push_back(e.message);
+        // respond back with error
+        wallet713->setExportProofResults(false, "", "Unable to export proof for transactions "+ QString::number(transactionId) +".\n" + util::formatErrorMessages(messages));
+        return true;
+    }
+
+    QVector< WEvent > lines = filterEvents(events, WALLET_EVENTS::S_LINE );
+
+    QString fileName;
+
+    int evtIdx = 0;
+    const QString writtenKeyPhrase("proof written to ");
+    for ( ; evtIdx<lines.size(); evtIdx++ ) {
+        QString & str = lines[evtIdx].message;
+        if (str.contains(writtenKeyPhrase)) {
+            fileName = lines[evtIdx].message.mid( str.indexOf(writtenKeyPhrase) + writtenKeyPhrase.length() ).trimmed();
+            qDebug() << "Found proof file name: " << fileName;
+            evtIdx++;
+            break;
+        }
+    }
+
+    if ( fileName.isEmpty() ) {
+        wallet713->setExportProofResults(false, "", "mwc713 return unexpected results.");
+        return true;
+    }
+
+    QString proofMsg;
+
+    // Process all lines until prompt
+    for ( ; evtIdx<lines.size(); evtIdx++ ) {
+        QString & str = lines[evtIdx].message;
+        if (str.contains( mwc::PROMPTS_MWC713 )) {
+            break;
+        }
+
+        if (!proofMsg.isEmpty())
+            proofMsg += "\n";
+
+        proofMsg += str;
+    }
+
+    qDebug() << "Calling setExportProofResults with success";
+    wallet713->setExportProofResults(true, fileName, proofMsg);
+    return true;
+}
+
+// ------------------------------------ TaskTransVerifyProof -------------------------------------------
+
+
+
+bool TaskTransVerifyProof::processTask(const QVector<WEvent> & events) {
+    QVector< WEvent > errors = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    if (!errors.isEmpty()) {
+        QStringList messages;
+        for (auto & e : errors)
+            messages.push_back(e.message);
+        // respond back with error
+        wallet713->setVerifyProofResults(false, proofFileName, "Unable to verify proof for file "+ proofFileName +".\n" + util::formatErrorMessages(messages));
+        return true;
+    }
+
+    QVector< WEvent > lines = filterEvents(events, WALLET_EVENTS::S_LINE );
+
+    QString proofMsg;
+
+    // Process all lines until prompt
+    for ( auto & ln : lines ) {
+        QString & str = ln.message;
+        if (str.contains( mwc::PROMPTS_MWC713 )) {
+            break;
+        }
+
+        if (!proofMsg.isEmpty())
+            proofMsg += "\n";
+
+        proofMsg += str;
+    }
+
+    qDebug() << "Calling setExportProofResults with success";
+    wallet713->setVerifyProofResults(true, proofFileName, proofMsg);
     return true;
 }
 

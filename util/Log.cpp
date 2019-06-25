@@ -21,7 +21,7 @@ void initLogger() {
     logClient = new LogSender(true);
     logServer = new LogReciever("mwcwallet.log");
 
-    bool connected = QObject::connect( logClient, &LogSender::doAppend2logs, logServer, &LogReciever::onAppend2logs, Qt::QueuedConnection );
+    bool connected = QObject::connect( logClient, &LogSender::doAppend2logs, logServer, &LogReciever::onAppend2logs, Qt::DirectConnection); // Qt::QueuedConnection );
     Q_ASSERT(connected);
     Q_UNUSED(connected);
 

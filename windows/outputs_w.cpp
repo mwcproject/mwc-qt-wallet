@@ -66,7 +66,7 @@ void Outputs::updateOutputsTable() {
                                          QString::number( out.MMRIndex),
                                          QString::number( out.lockHeight ),
                                          QString::number( out.lockedUntil )
-                                     } );
+                                     }, ListWithColumns::SELECTION::NORMAL );
     }
 }
 

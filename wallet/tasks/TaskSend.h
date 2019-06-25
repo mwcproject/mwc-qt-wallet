@@ -26,6 +26,7 @@ class TaskSendMwc : public QObject, public Mwc713Task {
 public:
     const static long TIMEOUT = 1000*60; // 1 minute should be enough
 
+    // coinNano == -1  - mean All
     TaskSendMwc( MWC713 *wallet713, long coinNano, const QString & address, QString message="", int inputConfirmationNumber=-1, int changeOutputs=-1 ) :
             Mwc713Task("TaskSendMwc",
                     buildCommand(wallet713, coinNano, address, message, inputConfirmationNumber, changeOutputs),
@@ -37,6 +38,7 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
+    // coinNano == -1  - mean All
     QString buildCommand( MWC713 *wallet713, long coinNano, const QString & address, QString message="", int inputConfirmationNumber=-1, int changeOutputs=-1) const;
 };
 

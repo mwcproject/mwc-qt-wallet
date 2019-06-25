@@ -26,5 +26,6 @@
         <file>img/RadioOff.png</file>
         <file>img/RadioOn.png</file>
         <file>img/Refresh.png</file>
+        <file>img/Delete.png</file>
     </qresource>
 </RCC>

@@ -96,15 +96,15 @@ struct WalletOutput {
 struct WalletTransaction {
     enum TRANSACTION_TYPE { NONE=0, SEND=1, RECIEVE=2, CANCELLED=0x8000};
 
-    long    txIdx;
-    uint    transactionType;
+    long    txIdx = -1;
+    uint    transactionType = TRANSACTION_TYPE::NONE;
     QString txid;
     QString address;
     QString creationTime;
-    bool    confirmed;
+    bool    confirmed = false;
     QString confirmationTime;
-    long    coinNano; // Net diffrence
-    bool    proof;
+    long    coinNano=0; // Net diffrence
+    bool    proof=false;
 
     void setData(long txIdx,
         uint    transactionType,
@@ -115,6 +115,13 @@ struct WalletTransaction {
         QString confirmationTime,
         long    coinNano,
         bool    proof);
+
+    bool isValid() const {return txIdx>=0 && transactionType!=TRANSACTION_TYPE::NONE && !txid.isEmpty();}
+
+    bool canBeCancelled() const { return (transactionType & TRANSACTION_TYPE::CANCELLED)==0 && !confirmed; }
+
+    // return transaction age (time interval from creation moment) in Seconds.
+    long calculateTransactionAge( const QDateTime & current ) const;
 
     // mark transaction as cancelled
     void cancelled() {
@@ -146,24 +153,6 @@ struct WalletTransaction {
                 expandStrR( string2shortStrR(txid, 12), 12) +
                 " " + creationTime;
     }
-};
-
-struct WalletProofInfo {
-    bool    successed = false;
-    QString errorMessage;
-    long    coinsNano = 0;
-    QString fromAddress;
-    QString toAddress;
-    QString output;
-    QString kernel;
-
-    void setDataSuccess(long coinsNano,
-        QString fromAddress,
-        QString toAddress,
-        QString output,
-        QString kernel);
-
-    void setDataFailure(QString errorMessage);
 };
 
 struct WalletUtxoSignature {
@@ -309,12 +298,18 @@ public:
 
     // Get wallet balance
     // Cancel transaction
-    virtual bool cancelTransacton(QString transactionID) noexcept(false) = 0;
+    // Check Signal:  onCancelTransacton
+    virtual void cancelTransacton(long transactionID) noexcept(false) = 0;
+
+    // Proof results
 
     // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
-    virtual WalletProofInfo  generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) = 0;
+    // Check Signal: onExportProof( bool success, QString fn, QString msg );
+    virtual void generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) = 0;
+
     // Verify the proof for transaction
-    virtual WalletProofInfo  verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) = 0;
+    // Check Signal: onVerifyProof( bool success, QString msg );
+    virtual void verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) = 0;
 
     // Init send transaction with file output
     // Check signal:  onSendFile
@@ -328,6 +323,7 @@ public:
 
     // Send some coins to address.
     // Before send, wallet always do the switch to account to make it active
+    // coinNano == -1  - mean All
     virtual void sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message="", int inputConfirmationNumber=-1, int changeOutputs=-1 ) noexcept(false) = 0;
     // Check signal:  onSend
 
@@ -398,6 +394,12 @@ signals:
 
     // Transactions
     void onTransactions( QString account, long height, QVector<WalletTransaction> Transactions);
+    void onCancelTransacton( bool success, long trIdx, QString errMessage );
+
+    // Proof results
+    void onExportProof( bool success, QString fn, QString msg );
+    void onVerifyProof( bool success, QString fn, QString msg );
+
 
     // Listener status listeners...
     void onMwcMqListenerStatus(bool online);

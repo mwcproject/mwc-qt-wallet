@@ -166,7 +166,7 @@ control--MwcPushButtonSmall {
 }
 
 control--MwcPushButtonTiny {
-    font-size: 9px;
+    font-size: 10px;
 }
 
 control--MwcPushButtonTinyUnderline {
@@ -190,12 +190,20 @@ QPushButton:pressed {
 }
 
 /* ------------------ Scroll bars ------------------------ */
-QScrollBar:vertical, QScrollBar:horizontal {
+QScrollBar {
     border: 1px solid rgba(255, 255, 255, 0.2);
     background: transparent;
-    width: 15px;
     margin: 0 0 0 0;
 }
+
+QScrollBar:vertical {
+    width: 15px;
+}
+
+QScrollBar:horizontal {
+    height: 15px;
+}
+
 QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
     background: rgba(255, 255, 255, 0.2);
     min-height: 20px;
@@ -211,6 +219,10 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical ,QScrollBar::add-li
 QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical, QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {
     border: none;
     background: none;
+}
+
+QAbstractScrollArea::corner {
+    background: transparent;
 }
 
 /* -------------- Progress bar ---------------- */
@@ -340,8 +352,12 @@ ListWithColumns::hover
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+ListWithColumns::item
+{
+    color: white;
+}
 
-ListWithColumns::item:selected:active
+ListWithColumns::item:selected
 {
     background-color: mediumpurple;
 }
@@ -362,6 +378,7 @@ QHeaderView::section {
 
     border: none;
     border-bottom: 1px solid #ffffff;
+    border-right: 1px solid #aaaaaa;
 
 /*    padding-left: 4px;
     border: 1px solid white;*/

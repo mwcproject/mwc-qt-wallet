@@ -70,7 +70,7 @@ void SendOnline::on_contactsButton_clicked()
 void SendOnline::on_allAmountButton_clicked()
 {
     int accountIdx = ui->accountComboBox->currentData().toInt();
-    ui->amountEdit->setText( util::nano2one( accountInfo[accountIdx].currentlySpendable ) );
+    ui->amountEdit->setText("All");//  util::nano2one( accountInfo[accountIdx].currentlySpendable ) );
 }
 
 void SendOnline::on_settingsButton_clicked()
@@ -89,19 +89,27 @@ void SendOnline::on_sendButton_clicked()
     int accountIdx = ui->accountComboBox->currentData().toInt();
     wallet::AccountInfo acc = accountInfo[accountIdx];
 
-    QPair<bool,long> mwcAmount = util::one2nano(ui->amountEdit->text());
-    if (!mwcAmount.first) {
-        control::MessageBox::message(this, "Incorrect Input", "Please specify correct number of MWC to send");
-        ui->amountEdit->setFocus();
-        return;
-    }
+    QString sendAmount = ui->amountEdit->text();
 
-    if ( mwcAmount.second > acc.currentlySpendable ) {
-        QString msg2print = generateAmountErrorMsg( mwcAmount.second, acc, state->getSendCoinsParams() );
-        control::MessageBox::message(this, "Incorrect Input",
-                                     msg2print );
-        ui->amountEdit->setFocus();
-        return;
+    QPair<bool, long> mwcAmount;
+    if (sendAmount != "All") {
+        mwcAmount = util::one2nano(ui->amountEdit->text());
+        if (!mwcAmount.first) {
+            control::MessageBox::message(this, "Incorrect Input", "Please specify correct number of MWC to send");
+            ui->amountEdit->setFocus();
+            return;
+        }
+
+        if (mwcAmount.second > acc.currentlySpendable) {
+            QString msg2print = generateAmountErrorMsg(mwcAmount.second, acc, state->getSendCoinsParams());
+            control::MessageBox::message(this, "Incorrect Input",
+                                         msg2print);
+            ui->amountEdit->setFocus();
+            return;
+        }
+    }
+    else { // All
+        mwcAmount = QPair<bool, long>(true, -1);
     }
 
     QString sendTo = ui->sendEdit->text();

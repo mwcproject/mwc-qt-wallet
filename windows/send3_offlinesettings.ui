@@ -6,111 +6,191 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>610</width>
-    <height>532</height>
+    <width>698</width>
+    <height>477</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="sendButton">
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>276</y>
-     <width>175</width>
-     <height>40</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>0</width>
-     <height>40</height>
-    </size>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>16777215</width>
-     <height>40</height>
-    </size>
-   </property>
-   <property name="text">
-    <string>Send</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="accountComboBox">
-   <property name="geometry">
-    <rect>
-     <x>69</x>
-     <y>99</y>
-     <width>376</width>
-     <height>40</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>0</width>
-     <height>40</height>
-    </size>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>16777215</width>
-     <height>40</height>
-    </size>
-   </property>
-  </widget>
-  <widget class="QTextEdit" name="descriptionEdit">
-   <property name="geometry">
-    <rect>
-     <x>69</x>
-     <y>162</y>
-     <width>379</width>
-     <height>94</height>
-    </rect>
-   </property>
-   <property name="placeholderText">
-    <string>Description</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="settingsButton">
-   <property name="geometry">
-    <rect>
-     <x>72</x>
-     <y>276</y>
-     <width>175</width>
-     <height>40</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>0</width>
-     <height>40</height>
-    </size>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>16777215</width>
-     <height>40</height>
-    </size>
-   </property>
-   <property name="text">
-    <string>Settings</string>
-   </property>
-  </widget>
-  <widget class="control::MwcLabelNormal" name="label">
-   <property name="geometry">
-    <rect>
-     <x>72</x>
-     <y>60</y>
-     <width>139</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>From account:</string>
-   </property>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>77</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QFrame" name="frame">
+       <property name="minimumSize">
+        <size>
+         <width>445</width>
+         <height>271</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>445</width>
+         <height>271</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="control::MwcLabelNormal" name="label">
+        <property name="geometry">
+         <rect>
+          <x>6</x>
+          <y>9</y>
+          <width>139</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>From account:</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="sendButton">
+        <property name="geometry">
+         <rect>
+          <x>264</x>
+          <y>228</y>
+          <width>175</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Send</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="settingsButton">
+        <property name="geometry">
+         <rect>
+          <x>3</x>
+          <y>228</y>
+          <width>175</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Settings</string>
+        </property>
+       </widget>
+       <widget class="QTextEdit" name="descriptionEdit">
+        <property name="geometry">
+         <rect>
+          <x>3</x>
+          <y>111</y>
+          <width>436</width>
+          <height>94</height>
+         </rect>
+        </property>
+        <property name="placeholderText">
+         <string>Description</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="accountComboBox">
+        <property name="geometry">
+         <rect>
+          <x>3</x>
+          <y>48</y>
+          <width>439</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>77</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
  </widget>
  <customwidgets>
   <customwidget>

@@ -24,6 +24,11 @@ void ListWithColumns::setListLook() {
     // no sorting
     setSortingEnabled(false);
 
+    // Horizontal scrolling
+//    setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+//    setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+
+
     verticalHeader()->setVisible(false);
     // Decrease slightly horizontally size
     verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
@@ -49,6 +54,10 @@ void ListWithColumns::setListLook() {
     // MWC palette
     bkColor1 = QColor(255,255,255,0);
     bkColor2 = QColor(255,255,255,20);
+
+    selectedLow = QColor(255,0xED,0,90); // Yellow color
+    selectedHi = QColor(255,0xED,0,200);
+
 }
 
 void ListWithColumns::setColumnWidths(QVector<int> widths) {
@@ -74,16 +83,33 @@ void ListWithColumns::clearData()
     setRowCount(0);
 }
 
-void ListWithColumns::appendRow( const QVector<QString> & rowData ) {
+void ListWithColumns::appendRow( const QVector<QString> & rowData, SELECTION selection ) {
     Q_ASSERT(rowData.size() == columnCount() );
 
     int rowIdx = rowCount();
+
+    QColor clr;
+    switch (selection) {
+    case SELECTION::SELECT_LOW:
+        clr = selectedLow;
+        if (rowIdx % 2 == 0)
+            clr.setAlpha( clr.alpha() + 20 );
+        break;
+    case SELECTION::SELECT_HI:
+        clr = selectedHi;
+        if (rowIdx % 2 == 0)
+            clr.setAlpha( clr.alpha() + 20 );
+        break;
+    default:
+        clr = rowIdx % 2 == 0 ? bkColor1 : bkColor2;
+        break;
+    }
 
     setRowCount(rowIdx+1);
     int sz = rowData.size();
     for ( int i=0; i<sz; i++ ) {
         auto * itm = new QTableWidgetItem( rowData[i] );
-        itm->setBackgroundColor( rowIdx % 2 == 0 ? bkColor1 : bkColor2 );
+        itm->setBackgroundColor( clr );
         setItem(rowIdx , i, itm );
     }
 }

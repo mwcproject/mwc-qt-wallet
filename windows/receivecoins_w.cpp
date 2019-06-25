@@ -1,7 +1,7 @@
 #include "receivecoins_w.h"
 #include "ui_receivecoins.h"
 #include "../state/e_listening.h"
-#include "../state/transactions.h"
+#include "state/e_transactions.h"
 #include "../control/messagebox.h"
 #include <QFileDialog>
 

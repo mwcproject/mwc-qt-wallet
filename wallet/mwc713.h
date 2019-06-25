@@ -120,10 +120,17 @@ public:
     virtual NodeStatus getNodeStatus() noexcept(false) override {return NodeStatus();}
 
     // -------------- Transactions
-    virtual bool cancelTransacton(QString transactionID) noexcept(false) override {return true;}
+    // Cancel transaction
+    // Check Signal:  onCancelTransacton
+    virtual void cancelTransacton(long transactionID) noexcept(false) override;
 
-    virtual WalletProofInfo  generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) override {return WalletProofInfo();}
-    virtual WalletProofInfo  verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) override {return WalletProofInfo();}
+    // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
+    // Check Signal: onExportProof( bool success, QString fn, QString msg );
+    virtual void generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) override;
+
+    // Verify the proof for transaction
+    // Check Signal: onVerifyProof( bool success, QString msg );
+    virtual void verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) override;
 
     // Init send transaction with file output
     // Check signal:  onSendFile
@@ -139,6 +146,7 @@ public:
     // Send some coins to address.
     // Before send, wallet always do the switch to account to make it active
     // Check signal:  onSend
+    // coinNano == -1  - mean All
     virtual void sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message="", int inputConfirmationNumber=-1, int changeOutputs=-1 ) noexcept(false) override;
 
     virtual QVector<WalletOutput> getOutputs() noexcept(false) override {return QVector<WalletOutput>();}
@@ -211,6 +219,10 @@ public:
     // Transactions
     void setTransactions( QString account, long height, QVector<WalletTransaction> Transactions);
 
+    void setExportProofResults( bool success, QString fn, QString msg );
+    void setVerifyProofResults( bool success, QString fn, QString msg );
+
+    void setTransCancelResult( bool success, long transId, QString errMsg );
 
 private:
     void mwc713connect();

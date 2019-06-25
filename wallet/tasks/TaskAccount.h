@@ -61,8 +61,9 @@ class TaskAccountInfo : public Mwc713Task {
 public:
     const static long TIMEOUT = 1000*10;
 
-    TaskAccountInfo( MWC713 * wallet713 ) :
-    Mwc713Task("TaskAccountInfo", "info", wallet713,"") {}
+    // noRefresh can be used for sequenced calls
+    TaskAccountInfo( MWC713 * wallet713, bool noRefresh ) :
+    Mwc713Task("TaskAccountInfo", QString("info") + (noRefresh ? " --no-refresh":""), wallet713,"") {}
 
     virtual ~TaskAccountInfo() override {}
 

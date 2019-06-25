@@ -97,10 +97,13 @@ public:
 
     // -------------- Transactions
     virtual QVector<AccountInfo> getWalletBalance() noexcept(false) override;
-    virtual bool cancelTransacton(QString transactionID) noexcept(false) override;
 
-    virtual WalletProofInfo  generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) override;
-    virtual WalletProofInfo  verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) override;
+    // Cancel transaction
+    // Check Signal:  onCancelTransacton
+    virtual void cancelTransacton(long transactionID) noexcept(false) override;
+
+    virtual void generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) override;
+    virtual void verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) override;
 
     // Init send transaction with file output
     // Check signal:  onSendFile

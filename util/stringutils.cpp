@@ -34,7 +34,7 @@ QString nano2one( long nano ) {
         return "0";
 
     if (nano<0)
-        return "-" + nano2one(nano);
+        return "-" + nano2one(-nano);
 
     QString myNumber = QString::number( std::abs(nano),10);
     while (myNumber.length()<9+1)
@@ -164,7 +164,7 @@ QString formatErrorMessages(QStringList messages) {
 
 // Get safely substring from the string. If indexes out of range, return emoty string
 QString getSubString(const QString & str, int idx1, int idx2) {
-    idx2 = std::max(idx2, str.length());
+    idx2 = std::min(idx2, str.length());
 
     if (idx2<=idx1 || idx1>=str.length())
         return "";

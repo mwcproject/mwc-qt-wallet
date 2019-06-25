@@ -74,8 +74,11 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
 QString TaskSendMwc::buildCommand( MWC713 *wallet713, long coinNano, const QString & address,
         QString message, int inputConfirmationNumber, int changeOutputs ) const {
 
-    QString cmd = "send " + util::nano2one(coinNano);
-    // TODO Message symbols MUST be escaped
+    QString cmd = "send ";// + util::nano2one(coinNano);
+    if (coinNano>0)
+        cmd += util::nano2one(coinNano);
+
+        // TODO Message symbols MUST be escaped
     if ( !message.isEmpty() )
         cmd += " --message \"" + message + "\""; // Message symbols MUST be escaped.
 
@@ -87,6 +90,10 @@ QString TaskSendMwc::buildCommand( MWC713 *wallet713, long coinNano, const QStri
 
     // So far documentation doesn't specify difference between protocols
     cmd += " --to " + address;
+
+    if (coinNano<0)
+        cmd += " ALL";
+
     return cmd;
 
 /*    QPair<bool, util::ADDRESS_TYPE> addressType = util::verifyAddress(address);
