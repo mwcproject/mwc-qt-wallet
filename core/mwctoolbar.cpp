@@ -90,7 +90,7 @@ void MwcToolbar::onWalletBalanceUpdated() {
         mwcSum += ai.total;
     }
 
-    ui->totalMwc->setText( util::nano2one(mwcSum) + " mwc" );
+    ui->totalMwc->setText( util::trimStrAsDouble( util::nano2one(mwcSum), 5) + " mwc" );
 }
 
 

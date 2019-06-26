@@ -157,7 +157,7 @@ wallet::WalletTransaction * Transactions::getSelectedTransaction() {
     if (row<0 || row>=transactions.size())
         return nullptr;
 
-    return &transactions[row];
+    return &transactions[ transactions.size()-1-row ];
 }
 
 void Transactions::updateButtons() {

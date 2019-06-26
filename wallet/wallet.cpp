@@ -97,9 +97,9 @@ void WalletTransaction::setData(long _txIdx,
     transactionType = _transactionType;
     txid = _txid;
     address = _address;
-    creationTime = _creationTime;
+    creationTime = util::mwc713time2ThisTime(_creationTime);
     confirmed = _confirmed;
-    confirmationTime = _confirmationTime;
+    confirmationTime = util::mwc713time2ThisTime(_confirmationTime);
     coinNano = _coinNano;
     proof = _proof;
 }
@@ -108,7 +108,7 @@ void WalletTransaction::setData(long _txIdx,
 long WalletTransaction::calculateTransactionAge( const QDateTime & current ) const {
     // Example: 2019-06-22 05:44:53
     QDateTime setTime = QDateTime::fromString (creationTime, "yyyy-MM-dd hh:mm:ss" );
-    setTime.setOffsetFromUtc(0);
+//    setTime.setOffsetFromUtc(0);
     return setTime.secsTo(current);
 }
 

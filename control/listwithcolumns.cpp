@@ -20,6 +20,7 @@ ListWithColumns::~ListWithColumns() {}
 void ListWithColumns::setListLook() {
     setShowGrid(false);
     setSelectionBehavior(QAbstractItemView::SelectRows);
+    setSelectionMode(QAbstractItemView::SingleSelection);
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     // no sorting
     setSortingEnabled(false);

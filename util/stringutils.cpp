@@ -1,8 +1,10 @@
+#include "../core/global.h"
 #include "stringutils.h"
+#include <QDateTime>
 
 namespace util {
 
-QVector<QString> parsePhrase2Words( QString phrase ) {
+QVector<QString> parsePhrase2Words( const QString & phrase ) {
 
     // input seed in low cases
     QVector<QString> words;
@@ -95,6 +97,24 @@ QPair<bool,long> one2nano(QString str) {
     return QPair<bool,long>( true, nano*s );
 }
 
+// Trim string that represent double. 23434.32345, len 7 => 23434.32; 23434.32345, len 5 => 23434
+QString trimStrAsDouble(const QString & dblStr, int maxLen) {
+    if (dblStr.size() < maxLen)
+        return dblStr;
+
+    QString res = dblStr;
+    int ptIdx = res.indexOf('.');
+    if (ptIdx<=0)
+        return res;
+
+    res = res.left( std::max(ptIdx, maxLen) );
+    if ( res[res.size()-1] == '.' ) {
+        res = res.left( res.size()-1 );
+    }
+
+    return res;
+}
+
 
 // convert long strign into shorter version
 // abcdefgh  => abc...
@@ -170,6 +190,24 @@ QString getSubString(const QString & str, int idx1, int idx2) {
         return "";
 
     return str.mid(idx1, idx2-idx1).trimmed();
+}
+
+static int calcOffsetFromUTC() {
+     return QDateTime::currentDateTime().offsetFromUtc();
+}
+
+// Convert mwc713 UTC time to this wallet time. Time template is different.
+QString mwc713time2ThisTime(QString mwc713TimeStr) {
+    if (mwc713TimeStr.isEmpty())
+        return mwc713TimeStr;
+
+    static int offsetFromUTC = calcOffsetFromUTC();
+
+    QDateTime time = QDateTime::fromString(mwc713TimeStr, mwc::DATETIME_TEMPLATE_MWC713 );
+    time = time.addSecs(offsetFromUTC);
+
+    QString res = time.toString( mwc::DATETIME_TEMPLATE_THIS);
+    return res;
 }
 
 

@@ -5,10 +5,13 @@
 
 namespace util {
 
-QVector<QString> parsePhrase2Words( QString phrase );
+QVector<QString> parsePhrase2Words( const QString & phrase );
 
 // convert nano items to dtirng that represent that fraction as a double
 QString nano2one( long nano );
+
+// Trim string that represent double. 23434.32345, len 7 => 23434.32; 23434.32345, len 5 => 23434
+QString trimStrAsDouble(const QString & dblStr, int maxLen);
 
 // 1.0100000 => 1.01   or 0001.0000000 => 1
 QString zeroDbl2Dbl(QString  dbl);
@@ -37,6 +40,9 @@ QString formatErrorMessages(QStringList messages);
 
 // Get safely substring from the string. If indexes out of range, return emoty string
 QString getSubString(const QString & str, int idx1, int idx2);
+
+// Convert mwc713 UTC time to this wallet time. Time template is different.
+QString mwc713time2ThisTime(QString mwc713TimeStr);
 
 }
 
