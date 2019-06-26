@@ -11,7 +11,7 @@
 #include "accounts.h"
 #include "events.h"
 #include "hodl.h"
-#include "receivecoins.h"
+#include "e_Recieve.h"
 #include "nodestatus.h"
 #include "connect2node.h"
 #include "nodemanually.h"
@@ -51,7 +51,7 @@ StateMachine::StateMachine(StateContext & context) :
     states[ STATE::SEND_ONLINE ]    = new SendOnline(context);
     states[ STATE::SEND_OFFLINE ]   = new SendOffline(context);
 
-    states[ STATE::RECIEVE_COINS ]  = new ReceiveCoins(context);
+    states[ STATE::RECIEVE_COINS ]  = new Recieve(context);
     states[ STATE::NODE_STATUS]     = new NodeStatus(context);
     states[ STATE::CONNECT_2_NODE ] = new Connect2Node(context);
     states[ STATE::NODE_MANUALY]    = new NodeManually(context);

@@ -13,19 +13,15 @@ Listening::Listening(const StateContext & context) :
 {
     // Let's establish connectoins at the beginning
 
-    logger::logConnect("Listening", "onMwcMqListenerStatus");
     QObject::connect(context.wallet, &wallet::Wallet::onMwcMqListenerStatus,
                                          this, &Listening::onMwcMqListenerStatus, Qt::QueuedConnection);
 
-    logger::logConnect("Listening", "onKeybaseListenerStatus");
     QObject::connect(context.wallet, &wallet::Wallet::onKeybaseListenerStatus,
                                          this, &Listening::onKeybaseListenerStatus, Qt::QueuedConnection);
 
-    logger::logConnect("Listening", "onListeningStartResults");
     QObject::connect(context.wallet, &wallet::Wallet::onListeningStartResults,
                                          this, &Listening::onListeningStartResults, Qt::QueuedConnection);
 
-    logger::logConnect("Listening", "onListeningStopResult");
     QObject::connect(context.wallet, &wallet::Wallet::onListeningStopResult,
                                          this, &Listening::onListeningStopResult, Qt::QueuedConnection);
 

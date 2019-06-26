@@ -12,27 +12,35 @@ public:
     ListWithColumns(int rows, int columns, QWidget *parent = nullptr);
     virtual ~ListWithColumns() override;
 
+    void setTextAlignment(int alignment) { textAlignment = alignment; }
+    void setHightlightColors(QColor low, QColor hi) {selectedLow=low; selectedHi=hi;}
+    // Alpha delta for row stripe coloring. Range 0-255
+    void setStripeAlfaDelta( int alpha ) { bkColor2.setAlpha(alpha); }
+
     void setColumnWidths(QVector<int> widths);
     QVector<int> getColumnWidths() const;
 
     // clear the data
     void clearData();
 
-    enum SELECTION {NORMAL, SELECT_LOW, SELECT_HI};
-
     // Caller responsible to setup the columns and be sure that the data match them.
-    void appendRow( const QVector<QString> & rowData, SELECTION selection );
+    // selection - highlighting level.
+    // <=0 - nothing
+    // >=1 - highlight a lot
+    void appendRow( const QVector<QString> & rowData, double selection = -1.0 );
 
 protected:
     void setListLook();
 
 protected:
-    // Two background color
-    QColor bkColor1; // System color
-    QColor bkColor2; // Secondary with modifyed Blue
+    int textAlignment = Qt::AlignCenter;
 
-    QColor selectedLow;  // Special color for row selection
-    QColor selectedHi;
+    // Two background color
+    QColor bkColor1 = QColor(255,255,255,0);
+    QColor bkColor2 = QColor(255,255,255,0);
+
+    QColor selectedLow = QColor(0,0,0,0);  // Special color for row selection
+    QColor selectedHi = QColor(0,0,0,0);
 };
 
 #endif // LISTWITHCOLUMNS_H

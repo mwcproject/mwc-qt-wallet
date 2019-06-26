@@ -62,7 +62,7 @@ void Contacts::updateContactTable() {
                                           QString::number(++idx),
                                           cont.name,
                                           cont.address
-                                      }, ListWithColumns::SELECTION::NORMAL );
+                                      } );
     }
 }
 

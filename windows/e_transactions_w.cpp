@@ -15,6 +15,11 @@ Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
 {
     ui->setupUi(this);
 
+    ui->transactionTable->setHightlightColors(QColor(255,255,255,51), QColor(255,255,255,153) ); // Alpha: 0.2  - 0.6
+    // Alpha delta for row stripe coloring. Range 0-255
+    ui->transactionTable->setStripeAlfaDelta( 5 ); // very small number
+
+
     ui->progress->initLoader(true);
     ui->progressFrame->hide();
 
@@ -93,12 +98,13 @@ void Transactions::setTransactionData(QString account, long height, const QVecto
     for ( int idx = transactions.size()-1; idx>=0; idx--) {
         const wallet::WalletTransaction trans = transactions[idx];
 
-        ListWithColumns::SELECTION selection = ListWithColumns::SELECTION::NORMAL;
+        double selection = 0.0;
 
         if ( trans.canBeCancelled() ) {
             long age = trans.calculateTransactionAge(current);
-            selection = age > 60 * 10 ?
-                ListWithColumns::SELECTION::SELECT_HI : ListWithColumns::SELECTION::SELECT_LOW;
+            // 1 hours is a 1.0
+            selection = age > 60 * 60 ?
+                1.0 : (double(age) / double(60 * 60));
         }
 
         ui->transactionTable->appendRow( QVector<QString>{
@@ -107,10 +113,10 @@ void Transactions::setTransactionData(QString account, long height, const QVecto
                 trans.txid,
                 trans.address,
                 trans.creationTime,
-                (trans.confirmed ? "Yes":"No"),
+                (trans.confirmed ? "YES":"NO"),
                 trans.confirmationTime,
                 util::nano2one(trans.coinNano),
-                (trans.proof ? "Yes":"No")
+                (trans.proof ? "YES":"NO")
         }, selection );
     }
 
@@ -267,7 +273,12 @@ void Transactions::updateWalletBalance() {
         if (info.accountName == selectedAccount)
             selectedAccIdx = idx;
 
-        ui->accountComboBox->addItem( util::expandStrR(info.accountName, 25) + "  " + util::nano2one(info.currentlySpendable) + " of " + util::nano2one(info.total) + " mwc", QVariant(idx++) );
+        ui->accountComboBox->addItem( info.accountName + "    Total: " + util::nano2one( info.total ) + "mwc  " +
+                                      "Spendable: " + util::nano2one(info.currentlySpendable) + "  Locked: " + util::nano2one(info.currentlySpendable) +
+                                      "  Awaiting Confirmation: " + util::nano2one( info.awaitingConfirmation ),
+                                      QVariant(idx++) );
+
+//                                      + util::nano2one(info.currentlySpendable) + " of " + util::nano2one(info.total) + " mwc", QVariant(idx++) );
     }
     ui->accountComboBox->setCurrentIndex(selectedAccIdx);
     updateAccountInfo(selectedAccIdx);
@@ -276,6 +287,8 @@ void Transactions::updateWalletBalance() {
 void Transactions::updateAccountInfo(int accIdx) {
     if (accIdx<0 || accIdx>=accountInfo.size())
         return;
+
+    ui->accInfoFrame->hide();
 
     wallet::AccountInfo info = accountInfo[accIdx];
 

@@ -63,7 +63,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="frame">
+          <widget class="QFrame" name="accInfoFrame">
            <property name="minimumSize">
             <size>
              <width>211</width>

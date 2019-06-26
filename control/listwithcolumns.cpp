@@ -53,11 +53,10 @@ void ListWithColumns::setListLook() {
 */
 
     // MWC palette
-    bkColor1 = QColor(255,255,255,0);
-    bkColor2 = QColor(255,255,255,20);
-
-    selectedLow = QColor(255,0xED,0,90); // Yellow color
-    selectedHi = QColor(255,0xED,0,200);
+//    bkColor1 = QColor(255,255,255,0);
+//    bkColor2 = QColor(255,255,255,20);
+//    selectedLow = QColor(255,0xED,0,90); // Yellow color
+//    selectedHi = QColor(255,0xED,0,200);
 
 }
 
@@ -84,26 +83,24 @@ void ListWithColumns::clearData()
     setRowCount(0);
 }
 
-void ListWithColumns::appendRow( const QVector<QString> & rowData, SELECTION selection ) {
+void ListWithColumns::appendRow( const QVector<QString> & rowData, double selection ) {
     Q_ASSERT(rowData.size() == columnCount() );
 
     int rowIdx = rowCount();
 
     QColor clr;
-    switch (selection) {
-    case SELECTION::SELECT_LOW:
-        clr = selectedLow;
-        if (rowIdx % 2 == 0)
-            clr.setAlpha( clr.alpha() + 20 );
-        break;
-    case SELECTION::SELECT_HI:
+
+    if (selection>=1.0)
         clr = selectedHi;
-        if (rowIdx % 2 == 0)
-            clr.setAlpha( clr.alpha() + 20 );
-        break;
-    default:
+    if (selection <= 0.0) {
         clr = rowIdx % 2 == 0 ? bkColor1 : bkColor2;
-        break;
+    }
+    else {
+        // Calculating the gradient
+        clr.setRgbF( selectedLow.redF() * (1.0-selection) + selectedHi.redF() * selection,
+                     selectedLow.greenF() * (1.0-selection) + selectedHi.greenF() * selection,
+                     selectedLow.blueF() * (1.0-selection) + selectedHi.blueF() * selection,
+                     selectedLow.alphaF() * (1.0-selection) + selectedHi.alphaF() * selection );
     }
 
     setRowCount(rowIdx+1);
@@ -111,6 +108,7 @@ void ListWithColumns::appendRow( const QVector<QString> & rowData, SELECTION sel
     for ( int i=0; i<sz; i++ ) {
         auto * itm = new QTableWidgetItem( rowData[i] );
         itm->setBackgroundColor( clr );
+        itm->setTextAlignment( textAlignment );
         setItem(rowIdx , i, itm );
     }
 }

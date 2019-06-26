@@ -1,6 +1,7 @@
 #include "wallet/wallet.h"
 #include <QDataStream>
 #include <QDateTime>
+#include "../core/global.h"
 
 namespace wallet {
 
@@ -107,7 +108,7 @@ void WalletTransaction::setData(long _txIdx,
 // return transaction age (time interval from creation moment) in Seconds.
 long WalletTransaction::calculateTransactionAge( const QDateTime & current ) const {
     // Example: 2019-06-22 05:44:53
-    QDateTime setTime = QDateTime::fromString (creationTime, "yyyy-MM-dd hh:mm:ss" );
+    QDateTime setTime = QDateTime::fromString (creationTime, mwc::DATETIME_TEMPLATE_THIS );
 //    setTime.setOffsetFromUtc(0);
     return setTime.secsTo(current);
 }
