@@ -271,6 +271,9 @@
        <property name="text">
         <string>Receive mwc by file</string>
        </property>
+       <property name="cursor">
+        <cursor>13</cursor>
+       </property>
       </widget>
      </item>
      <item>

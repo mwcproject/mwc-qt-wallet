@@ -92,6 +92,9 @@
         <property name="text">
          <string>Generate File</string>
         </property>
+        <property name="cursor">
+         <cursor>13</cursor>
+        </property>
        </widget>
        <widget class="control::MwcFrameWithBorder" name="frame">
         <property name="geometry">
@@ -295,6 +298,9 @@
         </property>
         <property name="text">
          <string>Publish Transaction</string>
+        </property>
+        <property name="cursor">
+         <cursor>13</cursor>
         </property>
        </widget>
       </widget>

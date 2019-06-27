@@ -99,6 +99,9 @@
         <property name="text">
          <string>Send</string>
         </property>
+        <property name="cursor">
+         <cursor>13</cursor>
+        </property>
        </widget>
        <widget class="QPushButton" name="settingsButton">
         <property name="geometry">
@@ -123,6 +126,9 @@
         </property>
         <property name="text">
          <string>Settings</string>
+        </property>
+        <property name="cursor">
+         <cursor>13</cursor>
         </property>
        </widget>
        <widget class="QTextEdit" name="descriptionEdit">

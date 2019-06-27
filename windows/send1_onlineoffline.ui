@@ -92,6 +92,9 @@
         <property name="text">
          <string>Send Online</string>
         </property>
+        <property name="cursor">
+         <cursor>13</cursor>
+        </property>
        </widget>
        <widget class="control::MwcFrameWithBorder" name="frame">
         <property name="geometry">
@@ -199,6 +202,9 @@
         </property>
         <property name="text">
          <string>Send Offline</string>
+        </property>
+        <property name="cursor">
+         <cursor>13</cursor>
         </property>
        </widget>
        <widget class="control::MwcFrameWithBorder" name="frame_5">

@@ -22,6 +22,9 @@
      <property name="title">
       <string>Contacts</string>
      </property>
+     <property name="cursor">
+      <cursor>13</cursor>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="ListWithColumns" name="contactsTable">

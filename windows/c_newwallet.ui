@@ -104,6 +104,9 @@
         </property>
        </widget>
        <widget class="QRadioButton" name="radioHaveSeed">
+        <property name="cursor">
+         <cursor>13</cursor>
+        </property>
         <property name="geometry">
          <rect>
           <x>3</x>
@@ -120,6 +123,9 @@
         </property>
        </widget>
        <widget class="QRadioButton" name="radioCreateNew">
+        <property name="cursor">
+         <cursor>13</cursor>
+        </property>
         <property name="geometry">
          <rect>
           <x>3</x>

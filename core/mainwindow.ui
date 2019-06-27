@@ -61,6 +61,9 @@
     </item>
     <item>
      <widget class="QPushButton" name="helpButton">
+      <property name="cursor">
+       <cursor>13</cursor>
+      </property>
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
         <horstretch>0</horstretch>
@@ -112,6 +115,9 @@
     </item>
     <item>
      <widget class="QPushButton" name="connectionStatusButton">
+      <property name="cursor">
+       <cursor>13</cursor>
+      </property>
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
         <horstretch>0</horstretch>

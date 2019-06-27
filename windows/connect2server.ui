@@ -46,6 +46,9 @@
    </item>
    <item>
     <widget class="QRadioButton" name="radioStandalone">
+     <property name="cursor">
+      <cursor>13</cursor>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -62,6 +65,9 @@
    </item>
    <item>
     <widget class="QRadioButton" name="radioAutoConnect">
+     <property name="cursor">
+      <cursor>13</cursor>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -78,6 +84,9 @@
    </item>
    <item>
     <widget class="QRadioButton" name="radioSelectManually">
+     <property name="cursor">
+      <cursor>13</cursor>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
