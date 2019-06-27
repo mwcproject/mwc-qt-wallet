@@ -274,7 +274,7 @@ void Transactions::updateWalletBalance() {
             selectedAccIdx = idx;
 
         ui->accountComboBox->addItem( info.accountName + "    Total: " + util::nano2one( info.total ) + "mwc  " +
-                                      "Spendable: " + util::nano2one(info.currentlySpendable) + "  Locked: " + util::nano2one(info.currentlySpendable) +
+                                      "Spendable: " + util::nano2one(info.currentlySpendable) + "  Locked: " + util::nano2one(info.lockedByPrevTransaction) +
                                       "  Awaiting Confirmation: " + util::nano2one( info.awaitingConfirmation ),
                                       QVariant(idx++) );
 
