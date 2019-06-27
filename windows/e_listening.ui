@@ -95,6 +95,9 @@
         <property name="text">
          <string>Start</string>
         </property>
+        <property name="cursor">
+         <cursor>13</cursor>
+        </property>
        </widget>
        <widget class="QLabel" name="mwcMqStatusImg">
         <property name="geometry">
@@ -138,6 +141,9 @@
         </property>
         <property name="text">
          <string>Start</string>
+        </property>
+        <property name="cursor">
+         <cursor>13</cursor>
         </property>
        </widget>
        <widget class="control::MwcLabelTiny" name="keybaseStatusTxt">
@@ -266,6 +272,9 @@
         <property name="text">
          <string>To index</string>
         </property>
+        <property name="cursor">
+         <cursor>13</cursor>
+        </property>
        </widget>
        <widget class="control::MwcPushButtonNormal" name="mwcMqNextAddress">
         <property name="geometry">
@@ -290,6 +299,9 @@
         </property>
         <property name="text">
          <string>Next Address</string>
+        </property>
+        <property name="cursor">
+         <cursor>13</cursor>
         </property>
        </widget>
        <widget class="control::MwcLabelTiny" name="mwcMqAddressIndexLabel">
