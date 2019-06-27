@@ -94,6 +94,8 @@ QString TaskSendMwc::buildCommand( MWC713 *wallet713, long coinNano, const QStri
     if (coinNano<0)
         cmd += " ALL";
 
+    qDebug() << "sendCommand: '" << cmd << "'";
+
     return cmd;
 
 /*    QPair<bool, util::ADDRESS_TYPE> addressType = util::verifyAddress(address);

@@ -99,14 +99,6 @@ void SendOnline::on_sendButton_clicked()
             ui->amountEdit->setFocus();
             return;
         }
-
-        if (mwcAmount.second > acc.currentlySpendable) {
-            QString msg2print = generateAmountErrorMsg(mwcAmount.second, acc, state->getSendCoinsParams());
-            control::MessageBox::message(this, "Incorrect Input",
-                                         msg2print);
-            ui->amountEdit->setFocus();
-            return;
-        }
     }
     else { // All
         mwcAmount = QPair<bool, long>(true, -1);
