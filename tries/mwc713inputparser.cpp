@@ -202,9 +202,17 @@ void Mwc713InputParser::initListening() {
                                                         new TriePhraseSection("starting keybase listener...")
                                                 }));
 
+    // for testnet
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_ON,
                                                 QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("listener started for ["),
+                                                        new TriePhraseSection("listener started for [x"),
+                                                        new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"","", 1), // mwc MQ address
+                                                        new TriePhraseSection("]")
+                                                }));
+    // for mainnet
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_ON,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("listener started for [q"),
                                                         new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"","", 1), // mwc MQ address
                                                         new TriePhraseSection("]")
                                                 }));
@@ -223,9 +231,17 @@ void Mwc713InputParser::initListening() {
                                                         new TriePhraseSection("stopping keybase listener...")
                                                 }));
 
+    // for testnet
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_OFF,
                                                 QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("listener ["),
+                                                        new TriePhraseSection("listener [x"),
+                                                        new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"","", 1), // mwc MQ address
+                                                        new TriePhraseSection("] stopped")
+                                                }));
+    // for mainnet
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_OFF,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("listener [q"),
                                                         new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"","", 1), // mwc MQ address
                                                         new TriePhraseSection("] stopped")
                                                 }));

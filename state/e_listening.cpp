@@ -4,6 +4,7 @@
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
+#include <QDebug>
 #include "../util/Log.h"
 
 namespace state {
@@ -71,6 +72,7 @@ void Listening::requestNextMwcMqAddressForIndex(int idx) {
 
 void Listening::triggerKeybaseState() {
     QPair<bool,bool> lsnStatus = context.wallet->getListeningStatus();
+    qDebug() << "lsnStatus: " << lsnStatus.first << " " << lsnStatus.second;
     if ( !lsnStatus.second ) {
         context.wallet->listeningStart(false, true);
     }

@@ -93,6 +93,7 @@ bool TaskListeningStop::processTask(const QVector<WEvent> &events) {
             errorMessages.append(evt.message);
     }
 
+    qDebug() << "results: mq=" << mqStopping.size() << ",kb=" << kbStopping.size();
     wallet713->setListeningStopResult( mqStopping.size()>0, kbStopping.size()>0,
                                        errorMessages );
 

@@ -53,7 +53,7 @@ void Listening::updateMwcMqState(bool online) {
 
 void Listening::updateKeybaseState(bool online) {
 
-    ui->keybaseStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOK.png" : ":/img/StatusEmpty.png" ) );
+    ui->keybaseStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOk.png" : ":/img/StatusEmpty.png" ) );
 
     ui->keybaseStatusTxt->setText( online ? "Online" : "Offline" );
 

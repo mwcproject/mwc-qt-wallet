@@ -161,6 +161,7 @@ void MWC713::listeningStart(bool startMq, bool startKb) noexcept(false) {
 
 // Check signal: onListeningStopResult
 void MWC713::listeningStop(bool stopMq, bool stopKb) noexcept(false) {
+    qDebug() << "listeningStop: mq=" << stopMq << ",kb=" << stopKb;
     if (initStatus==InitWalletStatus::READY) {
         eventCollector->addTask( new TaskListeningStop(this, stopMq,stopKb), TaskListeningStop::TIMEOUT );
     }
