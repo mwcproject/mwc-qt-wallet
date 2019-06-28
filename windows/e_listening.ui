@@ -272,6 +272,9 @@
         <property name="text">
          <string>To index</string>
         </property>
+        <property name="toolTip">
+         <string>Select a specific index for your MWC MQ address</string>
+        </property>
         <property name="cursor">
          <cursor>13</cursor>
         </property>
@@ -300,6 +303,9 @@
         <property name="text">
          <string>Next Address</string>
         </property>
+       <property name="toolTip">
+        <string>Use the next addess for listening to MWC MQ messages</string>
+       </property>
         <property name="cursor">
          <cursor>13</cursor>
         </property>

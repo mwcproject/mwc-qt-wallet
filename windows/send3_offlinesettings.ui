@@ -99,6 +99,9 @@
         <property name="text">
          <string>Send</string>
         </property>
+        <property name="toolTip">
+         <string>Send MWC</string>
+        </property>
         <property name="cursor">
          <cursor>13</cursor>
         </property>

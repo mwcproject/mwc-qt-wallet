@@ -95,6 +95,9 @@
         <property name="cursor">
          <cursor>13</cursor>
         </property>
+        <property name="toolTip">
+         <string>Send MWC</string>
+        </property>
        </widget>
        <widget class="QPushButton" name="settingsButton">
         <property name="geometry">
@@ -119,6 +122,9 @@
         </property>
         <property name="text">
          <string>Settings</string>
+        </property>
+        <property name="toolTip">
+         <string>Click to change settings. Number of change outputs and required confirmations.</string>
         </property>
         <property name="cursor">
          <cursor>13</cursor>
@@ -147,6 +153,9 @@
         </property>
         <property name="text">
          <string>Contacts</string>
+        </property>
+        <property name="toolTip">
+         <string>Choose a contact to send to</string>
         </property>
         <property name="cursor">
          <cursor>13</cursor>
@@ -188,6 +197,9 @@
         </property>
         <property name="text">
          <string>All</string>
+        </property>
+        <property name="toolTip">
+         <string>Send all MWC in this account</string>
         </property>
         <property name="cursor">
          <cursor>13</cursor>

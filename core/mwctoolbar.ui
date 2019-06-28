@@ -142,6 +142,9 @@ color: #FFFFFF;</string>
        <property name="text">
         <string>mwc</string>
        </property>
+       <property name="toolTip">
+        <string>This is the total MWC in all of your accounts that has at least 10 confirmations</string>
+       </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
@@ -203,6 +206,9 @@ color: #FFFFFF;</string>
        <property name="cursor">
         <cursor>13</cursor>
        </property>
+       <property name="toolTip">
+        <string>Click here to claim your MWC from the Airdrop</string>
+       </property>
        <property name="iconSize">
         <size>
          <width>150</width>
@@ -243,6 +249,9 @@ color: #FFFFFF;</string>
        <property name="icon">
         <iconset resource="../resources.qrc">
          <normaloff>:/img/Send.png</normaloff>:/img/Send.png</iconset>
+       </property>
+       <property name="toolTip">
+        <string>Send MWC</string>
        </property>
        <property name="cursor">
         <cursor>13</cursor>
@@ -288,6 +297,9 @@ color: #FFFFFF;</string>
         <iconset resource="../resources.qrc">
          <normaloff>:/img/Receive.png</normaloff>:/img/Receive.png</iconset>
        </property>
+       <property name="toolTip">
+        <string>Receive MWC</string>
+       </property>
        <property name="cursor">
         <cursor>13</cursor>
        </property>
@@ -332,6 +344,9 @@ color: #FFFFFF;</string>
         <iconset resource="../resources.qrc">
          <normaloff>:/img/Transactions.png</normaloff>:/img/Transactions.png</iconset>
        </property>
+       <property name="toolTip">
+        <string>Click here to view your transactions</string>
+       </property>
        <property name="cursor">
         <cursor>13</cursor>
        </property>
@@ -375,6 +390,9 @@ color: #FFFFFF;</string>
        <property name="icon">
         <iconset resource="../resources.qrc">
          <normaloff>:/img/HODL.png</normaloff>:/img/HODL.png</iconset>
+       </property>
+       <property name="toolTip">
+        <string>Click to register your coins for the HODL program</string>
        </property>
        <property name="cursor">
         <cursor>13</cursor>

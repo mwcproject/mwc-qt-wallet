@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QTime>
+#include <QDebug.h>
 #include "versiondialog.h"
 #include "../state/statemachine.h"
 #include "util/widgetutils.h"
@@ -129,14 +130,18 @@ void MainWindow::updateListenerStatus(bool online) {
 }
 
 void MainWindow::updateListenerBtn() {
-
     QPair<bool,bool> listStatus = wallet->getListeningStatus();
+    qDebug() << "updateListenerBtn: " << listStatus;
+
 
     bool listening = listStatus.first | listStatus.second;
 
     QPixmap pixmap( listening ? ":/img/StatusOk.png" : ":/img/StatusFail.png" );
+
     QIcon ButtonIcon(pixmap);
     ui->connectionStatusButton->setIcon( ButtonIcon );
+    ui->connectionStatusButton->setToolTip(listening ? "You are listening. Click here to view listener status"
+                                          : "You are not listening. Click here to view listener status");
 }
 
 
