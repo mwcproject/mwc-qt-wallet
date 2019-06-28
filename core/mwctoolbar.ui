@@ -128,6 +128,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="toolTip">
+        <string>This is the total MWC in all of your accounts that has at least 10 confirmations</string>
+       </property>
        <property name="styleSheet">
         <string notr="true">font-family: Open Sans;
 font-style: normal;
@@ -141,9 +144,6 @@ color: #FFFFFF;</string>
        </property>
        <property name="text">
         <string>mwc</string>
-       </property>
-       <property name="toolTip">
-        <string>This is the total MWC in all of your accounts that has at least 10 confirmations</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -193,8 +193,14 @@ color: #FFFFFF;</string>
          <height>71</height>
         </size>
        </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
        <property name="focusPolicy">
         <enum>Qt::TabFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Click here to claim your MWC from the Airdrop</string>
        </property>
        <property name="text">
         <string notr="true">Airdrop</string>
@@ -203,16 +209,10 @@ color: #FFFFFF;</string>
         <iconset resource="../resources.qrc">
          <normaloff>:/img/Airdrop.png</normaloff>:/img/Airdrop.png</iconset>
        </property>
-       <property name="cursor">
-        <cursor>13</cursor>
-       </property>
-       <property name="toolTip">
-        <string>Click here to claim your MWC from the Airdrop</string>
-       </property>
        <property name="iconSize">
         <size>
          <width>150</width>
-         <height>38</height>
+         <height>40</height>
         </size>
        </property>
        <property name="checkable">
@@ -240,8 +240,14 @@ color: #FFFFFF;</string>
          <height>71</height>
         </size>
        </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
        <property name="focusPolicy">
         <enum>Qt::TabFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Send MWC</string>
        </property>
        <property name="text">
         <string notr="true">Send</string>
@@ -250,16 +256,10 @@ color: #FFFFFF;</string>
         <iconset resource="../resources.qrc">
          <normaloff>:/img/Send.png</normaloff>:/img/Send.png</iconset>
        </property>
-       <property name="toolTip">
-        <string>Send MWC</string>
-       </property>
-       <property name="cursor">
-        <cursor>13</cursor>
-       </property>
        <property name="iconSize">
         <size>
-         <width>120</width>
-         <height>38</height>
+         <width>150</width>
+         <height>40</height>
         </size>
        </property>
        <property name="checkable">
@@ -287,8 +287,14 @@ color: #FFFFFF;</string>
          <height>71</height>
         </size>
        </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
        <property name="focusPolicy">
         <enum>Qt::TabFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Receive MWC</string>
        </property>
        <property name="text">
         <string notr="true">Receive</string>
@@ -297,16 +303,10 @@ color: #FFFFFF;</string>
         <iconset resource="../resources.qrc">
          <normaloff>:/img/Receive.png</normaloff>:/img/Receive.png</iconset>
        </property>
-       <property name="toolTip">
-        <string>Receive MWC</string>
-       </property>
-       <property name="cursor">
-        <cursor>13</cursor>
-       </property>
        <property name="iconSize">
         <size>
-         <width>120</width>
-         <height>38</height>
+         <width>150</width>
+         <height>40</height>
         </size>
        </property>
        <property name="checkable">
@@ -334,8 +334,14 @@ color: #FFFFFF;</string>
          <height>71</height>
         </size>
        </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
        <property name="focusPolicy">
         <enum>Qt::TabFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Click here to view your transactions</string>
        </property>
        <property name="text">
         <string notr="true">Transactions</string>
@@ -344,16 +350,10 @@ color: #FFFFFF;</string>
         <iconset resource="../resources.qrc">
          <normaloff>:/img/Transactions.png</normaloff>:/img/Transactions.png</iconset>
        </property>
-       <property name="toolTip">
-        <string>Click here to view your transactions</string>
-       </property>
-       <property name="cursor">
-        <cursor>13</cursor>
-       </property>
        <property name="iconSize">
         <size>
          <width>150</width>
-         <height>38</height>
+         <height>40</height>
         </size>
        </property>
        <property name="checkable">
@@ -381,8 +381,14 @@ color: #FFFFFF;</string>
          <height>71</height>
         </size>
        </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
        <property name="focusPolicy">
         <enum>Qt::TabFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Click to register your coins for the HODL program</string>
        </property>
        <property name="text">
         <string notr="true">HODL</string>
@@ -391,16 +397,10 @@ color: #FFFFFF;</string>
         <iconset resource="../resources.qrc">
          <normaloff>:/img/HODL.png</normaloff>:/img/HODL.png</iconset>
        </property>
-       <property name="toolTip">
-        <string>Click to register your coins for the HODL program</string>
-       </property>
-       <property name="cursor">
-        <cursor>13</cursor>
-       </property>
        <property name="iconSize">
         <size>
          <width>150</width>
-         <height>38</height>
+         <height>40</height>
         </size>
        </property>
        <property name="checkable">

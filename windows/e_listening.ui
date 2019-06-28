@@ -92,11 +92,11 @@
           <height>40</height>
          </size>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="text">
          <string>Start</string>
-        </property>
-        <property name="cursor">
-         <cursor>13</cursor>
         </property>
        </widget>
        <widget class="QLabel" name="mwcMqStatusImg">
@@ -139,11 +139,11 @@
           <height>40</height>
          </size>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="text">
          <string>Start</string>
-        </property>
-        <property name="cursor">
-         <cursor>13</cursor>
         </property>
        </widget>
        <widget class="control::MwcLabelTiny" name="keybaseStatusTxt">
@@ -269,14 +269,14 @@
           <height>40</height>
          </size>
         </property>
-        <property name="text">
-         <string>To index</string>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="toolTip">
          <string>Select a specific index for your MWC MQ address</string>
         </property>
-        <property name="cursor">
-         <cursor>13</cursor>
+        <property name="text">
+         <string>To index</string>
         </property>
        </widget>
        <widget class="control::MwcPushButtonNormal" name="mwcMqNextAddress">
@@ -300,14 +300,14 @@
           <height>40</height>
          </size>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="toolTip">
+         <string>Use the next addess for listening to MWC MQ messages</string>
+        </property>
         <property name="text">
          <string>Next Address</string>
-        </property>
-       <property name="toolTip">
-        <string>Use the next addess for listening to MWC MQ messages</string>
-       </property>
-        <property name="cursor">
-         <cursor>13</cursor>
         </property>
        </widget>
        <widget class="control::MwcLabelTiny" name="mwcMqAddressIndexLabel">
