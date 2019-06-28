@@ -20,8 +20,13 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
                 wallet713->setKeybaseListeningStatus(true);
             }
             else {
-                wallet713->setMwcMqListeningStatus(true);
-                wallet713->setMwcAddress(evt.message);
+                const QString & addrees = evt.message;
+                // x prefix is for testnet
+                // q - for mainnet
+                if (addrees.size()>0 && (addrees[0]=='x' || addrees[0]=='q') ) {
+                    wallet713->setMwcMqListeningStatus(true);
+                    wallet713->setMwcAddress(evt.message);
+                }
             }
             return true;
         }
