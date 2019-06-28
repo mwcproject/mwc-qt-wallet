@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
+#set( CMAKE_VERBOSE_MAKEFILE on )
 
 project(mwc-qt-wallet)
 
@@ -50,18 +51,18 @@ set(CMAKE_AUTORCC ON)
 # Outputs
 #
 
-add_executable(mwc-gui ${SOURCE_FILES} ${HEADER_FILES} ${UI_GENERATED_HEADERS} resources.qrc)
-target_link_libraries(mwc-gui Qt5::Widgets Qt5::Gui Qt5::Core)
+add_executable(mwc-qt-wallet ${SOURCE_FILES} ${HEADER_FILES} ${UI_GENERATED_HEADERS} resources.qrc)
+target_link_libraries(mwc-qt-wallet Qt5::Widgets Qt5::Gui Qt5::Core)
 
 # Copy Qt runtime libraries to build directory
 # [Copying Qt DLLs to executable directory on Windows using CMake](https://stackoverflow.com/questions/40564443/)
 add_custom_command(
-    TARGET mwc-gui POST_BUILD
+    TARGET mwc-qt-wallet POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         $<TARGET_FILE:Qt5::Core>
         $<TARGET_FILE:Qt5::Gui>
         $<TARGET_FILE:Qt5::Widgets>
-        $<TARGET_FILE_DIR:mwc-gui>
+        $<TARGET_FILE_DIR:mwc-qt-wallet>
 )
 
 
@@ -71,4 +72,4 @@ add_custom_command(
 #
 
 # Set Visual Studio start-up project
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT mwc-gui)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT mwc-qt-wallet)

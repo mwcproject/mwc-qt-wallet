@@ -102,7 +102,7 @@
        <widget class="QLabel" name="mwcMqStatusImg">
         <property name="geometry">
          <rect>
-          <x>105</x>
+          <x>120</x>
           <y>21</y>
           <width>21</width>
           <height>21</height>
@@ -203,7 +203,7 @@
        <widget class="QLabel" name="keybaseStatusImg">
         <property name="geometry">
          <rect>
-          <x>108</x>
+          <x>120</x>
           <y>234</y>
           <width>21</width>
           <height>21</height>

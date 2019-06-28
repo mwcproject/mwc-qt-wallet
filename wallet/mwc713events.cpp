@@ -28,12 +28,10 @@ QString toString(WALLET_EVENTS event) {
 
         case S_LISTENER_MQ_STARTING: return "S_LISTENER_MQ_STARTING";
         case S_LISTENER_KB_STARTING: return "S_LISTENER_KB_STARTING";
-        case S_LISTENER_MQ_ON:  return "S_LISTENER_MQ_ON";
-        case S_LISTENER_KB_ON:  return "S_LISTENER_KB_ON";
+        case S_LISTENER_ON:  return "S_LISTENER_ON";
         case S_LISTENER_MQ_STOPPING: return "S_LISTENER_MQ_STOPPING";
         case S_LISTENER_KB_STOPPING: return "S_LISTENER_KB_STOPPING";
-        case S_LISTENER_MQ_OFF: return "S_LISTENER_MQ_OFF";
-        case S_LISTENER_KB_OFF: return "S_LISTENER_KB_OFF";
+        case S_LISTENER_OFF: return "S_LISTENER_OFF";
         case S_RECOVERY_STARTING: return "S_RECOVERY_STARTING";
         case S_RECOVERY_DONE:   return "S_RECOVERY_DONE";
         case S_RECOVERY_PROGRESS: return "S_RECOVERY_PROGRESS";
