@@ -1,7 +1,7 @@
 #ifndef LISTENINGW_H
 #define LISTENINGW_H
 
-#include <QWidget>
+#include "../core/navwnd.h"
 
 namespace Ui {
 class Listening;
@@ -13,7 +13,7 @@ namespace state {
 
 namespace wnd {
 
-class Listening : public QWidget
+class Listening : public core::NavWnd
 {
     Q_OBJECT
 

@@ -27,5 +27,9 @@
         <file>img/RadioOn.png</file>
         <file>img/Refresh.png</file>
         <file>img/Delete.png</file>
+        <file>img/NavAccount.png</file>
+        <file>img/NavNotificationActive.png</file>
+        <file>img/NavNotificationNormal.png</file>
+        <file>img/NavSettings.png</file>
     </qresource>
 </RCC>
