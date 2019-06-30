@@ -15,7 +15,7 @@ struct SendCoinsParams {
     int changeOutputs;
 
     SendCoinsParams() :
-            inputConfirmationNumber(-1), changeOutputs(-1) {}
+            inputConfirmationNumber(10), changeOutputs(1) {}
 
     SendCoinsParams( int _inputConfirmationNumber, int _changeOutputs) :
             inputConfirmationNumber(_inputConfirmationNumber), changeOutputs(_changeOutputs) {}

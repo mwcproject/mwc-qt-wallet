@@ -147,7 +147,7 @@ public:
     // Before send, wallet always do the switch to account to make it active
     // Check signal:  onSend
     // coinNano == -1  - mean All
-    virtual void sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message="", int inputConfirmationNumber=-1, int changeOutputs=-1 ) noexcept(false) override;
+    virtual void sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 ) noexcept(false) override;
 
     virtual QVector<WalletOutput> getOutputs() noexcept(false) override {return QVector<WalletOutput>();}
 
