@@ -294,7 +294,7 @@
    <item>
     <widget class="control::MwcLabelSmall" name="label_3">
      <property name="text">
-      <string>Sign income transaction</string>
+      <string>Sign transaction</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

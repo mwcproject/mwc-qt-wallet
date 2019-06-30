@@ -37,7 +37,7 @@ void Recieve::updateMwcMqState(bool online) {
 }
 
 void Recieve::updateKeybaseState(bool online) {
-    ui->keybaseStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOK.png" : ":/img/StatusEmpty.png" ) );
+    ui->keybaseStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOk.png" : ":/img/StatusEmpty.png" ) );
     ui->keybaseStatusLabel->setText( online ? "Online" : "Offline" );
 }
 
