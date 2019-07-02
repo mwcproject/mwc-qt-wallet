@@ -57,6 +57,29 @@ private:
 };
 
 
+class TaskAccountRename : public Mwc713Task {
+public:
+    const static long TIMEOUT = 1000*5;
+
+    // createSimulation is true if user expect create account instead of rename deleted
+    TaskAccountRename( MWC713 * wallet713, QString oldAccountName, QString newAccountName, bool createSimulation ) :
+            Mwc713Task("TaskAccountRename", "account rename \"" + oldAccountName + "\" \"" + newAccountName + "\"", wallet713, ""),
+            oldName(oldAccountName),
+            newName(newAccountName),
+            createAccountSimulation(createSimulation) { }
+
+    virtual ~TaskAccountRename() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    QString oldName;
+    QString newName;
+    bool createAccountSimulation;
+};
+
+
 class TaskAccountInfo : public Mwc713Task {
 public:
     const static long TIMEOUT = 1000*10;

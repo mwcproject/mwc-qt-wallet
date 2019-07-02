@@ -3,15 +3,20 @@
 
 #include "state.h"
 #include "../wallet/wallet.h"
+#include "../windows/a_waitingwnd.h"
+
+
 
 namespace state {
 
 // Init the wallet. Then check how it is started. If it needs to have password or something
-class StartWallet : public QObject, public State {
+class StartWallet : public QObject, public State, public wnd::WaitingWndState {
     Q_OBJECT
 public:
     StartWallet(const StateContext & context);
     virtual ~StartWallet() override;
+
+    virtual void deleteWaitingWnd() override { wnd = nullptr; }
 
 protected:
     virtual NextStateRespond execute() override;
@@ -20,7 +25,7 @@ private slots:
     void onInitWalletStatus(wallet::InitWalletStatus status);
 
 private:
-    QMetaObject::Connection slotConn;
+    wnd::WaitingWnd * wnd = nullptr;
 };
 
 }

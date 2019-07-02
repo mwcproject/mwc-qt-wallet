@@ -1,7 +1,7 @@
 #ifndef TRANSACTIONSW_H
 #define TRANSACTIONSW_H
 
-#include <QWidget>
+#include "../core/navwnd.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
@@ -14,7 +14,7 @@ namespace state {
 
 namespace wnd {
 
-class Transactions : public QWidget
+class Transactions : public core::NavWnd
 {
     Q_OBJECT
 
@@ -51,8 +51,6 @@ private:
     void requestTransactions();
 
     void updateButtons();
-
-    void updateAccountInfo(int accIdx);
 
     void initTableHeaders();
     void saveTableHeaders();

@@ -30,6 +30,7 @@ enum STATE {
     TEST_NEW_SEED,  // Test a word from the seed
     CREATE_WITH_SEED,// Init wallet with exist seed
     ACCOUNTS,       // Wallet accounts
+    ACCOUNT_TRANSFER, // Transfer funds from account to account
     EVENTS,         // Wallet events (logs)
     HODL,           // Hodl program.
 
@@ -46,7 +47,8 @@ enum STATE {
     OUTPUTS,        // Outputs for this wallet
     CONTACTS,       // Contact page. COntacts supported by wallet713
     WALLET_CONFIG,  // Wallet config
-    AIRDRDOP_MAIN  // Starting airdrop page
+    AIRDRDOP_MAIN,  // Starting airdrop page
+    SHOW_SEED       // Show Seed
 };
 
 struct NextStateRespond {
@@ -88,6 +90,8 @@ protected:
 public:
     State(const StateContext & context, STATE stateId);
     virtual ~State();
+
+    state::StateMachine * getStateMachine() const {return context.stateMachine;}
 
     void setWindowTitle( QString title );
 

@@ -11,7 +11,15 @@
 namespace state {
 
 SendOffline::SendOffline(const StateContext & context) :
-        State(context, STATE::SEND_OFFLINE ) {}
+        State(context, STATE::SEND_OFFLINE ) {
+
+    QObject::connect(context.wallet, &wallet::Wallet::onSendFile,
+                                   this, &SendOffline::respSendFile, Qt::QueuedConnection);
+
+    QObject::connect(context.wallet, &wallet::Wallet::onFinalizeFile,
+                                   this, &SendOffline::respFinalizeFile, Qt::QueuedConnection);
+
+}
 
 SendOffline::~SendOffline() {}
 
@@ -19,7 +27,8 @@ NextStateRespond SendOffline::execute() {
     if ( context.appContext->getActiveWndState() != STATE::SEND_OFFLINE  )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context.wndManager->switchToWindow( new wnd::SendOfflineSettings( context.wndManager->getInWndParent(), this ) );
+    settingsWnd = new wnd::SendOfflineSettings( context.wndManager->getInWndParent(), this );
+    context.wndManager->switchToWindow( settingsWnd );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
@@ -42,8 +51,8 @@ void SendOffline::prepareSendMwcOffline( const wallet::AccountInfo & account, QS
     // Switching the account async, we don't really need the response
     context.wallet->switchAccount( account.accountName );
 
-    sendFilesWnd = new wnd::SendOfflineFiles( context.wndManager->getInWndParent(), account, this );
-    context.wndManager->switchToWindow( sendFilesWnd );
+    filesWnd = new wnd::SendOfflineFiles( context.wndManager->getInWndParent(), account, this );
+    context.wndManager->switchToWindow( filesWnd );
 }
 
 QString SendOffline::getFileGenerationPath() {
@@ -55,9 +64,6 @@ void SendOffline::updateFileGenerationPath(QString path) {
 }
 
 void SendOffline::sendToFile(long nanoCoins, QString fileName) {
-    logger::logConnect("SendOffline", "onSend");
-    sendConnect = QObject::connect(context.wallet, &wallet::Wallet::onSendFile,
-                                   this, &SendOffline::respSendFile, Qt::QueuedConnection);
 
     context.wallet->sendFile( nanoCoins, fileName );
 }
@@ -70,25 +76,19 @@ void SendOffline::sendToFile(long nanoCoins, QString fileName) {
 }*/
 
 void SendOffline::publishTransaction( QString fileName ) {
-    logger::logConnect("SendOffline", "onFinalizeFile");
-    sendConnect = QObject::connect(context.wallet, &wallet::Wallet::onFinalizeFile,
-                                   this, &SendOffline::respFinalizeFile, Qt::QueuedConnection);
     context.wallet->finalizeFile( fileName );
 }
 
 
 void SendOffline::respSendFile( bool success, QStringList errors, QString fileName ) {
-    logger::logDisconnect("SendOffline", "onSend");
-    QObject::disconnect(sendConnect);
-
-    if (sendFilesWnd) {
+    if (filesWnd) {
         QString message;
         if (success)
             message = "Transaction file was successfully generated at " + fileName;
         else
             message = "Unable to generate transaction file.\n" + util::formatErrorMessages(errors);
 
-        sendFilesWnd->onTransactionActionIsFinished( success, message );
+        filesWnd->onTransactionActionIsFinished( success, message );
 
         if (success)
             context.stateMachine->setActionWindow(STATE::SEND_ONLINE_OFFLINE);
@@ -114,17 +114,14 @@ void SendOffline::respSendFile( bool success, QStringList errors, QString fileNa
 }*/
 
 void SendOffline::respFinalizeFile( bool success, QStringList errors, QString fileName ) {
-    logger::logDisconnect("SendOffline", "onFinalizeFile");
-    QObject::disconnect(sendConnect);
-
-    if (sendFilesWnd) {
+    if (filesWnd) {
         QString message;
         if (success)
             message = "Transaction file was successfully published";
         else
             message = "Unable to publish file transaction.\n" + util::formatErrorMessages(errors);
 
-        sendFilesWnd->onTransactionActionIsFinished( success, message );
+        filesWnd->onTransactionActionIsFinished( success, message );
 
         if (success)
             context.stateMachine->setActionWindow(STATE::SEND_ONLINE_OFFLINE);

@@ -48,6 +48,20 @@ void AccountInfo::setData(QString account,
     mwcServerBroken = _mwcServerBroken;
 }
 
+QString AccountInfo::getLongAccountName() const {
+    return accountName + "  Total: " + util::nano2one(total) + "mwc  " +
+                "Spendable: " + util::nano2one(currentlySpendable) + "  Locked: " +
+                util::nano2one(lockedByPrevTransaction) +
+                "  Awaiting Confirmation: " + util::nano2one(awaitingConfirmation);
+}
+
+// return true is this account can be concidered as deleted
+bool AccountInfo::isDeleted() const {
+    return  accountName.startsWith( mwc::DEL_ACCONT_PREFIX ) &&
+            total == 0 && awaitingConfirmation==0 && lockedByPrevTransaction==0 && currentlySpendable==0;
+}
+
+
 void WalletConfig::saveData( QDataStream & out) const {
     out << 0x32189;
 

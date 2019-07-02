@@ -7,6 +7,10 @@
 #include "../core/testseedtask.h"
 #include <QObject>
 
+namespace wnd {
+class NewSeedTest;
+}
+
 namespace state {
 
 class NewSeedTest : public QObject, public State
@@ -15,6 +19,8 @@ class NewSeedTest : public QObject, public State
 public:
     NewSeedTest(const StateContext & context);
     virtual ~NewSeedTest() override;
+
+    void deleteWnd() {wnd= nullptr;}
 
     void submit(QString word);
 
@@ -25,8 +31,9 @@ private slots:
     void onWalletBalanceUpdated();
 
 private:
+    wnd::NewSeedTest * wnd = nullptr;
     core::TestSeedTask currentTask;
-    QMetaObject::Connection slotConn;
+
 };
 
 }

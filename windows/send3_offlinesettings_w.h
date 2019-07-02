@@ -1,7 +1,7 @@
 #ifndef SEND3_OFFLINESETTINGS_H
 #define SEND3_OFFLINESETTINGS_H
 
-#include <QWidget>
+#include "../core/navwnd.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
@@ -15,7 +15,7 @@ class SendOffline;
 
 namespace wnd {
 
-class SendOfflineSettings : public QWidget
+class SendOfflineSettings : public core::NavWnd
 {
     Q_OBJECT
 

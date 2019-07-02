@@ -5,9 +5,10 @@
 
 namespace wnd {
 
-WaitingWnd::WaitingWnd(QWidget *parent, QString title, QString progressMessage) :
+WaitingWnd::WaitingWnd(QWidget *parent, WaitingWndState * _state, QString title, QString progressMessage) :
     QWidget(parent),
-    ui(new Ui::WaitingWnd)
+    ui(new Ui::WaitingWnd),
+    state(_state)
 {
     ui->setupUi(this);
 
@@ -19,6 +20,7 @@ WaitingWnd::WaitingWnd(QWidget *parent, QString title, QString progressMessage) 
 
 WaitingWnd::~WaitingWnd()
 {
+    state->deleteWaitingWnd();
     delete ui;
 }
 

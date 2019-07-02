@@ -47,7 +47,7 @@ private:
 
 class TaskRecover1Type : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000; //
+    const static long TIMEOUT = 5000; //
 
     // Expected that listening is already stopped
     TaskRecover1Type( MWC713 *wallet713 ) :
@@ -63,7 +63,7 @@ public:
 
 class TaskRecover2Mnenonic : public Mwc713Task {
 public:
-    const static long TIMEOUT = 2000; //
+    const static long TIMEOUT = 5000; //
 
     // Expected that listening is already stopped
     TaskRecover2Mnenonic( MWC713 *wallet713, QVector<QString> seed ) :
@@ -96,6 +96,27 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 };
 
+///////////////////////////////////////////////////////////////
+////////////////////////
+
+// Just show mnenonic
+class TaskRecoverShowMnenonic : public Mwc713Task {
+public:
+    const static long TIMEOUT = 5000; //
+
+    // Expected that listening is already stopped
+    TaskRecoverShowMnenonic( MWC713 *wallet713, QString password ) :
+            Mwc713Task("TaskRecover", "recover -d -p " + password, wallet713, "get mnemonic seed") {}
+
+    virtual ~TaskRecoverShowMnenonic() override {}
+
+    virtual void onStarted() override;
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+
+};
 
 
 }

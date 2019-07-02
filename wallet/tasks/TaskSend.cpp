@@ -21,6 +21,8 @@ bool TaskSlatesListener::processTask(const QVector<WEvent> & events) {
         if (prms.size()==3) {
             wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
                        "Send slate " + prms[0] + " for " + util::zeroDbl2Dbl( prms[1] ) + " mwc was sent to " + prms[2] );
+
+            wallet713->reportSlateSend( prms[0], util::zeroDbl2Dbl( prms[1] ), prms[2] );
         }
         return true;
     }
@@ -30,6 +32,7 @@ bool TaskSlatesListener::processTask(const QVector<WEvent> & events) {
         if (prms.size()==3) {
             wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
                        "Received slate " + prms[0] + " for " + util::zeroDbl2Dbl( prms[2] ) + " mwc from " + prms[1] );
+            wallet713->reportSlateRecieved( prms[0], util::zeroDbl2Dbl( prms[2] ), prms[1] );
         }
         return true;
     }
@@ -39,6 +42,7 @@ bool TaskSlatesListener::processTask(const QVector<WEvent> & events) {
         if (prms.size()==1) {
             wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
                        "Finalized slate " + prms[0] );
+            wallet713->reportSlateFinalized( prms[0] );
         }
         return true;
     }
@@ -48,7 +52,27 @@ bool TaskSlatesListener::processTask(const QVector<WEvent> & events) {
 
 }
 
+// ---------------- TaskSetReceiveAccount -----------------------
 
+bool TaskSetReceiveAccount::processTask(const QVector<WEvent> &events) {
+
+    QVector< WEvent > okresp = filterEvents(events, WALLET_EVENTS::S_SET_RECEIVE );
+
+    if ( okresp.size()>0 ) {
+        wallet713->setSetReceiveAccount( true, okresp[0].message );
+        return true;
+    }
+
+    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    if (errs.size()>0) {
+        wallet713->setSetReceiveAccount( false, okresp[0].message );
+    }
+    else {
+        wallet713->setSetReceiveAccount( false, "Unknown error, didn't get expected respond from mwc713" );
+    }
+
+    return true;
+}
 
 // ------------------------ TaskSendMwc --------------------------------
 

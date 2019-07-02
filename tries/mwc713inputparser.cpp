@@ -159,12 +159,6 @@ void Mwc713InputParser::initMwcMqAddress() {
 }
 
 void Mwc713InputParser::initInitWalletWorkflow() {
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_INIT_IN_PROGRESS,
-         QVector<BaseTrieSection*>{
-              new TrieNewLineSection(),
-              new TriePhraseSection("Initialising a new wallet")
-         }));
-
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_PASSWORD_EXPECTED,
          QVector<BaseTrieSection*>{
@@ -273,6 +267,8 @@ void Mwc713InputParser::initRecovery() {
                                                         new TrieAnySection(100, TrieAnySection::NUMBERS,"","", 2), // current position
                                                         new TriePhraseSection(")")
                                                 }));
+
+    //
 }
 
 void Mwc713InputParser::initAccount() {
@@ -305,27 +301,19 @@ void Mwc713InputParser::initAccount() {
                                                         new TriePhraseSection("' as of height "),
                                                         // Height
                                                         new TrieAnySection(100, TrieAnySection::NUMBERS, "","", 2 ),
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "",""),
-                                                        new TrieNewLineSection(),
-                                                        new TrieNewLineSection(),
-                                                        new TriePhraseSection(" Total                            | "),
-                                                        new TrieAnySection(100, TrieAnySection::NUMBERS|TrieAnySection::NOT_NEW_LINE, ".","", 3),
-                                                        new TrieNewLineSection(),
-                                                        new TriePhraseSection(" Awaiting Confirmation (< 10)     | "),
-                                                        new TrieAnySection(100, TrieAnySection::NUMBERS|TrieAnySection::NOT_NEW_LINE, ".","", 4),
-                                                        new TrieNewLineSection(),
-                                                        new TriePhraseSection(" Locked by previous transaction   | "),
-                                                        new TrieAnySection(100, TrieAnySection::NUMBERS|TrieAnySection::NOT_NEW_LINE, ".","", 5),
-                                                        new TrieNewLineSection(),
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "",""),
-                                                        new TrieNewLineSection(),
-                                                        new TriePhraseSection(" Currently Spendable              | "),
-                                                        new TrieAnySection(100, TrieAnySection::NUMBERS|TrieAnySection::NOT_NEW_LINE, ".","", 6),
-                                                        new TrieNewLineSection()
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","")
                                                 }));
 }
 
 void Mwc713InputParser::initSend() {
+
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SET_RECEIVE,
+                                                QVector<BaseTrieSection*>{
+                                                        new TrieNewLineSection(),
+                                                        new TriePhraseSection("Incoming funds will be received in account: \""),
+                                                        new TrieAnySection(4000, TrieAnySection::NOT_NEW_LINE, "","\"", 1)
+                                                }));
+
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_FILE_TRANS_CREATED,
                                                 QVector<BaseTrieSection*>{
                                                         new TrieNewLineSection(),

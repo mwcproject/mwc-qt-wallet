@@ -15,7 +15,8 @@
         <file>resource/dialogs_style.css</file>
         <file>img/loading.gif</file>
         <file>resource/mwc-gui-wallet.conf</file>
-        <file>resource/wallet713.toml</file>
+        <file>resource/wallet713_mac.toml</file>
+        <file>resource/wallet713_def.toml</file>
         <file>img/StatusEmpty.png</file>
         <file>img/SendOffline.png</file>
         <file>img/SendOnline.png</file>
@@ -31,5 +32,7 @@
         <file>img/NavNotificationActive.png</file>
         <file>img/NavNotificationNormal.png</file>
         <file>img/NavSettings.png</file>
+        <file>img/Add.png</file>
+        <file>img/Transfer.png</file>
     </qresource>
 </RCC>

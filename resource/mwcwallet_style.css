@@ -420,7 +420,7 @@ control--NavMenuButton {
     border-radius: 4px;
     background: transparent;
 
-    font-size: 12px;
+    font-size: 13px;
 }
 
 control--NavMenuButton:focus {
@@ -434,5 +434,5 @@ control--NavMenuButton:pressed {
 core--NavMenu {
     border: 2px solid #FFFFFF;
     border-radius: 6px;
-    background: transparent;
+    background: #3600C9;
 }

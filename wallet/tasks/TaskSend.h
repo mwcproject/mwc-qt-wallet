@@ -19,6 +19,25 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>();}
 };
 
+////////////////////////////////////     set-recv       ///////////////
+
+class TaskSetReceiveAccount : public Mwc713Task {
+public:
+    const static long TIMEOUT = 1000*2;
+
+    TaskSetReceiveAccount( MWC713 *wallet713, QString account, QString password ) :
+            Mwc713Task("TaskSetReceiveAccount",
+                       QString("set-recv \"") + account + "\" -p " + password,
+                       wallet713, "set-recv for " + account) {}
+
+    virtual ~TaskSetReceiveAccount() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+};
+
+
 //////////////////////////////////////////////////////////////////
 
 class TaskSendMwc : public QObject, public Mwc713Task {

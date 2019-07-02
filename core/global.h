@@ -19,6 +19,7 @@ const QString PROMPTS_MWC713 = "<<+)mwc713(+>>";
 const QString DATETIME_TEMPLATE_MWC713 = "yyyy-MM-dd hh:mm:ss";
 const QString DATETIME_TEMPLATE_THIS = "hh:mm:ss dd-MM-yyyy";
 
+const QString DEL_ACCONT_PREFIX = "del_";
 
 void setApplication(QApplication * app, QMainWindow * mainWindow);
 

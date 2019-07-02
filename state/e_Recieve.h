@@ -16,6 +16,10 @@ public:
     Recieve(const StateContext & context);
     virtual ~Recieve() override;
 
+    QString  getReceiveAccount();
+    void  setReceiveAccount(QString accountName );
+    QVector<wallet::AccountInfo>  getWalletBalance();
+
     QString getFileGenerationPath();
     void updateFileGenerationPath(QString path);
 

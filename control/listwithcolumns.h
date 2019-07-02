@@ -20,6 +20,9 @@ public:
     void setColumnWidths(QVector<int> widths);
     QVector<int> getColumnWidths() const;
 
+    // Get current selected row.
+    int getSelectedRow() const;
+
     // clear the data
     void clearData();
 

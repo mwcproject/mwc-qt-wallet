@@ -72,6 +72,9 @@ p, li { white-space: pre-wrap; }
        <property name="acceptRichText">
         <bool>true</bool>
        </property>
+       <property name="placeholderText">
+        <string>Waiting for the seed from mwc713...</string>
+       </property>
       </widget>
      </item>
      <item>

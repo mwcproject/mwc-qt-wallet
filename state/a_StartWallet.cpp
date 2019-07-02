@@ -10,7 +10,9 @@ namespace state {
 // Init the wallet. Then check how it is started. If it needs to have password or something
 StartWallet::StartWallet(const StateContext & context) :
         State(context, STATE::START_WALLET)
-{}
+{
+    QObject::connect( context.wallet, &wallet::Wallet::onInitWalletStatus, this, &StartWallet::onInitWalletStatus, Qt::QueuedConnection );
+}
 
 StartWallet::~StartWallet() {
 }
@@ -24,12 +26,9 @@ NextStateRespond StartWallet::execute() {
     if (status == wallet::InitWalletStatus::NONE) {
         // starting the wallet. Then will check what we need
 
-        context.wndManager->switchToWindow(
-                new wnd::WaitingWnd( context.wndManager->getInWndParent(),
-                        "Starting mwc713", "Please wait for mwc713 process starting..." ) );
-
-        logger::logConnect("StartWallet", "onInitWalletStatus" );
-        slotConn = QObject::connect( context.wallet, &wallet::Wallet::onInitWalletStatus, this, &StartWallet::onInitWalletStatus, Qt::QueuedConnection );
+        wnd = new wnd::WaitingWnd( context.wndManager->getInWndParent(), this,
+                                   "Starting mwc713", "Please wait for mwc713 process starting..." );
+        context.wndManager->switchToWindow( wnd );
 
         context.wallet->start();
         return NextStateRespond(NextStateRespond::RESULT::WAIT_FOR_ACTION);
@@ -42,15 +41,15 @@ NextStateRespond StartWallet::execute() {
 
 
 void StartWallet::onInitWalletStatus(wallet::InitWalletStatus status) {
-    logger::logRecieve("StartWallet", "onInitWalletStatus", toString(status) );
-    // Listen for the changes...
+    if (wnd== nullptr)
+        return; // wnd as indicator that we are active
+
+    logger::logInfo("StartWallet", "Processing wallet status " + toString(status) );
 
     switch (status) {
         case wallet::InitWalletStatus::READY:
         case wallet::InitWalletStatus::NEED_INIT:
         case wallet::InitWalletStatus::NEED_PASSWORD: {
-            QObject::disconnect(slotConn);
-            logger::logDisconnect("StartWallet", "onInitWalletStatus" );
             context.stateMachine->executeFrom(STATE::STATE_INIT);
             return;
         }

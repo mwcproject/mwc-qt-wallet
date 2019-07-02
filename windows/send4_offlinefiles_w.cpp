@@ -9,7 +9,7 @@
 namespace wnd {
 
 SendOfflineFiles::SendOfflineFiles(QWidget *parent, const wallet::AccountInfo & _account, state::SendOffline * _state) :
-    QWidget(parent),
+    core::NavWnd(parent, _state->getStateMachine() ),
     ui(new Ui::SendOfflineFiles),
     state(_state),
     account(_account)

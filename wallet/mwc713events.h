@@ -29,7 +29,6 @@ enum WALLET_EVENTS {
     S_YOUR_MWC_ADDRESS=11, // Your mwc address/Your mwcmq address:...  Message: address
     S_MWC_ADDRESS_INDEX = 12, // Derived with index [7]     Message: index
 
-    S_INIT_IN_PROGRESS=13, // "Initialising a new wallet"
     S_PASSWORD_EXPECTED=14, // Password:
     S_PASS_PHRASE=15, // Passphrase from inti process
     S_INIT_WANT_ENTER=16, // Press ENTER when you have done so
@@ -57,16 +56,17 @@ enum WALLET_EVENTS {
 
     // Accounts
     S_ACCOUNTS_TITLE = 40,
-    S_ACCOUNTS_INFO_SUM = 41, // All coound info. Pretty large payload, has 6 message items
+    S_ACCOUNTS_INFO_SUM = 41, // Account header info. The rest of data will come in lines...
 
     // Send
     S_FILE_TRANS_CREATED = 50,
     S_FILE_RECEIVED = 51,
     S_FILE_TRANS_FINALIZED = 52,
-
     S_SLATE_WAS_SENT = 55,
     S_SLATE_WAS_RECEIVED = 56,
     S_SLATE_WAS_FINALIZED = 57,
+
+    S_SET_RECEIVE = 58,
 
     S_TRANSACTION_LOG = 60,
 

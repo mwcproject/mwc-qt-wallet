@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NavMenyAccount</class>
- <widget class="QWidget" name="NavMenyAccount">
+ <class>NavMenuAccount</class>
+ <widget class="QFrame" name="NavMenuAccount">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>240</width>
-    <height>173</height>
+    <width>189</width>
+    <height>151</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="control::NavMenuButton" name="pushButton_2">
+  <widget class="control::NavMenuButton" name="seedButton">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>60</y>
-     <width>200</width>
-     <height>50</height>
+     <x>9</x>
+     <y>54</y>
+     <width>170</width>
+     <height>38</height>
     </rect>
    </property>
    <property name="text">
-    <string>Outputs</string>
+    <string>Seed</string>
    </property>
   </widget>
   <widget class="control::MwcFrameWithBorder" name="frame_2">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>57</y>
-     <width>200</width>
+     <x>16</x>
+     <y>48</y>
+     <width>154</width>
      <height>2</height>
     </rect>
    </property>
@@ -42,25 +42,25 @@
     <enum>QFrame::Raised</enum>
    </property>
   </widget>
-  <widget class="control::NavMenuButton" name="pushButton_3">
+  <widget class="control::NavMenuButton" name="contactsButton">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>117</y>
-     <width>200</width>
-     <height>50</height>
+     <x>9</x>
+     <y>102</y>
+     <width>170</width>
+     <height>38</height>
     </rect>
    </property>
    <property name="text">
-    <string>mwc Box</string>
+    <string>Contacts</string>
    </property>
   </widget>
   <widget class="control::MwcFrameWithBorder" name="frame_3">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>111</y>
-     <width>200</width>
+     <x>16</x>
+     <y>96</y>
+     <width>154</width>
      <height>2</height>
     </rect>
    </property>
@@ -71,17 +71,17 @@
     <enum>QFrame::Raised</enum>
    </property>
   </widget>
-  <widget class="control::NavMenuButton" name="pushButton">
+  <widget class="control::NavMenuButton" name="accountsButton">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>9</x>
      <y>6</y>
-     <width>200</width>
-     <height>50</height>
+     <width>170</width>
+     <height>38</height>
     </rect>
    </property>
    <property name="text">
-    <string>Wallet Configuration</string>
+    <string>Accounts</string>
    </property>
   </widget>
  </widget>

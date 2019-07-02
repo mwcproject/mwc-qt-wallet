@@ -87,5 +87,20 @@ void Recieve::onMwcAddressWithIndex(QString mwcAddress, int idx) {
 }
 
 
+QString  Recieve::getReceiveAccount() {
+    return context.appContext->getReceiveAccount();
+}
+
+void  Recieve::setReceiveAccount(QString accountName ) {
+    context.appContext->setReceiveAccount(accountName);
+    context.wallet->setReceiveAccount(accountName);
+    // feedback will be ignored. Errors will go to the events naturally
+}
+
+QVector<wallet::AccountInfo>  Recieve::getWalletBalance() {
+    return context.wallet->getWalletBalance();
+}
+
+
 
 }

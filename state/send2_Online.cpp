@@ -9,7 +9,10 @@
 namespace state {
 
 SendOnline::SendOnline(const StateContext &context):
-        State(context, STATE::SEND_ONLINE ) {}
+        State(context, STATE::SEND_ONLINE ) {
+    QObject::connect(context.wallet, &wallet::Wallet::onSend,
+                                   this, &SendOnline::sendRespond, Qt::QueuedConnection);
+}
 
 SendOnline::~SendOnline() {}
 
@@ -44,24 +47,18 @@ void SendOnline::updateSendCoinsParams(const core::SendCoinsParams &params) {
 // Request for MWC to send
 void SendOnline::sendMwc(const wallet::AccountInfo &account, QString address, long mwcNano, QString message) {
 
-    logger::logConnect("SendOnline", "onSend");
-    sendConnect = QObject::connect(context.wallet, &wallet::Wallet::onSend,
-                                               this, &SendOnline::sendRespond, Qt::QueuedConnection);
     core::SendCoinsParams prms = context.appContext->getSendCoinsParams();
     context.wallet->sendTo( account, mwcNano, address, message, prms.inputConfirmationNumber, prms.changeOutputs );
 }
 
 void SendOnline::sendRespond( bool success, QStringList errors ) {
 
-    logger::logDisconnect("SendOnline", "onSend");
-    QObject::disconnect(sendConnect);
-
     if (wnd) {
-        wnd->sendRespond( success, errors );
-    }
+        wnd->sendRespond(success, errors);
 
-    if (success)
-        context.stateMachine->setActionWindow(STATE::SEND_ONLINE_OFFLINE);
+        if (success)
+            context.stateMachine->setActionWindow(STATE::SEND_ONLINE_OFFLINE);
+    }
 }
 
 

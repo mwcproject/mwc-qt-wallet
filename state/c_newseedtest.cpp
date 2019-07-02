@@ -14,6 +14,8 @@ namespace state {
 NewSeedTest::NewSeedTest(const StateContext & context) :
     State( context, STATE::TEST_NEW_SEED )
 {
+    QObject::connect( context.wallet, &wallet::Wallet::onWalletBalanceUpdated,
+                                 this, &NewSeedTest::onWalletBalanceUpdated, Qt::QueuedConnection );
 }
 
 NewSeedTest::~NewSeedTest() {
@@ -36,9 +38,6 @@ NextStateRespond NewSeedTest::execute() {
             control::MessageBox::message(nullptr, "Congratulations!", "Thank you for confirming all words from your passphrase. Your wallet was successfully created");
 
             // Updating the wallet balance
-            logger::logConnect("InputPassword", "onWalletBalanceUpdated" );
-            slotConn = QObject::connect( context.wallet, &wallet::Wallet::onWalletBalanceUpdated,
-                    this, &NewSeedTest::onWalletBalanceUpdated, Qt::QueuedConnection );
             context.wallet->updateWalletBalance();
 
             return NextStateRespond(NextStateRespond::RESULT::WAIT_FOR_ACTION);
@@ -52,16 +51,17 @@ NextStateRespond NewSeedTest::execute() {
     task.pop_back();
     context.appContext->pushCookie< QVector< core::TestSeedTask > >("seedTasks", task);
 
-    context.wndManager->switchToWindow(
-                new wnd::NewSeedTest( context.wndManager->getInWndParent(), this, currentTask.getWordIndex() ) );
+    wnd = new wnd::NewSeedTest( context.wndManager->getInWndParent(), this, currentTask.getWordIndex() );
+    context.wndManager->switchToWindow( wnd );
 
     return NextStateRespond(NextStateRespond::RESULT::WAIT_FOR_ACTION);
 }
 
 // Account info is updated
 void NewSeedTest::onWalletBalanceUpdated() {
-    logger::logDisconnect("InputPassword", "onWalletBalanceUpdated" );
-    QObject::disconnect(slotConn);
+
+    if (!wnd) // wnd as active state
+        return;
 
     context.stateMachine->executeFrom(STATE::TEST_NEW_SEED);
 }

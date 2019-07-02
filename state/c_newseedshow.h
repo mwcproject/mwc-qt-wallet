@@ -6,13 +6,18 @@
 
 namespace state {
 
-class NewSeedShow : public State
+class SubmitCaller {
+public:
+    virtual void submit() = 0;
+};
+
+class NewSeedShow : public State, public SubmitCaller
 {
 public:
     NewSeedShow(const StateContext & context);
     virtual ~NewSeedShow() override;
 
-    void submit();
+    virtual void submit() override;
 protected:
     virtual NextStateRespond execute() override;
 };

@@ -6,7 +6,7 @@
 namespace wnd {
 
 SendOfflineSettings::SendOfflineSettings(QWidget *parent, state::SendOffline * _state) :
-    QWidget(parent),
+    core::NavWnd(parent, _state->getStateMachine() ),
     ui(new Ui::SendOfflineSettings),
     state(_state)
 {
@@ -22,6 +22,7 @@ SendOfflineSettings::SendOfflineSettings(QWidget *parent, state::SendOffline * _
 
 SendOfflineSettings::~SendOfflineSettings()
 {
+    state->deletedSendOfflineSettings();
     delete ui;
 }
 

@@ -19,7 +19,6 @@ QString toString(WALLET_EVENTS event) {
         case S_GENERIC_ERROR:   return "S_GENERIC_ERROR";
         case S_YOUR_MWC_ADDRESS:return "S_YOUR_MWC_ADDRESS";
         case S_MWC_ADDRESS_INDEX:return "S_MWC_ADDRESS_INDEX";
-        case S_INIT_IN_PROGRESS:return "S_INIT_IN_PROGRESS";
         case S_PASSWORD_EXPECTED:return "S_PASSWORD_EXPECTED";
         case S_PASS_PHRASE:     return "S_PASS_PHRASE";
         case S_INIT_WANT_ENTER: return "S_INIT_WANT_ENTER";
@@ -53,6 +52,7 @@ QString toString(WALLET_EVENTS event) {
         case S_SLATE_WAS_SENT:      return "S_SLATE_WAS_SENT";
         case S_SLATE_WAS_RECEIVED:  return "S_SLATE_WAS_RECEIVED";
         case S_SLATE_WAS_FINALIZED: return "S_SLATE_WAS_FINALIZED";
+        case S_SET_RECEIVE:         return "S_SET_RECEIVE";
 
         case S_TRANSACTION_LOG:     return "S_TRANSACTION_LOG";
 

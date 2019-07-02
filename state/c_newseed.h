@@ -19,7 +19,6 @@ protected:
 protected slots:
     void onNewSeed(QVector<QString> seed);
 private:
-    QMetaObject::Connection slotConn;
 };
 
 }

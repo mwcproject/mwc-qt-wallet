@@ -17,6 +17,8 @@ public:
     SendOnline(const StateContext & context);
     virtual ~SendOnline() override;
 
+    void deleteWnd() {wnd = nullptr;}
+
     QVector<wallet::AccountInfo> getWalletBalance();
     QVector<wallet::WalletContact> getContacts();
 
@@ -34,7 +36,6 @@ private slots:
 
 private:
     wnd::SendOnline * wnd = nullptr; // not own, just a pointer
-    QMetaObject::Connection sendConnect;
 };
 
 

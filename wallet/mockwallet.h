@@ -21,7 +21,7 @@ public:
 
 
     virtual void start() noexcept(false) override;
-    virtual void loginWithPassword(QString password, QString account) noexcept(false) override;
+    virtual void loginWithPassword(QString password) noexcept(false) override;
 
     virtual InitWalletStatus getWalletStatus() noexcept(false) override {return initStatus;}
 
@@ -96,7 +96,7 @@ public:
     virtual NodeStatus getNodeStatus() noexcept(false) override;
 
     // -------------- Transactions
-    virtual QVector<AccountInfo> getWalletBalance() noexcept(false) override;
+    virtual QVector<AccountInfo> getWalletBalance(bool filterDeleted) const noexcept(false) override;
 
     // Cancel transaction
     // Check Signal:  onCancelTransacton

@@ -3,21 +3,26 @@
 
 #include <QWidget>
 
+namespace state {
+class StateMachine;
+}
+
 namespace core {
 
-class TopRightButtons;
+class NavBar;
+class NavMenuAccount;
 
 // Window with navigation bar
 class NavWnd : public QWidget {
 Q_OBJECT
 public:
-    explicit NavWnd(QWidget *parent);
+    explicit NavWnd(QWidget *parent, state::StateMachine * stateMachine, bool createNavigationButtons=true);
 
 protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
-    TopRightButtons * topRightButtonWnd = nullptr;
+    NavBar * topRightButtonWnd = nullptr;
 };
 
 }

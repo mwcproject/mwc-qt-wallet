@@ -9,7 +9,7 @@
 namespace wnd {
 
 Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
-    QWidget(parent),
+    core::NavWnd(parent, _state->getStateMachine() ),
     ui(new Ui::Transactions),
     state(_state)
 {
@@ -45,10 +45,10 @@ void Transactions::initTableHeaders() {
     // Disabling to show the grid
     // Creatign columns
     QVector<int> widths = state->getColumnsWidhts();
-    if ( widths.size() != 9 ) {
-        widths = QVector<int>{30,90,150,200,100,50,100,50,50};
+    if ( widths.size() != 7 ) {
+        widths = QVector<int>{30,100,150,200,100,100,100};
     }
-    Q_ASSERT( widths.size() == 9 );
+    Q_ASSERT( widths.size() == 7 );
 
     ui->transactionTable->setColumnWidths( widths );
 }
@@ -113,10 +113,8 @@ void Transactions::setTransactionData(QString account, long height, const QVecto
                 trans.txid,
                 trans.address,
                 trans.creationTime,
-                (trans.confirmed ? "YES":"NO"),
-                trans.confirmationTime,
                 util::nano2one(trans.coinNano),
-                (trans.proof ? "YES":"NO")
+                (trans.confirmed ? "YES":"NO")
         }, selection );
     }
 
@@ -155,11 +153,7 @@ void Transactions::requestTransactions() {
 
 // return null if nothing was selected
 wallet::WalletTransaction * Transactions::getSelectedTransaction() {
-    QList<QTableWidgetItem *> selItms = ui->transactionTable->selectedItems();
-    if (selItms.size()==0)
-        return nullptr;
-
-    int row = selItms.front()->row();
+    int row = ui->transactionTable->getSelectedRow();
     if (row<0 || row>=transactions.size())
         return nullptr;
 
@@ -227,7 +221,6 @@ void Transactions::on_transactionTable_itemSelectionChanged()
 void Transactions::on_accountComboBox_activated(int index)
 {
     if (index>=0 && index<accountInfo.size()) {
-        updateAccountInfo(index);
         state->switchCurrentAccount( accountInfo[index] );
         requestTransactions();
     }
@@ -273,29 +266,9 @@ void Transactions::updateWalletBalance() {
         if (info.accountName == selectedAccount)
             selectedAccIdx = idx;
 
-        ui->accountComboBox->addItem( info.accountName + "    Total: " + util::nano2one( info.total ) + "mwc  " +
-                                      "Spendable: " + util::nano2one(info.currentlySpendable) + "  Locked: " + util::nano2one(info.lockedByPrevTransaction) +
-                                      "  Awaiting Confirmation: " + util::nano2one( info.awaitingConfirmation ),
-                                      QVariant(idx++) );
-
-//                                      + util::nano2one(info.currentlySpendable) + " of " + util::nano2one(info.total) + " mwc", QVariant(idx++) );
+        ui->accountComboBox->addItem( info.getLongAccountName(), QVariant(idx++) );
     }
     ui->accountComboBox->setCurrentIndex(selectedAccIdx);
-    updateAccountInfo(selectedAccIdx);
-}
-
-void Transactions::updateAccountInfo(int accIdx) {
-    if (accIdx<0 || accIdx>=accountInfo.size())
-        return;
-
-    ui->accInfoFrame->hide();
-
-    wallet::AccountInfo info = accountInfo[accIdx];
-
-    ui->totalLabel->setText( "Total:            " + util::nano2one( info.total ) + " mwc" );
-    ui->awaitingLabel->setText( "Awaiting Confirmation: " + util::nano2one( info.awaitingConfirmation ) + " mwc" );
-    ui->lockedLabel->setText( "Locked by prev. transactions: " + util::nano2one( info.lockedByPrevTransaction ) + " mwc" );
-    ui->spendableLabel->setText( "Currently Spendable: " + util::nano2one( info.currentlySpendable ) + " mwc" );
 }
 
 

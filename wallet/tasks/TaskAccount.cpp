@@ -67,27 +67,74 @@ bool TaskAccountList::processTask(const QVector<WEvent> &events) {
 // ----------------------- TaskAccountCreate -------------------------------
 
 bool TaskAccountCreate::processTask(const QVector<WEvent> &events) {
-    if ( events.size()!=1 && events[0].event == WALLET_EVENTS::S_READY ) {
+    if ( events.size()==1 && events[0].event == WALLET_EVENTS::S_READY )
         wallet713->createNewAccount( newAccountName );
-        return true;
-    }
-    return false;
+    else
+        wallet713->createNewAccount( "" );
+
+    return true;
 }
 
 // ---------------------------- TaskAccountSwitch -------------------------
 
 bool TaskAccountSwitch::processTask(const QVector<WEvent> &events) {
-    if ( events.size()!=1 && events[0].event == WALLET_EVENTS::S_READY ) {
+    if ( events.size()!=1 && events[0].event == WALLET_EVENTS::S_READY )
         wallet713->switchToAccount( switchAccountName );
+    else
+        wallet713->switchToAccount( "" );
+
+    return true;
+}
+
+// ------------------------- TaskAccountRename --------------------------
+
+bool TaskAccountRename::processTask(const QVector<WEvent> &events) {
+    QVector< WEvent > lns = filterEvents( events, WALLET_EVENTS::S_LINE );
+    QVector< WEvent > errors = filterEvents( events, WALLET_EVENTS::S_ERROR );
+
+    // Check for success...
+    // rename acct from 'second' to 'forth'
+    bool ok = false;
+    for (auto & ln : lns) {
+        if (ln.message.contains("rename acct from") && ln.message.contains("' to '")) {
+            ok = true;
+            break;
+        }
+    }
+
+    if (ok) {
+        wallet713->updateRenameAccount(oldName, newName, createAccountSimulation,
+                                           true, "");
         return true;
     }
-    return false;
+    else {
+        QString errorMessage;
+        if (errors.isEmpty()) {
+            errorMessage = "Didn't get expected reply form mwc713";
+        }
+        else {
+            errorMessage = errors[0].message;
+        }
+
+        wallet713->updateRenameAccount(oldName, newName, createAccountSimulation, false, errorMessage);
+        return true;
+    }
 }
 
 // ------------------------- TaskAccountInfo --------------------------
+
+static long extractMwc( const QString & str ) {
+    int idx = str.lastIndexOf('|');
+    if (idx<0)
+        return -1;
+
+    return str.mid(idx+1).trimmed().remove('.').toLong();
+}
+
 bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
     QVector< WEvent > infoEvts = filterEvents( events, WALLET_EVENTS::S_ACCOUNTS_INFO_SUM );
     QVector< WEvent > warnings = filterEvents( events, WALLET_EVENTS::S_GENERIC_WARNING );
+    QVector< WEvent > lns = filterEvents( events, WALLET_EVENTS::S_LINE );
 
     if ( infoEvts.size()!=1 ) {
         wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::CRITICAL, MWC713::MESSAGE_ID::GENERIC, "Unable to mwc713 'info' about current account" );
@@ -95,7 +142,7 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
     }
 
     QStringList infoData = infoEvts[0].message.split('|');
-    bool ok = (infoData.size()==6);
+    bool ok = (infoData.size()==2);
     QString currentAccountName;
     if (ok)
         currentAccountName = infoData[0];
@@ -105,27 +152,41 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
         height = infoData[1].toLong(&ok);
     }
 
-    long totalNano = 0;
-    if (ok) {
-        totalNano = infoData[2].remove('.').toLong(&ok);
+    int lnIdx = 0;
+    long totalNano = -1;
+    for ( ; lnIdx<lns.size(); lnIdx++ ) {
+        if ( lns[lnIdx].message.contains("Total ") ) {
+            totalNano = extractMwc(lns[lnIdx].message);
+            break;
+        }
+    }
+    //
+
+    long waitingConfNano = -1;
+    for ( ; lnIdx<lns.size(); lnIdx++ ) {
+        if ( lns[lnIdx].message.contains("Awaiting Confirmation ") ) {
+            waitingConfNano = extractMwc(lns[lnIdx].message);
+            break;
+        }
     }
 
-    long waitingConfNano = 0;
-    if (ok) {
-        waitingConfNano = infoData[3].remove('.').toLong(&ok);
+    long lockedNano = -1;
+    for ( ; lnIdx<lns.size(); lnIdx++ ) {
+        if ( lns[lnIdx].message.contains("Locked by previous transaction") ) {
+            lockedNano = extractMwc(lns[lnIdx].message);
+            break;
+        }
     }
 
-    long lockedNano = 0;
-    if (ok) {
-        lockedNano = infoData[4].remove('.').toLong(&ok);
+    long spendableNano = -1;
+    for ( ; lnIdx<lns.size(); lnIdx++ ) {
+        if ( lns[lnIdx].message.contains("Currently Spendable ") ) {
+            spendableNano = extractMwc(lns[lnIdx].message);
+            break;
+        }
     }
 
-    long spendableNano = 0;
-    if (ok) {
-        spendableNano = infoData[5].remove('.').toLong(&ok);
-    }
-
-    if (!ok) {
+    if ( !ok || totalNano<0 || waitingConfNano<0 || lockedNano<0 || spendableNano<0 ) {
         wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::CRITICAL, MWC713::MESSAGE_ID::GENERIC, "Unable to parse mwc713 'info' output" );
         return false;
     }

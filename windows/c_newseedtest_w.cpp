@@ -58,6 +58,7 @@ NewSeedTest::NewSeedTest(QWidget *parent, state::NewSeedTest *_state, int wordNu
 
 NewSeedTest::~NewSeedTest()
 {
+    state->deleteWnd();
     delete ui;
 }
 

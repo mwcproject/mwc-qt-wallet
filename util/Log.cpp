@@ -117,19 +117,9 @@ void logEmit(QString who, QString event, QString params) {
     logClient->doAppend2logs(true, who, "emit " + event + (params.length()==0 ? "" : (" with "+params)) );
 }
 
-void logRecieve(QString who, QString event, QString params) {
+void logInfo(QString who, QString message) {
     Q_ASSERT(logClient); // call initLogger first
-    logClient->doAppend2logs(true, who, "recieve " + event + (params.length()==0 ? "" : (" with "+params)) );
-}
-
-void logConnect(QString who, QString event) {
-    Q_ASSERT(logClient); // call initLogger first
-    logClient->doAppend2logs(true, who, "connect to " + event);
-}
-
-void logDisconnect(QString who, QString event) {
-    Q_ASSERT(logClient); // call initLogger first
-    logClient->doAppend2logs(true, who, "disconnect from " + event);
+    logClient->doAppend2logs(true, who, message );
 }
 
 void logParsingEvent(wallet::WALLET_EVENTS event, QString message ) {

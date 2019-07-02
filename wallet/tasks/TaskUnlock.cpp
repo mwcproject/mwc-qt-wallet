@@ -35,12 +35,10 @@ namespace wallet {
     }
 
     // static
-    QString TaskUnlock::buildWalletRequest(QString password, QString account) {
+    QString TaskUnlock::buildWalletRequest(QString password) {
         QString res = "unlock";
         if (password.length() > 0)
             res += " -p " + password;
-        if (account.length() > 0)
-            res += " -a '" + account + "'";
         return res;
     }
 

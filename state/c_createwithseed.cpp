@@ -16,6 +16,20 @@ namespace state {
 
 CreateWithSeed::CreateWithSeed(const StateContext & context) :
     State(context, STATE::CREATE_WITH_SEED) {
+
+    // Creating connections...
+    QObject::connect(context.wallet, &wallet::Wallet::onListeningStopResult,
+                                               this, &CreateWithSeed::onListeningStopResult, Qt::QueuedConnection);
+
+    QObject::connect(context.wallet, &wallet::Wallet::onRecoverProgress,
+                                           this, &CreateWithSeed::onRecoverProgress, Qt::QueuedConnection);
+
+    QObject::connect(context.wallet, &wallet::Wallet::onRecoverResult,
+                                         this, &CreateWithSeed::onRecoverResult, Qt::QueuedConnection);
+
+    QObject::connect(context.wallet, &wallet::Wallet::onWalletBalanceUpdated,
+                                                this, &CreateWithSeed::onWalletBalanceUpdated, Qt::QueuedConnection);
+
 }
 
 CreateWithSeed::~CreateWithSeed() {
@@ -26,8 +40,8 @@ NextStateRespond CreateWithSeed::execute() {
     if (withSeed.length()==0)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context.wndManager->switchToWindow(
-                new wnd::EnterSeed( context.wndManager->getInWndParent(), this ) );
+    seedWnd = new wnd::EnterSeed( context.wndManager->getInWndParent(), this );
+    context.wndManager->switchToWindow( seedWnd );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
@@ -43,22 +57,9 @@ void CreateWithSeed::createWalletWithSeed( QVector<QString> seed ) {
     keybaseOriginalState = walletListenerStatus.second;
 
     // switching to a progress Wnd
-    progressWnd = new wnd::ProgressWnd(context.wndManager->getInWndParent(), "Recovering account from the passphrase", "",
-                                       "");
+    progressWnd = new wnd::ProgressWnd(context.wndManager->getInWndParent(), this, "Recovering account from the passphrase", "",
+                                       "", false);
     context.wndManager->switchToWindow(progressWnd);
-
-    // Creating connections...
-    logger::logConnect("CreateWithSeed", "onListeningStopResult");
-    connListeningStopResult = QObject::connect(context.wallet, &wallet::Wallet::onListeningStopResult,
-                                               this, &CreateWithSeed::onListeningStopResult, Qt::QueuedConnection);
-
-    logger::logConnect("CreateWithSeed", "onRecoverProgress");
-    connRecoverProgress = QObject::connect(context.wallet, &wallet::Wallet::onRecoverProgress,
-                                           this, &CreateWithSeed::onRecoverProgress, Qt::QueuedConnection);
-
-    logger::logConnect("CreateWithSeed", "onRecoverResult");
-    connRecoverResult = QObject::connect(context.wallet, &wallet::Wallet::onRecoverResult,
-                                         this, &CreateWithSeed::onRecoverResult, Qt::QueuedConnection);
 
     // Stopping listeners first. Not checking if they are running.
     progressWnd->setMsgPlus("Preparing for recovery...");
@@ -69,6 +70,10 @@ void CreateWithSeed::createWalletWithSeed( QVector<QString> seed ) {
 
 void CreateWithSeed::onListeningStopResult( bool mqTry, bool kbTry, // what we try to stop
                            QStringList errorMessages ) {
+
+    if ( seedWnd==nullptr && progressWnd==nullptr ) // active indicator
+        return;
+
     Q_UNUSED(errorMessages);
     qDebug() << "Stopping listener get: mqTry=" << mqTry << " kbTry=" << kbTry;
     if (mqTry) {
@@ -86,6 +91,9 @@ void CreateWithSeed::onListeningStopResult( bool mqTry, bool kbTry, // what we t
 }
 
 void CreateWithSeed::onRecoverProgress( int progress, int maxVal ) {
+    if ( progressWnd==nullptr ) // active indicator
+        return;
+
     progressMaxVal = maxVal;
     progressWnd->initProgress(0, maxVal);
 
@@ -95,24 +103,20 @@ void CreateWithSeed::onRecoverProgress( int progress, int maxVal ) {
 }
 
 void CreateWithSeed::onRecoverResult(bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages) {
+    Q_UNUSED(newAddress);
+
+    if ( progressWnd==nullptr ) // active indicator
+        return;
+
+
     // start listening first since it will be async and we don't need to wait
     if (mwcMqOriginalState)
         context.wallet->listeningStart( true, false );
     if (keybaseOriginalState)
         context.wallet->listeningStart( false, true );
 
-    // Removing connections...
-    logger::logDisconnect("CreateWithSeed", "onListeningStopResult");
-    QObject::disconnect(connListeningStopResult);
-
-    logger::logDisconnect("CreateWithSeed", "onRecoverProgress");
-    QObject::disconnect(connRecoverProgress);
-
-    logger::logDisconnect("CreateWithSeed", "onRecoverResult");
-    QObject::disconnect(connRecoverResult);
-
-    if (finishedWithSuccess)
-        progressWnd->updateProgress(progressMaxVal, "Done");
+    if (finishedWithSuccess && progressWnd)
+         progressWnd->updateProgress(progressMaxVal, "Done");
 
     QString errorMsg;
     if (errorMessages.size()>0) {
@@ -138,15 +142,12 @@ void CreateWithSeed::onRecoverResult(bool started, bool finishedWithSuccess, QSt
         // Great, we are done here.
         // Must wait for balance update
 
-        // Start Balance update
-        logger::logConnect("CreateWithSeed", "onWalletBalanceUpdated");
-        connWalletBalanceUpdated = QObject::connect(context.wallet, &wallet::Wallet::onWalletBalanceUpdated,
-                                                    this, &CreateWithSeed::onWalletBalanceUpdated, Qt::QueuedConnection);
-
         context.wallet->updateWalletBalance();
 
-        progressWnd->updateProgress(0,"");
-        progressWnd->setMsgPlus("Recovering your wallet...");
+        if (progressWnd) {
+            progressWnd->updateProgress(0,"");
+            progressWnd->setMsgPlus("Recovering your wallet...");
+        }
 
         return;
     }
@@ -160,8 +161,8 @@ void CreateWithSeed::onRecoverResult(bool started, bool finishedWithSuccess, QSt
 
 // Account info is updated
 void CreateWithSeed::onWalletBalanceUpdated() {
-    logger::logDisconnect("InputPassword", "onWalletBalanceUpdated" );
-    QObject::disconnect(connWalletBalanceUpdated);
+    if ( seedWnd==nullptr && progressWnd==nullptr ) // active indicator
+        return;
 
     context.stateMachine->executeFrom(STATE::CREATE_WITH_SEED);
 }

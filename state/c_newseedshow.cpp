@@ -22,7 +22,7 @@ NextStateRespond NewSeedShow::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     context.wndManager->switchToWindow(
-                new wnd::NewSeed( context.wndManager->getInWndParent(), this, seed ) );
+                new wnd::NewSeed( context.wndManager->getInWndParent(), this, getStateMachine(), seed ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 

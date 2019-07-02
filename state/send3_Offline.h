@@ -7,6 +7,7 @@
 
 namespace wnd {
 class SendOfflineFiles;
+class SendOfflineSettings;
 }
 
 namespace state {
@@ -31,7 +32,8 @@ public:
     //void signTransaction( QString fileName );
     void publishTransaction( QString fileName );
 
-    void deletedSendOfflineFiles() {sendFilesWnd = nullptr;}
+    void deletedSendOfflineFiles() {filesWnd = nullptr;}
+    void deletedSendOfflineSettings() {settingsWnd = nullptr;}
 protected:
     virtual NextStateRespond execute() override;
 
@@ -40,8 +42,8 @@ protected:
     void respFinalizeFile( bool success, QStringList errors, QString fileName );
 
 private:
-    QMetaObject::Connection sendConnect;
-    wnd::SendOfflineFiles * sendFilesWnd = nullptr;
+    wnd::SendOfflineSettings * settingsWnd = nullptr;
+    wnd::SendOfflineFiles * filesWnd = nullptr;
     QString message;
 };
 

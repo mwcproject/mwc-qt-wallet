@@ -9,13 +9,18 @@ class WaitingWnd;
 
 namespace wnd {
 
+class WaitingWndState {
+public:
+    void virtual deleteWaitingWnd() = 0;
+};
+
 // Just a waiting dialog, that can be updated with some info
 class WaitingWnd : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit WaitingWnd(QWidget *parent, QString title, QString progressMessage);
+    explicit WaitingWnd(QWidget *parent, WaitingWndState * state, QString title, QString progressMessage);
     ~WaitingWnd();
 
     void updateTitle(QString title);
@@ -23,6 +28,7 @@ public:
 
 private:
     Ui::WaitingWnd *ui;
+    WaitingWndState * state;
 };
 
 }

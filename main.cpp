@@ -28,7 +28,11 @@ bool deployFilesFromResources() {
     bool ok = true;
 
     if ( !QFile::exists(mwc713conf)) {
-        ok = ok && QFile::copy(":/resource/wallet713.toml", mwc713conf);
+#ifdef Q_OS_MACOS
+        ok = ok && QFile::copy(":/resource/wallet713_mac.toml", mwc713conf);
+#else
+        ok = ok && QFile::copy(":/resource/wallet713_def.toml", mwc713conf);
+#endif
         if (ok)
             QFile::setPermissions(mwc713conf, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup);
     }

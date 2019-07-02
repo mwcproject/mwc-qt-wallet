@@ -33,7 +33,7 @@ public:
 
     // ---- Wallet Init Phase
     virtual void start() noexcept(false) override;
-    virtual void loginWithPassword(QString password, QString account) noexcept(false) override;
+    virtual void loginWithPassword(QString password) noexcept(false) override;
     // Check signal: onInitWalletStatus
     virtual InitWalletStatus getWalletStatus() noexcept(false) override {return initStatus;}
 
@@ -53,6 +53,10 @@ public:
     virtual void recover(const QVector<QString> & seed, QString password) noexcept(false) override;
     // Check Signals: onRecoverProgress( int progress, int maxVal );
     // Check Signals: onRecoverResult(bool ok, QString newAddress );
+
+    // Current seed for runnign wallet
+    // Check Signals: onGetSeed(QVector<QString> seed);
+    virtual void getSeed() noexcept(false) override;
 
     //--------------- Listening
 
@@ -88,7 +92,7 @@ public:
 
     // Get all accounts with balances. Expected that Wallet allways maintain them in a cache.
     // This info needed in many cases and we don't want spend time every time for that.
-    virtual QVector<AccountInfo>  getWalletBalance() noexcept(false) override {return accountInfo;}
+    virtual QVector<AccountInfo>  getWalletBalance(bool filterDeleted = true) const noexcept(false) override;
 
     virtual QString getCurrentAccountName() noexcept(false) override {return currentAccount;}
 
@@ -107,6 +111,9 @@ public:
     virtual void switchAccount(const QString & accountName) noexcept(false) override;
     // Check Signal: onAccountSwitched
 
+    // Rename account
+    // Check Signal: onAccountRenamed(bool success, QString errorMessage);
+    virtual void renameAccount(const QString & oldName, const QString & newName) noexcept(false) override;
 
     // -------------- Maintaince
 
@@ -120,6 +127,11 @@ public:
     virtual NodeStatus getNodeStatus() noexcept(false) override {return NodeStatus();}
 
     // -------------- Transactions
+
+    // Set account that will receive the funds
+    // Check Signal:  onSetReceiveAccount( bool ok, QString AccountOrMessage );
+    virtual void setReceiveAccount(QString account) noexcept(false) override;
+
     // Cancel transaction
     // Check Signal:  onCancelTransacton
     virtual void cancelTransacton(long transactionID) noexcept(false) override;
@@ -186,6 +198,8 @@ public:
 
     void setNewSeed( QVector<QString> seed );
 
+    void setGettedSeed( QVector<QString> seed );
+
     void setListeningStartResults( bool mqTry, bool kbTry, // what we try to start
             QStringList errorMessages );
 
@@ -206,11 +220,18 @@ public:
     void createNewAccount( QString newAccountName );
     void switchToAccount( QString switchAccountName );
 
+    void updateRenameAccount(const QString & oldName, const QString & newName, bool createSimulation,
+                             bool success, QString errorMessage);
+
     void infoResults( QString currentAccountName, long height,
            long totalNano, long waitingConfNano, long lockedNano, long spendableNano,
                       bool mwcServerBroken );
 
     void setSendResults(bool success, QStringList errors);
+
+    void reportSlateSend( QString slate, QString mwc, QString sendAddr );
+    void reportSlateRecieved( QString slate, QString mwc, QString fromAddr );
+    void reportSlateFinalized( QString slate );
 
     void setSendFileResult( bool success, QStringList errors, QString fileName );
     void setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
@@ -224,6 +245,7 @@ public:
 
     void setTransCancelResult( bool success, long transId, QString errMsg );
 
+    void setSetReceiveAccount( bool ok, QString accountOrMessage );
 private:
     void mwc713connect();
     void mwc713disconnect();

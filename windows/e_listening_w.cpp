@@ -9,7 +9,7 @@ namespace wnd {
 
 Listening::Listening(QWidget *parent, state::Listening * _state, bool mwcMqStatus, bool keybaseStatus,
                      QString mwcMqAddress, int mwcMqAddrIdx) :
-    core::NavWnd(parent),
+    core::NavWnd(parent, _state->getStateMachine() ),
     ui(new Ui::Listening),
     state(_state)
 {

@@ -62,122 +62,6 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QFrame" name="accInfoFrame">
-           <property name="minimumSize">
-            <size>
-             <width>211</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>211</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::NoFrame</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="leftMargin">
-             <number>20</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="control::MwcLabelTiny" name="totalLabel">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>10</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Total:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="control::MwcLabelTiny" name="awaitingLabel">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>10</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Awaiting Confirmation:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="control::MwcLabelTiny" name="lockedLabel">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>10</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Locked by prev. transaction:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="control::MwcLabelTiny" name="spendableLabel">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>10</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Currently Spendable:</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_5">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </widget>
-         </item>
         </layout>
        </item>
        <item>
@@ -195,7 +79,7 @@
          </column>
          <column>
           <property name="text">
-           <string>Type</string>
+           <string>TYPE</string>
           </property>
          </column>
          <column>
@@ -205,22 +89,12 @@
          </column>
          <column>
           <property name="text">
-           <string>Address</string>
+           <string>ADDRESS</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>Creation Time</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Confirmed</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Confirmation time</string>
+           <string>TIME</string>
           </property>
          </column>
          <column>
@@ -230,7 +104,7 @@
          </column>
          <column>
           <property name="text">
-           <string>Proof</string>
+           <string>CONFIRMATION</string>
           </property>
          </column>
         </widget>
@@ -369,17 +243,17 @@
              <height>40</height>
             </size>
            </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
            <property name="focusPolicy">
             <enum>Qt::StrongFocus</enum>
-           </property>
-           <property name="text">
-            <string>Validate proof</string>
            </property>
            <property name="toolTip">
             <string>Allows you to validate a proof file that is generated from any wallet. Proves a transaction occurred.</string>
            </property>
-           <property name="cursor">
-            <cursor>13</cursor>
+           <property name="text">
+            <string>Validate proof</string>
            </property>
            <property name="autoDefault">
             <bool>true</bool>
@@ -413,17 +287,17 @@
              <height>40</height>
             </size>
            </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
            <property name="focusPolicy">
             <enum>Qt::StrongFocus</enum>
-           </property>
-           <property name="text">
-            <string>Generate proof</string>
            </property>
            <property name="toolTip">
             <string>Generate a proof and save to a file. Can be sent to others to prove a transactions occurred.</string>
            </property>
-           <property name="cursor">
-            <cursor>13</cursor>
+           <property name="text">
+            <string>Generate proof</string>
            </property>
            <property name="autoDefault">
             <bool>true</bool>
@@ -479,8 +353,14 @@
              <height>40</height>
             </size>
            </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
            <property name="focusPolicy">
             <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Cancel the specified transaction</string>
            </property>
            <property name="styleSheet">
             <string notr="true">border:none</string>
@@ -491,12 +371,6 @@
            <property name="icon">
             <iconset resource="../resources.qrc">
              <normaloff>:/img/Delete.png</normaloff>:/img/Delete.png</iconset>
-           </property>
-           <property name="toolTip">
-            <string>Cancel the specified transaction</string>
-           </property>
-           <property name="cursor">
-            <cursor>13</cursor>
            </property>
            <property name="iconSize">
             <size>
@@ -604,8 +478,14 @@
              <height>40</height>
             </size>
            </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
            <property name="focusPolicy">
             <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Refresh transaction list</string>
            </property>
            <property name="styleSheet">
             <string notr="true">border:none</string>
@@ -616,12 +496,6 @@
            <property name="icon">
             <iconset resource="../resources.qrc">
              <normaloff>:/img/Refresh.png</normaloff>:/img/Refresh.png</iconset>
-           </property>
-           <property name="toolTip">
-            <string>Refresh transaction list</string>
-           </property>
-           <property name="cursor">
-            <cursor>13</cursor>
            </property>
            <property name="iconSize">
             <size>
@@ -678,19 +552,14 @@
    <header>control/listwithcolumns.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcPushButtonNormal</class>
-   <extends>QPushButton</extends>
-   <header>control/MwcPushButton.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelTiny</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <class>control::MwcPushButtonNormal</class>
+   <extends>QPushButton</extends>
+   <header>control/MwcPushButton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -105,8 +105,7 @@ void MockWallet::start() noexcept(false) {
     emit onInitWalletStatus(initStatus);
 }
 
-void MockWallet::loginWithPassword(QString password, QString account) noexcept(false) {
-    Q_UNUSED(account);
+void MockWallet::loginWithPassword(QString password) noexcept(false) {
     if ( walletPassword == QString(password) ) {
         initStatus = InitWalletStatus::READY;
     }
@@ -246,7 +245,8 @@ NodeStatus MockWallet::getNodeStatus() {
 
 
 // Get wallet balance
-QVector<AccountInfo> MockWallet::getWalletBalance() {
+QVector<AccountInfo> MockWallet::getWalletBalance(bool filterDeleted) const noexcept(false) {
+    Q_UNUSED(filterDeleted);
     //QThread::sleep(3);
 
     long m1 = 1000000000L;

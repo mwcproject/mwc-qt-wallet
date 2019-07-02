@@ -1,7 +1,7 @@
 #ifndef SEND4_OFFLINEFILES_H
 #define SEND4_OFFLINEFILES_H
 
-#include <QWidget>
+#include "../core/navwnd.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
@@ -14,7 +14,7 @@ class SendOffline;
 
 namespace wnd {
 
-class SendOfflineFiles : public QWidget
+class SendOfflineFiles : public core::NavWnd
 {
     Q_OBJECT
 

@@ -1,6 +1,7 @@
 #include "navwnd.h"
-#include "toprightbuttons.h"
+#include "navbar.h"
 #include <QResizeEvent>
+#include "navmenuaccount.h"
 
 namespace core {
 
@@ -8,17 +9,27 @@ namespace core {
 const int TOP_RIGHT_BTNS_CX = 40;
 const int TOP_RIGHT_BTNS_CY = 15;
 
-NavWnd::NavWnd(QWidget *parent) : QWidget(parent)
+const int NAV_MENU_WIDTH = 190;
+
+NavWnd::NavWnd(QWidget *parent, state::StateMachine * stateMachine, bool createNavigationButtons) : QWidget(parent)
 {
-    topRightButtonWnd = new TopRightButtons(this);
+    if (createNavigationButtons) {
+        topRightButtonWnd = new NavBar(this, stateMachine);
+    }
 }
 
 void NavWnd::resizeEvent(QResizeEvent *event) {
 
-    QSize sz = event->size();
+    if (topRightButtonWnd!= nullptr) {
+        QSize sz = event->size();
 
-    QSize trwndSz = topRightButtonWnd->size();
-    topRightButtonWnd->move( sz.width() - trwndSz.width() - TOP_RIGHT_BTNS_CX, TOP_RIGHT_BTNS_CY );
+        QSize trwndSz = topRightButtonWnd->size();
+        int x0 = sz.width() - trwndSz.width() - TOP_RIGHT_BTNS_CX;
+        topRightButtonWnd->move(x0, TOP_RIGHT_BTNS_CY);
+
+        topRightButtonWnd->setNavMenuPosition(QPoint(std::min(x0, sz.width() - NAV_MENU_WIDTH - TOP_RIGHT_BTNS_CY),
+                                                     TOP_RIGHT_BTNS_CY + trwndSz.height() + trwndSz.height() / 3));
+    }
 }
 
 

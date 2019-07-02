@@ -9,9 +9,11 @@
 
 namespace state {
 
+
 NewSeed::NewSeed(const StateContext & context) :
     State(context, STATE::GENERATE_NEW_SEED)
 {
+    QObject::connect( context.wallet, &wallet::Wallet::onNewSeed, this, &NewSeed::onNewSeed, Qt::QueuedConnection );
 }
 
 NewSeed::~NewSeed(){
@@ -33,8 +35,6 @@ NextStateRespond NewSeed::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
     }
 
-    logger::logConnect("NewSeed", "onNewSeed" );
-    slotConn = QObject::connect( context.wallet, &wallet::Wallet::onNewSeed, this, &NewSeed::onNewSeed, Qt::QueuedConnection );
 
     // generate a new seed for a new wallet
     context.wallet->generateSeedForNewAccount(password);
@@ -46,10 +46,6 @@ NextStateRespond NewSeed::execute() {
 
 
 void NewSeed::onNewSeed(QVector<QString> seed) {
-
-    logger::logDisconnect("NewSeed", "onNewSeed" );
-    QObject::disconnect(slotConn);
-
     // Get the seed, continue processing
     context.appContext->pushCookie< QVector<QString> >("seed2verify", seed);
     context.appContext->pushCookie< QVector<core::TestSeedTask> >("seedTasks", core::generateSeedTasks( seed ) );

@@ -2,21 +2,39 @@
 #define NAVMENUCONFIG_H
 
 #include <QWidget>
+#include "navmenu.h"
 
 namespace Ui {
 class NavMenuConfig;
 }
 
-class NavMenuConfig : public QWidget
-{
-    Q_OBJECT
+
+namespace state {
+class StateMachine;
+}
+
+namespace core {
+
+class NavMenuConfig : public NavMenu {
+Q_OBJECT
 
 public:
-    explicit NavMenuConfig(QWidget *parent = nullptr);
+    explicit NavMenuConfig(QWidget *parent, state::StateMachine * stateMachine);
+
     ~NavMenuConfig();
+
+private slots:
+    void on_walletConfigButton_clicked();
+
+    void on_outputsButton_clicked();
+
+    void on_mwcmqButton_clicked();
 
 private:
     Ui::NavMenuConfig *ui;
+    state::StateMachine * stateMachine = nullptr;
 };
+
+}
 
 #endif // NAVMENUCONFIG_H

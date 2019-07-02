@@ -28,6 +28,7 @@ EnterSeed::EnterSeed(QWidget *parent, state::CreateWithSeed * _state) :
 
 EnterSeed::~EnterSeed()
 {
+    state->deleteEnterSeed();
     delete ui;
 }
 

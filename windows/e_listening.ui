@@ -95,6 +95,9 @@
         <property name="cursor">
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
         <property name="text">
          <string>Start</string>
         </property>
@@ -141,6 +144,9 @@
         </property>
         <property name="cursor">
          <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
         <property name="text">
          <string>Start</string>
@@ -272,6 +278,9 @@
         <property name="cursor">
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
         <property name="toolTip">
          <string>Select a specific index for your MWC MQ address</string>
         </property>
@@ -302,6 +311,9 @@
         </property>
         <property name="cursor">
          <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
          <string>Use the next addess for listening to MWC MQ messages</string>
@@ -376,6 +388,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>control::MwcFrameWithBorder</class>
+   <extends>QFrame</extends>
+   <header>control/MwcFrameWithBorder.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control/MwcPushButton.h</header>
@@ -384,12 +402,6 @@
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcFrameWithBorder</class>
-   <extends>QFrame</extends>
-   <header>control/MwcFrameWithBorder.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>

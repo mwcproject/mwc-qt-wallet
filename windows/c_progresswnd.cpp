@@ -3,10 +3,10 @@
 
 namespace wnd {
 
-ProgressWnd::ProgressWnd(QWidget *parent, QString header, QString msgProgress, QString msgPlus, IProgressWndState * callback ) :
+ProgressWnd::ProgressWnd(QWidget *parent, IProgressWndState * _state, QString header, QString msgProgress, QString msgPlus, bool cancellable ) :
     QWidget(parent),
     ui(new Ui::ProgressWnd),
-    cancelCallback(callback)
+    state(_state)
 {
     ui->setupUi(this);
 
@@ -15,19 +15,19 @@ ProgressWnd::ProgressWnd(QWidget *parent, QString header, QString msgProgress, Q
 
     setMsgPlus(msgPlus);
 
-    if (cancelCallback==nullptr)
+    if (!cancellable)
         ui->cancelButton->hide();
 }
 
 ProgressWnd::~ProgressWnd()
 {
+    state->destroyProgressWnd();
     delete ui;
 }
 
 void ProgressWnd::on_cancelButton_clicked()
 {
-    if (cancelCallback)
-        cancelCallback->cancelProgress();
+    state->cancelProgress();
 }
 
 void ProgressWnd::setHeader(QString header) {

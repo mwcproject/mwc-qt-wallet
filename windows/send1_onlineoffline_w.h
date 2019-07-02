@@ -1,7 +1,7 @@
 #ifndef SEND1_ONLINEOFFLINE_W_H
 #define SEND1_ONLINEOFFLINE_W_H
 
-#include <QWidget>
+#include "../core/navwnd.h"
 
 namespace Ui {
 class SendOnlineOffline;
@@ -13,7 +13,7 @@ namespace state {
 
 namespace wnd {
 
-class SendOnlineOffline : public QWidget
+class SendOnlineOffline : public core::NavWnd
 {
     Q_OBJECT
 

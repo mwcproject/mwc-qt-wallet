@@ -113,6 +113,15 @@ void ListWithColumns::appendRow( const QVector<QString> & rowData, double select
     }
 }
 
+int ListWithColumns::getSelectedRow() const {
+    QList<QTableWidgetItem *> selItms = selectedItems();
+    if (selItms.size() == 0)
+        return -1;
+
+    return selItms.front()->row();
+}
+
+
 //#include "listwithcolumns.moc"
 
 

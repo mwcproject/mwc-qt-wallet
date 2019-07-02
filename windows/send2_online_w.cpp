@@ -29,7 +29,7 @@ QString generateAmountErrorMsg( long mwcAmount, const wallet::AccountInfo & acc,
 }
 
 SendOnline::SendOnline(QWidget *parent, state::SendOnline * _state ) :
-    QWidget(parent),
+    core::NavWnd(parent, _state->getStateMachine() ),
     ui(new Ui::SendOnline),
     state(_state)
 {
@@ -43,12 +43,13 @@ SendOnline::SendOnline(QWidget *parent, state::SendOnline * _state ) :
 
     int idx=0;
     for (auto & info : accountInfo) {
-        ui->accountComboBox->addItem( util::expandStrR(info.accountName, 25) + " Available: " + util::nano2one(info.currentlySpendable) + " mwc", QVariant(idx++) );
+        ui->accountComboBox->addItem( info.getLongAccountName(), QVariant(idx++) );
     }
 }
 
 SendOnline::~SendOnline()
 {
+    state->deleteWnd();
     delete ui;
 }
 
@@ -69,11 +70,10 @@ void SendOnline::on_contactsButton_clicked()
 
 void SendOnline::on_allAmountButton_clicked()
 {
-    int accountIdx = ui->accountComboBox->currentData().toInt();
     ui->amountEdit->setText("All");//  util::nano2one( accountInfo[accountIdx].currentlySpendable ) );
 }
 
-void SendOnline::on_settingsButton_clicked()
+void SendOnline::on_settingsButton2_clicked()
 {
     core::SendCoinsParams  params = state->getSendCoinsParams();
 
@@ -86,7 +86,11 @@ void SendOnline::on_settingsButton_clicked()
 
 void SendOnline::on_sendButton_clicked()
 {
-    int accountIdx = ui->accountComboBox->currentData().toInt();
+    auto dt = ui->accountComboBox->currentData();
+    if (!dt.isValid())
+        return;
+
+    int accountIdx = dt.toInt();
     wallet::AccountInfo acc = accountInfo[accountIdx];
 
     QString sendAmount = ui->amountEdit->text();
@@ -114,6 +118,17 @@ void SendOnline::on_sendButton_clicked()
         ui->sendEdit->setFocus();
         return;
     }
+
+    if ( mwcAmount.second > acc.currentlySpendable ) {
+
+        QString msg2print = generateAmountErrorMsg( mwcAmount.second, acc, state->getSendCoinsParams() );
+
+        control::MessageBox::message(this, "Incorrect Input",
+                                     msg2print );
+        ui->amountEdit->setFocus();
+        return;
+    }
+
 
     // Check the address. Try contacts first
     QString address;
@@ -176,4 +191,5 @@ void SendOnline::sendRespond( bool success, const QStringList & errors ) {
 
 
 }
+
 

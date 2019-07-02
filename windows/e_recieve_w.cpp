@@ -9,13 +9,15 @@ namespace wnd {
 
 Recieve::Recieve(QWidget *parent, state::Recieve * _state, bool mwcMqStatus, bool keybaseStatus,
                  QString mwcMqAddress) :
-        QWidget(parent),
+        core::NavWnd(parent, _state->getStateMachine() ),
         ui(new Ui::Recieve),
         state(_state)
 {
     ui->setupUi(this);
 
     ui->progress->initLoader(false);
+
+    updateAccountList();
 
     updateMwcMqState(mwcMqStatus);
     updateKeybaseState(keybaseStatus);
@@ -37,7 +39,7 @@ void Recieve::updateMwcMqState(bool online) {
 }
 
 void Recieve::updateKeybaseState(bool online) {
-    ui->keybaseStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOk.png" : ":/img/StatusEmpty.png" ) );
+    ui->keybaseStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk.png" : ":/img/StatusEmpty.png") );
     ui->keybaseStatusLabel->setText( online ? "Online" : "Offline" );
 }
 
@@ -64,5 +66,28 @@ void Recieve::onTransactionActionIsFinished( bool success, QString message ) {
     control::MessageBox::message(this, success ? "Success" : "Failure", message );
 }
 
+void Recieve::on_accountComboBox_activated(int index)
+{
+    if (index>=0 && index < accountInfo.size() )
+        state->setReceiveAccount( accountInfo[index].accountName );
+}
+
+void Recieve::updateAccountList() {
+    accountInfo = state->getWalletBalance();
+    QString selectedAccount = state->getReceiveAccount();
+
+    int selectedAccIdx = 0;
+
+    ui->accountComboBox->clear();
+
+    int idx=0;
+    for (auto & info : accountInfo) {
+        if (info.accountName == selectedAccount)
+            selectedAccIdx = idx;
+
+        ui->accountComboBox->addItem( info.getLongAccountName(), QVariant(idx++) );
+    }
+    ui->accountComboBox->setCurrentIndex(selectedAccIdx);
+}
 
 }

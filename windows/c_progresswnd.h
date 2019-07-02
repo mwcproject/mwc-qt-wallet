@@ -9,11 +9,13 @@ class ProgressWnd;
 
 namespace wnd {
 
-// Cancell callback interface. Because of usege we are fine withinterface, no needs in callbacl function
+// Cancell callback interface. Because of usage we are fine withinterface, no needs in callback function
 class IProgressWndState {
 public:
     virtual void cancelProgress() = 0;
+    virtual void destroyProgressWnd() = 0;
 };
+
 
 class ProgressWnd : public QWidget
 {
@@ -21,7 +23,7 @@ class ProgressWnd : public QWidget
 
 public:
     // Empty string - hide this item, null - hidden
-    explicit ProgressWnd(QWidget *parent, QString header, QString msgProgress, QString msgPlus, IProgressWndState * callback = nullptr );
+    explicit ProgressWnd(QWidget *parent, IProgressWndState * state, QString header, QString msgProgress, QString msgPlus, bool cancellable );
     virtual ~ProgressWnd() override;
 
     void setHeader(QString header);
@@ -35,7 +37,7 @@ private slots:
 
 private:
     Ui::ProgressWnd *ui;
-    IProgressWndState * cancelCallback;
+    IProgressWndState * state;
 };
 
 }

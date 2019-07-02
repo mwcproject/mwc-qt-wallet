@@ -8,7 +8,8 @@
 #include "c_createwithseed.h"
 #include "../core/appcontext.h"
 #include "../core/mainwindow.h"
-#include "accounts.h"
+#include "k_accounts.h"
+#include "k_AccountTransfer.h"
 #include "events.h"
 #include "hodl.h"
 #include "e_Recieve.h"
@@ -25,6 +26,7 @@
 #include "send1_OnlineOffline.h"
 #include "send2_Online.h"
 #include "send3_Offline.h"
+#include "x_ShowSeed.h"
 
 namespace state {
 
@@ -44,6 +46,9 @@ StateMachine::StateMachine(StateContext & context) :
     states[ STATE::TEST_NEW_SEED ]     = new NewSeedTest(context);
     states[ STATE::CREATE_WITH_SEED ]  = new CreateWithSeed(context);
     states[ STATE::ACCOUNTS ]       = new Accounts(context);
+
+    states[ STATE::ACCOUNT_TRANSFER ] = new AccountTransfer(context);
+
     states[ STATE::EVENTS ]         = new Events(context);
     states[ STATE::HODL ]           = new Hodl(context);
 
@@ -61,6 +66,7 @@ StateMachine::StateMachine(StateContext & context) :
     states[ STATE::CONTACTS ]       = new Contacts(context);
     states[ STATE::WALLET_CONFIG ]  = new WalletConfig(context);
     states[ STATE::AIRDRDOP_MAIN ]  = new Airdrop(context);
+    states[ STATE::SHOW_SEED ]      = new ShowSeed(context);
 }
 
 StateMachine::~StateMachine() {

@@ -89,17 +89,17 @@
           <height>40</height>
          </size>
         </property>
-        <property name="text">
-         <string>Send</string>
-        </property>
         <property name="cursor">
-         <cursor>13</cursor>
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="toolTip">
          <string>Send MWC</string>
         </property>
+        <property name="text">
+         <string>Send</string>
+        </property>
        </widget>
-       <widget class="QPushButton" name="settingsButton">
+       <widget class="QPushButton" name="settingsButton2">
         <property name="geometry">
          <rect>
           <x>3</x>
@@ -120,14 +120,14 @@
           <height>40</height>
          </size>
         </property>
-        <property name="text">
-         <string>Settings</string>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="toolTip">
          <string>Click to change settings. Number of change outputs and required confirmations.</string>
         </property>
-        <property name="cursor">
-         <cursor>13</cursor>
+        <property name="text">
+         <string>Settings</string>
         </property>
        </widget>
        <widget class="control::MwcPushButtonNormal" name="contactsButton">
@@ -151,14 +151,14 @@
           <height>40</height>
          </size>
         </property>
-        <property name="text">
-         <string>Contacts</string>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="toolTip">
          <string>Choose a contact to send to</string>
         </property>
-        <property name="cursor">
-         <cursor>13</cursor>
+        <property name="text">
+         <string>Contacts</string>
         </property>
        </widget>
        <widget class="QTextEdit" name="descriptionEdit">
@@ -195,14 +195,14 @@
           <height>40</height>
          </size>
         </property>
-        <property name="text">
-         <string>All</string>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="toolTip">
          <string>Send all MWC in this account</string>
         </property>
-        <property name="cursor">
-         <cursor>13</cursor>
+        <property name="text">
+         <string>All</string>
         </property>
        </widget>
        <widget class="control::MwcLineEditNormal" name="sendEdit">

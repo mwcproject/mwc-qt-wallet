@@ -6,16 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>684</width>
-    <height>558</height>
+    <width>772</width>
+    <height>571</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="2,0,0,0,0,1,0,1">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
-    <number>15</number>
+    <number>0</number>
    </property>
    <item>
     <spacer name="verticalSpacer">
@@ -185,7 +185,10 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,5,2">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,7,1">
+     <property name="topMargin">
+      <number>20</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
@@ -200,28 +203,83 @@
       </spacer>
      </item>
      <item>
-      <widget class="control::MwcLineEditNormal" name="mwcmqAddress">
+      <widget class="QFrame" name="frame_2">
        <property name="minimumSize">
         <size>
          <width>600</width>
-         <height>40</height>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>16777215</width>
-         <height>40</height>
+         <width>60000</width>
+         <height>16777215</height>
         </size>
        </property>
-       <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
        </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
        </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>20</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QComboBox" name="accountComboBox">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="control::MwcLineEditNormal" name="mwcmqAddress">
+          <property name="minimumSize">
+           <size>
+            <width>600</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
      <item>
@@ -241,6 +299,12 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="topMargin">
+      <number>30</number>
+     </property>
+     <property name="bottomMargin">
+      <number>8</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer_5">
        <property name="orientation">
@@ -268,11 +332,11 @@
          <height>40</height>
         </size>
        </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
        <property name="text">
         <string>Receive mwc by file</string>
-       </property>
-       <property name="cursor">
-        <cursor>13</cursor>
        </property>
       </widget>
      </item>
@@ -390,7 +454,7 @@
    <header>control/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelTiny</class>
+   <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
@@ -400,7 +464,7 @@
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelSmall</class>
+   <class>control::MwcLabelTiny</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>

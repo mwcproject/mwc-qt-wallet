@@ -56,9 +56,7 @@ namespace logger {
 
     // Events activity
     void logEmit(QString who, QString event, QString params);
-    void logRecieve(QString who, QString event, QString params);
-    void logConnect(QString who, QString event);
-    void logDisconnect(QString who, QString event);
+    void logInfo(QString who, QString message);
 }
 
 

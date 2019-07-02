@@ -30,6 +30,8 @@ InputPassword::InputPassword(QWidget *parent, state::InputPassword * _state) :
 
 InputPassword::~InputPassword()
 {
+    state->deleteWnd();
+
     delete ui;
 }
 

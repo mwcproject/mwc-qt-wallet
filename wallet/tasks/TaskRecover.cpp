@@ -1,6 +1,8 @@
 #include "TaskRecover.h"
 #include <QDebug>
 #include "../mwc713.h"
+#include "../../util/Log.h"
+#include <QThread>
 
 namespace wallet {
 
@@ -119,6 +121,46 @@ QString TaskRecover2Mnenonic::calcCommand(QVector<QString> seed) const {
 bool TaskRecover3Password::processTask(const QVector<WEvent> &events) {
     return ProcessRecoverTask(events, wallet713);
 }
+
+// -------------------- TaskRecover3Password ----------------------
+
+void TaskRecoverShowMnenonic::onStarted() {
+    logger::blockLogMwc713out( true );
+
+    // Let's sleep some time. Needed to get a chance to stop listeners
+    QThread::msleep(3000); // 3 seconds normally is enough to stop all listeners
+}
+
+bool TaskRecoverShowMnenonic::processTask(const QVector<WEvent> &events) {
+    logger::blockLogMwc713out( false );
+    QVector< WEvent > passPhrase = filterEvents(events, WALLET_EVENTS::S_PASS_PHRASE );
+
+    if (passPhrase.size()>0) {
+
+        QStringList phr = passPhrase[0].message.split(" ");
+        qDebug() << "Get a passphrase, it has words: " << phr.size();
+
+        QVector<QString> seed;
+
+        for (QString &s : phr)
+            seed.push_back(s);
+
+        wallet713->setGettedSeed(seed);
+        return true;
+    }
+
+    // Check for error
+    QVector< WEvent > err = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    if (err.size()>0) {
+        wallet713->setGettedSeed( QVector<QString>{err[0].message} );
+    }
+    else {
+        wallet713->setGettedSeed( QVector<QString>() );
+    }
+
+    return true;
+}
+
 
 
 }

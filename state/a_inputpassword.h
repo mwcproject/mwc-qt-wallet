@@ -18,6 +18,8 @@ public:
     InputPassword(const StateContext & context);
     virtual ~InputPassword() override;
 
+    void deleteWnd() {wnd = nullptr;}
+
     // Async call to submit the password. This state migth get back to UI if password is incorrect
     void submitPassword(const QString & password);
 
@@ -30,7 +32,8 @@ protected slots:
 
 private:
     wnd::InputPassword * wnd = nullptr;
-    QMetaObject::Connection slotConn;
+
+    bool loggedIn = false;
 };
 
 }

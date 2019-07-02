@@ -10,7 +10,11 @@
 namespace state {
 
 SendOnlineOffline::SendOnlineOffline(const StateContext & context) :
-        State(context, STATE::SEND_ONLINE_OFFLINE ) {}
+        State(context, STATE::SEND_ONLINE_OFFLINE ) {
+
+    QObject::connect( context.wallet, &wallet::Wallet::onWalletBalanceUpdated,
+                                 this, &SendOnlineOffline::onWalletBalanceUpdated, Qt::QueuedConnection );
+}
 
 SendOnlineOffline::~SendOnlineOffline() {}
 
@@ -39,18 +43,16 @@ void SendOnlineOffline::updateBalanceAndContinue() {
     wnd->showProgress();
 
     // Updating the wallet balance
-    logger::logConnect("SendOnlineOffline", "onWalletBalanceUpdated" );
-    slotConn = QObject::connect( context.wallet, &wallet::Wallet::onWalletBalanceUpdated,
-                                 this, &SendOnlineOffline::onWalletBalanceUpdated, Qt::QueuedConnection );
     context.wallet->updateWalletBalance();
 }
 
 // Account info is updated
 void SendOnlineOffline::onWalletBalanceUpdated() {
-    logger::logDisconnect("SendOnlineOffline", "onWalletBalanceUpdated" );
-    QObject::disconnect(slotConn);
+    if ( nextStep == STATE::NONE )
+        return;
 
     context.stateMachine->setActionWindow(nextStep );
+    nextStep = STATE::NONE;
 }
 
 
