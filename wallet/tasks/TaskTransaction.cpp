@@ -53,7 +53,7 @@ bool parseTransactionLine( QString str, const TransactionIdxLayout & tl,
     else
         return false;
 
-    if (strTxid.isEmpty() || strCrTime.isEmpty())
+    if ( strCrTime.isEmpty())
         return false;
 
     bool conf = strConf.startsWith("yes", Qt::CaseInsensitive);
