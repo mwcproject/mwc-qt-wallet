@@ -127,8 +127,7 @@ static int64_t extractMwc( const QString & str ) {
     int idx = str.lastIndexOf('|');
     if (idx<0)
         return -1;
-
-    return str.mid(idx+1).trimmed().remove('.').toLong();
+    return str.mid(idx+1).trimmed().remove('.').toLongLong();
 }
 
 bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
