@@ -7,7 +7,7 @@ namespace wallet {
 
     class TaskStarting : public Mwc713Task {
     public:
-        const static long TIMEOUT = 8000;
+        const static int64_t TIMEOUT = 8000;
 
         TaskStarting( MWC713 * wallet713 ) : Mwc713Task("Starting", "", wallet713,"") {}
         virtual ~TaskStarting() override {}

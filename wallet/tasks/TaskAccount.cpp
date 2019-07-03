@@ -123,7 +123,7 @@ bool TaskAccountRename::processTask(const QVector<WEvent> &events) {
 
 // ------------------------- TaskAccountInfo --------------------------
 
-static long extractMwc( const QString & str ) {
+static int64_t extractMwc( const QString & str ) {
     int idx = str.lastIndexOf('|');
     if (idx<0)
         return -1;
@@ -147,13 +147,13 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
     if (ok)
         currentAccountName = infoData[0];
 
-    long height = 0;
+    int64_t height = 0;
     if (ok) {
         height = infoData[1].toLong(&ok);
     }
 
     int lnIdx = 0;
-    long totalNano = -1;
+    int64_t totalNano = -1;
     for ( ; lnIdx<lns.size(); lnIdx++ ) {
         if ( lns[lnIdx].message.contains("Total ") ) {
             totalNano = extractMwc(lns[lnIdx].message);
@@ -162,7 +162,7 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
     }
     //
 
-    long waitingConfNano = -1;
+    int64_t waitingConfNano = -1;
     for ( ; lnIdx<lns.size(); lnIdx++ ) {
         if ( lns[lnIdx].message.contains("Awaiting Confirmation ") ) {
             waitingConfNano = extractMwc(lns[lnIdx].message);
@@ -170,7 +170,7 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
         }
     }
 
-    long lockedNano = -1;
+    int64_t lockedNano = -1;
     for ( ; lnIdx<lns.size(); lnIdx++ ) {
         if ( lns[lnIdx].message.contains("Locked by previous transaction") ) {
             lockedNano = extractMwc(lns[lnIdx].message);
@@ -178,7 +178,7 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
         }
     }
 
-    long spendableNano = -1;
+    int64_t spendableNano = -1;
     for ( ; lnIdx<lns.size(); lnIdx++ ) {
         if ( lns[lnIdx].message.contains("Currently Spendable ") ) {
             spendableNano = extractMwc(lns[lnIdx].message);

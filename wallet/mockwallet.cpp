@@ -249,7 +249,7 @@ QVector<AccountInfo> MockWallet::getWalletBalance(bool filterDeleted) const noex
     Q_UNUSED(filterDeleted);
     //QThread::sleep(3);
 
-    long m1 = 1000000000L;
+    int64_t m1 = 1000000000L;
 
     AccountInfo acc1;
     acc1.setData( "default",
@@ -283,11 +283,11 @@ QVector<AccountInfo> MockWallet::getWalletBalance(bool filterDeleted) const noex
 
 // Cancel transaction
 // Check Signal:  onCancelTransacton
-void MockWallet::cancelTransacton(long transactionID) noexcept(false) {
+void MockWallet::cancelTransacton(int64_t transactionID) noexcept(false) {
     emit onCancelTransacton(true, transactionID, "OK");
 }
 
-void MockWallet::generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) {
+void MockWallet::generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName ) noexcept(false) {
     emit onExportProof(true, resultingFileName, "Placeholder for what this transaction mean");
 }
 void MockWallet::verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false)  {
@@ -296,7 +296,7 @@ void MockWallet::verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(
 
 // Init send transaction with file output
 // Check signal:  onSendFile
-void MockWallet::sendFile( long coinNano, QString fileTx ) noexcept(false) {
+void MockWallet::sendFile( int64_t coinNano, QString fileTx ) noexcept(false) {
     emit onSendFile(true, QStringList(), fileTx);
 }
 
@@ -315,7 +315,7 @@ void MockWallet::finalizeFile( QString fileTxResponse ) noexcept(false) {
 // Send some coins to address.
 // Before send, wallet always do the switch to account to make it active
 // Check signal:  onSend
-void MockWallet::sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message,
+void MockWallet::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message,
                      int inputConfirmationNumber, int changeOutputs ) noexcept(false) {
     Q_UNUSED(coinNano);
     Q_UNUSED(address);
@@ -367,7 +367,7 @@ QVector<WalletOutput> MockWallet::getOutputs() noexcept(false) {
 }
 
 // Show all transactions for current account
-// Check Signal: onTransactions( QString account, long height, QVector<WalletTransaction> Transactions)
+// Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
 void MockWallet::getTransactions() noexcept(false) {
     emit onTransactions( "default", 1234, transactions );
 }

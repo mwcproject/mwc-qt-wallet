@@ -26,7 +26,7 @@ public:
     // nanoCoins < 0 - all funds
     void transferFunds(const wallet::AccountInfo & accountFrom,
                        const wallet::AccountInfo & accountTo,
-                       long nanoCoins );
+                       int64_t nanoCoins );
 
     void goBack();
 
@@ -52,7 +52,7 @@ private:
     QString myAddress;
     wallet::AccountInfo trAccountFrom;
     wallet::AccountInfo trAccountTo;
-    long trNanoCoins = 0;
+    int64_t trNanoCoins = 0;
     QString trSlate;
 };
 

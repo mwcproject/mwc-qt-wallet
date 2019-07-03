@@ -29,7 +29,7 @@ public:
     void cancelTransaction(const wallet::WalletTransaction & transaction);
 
     // Proofs
-    void generateMwcBoxTransactionProof( long transactionId, QString resultingFileName );
+    void generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName );
     void verifyMwcBoxTransactionProof( QString proofFileName );
 
     // IO for columns widhts
@@ -45,9 +45,9 @@ protected:
     virtual NextStateRespond execute() override;
 
 private slots:
-    void updateTransactions( QString account, long height, QVector<wallet::WalletTransaction> Transactions);
+    void updateTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> Transactions);
 
-    void onCancelTransacton( bool success, long trIdx, QString errMessage );
+    void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
     void onWalletBalanceUpdated();
 
     void updateExportProof( bool success, QString fn, QString msg );

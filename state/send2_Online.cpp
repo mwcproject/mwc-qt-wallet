@@ -45,7 +45,7 @@ void SendOnline::updateSendCoinsParams(const core::SendCoinsParams &params) {
 }
 
 // Request for MWC to send
-void SendOnline::sendMwc(const wallet::AccountInfo &account, QString address, long mwcNano, QString message) {
+void SendOnline::sendMwc(const wallet::AccountInfo &account, QString address, int64_t mwcNano, QString message) {
 
     core::SendCoinsParams prms = context.appContext->getSendCoinsParams();
     context.wallet->sendTo( account, mwcNano, address, message, prms.inputConfirmationNumber, prms.changeOutputs );

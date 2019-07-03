@@ -100,14 +100,14 @@ public:
 
     // Cancel transaction
     // Check Signal:  onCancelTransacton
-    virtual void cancelTransacton(long transactionID) noexcept(false) override;
+    virtual void cancelTransacton(int64_t transactionID) noexcept(false) override;
 
-    virtual void generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) override;
+    virtual void generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName ) noexcept(false) override;
     virtual void verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) override;
 
     // Init send transaction with file output
     // Check signal:  onSendFile
-    virtual void sendFile( long coinNano, QString fileTx ) noexcept(false) override;
+    virtual void sendFile( int64_t coinNano, QString fileTx ) noexcept(false) override;
     // Recieve transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
     virtual void receiveFile( QString fileTx) noexcept(false) override;
@@ -117,14 +117,14 @@ public:
 
     // Send some coins to address.
     // Before send, wallet always do the switch to account to make it active
-    virtual void sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message="",
+    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message="",
                 int inputConfirmationNumber=10, int changeOutputs=1 ) noexcept(false) override;
     // Check signal:  onSend
 
     virtual QVector<WalletOutput> getOutputs() noexcept(false) override;
 
     // Show all transactions for current account
-    // Check Signal: onTransactions( QString account, long height, QVector<WalletTransaction> Transactions)
+    // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
     virtual void getTransactions() noexcept(false) override;
 
     // -------------- Contacts

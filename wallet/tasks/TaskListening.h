@@ -9,7 +9,7 @@ namespace wallet {
 // Listening for MWC MQ & keybase connection statuses
 class TaskListeningListener : public Mwc713Task {
 public:
-    const static long TIMEOUT = 3600*1000*5; // 5 hours should be enough
+    const static int64_t TIMEOUT = 3600*1000*5; // 5 hours should be enough
 
     TaskListeningListener( MWC713 *wallet713 ) :
             Mwc713Task("TaskListeningListener", "", wallet713,"") {}
@@ -24,7 +24,7 @@ public:
 
 class TaskListeningStart : public Mwc713Task {
 public:
-    const static long TIMEOUT = 7000;
+    const static int64_t TIMEOUT = 7000;
 
     // Start one listen per request. mwc713 doesn't support both
     TaskListeningStart(MWC713 *wallet713, bool startMq, bool startKeybase) :
@@ -45,7 +45,7 @@ private:
 
 class TaskListeningStop : public Mwc713Task {
 public:
-    const static long TIMEOUT = 8000;
+    const static int64_t TIMEOUT = 8000;
 
     // Start one listen per request. mwc713 doesn't support both
     TaskListeningStop(MWC713 *wallet713, bool stopMq, bool stopKeybase) :

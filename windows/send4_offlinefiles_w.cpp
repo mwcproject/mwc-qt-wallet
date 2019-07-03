@@ -44,7 +44,7 @@ void SendOfflineFiles::on_generateFileButton_clicked()
         return;
     }
 
-    long nanoCoins = mwcAmount.second;
+    int64_t nanoCoins = mwcAmount.second;
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Create initial transaction file"),
                                                           state->getFileGenerationPath(),

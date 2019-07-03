@@ -134,11 +134,11 @@ public:
 
     // Cancel transaction
     // Check Signal:  onCancelTransacton
-    virtual void cancelTransacton(long transactionID) noexcept(false) override;
+    virtual void cancelTransacton(int64_t transactionID) noexcept(false) override;
 
     // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
     // Check Signal: onExportProof( bool success, QString fn, QString msg );
-    virtual void generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) override;
+    virtual void generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName ) noexcept(false) override;
 
     // Verify the proof for transaction
     // Check Signal: onVerifyProof( bool success, QString msg );
@@ -146,7 +146,7 @@ public:
 
     // Init send transaction with file output
     // Check signal:  onSendFile
-    virtual void sendFile( long coinNano, QString fileTx ) noexcept(false) override;
+    virtual void sendFile( int64_t coinNano, QString fileTx ) noexcept(false) override;
     // Recieve transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
     virtual void receiveFile( QString fileTx) noexcept(false) override;
@@ -159,12 +159,12 @@ public:
     // Before send, wallet always do the switch to account to make it active
     // Check signal:  onSend
     // coinNano == -1  - mean All
-    virtual void sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 ) noexcept(false) override;
+    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 ) noexcept(false) override;
 
     virtual QVector<WalletOutput> getOutputs() noexcept(false) override {return QVector<WalletOutput>();}
 
     // Show all transactions for current account
-    // Check Signal: onTransactions( QString account, long height, QVector<WalletTransaction> Transactions)
+    // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
     virtual void getTransactions() noexcept(false) override;
 
     // -------------- Contacts
@@ -211,7 +211,7 @@ public:
 
 
     void setRecoveryResults( bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages );
-    void setRecoveryProgress( long progress, long limit );
+    void setRecoveryProgress( int64_t progress, int64_t limit );
 
     // Update account feedback
     void updateAccountList( QVector<QString> accounts );
@@ -223,8 +223,8 @@ public:
     void updateRenameAccount(const QString & oldName, const QString & newName, bool createSimulation,
                              bool success, QString errorMessage);
 
-    void infoResults( QString currentAccountName, long height,
-           long totalNano, long waitingConfNano, long lockedNano, long spendableNano,
+    void infoResults( QString currentAccountName, int64_t height,
+           int64_t totalNano, int64_t waitingConfNano, int64_t lockedNano, int64_t spendableNano,
                       bool mwcServerBroken );
 
     void setSendResults(bool success, QStringList errors);
@@ -238,12 +238,12 @@ public:
     void setFinalizeFile( bool success, QStringList errors, QString fileName );
 
     // Transactions
-    void setTransactions( QString account, long height, QVector<WalletTransaction> Transactions);
+    void setTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
 
     void setExportProofResults( bool success, QString fn, QString msg );
     void setVerifyProofResults( bool success, QString fn, QString msg );
 
-    void setTransCancelResult( bool success, long transId, QString errMsg );
+    void setTransCancelResult( bool success, int64_t transId, QString errMsg );
 
     void setSetReceiveAccount( bool ok, QString accountOrMessage );
 private:

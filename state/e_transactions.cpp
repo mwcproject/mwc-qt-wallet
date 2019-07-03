@@ -61,14 +61,14 @@ void Transactions::requestTransactions() {
     context.wallet->getTransactions();
 }
 
-void Transactions::updateTransactions( QString account, long height, QVector<wallet::WalletTransaction> transactions) {
+void Transactions::updateTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> transactions) {
     if (wnd) {
         wnd->setTransactionData(account, height, transactions);
     }
 }
 
 // Proofs
-void Transactions::generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) {
+void Transactions::generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName ) {
     context.wallet->generateMwcBoxTransactionProof(transactionId, resultingFileName);
     // respond will be async
 }
@@ -112,7 +112,7 @@ QVector<wallet::AccountInfo> Transactions::getWalletBalance() {
 }
 
 
-void Transactions::onCancelTransacton( bool success, long trIdx, QString errMessage ) {
+void Transactions::onCancelTransacton( bool success, int64_t trIdx, QString errMessage ) {
     if (success)
         context.wallet->updateWalletBalance(); // Updating balance, Likely something will be unblocked
 

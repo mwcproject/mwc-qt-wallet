@@ -13,22 +13,22 @@ namespace wallet {
 
 struct AccountInfo {
     QString accountName = "default";
-    long height = 0;
+    int64_t height = 0;
     // in nano coins
-    long total = 0;
-    long awaitingConfirmation = 0;
-    long lockedByPrevTransaction = 0;
-    long currentlySpendable = 0;
+    int64_t total = 0;
+    int64_t awaitingConfirmation = 0;
+    int64_t lockedByPrevTransaction = 0;
+    int64_t currentlySpendable = 0;
 
-    long mwcNodeHeight = 0;
+    int64_t mwcNodeHeight = 0;
     bool mwcServerBroken = true;
 
     void setData(QString account,
-        long total,
-        long awaitingConfirmation,
-        long lockedByPrevTransaction,
-        long currentlySpendable,
-        long mwcNodeHeight,
+        int64_t total,
+        int64_t awaitingConfirmation,
+        int64_t lockedByPrevTransaction,
+        int64_t currentlySpendable,
+        int64_t mwcNodeHeight,
         bool mwcServerBroken);
 
     QString getLongAccountName() const;
@@ -53,13 +53,13 @@ struct WalletConfig {
 struct NodeStatus {
     int     connection; // current number of connections
     QString tip; // Status og the current fork tip
-    long    height; // Height of the tip
-    long    total_difficulty; // Total difficulty accumulated on that fork since genesis block
+    int64_t    height; // Height of the tip
+    int64_t    total_difficulty; // Total difficulty accumulated on that fork since genesis block
 
     void setData(int   connection,
         QString tip,
-        long height,
-        long total_difficulty);
+        int64_t height,
+        int64_t total_difficulty);
 };
 
 struct WalletContact {
@@ -77,24 +77,24 @@ struct WalletOutput {
     enum STATUS {Unconfirmed, Confirmed};
 
     QString outputCommitment;
-    long    MMRIndex;
-    long    lockHeight;
+    int64_t    MMRIndex;
+    int64_t    lockHeight;
     bool    lockedUntil;
     STATUS  status;
     bool    coinbase;
-    long    numOfConfirms;
-    long    valueNano;
-    long    txIdx;
+    int64_t    numOfConfirms;
+    int64_t    valueNano;
+    int64_t    txIdx;
 
     void setData(QString outputCommitment,
-            long    MMRIndex,
-            long    lockHeight,
+            int64_t    MMRIndex,
+            int64_t    lockHeight,
             bool    lockedUntil,
             STATUS  status,
             bool    coinbase,
-            long    numOfConfirms,
-            long    valueNano,
-            long    txIdx);
+            int64_t    numOfConfirms,
+            int64_t    valueNano,
+            int64_t    txIdx);
 
     // return status value as a string
     QString getStatusStr() const;
@@ -103,24 +103,24 @@ struct WalletOutput {
 struct WalletTransaction {
     enum TRANSACTION_TYPE { NONE=0, SEND=1, RECIEVE=2, CANCELLED=0x8000};
 
-    long    txIdx = -1;
+    int64_t    txIdx = -1;
     uint    transactionType = TRANSACTION_TYPE::NONE;
     QString txid;
     QString address;
     QString creationTime;
     bool    confirmed = false;
     QString confirmationTime;
-    long    coinNano=0; // Net diffrence
+    int64_t    coinNano=0; // Net diffrence
     bool    proof=false;
 
-    void setData(long txIdx,
+    void setData(int64_t txIdx,
         uint    transactionType,
         QString txid,
         QString address,
         QString creationTime,
         bool    confirmed,
         QString confirmationTime,
-        long    coinNano,
+        int64_t    coinNano,
         bool    proof);
 
     bool isValid() const {return txIdx>=0 && transactionType!=TRANSACTION_TYPE::NONE && !txid.isEmpty();}
@@ -128,7 +128,7 @@ struct WalletTransaction {
     bool canBeCancelled() const { return (transactionType & TRANSACTION_TYPE::CANCELLED)==0 && !confirmed; }
 
     // return transaction age (time interval from creation moment) in Seconds.
-    long calculateTransactionAge( const QDateTime & current ) const;
+    int64_t calculateTransactionAge( const QDateTime & current ) const;
 
     // mark transaction as cancelled
     void cancelled() {
@@ -163,12 +163,12 @@ struct WalletTransaction {
 };
 
 struct WalletUtxoSignature {
-    long coinNano; // Output amount
+    int64_t coinNano; // Output amount
     QString messageHash;
     QString pubKeyCompressed;
     QString messageSignature;
 
-    void setData(long _coinNano, // Output amount
+    void setData(int64_t _coinNano, // Output amount
             QString _messageHash,
             QString _pubKeyCompressed,
             QString _messageSignature);
@@ -318,13 +318,13 @@ public:
     // Get wallet balance
     // Cancel transaction
     // Check Signal:  onCancelTransacton
-    virtual void cancelTransacton(long transactionID) noexcept(false) = 0;
+    virtual void cancelTransacton(int64_t transactionID) noexcept(false) = 0;
 
     // Proof results
 
     // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
     // Check Signal: onExportProof( bool success, QString fn, QString msg );
-    virtual void generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) = 0;
+    virtual void generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName ) noexcept(false) = 0;
 
     // Verify the proof for transaction
     // Check Signal: onVerifyProof( bool success, QString msg );
@@ -332,7 +332,7 @@ public:
 
     // Init send transaction with file output
     // Check signal:  onSendFile
-    virtual void sendFile( long coinNano, QString fileTx ) noexcept(false) = 0;
+    virtual void sendFile( int64_t coinNano, QString fileTx ) noexcept(false) = 0;
     // Recieve transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
     virtual void receiveFile( QString fileTx) noexcept(false) = 0;
@@ -343,14 +343,14 @@ public:
     // Send some coins to address.
     // Before send, wallet always do the switch to account to make it active
     // coinNano == -1  - mean All
-    virtual void sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 ) noexcept(false) = 0;
+    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 ) noexcept(false) = 0;
     // Check signal:  onSend
 
     // Show outputs for the wallet
     virtual QVector<WalletOutput> getOutputs() noexcept(false) = 0;
     // Show all transactions for current account
     virtual void getTransactions() noexcept(false) = 0;
-    // Check Signal: onTransactions( QString account, long height, QVector<WalletTransaction> Transactions)
+    // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
 
     // -------------- Contacts
 
@@ -425,8 +425,8 @@ signals:
     void onSetReceiveAccount( bool ok, QString AccountOrMessage );
 
     // Transactions
-    void onTransactions( QString account, long height, QVector<WalletTransaction> Transactions);
-    void onCancelTransacton( bool success, long trIdx, QString errMessage );
+    void onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
+    void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
 
     // Proof results
     void onExportProof( bool success, QString fn, QString msg );

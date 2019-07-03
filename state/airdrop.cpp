@@ -35,7 +35,7 @@ namespace state {
 
 
     void AirdropRequestsStatus::initOk(QString _btcAddress, QString _challendge, QString _signature,
-                                       QString _status, long _nanoCoins ) {
+                                       QString _status, int64_t _nanoCoins ) {
         btcAddress = _btcAddress;
         challendge = _challendge;
         signature  = _signature;

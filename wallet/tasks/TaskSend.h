@@ -23,7 +23,7 @@ public:
 
 class TaskSetReceiveAccount : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*2;
+    const static int64_t TIMEOUT = 1000*2;
 
     TaskSetReceiveAccount( MWC713 *wallet713, QString account, QString password ) :
             Mwc713Task("TaskSetReceiveAccount",
@@ -43,10 +43,10 @@ public:
 class TaskSendMwc : public QObject, public Mwc713Task {
     Q_OBJECT
 public:
-    const static long TIMEOUT = 1000*60; // 1 minute should be enough
+    const static int64_t TIMEOUT = 1000*60; // 1 minute should be enough
 
     // coinNano == -1  - mean All
-    TaskSendMwc( MWC713 *wallet713, long coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 ) :
+    TaskSendMwc( MWC713 *wallet713, int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 ) :
             Mwc713Task("TaskSendMwc",
                     buildCommand(wallet713, coinNano, address, message, inputConfirmationNumber, changeOutputs),
                     wallet713, "") {}
@@ -58,15 +58,15 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
     // coinNano == -1  - mean All
-    QString buildCommand( MWC713 *wallet713, long coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1) const;
+    QString buildCommand( MWC713 *wallet713, int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1) const;
 };
 
 
 class TaskSendFile : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*20;
+    const static int64_t TIMEOUT = 1000*20;
 
-    TaskSendFile( MWC713 *wallet713, long coinNano, QString fileTx ) :
+    TaskSendFile( MWC713 *wallet713, int64_t coinNano, QString fileTx ) :
             Mwc713Task("TaskSendFile",
                        QString("send ") + util::nano2one(coinNano) + " --file \"" + fileTx + "\"",
                        wallet713, "") {}
@@ -80,7 +80,7 @@ public:
 
 class TaskReceiveFile : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*20;
+    const static int64_t TIMEOUT = 1000*20;
 
     TaskReceiveFile( MWC713 *wallet713, QString fileName ) :
             Mwc713Task("TaskReceiveFile",  QString("receive --file \"") + fileName + "\"", wallet713,"") {}
@@ -94,7 +94,7 @@ public:
 
 class TaskFinalizeFile : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*20;
+    const static int64_t TIMEOUT = 1000*20;
 
     TaskFinalizeFile( MWC713 *wallet713, QString fileTxResponse ) :
             Mwc713Task("TaskReceiveFile",  QString("finalize --file \"") + fileTxResponse + "\"", wallet713, "") {}

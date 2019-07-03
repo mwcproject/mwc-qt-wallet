@@ -66,7 +66,7 @@ void Hodl::on_submitSelectedTransactionsButton_clicked()
     // Check what is submitted
     QVector<QString> submittedTransactions;
 
-    long totalAmount = 0;
+    int64_t totalAmount = 0;
     for (QListWidgetItem * selItm : selectedItems) {
         int idx = selItm->data(Qt::UserRole).toInt();
         submittedTransactions.push_back( transactions[idx].txid );

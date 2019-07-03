@@ -8,7 +8,7 @@ namespace wallet {
 // List all account
 class TaskAccountList : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*7;
+    const static int64_t TIMEOUT = 1000*7;
 
     TaskAccountList( MWC713 *wallet713 ) :
             Mwc713Task("TaskAccountList", "accounts", wallet713,"") {}
@@ -24,7 +24,7 @@ public:
 // Create acoount command. Note that after account creation wallet keeping the original default account
 class TaskAccountCreate : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*7;
+    const static int64_t TIMEOUT = 1000*7;
 
     // Expected that account is unique. Account must meet mwc713 expectations
     TaskAccountCreate( MWC713 * wallet713, QString account ) :
@@ -41,7 +41,7 @@ private:
 
 class TaskAccountSwitch : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*7;
+    const static int64_t TIMEOUT = 1000*7;
 
     TaskAccountSwitch( MWC713 * wallet713, QString accountName, QString password ) :
             Mwc713Task("TaskAccountSwitch", "account switch " + accountName + " -p " + password, wallet713, "account switch " + accountName ),
@@ -59,7 +59,7 @@ private:
 
 class TaskAccountRename : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*5;
+    const static int64_t TIMEOUT = 1000*5;
 
     // createSimulation is true if user expect create account instead of rename deleted
     TaskAccountRename( MWC713 * wallet713, QString oldAccountName, QString newAccountName, bool createSimulation ) :
@@ -82,7 +82,7 @@ private:
 
 class TaskAccountInfo : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*10;
+    const static int64_t TIMEOUT = 1000*10;
 
     // noRefresh can be used for sequenced calls
     TaskAccountInfo( MWC713 * wallet713, bool noRefresh ) :

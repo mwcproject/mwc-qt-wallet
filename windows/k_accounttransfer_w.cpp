@@ -93,7 +93,7 @@ void AccountTransfer::on_transferButton_clicked()
 
     QString sendAmount = ui->amountEdit->text();
 
-    QPair<bool, long> mwcAmount;
+    QPair<bool, int64_t> mwcAmount;
     if (sendAmount != "All") {
         mwcAmount = util::one2nano(ui->amountEdit->text());
         if (!mwcAmount.first) {
@@ -103,7 +103,7 @@ void AccountTransfer::on_transferButton_clicked()
         }
     }
     else { // All
-        mwcAmount = QPair<bool, long>(true, -1);
+        mwcAmount = QPair<bool, int64_t>(true, -1);
     }
 
     auto & acc = accountInfo[fromI];

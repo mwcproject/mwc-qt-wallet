@@ -9,7 +9,7 @@ namespace wallet {
 // Geting and chnanging
 class TaskMwcMqAddress : public Mwc713Task {
 public:
-    const static long TIMEOUT = 3000;
+    const static int64_t TIMEOUT = 3000;
 
     // genNext:true - generate next address, address by index
     // idx     - index for generated address (genNext is true)

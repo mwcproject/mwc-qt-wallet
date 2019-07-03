@@ -28,7 +28,7 @@ public:
     QString getFileGenerationPath();
     void updateFileGenerationPath(QString path);
 
-    void sendToFile(long nanoCoins, QString fileName);
+    void sendToFile(int64_t nanoCoins, QString fileName);
     //void signTransaction( QString fileName );
     void publishTransaction( QString fileName );
 

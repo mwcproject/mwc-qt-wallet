@@ -46,9 +46,9 @@ bool TaskRecoverProgressListener::processTask(const QVector<WEvent> &events) {
         return false;
 
     bool ok0 = false;
-    long limit = lst[0].toLong(&ok0); // Limit
+    int64_t limit = lst[0].toLong(&ok0); // Limit
     bool ok1 = false;
-    long pos = lst[1].toLong(&ok1); // position
+    int64_t pos = lst[1].toLong(&ok1); // position
 
     Q_ASSERT(ok0 && ok1);
     if (ok0 && ok1) {

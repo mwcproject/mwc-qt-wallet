@@ -7,7 +7,7 @@ namespace wallet {
 
 class TaskTransactions : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*60;
+    const static int64_t TIMEOUT = 1000*60;
 
     TaskTransactions( MWC713 * wallet713  ) :
             Mwc713Task("Transactions", "txs", wallet713, "") {}
@@ -23,9 +23,9 @@ public:
 
 class TaskTransCancel : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*7;
+    const static int64_t TIMEOUT = 1000*7;
 
-    TaskTransCancel( MWC713 * wallet713, long transId ) :
+    TaskTransCancel( MWC713 * wallet713, int64_t transId ) :
             Mwc713Task("TaskTransCancel", "cancel --id " + QString::number(transId) , wallet713, ""), transactionId(transId) {}
 
     virtual ~TaskTransCancel() override {}
@@ -34,7 +34,7 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
-    long transactionId;
+    int64_t transactionId;
     QString proofFileName;
 };
 
@@ -42,9 +42,9 @@ private:
 
 class TaskTransExportProof : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*7;
+    const static int64_t TIMEOUT = 1000*7;
 
-    TaskTransExportProof( MWC713 * wallet713, QString fileName, long transId ) :
+    TaskTransExportProof( MWC713 * wallet713, QString fileName, int64_t transId ) :
             Mwc713Task("TransExportProof", "export-proof --file \"" + fileName + "\" --id " + QString::number(transId) , wallet713, ""), transactionId(transId), proofFileName(fileName) {}
 
     virtual ~TaskTransExportProof () override {}
@@ -53,13 +53,13 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
-    long transactionId;
+    int64_t transactionId;
     QString proofFileName;
 };
 
 class TaskTransVerifyProof : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*7;
+    const static int64_t TIMEOUT = 1000*7;
 
     TaskTransVerifyProof( MWC713 * wallet713, QString fileName  ) :
             Mwc713Task("TaskTransVerifyProof", "verify-proof --file \"" + fileName + "\"", wallet713, ""), proofFileName(fileName) {}

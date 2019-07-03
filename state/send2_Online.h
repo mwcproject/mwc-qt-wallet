@@ -26,7 +26,7 @@ public:
     void updateSendCoinsParams( const core::SendCoinsParams  & params );
 
     // Request for MWC to send
-    void sendMwc( const wallet::AccountInfo & account, QString address, long mwcNano, QString message );
+    void sendMwc( const wallet::AccountInfo & account, QString address, int64_t mwcNano, QString message );
 
 protected:
     virtual NextStateRespond execute() override;

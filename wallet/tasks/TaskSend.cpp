@@ -95,7 +95,7 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
 }
 
 
-QString TaskSendMwc::buildCommand( MWC713 *wallet713, long coinNano, const QString & address,
+QString TaskSendMwc::buildCommand( MWC713 *wallet713, int64_t coinNano, const QString & address,
         QString message, int inputConfirmationNumber, int changeOutputs ) const {
 
     QString cmd = "send ";// + util::nano2one(coinNano);

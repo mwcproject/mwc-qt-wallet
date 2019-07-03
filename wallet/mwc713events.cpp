@@ -90,7 +90,7 @@ void Mwc713EventManager::connectWith(tries::Mwc713InputParser * inputParser) {
 // Add task (single wallet action) to perform.
 // This tale ownership of object
 // Note:  if timeout <= 0, task will be executed immediately
-void Mwc713EventManager::addTask( Mwc713Task * task, long timeout ) {
+void Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout ) {
     taskQ.push_back(taskInfo(task,timeout));
     processNextTask();
 

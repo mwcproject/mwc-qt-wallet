@@ -40,7 +40,7 @@ bool parseTransactionLine( QString str, const TransactionIdxLayout & tl,
         return false;
 
     bool ok = false;
-    long id = -1;
+    int64_t id = -1;
     id = strId.toLong(&ok);
     if (!ok || id < 0)
         return false;
@@ -58,7 +58,7 @@ bool parseTransactionLine( QString str, const TransactionIdxLayout & tl,
 
     bool conf = strConf.startsWith("yes", Qt::CaseInsensitive);
 
-    QPair<bool, long> net = util::one2nano(strNetDiff);
+    QPair<bool, int64_t> net = util::one2nano(strNetDiff);
     if ( !net.first )
         return false;
 
@@ -82,7 +82,7 @@ bool TaskTransactions::processTask(const QVector<WEvent> & events) {
     int curEvt = 0;
 
     QString account;
-    long  height = -1;
+    int64_t  height = -1;
 
     for ( ; curEvt < events.size(); curEvt++ ) {
         if (events[curEvt].event == WALLET_EVENTS::S_TRANSACTION_LOG ) {
@@ -134,10 +134,10 @@ bool TaskTransactions::processTask(const QVector<WEvent> & events) {
         }
     }
 
-    QMap< long, WalletTransaction > transactions;
+    QMap<int64_t, WalletTransaction > transactions;
 
     // Processing transactions
-    long lastTransId = -1;
+    int64_t lastTransId = -1;
     for ( ; curEvt < events.size(); curEvt++ ) {
         if (events[curEvt].event == WALLET_EVENTS::S_LINE ) {
             auto &str = events[curEvt].message;

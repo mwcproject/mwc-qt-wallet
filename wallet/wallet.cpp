@@ -32,11 +32,11 @@ QString WalletNotificationMessages::toString() const {
 }
 
 void AccountInfo::setData(QString account,
-                        long _total,
-                        long _awaitingConfirmation,
-                        long _lockedByPrevTransaction,
-                        long _currentlySpendable,
-                        long _mwcNodeHeight,
+                        int64_t _total,
+                        int64_t _awaitingConfirmation,
+                        int64_t _lockedByPrevTransaction,
+                        int64_t _currentlySpendable,
+                        int64_t _mwcNodeHeight,
                         bool _mwcServerBroken)
 {
     accountName = account;
@@ -88,8 +88,8 @@ bool WalletConfig::loadData( QDataStream & in) {
 
 void NodeStatus::setData(int   _connection,
                             QString _tip,
-                            long _height,
-                            long _total_difficulty)
+                            int64_t _height,
+                            int64_t _total_difficulty)
 {
     connection = _connection;
     tip = _tip;
@@ -98,14 +98,14 @@ void NodeStatus::setData(int   _connection,
 }
 
 
-void WalletTransaction::setData(long _txIdx,
+void WalletTransaction::setData(int64_t _txIdx,
     uint    _transactionType,
     QString _txid,
     QString _address,
     QString _creationTime,
     bool    _confirmed,
     QString _confirmationTime,
-    long    _coinNano,
+    int64_t    _coinNano,
     bool    _proof)
 {
     txIdx = _txIdx;
@@ -120,7 +120,7 @@ void WalletTransaction::setData(long _txIdx,
 }
 
 // return transaction age (time interval from creation moment) in Seconds.
-long WalletTransaction::calculateTransactionAge( const QDateTime & current ) const {
+int64_t WalletTransaction::calculateTransactionAge( const QDateTime & current ) const {
     // Example: 2019-06-22 05:44:53
     QDateTime setTime = QDateTime::fromString (creationTime, mwc::DATETIME_TEMPLATE_THIS );
 //    setTime.setOffsetFromUtc(0);
@@ -130,14 +130,14 @@ long WalletTransaction::calculateTransactionAge( const QDateTime & current ) con
 
 
 void WalletOutput::setData(QString _outputCommitment,
-        long    _MMRIndex,
-        long    _lockHeight,
+        int64_t    _MMRIndex,
+        int64_t    _lockHeight,
         bool    _lockedUntil,
         STATUS  _status,
         bool    _coinbase,
-        long    _numOfConfirms,
-        long    _valueNano,
-        long    _txIdx)
+        int64_t    _numOfConfirms,
+        int64_t    _valueNano,
+        int64_t    _txIdx)
 {
     outputCommitment = _outputCommitment;
     MMRIndex = _MMRIndex;
@@ -189,7 +189,7 @@ bool WalletContact::loadData( QDataStream & in) {
 }
 
 
-void WalletUtxoSignature::setData(long _coinNano, // Output amount
+void WalletUtxoSignature::setData(int64_t _coinNano, // Output amount
         QString _messageHash,
         QString _pubKeyCompressed,
         QString _messageSignature)

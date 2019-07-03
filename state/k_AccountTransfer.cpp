@@ -51,7 +51,7 @@ void AccountTransfer::updateSendCoinsParams(const core::SendCoinsParams &params)
 // nanoCoins < 0 - all funds
 void AccountTransfer::transferFunds(const wallet::AccountInfo & accountFrom,
                         const wallet::AccountInfo & accountTo,
-                        long nanoCoins) {
+                        int64_t nanoCoins) {
     Q_ASSERT(wnd);
     if (!wnd)
         return;

@@ -25,10 +25,10 @@ struct AirdropRequestsStatus {
     bool    ok = false;
     QString status; // ok status
     QString errMessage;
-    long    nanoCoins = 0; // amount that was requested
+    int64_t    nanoCoins = 0; // amount that was requested
 
     void initOk(QString btcAddress, QString challendge, QString signature,
-            QString status, long nanoCoins );
+            QString status, int64_t nanoCoins );
 
     void initFail( QString btcAddress, QString challendge, QString signature,
                    QString errMessage);

@@ -20,7 +20,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Here you can submit your MWC transactions for HODL program.&lt;br&gt;Please select transactions that you are going to hold for a long time.&lt;br&gt;For more details plase check &lt;a href=&quot;https://www.mwc.mw/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.mwc.mw/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Here you can submit your MWC transactions for HODL program.&lt;br&gt;Please select transactions that you are going to hold for a int64_t time.&lt;br&gt;For more details plase check &lt;a href=&quot;https://www.mwc.mw/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.mwc.mw/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

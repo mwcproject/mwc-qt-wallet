@@ -85,7 +85,7 @@ void MwcToolbar::onWalletBalanceUpdated() {
 
     QVector<wallet::AccountInfo> balance = wallet->getWalletBalance();
 
-    long mwcSum = 0;
+    int64_t mwcSum = 0;
     for ( const auto & ai : balance ) {
         mwcSum += ai.total;
     }

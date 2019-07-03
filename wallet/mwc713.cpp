@@ -286,7 +286,7 @@ void MWC713::renameAccount(const QString & oldName, const QString & newName) noe
 // Send some coins to address.
 // Before send, wallet always do the switch to account to make it active
 // Check signal:  onSend
-void MWC713::sendTo( const wallet::AccountInfo &account, long coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs ) noexcept(false) {
+void MWC713::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs ) noexcept(false) {
     // switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account.accountName, walletPassword), TaskAccountSwitch::TIMEOUT );
     // If listening, strting...
@@ -299,7 +299,7 @@ void MWC713::sendTo( const wallet::AccountInfo &account, long coinNano, const QS
 
 // Init send transaction with file output
 // Check signal:  onSendFile
-void MWC713::sendFile( long coinNano, QString fileTx ) noexcept(false) {
+void MWC713::sendFile( int64_t coinNano, QString fileTx ) noexcept(false) {
     eventCollector->addTask( new TaskSendFile(this, coinNano, fileTx ), TaskSendFile::TIMEOUT );
 }
 
@@ -330,14 +330,14 @@ void MWC713::setReceiveAccount(QString account) noexcept(false) {
 
 // Cancel transaction
 // Check Signal:  onCancelTransacton
-void MWC713::cancelTransacton(long transactionID) noexcept(false) {
+void MWC713::cancelTransacton(int64_t transactionID) noexcept(false) {
     eventCollector->addTask( new TaskTransCancel(this, transactionID), TaskTransCancel::TIMEOUT );
 }
 
 
 // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
 // Check Signal: onExportProof( bool success, QString fn, QString msg );
-void MWC713::generateMwcBoxTransactionProof( long transactionId, QString resultingFileName ) noexcept(false) {
+void MWC713::generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName ) noexcept(false) {
     eventCollector->addTask( new TaskTransExportProof(this, resultingFileName, transactionId), TaskTransExportProof::TIMEOUT );
 }
 
@@ -488,7 +488,7 @@ void MWC713::setRecoveryResults( bool started, bool finishedWithSuccess, QString
     }
 }
 
-void MWC713::setRecoveryProgress( long progress, long limit ) {
+void MWC713::setRecoveryProgress( int64_t progress, int64_t limit ) {
     logger::logEmit("MWC713", "onRecoverProgress", QString("progress=") + QString::number(progress) +
                                               " limit=" + QString::number(limit) );
     emit onRecoverProgress( int(progress), int(limit) );
@@ -577,8 +577,8 @@ void MWC713::updateRenameAccount(const QString & oldName, const QString & newNam
 }
 
 // Update with account info
-void MWC713::infoResults( QString currentAccountName, long height,
-                  long totalNano, long waitingConfNano, long lockedNano, long spendableNano, bool mwcServerBroken ) {
+void MWC713::infoResults( QString currentAccountName, int64_t height,
+                  int64_t totalNano, int64_t waitingConfNano, int64_t lockedNano, int64_t spendableNano, bool mwcServerBroken ) {
     AccountInfo acc;
     acc.setData(currentAccountName,
                 totalNano,
@@ -626,7 +626,7 @@ void MWC713::setFinalizeFile( bool success, QStringList errors, QString fileName
 }
 
 // Transactions
-void MWC713::setTransactions( QString account, long height, QVector<WalletTransaction> Transactions ) {
+void MWC713::setTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions ) {
     logger::logEmit( "MWC713", "onTransactions", "account="+account );
     emit onTransactions( account, height, Transactions );
 }
@@ -641,7 +641,7 @@ void MWC713::setVerifyProofResults( bool success, QString fn, QString msg ) {
     emit onVerifyProof(success, fn, msg);
 }
 
-void MWC713::setTransCancelResult( bool success, long transId, QString errMsg ) {
+void MWC713::setTransCancelResult( bool success, int64_t transId, QString errMsg ) {
     logger::logEmit( "MWC713", "onCancelTransacton", "success="+QString::number(success) );
     emit onCancelTransacton(success, transId, errMsg);
 }

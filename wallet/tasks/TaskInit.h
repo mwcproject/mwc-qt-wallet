@@ -7,7 +7,7 @@ namespace wallet {
 
 class TaskInit : public Mwc713Task {
 public:
-    const static long TIMEOUT = 5000;
+    const static int64_t TIMEOUT = 5000;
 
     TaskInit( MWC713 * wallet713) :
             Mwc713Task("TaskInit", "init", wallet713, "") {}
@@ -22,7 +22,7 @@ public:
 
 class TaskInitConfirm : public Mwc713Task {
 public:
-    const static long TIMEOUT = 5000;
+    const static int64_t TIMEOUT = 5000;
 
     TaskInitConfirm( MWC713 * wallet713) :
             Mwc713Task("TaskInitConfirm", " ", wallet713,"") {}  // Need to press enter only. But space is fine too
@@ -39,7 +39,7 @@ public:
 
 class TaskInitPassphrase : public Mwc713Task {
 public:
-    const static long TIMEOUT = 5000;
+    const static int64_t TIMEOUT = 5000;
 
     TaskInitPassphrase( MWC713 * wallet713, QString password) :
             Mwc713Task("TaskInitPassphrase", password, wallet713, "password") {}

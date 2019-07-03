@@ -58,7 +58,7 @@ void Transactions::saveTableHeaders() {
 }
 
 
-void Transactions::setTransactionData(QString account, long height, const QVector<wallet::WalletTransaction> & trans) {
+void Transactions::setTransactionData(QString account, int64_t height, const QVector<wallet::WalletTransaction> & trans) {
 
     ui->progressFrame->hide();
     ui->transactionTable->show();
@@ -101,7 +101,7 @@ void Transactions::setTransactionData(QString account, long height, const QVecto
         double selection = 0.0;
 
         if ( trans.canBeCancelled() ) {
-            long age = trans.calculateTransactionAge(current);
+            int64_t age = trans.calculateTransactionAge(current);
             // 1 hours is a 1.0
             selection = age > 60 * 60 ?
                 1.0 : (double(age) / double(60 * 60));
@@ -242,7 +242,7 @@ void Transactions::on_deleteButton_clicked()
     }
 }
 
-void Transactions::updateCancelTransacton(bool success, long trIdx, QString errMessage) {
+void Transactions::updateCancelTransacton(bool success, int64_t trIdx, QString errMessage) {
     if (success) {
         requestTransactions();
 

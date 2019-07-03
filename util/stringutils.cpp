@@ -31,7 +31,7 @@ QVector<QString> parsePhrase2Words( const QString & phrase ) {
 
 
 // convert nano items to dtirng that represent that fraction as a double
-QString nano2one( long nano ) {
+QString nano2one( int64_t nano ) {
     if (nano == 0)
         return "0";
 
@@ -78,23 +78,23 @@ QString zeroDbl2Dbl(QString  dbl) {
 
 
 // convert string representing double into nano
-QPair<bool,long> one2nano(QString str) {
+QPair<bool,int64_t> one2nano(QString str) {
     if (str.length()==0)
-        return QPair<bool,long>(false, 0);
+        return QPair<bool,int64_t>(false, 0);
 
     bool ok = false;
     double dbl = str.toDouble(&ok);
     if (!ok)
-        return QPair<bool,long>(false, 0);
+        return QPair<bool,int64_t>(false, 0);
 
-    long s = 1;
+    int64_t s = 1;
     if ( dbl < 0.0 ) {
         s = -1;
         dbl = -dbl;
     }
 
-    long nano = long(dbl * 1000000000.0 + 0.5);
-    return QPair<bool,long>( true, nano*s );
+    int64_t nano = int64_t(dbl * 1000000000.0 + 0.5);
+    return QPair<bool,int64_t>( true, nano*s );
 }
 
 // Trim string that represent double. 23434.32345, len 7 => 23434.32; 23434.32345, len 5 => 23434
@@ -116,7 +116,7 @@ QString trimStrAsDouble(const QString & dblStr, int maxLen) {
 }
 
 
-// convert long strign into shorter version
+// convert int64_t strign into shorter version
 // abcdefgh  => abc...
 QString string2shortStrR( QString str, int lenLimit ) {
     if ( str.length() < lenLimit )

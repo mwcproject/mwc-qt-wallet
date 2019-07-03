@@ -7,7 +7,7 @@
 
 namespace wnd {
 
-QString generateAmountErrorMsg( long mwcAmount, const wallet::AccountInfo & acc, const core::SendCoinsParams & sendParams ) {
+QString generateAmountErrorMsg( int64_t mwcAmount, const wallet::AccountInfo & acc, const core::SendCoinsParams & sendParams ) {
         QString msg2print = "You are trying to send " + util::nano2one(mwcAmount) + " wmc, but you only have " +
                             util::nano2one(acc.currentlySpendable) + " spendable wmc.";
         if (acc.awaitingConfirmation > 0)
@@ -95,7 +95,7 @@ void SendOnline::on_sendButton_clicked()
 
     QString sendAmount = ui->amountEdit->text();
 
-    QPair<bool, long> mwcAmount;
+    QPair<bool, int64_t> mwcAmount;
     if (sendAmount != "All") {
         mwcAmount = util::one2nano(ui->amountEdit->text());
         if (!mwcAmount.first) {
@@ -105,7 +105,7 @@ void SendOnline::on_sendButton_clicked()
         }
     }
     else { // All
-        mwcAmount = QPair<bool, long>(true, -1);
+        mwcAmount = QPair<bool, int64_t>(true, -1);
     }
 
     QString sendTo = ui->sendEdit->text();

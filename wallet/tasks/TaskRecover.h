@@ -8,7 +8,7 @@ namespace wallet {
 // It is listener task. No input can be defined
 class TaskRecoverProgressListener : public Mwc713Task {
 public:
-    const static long TIMEOUT = 3600*1000*5; // 5 hours should be enough
+    const static int64_t TIMEOUT = 3600*1000*5; // 5 hours should be enough
 
     // Start one listen per request. mwc713 doesn't support both
     TaskRecoverProgressListener( MWC713 *wallet713 ) :
@@ -26,7 +26,7 @@ public:
 
 class TaskRecoverFull : public Mwc713Task {
 public:
-    const static long TIMEOUT = 3600*1000*5; // 5 hours should be enough
+    const static int64_t TIMEOUT = 3600*1000*5; // 5 hours should be enough
 
     // Expected that listening is already stopped
     TaskRecoverFull( MWC713 *wallet713, QVector<QString> seed, QString password ) :
@@ -47,7 +47,7 @@ private:
 
 class TaskRecover1Type : public Mwc713Task {
 public:
-    const static long TIMEOUT = 5000; //
+    const static int64_t TIMEOUT = 5000; //
 
     // Expected that listening is already stopped
     TaskRecover1Type( MWC713 *wallet713 ) :
@@ -63,7 +63,7 @@ public:
 
 class TaskRecover2Mnenonic : public Mwc713Task {
 public:
-    const static long TIMEOUT = 5000; //
+    const static int64_t TIMEOUT = 5000; //
 
     // Expected that listening is already stopped
     TaskRecover2Mnenonic( MWC713 *wallet713, QVector<QString> seed ) :
@@ -80,10 +80,10 @@ private:
 
 };
 
-// type password and start recovering. Might be pretty long process...
+// type password and start recovering. Might be pretty int64_t process...
 class TaskRecover3Password : public Mwc713Task {
 public:
-    const static long TIMEOUT = 3600*1000*5; // 5 hours should be enough
+    const static int64_t TIMEOUT = 3600*1000*5; // 5 hours should be enough
 
     // Expected that listening is already stopped
     TaskRecover3Password( MWC713 *wallet713, QString password ) :
@@ -102,7 +102,7 @@ public:
 // Just show mnenonic
 class TaskRecoverShowMnenonic : public Mwc713Task {
 public:
-    const static long TIMEOUT = 5000; //
+    const static int64_t TIMEOUT = 5000; //
 
     // Expected that listening is already stopped
     TaskRecoverShowMnenonic( MWC713 *wallet713, QString password ) :

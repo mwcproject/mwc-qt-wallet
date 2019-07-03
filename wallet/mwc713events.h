@@ -121,7 +121,7 @@ public:
     // Add task (single wallet action) to perform.
     // This tale ownership of object
     // Note:  if timeout <= 0, task will be executed immediately
-    void addTask( Mwc713Task * task, long timeout );
+    void addTask( Mwc713Task * task, int64_t timeout );
 
 //    void addEvent(WALLET_EVENTS event) { events.push_back(WEvent(event)); }
   //  void addEvent(WALLET_EVENTS event, QString message) { events.push_back(WEvent(event, message)); }

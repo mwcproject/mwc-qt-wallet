@@ -8,7 +8,7 @@ namespace util {
 QVector<QString> parsePhrase2Words( const QString & phrase );
 
 // convert nano items to dtirng that represent that fraction as a double
-QString nano2one( long nano );
+QString nano2one( int64_t nano );
 
 // Trim string that represent double. 23434.32345, len 7 => 23434.32; 23434.32345, len 5 => 23434
 QString trimStrAsDouble(const QString & dblStr, int maxLen);
@@ -17,9 +17,9 @@ QString trimStrAsDouble(const QString & dblStr, int maxLen);
 QString zeroDbl2Dbl(QString  dbl);
 
 // convert string representing double into nano
-QPair<bool,long> one2nano(QString str);
+QPair<bool,int64_t> one2nano(QString str);
 
-// convert long strign into shorter version
+// convert int64_t strign into shorter version
 // abcdefgh  => abc...
 QString string2shortStrR( QString str, int lenLimit );
 // abcdefgh  => ab...gh

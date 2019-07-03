@@ -63,7 +63,7 @@ void SendOffline::updateFileGenerationPath(QString path) {
     context.appContext->updatePathFor("fileGen", path);
 }
 
-void SendOffline::sendToFile(long nanoCoins, QString fileName) {
+void SendOffline::sendToFile(int64_t nanoCoins, QString fileName) {
 
     context.wallet->sendFile( nanoCoins, fileName );
 }

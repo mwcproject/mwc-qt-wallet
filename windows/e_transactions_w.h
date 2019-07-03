@@ -22,12 +22,12 @@ public:
     explicit Transactions(QWidget *parent, state::Transactions * state);
     ~Transactions();
 
-    void setTransactionData(QString account, long height, const QVector<wallet::WalletTransaction> & transactions);
+    void setTransactionData(QString account, int64_t height, const QVector<wallet::WalletTransaction> & transactions);
 
     void showExportProofResults(bool success, QString fn, QString msg );
     void showVerifyProofResults(bool success, QString fn, QString msg );
 
-    void updateCancelTransacton(bool success, long trIdx, QString errMessage);
+    void updateCancelTransacton(bool success, int64_t trIdx, QString errMessage);
     void updateWalletBalance();
 
 
