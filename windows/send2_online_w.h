@@ -42,7 +42,7 @@ private:
     QVector<wallet::WalletContact> contacts;
 };
 
-QString generateAmountErrorMsg( long mwcAmount, const wallet::AccountInfo & acc, const core::SendCoinsParams & sendParams );
+extern QString generateAmountErrorMsg( long mwcAmount, const wallet::AccountInfo & acc, const core::SendCoinsParams & sendParams );
 
 
 }
