@@ -131,6 +131,7 @@ void Mwc713EventManager::processNextTask() {
 }
 
 void Mwc713EventManager::timerEvent(QTimerEvent *event) {
+    Q_UNUSED(event);
     if (taskExecutionTimeLimit==0)
         return;
 

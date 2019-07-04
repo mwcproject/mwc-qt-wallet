@@ -11,12 +11,14 @@ NavMenu::NavMenu(QWidget *parent) : QFrame(parent)
 }
 
 void NavMenu::focusOutEvent(QFocusEvent *event) {
+    Q_UNUSED(event);
     emit closed();
     close();
 
 }
 
 void NavMenu::leaveEvent(QEvent *event) {
+    Q_UNUSED(event);
     emit closed();
     close();
 }

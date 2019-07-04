@@ -199,12 +199,14 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
 // ------------------------- TaskAccountProgress --------------------------
 
 bool TaskAccountProgress::processTask(const QVector<WEvent> &events) {
+    Q_UNUSED(events);
     wallet713->updateAccountProgress( pos, total );
     return true;
 }
 
 // ---------------------- TaskAccountListFinal -------------------------
 bool TaskAccountListFinal::processTask(const QVector<WEvent> &events) {
+    Q_UNUSED(events);
     wallet713->updateAccountFinalize(accountName2switch);
     return true;
 }

@@ -159,13 +159,13 @@ QString expandStrM(QString str, int len, QChar filler ) {
 QString trimErrorMessage(QString errorMsg) {
     errorMsg = errorMsg.trimmed();
     if ( errorMsg.startsWith("error:", Qt::CaseInsensitive) )
-        return errorMsg.mid( strlen("error:") ).trimmed();
+        return errorMsg.mid( (int)strlen("error:") ).trimmed();
 
     if ( errorMsg.startsWith("warning:", Qt::CaseInsensitive) )
-        return errorMsg.mid( strlen("warning:") ).trimmed();
+        return errorMsg.mid( (int)strlen("warning:") ).trimmed();
 
     if ( errorMsg.startsWith("info:", Qt::CaseInsensitive) )
-        return errorMsg.mid( strlen("info:") ).trimmed();
+        return errorMsg.mid( (int)strlen("info:") ).trimmed();
 
     return errorMsg;
 }

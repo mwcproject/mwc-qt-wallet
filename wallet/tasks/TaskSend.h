@@ -48,7 +48,7 @@ public:
     // coinNano == -1  - mean All
     TaskSendMwc( MWC713 *wallet713, int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 ) :
             Mwc713Task("TaskSendMwc",
-                    buildCommand(wallet713, coinNano, address, message, inputConfirmationNumber, changeOutputs),
+                    buildCommand( coinNano, address, message, inputConfirmationNumber, changeOutputs),
                     wallet713, "") {}
 
     virtual ~TaskSendMwc() override {}
@@ -58,7 +58,7 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
     // coinNano == -1  - mean All
-    QString buildCommand( MWC713 *wallet713, int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1) const;
+    QString buildCommand(int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1) const;
 };
 
 

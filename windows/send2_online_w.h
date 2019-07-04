@@ -13,7 +13,7 @@ class SendOnline;
 }
 
 namespace core {
-class SendCoinsParams;
+struct SendCoinsParams;
 }
 
 namespace wnd {
@@ -42,7 +42,7 @@ private:
     QVector<wallet::WalletContact> contacts;
 };
 
-extern QString generateAmountErrorMsg( int64_t mwcAmount, const wallet::AccountInfo & acc, const core::SendCoinsParams & sendParams );
+QString generateAmountErrorMsg( int64_t mwcAmount, const wallet::AccountInfo & acc, const core::SendCoinsParams & sendParams );
 
 
 }
