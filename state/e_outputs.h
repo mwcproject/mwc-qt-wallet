@@ -33,7 +33,7 @@ public:
     QVector<wallet::AccountInfo> getWalletBalance();
 
 private slots:
-    void onOutputs( QString account, long height, QVector<wallet::WalletOutput> outputs);
+    void onOutputs( QString account, int64_t height, QVector<wallet::WalletOutput> outputs);
 
 
 protected:

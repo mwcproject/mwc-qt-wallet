@@ -22,7 +22,7 @@ public:
     explicit Outputs(QWidget *parent, state::Outputs * state);
     ~Outputs();
 
-    void setOutputsData(QString account, long height, const QVector<wallet::WalletOutput> & outp );
+    void setOutputsData(QString account, int64_t height, const QVector<wallet::WalletOutput> & outp );
 
 private slots:
     void on_accountComboBox_activated(int index);

@@ -7,7 +7,7 @@ namespace wallet {
 
 class TaskOutputs : public Mwc713Task {
 public:
-    const static long TIMEOUT = 1000*15;
+    const static int64_t TIMEOUT = 1000*15;
 
     TaskOutputs( MWC713 * wallet713  ) :
             Mwc713Task("Transactions", "outputs --show-spent", wallet713, "") {}

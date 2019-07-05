@@ -31,7 +31,7 @@ void Outputs::requestOutputs() {
     // Respond:  onOutputs(...)
 }
 
-void Outputs::onOutputs( QString account, long height, QVector<wallet::WalletOutput> outputs) {
+void Outputs::onOutputs( QString account, int64_t height, QVector<wallet::WalletOutput> outputs) {
     if (wnd) {
         wnd->setOutputsData(account,height, outputs);
     }

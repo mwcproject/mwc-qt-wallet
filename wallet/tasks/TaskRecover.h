@@ -125,7 +125,7 @@ public:
 // 'check' command. Will recover from
 class TaskCheck : public Mwc713Task {
 public:
-    const static long TIMEOUT = 3600*1000*5; // 5 hours should be enough
+    const static int64_t TIMEOUT = 3600*1000*5; // 5 hours should be enough
 
     // Expected that listening is already stopped
     TaskCheck( MWC713 *wallet713, bool wait4listeners ) :

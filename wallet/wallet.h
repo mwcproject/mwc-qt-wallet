@@ -428,7 +428,7 @@ signals:
     void onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
     void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
 
-    void onOutputs( QString account, long height, QVector<WalletOutput> Transactions);
+    void onOutputs( QString account, int64_t height, QVector<WalletOutput> Transactions);
 
     void onCheckResult(bool ok, QString errors );
 

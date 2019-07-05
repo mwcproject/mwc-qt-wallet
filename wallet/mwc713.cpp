@@ -322,7 +322,7 @@ void MWC713::finalizeFile( QString fileTxResponse ) noexcept(false) {
 }
 
 // Show outputs for the wallet
-// Check Signal: onOutputs( QString account, long height, QVector<WalletOutput> Transactions)
+// Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> Transactions)
 void MWC713::getOutputs() noexcept(false) {
     eventCollector->addTask( new TaskOutputs(this), TaskOutputs::TIMEOUT );
 }
@@ -643,7 +643,7 @@ void MWC713::setTransactions( QString account, int64_t height, QVector<WalletTra
     emit onTransactions( account, height, Transactions );
 }
 
-void MWC713::setOutputs( QString account, long height, QVector<WalletOutput> outputs) {
+void MWC713::setOutputs( QString account, int64_t height, QVector<WalletOutput> outputs) {
     logger::logEmit( "MWC713", "onOutputs", "account="+account );
     emit onOutputs( account, height, outputs );
 }

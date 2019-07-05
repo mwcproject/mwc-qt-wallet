@@ -124,7 +124,7 @@ public:
     // Check signal:  onSend
 
     // Show outputs for the wallet
-    // Check Signal: onOutputs( QString account, long height, QVector<WalletOutput> Transactions)
+    // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> Transactions)
     virtual void getOutputs() noexcept(false) override;
 
     // Show all transactions for current account

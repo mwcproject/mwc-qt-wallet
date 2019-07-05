@@ -164,7 +164,7 @@ public:
     virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 ) noexcept(false) override;
 
     // Show outputs for the wallet
-    // Check Signal: onOutputs( QString account, long height, QVector<WalletOutput> outputs)
+    // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
     virtual void getOutputs() noexcept(false) override;
 
     // Show all transactions for current account
@@ -227,8 +227,8 @@ public:
     void updateRenameAccount(const QString & oldName, const QString & newName, bool createSimulation,
                              bool success, QString errorMessage);
 
-    void infoResults( QString currentAccountName, long height,
-           long totalNano, long waitingConfNano, long lockedNano, long spendableNano,
+    void infoResults( QString currentAccountName, int64_t height,
+                      int64_t totalNano, int64_t waitingConfNano, int64_t lockedNano, int64_t spendableNano,
                       bool mwcServerBroken );
 
     void setSendResults(bool success, QStringList errors);

@@ -38,7 +38,7 @@ bool parseOutputLine( QString str, const OutputIdxLayout & tl,
     if (strOutputCommitment.isEmpty() )
         return false;
 
-    QPair<bool,long> mwcOne = util::one2nano(strValue);
+    QPair<bool,int64_t> mwcOne = util::one2nano(strValue);
 
     output.setData(strOutputCommitment,
                    strMmrIndex,
@@ -60,7 +60,7 @@ bool TaskOutputs::processTask(const QVector<WEvent> & events) {
     int curEvt = 0;
 
     QString account;
-    long  height = -1;
+    int64_t  height = -1;
 
     for ( ; curEvt < events.size(); curEvt++ ) {
         if (events[curEvt].event == WALLET_EVENTS::S_OUTPUT_LOG ) {
@@ -173,7 +173,7 @@ bool parseTransactionLine( QString str, const TransactionIdxLayout & tl,
 
     bool ok = false;
     int64_t id = -1;
-    id = strId.toLong(&ok);
+    id = strId.toLongLong(&ok);
     if (!ok || id < 0)
         return false;
 

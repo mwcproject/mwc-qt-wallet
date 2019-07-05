@@ -148,7 +148,7 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
 
     int64_t height = 0;
     if (ok) {
-        height = infoData[1].toLong(&ok);
+        height = infoData[1].toLongLong(&ok);
     }
 
     int lnIdx = 0;

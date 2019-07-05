@@ -53,7 +53,7 @@ void Outputs::saveTableHeaders() {
     state->updateColumnsWidhts( ui->outputsTable->getColumnWidths() );
 }
 
-void Outputs::setOutputsData(QString account, long height, const QVector<wallet::WalletOutput> & outp ) {
+void Outputs::setOutputsData(QString account, int64_t height, const QVector<wallet::WalletOutput> & outp ) {
 
     ui->progressFrame->hide();
     ui->outputsTable->show();
