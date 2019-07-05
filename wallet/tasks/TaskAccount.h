@@ -43,9 +43,9 @@ class TaskAccountSwitch : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*7;
 
-    TaskAccountSwitch( MWC713 * wallet713, QString accountName, QString password ) :
+    TaskAccountSwitch( MWC713 * wallet713, QString accountName, QString password, bool _makeAccountCurrent ) :
             Mwc713Task("TaskAccountSwitch", "account switch " + accountName + " -p " + password, wallet713, "account switch " + accountName ),
-            switchAccountName(accountName) { Q_ASSERT(accountName.length()>0); Q_ASSERT(password.length()>0); }
+            switchAccountName(accountName), makeAccountCurrent(_makeAccountCurrent) { Q_ASSERT(accountName.length()>0); Q_ASSERT(password.length()>0); }
 
     virtual ~TaskAccountSwitch() override {}
 
@@ -54,6 +54,7 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
     QString switchAccountName;
+    bool makeAccountCurrent;
 };
 
 

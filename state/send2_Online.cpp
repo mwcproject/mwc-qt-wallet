@@ -32,6 +32,10 @@ QVector<wallet::AccountInfo> SendOnline::getWalletBalance() {
     return context.wallet->getWalletBalance();
 }
 
+QString SendOnline::getCurrentAccountName() {
+    return context.wallet->getCurrentAccountName();
+}
+
 QVector<wallet::WalletContact> SendOnline::getContacts() {
     return context.wallet->getContacts();
 }

@@ -2,6 +2,7 @@
 #include "ui_e_outputs.h"
 #include "../state/e_outputs.h"
 #include "../util/stringutils.h"
+#include <QDebug>
 
 namespace wnd {
 
@@ -20,11 +21,11 @@ Outputs::Outputs(QWidget *parent, state::Outputs * _state) :
     ui->progress->initLoader(true);
     ui->progressFrame->hide();
 
-    updateWalletBalance();
+    QString accName = updateWalletBalance();
 
     initTableHeaders();
 
-    requestOutputs();
+    requestOutputs(accName);
 
     ui->outputsTable->setFocus();
 }
@@ -55,6 +56,8 @@ void Outputs::saveTableHeaders() {
 
 void Outputs::setOutputsData(QString account, int64_t height, const QVector<wallet::WalletOutput> & outp ) {
 
+    qDebug() << "Outputs::setOutputsData for account=" << account << " height=" << height << " outp zs=" << outp.size();
+
     ui->progressFrame->hide();
     ui->outputsTable->show();
 
@@ -77,6 +80,7 @@ void Outputs::setOutputsData(QString account, int64_t height, const QVector<wall
             }
         }
     }
+    qDebug() << "current account is set";
 
     Q_ASSERT(accountOK);
 
@@ -86,6 +90,7 @@ void Outputs::setOutputsData(QString account, int64_t height, const QVector<wall
 
     ui->outputsTable->clearData();
 
+    qDebug() << "updating output table for " << rowNum << " rows";
     for ( int i=0; i<rowNum; i++ ) {
         auto & out = outputs[i];
 
@@ -102,24 +107,24 @@ void Outputs::setOutputsData(QString account, int64_t height, const QVector<wall
     }
 }
 
-void Outputs::requestOutputs() {
+void Outputs::requestOutputs(QString account) {
 
     ui->progressFrame->show();
     ui->outputsTable->hide();
 
     ui->outputsTable->clearData();
-    state->requestOutputs();
+    state->requestOutputs(account);
 }
 
 void Outputs::on_accountComboBox_activated(int index)
 {
     if (index>=0 && index<accountInfo.size()) {
         state->switchCurrentAccount( accountInfo[index] );
-        requestOutputs();
+        requestOutputs( accountInfo[index].accountName );
     }
 }
 
-void Outputs::updateWalletBalance() {
+QString Outputs::updateWalletBalance() {
     accountInfo = state->getWalletBalance();
     QString selectedAccount = state->getCurrentAccountName();
 
@@ -135,6 +140,7 @@ void Outputs::updateWalletBalance() {
         ui->accountComboBox->addItem( info.getLongAccountName(), QVariant(idx++) );
     }
     ui->accountComboBox->setCurrentIndex(selectedAccIdx);
+    return accountInfo[selectedAccIdx].accountName;
 }
 
 }

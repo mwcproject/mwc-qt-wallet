@@ -18,10 +18,10 @@ public:
     Outputs(const StateContext & context);
     virtual ~Outputs() override;
 
-    void deleteWnd() {wnd= nullptr;}
+    void deleteWnd() {wnd = nullptr;}
 
     // request wallet for outputs
-    void requestOutputs();
+    void requestOutputs(QString account);
 
     QString getCurrentAccountName() const;
 
@@ -34,6 +34,8 @@ public:
 
 private slots:
     void onOutputs( QString account, int64_t height, QVector<wallet::WalletOutput> outputs);
+
+    void onWalletBalanceUpdated();
 
 
 protected:

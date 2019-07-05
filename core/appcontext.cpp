@@ -89,10 +89,11 @@ bool AppContext::loadData() {
 
      int id = 0;
      in >> id;
-     if (id!=0x4781)
+     if (id!=0x4782)
          return false;
 
      in >> recieveAccount;
+     in >> currentAccountName;
 
      int st;
      in >> st;
@@ -122,8 +123,9 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x4781;
+    out << 0x4782;
     out << recieveAccount;
+    out << currentAccountName;
     out << int(activeWndState);
     out << pathStates;
     out << intVectorStates;

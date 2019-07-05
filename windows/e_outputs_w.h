@@ -24,6 +24,9 @@ public:
 
     void setOutputsData(QString account, int64_t height, const QVector<wallet::WalletOutput> & outp );
 
+    // return selected account
+    QString updateWalletBalance();
+
 private slots:
     void on_accountComboBox_activated(int index);
 
@@ -31,8 +34,7 @@ private:
     void initTableHeaders();
     void saveTableHeaders();
 
-    void updateWalletBalance();
-    void requestOutputs();
+    void requestOutputs(QString account);
 
 private:
     Ui::Outputs *ui;

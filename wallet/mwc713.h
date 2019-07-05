@@ -10,9 +10,12 @@ namespace tries {
     class Mwc713InputParser;
 }
 
+namespace core {
+class AppContext;
+}
+
 namespace wallet {
 
-class Mwc713State;
 class Mwc713EventManager;
 
 class MWC713 : public Wallet
@@ -21,7 +24,7 @@ class MWC713 : public Wallet
 public:
 
 public:
-    MWC713(QString mwc713path, QString mwc713configPath);
+    MWC713(QString mwc713path, QString mwc713configPath, core::AppContext * appContext);
     virtual ~MWC713() override;
 
     // Generic. Reporting fatal error that somebody will process and exit app
@@ -165,11 +168,11 @@ public:
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
-    virtual void getOutputs() noexcept(false) override;
+    virtual void getOutputs(QString account) noexcept(false) override;
 
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
-    virtual void getTransactions() noexcept(false) override;
+    virtual void getTransactions(QString account) noexcept(false) override;
 
     // -------------- Contacts
 
@@ -222,7 +225,7 @@ public:
     void updateAccountProgress(int accountIdx, int totalAccounts);
     void updateAccountFinalize(QString prevCurrentAccount);
     void createNewAccount( QString newAccountName );
-    void switchToAccount( QString switchAccountName );
+    void switchToAccount( QString switchAccountName, bool makeAccountCurrent );
 
     void updateRenameAccount(const QString & oldName, const QString & newName, bool createSimulation,
                              bool success, QString errorMessage);
@@ -269,6 +272,8 @@ private slots:
     void	mwc713readyReadStandardOutput();
 
 private:
+    core::AppContext * appContext; // app context to store current account name
+
     QString mwc713Path; // path to the backed binary
     QString mwc713configPath; // config file for mwc713
     QProcess * mwc713process = nullptr;

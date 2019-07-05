@@ -20,7 +20,7 @@ public:
     void resetWnd() {wnd = nullptr;}
 
     // Current transactions that wallet has
-    void requestTransactions();
+    void requestTransactions(QString account);
 
     void switchCurrentAccount(const wallet::AccountInfo & account);
 

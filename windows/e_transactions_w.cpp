@@ -22,11 +22,11 @@ Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
     ui->progress->initLoader(true);
     ui->progressFrame->hide();
 
-    updateWalletBalance();
+    QString accName = updateWalletBalance();
 
     initTableHeaders();
 
-    requestTransactions();
+    requestTransactions(accName);
 }
 
 Transactions::~Transactions()
@@ -132,13 +132,13 @@ void Transactions::showVerifyProofResults(bool success, QString fn, QString msg 
 }
 
 
-void Transactions::requestTransactions() {
+void Transactions::requestTransactions(QString account) {
 
     ui->progressFrame->show();
     ui->transactionTable->hide();
 
     ui->transactionTable->clearData();
-    state->requestTransactions();
+    state->requestTransactions(account);
 
     updateButtons();
 }
@@ -162,7 +162,7 @@ void Transactions::updateButtons() {
 
 void Transactions::on_refreshButton_clicked()
 {
-    requestTransactions();
+    requestTransactions(getSelectedAccount().accountName);
 }
 
 void Transactions::on_validateProofButton_clicked()
@@ -214,7 +214,7 @@ void Transactions::on_accountComboBox_activated(int index)
 {
     if (index>=0 && index<accountInfo.size()) {
         state->switchCurrentAccount( accountInfo[index] );
-        requestTransactions();
+        requestTransactions( accountInfo[index].accountName );
     }
 }
 
@@ -236,7 +236,7 @@ void Transactions::on_deleteButton_clicked()
 
 void Transactions::updateCancelTransacton(bool success, int64_t trIdx, QString errMessage) {
     if (success) {
-        requestTransactions();
+        requestTransactions(getSelectedAccount().accountName);
 
         control::MessageBox::message(this, "Transaction was cancelled", "Transaction number " + QString::number(trIdx) + " was successfully cancelled");
     }
@@ -245,7 +245,7 @@ void Transactions::updateCancelTransacton(bool success, int64_t trIdx, QString e
     }
 }
 
-void Transactions::updateWalletBalance() {
+QString Transactions::updateWalletBalance() {
     accountInfo = state->getWalletBalance();
     QString selectedAccount = state->getCurrentAccountName();
 
@@ -261,9 +261,16 @@ void Transactions::updateWalletBalance() {
         ui->accountComboBox->addItem( info.getLongAccountName(), QVariant(idx++) );
     }
     ui->accountComboBox->setCurrentIndex(selectedAccIdx);
+    return accountInfo[selectedAccIdx].accountName;
 }
 
+wallet::AccountInfo Transactions::getSelectedAccount() const {
+    int idx = ui->accountComboBox->currentIndex();
+    if (idx<0)
+        idx = 0;
 
+    return accountInfo[idx];
+}
 
 }
 

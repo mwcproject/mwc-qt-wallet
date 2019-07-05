@@ -13,11 +13,17 @@ SendOfflineSettings::SendOfflineSettings(QWidget *parent, state::SendOffline * _
     ui->setupUi(this);
 
     accountInfo = state->getWalletBalance();
+    QString selectedAccount = state->getCurrentAccountName();
 
+    int selectedAccIdx = 0;
     int idx=0;
     for (auto & info : accountInfo) {
+        if (info.accountName == selectedAccount)
+            selectedAccIdx = idx;
+
         ui->accountComboBox->addItem( util::expandStrR(info.accountName, 25) + " Available: " + util::nano2one(info.currentlySpendable) + " mwc", QVariant(idx++) );
     }
+    ui->accountComboBox->setCurrentIndex(selectedAccIdx);
 }
 
 SendOfflineSettings::~SendOfflineSettings()

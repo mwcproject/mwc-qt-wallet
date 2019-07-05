@@ -18,6 +18,7 @@
 #include "tasks/TaskTransaction.h"
 #include "../util/Log.h"
 #include "../core/global.h"
+#include "../core/appcontext.h"
 #include "../control/messagebox.h"
 
 namespace wallet {
@@ -28,7 +29,10 @@ class Mwc713State {
     virtual ~Mwc713State();
 };
 
-MWC713::MWC713(QString _mwc713path, QString _mwc713configPath) : mwc713Path(_mwc713path), mwc713configPath(_mwc713configPath) {
+MWC713::MWC713(QString _mwc713path, QString _mwc713configPath, core::AppContext * _appContext) :
+        mwc713Path(_mwc713path), mwc713configPath(_mwc713configPath), appContext(_appContext) {
+
+    currentAccount = appContext->getCurrentAccountName();
 }
 
 MWC713::~MWC713() {
@@ -272,7 +276,7 @@ void MWC713::createAccount( const QString & accountName ) noexcept(false) {
 // Check Signal: onAccountSwitched
 void MWC713::switchAccount(const QString & accountName) noexcept(false) {
     // Expected that account is in the list
-    eventCollector->addTask( new TaskAccountSwitch(this, accountName, walletPassword), TaskAccountSwitch::TIMEOUT );
+    eventCollector->addTask( new TaskAccountSwitch(this, accountName, walletPassword, true), TaskAccountSwitch::TIMEOUT );
 }
 
 // Rename account
@@ -294,7 +298,7 @@ void MWC713::check(bool wait4listeners) noexcept(false) {
 // Check signal:  onSend
 void MWC713::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs ) noexcept(false) {
     // switch account first
-    eventCollector->addTask( new TaskAccountSwitch(this, account.accountName, walletPassword), TaskAccountSwitch::TIMEOUT );
+    eventCollector->addTask( new TaskAccountSwitch(this, account.accountName, walletPassword, true), TaskAccountSwitch::TIMEOUT );
     // If listening, strting...
 
     eventCollector->addTask( new TaskSendMwc(this, coinNano, address, message, inputConfirmationNumber, changeOutputs), TaskSendMwc::TIMEOUT );
@@ -323,11 +327,15 @@ void MWC713::finalizeFile( QString fileTxResponse ) noexcept(false) {
 
 // Show outputs for the wallet
 // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> Transactions)
-void MWC713::getOutputs() noexcept(false) {
+void MWC713::getOutputs(QString account) noexcept(false) {
+    // Need to switch account first
+    eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskOutputs(this), TaskOutputs::TIMEOUT );
 }
 
-void MWC713::getTransactions() noexcept(false) {
+void MWC713::getTransactions(QString account) noexcept(false) {
+    // Need to switch account first
+    eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskTransactions(this), TaskTransactions::TIMEOUT );
 }
 
@@ -511,7 +519,7 @@ void MWC713::updateAccountList( QVector<QString> accounts ) {
     collectedAccountInfo.clear();
     int idx = 0;
     for (QString acc : accounts) {
-        eventCollector->addTask( new TaskAccountSwitch(this, acc, walletPassword), TaskAccountSwitch::TIMEOUT );
+        eventCollector->addTask( new TaskAccountSwitch(this, acc, walletPassword, false), TaskAccountSwitch::TIMEOUT );
         eventCollector->addTask( new TaskAccountInfo(this, idx>0), TaskAccountInfo::TIMEOUT );
         eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1 ); // Updating the progress
     }
@@ -542,7 +550,9 @@ void MWC713::updateAccountFinalize(QString prevCurrentAccount) {
         prevCurrentAccount = accountInfo[0].accountName;
     }
 
-    eventCollector->addTask( new TaskAccountSwitch(this, prevCurrentAccount, walletPassword), TaskAccountSwitch::TIMEOUT );
+    // !!!!!! NOTE, 'false' mean that we don't save to that account. It make sence because during such long operation
+    //  somebody could change account
+    eventCollector->addTask( new TaskAccountSwitch(this, prevCurrentAccount, walletPassword, false), TaskAccountSwitch::TIMEOUT );
 }
 
 void MWC713::createNewAccount( QString newAccountName ) {
@@ -558,8 +568,13 @@ void MWC713::createNewAccount( QString newAccountName ) {
     emit onWalletBalanceUpdated();
 }
 
-void MWC713::switchToAccount( QString switchAccountName ) {
+void MWC713::switchToAccount( QString switchAccountName, bool makeAccountCurrent ) {
     logger::logEmit( "MWC713", "onAccountSwitched",switchAccountName);
+    if (makeAccountCurrent) {
+        currentAccount = switchAccountName;
+        appContext->setCurrentAccountName(currentAccount);
+    }
+
     emit onAccountSwitched(switchAccountName);
 }
 

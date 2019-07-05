@@ -71,6 +71,10 @@ public:
     QString getReceiveAccount() const {return recieveAccount;}
     void setReceiveAccount(QString account) {recieveAccount = account;}
 
+    QString getCurrentAccountName() const {return currentAccountName;};
+    void setCurrentAccountName(QString currentAccount) {currentAccountName = currentAccount;}
+
+
 private:
     bool loadData();
     void saveData() const;
@@ -81,6 +85,7 @@ private:
 //    int passHash = -1;
 
     QString recieveAccount = "default"; // Selected account
+    QString currentAccountName = "default"; // Current account
 
     // Active window that is visible
     state::STATE activeWndState = state::STATE::LISTENING;

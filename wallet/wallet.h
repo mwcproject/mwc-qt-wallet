@@ -346,11 +346,11 @@ public:
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
-    virtual void getOutputs() noexcept(false) = 0;
+    virtual void getOutputs(QString account) noexcept(false) = 0;
 
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
-    virtual void getTransactions() noexcept(false) = 0;
+    virtual void getTransactions(QString account) noexcept(false) = 0;
 
     // -------------- Contacts
 

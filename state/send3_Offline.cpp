@@ -38,6 +38,11 @@ QVector<wallet::AccountInfo> SendOffline::getWalletBalance() {
     return context.wallet->getWalletBalance();
 }
 
+QString SendOffline::getCurrentAccountName() {
+    return context.wallet->getCurrentAccountName();
+}
+
+
 core::SendCoinsParams SendOffline::getSendCoinsParams() {
     return context.appContext->getSendCoinsParams();
 }

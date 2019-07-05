@@ -20,6 +20,7 @@ public:
     void deleteWnd() {wnd = nullptr;}
 
     QVector<wallet::AccountInfo> getWalletBalance();
+    QString getCurrentAccountName();
     QVector<wallet::WalletContact> getContacts();
 
     core::SendCoinsParams getSendCoinsParams();

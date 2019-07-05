@@ -19,6 +19,7 @@ public:
     virtual ~SendOffline() override;
 
     QVector<wallet::AccountInfo> getWalletBalance();
+    QString getCurrentAccountName();
 
     core::SendCoinsParams getSendCoinsParams();
     void updateSendCoinsParams( const core::SendCoinsParams  & params );

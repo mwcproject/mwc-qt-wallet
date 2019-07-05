@@ -341,8 +341,8 @@ void MockWallet::sendTo( const wallet::AccountInfo &account, int64_t coinNano, c
 
 
 // Show outputs for the wallet
-void MockWallet::getOutputs() noexcept(false) {
-
+void MockWallet::getOutputs(QString account) noexcept(false) {
+    Q_UNUSED(account);
     QVector<WalletOutput> result;
 
     WalletOutput wi;
@@ -369,7 +369,8 @@ void MockWallet::getOutputs() noexcept(false) {
 
 // Show all transactions for current account
 // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
-void MockWallet::getTransactions() noexcept(false) {
+void MockWallet::getTransactions(QString account) noexcept(false) {
+    Q_UNUSED(account);
     emit onTransactions( "default", 1234, transactions );
 }
 

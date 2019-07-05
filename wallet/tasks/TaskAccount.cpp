@@ -78,10 +78,11 @@ bool TaskAccountCreate::processTask(const QVector<WEvent> &events) {
 // ---------------------------- TaskAccountSwitch -------------------------
 
 bool TaskAccountSwitch::processTask(const QVector<WEvent> &events) {
-    if ( events.size()!=1 && events[0].event == WALLET_EVENTS::S_READY )
-        wallet713->switchToAccount( switchAccountName );
+    QVector< WEvent > errors = filterEvents( events, WALLET_EVENTS::S_ERROR );
+    if ( errors.empty() )
+        wallet713->switchToAccount( switchAccountName, makeAccountCurrent );
     else
-        wallet713->switchToAccount( "" );
+        wallet713->switchToAccount( "", false );
 
     return true;
 }

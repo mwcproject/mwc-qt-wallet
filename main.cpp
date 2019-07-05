@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
 
     mwc::setApplication(&app, mainWnd);
 
-    wallet::MWC713 wallet( core::Config::getWallet713path(), core::Config::getMwc713conf() );
+    wallet::MWC713 wallet( core::Config::getWallet713path(), core::Config::getMwc713conf(), &appContext );
     //wallet::MockWallet wallet;
 
     core::WindowManager wndManager( mainWnd->getMainWindow() );

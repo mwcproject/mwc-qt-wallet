@@ -28,7 +28,7 @@ public:
     void showVerifyProofResults(bool success, QString fn, QString msg );
 
     void updateCancelTransacton(bool success, int64_t trIdx, QString errMessage);
-    void updateWalletBalance();
+    QString updateWalletBalance();
 
 
 private slots:
@@ -48,12 +48,14 @@ private:
     // return null if nothing was selected
     wallet::WalletTransaction * getSelectedTransaction();
 
-    void requestTransactions();
+    void requestTransactions(QString account);
 
     void updateButtons();
 
     void initTableHeaders();
     void saveTableHeaders();
+
+    wallet::AccountInfo getSelectedAccount() const;
 private:
     Ui::Transactions *ui;
     state::Transactions * state;

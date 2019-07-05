@@ -39,12 +39,18 @@ SendOnline::SendOnline(QWidget *parent, state::SendOnline * _state ) :
 
     // inti accounts
     accountInfo = state->getWalletBalance();
+    QString selectedAccount = state->getCurrentAccountName();
     contacts    = state->getContacts();
 
+    int selectedAccIdx = 0;
     int idx=0;
     for (auto & info : accountInfo) {
+        if (info.accountName == selectedAccount)
+            selectedAccIdx = idx;
+
         ui->accountComboBox->addItem( info.getLongAccountName(), QVariant(idx++) );
     }
+    ui->accountComboBox->setCurrentIndex(selectedAccIdx);
 }
 
 SendOnline::~SendOnline()

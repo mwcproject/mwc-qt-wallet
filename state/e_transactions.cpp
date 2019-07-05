@@ -56,9 +56,9 @@ void Transactions::switchCurrentAccount(const wallet::AccountInfo & account) {
 
 
 // Current transactions that wallet has
-void Transactions::requestTransactions() {
+void Transactions::requestTransactions(QString account) {
 
-    context.wallet->getTransactions();
+    context.wallet->getTransactions(account);
 }
 
 void Transactions::updateTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> transactions) {
