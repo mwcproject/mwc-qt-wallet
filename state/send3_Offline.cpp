@@ -48,6 +48,7 @@ void SendOffline::updateSendCoinsParams(const core::SendCoinsParams &params) {
 
 // Go to the next window
 void SendOffline::prepareSendMwcOffline( const wallet::AccountInfo & account, QString message ) {
+    Q_UNUSED(message);
     // Switching the account async, we don't really need the response
     context.wallet->switchAccount( account.accountName );
 
@@ -114,6 +115,8 @@ void SendOffline::respSendFile( bool success, QStringList errors, QString fileNa
 }*/
 
 void SendOffline::respFinalizeFile( bool success, QStringList errors, QString fileName ) {
+    Q_UNUSED(fileName);
+
     if (filesWnd) {
         QString message;
         if (success)

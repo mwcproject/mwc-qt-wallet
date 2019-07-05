@@ -1,5 +1,5 @@
 #include "windows/z_progresswnd.h"
-#include "ui_c_progresswnd.h"
+#include "ui_z_progresswnd.h"
 
 namespace wnd {
 

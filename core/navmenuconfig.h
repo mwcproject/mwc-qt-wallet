@@ -15,6 +15,8 @@ class StateMachine;
 
 namespace core {
 
+class AppContext;
+
 class NavMenuConfig : public NavMenu {
 Q_OBJECT
 public:
