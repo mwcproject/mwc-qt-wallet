@@ -17,7 +17,7 @@ NextStateRespond ShowSeed::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
 
-    wnd = new wnd::NewSeed( context.wndManager->getInWndParent(), this, getStateMachine(),  QVector<QString>(), false );
+    wnd = new wnd::NewSeed( context.wndManager->getInWndParent(), this, getStateMachine(), context.appContext, QVector<QString>(), true );
     context.wndManager->switchToWindow( wnd );
 
     context.wallet->getSeed();

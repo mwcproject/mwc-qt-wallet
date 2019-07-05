@@ -18,7 +18,7 @@
 #include "nodemanually.h"
 #include "e_listening.h"
 #include "e_transactions.h"
-#include "outputs.h"
+#include "e_outputs.h"
 #include "contacts.h"
 #include "walletconfig.h"
 #include "airdrop.h"
@@ -27,6 +27,7 @@
 #include "send2_Online.h"
 #include "send3_Offline.h"
 #include "x_ShowSeed.h"
+#include "x_Resync.h"
 
 namespace state {
 
@@ -67,6 +68,7 @@ StateMachine::StateMachine(StateContext & context) :
     states[ STATE::WALLET_CONFIG ]  = new WalletConfig(context);
     states[ STATE::AIRDRDOP_MAIN ]  = new Airdrop(context);
     states[ STATE::SHOW_SEED ]      = new ShowSeed(context);
+    states[ STATE::RESYNC ]         = new Resync(context);
 }
 
 StateMachine::~StateMachine() {

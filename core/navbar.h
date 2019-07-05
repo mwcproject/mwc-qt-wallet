@@ -13,13 +13,14 @@ class StateMachine;
 
 namespace core {
 
+class AppContext;
 class NavMenu;
 
 class NavBar : public QWidget {
 Q_OBJECT
 
 public:
-    explicit NavBar(QWidget *parent, state::StateMachine * stateMachine);
+    explicit NavBar(QWidget *parent, state::StateMachine * stateMachine, core::AppContext * appContext);
 
     ~NavBar();
 
@@ -41,6 +42,7 @@ private:
     Ui::NavBar *ui;
     QWidget *prntWnd; // will be used for popup
     state::StateMachine * stateMachine = nullptr;
+    core::AppContext * appContext = nullptr;
     QPoint navMenuPos; // Position of navigate menu
 };
 

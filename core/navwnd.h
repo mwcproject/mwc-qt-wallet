@@ -11,12 +11,14 @@ namespace core {
 
 class NavBar;
 class NavMenuAccount;
+class AppContext;
 
 // Window with navigation bar
 class NavWnd : public QWidget {
 Q_OBJECT
 public:
-    explicit NavWnd(QWidget *parent, state::StateMachine * stateMachine, bool createNavigationButtons=true);
+    explicit NavWnd(QWidget *parent, state::StateMachine * stateMachine,
+            AppContext * appContext, bool createNavigationButtons=true);
 
 protected:
     void resizeEvent(QResizeEvent *event);

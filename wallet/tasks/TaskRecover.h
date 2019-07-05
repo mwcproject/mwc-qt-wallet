@@ -2,6 +2,7 @@
 #define MWC_QT_WALLET_TASKRECOVER_H
 
 #include "../mwc713task.h"
+#include <QThread>
 
 namespace wallet {
 
@@ -117,6 +118,33 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 
 };
+
+////////////////////////////////////////////////////////////////
+///////////////////
+
+// 'check' command. Will recover from
+class TaskCheck : public Mwc713Task {
+public:
+    const static long TIMEOUT = 3600*1000*5; // 5 hours should be enough
+
+    // Expected that listening is already stopped
+    TaskCheck( MWC713 *wallet713, bool wait4listeners ) :
+            Mwc713Task("TaskRecover", "check", wallet713, ""), sleepBeforeStart(wait4listeners) {}
+
+    virtual ~TaskCheck() override {}
+
+    // Wait 3 seconds fro listeners to stop. Expected that stopping in the progress
+    virtual void onStarted() override { if (sleepBeforeStart) { QThread::msleep(3000); } }
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+
+private:
+    bool sleepBeforeStart;
+};
+
+
 
 
 }

@@ -29,7 +29,7 @@ QString generateAmountErrorMsg( int64_t mwcAmount, const wallet::AccountInfo & a
 }
 
 SendOnline::SendOnline(QWidget *parent, state::SendOnline * _state ) :
-    core::NavWnd(parent, _state->getStateMachine() ),
+    core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext() ),
     ui(new Ui::SendOnline),
     state(_state)
 {

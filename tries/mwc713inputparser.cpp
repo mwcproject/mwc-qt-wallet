@@ -376,6 +376,16 @@ void Mwc713InputParser::initSend() {
 }
 
 void Mwc713InputParser::initTransactions() {
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_OUTPUT_LOG,
+                                                QVector<BaseTrieSection*>{
+                                                        new TrieNewLineSection(),
+                                                        new TriePhraseSection("Wallet Outputs - Account '"),
+                                                        new TrieAnySection(200, TrieAnySection::NOT_NEW_LINE, "","'", 1),
+                                                        new TriePhraseSection("' - Block Height: "),
+                                                        new TrieAnySection(30, TrieAnySection::NUMBERS, "","", 2),
+                                                        new TrieNewLineSection()
+                                                }));
+
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_TRANSACTION_LOG,
                                                 QVector<BaseTrieSection*>{
                                                         new TrieNewLineSection(),

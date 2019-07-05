@@ -9,7 +9,7 @@ namespace wnd {
 
 Recieve::Recieve(QWidget *parent, state::Recieve * _state, bool mwcMqStatus, bool keybaseStatus,
                  QString mwcMqAddress) :
-        core::NavWnd(parent, _state->getStateMachine() ),
+        core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext() ),
         ui(new Ui::Recieve),
         state(_state)
 {

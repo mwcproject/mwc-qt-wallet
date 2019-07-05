@@ -8,7 +8,7 @@
 namespace wnd {
 
 AccountTransfer::AccountTransfer(QWidget *parent, state::AccountTransfer * _state) :
-    core::NavWnd(parent, _state->getStateMachine()),
+    core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext()),
     ui(new Ui::AccountTransfer),
     state(_state)
 {

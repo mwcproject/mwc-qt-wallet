@@ -1,4 +1,4 @@
-#include "windows/c_progresswnd.h"
+#include "windows/z_progresswnd.h"
 #include "ui_c_progresswnd.h"
 
 namespace wnd {

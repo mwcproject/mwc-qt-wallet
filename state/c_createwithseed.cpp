@@ -5,7 +5,7 @@
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../control/messagebox.h"
-#include "../windows/c_progresswnd.h"
+#include "windows/z_progresswnd.h"
 #include "../util/Log.h"
 #include <QDebug>
 #include <QThread>

@@ -124,6 +124,8 @@ void AccountTransfer::onSend( bool success, QStringList errors ) {
 }
 
 void AccountTransfer::onSlateSend( QString slate, QString mwc, QString sendAddr ) {
+    Q_UNUSED(mwc);
+    Q_UNUSED(sendAddr);
     if (transferState!=1)
         return;
 

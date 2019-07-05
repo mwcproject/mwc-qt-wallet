@@ -161,6 +161,31 @@ bool TaskRecoverShowMnenonic::processTask(const QVector<WEvent> &events) {
     return true;
 }
 
+// ----------------------- TaskCheck --------------------------
+
+bool TaskCheck::processTask(const QVector<WEvent> &events) {
+
+    QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
+    bool ok = false;
+    for ( auto & l : lns ) {
+        if (l.message.contains("check and repair done!"))
+            ok = true;
+    }
+
+    if (ok) {
+        wallet713->setCheckResult(true, "");
+        return true;
+    }
+
+    QStringList messages;
+    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    for (auto & e : errs)
+        messages.push_back(e.message);
+
+    wallet713->setCheckResult(false, util::formatErrorMessages(messages));
+
+    return true;
+}
 
 
 }

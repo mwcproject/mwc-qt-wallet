@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>189</width>
-    <height>151</height>
+    <width>187</width>
+    <height>197</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -85,6 +85,35 @@
    </property>
    <property name="text">
     <string>mwc mq</string>
+   </property>
+  </widget>
+  <widget class="control::MwcFrameWithBorder" name="frame_4">
+   <property name="geometry">
+    <rect>
+     <x>16</x>
+     <y>144</y>
+     <width>154</width>
+     <height>2</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="control::NavMenuButton" name="resyncButton">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>153</y>
+     <width>170</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Re-sync with full node</string>
    </property>
   </widget>
  </widget>

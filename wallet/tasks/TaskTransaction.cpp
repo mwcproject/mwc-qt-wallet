@@ -4,6 +4,138 @@
 
 namespace wallet {
 
+// ------------------------------------ TaskOutputs -------------------------------------------
+
+struct OutputIdxLayout {
+    int outputCommitment = -1;
+    int mmrIndex = -1;
+    int blockHeight = -1;
+    int lockedUntil = -1;
+    int status = -1;
+    int coinbase = -1;
+    int confirms= -1;
+    int value = -1;
+    int tx = -1;
+
+    bool isDefined() const {
+        return outputCommitment>=0 && mmrIndex>0 && blockHeight>0 && lockedUntil>0 && status >0 && coinbase>0 && confirms>0 && value>0 && tx>0;
+    }
+};
+
+bool parseOutputLine( QString str, const OutputIdxLayout & tl,
+                           WalletOutput & output) {
+
+    QString strOutputCommitment = util::getSubString(str, tl.outputCommitment, tl.mmrIndex );
+    QString strMmrIndex = util::getSubString(str, tl.mmrIndex, tl.blockHeight);
+    QString strBlockHeight = util::getSubString(str, tl.blockHeight, tl.lockedUntil);
+    QString strLockedUntil = util::getSubString(str, tl.lockedUntil, tl.status);
+    QString strStatus = util::getSubString(str, tl.status, tl.coinbase);
+    QString strCoinbase = util::getSubString(str, tl.coinbase, tl.confirms);
+    QString strConfirms = util::getSubString(str, tl.confirms, tl.value);
+    QString strValue = util::getSubString(str, tl.value, tl.tx);
+    QString strTx = util::getSubString(str, tl.tx, str.length());
+
+    if (strOutputCommitment.isEmpty() )
+        return false;
+
+    QPair<bool,long> mwcOne = util::one2nano(strValue);
+
+    output.setData(strOutputCommitment,
+                   strMmrIndex,
+                   strBlockHeight,
+            strLockedUntil,
+            strStatus,
+            strCoinbase != "false",
+            strConfirms,
+            mwcOne.second,
+            strTx);
+
+    return mwcOne.first;
+}
+
+
+bool TaskOutputs::processTask(const QVector<WEvent> & events) {
+    // We are processing transactions outptu mostly as a raw data
+
+    int curEvt = 0;
+
+    QString account;
+    long  height = -1;
+
+    for ( ; curEvt < events.size(); curEvt++ ) {
+        if (events[curEvt].event == WALLET_EVENTS::S_OUTPUT_LOG ) {
+            QStringList l = events[curEvt].message.split('|');
+            Q_ASSERT(l.size()==2);
+            account = l[0];
+            height = l[1].toInt();
+            break;
+        }
+    }
+
+    // positions for the columns. Note, the columns and the order are hardcoded and come from wmc713 data!!!
+
+    OutputIdxLayout outLayout;
+
+    // Continue with transaction output
+    // Search for Header first
+    for ( ; curEvt < events.size(); curEvt++ ) {
+        if (events[curEvt].event == WALLET_EVENTS::S_LINE ) {
+            auto & str = events[curEvt].message;
+            if ( str.contains("Output Commitment") && str.contains("Block Height") ) {
+
+                outLayout.outputCommitment = str.indexOf("Output Commitment");
+                outLayout.mmrIndex = str.indexOf("MMR Index", outLayout.outputCommitment);
+                outLayout.blockHeight = str.indexOf("Block Height", outLayout.mmrIndex);
+                outLayout.lockedUntil = str.indexOf("Locked Until", outLayout.blockHeight);
+                outLayout.status = str.indexOf("Status", outLayout.lockedUntil);
+                outLayout.coinbase = str.indexOf("Coinbase", outLayout.status);
+                outLayout.confirms= str.indexOf("# Confirms", outLayout.coinbase);
+                outLayout.value = str.indexOf("Value", outLayout.confirms);
+                outLayout.tx = str.indexOf("Tx", outLayout.value);
+
+                if ( outLayout.isDefined() ) {
+                    curEvt++;
+                    break;
+                }
+                Q_ASSERT(false); // There is a small chance, but it is really not likely it is ok
+            }
+        }
+    }
+
+    // Skip header
+    for ( ; curEvt < events.size(); curEvt++ ) {
+        if (events[curEvt].event == WALLET_EVENTS::S_LINE) {
+            auto &str = events[curEvt].message;
+            if (str.startsWith("==============")) {
+                curEvt++; // skipping this
+                break;
+            }
+        }
+    }
+
+    QVector< WalletOutput > outputResult;
+
+    // Processing transactions
+    for ( ; curEvt < events.size(); curEvt++ ) {
+        if (events[curEvt].event == WALLET_EVENTS::S_LINE ) {
+            auto &str = events[curEvt].message;
+
+            if (str.startsWith("--------------------"))
+                continue;
+
+            // Expected to be a normal line
+            WalletOutput output;
+            if ( parseOutputLine(str, outLayout, output) ) {
+                outputResult.push_back(output);
+            }
+        }
+    }
+
+    wallet713->setOutputs(account, height, outputResult );
+    return true;
+}
+
+
 // ------------------------------------ TaskTransactions -------------------------------------------
 
 struct TransactionIdxLayout {

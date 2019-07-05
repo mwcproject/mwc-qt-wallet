@@ -130,37 +130,24 @@ int64_t WalletTransaction::calculateTransactionAge( const QDateTime & current ) 
 
 
 void WalletOutput::setData(QString _outputCommitment,
-        int64_t    _MMRIndex,
-        int64_t    _lockHeight,
-        bool    _lockedUntil,
-        STATUS  _status,
-        bool    _coinbase,
-        int64_t    _numOfConfirms,
-        int64_t    _valueNano,
-        int64_t    _txIdx)
+        QString     _MMRIndex,
+        QString     _blockHeight,
+        QString     _lockedUntil,
+        QString     _status,
+        bool        _coinbase,
+        QString     _numOfConfirms,
+        int64_t     _valueNano,
+        QString     _txIdx)
 {
     outputCommitment = _outputCommitment;
     MMRIndex = _MMRIndex;
-    lockHeight = _lockHeight;
+    blockHeight = _blockHeight;
     lockedUntil = _lockedUntil;
     status = _status;
     coinbase = _coinbase;
     numOfConfirms = _numOfConfirms;
     valueNano = _valueNano;
     txIdx = _txIdx;
-}
-
-// return status value as a string
-QString WalletOutput::getStatusStr() const {
-    switch (status) {
-    case Unconfirmed:
-        return "Unconfirmed";
-    case Confirmed:
-        return "Confirmed";
-    default:
-        Q_ASSERT(false);
-        return "Unknown";
-    }
 }
 
 

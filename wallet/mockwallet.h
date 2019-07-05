@@ -87,7 +87,9 @@ public:
     // -------------- Maintaince
 
     // Check and repair the wallet. Will take a while
-    void check() noexcept(false) override;
+    // Check Signals: onRecoverProgress( int progress, int maxVal );
+    // Check Signals: onCheckResult(bool ok, QString errors );
+    void check(bool wait4listeners) noexcept(false) override;
 
     virtual WalletConfig getWalletConfig() noexcept(false) override;
     virtual QPair<bool, QString> setWalletConfig(const WalletConfig & config) noexcept(false) override;
@@ -121,7 +123,9 @@ public:
                 int inputConfirmationNumber=10, int changeOutputs=1 ) noexcept(false) override;
     // Check signal:  onSend
 
-    virtual QVector<WalletOutput> getOutputs() noexcept(false) override;
+    // Show outputs for the wallet
+    // Check Signal: onOutputs( QString account, long height, QVector<WalletOutput> Transactions)
+    virtual void getOutputs() noexcept(false) override;
 
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)

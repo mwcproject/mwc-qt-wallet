@@ -9,7 +9,7 @@
 namespace wnd {
 
 Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
-    core::NavWnd(parent, _state->getStateMachine() ),
+    core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext() ),
     ui(new Ui::Transactions),
     state(_state)
 {
@@ -19,12 +19,8 @@ Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
     // Alpha delta for row stripe coloring. Range 0-255
     ui->transactionTable->setStripeAlfaDelta( 5 ); // very small number
 
-
     ui->progress->initLoader(true);
     ui->progressFrame->hide();
-
-//    QString title = "Transactions for account " + state->getCurrentAccountName();
-  //  state->setWindowTitle(title);
 
     updateWalletBalance();
 
@@ -35,8 +31,8 @@ Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
 
 Transactions::~Transactions()
 {
-    state->resetWnd();
     saveTableHeaders();
+    state->resetWnd();
     delete ui;
 }
 
@@ -84,10 +80,6 @@ void Transactions::setTransactionData(QString account, int64_t height, const QVe
     }
 
     Q_ASSERT(accountOK);
-    if (!accountOK) {
-        control::MessageBox::message(this, "Internal Error", "wmc713 transaction output doesn't match previous data. We recommend you restart this app.");
-        // not exiting, error is not fatal. Let's upadte transaction data
-    }
 
     transactions = trans;
 

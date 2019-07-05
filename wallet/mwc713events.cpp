@@ -55,6 +55,7 @@ QString toString(WALLET_EVENTS event) {
         case S_SET_RECEIVE:         return "S_SET_RECEIVE";
 
         case S_TRANSACTION_LOG:     return "S_TRANSACTION_LOG";
+        case S_OUTPUT_LOG:          return "S_OUTPUT_LOG";
 
         case S_TABLE_LINE2:         return "S_TABLE_LINE2";
 

@@ -69,6 +69,7 @@ enum WALLET_EVENTS {
     S_SET_RECEIVE = 58,
 
     S_TRANSACTION_LOG = 60,
+    S_OUTPUT_LOG = 61,
 
     // TABLE lines
     S_TABLE_LINE2 = 100

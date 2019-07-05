@@ -9,7 +9,7 @@
 namespace wnd {
 
 Accounts::Accounts(QWidget *parent, state::Accounts * _state) :
-    core::NavWnd(parent, _state->getStateMachine()),
+    core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext()),
     ui(new Ui::Accounts),
     state(_state)
 {

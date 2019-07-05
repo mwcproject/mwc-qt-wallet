@@ -6,7 +6,7 @@
 namespace wnd {
 
 SendOfflineSettings::SendOfflineSettings(QWidget *parent, state::SendOffline * _state) :
-    core::NavWnd(parent, _state->getStateMachine() ),
+    core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext() ),
     ui(new Ui::SendOfflineSettings),
     state(_state)
 {

@@ -6,7 +6,7 @@
 #include <QPair>
 #include <QObject>
 #include <QVector>
-#include "../windows/c_progresswnd.h"
+#include "windows/z_progresswnd.h"
 
 namespace wnd {
 class ProgressWnd;

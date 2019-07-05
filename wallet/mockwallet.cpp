@@ -222,8 +222,9 @@ void MockWallet::switchAccount(const QString & accountName) {
 }
 
 // Check and repair the wallet. Will take a while
-void MockWallet::check() {
-    //QThread::sleep(5);
+void MockWallet::check(bool wait4listeners) {
+    emit onRecoverProgress( 5, 10 );
+    emit onCheckResult(true, "" );
 }
 
 // Get current configuration of the wallet.
@@ -340,30 +341,30 @@ void MockWallet::sendTo( const wallet::AccountInfo &account, int64_t coinNano, c
 
 
 // Show outputs for the wallet
-QVector<WalletOutput> MockWallet::getOutputs() noexcept(false) {
+void MockWallet::getOutputs() noexcept(false) {
 
     QVector<WalletOutput> result;
 
     WalletOutput wi;
     wi.setData("08710be0b3fffa79b9423f8e007709a815f237dcfd31340cfa1fdfefd823dca30e",
-                23,
-                3,
-                true,
-                WalletOutput::STATUS::Confirmed,
+                "23",
+                "3",
+                "34",
+                "Unspent",
                 false,
-                4,
+                "4",
                 1000000000L*9/2,
-                9);
+                "9");
 
     result.push_back(wi);
 
-    wi.status = WalletOutput::STATUS::Unconfirmed;
+    wi.status = "Unspent";
     result.push_back(wi);
 
     wi.outputCommitment = "0478532478593247852397592376590379475";
     result.push_back(wi);
 
-    return result;
+    emit onOutputs( "default", 12345, result);
 }
 
 // Show all transactions for current account

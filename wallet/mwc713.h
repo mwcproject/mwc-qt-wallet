@@ -118,7 +118,9 @@ public:
     // -------------- Maintaince
 
     // Check and repair the wallet. Will take a while
-    void check() noexcept(false) override {}
+    // Check Signals: onRecoverProgress( int progress, int maxVal );
+    // Check Signals: onCheckResult(bool ok, QString errors );
+    virtual void check(bool wait4listeners) noexcept(false) override;
 
     virtual WalletConfig getWalletConfig() noexcept(false) override {return WalletConfig();}
     virtual QPair<bool, QString> setWalletConfig(const WalletConfig & config) noexcept(false) override  {return QPair<bool, QString>(true,"");}
@@ -161,7 +163,9 @@ public:
     // coinNano == -1  - mean All
     virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 ) noexcept(false) override;
 
-    virtual QVector<WalletOutput> getOutputs() noexcept(false) override {return QVector<WalletOutput>();}
+    // Show outputs for the wallet
+    // Check Signal: onOutputs( QString account, long height, QVector<WalletOutput> outputs)
+    virtual void getOutputs() noexcept(false) override;
 
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
@@ -223,8 +227,8 @@ public:
     void updateRenameAccount(const QString & oldName, const QString & newName, bool createSimulation,
                              bool success, QString errorMessage);
 
-    void infoResults( QString currentAccountName, int64_t height,
-           int64_t totalNano, int64_t waitingConfNano, int64_t lockedNano, int64_t spendableNano,
+    void infoResults( QString currentAccountName, long height,
+           long totalNano, long waitingConfNano, long lockedNano, long spendableNano,
                       bool mwcServerBroken );
 
     void setSendResults(bool success, QStringList errors);
@@ -239,6 +243,8 @@ public:
 
     // Transactions
     void setTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
+    // Outputs results
+    void setOutputs( QString account, int64_t height, QVector<WalletOutput> outputs);
 
     void setExportProofResults( bool success, QString fn, QString msg );
     void setVerifyProofResults( bool success, QString fn, QString msg );
@@ -246,6 +252,8 @@ public:
     void setTransCancelResult( bool success, int64_t transId, QString errMsg );
 
     void setSetReceiveAccount( bool ok, QString accountOrMessage );
+
+    void setCheckResult(bool ok, QString errors);
 private:
     void mwc713connect();
     void mwc713disconnect();

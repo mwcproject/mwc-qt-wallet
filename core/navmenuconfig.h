@@ -17,9 +17,8 @@ namespace core {
 
 class NavMenuConfig : public NavMenu {
 Q_OBJECT
-
 public:
-    explicit NavMenuConfig(QWidget *parent, state::StateMachine * stateMachine);
+    explicit NavMenuConfig(QWidget *parent, state::StateMachine * stateMachine, core::AppContext * appContext);
 
     ~NavMenuConfig();
 
@@ -30,9 +29,12 @@ private slots:
 
     void on_mwcmqButton_clicked();
 
+    void on_resyncButton_clicked();
+
 private:
     Ui::NavMenuConfig *ui;
     state::StateMachine * stateMachine = nullptr;
+    core::AppContext * appContext = nullptr;
 };
 
 }

@@ -7,11 +7,12 @@
 
 namespace core {
 
-NavBar::NavBar(QWidget *parent, state::StateMachine * _stateMachine) :
+NavBar::NavBar(QWidget *parent, state::StateMachine * _stateMachine, core::AppContext * _appContext) :
         QWidget(parent),
         ui(new Ui::NavBar),
         prntWnd(parent),
-        stateMachine(_stateMachine)
+        stateMachine(_stateMachine),
+        appContext(_appContext)
 {
     ui->setupUi(this);
 }
@@ -36,7 +37,7 @@ void NavBar::on_settingsButton_clicked()
 {
     checkButton(BTN::SETTINGS);
 
-    showNavMenu( new NavMenuConfig( prntWnd, stateMachine ) );
+    showNavMenu( new NavMenuConfig( prntWnd, stateMachine, appContext ) );
 }
 
 void NavBar::on_accountButton_clicked()

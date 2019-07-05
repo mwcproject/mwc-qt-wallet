@@ -5,6 +5,22 @@
 
 namespace wallet {
 
+class TaskOutputs : public Mwc713Task {
+public:
+    const static long TIMEOUT = 1000*15;
+
+    TaskOutputs( MWC713 * wallet713  ) :
+            Mwc713Task("Transactions", "outputs --show-spent", wallet713, "") {}
+
+    virtual ~TaskOutputs() override {}
+
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+};
+
+
+
 class TaskTransactions : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*60;

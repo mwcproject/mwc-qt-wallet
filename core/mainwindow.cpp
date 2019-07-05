@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QTime>
-#include <QDebug.h>
+#include <QDebug>
 #include "versiondialog.h"
 #include "../state/statemachine.h"
 #include "util/widgetutils.h"

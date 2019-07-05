@@ -19,7 +19,8 @@ class NewSeed : public core::NavWnd
 
 public:
     explicit NewSeed(QWidget *parent, state::SubmitCaller * state, state::StateMachine * stateMachine,
-                const QVector<QString> & seed, bool hideSubmitButton = false );
+                     core::AppContext * appContext,
+                     const QVector<QString> & seed, bool hideSubmitButton = false );
     virtual ~NewSeed() override;
 
     // if seed empty or has size 1, it is error message

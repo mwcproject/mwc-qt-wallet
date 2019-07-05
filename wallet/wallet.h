@@ -74,30 +74,26 @@ struct WalletContact {
 };
 
 struct WalletOutput {
-    enum STATUS {Unconfirmed, Confirmed};
 
-    QString outputCommitment;
-    int64_t    MMRIndex;
-    int64_t    lockHeight;
-    bool    lockedUntil;
-    STATUS  status;
-    bool    coinbase;
-    int64_t    numOfConfirms;
-    int64_t    valueNano;
-    int64_t    txIdx;
+    QString     outputCommitment;
+    QString    MMRIndex = 0;
+    QString    blockHeight = 0;
+    QString    lockedUntil = 0;
+    QString    status;
+    bool       coinbase = 0;
+    QString    numOfConfirms = 0;
+    int64_t    valueNano = 0;
+    QString    txIdx = 0;
 
     void setData(QString outputCommitment,
-            int64_t    MMRIndex,
-            int64_t    lockHeight,
-            bool    lockedUntil,
-            STATUS  status,
-            bool    coinbase,
-            int64_t    numOfConfirms,
-            int64_t    valueNano,
-            int64_t    txIdx);
-
-    // return status value as a string
-    QString getStatusStr() const;
+            QString     MMRIndex,
+            QString     blockHeight,
+            QString     lockedUntil,
+            QString     status,
+            bool        coinbase,
+            QString     numOfConfirms,
+            int64_t     valueNano,
+            QString     txIdx);
 };
 
 struct WalletTransaction {
@@ -299,7 +295,9 @@ public:
     // -------------- Maintaince
 
     // Check and repair the wallet. Will take a while
-    virtual void check() noexcept(false) = 0;
+    // Check Signals: onRecoverProgress( int progress, int maxVal );
+    // Check Signals: onCheckResult(bool ok, QString errors );
+    virtual void check(bool wait4listeners) noexcept(false) = 0;
 
     // Get current configuration of the wallet.
     virtual WalletConfig getWalletConfig() noexcept(false) = 0;
@@ -347,10 +345,12 @@ public:
     // Check signal:  onSend
 
     // Show outputs for the wallet
-    virtual QVector<WalletOutput> getOutputs() noexcept(false) = 0;
+    // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
+    virtual void getOutputs() noexcept(false) = 0;
+
     // Show all transactions for current account
-    virtual void getTransactions() noexcept(false) = 0;
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
+    virtual void getTransactions() noexcept(false) = 0;
 
     // -------------- Contacts
 
@@ -428,6 +428,10 @@ signals:
     void onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
     void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
 
+    void onOutputs( QString account, long height, QVector<WalletOutput> Transactions);
+
+    void onCheckResult(bool ok, QString errors );
+
     // Proof results
     void onExportProof( bool success, QString fn, QString msg );
     void onVerifyProof( bool success, QString fn, QString msg );
@@ -443,5 +447,6 @@ signals:
 Q_DECLARE_METATYPE(wallet::WalletNotificationMessages::LEVEL);
 Q_DECLARE_METATYPE(wallet::InitWalletStatus);
 Q_DECLARE_METATYPE(wallet::WalletTransaction);
+Q_DECLARE_METATYPE(wallet::WalletOutput);
 
 #endif // MWCWALLET_H

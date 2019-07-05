@@ -281,6 +281,12 @@ void MWC713::renameAccount(const QString & oldName, const QString & newName) noe
     eventCollector->addTask( new TaskAccountRename(this, oldName, newName, false), TaskAccountRename::TIMEOUT );
 }
 
+// Check and repair the wallet. Will take a while
+// Check Signals: onRecoverProgress( int progress, int maxVal );
+// Check Signals: onCheckResult(bool ok, QString errors );
+void MWC713::check(bool wait4listeners) noexcept(false) {
+    eventCollector->addTask( new TaskCheck(this,wait4listeners), TaskCheck::TIMEOUT );
+}
 
 
 // Send some coins to address.
@@ -313,6 +319,12 @@ void MWC713::receiveFile( QString fileTx) noexcept(false) {
 // Check signal:  onFinalizeFile
 void MWC713::finalizeFile( QString fileTxResponse ) noexcept(false) {
     eventCollector->addTask( new TaskFinalizeFile(this, fileTxResponse), TaskFinalizeFile::TIMEOUT );
+}
+
+// Show outputs for the wallet
+// Check Signal: onOutputs( QString account, long height, QVector<WalletOutput> Transactions)
+void MWC713::getOutputs() noexcept(false) {
+    eventCollector->addTask( new TaskOutputs(this), TaskOutputs::TIMEOUT );
 }
 
 void MWC713::getTransactions() noexcept(false) {
@@ -631,6 +643,11 @@ void MWC713::setTransactions( QString account, int64_t height, QVector<WalletTra
     emit onTransactions( account, height, Transactions );
 }
 
+void MWC713::setOutputs( QString account, long height, QVector<WalletOutput> outputs) {
+    logger::logEmit( "MWC713", "onOutputs", "account="+account );
+    emit onOutputs( account, height, outputs );
+}
+
 void MWC713::setExportProofResults( bool success, QString fn, QString msg ) {
     logger::logEmit( "MWC713", "onExportProof", "success="+QString::number(success) );
     emit onExportProof( success, fn, msg );
@@ -650,6 +667,12 @@ void MWC713::setSetReceiveAccount( bool ok, QString accountOrMessage ) {
     logger::logEmit( "MWC713", "onSetReceiveAccount", "ok="+QString::number(ok) );
     emit onSetReceiveAccount(ok, accountOrMessage );
 }
+
+void MWC713::setCheckResult(bool ok, QString errors) {
+    logger::logEmit( "MWC713", "onCheckResult", "ok="+QString::number(ok) );
+    emit onCheckResult(ok, errors );
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////
 //      mwc713  IOs

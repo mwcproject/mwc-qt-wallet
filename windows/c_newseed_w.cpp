@@ -7,8 +7,10 @@
 namespace wnd {
 
 
-NewSeed::NewSeed( QWidget *parent, state::SubmitCaller * _state, state::StateMachine * stateMachine, const QVector<QString> & _seed, bool hideSubmitButton ) :
-    core::NavWnd( parent, stateMachine, !hideSubmitButton ),
+NewSeed::NewSeed( QWidget *parent, state::SubmitCaller * _state, state::StateMachine * stateMachine,
+                  core::AppContext * appContext,
+                  const QVector<QString> & _seed, bool hideSubmitButton ) :
+    core::NavWnd( parent, stateMachine, appContext, hideSubmitButton ),
     ui(new Ui::NewSeed),
     state(_state),
     seed(_seed)

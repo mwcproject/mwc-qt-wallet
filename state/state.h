@@ -48,7 +48,9 @@ enum STATE {
     CONTACTS,       // Contact page. COntacts supported by wallet713
     WALLET_CONFIG,  // Wallet config
     AIRDRDOP_MAIN,  // Starting airdrop page
-    SHOW_SEED       // Show Seed
+    SHOW_SEED,      // Show Seed
+
+    RESYNC          // Re-sync account with a node
 };
 
 struct NextStateRespond {
@@ -92,6 +94,7 @@ public:
     virtual ~State();
 
     state::StateMachine * getStateMachine() const {return context.stateMachine;}
+    core::AppContext    * getAppContext()   const {return context.appContext;}
 
     void setWindowTitle( QString title );
 
