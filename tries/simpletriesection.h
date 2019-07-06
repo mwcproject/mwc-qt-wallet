@@ -38,7 +38,7 @@ public:
     enum PROCESS { NUMBERS=0x0001, LOW_CASE=0x0002, UPPER_CASE=0x0004, SPACES=0x0008,
                    NOT_NEW_LINE = 0x0010, NOT_SPACES=0x0020,
                    NEW_LINE=0x0100,
-                   START_NEXT_EVERY_TRY=0x1000 };
+                   /*START_NEXT_EVERY_TRY=0x1000*/ };
     // acceptSymbols & stopSymbols are char sets. If strings are empty, will be ignored
     TrieAnySection(int lenLimit, uint32_t processMask, QString acceptSymbols, QString stopSymbols, int accumulateId=-1 );
     virtual uint32_t processChar(TrieContext & context, QChar ch) override;

@@ -42,12 +42,7 @@ QString toString(WALLET_EVENTS event) {
         case S_LISTENER_MQ_LOST_CONNECTION:  return "S_LISTENER_MQ_LOST_CONNECTION";
         case S_LISTENER_MQ_GET_CONNECTION: return "S_LISTENER_MQ_GET_CONNECTION";
 
-        case S_ACCOUNTS_TITLE: return "S_ACCOUNTS_TITLE";
         case S_ACCOUNTS_INFO_SUM: return "S_ACCOUNTS_INFO_SUM";
-
-        case S_FILE_TRANS_CREATED: return "S_FILE_TRANS_CREATED";
-        case S_FILE_RECEIVED:      return "S_FILE_RECEIVED";
-        case S_FILE_TRANS_FINALIZED: return "S_FILE_TRANS_FINALIZED";
 
         case S_SLATE_WAS_SENT:      return "S_SLATE_WAS_SENT";
         case S_SLATE_WAS_RECEIVED:  return "S_SLATE_WAS_RECEIVED";
@@ -56,8 +51,6 @@ QString toString(WALLET_EVENTS event) {
 
         case S_TRANSACTION_LOG:     return "S_TRANSACTION_LOG";
         case S_OUTPUT_LOG:          return "S_OUTPUT_LOG";
-
-        case S_TABLE_LINE2:         return "S_TABLE_LINE2";
 
         default: Q_ASSERT(false); return "Unknown";
     }

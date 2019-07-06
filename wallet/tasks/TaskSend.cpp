@@ -147,11 +147,15 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address,
 // ----------------------- TaskSendFile --------------------------
 
 bool TaskSendFile::processTask(const QVector<WEvent> &events) {
-    QVector< WEvent > res = filterEvents(events, WALLET_EVENTS::S_FILE_TRANS_CREATED );
-    if (res.size()>0) {
-        QString fn = res[0].message;
-        wallet713->setSendFileResult(true, QStringList(), fn);
-        return true;
+    QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
+
+    for ( auto & ln : lns ) {
+        int idx = ln.message.indexOf("created successfully.");
+        if (idx>0) {
+            QString fn = ln.message.left(idx).trimmed();
+            wallet713->setSendFileResult(true, QStringList(), fn);
+            return true;
+        }
     }
 
     QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_ERROR );
@@ -166,13 +170,28 @@ bool TaskSendFile::processTask(const QVector<WEvent> &events) {
 // ------------------- TaskReceiveFile -----------------------------
 
 bool TaskReceiveFile::processTask(const QVector<WEvent> &events) {
-    QVector< WEvent > get = filterEvents(events, WALLET_EVENTS::S_FILE_RECEIVED );
-    QVector< WEvent > create = filterEvents(events, WALLET_EVENTS::S_FILE_TRANS_CREATED );
+    QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
 
-    if (get.size()>0 && create.size()>0) {
-        QString getFn = get[0].message;
-        QString crFn = create[0].message;
+    int idx=0;
+    QString getFn;
+    for ( ;idx<lns.size(); idx++ ) {
+        int i = lns[idx].message.indexOf("received. amount =");
+        if ( i >=0 ) {
+            getFn = lns[idx].message.left(i).trimmed();
+            break;
+        }
+    }
 
+    QString crFn;
+    for ( ;idx<lns.size(); idx++ ) {
+        int i = lns[idx].message.indexOf("created successfully");
+        if ( i >=0 ) {
+            crFn = lns[idx].message.left(i).trimmed();
+            break;
+        }
+    }
+
+    if ( !getFn.isEmpty() && !crFn.isEmpty() ) {
         wallet713->setReceiveFile( true, QStringList(), getFn, crFn );
         return true;
     }
@@ -189,13 +208,16 @@ bool TaskReceiveFile::processTask(const QVector<WEvent> &events) {
 // ------------------- TaskFinalizeFile -------------------------
 
 bool TaskFinalizeFile::processTask(const QVector<WEvent> &events) {
-    QVector< WEvent > finFn = filterEvents(events, WALLET_EVENTS::S_FILE_TRANS_FINALIZED );
 
-    if (finFn.size()>0 ) {
-        QString fn = finFn[0].message;
+    QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
 
-        wallet713->setFinalizeFile(true, QStringList(), fn );
-        return true;
+    for ( auto ln : lns ) {
+        int idx = ln.message.indexOf(" finalized.");
+        if (idx>0) {
+            QString fileName = ln.message.left(idx).trimmed();
+            wallet713->setFinalizeFile(true, QStringList(), fileName );
+            return true;
+        }
     }
 
     QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_ERROR );

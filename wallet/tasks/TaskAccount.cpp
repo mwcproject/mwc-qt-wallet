@@ -24,33 +24,46 @@ static QString widenDerivPath(QString path ) {
 }
 
 bool TaskAccountList::processTask(const QVector<WEvent> &events) {
+    QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
 
-    qDebug() << "TaskAccountList::processTask with events: " << printEvents(events);
+    int idx = 0;
 
-
-    int idx=events.size()-1;
-    for ( ; idx>=0; idx-- ) {
-        if ( events[idx].event == WALLET_EVENTS::S_ACCOUNTS_TITLE )
+    for ( ;idx<lns.size(); idx++ ) {
+        if ( lns[idx].message.contains("____ Wallet Accounts ____")  )
             break;
     }
+    idx++;
 
-    if (idx<0) {
+    for ( ;idx<lns.size(); idx++ ) {
+        if ( lns[idx].message.contains("Parent BIP-32 Derivation Path")  )
+            break;
+    }
+    idx++;
+
+    for ( ;idx<lns.size(); idx++ ) {
+        if ( lns[idx].message.contains("----------------------------------")  )
+            break;
+    }
+    idx++;
+
+    if (idx>=lns.size()) {
         wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::CRITICAL, MWC713::MESSAGE_ID::GENERIC, "Unable to get a list of accounts from mwc713" );
-        return false; // No data to process.
+        return true; // No data to process.
     }
 
     // Collecting account
-
     QVector< QPair<QString, QString> > accounts;
 
+    const char * sep = " | m/";
+    for ( ;idx<lns.size(); idx++ ) {
+        const QString & ln = lns[idx].message;
+        int i = ln.lastIndexOf(sep);
 
-    for ( idx++; idx<events.size(); idx++ ) {
-        if ( events[idx].event == WALLET_EVENTS::S_TABLE_LINE2 ) {
-            // <account_name>|<XX/XX>
-            QStringList lst = events[idx].message.split("|");
-            if (lst.length()==2) {
-                accounts.push_back( QPair<QString, QString>( widenDerivPath(lst[1].trimmed()), lst[0].trimmed()) );
-            }
+        if (i>0) {
+            QString acc = ln.left(i).trimmed();
+            QString path = ln.mid( i + strlen(sep) );
+
+            accounts.push_back( QPair<QString, QString>( widenDerivPath(path), acc ) );
         }
     }
 

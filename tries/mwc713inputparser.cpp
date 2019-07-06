@@ -272,26 +272,6 @@ void Mwc713InputParser::initRecovery() {
 }
 
 void Mwc713InputParser::initAccount() {
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_ACCOUNTS_TITLE,
-                                                QVector<BaseTrieSection*>{
-                                                        new TrieNewLineSection(),
-                                                        new TriePhraseSection("____ Wallet Accounts ____"),
-                                                        new TrieNewLineSection()
-                                                }));
-
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_TABLE_LINE2,
-                                                QVector<BaseTrieSection*>{
-                                                        new TrieNewLineSection(),
-                                                        new TriePhraseSection(" "),
-                                                        // account name
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE | TrieAnySection::START_NEXT_EVERY_TRY,"","", 1),
-                                                        new TriePhraseSection(" | m/"),
-                                                        // Parent BIP-32 Derivation Path
-                                                        // m/0/0 =>  0/0;  m/2/0 => 2/0
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE,"","", 2),
-                                                        new TrieNewLineSection()
-                                                }));
-
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_ACCOUNTS_INFO_SUM,
                                                 QVector<BaseTrieSection*>{
                                                         new TrieNewLineSection(),
@@ -312,30 +292,6 @@ void Mwc713InputParser::initSend() {
                                                         new TrieNewLineSection(),
                                                         new TriePhraseSection("Incoming funds will be received in account: \""),
                                                         new TrieAnySection(4000, TrieAnySection::NOT_NEW_LINE, "","\"", 1)
-                                                }));
-
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_FILE_TRANS_CREATED,
-                                                QVector<BaseTrieSection*>{
-                                                        new TrieNewLineSection(),
-                                                        new TrieAnySection(4000, TrieAnySection::NOT_NEW_LINE|TrieAnySection::START_NEXT_EVERY_TRY, "","", 1),
-                                                        new TriePhraseSection(" created successfully."),
-                                                        new TrieNewLineSection()
-                                                }));
-
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_FILE_RECEIVED,
-                                                QVector<BaseTrieSection*>{
-                                                        new TrieNewLineSection(),
-                                                        new TrieAnySection(4000, TrieAnySection::NOT_NEW_LINE|TrieAnySection::START_NEXT_EVERY_TRY, "","", 1),
-                                                        new TriePhraseSection(" received."),
-                                                        new TrieNewLineSection()
-                                                }));
-
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_FILE_TRANS_FINALIZED,
-                                                QVector<BaseTrieSection*>{
-                                                        new TrieNewLineSection(),
-                                                        new TrieAnySection(4000, TrieAnySection::NOT_NEW_LINE|TrieAnySection::START_NEXT_EVERY_TRY, "","", 1),
-                                                        new TriePhraseSection(" finalized."),
-                                                        new TrieNewLineSection()
                                                 }));
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_SENT,

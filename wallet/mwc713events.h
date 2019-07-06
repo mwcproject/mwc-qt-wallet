@@ -55,13 +55,9 @@ enum WALLET_EVENTS {
     S_RECOVERY_MNEMONIC = 34, // Recovering from mnemonic => Mnemonic:
 
     // Accounts
-    S_ACCOUNTS_TITLE = 40,
     S_ACCOUNTS_INFO_SUM = 41, // Account header info. The rest of data will come in lines...
 
     // Send
-    S_FILE_TRANS_CREATED = 50,
-    S_FILE_RECEIVED = 51,
-    S_FILE_TRANS_FINALIZED = 52,
     S_SLATE_WAS_SENT = 55,
     S_SLATE_WAS_RECEIVED = 56,
     S_SLATE_WAS_FINALIZED = 57,
@@ -71,8 +67,6 @@ enum WALLET_EVENTS {
     S_TRANSACTION_LOG = 60,
     S_OUTPUT_LOG = 61,
 
-    // TABLE lines
-    S_TABLE_LINE2 = 100
 
 };
 QString toString(WALLET_EVENTS event);

@@ -107,9 +107,9 @@ uint32_t TrieAnySection::processChar(TrieContext & context, QChar ch) {
         ok = false;
 
     uint32_t startNextMask = 0;
-    if (processMask & START_NEXT_EVERY_TRY){
+/*    if (processMask & START_NEXT_EVERY_TRY){
         startNextMask = PROCESS_RESULT::START_NEXT;
-    }
+    }*/
 
     if (ok) {
         context.pos++;
