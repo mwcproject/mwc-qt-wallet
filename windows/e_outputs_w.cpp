@@ -42,10 +42,10 @@ void Outputs::initTableHeaders() {
     // Disabling to show the grid
     // Creatign columns
     QVector<int> widths = state->getColumnsWidhts();
-    if ( widths.size() != 8 ) {
-        widths = QVector<int>{70,100,80,70,70,200,70,70};
+    if ( widths.size() != 7 ) {
+        widths = QVector<int>{70,80,70,70,200,70,70};
     }
-    Q_ASSERT( widths.size() == 8 );
+    Q_ASSERT( widths.size() == 7 );
 
     ui->outputsTable->setColumnWidths(widths);
 }
@@ -96,7 +96,7 @@ void Outputs::setOutputsData(QString account, int64_t height, const QVector<wall
 
         ui->outputsTable->appendRow( QVector<QString>{
                                          out.txIdx,
-                                         out.status,
+                                        // out.status, // Status allways 'unspent', so no reasons to print it.
                                          util::nano2one(out.valueNano),
                                          out.numOfConfirms,
                                          out.coinbase ? "Yes":"No",

@@ -10,7 +10,7 @@ public:
     const static int64_t TIMEOUT = 1000*15;
 
     TaskOutputs( MWC713 * wallet713  ) :
-            Mwc713Task("Outputs", "outputs --show-spent", wallet713, "") {}
+            Mwc713Task("Outputs", "outputs", wallet713, "") {}
 
     virtual ~TaskOutputs() override {}
 
