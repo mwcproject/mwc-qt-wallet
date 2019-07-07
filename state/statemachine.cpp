@@ -108,6 +108,13 @@ void StateMachine::executeFrom( STATE nextState ) {
         mainWindow->updateActionStates(currentState);
         break;
     }
+
+    if (currentState == STATE::NONE) {
+        // Selecting the send page if nothing found
+        appContext->setActiveWndState( STATE::SEND_ONLINE_OFFLINE );
+        executeFrom(STATE::NONE);
+    }
+
 }
 
 bool StateMachine::setActionWindow( STATE actionWindowState, bool enforce ) {
