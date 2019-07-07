@@ -55,6 +55,12 @@ QToolButton::disabled {
     background-color: #E2CCF7;
 }
 
+QToolButton:enabled:!checked::hover
+{
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
 /*QDialog {
     color: white;
     font-family: Open Sans;
@@ -120,6 +126,11 @@ QLineEdit {
     selection-background-color: rgba(255, 255, 255, 0.3);
 }
 
+QLineEdit:enabled:!focus::hover
+{
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
 control--MwcLineEditNormal {
     font-size: 15px;
     border-radius: 6px;
@@ -146,6 +157,16 @@ QTextEdit {
     padding: 10px 6px 10px 15px;
 }
 
+QTextEdit:focus {
+    border: 2px solid #CCFF33;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+QTextEdit:enabled:!focus::hover
+{
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
 QPushButton
 {
     color: white;
@@ -156,6 +177,11 @@ QPushButton
     border: 2px solid #FFFFFF;
     border-radius: 6px;
     background: transparent;
+}
+
+QPushButton:enabled:!focus::hover
+{
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
 control--MwcPushButtonNormal {
@@ -273,6 +299,10 @@ QComboBox
     padding: 1px 0px 1px 20px;*/
 }
 
+QComboBox:enabled:!focus::hover
+{
+    background-color: rgba(255, 255, 255, 0.3);
+}
 
 QComboBox:on
 {
@@ -329,6 +359,7 @@ QRadioButton::indicator:unchecked {
 QRadioButton::indicator:checked {
     image: url(:/img/RadioOn.png);
 }
+
 
 /* ------------ ListWithColumns ----------------- */
 

@@ -30,7 +30,8 @@ Recieve::~Recieve() {
 }
 
 void Recieve::updateMwcMqAddress(QString address) {
-    ui->mwcmqAddress->setText( "mwcmq://" + address );
+    mwcAddress = "mwcmq://" + address;
+    ui->mwcmqAddress->setText( mwcAddress );
 }
 
 void Recieve::updateMwcMqState(bool online) {
@@ -91,3 +92,4 @@ void Recieve::updateAccountList() {
 }
 
 }
+

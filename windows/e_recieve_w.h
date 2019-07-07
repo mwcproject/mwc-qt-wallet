@@ -41,6 +41,7 @@ private:
     Ui::Recieve *ui;
     state::Recieve * state;
     QVector<wallet::AccountInfo> accountInfo;
+    QString mwcAddress;
 };
 
 }

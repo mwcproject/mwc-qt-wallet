@@ -269,7 +269,7 @@
            </size>
           </property>
           <property name="focusPolicy">
-           <enum>Qt::TabFocus</enum>
+           <enum>Qt::StrongFocus</enum>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
