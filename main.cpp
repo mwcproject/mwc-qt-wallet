@@ -116,6 +116,21 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
+    // -------------------------------------------
+    // Check envoronment variables
+/*    {
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        QStringList kk = env.keys();
+        QString reportStr = "Envirinment variable for this process at starting point:\n";
+        for ( const auto & k : kk ) {
+            QString val = env.value( k );
+            reportStr +=  "'" + k + "' => '" + val + "'\n";
+        }
+        QMessageBox::information(nullptr, "Environment variables", reportStr);
+    }*/
+    // -------------------------------------------
+
+
     logger::initLogger();
 
     if (!deployFilesFromResources() ) {

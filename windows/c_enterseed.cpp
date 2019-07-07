@@ -53,7 +53,15 @@ void EnterSeed::on_cancelButton_clicked()
 
 void EnterSeed::on_continueButton_clicked()
 {
-    QVector<QString> seed = util::parsePhrase2Words( ui->seedText->toPlainText().toLower() );
+    QString seedStr = ui->seedText->toPlainText().toLower();
+
+    QPair <bool, QString> valRes = util::validateMwc713Str( seedStr );
+    if (!valRes.first) {
+        control::MessageBox::message(this, "Verification error", valRes.second );
+        return;
+    }
+
+    QVector<QString> seed = util::parsePhrase2Words( seedStr );
 
     if (seed.size()!=24) {
         control::MessageBox::message(this, "Verification error",

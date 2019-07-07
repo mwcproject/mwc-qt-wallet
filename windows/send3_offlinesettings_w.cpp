@@ -2,6 +2,7 @@
 #include "ui_send3_offlinesettings.h"
 #include "sendcoinsparamsdialog.h"
 #include "state/send3_Offline.h"
+#include "../control/messagebox.h"
 
 namespace wnd {
 
@@ -48,7 +49,18 @@ void SendOfflineSettings::on_sendButton_clicked()
     int accountIdx = ui->accountComboBox->currentData().toInt();
     wallet::AccountInfo acc = accountInfo[accountIdx];
 
-    state->prepareSendMwcOffline( acc, ui->descriptionEdit->toPlainText() );
+    QString description = ui->descriptionEdit->toPlainText();
+
+    {
+        QPair<bool, QString> valRes = util::validateMwc713Str(description);
+        if (!valRes.first) {
+            control::MessageBox::message(this, "Incorrect Input", valRes.second);
+            ui->descriptionEdit->setFocus();
+            return;
+        }
+    }
+
+    state->prepareSendMwcOffline( acc, description );
 
 }
 

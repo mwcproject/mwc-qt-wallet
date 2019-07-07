@@ -117,6 +117,12 @@ void Accounts::on_addButton_clicked()
     if (!ok || accountName.isEmpty())
         return;
 
+    QPair <bool, QString> valRes = util::validateMwc713Str( accountName );
+    if (!valRes.first) {
+        control::MessageBox::message(this, "Account name", valRes.second );
+        return;
+    }
+
     // Check for account name
     {
         for (auto & acc : accounts) {
@@ -169,6 +175,12 @@ void Accounts::renameAccount(int idx) {
                                         accounts[idx].accountName, &ok);
     if (!ok || name.isEmpty() || name==accounts[idx].accountName )
         return;
+
+    QPair <bool, QString> valRes = util::validateMwc713Str( name );
+    if (!valRes.first) {
+        control::MessageBox::message(this, "Account name", valRes.second );
+        return;
+    }
 
     // check for name collision
     if ( name.startsWith( mwc::DEL_ACCONT_PREFIX ) ) {

@@ -44,6 +44,14 @@ QString getSubString(const QString & str, int idx1, int idx2);
 // Convert mwc713 UTC time to this wallet time. Time template is different.
 QString mwc713time2ThisTime(QString mwc713TimeStr);
 
+// Validate string for acceptable symbols. wmc713 understand low ASCII synblos only. Need to verify that.
+QPair <bool, QString> validateMwc713Str(QString str, bool secureStr = false);
+
+// String to escape and prepare for mwc713 input.
+// str - string to process   as sdd  =>  "as sdd";    pa@"a\s => "pa@\"a\\s"
+// noSpecialCharacters - if true will clean up all characters like a new line
+QString toMwc713input(QString str, bool noSpecialCharacters = true);
+
 }
 
 #endif // STRINGUTILS_H

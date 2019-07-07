@@ -118,6 +118,16 @@ void SendOnline::on_sendButton_clicked()
     if ( sendTo.size()>0 && sendTo[0] == '@' )
         sendTo = sendTo.right(sendTo.size()-1);
 
+    {
+        QPair<bool, QString> valRes = util::validateMwc713Str(sendTo);
+        if (!valRes.first) {
+            control::MessageBox::message(this, "Incorrect Input", valRes.second);
+            ui->sendEdit->setFocus();
+            return;
+        }
+    }
+
+
     if (sendTo.size() == 0 ) {
         control::MessageBox::message(this, "Incorrect Input",
                                      "Please specify an address of send your MWC" );
@@ -125,6 +135,7 @@ void SendOnline::on_sendButton_clicked()
         return;
     }
 
+    // init expected to be fixed, so no need to disable the message
     if ( mwcAmount.second > acc.currentlySpendable ) {
 
         QString msg2print = generateAmountErrorMsg( mwcAmount.second, acc, state->getSendCoinsParams() );
@@ -169,9 +180,20 @@ void SendOnline::on_sendButton_clicked()
         }
     }
 
+    QString description = ui->descriptionEdit->toPlainText();
+
+    {
+        QPair<bool, QString> valRes = util::validateMwc713Str(description);
+        if (!valRes.first) {
+            control::MessageBox::message(this, "Incorrect Input", valRes.second);
+            ui->descriptionEdit->setFocus();
+            return;
+        }
+    }
+
     ui->progress->show();
 
-    state->sendMwc( accountInfo[accountIdx], address, mwcAmount.second, ui->descriptionEdit->toPlainText() );
+    state->sendMwc( accountInfo[accountIdx], address, mwcAmount.second, description );
 }
 
 void SendOnline::sendRespond( bool success, const QStringList & errors ) {

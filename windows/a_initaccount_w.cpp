@@ -7,6 +7,7 @@
 #include <QShortcut>
 #include <QKeyEvent>
 #include "../core/global.h"
+#include "../util/stringutils.h"
 
 namespace wnd {
 
@@ -36,6 +37,12 @@ InitAccount::~InitAccount()
 
 void InitAccount::on_password1Edit_textChanged(const QString &text)
 {
+    QPair <bool, QString> valRes = util::validateMwc713Str(text, true);
+    if (!valRes.first) {
+        ui->strengthLabel->setText( valRes.second );
+        ui->submitButton->setEnabled( false );
+    }
+
     util::PasswordAnalyser pa(text);
     ui->strengthLabel->setText(pa.getPasswordQualityStr());
     ui->submitButton->setEnabled( pa.isPasswordOK() );
@@ -46,6 +53,12 @@ void InitAccount::on_submitButton_clicked()
     QString pswd1 = ui->password1Edit->text();
     QString pswd2 = ui->password2Edit->text();
     util::PasswordAnalyser pa(pswd1);
+
+    QPair <bool, QString> valRes = util::validateMwc713Str(pswd1, true);
+    if (!valRes.first) {
+        control::MessageBox::message(this, "Password", valRes.second );
+        return;
+    }
 
     if (!pa.isPasswordOK())
         return;

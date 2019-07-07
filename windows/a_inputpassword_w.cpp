@@ -5,6 +5,7 @@
 #include <QThread>
 #include <QShortcut>
 #include "../util/widgetutils.h"
+#include "../util/stringutils.h"
 #include <QMovie>
 #include <QLabel>
 #include "../core/global.h"
@@ -37,6 +38,12 @@ InputPassword::~InputPassword()
 
 void InputPassword::on_submitButton_clicked() {
     QString pswd = ui->passwordEdit->text();
+
+    QPair <bool, QString> valRes = util::validateMwc713Str(pswd, true);
+    if (!valRes.first) {
+        control::MessageBox::message(this, "Password", valRes.second );
+        return;
+    }
 
     // Submit the password and wait until state will push us.
     state->submitPassword(pswd);

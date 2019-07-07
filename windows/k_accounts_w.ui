@@ -156,7 +156,7 @@
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Refresh transaction list</string>
+            <string>Rename account</string>
            </property>
            <property name="styleSheet">
             <string notr="true">border:none</string>
@@ -203,7 +203,7 @@
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Refresh transaction list</string>
+            <string>Transfer mwc between accounts</string>
            </property>
            <property name="styleSheet">
             <string notr="true">border:none</string>
@@ -266,7 +266,7 @@
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Refresh transaction list</string>
+            <string>Refresh account list</string>
            </property>
            <property name="styleSheet">
             <string notr="true">border:none</string>
@@ -313,7 +313,7 @@
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Cancel the specified transaction</string>
+            <string>Create new account</string>
            </property>
            <property name="styleSheet">
             <string notr="true">border:none</string>
@@ -360,7 +360,7 @@
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Refresh transaction list</string>
+            <string>Remove empty account from the list</string>
            </property>
            <property name="styleSheet">
             <string notr="true">border:none</string>

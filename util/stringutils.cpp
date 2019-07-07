@@ -210,6 +210,54 @@ QString mwc713time2ThisTime(QString mwc713TimeStr) {
     return res;
 }
 
+QPair <bool, QString> validateMwc713Str(QString str, bool secureStr) {
+    QString nonAsciiChars;
+
+    for ( QChar ch : str ) {
+        if ( ch.isLowSurrogate() || ch.isNonCharacter() || ch.isSurrogate() )
+            return QPair<bool, QString>( false, (secureStr ? "Input string " : "String '" + str + "' ") + "contains not acceptable unicode characters" );
+
+        // https://ascii.cl/
+        ushort code = ch.unicode();
+        if ( code>=32 && code<127 )
+            continue; // Acceptable symbols
+
+        if ( !nonAsciiChars.contains(ch) )
+            nonAsciiChars += ch;
+    }
+
+    if (nonAsciiChars.isEmpty())   // success
+        return QPair<bool, QString>(true, "");
+
+    // generating the report about inputs
+    QString reportStr = (secureStr ? "Input string " : "String '" + str + "' ") + "contains not acceptable symbols: ";
+    for (QChar ch : nonAsciiChars)
+        reportStr += QString("'") + ch + "',";
+
+    return QPair<bool, QString>( false, reportStr.left(reportStr.size()-1) + "." );
+}
+
+
+// String to escape and prepare for mwc713 input.
+// str - string to process   as sdd  =>  "as sdd";    pa@"a\s => "pa@\"a\\s"
+// noSpecialCharacters - if true will clean up all characters like a new line
+QString toMwc713input(QString str, bool noSpecialCharacters ) {
+    QString res = "\"";
+    for (QChar ch : str) {
+        if (noSpecialCharacters && ch.row() < 32 ) // skipping all special chars
+            continue;
+
+        if (ch == '"')
+            res += "\\\"";
+        if (ch == '\\')
+            res += "\\\\";
+        else
+            res += ch;
+    }
+    res += "\"";
+    return res;
+}
+
 
 
 }
