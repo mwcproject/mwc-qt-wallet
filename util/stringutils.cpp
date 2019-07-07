@@ -244,12 +244,12 @@ QPair <bool, QString> validateMwc713Str(QString str, bool secureStr) {
 QString toMwc713input(QString str, bool noSpecialCharacters ) {
     QString res = "\"";
     for (QChar ch : str) {
-        if (noSpecialCharacters && ch.row() < 32 ) // skipping all special chars
+        if (noSpecialCharacters && ch.unicode() < 32 ) // skipping all special chars
             continue;
 
         if (ch == '"')
             res += "\\\"";
-        if (ch == '\\')
+        else if (ch == '\\')
             res += "\\\\";
         else
             res += ch;

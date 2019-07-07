@@ -104,7 +104,7 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address,
 
         // TODO Message symbols MUST be escaped
     if ( !message.isEmpty() )
-        cmd += " --message \"" + message + "\""; // Message symbols MUST be escaped.
+        cmd += " --message " + util::toMwc713input(message); // Message symbols MUST be escaped.
 
     if (inputConfirmationNumber > 0)
         cmd += " --confirmations " + QString::number(inputConfirmationNumber);
@@ -113,7 +113,7 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address,
         cmd += " --change-outputs " + QString::number(changeOutputs);
 
     // So far documentation doesn't specify difference between protocols
-    cmd += " --to " + address;
+    cmd += " --to " + util::toMwc713input(address);
 
     if (coinNano<0)
         cmd += " ALL";

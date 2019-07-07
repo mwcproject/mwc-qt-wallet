@@ -28,9 +28,9 @@ WalletConfig::~WalletConfig()
 
 void wnd::WalletConfig::on_updateButton_clicked()
 {
-    QString folder = ui->walletFolder->text();
-    QString boxDomain = ui->mwcboxHost->text();
-    QString boxPortStr = ui->mwcboxPort->text();
+    QString folder = ui->walletFolder->text().trimmed();
+    QString boxDomain = ui->mwcboxHost->text().trimmed();
+    QString boxPortStr = ui->mwcboxPort->text().trimmed();
 
     bool ok = false;
     int boxPort = boxPortStr.toInt(&ok);

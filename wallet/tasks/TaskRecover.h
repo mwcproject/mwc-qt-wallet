@@ -3,6 +3,7 @@
 
 #include "../mwc713task.h"
 #include <QThread>
+#include "../../util/stringutils.h"
 
 namespace wallet {
 
@@ -107,7 +108,7 @@ public:
 
     // Expected that listening is already stopped
     TaskRecoverShowMnenonic( MWC713 *wallet713, QString password ) :
-            Mwc713Task("TaskRecover", "recover -d -p " + password, wallet713, "get mnemonic seed") {}
+            Mwc713Task("TaskRecover", "recover -d -p " + util::toMwc713input(password), wallet713, "get mnemonic seed") {}
 
     virtual ~TaskRecoverShowMnenonic() override {}
 

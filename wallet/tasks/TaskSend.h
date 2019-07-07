@@ -27,7 +27,7 @@ public:
 
     TaskSetReceiveAccount( MWC713 *wallet713, QString account, QString password ) :
             Mwc713Task("TaskSetReceiveAccount",
-                       QString("set-recv \"") + account + "\" -p " + password,
+                       QString("set-recv ") + util::toMwc713input(account) + " -p " + util::toMwc713input(password),
                        wallet713, "set-recv for " + account) {}
 
     virtual ~TaskSetReceiveAccount() override {}
@@ -68,7 +68,7 @@ public:
 
     TaskSendFile( MWC713 *wallet713, int64_t coinNano, QString fileTx ) :
             Mwc713Task("TaskSendFile",
-                       QString("send ") + util::nano2one(coinNano) + " --file \"" + fileTx + "\"",
+                       QString("send ") + util::nano2one(coinNano) + " --file " + util::toMwc713input(fileTx),
                        wallet713, "") {}
 
     virtual ~TaskSendFile() override {}
@@ -83,7 +83,7 @@ public:
     const static int64_t TIMEOUT = 1000*20;
 
     TaskReceiveFile( MWC713 *wallet713, QString fileName ) :
-            Mwc713Task("TaskReceiveFile",  QString("receive --file \"") + fileName + "\"", wallet713,"") {}
+            Mwc713Task("TaskReceiveFile",  QString("receive --file ") + util::toMwc713input(fileName), wallet713,"") {}
 
     virtual ~TaskReceiveFile() override {}
 
@@ -97,7 +97,7 @@ public:
     const static int64_t TIMEOUT = 1000*20;
 
     TaskFinalizeFile( MWC713 *wallet713, QString fileTxResponse ) :
-            Mwc713Task("TaskReceiveFile",  QString("finalize --file \"") + fileTxResponse + "\"", wallet713, "") {}
+            Mwc713Task("TaskReceiveFile",  QString("finalize --file ") + util::toMwc713input(fileTxResponse), wallet713, "") {}
 
     virtual ~TaskFinalizeFile() override {}
 

@@ -66,7 +66,7 @@ NewSeedTest::~NewSeedTest()
 void NewSeedTest::on_submitButton_clicked()
 {
     // no need to verify the symbols
-    state->submit( ui->wordEdit->text() );
+    state->submit( ui->wordEdit->text().trimmed() );
 }
 
 }

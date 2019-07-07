@@ -75,7 +75,7 @@ QString TaskRecoverFull::calcCommand(QVector<QString> seed, QString password) co
     for (auto & s : seed)
         cmd += " " + s;
 
-    cmd += " -p " + password;
+    cmd += " -p " + util::toMwc713input(password);
     return cmd;
 }
 

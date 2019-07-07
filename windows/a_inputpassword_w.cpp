@@ -37,7 +37,7 @@ InputPassword::~InputPassword()
 }
 
 void InputPassword::on_submitButton_clicked() {
-    QString pswd = ui->passwordEdit->text();
+    QString pswd = ui->passwordEdit->text().trimmed();
 
     QPair <bool, QString> valRes = util::validateMwc713Str(pswd, true);
     if (!valRes.first) {

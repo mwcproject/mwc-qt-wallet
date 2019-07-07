@@ -20,7 +20,7 @@ InitAccount::InitAccount(QWidget *parent, state::InitAccount * _state) :
 
     state->setWindowTitle( mwc::VERSION + " " + mwc::APP_NAME );
 
-    util::PasswordAnalyser pa( ui->password1Edit->text() );
+    util::PasswordAnalyser pa( ui->password1Edit->text().trimmed() );
     ui->strengthLabel->setText(pa.getPasswordQualityStr());
 
     ui->submitButton->setEnabled( pa.isPasswordOK() );
@@ -50,8 +50,8 @@ void InitAccount::on_password1Edit_textChanged(const QString &text)
 
 void InitAccount::on_submitButton_clicked()
 {
-    QString pswd1 = ui->password1Edit->text();
-    QString pswd2 = ui->password2Edit->text();
+    QString pswd1 = ui->password1Edit->text().trimmed();
+    QString pswd2 = ui->password2Edit->text().trimmed();
     util::PasswordAnalyser pa(pswd1);
 
     QPair <bool, QString> valRes = util::validateMwc713Str(pswd1, true);

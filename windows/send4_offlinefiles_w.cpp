@@ -26,7 +26,7 @@ SendOfflineFiles::~SendOfflineFiles()
 
 void SendOfflineFiles::on_generateFileButton_clicked()
 {
-    QString mwc2sendStr = ui->amountEdit->text();
+    QString mwc2sendStr = ui->amountEdit->text().trimmed();
     auto mwcAmount = util::one2nano( mwc2sendStr );
     if (!mwcAmount.first) {
         control::MessageBox::message(this, "Verification Error", "Please input number of MWC coins that you want to send");

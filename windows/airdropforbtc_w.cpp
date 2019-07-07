@@ -29,9 +29,9 @@ AirdropForBTC::~AirdropForBTC()
 
 void AirdropForBTC::on_claimButton_clicked()
 {
-    QString btcAddr = ui->btcEdit->text();
-    QString challenge = ui->challengeEdit->text();
-    QString signature = ui->signatureEdit->text();
+    QString btcAddr = ui->btcEdit->text().trimmed();
+    QString challenge = ui->challengeEdit->text().trimmed();
+    QString signature = ui->signatureEdit->text().trimmed();
 
     if ( signature.length() == 0 ) {
         control::MessageBox::message(this, "MWC claim", "Please input the signature for the challenge");

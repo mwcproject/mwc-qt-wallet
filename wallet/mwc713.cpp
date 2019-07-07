@@ -517,10 +517,13 @@ void MWC713::setRecoveryProgress( int64_t progress, int64_t limit ) {
 // Apply accout list. Explory what does wallet has
 void MWC713::updateAccountList( QVector<QString> accounts ) {
     collectedAccountInfo.clear();
+
+    core::SendCoinsParams params = appContext->getSendCoinsParams();
+
     int idx = 0;
     for (QString acc : accounts) {
         eventCollector->addTask( new TaskAccountSwitch(this, acc, walletPassword, false), TaskAccountSwitch::TIMEOUT );
-        eventCollector->addTask( new TaskAccountInfo(this, idx>0), TaskAccountInfo::TIMEOUT );
+        eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber, idx>0), TaskAccountInfo::TIMEOUT );
         eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1 ); // Updating the progress
     }
     eventCollector->addTask( new TaskAccountListFinal(this, currentAccount), -1 ); // Finalize the task

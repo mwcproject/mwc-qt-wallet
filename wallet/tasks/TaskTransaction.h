@@ -2,6 +2,7 @@
 #define MWC_QT_WALLET_TASKTRANSACTION_H
 
 #include "../mwc713task.h"
+#include "../../util/stringutils.h"
 
 namespace wallet {
 
@@ -61,7 +62,7 @@ public:
     const static int64_t TIMEOUT = 1000*7;
 
     TaskTransExportProof( MWC713 * wallet713, QString fileName, int64_t transId ) :
-            Mwc713Task("TransExportProof", "export-proof --file \"" + fileName + "\" --id " + QString::number(transId) , wallet713, ""), transactionId(transId), proofFileName(fileName) {}
+            Mwc713Task("TransExportProof", "export-proof --file " + util::toMwc713input(fileName) + " --id " + QString::number(transId) , wallet713, ""), transactionId(transId), proofFileName(fileName) {}
 
     virtual ~TaskTransExportProof () override {}
 
@@ -78,7 +79,7 @@ public:
     const static int64_t TIMEOUT = 1000*7;
 
     TaskTransVerifyProof( MWC713 * wallet713, QString fileName  ) :
-            Mwc713Task("TaskTransVerifyProof", "verify-proof --file \"" + fileName + "\"", wallet713, ""), proofFileName(fileName) {}
+            Mwc713Task("TaskTransVerifyProof", "verify-proof --file " + util::toMwc713input(fileName), wallet713, ""), proofFileName(fileName) {}
 
     virtual ~TaskTransVerifyProof () override {}
 

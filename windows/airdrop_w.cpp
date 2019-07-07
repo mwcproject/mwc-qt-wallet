@@ -29,7 +29,7 @@ Airdrop::~Airdrop()
 
 void Airdrop::on_nextButton_clicked()
 {
-    QString address = ui->btcAddressEdit->text();
+    QString address = ui->btcAddressEdit->text().trimmed();
 
     if (address.length()==0) {
         control::MessageBox::message(this, "Error", "Please input your BTC address that you registered at airdrop");

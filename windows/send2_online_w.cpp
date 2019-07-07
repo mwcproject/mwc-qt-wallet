@@ -99,11 +99,11 @@ void SendOnline::on_sendButton_clicked()
     int accountIdx = dt.toInt();
     wallet::AccountInfo acc = accountInfo[accountIdx];
 
-    QString sendAmount = ui->amountEdit->text();
+    QString sendAmount = ui->amountEdit->text().trimmed();
 
     QPair<bool, int64_t> mwcAmount;
     if (sendAmount != "All") {
-        mwcAmount = util::one2nano(ui->amountEdit->text());
+        mwcAmount = util::one2nano(ui->amountEdit->text().trimmed());
         if (!mwcAmount.first) {
             control::MessageBox::message(this, "Incorrect Input", "Please specify correct number of MWC to send");
             ui->amountEdit->setFocus();
@@ -114,7 +114,7 @@ void SendOnline::on_sendButton_clicked()
         mwcAmount = QPair<bool, int64_t>(true, -1);
     }
 
-    QString sendTo = ui->sendEdit->text();
+    QString sendTo = ui->sendEdit->text().trimmed();
     if ( sendTo.size()>0 && sendTo[0] == '@' )
         sendTo = sendTo.right(sendTo.size()-1);
 
@@ -180,7 +180,7 @@ void SendOnline::on_sendButton_clicked()
         }
     }
 
-    QString description = ui->descriptionEdit->toPlainText();
+    QString description = ui->descriptionEdit->toPlainText().trimmed();
 
     {
         QPair<bool, QString> valRes = util::validateMwc713Str(description);

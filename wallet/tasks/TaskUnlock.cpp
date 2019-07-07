@@ -38,7 +38,7 @@ namespace wallet {
     QString TaskUnlock::buildWalletRequest(QString password) {
         QString res = "unlock";
         if (password.length() > 0)
-            res += " -p " + password;
+            res += " -p " + util::toMwc713input(password);
         return res;
     }
 

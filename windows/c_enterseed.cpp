@@ -53,7 +53,7 @@ void EnterSeed::on_cancelButton_clicked()
 
 void EnterSeed::on_continueButton_clicked()
 {
-    QString seedStr = ui->seedText->toPlainText().toLower();
+    QString seedStr = ui->seedText->toPlainText().toLower().trimmed();
 
     QPair <bool, QString> valRes = util::validateMwc713Str( seedStr );
     if (!valRes.first) {

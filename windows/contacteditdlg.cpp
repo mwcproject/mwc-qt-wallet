@@ -28,8 +28,8 @@ ContactEditDlg::~ContactEditDlg()
 
 void ContactEditDlg::on_applyButton_clicked()
 {
-    contact.name = ui->nameEdit->text();
-    contact.address = ui->addressEdit->text();
+    contact.name = ui->nameEdit->text().trimmed();
+    contact.address = ui->addressEdit->text().trimmed();
 
     if ( contact.name.isEmpty() )
     {

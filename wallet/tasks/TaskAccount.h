@@ -2,6 +2,7 @@
 #define MWC_QT_WALLET_TASKACCOUNT_H
 
 #include "../mwc713task.h"
+#include "../../util/stringutils.h"
 
 namespace wallet {
 
@@ -28,7 +29,7 @@ public:
 
     // Expected that account is unique. Account must meet mwc713 expectations
     TaskAccountCreate( MWC713 * wallet713, QString account ) :
-            Mwc713Task("TaskAccountCreate", "account create " + account, wallet713,""), newAccountName(account) { Q_ASSERT(account.length()>0); }
+            Mwc713Task("TaskAccountCreate", "account create " + util::toMwc713input(account), wallet713,""), newAccountName(account) { Q_ASSERT(account.length()>0); }
 
     virtual ~TaskAccountCreate() override {}
 
@@ -44,7 +45,7 @@ public:
     const static int64_t TIMEOUT = 1000*7;
 
     TaskAccountSwitch( MWC713 * wallet713, QString accountName, QString password, bool _makeAccountCurrent ) :
-            Mwc713Task("TaskAccountSwitch", "account switch " + accountName + " -p " + password, wallet713, "account switch " + accountName ),
+            Mwc713Task("TaskAccountSwitch", "account switch " +  util::toMwc713input(accountName) + " -p " +  util::toMwc713input(password), wallet713, "account switch " + accountName ),
             switchAccountName(accountName), makeAccountCurrent(_makeAccountCurrent) { Q_ASSERT(accountName.length()>0); Q_ASSERT(password.length()>0); }
 
     virtual ~TaskAccountSwitch() override {}
@@ -64,7 +65,7 @@ public:
 
     // createSimulation is true if user expect create account instead of rename deleted
     TaskAccountRename( MWC713 * wallet713, QString oldAccountName, QString newAccountName, bool createSimulation ) :
-            Mwc713Task("TaskAccountRename", "account rename \"" + oldAccountName + "\" \"" + newAccountName + "\"", wallet713, ""),
+            Mwc713Task("TaskAccountRename", "account rename " +  util::toMwc713input(oldAccountName) + " " + util::toMwc713input(newAccountName), wallet713, ""),
             oldName(oldAccountName),
             newName(newAccountName),
             createAccountSimulation(createSimulation) { }
@@ -86,8 +87,8 @@ public:
     const static int64_t TIMEOUT = 1000*10;
 
     // noRefresh can be used for sequenced calls
-    TaskAccountInfo( MWC713 * wallet713, bool noRefresh ) :
-    Mwc713Task("TaskAccountInfo", QString("info") + (noRefresh ? " --no-refresh":""), wallet713,"") {}
+    TaskAccountInfo( MWC713 * wallet713, int confimations, bool noRefresh ) :
+    Mwc713Task("TaskAccountInfo", QString("info -c ") + QString::number(confimations) + (noRefresh ? " --no-refresh":""), wallet713,"") {}
 
     virtual ~TaskAccountInfo() override {}
 

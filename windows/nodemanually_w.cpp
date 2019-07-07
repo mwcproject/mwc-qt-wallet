@@ -23,8 +23,8 @@ NodeManually::~NodeManually()
 }
 
 QPair<bool,NodeAddr> NodeManually::getNodeData() {
-    QString host = ui->hostEdit->text();
-    QString portStr = ui->portEdit->text();
+    QString host = ui->hostEdit->text().trimmed();
+    QString portStr = ui->portEdit->text().trimmed();
 
     if (host.length() == 0 || portStr.length()==0) {
         control::MessageBox::message(this, "Need info",

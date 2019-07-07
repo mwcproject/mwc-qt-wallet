@@ -49,7 +49,7 @@ void SendOfflineSettings::on_sendButton_clicked()
     int accountIdx = ui->accountComboBox->currentData().toInt();
     wallet::AccountInfo acc = accountInfo[accountIdx];
 
-    QString description = ui->descriptionEdit->toPlainText();
+    QString description = ui->descriptionEdit->toPlainText().trimmed();
 
     {
         QPair<bool, QString> valRes = util::validateMwc713Str(description);

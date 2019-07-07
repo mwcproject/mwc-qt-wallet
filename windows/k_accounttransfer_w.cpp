@@ -91,11 +91,11 @@ void AccountTransfer::on_transferButton_clicked()
         return;
     }
 
-    QString sendAmount = ui->amountEdit->text();
+    QString sendAmount = ui->amountEdit->text().trimmed();
 
     QPair<bool, int64_t> mwcAmount;
     if (sendAmount != "All") {
-        mwcAmount = util::one2nano(ui->amountEdit->text());
+        mwcAmount = util::one2nano(ui->amountEdit->text().trimmed());
         if (!mwcAmount.first) {
             control::MessageBox::message(this, "Incorrect Input", "Please specify correct number of MWC to send");
             ui->amountEdit->setFocus();
