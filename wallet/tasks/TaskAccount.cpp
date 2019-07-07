@@ -41,7 +41,7 @@ bool TaskAccountList::processTask(const QVector<WEvent> &events) {
     idx++;
 
     for ( ;idx<lns.size(); idx++ ) {
-        if ( lns[idx].message.contains("----------------------------------")  )
+        if ( lns[idx].message.contains("-------------------------------")  )
             break;
     }
     idx++;
