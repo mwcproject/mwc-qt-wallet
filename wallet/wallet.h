@@ -39,15 +39,23 @@ struct AccountInfo {
     bool isDeleted() const;
 };
 
+// Wallet config
 struct WalletConfig {
-    QString dataPath = "wallet";
-    QString mwcboxDomain = "mwcbox.mwc.mw";
-    int     mwcboxPort = 12456;
-    QString mwcNodeURI = "127.0.0.1:5432";
-    QString mwcNodeSecret = "3257683476";
+    QString dataPath;
+    QString mwcmqDomain;
+    QString keyBasePath;
 
-    void saveData( QDataStream & out) const;
-    bool loadData( QDataStream & in);
+    WalletConfig() : dataPath("Undefined"), mwcmqDomain("Undefined"), keyBasePath("Undefined") {}
+    WalletConfig(const WalletConfig & other) = default;
+    WalletConfig &operator = (const WalletConfig & other) = default;
+
+    bool operator == (const WalletConfig & other) const { return dataPath==other.dataPath && mwcmqDomain==other.mwcmqDomain && keyBasePath==other.keyBasePath; }
+
+    bool isDefined() const { return  dataPath!="Undefined" && mwcmqDomain!="Undefined" && keyBasePath!="Undefined"; }
+
+    WalletConfig & setData(QString dataPath,
+                QString mwcmqDomain,
+                QString keyBasePath);
 };
 
 struct NodeStatus {
@@ -301,8 +309,11 @@ public:
 
     // Get current configuration of the wallet.
     virtual WalletConfig getWalletConfig() noexcept(false) = 0;
-    // Update wallet config. Will be updated with non empty fields
-    virtual QPair<bool, QString> setWalletConfig(const WalletConfig & config) noexcept(false) = 0;
+    // Update wallet config. Will update config and restart the wmc713.
+    // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
+    //          and caller suppose listen for them
+    // If returns true, expected that wallet will need to have password input.
+    virtual bool setWalletConfig(const WalletConfig & config) noexcept(false) = 0;
 
     // Status of the node
     virtual NodeStatus getNodeStatus() noexcept(false) = 0;

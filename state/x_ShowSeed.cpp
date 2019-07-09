@@ -16,9 +16,7 @@ NextStateRespond ShowSeed::execute() {
     if ( context.appContext->getActiveWndState() != STATE::SHOW_SEED )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-
-    wnd = new wnd::NewSeed( context.wndManager->getInWndParent(), this, getStateMachine(), context.appContext, QVector<QString>(), true );
-    context.wndManager->switchToWindow( wnd );
+    wnd = (wnd::NewSeed*) context.wndManager->switchToWindowEx( new wnd::NewSeed( context.wndManager->getInWndParent(), this, getStateMachine(), context.appContext, QVector<QString>(), true ) );
 
     context.wallet->getSeed();
 

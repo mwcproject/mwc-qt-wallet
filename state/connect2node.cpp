@@ -21,7 +21,7 @@ NextStateRespond Connect2Node::execute() {
     if ( cookie.length() == 0 )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context.wndManager->switchToWindow(
+    context.wndManager->switchToWindowEx(
                 new wnd::ConnectToServer( context.wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
@@ -32,14 +32,14 @@ void Connect2Node::applyChoice(CONNECT_CHOICE connect) {
     switch(connect) {
     case NODE_LOCAL: {
         wallet::WalletConfig config = context.wallet->getWalletConfig();
-        config.mwcNodeURI = "127.0.0.1:13413";
+//        config.mwcNodeURI = "127.0.0.1:13413";
         context.wallet->setWalletConfig(config);
         context.stateMachine->setActionWindow( STATE::NODE_STATUS, true );
         break;
     }
     case NODE_POOL: {
         wallet::WalletConfig config = context.wallet->getWalletConfig();
-        config.mwcNodeURI = "pool.mwc.mw:13413";
+//        config.mwcNodeURI = "pool.mwc.mw:13413";
         context.wallet->setWalletConfig(config);
         context.stateMachine->setActionWindow( STATE::NODE_STATUS, true );
         break;

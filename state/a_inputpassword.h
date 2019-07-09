@@ -32,8 +32,6 @@ protected slots:
 
 private:
     wnd::InputPassword * wnd = nullptr;
-
-    bool loggedIn = false;
 };
 
 }

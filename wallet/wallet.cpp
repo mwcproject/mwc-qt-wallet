@@ -61,30 +61,16 @@ bool AccountInfo::isDeleted() const {
             total == 0 && awaitingConfirmation==0 && lockedByPrevTransaction==0 && currentlySpendable==0;
 }
 
+WalletConfig & WalletConfig::setData(QString _dataPath,
+                            QString _mwcmqDomain,
+                            QString _keyBasePath) {
+    dataPath = _dataPath;
+    mwcmqDomain = _mwcmqDomain;
+    keyBasePath = _keyBasePath;
 
-void WalletConfig::saveData( QDataStream & out) const {
-    out << 0x32189;
-
-    out << dataPath;
-    out << mwcboxDomain;
-    out << mwcboxPort;
-    out << mwcNodeURI;
-    out << mwcNodeSecret;
+    return * this;
 }
 
-bool WalletConfig::loadData( QDataStream & in) {
-    int id = 0;
-    in >> id;
-    if (id!=0x32189)
-        return false;
-
-    in >> dataPath;
-    in >> mwcboxDomain;
-    in >> mwcboxPort;
-    in >> mwcNodeURI;
-    in >> mwcNodeSecret;
-    return true;
-}
 
 void NodeStatus::setData(int   _connection,
                             QString _tip,

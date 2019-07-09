@@ -27,8 +27,7 @@ NextStateRespond AccountTransfer::execute() {
     if (context.appContext->getActiveWndState() != STATE::ACCOUNT_TRANSFER)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    wnd = new wnd::AccountTransfer( context.wndManager->getInWndParent(), this );
-    context.wndManager->switchToWindow(wnd);
+    wnd = (wnd::AccountTransfer*) context.wndManager->switchToWindowEx( new wnd::AccountTransfer( context.wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }

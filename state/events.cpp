@@ -20,7 +20,7 @@ NextStateRespond Events::execute() {
     if (context.appContext->getActiveWndState() != STATE::EVENTS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context.wndManager->switchToWindow(
+    context.wndManager->switchToWindowEx(
                 new wnd::Events( context.wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

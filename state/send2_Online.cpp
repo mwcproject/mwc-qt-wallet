@@ -21,9 +21,7 @@ NextStateRespond SendOnline::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
 
-    wnd = new wnd::SendOnline( context.wndManager->getInWndParent(), this );
-
-    context.wndManager->switchToWindow( wnd );
+    wnd = (wnd::SendOnline*)context.wndManager->switchToWindowEx( new wnd::SendOnline( context.wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }

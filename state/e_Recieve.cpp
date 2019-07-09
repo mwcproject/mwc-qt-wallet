@@ -35,11 +35,9 @@ NextStateRespond Recieve::execute() {
     QPair<bool,bool> lsnStatus = context.wallet->getListeningStatus();
     context.wallet->getMwcBoxAddress();
 
-    wnd = new wnd::Recieve( context.wndManager->getInWndParent(), this,
-                            lsnStatus.first, lsnStatus.second,
-                            context.wallet->getLastKnownMwcBoxAddress() );
-
-    context.wndManager->switchToWindow( wnd );
+    wnd = (wnd::Recieve*) context.wndManager->switchToWindowEx( new wnd::Recieve( context.wndManager->getInWndParent(), this,
+                                                          lsnStatus.first, lsnStatus.second,
+                                                          context.wallet->getLastKnownMwcBoxAddress() ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }

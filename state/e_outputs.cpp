@@ -23,8 +23,7 @@ NextStateRespond Outputs::execute() {
     if (context.appContext->getActiveWndState() != STATE::OUTPUTS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    wnd = new wnd::Outputs( context.wndManager->getInWndParent(), this);
-    context.wndManager->switchToWindow( wnd );
+    wnd = (wnd::Outputs*) context.wndManager->switchToWindowEx( new wnd::Outputs( context.wndManager->getInWndParent(), this) );
 
     // Requesting wallet balance update because Accounts into is there
     context.wallet->updateWalletBalance();

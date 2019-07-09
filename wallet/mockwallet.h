@@ -92,7 +92,7 @@ public:
     void check(bool wait4listeners) noexcept(false) override;
 
     virtual WalletConfig getWalletConfig() noexcept(false) override;
-    virtual QPair<bool, QString> setWalletConfig(const WalletConfig & config) noexcept(false) override;
+    virtual bool setWalletConfig(const WalletConfig & config) noexcept(false) override;
 
     // Status of the node
     virtual NodeStatus getNodeStatus() noexcept(false) override;

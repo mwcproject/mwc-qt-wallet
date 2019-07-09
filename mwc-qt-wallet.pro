@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets
+QT       += core gui widgets network
 requires(qtConfig(completer))
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

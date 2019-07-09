@@ -18,7 +18,7 @@ NextStateRespond Hodl::execute() {
     if (context.appContext->getActiveWndState() != STATE::HODL)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context.wndManager->switchToWindow(
+    context.wndManager->switchToWindowEx(
                 new wnd::Hodl( context.wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

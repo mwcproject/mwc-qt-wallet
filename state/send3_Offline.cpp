@@ -27,8 +27,8 @@ NextStateRespond SendOffline::execute() {
     if ( context.appContext->getActiveWndState() != STATE::SEND_OFFLINE  )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    settingsWnd = new wnd::SendOfflineSettings( context.wndManager->getInWndParent(), this );
-    context.wndManager->switchToWindow( settingsWnd );
+
+    settingsWnd = (wnd::SendOfflineSettings*) context.wndManager->switchToWindowEx( new wnd::SendOfflineSettings( context.wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
@@ -57,8 +57,7 @@ void SendOffline::prepareSendMwcOffline( const wallet::AccountInfo & account, QS
     // Switching the account async, we don't really need the response
     context.wallet->switchAccount( account.accountName );
 
-    filesWnd = new wnd::SendOfflineFiles( context.wndManager->getInWndParent(), account, this );
-    context.wndManager->switchToWindow( filesWnd );
+    filesWnd = (wnd::SendOfflineFiles*) context.wndManager->switchToWindowEx( new wnd::SendOfflineFiles( context.wndManager->getInWndParent(), account, this ) );
 }
 
 QString SendOffline::getFileGenerationPath() {

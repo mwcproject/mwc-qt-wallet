@@ -233,9 +233,9 @@ WalletConfig MockWallet::getWalletConfig() {
 }
 
 // Update wallet config. Will be updated with non empty fields
-QPair<bool, QString> MockWallet::setWalletConfig(const WalletConfig & cfg) {
+bool MockWallet::setWalletConfig(const WalletConfig & cfg) {
     config = cfg;
-    return QPair<bool, QString>(true,"");
+    return false;
 }
 
 NodeStatus MockWallet::getNodeStatus() {
@@ -431,7 +431,7 @@ void MockWallet::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x57670;
+    out << 0x57671;
 
     out << isInit;
     // It is mock test wallet, that is why we can store the password
@@ -442,8 +442,6 @@ void MockWallet::saveData() const {
         out << acc;
 
     out << selectedAccount;
-
-    config.saveData(out);
 
     out << int(contacts.size());
     for ( const WalletContact & wltCont : contacts )
@@ -456,55 +454,50 @@ void MockWallet::saveData() const {
 bool MockWallet::loadData() {
 
     QFile file(dataPath + "/" + settingsFileName);
-    if ( !file.open(QIODevice::ReadOnly) ) {
+    if (!file.open(QIODevice::ReadOnly)) {
         // first run, no file exist
         return false;
-     }
+    }
 
-     QDataStream in(&file);
-     in.setVersion(QDataStream::Qt_5_7);
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_5_7);
 
-     int id = 0;
-     in >> id;
-     if (id!=0x57670)
-         return false;
+    int id = 0;
+    in >> id;
+    if (id != 0x57671)
+        return false;
 
-     in >> isInit;
-     // It is mock test wallet, that is why we can store the password
-     in >> walletPassword;
+    in >> isInit;
+    // It is mock test wallet, that is why we can store the password
+    in >> walletPassword;
 
-     int size = 0;
-     in >> size;
-     if (size<0 || size>100000)
-         return false;
+    int size = 0;
+    in >> size;
+    if (size < 0 || size > 100000)
+        return false;
 
-     accounts.resize(size);
-     for ( QString & acc : accounts )
-         in >> acc;
+    accounts.resize(size);
+    for (QString &acc : accounts)
+        in >> acc;
 
-     if (id>=0x57668)
-         in >> selectedAccount;
+    in >> selectedAccount;
 
-     if (!config.loadData(in))
-         return false;
+    size = 0;
+    in >> size;
+    if (size < 0 || size > 100000)
+        return false;
 
-     size = 0;
-     in >> size;
-     if (size<0 || size>100000)
-         return false;
+    contacts.resize(size);
+    for (WalletContact &wltCont : contacts) {
+        if (!wltCont.loadData(in)) {
+            contacts.clear();
+            return false;
+        }
+    }
 
-     contacts.resize(size);
-     for ( WalletContact & wltCont : contacts ) {
-         if (!wltCont.loadData(in)) {
-             contacts.clear();
-             return false;
-         }
-     }
+    in >> currentAddressIdx;
 
-     if (id>=0x57669)
-         in >> currentAddressIdx;
-
-     return true;
- }
+    return true;
+}
 
 }

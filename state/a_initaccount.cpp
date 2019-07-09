@@ -21,7 +21,7 @@ NextStateRespond InitAccount::execute() {
         context.appContext->getCookie<QString>(COOKIE_PASSWORD).length()==0 ) {
         // Show window to input password
 
-        context.wndManager->switchToWindow(
+        context.wndManager->switchToWindowEx(
                     new wnd::InitAccount( context.wndManager->getInWndParent(), this ) );
 
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

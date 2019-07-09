@@ -18,8 +18,8 @@ class WindowManager : public QObject
 public:
     WindowManager(QWidget  * mainWnd );
 
-    // Show new window
-    void switchToWindow( QWidget * newWindow );
+    // Show new window and return it
+    QWidget * switchToWindowEx( QWidget * newWindow );
     // Parent for windows it can show.
     QWidget * getInWndParent() const;
 

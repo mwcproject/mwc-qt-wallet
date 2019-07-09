@@ -23,8 +23,7 @@ NextStateRespond Accounts::execute() {
     if (context.appContext->getActiveWndState() != STATE::ACCOUNTS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    wnd = new wnd::Accounts( context.wndManager->getInWndParent(), this );
-    context.wndManager->switchToWindow(wnd);
+    wnd  = (wnd::Accounts*)context.wndManager->switchToWindowEx(new wnd::Accounts( context.wndManager->getInWndParent(), this ));
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }

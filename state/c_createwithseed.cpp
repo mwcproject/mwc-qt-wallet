@@ -40,8 +40,7 @@ NextStateRespond CreateWithSeed::execute() {
     if (withSeed.length()==0)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    seedWnd = new wnd::EnterSeed( context.wndManager->getInWndParent(), this );
-    context.wndManager->switchToWindow( seedWnd );
+    seedWnd = (wnd::EnterSeed *) context.wndManager->switchToWindowEx( new wnd::EnterSeed( context.wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
@@ -57,9 +56,8 @@ void CreateWithSeed::createWalletWithSeed( QVector<QString> seed ) {
     keybaseOriginalState = walletListenerStatus.second;
 
     // switching to a progress Wnd
-    progressWnd = new wnd::ProgressWnd(context.wndManager->getInWndParent(), this, "Recovering account from the passphrase", "",
-                                       "", false);
-    context.wndManager->switchToWindow(progressWnd);
+    progressWnd = (wnd::ProgressWnd*) context.wndManager->switchToWindowEx(new wnd::ProgressWnd(context.wndManager->getInWndParent(), this, "Recovering account from the passphrase", "",
+                                                              "", false));
 
     // Stopping listeners first. Not checking if they are running.
     progressWnd->setMsgPlus("Preparing for recovery...");
@@ -153,7 +151,7 @@ void CreateWithSeed::onRecoverResult(bool started, bool finishedWithSuccess, QSt
     }
     else {
         // switch back to the seed window
-        context.wndManager->switchToWindow(
+        context.wndManager->switchToWindowEx(
                 new wnd::EnterSeed( context.wndManager->getInWndParent(), this ) );
         return;
     }

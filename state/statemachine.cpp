@@ -20,7 +20,7 @@
 #include "e_transactions.h"
 #include "e_outputs.h"
 #include "contacts.h"
-#include "walletconfig.h"
+#include "x_walletconfig.h"
 #include "airdrop.h"
 #include "a_StartWallet.h"
 #include "send1_OnlineOffline.h"

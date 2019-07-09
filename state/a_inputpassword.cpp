@@ -23,9 +23,7 @@ NextStateRespond InputPassword::execute() {
     if ( status == wallet::InitWalletStatus::NEED_PASSWORD ||
             status == wallet::InitWalletStatus::WRONG_PASSWORD )
     {
-        wnd = new wnd::InputPassword( context.wndManager->getInWndParent(), this );
-        context.wndManager->switchToWindow(wnd);
-
+        wnd = (wnd::InputPassword*)context.wndManager->switchToWindowEx(new wnd::InputPassword( context.wndManager->getInWndParent(), this ) );
 
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
     }
@@ -40,7 +38,6 @@ void InputPassword::submitPassword(const QString & password) {
         wnd->startWaiting();
     }
 
-    loggedIn = true;
     context.wallet->loginWithPassword( password );
 }
 
@@ -52,7 +49,6 @@ void InputPassword::onInitWalletStatus( wallet::InitWalletStatus  status ) {
             wnd->stopWaiting();
             wnd->reportWrongPassword();
         }
-        loggedIn = false;
     } else if (status == wallet::InitWalletStatus::READY ) {
         // Great, login is done. Now we can use the wallet
         Q_ASSERT(context.wallet->getWalletStatus() == wallet::InitWalletStatus::READY);
@@ -66,12 +62,6 @@ void InputPassword::onInitWalletStatus( wallet::InitWalletStatus  status ) {
 
         // Updating the wallet balance
         context.wallet->updateWalletBalance();
-    }
-    else {
-        if (loggedIn) {
-            // seems like fatal error. Unknown state
-            context.wallet->reportFatalError("Internal error. Wallet Password verification invalid state.");
-        }
     }
 }
 

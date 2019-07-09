@@ -20,7 +20,7 @@ NextStateRespond NodeManually::execute() {
     if (cookie.length()==0)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context.wndManager->switchToWindow(
+    context.wndManager->switchToWindowEx(
                 new wnd::NodeManually( context.wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
@@ -34,7 +34,7 @@ QPair<bool,QString> NodeManually::testMwcNode(QString host, int port) {
 
 void NodeManually::submitMwcNode(QString host, int port) {
     wallet::WalletConfig config = context.wallet->getWalletConfig();
-    config.mwcNodeURI = host + ":" + QString::number(port);
+//    config.mwcNodeURI = host + ":" + QString::number(port);
     context.wallet->setWalletConfig(config);
 
     context.stateMachine->setActionWindow( STATE::NODE_STATUS, true );

@@ -43,11 +43,9 @@ NextStateRespond Listening::execute() {
     context.wallet->getMwcBoxAddress();
     // will get result later and will update the window
 
-    wnd = new wnd::Listening( context.wndManager->getInWndParent(), this,
-                  lsnStatus.first, lsnStatus.second,
-                              context.wallet->getLastKnownMwcBoxAddress(), -1);
-
-    context.wndManager->switchToWindow(wnd);
+    wnd = (wnd::Listening*) context.wndManager->switchToWindowEx(new wnd::Listening( context.wndManager->getInWndParent(), this,
+                                                           lsnStatus.first, lsnStatus.second,
+                                                                       context.wallet->getLastKnownMwcBoxAddress(), -1));
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
@@ -102,6 +100,15 @@ void Listening::onListeningStartResults( bool mqTry, bool kbTry, // what we try 
         QString msg;
         for (auto & s : errorMessages)
             msg += s + '\n';
+
+        if (kbTry) {
+
+            wallet::WalletConfig cfg = context.wallet->getWalletConfig();
+            if (!cfg.keyBasePath.isEmpty() ) {
+                msg += "\nYour current keybase path:\n" + cfg.keyBasePath + "\nThe keybase path can be changed at 'Wallet Configuration' page.";
+            }
+        }
+
         wnd->showMessage("Start listening Error", msg);
     }
 }

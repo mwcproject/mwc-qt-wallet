@@ -39,7 +39,7 @@ NextStateRespond NewWallet::execute() {
         Q_ASSERT(pass.length()>0);
 
 
-        context.wndManager->switchToWindow(
+        context.wndManager->switchToWindowEx(
                     new wnd::NewWallet( context.wndManager->getInWndParent(), this ) );
 
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

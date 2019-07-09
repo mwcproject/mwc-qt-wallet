@@ -70,11 +70,11 @@ NextStateRespond Airdrop::execute() {
 
 
     if (lastChallendge.isEmpty()) {
-        context.wndManager->switchToWindow(
+        context.wndManager->switchToWindowEx(
                     new wnd::Airdrop( context.wndManager->getInWndParent(), this ) );
     }
     else {
-        context.wndManager->switchToWindow(
+        context.wndManager->switchToWindowEx(
             new wnd::AirdropForBTC( context.wndManager->getInWndParent(), this ) );
     }
 

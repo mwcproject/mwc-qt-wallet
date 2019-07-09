@@ -35,10 +35,10 @@ NextStateRespond NewSeedTest::execute() {
             context.appContext->pullCookie< QVector<QString> >("seed2verify");
             context.wallet->confirmNewSeed();
 
-            control::MessageBox::message(nullptr, "Congratulations!", "Thank you for confirming all words from your passphrase. Your wallet was successfully created");
-
             // Updating the wallet balance
             context.wallet->updateWalletBalance();
+
+            control::MessageBox::message(nullptr, "Congratulations!", "Thank you for confirming all words from your passphrase. Your wallet was successfully created");
 
             return NextStateRespond(NextStateRespond::RESULT::WAIT_FOR_ACTION);
         }
@@ -51,8 +51,7 @@ NextStateRespond NewSeedTest::execute() {
     task.pop_back();
     context.appContext->pushCookie< QVector< core::TestSeedTask > >("seedTasks", task);
 
-    wnd = new wnd::NewSeedTest( context.wndManager->getInWndParent(), this, currentTask.getWordIndex() );
-    context.wndManager->switchToWindow( wnd );
+    wnd = (wnd::NewSeedTest*) context.wndManager->switchToWindowEx( new wnd::NewSeedTest( context.wndManager->getInWndParent(), this, currentTask.getWordIndex() ) );
 
     return NextStateRespond(NextStateRespond::RESULT::WAIT_FOR_ACTION);
 }

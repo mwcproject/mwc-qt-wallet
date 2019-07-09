@@ -22,7 +22,7 @@
 bool deployFilesFromResources() {
     QString confPath = ioutils::getAppDataPath();
 
-    QString mwc713conf = confPath + "/wallet713.toml";
+    QString mwc713conf = confPath + "/wallet713v2.toml";
     QString mwcGuiWalletConf = confPath + "/mwc-gui-wallet.conf";
 
     bool ok = true;

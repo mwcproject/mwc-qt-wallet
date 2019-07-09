@@ -23,8 +23,7 @@ NextStateRespond SendOnlineOffline::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     nextStep = STATE::NONE;
-    wnd = new wnd::SendOnlineOffline( context.wndManager->getInWndParent(), this );
-    context.wndManager->switchToWindow( wnd );
+    wnd = (wnd::SendOnlineOffline*)context.wndManager->switchToWindowEx( new wnd::SendOnlineOffline( context.wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
@@ -40,7 +39,9 @@ void SendOnlineOffline::SendOfflineChosen()  {
 }
 
 void SendOnlineOffline::updateBalanceAndContinue() {
-    wnd->showProgress();
+    if (wnd) {
+        wnd->showProgress();
+    }
 
     // Updating the wallet balance
     context.wallet->updateWalletBalance();

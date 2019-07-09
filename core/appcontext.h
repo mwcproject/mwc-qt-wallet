@@ -25,6 +25,11 @@ struct SendCoinsParams {
         changeOutputs = _changeOutputs;
     }
 
+    SendCoinsParams(const SendCoinsParams & o) = default;
+    SendCoinsParams & operator = (const SendCoinsParams & o) = default;
+
+    bool operator == (const SendCoinsParams & o ) {return inputConfirmationNumber==o.inputConfirmationNumber && changeOutputs==o.changeOutputs;}
+
     void saveData(QDataStream & out) const;
     bool loadData(QDataStream & in);
 };

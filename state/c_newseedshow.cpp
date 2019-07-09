@@ -21,7 +21,7 @@ NextStateRespond NewSeedShow::execute() {
     if (seed.size()==0)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context.wndManager->switchToWindow(
+    context.wndManager->switchToWindowEx(
                 new wnd::NewSeed( context.wndManager->getInWndParent(), this, getStateMachine(), context.appContext, seed ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

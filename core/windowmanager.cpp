@@ -22,21 +22,22 @@ QWidget * WindowManager::getInWndParent() const {
 }
 
 
-void WindowManager::switchToWindow( QWidget * newWindow ) {
+QWidget * WindowManager::switchToWindowEx( QWidget * newWindow ) {
     if (currentWnd==newWindow)
-        return;
+        return newWindow;
 
     if (currentWnd!=nullptr) {
         currentWnd->close();
         currentWnd = nullptr;
     }
     if (newWindow==nullptr)
-        return;
+        return newWindow;
 
     currentWnd = newWindow;
     currentWnd->setAttribute( Qt::WA_DeleteOnClose );
     mainWindow->layout()->addWidget(currentWnd);
     currentWnd->show();
+    return newWindow;
 }
 
 }

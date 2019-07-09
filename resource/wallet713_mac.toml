@@ -1,5 +1,5 @@
 chain = "Floonet"
 wallet713_data_path = "gui_wallet713_data"
-grinbox_domain = "mq.mwc.mw"
+mwcmq_domain = "mq.mwc.mw"
 default_keybase_ttl = "24h"
 keybase_binary = "/Applications/Keybase.app/Contents/SharedSupport/bin/keybase"

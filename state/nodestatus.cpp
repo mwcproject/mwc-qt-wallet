@@ -27,7 +27,7 @@ NextStateRespond NodeStatus::execute() {
     if (context.appContext->getActiveWndState() != STATE::NODE_STATUS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context.wndManager->switchToWindow(
+    context.wndManager->switchToWindowEx(
                 new wnd::NodeStatus( context.wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

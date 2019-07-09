@@ -19,7 +19,11 @@
 #include "../util/Log.h"
 #include "../core/global.h"
 #include "../core/appcontext.h"
+#include "../core/Config.h"
 #include "../control/messagebox.h"
+#include "../util/ConfigReader.h"
+#include "../util/Files.h"
+#include "../util/Waiting.h"
 
 namespace wallet {
 
@@ -36,24 +40,7 @@ MWC713::MWC713(QString _mwc713path, QString _mwc713configPath, core::AppContext 
 }
 
 MWC713::~MWC713() {
-    mwc713disconnect();
-
-    if (mwc713process) {
-        mwc713process->terminate();
-        mwc713process->waitForFinished(5000);
-        delete mwc713process;
-        mwc713process = nullptr;
-    }
-
-    if (inputParser) {
-        delete  inputParser;
-        inputParser = nullptr;
-    }
-
-    if (eventCollector) {
-        delete eventCollector;
-        eventCollector = nullptr;
-    }
+    stop();
 }
 
 // Generic. Reporting fatal error that somebody will process and exit app
@@ -68,6 +55,7 @@ void MWC713::start() noexcept(false) {
 
     qDebug() << "Starting MWC713 at " << mwc713Path << " for config " << mwc713configPath;
 
+    // Creating process and starting
     mwc713process = new QProcess();
     mwc713process->setWorkingDirectory( QDir::homePath() );
     mwc713process->start(mwc713Path, {"--config", mwc713configPath, "-r", mwc::PROMPTS_MWC713 }, QProcess::Unbuffered | QProcess::ReadWrite );
@@ -109,6 +97,55 @@ void MWC713::start() noexcept(false) {
     // And eventing magic should begin...
 }
 
+void MWC713::stop() {
+    mwc713disconnect();
+
+    // reset mwc713 interna; state
+    initStatus = InitWalletStatus::NONE;
+    mwcAddress = "";
+    accountInfo.clear();
+    currentAccount = "default"; // Keep current account by name. It fit better to mwc713 interactions.
+    collectedAccountInfo.clear();
+
+    if (mwcMqOnline)
+        emit onMwcMqListenerStatus(false);
+
+    if (keybaseOnline)
+        emit onKeybaseListenerStatus(false);
+
+    mwcMqOnline = false;
+    keybaseOnline = false;
+
+    emit onMwcAddress("");
+    emit onMwcAddressWithIndex("",1);
+
+    emit onWalletBalanceUpdated();
+
+    walletPassword = "";
+
+    if (mwc713process) {
+        executeMwc713command("exit", "");
+        if (!mwc713process->waitForFinished(3000) ) {
+            mwc713process->terminate();
+            mwc713process->waitForFinished(5000);
+        }
+
+        delete mwc713process;
+        mwc713process = nullptr;
+    }
+
+    if (inputParser) {
+        delete  inputParser;
+        inputParser = nullptr;
+    }
+
+    if (eventCollector) {
+        delete eventCollector;
+        eventCollector = nullptr;
+    }
+
+
+}
 
 void MWC713::loginWithPassword(QString password) noexcept(false) {
     walletPassword = password;
@@ -781,6 +818,66 @@ void MWC713::updateAccountInfo( const AccountInfo & acc, QVector<AccountInfo> & 
         accounts.push_back(acc);
 
 }
+
+/////////////////////////////////////////////////////////////////////////
+
+// Get current configuration of the wallet. will read from wallet713.toml file
+WalletConfig MWC713::getWalletConfig() noexcept(false) {
+
+    QString mwc713confFN = core::Config::getMwc713conf();
+
+    util::ConfigReader  mwc713config;
+
+    if (!mwc713config.readConfig(mwc713confFN) ) {
+        control::MessageBox::message(nullptr, "Read failure", "Unable to read mwc713 configuration from " + mwc713confFN );
+        return WalletConfig();
+    }
+
+    QString dataPath = mwc713config.getString("wallet713_data_path");
+    QString keyBasePath = mwc713config.getString("keybase_binary");
+    QString mwcmqDomain = mwc713config.getString("mwcmq_domain");
+
+    if (dataPath.isEmpty() || keyBasePath.isEmpty() || mwcmqDomain.isEmpty()) {
+        control::MessageBox::message(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + mwc713confFN );
+        return WalletConfig();
+    }
+
+    return WalletConfig().setData(dataPath, mwcmqDomain, keyBasePath);
+}
+
+// Update wallet config. Will update config and restart the wmc713.
+// Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
+//          and caller suppose listen for them
+bool MWC713::setWalletConfig(const WalletConfig & config) noexcept(false) {
+    if (!config.isDefined())
+        return false;
+
+    QString mwc713confFN = core::Config::getMwc713conf();
+
+    QStringList confLines = util::readTextFile( mwc713confFN );
+    // Updating the config with new values
+
+    for (QString & ln : confLines) {
+        if (ln.startsWith("wallet713_data_path"))
+            ln = "wallet713_data_path = \"" + config.dataPath + "\"";
+        else if (ln.startsWith("keybase_binary"))
+            ln = "keybase_binary = \"" + config.keyBasePath + "\"";
+        else if (ln.startsWith("mwcmq_domain"))
+            ln = "mwcmq_domain = \"" + config.mwcmqDomain + "\"";
+    }
+
+    if (!util::writeTextFile( mwc713confFN, confLines )) {
+        control::MessageBox::message(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + mwc713confFN );
+        return false;
+    }
+
+    util::Waiting w; // Host verifucation might tale time, what is why waiting here
+
+    // Stopping the wallet. Start will be done by init state
+    stop();
+    return true;
+}
+
 
 
 }

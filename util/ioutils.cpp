@@ -16,7 +16,7 @@ QString getAppDataPath(QString localPath )
     QString path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
     if (path.isEmpty())
         throw core::MwcException("Qt error. Cannot determine home dir location.");
-    path += "/.mwc-gui-wallet/";
+    path += "/mwc-gui-wallet/";
 #endif
 
      QDir d(path);

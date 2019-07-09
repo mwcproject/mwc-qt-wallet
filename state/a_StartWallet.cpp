@@ -26,9 +26,8 @@ NextStateRespond StartWallet::execute() {
     if (status == wallet::InitWalletStatus::NONE) {
         // starting the wallet. Then will check what we need
 
-        wnd = new wnd::WaitingWnd( context.wndManager->getInWndParent(), this,
-                                   "Starting mwc713", "Please wait for mwc713 process starting..." );
-        context.wndManager->switchToWindow( wnd );
+        wnd = (wnd::WaitingWnd*) context.wndManager->switchToWindowEx( new wnd::WaitingWnd( context.wndManager->getInWndParent(), this,
+                                                                 "Starting mwc713", "Please wait for mwc713 process starting..." ) );
 
         context.wallet->start();
         return NextStateRespond(NextStateRespond::RESULT::WAIT_FOR_ACTION);

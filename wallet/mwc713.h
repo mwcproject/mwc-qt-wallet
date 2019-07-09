@@ -125,8 +125,13 @@ public:
     // Check Signals: onCheckResult(bool ok, QString errors );
     virtual void check(bool wait4listeners) noexcept(false) override;
 
-    virtual WalletConfig getWalletConfig() noexcept(false) override {return WalletConfig();}
-    virtual QPair<bool, QString> setWalletConfig(const WalletConfig & config) noexcept(false) override  {return QPair<bool, QString>(true,"");}
+    // Get current configuration of the wallet. will read from wallet713.toml file
+    virtual WalletConfig getWalletConfig() noexcept(false) override;
+    // Update wallet config. Will update config and restart the wmc713.
+    // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
+    //          and caller suppose listen for them
+    // If return true, expected that wallet will need to have password input.
+    virtual bool setWalletConfig(const WalletConfig & config) noexcept(false) override;
 
     // Status of the node
     virtual NodeStatus getNodeStatus() noexcept(false) override {return NodeStatus();}
@@ -258,6 +263,9 @@ public:
 
     void setCheckResult(bool ok, QString errors);
 private:
+    // stop mwc713 process nicely
+    void stop();
+
     void mwc713connect();
     void mwc713disconnect();
 

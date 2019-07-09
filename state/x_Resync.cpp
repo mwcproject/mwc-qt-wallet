@@ -36,9 +36,8 @@ NextStateRespond Resync::execute() {
     if (prevListeningStatus.second)
         context.wallet->listeningStop(false, true);
 
-    wnd = new wnd::ProgressWnd(
-            context.wndManager->getInWndParent(), this, "Re-sync with full node", "Preparing to re-sync", "", false);
-    context.wndManager->switchToWindow( wnd );
+    wnd = (wnd::ProgressWnd*)context.wndManager->switchToWindowEx( new wnd::ProgressWnd(
+                                            context.wndManager->getInWndParent(), this, "Re-sync with full node", "Preparing to re-sync", "", false) );
 
     context.wallet->check( prevListeningStatus.first || prevListeningStatus.second );
 
