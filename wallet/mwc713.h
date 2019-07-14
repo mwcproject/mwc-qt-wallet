@@ -183,11 +183,11 @@ public:
 
     // Get the contacts
     virtual QVector<WalletContact> getContacts() noexcept(false) override {return QVector<WalletContact>();}
-    virtual QPair<bool, QString> addContact( const WalletContact & contact ) noexcept(false) override  {return QPair<bool, QString>(true,"");}
-    virtual QPair<bool, QString> deleteContact( const QString & name ) noexcept(false) override  {return QPair<bool, QString>(true,"");}
+    virtual QPair<bool, QString> addContact( const WalletContact & contact ) noexcept(false) override  { Q_UNUSED(contact); return QPair<bool, QString>(true,"");}
+    virtual QPair<bool, QString> deleteContact( const QString & name ) noexcept(false) override  {Q_UNUSED(name); return QPair<bool, QString>(true,"");}
 
     // ----------- HODL
-    virtual WalletUtxoSignature sign_utxo( const QString & utxo, const QString & hash ) override {return WalletUtxoSignature();}
+    virtual WalletUtxoSignature sign_utxo( const QString & utxo, const QString & hash ) override { Q_UNUSED(utxo); Q_UNUSED(hash); return WalletUtxoSignature();}
 
 public:
 

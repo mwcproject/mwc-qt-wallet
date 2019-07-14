@@ -8,13 +8,14 @@ namespace core {
 // Note, workflow for config not enforced. Please don't abuse it
 class Config {
 public:
-    static QString getMwc713conf();
-    static QString getMwcGuiWalletConf();
+    static const QString & getMwc713conf();
+    static const QString & getMwcGuiWalletConf();
 
-    static QString getMwcpath(); // Not using now because so far there is no local node is running
-    static QString getWallet713path();
-    static QString getMainStyleSheetPath();
-    static QString getDialogsStyleSheetPath();
+    static const QString & getMwcpath(); // Not using now because so far there is no local node is running
+    static const QString & getWallet713path();
+    static const QString & getMainStyleSheetPath();
+    static const QString & getDialogsStyleSheetPath();
+    static const QString & getAirdropUrl();
 
     static QString toString();
 public:
@@ -22,7 +23,7 @@ public:
     static void setMwcGuiWalletConf( QString conf );
 
     static void setConfigData(QString mwcPath, QString wallet713path,
-            QString mainStyleSheetPath, QString dialogsStyleSheetPath);
+            QString mainStyleSheetPath, QString dialogsStyleSheetPath, QString airdropUrl);
 
 private:
     static QString mwc713conf;
@@ -31,6 +32,7 @@ private:
     static QString wallet713path;
     static QString mainStyleSheetPath;
     static QString dialogsStyleSheetPath;
+    static QString airdropUrl;
 };
 
 }

@@ -157,7 +157,23 @@
         </widget>
        </item>
        <item row="18" column="0" colspan="2">
-        <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,1,1">
+        <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1,1">
+         <property name="spacing">
+          <number>50</number>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
          <item>
           <widget class="control::MwcPushButtonNormal" name="restoreDefault">
            <property name="minimumSize">
@@ -176,7 +192,7 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="text">
-            <string>Restore original</string>
+            <string>Reset</string>
            </property>
            <property name="autoDefault">
             <bool>true</bool>
@@ -184,23 +200,10 @@
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_5">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
           <widget class="control::MwcPushButtonNormal" name="applyButton">
            <property name="minimumSize">
             <size>
-             <width>120</width>
+             <width>180</width>
              <height>40</height>
             </size>
            </property>

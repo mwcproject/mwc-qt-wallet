@@ -169,17 +169,17 @@ void WalletConfig::on_mwc713directorySelect_clicked()
     updateButtons();
 }
 
-void WalletConfig::on_mwc713directoryEdit_textEdited(const QString &arg1)
+void WalletConfig::on_mwc713directoryEdit_textEdited(const QString &)
 {
     updateButtons();
 }
 
-void WalletConfig::on_mwcmqHost_textEdited(const QString &arg1)
+void WalletConfig::on_mwcmqHost_textEdited(const QString &)
 {
     updateButtons();
 }
 
-void WalletConfig::on_keybasePathEdit_textChanged(const QString &arg1)
+void WalletConfig::on_keybasePathEdit_textChanged(const QString &)
 {
     updateButtons();
 }
@@ -198,12 +198,12 @@ void WalletConfig::on_keybasePathSelect_clicked()
     updateButtons();
 }
 
-void WalletConfig::on_confirmationNumberEdit_textChanged(const QString &arg1)
+void WalletConfig::on_confirmationNumberEdit_textChanged(const QString &)
 {
     updateButtons();
 }
 
-void WalletConfig::on_changeOutputsEdit_textEdited(const QString &arg1)
+void WalletConfig::on_changeOutputsEdit_textEdited(const QString &)
 {
     updateButtons();
 }

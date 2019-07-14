@@ -34,7 +34,7 @@ class Mwc713State {
 };
 
 MWC713::MWC713(QString _mwc713path, QString _mwc713configPath, core::AppContext * _appContext) :
-        mwc713Path(_mwc713path), mwc713configPath(_mwc713configPath), appContext(_appContext) {
+        appContext(_appContext), mwc713Path(_mwc713path),  mwc713configPath(_mwc713configPath) {
 
     currentAccount = appContext->getCurrentAccountName();
 }

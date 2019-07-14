@@ -17,13 +17,15 @@
 #include "core/Config.h"
 #include "util/ConfigReader.h"
 #include <QFileDevice>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 // Very first run - init everything
 bool deployFilesFromResources() {
     QString confPath = ioutils::getAppDataPath();
 
     QString mwc713conf = confPath + "/wallet713v2.toml";
-    QString mwcGuiWalletConf = confPath + "/mwc-gui-wallet.conf";
+    QString mwcGuiWalletConf = confPath + "/mwc-gui-wallet-v2.conf";
 
     bool ok = true;
 
@@ -87,8 +89,9 @@ bool readConfig(QApplication & app) {
     QString wallet713_path = reader.getString("wallet713_path");
     QString main_style_sheet = reader.getString("main_style_sheet");
     QString dialogs_style_sheet = reader.getString("dialogs_style_sheet");
+    QString airdropUrl = reader.getString("airdrop_url");
 
-    if ( mwc_path.isEmpty() || wallet713_path.isEmpty() || main_style_sheet.isEmpty() || dialogs_style_sheet.isEmpty()) {
+    if ( mwc_path.isEmpty() || wallet713_path.isEmpty() || main_style_sheet.isEmpty() || dialogs_style_sheet.isEmpty() || airdropUrl.isEmpty() ) {
         qDebug() << "Failed to read all expected data from config file " << config;
         return false;
     }
@@ -107,7 +110,7 @@ bool readConfig(QApplication & app) {
 #endif
     }
 
-    core::Config::setConfigData( mwc_path, wallet713_path, main_style_sheet, dialogs_style_sheet);
+    core::Config::setConfigData( mwc_path, wallet713_path, main_style_sheet, dialogs_style_sheet, airdropUrl);
     return true;
 }
 

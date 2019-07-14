@@ -21,7 +21,7 @@
 #include "e_outputs.h"
 #include "contacts.h"
 #include "x_walletconfig.h"
-#include "airdrop.h"
+#include "m_airdrop.h"
 #include "a_StartWallet.h"
 #include "send1_OnlineOffline.h"
 #include "send2_Online.h"

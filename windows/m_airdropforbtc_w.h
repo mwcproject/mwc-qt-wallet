@@ -18,8 +18,10 @@ class AirdropForBTC : public QWidget
     Q_OBJECT
 
 public:
-    explicit AirdropForBTC(QWidget *parent, state::Airdrop * state);
+    explicit AirdropForBTC(QWidget *parent, state::Airdrop * state, QString btcAddress, QString challenge );
     ~AirdropForBTC();
+
+    void reportMessage( QString title, QString message );
 
 private slots:
     void on_claimButton_clicked();
@@ -28,6 +30,8 @@ private slots:
 private:
     Ui::AirdropForBTC *ui;
     state::Airdrop * state;
+    QString btcAddress;
+    QString challenge;
 };
 
 }

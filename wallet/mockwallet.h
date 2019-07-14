@@ -161,7 +161,6 @@ private:
     // Runtime data
     bool listenMwcBox = false;
     bool listenKeybase = false;
-    bool listenFogeignApi = false;
     InitWalletStatus initStatus = InitWalletStatus::NONE;
 
     QVector<WalletNotificationMessages> notificationMessages;
