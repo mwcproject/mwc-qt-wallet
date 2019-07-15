@@ -9,8 +9,8 @@ AirdropForBTC::AirdropForBTC(QWidget *parent, state::Airdrop * _state, QString _
     QWidget(parent),
     ui(new Ui::AirdropForBTC),
     state(_state),
-    btcAddress(_btcAddress),
-    challenge(_challenge)
+    btcAddress(_btcAddress.trimmed()),
+    challenge(_challenge.trimmed())
 {
     ui->setupUi(this);
 
@@ -30,8 +30,6 @@ AirdropForBTC::~AirdropForBTC()
 
 void AirdropForBTC::on_claimButton_clicked()
 {
-    QString btcAddr = ui->btcEdit->text().trimmed();
-    QString challenge = ui->challengeEdit->text().trimmed();
     QString signature = ui->signatureEdit->text().trimmed();
 
     if ( signature.length() == 0 ) {
@@ -39,7 +37,7 @@ void AirdropForBTC::on_claimButton_clicked()
         return;
     }
 
-    state->requestClaimMWC( btcAddr, challenge, signature );
+    state->requestClaimMWC( btcAddress, challenge, signature );
 
     ui->progress->show();
 }

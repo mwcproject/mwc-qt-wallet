@@ -1,7 +1,7 @@
 #ifndef AIDROPW_H
 #define AIDROPW_H
 
-#include <QWidget>
+#include "../core/navwnd.h"
 
 namespace Ui {
 class Airdrop;
@@ -15,7 +15,7 @@ namespace state {
 
 namespace wnd {
 
-class Airdrop : public QWidget
+class Airdrop : public core::NavWnd
 {
     Q_OBJECT
 

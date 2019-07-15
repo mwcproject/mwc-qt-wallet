@@ -67,7 +67,7 @@ void Airdrop::requestGetChallenge( QString address ) {
     }
 
     sendRequest("/v1/getChallenge" ,
-            {"BTC_address", address, "mwcaddress", mqAddress},
+            {"btcaddress", address, "mwcaddress", mqAddress},
                 TAG_GET_CHALLENGE, address );
 
 }
@@ -199,8 +199,8 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
 
 
     if ( TAG_GET_CHALLENGE == tag ) {
-            QString status = jsonRespond["status"].toString();
-            if (status == "success") {
+            bool success = jsonRespond["success"].toBool(false);
+            if ( success ) {
                 QString address = reply->property("param1").toString();
 
                 QString challenge = jsonRespond["challenge"].toString();
@@ -210,8 +210,8 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
             }
             else {
                 // error status
-                int errCode = jsonRespond["code"].toInt(-1);
-                QString errMessage = jsonRespond["message"].toString();
+                int errCode = jsonRespond["error_code"].toInt(-1);
+                QString errMessage = jsonRespond["error_message"].toString();
 
                 reportMessageToUI("Claim request failed", "Unable to start claim process.\n" + (errCode>0? "Error Code: " + QString::number(errCode)+"\n" : "") +  errMessage );
             }

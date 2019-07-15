@@ -7,7 +7,8 @@
 namespace wnd {
 
 Airdrop::Airdrop(QWidget *parent, state::Airdrop * _state) :
-    QWidget(parent),
+    core::NavWnd(parent, _state->getStateMachine(),
+                _state->getAppContext() ),
     ui(new Ui::Airdrop),
     state(_state)
 {
