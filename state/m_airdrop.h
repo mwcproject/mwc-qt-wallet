@@ -19,10 +19,16 @@ struct AirdropRequests {
     QString btcAddress;
     QString challendge;
     QString signature;
+    QString mwcMqAddress;
+    int64_t timestamp;
 
     void setData(const QString & btcAddress,
                  const QString & challendge,
-                 const QString & signature);
+                 const QString & signature,
+                 const QString & mwcMqAddress );
+
+    void saveData(QDataStream & out) const;
+    bool loadData(QDataStream & in);
 };
 
 struct AirDropStatus {
@@ -57,7 +63,8 @@ public:
 protected:
     void sendRequest(const QString & url,
                 const QVector<QString> & body,
-                const QString & tag, const QString & param1="",const QString & param2="",const QString & param3=""); // Respond will be back at replyFinished.  replyFinished will process it accordingly
+                const QString & tag, const QString & param1="",const QString & param2="",
+                const QString & param3="", const QString & param4=""); // Respond will be back at replyFinished.  replyFinished will process it accordingly
 
     // Respond with error to UI. UI expected to stop waiting
     void reportMessageToUI( QString title, QString message );

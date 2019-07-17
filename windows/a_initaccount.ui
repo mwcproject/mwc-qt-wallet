@@ -216,7 +216,7 @@
          <enum>QLineEdit::Password</enum>
         </property>
         <property name="placeholderText">
-         <string>Cofirm password</string>
+         <string>Confirm password</string>
         </property>
        </widget>
        <widget class="control::MwcLabelSmall" name="strengthLabel">

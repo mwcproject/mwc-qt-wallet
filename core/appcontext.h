@@ -3,6 +3,7 @@
 
 #include <QMap>
 #include "../state/state.h"
+#include "../state/m_airdrop.h"
 
 class QAction;
 
@@ -79,6 +80,9 @@ public:
     QString getCurrentAccountName() const {return currentAccountName;};
     void setCurrentAccountName(QString currentAccount) {currentAccountName = currentAccount;}
 
+    // AirdropRequests will handle differently
+    void saveAirdropRequests( const QVector<state::AirdropRequests> & data );
+    QVector<state::AirdropRequests> loadAirdropRequests() const;
 
 private:
     bool loadData();

@@ -9,6 +9,7 @@
 namespace core {
 
 const static QString settingsFileName("context.dat");
+const static QString airdropRequestsFileName("requests.dat");
 
 
 void SendCoinsParams::saveData(QDataStream & out) const {
@@ -133,6 +134,64 @@ void AppContext::saveData() const {
     sendCoinsParams.saveData(out);
 }
 
+// AirdropRequests will handle differently
+void AppContext::saveAirdropRequests( const QVector<state::AirdropRequests> & data ) {
+    QString dataPath = ioutils::getAppDataPath("context");
+
+    QString filePath = dataPath + "/" + airdropRequestsFileName;
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly)) {
+        control::MessageBox::message(nullptr,
+                                     "ERROR",
+                                     "Unable to aidrop requests to " + filePath +
+                                     "\nError: " + file.errorString());
+        return;
+    }
+
+    QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_5_7);
+
+    out << 0x8327d1;
+    int sz = data.size();
+    out << sz;
+    for (auto & d : data ) {
+        d.saveData(out);
+    }
+}
+
+QVector<state::AirdropRequests> AppContext::loadAirdropRequests() const {
+
+    QVector<state::AirdropRequests> res;
+
+    QString dataPath = ioutils::getAppDataPath("context");
+
+    QFile file(dataPath + "/" + airdropRequestsFileName);
+    if ( !file.open(QIODevice::ReadOnly) ) {
+        // first run, no file exist
+        return res;
+    }
+
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_5_7);
+
+    int id = 0;
+    in >> id;
+    if (id!=0x8327d1)
+        return res;
+
+    int sz = 0;
+    in >> sz;
+
+    while(sz>0) {
+        sz--;
+        state::AirdropRequests req;
+        if (!req.loadData(in))
+            break;
+        res.push_back(req);
+    }
+
+    return res;
+}
 
 
 }

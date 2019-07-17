@@ -72,7 +72,7 @@ void Airdrop::saveTableHeaders() {
 }
 
 void Airdrop::updateClaimStatus() {
-    ui->claimsTable->clearContents();
+    ui->claimsTable->clearData();
 
     state->refreshAirdropStatusInfo();
 }
