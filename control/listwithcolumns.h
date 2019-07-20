@@ -12,6 +12,10 @@ public:
     ListWithColumns(int rows, int columns, QWidget *parent = nullptr);
     virtual ~ListWithColumns() override;
 
+    // get number of rows that expected to be visible
+    int getNumberOfVisibleRows() const;
+    static int getNumberOfVisibleRows(int height);
+
     void setTextAlignment(int alignment) { textAlignment = alignment; }
     void setHightlightColors(QColor low, QColor hi) {selectedLow=low; selectedHi=hi;}
     // Alpha delta for row stripe coloring. Range 0-255

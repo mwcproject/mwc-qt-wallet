@@ -57,7 +57,7 @@ QString toString(WALLET_EVENTS event) {
 }
 
 
-Mwc713EventManager::Mwc713EventManager(MWC713 * _mwc713wallet) : mwc713wallet(_mwc713wallet)
+Mwc713EventManager::Mwc713EventManager(MWC713 * _mwc713wallet) : mwc713wallet(_mwc713wallet) , taskQMutex(QMutex::Recursive)
 {
 }
 
@@ -85,6 +85,24 @@ void Mwc713EventManager::connectWith(tries::Mwc713InputParser * inputParser) {
 // This tale ownership of object
 // Note:  if timeout <= 0, task will be executed immediately
 void Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout ) {
+
+    QMutexLocker l( &taskQMutex );
+
+    // check if task is allready in the Q.
+    bool found = false;
+    for ( const taskInfo & ti : taskQ ) {
+        if (ti.task->getTaskName() == task->getTaskName() && ti.task->getInputStr() == task->getInputStr()) {
+            found = true;
+            break;
+        }
+    }
+
+    if (found) {
+        // not execute the task, it is allready in the Q
+        delete task;
+        return;
+    }
+
     taskQ.push_back(taskInfo(task,timeout));
     processNextTask();
 
@@ -95,6 +113,8 @@ void Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout ) {
 
 // Process next task
 void Mwc713EventManager::processNextTask() {
+    QMutexLocker l( &taskQMutex );
+
     if (taskQ.empty())
         return; // Nothing to process
 
@@ -125,6 +145,8 @@ void Mwc713EventManager::processNextTask() {
 }
 
 void Mwc713EventManager::timerEvent(QTimerEvent *event) {
+    QMutexLocker l( &taskQMutex );
+
     Q_UNUSED(event);
     if (taskExecutionTimeLimit==0)
         return;
@@ -165,6 +187,8 @@ void Mwc713EventManager::slRecieveEvent( WALLET_EVENTS event, QString message) {
             }
         }
     }
+
+    QMutexLocker l( &taskQMutex );
 
     if (taskQ.isEmpty())
         return;

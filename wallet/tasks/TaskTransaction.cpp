@@ -53,6 +53,33 @@ bool parseOutputLine( QString str, const OutputIdxLayout & tl,
     return mwcOne.first;
 }
 
+static int getNumberFromEvents(const QVector<WEvent> & events) {
+    // Searching for the last line with just a number
+    int number = 0; // in case if not found...
+    for (int i=events.size()-1; i>=0; i--) {
+        if ( events[i].event == WALLET_EVENTS::S_LINE ) {
+            bool ok = false;
+            int n = events[i].message.toInt(&ok);
+            if (ok && n>=0) {
+                number = n;
+                break;
+            }
+        }
+    }
+    return number;
+}
+
+
+bool TaskOutputCount::processTask(const QVector<WEvent> & events) {
+    wallet713->updateOutputCount( account, getNumberFromEvents(events));
+    return true;
+}
+
+bool TaskTransactionCount::processTask(const QVector<WEvent> & events) {
+    wallet713->updateTransactionCount(account, getNumberFromEvents(events));
+    return true;
+}
+
 
 bool TaskOutputs::processTask(const QVector<WEvent> & events) {
     // We are processing transactions outptu mostly as a raw data
@@ -66,7 +93,7 @@ bool TaskOutputs::processTask(const QVector<WEvent> & events) {
         if (events[curEvt].event == WALLET_EVENTS::S_OUTPUT_LOG ) {
             QStringList l = events[curEvt].message.split('|');
             Q_ASSERT(l.size()==2);
-            account = l[0].left( std::max(0,l[0].size()-1) );
+            account = l[0];
             height = l[1].toInt();
             break;
         }
@@ -220,7 +247,7 @@ bool TaskTransactions::processTask(const QVector<WEvent> & events) {
         if (events[curEvt].event == WALLET_EVENTS::S_TRANSACTION_LOG ) {
             QStringList l = events[curEvt].message.split('|');
             Q_ASSERT(l.size()==2);
-            account = l[0].left( std::max(0,l[0].size()-1) );
+            account = l[0];
             height = l[1].toInt();
             break;
         }

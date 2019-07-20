@@ -82,7 +82,7 @@ MockWallet::~MockWallet() {
 
 
 // Generic. Reporting fatal error that somebody will process and exit app
-void MockWallet::reportFatalError( QString message ) noexcept(false) {
+void MockWallet::reportFatalError( QString message )  {
     control::MessageBox::message(nullptr, "Critical Error", "We get a critical error from underneath layer and need to close appclication.\nError: " + message);
     QApplication::quit();
 }
@@ -94,7 +94,7 @@ const QVector<WalletNotificationMessages> & MockWallet::getWalletNotificationMes
 }
 
 
-void MockWallet::start() noexcept(false) {
+void MockWallet::start()  {
     if (isInit ) {
         initStatus = InitWalletStatus::NEED_PASSWORD;
     }
@@ -105,7 +105,7 @@ void MockWallet::start() noexcept(false) {
     emit onInitWalletStatus(initStatus);
 }
 
-void MockWallet::loginWithPassword(QString password) noexcept(false) {
+void MockWallet::loginWithPassword(QString password)  {
     if ( walletPassword == QString(password) ) {
         initStatus = InitWalletStatus::READY;
     }
@@ -138,7 +138,7 @@ void MockWallet::confirmNewSeed() {
 // recover wallet with a passphrase:
 // Check Signals: onRecoverProgress( int progress, int maxVal );
 // Check Signals: onRecoverResult(bool ok, QString newAddress );
-void MockWallet::recover(const QVector<QString> & seed, QString password) noexcept(false) {
+void MockWallet::recover(const QVector<QString> & seed, QString password)  {
     Q_UNUSED(seed);
     Q_UNUSED(password);
     emit onRecoverProgress(10,1000);
@@ -155,13 +155,13 @@ void MockWallet::recover(const QVector<QString> & seed, QString password) noexce
 
 // Checking if wallet is listening through services
 // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
-QPair<bool,bool> MockWallet::getListeningStatus() noexcept(false) {
+QPair<bool,bool> MockWallet::getListeningStatus()  {
     return QPair<bool,bool>(listenMwcBox, listenKeybase);
 }
 
 // Start listening through services
 // Check Signal: onStartListening
-void MockWallet::listeningStart(bool startMq, bool startKb) noexcept(false) {
+void MockWallet::listeningStart(bool startMq, bool startKb)  {
     if (startMq)
         listenMwcBox = true;
     if (startKb)
@@ -173,7 +173,7 @@ void MockWallet::listeningStart(bool startMq, bool startKb) noexcept(false) {
 
 // Stop listening through services
 // Check signal: onListeningStopResult
-void MockWallet::listeningStop(bool stopMq, bool stopKb) noexcept(false) {
+void MockWallet::listeningStop(bool stopMq, bool stopKb)  {
     if (stopMq)
         listenMwcBox = false;
     if (stopKb)
@@ -185,26 +185,26 @@ void MockWallet::listeningStop(bool stopMq, bool stopKb) noexcept(false) {
 
 
 // Get latest Mwc MQ address that we see
-QString MockWallet::getLastKnownMwcBoxAddress() noexcept(false) {
+QString MockWallet::getLastKnownMwcBoxAddress()  {
     return boxAddresses[ currentAddressIdx % boxAddresses.size() ];
 }
 
 // Get MWC box <address, index in the chain>
 // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
-void MockWallet::getMwcBoxAddress() noexcept(false) {
+void MockWallet::getMwcBoxAddress()  {
     emit onMwcAddressWithIndex( boxAddresses[ currentAddressIdx % boxAddresses.size() ], currentAddressIdx );
 }
 
 // Change MWC box address to another from the chain. idx - index in the chain.
 // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
-void MockWallet::changeMwcBoxAddress(int idx) noexcept(false) {
+void MockWallet::changeMwcBoxAddress(int idx)  {
     currentAddressIdx = std::max(0, idx);
     emit onMwcAddressWithIndex( boxAddresses[ currentAddressIdx % boxAddresses.size() ], currentAddressIdx );
 }
 
 // Generate next box address
 // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
-void MockWallet::nextBoxAddress() noexcept(false) {
+void MockWallet::nextBoxAddress()  {
     currentAddressIdx++;
     emit onMwcAddressWithIndex( boxAddresses[ currentAddressIdx % boxAddresses.size() ], currentAddressIdx );
 }
@@ -247,7 +247,7 @@ NodeStatus MockWallet::getNodeStatus() {
 
 
 // Get wallet balance
-QVector<AccountInfo> MockWallet::getWalletBalance(bool filterDeleted) const noexcept(false) {
+QVector<AccountInfo> MockWallet::getWalletBalance(bool filterDeleted) const  {
     Q_UNUSED(filterDeleted);
     //QThread::sleep(3);
 
@@ -285,34 +285,34 @@ QVector<AccountInfo> MockWallet::getWalletBalance(bool filterDeleted) const noex
 
 // Cancel transaction
 // Check Signal:  onCancelTransacton
-void MockWallet::cancelTransacton(int64_t transactionID) noexcept(false) {
+void MockWallet::cancelTransacton(int64_t transactionID)  {
     emit onCancelTransacton(true, transactionID, "OK");
 }
 
-void MockWallet::generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName ) noexcept(false) {
+void MockWallet::generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName )  {
     Q_UNUSED(transactionId);
     emit onExportProof(true, resultingFileName, "Placeholder for what this transaction mean");
 }
-void MockWallet::verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false)  {
+void MockWallet::verifyMwcBoxTransactionProof( QString proofFileName )   {
     emit onVerifyProof(true, proofFileName, "Placeholder for what this transaction mean");
 }
 
 // Init send transaction with file output
 // Check signal:  onSendFile
-void MockWallet::sendFile( int64_t coinNano, QString fileTx ) noexcept(false) {
+void MockWallet::sendFile( int64_t coinNano, QString fileTx )  {
     Q_UNUSED(coinNano);
     emit onSendFile(true, QStringList(), fileTx);
 }
 
 // Recieve transaction. Will generate *.response file in the same dir
 // Check signal:  onReceiveFile
-void MockWallet::receiveFile( QString fileTx) noexcept(false) {
+void MockWallet::receiveFile( QString fileTx)  {
     emit onReceiveFile( true, QStringList(), fileTx, fileTx+".response"  );
 }
 
 // finalize transaction and broadcast it
 // Check signal:  onFinalizeFile
-void MockWallet::finalizeFile( QString fileTxResponse ) noexcept(false) {
+void MockWallet::finalizeFile( QString fileTxResponse )  {
     emit onFinalizeFile( true, QStringList(), fileTxResponse );
 }
 
@@ -320,7 +320,7 @@ void MockWallet::finalizeFile( QString fileTxResponse ) noexcept(false) {
 // Before send, wallet always do the switch to account to make it active
 // Check signal:  onSend
 void MockWallet::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message,
-                     int inputConfirmationNumber, int changeOutputs ) noexcept(false) {
+                     int inputConfirmationNumber, int changeOutputs )  {
     Q_UNUSED(account);
     Q_UNUSED(coinNano);
     Q_UNUSED(address);
@@ -343,9 +343,14 @@ void MockWallet::sendTo( const wallet::AccountInfo &account, int64_t coinNano, c
     emit onSend( true, QStringList() );
 }
 
+// Get total number of Outputs
+// Check Signal: onOutputCount(int number)
+void MockWallet::getOutputCount(QString account) {
+    emit onOutputCount(account, 2);
+}
 
 // Show outputs for the wallet
-void MockWallet::getOutputs(QString account) noexcept(false) {
+void MockWallet::getOutputs(QString account, int offset, int number)  {
     Q_UNUSED(account);
     QVector<WalletOutput> result;
 
@@ -371,9 +376,15 @@ void MockWallet::getOutputs(QString account) noexcept(false) {
     emit onOutputs( "default", 12345, result);
 }
 
+// Get total number of Transactions
+// Check Signal: onTransactionCount(int number)
+void MockWallet::getTransactionCount(QString account) {
+    emit onTransactionCount( account, transactions.size() );
+}
+
 // Show all transactions for current account
 // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
-void MockWallet::getTransactions(QString account) noexcept(false) {
+void MockWallet::getTransactions(QString account, int offset, int number)  {
     Q_UNUSED(account);
     emit onTransactions( "default", 1234, transactions );
 }

@@ -6,6 +6,7 @@
 #include "../control/messagebox.h"
 #include <QMessageBox>
 #include "../state/timeoutlock.h"
+#include <QDebug>
 
 namespace wnd {
 
@@ -28,6 +29,8 @@ Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
     initTableHeaders();
 
     requestTransactions(accName);
+
+    updatePages(-1, -1, -1);
 }
 
 Transactions::~Transactions()
@@ -54,6 +57,82 @@ void Transactions::saveTableHeaders() {
     state->updateColumnsWidhts(ui->transactionTable->getColumnWidths());
 }
 
+int Transactions::calcPageSize() const {
+    QSize sz1 = ui->transactionTable->size();
+    QSize sz2 = ui->progressFrame->size();
+
+    return ListWithColumns::getNumberOfVisibleRows( std::max(sz1.height(), sz2.height()) );
+}
+
+
+void Transactions::setTransactionCount(QString account, int count) {
+    // Init arrays and request the data...
+    currentPagePosition = 0; // position at the paging...
+    totalTransactions = count;
+
+    if ( account != currentSelectedAccount() ) {
+        qDebug() << "Transactions::setOutputCount ignored because of account name";
+        return;
+    }
+
+    int pageSize = calcPageSize();
+    currentPagePosition = std::max(0, totalTransactions-pageSize);
+    buttonState = updatePages(currentPagePosition, totalTransactions, pageSize);
+
+    // Requesting the output data
+    state->requestTransactions(account, currentPagePosition, pageSize);
+}
+
+void Transactions::on_prevBtn_clicked()
+{
+    if (currentPagePosition > 0) {
+        int pageSize = calcPageSize();
+        currentPagePosition = std::max( 0, currentPagePosition-pageSize );
+
+        buttonState = updatePages(currentPagePosition, totalTransactions, pageSize);
+        state->requestTransactions(currentSelectedAccount(), currentPagePosition, pageSize);
+    }
+}
+
+void Transactions::on_nextBtn_clicked()
+{
+    if (currentPagePosition + transactions.size() < totalTransactions ) {
+        int pageSize = calcPageSize();
+        currentPagePosition = std::min( totalTransactions-pageSize, currentPagePosition+pageSize );
+
+        buttonState = updatePages(currentPagePosition, totalTransactions, pageSize);
+        state->requestTransactions(currentSelectedAccount(), currentPagePosition, pageSize);
+    }
+}
+
+QPair<bool,bool> Transactions::updatePages( int currentPos, int total, int pageSize ) {
+    ui->nextBtn->setEnabled(false);
+    ui->prevBtn->setEnabled(false);
+    if (currentPos <0 || total<=0 || pageSize<=0) {
+        ui->pageLabel->setText("");
+        return QPair<bool,bool>(false,false);
+    }
+    else {
+        if (total <= 1) {
+            ui->pageLabel->setText( QString::number(total) +
+                                    " of " + QString::number( total) );
+        }
+        else {
+            ui->pageLabel->setText( QString::number(currentPos+1) + "-" + QString::number( std::min(currentPos+pageSize-1+1, total) ) +
+                                " of " + QString::number( total) );
+        }
+        return QPair<bool,bool>(currentPos>0,currentPos < total-pageSize);
+    }
+}
+
+QString Transactions::currentSelectedAccount() {
+    int curIdx = ui->accountComboBox->currentIndex();
+
+    if ( curIdx>=0 && curIdx<accountInfo.size() )
+        return accountInfo[curIdx].accountName;
+
+    return "";
+}
 
 void Transactions::setTransactionData(QString account, int64_t height, const QVector<wallet::WalletTransaction> & trans) {
 
@@ -101,7 +180,7 @@ void Transactions::setTransactionData(QString account, int64_t height, const QVe
         }
 
         ui->transactionTable->appendRow( QVector<QString>{
-                QString::number(  trans.txIdx ),
+                QString::number(  trans.txIdx+1 ),
                 trans.getTypeAsStr(),
                 trans.txid,
                 trans.address,
@@ -110,6 +189,9 @@ void Transactions::setTransactionData(QString account, int64_t height, const QVe
                 (trans.confirmed ? "YES":"NO")
         }, selection );
     }
+
+    ui->prevBtn->setEnabled( buttonState.first );
+    ui->nextBtn->setEnabled( buttonState.second );
 
     updateButtons();
 }
@@ -138,10 +220,14 @@ void Transactions::showVerifyProofResults(bool success, QString fn, QString msg 
 void Transactions::requestTransactions(QString account) {
 
     ui->progressFrame->show();
+
     ui->transactionTable->hide();
 
     ui->transactionTable->clearData();
-    state->requestTransactions(account);
+
+    updatePages(-1, -1, -1);
+
+    state->requestTransactionCount(account);
 
     updateButtons();
 }
@@ -236,7 +322,7 @@ void Transactions::on_deleteButton_clicked()
         return;
     }
 
-    if ( QMessageBox::question(this, "Transaction cancellation", "Are you sure you want to cancet transaction #" + QString::number(selected->txIdx) +
+    if ( QMessageBox::question(this, "Transaction cancellation", "Are you sure you want to cancet transaction #" + QString::number(selected->txIdx+1) +
                                ", TXID " + selected->txid)  == QMessageBox::Yes ) {
         state->cancelTransaction(*selected);
     }
@@ -247,10 +333,10 @@ void Transactions::updateCancelTransacton(bool success, int64_t trIdx, QString e
     if (success) {
         requestTransactions(getSelectedAccount().accountName);
 
-        control::MessageBox::message(this, "Transaction was cancelled", "Transaction number " + QString::number(trIdx) + " was successfully cancelled");
+        control::MessageBox::message(this, "Transaction was cancelled", "Transaction number " + QString::number(trIdx+1) + " was successfully cancelled");
     }
     else {
-        control::MessageBox::message(this, "Failed to cancel transaction", "Cancel request for transaction number " + QString::number(trIdx) + " was failed.\n\n" + errMessage);
+        control::MessageBox::message(this, "Failed to cancel transaction", "Cancel request for transaction number " + QString::number(trIdx+1) + " was failed.\n\n" + errMessage);
     }
 }
 
@@ -282,6 +368,4 @@ wallet::AccountInfo Transactions::getSelectedAccount() const {
 }
 
 }
-
-
 

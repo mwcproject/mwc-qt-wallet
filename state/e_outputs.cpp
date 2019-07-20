@@ -15,6 +15,8 @@ Outputs::Outputs(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &Outputs::onWalletBalanceUpdated, Qt::QueuedConnection );
 
     QObject::connect( context->wallet, &wallet::Wallet::onOutputs, this, &Outputs::onOutputs );
+    QObject::connect( context->wallet, &wallet::Wallet::onOutputCount, this, &Outputs::onOutputCount );
+
 }
 
 Outputs::~Outputs() {}
@@ -32,14 +34,23 @@ NextStateRespond Outputs::execute() {
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
+void Outputs::requestOutputCount(QString account) {
+    context->wallet->getOutputCount(account);
+}
+
 // request wallet for outputs
-void Outputs::requestOutputs(QString account) {
-    context->wallet->getOutputs(account);
+void Outputs::requestOutputs(QString account, int offset, int number) {
+    context->wallet->getOutputs(account, offset, number);
     // Respond:  onOutputs(...)
 }
 
+void Outputs::onOutputCount(QString account, int count) {
+    if (wnd) {
+        wnd->setOutputCount(account, count);
+    }
+}
+
 void Outputs::onOutputs( QString account, int64_t height, QVector<wallet::WalletOutput> outputs) {
-    logger::logInfo("state::Outputs", QString("receive onOutputs for account ") + account);
     qDebug() << "state onOutputs call for wnd=" << wnd;
     if (wnd) {
         wnd->setOutputsData(account,height, outputs);

@@ -208,72 +208,72 @@ public:
     virtual ~Wallet();
 
     // Generic. Reporting fatal error that somebody will process and exit app
-    virtual void reportFatalError( QString message ) noexcept(false) = 0;
+    virtual void reportFatalError( QString message )  = 0;
 
 
     // Get all notification messages
-    virtual const QVector<WalletNotificationMessages> & getWalletNotificationMessages() noexcept(false) = 0;
+    virtual const QVector<WalletNotificationMessages> & getWalletNotificationMessages()  = 0;
     // Check signal: onNewNotificationMessage
 
     // ---- Wallet Init Phase
-    virtual void start() noexcept(false)  = 0;
-    virtual void loginWithPassword(QString password) noexcept(false)  = 0;
+    virtual void start()   = 0;
+    virtual void loginWithPassword(QString password)   = 0;
 
     // Exit from the wallet. Expected that state machine will switch to Init state
-    virtual void logout() noexcept(false)  = 0;
+    virtual void logout()   = 0;
 
     // Check signal: onInitWalletStatus
-    virtual InitWalletStatus getWalletStatus() noexcept(false) = 0;
+    virtual InitWalletStatus getWalletStatus()  = 0;
 
     // Close the wallet and release the process
-    virtual bool close() noexcept(false) = 0;
+    virtual bool close()  = 0;
 
     // Create the wallet, generate the seed. Return the words to recover the wallet
-    virtual void generateSeedForNewAccount(QString password) noexcept(false) = 0;
+    virtual void generateSeedForNewAccount(QString password)  = 0;
     // Check signal: onNewSeed( seed [] )
 
 
     // Confirm that user write the passphase
-    virtual void confirmNewSeed() noexcept(false) = 0;
+    virtual void confirmNewSeed()  = 0;
 
 
     // Recover the wallet with a mnemonic phrase
     // recover wallet with a passphrase:
-    virtual void recover(const QVector<QString> & seed, QString password) noexcept(false)  = 0;
+    virtual void recover(const QVector<QString> & seed, QString password)   = 0;
     // Check Signals: onRecoverProgress( int progress, int maxVal );
     // Check Signals: onRecoverResult(bool ok, QString newAddress );
 
     // Current seed for runnign wallet
     // Check Signals: onGetSeed(QVector<QString> seed);
-    virtual void getSeed() noexcept(false) = 0;
+    virtual void getSeed()  = 0;
 
     //--------------- Listening
 
     // Checking if wallet is listening through services
     // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
-    virtual QPair<bool,bool> getListeningStatus() noexcept(false) = 0;
+    virtual QPair<bool,bool> getListeningStatus()  = 0;
 
     // Start listening through services
-    virtual void listeningStart(bool startMq, bool startKb) noexcept(false) = 0;
+    virtual void listeningStart(bool startMq, bool startKb)  = 0;
     // Check Signal: onListeningStartResults
 
     // Stop listening through services
-    virtual void listeningStop(bool stopMq, bool stopKb) noexcept(false) = 0;
+    virtual void listeningStop(bool stopMq, bool stopKb)  = 0;
     // Check signal: onListeningStopResult
 
     // Get latest Mwc MQ address that we see
-    virtual QString getLastKnownMwcBoxAddress() noexcept(false) = 0;
+    virtual QString getLastKnownMwcBoxAddress()  = 0;
 
     // Get MWC box <address, index in the chain>
-    virtual void getMwcBoxAddress() noexcept(false) = 0;
+    virtual void getMwcBoxAddress()  = 0;
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
 
     // Change MWC box address to another from the chain. idx - index in the chain.
-    virtual void changeMwcBoxAddress(int idx) noexcept(false) = 0;
+    virtual void changeMwcBoxAddress(int idx)  = 0;
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
 
     // Generate next box address
-    virtual void nextBoxAddress() noexcept(false) = 0;
+    virtual void nextBoxAddress()  = 0;
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
 
 
@@ -281,104 +281,114 @@ public:
 
     // Get all accounts with balances. Expected that Wallet allways maintain them in a cache.
     // This info needed in many cases and we don't want spend time every time for that.
-    virtual QVector<AccountInfo> getWalletBalance(bool filterDeleted = true) const noexcept(false) = 0;
+    virtual QVector<AccountInfo> getWalletBalance(bool filterDeleted = true) const  = 0;
 
-    virtual QString getCurrentAccountName() noexcept(false) = 0;
+    virtual QString getCurrentAccountName()  = 0;
 
     // Request Wallet balance update. It is a multistep operation
-    virtual void updateWalletBalance() noexcept(false) = 0;
+    virtual void updateWalletBalance()  = 0;
     // Check signal: onWalletBalanceUpdated
     //          onWalletBalanceProgress
     //          onAccountSwitched - multiple calls, please ignore
 
 
     // Create another account, note no delete exist for accounts
-    virtual void createAccount( const QString & accountName ) noexcept(false) = 0;
+    virtual void createAccount( const QString & accountName )  = 0;
     // Check Signal:  onAccountCreated
 
     // Switch to different account
-    virtual void switchAccount(const QString & accountName) noexcept(false) = 0;
+    virtual void switchAccount(const QString & accountName)  = 0;
     // Check Signal: onAccountSwitched
 
     // Rename account
     // Check Signal: onAccountRenamed(bool success, QString errorMessage);
-    virtual void renameAccount(const QString & oldName, const QString & newName) noexcept(false) = 0;
+    virtual void renameAccount(const QString & oldName, const QString & newName)  = 0;
 
     // -------------- Maintaince
 
     // Check and repair the wallet. Will take a while
     // Check Signals: onRecoverProgress( int progress, int maxVal );
     // Check Signals: onCheckResult(bool ok, QString errors );
-    virtual void check(bool wait4listeners) noexcept(false) = 0;
+    virtual void check(bool wait4listeners)  = 0;
 
     // Get current configuration of the wallet.
-    virtual WalletConfig getWalletConfig() noexcept(false) = 0;
+    virtual WalletConfig getWalletConfig()  = 0;
 
     // Get configuration form the resource file.
-    virtual WalletConfig getDefaultConfig() noexcept(false) = 0;
+    virtual WalletConfig getDefaultConfig()  = 0;
 
     // Update wallet config. Will update config and restart the wmc713.
     // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
     //          and caller suppose listen for them
     // If returns true, expected that wallet will need to have password input.
-    virtual bool setWalletConfig(const WalletConfig & config) noexcept(false) = 0;
+    virtual bool setWalletConfig(const WalletConfig & config)  = 0;
 
     // Status of the node
-    virtual NodeStatus getNodeStatus() noexcept(false) = 0;
+    virtual NodeStatus getNodeStatus()  = 0;
 
     // -------------- Transactions
 
     // Set account that will receive the funds
     // Check Signal:  onSetReceiveAccount( bool ok, QString AccountOrMessage );
-    virtual void setReceiveAccount(QString account) noexcept(false) = 0;
+    virtual void setReceiveAccount(QString account)  = 0;
 
     // Get wallet balance
     // Cancel transaction
     // Check Signal:  onCancelTransacton
-    virtual void cancelTransacton(int64_t transactionID) noexcept(false) = 0;
+    virtual void cancelTransacton(int64_t transactionID)  = 0;
 
     // Proof results
 
     // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
     // Check Signal: onExportProof( bool success, QString fn, QString msg );
-    virtual void generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName ) noexcept(false) = 0;
+    virtual void generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName )  = 0;
 
     // Verify the proof for transaction
     // Check Signal: onVerifyProof( bool success, QString msg );
-    virtual void verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false) = 0;
+    virtual void verifyMwcBoxTransactionProof( QString proofFileName )  = 0;
 
     // Init send transaction with file output
     // Check signal:  onSendFile
-    virtual void sendFile( int64_t coinNano, QString fileTx ) noexcept(false) = 0;
+    virtual void sendFile( int64_t coinNano, QString fileTx )  = 0;
     // Recieve transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
-    virtual void receiveFile( QString fileTx) noexcept(false) = 0;
+    virtual void receiveFile( QString fileTx)  = 0;
     // finalize transaction and broadcast it
     // Check signal:  onFinalizeFile
-    virtual void finalizeFile( QString fileTxResponse ) noexcept(false) = 0;
+    virtual void finalizeFile( QString fileTxResponse )  = 0;
 
     // Send some coins to address.
     // Before send, wallet always do the switch to account to make it active
     // coinNano == -1  - mean All
-    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 ) noexcept(false) = 0;
+    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 )  = 0;
     // Check signal:  onSend
+
+    // Get total number of Outputs
+    // Check Signal: onOutputCount(int number)
+    virtual void getOutputCount(QString account)  = 0;
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
-    virtual void getOutputs(QString account) noexcept(false) = 0;
+    virtual void getOutputs(QString account, int offset, int number)  = 0;
+
+    // Get total number of Transactions
+    // Check Signal: onTransactionCount(int number)
+    virtual void getTransactionCount(QString account)  = 0;
 
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
-    virtual void getTransactions(QString account) noexcept(false) = 0;
+    virtual void getTransactions(QString account, int offset, int number)  = 0;
+
+
 
     // -------------- Contacts
 
     // Get the contacts
-    virtual QVector<WalletContact> getContacts() noexcept(false) = 0;
+    virtual QVector<WalletContact> getContacts()  = 0;
     // Add new contact
-    virtual QPair<bool, QString> addContact( const WalletContact & contact ) noexcept(false) = 0;
+    virtual QPair<bool, QString> addContact( const WalletContact & contact )  = 0;
     // Remove contact. return false if not found
-    virtual QPair<bool, QString> deleteContact( const QString & name ) noexcept(false) = 0;
+    virtual QPair<bool, QString> deleteContact( const QString & name )  = 0;
 
     // ----------- HODL
     // https://github.com/mimblewimble/grin/pull/2374
@@ -444,9 +454,11 @@ signals:
     void onSetReceiveAccount( bool ok, QString AccountOrMessage );
 
     // Transactions
+    void onTransactionCount(QString account, int number);
     void onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
     void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
 
+    void onOutputCount(QString account, int number);
     void onOutputs( QString account, int64_t height, QVector<WalletOutput> Transactions);
 
     void onCheckResult(bool ok, QString errors );

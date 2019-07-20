@@ -21,16 +21,19 @@ NavMenuConfig::~NavMenuConfig() {
 void NavMenuConfig::on_walletConfigButton_clicked()
 {
     context->stateMachine->setActionWindow( state::STATE::WALLET_CONFIG );
+    close();
 }
 
 void NavMenuConfig::on_outputsButton_clicked()
 {
     context->stateMachine->setActionWindow( state::STATE::OUTPUTS );
+    close();
 }
 
 void NavMenuConfig::on_mwcmqButton_clicked()
 {
     context->stateMachine->setActionWindow( state::STATE::LISTENING );
+    close();
 }
 
 void NavMenuConfig::on_resyncButton_clicked()
@@ -42,6 +45,7 @@ void NavMenuConfig::on_resyncButton_clicked()
         context->appContext->pushCookie("PrevState", (int)context->appContext->getActiveWndState() );
         context->stateMachine->setActionWindow( state::STATE::RESYNC );
     }
+    close();
 }
 
 }

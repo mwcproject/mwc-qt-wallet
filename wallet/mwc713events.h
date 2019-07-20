@@ -4,6 +4,7 @@
 #include <QString>
 #include <QVector>
 #include <QObject>
+#include <QMutex>
 
 namespace tries {
     class Mwc713InputParser;
@@ -146,6 +147,7 @@ private:
     // Example: checking for wallet become online/offline
     QVector< Mwc713Task* > listeners; // Owner of the tasks
 
+    QMutex taskQMutex; // recursive
     QVector< taskInfo > taskQ; // Owner of the tasks
 
     // Events for a new task

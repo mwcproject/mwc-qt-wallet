@@ -21,7 +21,8 @@ public:
     void deleteWnd(wnd::Outputs * w) { if(w==wnd) wnd = nullptr;}
 
     // request wallet for outputs
-    void requestOutputs(QString account);
+    void requestOutputCount(QString account);
+    void requestOutputs(QString account, int offset, int number);
 
     QString getCurrentAccountName() const;
 
@@ -33,6 +34,7 @@ public:
     QVector<wallet::AccountInfo> getWalletBalance();
 
 private slots:
+    void onOutputCount(QString account, int count);
     void onOutputs( QString account, int64_t height, QVector<wallet::WalletOutput> outputs);
 
     void onWalletBalanceUpdated();

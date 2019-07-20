@@ -277,7 +277,6 @@ void Mwc713InputParser::initAccount() {
                                                         new TrieNewLineSection(),
                                                         new TriePhraseSection("____ Wallet Summary Info - Account '"),
                                                         // account name,
-                                                        // Note!!!! Account name will have extra symblo at the end because of START_NEXT_EVERY_TRY!!!
                                                         new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE | TrieAnySection::START_NEXT_EVERY_TRY, "","", 1),
                                                         new TriePhraseSection("' as of height "),
                                                         // Height

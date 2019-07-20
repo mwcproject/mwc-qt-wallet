@@ -6,34 +6,67 @@
 
 namespace wallet {
 
+class TaskOutputCount : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*10;
+
+    TaskOutputCount( MWC713 * wallet713, QString _account ) :
+            Mwc713Task("Outputs", "output_count", wallet713, ""), account(_account) {}
+
+    virtual ~TaskOutputCount() override {}
+
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+private:
+    QString account;
+};
+
+
 class TaskOutputs : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*15;
 
-    TaskOutputs( MWC713 * wallet713  ) :
-            Mwc713Task("Outputs", "outputs", wallet713, "") {}
+    TaskOutputs( MWC713 * wallet713, int offset, int number ) :
+            Mwc713Task("Outputs", "outputs -o " + QString::number(offset) + " -l " + QString::number(number), wallet713, "")
+            { Q_ASSERT(offset>=0); Q_ASSERT(number>0);}
 
     virtual ~TaskOutputs() override {}
 
     virtual bool processTask(const QVector<WEvent> & events) override;
 
-    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
 };
 
+class TaskTransactionCount : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*10;
 
+    TaskTransactionCount( MWC713 * wallet713, QString _account ) :
+            Mwc713Task("Outputs", "txs_count", wallet713, ""), account(_account) {}
+
+    virtual ~TaskTransactionCount() override {}
+
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+private:
+    QString account;
+};
 
 class TaskTransactions : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*60;
 
-    TaskTransactions( MWC713 * wallet713  ) :
-            Mwc713Task("Transactions", "txs", wallet713, "") {}
+    TaskTransactions( MWC713 * wallet713, int offset, int number) :
+            Mwc713Task("Transactions", "txs -o " + QString::number(offset) + " -l " + QString::number(number), wallet713, "")
+            { Q_ASSERT(offset>=0); Q_ASSERT(number>0);}
 
     virtual ~TaskTransactions() override {}
 
     virtual bool processTask(const QVector<WEvent> & events) override;
 
-    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
 };
 
 
@@ -49,7 +82,7 @@ public:
 
     virtual bool processTask(const QVector<WEvent> & events) override;
 
-    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
 private:
     int64_t transactionId;
     QString proofFileName;
@@ -68,7 +101,7 @@ public:
 
     virtual bool processTask(const QVector<WEvent> & events) override;
 
-    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
 private:
     int64_t transactionId;
     QString proofFileName;
@@ -85,7 +118,7 @@ public:
 
     virtual bool processTask(const QVector<WEvent> & events) override;
 
-    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
 private:
     QString proofFileName;
 };

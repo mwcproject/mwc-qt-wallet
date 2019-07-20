@@ -34,5 +34,7 @@
         <file>img/NavSettings.png</file>
         <file>img/Add.png</file>
         <file>img/Transfer.png</file>
+        <file>img/Left.png</file>
+        <file>img/Right.png</file>
     </qresource>
 </RCC>

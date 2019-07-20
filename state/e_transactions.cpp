@@ -17,6 +17,7 @@ Transactions::Transactions( StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onCancelTransacton, this, &Transactions::onCancelTransacton, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &Transactions::onWalletBalanceUpdated, Qt::QueuedConnection );
 
+    QObject::connect( context->wallet, &wallet::Wallet::onTransactionCount, this, &Transactions::updateTransactionCount, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onTransactions, this, &Transactions::updateTransactions, Qt::QueuedConnection );
 
 }
@@ -53,12 +54,22 @@ void Transactions::switchCurrentAccount(const wallet::AccountInfo & account) {
     context->wallet->switchAccount( account.accountName );
 }
 
+void Transactions::requestTransactionCount(QString account) {
+    context->wallet->getTransactionCount(account);
+}
 
 // Current transactions that wallet has
-void Transactions::requestTransactions(QString account) {
+void Transactions::requestTransactions(QString account, int offset, int number) {
 
-    context->wallet->getTransactions(account);
+    context->wallet->getTransactions(account, offset, number);
 }
+
+void Transactions::updateTransactionCount(QString account, int number) {
+    if (wnd) {
+        wnd->setTransactionCount(account, number);
+    }
+}
+
 
 void Transactions::updateTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> transactions) {
     if (wnd) {

@@ -43,13 +43,10 @@ uint32_t TrieSectionContext::processChar( QChar ch )
 {
     uint32_t res = section->processChar(sectionContext, ch);
 
-    if (accId>=0) {
-        if (res & BaseTrieSection::PROCESS_RESULT::KEEP)
-            accStr += ch;
-        else if ( (res & BaseTrieSection::PROCESS_RESULT::DONE)!=0 &&
-            (res & BaseTrieSection::PROCESS_RESULT::START_NEXT)==0 )
-                accStr += ch;
-    }
+    // Note, last symbol need to be excluded
+    if (accId>=0)
+        accStr += ch;
+
     return res;
 }
 
@@ -57,7 +54,7 @@ LineResult TrieSectionContext::calcResult() const {
     if (accId<0)
         return prevParseResults;
 
-    return LineResult(prevParseResults, SectionResult(accStr ,accId) );
+    return LineResult(prevParseResults, SectionResult(accStr.left( std::max(accStr.size()-1,0) ) ,accId) );
 }
 
 

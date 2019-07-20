@@ -2,6 +2,8 @@
 #include <QHeaderView>
 #include <QApplication>
 
+const int ROW_HEIGHT = 30;
+
 ListWithColumns::ListWithColumns(QWidget *parent) :
     QTableWidget (parent)
 {
@@ -34,10 +36,10 @@ void ListWithColumns::setListLook() {
     // Decrease slightly horizontally size
     verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     //verticalHeader()->setMinimumSectionSize(verticalHeader()->minimumSectionSize()*5/6);
-    verticalHeader()->setDefaultSectionSize(30);
+    verticalHeader()->setDefaultSectionSize(ROW_HEIGHT);
     // Increase V size so
 
-    horizontalHeader()->setFixedHeight( 30 );
+    horizontalHeader()->setFixedHeight( ROW_HEIGHT );
 
     // Setup some colors
     /*  System color
@@ -59,6 +61,19 @@ void ListWithColumns::setListLook() {
 //    selectedHi = QColor(255,0xED,0,200);
 
 }
+
+// static
+int ListWithColumns::getNumberOfVisibleRows(int height)  {
+    return std::max( 1, height / ROW_HEIGHT -2 ); // -2 for headers
+}
+
+
+// get number of rows that expected to be visible
+int ListWithColumns::getNumberOfVisibleRows() const {
+    QSize sz = size();
+    return getNumberOfVisibleRows( sz.height() );
+}
+
 
 void ListWithColumns::setColumnWidths(QVector<int> widths) {
     Q_ASSERT( columnCount() == widths.size() );

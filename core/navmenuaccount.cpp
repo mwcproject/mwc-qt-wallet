@@ -22,6 +22,7 @@ NavMenuAccount::~NavMenuAccount() {
 void NavMenuAccount::on_accountsButton_clicked()
 {
     context->stateMachine->setActionWindow( state::STATE::ACCOUNTS );
+    close();
 }
 
 void NavMenuAccount::on_seedButton_clicked()
@@ -32,11 +33,13 @@ void NavMenuAccount::on_seedButton_clicked()
     context->appContext->setActiveWndState(state::STATE::SHOW_SEED);
     context->wallet->logout();
     context->stateMachine->executeFrom( state::STATE::NONE);
+    close();
 }
 
 void NavMenuAccount::on_contactsButton_clicked()
 {
     context->stateMachine->setActionWindow( state::STATE::CONTACTS );
+    close();
 }
 
 }

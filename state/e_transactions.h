@@ -20,7 +20,8 @@ public:
     void resetWnd(wnd::Transactions * w) { if(w==wnd) wnd = nullptr;}
 
     // Current transactions that wallet has
-    void requestTransactions(QString account);
+    void requestTransactionCount(QString account);
+    void requestTransactions(QString account, int offset, int number);
 
     void switchCurrentAccount(const wallet::AccountInfo & account);
 
@@ -45,6 +46,7 @@ protected:
     virtual NextStateRespond execute() override;
 
 private slots:
+    void updateTransactionCount(QString account, int number);
     void updateTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> Transactions);
 
     void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
