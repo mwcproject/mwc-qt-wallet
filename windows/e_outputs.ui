@@ -178,7 +178,7 @@
                <property name="geometry">
                 <rect>
                  <x>0</x>
-                 <y>6</y>
+                 <y>3</y>
                  <width>124</width>
                  <height>34</height>
                 </rect>
@@ -218,7 +218,7 @@
                 <enum>Qt::NoFocus</enum>
                </property>
                <property name="toolTip">
-                <string>Cancel the specified transaction</string>
+                <string>Newest outputs</string>
                </property>
                <property name="styleSheet">
                 <string notr="true">border:none</string>
@@ -271,7 +271,7 @@
                 <enum>Qt::NoFocus</enum>
                </property>
                <property name="toolTip">
-                <string>Cancel the specified transaction</string>
+                <string>Oldest outputs</string>
                </property>
                <property name="styleSheet">
                 <string notr="true">border:none</string>

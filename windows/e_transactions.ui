@@ -393,7 +393,7 @@
              <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
-             <string>Cancel the specified transaction</string>
+             <string>Newest transactions</string>
             </property>
             <property name="styleSheet">
              <string notr="true">border:none</string>
@@ -446,7 +446,7 @@
              <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
-             <string>Cancel the specified transaction</string>
+             <string>Oldest transactions</string>
             </property>
             <property name="styleSheet">
              <string notr="true">border:none</string>
