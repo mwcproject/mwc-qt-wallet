@@ -20,7 +20,7 @@ WaitingWnd::WaitingWnd(QWidget *parent, WaitingWndState * _state, QString title,
 
 WaitingWnd::~WaitingWnd()
 {
-    state->deleteWaitingWnd();
+    state->deleteWaitingWnd(this);
     delete ui;
 }
 

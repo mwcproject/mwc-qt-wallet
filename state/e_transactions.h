@@ -14,10 +14,10 @@ class Transactions : public QObject, public State
 {
     Q_OBJECT
 public:
-    Transactions(const StateContext & context);
+    Transactions( StateContext * context );
     virtual ~Transactions() override;
 
-    void resetWnd() {wnd = nullptr;}
+    void resetWnd(wnd::Transactions * w) { if(w==wnd) wnd = nullptr;}
 
     // Current transactions that wallet has
     void requestTransactions(QString account);

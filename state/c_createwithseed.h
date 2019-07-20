@@ -20,11 +20,10 @@ class CreateWithSeed: public QObject, public State, public wnd::IProgressWndStat
 {
     Q_OBJECT
 public:
-    CreateWithSeed(const StateContext & context);
+    CreateWithSeed( StateContext * context);
     virtual ~CreateWithSeed() override;
 
-    void deleteEnterSeed() {seedWnd = nullptr; }
-    void deleteProgressWnd() {progressWnd = nullptr; }
+    void deleteEnterSeed(wnd::EnterSeed * w) { if (w==seedWnd) seedWnd = nullptr; }
 
     // Second Step, switching to the progress and starting this process at mwc713
     void createWalletWithSeed( QVector<QString> seed );
@@ -33,7 +32,7 @@ public:
 protected:
     // IProgressWndState
     virtual void cancelProgress() override {}
-    virtual void destroyProgressWnd() override {progressWnd=nullptr;}
+    virtual void destroyProgressWnd(wnd::ProgressWnd * w) override { if (w==progressWnd) progressWnd=nullptr;}
 
     virtual NextStateRespond execute() override;
 

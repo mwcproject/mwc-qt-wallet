@@ -7,31 +7,35 @@
 
 namespace state {
 
-WalletConfig::WalletConfig(const StateContext & context) :
+WalletConfig::WalletConfig( StateContext * context) :
     State (context, STATE::WALLET_CONFIG) {
 }
 
 WalletConfig::~WalletConfig() {}
 
 NextStateRespond WalletConfig::execute() {
-    if (context.appContext->getActiveWndState() != STATE::WALLET_CONFIG)
+    if (context->appContext->getActiveWndState() != STATE::WALLET_CONFIG)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context.wndManager->switchToWindowEx(
-                new wnd::WalletConfig( context.wndManager->getInWndParent(), this ) );
+    context->wndManager->switchToWindowEx(
+                new wnd::WalletConfig( context->wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
 
 wallet::WalletConfig WalletConfig::getWalletConfig() const {
-    return context.wallet->getWalletConfig();
+    return context->wallet->getWalletConfig();
+}
+
+wallet::WalletConfig WalletConfig::getDefaultWalletConfig() const {
+    return context->wallet->getDefaultConfig();
 }
 
 bool WalletConfig::setWalletConfig(const wallet::WalletConfig & config) {
-    if (context.wallet->setWalletConfig(config)) {
+    if (context->wallet->setWalletConfig(config)) {
         // restarting the wallet...
-        context.stateMachine->executeFrom( STATE::NONE );
+        context->stateMachine->executeFrom( STATE::NONE );
         return true;
     }
     return false;
@@ -40,13 +44,13 @@ bool WalletConfig::setWalletConfig(const wallet::WalletConfig & config) {
 
 
 core::SendCoinsParams  WalletConfig::getSendCoinsParams() const {
-    return context.appContext->getSendCoinsParams();
+    return context->appContext->getSendCoinsParams();
 }
 
 // account refresh will be requested...
 void WalletConfig::setSendCoinsParams(const core::SendCoinsParams & params) {
-    context.appContext->setSendCoinsParams(params);
-    context.wallet->updateWalletBalance(); // Number of outputs might change, requesting update in background
+    context->appContext->setSendCoinsParams(params);
+    context->wallet->updateWalletBalance(); // Number of outputs might change, requesting update in background
 }
 
 

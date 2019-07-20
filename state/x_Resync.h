@@ -12,12 +12,12 @@ namespace state {
 class Resync : public QObject, public State, public wnd::IProgressWndState {
     Q_OBJECT
 public:
-    Resync(const StateContext & context);
+    Resync( StateContext * context);
     virtual ~Resync() override;
 
 
     virtual void cancelProgress() override {Q_ASSERT(false);} // progress cancel not expected
-    virtual void destroyProgressWnd() override {wnd = nullptr;}
+    virtual void destroyProgressWnd(wnd::ProgressWnd * w) override { if (w==wnd) wnd = nullptr;}
 protected:
     virtual NextStateRespond execute() override;
 

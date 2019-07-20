@@ -4,8 +4,8 @@
 
 namespace state {
 
-ShowSeed::ShowSeed(const StateContext & context) : State(context,  STATE::SHOW_SEED ) {
-    QObject::connect(context.wallet, &wallet::Wallet::onGetSeed,
+ShowSeed::ShowSeed( StateContext * context) : State(context,  STATE::SHOW_SEED ) {
+    QObject::connect(context->wallet, &wallet::Wallet::onGetSeed,
                                    this, &ShowSeed::recoverPassphrase, Qt::QueuedConnection);
 
 }
@@ -13,13 +13,13 @@ ShowSeed::ShowSeed(const StateContext & context) : State(context,  STATE::SHOW_S
 ShowSeed::~ShowSeed() {}
 
 NextStateRespond ShowSeed::execute() {
-    if ( context.appContext->getActiveWndState() != STATE::SHOW_SEED )
+    if ( context->appContext->getActiveWndState() != STATE::SHOW_SEED )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    wnd = (wnd::NewSeed*) context.wndManager->switchToWindowEx( new wnd::NewSeed( context.wndManager->getInWndParent(), this, getStateMachine(), context.appContext, QVector<QString>(), true ) );
-
-    context.wallet->getSeed();
-
+    if (wnd==nullptr) {
+        wnd = (wnd::NewSeed*) context->wndManager->switchToWindowEx( new wnd::NewSeed( context->wndManager->getInWndParent(), this, context, QVector<QString>(), true ) );
+        context->wallet->getSeed();
+    }
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 

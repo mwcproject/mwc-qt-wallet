@@ -24,22 +24,18 @@ static const QString TAG_CLAIM_MWC     = "claimMwc";
 static const QString TAG_STATUS_PREF   = "Status_";
 
 void AirdropRequests::setData(const QString & _btcAddress,
-             const QString & _challendge,
-             const QString & _signature,
-             const QString & _mwcMqAddress) {
+             const QString & _challendge, const QString & _signature) {
     btcAddress = _btcAddress;
     challendge = _challendge;
-    signature  = _signature;
-    mwcMqAddress = _mwcMqAddress;
+    signature = _signature;
     timestamp = QDateTime::currentMSecsSinceEpoch();
 }
 
 void AirdropRequests::saveData(QDataStream & out) const {
-    out << int(0x89F15);
+    out << int(0x89F17);
     out << btcAddress;
     out << challendge;
     out << signature;
-    out << mwcMqAddress;
     out << timestamp;
 }
 
@@ -47,19 +43,18 @@ bool AirdropRequests::loadData(QDataStream & in) {
     int id = 0;
     in >> id;
 
-    if ( id!=0x89F15 )
+    if ( id!=0x89F17 )
         return false;
 
     in >> btcAddress;
     in >> challendge;
     in >> signature;
-    in >> mwcMqAddress;
     in >> timestamp;
     return true;
 }
 
 
-Airdrop::Airdrop(const StateContext & context ) :
+Airdrop::Airdrop(StateContext * context ) :
         State(context, STATE::AIRDRDOP_MAIN)
 {
     nwManager = new QNetworkAccessManager(this);
@@ -70,17 +65,19 @@ Airdrop::Airdrop(const StateContext & context ) :
     airDropStatus.waiting = true;
     sendRequest( "/v1/claimsAvailable", {}, TAG_CLAIMS_AVAIL);
 
-    airdropRequests = context.appContext->loadAirdropRequests();
+    airdropRequests = context->appContext->loadAirdropRequests();
 }
 
 Airdrop::~Airdrop() {}
 
 NextStateRespond Airdrop::execute() {
-    if (context.appContext->getActiveWndState() != STATE::AIRDRDOP_MAIN)
+    if (context->appContext->getActiveWndState() != STATE::AIRDRDOP_MAIN)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    airdropWnd = (wnd::Airdrop *) context.wndManager->switchToWindowEx(
-                    new wnd::Airdrop( context.wndManager->getInWndParent(), this ) );
+    if (airdropWnd==nullptr) {
+        airdropWnd = (wnd::Airdrop *) context->wndManager->switchToWindowEx(
+                    new wnd::Airdrop( context->wndManager->getInWndParent(), this ) );
+    }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
@@ -89,9 +86,9 @@ NextStateRespond Airdrop::execute() {
 void Airdrop::requestGetChallenge( QString address ) {
     // From here we suppose to call Rest API and get the info
 
-    QString mqAddress = context.wallet->getLastKnownMwcBoxAddress();
+    QString mqAddress = context->wallet->getLastKnownMwcBoxAddress();
 
-    if (mqAddress.isEmpty() || !context.wallet->getListeningStatus().first) {
+    if (mqAddress.isEmpty() || !context->wallet->getListeningStatus().first) {
         reportMessageToUI("MWC MQ Connection", "MWC MQ listener is offline. Please verify your network connection and check if MWC MQ listener running." );
         return;
     }
@@ -104,9 +101,9 @@ void Airdrop::requestGetChallenge( QString address ) {
 
 void Airdrop::requestClaimMWC( QString btcAddress, QString challendge, QString signature ) {
 
-    QString mqAddress = context.wallet->getLastKnownMwcBoxAddress();
+    QString mqAddress = context->wallet->getLastKnownMwcBoxAddress();
 
-    if (mqAddress.isEmpty() || !context.wallet->getListeningStatus().first) {
+    if (mqAddress.isEmpty() || !context->wallet->getListeningStatus().first) {
         reportMessageToUI("MWC MQ Connection", "MWC MQ listener is offline. Please verify your network connection and check if MWC MQ listener running." );
         return;
     }
@@ -125,22 +122,24 @@ void Airdrop::refreshAirdropStatusInfo() {
 }
 
 void Airdrop::requestStatusFor(int idx) {
+    // https://<api_endpoint>/v1/checkStatus?btcaddress=<btcaddress>&challenge=<challenge>
     sendRequest("/v1/checkStatus" ,
-                {"btcaddress", airdropRequests[idx].btcAddress },
+                { "btcaddress", airdropRequests[idx].btcAddress, "challenge", airdropRequests[idx].challendge,
+                  "challendge" , airdropRequests[idx].challendge },
                 TAG_STATUS_PREF+ QString::number(idx) );
 }
 
 void Airdrop::backToMainAirDropPage() {
-    airdropWnd = (wnd::Airdrop *) context.wndManager->switchToWindowEx(
-            new wnd::Airdrop( context.wndManager->getInWndParent(), this ) );
+    airdropWnd = (wnd::Airdrop *) context->wndManager->switchToWindowEx(
+            new wnd::Airdrop( context->wndManager->getInWndParent(), this ) );
 }
 
 QVector<int> Airdrop::getColumnsWidhts() {
-    return context.appContext->getIntVectorFor("AirdropTblWidth");
+    return context->appContext->getIntVectorFor("AirdropTblWidth");
 }
 
 void Airdrop::updateColumnsWidhts(QVector<int> widths) {
-    context.appContext->updateIntVectorFor("AirdropTblWidth", widths);
+    context->appContext->updateIntVectorFor("AirdropTblWidth", widths);
 }
 
 
@@ -149,7 +148,7 @@ void Airdrop::sendRequest(const QString & api,
                           const QString & tag, const QString & param1, const QString & param2,
                           const QString & param3, const QString & param4) {
 
-    QString url = core::Config::getAirdropUrl() + api;
+    QString url = config::getAirdropUrl() + api;
 
     qDebug() << "Sending request: " << url << ", params: " << params << "  tag:" << tag;
 
@@ -183,6 +182,17 @@ void Airdrop::sendRequest(const QString & api,
     reply->setProperty("param3", QVariant(param3));
     reply->setProperty("param4", QVariant(param4));
     // Respond will be send back async
+}
+
+static QString generateMessage( QString errMessage, int errCode ) {
+    QString message;
+    if (!errMessage.isEmpty()) {
+        message += "\n" + errMessage;
+        if (errCode != INT_MAX) {
+            message += " (Code: " + QString::number( errCode ) + ")";
+        }
+    }
+    return message;
 }
 
 void Airdrop::replyFinished(QNetworkReply* reply) {
@@ -229,7 +239,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
             airDropStatus.message = jsonRespond["message"].toString();
         } else {
             airDropStatus.status = false;
-            airDropStatus.message = "Unable to request the status info from " + core::Config::getAirdropUrl() +
+            airDropStatus.message = "Unable to request the status info from " + config::getAirdropUrl() +
                                     ".\nGet communication error: " + requestErrorMessage;
         }
 
@@ -240,7 +250,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
     }
 
     if (!requestOk) {
-        reportMessageToUI("Network error", "Unable to communicate with " + core::Config::getAirdropUrl() + ".\nGet communication error: " + requestErrorMessage);
+        reportMessageToUI("Network error", "Unable to communicate with " + config::getAirdropUrl() + ".\nGet communication error: " + requestErrorMessage);
         return;
     }
 
@@ -252,22 +262,18 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
 
                 QString challenge = jsonRespond["challenge"].toString();
                 // Switch to the claim window...
-                airdropForBtcWnd = (wnd::AirdropForBTC *) context.wndManager->switchToWindowEx(
-                        new wnd::AirdropForBTC( context.wndManager->getInWndParent(), this, address, challenge ) );
+                airdropForBtcWnd = (wnd::AirdropForBTC *) context->wndManager->switchToWindowEx(
+                        new wnd::AirdropForBTC( context->wndManager->getInWndParent(), this, address, challenge ) );
             }
             else {
                 // error status
-                int errCode = jsonRespond["error_code"].toInt(-1);
-                QString errMessage = jsonRespond["error_message"].toString();
-
-                reportMessageToUI("Claim request failed", "Unable to start claim process.\n" + (errCode>0? "Error Code: " + QString::number(errCode)+"\n" : "") +  errMessage );
+                reportMessageToUI("Claim request failed", "Unable to start claim process." +
+                                  generateMessage(jsonRespond["error_message"].toString(), jsonRespond["error_code"].toInt( INT_MAX )) );
             }
     }
 
     if (TAG_CLAIM_MWC == tag) {
         bool success = jsonRespond["success"].toBool(false);
-        QString errMessage = jsonRespond["error_message"].toString();
-        int errCode = jsonRespond["error_code"].toInt(-1);
 
         QString btcAddress = reply->property("param1").toString();
         QString challendge = reply->property("param2").toString();
@@ -279,25 +285,26 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
             bool found = false;
             for (auto &req : airdropRequests) {
                 if (req.btcAddress == btcAddress) {
-                    req.setData(btcAddress, challendge, signature, mwcAddress);
+                    req.setData(btcAddress, challendge, signature);
                     found = true;
                 }
             }
 
-            if (!found) {
+            if (!found) { // Normally not found.  Found is likely fix for some problems.
                 AirdropRequests newReq;
-                newReq.setData( btcAddress, challendge, signature, mwcAddress );
+                newReq.setData( btcAddress, challendge, signature );
 
                 airdropRequests.push_back(newReq);
-                context.appContext->saveAirdropRequests( airdropRequests );
+                context->appContext->saveAirdropRequests( airdropRequests );
             }
 
-            reportMessageToUI("Your MWC claim succeeded", "Your clain for address " + btcAddress + "was sucessfully processed" + (errMessage.isEmpty() ? "" : "\n" + errMessage) );
+            reportMessageToUI("Your MWC claim succeeded", "Your claim for address " + btcAddress + " was sucessfully processed.");
 
             backToMainAirDropPage();
         }
         else {
-            reportMessageToUI("Claim request failed", "Unable to process your claim.\n" + (errCode>0? "Error Code: " + QString::number(errCode)+"\n" : "") +  errMessage );
+           reportMessageToUI("Claim request failed", "Unable to process your claim." +
+                                  generateMessage(jsonRespond["error_message"].toString(), jsonRespond["error_code"].toInt( INT_MAX )) );
         }
     }
 
@@ -306,7 +313,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
         int idx = tag.mid( TAG_STATUS_PREF.length() ).toInt();
 
         int errCode = jsonRespond["code"].toInt(-1);
-        int64_t amount = jsonRespond["amount_sent"].toString("-1").toLongLong();
+        int64_t amount = jsonRespond["amount"].toString("-1").toLongLong();
         QString status = jsonRespond["status"].toString();
         QString message = jsonRespond["response"].toString();
 

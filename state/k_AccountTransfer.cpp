@@ -7,16 +7,16 @@
 
 namespace state {
 
-AccountTransfer::AccountTransfer(const StateContext &context) :
+AccountTransfer::AccountTransfer( StateContext * context) :
         State(context, STATE::ACCOUNT_TRANSFER) {
 
     // using static connection. Lock flag transferInProgress will be used to switch the processing
 
-    connect( context.wallet, &wallet::Wallet::onSetReceiveAccount, this, &AccountTransfer::onSetReceiveAccount, Qt::QueuedConnection );
-    connect( context.wallet, &wallet::Wallet::onSend, this, &AccountTransfer::onSend, Qt::QueuedConnection );
-    connect( context.wallet, &wallet::Wallet::onSlateSend, this, &AccountTransfer::onSlateSend, Qt::QueuedConnection );
-    connect( context.wallet, &wallet::Wallet::onSlateFinalized, this, &AccountTransfer::onSlateFinalized, Qt::QueuedConnection );
-    connect( context.wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &AccountTransfer::onWalletBalanceUpdated, Qt::QueuedConnection );
+    connect( context->wallet, &wallet::Wallet::onSetReceiveAccount, this, &AccountTransfer::onSetReceiveAccount, Qt::QueuedConnection );
+    connect( context->wallet, &wallet::Wallet::onSend, this, &AccountTransfer::onSend, Qt::QueuedConnection );
+    connect( context->wallet, &wallet::Wallet::onSlateSend, this, &AccountTransfer::onSlateSend, Qt::QueuedConnection );
+    connect( context->wallet, &wallet::Wallet::onSlateFinalized, this, &AccountTransfer::onSlateFinalized, Qt::QueuedConnection );
+    connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &AccountTransfer::onWalletBalanceUpdated, Qt::QueuedConnection );
 }
 
 AccountTransfer::~AccountTransfer() {
@@ -24,10 +24,12 @@ AccountTransfer::~AccountTransfer() {
 }
 
 NextStateRespond AccountTransfer::execute() {
-    if (context.appContext->getActiveWndState() != STATE::ACCOUNT_TRANSFER)
+    if (context->appContext->getActiveWndState() != STATE::ACCOUNT_TRANSFER)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    wnd = (wnd::AccountTransfer*) context.wndManager->switchToWindowEx( new wnd::AccountTransfer( context.wndManager->getInWndParent(), this ) );
+    if (wnd==nullptr) {
+        wnd = (wnd::AccountTransfer*) context->wndManager->switchToWindowEx( new wnd::AccountTransfer( context->wndManager->getInWndParent(), this ) );
+    }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
@@ -35,15 +37,15 @@ NextStateRespond AccountTransfer::execute() {
 
 // get balance for current account
 QVector<wallet::AccountInfo> AccountTransfer::getWalletBalance() {
-    return context.wallet->getWalletBalance();
+    return context->wallet->getWalletBalance();
 }
 
 core::SendCoinsParams AccountTransfer::getSendCoinsParams() {
-    return context.appContext->getSendCoinsParams();
+    return context->appContext->getSendCoinsParams();
 }
 
 void AccountTransfer::updateSendCoinsParams(const core::SendCoinsParams &params) {
-    context.appContext->setSendCoinsParams(params);
+    context->appContext->setSendCoinsParams(params);
 }
 
 
@@ -60,10 +62,10 @@ void AccountTransfer::transferFunds(const wallet::AccountInfo & accountFrom,
         return;
     }
 
-    myAddress = context.wallet->getLastKnownMwcBoxAddress();
+    myAddress = context->wallet->getLastKnownMwcBoxAddress();
 
     // mwc mq expected to be online, we will use it for slate exchange
-    if (myAddress.isEmpty() || !context.wallet->getListeningStatus().first) {
+    if (myAddress.isEmpty() || !context->wallet->getListeningStatus().first) {
         wnd->showTransferResults(false, "Please turn on mwc mq listener. We can't transfer funds in offline mode");
         return;
     }
@@ -82,11 +84,11 @@ void AccountTransfer::transferFunds(const wallet::AccountInfo & accountFrom,
     trSlate = "";
 
     transferState = 0;
-    context.wallet->setReceiveAccount( trAccountTo.accountName );
+    context->wallet->setReceiveAccount( trAccountTo.accountName );
 }
 
 void AccountTransfer::goBack() {
-    context.stateMachine->setActionWindow( STATE::ACCOUNTS );
+    context->stateMachine->setActionWindow( STATE::ACCOUNTS );
 }
 
 // set receive account name results
@@ -103,8 +105,8 @@ void AccountTransfer::onSetReceiveAccount( bool ok, QString AccountOrMessage ) {
 
     transferState=1;
 
-    core::SendCoinsParams prms = context.appContext->getSendCoinsParams();
-    context.wallet->sendTo( trAccountFrom, trNanoCoins, myAddress, "", prms.inputConfirmationNumber, prms.changeOutputs );
+    core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
+    context->wallet->sendTo( trAccountFrom, trNanoCoins, myAddress, "", prms.inputConfirmationNumber, prms.changeOutputs );
 }
 
 
@@ -140,8 +142,8 @@ void AccountTransfer::onSlateFinalized( QString slate ) {
 
         transferState=2;
 
-        context.wallet->setReceiveAccount( context.appContext->getReceiveAccount() );
-        context.wallet->updateWalletBalance();
+        context->wallet->setReceiveAccount( context->appContext->getReceiveAccount() );
+        context->wallet->updateWalletBalance();
     }
 }
 

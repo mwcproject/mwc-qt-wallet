@@ -3,14 +3,14 @@
 
 namespace state {
 
-State::State(const StateContext & _context, STATE _stateId) :
+State::State(StateContext * _context, STATE _stateId) :
     context(_context), stateId(_stateId)
 {}
 
 State::~State() {}
 
 void State::setWindowTitle( QString title ) {
-    context.mainWnd->setWindowTitle(title);
+    context->mainWnd->setWindowTitle(title);
 }
 
 }

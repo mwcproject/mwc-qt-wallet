@@ -152,6 +152,12 @@ void MWC713::loginWithPassword(QString password) noexcept(false) {
     eventCollector->addTask( new TaskUnlock(this, password), TaskUnlock::TIMEOUT );
 }
 
+// Exit from the wallet. Expected that state machine will switch to Init state
+void MWC713::logout() noexcept(false) {
+    stop();
+}
+
+
 void MWC713::generateSeedForNewAccount(QString password) noexcept(false) {
     walletPassword = password;
 
@@ -820,16 +826,12 @@ void MWC713::updateAccountInfo( const AccountInfo & acc, QVector<AccountInfo> & 
 }
 
 /////////////////////////////////////////////////////////////////////////
-
-// Get current configuration of the wallet. will read from wallet713.toml file
-WalletConfig MWC713::getWalletConfig() noexcept(false) {
-
-    QString mwc713confFN = core::Config::getMwc713conf();
-
+// Read config from the file
+WalletConfig MWC713::readWalletConfig(QString source) const {
     util::ConfigReader  mwc713config;
 
-    if (!mwc713config.readConfig(mwc713confFN) ) {
-        control::MessageBox::message(nullptr, "Read failure", "Unable to read mwc713 configuration from " + mwc713confFN );
+    if (!mwc713config.readConfig(source) ) {
+        control::MessageBox::message(nullptr, "Read failure", "Unable to read mwc713 configuration from " + source );
         return WalletConfig();
     }
 
@@ -838,12 +840,24 @@ WalletConfig MWC713::getWalletConfig() noexcept(false) {
     QString mwcmqDomain = mwc713config.getString("mwcmq_domain");
 
     if (dataPath.isEmpty() || keyBasePath.isEmpty() || mwcmqDomain.isEmpty()) {
-        control::MessageBox::message(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + mwc713confFN );
+        control::MessageBox::message(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + source );
         return WalletConfig();
     }
 
     return WalletConfig().setData(dataPath, mwcmqDomain, keyBasePath);
 }
+
+
+// Get current configuration of the wallet. will read from wallet713.toml file
+WalletConfig MWC713::getWalletConfig() noexcept(false) {
+    return readWalletConfig(config::getMwc713conf());
+}
+
+// Get configuration form the resource file.
+WalletConfig MWC713::getDefaultConfig() noexcept(false) {
+    return readWalletConfig( mwc::MWC713_DEFAULT_CONFIG );
+}
+
 
 // Update wallet config. Will update config and restart the wmc713.
 // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
@@ -852,7 +866,7 @@ bool MWC713::setWalletConfig(const WalletConfig & config) noexcept(false) {
     if (!config.isDefined())
         return false;
 
-    QString mwc713confFN = core::Config::getMwc713conf();
+    QString mwc713confFN = config::getMwc713conf();
 
     QStringList confLines = util::readTextFile( mwc713confFN );
     // Updating the config with new values

@@ -5,11 +5,12 @@
 #include <QFileDialog>
 #include "../control/messagebox.h"
 #include <QMessageBox>
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
 Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
-    core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext() ),
+    core::NavWnd(parent, _state->getContext() ),
     ui(new Ui::Transactions),
     state(_state)
 {
@@ -32,7 +33,7 @@ Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
 Transactions::~Transactions()
 {
     saveTableHeaders();
-    state->resetWnd();
+    state->resetWnd(this);
     delete ui;
 }
 
@@ -114,6 +115,7 @@ void Transactions::setTransactionData(QString account, int64_t height, const QVe
 }
 
 void Transactions::showExportProofResults(bool success, QString fn, QString msg ) {
+    state::TimeoutLockObject to( state );
     if (success) {
         QMessageBox::information(this, "Success", "Your transaction proof located at " + fn + "\n\n" + msg );
     }
@@ -123,6 +125,7 @@ void Transactions::showExportProofResults(bool success, QString fn, QString msg 
 
 }
 void Transactions::showVerifyProofResults(bool success, QString fn, QString msg ) {
+    state::TimeoutLockObject to( state );
     if (success) {
         QMessageBox::information(this, "Success", "Proof at " + fn + ":\n\n" + msg );
     }
@@ -167,6 +170,8 @@ void Transactions::on_refreshButton_clicked()
 
 void Transactions::on_validateProofButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open proof file"),
                                  state->getProofFilesPath(),
                                  tr("transaction proof (*.proof)"));
@@ -183,6 +188,8 @@ void Transactions::on_validateProofButton_clicked()
 
 void Transactions::on_generateProofButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
 
     if (! ( selected!=nullptr && selected->proof ) ) {
@@ -220,6 +227,7 @@ void Transactions::on_accountComboBox_activated(int index)
 
 void Transactions::on_deleteButton_clicked()
 {
+    state::TimeoutLockObject to( state );
     wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
 
     if (! ( selected!=nullptr && !selected->confirmed ) ) {
@@ -235,6 +243,7 @@ void Transactions::on_deleteButton_clicked()
 }
 
 void Transactions::updateCancelTransacton(bool success, int64_t trIdx, QString errMessage) {
+    state::TimeoutLockObject to( state );
     if (success) {
         requestTransactions(getSelectedAccount().accountName);
 

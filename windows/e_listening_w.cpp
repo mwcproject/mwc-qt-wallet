@@ -4,12 +4,13 @@
 #include <QInputDialog>
 #include "../control/messagebox.h"
 #include <QDebug>
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
 Listening::Listening(QWidget *parent, state::Listening * _state, bool mwcMqStatus, bool keybaseStatus,
                      QString mwcMqAddress, int mwcMqAddrIdx) :
-    core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext() ),
+    core::NavWnd(parent, _state->getContext() ),
     ui(new Ui::Listening),
     state(_state)
 {
@@ -24,11 +25,12 @@ Listening::Listening(QWidget *parent, state::Listening * _state, bool mwcMqStatu
 
 Listening::~Listening()
 {
-    state->wndIsGone();
+    state->wndIsGone(this);
     delete ui;
 }
 
 void Listening::showMessage(QString title, QString message) {
+    state::TimeoutLockObject to( state );
     control::MessageBox::message(this, title, message);
 }
 
@@ -71,6 +73,7 @@ void Listening::on_mwcMqNextAddress_clicked()
 
 void Listening::on_mwcMqToIndex_clicked()
 {
+    state::TimeoutLockObject to( state );
     bool ok = false;
     QString index = QInputDialog::getText(this, tr("Select MWX box address by index"),
                                             tr("Please specify index of mwc mq address"), QLineEdit::Normal,

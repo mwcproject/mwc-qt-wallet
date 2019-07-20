@@ -9,9 +9,11 @@ class WaitingWnd;
 
 namespace wnd {
 
+class WaitingWnd;
+
 class WaitingWndState {
 public:
-    void virtual deleteWaitingWnd() = 0;
+    void virtual deleteWaitingWnd(wnd::WaitingWnd * w) = 0;
 };
 
 // Just a waiting dialog, that can be updated with some info

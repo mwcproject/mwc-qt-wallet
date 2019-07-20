@@ -10,7 +10,7 @@ class NavMenuAccount;
 
 
 namespace state {
-class StateMachine;
+struct StateContext;
 }
 
 namespace core {
@@ -20,7 +20,7 @@ class NavMenuAccount : public NavMenu
     Q_OBJECT
 
 public:
-    explicit NavMenuAccount(QWidget *parent, state::StateMachine * stateMachine);
+    explicit NavMenuAccount(QWidget *parent, state::StateContext * context);
     ~NavMenuAccount();
 
 private slots:
@@ -32,7 +32,7 @@ private slots:
 
 private:
     Ui::NavMenuAccount *ui;
-    state::StateMachine * stateMachine = nullptr;
+    state::StateContext * context = nullptr;
 };
 
 }

@@ -9,19 +9,19 @@
 
 namespace state {
 
-Recieve::Recieve(const StateContext &context) :
+Recieve::Recieve( StateContext * context ) :
         State(context, STATE::RECIEVE_COINS) {
 
-    QObject::connect(context.wallet, &wallet::Wallet::onMwcMqListenerStatus,
+    QObject::connect(context->wallet, &wallet::Wallet::onMwcMqListenerStatus,
                      this, &Recieve::onMwcMqListenerStatus, Qt::QueuedConnection);
 
-    QObject::connect(context.wallet, &wallet::Wallet::onKeybaseListenerStatus,
+    QObject::connect(context->wallet, &wallet::Wallet::onKeybaseListenerStatus,
                      this, &Recieve::onKeybaseListenerStatus, Qt::QueuedConnection);
 
-    QObject::connect(context.wallet, &wallet::Wallet::onMwcAddressWithIndex,
+    QObject::connect(context->wallet, &wallet::Wallet::onMwcAddressWithIndex,
                      this, &Recieve::onMwcAddressWithIndex, Qt::QueuedConnection);
 
-    QObject::connect(context.wallet, &wallet::Wallet::onReceiveFile,
+    QObject::connect(context->wallet, &wallet::Wallet::onReceiveFile,
                                    this, &Recieve::respReceiveFile, Qt::QueuedConnection);
 
 }
@@ -29,30 +29,32 @@ Recieve::Recieve(const StateContext &context) :
 Recieve::~Recieve() {}
 
 NextStateRespond Recieve::execute() {
-    if ( context.appContext->getActiveWndState() != STATE::RECIEVE_COINS  )
+    if ( context->appContext->getActiveWndState() != STATE::RECIEVE_COINS  )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    QPair<bool,bool> lsnStatus = context.wallet->getListeningStatus();
-    context.wallet->getMwcBoxAddress();
+    if (wnd==nullptr) {
+        QPair<bool,bool> lsnStatus = context->wallet->getListeningStatus();
+        context->wallet->getMwcBoxAddress();
 
-    wnd = (wnd::Recieve*) context.wndManager->switchToWindowEx( new wnd::Recieve( context.wndManager->getInWndParent(), this,
+        wnd = (wnd::Recieve*) context->wndManager->switchToWindowEx( new wnd::Recieve( context->wndManager->getInWndParent(), this,
                                                           lsnStatus.first, lsnStatus.second,
-                                                          context.wallet->getLastKnownMwcBoxAddress() ) );
+                                                          context->wallet->getLastKnownMwcBoxAddress() ) );
+    }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
 
 QString Recieve::getFileGenerationPath() {
-    return context.appContext->getPathFor("fileGen");
+    return context->appContext->getPathFor("fileGen");
 }
 
 void Recieve::updateFileGenerationPath(QString path) {
-    context.appContext->updatePathFor("fileGen", path);
+    context->appContext->updatePathFor("fileGen", path);
 }
 
 void Recieve::signTransaction( QString fileName ) {
-    context.wallet->receiveFile( fileName );
+    context->wallet->receiveFile( fileName );
 }
 
 void Recieve::respReceiveFile( bool success, QStringList errors, QString inFileName ) {
@@ -86,17 +88,17 @@ void Recieve::onMwcAddressWithIndex(QString mwcAddress, int idx) {
 
 
 QString  Recieve::getReceiveAccount() {
-    return context.appContext->getReceiveAccount();
+    return context->appContext->getReceiveAccount();
 }
 
 void  Recieve::setReceiveAccount(QString accountName ) {
-    context.appContext->setReceiveAccount(accountName);
-    context.wallet->setReceiveAccount(accountName);
+    context->appContext->setReceiveAccount(accountName);
+    context->wallet->setReceiveAccount(accountName);
     // feedback will be ignored. Errors will go to the events naturally
 }
 
 QVector<wallet::AccountInfo>  Recieve::getWalletBalance() {
-    return context.wallet->getWalletBalance();
+    return context->wallet->getWalletBalance();
 }
 
 

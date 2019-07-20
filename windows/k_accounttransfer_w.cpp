@@ -4,11 +4,12 @@
 #include "../state/k_AccountTransfer.h"
 #include "sendcoinsparamsdialog.h"
 #include "send2_online_w.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
 AccountTransfer::AccountTransfer(QWidget *parent, state::AccountTransfer * _state) :
-    core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext()),
+    core::NavWnd(parent, _state->getContext() ),
     ui(new Ui::AccountTransfer),
     state(_state)
 {
@@ -47,6 +48,8 @@ void AccountTransfer::showTransferResults(bool ok, QString errMsg) {
 
     ui->progress->hide();
 
+    state::TimeoutLockObject to( state );
+
     if (ok) {
         control::MessageBox::message(this, "Success", "Your funds was successfully transferred");
         // reset state
@@ -68,6 +71,8 @@ void AccountTransfer::on_settingsButton_clicked()
 {
     core::SendCoinsParams  params = state->getSendCoinsParams();
 
+    state::TimeoutLockObject to( state );
+
     SendCoinsParamsDialog dlg(this, params);
     if (dlg.exec() == QDialog::Accepted) {
         state->updateSendCoinsParams( dlg.getSendCoinsParams() );
@@ -76,6 +81,8 @@ void AccountTransfer::on_settingsButton_clicked()
 
 void AccountTransfer::on_transferButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     auto fromDt = ui->accountFromCB->currentData();
     auto toDt = ui->accountToCB->currentData();
     if ( !fromDt.isValid() || !toDt.isValid() ) {

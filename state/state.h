@@ -39,9 +39,6 @@ enum STATE {
     SEND_OFFLINE, // Account for online
 
     RECIEVE_COINS,   // Recieve coins
-    NODE_STATUS,    // Cgeck node status
-    CONNECT_2_NODE, // connection to the MWC nodes
-    NODE_MANUALY,   // input URI to the custom node
     LISTENING,      // Listening API setting/status
     TRANSACTIONS,   // Transactions dialog
     OUTPUTS,        // Outputs for this wallet
@@ -79,22 +76,22 @@ struct StateContext {
     void setStateMachine(StateMachine * sm) {stateMachine=sm;}
 };
 
+
 // Single state of the app that is described with Dialog
 class State
 {
 protected:
-    StateContext context;
+    StateContext * context;
     STATE stateId;
 
     //core::WalletWindow * wnd; //
     //State * prevState = nullptr;
     //State * nextState = nullptr;
 public:
-    State(const StateContext & context, STATE stateId);
+    State(StateContext * context, STATE stateId);
     virtual ~State();
 
-    state::StateMachine * getStateMachine() const {return context.stateMachine;}
-    core::AppContext    * getAppContext()   const {return context.appContext;}
+    state::StateContext * getContext() {return context;}
 
     void setWindowTitle( QString title );
 

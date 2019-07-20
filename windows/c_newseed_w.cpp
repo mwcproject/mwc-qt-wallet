@@ -3,16 +3,17 @@
 #include "../state/c_newseedshow.h"
 #include "../util/widgetutils.h"
 #include "../control/messagebox.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
 
-NewSeed::NewSeed( QWidget *parent, state::SubmitCaller * _state, state::StateMachine * stateMachine,
-                  core::AppContext * appContext,
+NewSeed::NewSeed( QWidget *parent, state::SubmitCaller * _state, state::StateContext * _context,
                   const QVector<QString> & _seed, bool hideSubmitButton ) :
-    core::NavWnd( parent, stateMachine, appContext, hideSubmitButton ),
+    core::NavWnd( parent, _context, hideSubmitButton ),
     ui(new Ui::NewSeed),
     state(_state),
+    context(_context),
     seed(_seed)
 {
     ui->setupUi(this);
@@ -30,11 +31,14 @@ NewSeed::NewSeed( QWidget *parent, state::SubmitCaller * _state, state::StateMac
 
 NewSeed::~NewSeed()
 {
+    state->wndDeleted(this);
     delete ui;
 }
 
 // if seed empty or has size 1, it is error message
 void NewSeed::showSeedData(const QVector<QString> & seed) {
+    state::TimeoutLockObject to( context->stateMachine );
+
     if (seed.size()<2) {
         control::MessageBox::message( this, "Getting Seed Failure", "Unable to retrieve a seed from mwc713." + (seed.size()>0 ? seed[0] : "") );
         return;

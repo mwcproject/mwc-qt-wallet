@@ -11,7 +11,7 @@ namespace state {
 class Contacts : public State
 {
 public:
-    Contacts(const StateContext & context);
+    Contacts(StateContext * context);
     virtual ~Contacts() override;
 
     // Get the contacts

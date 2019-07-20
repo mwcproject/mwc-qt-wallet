@@ -15,10 +15,10 @@ class Outputs : public QObject, public State
 {
     Q_OBJECT
 public:
-    Outputs(const StateContext & context);
+    Outputs( StateContext * context);
     virtual ~Outputs() override;
 
-    void deleteWnd() {wnd = nullptr;}
+    void deleteWnd(wnd::Outputs * w) { if(w==wnd) wnd = nullptr;}
 
     // request wallet for outputs
     void requestOutputs(QString account);

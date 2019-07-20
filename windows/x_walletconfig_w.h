@@ -43,7 +43,11 @@ private slots:
     void on_mwcmqHost_textEdited(const QString &arg1);
 
 private:
-    void setValues();
+    void setValues(const QString & mwc713directory,
+                   const QString & keyBasePath,
+                   const QString & mwcmqHost,
+                   int inputConfirmationNumber,
+                   int changeOutputs);
     // return true if data is fine. In case of error will show message for the user
     bool readInputValue( wallet::WalletConfig & newWalletConfig, core::SendCoinsParams & newSendParams );
 
@@ -62,6 +66,9 @@ private:
 
     wallet::WalletConfig currentWalletConfig;
     core::SendCoinsParams sendParams;
+
+    wallet::WalletConfig defaultWalletConfig;
+    core::SendCoinsParams defaultSendParams;
 };
 
 }

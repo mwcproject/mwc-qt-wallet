@@ -15,6 +15,7 @@ struct SendCoinsParams {
     int inputConfirmationNumber;
     int changeOutputs;
 
+    // Expected to be deafult values
     SendCoinsParams() :
             inputConfirmationNumber(10), changeOutputs(1) {}
 

@@ -3,6 +3,7 @@
 #include "../state/c_newwallet.h"
 #include "../control/messagebox.h"
 #include "../util/widgetutils.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
@@ -36,6 +37,8 @@ void NewWallet::updateControls() {
 
 void NewWallet::on_submitButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     if ( ui->radioCreateNew->isChecked() )
         state->submitCreateChoice( state::NewWallet::NEW_WALLET_CHOICE::CREATE_NEW);
     else if (ui->radioHaveSeed->isChecked())

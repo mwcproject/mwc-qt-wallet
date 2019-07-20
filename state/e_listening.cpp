@@ -9,24 +9,24 @@
 
 namespace state {
 
-Listening::Listening(const StateContext & context) :
+Listening::Listening(StateContext * context) :
     State(context, STATE::LISTENING )
 {
     // Let's establish connectoins at the beginning
 
-    QObject::connect(context.wallet, &wallet::Wallet::onMwcMqListenerStatus,
+    QObject::connect(context->wallet, &wallet::Wallet::onMwcMqListenerStatus,
                                          this, &Listening::onMwcMqListenerStatus, Qt::QueuedConnection);
 
-    QObject::connect(context.wallet, &wallet::Wallet::onKeybaseListenerStatus,
+    QObject::connect(context->wallet, &wallet::Wallet::onKeybaseListenerStatus,
                                          this, &Listening::onKeybaseListenerStatus, Qt::QueuedConnection);
 
-    QObject::connect(context.wallet, &wallet::Wallet::onListeningStartResults,
+    QObject::connect(context->wallet, &wallet::Wallet::onListeningStartResults,
                                          this, &Listening::onListeningStartResults, Qt::QueuedConnection);
 
-    QObject::connect(context.wallet, &wallet::Wallet::onListeningStopResult,
+    QObject::connect(context->wallet, &wallet::Wallet::onListeningStopResult,
                                          this, &Listening::onListeningStopResult, Qt::QueuedConnection);
 
-    QObject::connect(context.wallet, &wallet::Wallet::onMwcAddressWithIndex,
+    QObject::connect(context->wallet, &wallet::Wallet::onMwcAddressWithIndex,
                                          this, &Listening::onMwcAddressWithIndex, Qt::QueuedConnection);
 }
 
@@ -35,47 +35,49 @@ Listening::~Listening() {
 }
 
 NextStateRespond Listening::execute() {
-    if ( context.appContext->getActiveWndState() != STATE::LISTENING )
+    if ( context->appContext->getActiveWndState() != STATE::LISTENING )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    QPair<bool,bool> lsnStatus = context.wallet->getListeningStatus();
+    if (wnd==nullptr) {
+        QPair<bool,bool> lsnStatus = context->wallet->getListeningStatus();
 
-    context.wallet->getMwcBoxAddress();
-    // will get result later and will update the window
+        context->wallet->getMwcBoxAddress();
+        // will get result later and will update the window
 
-    wnd = (wnd::Listening*) context.wndManager->switchToWindowEx(new wnd::Listening( context.wndManager->getInWndParent(), this,
+        wnd = (wnd::Listening*) context->wndManager->switchToWindowEx(new wnd::Listening( context->wndManager->getInWndParent(), this,
                                                            lsnStatus.first, lsnStatus.second,
-                                                                       context.wallet->getLastKnownMwcBoxAddress(), -1));
+                                                                       context->wallet->getLastKnownMwcBoxAddress(), -1));
+    }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
 void Listening::triggerMwcState() {
-    QPair<bool,bool> lsnStatus = context.wallet->getListeningStatus();
+    QPair<bool,bool> lsnStatus = context->wallet->getListeningStatus();
     if ( !lsnStatus.first ) {
-        context.wallet->listeningStart(true, false);
+        context->wallet->listeningStart(true, false);
     }
     else {
-        context.wallet->listeningStop(true, false);
+        context->wallet->listeningStop(true, false);
     }
 }
 
 void Listening::requestNextMwcMqAddress() {
-    context.wallet->nextBoxAddress();
+    context->wallet->nextBoxAddress();
 }
 
 void Listening::requestNextMwcMqAddressForIndex(int idx) {
-    context.wallet->changeMwcBoxAddress(idx);
+    context->wallet->changeMwcBoxAddress(idx);
 }
 
 void Listening::triggerKeybaseState() {
-    QPair<bool,bool> lsnStatus = context.wallet->getListeningStatus();
+    QPair<bool,bool> lsnStatus = context->wallet->getListeningStatus();
     qDebug() << "lsnStatus: " << lsnStatus.first << " " << lsnStatus.second;
     if ( !lsnStatus.second ) {
-        context.wallet->listeningStart(false, true);
+        context->wallet->listeningStart(false, true);
     }
     else {
-        context.wallet->listeningStop(false, true);
+        context->wallet->listeningStop(false, true);
     }
 }
 
@@ -103,7 +105,7 @@ void Listening::onListeningStartResults( bool mqTry, bool kbTry, // what we try 
 
         if (kbTry) {
 
-            wallet::WalletConfig cfg = context.wallet->getWalletConfig();
+            wallet::WalletConfig cfg = context->wallet->getWalletConfig();
             if (!cfg.keyBasePath.isEmpty() ) {
                 msg += "\nYour current keybase path:\n" + cfg.keyBasePath + "\nThe keybase path can be changed at 'Wallet Configuration' page.";
             }

@@ -9,6 +9,7 @@ class NewSeed;
 
 namespace state {
     class SubmitCaller;
+    struct StateContext;
 }
 
 namespace wnd {
@@ -18,8 +19,7 @@ class NewSeed : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit NewSeed(QWidget *parent, state::SubmitCaller * state, state::StateMachine * stateMachine,
-                     core::AppContext * appContext,
+    explicit NewSeed(QWidget *parent, state::SubmitCaller * state, state::StateContext * context,
                      const QVector<QString> & seed, bool hideSubmitButton = false );
     virtual ~NewSeed() override;
 
@@ -35,6 +35,7 @@ private slots:
 private:
     Ui::NewSeed *ui;
     state::SubmitCaller * state;
+    state::StateContext * context;
     QVector<QString> seed;
 };
 

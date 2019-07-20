@@ -15,7 +15,7 @@ namespace state {
 class SendOffline : public QObject, public State {
     Q_OBJECT
 public:
-    SendOffline(const StateContext & context);
+    SendOffline( StateContext * context);
     virtual ~SendOffline() override;
 
     QVector<wallet::AccountInfo> getWalletBalance();
@@ -33,8 +33,8 @@ public:
     //void signTransaction( QString fileName );
     void publishTransaction( QString fileName );
 
-    void deletedSendOfflineFiles() {filesWnd = nullptr;}
-    void deletedSendOfflineSettings() {settingsWnd = nullptr;}
+    void deletedSendOfflineFiles(wnd::SendOfflineFiles * w) { if (w==filesWnd) filesWnd = nullptr;}
+    void deletedSendOfflineSettings(wnd::SendOfflineSettings * w) { if (w==settingsWnd) settingsWnd = nullptr;}
 protected:
     virtual NextStateRespond execute() override;
 

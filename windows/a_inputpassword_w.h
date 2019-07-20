@@ -18,13 +18,16 @@ class InputPassword : public QWidget
     Q_OBJECT
 
 public:
-    explicit InputPassword(QWidget *parent, state::InputPassword * state);
+    explicit InputPassword(QWidget *parent, state::InputPassword * state, bool lockMode);
     ~InputPassword();
 
     void startWaiting();
     void stopWaiting();
 
     void reportWrongPassword();
+
+    void updateMwcMqState(bool online);
+    void updateKeybaseState(bool online);
 
 private slots:
     void on_submitButton_clicked();

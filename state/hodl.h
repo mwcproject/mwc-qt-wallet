@@ -11,7 +11,7 @@ namespace state {
 class Hodl : public State
 {
 public:
-    Hodl(const StateContext & context);
+    Hodl(StateContext * context);
     virtual ~Hodl() override;
 
     QVector<wallet::WalletTransaction> getTransactions();

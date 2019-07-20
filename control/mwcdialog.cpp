@@ -12,7 +12,7 @@ namespace control {
 MwcDialog::MwcDialog( QWidget * parent )
 {
     { // Apply style sheet
-        QFile file( core::Config::getDialogsStyleSheetPath() );
+        QFile file( config::getDialogsStyleSheetPath() );
         if (file.open(QFile::ReadOnly | QFile::Text)) {
                QTextStream ts( &file );
                setStyleSheet( ts.readAll() );

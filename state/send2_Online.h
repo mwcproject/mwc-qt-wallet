@@ -14,10 +14,10 @@ namespace state {
 class SendOnline : public QObject, public State {
     Q_OBJECT
 public:
-    SendOnline(const StateContext & context);
+    SendOnline( StateContext * context );
     virtual ~SendOnline() override;
 
-    void deleteWnd() {wnd = nullptr;}
+    void deleteWnd(wnd::SendOnline * w) { if (w==wnd) wnd = nullptr;}
 
     QVector<wallet::AccountInfo> getWalletBalance();
     QString getCurrentAccountName();

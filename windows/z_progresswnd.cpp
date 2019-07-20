@@ -21,7 +21,7 @@ ProgressWnd::ProgressWnd(QWidget *parent, IProgressWndState * _state, QString he
 
 ProgressWnd::~ProgressWnd()
 {
-    state->destroyProgressWnd();
+    state->destroyProgressWnd(this);
     delete ui;
 }
 

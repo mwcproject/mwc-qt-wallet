@@ -9,21 +9,21 @@
 
 namespace state {
 
-SendOnlineOffline::SendOnlineOffline(const StateContext & context) :
+SendOnlineOffline::SendOnlineOffline(StateContext * context) :
         State(context, STATE::SEND_ONLINE_OFFLINE ) {
 
-    QObject::connect( context.wallet, &wallet::Wallet::onWalletBalanceUpdated,
+    QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated,
                                  this, &SendOnlineOffline::onWalletBalanceUpdated, Qt::QueuedConnection );
 }
 
 SendOnlineOffline::~SendOnlineOffline() {}
 
 NextStateRespond SendOnlineOffline::execute() {
-    if ( context.appContext->getActiveWndState() != STATE::SEND_ONLINE_OFFLINE )
+    if ( context->appContext->getActiveWndState() != STATE::SEND_ONLINE_OFFLINE )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     nextStep = STATE::NONE;
-    wnd = (wnd::SendOnlineOffline*)context.wndManager->switchToWindowEx( new wnd::SendOnlineOffline( context.wndManager->getInWndParent(), this ) );
+    wnd = (wnd::SendOnlineOffline*)context->wndManager->switchToWindowEx( new wnd::SendOnlineOffline( context->wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
@@ -44,7 +44,7 @@ void SendOnlineOffline::updateBalanceAndContinue() {
     }
 
     // Updating the wallet balance
-    context.wallet->updateWalletBalance();
+    context->wallet->updateWalletBalance();
 }
 
 // Account info is updated
@@ -52,7 +52,7 @@ void SendOnlineOffline::onWalletBalanceUpdated() {
     if ( nextStep == STATE::NONE )
         return;
 
-    context.stateMachine->setActionWindow(nextStep );
+    context->stateMachine->setActionWindow(nextStep );
     nextStep = STATE::NONE;
 }
 

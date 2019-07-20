@@ -2,6 +2,7 @@
 #include "ui_m_airdropforbtc.h"
 #include "state/m_airdrop.h"
 #include "../control/messagebox.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
@@ -24,12 +25,14 @@ AirdropForBTC::AirdropForBTC(QWidget *parent, state::Airdrop * _state, QString _
 
 AirdropForBTC::~AirdropForBTC()
 {
-    state->deleteAirdropForBtcWnd();
+    state->deleteAirdropForBtcWnd(this);
     delete ui;
 }
 
 void AirdropForBTC::on_claimButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     QString signature = ui->signatureEdit->toPlainText().trimmed();
 
     if ( signature.length() == 0 ) {
@@ -48,6 +51,8 @@ void AirdropForBTC::on_backButton_clicked()
 }
 
 void AirdropForBTC::reportMessage( QString title, QString message ) {
+    state::TimeoutLockObject to( state );
+
     ui->progress->hide();
     control::MessageBox::message(this, title, message);
 }

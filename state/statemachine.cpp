@@ -13,9 +13,6 @@
 #include "events.h"
 #include "hodl.h"
 #include "e_Recieve.h"
-#include "nodestatus.h"
-#include "connect2node.h"
-#include "nodemanually.h"
 #include "e_listening.h"
 #include "e_transactions.h"
 #include "e_outputs.h"
@@ -28,15 +25,14 @@
 #include "send3_Offline.h"
 #include "x_ShowSeed.h"
 #include "x_Resync.h"
+#include "../core/Config.h"
 
 namespace state {
 
-StateMachine::StateMachine(StateContext & context) :
-    appContext(context.appContext),
-    mainWindow(context.mainWnd)
+StateMachine::StateMachine(StateContext * _context) :
+        context(_context)
 {
-    context.setStateMachine(this);
-    Q_ASSERT(appContext);
+    context->setStateMachine(this);
 
     states[ STATE::START_WALLET ]   = new StartWallet(context);
     states[ STATE::STATE_INIT ]     = new InitAccount(context);
@@ -58,9 +54,6 @@ StateMachine::StateMachine(StateContext & context) :
     states[ STATE::SEND_OFFLINE ]   = new SendOffline(context);
 
     states[ STATE::RECIEVE_COINS ]  = new Recieve(context);
-    states[ STATE::NODE_STATUS]     = new NodeStatus(context);
-    states[ STATE::CONNECT_2_NODE ] = new Connect2Node(context);
-    states[ STATE::NODE_MANUALY]    = new NodeManually(context);
     states[ STATE::LISTENING ]      = new Listening(context);
     states[ STATE::TRANSACTIONS ]   = new Transactions(context);
     states[ STATE::OUTPUTS ]        = new Outputs(context);
@@ -69,6 +62,8 @@ StateMachine::StateMachine(StateContext & context) :
     states[ STATE::AIRDRDOP_MAIN ]  = new Airdrop(context);
     states[ STATE::SHOW_SEED ]      = new ShowSeed(context);
     states[ STATE::RESYNC ]         = new Resync(context);
+
+    startTimer(1000);
 }
 
 StateMachine::~StateMachine() {
@@ -87,7 +82,7 @@ void StateMachine::start() {
             continue;
 
         currentState = it.key();
-        mainWindow->updateActionStates(currentState);
+        context->mainWnd->updateActionStates(currentState);
         break;
     }
 }
@@ -95,6 +90,9 @@ void StateMachine::start() {
 void StateMachine::executeFrom( STATE nextState ) {
     if (nextState == STATE::NONE)
         nextState = states.firstKey();
+
+    if ( nextState < STATE::ACCOUNTS )
+        logoutTime = 0;
 
     Q_ASSERT( states.contains(nextState) );
 
@@ -105,13 +103,16 @@ void StateMachine::executeFrom( STATE nextState ) {
             continue;
 
         currentState = it.key();
-        mainWindow->updateActionStates(currentState);
+        context->mainWnd->updateActionStates(currentState);
         break;
     }
 
+    if ( currentState >= STATE::ACCOUNTS )
+        resetLogoutLimit();
+
     if (currentState == STATE::NONE) {
         // Selecting the send page if nothing found
-        appContext->setActiveWndState( STATE::SEND_ONLINE_OFFLINE );
+        context->appContext->setActiveWndState( STATE::SEND_ONLINE_OFFLINE );
         executeFrom(STATE::NONE);
     }
 
@@ -121,21 +122,36 @@ bool StateMachine::setActionWindow( STATE actionWindowState, bool enforce ) {
     if (!enforce && !isActionWindowMode() )
             return false;
 
-    appContext->setActiveWndState(actionWindowState);
+    context->appContext->setActiveWndState(actionWindowState);
     executeFrom(actionWindowState);
     return currentState==actionWindowState;
 }
 
 STATE StateMachine::getActionWindow() const {
-    return appContext->getActiveWndState();
+    return context->appContext->getActiveWndState();
 }
 
 // return true if action window will applicable
 bool StateMachine::isActionWindowMode() const {
-    return appContext->getActiveWndState() == currentState;
+    return context->appContext->getActiveWndState() == currentState;
 }
 
+// Reset logout time.
+void StateMachine::resetLogoutLimit() {
+    logoutTime = QDateTime::currentMSecsSinceEpoch() + config::getLogoutTimeMs();
+    blockLogoutCounter = 0;
+}
 
+// Logout must be blocked for modal dialogs
+void StateMachine::blockLogout() {
+    blockLogoutCounter++;
+    logoutTime = 0;
+}
+void StateMachine::unblockLogout() {
+    blockLogoutCounter--;
+    if (blockLogoutCounter<=0 && logoutTime==0)
+        resetLogoutLimit();
+}
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -157,6 +173,19 @@ bool StateMachine::processState(State* st) {
     return false;
 }
 
+void StateMachine::timerEvent(QTimerEvent *event) {
+    Q_UNUSED(event);
+    // Check if timer expired and we need to logout...
+    if (logoutTime==0)
+        return;
+
+    if (QDateTime::currentMSecsSinceEpoch() > logoutTime ) {
+        // logout
+        logoutTime = 0;
+        context->appContext->pushCookie<QString>("LockWallet", "lock");
+        context->stateMachine->executeFrom(STATE::NONE);
+    }
+}
 
 
 }

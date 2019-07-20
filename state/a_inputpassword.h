@@ -15,13 +15,15 @@ class InputPassword : public QObject, public State
 {
     Q_OBJECT
 public:
-    InputPassword(const StateContext & context);
+    InputPassword(StateContext * context);
     virtual ~InputPassword() override;
 
-    void deleteWnd() {wnd = nullptr;}
+    void deleteWnd(wnd::InputPassword * w) { if (w==wnd) wnd = nullptr;}
 
     // Async call to submit the password. This state migth get back to UI if password is incorrect
     void submitPassword(const QString & password);
+
+    QPair<bool,bool> getWalletListeningStatus();
 
 protected:
     virtual NextStateRespond execute() override;
@@ -29,6 +31,9 @@ protected:
 protected slots:
     void onInitWalletStatus( wallet::InitWalletStatus  status );
     void onWalletBalanceUpdated();
+
+    void onMwcMqListenerStatus(bool online);
+    void onKeybaseListenerStatus(bool online);
 
 private:
     wnd::InputPassword * wnd = nullptr;

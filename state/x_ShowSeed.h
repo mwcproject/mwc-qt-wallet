@@ -15,7 +15,7 @@ namespace state {
 class ShowSeed : public QObject, public State, SubmitCaller {
     Q_OBJECT
 public:
-    ShowSeed(const StateContext & context);
+    ShowSeed( StateContext * context);
     virtual ~ShowSeed() override;
 
     void deleteWnd() {wnd= nullptr;}
@@ -25,6 +25,7 @@ protected:
 
     // submit is hidden, never expected to be called.
     virtual void submit() override {Q_ASSERT(false);}
+    virtual void wndDeleted(wnd::NewSeed * w) override { if (w==wnd) wnd=nullptr; }
 
 private slots:
     void recoverPassphrase( QVector<QString> seed );

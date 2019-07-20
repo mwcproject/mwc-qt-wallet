@@ -277,7 +277,8 @@ void Mwc713InputParser::initAccount() {
                                                         new TrieNewLineSection(),
                                                         new TriePhraseSection("____ Wallet Summary Info - Account '"),
                                                         // account name,
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","'", 1),
+                                                        // Note!!!! Account name will have extra symblo at the end because of START_NEXT_EVERY_TRY!!!
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE | TrieAnySection::START_NEXT_EVERY_TRY, "","", 1),
                                                         new TriePhraseSection("' as of height "),
                                                         // Height
                                                         new TrieAnySection(100, TrieAnySection::NUMBERS, "","", 2 ),
@@ -336,7 +337,8 @@ void Mwc713InputParser::initTransactions() {
                                                 QVector<BaseTrieSection*>{
                                                         new TrieNewLineSection(),
                                                         new TriePhraseSection("Wallet Outputs - Account '"),
-                                                        new TrieAnySection(200, TrieAnySection::NOT_NEW_LINE, "","'", 1),
+                                                        // Account name have extra character!
+                                                        new TrieAnySection(200, TrieAnySection::NOT_NEW_LINE|TrieAnySection::START_NEXT_EVERY_TRY, "","", 1),
                                                         new TriePhraseSection("' - Block Height: "),
                                                         new TrieAnySection(30, TrieAnySection::NUMBERS, "","", 2),
                                                         new TrieNewLineSection()
@@ -346,7 +348,8 @@ void Mwc713InputParser::initTransactions() {
                                                 QVector<BaseTrieSection*>{
                                                         new TrieNewLineSection(),
                                                         new TriePhraseSection("Transaction Log - Account '"),
-                                                        new TrieAnySection(200, TrieAnySection::NOT_NEW_LINE, "","'", 1),
+                                                        // Account name have extra character!
+                                                        new TrieAnySection(200, TrieAnySection::NOT_NEW_LINE|TrieAnySection::START_NEXT_EVERY_TRY, "","", 1),
                                                         new TriePhraseSection("' - Block Height: "),
                                                         new TrieAnySection(30, TrieAnySection::NUMBERS, "","", 2),
                                                         new TrieNewLineSection()

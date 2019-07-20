@@ -3,6 +3,7 @@
 #include "../state/hodl.h"
 #include "../control/messagebox.h"
 #include <QAbstractItemView>
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
@@ -41,6 +42,8 @@ Hodl::~Hodl()
 
 void Hodl::on_submitAllTransactionsButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     control::MessageBox::RETURN_CODE res = control::MessageBox::question(this, "Warning",
                          "You are submitting all your MWC to HODL program. Those funds will be moved to your new account. This process might take some time. Please press 'Process' to start processing", "Process", "Cancel", false, true);
     if (res!=control::MessageBox::BTN1)
@@ -56,6 +59,7 @@ void Hodl::on_submitAllTransactionsButton_clicked()
 
 void Hodl::on_submitSelectedTransactionsButton_clicked()
 {
+    state::TimeoutLockObject to( state );
     QList<QListWidgetItem *> selectedItems = ui->transactionsListWidget->selectedItems();
     if (selectedItems.size()==0) {
         control::MessageBox::message(this, "Need info",

@@ -89,14 +89,14 @@
           <height>40</height>
          </size>
         </property>
-        <property name="text">
-         <string>Send Online</string>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="toolTip">
          <string>Send to the address of a user who is currently online. (i.e. mwcmq://..., https://..., keybase://...)</string>
         </property>
-        <property name="cursor">
-         <cursor>13</cursor>
+        <property name="text">
+         <string>Send Online</string>
         </property>
        </widget>
        <widget class="control::MwcFrameWithBorder" name="frame">
@@ -203,14 +203,14 @@
           <height>40</height>
          </size>
         </property>
-        <property name="text">
-         <string>Send Offline</string>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="toolTip">
          <string>Send to a user via file. Can be done offline.</string>
         </property>
-        <property name="cursor">
-         <cursor>13</cursor>
+        <property name="text">
+         <string>Send Offline</string>
         </property>
        </widget>
        <widget class="control::MwcFrameWithBorder" name="frame_5">
@@ -331,6 +331,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
@@ -365,10 +368,26 @@
         </size>
        </property>
        <property name="text">
-        <string>PR</string>
+        <string/>
        </property>
        <property name="pixmap">
         <pixmap>:/img/loader.gif</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="widget" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>1</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1</width>
+         <height>50</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -409,9 +428,9 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
+   <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcFrameWithBorder</class>
@@ -420,14 +439,14 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
+   <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
+   <header>control/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources>

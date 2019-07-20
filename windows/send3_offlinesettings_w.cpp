@@ -3,11 +3,12 @@
 #include "sendcoinsparamsdialog.h"
 #include "state/send3_Offline.h"
 #include "../control/messagebox.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
 SendOfflineSettings::SendOfflineSettings(QWidget *parent, state::SendOffline * _state) :
-    core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext() ),
+    core::NavWnd(parent, _state->getContext() ),
     ui(new Ui::SendOfflineSettings),
     state(_state)
 {
@@ -29,12 +30,14 @@ SendOfflineSettings::SendOfflineSettings(QWidget *parent, state::SendOffline * _
 
 SendOfflineSettings::~SendOfflineSettings()
 {
-    state->deletedSendOfflineSettings();
+    state->deletedSendOfflineSettings(this);
     delete ui;
 }
 
 void SendOfflineSettings::on_settingsButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     core::SendCoinsParams  params = state->getSendCoinsParams();
 
     SendCoinsParamsDialog dlg(this, params);
@@ -46,6 +49,8 @@ void SendOfflineSettings::on_settingsButton_clicked()
 
 void SendOfflineSettings::on_sendButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     int accountIdx = ui->accountComboBox->currentData().toInt();
     wallet::AccountInfo acc = accountInfo[accountIdx];
 
@@ -61,7 +66,7 @@ void SendOfflineSettings::on_sendButton_clicked()
     }
 
     state->prepareSendMwcOffline( acc, description );
-
 }
+
 
 }

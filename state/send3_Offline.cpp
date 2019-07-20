@@ -10,13 +10,13 @@
 
 namespace state {
 
-SendOffline::SendOffline(const StateContext & context) :
+SendOffline::SendOffline( StateContext * context) :
         State(context, STATE::SEND_OFFLINE ) {
 
-    QObject::connect(context.wallet, &wallet::Wallet::onSendFile,
+    QObject::connect(context->wallet, &wallet::Wallet::onSendFile,
                                    this, &SendOffline::respSendFile, Qt::QueuedConnection);
 
-    QObject::connect(context.wallet, &wallet::Wallet::onFinalizeFile,
+    QObject::connect(context->wallet, &wallet::Wallet::onFinalizeFile,
                                    this, &SendOffline::respFinalizeFile, Qt::QueuedConnection);
 
 }
@@ -24,64 +24,64 @@ SendOffline::SendOffline(const StateContext & context) :
 SendOffline::~SendOffline() {}
 
 NextStateRespond SendOffline::execute() {
-    if ( context.appContext->getActiveWndState() != STATE::SEND_OFFLINE  )
+    if ( context->appContext->getActiveWndState() != STATE::SEND_OFFLINE  )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
 
-    settingsWnd = (wnd::SendOfflineSettings*) context.wndManager->switchToWindowEx( new wnd::SendOfflineSettings( context.wndManager->getInWndParent(), this ) );
+    settingsWnd = (wnd::SendOfflineSettings*) context->wndManager->switchToWindowEx( new wnd::SendOfflineSettings( context->wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
 
 QVector<wallet::AccountInfo> SendOffline::getWalletBalance() {
-    return context.wallet->getWalletBalance();
+    return context->wallet->getWalletBalance();
 }
 
 QString SendOffline::getCurrentAccountName() {
-    return context.wallet->getCurrentAccountName();
+    return context->wallet->getCurrentAccountName();
 }
 
 
 core::SendCoinsParams SendOffline::getSendCoinsParams() {
-    return context.appContext->getSendCoinsParams();
+    return context->appContext->getSendCoinsParams();
 }
 
 void SendOffline::updateSendCoinsParams(const core::SendCoinsParams &params) {
-    context.appContext->setSendCoinsParams(params);
+    context->appContext->setSendCoinsParams(params);
 }
 
 // Go to the next window
 void SendOffline::prepareSendMwcOffline( const wallet::AccountInfo & account, QString message ) {
     Q_UNUSED(message);
     // Switching the account async, we don't really need the response
-    context.wallet->switchAccount( account.accountName );
+    context->wallet->switchAccount( account.accountName );
 
-    filesWnd = (wnd::SendOfflineFiles*) context.wndManager->switchToWindowEx( new wnd::SendOfflineFiles( context.wndManager->getInWndParent(), account, this ) );
+    filesWnd = (wnd::SendOfflineFiles*) context->wndManager->switchToWindowEx( new wnd::SendOfflineFiles( context->wndManager->getInWndParent(), account, this ) );
 }
 
 QString SendOffline::getFileGenerationPath() {
-    return context.appContext->getPathFor("fileGen");
+    return context->appContext->getPathFor("fileGen");
 }
 
 void SendOffline::updateFileGenerationPath(QString path) {
-    context.appContext->updatePathFor("fileGen", path);
+    context->appContext->updatePathFor("fileGen", path);
 }
 
 void SendOffline::sendToFile(int64_t nanoCoins, QString fileName) {
 
-    context.wallet->sendFile( nanoCoins, fileName );
+    context->wallet->sendFile( nanoCoins, fileName );
 }
 
 /*void SendOffline::signTransaction( QString fileName ) {
     logger::logConnect("SendOffline", "onReceiveFile");
-    sendConnect = QObject::connect(context.wallet, &wallet::Wallet::onReceiveFile,
+    sendConnect = QObject::connect(context->wallet, &wallet::Wallet::onReceiveFile,
                                    this, &SendOffline::respReceiveFile, Qt::QueuedConnection);
-    context.wallet->receiveFile( fileName );
+    context->wallet->receiveFile( fileName );
 }*/
 
 void SendOffline::publishTransaction( QString fileName ) {
-    context.wallet->finalizeFile( fileName );
+    context->wallet->finalizeFile( fileName );
 }
 
 
@@ -96,7 +96,7 @@ void SendOffline::respSendFile( bool success, QStringList errors, QString fileNa
         filesWnd->onTransactionActionIsFinished( success, message );
 
         if (success)
-            context.stateMachine->setActionWindow(STATE::SEND_ONLINE_OFFLINE);
+            context->stateMachine->setActionWindow(STATE::SEND_ONLINE_OFFLINE);
     }
 }
 
@@ -114,7 +114,7 @@ void SendOffline::respSendFile( bool success, QStringList errors, QString fileNa
         sendFilesWnd->onTransactionActionIsFinished( success, message );
 
         if (success)
-            context.stateMachine->setActionWindow(STATE::SEND_ONLINE_OFFLINE);
+            context->stateMachine->setActionWindow(STATE::SEND_ONLINE_OFFLINE);
     }
 }*/
 
@@ -131,7 +131,7 @@ void SendOffline::respFinalizeFile( bool success, QStringList errors, QString fi
         filesWnd->onTransactionActionIsFinished( success, message );
 
         if (success)
-            context.stateMachine->setActionWindow(STATE::SEND_ONLINE_OFFLINE);
+            context->stateMachine->setActionWindow(STATE::SEND_ONLINE_OFFLINE);
     }
 }
 

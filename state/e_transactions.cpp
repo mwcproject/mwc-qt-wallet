@@ -7,36 +7,36 @@
 
 namespace state {
 
-Transactions::Transactions(const StateContext & context) :
+Transactions::Transactions( StateContext * context) :
     State(context, STATE::TRANSACTIONS)
 {
     // Let's use static connections for proofes. It will be really the only listener
-    QObject::connect( context.wallet, &wallet::Wallet::onExportProof, this, &Transactions::updateExportProof, Qt::QueuedConnection );
-    QObject::connect( context.wallet, &wallet::Wallet::onVerifyProof, this, &Transactions::updateVerifyProof, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onExportProof, this, &Transactions::updateExportProof, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onVerifyProof, this, &Transactions::updateVerifyProof, Qt::QueuedConnection );
 
-    QObject::connect( context.wallet, &wallet::Wallet::onCancelTransacton, this, &Transactions::onCancelTransacton, Qt::QueuedConnection );
-    QObject::connect( context.wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &Transactions::onWalletBalanceUpdated, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onCancelTransacton, this, &Transactions::onCancelTransacton, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &Transactions::onWalletBalanceUpdated, Qt::QueuedConnection );
 
-    QObject::connect( context.wallet, &wallet::Wallet::onTransactions, this, &Transactions::updateTransactions, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onTransactions, this, &Transactions::updateTransactions, Qt::QueuedConnection );
 
 }
 
 Transactions::~Transactions() {}
 
 NextStateRespond Transactions::execute() {
-    if (context.appContext->getActiveWndState() != STATE::TRANSACTIONS)
+    if (context->appContext->getActiveWndState() != STATE::TRANSACTIONS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    wnd = (wnd::Transactions*)context.wndManager->switchToWindowEx( new wnd::Transactions( context.wndManager->getInWndParent(), this ) );
-
-    // Requesting wallet balance update because Accounts into is there
-    context.wallet->updateWalletBalance();
-
+    if (wnd==nullptr) {
+        wnd = (wnd::Transactions*)context->wndManager->switchToWindowEx( new wnd::Transactions( context->wndManager->getInWndParent(), this ) );
+        // Requesting wallet balance update because Accounts into is there
+        context->wallet->updateWalletBalance();
+    }
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 };
 
 QString Transactions::getCurrentAccountName() const {
-    return context.wallet->getCurrentAccountName();
+    return context->wallet->getCurrentAccountName();
 }
 
 void Transactions::cancelTransaction(const wallet::WalletTransaction & transaction) {
@@ -45,19 +45,19 @@ void Transactions::cancelTransaction(const wallet::WalletTransaction & transacti
         return;
     }
 
-    context.wallet->cancelTransacton(transaction.txIdx);
+    context->wallet->cancelTransacton(transaction.txIdx);
 }
 
 void Transactions::switchCurrentAccount(const wallet::AccountInfo & account) {
     // Switching without expected feedback.   Possible error will be cought by requestTransactions.
-    context.wallet->switchAccount( account.accountName );
+    context->wallet->switchAccount( account.accountName );
 }
 
 
 // Current transactions that wallet has
 void Transactions::requestTransactions(QString account) {
 
-    context.wallet->getTransactions(account);
+    context->wallet->getTransactions(account);
 }
 
 void Transactions::updateTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> transactions) {
@@ -68,12 +68,12 @@ void Transactions::updateTransactions( QString account, int64_t height, QVector<
 
 // Proofs
 void Transactions::generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName ) {
-    context.wallet->generateMwcBoxTransactionProof(transactionId, resultingFileName);
+    context->wallet->generateMwcBoxTransactionProof(transactionId, resultingFileName);
     // respond will be async
 }
 
 void Transactions::verifyMwcBoxTransactionProof( QString proofFileName ) {
-    context.wallet->verifyMwcBoxTransactionProof(proofFileName);
+    context->wallet->verifyMwcBoxTransactionProof(proofFileName);
     // respond will be async
 }
 
@@ -91,29 +91,29 @@ void Transactions::updateVerifyProof( bool success, QString fn, QString msg ) {
 
 
 QVector<int> Transactions::getColumnsWidhts() const {
-    return context.appContext->getIntVectorFor("TransTblColWidth");
+    return context->appContext->getIntVectorFor("TransTblColWidth");
 }
 
 void Transactions::updateColumnsWidhts(const QVector<int> & widths) {
-    context.appContext->updateIntVectorFor("TransTblColWidth", widths);
+    context->appContext->updateIntVectorFor("TransTblColWidth", widths);
 }
 
 QString Transactions::getProofFilesPath() const {
-    return context.appContext->getPathFor("Transactions");
+    return context->appContext->getPathFor("Transactions");
 }
 
 void Transactions::updateProofFilesPath(QString path) {
-    context.appContext->updatePathFor("Transactions", path);
+    context->appContext->updatePathFor("Transactions", path);
 }
 
 QVector<wallet::AccountInfo> Transactions::getWalletBalance() {
-    return context.wallet->getWalletBalance();
+    return context->wallet->getWalletBalance();
 }
 
 
 void Transactions::onCancelTransacton( bool success, int64_t trIdx, QString errMessage ) {
     if (success)
-        context.wallet->updateWalletBalance(); // Updating balance, Likely something will be unblocked
+        context->wallet->updateWalletBalance(); // Updating balance, Likely something will be unblocked
 
     if (wnd) {
         wnd->updateCancelTransacton(success, trIdx, errMessage);

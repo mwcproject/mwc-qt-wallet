@@ -9,7 +9,7 @@ namespace state {
 class NewWallet : public State
 {
 public:
-    NewWallet(const StateContext & context);
+    NewWallet(StateContext * context);
     virtual ~NewWallet() override;
 
     enum NEW_WALLET_CHOICE { CREATE_NEW, CREATE_WITH_SEED };

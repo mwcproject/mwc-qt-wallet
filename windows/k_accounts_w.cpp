@@ -5,11 +5,12 @@
 #include <QInputDialog>
 #include "../control/messagebox.h"
 #include "../core/global.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
 Accounts::Accounts(QWidget *parent, state::Accounts * _state) :
-    core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext()),
+    core::NavWnd(parent, _state->getContext() ),
     ui(new Ui::Accounts),
     state(_state)
 {
@@ -33,7 +34,7 @@ Accounts::Accounts(QWidget *parent, state::Accounts * _state) :
 
 Accounts::~Accounts()
 {
-    state->wndDeleted();
+    state->wndDeleted(this);
     saveTableHeaders();
     delete ui;
 }
@@ -88,6 +89,8 @@ void Accounts::refreshWalletBalance()
 }
 
 void Accounts::onAccountRenamed(bool success, QString errorMessage) {
+    state::TimeoutLockObject to( state );
+
     refreshWalletBalance();
     if (!success) {
         control::MessageBox::message(this, "Account rename faulure", "Your account wasn't renamed.\n" + errorMessage);
@@ -110,6 +113,8 @@ void Accounts::on_transferButton_clicked()
 
 void Accounts::on_addButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     bool ok = false;
     QString accountName = QInputDialog::getText(this, tr("Add account"),
                                                 tr("Please specify the name of a new account in your wallet. Please note, there is no delete action for accounts."), QLineEdit::Normal,
@@ -149,6 +154,8 @@ void Accounts::on_deleteButton_clicked()
 {
     using namespace control;
 
+    state::TimeoutLockObject to( state );
+
     int idx = ui->accountList->getSelectedRow();
     if (idx>=0 && idx<accounts.size() && accounts[idx].canDelete()) {
         MessageBox::RETURN_CODE res = MessageBox::question( this, "Delete account", "Are you sure that you want to delet this account?", "Yes", "No", false, true );
@@ -168,6 +175,8 @@ void Accounts::on_renameButton_clicked()
 void Accounts::renameAccount(int idx) {
     if (idx<0 || idx>=accounts.size())
         return;
+
+    state::TimeoutLockObject to( state );
 
     bool ok = false;
     QString name = QInputDialog::getText(this, "Rename mwc account",

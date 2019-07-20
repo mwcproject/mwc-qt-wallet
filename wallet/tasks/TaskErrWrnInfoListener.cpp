@@ -11,20 +11,34 @@ bool TaskErrWrnInfoListener::processTask(const QVector<WEvent> &events) {
     const WEvent & evt = events[0];
 
     switch (evt.event) {
+        case S_READY:
+            if (!walletIsReady)
+                qDebug() << "TaskErrWrnInfoListener::processTask switch to ready state";
+            walletIsReady = true;
+            return false;
         case S_ERROR:
         case S_GENERIC_ERROR: {
-            qDebug() << "TaskErrWrnInfoListener::processTask with events: " << printEvents(events);
-            wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::CRITICAL, MWC713::MESSAGE_ID::GENERIC, evt.message );
+            if (walletIsReady) {
+                qDebug() << "TaskErrWrnInfoListener::processTask with events: " << printEvents(events);
+                wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::CRITICAL, MWC713::MESSAGE_ID::GENERIC,
+                                                     evt.message);
+            }
             return true;
         }
         case S_GENERIC_WARNING: {
-            qDebug() << "TaskErrWrnInfoListener::processTask with events: " << printEvents(events);
-            wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::WARNING, MWC713::MESSAGE_ID::GENERIC, evt.message );
+            if (walletIsReady) {
+                qDebug() << "TaskErrWrnInfoListener::processTask with events: " << printEvents(events);
+                wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::WARNING, MWC713::MESSAGE_ID::GENERIC,
+                                                     evt.message);
+            }
             return true;
         }
         case S_GENERIC_INFO: {
-            qDebug() << "TaskErrWrnInfoListener::processTask with events: " << printEvents(events);
-            wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC, evt.message );
+            if (walletIsReady) {
+                qDebug() << "TaskErrWrnInfoListener::processTask with events: " << printEvents(events);
+                wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
+                                                     evt.message);
+            }
             return true;
         }
         default:

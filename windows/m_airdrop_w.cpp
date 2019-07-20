@@ -3,12 +3,12 @@
 #include "state/m_airdrop.h"
 #include "../control/messagebox.h"
 #include "../util/stringutils.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
 Airdrop::Airdrop(QWidget *parent, state::Airdrop * _state) :
-    core::NavWnd(parent, _state->getStateMachine(),
-                _state->getAppContext() ),
+    core::NavWnd(parent, _state->getContext() ),
     ui(new Ui::Airdrop),
     state(_state)
 {
@@ -28,7 +28,7 @@ Airdrop::Airdrop(QWidget *parent, state::Airdrop * _state) :
 
 Airdrop::~Airdrop()
 {
-    state->deleteAirdropWnd();
+    state->deleteAirdropWnd(this);
     saveTableHeaders();
     delete ui;
 }
@@ -86,6 +86,8 @@ void Airdrop::on_btcAddressEdit_textChanged(const QString & text)
 
 void Airdrop::on_claimAirdropBtn_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     QString address = ui->btcAddressEdit->text().trimmed();
 
     if (address.length()==0) {
@@ -99,6 +101,8 @@ void Airdrop::on_claimAirdropBtn_clicked()
 }
 
 void Airdrop::reportMessage( QString title, QString message ) {
+    state::TimeoutLockObject to( state );
+
     hideProgress();
 
     control::MessageBox::message(this, title, message);

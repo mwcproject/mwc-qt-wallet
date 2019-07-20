@@ -13,10 +13,10 @@ namespace state {
 class StartWallet : public QObject, public State, public wnd::WaitingWndState {
     Q_OBJECT
 public:
-    StartWallet(const StateContext & context);
+    StartWallet(StateContext * context);
     virtual ~StartWallet() override;
 
-    virtual void deleteWaitingWnd() override { wnd = nullptr; }
+    virtual void deleteWaitingWnd(wnd::WaitingWnd * w) override { if (w==wnd) {wnd = nullptr;} }
 
 protected:
     virtual NextStateRespond execute() override;

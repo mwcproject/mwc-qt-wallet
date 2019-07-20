@@ -13,7 +13,7 @@ namespace state {
 class Recieve : public QObject, public State {
     Q_OBJECT
 public:
-    Recieve(const StateContext & context);
+    Recieve( StateContext * context );
     virtual ~Recieve() override;
 
     QString  getReceiveAccount();
@@ -25,7 +25,7 @@ public:
 
     void signTransaction( QString fileName );
 
-    void deletedWnd() {wnd = nullptr;}
+    void deletedWnd(wnd::Recieve * w) { if(w==wnd) wnd = nullptr;}
 protected:
     virtual NextStateRespond execute() override;
 

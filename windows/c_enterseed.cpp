@@ -5,6 +5,7 @@
 #include "../state/c_createwithseed.h"
 #include "../util/widgetutils.h"
 #include "../util/Dictionary.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
@@ -28,7 +29,7 @@ EnterSeed::EnterSeed(QWidget *parent, state::CreateWithSeed * _state) :
 
 EnterSeed::~EnterSeed()
 {
-    state->deleteEnterSeed();
+    state->deleteEnterSeed(this);
     delete ui;
 }
 
@@ -53,6 +54,8 @@ void EnterSeed::on_cancelButton_clicked()
 
 void EnterSeed::on_continueButton_clicked()
 {
+    state::TimeoutLockObject to(state);
+
     QString seedStr = ui->seedText->toPlainText().toLower().trimmed();
 
     QPair <bool, QString> valRes = util::validateMwc713Str( seedStr );

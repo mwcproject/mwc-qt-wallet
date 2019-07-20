@@ -4,7 +4,7 @@
 #include <QWidget>
 
 namespace state {
-class StateMachine;
+struct StateContext;
 }
 
 namespace core {
@@ -17,8 +17,7 @@ class AppContext;
 class NavWnd : public QWidget {
 Q_OBJECT
 public:
-    explicit NavWnd(QWidget *parent, state::StateMachine * stateMachine,
-            AppContext * appContext, bool createNavigationButtons=true);
+    explicit NavWnd(QWidget *parent, state::StateContext * context, bool createNavigationButtons=true);
 
 protected:
     void resizeEvent(QResizeEvent *event);

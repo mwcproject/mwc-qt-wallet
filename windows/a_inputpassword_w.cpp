@@ -9,10 +9,11 @@
 #include <QMovie>
 #include <QLabel>
 #include "../core/global.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
-InputPassword::InputPassword(QWidget *parent, state::InputPassword * _state) :
+InputPassword::InputPassword(QWidget *parent, state::InputPassword * _state, bool lockMode) :
     QWidget(parent),
     ui(new Ui::InputPassword),
     state(_state)
@@ -27,16 +28,30 @@ InputPassword::InputPassword(QWidget *parent, state::InputPassword * _state) :
     ui->passwordEdit->setFocus(Qt::OtherFocusReason);
 
     utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()) );
+
+    if (lockMode) {
+        QPair<bool,bool> status = state->getWalletListeningStatus();
+
+        updateMwcMqState(status.first);
+        updateKeybaseState(status.second);
+
+        ui->instancesButton->hide();
+    }
+    else {
+        ui->listeningStatusFrame->hide();
+    }
 }
 
 InputPassword::~InputPassword()
 {
-    state->deleteWnd();
+    state->deleteWnd(this);
 
     delete ui;
 }
 
 void InputPassword::on_submitButton_clicked() {
+    state::TimeoutLockObject to(state);
+
     QString pswd = ui->passwordEdit->text().trimmed();
 
     QPair <bool, QString> valRes = util::validateMwc713Str(pswd, true);
@@ -59,6 +74,7 @@ void InputPassword::stopWaiting() {
 }
 
 void InputPassword::reportWrongPassword() {
+    state::TimeoutLockObject to(state);
     control::MessageBox::message(this, "Password", "Password supplied was incorrect. Please input correct password.");
 
     QThread::sleep(1); // sleep to prevent brute force attack.
@@ -71,7 +87,21 @@ void InputPassword::reportWrongPassword() {
 
 void InputPassword::on_instancesButton_clicked()
 {
+    state::TimeoutLockObject to(state);
     control::MessageBox::message(this, "Not implemented", "Here we will have a dialog or a page where it will be possible to specify the directory with wallet data. Somilar to electrum");
+}
+
+void InputPassword::updateMwcMqState(bool online) {
+    ui->mwcMqStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk.png" : ":/img/StatusEmpty.png") );
+    ui->mwcMqStatusImg->setToolTip(online ? "Listener connected to mwcmq" : "Listener diconnected from mwcmq");
+    ui->mwcMqStatusTxt->setText( online ? "Online" : "Offline" );
+}
+
+void InputPassword::updateKeybaseState(bool online) {
+
+    ui->keybaseStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOk.png" : ":/img/StatusEmpty.png" ) );
+    ui->keybaseStatusImg->setToolTip(online ? "Listener connected to keybase" : "Listener diconnected from keybase");
+    ui->keybaseStatusTxt->setText( online ? "Online" : "Offline" );
 }
 
 

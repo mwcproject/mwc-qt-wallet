@@ -13,13 +13,13 @@ namespace state {
 class SendOnlineOffline : public QObject, public State {
     Q_OBJECT
 public:
-    SendOnlineOffline(const StateContext & context);
+    SendOnlineOffline( StateContext * context);
     virtual ~SendOnlineOffline() override;
 
     void SendOnlineChosen();
     void SendOfflineChosen();
 
-    void destroyWnd() {wnd = nullptr;}
+    void destroyWnd(wnd::SendOnlineOffline * w) { if (w==wnd) wnd = nullptr;}
 protected:
     virtual NextStateRespond execute() override;
 

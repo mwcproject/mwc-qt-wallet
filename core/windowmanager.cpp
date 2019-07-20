@@ -2,9 +2,6 @@
 #include "../wallet/wallet.h"
 #include <QDebug>
 #include <QApplication>
-#include "../windows/connect2server.h"
-#include "../windows/nodemanually_w.h"
-#include "../windows/nodestatus_w.h"
 #include "../windows/c_newwallet_w.h"
 #include "../windows/c_newseed_w.h"
 #include "../windows/c_enterseed.h"

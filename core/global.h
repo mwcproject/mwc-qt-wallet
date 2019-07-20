@@ -21,6 +21,14 @@ const QString DATETIME_TEMPLATE_THIS = "hh:mm:ss dd-MM-yyyy";
 
 const QString DEL_ACCONT_PREFIX = "del_";
 
+#ifdef Q_OS_MACOS
+const QString MWC713_DEFAULT_CONFIG = ":/resource/wallet713_mac.toml";
+#else
+const QString MWC713_DEFAULT_CONFIG = ":/resource/wallet713_def.toml";
+#endif
+
+const int64_t AIRDROP_TRANS_KEEP_TIME_MS = 1000L*3600L*24L*15; // 15 days should be enough
+
 void setApplication(QApplication * app, QMainWindow * mainWindow);
 
 void closeApplication();

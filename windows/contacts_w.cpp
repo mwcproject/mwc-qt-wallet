@@ -3,6 +3,7 @@
 #include "../state/contacts.h"
 #include "contacteditdlg.h"
 #include "../control/messagebox.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
@@ -81,6 +82,8 @@ int  Contacts::getSelectedContactIndex() const {
 
 void Contacts::on_addButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     ContactEditDlg dlg(this, wallet::WalletContact(),
                                    contacts, false );
     if (dlg.exec() == QDialog::Accepted) {
@@ -97,6 +100,8 @@ void Contacts::on_addButton_clicked()
 
 void Contacts::on_editButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     int idx = getSelectedContactIndex();
     if (idx<0) // expected to be disabled
         return;
@@ -121,6 +126,8 @@ void Contacts::on_editButton_clicked()
 
 void Contacts::on_removeButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     int idx = getSelectedContactIndex();
     if (idx<0) // expected to be disabled
         return;

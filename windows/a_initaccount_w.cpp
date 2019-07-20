@@ -8,6 +8,7 @@
 #include <QKeyEvent>
 #include "../core/global.h"
 #include "../util/stringutils.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
@@ -50,6 +51,8 @@ void InitAccount::on_password1Edit_textChanged(const QString &text)
 
 void InitAccount::on_submitButton_clicked()
 {
+    state::TimeoutLockObject to(state);
+
     QString pswd1 = ui->password1Edit->text().trimmed();
     QString pswd2 = ui->password2Edit->text().trimmed();
     util::PasswordAnalyser pa(pswd1);
@@ -78,6 +81,8 @@ void InitAccount::on_submitButton_clicked()
 
 void InitAccount::on_instancesButton_clicked()
 {
+    state::TimeoutLockObject to(state);
+
     control::MessageBox::message(this, "Not implemented", "Here we will have a dialog or a page where it will be possible to specify the directory with wallet data. Somilar to electrum");
 }
 

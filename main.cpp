@@ -30,11 +30,7 @@ bool deployFilesFromResources() {
     bool ok = true;
 
     if ( !QFile::exists(mwc713conf)) {
-#ifdef Q_OS_MACOS
-        ok = ok && QFile::copy(":/resource/wallet713_mac.toml", mwc713conf);
-#else
-        ok = ok && QFile::copy(":/resource/wallet713_def.toml", mwc713conf);
-#endif
+        ok = ok && QFile::copy(mwc::MWC713_DEFAULT_CONFIG, mwc713conf);
         if (ok)
             QFile::setPermissions(mwc713conf, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup);
     }
@@ -46,8 +42,8 @@ bool deployFilesFromResources() {
     }
 
     // Set default values
-    core::Config::setMwc713conf(mwc713conf);
-    core::Config::setMwcGuiWalletConf(mwcGuiWalletConf);
+    config::setMwc713conf(mwc713conf);
+    config::setMwcGuiWalletConf(mwcGuiWalletConf);
 
     return ok;
 }
@@ -73,10 +69,10 @@ bool readConfig(QApplication & app) {
 
     QString config = parser.value("config");
     if (config.isEmpty()) {
-        config = core::Config::getMwcGuiWalletConf();
+        config = config::getMwcGuiWalletConf();
     }
     else {
-        core::Config::setMwcGuiWalletConf(config);
+        config::setMwcGuiWalletConf(config);
     }
 
     util::ConfigReader reader;
@@ -90,6 +86,13 @@ bool readConfig(QApplication & app) {
     QString main_style_sheet = reader.getString("main_style_sheet");
     QString dialogs_style_sheet = reader.getString("dialogs_style_sheet");
     QString airdropUrl = reader.getString("airdrop_url");
+
+    QString logoutTimeoutStr = reader.getString("logoutTimeout");
+    bool logoutTimeoutOk = false;
+    int     logoutTimeout = reader.getString("logoutTimeout").toInt(&logoutTimeoutOk);
+    if (!logoutTimeoutOk || logoutTimeoutStr.isEmpty() )
+        logoutTimeout = 15*60;
+
 
     if ( mwc_path.isEmpty() || wallet713_path.isEmpty() || main_style_sheet.isEmpty() || dialogs_style_sheet.isEmpty() || airdropUrl.isEmpty() ) {
         qDebug() << "Failed to read all expected data from config file " << config;
@@ -110,7 +113,7 @@ bool readConfig(QApplication & app) {
 #endif
     }
 
-    core::Config::setConfigData( mwc_path, wallet713_path, main_style_sheet, dialogs_style_sheet, airdropUrl);
+    config::setConfigData( mwc_path, wallet713_path, main_style_sheet, dialogs_style_sheet, airdropUrl, logoutTimeout*1000L );
     return true;
 }
 
@@ -146,11 +149,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << core::Config::toString();
+    qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
 
 
     { // Apply style sheet
-        QFile file( core::Config::getMainStyleSheetPath() );
+        QFile file( config::getMainStyleSheetPath() );
         if (file.open(QFile::ReadOnly | QFile::Text)) {
                QTextStream ts(&file);
                app.setStyleSheet(ts.readAll());
@@ -169,7 +172,7 @@ int main(int argc, char *argv[])
 
     mwc::setApplication(&app, mainWnd);
 
-    wallet::MWC713 wallet( core::Config::getWallet713path(), core::Config::getMwc713conf(), &appContext );
+    wallet::MWC713 wallet( config::getWallet713path(), config::getMwc713conf(), &appContext );
     //wallet::MockWallet wallet;
 
     core::WindowManager wndManager( mainWnd->getMainWindow() );
@@ -178,7 +181,7 @@ int main(int argc, char *argv[])
 
     state::StateContext context( &appContext, &wallet, &wndManager, mainWnd );
 
-    state::StateMachine machine(context);
+    state::StateMachine machine(&context);
     mainWnd->setAppEnvironment(&machine, &wallet);
     machine.start();
 

@@ -66,7 +66,7 @@ bool TaskOutputs::processTask(const QVector<WEvent> & events) {
         if (events[curEvt].event == WALLET_EVENTS::S_OUTPUT_LOG ) {
             QStringList l = events[curEvt].message.split('|');
             Q_ASSERT(l.size()==2);
-            account = l[0];
+            account = l[0].left( std::max(0,l[0].size()-1) );
             height = l[1].toInt();
             break;
         }
@@ -220,7 +220,7 @@ bool TaskTransactions::processTask(const QVector<WEvent> & events) {
         if (events[curEvt].event == WALLET_EVENTS::S_TRANSACTION_LOG ) {
             QStringList l = events[curEvt].message.split('|');
             Q_ASSERT(l.size()==2);
-            account = l[0];
+            account = l[0].left( std::max(0,l[0].size()-1) );
             height = l[1].toInt();
             break;
         }

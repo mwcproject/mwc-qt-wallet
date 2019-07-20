@@ -19,6 +19,8 @@ public:
     virtual bool processTask(const QVector<WEvent> &events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>();}
+private:
+    bool walletIsReady = false;
 };
 
 }

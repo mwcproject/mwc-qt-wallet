@@ -37,6 +37,10 @@ public:
     // ---- Wallet Init Phase
     virtual void start() noexcept(false) override;
     virtual void loginWithPassword(QString password) noexcept(false) override;
+
+    // Exit from the wallet. Expected that state machine will switch to Init state
+    virtual void logout() noexcept(false) override;
+
     // Check signal: onInitWalletStatus
     virtual InitWalletStatus getWalletStatus() noexcept(false) override {return initStatus;}
 
@@ -127,6 +131,10 @@ public:
 
     // Get current configuration of the wallet. will read from wallet713.toml file
     virtual WalletConfig getWalletConfig() noexcept(false) override;
+
+    // Get configuration form the resource file.
+    virtual WalletConfig getDefaultConfig() noexcept(false) override;
+
     // Update wallet config. Will update config and restart the wmc713.
     // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
     //          and caller suppose listen for them
@@ -271,6 +279,9 @@ private:
 
     // Update acc value at collection accounts. If account is not founf, we can add it (addIfNotFound) or skip
     void updateAccountInfo( const AccountInfo & acc, QVector<AccountInfo> & accounts, bool addIfNotFound ) const;
+
+    // Read config from the file
+    WalletConfig readWalletConfig(QString source) const;
 
 private slots:
     // mwc713 Process IOs

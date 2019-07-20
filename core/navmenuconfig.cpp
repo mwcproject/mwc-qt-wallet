@@ -7,11 +7,10 @@
 
 namespace core {
 
-NavMenuConfig::NavMenuConfig(QWidget *parent, state::StateMachine * _stateMachine, core::AppContext * _appContext) :
+NavMenuConfig::NavMenuConfig(QWidget *parent, state::StateContext * _context ) :
         NavMenu(parent),
         ui(new Ui::NavMenuConfig),
-        stateMachine(_stateMachine),
-        appContext(_appContext) {
+        context(_context) {
     ui->setupUi(this);
 }
 
@@ -21,17 +20,17 @@ NavMenuConfig::~NavMenuConfig() {
 
 void NavMenuConfig::on_walletConfigButton_clicked()
 {
-    stateMachine->setActionWindow( state::STATE::WALLET_CONFIG );
+    context->stateMachine->setActionWindow( state::STATE::WALLET_CONFIG );
 }
 
 void NavMenuConfig::on_outputsButton_clicked()
 {
-    stateMachine->setActionWindow( state::STATE::OUTPUTS );
+    context->stateMachine->setActionWindow( state::STATE::OUTPUTS );
 }
 
 void NavMenuConfig::on_mwcmqButton_clicked()
 {
-    stateMachine->setActionWindow( state::STATE::LISTENING );
+    context->stateMachine->setActionWindow( state::STATE::LISTENING );
 }
 
 void NavMenuConfig::on_resyncButton_clicked()
@@ -40,8 +39,8 @@ void NavMenuConfig::on_resyncButton_clicked()
                        "Yes", "No", false,true) == control::MessageBox::BTN1 ) {
         // Starting resync
 
-        appContext->pushCookie("PrevState", (int)appContext->getActiveWndState() );
-        stateMachine->setActionWindow( state::STATE::RESYNC );
+        context->appContext->pushCookie("PrevState", (int)context->appContext->getActiveWndState() );
+        context->stateMachine->setActionWindow( state::STATE::RESYNC );
     }
 }
 

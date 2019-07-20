@@ -5,11 +5,12 @@
 #include "../control/messagebox.h"
 #include "../state/send3_Offline.h"
 #include <QFileDialog>
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
 SendOfflineFiles::SendOfflineFiles(QWidget *parent, const wallet::AccountInfo & _account, state::SendOffline * _state) :
-    core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext() ),
+    core::NavWnd(parent, _state->getContext() ),
     ui(new Ui::SendOfflineFiles),
     state(_state),
     account(_account)
@@ -20,12 +21,14 @@ SendOfflineFiles::SendOfflineFiles(QWidget *parent, const wallet::AccountInfo & 
 
 SendOfflineFiles::~SendOfflineFiles()
 {
-    state->deletedSendOfflineFiles();
+    state->deletedSendOfflineFiles(this);
     delete ui;
 }
 
 void SendOfflineFiles::on_generateFileButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     QString mwc2sendStr = ui->amountEdit->text().trimmed();
     auto mwcAmount = util::one2nano( mwc2sendStr );
     if (!mwcAmount.first) {
@@ -63,27 +66,11 @@ void SendOfflineFiles::on_generateFileButton_clicked()
     // Wallet should answer with a callback.
 }
 
-/*void SendOfflineFiles::on_signTransactionButton_clicked()
-{
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open initial transaction file"),
-                                                          state->getFileGenerationPath(),
-                                                            tr("MWC transaction (*.tx)"));
-
-    if (fileName.length()==0)
-        return;
-
-    // Update path
-    QFileInfo flInfo(fileName);
-    state->updateFileGenerationPath( flInfo.path() );
-
-    ui->progress->show();
-
-    state->signTransaction(fileName);
-    // Expected respond from state with result
-}*/
 
 void SendOfflineFiles::on_publishTransactionButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open signed transaction file"),
                                                           state->getFileGenerationPath(),
                                                             tr("MWC transaction (*.tx.response)"));
@@ -102,6 +89,8 @@ void SendOfflineFiles::on_publishTransactionButton_clicked()
 }
 
 void SendOfflineFiles::onTransactionActionIsFinished( bool success, QString message ) {
+    state::TimeoutLockObject to( state );
+
     ui->progress->hide();
     control::MessageBox::message(this, success ? "Success" : "Failure", message );
 }

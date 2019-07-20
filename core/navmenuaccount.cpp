@@ -2,14 +2,15 @@
 #include "../state/state.h"
 #include "ui_navmenuaccount.h"
 #include "../state/statemachine.h"
+#include "../core/appcontext.h"
 
 
 namespace core {
 
-NavMenuAccount::NavMenuAccount(QWidget *parent, state::StateMachine * _stateMachine) :
+NavMenuAccount::NavMenuAccount(QWidget *parent, state::StateContext * _context) :
         NavMenu(parent),
         ui(new Ui::NavMenuAccount),
-        stateMachine(_stateMachine)
+        context(_context)
 {
     ui->setupUi(this);
 }
@@ -20,17 +21,22 @@ NavMenuAccount::~NavMenuAccount() {
 
 void NavMenuAccount::on_accountsButton_clicked()
 {
-    stateMachine->setActionWindow( state::STATE::ACCOUNTS );
+    context->stateMachine->setActionWindow( state::STATE::ACCOUNTS );
 }
 
 void NavMenuAccount::on_seedButton_clicked()
 {
-    stateMachine->setActionWindow( state::STATE::SHOW_SEED );
+    // need to logout first, than switch to the seed
+
+    // State where to go after login
+    context->appContext->setActiveWndState(state::STATE::SHOW_SEED);
+    context->wallet->logout();
+    context->stateMachine->executeFrom( state::STATE::NONE);
 }
 
 void NavMenuAccount::on_contactsButton_clicked()
 {
-    stateMachine->setActionWindow( state::STATE::CONTACTS );
+    context->stateMachine->setActionWindow( state::STATE::CONTACTS );
 }
 
 }

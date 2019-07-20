@@ -7,7 +7,7 @@
 
 namespace state {
 
-NewWallet::NewWallet(const StateContext & context) :
+NewWallet::NewWallet( StateContext * context) :
     State(context, STATE::NEW_WALLET)
 {
 }
@@ -19,12 +19,12 @@ NewWallet::~NewWallet() {
 void NewWallet::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice) {
     switch (newWalletChoice) {
     case CREATE_NEW:
-        context.appContext->pushCookie<QString>("newSeed", "Yes");
-        context.stateMachine->executeFrom(STATE::GENERATE_NEW_SEED);
+        context->appContext->pushCookie<QString>("newSeed", "Yes");
+        context->stateMachine->executeFrom(STATE::GENERATE_NEW_SEED);
         break;
     case CREATE_WITH_SEED:
-        context.appContext->pushCookie<QString>("withSeed", "Yes");
-        context.stateMachine->executeFrom(STATE::CREATE_WITH_SEED);
+        context->appContext->pushCookie<QString>("withSeed", "Yes");
+        context->stateMachine->executeFrom(STATE::CREATE_WITH_SEED);
         break;
     default:
         Q_ASSERT(false);
@@ -33,14 +33,14 @@ void NewWallet::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice) {
 }
 
 NextStateRespond NewWallet::execute() {
-    if ( context.wallet->getWalletStatus() == wallet::InitWalletStatus::NEED_INIT ) {
+    if ( context->wallet->getWalletStatus() == wallet::InitWalletStatus::NEED_INIT ) {
         // Password expected to be entered
-        QString pass = context.appContext->getCookie<QString>(COOKIE_PASSWORD);
+        QString pass = context->appContext->getCookie<QString>(COOKIE_PASSWORD);
         Q_ASSERT(pass.length()>0);
 
 
-        context.wndManager->switchToWindowEx(
-                    new wnd::NewWallet( context.wndManager->getInWndParent(), this ) );
+        context->wndManager->switchToWindowEx(
+                    new wnd::NewWallet( context->wndManager->getInWndParent(), this ) );
 
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
     }

@@ -4,6 +4,7 @@
 #include "../control/messagebox.h"
 #include "../util/address.h"
 #include "../state/send2_Online.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
@@ -29,7 +30,7 @@ QString generateAmountErrorMsg( int64_t mwcAmount, const wallet::AccountInfo & a
 }
 
 SendOnline::SendOnline(QWidget *parent, state::SendOnline * _state ) :
-    core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext() ),
+    core::NavWnd(parent, _state->getContext() ),
     ui(new Ui::SendOnline),
     state(_state)
 {
@@ -55,7 +56,7 @@ SendOnline::SendOnline(QWidget *parent, state::SendOnline * _state ) :
 
 SendOnline::~SendOnline()
 {
-    state->deleteWnd();
+    state->deleteWnd(this);
     delete ui;
 }
 
@@ -63,6 +64,8 @@ SendOnline::~SendOnline()
 
 void SendOnline::on_contactsButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     // Get the contacts
     control::MessageBox::message(this, "Not implemented", "This functionality is not implemented yet");
 
@@ -81,6 +84,8 @@ void SendOnline::on_allAmountButton_clicked()
 
 void SendOnline::on_settingsButton2_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     core::SendCoinsParams  params = state->getSendCoinsParams();
 
     SendCoinsParamsDialog dlg(this, params);
@@ -92,6 +97,8 @@ void SendOnline::on_settingsButton2_clicked()
 
 void SendOnline::on_sendButton_clicked()
 {
+    state::TimeoutLockObject to( state );
+
     auto dt = ui->accountComboBox->currentData();
     if (!dt.isValid())
         return;
@@ -191,12 +198,20 @@ void SendOnline::on_sendButton_clicked()
         }
     }
 
+    // Ask for confirmation
+
+    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::question(this,"Confirn Send request",
+                                  "You are sending " + util::nano2one(mwcAmount.second) + " mwc to address " + address, "Decline", "Confirm", false, true ) )
+        return;
+
     ui->progress->show();
 
     state->sendMwc( accountInfo[accountIdx], address, mwcAmount.second, description );
 }
 
 void SendOnline::sendRespond( bool success, const QStringList & errors ) {
+    state::TimeoutLockObject to( state );
+
     ui->progress->hide();
 
     if (success) {

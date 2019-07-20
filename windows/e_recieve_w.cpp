@@ -4,12 +4,13 @@
 #include "../state/e_Recieve.h"
 #include <QFileDialog>
 #include "../control/messagebox.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
 Recieve::Recieve(QWidget *parent, state::Recieve * _state, bool mwcMqStatus, bool keybaseStatus,
                  QString mwcMqAddress) :
-        core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext() ),
+        core::NavWnd(parent, _state->getContext() ),
         ui(new Ui::Recieve),
         state(_state)
 {
@@ -25,7 +26,7 @@ Recieve::Recieve(QWidget *parent, state::Recieve * _state, bool mwcMqStatus, boo
 }
 
 Recieve::~Recieve() {
-    state->deletedWnd();
+    state->deletedWnd(this);
     delete ui;
 }
 
@@ -45,6 +46,8 @@ void Recieve::updateKeybaseState(bool online) {
 }
 
 void Recieve::on_pushButton_clicked() {
+    state::TimeoutLockObject to( state );
+
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open initial transaction file"),
                                                     state->getFileGenerationPath(),
                                                     tr("MWC transaction (*.tx)"));
@@ -63,6 +66,8 @@ void Recieve::on_pushButton_clicked() {
 }
 
 void Recieve::onTransactionActionIsFinished( bool success, QString message ) {
+    state::TimeoutLockObject to( state );
+
     ui->progress->hide();
     control::MessageBox::message(this, success ? "Success" : "Failure", message );
 }

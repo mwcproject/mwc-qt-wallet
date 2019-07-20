@@ -218,6 +218,10 @@ public:
     // ---- Wallet Init Phase
     virtual void start() noexcept(false)  = 0;
     virtual void loginWithPassword(QString password) noexcept(false)  = 0;
+
+    // Exit from the wallet. Expected that state machine will switch to Init state
+    virtual void logout() noexcept(false)  = 0;
+
     // Check signal: onInitWalletStatus
     virtual InitWalletStatus getWalletStatus() noexcept(false) = 0;
 
@@ -309,6 +313,10 @@ public:
 
     // Get current configuration of the wallet.
     virtual WalletConfig getWalletConfig() noexcept(false) = 0;
+
+    // Get configuration form the resource file.
+    virtual WalletConfig getDefaultConfig() noexcept(false) = 0;
+
     // Update wallet config. Will update config and restart the wmc713.
     // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
     //          and caller suppose listen for them

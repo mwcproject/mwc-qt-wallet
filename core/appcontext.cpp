@@ -5,6 +5,7 @@
 #include <QDataStream>
 #include <QDir>
 #include "../control/messagebox.h"
+#include "../core/global.h"
 
 namespace core {
 
@@ -32,6 +33,20 @@ bool SendCoinsParams::loadData(QDataStream & in) {
 
 AppContext::AppContext() {
     loadData();
+
+    // Check if airdrop request need to be cleaned up
+    QVector<state::AirdropRequests> airDropData = loadAirdropRequests();
+
+    int64_t cleanTimeLimit = QDateTime::currentMSecsSinceEpoch() - mwc::AIRDROP_TRANS_KEEP_TIME_MS;
+    int sz = airDropData.size();
+    for (int t=sz-1; t>=0; t--) {
+        if (airDropData[t].timestamp < cleanTimeLimit) {
+            airDropData.remove(t);
+        }
+    }
+
+    if (sz != airDropData.size())
+        saveAirdropRequests(airDropData);
 }
 
 AppContext::~AppContext() {

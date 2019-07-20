@@ -10,7 +10,7 @@ namespace state {
 class Events : public State
 {
 public:
-    Events(const StateContext & context);
+    Events( StateContext * context );
     virtual ~Events() override;
 
 protected:

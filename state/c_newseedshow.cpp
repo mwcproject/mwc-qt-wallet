@@ -7,7 +7,7 @@
 
 namespace state {
 
-NewSeedShow::NewSeedShow(const StateContext & context) :
+NewSeedShow::NewSeedShow(StateContext * context) :
     State(context, STATE::SHOW_NEW_SEED)
 {
 
@@ -16,13 +16,15 @@ NewSeedShow::NewSeedShow(const StateContext & context) :
 NewSeedShow::~NewSeedShow() {}
 
 NextStateRespond NewSeedShow::execute() {
-    auto seed = context.appContext->getCookie< QVector<QString> >("seed2verify");
+    auto seed = context->appContext->getCookie< QVector<QString> >("seed2verify");
 
     if (seed.size()==0)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context.wndManager->switchToWindowEx(
-                new wnd::NewSeed( context.wndManager->getInWndParent(), this, getStateMachine(), context.appContext, seed ) );
+    if (wnd==nullptr) {
+        wnd = (wnd::NewSeed*) context->wndManager->switchToWindowEx(
+                new wnd::NewSeed( context->wndManager->getInWndParent(), this, context, seed ) );
+    }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 
@@ -30,7 +32,8 @@ NextStateRespond NewSeedShow::execute() {
 
 void NewSeedShow::submit() {
     // go to the next page
-    context.stateMachine->executeFrom(STATE::TEST_NEW_SEED);
+    context->stateMachine->executeFrom(STATE::TEST_NEW_SEED);
 }
+
 
 }

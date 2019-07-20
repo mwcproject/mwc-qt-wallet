@@ -7,7 +7,7 @@
 namespace wnd {
 
 Outputs::Outputs(QWidget *parent, state::Outputs * _state) :
-    core::NavWnd(parent, _state->getStateMachine(), _state->getAppContext() ),
+    core::NavWnd(parent, _state->getContext() ),
     ui(new Ui::Outputs),
     state(_state)
 {
@@ -33,7 +33,7 @@ Outputs::Outputs(QWidget *parent, state::Outputs * _state) :
 Outputs::~Outputs()
 {
     saveTableHeaders();
-    state->deleteWnd();
+    state->deleteWnd(this);
     delete ui;
 }
 

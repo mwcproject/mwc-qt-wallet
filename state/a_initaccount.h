@@ -9,7 +9,7 @@ namespace state {
 class InitAccount : public State
 {
 public:
-    InitAccount(const StateContext & context);
+    InitAccount(StateContext * context);
     virtual ~InitAccount() override;
 
     void setPassword(const QString & password);

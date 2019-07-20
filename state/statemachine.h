@@ -3,14 +3,16 @@
 
 #include <QMap>
 #include "state.h"
+#include <QObject>
 
 namespace state {
 
 // State machine that describes wallet application
-class StateMachine
+class StateMachine : public QObject
 {
+    Q_OBJECT
 public:
-    StateMachine(StateContext & context);
+    StateMachine(StateContext * context);
     ~StateMachine();
 
     void start();
@@ -24,18 +26,31 @@ public:
 
     // return true if action window will applicable
     bool isActionWindowMode() const;
+
+    // Reset logout time.
+    void resetLogoutLimit();
+
+
+    // Logout must be blocked for modal dialogs
+    void blockLogout();
+    void unblockLogout();
+
 private:
     // routine to process state into the loop
     bool processState(State* st);
 
+    virtual void timerEvent(QTimerEvent *event) override;
+
 private:
-    core::AppContext * const appContext;
-    core::MainWindow * const mainWindow;
+    StateContext * context = nullptr;
 
     // Map is orders by Ids. It naturally define the priority of
     // all states
     QMap< STATE, State* > states;
     STATE currentState = STATE::NONE;
+
+    int64_t logoutTime = 0; // 0 mean never logout...
+    int     blockLogoutCounter = 0;
 };
 
 

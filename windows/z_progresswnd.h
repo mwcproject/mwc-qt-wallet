@@ -9,11 +9,13 @@ class ProgressWnd;
 
 namespace wnd {
 
+class ProgressWnd;
+
 // Cancell callback interface. Because of usage we are fine withinterface, no needs in callback function
 class IProgressWndState {
 public:
     virtual void cancelProgress() = 0;
-    virtual void destroyProgressWnd() = 0;
+    virtual void destroyProgressWnd(ProgressWnd * w) = 0;
 };
 
 

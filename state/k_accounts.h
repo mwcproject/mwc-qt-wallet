@@ -16,10 +16,10 @@ class Accounts : public QObject, public State
 {
     Q_OBJECT
 public:
-    Accounts(const StateContext & context);
+    Accounts(StateContext * context);
     virtual ~Accounts() override;
 
-    void wndDeleted() { wnd = nullptr; }
+    void wndDeleted(wnd::Accounts * w) { if(w==wnd) wnd = nullptr; }
 
     // get balance for current account
     QVector<wallet::AccountInfo> getWalletBalance();

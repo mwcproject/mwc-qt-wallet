@@ -19,13 +19,11 @@ struct AirdropRequests {
     QString btcAddress;
     QString challendge;
     QString signature;
-    QString mwcMqAddress;
-    int64_t timestamp;
+    int64_t timestamp; // ms since epoch
 
     void setData(const QString & btcAddress,
                  const QString & challendge,
-                 const QString & signature,
-                 const QString & mwcMqAddress );
+                 const QString & signature);
 
     void saveData(QDataStream & out) const;
     bool loadData(QDataStream & in);
@@ -41,11 +39,11 @@ class Airdrop : public QObject, public State
 {
     Q_OBJECT
 public:
-    Airdrop(const StateContext & context);
+    Airdrop( StateContext * context);
     virtual ~Airdrop() override;
 
-    void deleteAirdropForBtcWnd() {airdropForBtcWnd = nullptr;}
-    void deleteAirdropWnd() {airdropWnd = nullptr;}
+    void deleteAirdropForBtcWnd(wnd::AirdropForBTC * w) { if (w==airdropForBtcWnd) airdropForBtcWnd = nullptr;}
+    void deleteAirdropWnd(wnd::Airdrop * w) { if (w==airdropWnd) airdropWnd = nullptr;}
 
     const AirDropStatus & getAirDropStatus() const {return airDropStatus;}
 

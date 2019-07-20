@@ -6,7 +6,7 @@
 
 namespace state {
 
-Contacts::Contacts(const StateContext & context) :
+Contacts::Contacts(StateContext * context) :
     State(context, STATE::CONTACTS)
 {
 
@@ -15,33 +15,33 @@ Contacts::Contacts(const StateContext & context) :
 Contacts::~Contacts() {}
 
 NextStateRespond Contacts::execute() {
-    if (context.appContext->getActiveWndState() != STATE::CONTACTS)
+    if (context->appContext->getActiveWndState() != STATE::CONTACTS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context.wndManager->switchToWindowEx(
-                new wnd::Contacts( context.wndManager->getInWndParent(), this ) );
+    context->wndManager->switchToWindowEx(
+                new wnd::Contacts( context->wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
 QVector<wallet::WalletContact> Contacts::getContacts() {
-    return context.wallet->getContacts();
+    return context->wallet->getContacts();
 }
 
 QPair<bool, QString> Contacts::addContact( const wallet::WalletContact & contact ) {
-    return context.wallet->addContact(contact);
+    return context->wallet->addContact(contact);
 }
 
 QPair<bool, QString> Contacts::deleteContact( const QString & name ) {
-    return context.wallet->deleteContact(name);
+    return context->wallet->deleteContact(name);
 }
 
 QVector<int> Contacts::getColumnsWidhts() const {
-    return context.appContext->getIntVectorFor("ContactsTblWidth");
+    return context->appContext->getIntVectorFor("ContactsTblWidth");
 }
 
 void Contacts::updateColumnsWidhts(const QVector<int> & width) {
-    context.appContext->updateIntVectorFor("ContactsTblWidth", width);
+    context->appContext->updateIntVectorFor("ContactsTblWidth", width);
 }
 
 

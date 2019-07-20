@@ -14,10 +14,10 @@ class Listening : public QObject, public State
 {
     Q_OBJECT
 public:
-    Listening(const StateContext & context);
+    Listening( StateContext * context);
     virtual ~Listening() override;
 
-    void wndIsGone() {wnd = nullptr;} // window is closed
+    void wndIsGone(wnd::Listening * w) { if(w==wnd) wnd = nullptr;} // window is closed
 
 
     void triggerMwcState();

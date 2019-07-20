@@ -17,10 +17,10 @@ class NewSeedTest : public QObject, public State
 {
     Q_OBJECT
 public:
-    NewSeedTest(const StateContext & context);
+    NewSeedTest( StateContext * context);
     virtual ~NewSeedTest() override;
 
-    void deleteWnd() {wnd= nullptr;}
+    void deleteWnd(wnd::NewSeedTest * w) { if(w==wnd) wnd=nullptr;}
 
     void submit(QString word);
 

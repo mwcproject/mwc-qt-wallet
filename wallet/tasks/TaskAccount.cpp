@@ -158,7 +158,7 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
     bool ok = (infoData.size()==2);
     QString currentAccountName;
     if (ok)
-        currentAccountName = infoData[0];
+        currentAccountName = infoData[0].left( std::max(0,infoData[0].size()-1) ); // Removing extra symbol from account name
 
     int64_t height = 0;
     if (ok) {

@@ -8,17 +8,17 @@
 namespace state {
 
 // Init the wallet. Then check how it is started. If it needs to have password or something
-StartWallet::StartWallet(const StateContext & context) :
+StartWallet::StartWallet(StateContext * context) :
         State(context, STATE::START_WALLET)
 {
-    QObject::connect( context.wallet, &wallet::Wallet::onInitWalletStatus, this, &StartWallet::onInitWalletStatus, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onInitWalletStatus, this, &StartWallet::onInitWalletStatus, Qt::QueuedConnection );
 }
 
 StartWallet::~StartWallet() {
 }
 
 NextStateRespond StartWallet::execute() {
-    wallet::InitWalletStatus status = context.wallet->getWalletStatus();
+    wallet::InitWalletStatus status = context->wallet->getWalletStatus();
 
     if (status == wallet::InitWalletStatus::READY)
         return NextStateRespond(NextStateRespond::RESULT::DONE); // We are good, nothing need to be done
@@ -26,10 +26,10 @@ NextStateRespond StartWallet::execute() {
     if (status == wallet::InitWalletStatus::NONE) {
         // starting the wallet. Then will check what we need
 
-        wnd = (wnd::WaitingWnd*) context.wndManager->switchToWindowEx( new wnd::WaitingWnd( context.wndManager->getInWndParent(), this,
+        wnd = (wnd::WaitingWnd*) context->wndManager->switchToWindowEx( new wnd::WaitingWnd( context->wndManager->getInWndParent(), this,
                                                                  "Starting mwc713", "Please wait for mwc713 process starting..." ) );
 
-        context.wallet->start();
+        context->wallet->start();
         return NextStateRespond(NextStateRespond::RESULT::WAIT_FOR_ACTION);
     }
 
@@ -49,12 +49,12 @@ void StartWallet::onInitWalletStatus(wallet::InitWalletStatus status) {
         case wallet::InitWalletStatus::READY:
         case wallet::InitWalletStatus::NEED_INIT:
         case wallet::InitWalletStatus::NEED_PASSWORD: {
-            context.stateMachine->executeFrom(STATE::STATE_INIT);
+            context->stateMachine->executeFrom(STATE::STATE_INIT);
             return;
         }
         default: {
             Q_ASSERT(false);
-            context.wallet->reportFatalError("Unable to init the wallet. Get unexpected wallet status: " + QString::number(status));
+            context->wallet->reportFatalError("Unable to init the wallet. Get unexpected wallet status: " + QString::number(status));
             return;
         }
     }

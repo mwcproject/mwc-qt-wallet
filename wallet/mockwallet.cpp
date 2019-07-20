@@ -223,6 +223,7 @@ void MockWallet::switchAccount(const QString & accountName) {
 
 // Check and repair the wallet. Will take a while
 void MockWallet::check(bool wait4listeners) {
+    Q_UNUSED(wait4listeners);
     emit onRecoverProgress( 5, 10 );
     emit onCheckResult(true, "" );
 }
@@ -289,6 +290,7 @@ void MockWallet::cancelTransacton(int64_t transactionID) noexcept(false) {
 }
 
 void MockWallet::generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName ) noexcept(false) {
+    Q_UNUSED(transactionId);
     emit onExportProof(true, resultingFileName, "Placeholder for what this transaction mean");
 }
 void MockWallet::verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(false)  {
@@ -298,6 +300,7 @@ void MockWallet::verifyMwcBoxTransactionProof( QString proofFileName ) noexcept(
 // Init send transaction with file output
 // Check signal:  onSendFile
 void MockWallet::sendFile( int64_t coinNano, QString fileTx ) noexcept(false) {
+    Q_UNUSED(coinNano);
     emit onSendFile(true, QStringList(), fileTx);
 }
 
@@ -318,6 +321,7 @@ void MockWallet::finalizeFile( QString fileTxResponse ) noexcept(false) {
 // Check signal:  onSend
 void MockWallet::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message,
                      int inputConfirmationNumber, int changeOutputs ) noexcept(false) {
+    Q_UNUSED(account);
     Q_UNUSED(coinNano);
     Q_UNUSED(address);
     Q_UNUSED(message);

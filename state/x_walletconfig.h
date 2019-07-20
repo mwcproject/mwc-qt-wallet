@@ -10,17 +10,18 @@ namespace state {
 class WalletConfig : public State
 {
 public:
-    WalletConfig(const StateContext & context);
+    WalletConfig( StateContext * context);
     virtual ~WalletConfig() override;
 
     wallet::WalletConfig    getWalletConfig() const;
+    wallet::WalletConfig    getDefaultWalletConfig() const;
+
     // return true if mwc713 will be restarted. UI suppose to finish asap
     bool setWalletConfig(const wallet::WalletConfig & config);
 
     core::SendCoinsParams   getSendCoinsParams() const;
     // account refresh will be requested...
     void setSendCoinsParams(const core::SendCoinsParams & params);
-
 
 protected:
     virtual NextStateRespond execute() override;

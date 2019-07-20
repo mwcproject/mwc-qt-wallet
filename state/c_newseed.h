@@ -10,7 +10,7 @@ namespace state {
 class NewSeed : public QObject, public State
 {
 public:
-    NewSeed(const StateContext & context);
+    NewSeed(StateContext * context);
     virtual ~NewSeed() override;
 
 protected:
