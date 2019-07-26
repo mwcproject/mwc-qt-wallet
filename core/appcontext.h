@@ -9,8 +9,6 @@ class QAction;
 
 namespace core {
 
-#define COOKIE_PASSWORD "pswd"
-
 struct SendCoinsParams {
     int inputConfirmationNumber;
     int changeOutputs;

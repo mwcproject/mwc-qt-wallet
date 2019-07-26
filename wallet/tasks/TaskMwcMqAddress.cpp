@@ -32,8 +32,6 @@ bool TaskMwcMqAddress::processTask(const QVector<WEvent> & events) {
 
     if (idx>=0)
         wallet713->setMwcAddressWithIndex( address, idx );
-    else
-        wallet713->setMwcAddress( address ); // Set active MWC address. Listener might be offline
 
     return true;
 }

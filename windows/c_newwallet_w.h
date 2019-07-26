@@ -8,7 +8,7 @@ class NewWallet;
 }
 
 namespace state {
-    class NewWallet;
+    class InitAccount;
 }
 
 namespace wnd {
@@ -18,9 +18,7 @@ class NewWallet : public QWidget
     Q_OBJECT
 
 public:
-    enum NewWalletChoice {NEW_SEED, HAVE_SEED, SEED_FILE };
-
-    explicit NewWallet(QWidget *parent, state::NewWallet * state);
+    explicit NewWallet(QWidget *parent, state::InitAccount * state);
     virtual ~NewWallet() override;
 
 private slots:
@@ -33,7 +31,7 @@ private:
     void updateControls();
 private:
     Ui::NewWallet *ui;
-    state::NewWallet * state = nullptr;
+    state::InitAccount * state = nullptr;
 };
 
 }

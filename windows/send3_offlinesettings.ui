@@ -147,7 +147,7 @@
          <string>Description</string>
         </property>
        </widget>
-       <widget class="QComboBox" name="accountComboBox">
+       <widget class="control::MwcComboBox" name="accountComboBox">
         <property name="geometry">
          <rect>
           <x>3</x>
@@ -202,6 +202,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>control::MwcComboBox</class>
+   <extends>QComboBox</extends>
+   <header>control/MwcComboBox.h</header>
+  </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>

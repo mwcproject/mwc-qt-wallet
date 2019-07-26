@@ -64,7 +64,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="accountFromCB">
+        <widget class="control::MwcComboBox" name="accountFromCB">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -112,7 +112,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="accountToCB">
+        <widget class="control::MwcComboBox" name="accountToCB">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -435,6 +435,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>control::MwcComboBox</class>
+   <extends>QComboBox</extends>
+   <header>control/MwcComboBox.h</header>
+  </customwidget>
   <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>

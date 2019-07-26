@@ -1,13 +1,13 @@
 #include "c_newwallet_w.h"
 #include "ui_c_newwallet.h"
-#include "../state/c_newwallet.h"
+#include "../state/a_initaccount.h"
 #include "../control/messagebox.h"
 #include "../util/widgetutils.h"
 #include "../state/timeoutlock.h"
 
 namespace wnd {
 
-NewWallet::NewWallet(QWidget *parent, state::NewWallet * _state) :
+NewWallet::NewWallet(QWidget *parent, state::InitAccount * _state) :
     QWidget(parent),
     ui(new Ui::NewWallet),
     state(_state)
@@ -40,9 +40,9 @@ void NewWallet::on_submitButton_clicked()
     state::TimeoutLockObject to( state );
 
     if ( ui->radioCreateNew->isChecked() )
-        state->submitCreateChoice( state::NewWallet::NEW_WALLET_CHOICE::CREATE_NEW);
+        state->submitCreateChoice( state::InitAccount::NEW_WALLET_CHOICE::CREATE_NEW);
     else if (ui->radioHaveSeed->isChecked())
-        state->submitCreateChoice( state::NewWallet::NEW_WALLET_CHOICE::CREATE_WITH_SEED);
+        state->submitCreateChoice( state::InitAccount::NEW_WALLET_CHOICE::CREATE_WITH_SEED);
     else {
         control::MessageBox::message(nullptr, "Please select", "Please select how you want to provision a new wallet");
         Q_ASSERT(false);

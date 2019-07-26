@@ -11,7 +11,10 @@ namespace state {
 InputPassword::InputPassword( StateContext * context) :
     State(context, STATE::INPUT_PASSWORD)
 {
-    QObject::connect( context->wallet, &wallet::Wallet::onInitWalletStatus, this, &InputPassword::onInitWalletStatus, Qt::QueuedConnection );
+    // Result of the login
+    QObject::connect( context->wallet, &wallet::Wallet::onLoginResult, this, &InputPassword::onLoginResult, Qt::QueuedConnection );
+
+
     QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &InputPassword::onWalletBalanceUpdated, Qt::QueuedConnection );
 
     QObject::connect(context->wallet, &wallet::Wallet::onMwcMqListenerStatus,
@@ -26,20 +29,26 @@ InputPassword::~InputPassword() {
 }
 
 NextStateRespond InputPassword::execute() {
-    auto status = context->wallet->getWalletStatus();
-
+    bool running = context->wallet->isRunning();
     QString lockStr = context->appContext->pullCookie<QString>("LockWallet");
+    inLockMode = false;
 
-    if ( status == wallet::InitWalletStatus::NEED_PASSWORD ||
-            status == wallet::InitWalletStatus::WRONG_PASSWORD )
-    {
+    // Allways try ti start the wallet. State before is responsible for the first init
+    if ( !running ) {
+        // We are at the right place. Let's start the wallet
+
+        // Starting the wallet normally. The password is needed and it will be provided.
+        // It is a first run, just need to login
+        context->wallet->start();
+
         wnd = (wnd::InputPassword*)context->wndManager->switchToWindowEx(new wnd::InputPassword( context->wndManager->getInWndParent(), this, false ) );
 
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
     }
 
     if (!lockStr.isEmpty()) {
-        // wallet locking mode
+        inLockMode = true;
+                // wallet locking mode
         wnd = (wnd::InputPassword*)context->wndManager->switchToWindowEx(new wnd::InputPassword( context->wndManager->getInWndParent(), this, true ) );
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
     }
@@ -55,12 +64,10 @@ void InputPassword::submitPassword(const QString & password) {
     }
 
     // Check if we need to logout first. It is very valid case if we in lock mode
-    auto status = context->wallet->getWalletStatus();
-    if (!(status == wallet::InitWalletStatus::NEED_PASSWORD ||
-          status == wallet::InitWalletStatus::WRONG_PASSWORD)) {
-
+    if ( !inLockMode ) {
         context->wallet->logout();
         context->wallet->start();
+        inLockMode = false;
     }
 
     context->wallet->loginWithPassword( password );
@@ -70,18 +77,15 @@ QPair<bool,bool> InputPassword::getWalletListeningStatus() {
     return context->wallet->getListeningStatus();
 }
 
-
-void InputPassword::onInitWalletStatus( wallet::InitWalletStatus  status ) {
-
-    if (status == wallet::InitWalletStatus::WRONG_PASSWORD ) {
-        //Q_ASSERT(wnd != nullptr);
+void InputPassword::onLoginResult(bool ok) {
+    if (!ok) {
         if (wnd) {
             wnd->stopWaiting();
             wnd->reportWrongPassword();
         }
-    } else if (status == wallet::InitWalletStatus::READY ) {
-        // Great, login is done. Now we can use the wallet
-        Q_ASSERT(context->wallet->getWalletStatus() == wallet::InitWalletStatus::READY);
+    }
+    else {
+        // Going forward by initializing the wallet
 
         // Start listening, no feedback interested
         context->wallet->listeningStart(true, false);
@@ -92,13 +96,15 @@ void InputPassword::onInitWalletStatus( wallet::InitWalletStatus  status ) {
 
         // Updating the wallet balance
         context->wallet->updateWalletBalance();
+
     }
 }
+
 
 // Account info is updated
 void InputPassword::onWalletBalanceUpdated() {
 
-    if (context->wallet->getWalletStatus() == wallet::InitWalletStatus::NONE)
+    if (context->wallet->getWalletBalance().isEmpty() )
         return; // in restart mode
 
     // Using wnd as a flag that we are active

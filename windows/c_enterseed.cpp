@@ -2,14 +2,14 @@
 #include "ui_c_enterseed.h"
 #include "../util/stringutils.h"
 #include "../control/messagebox.h"
-#include "../state/c_createwithseed.h"
+#include "../state/a_initaccount.h"
 #include "../util/widgetutils.h"
 #include "../util/Dictionary.h"
 #include "../state/timeoutlock.h"
 
 namespace wnd {
 
-EnterSeed::EnterSeed(QWidget *parent, state::CreateWithSeed * _state) :
+EnterSeed::EnterSeed(QWidget *parent, state::InitAccount * _state) :
     QWidget(parent),
     ui(new Ui::EnterSeed),
     state(_state)

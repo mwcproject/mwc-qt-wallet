@@ -10,7 +10,7 @@ class NewSeedTest;
 class QCompleter;
 
 namespace state {
-    class NewSeedTest;
+    class InitAccount;
 }
 
 namespace wnd {
@@ -20,7 +20,7 @@ class NewSeedTest : public QWidget
     Q_OBJECT
 
 public:
-    explicit NewSeedTest(QWidget *parent, state::NewSeedTest *state, int wordNumber);
+    explicit NewSeedTest(QWidget *parent, state::InitAccount *state, int wordNumber);
     ~NewSeedTest();
 
 private slots:
@@ -28,7 +28,7 @@ private slots:
 
 private:
     Ui::NewSeedTest *ui;
-    state::NewSeedTest *state;
+    state::InitAccount *state;
     QCompleter *completer = nullptr;
 };
 

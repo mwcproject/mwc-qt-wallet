@@ -30,8 +30,6 @@ enum WALLET_EVENTS {
     S_YOUR_MWC_ADDRESS=11, // Your mwc address/Your mwcmq address:...  Message: address
     S_MWC_ADDRESS_INDEX = 12, // Derived with index [7]     Message: index
 
-    S_PASSWORD_EXPECTED=14, // Password:
-    S_PASS_PHRASE=15, // Passphrase from inti process
     S_INIT_WANT_ENTER=16, // Press ENTER when you have done so
 
     S_LINE=17,   // Just a line of output data as it is

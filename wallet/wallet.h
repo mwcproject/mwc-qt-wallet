@@ -194,9 +194,6 @@ struct WalletNotificationMessages {
     QString toString() const;
 };
 
-enum InitWalletStatus {NONE, NEED_PASSWORD, NEED_INIT, WRONG_PASSWORD, READY};
-QString toString(InitWalletStatus status);
-
 // Interface to wallet functionality
 // can throw MwcException to signal errors
 class Wallet : public QObject
@@ -215,33 +212,36 @@ public:
     virtual const QVector<WalletNotificationMessages> & getWalletNotificationMessages()  = 0;
     // Check signal: onNewNotificationMessage
 
+    // Return true if wallet is running
+    virtual bool isRunning() = 0;
+
+    // Check if wallet need to be initialized or not. Will run standalone app, wait for exit and return the result
+    // Call might take few seconds
+    virtual bool checkWalletInitialized() = 0;
+
     // ---- Wallet Init Phase
     virtual void start()   = 0;
+    // Create new wallet and generate a seed for it
+    // Check signal: onNewSeed( seed [] )
+    virtual void start2init(QString password) = 0;
+    // Recover the wallet with a mnemonic phrase
+    // recover wallet with a passphrase:
+    // Check Signals: onRecoverProgress( int progress, int maxVal );
+    // Check Signals: onRecoverResult(bool ok, QString newAddress );
+    virtual void start2recover(const QVector<QString> & seed, QString password)   = 0;
+
+    // Check signal: onLoginResult(bool ok)
     virtual void loginWithPassword(QString password)   = 0;
 
     // Exit from the wallet. Expected that state machine will switch to Init state
     virtual void logout()   = 0;
 
-    // Check signal: onInitWalletStatus
-    virtual InitWalletStatus getWalletStatus()  = 0;
-
     // Close the wallet and release the process
     virtual bool close()  = 0;
-
-    // Create the wallet, generate the seed. Return the words to recover the wallet
-    virtual void generateSeedForNewAccount(QString password)  = 0;
-    // Check signal: onNewSeed( seed [] )
-
 
     // Confirm that user write the passphase
     virtual void confirmNewSeed()  = 0;
 
-
-    // Recover the wallet with a mnemonic phrase
-    // recover wallet with a passphrase:
-    virtual void recover(const QVector<QString> & seed, QString password)   = 0;
-    // Check Signals: onRecoverProgress( int progress, int maxVal );
-    // Check Signals: onRecoverResult(bool ok, QString newAddress );
 
     // Current seed for runnign wallet
     // Check Signals: onGetSeed(QVector<QString> seed);
@@ -402,8 +402,8 @@ signals:
     // Notification/error message
     void onNewNotificationMessage(WalletNotificationMessages::LEVEL level, QString message);
 
-    // Update of the wallet status
-    void onInitWalletStatus(InitWalletStatus status);
+    // Result of the login
+    void onLoginResult(bool ok);
 
     // Get MWC updated address. Normally you don't need that
     void onMwcAddress(QString mwcAddress);
@@ -476,7 +476,6 @@ signals:
 }
 
 Q_DECLARE_METATYPE(wallet::WalletNotificationMessages::LEVEL);
-Q_DECLARE_METATYPE(wallet::InitWalletStatus);
 Q_DECLARE_METATYPE(wallet::WalletTransaction);
 Q_DECLARE_METATYPE(wallet::WalletOutput);
 

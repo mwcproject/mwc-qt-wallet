@@ -66,7 +66,7 @@
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
        <item>
-        <widget class="QComboBox" name="accountComboBox">
+        <widget class="control::MwcComboBox" name="accountComboBox">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -412,6 +412,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>control::MwcComboBox</class>
+   <extends>QComboBox</extends>
+   <header>control/MwcComboBox.h</header>
+  </customwidget>
   <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>

@@ -160,25 +160,6 @@ void Mwc713InputParser::initMwcMqAddress() {
 
 void Mwc713InputParser::initInitWalletWorkflow() {
 
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_PASSWORD_EXPECTED,
-         QVector<BaseTrieSection*>{
-              new TriePhraseSection("Set an optional password to secure your wallet with. Leave blank for no password.")
-         }));
-
-
-
-
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_PASS_PHRASE,
-         QVector<BaseTrieSection*>{
-              new TriePhraseSection("Your recovery phrase is:"),
-              new TrieAnySection(7, TrieAnySection::NEW_LINE | TrieAnySection::SPACES,"",""), // EMpty lines
-              new TrieAnySection(512, TrieAnySection::NOT_NEW_LINE,"","", 100), // Pass phrase separated by spaces
-              new TrieAnySection(7, TrieAnySection::NEW_LINE | TrieAnySection::SPACES,"",""), // EMpty lines
-              new TriePhraseSection("Please back-up these words in a non-digital format"),
-         }));
-
-
-
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_INIT_WANT_ENTER,
          QVector<BaseTrieSection*>{
               new TriePhraseSection("Press ENTER when you have done so")

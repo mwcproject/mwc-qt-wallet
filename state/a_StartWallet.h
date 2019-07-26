@@ -10,22 +10,16 @@
 namespace state {
 
 // Init the wallet. Then check how it is started. If it needs to have password or something
-class StartWallet : public QObject, public State, public wnd::WaitingWndState {
-    Q_OBJECT
+class StartWallet : public State {
 public:
     StartWallet(StateContext * context);
     virtual ~StartWallet() override;
 
-    virtual void deleteWaitingWnd(wnd::WaitingWnd * w) override { if (w==wnd) {wnd = nullptr;} }
-
 protected:
     virtual NextStateRespond execute() override;
 
-private slots:
-    void onInitWalletStatus(wallet::InitWalletStatus status);
 
 private:
-    wnd::WaitingWnd * wnd = nullptr;
 };
 
 }

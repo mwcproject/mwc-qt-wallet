@@ -33,19 +33,19 @@ bool TaskStarting::processTask(const QVector<WEvent> & events) {
 
         if ( !init.empty() ) {
             // wallet need to be provisioned
-            wallet713->setInitStatus( MWC713::INIT_STATUS::NEED_SEED);
+            wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::GENERIC,
+                                                 "Wallet mwc713 in non initialized state. Internal error.");
             return true; // Done. Now it is UI problem to provision the wallet
         }
 
         if (need2unlock.empty()) {
-            Q_ASSERT( false ); // Wallet Without a password?
-            wallet713->setInitStatus( MWC713::INIT_STATUS::READY);
+            wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::GENERIC,
+                                                 "Wallet mwc713 has a seed without a password. Did you initialize it manually? "
+                                                 "To fix this problem you will need to reinitialize your seed with a password.");
             return true;
         }
 
-        // Wallet want the password, and optionaly account
-        // It is a normal workflow
-        wallet713->setInitStatus( MWC713::INIT_STATUS::NEED_PASSWORD);
+        // It is a normal workflow, password does required
         return true;
     }
 

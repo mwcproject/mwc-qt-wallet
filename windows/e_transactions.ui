@@ -47,7 +47,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QComboBox" name="accountComboBox">
+          <widget class="control::MwcComboBox" name="accountComboBox">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -646,6 +646,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>control::MwcComboBox</class>
+   <extends>QComboBox</extends>
+   <header>control/MwcComboBox.h</header>
+  </customwidget>
   <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>

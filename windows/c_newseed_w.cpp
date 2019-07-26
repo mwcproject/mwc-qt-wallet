@@ -1,6 +1,6 @@
 #include "c_newseed_w.h"
 #include "ui_c_newseed.h"
-#include "../state/c_newseedshow.h"
+#include "../state/a_initaccount.h"
 #include "../util/widgetutils.h"
 #include "../control/messagebox.h"
 #include "../state/timeoutlock.h"

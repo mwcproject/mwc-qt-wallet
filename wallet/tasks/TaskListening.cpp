@@ -13,6 +13,15 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
     const WEvent & evt = events[0];
 
     switch (evt.event) {
+        case S_YOUR_MWC_ADDRESS: {
+            QString address = evt.message;
+            if (address.length()==0) {
+                wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::WARNING, MWC713::MESSAGE_ID::GENERIC,
+                                                      "mwc713 responded with empty MWC address" );
+            }
+            wallet713->setMwcAddress(address);
+            return true;
+        }
         case S_LISTENER_ON: {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
 

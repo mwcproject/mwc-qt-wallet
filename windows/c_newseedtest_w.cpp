@@ -1,6 +1,6 @@
 #include "c_newseedtest_w.h"
 #include "ui_c_newseedtest.h"
-#include "../state/c_newseedtest.h"
+#include "../state/a_initaccount.h"
 #include <QCompleter>
 #include <QFile>
 #include <QStringListModel>
@@ -10,7 +10,7 @@
 
 namespace wnd {
 
-NewSeedTest::NewSeedTest(QWidget *parent, state::NewSeedTest *_state, int wordNumber) :
+NewSeedTest::NewSeedTest(QWidget *parent, state::InitAccount *_state, int wordNumber) :
     QWidget(parent),
     ui(new Ui::NewSeedTest),
     state(_state)
@@ -58,7 +58,7 @@ NewSeedTest::NewSeedTest(QWidget *parent, state::NewSeedTest *_state, int wordNu
 
 NewSeedTest::~NewSeedTest()
 {
-    state->deleteWnd(this);
+    state->deleteNewSeedTestWnd(this);
     delete ui;
 }
 

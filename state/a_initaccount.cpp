@@ -4,12 +4,29 @@
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
+#include "../windows/c_newwallet_w.h"
+#include "../windows/c_newseed_w.h"
+#include "../windows/c_newseedtest_w.h"
+#include "../windows/c_enterseed.h"
+#include "../windows/z_progresswnd.h"
+#include "../util/Log.h"
+#include "../control/messagebox.h"
 
 namespace state {
 
 InitAccount::InitAccount(StateContext * context) :
         State(context, STATE::STATE_INIT)
 {
+    QObject::connect( context->wallet, &wallet::Wallet::onNewSeed, this, &InitAccount::onNewSeed, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onLoginResult, this, &InitAccount::onLoginResult, Qt::QueuedConnection );
+
+    // Creating connections...
+    QObject::connect(context->wallet, &wallet::Wallet::onRecoverProgress,
+                     this, &InitAccount::onRecoverProgress, Qt::QueuedConnection);
+
+    QObject::connect(context->wallet, &wallet::Wallet::onRecoverResult,
+                     this, &InitAccount::onRecoverResult, Qt::QueuedConnection);
+
 }
 
 InitAccount::~InitAccount() {
@@ -17,10 +34,11 @@ InitAccount::~InitAccount() {
 }
 
 NextStateRespond InitAccount::execute() {
-    if ( context->wallet->getWalletStatus() == wallet::InitWalletStatus::NEED_INIT &&
-        context->appContext->getCookie<QString>(COOKIE_PASSWORD).length()==0 ) {
-        // Show window to input password
+    bool running = context->wallet->isRunning();
 
+    // Need to provision the wallet. If it is not running, mean that we wasn't be able to login.
+    // So we have to init the wallet
+    if ( !running && context->appContext->pullCookie<QString>("checkWalletInitialized")=="FAILED" ) {
         context->wndManager->switchToWindowEx(
                     new wnd::InitAccount( context->wndManager->getInWndParent(), this ) );
 
@@ -31,12 +49,216 @@ NextStateRespond InitAccount::execute() {
     return NextStateRespond( NextStateRespond::RESULT::DONE );
 }
 
+// Get Password, Choose what to do
 void InitAccount::setPassword(const QString & password) {
-    context->appContext->pushCookie<QString>(COOKIE_PASSWORD, password);
-//    context.appContext->setPassHash(password);
-
-    context->stateMachine->executeFrom(STATE::STATE_INIT);
+    pass = password;
+    context->wndManager->switchToWindowEx(
+            new wnd::NewWallet( context->wndManager->getInWndParent(), this ) );
 }
+
+// How to provosion the wallet
+void InitAccount::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice) {
+    switch (newWalletChoice) {
+        case CREATE_NEW:
+            // generate a new seed for a new wallet
+            context->wallet->start2init(pass);
+            break;
+        case CREATE_WITH_SEED:
+            context->wndManager->switchToWindowEx( new wnd::EnterSeed( context->wndManager->getInWndParent(), this ) );
+            break;
+        default:
+            Q_ASSERT(false);
+            break;
+    }
+}
+
+// New see was created....
+void InitAccount::onNewSeed(QVector<QString> sd) {
+    seed = sd;
+    tasks = core::generateSeedTasks( seed ); // generate tasks
+
+#ifdef QT_DEBUG
+    // We really don't want go trough all words
+    tasks.resize(1);
+#endif
+
+    context->wndManager->switchToWindowEx(
+        new wnd::NewSeed( context->wndManager->getInWndParent(), this, getContext(),
+                    seed ) );
+}
+
+void InitAccount::wndDeleted(wnd::NewSeed * w)  {}
+
+// New seed was acknoleged...
+void InitAccount::submit() {
+    // Start next task
+
+    if (finishSeedVerification())
+        return;
+
+    Q_ASSERT(tasks.size()>0);
+    if (tasks.size()==0)
+        return;
+
+    // Show verify dialog
+    context->wndManager->switchToWindowEx( new wnd::NewSeedTest( context->wndManager->getInWndParent(), this, tasks[0].getWordIndex() ) );
+}
+
+
+// Verify Dialog respond...
+void InitAccount::submit(QString word) {
+    if (tasks.size()==0) {
+        Q_ASSERT(false);
+        return;
+    }
+
+#ifdef QT_DEBUG
+    // Allways treat as correct answer...
+    tasks.remove(0);
+#else
+    // Release, the normal way
+    if (tasks[0].applyInputResults(word)) {
+        // ok case
+        tasks.remove(0);
+        // retry with submit call
+    }
+    else {
+        control::MessageBox::message(nullptr, "Wrong word",
+                                     "The word number " + QString::number(tasks[0].getWordIndex()) +
+                                     " was typed incorrectly. " +
+                                     "Please review your passphrase.");
+
+        // regenerate if totally failed
+        if (tasks[0].isTestCompletelyFailed()) {
+            // generate a new tasks for a wallet
+            tasks = core::generateSeedTasks(seed);
+        } else {
+            // add to the Q
+            tasks.push_back( tasks[0] );
+            tasks.remove(0);
+        }
+    }
+#endif
+    submit();
+}
+
+bool InitAccount::finishSeedVerification() {
+    if (tasks.size()==0 && seed.size()>0) {
+            // clean up the state
+            context->wallet->confirmNewSeed();
+            context->wallet->logout(); // Stop the wallet with inti process first
+
+            // Now need to start the normall wallet...
+            context->wallet->start();
+            context->wallet->loginWithPassword(pass);
+
+            control::MessageBox::message(nullptr, "Congratulations!", "Thank you for confirming all words from your passphrase. Your wallet was successfully created");
+            // onLoginResult - will be the next step
+            return true;
+    }
+    return false;
+}
+
+void InitAccount::onLoginResult(bool ok) {
+    if ( seed.isEmpty() )
+        return;
+
+    seed.clear();
+
+    if ( !ok  ) {
+        context->wallet->reportFatalError("Unfortunately we unable to login into mwc713 wallet after provisioning. Internal error.");
+        return;
+    }
+
+    // switch to the next state
+    context->stateMachine->executeFrom(STATE::NONE);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+///// Create from seed
+
+// Second Step, switching to the progress and starting this process at mwc713
+void InitAccount::createWalletWithSeed( QVector<QString> sd ) {
+    seed = sd;
+
+    // switching to a progress Wnd
+    progressWnd = (wnd::ProgressWnd*) context->wndManager->switchToWindowEx(new wnd::ProgressWnd(context->wndManager->getInWndParent(), this, "Recovering account from the passphrase", "",
+                                                                                                 "", false));
+
+    // Stopping listeners first. Not checking if they are running.
+    progressWnd->setMsgPlus("Preparing for recovery...");
+    context->wallet->start2recover(seed, pass);
+
+}
+
+void InitAccount::onRecoverProgress( int progress, int maxVal ) {
+    if ( progressWnd==nullptr ) // active indicator
+        return;
+
+    progressMaxVal = maxVal;
+    progressWnd->initProgress(0, maxVal);
+
+    QString msgProgress = "Recovering..." + QString::number(progress * 100 / maxVal) + "%";
+    progressWnd->updateProgress(progress, msgProgress);
+    progressWnd->setMsgPlus("");
+}
+
+void InitAccount::onRecoverResult(bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages) {
+    Q_UNUSED(newAddress);
+
+    context->wallet->logout();
+
+    if ( progressWnd==nullptr ) // active indicator
+        return;
+
+
+    if (finishedWithSuccess && progressWnd)
+        progressWnd->updateProgress(progressMaxVal, "Done");
+
+    QString errorMsg;
+    if (errorMessages.size()>0) {
+        errorMsg += "\nErrors:";
+        for (auto & s : errorMessages)
+            errorMsg += "\n" + s;
+    }
+
+    bool success = false;
+
+    if (!started) {
+        control::MessageBox::message(nullptr, "Recover failure", "Account recovery failed to start." + errorMsg);
+    }
+    else if (!finishedWithSuccess) {
+        control::MessageBox::message(nullptr, "Recover failure", "Account recovery failed to finish." + errorMsg);
+    }
+    else {
+        success = true;
+        control::MessageBox::message(nullptr, "Success", "Your account was successfully recovered from the passphrase." + errorMsg);
+    }
+
+    if (success) {
+
+        // Now need to start the normall wallet...
+        context->wallet->start();
+        context->wallet->loginWithPassword(pass);
+
+        // We are done. Wallet is provisioned and restarted...
+        context->stateMachine->executeFrom(STATE::NONE);
+        return;
+    }
+    else {
+        // switch back to the seed window
+        context->wndManager->switchToWindowEx( new wnd::EnterSeed( context->wndManager->getInWndParent(), this ) );
+        return;
+    }
+}
+
+void InitAccount::cancel() {
+    context->wndManager->switchToWindowEx(
+            new wnd::NewWallet( context->wndManager->getInWndParent(), this ) );
+}
+
+
 
 
 }

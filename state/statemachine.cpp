@@ -1,11 +1,6 @@
 #include "statemachine.h"
 #include "a_initaccount.h"
 #include "a_inputpassword.h"
-#include "c_newwallet.h"
-#include "c_newseed.h"
-#include "c_newseedtest.h"
-#include "c_newseedshow.h"
-#include "c_createwithseed.h"
 #include "../core/appcontext.h"
 #include "../core/mainwindow.h"
 #include "k_accounts.h"
@@ -37,11 +32,6 @@ StateMachine::StateMachine(StateContext * _context) :
     states[ STATE::START_WALLET ]   = new StartWallet(context);
     states[ STATE::STATE_INIT ]     = new InitAccount(context);
     states[ STATE::INPUT_PASSWORD ] = new InputPassword(context);
-    states[ STATE::NEW_WALLET ]     = new NewWallet(context);
-    states[ STATE::GENERATE_NEW_SEED ] = new NewSeed( context );
-    states[ STATE::SHOW_NEW_SEED ]     = new NewSeedShow(context);
-    states[ STATE::TEST_NEW_SEED ]     = new NewSeedTest(context);
-    states[ STATE::CREATE_WITH_SEED ]  = new CreateWithSeed(context);
     states[ STATE::ACCOUNTS ]       = new Accounts(context);
 
     states[ STATE::ACCOUNT_TRANSFER ] = new AccountTransfer(context);

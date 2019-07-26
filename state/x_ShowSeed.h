@@ -4,7 +4,7 @@
 #include "state.h"
 #include "../wallet/wallet.h"
 #include "../core/appcontext.h"
-#include "c_newseedshow.h"
+#include "../state/a_initaccount.h"
 
 namespace wnd {
 class NewSeed;

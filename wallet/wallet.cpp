@@ -6,17 +6,6 @@
 namespace wallet {
 
 
-QString toString(InitWalletStatus status) {
-    switch (status) {
-        case NONE:          return "NONE";
-        case NEED_PASSWORD: return "NEED_PASSWORD";
-        case NEED_INIT:     return "NEED_INIT";
-        case WRONG_PASSWORD:return "WRONG_PASSWORD";
-        case READY:         return "READY";
-        default:            Q_ASSERT(false); return "Unknown";
-    }
-}
-
 // To debug string
 QString WalletNotificationMessages::toString() const {
     QString levelStr;

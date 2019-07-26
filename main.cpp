@@ -1,7 +1,6 @@
 #include "core/mainwindow.h"
 #include <QApplication>
 #include "core/windowmanager.h"
-#include "wallet/mockwallet.h"
 #include "wallet/mwc713.h"
 #include "state/state.h"
 #include "state/statemachine.h"
@@ -173,7 +172,6 @@ int main(int argc, char *argv[])
     mwc::setApplication(&app, mainWnd);
 
     wallet::MWC713 wallet( config::getWallet713path(), config::getMwc713conf(), &appContext );
-    //wallet::MockWallet wallet;
 
     core::WindowManager wndManager( mainWnd->getMainWindow() );
 

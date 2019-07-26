@@ -8,7 +8,7 @@ class EnterSeed;
 }
 
 namespace state {
-    class CreateWithSeed;
+    class InitAccount;
 }
 
 namespace wnd {
@@ -18,7 +18,7 @@ class EnterSeed : public QWidget
     Q_OBJECT
 
 public:
-    explicit EnterSeed(QWidget *parent, state::CreateWithSeed * state );
+    explicit EnterSeed(QWidget *parent, state::InitAccount * state );
     virtual ~EnterSeed() override;
 
     void updateProgress(bool show);
@@ -32,7 +32,7 @@ private slots:
 
 private:
     Ui::EnterSeed *ui;
-    state::CreateWithSeed * state;
+    state::InitAccount * state;
 };
 
 }

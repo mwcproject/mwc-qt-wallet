@@ -272,9 +272,9 @@ MwcFrameWithBorder {
     border-radius: 6px;
 }
 
-/* ------------  QComboBox ------- */
+/* ------------  MwcComboBox ------- */
 
-QComboBox
+control--MwcComboBox
 {
    border: transparent;
    border-radius: 6px;
@@ -291,7 +291,7 @@ QComboBox
     font-size: 15px;
 
     subcontrol-origin: padding;
-    subcontrol-position: top right;
+    subcontrol-position: bottom right;
 
 /*    border-style: solid;
     border: 1px solid #1e1e1e;
@@ -299,12 +299,12 @@ QComboBox
     padding: 1px 0px 1px 20px;*/
 }
 
-QComboBox:enabled:!focus::hover
+control--MwcComboBox:enabled:!focus::hover
 {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.4);
 }
 
-QComboBox:on
+/*control--MwcComboBox:on
 {
     padding-top: 0px;
     padding-left: 0px;
@@ -312,27 +312,24 @@ QComboBox:on
     selection-background-color: rgba(255, 255, 255, 0.5);
 }
 
-QComboBox:!on
+control--MwcComboBox:!on
 {
     color: white;
-}
+}*/
 
-QComboBox::drop-down {
+control--MwcComboBox::drop-down {
     subcontrol-origin: padding;
     subcontrol-position: bottom right;
     width: 30px;
 
-    background: transparent; /*  rgba(255, 255, 255, 0.25);*/
+    background: transparent;
     border: transparent;
 
-/*    border-left-width: 1px;*/
-/*    border-left-color: darkgray;*/
-/*    border-left-style: solid;*/ /* just a single line */
-    border-top-right-radius: 3px; /* same radius as the QComboBox */
+    border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
 }
 
-QComboBox::down-arrow {
+control--MwcComboBox::down-arrow {
     image: url(:/img/ComboBoxArrow.png);
     border: transparent;
 }
@@ -466,4 +463,18 @@ core--NavMenu {
     border: 2px solid #FFFFFF;
     border-radius: 6px;
     background: #3600C9;
+}
+
+/* ---------  QToolTip   ------- */
+QToolTip {
+    color: white;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
+
+    border: 1px solid white;
+    border-radius: 3px;
+    padding: 1px;
+    background: #9E00E7;
 }

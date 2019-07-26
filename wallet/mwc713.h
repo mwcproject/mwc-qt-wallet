@@ -34,32 +34,36 @@ public:
     virtual const QVector<WalletNotificationMessages> & getWalletNotificationMessages()  override {return notificationMessages;}
     // Check signal: onNewNotificationMessage
 
+    // Return true if wallet is running
+    virtual bool isRunning() override {return mwc713process!= nullptr;}
+
+
+    // Check if waaled need to be initialized or not. Will run statndalone app, wait for exit and return the result
+    // Call might take few seconds
+    virtual bool checkWalletInitialized() override;
+
     // ---- Wallet Init Phase
     virtual void start()  override;
+    // Create new wallet and generate a seed for it
+    // Check signal: onNewSeed( seed [] )
+    virtual void start2init(QString password)  override;
+
+    // Recover the wallet with a mnemonic phrase
+    // recover wallet with a passphrase:
+    // Check Signals: onRecoverProgress( int progress, int maxVal );
+    // Check Signals: onRecoverResult(bool ok, QString newAddress );
+    virtual void start2recover(const QVector<QString> & seed, QString password) override ;
+
+    // Check signal: onLoginResult(bool ok)
     virtual void loginWithPassword(QString password)  override;
 
     // Exit from the wallet. Expected that state machine will switch to Init state
     virtual void logout()  override;
 
-    // Check signal: onInitWalletStatus
-    virtual InitWalletStatus getWalletStatus()  override {return initStatus;}
-
-
     virtual bool close()  override {return true;}
-    virtual void generateSeedForNewAccount(QString password)  override;
-    // Check signal: onNewSeed( seed [] )
 
     // Confirm that user write the passphase
     virtual void confirmNewSeed()  override;
-
-    // Recover the wallet with a mnemonic phrase
-    // recover wallet with a passphrase:
-    // NOTE: Expected that listen is stopped for both - mwc MQ & keybase
-    // Recover with percentage
-    // NOTE: Expected that listening will be started
-    virtual void recover(const QVector<QString> & seed, QString password)  override;
-    // Check Signals: onRecoverProgress( int progress, int maxVal );
-    // Check Signals: onRecoverResult(bool ok, QString newAddress );
 
     // Current seed for runnign wallet
     // Check Signals: onGetSeed(QVector<QString> seed);
@@ -206,9 +210,6 @@ public:
     virtual WalletUtxoSignature sign_utxo( const QString & utxo, const QString & hash ) override { Q_UNUSED(utxo); Q_UNUSED(hash); return WalletUtxoSignature();}
 
 public:
-
-    tries::Mwc713InputParser * getInputParser() const { return inputParser;}
-
     // Feed the command to mwc713 process
     void executeMwc713command( QString cmd, QString shadowStr);
 public:
@@ -217,9 +218,11 @@ public:
     enum MESSAGE_ID {INIT_ERROR, GENERIC, MWC7113_ERROR, TASK_TIMEOUT };
     void appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QString message );
 
+    void setLoginResult(bool ok);
+
     // Wallet init status
-    enum INIT_STATUS {NONE, NEED_PASSWORD, NEED_SEED, WRONG_PASSWORD, READY };
-    void setInitStatus( INIT_STATUS  initStatus );
+   // enum INIT_STATUS {NONE, NEED_PASSWORD, NEED_SEED, WRONG_PASSWORD, READY };
+  //  void setInitStatus( INIT_STATUS  initStatus );
 
     void setMwcAddress( QString mwcAddress ); // Set active MWC address. Listener might be offline
     void setMwcAddressWithIndex( QString mwcAddress, int idx );
@@ -284,7 +287,7 @@ private:
     // stop mwc713 process nicely
     void stop();
 
-    void mwc713connect();
+    void mwc713connect(QProcess * process);
     void mwc713disconnect();
 
     // Update acc value at collection accounts. If account is not founf, we can add it (addIfNotFound) or skip
@@ -292,6 +295,11 @@ private:
 
     // Read config from the file
     WalletConfig readWalletConfig(QString source) const;
+
+    // pass - provide password through env variable. If pass empty - nothing will be done
+    // envVariables - environment variables (key/value). Must be in pairs.
+    // paramsPlus - additional parameters for the process
+    QProcess * initMwc713process( const QStringList & envVariables, const QStringList & paramsPlus, bool trackProcessExit = true );
 
 private slots:
     // mwc713 Process IOs
@@ -311,7 +319,7 @@ private:
     Mwc713EventManager * eventCollector = nullptr;
 
     // Stages (flags) of the wallet
-    InitWalletStatus initStatus = InitWalletStatus::NONE;
+    //InitWalletStatus initStatus = InitWalletStatus::NONE;
 
     const int MESSAGE_SIZE_LIMIT = 10000;
     QVector<WalletNotificationMessages> notificationMessages;

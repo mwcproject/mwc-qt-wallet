@@ -5,86 +5,63 @@
 
 namespace wallet {
 
-// ------------------------------ TaskInit ----------------------------
+QVector<QString> calcSeedFromEvents(const QVector<WEvent> &events) {
+    QVector<WEvent> lines = filterEvents(events, WALLET_EVENTS::S_LINE);
+
+    int idx = 0;
+
+    for (; idx < lines.size(); idx++) {
+        if (lines[idx].message.contains("Your recovery phrase is")) { // This line might be started with prompt...
+            idx++;
+            break;
+        }
+    }
+
+    QString passPhs;
+
+    // Expected 24 words. 23 spaces plus many letters
+    for (; idx < lines.size() && passPhs.size() < 42; idx++) {
+        passPhs = lines[idx].message;
+    }
+
+    bool found = false;
+    for (; idx < lines.size(); idx++) {
+        if (lines[idx].message.contains("Please back-up these words in a non-digital format")) {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+        return QVector<QString>();
+
+    // Get a passphrase, let's parse it
+    QStringList phr = passPhs.split(" ");
+    qDebug() << "Get a passphrase, it has words: " << phr.size();
+
+    QVector<QString> seed;
+
+    for (QString &s : phr)
+        seed.push_back(s);
+
+    return seed;
+}
+
+
+void TaskInit::onStarted() {
+   // logger::blockLogMwc713out( true );
+}
 
 bool TaskInit::processTask(const QVector<WEvent> & events) {
 
+    logger::blockLogMwc713out(false);
+
     qDebug() << "TaskInit::processTask: " << printEvents(events);
 
-    QVector< WEvent > evt2 = filterEvents(events, WALLET_EVENTS::S_PASSWORD_EXPECTED );
-    if (evt2.empty()) {
-        wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::GENERIC,
-                                             "Unable to init wallet and get a passphrase for you");
-    }
-
+    wallet713->setNewSeed(calcSeedFromEvents(events));
     return true;
 }
 
-// ------------------------- TaskInitConfirm --------------------------
-
-TaskInitConfirm::~TaskInitConfirm() {}
-
-
-bool TaskInitConfirm::processTask(const QVector<WEvent> & events) {
-
-    qDebug() << "TaskInitConfirm::processTask: " << printEvents(events);
-
-    // Here we can't fail
-    QVector< WEvent > mwcAddr = filterEvents(events, WALLET_EVENTS::S_YOUR_MWC_ADDRESS );
-
-    if (mwcAddr.size()>0) {
-        QString address = mwcAddr[0].message;
-        if (address.length()==0) {
-            wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::WARNING, MWC713::MESSAGE_ID::GENERIC,
-                                                  "mwc713 responded with empty MWC address" );
-        }
-        else {
-            wallet713->setMwcAddress(address);
-        }
-    }
-
-    return true;
-}
-
-// ---------------------------------- TaskInitPassphrase -----------------------------------
-
-void TaskInitPassphrase::onStarted() {
-    logger::blockLogMwc713out( true );
-}
-
-bool TaskInitPassphrase::processTask(const QVector<WEvent> & events) {
-
-    logger::blockLogMwc713out( false );
-
-    qDebug() << "TaskInitPassphrase::processTask: " << printEvents(events);
-
-    while (true) {
-        // happy path
-
-        QVector< WEvent > passPhrase = filterEvents(events, WALLET_EVENTS::S_PASS_PHRASE );
-        QVector< WEvent > evt2 = filterEvents(events, WALLET_EVENTS::S_INIT_WANT_ENTER );
-
-        if (passPhrase.empty() ||evt2.empty())
-            break;
-
-        // Get a passphrase, let's parse it
-        QStringList phr = passPhrase[0].message.split(" ");
-        qDebug() << "Get a passphrase, it has words: " << phr.size();
-
-        QVector<QString> seed;
-
-        for (QString & s : phr)
-            seed.push_back(s);
-
-        wallet713->setNewSeed( seed );
-        return true;
-    }
-
-    // Failure path. Just report a error
-    wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::GENERIC,
-                                         "Unable to init wallet and get a passphrase for you");
-    return true;
-}
 
 }
 

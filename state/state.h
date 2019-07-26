@@ -25,10 +25,6 @@ enum STATE {
     STATE_INIT, // first run. Creating the password for a wallet
     INPUT_PASSWORD, // Input password from the wallet
     NEW_WALLET,     // Select how to init the wallet (first run)
-    GENERATE_NEW_SEED, // Init a new wallet, generate a new seed
-    SHOW_NEW_SEED,  // Show the new seed
-    TEST_NEW_SEED,  // Test a word from the seed
-    CREATE_WITH_SEED,// Init wallet with exist seed
     ACCOUNTS,       // Wallet accounts
     ACCOUNT_TRANSFER, // Transfer funds from account to account
     EVENTS,         // Wallet events (logs)

@@ -29,7 +29,9 @@ protected:
     virtual NextStateRespond execute() override;
 
 protected slots:
-    void onInitWalletStatus( wallet::InitWalletStatus  status );
+    // Result of the login
+    void onLoginResult(bool ok);
+
     void onWalletBalanceUpdated();
 
     void onMwcMqListenerStatus(bool online);
@@ -37,6 +39,7 @@ protected slots:
 
 private:
     wnd::InputPassword * wnd = nullptr;
+    bool inLockMode = false;
 };
 
 }
