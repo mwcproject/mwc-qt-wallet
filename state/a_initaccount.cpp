@@ -87,7 +87,7 @@ void InitAccount::onNewSeed(QVector<QString> sd) {
                     seed ) );
 }
 
-void InitAccount::wndDeleted(wnd::NewSeed * w)  {}
+void InitAccount::wndDeleted(wnd::NewSeed * )  {}
 
 // New seed was acknoleged...
 void InitAccount::submit() {
@@ -137,6 +137,12 @@ void InitAccount::submit(QString word) {
             tasks.push_back( tasks[0] );
             tasks.remove(0);
         }
+
+        // switch to 'show seed' window
+        context->wndManager->switchToWindowEx(
+            new wnd::NewSeed( context->wndManager->getInWndParent(), this, getContext(),
+                        seed ) );
+        return;
     }
 #endif
     submit();

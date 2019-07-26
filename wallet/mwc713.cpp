@@ -40,7 +40,7 @@ MWC713::MWC713(QString _mwc713path, QString _mwc713configPath, core::AppContext 
 }
 
 MWC713::~MWC713() {
-    stop();
+    stop(wantSafelyExit);
 }
 
 // Generic. Reporting fatal error that somebody will process and exit app
@@ -127,6 +127,8 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
 
 // normal start. will require the password
 void MWC713::start()  {
+    wantSafelyExit = true;
+
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
@@ -155,6 +157,7 @@ void MWC713::start()  {
 // start to init. Expected that we will exit pretty quckly
 // Check signal: onNewSeed( seed [] )
 void MWC713::start2init(QString password) {
+    wantSafelyExit = false;
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
@@ -181,6 +184,8 @@ void MWC713::start2init(QString password) {
 // Check Signals: onRecoverProgress( int progress, int maxVal );
 // Check Signals: onRecoverResult(bool ok, QString newAddress );
 void MWC713::start2recover(const QVector<QString> & seed, QString password) {
+    wantSafelyExit = true;
+
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
@@ -211,7 +216,7 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
 }
 
 
-void MWC713::stop() {
+void MWC713::stop(bool exitNicely) {
     mwc713disconnect();
 
     // reset mwc713 interna; state
@@ -239,10 +244,17 @@ void MWC713::stop() {
     walletPassword = "";
 
     if (mwc713process) {
-        executeMwc713command("exit", "");
-        if (!mwc713process->waitForFinished(3000) ) {
-            mwc713process->terminate();
-            mwc713process->waitForFinished(5000);
+        if (exitNicely) {
+            executeMwc713command("exit", "");
+            if (!mwc713process->waitForFinished(3000) ) {
+                mwc713process->terminate();
+                mwc713process->waitForFinished(5000);
+            }
+        }
+        else {
+            // init state have to be killed. Otherwise it will create a
+            // seed without verification. We don't want that
+            mwc713process->kill();
         }
 
         delete mwc713process;

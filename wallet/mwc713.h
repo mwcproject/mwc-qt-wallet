@@ -285,7 +285,7 @@ public:
     void setCheckResult(bool ok, QString errors);
 private:
     // stop mwc713 process nicely
-    void stop();
+    void stop(bool exitNicely = true);
 
     void mwc713connect(QProcess * process);
     void mwc713disconnect();
@@ -337,6 +337,7 @@ private:
     QVector<AccountInfo> accountInfo;
     QString currentAccount = "default"; // Keep current account by name. It fit better to mwc713 interactions.
 
+    bool wantSafelyExit = true; // want exit safely in destructor. It is not a ces for init. Init we want just kill.
 private:
     // Temprary values, local values for states
     QString walletPassword;

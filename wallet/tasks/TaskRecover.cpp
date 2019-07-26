@@ -71,14 +71,14 @@ bool TaskRecoverFull::processTask(const QVector<WEvent> &events) {
 // -------------------- TaskRecover3Password ----------------------
 
 void TaskRecoverShowMnenonic::onStarted() {
-   // logger::blockLogMwc713out( true );
+    logger::blockLogMwc713out( true );
 
     // Let's sleep some time. Needed to get a chance to stop listeners
     QThread::msleep(5000); // 5 seconds normally is enough to stop all listeners
 }
 
 bool TaskRecoverShowMnenonic::processTask(const QVector<WEvent> &events) {
-   // logger::blockLogMwc713out( false );
+    logger::blockLogMwc713out( false );
 
 
     QVector<QString> seed = calcSeedFromEvents(events);
