@@ -49,7 +49,7 @@ public:
     TaskSendMwc( MWC713 *wallet713, int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 ) :
             Mwc713Task("TaskSendMwc",
                     buildCommand( coinNano, address, message, inputConfirmationNumber, changeOutputs),
-                    wallet713, "") {}
+                    wallet713, ""), sendMwcNano(coinNano) {}
 
     virtual ~TaskSendMwc() override {}
 
@@ -59,6 +59,8 @@ public:
 private:
     // coinNano == -1  - mean All
     QString buildCommand(int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1) const;
+
+    int64_t sendMwcNano;
 };
 
 

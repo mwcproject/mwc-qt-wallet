@@ -1,8 +1,4 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2019-04-08T18:49:48
-#
-#-------------------------------------------------
+# MWC QT Wallet project for QtCreator
 
 QT       += core gui widgets network
 requires(qtConfig(completer))

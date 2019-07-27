@@ -4,6 +4,7 @@
 #include "../state/statemachine.h"
 #include "navmenuconfig.h"
 #include "navmenuaccount.h"
+#include "../state/x_events.h"
 
 namespace core {
 
@@ -13,7 +14,15 @@ NavBar::NavBar(QWidget *parent, state::StateContext * _context ) :
         prntWnd(parent),
         context(_context)
 {
+    state::Events * evtState = (state::Events *)context->stateMachine->getState(state::STATE::EVENTS);
+    Q_ASSERT(evtState);
+
+    QObject::connect( evtState, &state::Events::updateNonShownWarnings,
+                      this, &NavBar::onUpdateNonShownWarnings, Qt::QueuedConnection );
+
     ui->setupUi(this);
+
+    onUpdateNonShownWarnings( evtState->hasNonShownWarnings() );
 }
 
 NavBar::~NavBar() {
@@ -24,6 +33,11 @@ void NavBar::checkButton(BTN b) {
     ui->accountButton->setChecked(b==BTN::ACCOUNTS);
     ui->notificationButton->setChecked(b==BTN::NOTIFICATION);
     ui->settingsButton->setChecked(b==BTN::SETTINGS);
+}
+
+void NavBar::onUpdateNonShownWarnings(bool hasNonShownWarns) {
+    ui->notificationButton->setIcon( QIcon( QPixmap(
+            hasNonShownWarns ? ":/img/NavNotificationActive.png" : ":/img/NavNotificationNormal.png" ) ) );
 }
 
 void NavBar::on_notificationButton_clicked()

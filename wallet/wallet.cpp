@@ -6,18 +6,29 @@
 namespace wallet {
 
 
+QString WalletNotificationMessages::getLevelStr() const {
+    switch (level) {
+        case ERROR:     return "Crit";
+        case WARNING:   return "Warn";
+        case INFO:      return "info";
+        case DEBUG:     return "dbg";
+        default:        Q_ASSERT(false); return "???";
+    }
+}
+
+QString WalletNotificationMessages::getLevelLongStr() const {
+    switch (level) {
+        case ERROR:     return "Critical";
+        case WARNING:   return "Warning";
+        case INFO:      return "Info";
+        case DEBUG:     return "Debug";
+        default:        Q_ASSERT(false); return "???";
+    }
+}
+
 // To debug string
 QString WalletNotificationMessages::toString() const {
-    QString levelStr;
-    switch (level) {
-        case ERROR:     levelStr="ERROR"; break;
-        case WARNING:   levelStr="WARNING"; break;
-        case INFO:      levelStr="INFO"; break;
-        case DEBUG:     levelStr="DEBUG"; break;
-        default:        Q_ASSERT(false);
-    }
-
-    return ( "NotifMsg(level=" + levelStr + ", message="+message + ")" );
+    return ( "NotifMsg(level=" + getLevelStr() + ", message="+message + ")" );
 }
 
 void AccountInfo::setData(QString account,

@@ -5,7 +5,7 @@
 #include "../core/mainwindow.h"
 #include "k_accounts.h"
 #include "k_AccountTransfer.h"
-#include "events.h"
+#include "x_events.h"
 #include "hodl.h"
 #include "e_Recieve.h"
 #include "e_listening.h"
@@ -62,6 +62,12 @@ StateMachine::~StateMachine() {
 
     states.clear();
 }
+
+// Please use carefully, don't abuse this interface since no type control can be done
+State * StateMachine::getState(STATE state) const {
+    return states.value(state, nullptr);
+}
+
 
 void StateMachine::start() {
 

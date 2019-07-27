@@ -1,7 +1,7 @@
 #include "versiondialog.h"
 #include "ui_versiondialog.h"
 
-namespace core {
+namespace dlg {
 
 VersionDialog::VersionDialog(QWidget *parent) :
     QDialog(parent),

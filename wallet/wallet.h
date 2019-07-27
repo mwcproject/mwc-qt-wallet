@@ -180,7 +180,7 @@ struct WalletUtxoSignature {
 
 
 struct WalletNotificationMessages {
-    enum LEVEL {ERROR, WARNING, INFO, DEBUG};
+    enum LEVEL {ERROR=1, WARNING=2, INFO=3, DEBUG=4};
     LEVEL level=DEBUG;
     QString message;
     QDateTime time;
@@ -189,6 +189,12 @@ struct WalletNotificationMessages {
     WalletNotificationMessages(LEVEL _level, QString _message) : level(_level), message(_message) {time=QDateTime::currentDateTime();}
     WalletNotificationMessages(const WalletNotificationMessages&) = default;
     WalletNotificationMessages &operator=(const WalletNotificationMessages&) = default;
+
+    QString getLevelStr() const;
+    QString getLevelLongStr() const;
+
+    static bool isCritical(LEVEL l) {return l<=WARNING;}
+    bool isCritical() const {return isCritical(level);}
 
     // To debug string
     QString toString() const;

@@ -12,7 +12,7 @@ namespace wallet {
         wallet713->setLoginResult( error.empty() );
 
         if (error.empty())
-            wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::WARNING, MWC713::MESSAGE_ID::GENERIC,"Successfully logged into the wallet");
+            wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,"Successfully logged into the wallet");
         return true;
     }
 

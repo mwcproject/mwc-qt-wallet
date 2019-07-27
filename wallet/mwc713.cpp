@@ -621,12 +621,18 @@ void MWC713::setListeningStopResult(bool mqTry, bool kbTry, // what we try to st
 }
 
 void MWC713::setMwcMqListeningStatus(bool online) {
+    if (mwcMqOnline != online) {
+        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, (online ? "Start " : "Stop ") + QString("listening on mwc mq"));
+    }
     mwcMqOnline = online;
     logger::logEmit("MWC713", "onMwcMqListenerStatus", QString("online=") + QString::number(online));
     emit onMwcMqListenerStatus(online);
 
 }
 void MWC713::setKeybaseListeningStatus(bool online) {
+    if (keybaseOnline != online) {
+        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, (online ? "Start " : "Stop ") + QString("listening on keybase"));
+    }
     keybaseOnline = online;
     logger::logEmit("MWC713", "onKeybaseListenerStatus", QString("online=") + QString::number(online));
     emit onKeybaseListenerStatus(online);
@@ -642,6 +648,13 @@ void MWC713::setRecoveryResults( bool started, bool finishedWithSuccess, QString
     // Update the address as well
     if ( newAddress.length()>0 ) {
         setMwcAddress(newAddress);
+    }
+
+    if (finishedWithSuccess) {
+        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("MWC wallet was successfully recovered from the mnemonic"));
+    }
+    else {
+        appendNotificationMessage( MESSAGE_LEVEL::WARNING, MESSAGE_ID::GENERIC, QString("Failed to recover from the mnemonic"));
     }
 }
 
@@ -706,6 +719,8 @@ void MWC713::createNewAccount( QString newAccountName ) {
 
     emit onAccountCreated(newAccountName);
     emit onWalletBalanceUpdated();
+
+    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("New account '" + newAccountName + "' was created" ));
 }
 
 void MWC713::switchToAccount( QString switchAccountName, bool makeAccountCurrent ) {
@@ -738,6 +753,11 @@ void MWC713::updateRenameAccount(const QString & oldName, const QString & newNam
         emit onAccountRenamed(success, errorMessage);
     }
 
+    if (success)
+        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("Account '" + oldName + "' was renamed to '" + newName + "'" ));
+    else
+        appendNotificationMessage( MESSAGE_LEVEL::WARNING, MESSAGE_ID::GENERIC, QString("Failed to rename account '" + oldName + "'" ));
+
     logger::logEmit( "MWC713", "onWalletBalanceUpdated","");
     emit onWalletBalanceUpdated();
 
@@ -765,11 +785,16 @@ void MWC713::setSendResults(bool success, QStringList errors) {
 }
 
 void MWC713::reportSlateSend( QString slate, QString mwc, QString sendAddr ) {
+    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("You successfully sent " + mwc + " mwc to " + sendAddr ));
+
     logger::logEmit( "MWC713", "onSlateSend", slate + " with " +mwc + " to " + sendAddr );
     emit onSlateSend(slate, mwc, sendAddr);
 }
 void MWC713::reportSlateRecieved( QString slate, QString mwc, QString fromAddr ) {
     logger::logEmit( "MWC713", "onSlateRecieved", slate + " with " +mwc + " from " + fromAddr );
+
+    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("You received " + mwc+ " mwc form " + fromAddr ));
+
     emit onSlateRecieved( slate, mwc, fromAddr );
 
     // Request balace refresh
@@ -777,6 +802,9 @@ void MWC713::reportSlateRecieved( QString slate, QString mwc, QString fromAddr )
 }
 
 void MWC713::reportSlateFinalized( QString slate ) {
+
+    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("Slate finalized : "+slate ));
+
     logger::logEmit( "MWC713", "onSlateFinalized", slate );
     emit onSlateFinalized(slate);
 
@@ -785,16 +813,23 @@ void MWC713::reportSlateFinalized( QString slate ) {
 }
 
 void MWC713::setSendFileResult( bool success, QStringList errors, QString fileName ) {
+
+    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("File transaction was initiated for "+ fileName ));
+
     logger::logEmit( "MWC713", "onSendFile", "success="+QString::number(success) );
     emit onSendFile(success, errors, fileName);
 }
 
 void MWC713::setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn ) {
+    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("File receive transaction was processed for "+ inFileName ));
+
     logger::logEmit( "MWC713", "onReceiveFile", "success="+QString::number(success) );
     emit onReceiveFile( success, errors, inFileName, outFn );
 }
 
 void MWC713::setFinalizeFile( bool success, QStringList errors, QString fileName ) {
+    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("File finalized for "+ fileName ));
+
     logger::logEmit( "MWC713", "onFinalizeFile", "success="+QString::number(success) );
     emit onFinalizeFile( success, errors, fileName);
 }
@@ -836,11 +871,20 @@ void MWC713::setTransCancelResult( bool success, int64_t transId, QString errMsg
 }
 
 void MWC713::setSetReceiveAccount( bool ok, QString accountOrMessage ) {
+    if (ok)
+        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("Set receive account: '" + accountOrMessage + "'" ));
+
     logger::logEmit( "MWC713", "onSetReceiveAccount", "ok="+QString::number(ok) );
     emit onSetReceiveAccount(ok, accountOrMessage );
 }
 
 void MWC713::setCheckResult(bool ok, QString errors) {
+
+    if (ok)
+        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, "Account re-sync was finished successfully.");
+    else
+        appendNotificationMessage( MESSAGE_LEVEL::WARNING, MESSAGE_ID::GENERIC, "Account re-sync was failed.");
+
     logger::logEmit( "MWC713", "onCheckResult", "ok="+QString::number(ok) );
     emit onCheckResult(ok, errors );
 }

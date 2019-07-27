@@ -35,6 +35,9 @@ public:
     void blockLogout();
     void unblockLogout();
 
+    // Please use carefully, don't abuse this interface since no type control can be done
+    State* getState(STATE state) const;
+
 private:
     // routine to process state into the loop
     bool processState(State* st);

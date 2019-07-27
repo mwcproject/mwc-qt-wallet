@@ -7,7 +7,7 @@ namespace Ui {
 class VersionDialog;
 }
 
-namespace core {
+namespace dlg {
 
 class VersionDialog : public QDialog
 {

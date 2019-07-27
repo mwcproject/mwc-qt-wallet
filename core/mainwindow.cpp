@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include <QTime>
 #include <QDebug>
-#include "versiondialog.h"
 #include "../state/statemachine.h"
 #include "util/widgetutils.h"
 #include "../control/messagebox.h"
@@ -143,79 +142,6 @@ void MainWindow::updateListenerBtn() {
     ui->connectionStatusButton->setToolTip(listening ? "You are listening. Click here to view listener status"
                                           : "You are not listening. Click here to view listener status");
 }
-
-
-/*void MainWindow::on_actionVersion_triggered()
-{
-    VersionDialog verDlg(this);
-    verDlg.exec();
-}
-
-void MainWindow::on_actionAccount_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::ACCOUNTS );
-}
-
-void MainWindow::on_actionEvents_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::EVENTS );
-}
-
-void MainWindow::on_actionHODL_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::HODL );
-}
-
-void MainWindow::on_actionSend_coins_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::SEND_COINS );
-}
-
-void MainWindow::on_actionRecieve_coins_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::RECIEVE_COINS );
-}
-
-void MainWindow::on_actionNode_status_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::NODE_STATUS );
-}
-
-void MainWindow::on_actionSend_recieve_offline_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::FILE_TRANSACTIONS );
-}
-
-void MainWindow::on_actionListening_Status_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::LISTENING );
-}
-
-void MainWindow::on_actionTransactions_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::TRANSACTIONS );
-}
-
-void MainWindow::on_actionOutputs_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::OUTPUTS );
-}
-
-void MainWindow::on_actionContacts_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::CONTACTS );
-}
-
-void MainWindow::on_actionConfig_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::WALLET_CONFIG );
-}
-
-void core::MainWindow::on_actionAirdrop_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::AIRDRDOP_MAIN );
-}*/
-
 
 }
 

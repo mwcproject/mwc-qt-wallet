@@ -31,13 +31,14 @@ private slots:
     void on_settingsButton_clicked();
     void on_accountButton_clicked();
 
+    void onUpdateNonShownWarnings(bool hasNonShownWarns);
+
     void onMenuDestroy();
 private:
     enum BTN {NONE, NOTIFICATION, SETTINGS, ACCOUNTS};
     void checkButton(BTN b);
 
     void showNavMenu( NavMenu * menu );
-
 private:
     Ui::NavBar *ui;
     QWidget *prntWnd; // will be used for popup
