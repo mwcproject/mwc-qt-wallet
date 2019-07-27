@@ -207,6 +207,9 @@
          <height>40</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <property name="text">
         <string>OK</string>
        </property>

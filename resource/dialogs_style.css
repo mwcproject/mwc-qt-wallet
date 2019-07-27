@@ -14,13 +14,38 @@ QLabel {
 
 QLineEdit {
     color: #3600C9;
-    background: rgba(111, 0, 214, 0.2);;
-    selection-background-color: rgba(111, 0, 214, 0.4);
+
+    border: transparent;
+    background:  #E2CCF7;
+    selection-background-color: #cc9afb;
+}
+
+QLineEdit:enabled:!focus::hover
+{
+    background: #e1c2ff;
 }
 
 QLineEdit:focus {
-    border: 2px solid #CCFF33;
-    background: rrgba(111, 0, 214, 0.3);
+    border: 2px solid #9e39ff;
+    background: #d2a4ff;
+}
+
+QTextEdit {
+    color: #3600C9;
+
+    border: transparent;
+    background:  #E2CCF7;
+    selection-background-color: #cc9afb;
+}
+
+QTextEdit:focus {
+    border: 2px solid #9e39ff;
+    background: #d2a4ff;
+}
+
+QTextEdit:enabled:!focus::hover
+{
+    background: #e1c2ff;
 }
 
 QPushButton
@@ -29,19 +54,97 @@ QPushButton
 
     border: 2px solid #6F00D6;
     border-radius: 6px;
+    background: transparent;
+}
+
+QPushButton:enabled:!focus::hover
+{
+    background: #cea1e3;
 }
 
 QPushButton:focus {
     background: #9E00E7;
     color: white;
-    border: 2px solid #6F00D6;
+    border: 2px solid #9E00E7;
 }
 
 QPushButton:disabled {
-    border: 2px solid gray;
-    color: gray;
+    border: 2px solid lightgrey;
+    color: lightgrey;
 }
 
 QPushButton:pressed {
-    background: #ac56d3;
+    background: #8500c3;
 }
+
+/* ----------- Frame with a white border -----------------*/
+
+MwcFrameWithBorder {
+    background: transparent;
+    border: 2px solid #6F00D6;
+    border-radius: 6px;
+}
+
+/* ----------  QRadioButton  ------------*/
+QRadioButton {
+    color: #6F00D6;
+}
+
+QRadioButton::indicator:unchecked {
+    image: url(:/img/RadioOff.png);
+}
+
+QRadioButton::indicator:checked {
+    image: url(:/img/RadioOn.png);
+}
+
+
+/* ------------ ListWithColumns ----------------- */
+
+ListWithColumns
+{
+    color: #6F00D6;
+    border: 2px solid #6F00D6;
+    background: transparent;
+}
+
+ListWithColumns::hover
+{
+    background-color: #ca89e8;
+}
+
+ListWithColumns::item
+{
+    color: #6F00D6;
+}
+
+ListWithColumns::item:selected
+{
+    background-color: #cd9be5;
+}
+/* header for table view */
+
+QHeaderView::section {
+    background-color: transparent;
+
+    color: #6F00D6;
+
+    border: none;
+    border-bottom: 1px solid #9a55d9;
+    border-right: 1px solid #ae7cdd;
+}
+
+/* -------- Navigation buttons ------------- */
+
+
+/* ---------  QToolTip   ------- */
+QToolTip {
+    color: #6F00D6;
+
+    border: 1px solid #9759d0;
+    border-radius: 3px;
+    padding: 1px;
+    background: #cebae1;
+}
+
+

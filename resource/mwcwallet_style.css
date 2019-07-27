@@ -292,30 +292,12 @@ control--MwcComboBox
 
     subcontrol-origin: padding;
     subcontrol-position: bottom right;
-
-/*    border-style: solid;
-    border: 1px solid #1e1e1e;
-    border-radius: 5;
-    padding: 1px 0px 1px 20px;*/
 }
 
 control--MwcComboBox:enabled:!focus::hover
 {
     background-color: rgba(255, 255, 255, 0.4);
 }
-
-/*control--MwcComboBox:on
-{
-    padding-top: 0px;
-    padding-left: 0px;
-    color: white;
-    selection-background-color: rgba(255, 255, 255, 0.5);
-}
-
-control--MwcComboBox:!on
-{
-    color: white;
-}*/
 
 control--MwcComboBox::drop-down {
     subcontrol-origin: padding;
@@ -408,9 +390,6 @@ QHeaderView::section {
     border: none;
     border-bottom: 1px solid #ffffff;
     border-right: 1px solid #aaaaaa;
-
-/*    padding-left: 4px;
-    border: 1px solid white;*/
 }
 
 /* -------- Navigation buttons ------------- */
