@@ -1,7 +1,7 @@
 #include "TaskStarting.h"
 #include "../mwc713.h"
 #include <QDebug>
-#include "TaskUnlock.h"
+#include "TaskWallet.h"
 
 namespace wallet {
 

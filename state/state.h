@@ -92,6 +92,9 @@ public:
 
     // process/verify the state
     virtual NextStateRespond execute() = 0;
+
+    // Executing another state
+    virtual void exitingState() {};
 };
 
 }

@@ -1,7 +1,7 @@
-#include "contacts_w.h"
-#include "ui_contacts.h"
-#include "../state/contacts.h"
-#include "contacteditdlg.h"
+#include "w_contacts_w.h"
+#include "ui_w_contacts.h"
+#include "../state/w_contacts.h"
+#include "w_contacteditdlg.h"
 #include "../control/messagebox.h"
 #include "../state/timeoutlock.h"
 

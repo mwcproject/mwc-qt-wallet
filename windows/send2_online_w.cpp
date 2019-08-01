@@ -1,6 +1,6 @@
 #include "send2_online_w.h"
 #include "ui_send2_online.h"
-#include "sendcoinsparamsdialog.h"
+#include "../dialogs/sendcoinsparamsdialog.h"
 #include "../control/messagebox.h"
 #include "../util/address.h"
 #include "../state/send2_Online.h"

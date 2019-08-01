@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>712</width>
+    <width>759</width>
     <height>517</height>
    </rect>
   </property>
@@ -91,6 +91,28 @@
           </property>
           <property name="placeholderText">
            <string>BTC address to claim</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="control::MwcLineEditNormal" name="passwordAirdrop">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+          <property name="placeholderText">
+           <string>Airdrop account password</string>
           </property>
          </widget>
         </item>

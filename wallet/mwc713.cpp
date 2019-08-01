@@ -7,7 +7,7 @@
 #include "mwc713events.h"
 #include <QApplication>
 #include "tasks/TaskStarting.h"
-#include "tasks/TaskUnlock.h"
+#include "tasks/TaskWallet.h"
 #include "tasks/TaskListening.h"
 #include "tasks/TaskRecover.h"
 #include "tasks/TaskErrWrnInfoListener.h"
@@ -15,7 +15,6 @@
 #include "tasks/TaskAccount.h"
 #include "tasks/TaskSend.h"
 #include "tasks/TaskTransaction.h"
-#include "tasks/TaskInit.h"
 #include "../util/Log.h"
 #include "../core/global.h"
 #include "../core/appcontext.h"
@@ -40,7 +39,7 @@ MWC713::MWC713(QString _mwc713path, QString _mwc713configPath, core::AppContext 
 }
 
 MWC713::~MWC713() {
-    stop(wantSafelyExit);
+    processStop(startedMode != STARTED_MODE::INIT);
 }
 
 // Generic. Reporting fatal error that somebody will process and exit app
@@ -118,16 +117,14 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
         }
     }
 
-    if (trackProcessExit) {
-        mwc713connect(process);
-    }
+    mwc713connect(process, trackProcessExit);
 
     return process;
 }
 
 // normal start. will require the password
-void MWC713::start()  {
-    wantSafelyExit = true;
+void MWC713::start(bool loginWithLastKnownPassword)  {
+    startedMode = STARTED_MODE::NORMAL;
 
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
@@ -152,12 +149,14 @@ void MWC713::start()  {
     eventCollector->addListener( new TaskSlatesListener(this) );
 
     // And eventing magic should begin...
+    if (loginWithLastKnownPassword)
+        loginWithPassword(walletPassword);
 }
 
 // start to init. Expected that we will exit pretty quckly
 // Check signal: onNewSeed( seed [] )
 void MWC713::start2init(QString password) {
-    wantSafelyExit = false;
+    startedMode = STARTED_MODE::INIT;
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
@@ -184,7 +183,7 @@ void MWC713::start2init(QString password) {
 // Check Signals: onRecoverProgress( int progress, int maxVal );
 // Check Signals: onRecoverResult(bool ok, QString newAddress );
 void MWC713::start2recover(const QVector<QString> & seed, QString password) {
-    wantSafelyExit = true;
+    startedMode = STARTED_MODE::RECOVER;
 
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
@@ -215,8 +214,76 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
     eventCollector->addListener( new TaskRecoverProgressListener(this) );
 }
 
+// Need for claiming process only
+// Starting the wallet and get the next key
+// wallet713> getnextkey --amount 1000000
+// "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
+// Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage);
+void MWC713::start2getnextkey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) {
+    startedMode = STARTED_MODE::GET_NEXTKEY;
 
-void MWC713::stop(bool exitNicely) {
+    // Start the binary
+    Q_ASSERT(mwc713process == nullptr);
+    Q_ASSERT(inputParser == nullptr);
+
+    qDebug() << "Starting MWC713 for getnextkey at " << mwc713Path << " for config " << mwc713configPath;
+
+    // Creating process and starting
+    // Mnemonic will moved into variables
+    // !!!!! Security breach
+    mwc713process = initMwc713process({}, {} );
+    inputParser = new tries::Mwc713InputParser();
+    eventCollector = new Mwc713EventManager(this);
+    eventCollector->connectWith(inputParser);
+
+    // Excuting the single command and then read all output
+
+    eventCollector->addTask( new TaskStarting(this), TaskStarting::TIMEOUT );
+    eventCollector->addTask( new TaskInitW(this, walletPassword ), TaskInitW::TIMEOUT );
+    eventCollector->addTask( new TaskInitWpressEnter(this ), TaskInitWpressEnter::TIMEOUT );
+    eventCollector->addTask( new TaskGetNextKey(this,amountNano, btcaddress, airDropAccPassword ), TaskGetNextKey::TIMEOUT );
+    // then exit
+    eventCollector->addTask( new TaskLogout(this), TaskLogout::TIMEOUT);
+}
+
+// Need for claiming process only
+// identifier  - output from start2getnextkey
+// Check Signal: onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
+void MWC713::start2recieveSlate( QString recieveAccount, QString identifier, QString slateFN ) {
+    startedMode = STARTED_MODE::RECIEVE_SLATE;
+
+    // Start the binary
+    Q_ASSERT(mwc713process == nullptr);
+    Q_ASSERT(inputParser == nullptr);
+
+    qDebug() << "Starting MWC713 recieveSlate at " << mwc713Path << " for config " << mwc713configPath;
+
+    // Creating process and starting
+    // Mnemonic will moved into variables
+    mwc713process = initMwc713process({}, {} );
+
+    inputParser = new tries::Mwc713InputParser();
+
+    eventCollector = new Mwc713EventManager(this);
+    eventCollector->connectWith(inputParser);
+
+    // Adding permanent listeners
+    eventCollector->addListener( new TaskErrWrnInfoListener(this) );
+
+
+    // Add first init task
+    eventCollector->addTask( new TaskStarting(this), TaskStarting::TIMEOUT );
+    // log in
+    eventCollector->addTask( new TaskUnlock(this, walletPassword), TaskUnlock::TIMEOUT );
+
+    eventCollector->addTask( new TaskSetReceiveAccount(this, recieveAccount, walletPassword), TaskSetReceiveAccount::TIMEOUT );
+    // Recieve file first
+    eventCollector->addTask( new TaskReceiveFile( this, slateFN, identifier ), TaskReceiveFile::TIMEOUT );
+    // then exit
+    eventCollector->addTask( new TaskLogout(this), TaskLogout::TIMEOUT);
+}
+
+void MWC713::processStop(bool exitNicely) {
     mwc713disconnect();
 
     // reset mwc713 interna; state
@@ -241,8 +308,6 @@ void MWC713::stop(bool exitNicely) {
     // No balance updated because it is a trigger that wallet is ready
     // emit onWalletBalanceUpdated();
 
-    walletPassword = "";
-
     if (mwc713process) {
         if (exitNicely) {
             executeMwc713command("exit", "");
@@ -257,17 +322,18 @@ void MWC713::stop(bool exitNicely) {
             mwc713process->kill();
         }
 
-        delete mwc713process;
+        mwc713process->deleteLater();
         mwc713process = nullptr;
     }
 
     if (inputParser) {
-        delete  inputParser;
+        inputParser->deleteLater();
         inputParser = nullptr;
     }
 
     if (eventCollector) {
-        delete eventCollector;
+        eventCollector->clear();
+        eventCollector->deleteLater();
         eventCollector = nullptr;
     }
 
@@ -281,8 +347,12 @@ void MWC713::loginWithPassword(QString password)  {
 }
 
 // Exit from the wallet. Expected that state machine will switch to Init state
-void MWC713::logout()  {
-    stop();
+// syncCall - stop NOW. Caller suppose to understand what he is doing
+void MWC713::logout(bool syncCall)  {
+    if (syncCall)
+        processStop(true);
+    else 
+        eventCollector->addTask( new TaskStop(this), TaskStop::TIMEOUT );
 }
 
 
@@ -579,6 +649,12 @@ void MWC713::setLoginResult(bool ok) {
     emit onLoginResult(ok);
 
 }
+
+void MWC713::setGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPasswor) {
+    logger::logEmit("MWC713", "onGetNextKeyResult", QString::number(success) + " " + identifier + " " + publicKey + " " + errorMessage + " " + btcaddress + " " + airDropAccPasswor );
+    emit onGetNextKeyResult(success, identifier, publicKey, errorMessage, btcaddress, airDropAccPasswor);
+}
+
 
 void MWC713::setMwcAddress( QString _mwcAddress ) { // Set active MWC address. Listener might be offline
     mwcAddress = _mwcAddress;
@@ -893,17 +969,21 @@ void MWC713::setCheckResult(bool ok, QString errors) {
 /////////////////////////////////////////////////////////////////////////////////
 //      mwc713  IOs
 
-void MWC713::mwc713connect(QProcess * process) {
+void MWC713::mwc713connect(QProcess * process, bool trackProcessExit) {
     mwc713disconnect();
     Q_ASSERT(mwc713connections.isEmpty());
     Q_ASSERT(process);
 
     if (process) {
         mwc713connections.push_back( connect( process, &QProcess::errorOccurred, this, &MWC713::mwc713errorOccurred, Qt::QueuedConnection) );
-        mwc713connections.push_back( connect( process, SIGNAL(finished(int , QProcess::ExitStatus )), this,
-                                              SLOT(mwc713finished(int , QProcess::ExitStatus )) ));
-        mwc713connections.push_back( connect( process, &QProcess::readyReadStandardError, this, &MWC713::mwc713readyReadStandardError, Qt::QueuedConnection) );
-        mwc713connections.push_back( connect( process, &QProcess::readyReadStandardOutput, this, &MWC713::mwc713readyReadStandardOutput, Qt::QueuedConnection) );
+
+        if (trackProcessExit) {
+            mwc713connections.push_back(connect(process, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+                                                SLOT(mwc713finished(int, QProcess::ExitStatus))));
+            mwc713connections.push_back( connect( process, &QProcess::readyReadStandardError, this, &MWC713::mwc713readyReadStandardError, Qt::QueuedConnection) );
+            mwc713connections.push_back( connect( process, &QProcess::readyReadStandardOutput, this, &MWC713::mwc713readyReadStandardOutput, Qt::QueuedConnection) );
+        }
+
     }
 }
 
@@ -921,7 +1001,7 @@ void MWC713::mwc713errorOccurred(QProcess::ProcessError error) {
     qDebug() << "ERROR OCCURRED. Error = " << error;
 
     if (mwc713process) {
-        delete mwc713process;
+        mwc713process->deleteLater();
         mwc713process = nullptr;
     }
 
@@ -936,7 +1016,7 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
     qDebug() << "mwc713 is exiting with exit code " << exitCode << ", exitStatus=" << exitStatus;
 
     if (mwc713process) {
-        delete mwc713process;
+        mwc713process->deleteLater();
         mwc713process = nullptr;
     }
 
@@ -1043,7 +1123,7 @@ bool MWC713::setWalletConfig(const WalletConfig & config)  {
     util::Waiting w; // Host verifucation might tale time, what is why waiting here
 
     // Stopping the wallet. Start will be done by init state
-    stop();
+    processStop(true); // sync if ok for this call
     return true;
 }
 

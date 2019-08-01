@@ -60,6 +60,10 @@ Mwc713EventManager::Mwc713EventManager(MWC713 * _mwc713wallet) : mwc713wallet(_m
 }
 
 Mwc713EventManager::~Mwc713EventManager() {
+    clear();
+}
+
+void Mwc713EventManager::clear() {
     for (auto t : listeners) {
         delete t;
     }
@@ -69,6 +73,8 @@ Mwc713EventManager::~Mwc713EventManager() {
         delete t.task;
     }
     taskQ.clear();
+    events.clear();
+    taskExecutionTimeLimit = 0;
 }
 
 void Mwc713EventManager::connectWith(tries::Mwc713InputParser * inputParser) {

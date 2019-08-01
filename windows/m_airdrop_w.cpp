@@ -95,9 +95,15 @@ void Airdrop::on_claimAirdropBtn_clicked()
         return;
     }
 
+    QString password = ui->passwordAirdrop->text();
+    if (password.isEmpty()) {
+        control::MessageBox::message(this, "Error", "Please specify your password from your Airdrop account at www.mwc.mw");
+        return;
+    }
+
     showProgress("Claiming BTC address");
 
-    state->requestGetChallenge( address );
+    state->startClaimingProcess( address, password );
 }
 
 void Airdrop::reportMessage( QString title, QString message ) {

@@ -2,7 +2,7 @@
 #include "ui_k_accounttransfer_w.h"
 #include "../control/messagebox.h"
 #include "../state/k_AccountTransfer.h"
-#include "sendcoinsparamsdialog.h"
+#include "../dialogs/sendcoinsparamsdialog.h"
 #include "send2_online_w.h"
 #include "../state/timeoutlock.h"
 

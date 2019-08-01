@@ -114,6 +114,7 @@ void InitAccount::submit(QString word) {
 
 #ifdef QT_DEBUG
     // Allways treat as correct answer...
+    Q_UNUSED(word);
     tasks.remove(0);
 #else
     // Release, the normal way
@@ -152,10 +153,10 @@ bool InitAccount::finishSeedVerification() {
     if (tasks.size()==0 && seed.size()>0) {
             // clean up the state
             context->wallet->confirmNewSeed();
-            context->wallet->logout(); // Stop the wallet with inti process first
+            context->wallet->logout(true); // Stop the wallet with inti process first
 
             // Now need to start the normall wallet...
-            context->wallet->start();
+            context->wallet->start(false);
             context->wallet->loginWithPassword(pass);
 
             control::MessageBox::message(nullptr, "Congratulations!", "Thank you for confirming all words from your passphrase. Your wallet was successfully created");
@@ -213,7 +214,7 @@ void InitAccount::onRecoverProgress( int progress, int maxVal ) {
 void InitAccount::onRecoverResult(bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages) {
     Q_UNUSED(newAddress);
 
-    context->wallet->logout();
+    context->wallet->logout(true);
 
     if ( progressWnd==nullptr ) // active indicator
         return;
@@ -243,9 +244,8 @@ void InitAccount::onRecoverResult(bool started, bool finishedWithSuccess, QStrin
     }
 
     if (success) {
-
         // Now need to start the normall wallet...
-        context->wallet->start();
+        context->wallet->start(false);
         context->wallet->loginWithPassword(pass);
 
         // We are done. Wallet is provisioned and restarted...

@@ -11,7 +11,7 @@
 #include "e_listening.h"
 #include "e_transactions.h"
 #include "e_outputs.h"
-#include "contacts.h"
+#include "w_contacts.h"
 #include "x_walletconfig.h"
 #include "m_airdrop.h"
 #include "a_StartWallet.h"
@@ -84,6 +84,12 @@ void StateMachine::start() {
 }
 
 void StateMachine::executeFrom( STATE nextState ) {
+
+    // notify current state
+    State* prevState = states.value(currentState, nullptr);
+    if (prevState)
+        prevState->exitingState();
+
     if (nextState == STATE::NONE)
         nextState = states.firstKey();
 

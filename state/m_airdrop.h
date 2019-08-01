@@ -4,6 +4,7 @@
 #include "state.h"
 #include "../wallet/wallet.h"
 #include <QObject>
+#include <QMap>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -49,8 +50,8 @@ public:
 
     bool hasAirdropRequests() const {return airdropRequests.size()>0;}
 
-    void requestGetChallenge( QString btcAddress );
-    void requestClaimMWC( QString btcAddress, QString challendge, QString signature );
+    void startClaimingProcess( const QString & btcAddress, const QString & passwordAirdrop );
+    void requestClaimMWC( const QString & btcAddress, const QString & challendge, const QString & signature, const QString & identifier );
     // Get current status for that
     void refreshAirdropStatusInfo();
 
@@ -59,8 +60,10 @@ public:
 
     void backToMainAirDropPage();
 protected:
-    void sendRequest(const QString & url,
-                const QVector<QString> & body,
+    enum HTTP_CALL {GET, POST};
+    void sendRequest(HTTP_CALL call, const QString & url,
+                const QVector<QString> & urlParams,
+                const QByteArray & body, //
                 const QString & tag, const QString & param1="",const QString & param2="",
                 const QString & param3="", const QString & param4=""); // Respond will be back at replyFinished.  replyFinished will process it accordingly
 
@@ -75,9 +78,14 @@ protected:
 
     virtual NextStateRespond execute() override;
 
+    virtual void exitingState() override;
+
 private slots:
     void replyFinished(QNetworkReply* reply);
 
+    void onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPasswor);
+
+    void onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
 private:
     QVector<AirdropRequests> airdropRequests;
     QNetworkAccessManager *nwManager;
@@ -86,6 +94,9 @@ private:
 
     wnd::Airdrop * airdropWnd = nullptr;
     wnd::AirdropForBTC * airdropForBtcWnd = nullptr;
+
+    int requestCounter = 0;
+    QMap<QString, QString> claimRequests; // Key: slate file; value: btcAddress
 };
 
 }

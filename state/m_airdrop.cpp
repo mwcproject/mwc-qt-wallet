@@ -15,12 +15,15 @@
 #include <QJsonObject>
 #include <QUrlQuery>
 #include "../util/Log.h"
+#include <QFile>
 
 namespace state {
 
 static const QString TAG_CLAIMS_AVAIL  = "claimsAvailable";
+static const QString TAG_AMOUNT        = "getAmount";
 static const QString TAG_GET_CHALLENGE = "getChallenge";
 static const QString TAG_CLAIM_MWC     = "claimMwc";
+static const QString TAG_RESPONCE_SLATE = "submitResponseSlate";
 static const QString TAG_STATUS_PREF   = "Status_";
 
 void AirdropRequests::setData(const QString & _btcAddress,
@@ -59,11 +62,13 @@ Airdrop::Airdrop(StateContext * context ) :
 {
     nwManager = new QNetworkAccessManager(this);
 
-    connect( nwManager, &QNetworkAccessManager::finished, this, &Airdrop::replyFinished );
+    connect( nwManager, &QNetworkAccessManager::finished, this, &Airdrop::replyFinished, Qt::QueuedConnection );
+    connect( context->wallet , &wallet::Wallet::onReceiveFile, this, &Airdrop::onReceiveFile, Qt::QueuedConnection );
+    connect( context->wallet , &wallet::Wallet::onGetNextKeyResult, this, &Airdrop::onGetNextKeyResult, Qt::QueuedConnection );
 
     // request AirDrop Status in background
     airDropStatus.waiting = true;
-    sendRequest( "/v1/claimsAvailable", {}, TAG_CLAIMS_AVAIL);
+    sendRequest( HTTP_CALL::GET, "/v1/claimsAvailable", {}, "", TAG_CLAIMS_AVAIL);
 
     airdropRequests = context->appContext->loadAirdropRequests();
 }
@@ -82,35 +87,37 @@ NextStateRespond Airdrop::execute() {
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
-
-void Airdrop::requestGetChallenge( QString address ) {
-    // From here we suppose to call Rest API and get the info
-
-    QString mqAddress = context->wallet->getLastKnownMwcBoxAddress();
-
-    if (mqAddress.isEmpty() || !context->wallet->getListeningStatus().first) {
-        reportMessageToUI("MWC MQ Connection", "MWC MQ listener is offline. Please verify your network connection and check if MWC MQ listener running." );
-        return;
+void Airdrop::exitingState() {
+    // Start wallet normally...
+    if (!context->wallet->isRunning()) {
+        context->wallet->start(true);
     }
-
-    sendRequest("/v1/getChallenge" ,
-            {"btcaddress", address, "mwcaddress", mqAddress},
-                TAG_GET_CHALLENGE, address );
-
 }
 
-void Airdrop::requestClaimMWC( QString btcAddress, QString challendge, QString signature ) {
 
-    QString mqAddress = context->wallet->getLastKnownMwcBoxAddress();
+void Airdrop::startClaimingProcess( const QString & btcAddress, const QString & passwordAirdrop ) {
+    // From here we suppose to call Rest API and get the info
 
-    if (mqAddress.isEmpty() || !context->wallet->getListeningStatus().first) {
-        reportMessageToUI("MWC MQ Connection", "MWC MQ listener is offline. Please verify your network connection and check if MWC MQ listener running." );
-        return;
+    // Stopping the wallet. Claiming process is mostly offline.
+    if (context->wallet->isRunning()) {
+        context->wallet->logout(true);
     }
 
-    sendRequest("/v1/claimMWC" ,
-                {"btcaddress", btcAddress, "challenge", challendge, "signature", signature, "mwcaddress", mqAddress },
-                TAG_CLAIM_MWC, btcAddress, challendge, signature, mqAddress);
+    // First, let's get amount.
+    sendRequest( HTTP_CALL::GET, "/v1/getAmount" ,
+                {"password", passwordAirdrop,  "btcaddress", btcAddress },
+                "",
+                TAG_AMOUNT, passwordAirdrop, btcAddress );
+
+    // Then get challenge
+    //...
+}
+
+void Airdrop::requestClaimMWC( const QString & btcAddress, const QString & challendge, const QString & signature, const QString & identifier ) {
+    sendRequest( HTTP_CALL::GET, "/v1/claimMWC" ,
+                {"btcaddress", btcAddress, "challenge", challendge, "signature", signature },
+                "",
+                TAG_CLAIM_MWC, btcAddress, challendge, signature, identifier);
 }
 
 
@@ -123,9 +130,10 @@ void Airdrop::refreshAirdropStatusInfo() {
 
 void Airdrop::requestStatusFor(int idx) {
     // https://<api_endpoint>/v1/checkStatus?btcaddress=<btcaddress>&challenge=<challenge>
-    sendRequest("/v1/checkStatus" ,
+    sendRequest(HTTP_CALL::GET, "/v1/checkStatus" ,
                 { "btcaddress", airdropRequests[idx].btcAddress, "challenge", airdropRequests[idx].challendge,
-                  "challendge" , airdropRequests[idx].challendge },
+                  "signature" , airdropRequests[idx].signature },
+                "",
                 TAG_STATUS_PREF+ QString::number(idx) );
 }
 
@@ -143,8 +151,9 @@ void Airdrop::updateColumnsWidhts(QVector<int> widths) {
 }
 
 
-void Airdrop::sendRequest(const QString & api,
+void Airdrop::sendRequest(HTTP_CALL call, const QString & api,
                           const QVector<QString> & params,
+                          const QByteArray & body, //
                           const QString & tag, const QString & param1, const QString & param2,
                           const QString & param3, const QString & param4) {
 
@@ -174,14 +183,27 @@ void Airdrop::sendRequest(const QString & api,
     request.setUrl( requestUrl );
     request.setHeader(QNetworkRequest::ServerHeader, "application/json");
 
+    QNetworkReply *reply = nullptr;
+    switch (call) {
+        case GET:
+            reply =  nwManager->get(request);
+            break;
+        case POST:
+            reply =  nwManager->post(request, body );
+            break;
+        default:
+            Q_ASSERT(false);
+    }
+    Q_ASSERT(reply);
 
-    QNetworkReply *reply =  nwManager->get(request);
-    reply->setProperty("tag", QVariant(tag));
-    reply->setProperty("param1", QVariant(param1));
-    reply->setProperty("param2", QVariant(param2));
-    reply->setProperty("param3", QVariant(param3));
-    reply->setProperty("param4", QVariant(param4));
-    // Respond will be send back async
+    if (reply) {
+        reply->setProperty("tag", QVariant(tag));
+        reply->setProperty("param1", QVariant(param1));
+        reply->setProperty("param2", QVariant(param2));
+        reply->setProperty("param3", QVariant(param3));
+        reply->setProperty("param4", QVariant(param4));
+        // Respond will be send back async
+    }
 }
 
 static QString generateMessage( QString errMessage, int errCode ) {
@@ -254,22 +276,44 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
         return;
     }
 
+    if ( TAG_AMOUNT == tag ) {
+        bool success = jsonRespond["success"].toBool(false);
+        if ( success ) {
+            int64_t amount = jsonRespond["amount"].toString("-1").toLongLong();
+
+            QString password = reply->property("param1").toString();
+            QString address = reply->property("param2").toString();
+
+            // Preparing for the getChallenge...
+            // Expected that walllet is offline
+            context->wallet->start2getnextkey( amount, address, password );
+            // see onGetNextKeyResult to continue...
+        }
+        else {
+            // error status
+            reportMessageToUI("Claim request failed", "Unable to start claim process." +
+                                                      generateMessage(jsonRespond["error_message"].toString(), jsonRespond["error_code"].toInt( INT_MAX )) );
+        }
+        return;
+    }
 
     if ( TAG_GET_CHALLENGE == tag ) {
             bool success = jsonRespond["success"].toBool(false);
             if ( success ) {
                 QString address = reply->property("param1").toString();
+                QString identifier = reply->property("param2").toString();
 
                 QString challenge = jsonRespond["challenge"].toString();
                 // Switch to the claim window...
                 airdropForBtcWnd = (wnd::AirdropForBTC *) context->wndManager->switchToWindowEx(
-                        new wnd::AirdropForBTC( context->wndManager->getInWndParent(), this, address, challenge ) );
+                        new wnd::AirdropForBTC( context->wndManager->getInWndParent(), this, address, challenge, identifier ) );
             }
             else {
                 // error status
                 reportMessageToUI("Claim request failed", "Unable to start claim process." +
                                   generateMessage(jsonRespond["error_message"].toString(), jsonRespond["error_code"].toInt( INT_MAX )) );
             }
+        return;
     }
 
     if (TAG_CLAIM_MWC == tag) {
@@ -278,34 +322,104 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
         QString btcAddress = reply->property("param1").toString();
         QString challendge = reply->property("param2").toString();
         QString signature = reply->property("param3").toString();
-        QString mwcAddress = reply->property("param4").toString();
+        QString identifier = reply->property("param4").toString();
 
-        if (success) {
-            // add to the list of claimed...
-            bool found = false;
-            for (auto &req : airdropRequests) {
-                if (req.btcAddress == btcAddress) {
-                    req.setData(btcAddress, challendge, signature);
-                    found = true;
+        Q_ASSERT( !btcAddress.isEmpty() && !challendge.isEmpty() && !signature.isEmpty() && !identifier.isEmpty() );
+
+        if ( success && !btcAddress.isEmpty() && !challendge.isEmpty() && !signature.isEmpty() && !identifier.isEmpty() ) {
+            QString errMsg;
+            while (true) {
+                QString slateBase64 = jsonRespond["slate"].toString();
+                // Expected to have a base64 encoded slate
+                if (slateBase64.isEmpty()) {
+                    errMsg = "Not found slate data fropm AirDrop API respond";
+                    break;
                 }
+
+                QByteArray slate = QByteArray::fromBase64(slateBase64.toLatin1());
+
+                if (slate.isEmpty()) {
+                    errMsg = "Not able to decode slate from AirDrop API respond";
+                    break;
+                }
+
+                QString slateFn = ioutils::getAppDataPath("tmp") + "/" + "slate"+QString::number(requestCounter++)+".tx";
+                {
+                    // Clean up response if exist
+                    QString slateRespFn = slateFn + ".response";
+                    QFile::remove(slateRespFn);
+                }
+
+
+                claimRequests[slateFn] = btcAddress;
+
+                QFile slateFile(slateFn);
+                if (slateFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+                    slateFile.write(slate);
+                }
+                else {
+                    errMsg = "Not able save slate at the file " + slateFn;
+                    break;
+
+                }
+                slateFile.close();
+
+                // Registering the transaction even it is not finished. The reason - possible failure.
+                // We better have non complete data then lost one. In case of lost,
+                // no tracking status will be possible...
+                {
+                    bool found = false;
+                    for (auto &req : airdropRequests) {
+                        if (req.btcAddress == btcAddress) {
+                            req.setData(btcAddress, challendge, signature);
+                            found = true;
+                        }
+                    }
+
+                    if (!found) {
+                        AirdropRequests newReq;
+                        newReq.setData(btcAddress, challendge, signature);
+                        airdropRequests.push_back(newReq);
+                    }
+                    context->appContext->saveAirdropRequests(airdropRequests);
+                }
+
+                // Starting the slate processing transaction...
+                // wallet expected to be offline...
+                context->wallet->start2recieveSlate( context->appContext->getReceiveAccount(), identifier, slateFn );
+
+                // Continue at onReceiveFile
+                break;
             }
 
-            if (!found) { // Normally not found.  Found is likely fix for some problems.
-                AirdropRequests newReq;
-                newReq.setData( btcAddress, challendge, signature );
-
-                airdropRequests.push_back(newReq);
-                context->appContext->saveAirdropRequests( airdropRequests );
+            if (!errMsg.isEmpty()) {
+                reportMessageToUI("Claim request failed", errMsg);
             }
 
-            reportMessageToUI("Your MWC claim succeeded", "Your claim for address " + btcAddress + " was sucessfully processed.");
-
-            backToMainAirDropPage();
         }
         else {
            reportMessageToUI("Claim request failed", "Unable to process your claim." +
                                   generateMessage(jsonRespond["error_message"].toString(), jsonRespond["error_code"].toInt( INT_MAX )) );
         }
+        return;
+    }
+
+    if ( TAG_RESPONCE_SLATE == tag ) {
+
+        bool success = jsonRespond["success"].toBool(false);
+        if ( success ) {
+            QString btcAddress = reply->property("param1").toString();
+
+            reportMessageToUI("Your MWC claim succeeded", "Your claim for address " + btcAddress + " was successfully processed.");
+
+            backToMainAirDropPage();
+        }
+        else {
+            // error status
+            reportMessageToUI("Claim request failed", "Unable to finalize claim process." +
+                                                      generateMessage(jsonRespond["error_message"].toString(), jsonRespond["error_code"].toInt( INT_MAX )) );
+        }
+        return;
     }
 
     if ( tag.startsWith(TAG_STATUS_PREF)) {
@@ -331,9 +445,83 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
                 }
             }
         }
+        return;
     }
 
 }
+
+
+void Airdrop::onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPassword) {
+    if (success) {
+        sendRequest( HTTP_CALL::GET, "/v1/getChallenge" ,
+                              {"btcaddress", btcaddress, "password", airDropAccPassword, "pubkey", publicKey },
+                              "",
+                              TAG_GET_CHALLENGE, btcaddress, identifier );
+
+    }
+    else {
+        reportMessageToUI("Claim request failed", "Unable to start claim process.\n" +
+                                                  errorMessage );
+    }
+}
+
+
+
+
+static void cleanFiles(const QString & inFileName, const QString & outFn) {
+    if (!inFileName.isEmpty())
+        QFile::remove( inFileName );
+
+    if (!outFn.isEmpty())
+        QFile::remove( outFn );
+}
+
+// Continue at onReceiveFile
+void Airdrop::onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn ) {
+    // It is a global listener. Not necessary it is our request. Need to check first
+
+    QString btcAddress = claimRequests.value( inFileName, "" );
+    if (btcAddress.isEmpty())
+        return; // not our call, just sckipping
+
+    // It is our call. Letch prepare for the request
+
+    if (!success) {
+        // Cleaning the data first
+        cleanFiles(inFileName, outFn);
+
+        reportMessageToUI("Claim request failed", "Unable to process the slate with mwc713 to complete the claim.\n" +
+                util::formatErrorMessages(errors) );
+        return;
+    }
+    else {
+        // outFN should contain the resulting slate...
+
+        QFile slateFile(outFn);
+        QByteArray stateData;
+        if (slateFile.open(QIODevice::ReadOnly )) {
+            stateData = slateFile.readAll();
+        }
+        else {
+            cleanFiles(inFileName, outFn);
+            reportMessageToUI("Claim request failed", "Unable to process the slate with mwc713 to complete the claim." );
+            return;
+        }
+        slateFile.close();
+
+        cleanFiles(inFileName, outFn);
+
+        sendRequest( HTTP_CALL::POST, "/v1/submitResponseSlate" ,
+                    {"btcaddress", btcAddress },
+                     stateData,
+                     TAG_RESPONCE_SLATE, btcAddress );
+    }
+
+}
+
+
+
+
 
 // Respond with error to UI. UI expected to stop waiting
 void Airdrop::reportMessageToUI( QString title, QString message ) {

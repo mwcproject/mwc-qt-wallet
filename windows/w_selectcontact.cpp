@@ -1,5 +1,5 @@
-#include "windows/selectcontact.h"
-#include "ui_selectcontact.h"
+#include "w_selectcontact.h"
+#include "ui_w_selectcontact.h"
 #include "../util/stringutils.h"
 #include <QListWidgetItem>
 #include "../control/messagebox.h"

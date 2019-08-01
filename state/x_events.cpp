@@ -52,6 +52,8 @@ QVector<wallet::WalletNotificationMessages> Events::getWalletNotificationMessage
 }
 
 void Events::onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message) {
+    Q_UNUSED(message);
+
     if (wnd!= nullptr) {
         wnd->updateShowMessages();
     }

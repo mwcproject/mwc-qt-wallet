@@ -84,14 +84,14 @@ struct WalletContact {
 struct WalletOutput {
 
     QString     outputCommitment;
-    QString    MMRIndex = 0;
-    QString    blockHeight = 0;
-    QString    lockedUntil = 0;
+    QString    MMRIndex;
+    QString    blockHeight;
+    QString    lockedUntil;
     QString    status;
-    bool       coinbase = 0;
-    QString    numOfConfirms = 0;
-    int64_t    valueNano = 0;
-    QString    txIdx = 0;
+    bool       coinbase = false;
+    QString    numOfConfirms;
+    int64_t    valueNano = 0L;
+    QString    txIdx;
 
     void setData(QString outputCommitment,
             QString     MMRIndex,
@@ -200,6 +200,7 @@ struct WalletNotificationMessages {
     QString toString() const;
 };
 
+
 // Interface to wallet functionality
 // can throw MwcException to signal errors
 class Wallet : public QObject
@@ -225,8 +226,11 @@ public:
     // Call might take few seconds
     virtual bool checkWalletInitialized() = 0;
 
+    enum STARTED_MODE { OFFLINE, NORMAL, INIT, RECOVER, GET_NEXTKEY, RECIEVE_SLATE };
+    virtual STARTED_MODE getStartedMode() = 0;
+
     // ---- Wallet Init Phase
-    virtual void start()   = 0;
+    virtual void start(bool loginWithLastKnownPassword)   = 0;
     // Create new wallet and generate a seed for it
     // Check signal: onNewSeed( seed [] )
     virtual void start2init(QString password) = 0;
@@ -236,16 +240,30 @@ public:
     // Check Signals: onRecoverResult(bool ok, QString newAddress );
     virtual void start2recover(const QVector<QString> & seed, QString password)   = 0;
 
+    // Need for claiming process only
+    // Starting the wallet and get the next key
+    // wallet713> getnextkey --amount 1000000
+    // "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
+    // Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPasswor);
+    virtual void start2getnextkey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) = 0;
+
+    // Need for claiming process only
+    // identifier  - output from start2getnextkey
+    // Check Signal: onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
+    virtual void start2recieveSlate( QString recieveAccount, QString identifier, QString slateFN ) = 0;
+
     // Check signal: onLoginResult(bool ok)
     virtual void loginWithPassword(QString password)   = 0;
 
     // Exit from the wallet. Expected that state machine will switch to Init state
-    virtual void logout()   = 0;
+    // syncCall - stop NOW. Caller suppose to understand what he is doing
+    virtual void logout(bool syncCall) = 0;
 
     // Close the wallet and release the process
     virtual bool close()  = 0;
 
     // Confirm that user write the passphase
+    // SYNC command
     virtual void confirmNewSeed()  = 0;
 
 
@@ -407,6 +425,9 @@ private:
 signals:
     // Notification/error message
     void onNewNotificationMessage(WalletNotificationMessages::LEVEL level, QString message);
+
+    // Get next key result
+    void onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPassword);
 
     // Result of the login
     void onLoginResult(bool ok);

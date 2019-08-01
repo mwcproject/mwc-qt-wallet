@@ -42,8 +42,10 @@ public:
     // Call might take few seconds
     virtual bool checkWalletInitialized() override;
 
+    virtual STARTED_MODE getStartedMode() override { if (mwc713process==nullptr) {return STARTED_MODE::OFFLINE;} return startedMode;}
+
     // ---- Wallet Init Phase
-    virtual void start()  override;
+    virtual void start(bool loginWithLastKnownPassword)  override;
     // Create new wallet and generate a seed for it
     // Check signal: onNewSeed( seed [] )
     virtual void start2init(QString password)  override;
@@ -52,17 +54,37 @@ public:
     // recover wallet with a passphrase:
     // Check Signals: onRecoverProgress( int progress, int maxVal );
     // Check Signals: onRecoverResult(bool ok, QString newAddress );
-    virtual void start2recover(const QVector<QString> & seed, QString password) override ;
+    virtual void start2recover(const QVector<QString> & seed, QString password) override;
+
+    // Need for claiming process only
+    // Starting the wallet and get the next key
+    // wallet713> getnextkey --amount 1000000
+    // "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
+    // Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage);
+    virtual void start2getnextkey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) override;
+
+    // it is a distructive command, that will process only this command and wallet will exit.
+    // respond will go with
+    // Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage);
+    //void processGetNextKey(int64_t amountNano, QString btcaddress, QString airDropAccPassword);
+
+    // Need for claiming process only
+    // identifier  - output from start2getnextkey
+    // Check Signal: onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
+    virtual void start2recieveSlate( QString recieveAccount,  QString identifier, QString slateFN ) override;
+
 
     // Check signal: onLoginResult(bool ok)
     virtual void loginWithPassword(QString password)  override;
 
     // Exit from the wallet. Expected that state machine will switch to Init state
-    virtual void logout()  override;
+    // syncCall - stop NOW. Caller suppose to understand what he is doing
+    virtual void logout(bool syncCall) override;
 
     virtual bool close()  override {return true;}
 
     // Confirm that user write the passphase
+    // SYNC command
     virtual void confirmNewSeed()  override;
 
     // Current seed for runnign wallet
@@ -212,13 +234,20 @@ public:
 public:
     // Feed the command to mwc713 process
     void executeMwc713command( QString cmd, QString shadowStr);
+
+
 public:
     // Task Reporting methods
     enum MESSAGE_LEVEL { FATAL_ERROR, CRITICAL, WARNING, INFO, DEBUG };
     enum MESSAGE_ID {INIT_ERROR, GENERIC, MWC7113_ERROR, TASK_TIMEOUT };
     void appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QString message );
 
+    // stop mwc713 process nicely
+    void processStop(bool exitNicely);
+
     void setLoginResult(bool ok);
+
+    void setGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPasswor);
 
     // Wallet init status
    // enum INIT_STATUS {NONE, NEED_PASSWORD, NEED_SEED, WRONG_PASSWORD, READY };
@@ -284,10 +313,9 @@ public:
 
     void setCheckResult(bool ok, QString errors);
 private:
-    // stop mwc713 process nicely
-    void stop(bool exitNicely = true);
 
-    void mwc713connect(QProcess * process);
+
+    void mwc713connect(QProcess * process, bool trackProcessExit);
     void mwc713disconnect();
 
     // Update acc value at collection accounts. If account is not founf, we can add it (addIfNotFound) or skip
@@ -308,6 +336,9 @@ private slots:
     void	mwc713readyReadStandardError();
     void	mwc713readyReadStandardOutput();
 
+
+private:
+
 private:
     core::AppContext * appContext; // app context to store current account name
 
@@ -315,6 +346,8 @@ private:
     QString mwc713configPath; // config file for mwc713
     QProcess * mwc713process = nullptr;
     tries::Mwc713InputParser * inputParser = nullptr; // Parser will generate bunch of signals that wallet will listem on
+
+    STARTED_MODE startedMode = STARTED_MODE::OFFLINE;
 
     Mwc713EventManager * eventCollector = nullptr;
 
@@ -336,8 +369,6 @@ private:
     // Accounts with balances info
     QVector<AccountInfo> accountInfo;
     QString currentAccount = "default"; // Keep current account by name. It fit better to mwc713 interactions.
-
-    bool wantSafelyExit = true; // want exit safely in destructor. It is not a ces for init. Init we want just kill.
 private:
     // Temprary values, local values for states
     QString walletPassword;

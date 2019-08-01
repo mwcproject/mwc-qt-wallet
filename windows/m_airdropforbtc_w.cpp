@@ -6,12 +6,13 @@
 
 namespace wnd {
 
-AirdropForBTC::AirdropForBTC(QWidget *parent, state::Airdrop * _state, QString _btcAddress, QString _challenge) :
+AirdropForBTC::AirdropForBTC(QWidget *parent, state::Airdrop * _state, QString _btcAddress, QString _challenge, QString _identifier) :
     QWidget(parent),
     ui(new Ui::AirdropForBTC),
     state(_state),
     btcAddress(_btcAddress.trimmed()),
-    challenge(_challenge.trimmed())
+    challenge(_challenge.trimmed()),
+    identifier(_identifier)
 {
     ui->setupUi(this);
 
@@ -40,7 +41,7 @@ void AirdropForBTC::on_claimButton_clicked()
         return;
     }
 
-    state->requestClaimMWC( btcAddress, challenge, signature );
+    state->requestClaimMWC( btcAddress, challenge, signature, identifier );
 
     ui->progress->show();
 }

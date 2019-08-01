@@ -1,5 +1,5 @@
-#include "windows/contacteditdlg.h"
-#include "ui_contacteditdlg.h"
+#include "windows/w_contacteditdlg.h"
+#include "ui_w_contacteditdlg.h"
 #include "../control/messagebox.h"
 
 namespace wnd {

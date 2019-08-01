@@ -3,7 +3,7 @@
 #include "../mwc713.h"
 #include "../../util/Log.h"
 #include <QThread>
-#include "TaskInit.h"
+#include "TaskWallet.h"
 
 namespace wallet {
 

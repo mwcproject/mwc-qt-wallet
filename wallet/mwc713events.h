@@ -123,6 +123,8 @@ public:
 
     const QVector<WEvent> & getEvents() const {return events;}
 
+    // clean all tasks, events and all
+    void clear();
 public slots:
     void slRecieveEvent( WALLET_EVENTS event, QString message); // message is optional
 

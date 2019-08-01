@@ -1,5 +1,5 @@
-#include "contacts.h"
-#include "../windows/contacts_w.h"
+#include "w_contacts.h"
+#include "windows/w_contacts_w.h"
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"

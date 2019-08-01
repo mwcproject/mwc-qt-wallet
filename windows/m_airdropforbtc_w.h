@@ -18,7 +18,7 @@ class AirdropForBTC : public QWidget
     Q_OBJECT
 
 public:
-    explicit AirdropForBTC(QWidget *parent, state::Airdrop * state, QString btcAddress, QString challenge );
+    explicit AirdropForBTC(QWidget *parent, state::Airdrop * state, QString btcAddress, QString challenge, QString identifier );
     ~AirdropForBTC();
 
     void reportMessage( QString title, QString message );
@@ -32,6 +32,7 @@ private:
     state::Airdrop * state;
     QString btcAddress;
     QString challenge;
+    QString identifier;
 };
 
 }

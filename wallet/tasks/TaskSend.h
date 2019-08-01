@@ -84,14 +84,17 @@ class TaskReceiveFile : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*20;
 
-    TaskReceiveFile( MWC713 *wallet713, QString fileName ) :
-            Mwc713Task("TaskReceiveFile",  QString("receive --file ") + util::toMwc713input(fileName), wallet713,"") {}
+    TaskReceiveFile( MWC713 *wallet713, QString fileName, QString identifier = "" ) :
+            Mwc713Task("TaskReceiveFile", buildCommand(fileName, identifier), wallet713,""), inFileName(fileName) {}
 
     virtual ~TaskReceiveFile() override {}
 
     virtual bool processTask(const QVector<WEvent> &events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    QString buildCommand(QString fileName, QString identifier) const;
+    QString inFileName;
 };
 
 class TaskFinalizeFile : public Mwc713Task {

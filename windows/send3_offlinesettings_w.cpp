@@ -1,6 +1,6 @@
 #include "send3_offlinesettings_w.h"
 #include "ui_send3_offlinesettings.h"
-#include "sendcoinsparamsdialog.h"
+#include "../dialogs/sendcoinsparamsdialog.h"
 #include "state/send3_Offline.h"
 #include "../control/messagebox.h"
 #include "../state/timeoutlock.h"

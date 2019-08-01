@@ -169,6 +169,16 @@ bool TaskSendFile::processTask(const QVector<WEvent> &events) {
 
 // ------------------- TaskReceiveFile -----------------------------
 
+QString TaskReceiveFile::buildCommand(QString fileName, QString identifier) const {
+    QString res("receive ");
+    res += "--file " + util::toMwc713input(fileName);
+    if ( ! identifier.isEmpty() ) {
+        res += " -k " + identifier;
+    }
+    return res;
+}
+
+
 bool TaskReceiveFile::processTask(const QVector<WEvent> &events) {
     QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
 
@@ -201,7 +211,7 @@ bool TaskReceiveFile::processTask(const QVector<WEvent> &events) {
     for (auto & er:errs)
         errMsg.push_back(er.message);
 
-    wallet713->setReceiveFile(false, errMsg, "","");
+    wallet713->setReceiveFile(false, errMsg, inFileName,"");
     return true;
 }
 

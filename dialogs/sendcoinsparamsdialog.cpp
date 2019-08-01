@@ -1,4 +1,4 @@
-#include "windows/sendcoinsparamsdialog.h"
+#include "sendcoinsparamsdialog.h"
 #include "ui_sendcoinsparamsdialog.h"
 #include "../control/messagebox.h"
 

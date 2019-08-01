@@ -31,7 +31,7 @@ void NavMenuAccount::on_seedButton_clicked()
 
     // State where to go after login
     context->appContext->setActiveWndState(state::STATE::SHOW_SEED);
-    context->wallet->logout();
+    context->wallet->logout(true);
     context->stateMachine->executeFrom( state::STATE::NONE);
     close();
 }

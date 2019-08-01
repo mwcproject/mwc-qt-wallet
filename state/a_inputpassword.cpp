@@ -39,7 +39,7 @@ NextStateRespond InputPassword::execute() {
 
         // Starting the wallet normally. The password is needed and it will be provided.
         // It is a first run, just need to login
-        context->wallet->start();
+        context->wallet->start(false);
 
         wnd = (wnd::InputPassword*)context->wndManager->switchToWindowEx(new wnd::InputPassword( context->wndManager->getInWndParent(), this, false ) );
 
@@ -65,8 +65,8 @@ void InputPassword::submitPassword(const QString & password) {
 
     // Check if we need to logout first. It is very valid case if we in lock mode
     if ( !inLockMode ) {
-        context->wallet->logout();
-        context->wallet->start();
+        context->wallet->logout(true);
+        context->wallet->start(false);
         inLockMode = false;
     }
 
@@ -86,16 +86,18 @@ void InputPassword::onLoginResult(bool ok) {
     }
     else {
         // Going forward by initializing the wallet
+        if ( context->wallet->getStartedMode() == wallet::Wallet::STARTED_MODE::NORMAL ) { // Normall start of the wallet. Problem that now we have many cases how wallet started
 
-        // Start listening, no feedback interested
-        context->wallet->listeningStart(true, false);
-        context->wallet->listeningStart(false, true);
+            // Start listening, no feedback interested
+            context->wallet->listeningStart(true, false);
+            context->wallet->listeningStart(false, true);
 
-        // Set current receive account
-        context->wallet->setReceiveAccount( context->appContext->getReceiveAccount() );
+            // Set current receive account
+            context->wallet->setReceiveAccount(context->appContext->getReceiveAccount());
 
-        // Updating the wallet balance
-        context->wallet->updateWalletBalance();
+            // Updating the wallet balance
+            context->wallet->updateWalletBalance();
+        }
 
     }
 }
