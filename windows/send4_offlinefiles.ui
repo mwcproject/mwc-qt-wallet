@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="2,0,1,0,1">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="3,0,1,0,1">
    <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -123,9 +123,6 @@
          <property name="text">
           <string/>
          </property>
-         <property name="pixmap">
-          <pixmap resource="../resources.qrc">:/img/SendSend.png</pixmap>
-         </property>
          <property name="scaledContents">
           <bool>true</bool>
          </property>
@@ -205,9 +202,6 @@
          </property>
          <property name="text">
           <string/>
-         </property>
-         <property name="pixmap">
-          <pixmap resource="../resources.qrc">:/img/SendReceive.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -433,12 +427,6 @@
    <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcFrameWithBorder</class>
-   <extends>QFrame</extends>
-   <header>control/MwcFrameWithBorder.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
@@ -448,9 +436,13 @@
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
+  <customwidget>
+   <class>control::MwcFrameWithBorder</class>
+   <extends>QFrame</extends>
+   <header>control/MwcFrameWithBorder.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

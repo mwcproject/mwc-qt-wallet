@@ -91,11 +91,11 @@ QRadioButton {
 }
 
 QRadioButton::indicator:unchecked {
-    image: url(:/img/RadioOff.png);
+    image: url(:/img/RadioOff.svg);
 }
 
 QRadioButton::indicator:checked {
-    image: url(:/img/RadioOn.png);
+    image: url(:/img/RadioOn.svg);
 }
 
 

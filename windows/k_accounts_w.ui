@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,7,1">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2,14,1">
    <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -152,7 +152,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="renameButton">
+          <widget class="control::MwcPushButtonRound" name="renameButton">
            <property name="minimumSize">
             <size>
              <width>40</width>
@@ -182,7 +182,7 @@
            </property>
            <property name="icon">
             <iconset resource="../resources.qrc">
-             <normaloff>:/img/NavAccount.png</normaloff>:/img/NavAccount.png</iconset>
+             <normaloff>:/img/Edit@2x.svg</normaloff>:/img/Edit@2x.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -199,7 +199,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="transferButton">
+          <widget class="control::MwcPushButtonRound" name="transferButton">
            <property name="minimumSize">
             <size>
              <width>40</width>
@@ -229,7 +229,7 @@
            </property>
            <property name="icon">
             <iconset resource="../resources.qrc">
-             <normaloff>:/img/Transfer.png</normaloff>:/img/Transfer.png</iconset>
+             <normaloff>:/img/Transfer@2x.svg</normaloff>:/img/Transfer@2x.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -262,7 +262,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="refreshButton">
+          <widget class="control::MwcPushButtonRound" name="refreshButton">
            <property name="minimumSize">
             <size>
              <width>40</width>
@@ -292,7 +292,7 @@
            </property>
            <property name="icon">
             <iconset resource="../resources.qrc">
-             <normaloff>:/img/Refresh.png</normaloff>:/img/Refresh.png</iconset>
+             <normaloff>:/img/Refresh@2x.svg</normaloff>:/img/Refresh@2x.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -309,7 +309,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="addButton">
+          <widget class="control::MwcPushButtonRound" name="addButton">
            <property name="minimumSize">
             <size>
              <width>40</width>
@@ -338,8 +338,8 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources.qrc">
-             <normaloff>:/img/Add.png</normaloff>:/img/Add.png</iconset>
+            <iconset>
+             <normaloff>:/img/Add.svg</normaloff>:/img/Add.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -356,7 +356,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="deleteButton">
+          <widget class="control::MwcPushButtonRound" name="deleteButton">
            <property name="minimumSize">
             <size>
              <width>40</width>
@@ -386,7 +386,7 @@
            </property>
            <property name="icon">
             <iconset resource="../resources.qrc">
-             <normaloff>:/img/Delete.png</normaloff>:/img/Delete.png</iconset>
+             <normaloff>:/img/Delete@2x.svg</normaloff>:/img/Delete@2x.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -446,6 +446,11 @@
    <class>ListWithColumns</class>
    <extends>QTableWidget</extends>
    <header>control/listwithcolumns.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcPushButtonRound</class>
+   <extends>QPushButton</extends>
+   <header>control/MwcPushButton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

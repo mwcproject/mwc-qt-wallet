@@ -92,14 +92,14 @@ void InputPassword::on_instancesButton_clicked()
 }
 
 void InputPassword::updateMwcMqState(bool online) {
-    ui->mwcMqStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk.png" : ":/img/StatusEmpty.png") );
+    ui->mwcMqStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->mwcMqStatusImg->setToolTip(online ? "Listener connected to mwcmq" : "Listener diconnected from mwcmq");
     ui->mwcMqStatusTxt->setText( online ? "Online" : "Offline" );
 }
 
 void InputPassword::updateKeybaseState(bool online) {
 
-    ui->keybaseStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOk.png" : ":/img/StatusEmpty.png" ) );
+    ui->keybaseStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg" ) );
     ui->keybaseStatusImg->setToolTip(online ? "Listener connected to keybase" : "Listener diconnected from keybase");
     ui->keybaseStatusTxt->setText( online ? "Online" : "Offline" );
 }

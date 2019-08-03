@@ -42,7 +42,7 @@ void Listening::updateMwcMqAddress(QString address, int addrIdx) {
 }
 
 void Listening::updateMwcMqState(bool online) {
-    ui->mwcMqStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk.png" : ":/img/StatusEmpty.png") );
+    ui->mwcMqStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->mwcMqStatusImg->setToolTip(online ? "Listener connected to mwcmq" : "Listener diconnected from mwcmq");
     ui->mwcMqStatusTxt->setText( online ? "Online" : "Offline" );
     ui->mwcMqTriggerButton->setText( online ? "Stop" : "Start" );
@@ -53,7 +53,7 @@ void Listening::updateMwcMqState(bool online) {
 
 void Listening::updateKeybaseState(bool online) {
 
-    ui->keybaseStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOk.png" : ":/img/StatusEmpty.png" ) );
+    ui->keybaseStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg" ) );
     ui->keybaseStatusImg->setToolTip(online ? "Listener connected to keybase" : "Listener diconnected from keybase");
     ui->keybaseStatusTxt->setText( online ? "Online" : "Offline" );
     ui->keybaseTriggerButton->setToolTip(online ? "Stop the Keybase Listener" : "Start the Keybase Listener");

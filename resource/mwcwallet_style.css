@@ -202,14 +202,22 @@ control--MwcPushButtonTinyUnderline {
     border: none;
 }
 
+control--MwcPushButtonRound {
+    font-size: 15px;
+    border-radius: 18px;
+    border: none;
+}
+
+
 QPushButton:focus {
     background: #FFFFFF;
     color: #6F00D6;
 }
 
 QPushButton:disabled {
-    border: 2px solid gray;
-    color: gray;
+/*    border: 2px solid gray;
+    color: gray;*/
+    background: rgba(255, 255, 255, 0.5);
 }
 
 QPushButton:pressed {
@@ -312,7 +320,7 @@ control--MwcComboBox::drop-down {
 }
 
 control--MwcComboBox::down-arrow {
-    image: url(:/img/ComboBoxArrow.png);
+    image: url(:/img/ComboBoxArrow.svg);
     border: transparent;
 }
 
@@ -332,11 +340,11 @@ QRadioButton::indicator {
 }
 
 QRadioButton::indicator:unchecked {
-    image: url(:/img/RadioOff.png);
+    image: url(:/img/RadioOff.svg);
 }
 
 QRadioButton::indicator:checked {
-    image: url(:/img/RadioOn.png);
+    image: url(:/img/RadioOn.svg);
 }
 
 

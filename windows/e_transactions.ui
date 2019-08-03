@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,7,1">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="2,14,1">
    <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -365,7 +365,7 @@
              <set>Qt::AlignCenter</set>
             </property>
            </widget>
-           <widget class="QPushButton" name="nextBtn">
+           <widget class="control::MwcPushButtonRound" name="nextBtn">
             <property name="geometry">
              <rect>
               <x>138</x>
@@ -403,7 +403,7 @@
             </property>
             <property name="icon">
              <iconset resource="../resources.qrc">
-              <normaloff>:/img/Left.png</normaloff>:/img/Left.png</iconset>
+              <normaloff>:/img/Left@2x.svg</normaloff>:/img/Left@2x.svg</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -418,7 +418,7 @@
              <bool>true</bool>
             </property>
            </widget>
-           <widget class="QPushButton" name="prevBtn">
+           <widget class="control::MwcPushButtonRound" name="prevBtn">
             <property name="geometry">
              <rect>
               <x>186</x>
@@ -456,7 +456,7 @@
             </property>
             <property name="icon">
              <iconset resource="../resources.qrc">
-              <normaloff>:/img/Right.png</normaloff>:/img/Right.png</iconset>
+              <normaloff>:/img/Right@2x.svg</normaloff>:/img/Right@2x.svg</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -496,7 +496,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="deleteButton">
+          <widget class="control::MwcPushButtonRound" name="deleteButton">
            <property name="minimumSize">
             <size>
              <width>40</width>
@@ -525,8 +525,8 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources.qrc">
-             <normaloff>:/img/Delete.png</normaloff>:/img/Delete.png</iconset>
+            <iconset>
+             <normaloff>:/img/Delete.svg</normaloff>:/img/Delete.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -565,7 +565,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="refreshButton">
+          <widget class="control::MwcPushButtonRound" name="refreshButton">
            <property name="minimumSize">
             <size>
              <width>40</width>
@@ -595,7 +595,7 @@
            </property>
            <property name="icon">
             <iconset resource="../resources.qrc">
-             <normaloff>:/img/Refresh.png</normaloff>:/img/Refresh.png</iconset>
+             <normaloff>:/img/Refresh@2x.svg</normaloff>:/img/Refresh@2x.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -647,9 +647,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcComboBox</class>
-   <extends>QComboBox</extends>
-   <header>control/MwcComboBox.h</header>
+   <class>control::MwcPushButtonNormal</class>
+   <extends>QPushButton</extends>
+   <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelProgress</class>
@@ -657,19 +657,24 @@
    <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>ListWithColumns</class>
    <extends>QTableWidget</extends>
    <header>control/listwithcolumns.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcPushButtonNormal</class>
-   <extends>QPushButton</extends>
-   <header>control/MwcPushButton.h</header>
+   <class>control::MwcComboBox</class>
+   <extends>QComboBox</extends>
+   <header>control/MwcComboBox.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <class>control::MwcPushButtonRound</class>
+   <extends>QPushButton</extends>
+   <header>control/MwcPushButton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

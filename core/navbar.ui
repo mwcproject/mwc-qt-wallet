@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>120</width>
-    <height>35</height>
+    <width>130</width>
+    <height>40</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>35</width>
-     <height>35</height>
+     <width>38</width>
+     <height>38</height>
     </rect>
    </property>
    <property name="text">
@@ -27,7 +27,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/NavNotificationNormal.png</normaloff>:/img/NavNotificationNormal.png</iconset>
+     <normaloff>:/img/NavNotificationNormal@2x.svg</normaloff>:/img/NavNotificationNormal@2x.svg</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -48,10 +48,10 @@
   <widget class="control::NavPushButton" name="settingsButton">
    <property name="geometry">
     <rect>
-     <x>42</x>
+     <x>45</x>
      <y>0</y>
-     <width>35</width>
-     <height>35</height>
+     <width>38</width>
+     <height>38</height>
     </rect>
    </property>
    <property name="text">
@@ -59,7 +59,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/NavSettings.png</normaloff>:/img/NavSettings.png</iconset>
+     <normaloff>:/img/NavSettings@2x.svg</normaloff>:/img/NavSettings@2x.svg</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -80,10 +80,10 @@
   <widget class="control::NavPushButton" name="accountButton">
    <property name="geometry">
     <rect>
-     <x>84</x>
+     <x>90</x>
      <y>0</y>
-     <width>35</width>
-     <height>35</height>
+     <width>38</width>
+     <height>38</height>
     </rect>
    </property>
    <property name="text">
@@ -91,7 +91,7 @@
    </property>
    <property name="icon">
     <iconset resource="../resources.qrc">
-     <normaloff>:/img/NavAccount.png</normaloff>:/img/NavAccount.png</iconset>
+     <normaloff>:/img/NavAccount@2x.svg</normaloff>:/img/NavAccount@2x.svg</iconset>
    </property>
    <property name="iconSize">
     <size>

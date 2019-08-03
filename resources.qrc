@@ -2,39 +2,37 @@
     <qresource prefix="/">
         <file>txt/bip39_words.txt</file>
         <file>resource/mwcwallet_style.css</file>
-        <file>img/Receive.png</file>
-        <file>img/Send.png</file>
-        <file>img/Transactions.png</file>
-        <file>img/Airdrop.png</file>
-        <file>img/HODL.png</file>
-        <file>img/TBLogo.png</file>
-        <file>img/StatusFail.png</file>
-        <file>img/StatusOk.png</file>
-        <file>img/HelpBtn.png</file>
-        <file>img/BigLogo.png</file>
+        <file>img/Receive@2x.svg</file>
+        <file>img/Send@2x.svg</file>
+        <file>img/Transactions@2x.svg</file>
+        <file>img/Airdrop@2x.svg</file>
+        <file>img/HODL@2x.svg</file>
+        <file>img/TBLogo@2x.svg</file>
+        <file>img/StatusFail@2x.svg</file>
+        <file>img/StatusOk@2x.svg</file>
+        <file>img/HelpBtn@2x.svg</file>
         <file>resource/dialogs_style.css</file>
         <file>img/loading.gif</file>
         <file>resource/mwc-gui-wallet.conf</file>
         <file>resource/wallet713_mac.toml</file>
         <file>resource/wallet713_def.toml</file>
-        <file>img/StatusEmpty.png</file>
-        <file>img/SendOffline.png</file>
-        <file>img/SendOnline.png</file>
-        <file>img/ComboBoxArrow.png</file>
-        <file>img/SendReceive.png</file>
-        <file>img/SendSend.png</file>
-        <file>img/File.png</file>
-        <file>img/RadioOff.png</file>
-        <file>img/RadioOn.png</file>
-        <file>img/Refresh.png</file>
-        <file>img/Delete.png</file>
-        <file>img/NavAccount.png</file>
-        <file>img/NavNotificationActive.png</file>
-        <file>img/NavNotificationNormal.png</file>
-        <file>img/NavSettings.png</file>
-        <file>img/Add.png</file>
-        <file>img/Transfer.png</file>
-        <file>img/Left.png</file>
-        <file>img/Right.png</file>
+        <file>img/StatusEmpty@2x.svg</file>
+        <file>img/SendOnline@2x.svg</file>
+        <file>img/ComboBoxArrow@2x.svg</file>
+        <file>img/File@2x.svg</file>
+        <file>img/RadioOff@2x.svg</file>
+        <file>img/RadioOn@2x.svg</file>
+        <file>img/Refresh@2x.svg</file>
+        <file>img/Delete@2x.svg</file>
+        <file>img/NavAccount@2x.svg</file>
+        <file>img/NavNotificationActive@2x.svg</file>
+        <file>img/NavNotificationNormal@2x.svg</file>
+        <file>img/NavSettings@2x.svg</file>
+        <file>img/Add@2x.svg</file>
+        <file>img/Transfer@2x.svg</file>
+        <file>img/Left@2x.svg</file>
+        <file>img/Right@2x.svg</file>
+        <file>img/Edit@2x.svg</file>
+        <file>img/BigLogo@2x.svg</file>
     </qresource>
 </RCC>

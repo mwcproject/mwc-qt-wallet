@@ -42,6 +42,16 @@ public:
 };
 
 
+class MwcPushButtonRound : public QPushButton {
+Q_OBJECT
+public:
+    explicit MwcPushButtonRound(QWidget *parent = Q_NULLPTR);
+    explicit MwcPushButtonRound(const QString &text, QWidget *parent = Q_NULLPTR);
+    MwcPushButtonRound(const QIcon &icon, const QString &text, QWidget *parent = Q_NULLPTR);
+    virtual ~MwcPushButtonRound() override;
+};
+
+
 }
 
 #endif //GUI_WALLET_MWCPUSHBUTTON_H

@@ -73,7 +73,7 @@ QString PasswordAnalyser::getPasswordQualityStr()
         return "<font color=#CCFF33>Password require at least "+ QString::number(PASS_MIN_LOWCASE) +" low case symbol</font>";
 
     if (entropyLen < len/2) {
-        return "<font color=#CCFF33; font-size: 18px>Your password phrase has low entropy. Please choose another phrase</font>";
+        return "<font color=#CCFF33>Your password phrase has low entropy. Please choose another phrase</font>";
     }
 
     return "";// "<font color=\"green\">OK</font>";

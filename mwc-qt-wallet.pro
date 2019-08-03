@@ -1,6 +1,6 @@
 # MWC QT Wallet project for QtCreator
 
-QT       += core gui widgets network
+QT       += core gui widgets network svg
 requires(qtConfig(completer))
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

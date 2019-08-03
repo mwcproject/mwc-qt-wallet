@@ -135,7 +135,7 @@ void MainWindow::updateListenerBtn() {
 
     bool listening = listStatus.first | listStatus.second;
 
-    QPixmap pixmap( listening ? ":/img/StatusOk.png" : ":/img/StatusFail.png" );
+    QPixmap pixmap( listening ? ":/img/StatusOk@2x.svg" : ":/img/StatusFail@2x.svg" );
 
     QIcon ButtonIcon(pixmap);
     ui->connectionStatusButton->setIcon( ButtonIcon );

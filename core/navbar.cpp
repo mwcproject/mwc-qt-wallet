@@ -37,7 +37,7 @@ void NavBar::checkButton(BTN b) {
 
 void NavBar::onUpdateNonShownWarnings(bool hasNonShownWarns) {
     ui->notificationButton->setIcon( QIcon( QPixmap(
-            hasNonShownWarns ? ":/img/NavNotificationActive.png" : ":/img/NavNotificationNormal.png" ) ) );
+            hasNonShownWarns ? ":/img/NavNotificationActive@2x.svg" : ":/img/NavNotificationNormal@2x.svg" ) ) );
 }
 
 void NavBar::on_notificationButton_clicked()

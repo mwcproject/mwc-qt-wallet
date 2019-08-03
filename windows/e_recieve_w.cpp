@@ -36,12 +36,12 @@ void Recieve::updateMwcMqAddress(QString address) {
 }
 
 void Recieve::updateMwcMqState(bool online) {
-    ui->mwcmqStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk.png" : ":/img/StatusEmpty.png") );
+    ui->mwcmqStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->mwcmqStatusLabel->setText( online ? "Online" : "Offline" );
 }
 
 void Recieve::updateKeybaseState(bool online) {
-    ui->keybaseStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk.png" : ":/img/StatusEmpty.png") );
+    ui->keybaseStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->keybaseStatusLabel->setText( online ? "Online" : "Offline" );
 }
 

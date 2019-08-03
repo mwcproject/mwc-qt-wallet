@@ -72,6 +72,22 @@ MwcPushButtonTinyUnderline::MwcPushButtonTinyUnderline(const QIcon &icon, const 
 MwcPushButtonTinyUnderline::~MwcPushButtonTinyUnderline()
 {}
 
+// -----------------   MwcPushButtonRound  -----------------------
+
+
+MwcPushButtonRound::MwcPushButtonRound(QWidget *parent) :
+    QPushButton(parent)
+{}
+MwcPushButtonRound::MwcPushButtonRound(const QString &text, QWidget *parent) :
+    QPushButton(text,parent)
+{}
+
+MwcPushButtonRound::MwcPushButtonRound(const QIcon &icon, const QString &text, QWidget *parent)  :
+    QPushButton(icon,text,parent)
+{}
+
+MwcPushButtonRound::~MwcPushButtonRound() {}
+
 
 
 }
