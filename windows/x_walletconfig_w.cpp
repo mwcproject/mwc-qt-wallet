@@ -21,8 +21,6 @@ WalletConfig::WalletConfig(QWidget *parent, state::WalletConfig * _state) :
 {
     ui->setupUi(this);
 
-    state->setWindowTitle("Wallet config");
-
     currentWalletConfig = state->getWalletConfig();
     sendParams = state->getSendCoinsParams();
 
@@ -177,7 +175,7 @@ void WalletConfig::on_mwc713directorySelect_clicked()
     QString basePath = ioutils::getAppDataPath();
     QString dir = QFileDialog::getExistingDirectory(
             nullptr,
-            "Select your wallet forder name",
+            "Select your wallet folder name",
             basePath);
     if (dir.isEmpty())
         return;

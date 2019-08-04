@@ -9,6 +9,7 @@ class InitAccount;
 
 namespace state {
     class InitAccount;
+    class WalletConfig;
 }
 
 namespace wnd {
@@ -18,7 +19,7 @@ class InitAccount : public QWidget
     Q_OBJECT
 
 public:
-    explicit InitAccount(QWidget *parent, state::InitAccount * state);
+    explicit InitAccount(QWidget *parent, state::InitAccount * state, state::WalletConfig * configState);
     virtual ~InitAccount() override;
 
 private slots:
@@ -31,6 +32,7 @@ private slots:
 private:
     Ui::InitAccount *ui;
     state::InitAccount * state;
+    state::WalletConfig * configState;
 };
 
 }

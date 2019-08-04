@@ -40,7 +40,8 @@ NextStateRespond InitAccount::execute() {
     // So we have to init the wallet
     if ( !running && context->appContext->pullCookie<QString>("checkWalletInitialized")=="FAILED" ) {
         context->wndManager->switchToWindowEx(
-                    new wnd::InitAccount( context->wndManager->getInWndParent(), this ) );
+                    new wnd::InitAccount( context->wndManager->getInWndParent(), this,
+                            (state::WalletConfig *) context->stateMachine->getState(STATE::WALLET_CONFIG) ) );
 
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
     }

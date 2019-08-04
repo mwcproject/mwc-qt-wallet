@@ -9,13 +9,15 @@
 #include "../core/global.h"
 #include "../util/stringutils.h"
 #include "../state/timeoutlock.h"
+#include "../dialogs/x_walletinstances.h"
 
 namespace wnd {
 
-InitAccount::InitAccount(QWidget *parent, state::InitAccount * _state) :
+InitAccount::InitAccount(QWidget *parent, state::InitAccount * _state, state::WalletConfig * _configState) :
     QWidget(parent),
     ui(new Ui::InitAccount),
-    state(_state)
+    state(_state),
+    configState(_configState)
 {
     ui->setupUi(this);
 
@@ -83,7 +85,8 @@ void InitAccount::on_instancesButton_clicked()
 {
     state::TimeoutLockObject to(state);
 
-    control::MessageBox::message(this, "Not implemented", "Here we will have a dialog or a page where it will be possible to specify the directory with wallet data. Somilar to electrum");
+    dlg::WalletInstances  walletInstances(this, configState);
+    walletInstances.exec();
 }
 
 }

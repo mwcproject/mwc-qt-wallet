@@ -10,13 +10,15 @@
 #include <QLabel>
 #include "../core/global.h"
 #include "../state/timeoutlock.h"
+#include "../dialogs/x_walletinstances.h"
 
 namespace wnd {
 
-InputPassword::InputPassword(QWidget *parent, state::InputPassword * _state, bool lockMode) :
+InputPassword::InputPassword(QWidget *parent, state::InputPassword * _state, state::WalletConfig * _configState, bool lockMode) :
     QWidget(parent),
     ui(new Ui::InputPassword),
-    state(_state)
+    state(_state),
+    configState(_configState)
 {
     ui->setupUi(this);
 
@@ -88,7 +90,9 @@ void InputPassword::reportWrongPassword() {
 void InputPassword::on_instancesButton_clicked()
 {
     state::TimeoutLockObject to(state);
-    control::MessageBox::message(this, "Not implemented", "Here we will have a dialog or a page where it will be possible to specify the directory with wallet data. Somilar to electrum");
+
+    dlg::WalletInstances  walletInstances(this, configState);
+    walletInstances.exec();
 }
 
 void InputPassword::updateMwcMqState(bool online) {

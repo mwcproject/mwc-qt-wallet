@@ -1,7 +1,7 @@
 #ifndef CONTACTSW_H
 #define CONTACTSW_H
 
-#include <QWidget>
+#include "../core/navwnd.h"
 #include "../wallet/wallet.h"
 #include "../core/appcontext.h"
 
@@ -15,7 +15,7 @@ namespace state {
 
 namespace wnd {
 
-class Contacts : public QWidget
+class Contacts : public core::NavWnd
 {
     Q_OBJECT
 

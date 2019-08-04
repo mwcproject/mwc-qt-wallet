@@ -9,6 +9,7 @@ class InputPassword;
 
 namespace state {
     class InputPassword;
+    class WalletConfig;
 }
 
 namespace wnd {
@@ -18,7 +19,7 @@ class InputPassword : public QWidget
     Q_OBJECT
 
 public:
-    explicit InputPassword(QWidget *parent, state::InputPassword * state, bool lockMode);
+    explicit InputPassword(QWidget *parent, state::InputPassword * state, state::WalletConfig * configState, bool lockMode);
     ~InputPassword();
 
     void startWaiting();
@@ -37,6 +38,7 @@ private slots:
 private:
     Ui::InputPassword *ui;
     state::InputPassword * state;
+    state::WalletConfig * configState;
 };
 
 }

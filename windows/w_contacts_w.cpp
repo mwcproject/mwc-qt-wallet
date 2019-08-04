@@ -8,7 +8,7 @@
 namespace wnd {
 
 Contacts::Contacts(QWidget *parent, state::Contacts * _state) :
-    QWidget(parent),
+    core::NavWnd(parent, _state->getContext()),
     ui(new Ui::Contacts),
     state(_state)
 {

@@ -1,6 +1,7 @@
 #include "w_contacteditdlg.h"
 #include "ui_w_contacteditdlg.h"
 #include "../control/messagebox.h"
+#include "../util/address.h"
 
 namespace wnd {
 
@@ -32,19 +33,31 @@ void ContactEditDlg::on_applyButton_clicked()
     if ( contact.name.isEmpty() )
     {
         control::MessageBox::message(this, "Need Info", "Please specify a name for your contact");
+        ui->nameEdit->setFocus();
         return;
     }
 
     if ( contact.address.isEmpty() )
     {
         control::MessageBox::message(this, "Need info", "Please specify an address for your contact");
+        ui->addressEdit->setFocus();
         return;
     }
+
+    QPair< bool, util::ADDRESS_TYPE > res = util::verifyAddress(contact.address);
+    if ( !res.first ) {
+        control::MessageBox::message(this, "Incorrect Input",
+                                     "Please specify correct address for your contact" );
+        ui->addressEdit->setFocus();
+        return;
+    }
+
 
     for ( auto & cnt : contactList ) {
             if (cnt.name == contact.name) {
                 control::MessageBox::message(this, "Names collision", "Contact with a name "+contact.name+
                                       " allready exist. Please specify unique name for your contact");
+                ui->nameEdit->setFocus();
                 return;
             }
     }

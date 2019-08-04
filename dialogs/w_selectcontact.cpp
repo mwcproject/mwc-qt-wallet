@@ -94,9 +94,8 @@ void SelectContact::on_selectButton_clicked()
 
 void SelectContact::on_contactsTable_itemDoubleClicked(QTableWidgetItem *item)
 {
-    int idx = item->data(Qt::UserRole).toInt();
-    selectedContact = contacts[idx];
-    accept();
+    Q_UNUSED(item);
+    on_selectButton_clicked();
 }
 
 }

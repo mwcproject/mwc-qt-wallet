@@ -41,7 +41,9 @@ NextStateRespond InputPassword::execute() {
         // It is a first run, just need to login
         context->wallet->start(false);
 
-        wnd = (wnd::InputPassword*)context->wndManager->switchToWindowEx(new wnd::InputPassword( context->wndManager->getInWndParent(), this, false ) );
+        wnd = (wnd::InputPassword*)context->wndManager->switchToWindowEx(new wnd::InputPassword( context->wndManager->getInWndParent(), this,
+                (state::WalletConfig *) context->stateMachine->getState(STATE::WALLET_CONFIG),
+                false ) );
 
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
     }
@@ -49,7 +51,9 @@ NextStateRespond InputPassword::execute() {
     if (!lockStr.isEmpty()) {
         inLockMode = true;
                 // wallet locking mode
-        wnd = (wnd::InputPassword*)context->wndManager->switchToWindowEx(new wnd::InputPassword( context->wndManager->getInWndParent(), this, true ) );
+        wnd = (wnd::InputPassword*)context->wndManager->switchToWindowEx(new wnd::InputPassword( context->wndManager->getInWndParent(), this,
+                      (state::WalletConfig *) context->stateMachine->getState(STATE::WALLET_CONFIG),
+                      true ) );
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
     }
 
