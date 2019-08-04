@@ -6,6 +6,7 @@
 #include <QDir>
 #include "../control/messagebox.h"
 #include "../core/global.h"
+#include <QtAlgorithms>
 
 namespace core {
 
@@ -30,6 +31,35 @@ bool SendCoinsParams::loadData(QDataStream & in) {
     return true;
 }
 
+//////////////////////////////////////////////////////////////////
+
+void ContactRecord::setData(QString _name,
+                            QString _address)
+{
+    name = _name;
+    address = _address;
+}
+
+void ContactRecord::saveData( QDataStream & out) const {
+    out << 0x89365;
+    out << name;
+    out << address;
+}
+
+bool ContactRecord::loadData( QDataStream & in) {
+    int id = 0;
+    in >> id;
+    if (id!=0x89365)
+        return false;
+
+    in >> name;
+    in >> address;
+    return true;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//   AppContext
 
 AppContext::AppContext() {
     loadData();
@@ -52,19 +82,6 @@ AppContext::AppContext() {
 AppContext::~AppContext() {
     saveData();
 }
-
-/*void AppContext::setPassHash(const QString & pass) {
-    if (pass.length()==0) {
-        passHash = -1;
-        return;
-    }
-
-    passHash = qHash(pass) % 0xFFFF;
-}
-
-bool AppContext::checkPassHash(const QString & pass) const {
-    return passHash == qHash(pass) % 0xFFFF;
-}*/
 
 // Get last path state. Default: Home dir
 QString AppContext::getPathFor( QString name ) const {
@@ -98,29 +115,40 @@ bool AppContext::loadData() {
     if ( !file.open(QIODevice::ReadOnly) ) {
         // first run, no file exist
         return false;
-     }
+    }
 
-     QDataStream in(&file);
-     in.setVersion(QDataStream::Qt_5_7);
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_5_7);
 
-     int id = 0;
-     in >> id;
-     if (id!=0x4782)
+    int id = 0;
+    in >> id;
+    if (id!=0x4783)
          return false;
 
-     in >> recieveAccount;
-     in >> currentAccountName;
+    in >> recieveAccount;
+    in >> currentAccountName;
 
-     int st;
-     in >> st;
-     activeWndState = (state::STATE)st;
+    int st;
+    in >> st;
+    activeWndState = (state::STATE)st;
 
-     in >> pathStates;
-     in >> intVectorStates;
+    in >> pathStates;
+    in >> intVectorStates;
 
-     sendCoinsParams.loadData(in);
+    sendCoinsParams.loadData(in);
 
-     return true;
+    int contSz = 0;
+    in >> contSz;
+    contactList.clear();
+    for (int i=0;i<contSz;i++) {
+        core::ContactRecord cnt;
+        if (cnt.loadData(in))
+            contactList.push_back(cnt);
+        else
+            return false;
+    }
+
+    return true;
 }
 
 void AppContext::saveData() const {
@@ -139,7 +167,7 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x4782;
+    out << 0x4783;
     out << recieveAccount;
     out << currentAccountName;
     out << int(activeWndState);
@@ -147,6 +175,11 @@ void AppContext::saveData() const {
     out << intVectorStates;
 
     sendCoinsParams.saveData(out);
+
+    out << (int)contactList.size();
+    for ( const auto & c : contactList ) {
+        c.saveData(out);
+    }
 }
 
 // AirdropRequests will handle differently
@@ -206,6 +239,50 @@ QVector<state::AirdropRequests> AppContext::loadAirdropRequests() const {
     }
 
     return res;
+}
+
+
+// -------------- Contacts
+
+// Add new contact
+QPair<bool, QString> AppContext::addContact( const ContactRecord & contact ) {
+    // check for duplication...
+    // Check for names duplication...
+    for ( const auto & cont : contactList ) {
+        if (cont.name == contact.name)
+            return QPair<bool, QString>(false, "Contact '" + contact.name + "' already exist.");
+    }
+
+    contactList.push_back(contact);
+    qSort(contactList.begin(), contactList.end(), [](const ContactRecord &c1, const ContactRecord &c2) { return c1.name < c2.name; } );
+    saveData();
+    return QPair<bool, QString>(true, "");
+}
+
+// Remove contact. return false if not found
+QPair<bool, QString> AppContext::deleteContact( const ContactRecord & contact ) {
+
+    for ( int i=0; i<contactList.size(); i++ ) {
+        if ( contactList[i] == contact ) {
+            contactList.remove(i);
+            saveData();
+            return QPair<bool, QString>(true, "");
+        }
+    }
+    return QPair<bool, QString>(false, "Contact '" + contact.name + "' not found. Unable to delete it.");
+}
+
+// Update contact
+QPair<bool, QString> AppContext::updateContact( const ContactRecord & prevValue, const ContactRecord & newValue ) {
+    for ( int i=0; i<contactList.size(); i++ ) {
+        if ( contactList[i] == prevValue ) {
+            contactList[i] = newValue;
+            qSort(contactList.begin(), contactList.end(), [](const ContactRecord &c1, const ContactRecord &c2) { return c1.name < c2.name; } );
+            saveData();
+            return QPair<bool, QString>(true, "");
+        }
+    }
+    return QPair<bool, QString>(false, "Contact '" + prevValue.name + "' not found. Unable to update it.");
 }
 
 

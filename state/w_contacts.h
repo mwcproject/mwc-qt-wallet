@@ -4,6 +4,7 @@
 
 #include "state.h"
 #include "../wallet/wallet.h"
+#include "../core/appcontext.h"
 
 namespace state {
 
@@ -15,13 +16,11 @@ public:
     virtual ~Contacts() override;
 
     // Get the contacts
-    QVector<wallet::WalletContact> getContacts();
+    QVector<core::ContactRecord> getContacts();
 
-    // Add new contact
-    QPair<bool, QString> addContact( const wallet::WalletContact & contact );
-
-    // Remove contact. return false if not found
-    QPair<bool, QString> deleteContact( const QString & name );
+    QPair<bool, QString> addContact( const core::ContactRecord & contact );
+    QPair<bool, QString> deleteContact( const core::ContactRecord & contact );
+    QPair<bool, QString> updateContact( const core::ContactRecord & prevValue, const core::ContactRecord & newValue );
 
     QVector<int> getColumnsWidhts() const;
     void updateColumnsWidhts(const QVector<int> & width);

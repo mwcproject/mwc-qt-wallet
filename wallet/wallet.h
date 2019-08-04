@@ -70,17 +70,6 @@ struct NodeStatus {
         int64_t total_difficulty);
 };
 
-struct WalletContact {
-    QString name;
-    QString address;
-
-    void setData(QString name,
-        QString address);
-
-    void saveData( QDataStream & out) const;
-    bool loadData( QDataStream & in);
-};
-
 struct WalletOutput {
 
     QString     outputCommitment;
@@ -403,16 +392,6 @@ public:
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
     virtual void getTransactions(QString account, int offset, int number)  = 0;
 
-
-
-    // -------------- Contacts
-
-    // Get the contacts
-    virtual QVector<WalletContact> getContacts()  = 0;
-    // Add new contact
-    virtual QPair<bool, QString> addContact( const WalletContact & contact )  = 0;
-    // Remove contact. return false if not found
-    virtual QPair<bool, QString> deleteContact( const QString & name )  = 0;
 
     // ----------- HODL
     // https://github.com/mimblewimble/grin/pull/2374

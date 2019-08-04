@@ -110,7 +110,7 @@ ListWithColumns
 
 ListWithColumns::hover
 {
-    background-color: #ca89e8;
+    background-color: #eee0fb;
 }
 
 ListWithColumns::item
@@ -120,7 +120,7 @@ ListWithColumns::item
 
 ListWithColumns::item:selected
 {
-    background-color: #cd9be5;
+    background-color: #E2CCF7;
 }
 /* header for table view */
 

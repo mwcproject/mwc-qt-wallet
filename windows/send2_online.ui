@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>899</width>
-    <height>492</height>
+    <width>997</width>
+    <height>591</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="3,0,1,0,1">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2,0,1,0,1">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -60,7 +60,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
-        <number>20</number>
+        <number>0</number>
        </property>
        <property name="sizeConstraint">
         <enum>QLayout::SetDefaultConstraint</enum>
@@ -83,6 +83,22 @@
           <size>
            <width>16777215</width>
            <height>40</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget_4" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
           </size>
          </property>
         </widget>
@@ -145,6 +161,28 @@
         </layout>
        </item>
        <item>
+        <widget class="control::MwcLabelSmall" name="contactNameLable">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>      Contact: </string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,1">
          <property name="spacing">
           <number>20</number>
@@ -202,6 +240,22 @@
         </layout>
        </item>
        <item>
+        <widget class="QWidget" name="widget_2" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QTextEdit" name="descriptionEdit">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -223,6 +277,22 @@
          </property>
          <property name="placeholderText">
           <string>Description</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget_3" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
          </property>
         </widget>
        </item>
@@ -431,6 +501,11 @@
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
    <header>control/MwcComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

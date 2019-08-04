@@ -221,13 +221,6 @@ public:
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
     virtual void getTransactions(QString account, int offset, int number)  override;
 
-    // -------------- Contacts
-
-    // Get the contacts
-    virtual QVector<WalletContact> getContacts()  override {return QVector<WalletContact>();}
-    virtual QPair<bool, QString> addContact( const WalletContact & contact )  override  { Q_UNUSED(contact); return QPair<bool, QString>(true,"");}
-    virtual QPair<bool, QString> deleteContact( const QString & name )  override  {Q_UNUSED(name); return QPair<bool, QString>(true,"");}
-
     // ----------- HODL
     virtual WalletUtxoSignature sign_utxo( const QString & utxo, const QString & hash ) override { Q_UNUSED(utxo); Q_UNUSED(hash); return WalletUtxoSignature();}
 

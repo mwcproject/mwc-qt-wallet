@@ -20,7 +20,9 @@ NextStateRespond SendOnline::execute() {
     if ( context->appContext->getActiveWndState() != STATE::SEND_ONLINE )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    wnd = (wnd::SendOnline*)context->wndManager->switchToWindowEx( new wnd::SendOnline( context->wndManager->getInWndParent(), this ) );
+    wnd = (wnd::SendOnline*)context->wndManager->switchToWindowEx( new wnd::SendOnline( context->wndManager->getInWndParent(), this,
+                                                                                        (state::Contacts *) context->stateMachine->getState( STATE::CONTACTS ) )
+            );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
@@ -31,10 +33,6 @@ QVector<wallet::AccountInfo> SendOnline::getWalletBalance() {
 
 QString SendOnline::getCurrentAccountName() {
     return context->wallet->getCurrentAccountName();
-}
-
-QVector<wallet::WalletContact> SendOnline::getContacts() {
-    return context->wallet->getContacts();
 }
 
 core::SendCoinsParams SendOnline::getSendCoinsParams() {

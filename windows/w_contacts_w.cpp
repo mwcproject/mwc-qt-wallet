@@ -1,7 +1,7 @@
 #include "w_contacts_w.h"
 #include "ui_w_contacts.h"
 #include "../state/w_contacts.h"
-#include "w_contacteditdlg.h"
+#include "../dialogs/w_contacteditdlg.h"
 #include "../control/messagebox.h"
 #include "../state/timeoutlock.h"
 
@@ -14,12 +14,11 @@ Contacts::Contacts(QWidget *parent, state::Contacts * _state) :
 {
     ui->setupUi(this);
 
-    state->setWindowTitle("Contacts");
-
     initTableHeaders();
     updateContactTable();
 
     ui->contactsTable->setFocus();
+    updateButtons();
 }
 
 Contacts::~Contacts()
@@ -33,7 +32,7 @@ void Contacts::updateButtons() {
 
     ui->addButton->setEnabled(true);
     ui->editButton->setEnabled(idx>=0);
-    ui->removeButton->setEnabled(idx>=0);
+    ui->deleteButton->setEnabled(idx>=0);
 }
 
 
@@ -43,7 +42,7 @@ void Contacts::initTableHeaders() {
     // Creatign columns
     QVector<int> widths = state->getColumnsWidhts();
     if ( widths.size() != 3 ) {
-        widths = QVector<int>{30,100,300};
+        widths = QVector<int>{30,100,400};
     }
     Q_ASSERT( widths.size() == 3 );
     ui->contactsTable->setColumnWidths( widths );
@@ -58,7 +57,7 @@ void Contacts::updateContactTable() {
 
     ui->contactsTable->clearData();
     int idx = 0;
-    for ( const wallet::WalletContact & cont : contacts ) {
+    for ( const core::ContactRecord & cont : contacts ) {
         ui->contactsTable->appendRow( QVector<QString>{
                                           QString::number(++idx),
                                           cont.name,
@@ -84,13 +83,13 @@ void Contacts::on_addButton_clicked()
 {
     state::TimeoutLockObject to( state );
 
-    ContactEditDlg dlg(this, wallet::WalletContact(),
+    ContactEditDlg dlg(this, core::ContactRecord(),
                                    contacts, false );
     if (dlg.exec() == QDialog::Accepted) {
         QPair<bool, QString> res = state->addContact(dlg.getContact());
 
         if (!res.first) {
-            control::MessageBox::message(this, "Error", "You contact wasn't added because of the error: " + res.second);
+            control::MessageBox::message(this, "Error", "Unable to add a new contact.\n" + res.second);
         }
 
         updateContactTable();
@@ -106,15 +105,17 @@ void Contacts::on_editButton_clicked()
     if (idx<0) // expected to be disabled
         return;
 
-    ContactEditDlg dlg(this, contacts[idx],
-                                   contacts, true );
+    core::ContactRecord oldContact = contacts[idx];
+    QVector<core::ContactRecord> contacts2check = contacts;
+    contacts2check.remove(idx);
+
+    ContactEditDlg dlg(this, oldContact,
+                       contacts2check, true );
     if (dlg.exec() == QDialog::Accepted) {
         auto contact = dlg.getContact();
 
         // Update is not atomic. There is a chnce to lost the contact.
-        QPair<bool, QString> res = state->deleteContact(contact.name);
-        if (res.first)
-            res = state->addContact(contact);
+        QPair<bool, QString> res = state->updateContact( oldContact, contact );
 
         if (!res.first)
             control::MessageBox::message(this, "Error", "Unable to update the contact data. Error: " + res.second);
@@ -124,7 +125,16 @@ void Contacts::on_editButton_clicked()
 
 }
 
-void Contacts::on_removeButton_clicked()
+void wnd::Contacts::on_contactsTable_cellDoubleClicked(int row, int column)
+{
+    Q_UNUSED(row);
+    Q_UNUSED(column);
+
+    on_editButton_clicked();
+}
+
+
+void Contacts::on_deleteButton_clicked()
 {
     state::TimeoutLockObject to( state );
 
@@ -132,18 +142,27 @@ void Contacts::on_removeButton_clicked()
     if (idx<0) // expected to be disabled
         return;
 
-    QString name2del = contacts[idx].name;
+    core::ContactRecord contact2del = contacts[idx];
 
-    if (control::MessageBox::question(this, "Remove a contact", "Remove the selected contact for " + name2del +
+    if (control::MessageBox::question(this, "Remove a contact", "Remove the selected contact for " + contact2del.name +
                               "? Press 'Yes' to delete.", "Yes", "No", false,true) == control::MessageBox::BTN1 ) {
-        QPair<bool, QString> res = state->deleteContact(name2del);
+        QPair<bool, QString> res = state->deleteContact(contact2del);
         if (!res.first) {
-            control::MessageBox::message(this, "Error", "Unable to remove the contact for "+name2del+".\nError: " + res.second);
+            control::MessageBox::message(this, "Error", "Unable to remove the contact '"+ contact2del.name +"'.\nError: " + res.second);
         }
 
         updateContactTable();
     }
 }
 
+
+void Contacts::on_contactsTable_itemSelectionChanged()
+{
+    updateButtons();
+
 }
+
+}
+
+
 

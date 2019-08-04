@@ -136,32 +136,6 @@ void WalletOutput::setData(QString _outputCommitment,
     txIdx = _txIdx;
 }
 
-
-void WalletContact::setData(QString _name,
-    QString _address)
-{
-    name = _name;
-    address = _address;
-}
-
-void WalletContact::saveData( QDataStream & out) const {
-    out << 0x89365;
-    out << name;
-    out << address;
-}
-
-bool WalletContact::loadData( QDataStream & in) {
-    int id = 0;
-    in >> id;
-    if (id!=0x89365)
-        return false;
-
-    in >> name;
-    in >> address;
-    return true;
-}
-
-
 void WalletUtxoSignature::setData(int64_t _coinNano, // Output amount
         QString _messageHash,
         QString _pubKeyCompressed,

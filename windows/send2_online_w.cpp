@@ -5,6 +5,7 @@
 #include "../util/address.h"
 #include "../state/send2_Online.h"
 #include "../state/timeoutlock.h"
+#include "../dialogs/w_selectcontact.h"
 
 namespace wnd {
 
@@ -29,10 +30,11 @@ QString generateAmountErrorMsg( int64_t mwcAmount, const wallet::AccountInfo & a
         return msg2print;
 }
 
-SendOnline::SendOnline(QWidget *parent, state::SendOnline * _state ) :
+SendOnline::SendOnline(QWidget *parent, state::SendOnline * _state, state::Contacts * _contactsState ) :
     core::NavWnd(parent, _state->getContext() ),
     ui(new Ui::SendOnline),
-    state(_state)
+    state(_state),
+    contactsState(_contactsState )
 {
     ui->setupUi(this);
 
@@ -41,7 +43,6 @@ SendOnline::SendOnline(QWidget *parent, state::SendOnline * _state ) :
     // inti accounts
     accountInfo = state->getWalletBalance();
     QString selectedAccount = state->getCurrentAccountName();
-    contacts    = state->getContacts();
 
     int selectedAccIdx = 0;
     int idx=0;
@@ -52,6 +53,8 @@ SendOnline::SendOnline(QWidget *parent, state::SendOnline * _state ) :
         ui->accountComboBox->addItem( info.getLongAccountName(), QVariant(idx++) );
     }
     ui->accountComboBox->setCurrentIndex(selectedAccIdx);
+
+    ui->contactNameLable->setText("");
 }
 
 SendOnline::~SendOnline()
@@ -67,15 +70,22 @@ void SendOnline::on_contactsButton_clicked()
     state::TimeoutLockObject to( state );
 
     // Get the contacts
-    control::MessageBox::message(this, "Not implemented", "This functionality is not implemented yet");
 
-/*    SelectContactDlg dlg(this, contacts);
+    dlg::SelectContact dlg(this, contactsState);
     if (dlg.exec() == QDialog::Accepted) {
-        wallet::WalletContact selectedContact = dlg.getSelectedContact();
+        core::ContactRecord selectedContact = dlg.getSelectedContact();
         ui->sendEdit->setText( selectedContact.address );
-    }*/
+        ui->contactNameLable->setText("     Contact: " + selectedContact.name );
+    }
 
 }
+
+
+void SendOnline::on_sendEdit_textEdited(const QString &)
+{
+    ui->contactNameLable->setText("");
+}
+
 
 void SendOnline::on_allAmountButton_clicked()
 {
@@ -155,36 +165,15 @@ void SendOnline::on_sendButton_clicked()
 
 
     // Check the address. Try contacts first
-    QString address;
-
-    for ( auto & cnt : contacts ) {
-        if (cnt.name == sendTo) {
-            address = "@" + cnt.name;
-            break;
-        }
-    }
-    if (address.isEmpty()) {
-        for ( auto & cnt : contacts ) {
-            if (cnt.name.compare(sendTo,  Qt::CaseSensitivity::CaseInsensitive)) {
-                address = "@" + cnt.name;
-                break;
-            }
-        }
-    }
-
-
-    if (address.isEmpty())
-        address = sendTo;
+    QString address = sendTo;
 
     // Let's  verify address first
-    if (address[0]!='@') {
-        QPair< bool, util::ADDRESS_TYPE > res = util::verifyAddress(address);
+    QPair< bool, util::ADDRESS_TYPE > res = util::verifyAddress(address);
         if ( !res.first ) {
             control::MessageBox::message(this, "Incorrect Input",
                                          "Please specify correct address to send your MWC" );
             ui->sendEdit->setFocus();
             return;
-        }
     }
 
     QString description = ui->descriptionEdit->toPlainText().trimmed();

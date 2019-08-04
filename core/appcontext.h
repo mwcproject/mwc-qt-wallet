@@ -34,6 +34,19 @@ struct SendCoinsParams {
     bool loadData(QDataStream & in);
 };
 
+struct ContactRecord {
+    QString name;
+    QString address;
+
+    bool operator ==(const ContactRecord & o) {return name == o.name && address == o.address;}
+
+    void setData(QString name,
+                 QString address);
+
+    void saveData( QDataStream & out) const;
+    bool loadData( QDataStream & in);
+};
+
 
 // State that applicable to all application.
 class AppContext
@@ -83,6 +96,17 @@ public:
     void saveAirdropRequests( const QVector<state::AirdropRequests> & data );
     QVector<state::AirdropRequests> loadAirdropRequests() const;
 
+    // -------------- Contacts
+    // Get the contacts
+    QVector<ContactRecord> getContacts() const {return contactList;}
+    // Add s new contact
+    QPair<bool, QString> addContact( const ContactRecord & contact );
+    // Remove contact. return false if not found
+    QPair<bool, QString> deleteContact( const ContactRecord & contact );
+    // Update contact
+    QPair<bool, QString> updateContact( const ContactRecord & prevValue, const ContactRecord & newValue );
+
+
 private:
     bool loadData();
     void saveData() const;
@@ -104,6 +128,9 @@ private:
     // Current Path dirs
     QMap<QString,QString> pathStates;
     QMap<QString,QVector<int> > intVectorStates;
+
+    // Contact list
+    QVector<ContactRecord> contactList;
 };
 
 template <class T>

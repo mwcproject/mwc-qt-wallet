@@ -21,7 +21,6 @@ public:
 
     QVector<wallet::AccountInfo> getWalletBalance();
     QString getCurrentAccountName();
-    QVector<wallet::WalletContact> getContacts();
 
     core::SendCoinsParams getSendCoinsParams();
     void updateSendCoinsParams( const core::SendCoinsParams  & params );

@@ -24,16 +24,20 @@ NextStateRespond Contacts::execute() {
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
-QVector<wallet::WalletContact> Contacts::getContacts() {
-    return context->wallet->getContacts();
+QVector<core::ContactRecord> Contacts::getContacts() {
+    return context->appContext->getContacts();
 }
 
-QPair<bool, QString> Contacts::addContact( const wallet::WalletContact & contact ) {
-    return context->wallet->addContact(contact);
+QPair<bool, QString> Contacts::addContact( const core::ContactRecord & contact ) {
+    return context->appContext->addContact(contact);
 }
 
-QPair<bool, QString> Contacts::deleteContact( const QString & name ) {
-    return context->wallet->deleteContact(name);
+QPair<bool, QString> Contacts::deleteContact( const core::ContactRecord & contact ) {
+    return context->appContext->deleteContact(contact);
+}
+
+QPair<bool, QString> Contacts::updateContact( const core::ContactRecord & prevValue, const core::ContactRecord & newValue ) {
+    return context->appContext->updateContact( prevValue, newValue );
 }
 
 QVector<int> Contacts::getColumnsWidhts() const {

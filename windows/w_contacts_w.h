@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "../wallet/wallet.h"
+#include "../core/appcontext.h"
 
 namespace Ui {
 class Contacts;
@@ -25,7 +26,11 @@ public:
 private slots:
     void on_addButton_clicked();
     void on_editButton_clicked();
-    void on_removeButton_clicked();
+    void on_deleteButton_clicked();
+
+    void on_contactsTable_cellDoubleClicked(int row, int column);
+
+    void on_contactsTable_itemSelectionChanged();
 
 private:
     void updateButtons();
@@ -39,7 +44,7 @@ private:
 private:
     Ui::Contacts *ui;
     state::Contacts * state;
-    QVector<wallet::WalletContact> contacts;
+    QVector<core::ContactRecord> contacts;
 };
 
 }
