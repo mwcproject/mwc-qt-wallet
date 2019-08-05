@@ -160,6 +160,57 @@ bool TaskGetNextKey::processTask(const QVector<WEvent> & events) {
     return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// TaskNodeInfo
+
+bool TaskNodeInfo::processTask(const QVector<WEvent> & events) {
+    int height = -1;
+    int64_t difficulty = -1;
+    int connections = -1;
+
+    QString errors;
+
+    for ( const auto evt : events ) {
+        if (evt.event != WALLET_EVENTS::S_LINE)
+            continue;
+
+        QString ln = evt.message;
+        if (ln.contains("Error", Qt::CaseInsensitive)) {
+            if (errors.isEmpty())
+                errors+="\n";
+            errors+=ln;
+        }
+
+        if ( ln.startsWith("Height:") ) {
+            bool ok = false;
+            height = ln.mid( strlen("Height:") ).trimmed().toInt(&ok);
+            if (!ok)
+                height = -1;
+        }
+
+        if ( ln.startsWith("Total_Difficulty:") ) {
+            bool ok = false;
+            difficulty = ln.mid( strlen("Total_Difficulty:") ).trimmed().toLongLong(&ok);
+            if (!ok)
+                difficulty = -1;
+        }
+
+        if ( ln.startsWith("PeerInfo:") ) {
+            // PeerInfo is not Json and we can't parse it. We just need to find number of peers.
+            // Counting PeerInfoDisplay substrings for that
+            connections = -1;
+            int idx0 = 0;
+            while (idx0>=0) {
+                connections++;
+                idx0 = ln.indexOf( "PeerInfoDisplay", idx0+1 );
+            }
+        }
+    }
+
+    wallet713->setNodeStatus(  height>0 && difficulty>0 && connections>=0, errors, height, difficulty, connections );
+    return true;
+}
+
 
 }
 

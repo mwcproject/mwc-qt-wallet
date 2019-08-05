@@ -34,5 +34,9 @@
         <file>img/Right@2x.svg</file>
         <file>img/Edit@2x.svg</file>
         <file>img/BigLogo@2x.svg</file>
+        <file>img/Ready@2x.svg</file>
+        <file>img/Connections@2x.svg</file>
+        <file>img/Blockchain@2x.svg</file>
+        <file>img/Difficulty@2x.svg</file>
     </qresource>
 </RCC>

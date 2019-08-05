@@ -258,6 +258,22 @@ QString toMwc713input(QString str, bool noSpecialCharacters ) {
     return res;
 }
 
+// Formal long number to string. Example   78,765
+QString longLong2Str(int64_t n) {
+    QString res = QString::number(n);
+
+    if (res.size()<=3)
+        return res;
+
+    // add commas every 3 digits
+    int pos = res.length() - 3;
+
+    while ( pos>0 && res[pos-1].isDigit() ) {
+        res.insert(pos, ',');
+        pos -= 3;
+    }
+    return res;
+}
 
 
 }

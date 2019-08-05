@@ -596,6 +596,12 @@ void MWC713::verifyMwcBoxTransactionProof( QString proofFileName )  {
     eventCollector->addTask( new TaskTransVerifyProof(this, proofFileName), TaskTransExportProof::TIMEOUT );
 }
 
+// Status of the node
+// Check Signal: onNodeSatatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections )
+void MWC713::getNodeStatus() {
+    eventCollector->addTask( new TaskNodeInfo(this), TaskNodeInfo::TIMEOUT );
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -965,6 +971,11 @@ void MWC713::setCheckResult(bool ok, QString errors) {
     emit onCheckResult(ok, errors );
 }
 
+void MWC713::setNodeStatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections ) {
+    logger::logEmit( "MWC713", "onNodeSatatus", "online="+QString::number(online) + " height="+QString::number(height) +
+                          " totalDifficulty=" + QString::number(totalDifficulty) + " connections=" + QString::number(connections) );
+    emit onNodeStatus( online, errMsg, height, totalDifficulty, connections );
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 //      mwc713  IOs
@@ -1079,7 +1090,9 @@ WalletConfig MWC713::readWalletConfig(QString source) const {
         return WalletConfig();
     }
 
-    return WalletConfig().setData(dataPath, mwcmqDomain, keyBasePath);
+    return WalletConfig().setData(dataPath, mwcmqDomain, keyBasePath,
+                                  mwc713config.getString("mwc_node_uri"),
+                                  mwc713config.getString("mwc_node_secret") );
 }
 
 
@@ -1106,23 +1119,39 @@ bool MWC713::setWalletConfig(const WalletConfig & config)  {
     QStringList confLines = util::readTextFile( mwc713confFN );
     // Updating the config with new values
 
+    QStringList newConfLines;
+
     for (QString & ln : confLines) {
-        if (ln.startsWith("wallet713_data_path"))
-            ln = "wallet713_data_path = \"" + config.dataPath + "\"";
-        else if (ln.startsWith("keybase_binary"))
-            ln = "keybase_binary = \"" + config.keyBasePath + "\"";
-        else if (ln.startsWith("mwcmq_domain"))
-            ln = "mwcmq_domain = \"" + config.mwcmqDomain + "\"";
+        if ( ln.trimmed().isEmpty())
+            continue; // skipping empty lines
+
+        if (ln.startsWith("wallet713_data_path") || ln.startsWith("keybase_binary") || ln.startsWith("mwcmq_domain") ||
+                                ln.startsWith("mwc_node_uri") || ln.startsWith("mwc_node_secret") ) {
+            continue; // skippping the line. Will apply later
+        }
+        else {
+            // keep whatever we have here
+            newConfLines.append(ln);
+        }
     }
 
-    if (!util::writeTextFile( mwc713confFN, confLines )) {
+
+    newConfLines.append("wallet713_data_path = \"" + config.dataPath + "\"");
+    newConfLines.append("keybase_binary = \"" + config.keyBasePath + "\"");
+    newConfLines.append("mwcmq_domain = \"" + config.mwcmqDomain + "\"");
+    if ( !config.mwcNodeURI.isEmpty() && !config.mwcNodeSecret.isEmpty() ) {
+        newConfLines.append("mwc_node_uri = \"" + config.mwcNodeURI + "\"");
+        newConfLines.append("mwc_node_secret = \"" + config.mwcNodeSecret + "\"");
+    }
+
+    if (!util::writeTextFile( mwc713confFN, newConfLines )) {
         control::MessageBox::message(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + mwc713confFN );
         return false;
     }
 
     util::Waiting w; // Host verifucation might tale time, what is why waiting here
 
-    // Stopping the wallet. Start will be done by init state
+    // Stopping the wallet. Start will be done by init state and caller is responsible for that
     processStop(true); // sync if ok for this call
     return true;
 }

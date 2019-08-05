@@ -44,30 +44,23 @@ struct WalletConfig {
     QString dataPath;
     QString mwcmqDomain;
     QString keyBasePath;
+    QString mwcNodeURI; // Connection to alternative MWC node
+    QString mwcNodeSecret;
 
     WalletConfig() : dataPath("Undefined"), mwcmqDomain("Undefined"), keyBasePath("Undefined") {}
     WalletConfig(const WalletConfig & other) = default;
     WalletConfig &operator = (const WalletConfig & other) = default;
 
-    bool operator == (const WalletConfig & other) const { return dataPath==other.dataPath && mwcmqDomain==other.mwcmqDomain && keyBasePath==other.keyBasePath; }
+    bool operator == (const WalletConfig & other) const { return dataPath==other.dataPath && mwcmqDomain==other.mwcmqDomain &&
+                keyBasePath==other.keyBasePath && mwcNodeURI==other.mwcNodeURI  && mwcNodeSecret==other.mwcNodeSecret; }
 
     bool isDefined() const { return  dataPath!="Undefined" && mwcmqDomain!="Undefined" && keyBasePath!="Undefined"; }
 
     WalletConfig & setData(QString dataPath,
                 QString mwcmqDomain,
-                QString keyBasePath);
-};
-
-struct NodeStatus {
-    int     connection; // current number of connections
-    QString tip; // Status og the current fork tip
-    int64_t    height; // Height of the tip
-    int64_t    total_difficulty; // Total difficulty accumulated on that fork since genesis block
-
-    void setData(int   connection,
-        QString tip,
-        int64_t height,
-        int64_t total_difficulty);
+                QString keyBasePath,
+                QString mwcNodeURI,
+                QString mwcNodeSecret);
 };
 
 struct WalletOutput {
@@ -337,7 +330,8 @@ public:
     virtual bool setWalletConfig(const WalletConfig & config)  = 0;
 
     // Status of the node
-    virtual NodeStatus getNodeStatus()  = 0;
+    // Check Signal: onNodeStatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections )
+    virtual void getNodeStatus() = 0;
 
     // -------------- Transactions
 
@@ -398,7 +392,7 @@ public:
 
     // sign output commitment utxo. Hash must be provivded by party that want to verify the signature.
     // Late this signature can be used for verification of ounewship
-    virtual WalletUtxoSignature sign_utxo( const QString & utxo, const QString & hash ) = 0;
+    //virtual WalletUtxoSignature sign_utxo( const QString & utxo, const QString & hash ) = 0;
 
 private:
 signals:
@@ -477,6 +471,9 @@ signals:
     // Listener status listeners...
     void onMwcMqListenerStatus(bool online);
     void onKeybaseListenerStatus(bool online);
+
+    // Node info
+    void onNodeStatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections );
 };
 
 }

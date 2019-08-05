@@ -168,7 +168,8 @@ public:
     virtual bool setWalletConfig(const WalletConfig & config)  override;
 
     // Status of the node
-    virtual NodeStatus getNodeStatus()  override {return NodeStatus();}
+    // Check Signal: onNodeSatatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections )
+    virtual void getNodeStatus() override;
 
     // -------------- Transactions
 
@@ -220,9 +221,6 @@ public:
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
     virtual void getTransactions(QString account, int offset, int number)  override;
-
-    // ----------- HODL
-    virtual WalletUtxoSignature sign_utxo( const QString & utxo, const QString & hash ) override { Q_UNUSED(utxo); Q_UNUSED(hash); return WalletUtxoSignature();}
 
 public:
     // Feed the command to mwc713 process
@@ -305,6 +303,8 @@ public:
     void setSetReceiveAccount( bool ok, QString accountOrMessage );
 
     void setCheckResult(bool ok, QString errors);
+
+    void setNodeStatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections );
 private:
 
 

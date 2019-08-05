@@ -42,6 +42,8 @@ enum STATE {
     AIRDRDOP_MAIN,  // Starting airdrop page
     SHOW_SEED,      // Show Seed
 
+    NODE_INFO,      // Show node info
+
     RESYNC          // Re-sync account with a node
 };
 

@@ -125,6 +125,22 @@ private:
     QString airDropAccPassword;
 };
 
+// node info command
+class TaskNodeInfo: public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 8000; // execute now
+
+    TaskNodeInfo( MWC713 * wallet713) :
+            Mwc713Task("TaskNodeInfo","nodeinfo", wallet713, "") {}
+
+    virtual ~TaskNodeInfo() override {}
+
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+};
+
+
 }
 
 #endif //MWC_QT_WALLET_TASKWALLET_H

@@ -36,6 +36,12 @@ void NavMenuConfig::on_mwcmqButton_clicked()
     close();
 }
 
+void NavMenuConfig::on_nodeOverviewButton_clicked()
+{
+    context->stateMachine->setActionWindow( state::STATE::NODE_INFO );
+    close();
+}
+
 void NavMenuConfig::on_resyncButton_clicked()
 {
     if (control::MessageBox::question(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",

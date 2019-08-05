@@ -63,24 +63,16 @@ bool AccountInfo::isDeleted() const {
 
 WalletConfig & WalletConfig::setData(QString _dataPath,
                             QString _mwcmqDomain,
-                            QString _keyBasePath) {
+                            QString _keyBasePath,
+                            QString _mwcNodeURI,
+                            QString _mwcNodeSecret) {
     dataPath = _dataPath;
     mwcmqDomain = _mwcmqDomain;
     keyBasePath = _keyBasePath;
+    mwcNodeURI = _mwcNodeURI;
+    mwcNodeSecret = _mwcNodeSecret;
 
     return * this;
-}
-
-
-void NodeStatus::setData(int   _connection,
-                            QString _tip,
-                            int64_t _height,
-                            int64_t _total_difficulty)
-{
-    connection = _connection;
-    tip = _tip;
-    height = _height;
-    total_difficulty = _total_difficulty;
 }
 
 

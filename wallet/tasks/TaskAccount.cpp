@@ -61,13 +61,13 @@ bool TaskAccountList::processTask(const QVector<WEvent> &events) {
 
         if (i>0) {
             QString acc = ln.left(i).trimmed();
-            QString path = ln.mid( i + strlen(sep) );
+            QString path = ln.mid( i + (int)strlen(sep) );
 
             accounts.push_back( QPair<QString, QString>( widenDerivPath(path), acc ) );
         }
     }
 
-    qSort(accounts);
+    std::sort(accounts.begin(), accounts.end());
 
     QVector<QString> res;
     for (auto ap : accounts)

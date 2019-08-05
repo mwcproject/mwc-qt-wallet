@@ -254,7 +254,7 @@ QPair<bool, QString> AppContext::addContact( const ContactRecord & contact ) {
     }
 
     contactList.push_back(contact);
-    qSort(contactList.begin(), contactList.end(), [](const ContactRecord &c1, const ContactRecord &c2) { return c1.name < c2.name; } );
+    std::sort(contactList.begin(), contactList.end(), [](const ContactRecord &c1, const ContactRecord &c2) { return c1.name < c2.name; } );
     saveData();
     return QPair<bool, QString>(true, "");
 }
@@ -277,7 +277,7 @@ QPair<bool, QString> AppContext::updateContact( const ContactRecord & prevValue,
     for ( int i=0; i<contactList.size(); i++ ) {
         if ( contactList[i] == prevValue ) {
             contactList[i] = newValue;
-            qSort(contactList.begin(), contactList.end(), [](const ContactRecord &c1, const ContactRecord &c2) { return c1.name < c2.name; } );
+            std::sort(contactList.begin(), contactList.end(), [](const ContactRecord &c1, const ContactRecord &c2) { return c1.name < c2.name; } );
             saveData();
             return QPair<bool, QString>(true, "");
         }

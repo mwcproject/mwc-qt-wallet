@@ -21,6 +21,8 @@
 #include "x_ShowSeed.h"
 #include "x_Resync.h"
 #include "../core/Config.h"
+#include "u_nodeinfo.h"
+
 
 namespace state {
 
@@ -52,6 +54,8 @@ StateMachine::StateMachine(StateContext * _context) :
     states[ STATE::AIRDRDOP_MAIN ]  = new Airdrop(context);
     states[ STATE::SHOW_SEED ]      = new ShowSeed(context);
     states[ STATE::RESYNC ]         = new Resync(context);
+
+    states[ STATE::NODE_INFO ]      = new NodeInfo(context);
 
     startTimer(1000);
 }

@@ -52,6 +52,9 @@ QPair <bool, QString> validateMwc713Str(QString str, bool secureStr = false);
 // noSpecialCharacters - if true will clean up all characters like a new line
 QString toMwc713input(QString str, bool noSpecialCharacters = true);
 
+// Formal long number to string. Example   78,765
+QString longLong2Str(int64_t n);
+
 }
 
 #endif // STRINGUTILS_H

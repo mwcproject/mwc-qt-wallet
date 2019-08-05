@@ -158,7 +158,7 @@ void Accounts::on_deleteButton_clicked()
 
     int idx = ui->accountList->getSelectedRow();
     if (idx>=0 && idx<accounts.size() && accounts[idx].canDelete()) {
-        MessageBox::RETURN_CODE res = MessageBox::question( this, "Delete account", "Are you sure that you want to delet this account?", "Yes", "No", false, true );
+        MessageBox::RETURN_CODE res = MessageBox::question( this, "Delete account", "Are you sure that you want to delete this account?", "Yes", "No", false, true );
         if (res == MessageBox::RETURN_CODE::BTN1 ) {
             state->deleteAccount( accounts[idx] );
             startWaiting();

@@ -33,6 +33,8 @@ private slots:
 
     void on_resyncButton_clicked();
 
+    void on_nodeOverviewButton_clicked();
+
 private:
     Ui::NavMenuConfig *ui;
     state::StateContext * context = nullptr;

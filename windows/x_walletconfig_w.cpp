@@ -103,7 +103,8 @@ QString WalletConfig::keybasePathInputStr2Config(QString kbpath) {
 
 
 // return true if data is fine. In case of error will show message for the user
-bool WalletConfig::readInputValue( wallet::WalletConfig & newWalletConfig, core::SendCoinsParams & newSendParams ) {
+bool WalletConfig::readInputValue( const wallet::WalletConfig & prevWalletConfig,
+                    wallet::WalletConfig & newWalletConfig, core::SendCoinsParams & newSendParams ) {
     state::TimeoutLockObject to( state );
 
     util::Waiting w; // Host verification might tale time, what is why waiting here
@@ -160,9 +161,11 @@ bool WalletConfig::readInputValue( wallet::WalletConfig & newWalletConfig, core:
     }
 
     // So far we are good
-    newWalletConfig.setData(walletDir,
+    newWalletConfig.setData( walletDir,
                             mwcmqHost,
-                            keybasePath);
+                            keybasePath,
+                            prevWalletConfig.mwcNodeURI,
+                            prevWalletConfig.mwcNodeSecret );
     newSendParams.setData( confirmations, changeOutputs );
     return true;
 }
@@ -238,7 +241,7 @@ void WalletConfig::on_applyButton_clicked()
     wallet::WalletConfig newWalletConfig;
     core::SendCoinsParams newSendParams;
 
-    if ( readInputValue( newWalletConfig, newSendParams ) ) {
+    if ( readInputValue( currentWalletConfig, newWalletConfig, newSendParams ) ) {
         if (! (sendParams == newSendParams)) {
             state->setSendCoinsParams(newSendParams);
             sendParams = newSendParams;
