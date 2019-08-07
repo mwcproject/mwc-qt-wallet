@@ -191,7 +191,7 @@ public:
 
     // Init send transaction with file output
     // Check signal:  onSendFile
-    virtual void sendFile( int64_t coinNano, QString fileTx )  override;
+    virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx )  override;
     // Recieve transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
     virtual void receiveFile( QString fileTx)  override;

@@ -76,7 +76,7 @@ void Events::on_notificationList_cellActivated(int row, int column)
     // Show message details for that row
     if (row>=0 && row<messages.size()) {
 
-        dlg::ShowNotificationDlg * showDlg = new dlg::ShowNotificationDlg( messages[row], this );
+        dlg::ShowNotificationDlg * showDlg = new dlg::ShowNotificationDlg( messages[messages.size()-1-row], this );
         showDlg->exec();
         delete(showDlg);
     }

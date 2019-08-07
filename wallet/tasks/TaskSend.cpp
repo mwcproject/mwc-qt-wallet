@@ -146,6 +146,25 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address,
 
 // ----------------------- TaskSendFile --------------------------
 
+QString TaskSendFile::buildCommand( int64_t coinNano, QString message, QString fileTx ) const {
+    QString cmd = "send ";// + util::nano2one(coinNano);
+    if (coinNano > 0)
+        cmd += util::nano2one(coinNano);
+
+    if (!message.isEmpty())
+        cmd += " --message " + util::toMwc713input(message); // Message symbols MUST be escaped.
+
+    // So far documentation doesn't specify difference between protocols
+    cmd += " --file " + util::toMwc713input(fileTx);
+
+    if (coinNano < 0)
+        cmd += " ALL";
+
+    qDebug() << "sendCommand: '" << cmd << "'";
+
+    return cmd;
+}
+
 bool TaskSendFile::processTask(const QVector<WEvent> &events) {
     QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
 

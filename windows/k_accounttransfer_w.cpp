@@ -3,7 +3,7 @@
 #include "../control/messagebox.h"
 #include "../state/k_AccountTransfer.h"
 #include "../dialogs/sendcoinsparamsdialog.h"
-#include "send2_online_w.h"
+#include "g_sendStarting.h"
 #include "../state/timeoutlock.h"
 
 namespace wnd {

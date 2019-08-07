@@ -55,6 +55,13 @@ QString AccountInfo::getLongAccountName() const {
                 "  Awaiting Confirmation: " + util::nano2one(awaitingConfirmation);
 }
 
+QString AccountInfo::getSpendableAccountName() const {
+    return  util::expandStrR(accountName, 15) +
+           "   Available: " + util::nano2one(currentlySpendable) + " mwc";
+
+}
+
+
 // return true is this account can be concidered as deleted
 bool AccountInfo::isDeleted() const {
     return  accountName.startsWith( mwc::DEL_ACCONT_PREFIX ) &&

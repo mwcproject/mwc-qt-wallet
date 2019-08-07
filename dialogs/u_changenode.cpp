@@ -2,6 +2,7 @@
 #include "ui_u_changenode.h"
 #include "../control/messagebox.h"
 #include <QHostInfo>
+#include <QUrl>
 
 namespace dlg {
 
@@ -71,11 +72,17 @@ void ChangeNode::on_applyButton_clicked() {
             return;
         }
 
+        if ( ! (mwcNodeUri.startsWith("http://") || mwcNodeUri.startsWith("https://") ) ) {
+            control::MessageBox::message(this, "Input", "Please specify http or https protocol for mwc node connection. Please note, https connection does require CA certificate" );
+            ui->mwcNodeUriEdit->setFocus();
+            return;
+        }
+
         // Remove the port part to verify the host
-        int uriPortIdx = mwcNodeUri.indexOf(':');
+        int uriPortIdx = mwcNodeUri.indexOf(':', std::strlen("https://") );
         if (uriPortIdx<=0) {
             mwcNodeUri += ":" + QString::number(MWC_NODE_DEFAULT_PORT);
-            uriPortIdx = mwcNodeUri.indexOf(':');
+            uriPortIdx = mwcNodeUri.indexOf(':', std::strlen("https://"));
         }
         Q_ASSERT( uriPortIdx>0 );
 
@@ -88,9 +95,19 @@ void ChangeNode::on_applyButton_clicked() {
         }
 
         // Checking if URI is reachable...
-        QHostInfo host = QHostInfo::fromName(mwcNodeUri.left(uriPortIdx));
+        QUrl url2test(mwcNodeUri);
+        if ( !url2test.isValid() ) {
+            control::MessageBox::message( this, "Input", "mwc node URL "+mwcNodeUri+" is invalid. Please specify valid URI" );
+            ui->mwcNodeUriEdit->setFocus();
+            return;
+        }
+
+        QString hostName = url2test.host();
+        QHostInfo host = QHostInfo::fromName( hostName );
         if (host.error() != QHostInfo::NoError) {
-            control::MessageBox::message( this, "Input", "mwc node host "+mwcNodeUri+" is not reachable.\n" + host.errorString() );
+
+            control::MessageBox::message(this, "Input",
+                                         "mwc node host " + hostName + " is not reachable.\n" + host.errorString());
             ui->mwcNodeUriEdit->setFocus();
             return;
         }

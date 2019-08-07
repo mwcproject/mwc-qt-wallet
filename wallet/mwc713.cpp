@@ -524,8 +524,11 @@ void MWC713::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const
 
 // Init send transaction with file output
 // Check signal:  onSendFile
-void MWC713::sendFile( int64_t coinNano, QString fileTx )  {
-    eventCollector->addTask( new TaskSendFile(this, coinNano, fileTx ), TaskSendFile::TIMEOUT );
+void MWC713::sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx )  {
+    // switch account first
+    eventCollector->addTask( new TaskAccountSwitch(this, account.accountName, walletPassword, true), TaskAccountSwitch::TIMEOUT );
+
+    eventCollector->addTask( new TaskSendFile(this, coinNano, message, fileTx ), TaskSendFile::TIMEOUT );
 }
 
 // Recieve transaction. Will generate *.response file in the same dir

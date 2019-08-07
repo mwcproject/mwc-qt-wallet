@@ -68,7 +68,7 @@
         </size>
        </property>
        <property name="text">
-        <string>mwc node URI: &lt;host&gt;:&lt;port&gt;</string>
+        <string>mwc node URI: http(s)://&lt;host&gt;:&lt;port&gt;</string>
        </property>
       </widget>
      </item>

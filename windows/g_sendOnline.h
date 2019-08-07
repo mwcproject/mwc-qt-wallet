@@ -9,7 +9,7 @@ class SendOnline;
 }
 
 namespace state {
-class SendOnline;
+class Send;
 class Contacts;
 }
 
@@ -24,28 +24,25 @@ class SendOnline : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit SendOnline(QWidget *parent, state::SendOnline * state, state::Contacts * contactsState );
+    explicit SendOnline(QWidget *parent, const wallet::AccountInfo & selectedAccount, int64_t amount, state::Send * state, state::Contacts * contactsState );
     virtual ~SendOnline() override;
 
     void sendRespond( bool success, const QStringList & errors );
 
 private slots:
     void on_contactsButton_clicked();
-    void on_allAmountButton_clicked();
+    void on_settingsButton_clicked();
     void on_sendButton_clicked();
 
-    void on_settingsButton2_clicked();
-
     void on_sendEdit_textEdited(const QString &arg1);
-
 private:
     Ui::SendOnline *ui;
-    state::SendOnline * state = nullptr;
+    state::Send * state = nullptr;
     state::Contacts * contactsState = nullptr;
-    QVector<wallet::AccountInfo> accountInfo;
-};
 
-QString generateAmountErrorMsg( int64_t mwcAmount, const wallet::AccountInfo & acc, const core::SendCoinsParams & sendParams );
+    wallet::AccountInfo selectedAccount;
+    int64_t amount;
+};
 
 
 }

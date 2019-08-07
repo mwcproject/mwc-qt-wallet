@@ -68,9 +68,9 @@ class TaskSendFile : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*20;
 
-    TaskSendFile( MWC713 *wallet713, int64_t coinNano, QString fileTx ) :
+    TaskSendFile( MWC713 *wallet713, int64_t coinNano, QString message, QString fileTx ) :
             Mwc713Task("TaskSendFile",
-                       QString("send ") + util::nano2one(coinNano) + " --file " + util::toMwc713input(fileTx),
+                       buildCommand(coinNano, message, fileTx),
                        wallet713, "") {}
 
     virtual ~TaskSendFile() override {}
@@ -78,6 +78,8 @@ public:
     virtual bool processTask(const QVector<WEvent> &events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    QString buildCommand( int64_t coinNano, QString message, QString fileTx ) const;
 };
 
 class TaskReceiveFile : public Mwc713Task {

@@ -274,7 +274,7 @@ QProgressBar::chunk {
 
 /* ----------- Frame with a white border -----------------*/
 
-MwcFrameWithBorder {
+control--MwcFrameWithBorder {
     background: transparent;
     border: 2px solid #FFFFFF;
     border-radius: 6px;

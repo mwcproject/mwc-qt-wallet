@@ -32,6 +32,7 @@ struct AccountInfo {
         bool mwcServerBroken);
 
     QString getLongAccountName() const;
+    QString getSpendableAccountName() const;
 
     bool canDelete() const {return total == 0 && awaitingConfirmation==0 && lockedByPrevTransaction==0 && currentlySpendable==0;}
 
@@ -356,7 +357,7 @@ public:
 
     // Init send transaction with file output
     // Check signal:  onSendFile
-    virtual void sendFile( int64_t coinNano, QString fileTx )  = 0;
+    virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx )  = 0;
     // Recieve transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
     virtual void receiveFile( QString fileTx)  = 0;

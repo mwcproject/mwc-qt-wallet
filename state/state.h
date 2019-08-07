@@ -28,12 +28,8 @@ enum STATE {
     ACCOUNT_TRANSFER, // Transfer funds from account to account
     EVENTS,         // Wallet events (logs)
     HODL,           // Hodl program.
-
-    SEND_ONLINE_OFFLINE, // PAGE_HOW_TO_SEND
-    SEND_ONLINE,  // Amount for online
-    SEND_OFFLINE, // Account for online
-
-    RECIEVE_COINS,   // Recieve coins
+    SEND,           // Send coins Page
+    RECIEVE_COINS,  // Recieve coins
     LISTENING,      // Listening API setting/status
     TRANSACTIONS,   // Transactions dialog
     OUTPUTS,        // Outputs for this wallet

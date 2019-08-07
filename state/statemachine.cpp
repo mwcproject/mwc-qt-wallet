@@ -15,9 +15,7 @@
 #include "x_walletconfig.h"
 #include "m_airdrop.h"
 #include "a_StartWallet.h"
-#include "send1_OnlineOffline.h"
-#include "send2_Online.h"
-#include "send3_Offline.h"
+#include "g_Send.h"
 #include "x_ShowSeed.h"
 #include "x_Resync.h"
 #include "../core/Config.h"
@@ -35,16 +33,10 @@ StateMachine::StateMachine(StateContext * _context) :
     states[ STATE::STATE_INIT ]     = new InitAccount(context);
     states[ STATE::INPUT_PASSWORD ] = new InputPassword(context);
     states[ STATE::ACCOUNTS ]       = new Accounts(context);
-
     states[ STATE::ACCOUNT_TRANSFER ] = new AccountTransfer(context);
-
     states[ STATE::EVENTS ]         = new Events(context);
     states[ STATE::HODL ]           = new Hodl(context);
-
-    states[ STATE::SEND_ONLINE_OFFLINE ] = new SendOnlineOffline(context);
-    states[ STATE::SEND_ONLINE ]    = new SendOnline(context);
-    states[ STATE::SEND_OFFLINE ]   = new SendOffline(context);
-
+    states[ STATE::SEND ]           = new Send(context);
     states[ STATE::RECIEVE_COINS ]  = new Recieve(context);
     states[ STATE::LISTENING ]      = new Listening(context);
     states[ STATE::TRANSACTIONS ]   = new Transactions(context);
@@ -118,7 +110,7 @@ void StateMachine::executeFrom( STATE nextState ) {
 
     if (currentState == STATE::NONE) {
         // Selecting the send page if nothing found
-        context->appContext->setActiveWndState( STATE::SEND_ONLINE_OFFLINE );
+        context->appContext->setActiveWndState( STATE::SEND );
         executeFrom(STATE::NONE);
     }
 

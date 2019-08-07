@@ -22,7 +22,7 @@ NextStateRespond Events::execute() {
     if (context->appContext->getActiveWndState() != STATE::EVENTS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context->wndManager->switchToWindowEx(
+    wnd = (wnd::Events*) context->wndManager->switchToWindowEx(
                 new wnd::Events( context->wndManager->getInWndParent(), this ) );
 
     emit updateNonShownWarnings(false);
@@ -68,7 +68,7 @@ bool Events::hasNonShownWarnings() const {
     QVector<wallet::WalletNotificationMessages> msgs = context->wallet->getWalletNotificationMessages();
 
     for ( int i = msgs.size()-1; i>=0; i-- ) {
-        if (msgs[i].time.currentMSecsSinceEpoch() <= messageWaterMark )
+        if (msgs[i].time.toMSecsSinceEpoch() <= messageWaterMark )
             return false;
 
         if ( msgs[i].isCritical() )
