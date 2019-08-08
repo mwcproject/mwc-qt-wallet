@@ -1,7 +1,7 @@
 #ifndef HODLW_H
 #define HODLW_H
 
-#include <QWidget>
+#include "../core/navwnd.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
@@ -14,7 +14,7 @@ namespace state {
 
 namespace wnd {
 
-class Hodl : public QWidget
+class Hodl : public core::NavWnd
 {
     Q_OBJECT
 
@@ -22,16 +22,9 @@ public:
     explicit Hodl(QWidget *parent, state::Hodl * state );
     ~Hodl();
 
-private slots:
-
-    void on_submitAllTransactionsButton_clicked();
-
-    void on_submitSelectedTransactionsButton_clicked();
-
 private:
     Ui::Hodl *ui;
     state::Hodl * state;
-    QVector<wallet::WalletTransaction> transactions;
 };
 
 }

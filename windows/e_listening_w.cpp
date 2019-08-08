@@ -1,8 +1,8 @@
 #include "e_listening_w.h"
 #include "ui_e_listening.h"
 #include "../state/e_listening.h"
-#include <QInputDialog>
 #include "../control/messagebox.h"
+#include "../control/inputdialog.h"
 #include <QDebug>
 #include "../state/timeoutlock.h"
 
@@ -75,8 +75,8 @@ void Listening::on_mwcMqToIndex_clicked()
 {
     state::TimeoutLockObject to( state );
     bool ok = false;
-    QString index = QInputDialog::getText(this, tr("Select MWX box address by index"),
-                                            tr("Please specify index of mwc mq address"), QLineEdit::Normal,
+    QString index = control::InputDialog::getText(this, tr("Select MWX box address by index"),
+                                            tr("Please specify index of mwc mq address"), "integer from 0 to 65000",
                                             "", &ok);
     if (!ok || index.isEmpty())
         return;

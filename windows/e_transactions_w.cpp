@@ -4,7 +4,6 @@
 #include "../util/stringutils.h"
 #include <QFileDialog>
 #include "../control/messagebox.h"
-#include <QMessageBox>
 #include "../state/timeoutlock.h"
 #include <QDebug>
 
@@ -199,7 +198,7 @@ void Transactions::setTransactionData(QString account, int64_t height, const QVe
 void Transactions::showExportProofResults(bool success, QString fn, QString msg ) {
     state::TimeoutLockObject to( state );
     if (success) {
-        QMessageBox::information(this, "Success", "Your transaction proof located at " + fn + "\n\n" + msg );
+        control::MessageBox::message(this, "Success", "Your transaction proof located at " + fn + "\n\n" + msg );
     }
     else {
         control::MessageBox::message(this, "Failure", msg );
@@ -209,7 +208,7 @@ void Transactions::showExportProofResults(bool success, QString fn, QString msg 
 void Transactions::showVerifyProofResults(bool success, QString fn, QString msg ) {
     state::TimeoutLockObject to( state );
     if (success) {
-        QMessageBox::information(this, "Success", "Proof at " + fn + ":\n\n" + msg );
+        control::MessageBox::message(this, "Success", "Proof at " + fn + ":\n\n" + msg );
     }
     else {
         control::MessageBox::message(this, "Failure", msg );
@@ -321,9 +320,9 @@ void Transactions::on_deleteButton_clicked()
                               "Please select qualify transaction to cancel.");
         return;
     }
-
-    if ( QMessageBox::question(this, "Transaction cancellation", "Are you sure you want to cancet transaction #" + QString::number(selected->txIdx+1) +
-                               ", TXID " + selected->txid)  == QMessageBox::Yes ) {
+    if ( control::MessageBox::question(this, "Transaction cancellation",
+            "Are you sure you want to cancet transaction #" + QString::number(selected->txIdx+1) +
+                               ", TXID " + selected->txid, "No", "Yes", true, false) == control::MessageBox::RETURN_CODE::BTN2 ) {
         state->cancelTransaction(*selected);
     }
 }

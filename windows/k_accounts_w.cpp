@@ -2,8 +2,8 @@
 #include "ui_k_accounts_w.h"
 #include "../state/k_accounts.h"
 #include "../util/stringutils.h"
-#include <QInputDialog>
 #include "../control/messagebox.h"
+#include "../control/inputdialog.h"
 #include "../core/global.h"
 #include "../state/timeoutlock.h"
 
@@ -114,10 +114,9 @@ void Accounts::on_transferButton_clicked()
 void Accounts::on_addButton_clicked()
 {
     state::TimeoutLockObject to( state );
-
     bool ok = false;
-    QString accountName = QInputDialog::getText(this, tr("Add account"),
-                                                tr("Please specify the name of a new account in your wallet. Please note, there is no delete action for accounts."), QLineEdit::Normal,
+    QString accountName = control::InputDialog::getText(this, tr("Add account"),
+                                                tr("Please specify the name of a new account in your wallet"), "account name",
                                                 "", &ok);
     if (!ok || accountName.isEmpty())
         return;
@@ -179,8 +178,8 @@ void Accounts::renameAccount(int idx) {
     state::TimeoutLockObject to( state );
 
     bool ok = false;
-    QString name = QInputDialog::getText(this, "Rename mwc account",
-                                        QString("Input a new name for your account '") + accounts[idx].accountName + "'", QLineEdit::Normal,
+    QString name = control::InputDialog::getText(this, "Rename mwc account",
+                                        QString("Input a new name for your account '") + accounts[idx].accountName + "'", "",
                                         accounts[idx].accountName, &ok);
     if (!ok || name.isEmpty() || name==accounts[idx].accountName )
         return;

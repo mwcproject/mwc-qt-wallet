@@ -6,84 +6,143 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>491</width>
-    <height>415</height>
+    <width>556</width>
+    <height>465</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
-   <property name="spacing">
-    <number>0</number>
-   </property>
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,4,1">
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Here you can submit your MWC transactions for HODL program.&lt;br&gt;Please select transactions that you are going to hold for a int64_t time.&lt;br&gt;For more details plase check &lt;a href=&quot;https://www.mwc.mw/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.mwc.mw/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="wordWrap">
-      <bool>true</bool>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>82</width>
+       <height>20</height>
+      </size>
      </property>
-     <property name="margin">
-      <number>5</number>
-     </property>
-    </widget>
+    </spacer>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="font">
-      <font>
-       <pointsize>13</pointsize>
-      </font>
-     </property>
-     <property name="title">
-      <string>Transactions</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QListWidget" name="transactionsListWidget"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="2,0,1,0,1,0,5">
      <item>
-      <widget class="QPushButton" name="submitAllTransactionsButton">
-       <property name="focusPolicy">
-        <enum>Qt::StrongFocus</enum>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
        </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>69</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="control::MwcLabelLarge" name="label_3">
        <property name="text">
-        <string>Submit all transactions</string>
+        <string>HODL</string>
        </property>
-       <property name="autoDefault">
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>33</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="control::MwcLabelNormal" name="label_2">
+       <property name="text">
+        <string>Coming soon...</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>33</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>2 million coins allocated to the &quot;HODL Program&quot;, we choose to reward people who HODL by giving them more coins</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
         <bool>true</bool>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="submitSelectedTransactionsButton">
-       <property name="focusPolicy">
-        <enum>Qt::StrongFocus</enum>
+      <spacer name="verticalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
        </property>
-       <property name="text">
-        <string>Submit selected only</string>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>176</height>
+        </size>
        </property>
-       <property name="autoDefault">
-        <bool>true</bool>
-       </property>
-      </widget>
+      </spacer>
      </item>
     </layout>
    </item>
+   <item>
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>82</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>transactionsListWidget</tabstop>
-  <tabstop>submitAllTransactionsButton</tabstop>
-  <tabstop>submitSelectedTransactionsButton</tabstop>
- </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
