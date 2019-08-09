@@ -64,6 +64,10 @@ State * StateMachine::getState(STATE state) const {
     return states.value(state, nullptr);
 }
 
+State* StateMachine::getCurrentState() const {
+    return getState(currentState);
+}
+
 
 void StateMachine::start() {
 
@@ -160,11 +164,6 @@ bool StateMachine::processState(State* st) {
 
     if (resp.result == NextStateRespond::RESULT::WAIT_FOR_ACTION)
         return false;
-
-    if (resp.result == NextStateRespond::RESULT::NEXT_STATE) {
-        executeFrom( resp.nextState );
-        return false;
-    }
 
     Q_ASSERT(false); // NONE state is a bug
 

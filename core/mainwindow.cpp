@@ -5,6 +5,7 @@
 #include "../state/statemachine.h"
 #include "util/widgetutils.h"
 #include "../control/messagebox.h"
+#include "../dialogs/helpdlg.h"
 
 namespace core {
 
@@ -119,7 +120,18 @@ void MainWindow::on_connectionStatusButton_clicked()
 
 void MainWindow::on_helpButton_clicked()
 {
-    control::MessageBox::message(this, "Help", "Here is we suppose provide some help." );
+    state::State * state = stateMachine->getCurrentState();
+    QString docName = "";
+    if (state != nullptr) {
+        docName = state->getHelpDocName();
+    }
+
+    if ( docName.isEmpty() ) {
+        docName = "Default.html";
+    }
+
+    dlg::HelpDlg helpDlg(this, docName);
+    helpDlg.exec();
 }
 
 void MainWindow::updateListenerStatus(bool online) {

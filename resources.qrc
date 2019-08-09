@@ -38,5 +38,11 @@
         <file>img/Connections@2x.svg</file>
         <file>img/Blockchain@2x.svg</file>
         <file>img/Difficulty@2x.svg</file>
+        <file>help/Airdrop.html</file>
+        <file>help/Transactions.html</file>
+        <file>help/images/image1.png</file>
+        <file>help/Default.html</file>
+        <file>img/purpLeft@2x.svg</file>
+        <file>img/purpRight@2x.svg</file>
     </qresource>
 </RCC>

@@ -44,7 +44,7 @@ enum STATE {
 };
 
 struct NextStateRespond {
-    enum RESULT { NONE, NEXT_STATE, WAIT_FOR_ACTION, DONE };
+    enum RESULT { NONE, WAIT_FOR_ACTION, DONE };
 
     NextStateRespond( RESULT res ) : result(res) {}
     NextStateRespond( RESULT res, STATE nextSt  ) : result(res), nextState(nextSt) {}
@@ -93,6 +93,9 @@ public:
 
     // Executing another state
     virtual void exitingState() {};
+
+    // Empty string - default document name
+    virtual QString getHelpDocName() {return "";}
 };
 
 }

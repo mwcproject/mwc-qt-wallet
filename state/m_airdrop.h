@@ -80,6 +80,8 @@ protected:
 
     virtual void exitingState() override;
 
+    virtual QString getHelpDocName() override {return "Airdrop.html";}
+
 private slots:
     void replyFinished(QNetworkReply* reply);
 

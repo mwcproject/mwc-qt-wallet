@@ -1,0 +1,9 @@
+<?xml version="1.0" standalone="no"?>
+<svg contentScriptType="text/ecmascript" fill="none" width="52" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="full"
+    zoomAndPan="magnify" contentStyleType="text/css" viewBox="0 0 52 52" height="52" preserveAspectRatio="xMidYMid meet"
+    xmlns="http://www.w3.org/2000/svg" version="1.0">
+    <path stroke-miterlimit="10" d="M26 51C39.8071 51 51 39.8071 51 26C51 12.1929 39.8071 1 26 1C12.1929 1 1 12.1929 1 
+        26C1 39.8071 12.1929 51 26 51Z" stroke-width="2" stroke-linecap="round" stroke="#6F00D6"/>
+    <line fill="none" x1="33.0" x2="13.0" y1="11.5" y2="27.5" stroke="#6F00D6" stroke-width="2"/>
+    <line fill="none" x1="13.75" x2="33.75" y1="27.5" y2="40.25" stroke="#6F00D6" stroke-width="2"/>
+</svg>
