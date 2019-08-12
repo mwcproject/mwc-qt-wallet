@@ -22,6 +22,9 @@ public:
     explicit Hodl(QWidget *parent, state::Hodl * state );
     ~Hodl();
 
+private slots:
+    void on_pushButton_clicked();
+
 private:
     Ui::Hodl *ui;
     state::Hodl * state;

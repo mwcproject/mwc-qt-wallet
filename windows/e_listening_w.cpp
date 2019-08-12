@@ -16,7 +16,7 @@ Listening::Listening(QWidget *parent, state::Listening * _state, bool mwcMqStatu
 {
     ui->setupUi(this);
 
-    state->setWindowTitle("Listening");
+    //state->setWindowTitle("Listening");
 
     updateMwcMqState(mwcMqStatus);
     updateKeybaseState(keybaseStatus);

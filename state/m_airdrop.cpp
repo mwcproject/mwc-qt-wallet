@@ -410,7 +410,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
         if ( success ) {
             QString btcAddress = reply->property("param1").toString();
 
-            reportMessageToUI("Your MWC claim succeeded", "Your claim for address " + btcAddress + " was successfully processed.");
+            reportMessageToUI("Your MWC claim succeeded", "Your claim for address " + btcAddress + " was successfully processed.\nPlease note, to finalize transaction might take up to 48 hours to process.");
 
             backToMainAirDropPage();
         }

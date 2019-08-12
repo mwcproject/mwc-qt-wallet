@@ -44,5 +44,6 @@
         <file>help/Default.html</file>
         <file>img/purpLeft@2x.svg</file>
         <file>img/purpRight@2x.svg</file>
+        <file>img/HODL_big@2x.svg</file>
     </qresource>
 </RCC>

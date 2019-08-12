@@ -15,6 +15,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+#ifdef Q_OS_MACOS
+    Cocoa::changeTitleBarColor(winId(), 0x6F/255.0, 0.0, 0xD6/255.0 );
+#endif
+
     ui->statusBar->addPermanentWidget(ui->helpButton);
     ui->statusBar->addPermanentWidget(ui->btnSpacerLabel1);
     ui->statusBar->addPermanentWidget(ui->connectionStatusButton);

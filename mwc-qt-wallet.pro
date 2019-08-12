@@ -28,6 +28,9 @@ macx {
 #mySetOfExtraFiles.files = $$PWD/imagesFolder
 #mySetOfExtraFiles.path = Contents/Resources
 #QMAKE_BUNDLE_DATA += mySetOfExtraFiles
+
+    OBJECTIVE_SOURCES += macos/changetitlebarcolor.mm
+    LIBS +=        -framework AppKit
 }
 
 

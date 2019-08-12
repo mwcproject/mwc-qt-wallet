@@ -12,6 +12,10 @@ public:
     ListWithColumns(int rows, int columns, QWidget *parent = nullptr);
     virtual ~ListWithColumns() override;
 
+    // Note, changes will be applicable to a new data only!!!
+  //  void setMultilineColumn(int column) { multilineColumns += column; }
+  //  void removeMultilineColumn(int column) { multilineColumns -= column; }
+
     // get number of rows that expected to be visible
     int getNumberOfVisibleRows() const;
     static int getNumberOfVisibleRows(int height);
@@ -48,6 +52,8 @@ protected:
 
     QColor selectedLow = QColor(0,0,0,0);  // Special color for row selection
     QColor selectedHi = QColor(0,0,0,0);
+
+   // QSet<int> multilineColumns;
 };
 
 #endif // LISTWITHCOLUMNS_H

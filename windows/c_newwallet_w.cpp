@@ -14,7 +14,7 @@ NewWallet::NewWallet(QWidget *parent, state::InitAccount * _state) :
 {
     ui->setupUi(this);
 
-    state->setWindowTitle("Init your wallet");
+    //state->setWindowTitle("Init your wallet");
 
     ui->radioCreateNew->setChecked(true);
     updateControls();

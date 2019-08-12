@@ -4,6 +4,7 @@
 #include "../control/messagebox.h"
 #include <QAbstractItemView>
 #include "../state/timeoutlock.h"
+#include <QProcess>
 
 namespace wnd {
 
@@ -21,6 +22,12 @@ Hodl::~Hodl()
     delete ui;
 }
 
+void Hodl::on_pushButton_clicked()
+{
+    QProcess::startDetached("open https://www.mwc.mw/contact");
+}
+
 
 }
+
 

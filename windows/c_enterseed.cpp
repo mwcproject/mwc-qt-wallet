@@ -14,7 +14,7 @@ EnterSeed::EnterSeed(QWidget *parent, state::InitAccount * _state) :
     ui(new Ui::EnterSeed),
     state(_state)
 {
-    state->setWindowTitle("Recover wallet from a Passphrase");
+    //state->setWindowTitle("Recover wallet from a Passphrase");
 
     ui->setupUi(this);
 

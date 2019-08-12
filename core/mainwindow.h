@@ -15,6 +15,14 @@ namespace state {
     class StateMachine;
 }
 
+
+#ifdef Q_OS_MACOS
+namespace Cocoa
+{
+    void changeTitleBarColor(WId winId, double red, double green, double blue);
+}
+#endif
+
 namespace core {
 
 class WindowManager;

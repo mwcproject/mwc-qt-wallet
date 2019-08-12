@@ -45,14 +45,28 @@ set(CMAKE_AUTOMOC ON)
 # Handle .qrc files automatically
 set(CMAKE_AUTORCC ON)
 
+IF(APPLE)
+    # For mac OS we have a cocoa file that customize the title
+    find_library(AppKit AppKit)
+
+    #target_link_libraries(${AppKit})
+
+    set (Cocoa_SRCS
+            macos/changetitlebarcolor.mm)
+
+    set_source_files_properties(changetitlebarcolor.mm
+            PROPERTIES COMPILE_FLAGS "-fobjc-arc")
+
+
+ENDIF(APPLE)
 
 ####################
 #
 # Outputs
 #
 
-add_executable(mwc-qt-wallet ${SOURCE_FILES} ${HEADER_FILES} ${UI_GENERATED_HEADERS} resources.qrc)
-target_link_libraries(mwc-qt-wallet Qt5::Widgets Qt5::Gui Qt5::Core Qt5::Network)
+add_executable(mwc-qt-wallet ${SOURCE_FILES} ${HEADER_FILES} ${UI_GENERATED_HEADERS} ${Cocoa_SRCS} resources.qrc)
+target_link_libraries(mwc-qt-wallet Qt5::Widgets Qt5::Gui Qt5::Core Qt5::Network ${AppKit})
 
 # Copy Qt runtime libraries to build directory
 # [Copying Qt DLLs to executable directory on Windows using CMake](https://stackoverflow.com/questions/40564443/)

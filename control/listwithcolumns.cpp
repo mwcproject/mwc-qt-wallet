@@ -1,6 +1,7 @@
 #include "listwithcolumns.h"
 #include <QHeaderView>
 #include <QApplication>
+#include <QTextEdit>
 
 const int ROW_HEIGHT = 30;
 
@@ -125,6 +126,13 @@ void ListWithColumns::appendRow( const QVector<QString> & rowData, double select
         itm->setBackgroundColor( clr );
         itm->setTextAlignment( textAlignment );
         setItem(rowIdx , i, itm );
+
+     /*   if (multilineColumns.contains(i)) {
+            QTextEdit *edit = new QTextEdit();
+            edit->setText(rowData[i]);
+            edit->setReadOnly(true);
+            setCellWidget(rowIdx, i, edit);
+        }*/
     }
 }
 

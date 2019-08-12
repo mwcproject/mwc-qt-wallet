@@ -17,7 +17,7 @@ NewSeedTest::NewSeedTest(QWidget *parent, state::InitAccount *_state, int wordNu
 {
     ui->setupUi(this);
 
-    state->setWindowTitle("Verify your seed");
+    //state->setWindowTitle("Verify your seed");
 
     ui->wordEdit->setPlaceholderText( "Please enter word number " + QString::number(wordNumber) );
 
