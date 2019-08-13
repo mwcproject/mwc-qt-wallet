@@ -1,7 +1,7 @@
 #ifndef SENDCOINSPARAMSDIALOG_H
 #define SENDCOINSPARAMSDIALOG_H
 
-#include <QDialog>
+#include "../control/mwcdialog.h"
 #include "../core/appcontext.h"
 
 namespace Ui {
@@ -10,7 +10,7 @@ class SendCoinsParamsDialog;
 
 namespace wnd {
 
-class SendCoinsParamsDialog : public QDialog
+class SendCoinsParamsDialog : public control::MwcDialog
 {
     Q_OBJECT
 

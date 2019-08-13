@@ -132,7 +132,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="claimAirdropBtn">
+           <widget class="control::MwcPushButtonNormal" name="claimAirdropBtn">
             <property name="minimumSize">
              <size>
               <width>150</width>
@@ -217,7 +217,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="refreshClaimsButton">
+           <widget class="control::MwcPushButtonNormal" name="refreshClaimsButton">
             <property name="minimumSize">
              <size>
               <width>150</width>
@@ -444,14 +444,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcPushButtonNormal</class>
+   <extends>QPushButton</extends>
+   <header>control/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>

@@ -71,7 +71,7 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <widget class="QPushButton" name="chnageNodeButton">
+       <widget class="control::MwcPushButtonNormal" name="chnageNodeButton">
         <property name="geometry">
          <rect>
           <x>405</x>
@@ -345,7 +345,7 @@
          </property>
         </widget>
        </widget>
-       <widget class="QPushButton" name="refreshButton">
+       <widget class="control::MwcPushButtonNormal" name="refreshButton">
         <property name="geometry">
          <rect>
           <x>201</x>
@@ -608,10 +608,14 @@
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcFrameWithBorder</class>
-   <extends>QFrame</extends>
-   <header>control/MwcFrameWithBorder.h</header>
-   <container>1</container>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcPushButtonNormal</class>
+   <extends>QPushButton</extends>
+   <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
@@ -619,9 +623,10 @@
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
+   <class>control::MwcFrameWithBorder</class>
+   <extends>QFrame</extends>
+   <header>control/MwcFrameWithBorder.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

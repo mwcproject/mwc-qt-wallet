@@ -31,10 +31,11 @@ public:
 
 private slots:
     void on_contactsButton_clicked();
-    void on_settingsButton_clicked();
     void on_sendButton_clicked();
 
     void on_sendEdit_textEdited(const QString &arg1);
+    void on_settingsBtn_clicked();
+
 private:
     Ui::SendOnline *ui;
     state::Send * state = nullptr;

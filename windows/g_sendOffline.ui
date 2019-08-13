@@ -163,7 +163,7 @@
          <string>Description</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="settingsButton">
+       <widget class="control::MwcPushButtonNormal" name="settingsBtn">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -194,7 +194,7 @@
          <string>Settings</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="sendButton">
+       <widget class="control::MwcPushButtonNormal" name="sendButton">
         <property name="geometry">
          <rect>
           <x>237</x>
@@ -352,6 +352,11 @@
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcPushButtonNormal</class>
+   <extends>QPushButton</extends>
+   <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>

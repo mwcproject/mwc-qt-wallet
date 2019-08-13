@@ -194,7 +194,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="control::MwcPushButtonNormal" name="pushButton">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -233,6 +233,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>control::MwcPushButtonNormal</class>
+   <extends>QPushButton</extends>
+   <header>control/MwcPushButton.h</header>
+  </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>

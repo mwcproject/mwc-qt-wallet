@@ -226,7 +226,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QPushButton" name="backButton">
+          <widget class="control::MwcPushButtonNormal" name="backButton">
            <property name="minimumSize">
             <size>
              <width>150</width>
@@ -264,7 +264,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="settingsButton">
+          <widget class="control::MwcPushButtonNormal" name="settingsBtn">
            <property name="minimumSize">
             <size>
              <width>150</width>
@@ -289,7 +289,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="transferButton">
+          <widget class="control::MwcPushButtonNormal" name="transferButton">
            <property name="minimumSize">
             <size>
              <width>150</width>
@@ -436,6 +436,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control/MwcPushButton.h</header>
@@ -444,11 +449,6 @@
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control/MwcLineEdit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>

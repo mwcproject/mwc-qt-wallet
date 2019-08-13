@@ -24,7 +24,7 @@ NewSeed::NewSeed( QWidget *parent, state::SubmitCaller * _state, state::StateCon
         utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()) );
 
     if (!seed.isEmpty()) {
-        updateSeedData(seed);
+        updateSeedData("Seed:",seed); // Seed allways comes from ctor. Mean we are created a new account with a seed.
     }
 
 }
@@ -44,17 +44,18 @@ void NewSeed::showSeedData(const QVector<QString> & seed) {
         return;
     }
 
-    updateSeedData(seed);
+    // By update allways come mnemonic. It is mean that we read the seed from the wallet. That is why it has different name.
+    updateSeedData("Mnemonic:", seed);
 }
 
-void NewSeed::updateSeedData(const QVector<QString> & seed) {
+void NewSeed::updateSeedData( const QString & name, const QVector<QString> & seed) {
     QString thePhrase = "";
     for (const auto & s : seed) {
         if (thePhrase.length()>0)
             thePhrase+=" ";
         thePhrase+=s;
     }
-    ui->seedText->setPlainText( "Seed:\n" + thePhrase);
+    ui->seedText->setPlainText( name + "\n" + thePhrase);
     ui->seedText->setFocus();
 }
 

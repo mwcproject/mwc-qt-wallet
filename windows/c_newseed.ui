@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="3,7,1,5,1,1,1">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="6,12,1,5,2,1,2">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -100,7 +100,7 @@ p, li { white-space: pre-wrap; }
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>25</height>
+       <height>15</height>
       </size>
      </property>
     </spacer>
@@ -123,13 +123,18 @@ p, li { white-space: pre-wrap; }
      <item>
       <widget class="control::MwcLabelSmall" name="label_3">
        <property name="text">
-        <string>Please save these words on paper (order is important).
-This seed will allow you to recover your wallet in case of computer failure.
-
-WARNING:
-- Never disclosure your seed.
-- Never type it on a website.
-- Do not store it electronically.</string>
+        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot;line-height:138%;&quot;&gt;
+&lt;p&gt;
+Please save these words on paper (order is important).&lt;br/&gt;
+This seed will allow you to recover your wallet in case of computer failure.&lt;br/&gt; 
+&lt;br /&gt;
+WARNING:&lt;br/&gt; 
+- Never disclosure your seed.&lt;br/&gt; 
+- Never type it on a website.&lt;br/&gt; 
+- Do not store it electronically.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -236,14 +241,14 @@ WARNING:
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

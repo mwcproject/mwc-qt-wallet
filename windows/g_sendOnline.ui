@@ -259,7 +259,7 @@
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
-       <widget class="QPushButton" name="settingsButton">
+       <widget class="control::MwcPushButtonNormal" name="settingsBtn">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -290,7 +290,7 @@
          <string>Settings</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="sendButton">
+       <widget class="control::MwcPushButtonNormal" name="sendButton">
         <property name="geometry">
          <rect>
           <x>237</x>

@@ -19,7 +19,7 @@ SendOffline::SendOffline(QWidget *parent, const wallet::AccountInfo & _selectedA
     ui->progress->initLoader(false);
 
     ui->fromAccount->setText("From account: " + selectedAccount.accountName );
-    ui->amount2send->setText( "Amount to send: " + util::nano2one(amount) + " mwc" );
+    ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util::nano2one(amount)) + " mwc" );
 
 }
 
@@ -29,7 +29,7 @@ SendOffline::~SendOffline()
     delete ui;
 }
 
-void SendOffline::on_settingsButton_clicked()
+void wnd::SendOffline::on_settingsBtn_clicked()
 {
     state::TimeoutLockObject to( state );
 
@@ -39,7 +39,6 @@ void SendOffline::on_settingsButton_clicked()
     if (dlg.exec() == QDialog::Accepted) {
         state->updateSendCoinsParams( dlg.getSendCoinsParams() );
     }
-
 }
 
 void SendOffline::on_sendButton_clicked()
@@ -83,3 +82,4 @@ void SendOffline::showSendMwcOfflineResult( bool success, QString message ) {
 
 
 }
+

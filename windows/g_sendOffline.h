@@ -25,8 +25,9 @@ public:
 
     void showSendMwcOfflineResult( bool success, QString message );
 private slots:
-    void on_settingsButton_clicked();
     void on_sendButton_clicked();
+
+    void on_settingsBtn_clicked();
 
 private:
     Ui::SendOffline * ui;

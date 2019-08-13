@@ -27,7 +27,7 @@ public:
     void showSeedData(const QVector<QString> & seed);
 
 protected:
-    void updateSeedData(const QVector<QString> & seed);
+    void updateSeedData(const QString & name, const QVector<QString> & seed);
 
 private slots:
     void on_submitButton_clicked();

@@ -21,6 +21,7 @@ AccountTransfer::AccountTransfer(QWidget *parent, state::AccountTransfer * _stat
 
 AccountTransfer::~AccountTransfer()
 {
+    state->wndDeleted(this);
     delete ui;
 }
 
@@ -67,7 +68,7 @@ void AccountTransfer::on_allAmountButton_clicked()
     ui->amountEdit->setText("All");
 }
 
-void AccountTransfer::on_settingsButton_clicked()
+void AccountTransfer::on_settingsBtn_clicked()
 {
     core::SendCoinsParams  params = state->getSendCoinsParams();
 

@@ -28,7 +28,7 @@ protected:
 
 private slots:
     void on_allAmountButton_clicked();
-    void on_settingsButton_clicked();
+    void on_settingsBtn_clicked();
     void on_transferButton_clicked();
     void on_backButton_clicked();
 

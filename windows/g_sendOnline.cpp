@@ -26,7 +26,7 @@ SendOnline::SendOnline(QWidget *parent,
     ui->contactNameLable->setText("");
 
     ui->fromAccount->setText("From account: " + selectedAccount.accountName );
-    ui->amount2send->setText( "Amount to send: " + util::nano2one(amount) + " mwc" );
+    ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util::nano2one(amount)) + " mwc" );
 }
 
 SendOnline::~SendOnline()
@@ -57,8 +57,7 @@ void SendOnline::on_sendEdit_textEdited(const QString &)
     ui->contactNameLable->setText("");
 }
 
-
-void SendOnline::on_settingsButton_clicked()
+void SendOnline::on_settingsBtn_clicked()
 {
     state::TimeoutLockObject to( state );
 
