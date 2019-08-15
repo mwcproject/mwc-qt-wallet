@@ -6,6 +6,7 @@
 #include "../control/messagebox.h"
 #include "../state/timeoutlock.h"
 #include <QDebug>
+#include "../dialogs/showproofdlg.h"
 
 namespace wnd {
 
@@ -198,7 +199,14 @@ void Transactions::setTransactionData(QString account, int64_t height, const QVe
 void Transactions::showExportProofResults(bool success, QString fn, QString msg ) {
     state::TimeoutLockObject to( state );
     if (success) {
-        control::MessageBox::message(this, "Success", "Your transaction proof located at " + fn + "\n\n" + msg );
+        dlg::ProofInfo proof;
+        if (proof.parseProofText(msg)) {
+            dlg::ShowProofDlg dlg(this, fn, proof );
+            dlg.exec();
+        }
+        else {
+            control::MessageBox::message(this, "Failure", "Internal error. Unable to decode the results of the proof located at  " + fn + "\n\n" + msg );
+        }
     }
     else {
         control::MessageBox::message(this, "Failure", msg );
@@ -208,7 +216,14 @@ void Transactions::showExportProofResults(bool success, QString fn, QString msg 
 void Transactions::showVerifyProofResults(bool success, QString fn, QString msg ) {
     state::TimeoutLockObject to( state );
     if (success) {
-        control::MessageBox::message(this, "Success", "Proof at " + fn + ":\n\n" + msg );
+        dlg::ProofInfo proof;
+        if (proof.parseProofText(msg)) {
+            dlg::ShowProofDlg dlg(this, fn, proof );
+            dlg.exec();
+        }
+        else {
+            control::MessageBox::message(this, "Failure", "Internal error. Unable to decode the results of the proof from the file " + fn + "\n\n" + msg );
+        }
     }
     else {
         control::MessageBox::message(this, "Failure", msg );

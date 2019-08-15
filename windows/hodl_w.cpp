@@ -5,6 +5,7 @@
 #include <QAbstractItemView>
 #include "../state/timeoutlock.h"
 #include <QProcess>
+#include "../util/execute.h"
 
 namespace wnd {
 
@@ -24,7 +25,7 @@ Hodl::~Hodl()
 
 void Hodl::on_pushButton_clicked()
 {
-    QProcess::startDetached("open https://www.mwc.mw/contact");
+    util::openUrlInBrowser("https://www.mwc.mw/contact");
 }
 
 
