@@ -66,6 +66,7 @@ private slots:
 
 protected:
     virtual NextStateRespond execute() override;
+    virtual void exitingState() override;
 
     // return true if done
     bool finishSeedVerification();

@@ -33,7 +33,7 @@ NextStateRespond InputPassword::execute() {
     QString lockStr = context->appContext->pullCookie<QString>("LockWallet");
     inLockMode = false;
 
-    // Allways try ti start the wallet. State before is responsible for the first init
+    // Allways try to start the wallet. State before is responsible for the first init
     if ( !running ) {
         // We are at the right place. Let's start the wallet
 

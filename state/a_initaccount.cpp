@@ -43,11 +43,19 @@ NextStateRespond InitAccount::execute() {
                     new wnd::InitAccount( context->wndManager->getInWndParent(), this,
                             (state::WalletConfig *) context->stateMachine->getState(STATE::WALLET_CONFIG) ) );
 
+        // Provosion of new wallet, need to block locking
+        context->stateMachine->blockLogout();
+
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
     }
 
     // Just skip that step
     return NextStateRespond( NextStateRespond::RESULT::DONE );
+}
+
+// Executing another state
+void InitAccount::exitingState() {
+    context->stateMachine->unblockLogout();
 }
 
 // Get Password, Choose what to do
