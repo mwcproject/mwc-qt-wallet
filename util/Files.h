@@ -2,6 +2,7 @@
 #define MWC_QT_WALLET_FILES_H
 
 #include <QStringList>
+#include <functional>
 
 namespace util {
 

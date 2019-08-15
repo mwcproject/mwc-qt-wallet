@@ -3,6 +3,7 @@
 #include "../control/messagebox.h"
 #include <QHostInfo>
 #include <QUrl>
+#include <cstring>
 
 namespace dlg {
 

@@ -39,7 +39,7 @@ void AirdropRequests::saveData(QDataStream & out) const {
     out << btcAddress;
     out << challendge;
     out << signature;
-    out << timestamp;
+    out.writeRawData( (char*)&timestamp, sizeof(timestamp));
 }
 
 bool AirdropRequests::loadData(QDataStream & in) {
@@ -52,7 +52,7 @@ bool AirdropRequests::loadData(QDataStream & in) {
     in >> btcAddress;
     in >> challendge;
     in >> signature;
-    in >> timestamp;
+    in.readRawData( (char*) &timestamp, sizeof(timestamp));
     return true;
 }
 
