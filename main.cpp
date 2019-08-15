@@ -18,6 +18,7 @@
 #include <QFileDevice>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include "util/address.h"
 
 // Very first run - init everything
 bool deployFilesFromResources() {
