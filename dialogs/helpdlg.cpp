@@ -16,6 +16,10 @@ HelpDlg::HelpDlg( QWidget *parent, QString documentName ) :
 
     ui->forwardBtn->setEnabled(false);
     ui->backwardBtn->setEnabled(false);
+
+    // In any case we don't have any pages with navigation so far
+    ui->forwardBtn->hide();
+    ui->backwardBtn->hide();
 }
 
 HelpDlg::~HelpDlg()

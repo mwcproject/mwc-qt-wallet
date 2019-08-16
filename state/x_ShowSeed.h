@@ -22,6 +22,7 @@ public:
 
 protected:
     virtual NextStateRespond execute() override;
+    virtual QString getHelpDocName() override {return "seed.html";}
 
     // submit is hidden, never expected to be called.
     virtual void submit() override {Q_ASSERT(false);}

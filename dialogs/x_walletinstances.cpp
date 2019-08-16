@@ -53,6 +53,7 @@ void WalletInstances::on_applyButton_clicked() {
 
     wallet::WalletConfig newWalletConfig = state->getWalletConfig();
     if ( dataPath == newWalletConfig.dataPath ) {
+        reject();
         return; // no changes was made
     }
 

@@ -37,7 +37,7 @@ private slots:
 
 protected:
     virtual NextStateRespond execute() override;
-
+    virtual QString getHelpDocName() override {return "event_log.html";}
 private:
     wnd::Events *   wnd = nullptr;
     int64_t         messageWaterMark = 0;

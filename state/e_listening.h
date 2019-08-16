@@ -30,6 +30,7 @@ public:
 
 protected:
     virtual NextStateRespond execute() override;
+    virtual QString getHelpDocName() override {return "listener.html";}
 
 private slots:
     void onMwcMqListenerStatus(bool online);

@@ -42,6 +42,7 @@ private slots:
 
 protected:
     virtual NextStateRespond execute() override;
+    virtual QString getHelpDocName() override {return "outputs.html";}
 
 private:
     wnd::Outputs * wnd = nullptr;

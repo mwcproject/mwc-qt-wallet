@@ -20,6 +20,7 @@ public:
 
 protected:
     virtual NextStateRespond execute() override;
+    virtual QString getHelpDocName() override {return "hodl.html";}
 };
 
 }

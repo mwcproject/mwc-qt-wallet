@@ -161,4 +161,39 @@ QToolTip {
     background: #cebae1;
 }
 
+/* ------------------ Scroll bars ------------------------ */
+QScrollBar {
+    border: 1px solid  rgba(111, 0, 214, 0.15);
+    background: transparent;
+    margin: 0 0 0 0;
+}
+
+QScrollBar:vertical {
+    width: 15px;
+}
+
+QScrollBar:horizontal {
+    height: 15px;
+}
+
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+    background: rgba(111, 0, 214, 0.15);
+    min-height: 20px;
+    border: transparent;
+    border-radius: 9px;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical ,QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    border: none;
+    background: none;
+    height: 0px;
+}
+
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical, QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {
+    border: none;
+    background: none;
+}
+
+QAbstractScrollArea::corner {
+    background: transparent;
+}
 

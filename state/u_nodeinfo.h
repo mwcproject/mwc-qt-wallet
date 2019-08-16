@@ -25,6 +25,7 @@ public:
 
 protected:
     virtual NextStateRespond execute() override;
+    virtual QString getHelpDocName() override {return "node_overview.html";}
 
 private slots:
     void onNodeStatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections );

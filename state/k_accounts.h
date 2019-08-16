@@ -39,7 +39,7 @@ public:
     void deleteAccount( const wallet::AccountInfo & account );
 protected:
     virtual NextStateRespond execute() override;
-
+    virtual QString getHelpDocName() override {return "accounts.html";}
 private slots:
     // Account info is updated
     void onWalletBalanceUpdated();

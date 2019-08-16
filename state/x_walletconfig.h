@@ -25,6 +25,7 @@ public:
 
 protected:
     virtual NextStateRespond execute() override;
+    virtual QString getHelpDocName() override {return "wallet_configuration.html";}
 };
 
 }

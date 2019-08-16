@@ -45,7 +45,7 @@ public:
 protected:
     virtual NextStateRespond execute() override;
 
-    virtual QString getHelpDocName() override {return "Transactions.html";}
+    virtual QString getHelpDocName() override {return "transactions.html";}
 
 private slots:
     void updateTransactionCount(QString account, int number);

@@ -28,6 +28,7 @@ public:
     void deletedWnd(wnd::Recieve * w) { if(w==wnd) wnd = nullptr;}
 protected:
     virtual NextStateRespond execute() override;
+    virtual QString getHelpDocName() override {return "receive.html";}
 
     void respReceiveFile( bool success, QStringList errors, QString inFileName );
 

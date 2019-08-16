@@ -131,7 +131,7 @@ void MainWindow::on_helpButton_clicked()
     }
 
     if ( docName.isEmpty() ) {
-        docName = "Default.html";
+        docName = "default.html";
     }
 
     dlg::HelpDlg helpDlg(this, docName);

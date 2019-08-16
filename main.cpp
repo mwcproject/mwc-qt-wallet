@@ -19,6 +19,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include "util/address.h"
+#include "dialogs/helpdlg.h"
 
 // Very first run - init everything
 bool deployFilesFromResources() {

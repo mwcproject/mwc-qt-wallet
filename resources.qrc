@@ -38,12 +38,22 @@
         <file>img/Connections@2x.svg</file>
         <file>img/Blockchain@2x.svg</file>
         <file>img/Difficulty@2x.svg</file>
-        <file>help/Airdrop.html</file>
-        <file>help/Transactions.html</file>
-        <file>help/images/image1.png</file>
-        <file>help/Default.html</file>
         <file>img/purpLeft@2x.svg</file>
         <file>img/purpRight@2x.svg</file>
         <file>img/HODL_big@2x.svg</file>
+        <file>help/accounts.html</file>
+        <file>help/contacts.html</file>
+        <file>help/event_log.html</file>
+        <file>help/hodl.html</file>
+        <file>help/listener.html</file>
+        <file>help/node_overview.html</file>
+        <file>help/outputs.html</file>
+        <file>help/receive.html</file>
+        <file>help/seed.html</file>
+        <file>help/send.html</file>
+        <file>help/wallet_configuration.html</file>
+        <file>help/default.html</file>
+        <file>help/airdrop.html</file>
+        <file>help/transactions.html</file>
     </qresource>
 </RCC>
