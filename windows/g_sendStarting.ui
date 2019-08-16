@@ -121,7 +121,7 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-        <widget class="control::MwcFrameWithBorder" name="frame_2">
+        <widget class="control::MwcLine" name="frame_2">
          <property name="geometry">
           <rect>
            <x>39</x>
@@ -226,7 +226,7 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-        <widget class="control::MwcFrameWithBorder" name="frame_9">
+        <widget class="control::MwcLine" name="frame_9">
          <property name="geometry">
           <rect>
            <x>39</x>
@@ -524,18 +524,28 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
+   <class>control::MwcPushButtonNormal</class>
+   <extends>QPushButton</extends>
+   <header>control/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcFrameWithBorder</class>
+   <class>control::MwcLine</class>
    <extends>QFrame</extends>
    <header>control/MwcFrameWithBorder.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
+   <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
@@ -545,23 +555,7 @@
    <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcPushButtonNormal</class>
-   <extends>QPushButton</extends>
-   <header>control/MwcPushButton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcCheckedFrame</class>
-   <extends>QFrame</extends>
-   <header>control/MwcCheckedFrame.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelSmall</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
@@ -569,6 +563,12 @@
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
    <header>control/MwcComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcCheckedFrame</class>
+   <extends>QFrame</extends>
+   <header>control/MwcCheckedFrame.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

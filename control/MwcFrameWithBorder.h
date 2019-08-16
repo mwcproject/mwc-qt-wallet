@@ -12,6 +12,13 @@ public:
     MwcFrameWithBorder(QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
 };
 
+class MwcLine : public QFrame {
+Q_OBJECT
+public:
+    MwcLine(QWidget* parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+};
+
+
 }
 
 #endif //MWC_QT_WALLET_MWCFRAMEWITHBORDER_H

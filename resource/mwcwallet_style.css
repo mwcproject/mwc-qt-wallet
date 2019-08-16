@@ -7,12 +7,6 @@ core--MwcToolbar {
     background-color: #6F00D6;
 }
 
-control--MwcFrameWithBorder {
-    border: 2px solid #FFFFFF;
-    border-radius: 6px;
-    background: transparent;
-}
-
 QStatusBar {
     background-color: qlineargradient(x1: 1, y1: 0, x2: 1, y2: 0,
                                   stop: 0 #6F00D6, stop: 0.3 #6F00D6, stop: 0.9 #9E00E7, stop: 1 #9E00E7);
@@ -217,7 +211,8 @@ QPushButton:focus {
 QPushButton:disabled {
 /*    border: 2px solid gray;
     color: gray;*/
-    background: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 QPushButton:pressed {
@@ -278,6 +273,11 @@ control--MwcFrameWithBorder {
     background: transparent;
     border: 2px solid #FFFFFF;
     border-radius: 6px;
+}
+
+control--MwcLine {
+    background: rgba(255, 255, 255, 0.5);
+    border: transparent;
 }
 
 /* ------------  MwcComboBox ------- */

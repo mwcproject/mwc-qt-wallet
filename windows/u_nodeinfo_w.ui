@@ -146,7 +146,7 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-        <widget class="control::MwcFrameWithBorder" name="frame_4">
+        <widget class="control::MwcLine" name="frame_4">
          <property name="geometry">
           <rect>
            <x>39</x>
@@ -229,7 +229,7 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-        <widget class="control::MwcFrameWithBorder" name="frame_2">
+        <widget class="control::MwcLine" name="frame_2">
          <property name="geometry">
           <rect>
            <x>39</x>
@@ -312,7 +312,7 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-        <widget class="control::MwcFrameWithBorder" name="frame_8">
+        <widget class="control::MwcLine" name="frame_8">
          <property name="geometry">
           <rect>
            <x>39</x>
@@ -420,7 +420,7 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-        <widget class="control::MwcFrameWithBorder" name="frame_6">
+        <widget class="control::MwcLine" name="frame_6">
          <property name="geometry">
           <rect>
            <x>39</x>
@@ -453,7 +453,7 @@
          </property>
         </widget>
        </widget>
-       <widget class="control::MwcFrameWithBorder" name="frame_9">
+       <widget class="control::MwcLine" name="frame_9">
         <property name="geometry">
          <rect>
           <x>285</x>
@@ -603,19 +603,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcFrameWithBorder</class>
+   <extends>QFrame</extends>
+   <header>control/MwcFrameWithBorder.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
@@ -623,10 +619,20 @@
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcFrameWithBorder</class>
+   <class>control::MwcLine</class>
    <extends>QFrame</extends>
    <header>control/MwcFrameWithBorder.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources>
