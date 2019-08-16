@@ -1,4 +1,5 @@
 #include "address.h"
+#include <cassert>
 #include <QVector>
 #include <QCryptographicHash>
 
