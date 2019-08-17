@@ -86,6 +86,11 @@ void Recieve::onTransactionActionIsFinished( bool success, QString message ) {
     control::MessageBox::message(this, success ? "Success" : "Failure", message );
 }
 
+void Recieve::stopWaiting() {
+    ui->progress->hide();
+}
+
+
 void Recieve::on_accountComboBox_activated(int index)
 {
     if (index>=0 && index < accountInfo.size() )

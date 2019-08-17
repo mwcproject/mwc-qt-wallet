@@ -19,7 +19,9 @@
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../util/Log.h"
-
+#include "../util/Json.h"
+#include "../dialogs/fileslateinfodlg.h"
+#include "timeoutlock.h"
 
 namespace state {
 
@@ -68,6 +70,28 @@ void Recieve::updateFileGenerationPath(QString path) {
 }
 
 void Recieve::signTransaction( QString fileName ) {
+    Q_ASSERT(wnd);
+
+    // Let's parse transaction first
+    util::FileTransactionInfo flTrInfo;
+    if (!flTrInfo.parseTransaction(fileName)) {
+        if (wnd) {
+            wnd->onTransactionActionIsFinished( false, "Unable to parse mwc transaction data at file: " + fileName );
+        }
+        return;
+    }
+
+    TimeoutLockObject to( this );
+
+    // Ask for acceptanse...
+    dlg::FileSlateInfoDlg acceptDlg( wnd, "Recieve File Transaction", flTrInfo );
+    if ( acceptDlg.exec() != QDialog::Accepted ) {
+        if (wnd) {
+            wnd->stopWaiting();
+        }
+        return;
+    }
+
     context->wallet->receiveFile( fileName );
 }
 

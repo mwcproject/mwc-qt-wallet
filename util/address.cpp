@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include "address.h"
-#include <cassert>
 #include <QVector>
 #include <QCryptographicHash>
 
@@ -66,7 +65,7 @@ static bool decodeBase58( QString sz, QByteArray & vch)
             *it = carry % 256;
             carry /= 256;
         }
-        assert(carry == 0);
+        Q_ASSERT(carry == 0);
         length = i;
         psz++;
     }

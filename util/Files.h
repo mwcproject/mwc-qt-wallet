@@ -22,7 +22,7 @@ namespace util {
 
 // Read all lines from text file
 // if openOpenErrorCallback will be called in case of open file error,
-QStringList readTextFile(QString fileName,  std::function<void()> openOpenErrorCallback = [](){} );
+QStringList readTextFile(QString fileName,  std::function<void()> openErrorCallback = [](){} );
 
 // Write text lines into the file
 bool writeTextFile(QString fileName, QStringList lines );

@@ -42,6 +42,7 @@ public:
     void updateKeybaseState(bool online);
 
     void onTransactionActionIsFinished( bool success, QString message );
+    void stopWaiting();
 
 private slots:
     void on_pushButton_clicked();
