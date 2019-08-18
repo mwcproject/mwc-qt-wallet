@@ -49,6 +49,7 @@ public:
 
 protected:
     virtual NextStateRespond execute() override;
+    virtual QString getHelpDocName() override {return "accounts.html";}
 
 private slots:
     // set receive account name results

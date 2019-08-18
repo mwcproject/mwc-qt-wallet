@@ -31,6 +31,8 @@ NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
     ui->progress->initLoader(true);
 
     state->requestNodeInfo();
+
+    startTimer(20000); // Let's update node info every 20 seconds
 }
 
 NodeInfo::~NodeInfo() {
@@ -57,10 +59,17 @@ void NodeInfo::setNodeStatus( bool online, QString errMsg, int height, int64_t t
     }
 }
 
+void NodeInfo::timerEvent(QTimerEvent *event) {
+    Q_UNUSED(event);
+    state->requestNodeInfo();
+}
+
 
 void NodeInfo::on_refreshButton_clicked() {
-    ui->progress->show();
-    state->requestNodeInfo();
+    if (control::MessageBox::question(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
+                       "Yes", "No", false,true) == control::MessageBox::BTN1 ) {
+        state->requestWalletResync();
+    }
 }
 
 void NodeInfo::on_chnageNodeButton_clicked() {

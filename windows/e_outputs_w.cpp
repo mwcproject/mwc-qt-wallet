@@ -59,7 +59,7 @@ void Outputs::initTableHeaders() {
     // Creatign columns
     QVector<int> widths = state->getColumnsWidhts();
     if ( widths.size() != 7 ) {
-        widths = QVector<int>{70,80,70,70,200,70,70};
+        widths = QVector<int>{40,90,70,50,240,70,70};
     }
     Q_ASSERT( widths.size() == 7 );
 

@@ -44,6 +44,11 @@ private:
     int prevState = STATE::TRANSACTIONS;
     QPair<bool,bool> prevListeningStatus = QPair<bool,bool>(false,false);
     int maxProgrVal = 100;
+    // Need to recalibrate ther progress..
+    // First few respond might be too fast
+    int respondCounter = 0;
+    int respondZeroLevel = 0;
+    int progressBase = 0;
 };
 
 }

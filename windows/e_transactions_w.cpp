@@ -60,7 +60,7 @@ void Transactions::initTableHeaders() {
     // Creatign columns
     QVector<int> widths = state->getColumnsWidhts();
     if ( widths.size() != 7 ) {
-        widths = QVector<int>{30,100,150,200,100,100,100};
+        widths = QVector<int>{30,90,100,200,160,90,70};
     }
     Q_ASSERT( widths.size() == 7 );
 

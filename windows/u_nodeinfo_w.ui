@@ -367,7 +367,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Refresh</string>
+         <string>Re-sync with node</string>
         </property>
        </widget>
        <widget class="control::MwcFrameWithBorder" name="frame_5">
@@ -608,6 +608,16 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcFrameWithBorder</class>
    <extends>QFrame</extends>
    <header>control/MwcFrameWithBorder.h</header>
@@ -623,16 +633,6 @@
    <extends>QFrame</extends>
    <header>control/MwcFrameWithBorder.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources>

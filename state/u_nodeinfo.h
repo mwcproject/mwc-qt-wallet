@@ -34,6 +34,8 @@ public:
 
     void requestNodeInfo();
 
+    void requestWalletResync();
+
     wallet::WalletConfig getWalletConfig() const;
     void updateWalletConfig( const wallet::WalletConfig & config );
 

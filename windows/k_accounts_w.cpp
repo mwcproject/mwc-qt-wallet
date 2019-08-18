@@ -66,7 +66,7 @@ void Accounts::initTableHeaders() {
     // Creatign columns
     QVector<int> widths = state->getColumnsWidhts();
     if ( widths.size() != 5 ) {
-        widths = QVector<int>{150,150,150,150,150};
+        widths = QVector<int>{250,110,90,90,90};
     }
     Q_ASSERT( widths.size() == 5 );
 
@@ -93,8 +93,8 @@ void Accounts::refreshWalletBalance()
     ui->accountList->clearData();
 
     for (auto & acc : accounts) {
-        QVector<QString> data{ acc.accountName, util::nano2one(acc.total), util::nano2one(acc.awaitingConfirmation),
-                               util::nano2one(acc.lockedByPrevTransaction), util::nano2one(acc.currentlySpendable) };
+        QVector<QString> data{ acc.accountName, util::nano2one(acc.currentlySpendable), util::nano2one(acc.awaitingConfirmation),
+                               util::nano2one(acc.lockedByPrevTransaction), util::nano2one(acc.total) };
 
         ui->accountList->appendRow( data, acc.accountName.startsWith("HODL") ? 0.8 : 0.0 );
     }

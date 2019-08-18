@@ -62,15 +62,23 @@
          </column>
          <column>
           <property name="text">
-           <string>TOTAL</string>
+           <string>SPENDABLE</string>
+          </property>
+          <property name="textAlignment">
+           <set>AlignCenter</set>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>AWAITING CONFIRMATION</string>
+           <string>AWAITING</string>
+          </property>
+          <property name="font">
+           <font>
+            <kerning>true</kerning>
+           </font>
           </property>
           <property name="textAlignment">
-           <set>AlignLeading|AlignVCenter</set>
+           <set>AlignCenter</set>
           </property>
          </column>
          <column>
@@ -80,7 +88,7 @@
          </column>
          <column>
           <property name="text">
-           <string>SPENDABLE</string>
+           <string>TOTAL</string>
           </property>
          </column>
         </widget>

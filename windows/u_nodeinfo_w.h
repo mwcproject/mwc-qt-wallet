@@ -44,6 +44,9 @@ private slots:
     void on_chnageNodeButton_clicked();
 
 private:
+    virtual void timerEvent(QTimerEvent *event) override;
+
+private:
     Ui::NodeInfo *ui;
     state::NodeInfo * state;
 };

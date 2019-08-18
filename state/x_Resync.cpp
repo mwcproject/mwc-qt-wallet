@@ -53,6 +53,10 @@ NextStateRespond Resync::execute() {
     wnd = (wnd::ProgressWnd*)context->wndManager->switchToWindowEx( new wnd::ProgressWnd(
                                             context->wndManager->getInWndParent(), this, "Re-sync with full node", "Preparing to re-sync", "", false) );
 
+    respondCounter = 0;
+    respondZeroLevel = 0;
+    progressBase = 0;
+
     context->wallet->check( prevListeningStatus.first || prevListeningStatus.second );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
@@ -61,6 +65,22 @@ NextStateRespond Resync::execute() {
 
 void Resync::onRecoverProgress( int progress, int maxVal ) {
     if (wnd) {
+
+        if (respondCounter<3) {
+            respondCounter++;
+            respondZeroLevel = progress;
+            progressBase = maxVal / 100 * respondCounter;
+
+            progress = respondCounter;
+            maxVal = 100;
+        }
+        else {
+            progress -= respondZeroLevel;
+            maxVal -= respondZeroLevel;
+            progress += progressBase;
+            maxVal += progressBase;
+        }
+
         wnd->initProgress(0, maxVal);
 
         maxProgrVal = maxVal;

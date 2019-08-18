@@ -47,6 +47,11 @@ NextStateRespond NodeInfo::execute() {
 }
 
 
+void NodeInfo::requestWalletResync() {
+    context->appContext->pushCookie("PrevState", (int)context->appContext->getActiveWndState() );
+    context->stateMachine->setActionWindow( state::STATE::RESYNC );
+}
+
 void NodeInfo::requestNodeInfo() {
     context->wallet->getNodeStatus();
 }

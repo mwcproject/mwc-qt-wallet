@@ -108,12 +108,12 @@
             </column>
             <column>
              <property name="text">
-              <string>CONFIRMED</string>
+              <string>CONF</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>COINBASE</string>
+              <string>CB</string>
              </property>
             </column>
             <column>
@@ -128,7 +128,7 @@
             </column>
             <column>
              <property name="text">
-              <string>LOCK HEIGHT</string>
+              <string>LOCK H</string>
              </property>
             </column>
            </widget>
