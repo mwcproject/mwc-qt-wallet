@@ -30,13 +30,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
 #ifdef Q_OS_MACOS
-    Cocoa::changeTitleBarColor(winId(), 0x6F/255.0, 0.0, 0xD6/255.0 );
+    Cocoa::changeTitleBarColor(winId(), 0x6F/255.0, 0.0, 0xD6/255.0 ); // Color #6f00d6
 #endif
 
     ui->statusBar->addPermanentWidget(ui->helpButton);
     ui->statusBar->addPermanentWidget(ui->btnSpacerLabel1);
     ui->statusBar->addPermanentWidget(ui->connectionStatusButton);
+    ui->statusBar->addPermanentWidget(ui->network);
     ui->statusBar->addPermanentWidget(ui->rightestSpacerLabel);
+
+    ui->network->setText(""); // No network is known
 
     //ui->statusBar->showMessage("Can show any message here", 2000);
 
@@ -103,6 +106,8 @@ void MainWindow::setAppEnvironment(state::StateMachine * _stateMachine, wallet::
 
     QObject::connect(wallet, &wallet::Wallet::onNewNotificationMessage,
                      this, &MainWindow::onNewNotificationMessage, Qt::QueuedConnection);
+    QObject::connect(wallet, &wallet::Wallet::onConfigUpdate,
+                     this, &MainWindow::onConfigUpdate, Qt::QueuedConnection);
 
 
     QObject::connect(wallet, &wallet::Wallet::onMwcMqListenerStatus,
@@ -111,6 +116,7 @@ void MainWindow::setAppEnvironment(state::StateMachine * _stateMachine, wallet::
                      this, &MainWindow::updateListenerStatus, Qt::QueuedConnection);
 
     updateListenerBtn();
+    updateNetwork();
 }
 
 QWidget * MainWindow::getMainWindow() {
@@ -156,7 +162,13 @@ void MainWindow::updateListenerStatus(bool online) {
     Q_UNUSED(online);
 
     updateListenerBtn();
+    updateNetwork();
 }
+
+void MainWindow::onConfigUpdate() {
+    updateNetwork();
+}
+
 
 void MainWindow::updateListenerBtn() {
     QPair<bool,bool> listStatus = wallet->getListeningStatus();
@@ -172,6 +184,13 @@ void MainWindow::updateListenerBtn() {
     ui->connectionStatusButton->setToolTip(listening ? "You are listening. Click here to view listener status"
                                           : "You are not listening. Click here to view listener status");
 }
+
+
+void MainWindow::updateNetwork() {
+    ui->network->setText( wallet->getWalletConfig().getNetwork() );
+}
+
+
 
 }
 

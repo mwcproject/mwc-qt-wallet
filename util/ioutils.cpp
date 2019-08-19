@@ -34,7 +34,7 @@ QString getAppDataPath(QString localPath )
 #endif
 
      QDir d(path);
-     QString dataPath = d.absolutePath() + "/" + localPath;
+     QString dataPath = QDir::cleanPath( d.absolutePath() + QDir::separator() + localPath );
      if ( !d.mkpath(dataPath) )
          throw core::MwcException("Unable create app data directory: " + d.absolutePath());
 

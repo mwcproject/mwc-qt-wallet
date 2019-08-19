@@ -25,6 +25,9 @@
 #include "../windows/z_progresswnd.h"
 #include "../util/Log.h"
 #include "../control/messagebox.h"
+#include "x_walletconfig.h"
+#include "../util/ioutils.h"
+#include "../util/Files.h"
 
 namespace state {
 
@@ -80,7 +83,18 @@ void InitAccount::setPassword(const QString & password) {
 }
 
 // How to provosion the wallet
-void InitAccount::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice) {
+void InitAccount::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice, MWC_NETWORK network) {
+    // Apply network first
+    Q_ASSERT( !context->wallet->isRunning() );
+    wallet::WalletConfig walletCfg = context->wallet->getWalletConfig();
+    QString nwName = network == MWC_NETWORK::MWC_MAIN_NET ? "Mainnet" : "Floonet";
+    walletCfg.setDataPathWithNetwork( walletCfg.getDataPath(), nwName );
+
+    // Store the nw name at the data folder
+    walletCfg.saveNetwork2DataPath(walletCfg.getDataPath(), nwName );
+
+    context->wallet->setWalletConfig(walletCfg);
+
     switch (newWalletChoice) {
         case CREATE_NEW:
             // generate a new seed for a new wallet

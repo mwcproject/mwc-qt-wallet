@@ -53,5 +53,4 @@ RESOURCES += \
     resources.qrc
 
 DISTFILES += \
-    CMakeLists.txt \
     mw-logo.icns

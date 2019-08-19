@@ -31,6 +31,7 @@ NewWallet::NewWallet(QWidget *parent, state::InitAccount * _state) :
     //state->setWindowTitle("Init your wallet");
 
     ui->radioCreateNew->setChecked(true);
+    ui->radioMainNet->setChecked(true);
     updateControls();
 
     ui->radioCreateNew->setFocus();
@@ -53,14 +54,13 @@ void NewWallet::on_submitButton_clicked()
 {
     state::TimeoutLockObject to( state );
 
-    if ( ui->radioCreateNew->isChecked() )
-        state->submitCreateChoice( state::InitAccount::NEW_WALLET_CHOICE::CREATE_NEW);
-    else if (ui->radioHaveSeed->isChecked())
-        state->submitCreateChoice( state::InitAccount::NEW_WALLET_CHOICE::CREATE_WITH_SEED);
-    else {
-        control::MessageBox::message(nullptr, "Please select", "Please select how you want to provision a new wallet");
-        Q_ASSERT(false);
-    }
+    Q_ASSERT(ui->radioCreateNew->isChecked() || ui->radioHaveSeed->isChecked());
+    Q_ASSERT(ui->radioMainNet->isChecked() || ui->radioFloonet->isChecked());
+
+    state::InitAccount::NEW_WALLET_CHOICE newWalletChoice = ui->radioCreateNew->isChecked() ? state::InitAccount::NEW_WALLET_CHOICE::CREATE_NEW : state::InitAccount::NEW_WALLET_CHOICE::CREATE_WITH_SEED;
+    state::InitAccount::MWC_NETWORK       mwcNetworkChoice = ui->radioMainNet->isChecked() ? state::InitAccount::MWC_NETWORK::MWC_MAIN_NET      : state::InitAccount::MWC_NETWORK::MWC_FLOO_NET;
+
+    state->submitCreateChoice(newWalletChoice, mwcNetworkChoice);
 }
 
 void NewWallet::on_radioHaveSeed_clicked()

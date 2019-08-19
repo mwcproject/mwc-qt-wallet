@@ -169,6 +169,13 @@
        </widget>
       </item>
       <item>
+       <widget class="control::MwcLabelNormal" name="network">
+        <property name="text">
+         <string>MainNet</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="rightestSpacerLabel">
         <property name="minimumSize">
          <size>
@@ -195,6 +202,11 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
+  <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
   <customwidget>
    <class>core::MwcToolbar</class>
    <extends>QWidget</extends>

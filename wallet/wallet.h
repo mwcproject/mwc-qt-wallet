@@ -56,13 +56,17 @@ struct AccountInfo {
 
 // Wallet config
 struct WalletConfig {
+private:
+    QString network; // Name of the network as wallet undertand: "Floonet" or "Mainnet"
     QString dataPath;
+
+public:
     QString mwcmqDomain;
     QString keyBasePath;
     QString mwcNodeURI; // Connection to alternative MWC node
     QString mwcNodeSecret;
 
-    WalletConfig() : dataPath("Undefined"), mwcmqDomain("Undefined"), keyBasePath("Undefined") {}
+    WalletConfig() : network("Floonet"), dataPath("Undefined"), mwcmqDomain("Undefined"), keyBasePath("Undefined") {}
     WalletConfig(const WalletConfig & other) = default;
     WalletConfig &operator = (const WalletConfig & other) = default;
 
@@ -71,11 +75,22 @@ struct WalletConfig {
 
     bool isDefined() const { return  dataPath!="Undefined" && mwcmqDomain!="Undefined" && keyBasePath!="Undefined"; }
 
-    WalletConfig & setData(QString dataPath,
+    WalletConfig & setData(QString network,
+                QString dataPath,
                 QString mwcmqDomain,
                 QString keyBasePath,
                 QString mwcNodeURI,
                 QString mwcNodeSecret);
+
+    QString getDataPath() const {return dataPath;}
+    QString getNetwork() const {return network;}
+
+    // caller is responsible to call saveNetwork2DataPath if needed
+    void setDataPathWithNetwork( QString _dataPath, QString _network ) { dataPath=_dataPath; network = _network;}
+
+    static QString readNetworkFromDataPath(QString configPath); // local path as writen in config
+    static bool    doesSeedExist(QString configPath);
+    static void    saveNetwork2DataPath(QString configPath, QString network); // Save the network into the data path
 };
 
 struct WalletOutput {
@@ -342,6 +357,7 @@ public:
     // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
     //          and caller suppose listen for them
     // If returns true, expected that wallet will need to have password input.
+    // Check signal: onConfigUpdate()
     virtual bool setWalletConfig(const WalletConfig & config)  = 0;
 
     // Status of the node
@@ -413,6 +429,9 @@ private:
 signals:
     // Notification/error message
     void onNewNotificationMessage(WalletNotificationMessages::LEVEL level, QString message);
+
+    // Config was updated
+    void onConfigUpdate();
 
     // Get next key result
     void onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPassword);

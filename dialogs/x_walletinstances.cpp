@@ -18,6 +18,7 @@
 #include "../state/timeoutlock.h"
 #include <QFileDialog>
 #include "../control/messagebox.h"
+#include "../dialogs/networkselectiondlg.h"
 
 namespace dlg {
 
@@ -28,7 +29,7 @@ WalletInstances::WalletInstances(QWidget *parent, state::WalletConfig * _state) 
 {
     ui->setupUi(this);
 
-    ui-> mwc713directoryEdit->setText( state->getWalletConfig().dataPath );
+    ui-> mwc713directoryEdit->setText( state->getWalletConfig().getDataPath() );
 }
 
 WalletInstances::~WalletInstances() {
@@ -66,12 +67,30 @@ void WalletInstances::on_applyButton_clicked() {
     }
 
     wallet::WalletConfig newWalletConfig = state->getWalletConfig();
-    if ( dataPath == newWalletConfig.dataPath ) {
+    if ( dataPath == newWalletConfig.getDataPath() ) {
         reject();
         return; // no changes was made
     }
 
-    newWalletConfig.dataPath = dataPath;
+    // Data path need to be updated, as well as a network
+    QString network = wallet::WalletConfig::readNetworkFromDataPath(dataPath); // local path as writen in config
+    if (network.isEmpty()) {
+        // Check if seed file does exist. Import of the data?
+        if ( wallet::WalletConfig::doesSeedExist(dataPath) ) {
+
+            dlg::NetworkSelectionDlg nwDlg(this);
+            if (nwDlg.exec() != QDialog::Accepted)
+                return;
+
+            network = nwDlg.getNetwork() == state::InitAccount::MWC_NETWORK::MWC_MAIN_NET ? "Mainnet" : "Floonet";
+
+            wallet::WalletConfig::saveNetwork2DataPath(dataPath, network);
+        }
+        else
+            network = "Mainnet"; // will be redefined later in any case...
+    }
+
+    newWalletConfig.setDataPathWithNetwork( dataPath, network );
 
     if (!state->setWalletConfig(newWalletConfig) )
     {

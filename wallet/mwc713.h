@@ -179,6 +179,7 @@ public:
     // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
     //          and caller suppose listen for them
     // If return true, expected that wallet will need to have password input.
+    // Check signal: onConfigUpdate()
     virtual bool setWalletConfig(const WalletConfig & config)  override;
 
     // Status of the node

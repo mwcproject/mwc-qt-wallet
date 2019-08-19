@@ -49,7 +49,8 @@ public:
 
     // Step 2
     enum NEW_WALLET_CHOICE { CREATE_NEW, CREATE_WITH_SEED };
-    void submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice);
+    enum MWC_NETWORK { MWC_MAIN_NET, MWC_FLOO_NET };
+    void submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice, MWC_NETWORK network);
 
     // Step 3  New seed
     virtual void submit() override;

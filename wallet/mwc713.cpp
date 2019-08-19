@@ -178,6 +178,7 @@ void MWC713::start2init(QString password) {
     qDebug() << "Starting MWC713 as init at " << mwc713Path << " for config " << mwc713configPath;
 
     // Creating process and starting
+
     mwc713process = initMwc713process({"MWC_PASSWORD", password}, {"init"} );
 
     inputParser = new tries::Mwc713InputParser();
@@ -185,6 +186,7 @@ void MWC713::start2init(QString password) {
     eventCollector = new Mwc713EventManager(this);
     eventCollector->connectWith(inputParser);
 
+    // Adding permanent listeners
     // Adding permanent listeners
     eventCollector->addListener( new TaskErrWrnInfoListener(this) );
 
@@ -1098,6 +1100,7 @@ WalletConfig MWC713::readWalletConfig(QString source) const {
         return WalletConfig();
     }
 
+    QString network = mwc713config.getString("chain");
     QString dataPath = mwc713config.getString("wallet713_data_path");
     QString keyBasePath = mwc713config.getString("keybase_binary");
     QString mwcmqDomain = mwc713config.getString("mwcmq_domain");
@@ -1107,7 +1110,7 @@ WalletConfig MWC713::readWalletConfig(QString source) const {
         return WalletConfig();
     }
 
-    return WalletConfig().setData(dataPath, mwcmqDomain, keyBasePath,
+    return WalletConfig().setData( network, dataPath, mwcmqDomain, keyBasePath,
                                   mwc713config.getString("mwc_node_uri"),
                                   mwc713config.getString("mwc_node_secret") );
 }
@@ -1143,7 +1146,7 @@ bool MWC713::setWalletConfig(const WalletConfig & config)  {
             continue; // skipping empty lines
 
         if (ln.startsWith("wallet713_data_path") || ln.startsWith("keybase_binary") || ln.startsWith("mwcmq_domain") ||
-                                ln.startsWith("mwc_node_uri") || ln.startsWith("mwc_node_secret") ) {
+                                ln.startsWith("mwc_node_uri") || ln.startsWith("mwc_node_secret") || ln.startsWith("chain") ) {
             continue; // skippping the line. Will apply later
         }
         else {
@@ -1152,8 +1155,8 @@ bool MWC713::setWalletConfig(const WalletConfig & config)  {
         }
     }
 
-
-    newConfLines.append("wallet713_data_path = \"" + config.dataPath + "\"");
+    newConfLines.append("chain = \"" + config.getNetwork() + "\"");
+    newConfLines.append("wallet713_data_path = \"" + config.getDataPath() + "\"");
     newConfLines.append("keybase_binary = \"" + config.keyBasePath + "\"");
     newConfLines.append("mwcmq_domain = \"" + config.mwcmqDomain + "\"");
     if ( !config.mwcNodeURI.isEmpty() && !config.mwcNodeSecret.isEmpty() ) {
@@ -1166,7 +1169,9 @@ bool MWC713::setWalletConfig(const WalletConfig & config)  {
         return false;
     }
 
-    util::Waiting w; // Host verifucation might tale time, what is why waiting here
+    util::Waiting w; // Host verification might take time, that is why waiting here
+
+    emit onConfigUpdate();
 
     // Stopping the wallet. Start will be done by init state and caller is responsible for that
     processStop(true); // sync if ok for this call

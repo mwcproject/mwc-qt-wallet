@@ -16,6 +16,8 @@
 #include <QDataStream>
 #include <QDateTime>
 #include "../core/global.h"
+#include <QDir>
+#include "../util/Files.h"
 
 namespace wallet {
 
@@ -82,11 +84,13 @@ bool AccountInfo::isDeleted() const {
             total == 0 && awaitingConfirmation==0 && lockedByPrevTransaction==0 && currentlySpendable==0;
 }
 
-WalletConfig & WalletConfig::setData(QString _dataPath,
+WalletConfig & WalletConfig::setData(QString _network,
+                            QString _dataPath,
                             QString _mwcmqDomain,
                             QString _keyBasePath,
                             QString _mwcNodeURI,
                             QString _mwcNodeSecret) {
+    network  = _network;
     dataPath = _dataPath;
     mwcmqDomain = _mwcmqDomain;
     keyBasePath = _keyBasePath;
@@ -94,6 +98,33 @@ WalletConfig & WalletConfig::setData(QString _dataPath,
     mwcNodeSecret = _mwcNodeSecret;
 
     return * this;
+}
+
+// Return empty if not found
+//static
+QString WalletConfig::readNetworkFromDataPath(QString configPath) // local path as writen in config
+{
+    QString path = ioutils::getAppDataPath( configPath );
+    QStringList lns = util::readTextFile(path + "/net.txt" );
+    if (lns.isEmpty())
+        return "";
+    QString nw = lns[0];
+    if (!nw.contains("net"))
+        return "";
+    return nw;
+}
+
+//static
+bool  WalletConfig::doesSeedExist(QString configPath) {
+    QString path = ioutils::getAppDataPath( configPath );
+    return QFile::exists( path + "/" + "wallet.seed" );
+}
+
+//static
+void  WalletConfig::saveNetwork2DataPath(QString configPath, QString network) // Save the network into the data path
+{
+    QString path = ioutils::getAppDataPath( configPath );
+    util::writeTextFile(path + "/net.txt", {network} );
 }
 
 

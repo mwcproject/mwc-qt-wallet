@@ -60,6 +60,7 @@ public:
 
 private slots:
     void onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message);
+    void onConfigUpdate();
 
     void on_connectionStatusButton_clicked();
     void on_helpButton_clicked();
@@ -68,6 +69,7 @@ private slots:
 
 private:
     void updateListenerBtn();
+    void updateNetwork();
 
 private:
     Ui::MainWindow *ui;
