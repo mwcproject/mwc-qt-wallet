@@ -84,7 +84,7 @@ p, li { white-space: pre-wrap; }
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Newest transactions</string>
+        <string>Previous page</string>
        </property>
        <property name="styleSheet">
         <string notr="true">border:none</string>
@@ -131,7 +131,7 @@ p, li { white-space: pre-wrap; }
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Oldest transactions</string>
+        <string>Next page</string>
        </property>
        <property name="styleSheet">
         <string notr="true">border:none</string>

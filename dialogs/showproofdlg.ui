@@ -158,6 +158,9 @@ p, li { white-space: pre-wrap; }
    <property name="focusPolicy">
     <enum>Qt::StrongFocus</enum>
    </property>
+   <property name="toolTip">
+    <string>Open output details with MWC block explorer</string>
+   </property>
    <property name="text">
     <string>View</string>
    </property>
@@ -216,6 +219,9 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="focusPolicy">
     <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="toolTip">
+    <string>Open kernel details with MWC block explorer</string>
    </property>
    <property name="text">
     <string>View</string>

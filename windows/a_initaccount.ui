@@ -280,6 +280,9 @@
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
+        <property name="toolTip">
+         <string>Continue with creation of a new wallet</string>
+        </property>
         <property name="text">
          <string>Create</string>
         </property>
@@ -315,6 +318,9 @@
          <font>
           <underline>false</underline>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Change wallet instance</string>
         </property>
         <property name="styleSheet">
          <string notr="true"/>

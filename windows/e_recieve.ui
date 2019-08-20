@@ -74,6 +74,9 @@
           <height>21</height>
          </rect>
         </property>
+        <property name="toolTip">
+         <string>mwc MQ listener status</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -124,6 +127,9 @@
           <width>21</width>
           <height>21</height>
          </rect>
+        </property>
+        <property name="toolTip">
+         <string>Keybase listener status</string>
         </property>
         <property name="text">
          <string/>
@@ -335,6 +341,9 @@
        <property name="cursor">
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
+       <property name="toolTip">
+        <string>Sign income File Transaction</string>
+       </property>
        <property name="text">
         <string>Receive mwc by file</string>
        </property>
@@ -463,16 +472,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control/MwcPushButton.h</header>
@@ -484,6 +483,16 @@
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>

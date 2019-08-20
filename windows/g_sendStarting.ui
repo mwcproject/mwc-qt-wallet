@@ -97,6 +97,9 @@
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
+        <property name="toolTip">
+         <string>Send mwc online with mwc MQ, Keybase or HTTPS</string>
+        </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
@@ -198,6 +201,9 @@
         </property>
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Send MWC with File Transaction</string>
         </property>
         <property name="styleSheet">
          <string notr="true"/>
@@ -319,6 +325,9 @@
           <height>40</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Account to send mwc from</string>
+        </property>
        </widget>
        <widget class="control::MwcLineEditNormal" name="amountEdit">
         <property name="geometry">
@@ -385,7 +394,7 @@
        <widget class="control::MwcPushButtonNormal" name="nextButton">
         <property name="geometry">
          <rect>
-          <x>126</x>
+          <x>120</x>
           <y>387</y>
           <width>148</width>
           <height>40</height>
@@ -407,7 +416,7 @@
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="toolTip">
-         <string>Send all MWC in this account</string>
+         <string>Send mwc. Continue with a next step.</string>
         </property>
         <property name="text">
          <string>Next</string>

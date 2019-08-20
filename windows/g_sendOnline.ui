@@ -165,6 +165,9 @@
           <height>120</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Input message for this transaction.</string>
+        </property>
         <property name="placeholderText">
          <string>Description</string>
         </property>
@@ -452,16 +455,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control/MwcPushButton.h</header>
@@ -473,6 +466,16 @@
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>

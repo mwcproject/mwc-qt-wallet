@@ -197,6 +197,9 @@
           <height>28</height>
          </rect>
         </property>
+        <property name="toolTip">
+         <string>Select MWC network that you new wallet will be connected to</string>
+        </property>
         <property name="text">
          <string>MWC network</string>
         </property>
@@ -260,6 +263,9 @@
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
+        <property name="toolTip">
+         <string>Continue with new wallet provision</string>
+        </property>
         <property name="text">
          <string>Submit</string>
         </property>
@@ -309,15 +315,15 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLine</class>
    <extends>QFrame</extends>
    <header>control/MwcFrameWithBorder.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

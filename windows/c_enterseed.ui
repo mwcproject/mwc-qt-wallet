@@ -71,6 +71,9 @@
          <property name="acceptDrops">
           <bool>false</bool>
          </property>
+         <property name="toolTip">
+          <string/>
+         </property>
          <property name="lineWidth">
           <number>0</number>
          </property>

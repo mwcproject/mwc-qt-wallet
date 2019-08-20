@@ -22,6 +22,9 @@
      <height>38</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>History of wallet events</string>
+   </property>
    <property name="text">
     <string>...</string>
    </property>
@@ -53,6 +56,9 @@
      <width>38</width>
      <height>38</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Wallet settings</string>
    </property>
    <property name="text">
     <string>...</string>
@@ -86,6 +92,9 @@
      <height>38</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Account options</string>
+   </property>
    <property name="text">
     <string>...</string>
    </property>
@@ -117,6 +126,9 @@
      <width>38</width>
      <height>38</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Finalize File Transaction</string>
    </property>
    <property name="text">
     <string>...</string>

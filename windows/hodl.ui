@@ -175,6 +175,9 @@ p, li { white-space: pre-wrap; }
            <height>40</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>Open Sugn Up page in your browser</string>
+         </property>
          <property name="text">
           <string>Sign up for Updates</string>
          </property>
@@ -227,6 +230,11 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
+   <class>control::MwcPushButtonNormal</class>
+   <extends>QPushButton</extends>
+   <header>control/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
@@ -235,11 +243,6 @@ p, li { white-space: pre-wrap; }
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcPushButtonNormal</class>
-   <extends>QPushButton</extends>
-   <header>control/MwcPushButton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

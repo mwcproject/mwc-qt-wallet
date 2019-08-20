@@ -92,6 +92,9 @@
           <height>40</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Change mwc node that your wallet is connected to</string>
+        </property>
         <property name="text">
          <string>Change Node</string>
         </property>
@@ -366,6 +369,9 @@
           <height>40</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Re-sync your wallet with a full node. Please note, resync process will take time.</string>
+        </property>
         <property name="text">
          <string>Re-sync with node</string>
         </property>
@@ -608,9 +614,15 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
+   <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLine</class>
+   <extends>QFrame</extends>
+   <header>control/MwcFrameWithBorder.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelProgress</class>
@@ -618,18 +630,12 @@
    <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcFrameWithBorder</class>
-   <extends>QFrame</extends>
-   <header>control/MwcFrameWithBorder.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelNormal</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLine</class>
+   <class>control::MwcFrameWithBorder</class>
    <extends>QFrame</extends>
    <header>control/MwcFrameWithBorder.h</header>
    <container>1</container>

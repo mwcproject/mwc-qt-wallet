@@ -145,7 +145,7 @@
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="toolTip">
-         <string>You are currently not connected. Click here to view Listener settings</string>
+         <string>Click here to view Listener settings.</string>
         </property>
         <property name="styleSheet">
          <string notr="true">border: none;</string>
@@ -170,6 +170,9 @@
       </item>
       <item>
        <widget class="control::MwcLabelNormal" name="network">
+        <property name="toolTip">
+         <string>Name of the network that you are connected to.</string>
+        </property>
         <property name="text">
          <string>MainNet</string>
         </property>

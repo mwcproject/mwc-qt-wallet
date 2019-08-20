@@ -98,6 +98,9 @@
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
+        <property name="toolTip">
+         <string>Start/Stop listening for messages at Keybase</string>
+        </property>
         <property name="text">
          <string>Start</string>
         </property>
@@ -110,6 +113,9 @@
           <width>21</width>
           <height>21</height>
          </rect>
+        </property>
+        <property name="toolTip">
+         <string>mwc MQ listener status</string>
         </property>
         <property name="text">
          <string/>
@@ -147,6 +153,9 @@
         </property>
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Start/Stop listening for messages at mwc MQ</string>
         </property>
         <property name="text">
          <string>Start</string>
@@ -189,6 +198,9 @@
           <height>40</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>You mwc MQ address</string>
+        </property>
         <property name="readOnly">
          <bool>true</bool>
         </property>
@@ -214,6 +226,9 @@
           <width>21</width>
           <height>21</height>
          </rect>
+        </property>
+        <property name="toolTip">
+         <string>Keybase listener status</string>
         </property>
         <property name="text">
          <string/>
@@ -398,11 +413,6 @@
    <header>control/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelTiny</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
@@ -412,6 +422,11 @@
    <extends>QFrame</extends>
    <header>control/MwcFrameWithBorder.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelTiny</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources>
