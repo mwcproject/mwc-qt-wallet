@@ -51,10 +51,9 @@ enum STATE {
     WALLET_CONFIG,  // Wallet config
     AIRDRDOP_MAIN,  // Starting airdrop page
     SHOW_SEED,      // Show Seed
-
     NODE_INFO,      // Show node info
-
-    RESYNC          // Re-sync account with a node
+    RESYNC,         // Re-sync account with a node
+    FINALIZE        // Finalize transaction. Windowless state
 };
 
 struct NextStateRespond {

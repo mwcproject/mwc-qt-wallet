@@ -57,5 +57,6 @@
         <file>help/transactions.html</file>
         <file>img/purpRadioOff@2x.svg</file>
         <file>img/purpRadioOn@2x.svg</file>
+        <file>img/Finalize@2x.svg</file>
     </qresource>
 </RCC>

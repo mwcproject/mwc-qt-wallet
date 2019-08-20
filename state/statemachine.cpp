@@ -34,6 +34,7 @@
 #include "x_Resync.h"
 #include "../core/Config.h"
 #include "u_nodeinfo.h"
+#include "g_Finalize.h"
 
 
 namespace state {
@@ -60,8 +61,8 @@ StateMachine::StateMachine(StateContext * _context) :
     states[ STATE::AIRDRDOP_MAIN ]  = new Airdrop(context);
     states[ STATE::SHOW_SEED ]      = new ShowSeed(context);
     states[ STATE::RESYNC ]         = new Resync(context);
-
     states[ STATE::NODE_INFO ]      = new NodeInfo(context);
+    states[ STATE::FINALIZE ]       = new Finalize(context);
 
     startTimer(1000);
 }

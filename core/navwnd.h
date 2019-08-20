@@ -31,7 +31,7 @@ class AppContext;
 class NavWnd : public QWidget {
 Q_OBJECT
 public:
-    explicit NavWnd(QWidget *parent, state::StateContext * context, bool createNavigationButtons=true);
+    explicit NavWnd(QWidget *parent, state::StateContext * context, bool createNavigationButtons=true, bool showFinalizeButton = false);
 
 protected:
     void resizeEvent(QResizeEvent *event);
