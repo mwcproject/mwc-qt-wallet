@@ -95,7 +95,7 @@ void Airdrop::updateClaimStatus() {
 void Airdrop::on_btcAddressEdit_textChanged(const QString & text)
 {
     QString addr = text.trimmed();
-    ui->claimAirdropBtn->setEnabled(addr.length()>=26 && addr.length()<=35);
+    ui->claimAirdropBtn->setEnabled(addr.length()>=26);
 }
 
 void Airdrop::on_claimAirdropBtn_clicked()
