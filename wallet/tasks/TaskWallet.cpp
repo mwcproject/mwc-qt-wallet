@@ -221,7 +221,7 @@ bool TaskNodeInfo::processTask(const QVector<WEvent> & events) {
         }
     }
 
-    wallet713->setNodeStatus(  height>0 && difficulty>0 && connections>=0, errors, height, difficulty, connections );
+    wallet713->setNodeStatus( height>=0 && difficulty>=0 && connections>=0, errors, height, difficulty, connections );
     return true;
 }
 

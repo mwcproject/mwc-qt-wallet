@@ -25,6 +25,8 @@ static QString dialogsStyleSheetPath;
 static QString airdropUrl;
 static int64_t logoutTimeMs = 1000*60*15; // 15 minutes is default
 
+static double timeoutMultiplier = 1.0;
+
 
 void setMwc713conf( QString conf ) {
     mwc713conf = conf;
@@ -34,13 +36,15 @@ void setMwcGuiWalletConf( QString conf ) {
 }
 
 void setConfigData(QString _mwcPath, QString _wallet713path,
-                   QString _mainStyleSheetPath, QString _dialogsStyleSheetPath, QString _airdropUrl, int64_t  _logoutTimeMs) {
+                   QString _mainStyleSheetPath, QString _dialogsStyleSheetPath, QString _airdropUrl, int64_t  _logoutTimeMs,
+                   double _timeoutMultiplier) {
     mwcPath = _mwcPath;
     wallet713path = _wallet713path;
     mainStyleSheetPath = _mainStyleSheetPath;
     dialogsStyleSheetPath = _dialogsStyleSheetPath;
     airdropUrl = _airdropUrl;
     logoutTimeMs = _logoutTimeMs;
+    timeoutMultiplier = _timeoutMultiplier;
 }
 
 
@@ -53,6 +57,10 @@ const QString & getMainStyleSheetPath() {return mainStyleSheetPath;}
 const QString & getDialogsStyleSheetPath() {return dialogsStyleSheetPath;}
 const QString & getAirdropUrl() {return airdropUrl;}
 int64_t         getLogoutTimeMs() {return logoutTimeMs;}
+
+
+double          getTimeoutMultiplier() {return timeoutMultiplier;}
+void            increaseTimeoutMultiplier() { timeoutMultiplier *= 1.6; }
 
 
 QString toString() {

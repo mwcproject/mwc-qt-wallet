@@ -18,6 +18,8 @@
 #include "mwc713task.h"
 #include <QDateTime>
 #include "../util/Log.h"
+#include "../core/Config.h"
+#include "../control/messagebox.h"
 
 namespace wallet {
 
@@ -121,11 +123,13 @@ void Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout ) {
         return;
     }
 
+    // timeout multiplier will be applyed to the task because we want apply this value as late as posiible.
+    // User might change it at any moment.
     taskQ.push_back(taskInfo(task,timeout));
     processNextTask();
 
     if (taskExecutionTimeLimit==0) {
-         taskExecutionTimeLimit = QDateTime::currentMSecsSinceEpoch() + timeout;
+         taskExecutionTimeLimit = QDateTime::currentMSecsSinceEpoch() + (int64_t)(timeout * config::getTimeoutMultiplier());
     }
 }
 
@@ -153,7 +157,7 @@ void Mwc713EventManager::processNextTask() {
             if (!task.task->getInputStr().isEmpty()) {
                 mwc713wallet->executeMwc713command(task.task->getInputStr(), task.task->getShadowStr());
             }
-            taskExecutionTimeLimit = QDateTime::currentMSecsSinceEpoch() + task.timeout;
+            taskExecutionTimeLimit = QDateTime::currentMSecsSinceEpoch() +  (int64_t)(task.timeout * config::getTimeoutMultiplier());
         }
         else {
             // execute the task now. Next task will be started
@@ -180,12 +184,24 @@ void Mwc713EventManager::timerEvent(QTimerEvent *event) {
         mwc713wallet->executeMwc713command("");
     }*/
 
+    QString taskName = taskQ.front().task->getTaskName();
+
     if (QDateTime::currentMSecsSinceEpoch() > taskExecutionTimeLimit) {
+
+        if (control::MessageBox::question(nullptr, "Warning", "mwc713 command execution is taking longer than expected.\nContinue to wait?",
+                                          "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
+            config::increaseTimeoutMultiplier();
+            // Update the waiting time
+
+            if (!taskQ.isEmpty())
+                taskExecutionTimeLimit = QDateTime::currentMSecsSinceEpoch() +  (int64_t)(taskQ.front().timeout * config::getTimeoutMultiplier());
+            return;
+        }
+
         // report timeout error. Do it once
         taskExecutionTimeLimit = 0;
-        taskInfo task = taskQ.front();
         mwc713wallet->appendNotificationMessage(  MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::TASK_TIMEOUT,
-                "mwc713 unable to process the task '" + task.task->getTaskName() + "'" );
+                "mwc713 unable to process the task '" + taskName + "'" );
     }
 }
 

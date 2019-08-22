@@ -23,7 +23,7 @@ namespace wallet {
 // Listening for MWC MQ & keybase connection statuses
 class TaskListeningListener : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 3600*1000*5; // 5 hours should be enough
+    const static int64_t TIMEOUT = 3600*1000*5; // NA in any case
 
     TaskListeningListener( MWC713 *wallet713 ) :
             Mwc713Task("TaskListeningListener", "", wallet713,"") {}

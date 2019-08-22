@@ -37,6 +37,7 @@
 #include "../util/ConfigReader.h"
 #include "../util/Files.h"
 #include "../util/Waiting.h"
+#include "../util/Process.h"
 
 namespace wallet {
 
@@ -72,7 +73,7 @@ bool MWC713::checkWalletInitialized() {
     if (process==nullptr)
         return false; // error expected to be reported by initMwc713process
 
-    if ( !process->waitForFinished(20000) ) {
+    if (!util::processWaitForFinished( process, 20000, "mwc713")) {
         appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::INIT_ERROR, "mwc713 failed to invalidate the status.\nPath: " + mwc713Path + "\nConfig:" + mwc713configPath );
         return false;
     }
@@ -112,8 +113,7 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
 
     process->start(mwc713Path, params, QProcess::Unbuffered | QProcess::ReadWrite );
 
-    bool startOk = process->waitForStarted(10000);
-    if (!startOk) {
+    while ( ! process->waitForStarted( (int)(10000 * config::getTimeoutMultiplier()) ) ) {
         switch (process->error())
         {
             case QProcess::FailedToStart:
@@ -123,7 +123,12 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
                 appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::INIT_ERROR, "mwc713 crashed during start" );
                 return nullptr;
             case QProcess::Timedout:
-                appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::INIT_ERROR, "mwc713 failed to start because of timeout" );
+                if (control::MessageBox::question(nullptr, "Warning", "Starting for mwc713 process is taking longer than expected.\nContinue to wait?",
+                                                  "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
+                    config::increaseTimeoutMultiplier();
+                    continue; // retry with waiting
+                }
+                appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::INIT_ERROR, "mwc713 takes too much time to start. Something wrong with environment." );
                 return nullptr;
             default:
                 appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::INIT_ERROR, "mwc713 failed to start because of unknown error" );
@@ -327,9 +332,10 @@ void MWC713::processStop(bool exitNicely) {
     if (mwc713process) {
         if (exitNicely) {
             executeMwc713command("exit", "");
-            if (!mwc713process->waitForFinished(3000) ) {
+
+            if (!util::processWaitForFinished( mwc713process, 10000, "mwc713")) {
                 mwc713process->terminate();
-                mwc713process->waitForFinished(5000);
+                util::processWaitForFinished( mwc713process, 10000, "mwc713");
             }
         }
         else {

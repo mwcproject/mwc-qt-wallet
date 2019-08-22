@@ -23,7 +23,8 @@ void setMwc713conf( QString conf );
 void setMwcGuiWalletConf( QString conf );
 
 void setConfigData(QString mwcPath, QString wallet713path,
-                   QString mainStyleSheetPath, QString dialogsStyleSheetPath, QString airdropUrl, int64_t logoutTimeMs);
+                   QString mainStyleSheetPath, QString dialogsStyleSheetPath, QString airdropUrl, int64_t logoutTimeMs,
+                   double timeoutMultiplier);
 
 
 // Note, workflow for config not enforced. Please don't abuse it
@@ -36,6 +37,9 @@ const QString & getMainStyleSheetPath();
 const QString & getDialogsStyleSheetPath();
 const QString & getAirdropUrl();
 int64_t         getLogoutTimeMs();
+
+double          getTimeoutMultiplier();
+void            increaseTimeoutMultiplier();
 
 QString toString();
 

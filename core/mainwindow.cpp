@@ -20,6 +20,7 @@
 #include "util/widgetutils.h"
 #include "../control/messagebox.h"
 #include "../dialogs/helpdlg.h"
+#include "../core/Config.h"
 
 namespace core {
 
@@ -77,7 +78,7 @@ void MainWindow::onNewNotificationMessage(wallet::WalletNotificationMessages::LE
         break;
     }
 
-    ui->statusBar->showMessage( prefix + message, timeout);
+    ui->statusBar->showMessage( prefix + message, (int)(timeout * config::getTimeoutMultiplier()) );
 }
 
 

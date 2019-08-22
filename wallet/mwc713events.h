@@ -167,7 +167,7 @@ private:
     // Events for a new task
     QVector<WEvent> events;
 
-    volatile qint64 taskExecutionTimeLimit = 0; // Timeout valur for the task
+    volatile qint64 taskExecutionTimeLimit = 0; // Timeout value for the task
 };
 
 }

@@ -49,7 +49,7 @@ void NodeInfo::setNodeStatus( bool online, QString errMsg, int height, int64_t t
         ui->heightInfo->setText("-");
         ui->difficultyInfo->setText("-");
 
-        control::MessageBox::message( this, "mwc node connection error", "Unable to connect to mwc node.\n" + errMsg );
+        control::MessageBox::message( this, "mwc node connection error", "Unable to retrieve mwc node status.\n" + errMsg );
     }
     else {
         ui->statusInfo->setText("Online");
