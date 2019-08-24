@@ -80,7 +80,6 @@ int Outputs::calcPageSize() const {
 
 void Outputs::setOutputCount(QString account, int count) {
     // Init arrays and request the data...
-    currentPagePosition = 0; // position at the paging...
     totalOutputs = count;
 
     if ( account != currentSelectedAccount() ) {
@@ -89,7 +88,7 @@ void Outputs::setOutputCount(QString account, int count) {
     }
 
     int pageSize = calcPageSize();
-    currentPagePosition = std::max(0, totalOutputs-pageSize);
+    currentPagePosition = std::max(0, std::min(currentPagePosition, totalOutputs-pageSize));
     buttonState = updatePages(currentPagePosition, totalOutputs, pageSize);
 
     // Requesting the output data
@@ -194,8 +193,20 @@ void Outputs::setOutputsData(QString account, int64_t height, const QVector<wall
     ui->nextBtn->setEnabled( buttonState.second );
 }
 
+void wnd::Outputs::on_refreshButton_clicked()
+{
+    ui->progressFrame->show();
+    ui->tableFrame->hide();
+    // Request count and then refresh from current posiotion...
+    state->requestOutputCount( currentSelectedAccount() );
+    // count will trigger the page update
+}
+
+
 // Request and reset page counter
 void Outputs::requestOutputs(QString account) {
+
+    currentPagePosition = INT_MAX; // Reset Paging
 
     ui->progressFrame->show();
     ui->tableFrame->hide();
@@ -209,6 +220,7 @@ void Outputs::requestOutputs(QString account) {
 void Outputs::on_accountComboBox_activated(int index)
 {
     if (index>=0 && index<accountInfo.size()) {
+        currentPagePosition = INT_MAX; // Reset Paging
         state->switchCurrentAccount( accountInfo[index] );
         requestOutputs( accountInfo[index].accountName );
     }

@@ -104,23 +104,25 @@ void Mwc713EventManager::connectWith(tries::Mwc713InputParser * inputParser) {
 // Add task (single wallet action) to perform.
 // This tale ownership of object
 // Note:  if timeout <= 0, task will be executed immediately
-void Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout ) {
+bool Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout, bool cancelIfExist ) {
 
     QMutexLocker l( &taskQMutex );
 
     // check if task is allready in the Q.
     bool found = false;
-    for ( const taskInfo & ti : taskQ ) {
-        if (ti.task->getTaskName() == task->getTaskName() && ti.task->getInputStr() == task->getInputStr()) {
-            found = true;
-            break;
+    if (cancelIfExist) {
+        for ( const taskInfo & ti : taskQ ) {
+            if (ti.task->getTaskName() == task->getTaskName() && ti.task->getInputStr() == task->getInputStr()) {
+                found = true;
+                break;
+            }
         }
     }
 
     if (found) {
         // not execute the task, it is allready in the Q
         delete task;
-        return;
+        return false;
     }
 
     // timeout multiplier will be applyed to the task because we want apply this value as late as posiible.
@@ -131,6 +133,8 @@ void Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout ) {
     if (taskExecutionTimeLimit==0) {
          taskExecutionTimeLimit = QDateTime::currentMSecsSinceEpoch() + (int64_t)(timeout * config::getTimeoutMultiplier());
     }
+
+    return true;
 }
 
 // Process next task

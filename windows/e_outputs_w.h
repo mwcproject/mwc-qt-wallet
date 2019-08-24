@@ -49,6 +49,8 @@ private slots:
 
     void on_nextBtn_clicked();
 
+    void on_refreshButton_clicked();
+
 private:
     void initTableHeaders();
     void saveTableHeaders();
@@ -67,7 +69,7 @@ private:
     QVector<wallet::AccountInfo> accountInfo;
     QVector<wallet::WalletOutput> outputs;
 
-    int currentPagePosition = 0; // position at the paging...
+    int currentPagePosition = INT_MAX; // position at the paging...
     int totalOutputs = 0;
 
     QPair<bool,bool> buttonState = QPair<bool,bool>(false, false);

@@ -782,13 +782,19 @@ void MWC713::updateAccountList( QVector<QString> accounts ) {
 
     core::SendCoinsParams params = appContext->getSendCoinsParams();
 
+    bool cancel = false;
     int idx = 0;
     for (QString acc : accounts) {
-        eventCollector->addTask( new TaskAccountSwitch(this, acc, walletPassword, false), TaskAccountSwitch::TIMEOUT );
-        eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber, idx>0), TaskAccountInfo::TIMEOUT );
-        eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1 ); // Updating the progress
+        if (! eventCollector->addTask( new TaskAccountSwitch(this, acc, walletPassword, false), TaskAccountSwitch::TIMEOUT, idx == 0 ) ) {
+            cancel  = true;
+            break;
+        }
+        eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber, idx>0), TaskAccountInfo::TIMEOUT, false );
+        eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1, false ); // Updating the progress
     }
-    eventCollector->addTask( new TaskAccountListFinal(this, currentAccount), -1 ); // Finalize the task
+    if (!cancel) {
+        eventCollector->addTask( new TaskAccountListFinal(this, currentAccount), -1, false ); // Finalize the task
+    }
     // Final will switch back to current account
 }
 
