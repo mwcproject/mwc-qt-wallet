@@ -210,6 +210,6 @@ int main(int argc, char *argv[])
     mainWnd->setAppEnvironment(&machine, &wallet);
     machine.start();
 
-    app.exec();
+    return app.exec();
   }
 

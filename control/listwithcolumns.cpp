@@ -137,7 +137,7 @@ void ListWithColumns::appendRow( const QVector<QString> & rowData, double select
     int sz = rowData.size();
     for ( int i=0; i<sz; i++ ) {
         auto * itm = new QTableWidgetItem( rowData[i] );
-        itm->setBackgroundColor( clr );
+        itm->setBackground( QBrush(clr) );
         itm->setTextAlignment( textAlignment );
         setItem(rowIdx , i, itm );
 

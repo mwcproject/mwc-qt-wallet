@@ -23,8 +23,10 @@ void openUrlInBrowser(const QString & url) {
 #elif defined(LINUX)
     QProcess::startDetached("xdg-open " + url);
 #elif defined(Q_OS_WIN)
+    Q_UNUSED(url);
     Q_ASSERT(false); // support me
 #else
+    Q_UNUSED(url);
     Q_ASSERT(false); // unexperted OS.
 #endif
 
