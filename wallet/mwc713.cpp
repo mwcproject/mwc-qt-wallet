@@ -1116,7 +1116,7 @@ WalletConfig MWC713::readWalletConfig(QString source) const {
     QString keyBasePath = mwc713config.getString("keybase_binary");
     QString mwcmqDomain = mwc713config.getString("mwcmq_domain");
 
-    if (dataPath.isEmpty() || keyBasePath.isEmpty() || mwcmqDomain.isEmpty()) {
+    if (dataPath.isEmpty() || mwcmqDomain.isEmpty()) {
         control::MessageBox::message(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + source );
         return WalletConfig();
     }
