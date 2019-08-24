@@ -17,6 +17,7 @@
 #include "../state/x_events.h"
 #include "../wallet/wallet.h"
 #include "../dialogs/shownotificationdlg.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
@@ -86,6 +87,8 @@ void Events::updateShowMessages() {
 
 void Events::on_notificationList_cellActivated(int row, int column)
 {
+    state::TimeoutLockObject to( state );
+
     Q_UNUSED(column);
     // Show message details for that row
     if (row>=0 && row<messages.size()) {

@@ -642,7 +642,8 @@ void MWC713::executeMwc713command(QString cmd, QString shadowStr) {
     mwc713process->write( (cmd + "\n").toLocal8Bit() );
 }
 
-
+// Message that will be requlified from Critical to Info
+static QSet<QString> falseCriticalMessages{"keybase not found! consider installing keybase locally first."};
 
 // Task Reporting methods
 //enum MESSAGE_LEVEL { FATAL_ERROR, WARNING, INFO, DEBUG }
@@ -658,8 +659,12 @@ void MWC713::appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QStr
 
     // Message is not fatal, adding it into the logs
     WalletNotificationMessages::LEVEL wlevel = WalletNotificationMessages::LEVEL::DEBUG;
-    if (level == MESSAGE_LEVEL::CRITICAL)
-        wlevel = WalletNotificationMessages::ERROR;
+    if (level == MESSAGE_LEVEL::CRITICAL) {
+        if ( falseCriticalMessages.contains(message) )
+            wlevel = WalletNotificationMessages::INFO;
+        else
+            wlevel = WalletNotificationMessages::ERROR;
+    }
     else if (level == MESSAGE_LEVEL::WARNING)
         wlevel = WalletNotificationMessages::WARNING;
     else if (level == MESSAGE_LEVEL::INFO)
