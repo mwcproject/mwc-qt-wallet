@@ -26,7 +26,7 @@ const QString VERSION = "v1.05";
 const QString APP_NAME = "mwc wallet";
 
 // MWC version that we are expecting to ship
-const QString WMC_713_VERSION("2.0.2");
+const QString WMC_713_VERSION("2.1.0");
 
 const QString PROMPTS_MWC713 = "<<+)mwc713(+>>";
 
