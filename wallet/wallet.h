@@ -117,7 +117,7 @@ struct WalletOutput {
 };
 
 struct WalletTransaction {
-    enum TRANSACTION_TYPE { NONE=0, SEND=1, RECIEVE=2, CANCELLED=0x8000};
+    enum TRANSACTION_TYPE { NONE=0, SEND=1, RECEIVE=2, CANCELLED=0x8000};
 
     int64_t    txIdx = -1;
     uint    transactionType = TRANSACTION_TYPE::NONE;
@@ -156,8 +156,8 @@ struct WalletTransaction {
 
         if ( transactionType & TRANSACTION_TYPE::SEND )
             res += "Send";
-        if ( transactionType & TRANSACTION_TYPE::RECIEVE )
-            res += "Recieve";
+        if ( transactionType & TRANSACTION_TYPE::RECEIVE )
+            res += "Receive";
 
         if ( transactionType & TRANSACTION_TYPE::CANCELLED ) {
             if (!res.isEmpty())
@@ -238,7 +238,7 @@ public:
     // Call might take few seconds
     virtual bool checkWalletInitialized() = 0;
 
-    enum STARTED_MODE { OFFLINE, NORMAL, INIT, RECOVER, GET_NEXTKEY, RECIEVE_SLATE };
+    enum STARTED_MODE { OFFLINE, NORMAL, INIT, RECOVER, GET_NEXTKEY, RECEIVE_SLATE };
     virtual STARTED_MODE getStartedMode() = 0;
 
     // ---- Wallet Init Phase
@@ -262,7 +262,7 @@ public:
     // Need for claiming process only
     // identifier  - output from start2getnextkey
     // Check Signal: onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
-    virtual void start2recieveSlate( QString recieveAccount, QString identifier, QString slateFN ) = 0;
+    virtual void start2receiveSlate( QString receiveAccount, QString identifier, QString slateFN ) = 0;
 
     // Check signal: onLoginResult(bool ok)
     virtual void loginWithPassword(QString password)   = 0;
@@ -388,7 +388,7 @@ public:
     // Init send transaction with file output
     // Check signal:  onSendFile
     virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx )  = 0;
-    // Recieve transaction. Will generate *.response file in the same dir
+    // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
     virtual void receiveFile( QString fileTx)  = 0;
     // finalize transaction and broadcast it
@@ -476,7 +476,7 @@ signals:
     void onSend( bool success, QStringList errors );
 
     void onSlateSend( QString slate, QString mwc, QString sendAddr );
-    void onSlateRecieved( QString slate, QString mwc, QString fromAddr );
+    void onSlateReceived( QString slate, QString mwc, QString fromAddr );
     void onSlateFinalized( QString slate );
 
     // Files operations

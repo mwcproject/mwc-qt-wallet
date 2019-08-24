@@ -94,7 +94,7 @@ void Mwc713EventManager::clear() {
 }
 
 void Mwc713EventManager::connectWith(tries::Mwc713InputParser * inputParser) {
-    const bool connected = connect(inputParser, &tries::Mwc713InputParser::sgGenericEvent, this, &wallet::Mwc713EventManager::slRecieveEvent,Qt::QueuedConnection );
+    const bool connected = connect(inputParser, &tries::Mwc713InputParser::sgGenericEvent, this, &wallet::Mwc713EventManager::slReceiveEvent,Qt::QueuedConnection );
     Q_ASSERT(connected);
     Q_UNUSED(connected);
 
@@ -206,8 +206,8 @@ void Mwc713EventManager::timerEvent(QTimerEvent *event) {
 }
 
 
-// Events reciever
-void Mwc713EventManager::slRecieveEvent( WALLET_EVENTS event, QString message) {
+// Events receiver
+void Mwc713EventManager::slReceiveEvent( WALLET_EVENTS event, QString message) {
 
     // Preprocess event with listeners
     {
@@ -216,7 +216,7 @@ void Mwc713EventManager::slRecieveEvent( WALLET_EVENTS event, QString message) {
 
         for (Mwc713Task *t : listeners) {
             if (t->processTask(evt)) {
-                qDebug() << "Mwc713EventManager::sRecieveEvent was preprocessed. event=" << event << " msg='" << message
+                qDebug() << "Mwc713EventManager::sReceiveEvent was preprocessed. event=" << event << " msg='" << message
                          << "'";
             }
         }
@@ -228,7 +228,7 @@ void Mwc713EventManager::slRecieveEvent( WALLET_EVENTS event, QString message) {
         return;
 
     events.push_back(WEvent(event, message));
-    qDebug() << "Mwc713EventManager::sRecieveEvent adding Event into the list. event=" << event << " msg='"
+    qDebug() << "Mwc713EventManager::sReceiveEvent adding Event into the list. event=" << event << " msg='"
              << message << "'  New size:" << events.size();
 
 

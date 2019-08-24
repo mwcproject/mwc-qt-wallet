@@ -53,7 +53,7 @@ void MwcToolbar::setAppEnvironment(state::StateMachine * _stateMachine, wallet::
 void MwcToolbar::updateButtonsState( state::STATE state ) {
     ui->airdropToolButton->setChecked( state==state::AIRDRDOP_MAIN );
     ui->sendToolButton->setChecked( state==state::SEND );
-    ui->recieveToolButton->setChecked( state==state::RECIEVE_COINS);
+    ui->receiveToolButton->setChecked( state==state::RECEIVE_COINS);
     ui->transactionToolButton->setChecked(state==state::TRANSACTIONS);
     ui->hodlToolButton->setChecked(state==state::HODL);
 }
@@ -76,9 +76,9 @@ void MwcToolbar::on_sendToolButton_clicked()
     stateMachine->setActionWindow( state::STATE::SEND );
 }
 
-void MwcToolbar::on_recieveToolButton_clicked()
+void MwcToolbar::on_receiveToolButton_clicked()
 {
-    stateMachine->setActionWindow( state::STATE::RECIEVE_COINS );
+    stateMachine->setActionWindow( state::STATE::RECEIVE_COINS );
 
 }
 

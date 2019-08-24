@@ -275,7 +275,7 @@ color: #FFFFFF;</string>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="recieveToolButton">
+      <widget class="QToolButton" name="receiveToolButton">
        <property name="minimumSize">
         <size>
          <width>131</width>

@@ -110,7 +110,7 @@ void NavBar::on_finalizeButton_clicked()
         return;
     }
 
-    dlg::FileSlateInfoDlg acceptDlg( this, "Recieve File Transaction", transInfo );
+    dlg::FileSlateInfoDlg acceptDlg( this, "Receive File Transaction", transInfo );
     if ( acceptDlg.exec() != QDialog::Accepted ) {
            return;
     }

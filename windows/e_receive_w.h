@@ -12,30 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef E_RECIEVE_W_H
-#define E_RECIEVE_W_H
+#ifndef E_RECEIVE_W_H
+#define E_RECEIVE_W_H
 
 #include "../core/navwnd.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
-class Recieve;
+class Receive;
 }
 
 namespace state {
-class Recieve;
+class Receive;
 }
 
 namespace wnd {
 
-class Recieve : public core::NavWnd {
+class Receive : public core::NavWnd {
 Q_OBJECT
 
 public:
-    explicit Recieve(QWidget *parent, state::Recieve * state, bool mwcMqStatus, bool keybaseStatus,
+    explicit Receive(QWidget *parent, state::Receive * state, bool mwcMqStatus, bool keybaseStatus,
                      QString mwcMqAddress);
 
-    virtual ~Recieve() override ;
+    virtual ~Receive() override ;
 
     void updateMwcMqAddress(QString address);
     void updateMwcMqState(bool online);
@@ -53,12 +53,12 @@ private:
     void updateAccountList();
 
 private:
-    Ui::Recieve *ui;
-    state::Recieve * state;
+    Ui::Receive *ui;
+    state::Receive * state;
     QVector<wallet::AccountInfo> accountInfo;
     QString mwcAddress;
 };
 
 }
 
-#endif // E_RECIEVE_W_H
+#endif // E_RECEIVE_W_H

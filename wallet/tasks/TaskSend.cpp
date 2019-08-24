@@ -46,7 +46,7 @@ bool TaskSlatesListener::processTask(const QVector<WEvent> & events) {
         if (prms.size()==3) {
             wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
                        "Received slate " + prms[0] + " for " + util::zeroDbl2Dbl( prms[2] ) + " mwc from " + prms[1] );
-            wallet713->reportSlateRecieved( prms[0], util::zeroDbl2Dbl( prms[2] ), prms[1] );
+            wallet713->reportSlateReceived( prms[0], util::zeroDbl2Dbl( prms[2] ), prms[1] );
         }
         return true;
     }

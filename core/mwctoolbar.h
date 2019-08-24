@@ -50,7 +50,7 @@ private slots:
 
     void on_sendToolButton_clicked();
 
-    void on_recieveToolButton_clicked();
+    void on_receiveToolButton_clicked();
 
     void on_transactionToolButton_clicked();
 

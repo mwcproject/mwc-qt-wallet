@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MWC_QT_WALLET_RECIEVE_H
-#define MWC_QT_WALLET_RECIEVE_H
+#ifndef MWC_QT_WALLET_RECEIVE_H
+#define MWC_QT_WALLET_RECEIVE_H
 
 #include "state.h"
 #include "../wallet/wallet.h"
 
 namespace wnd {
-class Recieve;
+class Receive;
 }
 
 namespace state {
 
-class Recieve : public QObject, public State {
+class Receive : public QObject, public State {
     Q_OBJECT
 public:
-    Recieve( StateContext * context );
-    virtual ~Recieve() override;
+    Receive( StateContext * context );
+    virtual ~Receive() override;
 
     QString  getReceiveAccount();
     void  setReceiveAccount(QString accountName );
@@ -39,7 +39,7 @@ public:
 
     void signTransaction( QString fileName );
 
-    void deletedWnd(wnd::Recieve * w) { if(w==wnd) wnd = nullptr;}
+    void deletedWnd(wnd::Receive * w) { if(w==wnd) wnd = nullptr;}
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "receive.html";}
@@ -52,10 +52,10 @@ private slots:
     void onMwcAddressWithIndex(QString mwcAddress, int idx);
 
 private:
-    wnd::Recieve * wnd = nullptr;
+    wnd::Receive * wnd = nullptr;
 };
 
 
 }
 
-#endif //MWC_QT_WALLET_RECIEVE_H
+#endif //MWC_QT_WALLET_RECEIVE_H

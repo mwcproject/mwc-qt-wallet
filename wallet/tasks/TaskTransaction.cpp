@@ -222,7 +222,7 @@ bool parseTransactionLine( QString str, const TransactionIdxLayout & tl,
     if (strType.startsWith("Sent") || strType.startsWith("Send"))
         tansType = WalletTransaction::TRANSACTION_TYPE::SEND;
     else if (strType.startsWith("Received"))
-        tansType = WalletTransaction::TRANSACTION_TYPE::RECIEVE;
+        tansType = WalletTransaction::TRANSACTION_TYPE::RECEIVE;
     else
         return false;
 

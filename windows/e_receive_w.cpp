@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "e_recieve_w.h"
-#include "ui_e_recieve.h"
+#include "e_receive_w.h"
+#include "ui_e_receive.h"
 #include <QFileInfo>
-#include "../state/e_Recieve.h"
+#include "../state/e_Receive.h"
 #include <QFileDialog>
 #include "../control/messagebox.h"
 #include "../state/timeoutlock.h"
 
 namespace wnd {
 
-Recieve::Recieve(QWidget *parent, state::Recieve * _state, bool mwcMqStatus, bool keybaseStatus,
+Receive::Receive(QWidget *parent, state::Receive * _state, bool mwcMqStatus, bool keybaseStatus,
                  QString mwcMqAddress) :
         core::NavWnd(parent, _state->getContext() ),
-        ui(new Ui::Recieve),
+        ui(new Ui::Receive),
         state(_state)
 {
     ui->setupUi(this);
@@ -39,27 +39,27 @@ Recieve::Recieve(QWidget *parent, state::Recieve * _state, bool mwcMqStatus, boo
     updateMwcMqAddress(mwcMqAddress);
 }
 
-Recieve::~Recieve() {
+Receive::~Receive() {
     state->deletedWnd(this);
     delete ui;
 }
 
-void Recieve::updateMwcMqAddress(QString address) {
+void Receive::updateMwcMqAddress(QString address) {
     mwcAddress = "mwcmq://" + address;
     ui->mwcmqAddress->setText( mwcAddress );
 }
 
-void Recieve::updateMwcMqState(bool online) {
+void Receive::updateMwcMqState(bool online) {
     ui->mwcmqStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->mwcmqStatusLabel->setText( online ? "Online" : "Offline" );
 }
 
-void Recieve::updateKeybaseState(bool online) {
+void Receive::updateKeybaseState(bool online) {
     ui->keybaseStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->keybaseStatusLabel->setText( online ? "Online" : "Offline" );
 }
 
-void Recieve::on_pushButton_clicked() {
+void Receive::on_pushButton_clicked() {
     state::TimeoutLockObject to( state );
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open initial transaction file"),
@@ -79,25 +79,25 @@ void Recieve::on_pushButton_clicked() {
     // Expected respond from state with result
 }
 
-void Recieve::onTransactionActionIsFinished( bool success, QString message ) {
+void Receive::onTransactionActionIsFinished( bool success, QString message ) {
     state::TimeoutLockObject to( state );
 
     ui->progress->hide();
     control::MessageBox::message(this, success ? "Success" : "Failure", message );
 }
 
-void Recieve::stopWaiting() {
+void Receive::stopWaiting() {
     ui->progress->hide();
 }
 
 
-void Recieve::on_accountComboBox_activated(int index)
+void Receive::on_accountComboBox_activated(int index)
 {
     if (index>=0 && index < accountInfo.size() )
         state->setReceiveAccount( accountInfo[index].accountName );
 }
 
-void Recieve::updateAccountList() {
+void Receive::updateAccountList() {
     accountInfo = state->getWalletBalance();
     QString selectedAccount = state->getReceiveAccount();
 

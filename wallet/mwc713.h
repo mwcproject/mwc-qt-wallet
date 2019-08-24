@@ -85,7 +85,7 @@ public:
     // Need for claiming process only
     // identifier  - output from start2getnextkey
     // Check Signal: onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
-    virtual void start2recieveSlate( QString recieveAccount,  QString identifier, QString slateFN ) override;
+    virtual void start2receiveSlate( QString receiveAccount,  QString identifier, QString slateFN ) override;
 
 
     // Check signal: onLoginResult(bool ok)
@@ -207,7 +207,7 @@ public:
     // Init send transaction with file output
     // Check signal:  onSendFile
     virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx )  override;
-    // Recieve transaction. Will generate *.response file in the same dir
+    // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
     virtual void receiveFile( QString fileTx)  override;
     // finalize transaction and broadcast it
@@ -296,7 +296,7 @@ public:
     void setSendResults(bool success, QStringList errors);
 
     void reportSlateSend( QString slate, QString mwc, QString sendAddr );
-    void reportSlateRecieved( QString slate, QString mwc, QString fromAddr );
+    void reportSlateReceived( QString slate, QString mwc, QString fromAddr );
     void reportSlateFinalized( QString slate );
 
     void setSendFileResult( bool success, QStringList errors, QString fileName );

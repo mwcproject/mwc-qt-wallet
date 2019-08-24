@@ -27,15 +27,15 @@
 namespace logger {
 
 static LogSender *   logClient = nullptr;
-static LogReciever * logServer = nullptr;
+static LogReceiver * logServer = nullptr;
 
 static bool logMwc713outBlocked = false;
 
 void initLogger() {
     logClient = new LogSender(true);
-    logServer = new LogReciever("mwcwallet.log");
+    logServer = new LogReceiver("mwcwallet.log");
 
-    bool connected = QObject::connect( logClient, &LogSender::doAppend2logs, logServer, &LogReciever::onAppend2logs, Qt::DirectConnection); // Qt::QueuedConnection );
+    bool connected = QObject::connect( logClient, &LogSender::doAppend2logs, logServer, &LogReceiver::onAppend2logs, Qt::DirectConnection); // Qt::QueuedConnection );
     Q_ASSERT(connected);
     Q_UNUSED(connected);
 
@@ -52,7 +52,7 @@ void LogSender::log(bool addDate, const QString & prefix, const QString & line) 
 }
 
 // Create logger file with some simplest rotation
-LogReciever::LogReciever(const QString & filename) {
+LogReceiver::LogReceiver(const QString & filename) {
     QString logPath = ioutils::getAppDataPath("logs");
 
     QString logFn = logPath + "/" + filename;
@@ -75,11 +75,11 @@ LogReciever::LogReciever(const QString & filename) {
         return;
     }
 }
-LogReciever::~LogReciever() {
+LogReceiver::~LogReceiver() {
     delete logFile;
 }
 
-void LogReciever::onAppend2logs(bool addDate, QString prefix, QString line ) {
+void LogReceiver::onAppend2logs(bool addDate, QString prefix, QString line ) {
     QString logLine;
     if (addDate)
         logLine += QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz") + " ";

@@ -270,14 +270,14 @@ void MWC713::start2getnextkey( int64_t amountNano, QString btcaddress, QString a
 // Need for claiming process only
 // identifier  - output from start2getnextkey
 // Check Signal: onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
-void MWC713::start2recieveSlate( QString recieveAccount, QString identifier, QString slateFN ) {
-    startedMode = STARTED_MODE::RECIEVE_SLATE;
+void MWC713::start2receiveSlate( QString receiveAccount, QString identifier, QString slateFN ) {
+    startedMode = STARTED_MODE::RECEIVE_SLATE;
 
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
 
-    qDebug() << "Starting MWC713 recieveSlate at " << mwc713Path << " for config " << mwc713configPath;
+    qDebug() << "Starting MWC713 receiveSlate at " << mwc713Path << " for config " << mwc713configPath;
 
     // Creating process and starting
     // Mnemonic will moved into variables
@@ -297,8 +297,8 @@ void MWC713::start2recieveSlate( QString recieveAccount, QString identifier, QSt
     // log in
     eventCollector->addTask( new TaskUnlock(this, walletPassword), TaskUnlock::TIMEOUT );
 
-    eventCollector->addTask( new TaskSetReceiveAccount(this, recieveAccount, walletPassword), TaskSetReceiveAccount::TIMEOUT );
-    // Recieve file first
+    eventCollector->addTask( new TaskSetReceiveAccount(this, receiveAccount, walletPassword), TaskSetReceiveAccount::TIMEOUT );
+    // Receive file first
     eventCollector->addTask( new TaskReceiveFile( this, slateFN, identifier ), TaskReceiveFile::TIMEOUT );
     // then exit
     eventCollector->addTask( new TaskLogout(this), TaskLogout::TIMEOUT);
@@ -553,7 +553,7 @@ void MWC713::sendFile( const wallet::AccountInfo &account, int64_t coinNano, QSt
     eventCollector->addTask( new TaskSendFile(this, coinNano, message, fileTx ), TaskSendFile::TIMEOUT );
 }
 
-// Recieve transaction. Will generate *.response file in the same dir
+// Receive transaction. Will generate *.response file in the same dir
 // Check signal:  onReceiveFile
 void MWC713::receiveFile( QString fileTx)  {
     eventCollector->addTask( new TaskReceiveFile(this, fileTx), TaskReceiveFile::TIMEOUT );
@@ -897,12 +897,12 @@ void MWC713::reportSlateSend( QString slate, QString mwc, QString sendAddr ) {
     logger::logEmit( "MWC713", "onSlateSend", slate + " with " +mwc + " to " + sendAddr );
     emit onSlateSend(slate, mwc, sendAddr);
 }
-void MWC713::reportSlateRecieved( QString slate, QString mwc, QString fromAddr ) {
-    logger::logEmit( "MWC713", "onSlateRecieved", slate + " with " +mwc + " from " + fromAddr );
+void MWC713::reportSlateReceived( QString slate, QString mwc, QString fromAddr ) {
+    logger::logEmit( "MWC713", "onSlateReceived", slate + " with " +mwc + " from " + fromAddr );
 
     appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("You received " + mwc+ " mwc form " + fromAddr ));
 
-    emit onSlateRecieved( slate, mwc, fromAddr );
+    emit onSlateReceived( slate, mwc, fromAddr );
 
     // Request balace refresh
     updateWalletBalance();

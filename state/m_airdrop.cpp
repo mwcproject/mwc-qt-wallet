@@ -400,7 +400,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
 
                 // Starting the slate processing transaction...
                 // wallet expected to be offline...
-                context->wallet->start2recieveSlate( context->appContext->getReceiveAccount(), identifier, slateFn );
+                context->wallet->start2receiveSlate( context->appContext->getReceiveAccount(), identifier, slateFn );
 
                 // Continue at onReceiveFile
                 break;

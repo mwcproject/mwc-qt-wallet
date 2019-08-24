@@ -140,7 +140,7 @@ public:
     // clean all tasks, events and all
     void clear();
 public slots:
-    void slRecieveEvent( WALLET_EVENTS event, QString message); // message is optional
+    void slReceiveEvent( WALLET_EVENTS event, QString message); // message is optional
 
 private:
     // timer that we are using for timeouts

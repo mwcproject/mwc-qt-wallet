@@ -43,11 +43,11 @@ namespace logger {
         bool asyncLogging; // Use QT messaging or write directly. Direct writing might cause concurrency issues
     };
 
-    class LogReciever : public QObject {
+    class LogReceiver : public QObject {
         Q_OBJECT
     public:
-        LogReciever(const QString & filename);
-        virtual ~LogReciever() override;
+        LogReceiver(const QString & filename);
+        virtual ~LogReceiver() override;
 
     public slots:
         void onAppend2logs(bool addDate, QString prefix, QString line );

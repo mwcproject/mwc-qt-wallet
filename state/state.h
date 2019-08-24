@@ -43,7 +43,7 @@ enum STATE {
     EVENTS,         // Wallet events (logs)
     HODL,           // Hodl program.
     SEND,           // Send coins Page
-    RECIEVE_COINS,  // Recieve coins
+    RECEIVE_COINS,  // Receive coins
     LISTENING,      // Listening API setting/status
     TRANSACTIONS,   // Transactions dialog
     OUTPUTS,        // Outputs for this wallet

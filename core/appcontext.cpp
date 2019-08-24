@@ -139,7 +139,7 @@ bool AppContext::loadData() {
     if (id!=0x4783)
          return false;
 
-    in >> recieveAccount;
+    in >> receiveAccount;
     in >> currentAccountName;
 
     int st;
@@ -182,7 +182,7 @@ void AppContext::saveData() const {
     out.setVersion(QDataStream::Qt_5_7);
 
     out << 0x4783;
-    out << recieveAccount;
+    out << receiveAccount;
     out << currentAccountName;
     out << int(activeWndState);
     out << pathStates;

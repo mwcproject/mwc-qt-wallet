@@ -21,7 +21,7 @@
 
 namespace tries {
 
-// Recieve signals
+// Receive signals
 class Mwc713InputGetter {
 
 };

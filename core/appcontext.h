@@ -100,8 +100,8 @@ public:
     QVector<int> getIntVectorFor( QString name ) const;
     void updateIntVectorFor( QString name, const QVector<int> & data );
 
-    QString getReceiveAccount() const {return recieveAccount;}
-    void setReceiveAccount(QString account) {recieveAccount = account;}
+    QString getReceiveAccount() const {return receiveAccount;}
+    void setReceiveAccount(QString account) {receiveAccount = account;}
 
     QString getCurrentAccountName() const {return currentAccountName;};
     void setCurrentAccountName(QString currentAccount) {currentAccountName = currentAccount;}
@@ -130,7 +130,7 @@ private:
     // Don't use many bits because we don't want it be much usable for attacks.
 //    int passHash = -1;
 
-    QString recieveAccount = "default"; // Selected account
+    QString receiveAccount = "default"; // Selected account
     QString currentAccountName = "default"; // Current account
 
     // Active window that is visible

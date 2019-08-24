@@ -21,7 +21,7 @@
 #include "k_AccountTransfer.h"
 #include "x_events.h"
 #include "hodl.h"
-#include "e_Recieve.h"
+#include "e_Receive.h"
 #include "e_listening.h"
 #include "e_transactions.h"
 #include "e_outputs.h"
@@ -52,7 +52,7 @@ StateMachine::StateMachine(StateContext * _context) :
     states[ STATE::EVENTS ]         = new Events(context);
     states[ STATE::HODL ]           = new Hodl(context);
     states[ STATE::SEND ]           = new Send(context);
-    states[ STATE::RECIEVE_COINS ]  = new Recieve(context);
+    states[ STATE::RECEIVE_COINS ]  = new Receive(context);
     states[ STATE::LISTENING ]      = new Listening(context);
     states[ STATE::TRANSACTIONS ]   = new Transactions(context);
     states[ STATE::OUTPUTS ]        = new Outputs(context);
