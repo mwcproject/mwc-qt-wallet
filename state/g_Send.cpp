@@ -100,7 +100,8 @@ void Send::sendRespond( bool success, QStringList errors ) {
 
 
 void Send::sendMwcOffline(  const wallet::AccountInfo & account, int64_t amount, QString message, QString fileName ) {
-    context->wallet->sendFile( account, amount, message, fileName );
+    core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
+    context->wallet->sendFile( account, amount, message, fileName,prms.inputConfirmationNumber, prms.changeOutputs );
 }
 void Send::respSendFile( bool success, QStringList errors, QString fileName ) {
     if (offlineWnd) {

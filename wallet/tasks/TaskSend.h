@@ -60,7 +60,7 @@ public:
     const static int64_t TIMEOUT = 1000*60; // 1 minute should be enough
 
     // coinNano == -1  - mean All
-    TaskSendMwc( MWC713 *wallet713, int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 ) :
+    TaskSendMwc( MWC713 *wallet713, int64_t coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs ) :
             Mwc713Task("TaskSendMwc",
                     buildCommand( coinNano, address, message, inputConfirmationNumber, changeOutputs),
                     wallet713, ""), sendMwcNano(coinNano) {}
@@ -82,9 +82,9 @@ class TaskSendFile : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*20;
 
-    TaskSendFile( MWC713 *wallet713, int64_t coinNano, QString message, QString fileTx ) :
+    TaskSendFile( MWC713 *wallet713, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs ) :
             Mwc713Task("TaskSendFile",
-                       buildCommand(coinNano, message, fileTx),
+                       buildCommand(coinNano, message, fileTx, inputConfirmationNumber, changeOutputs),
                        wallet713, "") {}
 
     virtual ~TaskSendFile() override {}
@@ -93,7 +93,7 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
-    QString buildCommand( int64_t coinNano, QString message, QString fileTx ) const;
+    QString buildCommand( int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs ) const;
 };
 
 class TaskReceiveFile : public Mwc713Task {

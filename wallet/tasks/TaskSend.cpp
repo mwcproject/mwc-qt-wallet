@@ -108,7 +108,6 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
     return true;
 }
 
-
 QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address,
         QString message, int inputConfirmationNumber, int changeOutputs ) const {
 
@@ -160,13 +159,19 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address,
 
 // ----------------------- TaskSendFile --------------------------
 
-QString TaskSendFile::buildCommand( int64_t coinNano, QString message, QString fileTx ) const {
+QString TaskSendFile::buildCommand( int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs ) const {
     QString cmd = "send ";// + util::nano2one(coinNano);
     if (coinNano > 0)
         cmd += util::nano2one(coinNano);
 
     if (!message.isEmpty())
         cmd += " --message " + util::toMwc713input(message); // Message symbols MUST be escaped.
+
+    if (inputConfirmationNumber > 0)
+        cmd += " --confirmations " + QString::number(inputConfirmationNumber);
+
+    if (changeOutputs > 0)
+        cmd += " --change-outputs " + QString::number(changeOutputs);
 
     // So far documentation doesn't specify difference between protocols
     cmd += " --file " + util::toMwc713input(fileTx);

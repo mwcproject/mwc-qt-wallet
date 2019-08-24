@@ -387,7 +387,7 @@ public:
 
     // Init send transaction with file output
     // Check signal:  onSendFile
-    virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx )  = 0;
+    virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs )  = 0;
     // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
     virtual void receiveFile( QString fileTx)  = 0;
@@ -398,7 +398,7 @@ public:
     // Send some coins to address.
     // Before send, wallet always do the switch to account to make it active
     // coinNano == -1  - mean All
-    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message="", int inputConfirmationNumber=10, int changeOutputs=1 )  = 0;
+    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs )  = 0;
     // Check signal:  onSend
 
     // Get total number of Outputs
