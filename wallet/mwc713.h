@@ -183,8 +183,9 @@ public:
     virtual bool setWalletConfig(const WalletConfig & config)  override;
 
     // Status of the node
+    // return true if task was scheduled
     // Check Signal: onNodeSatatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections )
-    virtual void getNodeStatus() override;
+    virtual bool getNodeStatus() override;
 
     // -------------- Transactions
 
@@ -244,9 +245,7 @@ public:
 
 public:
     // Task Reporting methods
-    enum MESSAGE_LEVEL { FATAL_ERROR, CRITICAL, WARNING, INFO, DEBUG };
-    enum MESSAGE_ID {INIT_ERROR, GENERIC, MWC7113_ERROR, TASK_TIMEOUT };
-    void appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QString message );
+    virtual void appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QString message ) override;
 
     // stop mwc713 process nicely
     void processStop(bool exitNicely);

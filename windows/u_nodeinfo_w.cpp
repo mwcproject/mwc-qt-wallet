@@ -21,6 +21,10 @@
 
 namespace wnd {
 
+//static
+QString NodeInfo::lastShownErrorMessage;
+
+
 NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
         core::NavWnd(parent, _state->getContext()),
         ui(new Ui::NodeInfo),

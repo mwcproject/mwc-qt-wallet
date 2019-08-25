@@ -55,7 +55,7 @@ private:
     state::NodeInfo * state;
 
     // Cache for latest error. We don't want spam user with messages about the node connection
-    QString lastShownErrorMessage;
+    static QString lastShownErrorMessage;
 };
 
 }

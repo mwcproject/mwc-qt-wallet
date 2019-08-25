@@ -79,7 +79,7 @@ State * StateMachine::getState(STATE state) const {
     return states.value(state, nullptr);
 }
 
-State* StateMachine::getCurrentState() const {
+State* StateMachine::getCurrentStateObj() const {
     return getState(currentState);
 }
 

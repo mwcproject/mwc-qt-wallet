@@ -52,7 +52,9 @@ public:
     // Please use carefully, don't abuse this interface since no type control can be done
     State* getState(STATE state) const;
 
-    State* getCurrentState() const;
+    State* getCurrentStateObj() const;
+
+    STATE  getCurrentStateId() const {return currentState;}
 
 private:
     // routine to process state into the loop

@@ -623,8 +623,12 @@ void MWC713::verifyMwcBoxTransactionProof( QString proofFileName )  {
 
 // Status of the node
 // Check Signal: onNodeSatatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections )
-void MWC713::getNodeStatus() {
+bool MWC713::getNodeStatus() {
+    if (eventCollector== nullptr)
+        return false;
+
     eventCollector->addTask( new TaskNodeInfo(this), TaskNodeInfo::TIMEOUT );
+    return true;
 }
 
 

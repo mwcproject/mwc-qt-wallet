@@ -84,7 +84,7 @@ void NodeInfo::timerEvent(QTimerEvent *event) {
     Q_UNUSED(event);
 
     // Don't request for inti or lock states.
-    if ( context->stateMachine->getActionWindow() >= STATE::ACCOUNTS )
+    if ( context->stateMachine->getCurrentStateId() >= STATE::ACCOUNTS )
         requestNodeInfo();
 }
 
@@ -94,7 +94,8 @@ void NodeInfo::requestWalletResync() {
 }
 
 void NodeInfo::requestNodeInfo() {
-    context->wallet->getNodeStatus();
+    if (context->wallet->isRunning())
+        context->wallet->getNodeStatus();
 }
 
 wallet::WalletConfig NodeInfo::getWalletConfig() const {
@@ -109,6 +110,40 @@ void NodeInfo::updateWalletConfig( const wallet::WalletConfig & config ) {
 }
 
 void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
+
+    if (!justLogin) {
+        // check if node state was changed. In this case let's emit a message
+        if (online != lastNodeStatus.online) {
+            if (online) {
+                context->wallet->appendNotificationMessage(wallet::Wallet::MESSAGE_LEVEL::INFO, wallet::Wallet::MESSAGE_ID::GENERIC,
+                        "Wallet restore connection to mwc node");
+            }
+            else {
+                context->wallet->appendNotificationMessage(wallet::Wallet::MESSAGE_LEVEL::CRITICAL, wallet::Wallet::MESSAGE_ID::GENERIC,
+                                                           "Wallet lost connection to mwc node");
+            }
+        }
+        else if ( connections==0 ^ lastNodeStatus.connections==0 ) {
+                if (connections>0) {
+                    context->wallet->appendNotificationMessage(wallet::Wallet::MESSAGE_LEVEL::INFO, wallet::Wallet::MESSAGE_ID::GENERIC,
+                                                               "mwc node restored connection to mwc network");
+                }
+                else {
+                    context->wallet->appendNotificationMessage(wallet::Wallet::MESSAGE_LEVEL::CRITICAL, wallet::Wallet::MESSAGE_ID::GENERIC,
+                                                               "mwc node lost connection to mwc network");
+                }
+        }
+        else if ( (nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight) ^ (lastNodeStatus.nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < lastNodeStatus.peerHeight) ) {
+            if (nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight) {
+                context->wallet->appendNotificationMessage(wallet::Wallet::MESSAGE_LEVEL::CRITICAL, wallet::Wallet::MESSAGE_ID::GENERIC,
+                                                           "mwc node out of sync from mwc network");
+            }
+            else {
+                context->wallet->appendNotificationMessage(wallet::Wallet::MESSAGE_LEVEL::INFO, wallet::Wallet::MESSAGE_ID::GENERIC,
+                                                           "mwc node finish syncing and runs well now");
+            }
+        }
+    }
 
     lastNodeStatus.setData(online, errMsg, nodeHeight, peerHeight, totalDifficulty, connections);
 

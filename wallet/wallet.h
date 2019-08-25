@@ -223,6 +223,11 @@ public:
     Wallet();
     virtual ~Wallet();
 
+    // Report Message to the wallet.
+    enum class MESSAGE_LEVEL { FATAL_ERROR, CRITICAL, WARNING, INFO, DEBUG };
+    enum class MESSAGE_ID {INIT_ERROR, GENERIC, MWC7113_ERROR, TASK_TIMEOUT };
+    virtual void appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QString message ) = 0;
+
     // Generic. Reporting fatal error that somebody will process and exit app
     virtual void reportFatalError( QString message )  = 0;
 
@@ -361,8 +366,9 @@ public:
     virtual bool setWalletConfig(const WalletConfig & config)  = 0;
 
     // Status of the node
+    // return true if task was scheduled
     // Check Signal: onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections )
-    virtual void getNodeStatus() = 0;
+    virtual bool getNodeStatus() = 0;
 
     // -------------- Transactions
 

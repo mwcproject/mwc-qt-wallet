@@ -34,6 +34,10 @@
 #include <QJsonObject>
 #include "util/address.h"
 #include "dialogs/helpdlg.h"
+#include <QSystemSemaphore>
+#include <QThread>
+#include <control/messagebox.h>
+#include "util/TestSystemSemaphoreThread.h"
 
 // Very first run - init everything
 bool deployFilesFromResources() {
@@ -189,6 +193,27 @@ int main(int argc, char *argv[])
             QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read the stylesheet.");
             return 1;
         }
+    }
+
+    // Ensure that only instance can run
+    // The easiest and error proof way - create global system object, so
+    // OS will manage it's lifecycle.
+    // Shared memory doesn't work for Linux (will work for Windows), Unfortunately it can survive crash and it is not what we need.
+    // QSystemSemaphore fits better. Enen it survive crash on Unix, but OS at least revert back acquire operations.
+    // It is good enough for us, so we can use QSystemSemaphore. Counter will show number of instances
+
+    QSystemSemaphore instancesSemaphore("mwc-qt-wallet-instances", 1);
+    {
+        // Testing semaphore from different thread. Problem that system semaphore doesn't have timeout.
+        util::TestSystemSemaphoreThread *testThread = new util::TestSystemSemaphoreThread(&instancesSemaphore);
+        testThread->start();
+        if (!testThread->wait( int(500 * std::max(1.0,config::getTimeoutMultiplier()) + 0.5) ) ) {
+            // Seems like we are blocked on global semaphore. It is mean that second instance does exist
+            control::MessageBox::message(nullptr, "Second mwc-qt-wallet instance is detected",
+                                         "There is another instance of mwc-qt-wallet is already running. It is impossible to run more than one instance of the wallet at the same time.");
+            return 1;
+        }
+        delete testThread;
     }
 
     core::AppContext appContext;

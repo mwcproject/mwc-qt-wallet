@@ -40,6 +40,8 @@ NextStateRespond Events::execute() {
 
     emit updateNonShownWarnings(false);
 
+    messageWaterMark = QDateTime::currentMSecsSinceEpoch();
+
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 

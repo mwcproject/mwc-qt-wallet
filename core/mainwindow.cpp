@@ -145,7 +145,7 @@ void MainWindow::on_connectionStatusButton_clicked()
 
 void MainWindow::on_helpButton_clicked()
 {
-    state::State * state = stateMachine->getCurrentState();
+    state::State * state = stateMachine->getCurrentStateObj();
     QString docName = "";
     if (state != nullptr) {
         docName = state->getHelpDocName();
