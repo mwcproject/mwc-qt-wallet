@@ -18,6 +18,7 @@
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
+#include "../core/global.h"
 
 namespace state {
 
@@ -31,7 +32,7 @@ NextStateRespond WalletConfig::execute() {
     if (context->appContext->getActiveWndState() != STATE::WALLET_CONFIG)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context->wndManager->switchToWindowEx(
+    context->wndManager->switchToWindowEx( mwc::PAGE_X_WALLET_CONFIG,
                 new wnd::WalletConfig( context->wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

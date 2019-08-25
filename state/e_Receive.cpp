@@ -22,6 +22,7 @@
 #include "../util/Json.h"
 #include "../dialogs/fileslateinfodlg.h"
 #include "timeoutlock.h"
+#include "../core/global.h"
 
 namespace state {
 
@@ -52,9 +53,10 @@ NextStateRespond Receive::execute() {
         QPair<bool,bool> lsnStatus = context->wallet->getListeningStatus();
         context->wallet->getMwcBoxAddress();
 
-        wnd = (wnd::Receive*) context->wndManager->switchToWindowEx( new wnd::Receive( context->wndManager->getInWndParent(), this,
-                                                          lsnStatus.first, lsnStatus.second,
-                                                          context->wallet->getLastKnownMwcBoxAddress() ) );
+        wnd = (wnd::Receive*) context->wndManager->switchToWindowEx( mwc::PAGE_E_RECEIVE,
+                new wnd::Receive( context->wndManager->getInWndParent(), this,
+                           lsnStatus.first, lsnStatus.second,
+                           context->wallet->getLastKnownMwcBoxAddress() ) );
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

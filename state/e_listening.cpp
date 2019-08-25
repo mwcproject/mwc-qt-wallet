@@ -20,6 +20,7 @@
 #include "../state/statemachine.h"
 #include <QDebug>
 #include "../util/Log.h"
+#include "../core/global.h"
 
 namespace state {
 
@@ -58,9 +59,10 @@ NextStateRespond Listening::execute() {
         context->wallet->getMwcBoxAddress();
         // will get result later and will update the window
 
-        wnd = (wnd::Listening*) context->wndManager->switchToWindowEx(new wnd::Listening( context->wndManager->getInWndParent(), this,
-                                                           lsnStatus.first, lsnStatus.second,
-                                                                       context->wallet->getLastKnownMwcBoxAddress(), -1));
+        wnd = (wnd::Listening*) context->wndManager->switchToWindowEx( mwc::PAGE_E_LISTENING,
+                new wnd::Listening( context->wndManager->getInWndParent(), this,
+                       lsnStatus.first, lsnStatus.second,
+                       context->wallet->getLastKnownMwcBoxAddress(), -1));
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

@@ -28,6 +28,7 @@
 #include "x_walletconfig.h"
 #include "../util/ioutils.h"
 #include "../util/Files.h"
+#include "../core/global.h"
 
 namespace state {
 
@@ -56,7 +57,7 @@ NextStateRespond InitAccount::execute() {
     // Need to provision the wallet. If it is not running, mean that we wasn't be able to login.
     // So we have to init the wallet
     if ( !running && context->appContext->pullCookie<QString>("checkWalletInitialized")=="FAILED" ) {
-        context->wndManager->switchToWindowEx(
+        context->wndManager->switchToWindowEx( mwc::PAGE_A_INIT_ACCOUNT,
                     new wnd::InitAccount( context->wndManager->getInWndParent(), this,
                             (state::WalletConfig *) context->stateMachine->getState(STATE::WALLET_CONFIG) ) );
 
@@ -78,7 +79,7 @@ void InitAccount::exitingState() {
 // Get Password, Choose what to do
 void InitAccount::setPassword(const QString & password) {
     pass = password;
-    context->wndManager->switchToWindowEx(
+    context->wndManager->switchToWindowEx( mwc::PAGE_A_NEW_WALLET,
             new wnd::NewWallet( context->wndManager->getInWndParent(), this ) );
 }
 
@@ -101,7 +102,7 @@ void InitAccount::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice, MWC_NETW
             context->wallet->start2init(pass);
             break;
         case CREATE_WITH_SEED:
-            context->wndManager->switchToWindowEx( new wnd::EnterSeed( context->wndManager->getInWndParent(), this ) );
+            context->wndManager->switchToWindowEx( mwc::PAGE_A_ENTER_SEED, new wnd::EnterSeed( context->wndManager->getInWndParent(), this ) );
             break;
         default:
             Q_ASSERT(false);
@@ -119,7 +120,7 @@ void InitAccount::onNewSeed(QVector<QString> sd) {
     tasks.resize(1);
 #endif
 
-    context->wndManager->switchToWindowEx(
+    context->wndManager->switchToWindowEx( mwc::PAGE_A_NEW_WALLET_PASSPHRASE,
         new wnd::NewSeed( context->wndManager->getInWndParent(), this, getContext(),
                     seed ) );
 }
@@ -138,7 +139,8 @@ void InitAccount::submit() {
         return;
 
     // Show verify dialog
-    context->wndManager->switchToWindowEx( new wnd::NewSeedTest( context->wndManager->getInWndParent(), this, tasks[0].getWordIndex() ) );
+    context->wndManager->switchToWindowEx( mwc::PAGE_A_PASSPHRASE_TEST,
+            new wnd::NewSeedTest( context->wndManager->getInWndParent(), this, tasks[0].getWordIndex() ) );
 }
 
 
@@ -227,7 +229,8 @@ void InitAccount::createWalletWithSeed( QVector<QString> sd ) {
     seed = sd;
 
     // switching to a progress Wnd
-    progressWnd = (wnd::ProgressWnd*) context->wndManager->switchToWindowEx(new wnd::ProgressWnd(context->wndManager->getInWndParent(), this, "Recovering account from the passphrase", "",
+    progressWnd = (wnd::ProgressWnd*) context->wndManager->switchToWindowEx( mwc::PAGE_A_RECOVERY_FROM_PASSPHRASE,
+            new wnd::ProgressWnd(context->wndManager->getInWndParent(), this, "Recovering account from the passphrase", "",
                                                                                                  "", false));
 
     // Stopping listeners first. Not checking if they are running.
@@ -291,13 +294,14 @@ void InitAccount::onRecoverResult(bool started, bool finishedWithSuccess, QStrin
     }
     else {
         // switch back to the seed window
-        context->wndManager->switchToWindowEx( new wnd::EnterSeed( context->wndManager->getInWndParent(), this ) );
+        context->wndManager->switchToWindowEx( mwc::PAGE_A_ENTER_SEED,
+                new wnd::EnterSeed( context->wndManager->getInWndParent(), this ) );
         return;
     }
 }
 
 void InitAccount::cancel() {
-    context->wndManager->switchToWindowEx(
+    context->wndManager->switchToWindowEx( mwc::PAGE_A_NEW_WALLET,
             new wnd::NewWallet( context->wndManager->getInWndParent(), this ) );
 }
 

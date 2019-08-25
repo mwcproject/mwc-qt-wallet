@@ -19,6 +19,7 @@
 #include "../state/statemachine.h"
 #include "../util/Log.h"
 #include <QDebug>
+#include "../core/global.h"
 
 namespace state {
 
@@ -40,7 +41,8 @@ NextStateRespond Outputs::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     if (wnd==nullptr) {
-        wnd = (wnd::Outputs*) context->wndManager->switchToWindowEx( new wnd::Outputs( context->wndManager->getInWndParent(), this) );
+        wnd = (wnd::Outputs*) context->wndManager->switchToWindowEx( mwc::PAGE_E_OUTPUTS,
+                new wnd::Outputs( context->wndManager->getInWndParent(), this) );
         // Requesting wallet balance update because Accounts into is there
         context->wallet->updateWalletBalance();
     }

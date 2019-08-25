@@ -19,21 +19,25 @@
 #include "../windows/c_newwallet_w.h"
 #include "../windows/c_newseed_w.h"
 #include "../windows/c_enterseed.h"
+#include "../core/global.h"
+#include "../build_version.h"
 
 namespace core {
 
-WindowManager::WindowManager(QWidget  * mainWnd ) :
-    mainWindow(mainWnd)
+WindowManager::WindowManager(core::MainWindow * _mainWnd, QWidget * _pageHostWnd) :
+    mainWnd(_mainWnd),
+    pageHostWnd(_pageHostWnd)
 {
-    Q_ASSERT(mainWindow);
+    Q_ASSERT(mainWnd);
+    Q_ASSERT(pageHostWnd);
 }
 
 QWidget * WindowManager::getInWndParent() const {
-    return mainWindow;
+    return pageHostWnd;
 }
 
 
-QWidget * WindowManager::switchToWindowEx( QWidget * newWindow ) {
+QWidget * WindowManager::switchToWindowEx( const QString & pageName, QWidget * newWindow ) {
     if (currentWnd==newWindow)
         return newWindow;
 
@@ -46,10 +50,26 @@ QWidget * WindowManager::switchToWindowEx( QWidget * newWindow ) {
 
     currentWnd = newWindow;
     currentWnd->setAttribute( Qt::WA_DeleteOnClose );
-    mainWindow->layout()->addWidget(currentWnd);
+    pageHostWnd->layout()->addWidget(currentWnd);
     currentWnd->show();
+
+    mainWnd->setWindowTitle(buildWalletTitle(pageName));
+
     return newWindow;
 }
+
+QString WindowManager::buildWalletTitle(const QString & pageName) {
+    QString buildNumber = BUILD_VERSION;
+
+    QString title = mwc::APP_NAME + " v" + buildNumber;
+
+    if (!pageName.isEmpty()) {
+        title += " - " + pageName;
+    }
+    return title;
+}
+
+
 
 }
 

@@ -18,6 +18,7 @@
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
+#include "../core/global.h"
 
 namespace state {
 
@@ -42,7 +43,8 @@ NextStateRespond AccountTransfer::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     if (wnd==nullptr) {
-        wnd = (wnd::AccountTransfer*) context->wndManager->switchToWindowEx( new wnd::AccountTransfer( context->wndManager->getInWndParent(), this ) );
+        wnd = (wnd::AccountTransfer*) context->wndManager->switchToWindowEx( mwc::PAGE_K_ACCOUNT_TRANSFER,
+                new wnd::AccountTransfer( context->wndManager->getInWndParent(), this ) );
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

@@ -35,8 +35,6 @@ InitAccount::InitAccount(QWidget *parent, state::InitAccount * _state, state::Wa
 {
     ui->setupUi(this);
 
-    state->setWindowTitle( mwc::VERSION + " " + mwc::APP_NAME );
-
     util::PasswordAnalyser pa( ui->password1Edit->text().trimmed() );
     ui->strengthLabel->setText(pa.getPasswordQualityStr());
 

@@ -38,8 +38,6 @@ InputPassword::InputPassword(QWidget *parent, state::InputPassword * _state, sta
 
     ui->progress->initLoader(false);
 
-    state->setWindowTitle( mwc::VERSION + " " + mwc::APP_NAME );
-
     setFocusPolicy(Qt::StrongFocus);
     ui->passwordEdit->setFocus(Qt::OtherFocusReason);
 

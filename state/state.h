@@ -99,8 +99,6 @@ public:
 
     state::StateContext * getContext() {return context;}
 
-    void setWindowTitle( QString title );
-
     // process/verify the state
     virtual NextStateRespond execute() = 0;
 

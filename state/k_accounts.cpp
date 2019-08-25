@@ -19,6 +19,8 @@
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
+#include "../core/global.h"
+
 
 namespace state {
 
@@ -38,7 +40,8 @@ NextStateRespond Accounts::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     if (wnd==nullptr) {
-        wnd  = (wnd::Accounts*)context->wndManager->switchToWindowEx(new wnd::Accounts( context->wndManager->getInWndParent(), this ));
+        wnd  = (wnd::Accounts*)context->wndManager->switchToWindowEx( mwc::PAGE_K_ACCOUNTS,
+                new wnd::Accounts( context->wndManager->getInWndParent(), this ));
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

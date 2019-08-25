@@ -18,8 +18,7 @@
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
-
-
+#include "../core/global.h"
 
 namespace state {
 
@@ -36,7 +35,7 @@ NextStateRespond Events::execute() {
     if (context->appContext->getActiveWndState() != STATE::EVENTS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    wnd = (wnd::Events*) context->wndManager->switchToWindowEx(
+    wnd = (wnd::Events*) context->wndManager->switchToWindowEx( mwc::PAGE_X_EVENTS,
                 new wnd::Events( context->wndManager->getInWndParent(), this ) );
 
     emit updateNonShownWarnings(false);

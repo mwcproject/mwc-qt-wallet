@@ -18,6 +18,7 @@
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../util/Log.h"
+#include "../core/global.h"
 
 namespace state {
 
@@ -43,7 +44,8 @@ NextStateRespond Transactions::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     if (wnd==nullptr) {
-        wnd = (wnd::Transactions*)context->wndManager->switchToWindowEx( new wnd::Transactions( context->wndManager->getInWndParent(), this ) );
+        wnd = (wnd::Transactions*)context->wndManager->switchToWindowEx( mwc::PAGE_E_TRANSACTION,
+                new wnd::Transactions( context->wndManager->getInWndParent(), this ) );
         // Requesting wallet balance update because Accounts into is there
         context->wallet->updateWalletBalance();
     }

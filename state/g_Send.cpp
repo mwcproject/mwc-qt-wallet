@@ -21,7 +21,7 @@
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../util/Log.h"
-
+#include "../core/global.h"
 
 namespace state {
 
@@ -49,7 +49,8 @@ NextStateRespond Send::execute() {
 }
 
 void Send::switchToStartingWindow() {
-    onlineOfflineWnd = (wnd::SendStarting*)context->wndManager->switchToWindowEx( new wnd::SendStarting( context->wndManager->getInWndParent(), this ) );
+    onlineOfflineWnd = (wnd::SendStarting*)context->wndManager->switchToWindowEx( mwc::PAGE_G_SEND,
+            new wnd::SendStarting( context->wndManager->getInWndParent(), this ) );
     context->wallet->updateWalletBalance(); // request update, respond at onWalletBalanceUpdated
 }
 
@@ -73,12 +74,12 @@ void Send::updateFileGenerationPath(QString path) {
 // onlineOffline => Next step
 void Send::processSendRequest( bool isOnline, const wallet::AccountInfo & selectedAccount, int64_t amount ) {
     if (isOnline) {
-        onlineWnd = (wnd::SendOnline*)context->wndManager->switchToWindowEx(
+        onlineWnd = (wnd::SendOnline*)context->wndManager->switchToWindowEx( mwc::PAGE_G_SEND_ONLINE,
                 new wnd::SendOnline( context->wndManager->getInWndParent(), selectedAccount, amount, this,
                                      (state::Contacts *)context->stateMachine->getState(STATE::CONTACTS) ) );
     }
     else {
-        offlineWnd = (wnd::SendOffline*)context->wndManager->switchToWindowEx(
+        offlineWnd = (wnd::SendOffline*)context->wndManager->switchToWindowEx( mwc::PAGE_G_SEND_FILE,
                 new wnd::SendOffline( context->wndManager->getInWndParent(), selectedAccount, amount, this ) );
     }
 }

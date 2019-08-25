@@ -15,6 +15,7 @@
 #include "x_ShowSeed.h"
 #include "../windows/c_newseed_w.h"
 #include "../core/windowmanager.h"
+#include "../core/global.h"
 
 namespace state {
 
@@ -31,7 +32,8 @@ NextStateRespond ShowSeed::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     if (wnd==nullptr) {
-        wnd = (wnd::NewSeed*) context->wndManager->switchToWindowEx( new wnd::NewSeed( context->wndManager->getInWndParent(), this, context, QVector<QString>(), true ) );
+        wnd = (wnd::NewSeed*) context->wndManager->switchToWindowEx( mwc::PAGE_X_SHOW_PASSPHRASE,
+                new wnd::NewSeed( context->wndManager->getInWndParent(), this, context, QVector<QString>(), true ) );
         context->wallet->getSeed();
     }
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

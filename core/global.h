@@ -22,7 +22,6 @@ class QMainWindow;
 
 namespace mwc {
 
-const QString VERSION = "v1.05";
 const QString APP_NAME = "mwc wallet";
 
 // We not checking mwc713 versions because so far there is no benefits from that.
@@ -43,6 +42,44 @@ const QString MWC713_DEFAULT_CONFIG = ":/resource/wallet713_def.toml";
 #endif
 
 const int64_t AIRDROP_TRANS_KEEP_TIME_MS = 1000L*3600L*24L*15; // 15 days should be enough
+
+//////////////////////////////
+// Page Names
+
+const QString PAGE_A_ACCOUNT_LOGIN  = "Login into Wallet";
+const QString PAGE_A_ACCOUNT_UNLOCK = "Unlock Wallet";
+const QString PAGE_A_INIT_ACCOUNT   = "Init a new Wallet";
+const QString PAGE_A_NEW_WALLET     = "Init a new Wallet";
+const QString PAGE_A_ENTER_SEED     = "Recover Wallet from a Passphrase";
+const QString PAGE_A_NEW_WALLET_PASSPHRASE= "Passphrase for a new Wallet";
+const QString PAGE_A_PASSPHRASE_TEST  = "Passphrase test";
+const QString PAGE_A_RECOVERY_FROM_PASSPHRASE = "Recovery from passphrase";
+
+const QString PAGE_E_TRANSACTION    = "Transactions";
+const QString PAGE_E_RECEIVE        = "Receive coins";
+const QString PAGE_E_LISTENING      = "Listening";
+const QString PAGE_E_OUTPUTS        = "Outputs";
+
+const QString PAGE_G_SEND           = "Send coins";
+const QString PAGE_G_SEND_ONLINE    = "Send coins to address";
+const QString PAGE_G_SEND_FILE      = "Send coins with file";
+
+const QString PAGE_K_ACCOUNTS       = "Accounts";
+const QString PAGE_K_ACCOUNT_TRANSFER = "Transfer coins between accounts";
+
+const QString PAGE_M_AIRDROP        = "Airdrop";
+const QString PAGE_M_AIRDROP_CLAIM  = "Claim coins for BTC address";
+
+const QString PAGE_U_NODE_STATUS    = "mwc node status";
+
+const QString PAGE_W_CONTACTS       = "Contacts";
+
+const QString PAGE_X_EVENTS         = "Event log";
+const QString PAGE_X_SHOW_PASSPHRASE= "Wallet mnemonic passphrase";
+const QString PAGE_X_WALLET_CONFIG  = "Wallet Config";
+const QString PAGE_X_RESYNC         = "Re-sync wallet with mwc node";
+
+const QString PAGE_HODL             = "HODL";
 
 void setApplication(QApplication * app, QMainWindow * mainWindow);
 

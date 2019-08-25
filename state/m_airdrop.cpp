@@ -94,7 +94,7 @@ NextStateRespond Airdrop::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     if (airdropWnd==nullptr) {
-        airdropWnd = (wnd::Airdrop *) context->wndManager->switchToWindowEx(
+        airdropWnd = (wnd::Airdrop *) context->wndManager->switchToWindowEx( mwc::PAGE_M_AIRDROP,
                     new wnd::Airdrop( context->wndManager->getInWndParent(), this ) );
     }
 
@@ -163,7 +163,7 @@ void Airdrop::requestStatusFor(int idx) {
 }
 
 void Airdrop::backToMainAirDropPage() {
-    airdropWnd = (wnd::Airdrop *) context->wndManager->switchToWindowEx(
+    airdropWnd = (wnd::Airdrop *) context->wndManager->switchToWindowEx( mwc::PAGE_M_AIRDROP,
             new wnd::Airdrop( context->wndManager->getInWndParent(), this ) );
 }
 
@@ -330,7 +330,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
 
                 QString challenge = jsonRespond["challenge"].toString();
                 // Switch to the claim window...
-                airdropForBtcWnd = (wnd::AirdropForBTC *) context->wndManager->switchToWindowEx(
+                airdropForBtcWnd = (wnd::AirdropForBTC *) context->wndManager->switchToWindowEx( mwc::PAGE_M_AIRDROP_CLAIM,
                         new wnd::AirdropForBTC( context->wndManager->getInWndParent(), this, address, challenge, identifier ) );
             }
             else {

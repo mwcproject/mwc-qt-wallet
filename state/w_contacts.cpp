@@ -17,6 +17,7 @@
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
+#include "../core/global.h"
 
 namespace state {
 
@@ -32,7 +33,7 @@ NextStateRespond Contacts::execute() {
     if (context->appContext->getActiveWndState() != STATE::CONTACTS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context->wndManager->switchToWindowEx(
+    context->wndManager->switchToWindowEx( mwc::PAGE_W_CONTACTS,
                 new wnd::Contacts( context->wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

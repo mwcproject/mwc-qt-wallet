@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
 
     wallet::MWC713 wallet( config::getWallet713path(), config::getMwc713conf(), &appContext );
 
-    core::WindowManager wndManager( mainWnd->getMainWindow() );
+    core::WindowManager wndManager( mainWnd, mainWnd->getMainWindow() );
 
     mainWnd->show();
 

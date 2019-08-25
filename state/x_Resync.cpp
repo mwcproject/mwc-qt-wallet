@@ -17,6 +17,7 @@
 #include "../core/windowmanager.h"
 #include "../state/statemachine.h"
 #include "../control/messagebox.h"
+#include "../core/global.h"
 
 namespace state {
 
@@ -50,8 +51,8 @@ NextStateRespond Resync::execute() {
     if (prevListeningStatus.second)
         context->wallet->listeningStop(false, true);
 
-    wnd = (wnd::ProgressWnd*)context->wndManager->switchToWindowEx( new wnd::ProgressWnd(
-                                            context->wndManager->getInWndParent(), this, "Re-sync with full node", "Preparing to re-sync", "", false) );
+    wnd = (wnd::ProgressWnd*)context->wndManager->switchToWindowEx( mwc::PAGE_X_RESYNC,
+            new wnd::ProgressWnd( context->wndManager->getInWndParent(), this, "Re-sync with full node", "Preparing to re-sync", "", false) );
 
     respondCounter = 0;
     respondZeroLevel = 0;

@@ -20,6 +20,7 @@
 #include "../state/statemachine.h"
 #include <QDebug>
 #include "../util/Log.h"
+#include "../core/global.h"
 
 namespace state {
 
@@ -40,7 +41,8 @@ NextStateRespond NodeInfo::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     if (wnd==nullptr) {
-        wnd = (wnd::NodeInfo*) context->wndManager->switchToWindowEx(new wnd::NodeInfo( context->wndManager->getInWndParent(), this));
+        wnd = (wnd::NodeInfo*) context->wndManager->switchToWindowEx( mwc::PAGE_U_NODE_STATUS,
+                new wnd::NodeInfo( context->wndManager->getInWndParent(), this));
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

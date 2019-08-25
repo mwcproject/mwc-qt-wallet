@@ -18,6 +18,7 @@
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
+#include "../core/global.h"
 
 namespace state {
 
@@ -32,7 +33,7 @@ NextStateRespond Hodl::execute() {
     if (context->appContext->getActiveWndState() != STATE::HODL)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context->wndManager->switchToWindowEx(
+    context->wndManager->switchToWindowEx( mwc::PAGE_HODL,
                 new wnd::Hodl( context->wndManager->getInWndParent(), this ) );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
