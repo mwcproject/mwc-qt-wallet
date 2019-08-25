@@ -97,6 +97,9 @@ protected:
     virtual QString getHelpDocName() override {return "airdrop.html";}
 
 private slots:
+    // Need to get a network info
+    void onLoginResult(bool ok);
+
     void replyFinished(QNetworkReply* reply);
 
     void onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPasswor);
@@ -110,6 +113,8 @@ private:
 
     wnd::Airdrop * airdropWnd = nullptr;
     wnd::AirdropForBTC * airdropForBtcWnd = nullptr;
+
+    QString airDropUrl; // Url for airdrop requests. Url depend on current network.
 
     int requestCounter = 0;
     QMap<QString, QString> claimRequests; // Key: slate file; value: btcAddress

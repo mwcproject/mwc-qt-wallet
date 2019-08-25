@@ -23,7 +23,7 @@ void setMwc713conf( QString conf );
 void setMwcGuiWalletConf( QString conf );
 
 void setConfigData(QString mwcPath, QString wallet713path,
-                   QString mainStyleSheetPath, QString dialogsStyleSheetPath, QString airdropUrl, int64_t logoutTimeMs,
+                   QString mainStyleSheetPath, QString dialogsStyleSheetPath, QString airdropUrlMainNetUrl, QString airdropUrlTestNetUrl, int64_t logoutTimeMs,
                    double timeoutMultiplier);
 
 
@@ -35,7 +35,8 @@ const QString & getMwcpath(); // Not using now because so far there is no local 
 const QString & getWallet713path();
 const QString & getMainStyleSheetPath();
 const QString & getDialogsStyleSheetPath();
-const QString & getAirdropUrl();
+const QString & getAirdropMainNetUrl();
+const QString & getAirdropTestNetUrl();
 int64_t         getLogoutTimeMs();
 
 double          getTimeoutMultiplier();

@@ -23,6 +23,8 @@ static QString wallet713path;
 static QString mainStyleSheetPath;
 static QString dialogsStyleSheetPath;
 static QString airdropUrl;
+static QString airdropUrlMainNetUrl;
+static QString airdropUrlTestNetUrl;
 static int64_t logoutTimeMs = 1000*60*15; // 15 minutes is default
 
 static double timeoutMultiplier = 1.0;
@@ -36,13 +38,16 @@ void setMwcGuiWalletConf( QString conf ) {
 }
 
 void setConfigData(QString _mwcPath, QString _wallet713path,
-                   QString _mainStyleSheetPath, QString _dialogsStyleSheetPath, QString _airdropUrl, int64_t  _logoutTimeMs,
+                   QString _mainStyleSheetPath, QString _dialogsStyleSheetPath,
+                   QString _airdropUrlMainNetUrl, QString _airdropUrlTestNetUrl,
+                   int64_t  _logoutTimeMs,
                    double _timeoutMultiplier) {
     mwcPath = _mwcPath;
     wallet713path = _wallet713path;
     mainStyleSheetPath = _mainStyleSheetPath;
     dialogsStyleSheetPath = _dialogsStyleSheetPath;
-    airdropUrl = _airdropUrl;
+    airdropUrlMainNetUrl = _airdropUrlMainNetUrl;
+    airdropUrlTestNetUrl = _airdropUrlTestNetUrl;
     logoutTimeMs = _logoutTimeMs;
     timeoutMultiplier = _timeoutMultiplier;
 }
@@ -55,7 +60,8 @@ const QString & getMwcGuiWalletConf() {return mwcGuiWalletConf;}
 const QString & getWallet713path() {return wallet713path;}
 const QString & getMainStyleSheetPath() {return mainStyleSheetPath;}
 const QString & getDialogsStyleSheetPath() {return dialogsStyleSheetPath;}
-const QString & getAirdropUrl() {return airdropUrl;}
+const QString & getAirdropMainNetUrl() {return airdropUrlMainNetUrl;}
+const QString & getAirdropTestNetUrl() {return airdropUrlTestNetUrl;}
 int64_t         getLogoutTimeMs() {return logoutTimeMs;}
 
 

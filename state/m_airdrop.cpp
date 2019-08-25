@@ -79,10 +79,10 @@ Airdrop::Airdrop(StateContext * context ) :
     connect( nwManager, &QNetworkAccessManager::finished, this, &Airdrop::replyFinished, Qt::QueuedConnection );
     connect( context->wallet , &wallet::Wallet::onReceiveFile, this, &Airdrop::onReceiveFile, Qt::QueuedConnection );
     connect( context->wallet , &wallet::Wallet::onGetNextKeyResult, this, &Airdrop::onGetNextKeyResult, Qt::QueuedConnection );
+    connect( context->wallet , &wallet::Wallet::onLoginResult, this, &Airdrop::onLoginResult, Qt::QueuedConnection );
 
     // request AirDrop Status in background
     airDropStatus.waiting = true;
-    sendRequest( HTTP_CALL::GET, "/v1/claimsAvailable", {}, "", TAG_CLAIMS_AVAIL);
 
     airdropRequests = context->appContext->loadAirdropRequests();
 }
@@ -100,6 +100,17 @@ NextStateRespond Airdrop::execute() {
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
+
+void Airdrop::onLoginResult(bool ok) {
+    Q_UNUSED(ok)
+
+    airDropStatus.waiting = true;
+    airDropUrl = (context->wallet->getWalletConfig().getNetwork() == "Mainnet") ?
+                config::getAirdropMainNetUrl() : config::getAirdropTestNetUrl();
+
+    sendRequest( HTTP_CALL::GET, "/v1/claimsAvailable", {}, "", TAG_CLAIMS_AVAIL);
+}
+
 
 void Airdrop::exitingState() {
     // Start wallet normally...
@@ -171,7 +182,7 @@ void Airdrop::sendRequest(HTTP_CALL call, const QString & api,
                           const QString & tag, const QString & param1, const QString & param2,
                           const QString & param3, const QString & param4) {
 
-    QString url = config::getAirdropUrl() + api;
+    QString url = airDropUrl + api;
 
     qDebug() << "Sending request: " << url << ", params: " << params << "  tag:" << tag;
 
@@ -275,7 +286,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
             airDropStatus.message = jsonRespond["message"].toString();
         } else {
             airDropStatus.status = false;
-            airDropStatus.message = "Unable to request the status info from " + config::getAirdropUrl() +
+            airDropStatus.message = "Unable to request the status info from " + airDropUrl +
                                     ".\nGet communication error: " + requestErrorMessage;
         }
 
@@ -286,7 +297,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
     }
 
     if (!requestOk) {
-        reportMessageToUI("Network error", "Unable to communicate with " + config::getAirdropUrl() + ".\nGet communication error: " + requestErrorMessage);
+        reportMessageToUI("Network error", "Unable to communicate with " + airDropUrl + ".\nGet communication error: " + requestErrorMessage);
         return;
     }
 

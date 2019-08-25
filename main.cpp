@@ -100,7 +100,8 @@ bool readConfig(QApplication & app) {
     QString wallet713_path = reader.getString("wallet713_path");
     QString main_style_sheet = reader.getString("main_style_sheet");
     QString dialogs_style_sheet = reader.getString("dialogs_style_sheet");
-    QString airdropUrl = reader.getString("airdrop_url");
+    QString airdropUrlMainNet = reader.getString("airdrop_url_mainnet");
+    QString airdropUrlTestNet = reader.getString("airdrop_url_testnet");
     QString logoutTimeoutStr = reader.getString("logoutTimeout");
     QString timeoutMultiplier = reader.getString("timeoutMultiplier");
 
@@ -119,7 +120,7 @@ bool readConfig(QApplication & app) {
     if ( timeoutMultiplierVal < 0.01 )
         timeoutMultiplierVal = 1.0;
 
-    if ( mwc_path.isEmpty() || wallet713_path.isEmpty() || main_style_sheet.isEmpty() || dialogs_style_sheet.isEmpty() || airdropUrl.isEmpty() ) {
+    if ( mwc_path.isEmpty() || wallet713_path.isEmpty() || main_style_sheet.isEmpty() || dialogs_style_sheet.isEmpty() || airdropUrlMainNet.isEmpty() || airdropUrlTestNet.isEmpty() ) {
         qDebug() << "Failed to read all expected data from config file " << config;
         return false;
     }
@@ -138,7 +139,7 @@ bool readConfig(QApplication & app) {
 #endif
     }
 
-    config::setConfigData( mwc_path, wallet713_path, main_style_sheet, dialogs_style_sheet, airdropUrl, logoutTimeout*1000L, timeoutMultiplierVal );
+    config::setConfigData( mwc_path, wallet713_path, main_style_sheet, dialogs_style_sheet, airdropUrlMainNet, airdropUrlTestNet, logoutTimeout*1000L, timeoutMultiplierVal );
     return true;
 }
 
