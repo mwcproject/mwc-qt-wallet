@@ -75,17 +75,48 @@ QString readStringFromJson(const QJsonObject & jsonObj, QString path, const QStr
 bool FileTransactionInfo::parseTransaction( QString fn ) {
     QString jsonStr = readTextFile(fn).join(' ');
 
+    qDebug() << "parseTransaction for " << fn << " Body:" << jsonStr;
+
     QJsonObject json = jsonFromString(jsonStr);
 
     bool ok1 = true, ok2 = true, ok3 = true, ok4 = true;
 
     fileName = fn;
-    transactionId = readStringFromJson( json, "id" );
-    amount  = readStringFromJson( json, "amount" ).toLongLong(&ok1);
-    fee     = readStringFromJson( json, "fee" ).toLongLong(&ok2);
-    height  = readStringFromJson( json, "height" ).toInt(&ok3);
-    lock_height = readStringFromJson( json, "lock_height" ).toInt(&ok4);
 
+    // V1
+    int version = readValueFromJson(json, "version").toInt(-1);
+    // V2
+    if (version != 1) {
+        QJsonObject version_info = readValueFromJson( json, "version_info" ).toObject();
+        version = readValueFromJson(version_info, "version").toInt(-1);
+    }
+    // V0 doesn't have any version
+    if (version<0)  // So any garbage assuming to be v0
+        version = 0;
+
+    // v0, v1 & v2
+    transactionId = readStringFromJson( json, "id" );
+
+    switch (version) {
+        case 0:
+        case 1:
+            amount  = int64_t (readValueFromJson( json, "amount" ).toDouble(-10.0) + 0.5);
+            fee     = int64_t (readValueFromJson( json, "fee" ).toDouble(-10.0) + 0.5);
+            height  = readValueFromJson( json, "height" ).toInt(-1);
+            lock_height = readValueFromJson( json, "lock_height" ).toInt(-1);
+            break;
+        case 2:
+            amount  = readStringFromJson( json, "amount" ).toLongLong(&ok1);
+            fee     = readStringFromJson( json, "fee" ).toLongLong(&ok2);
+            height  = readStringFromJson( json, "height" ).toInt(&ok3);
+            lock_height = readStringFromJson( json, "lock_height" ).toInt(&ok4);
+            break;
+        default:
+            qDebug() << "Transaction has unknown version " << version;
+            return false;
+    }
+
+    // Same for v0, v1 & v2
     QJsonArray participant_data = readValueFromJson( json, "participant_data" ).toArray();
     for (int i=0; i<participant_data.size(); i++ ) {
          QString m = readStringFromJson( participant_data[i].toObject(), "message" );
@@ -97,7 +128,7 @@ bool FileTransactionInfo::parseTransaction( QString fn ) {
 
     }
 
-    return ok1 && ok2 && ok3 && ok4 && !transactionId.isEmpty() && amount >0 && fee>0 && height>0 && lock_height>0;
+    return ok1 && ok2 && ok3 && ok4 && !transactionId.isEmpty() && amount>0 && fee>0 && height>0 && lock_height>=0;
 }
 
 
