@@ -184,6 +184,8 @@ bool TaskNodeInfo::processTask(const QVector<WEvent> & events) {
 
     QString errors;
 
+    int peerHeight = 0; // max from all peers
+
     for ( const auto evt : events ) {
         if (evt.event != WALLET_EVENTS::S_LINE)
             continue;
@@ -217,11 +219,24 @@ bool TaskNodeInfo::processTask(const QVector<WEvent> & events) {
             while (idx0>=0) {
                 connections++;
                 idx0 = ln.indexOf( "PeerInfoDisplay", idx0+1 );
+
+                int idxH1 = ln.indexOf( "height:", idx0+1 );
+                if (idxH1>0) {
+                    idxH1 += strlen("height:");
+                    int idxH2 = ln.indexOf( '}', idxH1 );
+                    if (idxH2>0) {
+                        bool ok = false;
+                        int peerH = ln.mid(idxH1, idxH2 - idxH1 ).trimmed().toInt(&ok);
+                        if (ok)
+                            peerHeight = std::max(peerHeight, peerH);
+                    }
+                }
+
             }
         }
     }
 
-    wallet713->setNodeStatus( height>=0 && difficulty>=0 && connections>=0, errors, height, difficulty, connections );
+    wallet713->setNodeStatus( height>=0 && difficulty>=0 && connections>=0, errors, height, peerHeight, difficulty, connections );
     return true;
 }
 

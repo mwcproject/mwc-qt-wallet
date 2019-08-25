@@ -179,7 +179,7 @@ void InitAccount::submit(QString word) {
         }
 
         // switch to 'show seed' window
-        context->wndManager->switchToWindowEx(mwc::PAGE_A_INIT_ACCOUNT, 
+        context->wndManager->switchToWindowEx( mwc::PAGE_A_NEW_WALLET_PASSPHRASE,
             new wnd::NewSeed( context->wndManager->getInWndParent(), this, getContext(),
                         seed ) );
         return;

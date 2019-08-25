@@ -24,6 +24,23 @@ class NodeInfo;
 
 namespace state {
 
+struct NodeStatus {
+    bool online = false;
+    QString errMsg;
+    int nodeHeight = 0;
+    int peerHeight = 0;
+    int64_t totalDifficulty = 0;
+    int connections = 0;
+
+    void setData(bool online,
+            const QString & errMsg,
+            int nodeHeight,
+            int peerHeight,
+            int64_t totalDifficulty,
+            int connections);
+};
+
+
 class NodeInfo : public QObject, public State {
 Q_OBJECT
 public:
@@ -44,10 +61,17 @@ protected:
     virtual QString getHelpDocName() override {return "node_overview.html";}
 
 private slots:
-    void onNodeStatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections );
+    void onLoginResult(bool ok);
+
+    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
+
+private:
+    virtual void timerEvent(QTimerEvent *event) override;
 
 private:
     wnd::NodeInfo * wnd = nullptr;
+    bool  justLogin = false;
+    NodeStatus lastNodeStatus;
 };
 
 }

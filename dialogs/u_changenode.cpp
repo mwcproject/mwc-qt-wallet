@@ -24,7 +24,7 @@ namespace dlg {
 static const QString MWC_NODE_URI_DEFAULT = "Provided by mwc wallet";
 static const QString MWC_NODE_SECRET_DEFAULT = "Provided by mwc wallet";
 
-static const int     MWC_NODE_DEFAULT_PORT = 13415;
+static const int     MWC_NODE_DEFAULT_PORT = 13413;
 
 
 ChangeNode::ChangeNode(QWidget * parent, const wallet::WalletConfig & _config ) :

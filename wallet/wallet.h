@@ -361,7 +361,7 @@ public:
     virtual bool setWalletConfig(const WalletConfig & config)  = 0;
 
     // Status of the node
-    // Check Signal: onNodeStatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections )
+    // Check Signal: onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections )
     virtual void getNodeStatus() = 0;
 
     // -------------- Transactions
@@ -507,7 +507,7 @@ signals:
     void onKeybaseListenerStatus(bool online);
 
     // Node info
-    void onNodeStatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections );
+    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 };
 
 }

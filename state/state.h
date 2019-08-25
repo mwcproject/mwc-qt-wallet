@@ -38,7 +38,7 @@ enum STATE {
     START_WALLET, // Start backed mwc713. Check what it want and then delegate control to the next state
     STATE_INIT, // first run. Creating the password for a wallet
     INPUT_PASSWORD, // Input password from the wallet
-    ACCOUNTS,       // Wallet accounts
+    ACCOUNTS,       // Wallet accounts.              Note!!!  Keep accounts first Action page.
     ACCOUNT_TRANSFER, // Transfer funds from account to account
     EVENTS,         // Wallet events (logs)
     HODL,           // Hodl program.

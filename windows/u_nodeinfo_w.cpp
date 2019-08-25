@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/global.h>
 #include "u_nodeinfo_w.h"
 #include "ui_u_nodeinfo_w.h"
 #include "../state/u_nodeinfo.h"
@@ -30,9 +31,8 @@ NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
     // progress is active because of node info request
     ui->progress->initLoader(true);
 
-    state->requestNodeInfo();
-
-    startTimer(20000); // Let's update node info every 20 seconds
+    // Need simulate post message. Using events for that
+    connect(this, &NodeInfo::showNodeConnectionError, this,  &NodeInfo::onShowNodeConnectionError, Qt::QueuedConnection );
 }
 
 NodeInfo::~NodeInfo() {
@@ -40,30 +40,45 @@ NodeInfo::~NodeInfo() {
     delete ui;
 }
 
-void NodeInfo::setNodeStatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections ) {
+static QString toBoldAndYellow(QString text) {
+    return "<span style=\" font-weight:900; color:#CCFF33;\">" + text + "</span>";
+}
+
+void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
     ui->progress->hide();
 
-    if (!online) {
-        ui->statusInfo->setText("Offline");
+    if (!status.online) {
+        ui->statusInfo->setText( toBoldAndYellow("Offline") );
         ui->connectionsInfo->setText("-");
         ui->heightInfo->setText("-");
         ui->difficultyInfo->setText("-");
 
-        control::MessageBox::message( this, "mwc node connection error", "Unable to retrieve mwc node status.\n" + errMsg );
+         if (lastShownErrorMessage != status.errMsg) {
+             emit showNodeConnectionError(status.errMsg);
+             lastShownErrorMessage = status.errMsg;
+        }
     }
     else {
-        ui->statusInfo->setText("Online");
-        ui->connectionsInfo->setText( util::longLong2Str(connections) );
-        ui->heightInfo->setText( util::longLong2Str(height) );
-        ui->difficultyInfo->setText( util::longLong2Str(totalDifficulty) );
+
+        if ( status.nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < status.peerHeight )
+            ui->statusInfo->setText(toBoldAndYellow("Syncing") );
+        else
+            ui->statusInfo->setText("Online");
+
+        if (status.connections <= 0)
+            ui->connectionsInfo->setText( toBoldAndYellow("Offline") );
+        else
+            ui->connectionsInfo->setText( util::longLong2Str(status.connections) );
+
+        ui->heightInfo->setText( util::longLong2Str(status.nodeHeight) );
+        ui->difficultyInfo->setText( util::longLong2Str(status.totalDifficulty) );
     }
 }
 
-void NodeInfo::timerEvent(QTimerEvent *event) {
-    Q_UNUSED(event);
-    state->requestNodeInfo();
+void NodeInfo::onShowNodeConnectionError(QString errorMessage) {
+    control::MessageBox::message(this, "mwc node connection error",
+        "Unable to retrieve mwc node status.\n" + errorMessage);
 }
-
 
 void NodeInfo::on_refreshButton_clicked() {
     if (control::MessageBox::question(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",

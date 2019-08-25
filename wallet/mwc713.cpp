@@ -1007,10 +1007,10 @@ void MWC713::setCheckResult(bool ok, QString errors) {
     emit onCheckResult(ok, errors );
 }
 
-void MWC713::setNodeStatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections ) {
-    logger::logEmit( "MWC713", "onNodeSatatus", "online="+QString::number(online) + " height="+QString::number(height) +
+void MWC713::setNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
+    logger::logEmit( "MWC713", "onNodeSatatus", "online="+QString::number(online) + " NodeHeight="+QString::number(nodeHeight) + " PeerHeight="+QString::number(peerHeight) +
                           " totalDifficulty=" + QString::number(totalDifficulty) + " connections=" + QString::number(connections) );
-    emit onNodeStatus( online, errMsg, height, totalDifficulty, connections );
+    emit onNodeStatus( online, errMsg, nodeHeight, peerHeight, totalDifficulty, connections );
 }
 
 /////////////////////////////////////////////////////////////////////////////////

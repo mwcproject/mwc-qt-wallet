@@ -43,6 +43,9 @@ const QString MWC713_DEFAULT_CONFIG = ":/resource/wallet713_def.toml";
 
 const int64_t AIRDROP_TRANS_KEEP_TIME_MS = 1000L*3600L*24L*15; // 15 days should be enough
 
+// Limit for the node height to consider it out of sync. 1 blocks is 1 minute.
+const int NODE_HEIGHT_DIFF_LIMIT = 5;
+
 //////////////////////////////
 // Page Names
 

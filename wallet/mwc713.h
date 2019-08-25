@@ -319,7 +319,7 @@ public:
 
     void setCheckResult(bool ok, QString errors);
 
-    void setNodeStatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections );
+    void setNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 private:
 
 

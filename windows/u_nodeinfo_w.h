@@ -22,6 +22,7 @@ class NodeInfo;
 }
 
 namespace state {
+struct NodeStatus;
 class NodeInfo;
 }
 
@@ -35,7 +36,7 @@ public:
 
     ~NodeInfo();
 
-    void setNodeStatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections );
+    void setNodeStatus( const state::NodeStatus & status );
 
 private slots:
 
@@ -43,12 +44,18 @@ private slots:
 
     void on_chnageNodeButton_clicked();
 
+    void onShowNodeConnectionError(QString errorMessage);
+
 private:
-    virtual void timerEvent(QTimerEvent *event) override;
+signals:
+    void showNodeConnectionError(QString errorMessage);
 
 private:
     Ui::NodeInfo *ui;
     state::NodeInfo * state;
+
+    // Cache for latest error. We don't want spam user with messages about the node connection
+    QString lastShownErrorMessage;
 };
 
 }
