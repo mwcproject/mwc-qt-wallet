@@ -75,7 +75,7 @@ void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
             ui->connectionsInfo->setText( util::longLong2Str(status.connections) );
 
         ui->heightInfo->setText( util::longLong2Str(status.nodeHeight) );
-        ui->difficultyInfo->setText( util::longLong2Str(status.totalDifficulty) );
+        ui->difficultyInfo->setText( util::longLong2ShortStr(status.totalDifficulty, 9) );
     }
 }
 

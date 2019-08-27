@@ -38,6 +38,7 @@
 #include <QThread>
 #include <control/messagebox.h>
 #include "util/TestSystemSemaphoreThread.h"
+#include "tests/testStringUtils.h"
 
 // Very first run - init everything
 bool deployFilesFromResources() {
@@ -149,6 +150,13 @@ bool readConfig(QApplication & app) {
 
 int main(int argc, char *argv[])
 {
+
+#ifdef QT_DEBUG
+    // tests are quick, let's run them in debug
+    test::testLongLong2ShortStr();
+#endif
+
+
     QApplication app(argc, argv);
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);

@@ -289,6 +289,63 @@ QString longLong2Str(int64_t n) {
     return res;
 }
 
+// Formal long number to string with length Limit. Example 1123123123, 9 => 1123.12 M
+QString longLong2ShortStr(int64_t n, int lengthLimit) {
+    QString numberStr = longLong2Str(n);
+
+    if (numberStr.length()<=lengthLimit)
+        return numberStr;
+
+    // Need to shorten the string
+    // We can do
+    // M - millions, 6+2 digits
+    // B - billion,  9+3 Digits
+    // T - trillion, 12+4 Digits
+    // Q - quadrillions, 15+5  Digits
+
+    // Letter will take 2 digits
+    int scale = numberStr.length() - lengthLimit + 2;
+    QString decimals;
+    QString letter;
+    QString number;
+    if (scale <= 6+2) {
+        letter = "M";
+        scale = 6+2;
+    }
+    else if (scale <= 9+3) {
+        letter = "B";
+        scale = 9+3;
+    }
+    else if (scale <= 12+4) {
+        letter = "T";
+        scale = 12+4;
+    }
+    else {
+        letter = "Q";
+        scale = 15+5;
+    }
+
+    number = numberStr.left( numberStr.size() - scale );
+    decimals = numberStr.right( scale ).remove(',');
+    if (decimals.length()>3)
+        decimals = decimals.left(3); // we really don't want print many decimals. It doesn't look good
+
+    if (number.length()+2 <= lengthLimit-2 ) {
+        number += "." + decimals;
+        number = number.left(lengthLimit-2);
+
+        // Clean up .00
+        while ( number.size()>0 && number[number.size()-1] == '0' )
+            number = number.left(number.size()-1);
+
+        if ( number.size()>0 && number[number.size()-1] == '.' )
+            number = number.left(number.size()-1);
+    }
+
+    return number + " " + letter;
+}
+
+
 
 }
 

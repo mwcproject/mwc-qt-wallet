@@ -69,6 +69,10 @@ QString toMwc713input(QString str, bool noSpecialCharacters = true);
 // Formal long number to string. Example   78,765
 QString longLong2Str(int64_t n);
 
+// Formal long number to string with length Limit. Example 1123123123, 9 => 1123.12 M
+QString longLong2ShortStr(int64_t n, int length);
+
+
 }
 
 #endif // STRINGUTILS_H
