@@ -809,6 +809,7 @@ void MWC713::updateAccountProgress(int accountIdx, int totalAccounts) {
 
 void MWC713::updateAccountFinalize(QString prevCurrentAccount) {
     accountInfo = collectedAccountInfo;
+    collectedAccountInfo.clear();
     logger::logEmit( "MWC713", "updateAccountFinalize","");
     emit onWalletBalanceUpdated();
 

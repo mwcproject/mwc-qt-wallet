@@ -130,7 +130,7 @@ void SendOnline::on_sendButton_clicked()
 
     // Ask for confirmation
     if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::question(this,"Confirn Send request",
-                                  "You are sending " + util::nano2one(amount) + " mwc to address " + address, "Decline", "Confirm", false, true ) )
+                                  "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " mwc to address " + address, "Decline", "Confirm", false, true ) )
         return;
 
     ui->progress->show();
