@@ -124,7 +124,8 @@ void StateMachine::executeFrom( STATE nextState ) {
         break;
     }
 
-    if ( currentState >= STATE::ACCOUNTS )
+    // Resync is blocking logout. We need to respect that.
+    if ( currentState >= STATE::ACCOUNTS && currentState!=STATE::RESYNC )
         resetLogoutLimit();
 
     if (currentState == STATE::NONE) {

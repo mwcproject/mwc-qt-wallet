@@ -34,6 +34,7 @@ public:
     virtual void destroyProgressWnd(wnd::ProgressWnd * w) override { if (w==wnd) wnd = nullptr;}
 protected:
     virtual NextStateRespond execute() override;
+    virtual void exitingState() override;
 
 private slots:
     void onRecoverProgress( int progress, int maxVal );

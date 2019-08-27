@@ -58,11 +58,19 @@ NextStateRespond Resync::execute() {
     respondZeroLevel = 0;
     progressBase = 0;
 
+    // We can't really be blocked form resync. Result will be looping with locking screen
+    context->stateMachine->blockLogout();
+
     context->wallet->check( prevListeningStatus.first || prevListeningStatus.second );
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 
 }
+
+void Resync::exitingState() {
+    context->stateMachine->unblockLogout();
+}
+
 
 void Resync::onRecoverProgress( int progress, int maxVal ) {
     if (wnd) {
