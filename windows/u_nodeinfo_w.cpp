@@ -70,7 +70,7 @@ void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
             ui->statusInfo->setText("Online");
 
         if (status.connections <= 0)
-            ui->connectionsInfo->setText( toBoldAndYellow("Offline") );
+            ui->connectionsInfo->setText( toBoldAndYellow("None") ); // Two offline is confusing and doesn't look good. Let's keep zero and highlight it.
         else
             ui->connectionsInfo->setText( util::longLong2Str(status.connections) );
 
