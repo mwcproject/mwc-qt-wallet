@@ -47,21 +47,18 @@ public:
 
 
 private slots:
-    void on_refreshButton_clicked();
-
-    void on_validateProofButton_clicked();
-
-    void on_generateProofButton_clicked();
-
     void on_transactionTable_itemSelectionChanged();
+    void on_transactionTable_cellDoubleClicked(int row, int column);
 
     void on_accountComboBox_activated(int index);
 
+    void on_refreshButton_clicked();
+    void on_validateProofButton_clicked();
+    void on_generateProofButton_clicked();
     void on_deleteButton_clicked();
-
     void on_prevBtn_clicked();
-
     void on_nextBtn_clicked();
+
 
 private:
     // return null if nothing was selected

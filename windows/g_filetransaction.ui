@@ -99,7 +99,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Start/Stop listening for messages at Keybase</string>
+         <string/>
         </property>
         <property name="text">
          <string>Finalize</string>
@@ -271,7 +271,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Start/Stop listening for messages at Keybase</string>
+         <string/>
         </property>
         <property name="text">
          <string>Cancel</string>
@@ -463,14 +463,14 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
@@ -478,9 +478,9 @@ p, li { white-space: pre-wrap; }
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
+   <header>control/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources>

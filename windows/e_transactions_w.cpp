@@ -21,6 +21,7 @@
 #include "../state/timeoutlock.h"
 #include <QDebug>
 #include "../dialogs/showproofdlg.h"
+#include "../dialogs/showtransactiondlg.h"
 
 namespace wnd {
 
@@ -331,6 +332,19 @@ void Transactions::on_transactionTable_itemSelectionChanged()
     updateButtons();
 }
 
+void Transactions::on_transactionTable_cellDoubleClicked(int row, int column)
+{
+    state::TimeoutLockObject to( state );
+    wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
+
+    if (selected==nullptr)
+        return;
+
+    dlg::ShowTransactionDlg showTransDlg(this, *selected);
+    showTransDlg.exec();
+}
+
+
 void Transactions::on_accountComboBox_activated(int index)
 {
     if (index>=0 && index<accountInfo.size()) {
@@ -396,4 +410,5 @@ wallet::AccountInfo Transactions::getSelectedAccount() const {
 }
 
 }
+
 

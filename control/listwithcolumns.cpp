@@ -56,25 +56,6 @@ void ListWithColumns::setListLook() {
 
     horizontalHeader()->setFixedHeight( ROW_HEIGHT );
 
-    // Setup some colors
-    /*  System color
-    bkColor1 = QApplication::palette().color(QPalette::Base); // Normally it is white
-    bkColor2 = bkColor1;
-    qreal r,g,b;
-    bkColor2.getRgbF(&r,&g,&b);
-    const qreal d = 0.05;
-    if (r+g+b < 1.5)
-        bkColor2.setRgbF( std::min(1.0,r+d), std::min(1.0,g+d), std::min(1.0,b+d) );
-    else
-        bkColor2.setRgbF( std::max(0.0,r-d), std::max(0.0,g-d), std::max(0.0,b-d) );
-*/
-
-    // MWC palette
-//    bkColor1 = QColor(255,255,255,0);
-//    bkColor2 = QColor(255,255,255,20);
-//    selectedLow = QColor(255,0xED,0,90); // Yellow color
-//    selectedHi = QColor(255,0xED,0,200);
-
 }
 
 // static
@@ -137,7 +118,14 @@ void ListWithColumns::appendRow( const QVector<QString> & rowData, double select
     int sz = rowData.size();
     for ( int i=0; i<sz; i++ ) {
         auto * itm = new QTableWidgetItem( rowData[i] );
-        itm->setBackground( QBrush(clr) );
+
+        QColor c2set = clr;
+        /*if (i%2==1)
+        {
+            c2set = bkColor2;
+        }*/
+
+        itm->setBackground( QBrush(c2set) );
         itm->setTextAlignment( textAlignment );
         setItem(rowIdx , i, itm );
 
