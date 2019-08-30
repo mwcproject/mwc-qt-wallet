@@ -48,12 +48,12 @@ QString InputDialog::getText(QWidget *parent, QString title, QString message, QS
 }
 
 void InputDialog::on_cancelBtn_clicked() {
-    text = ui->edit->text();
+    text = ui->edit->text().trimmed();
     reject();
 }
 
 void InputDialog::on_okBtn_clicked() {
-    text = ui->edit->text();
+    text = ui->edit->text().trimmed();
     accept();
 }
 

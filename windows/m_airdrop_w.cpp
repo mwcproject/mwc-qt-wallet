@@ -102,7 +102,7 @@ void Airdrop::on_claimAirdropBtn_clicked()
 {
     state::TimeoutLockObject to( state );
 
-    QString address = ui->btcAddressEdit->text().trimmed();
+    QString address = ui->btcAddressEdit->text().trimmed().trimmed();
 
     if (address.length()==0) {
         control::MessageBox::message(this, "Error", "Please input your BTC address that you registered at airdrop");

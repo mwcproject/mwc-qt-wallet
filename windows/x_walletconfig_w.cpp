@@ -69,18 +69,18 @@ void WalletConfig::setValues(const QString & mwc713directory,
 
 void WalletConfig::updateButtons() {
     bool sameWithCurrent =
-        ui->mwc713directoryEdit->text() == currentWalletConfig.getDataPath() &&
-        keybasePathInputStr2Config( ui->keybasePathEdit->text() ) == currentWalletConfig.keyBasePath &&
-        mwcDomainInputStr2Config( ui->mwcmqHost->text() ) == currentWalletConfig.mwcmqDomain &&
-        ui->confirmationNumberEdit->text() == QString::number(sendParams.inputConfirmationNumber) &&
-        ui->changeOutputsEdit->text() == QString::number(sendParams.changeOutputs);
+        ui->mwc713directoryEdit->text().trimmed() == currentWalletConfig.getDataPath() &&
+        keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == currentWalletConfig.keyBasePath &&
+        mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == currentWalletConfig.mwcmqDomain &&
+        ui->confirmationNumberEdit->text().trimmed() == QString::number(sendParams.inputConfirmationNumber) &&
+        ui->changeOutputsEdit->text().trimmed() == QString::number(sendParams.changeOutputs);
 
     bool sameWithDefault =
-        ui->mwc713directoryEdit->text() == defaultWalletConfig.getDataPath() &&
-        keybasePathInputStr2Config( ui->keybasePathEdit->text() ) == defaultWalletConfig.keyBasePath &&
-        mwcDomainInputStr2Config( ui->mwcmqHost->text() ) == defaultWalletConfig.mwcmqDomain &&
-        ui->confirmationNumberEdit->text() == QString::number(defaultSendParams.inputConfirmationNumber) &&
-        ui->changeOutputsEdit->text() == QString::number(defaultSendParams.changeOutputs);
+        ui->mwc713directoryEdit->text().trimmed() == defaultWalletConfig.getDataPath() &&
+        keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == defaultWalletConfig.keyBasePath &&
+        mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == defaultWalletConfig.mwcmqDomain &&
+        ui->confirmationNumberEdit->text().trimmed() == QString::number(defaultSendParams.inputConfirmationNumber) &&
+        ui->changeOutputsEdit->text().trimmed() == QString::number(defaultSendParams.changeOutputs);
 
     ui->restoreDefault->setEnabled( !sameWithDefault );
     ui->applyButton->setEnabled( !sameWithCurrent );
@@ -123,7 +123,7 @@ bool WalletConfig::readInputValue( const wallet::WalletConfig & prevWalletConfig
     state::TimeoutLockObject to( state );
 
     // mwc713 directory
-    QString walletDir = ui->mwc713directoryEdit->text();
+    QString walletDir = ui->mwc713directoryEdit->text().trimmed();
     if (walletDir.isEmpty()) {
         control::MessageBox::message(this, "Input", "Please specify non empty wallet folder name");
         ui->mwc713directoryEdit->setFocus();
@@ -138,7 +138,7 @@ bool WalletConfig::readInputValue( const wallet::WalletConfig & prevWalletConfig
     }
 
     // keybase path
-    QString keybasePath = keybasePathInputStr2Config( ui->keybasePathEdit->text() );
+    QString keybasePath = keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() );
     res = util::validateMwc713Str(keybasePath);
     if (!res.first) {
         control::MessageBox::message( this, "Input", res.second );
@@ -146,7 +146,7 @@ bool WalletConfig::readInputValue( const wallet::WalletConfig & prevWalletConfig
         return false;
     }
 
-    QString mwcmqHost = mwcDomainInputStr2Config(ui->mwcmqHost->text());
+    QString mwcmqHost = mwcDomainInputStr2Config(ui->mwcmqHost->text().trimmed());
     if (mwcmqHost!=MWCMW_DOMAIN_DEFAULT_HOST) {
         // Checking the host
 
@@ -161,14 +161,14 @@ bool WalletConfig::readInputValue( const wallet::WalletConfig & prevWalletConfig
     }
 
     bool ok = false;
-    int confirmations = ui->confirmationNumberEdit->text().toInt(&ok);
+    int confirmations = ui->confirmationNumberEdit->text().trimmed().toInt(&ok);
     if (!ok || confirmations<=0 || confirmations>10) {
         control::MessageBox::message( this, "Input", "Please input the number of confirmations in the range from 1 to 10" );
         ui->confirmationNumberEdit->setFocus();
         return false;
     }
 
-    int changeOutputs = ui->changeOutputsEdit->text().toInt(&ok);
+    int changeOutputs = ui->changeOutputsEdit->text().trimmed().toInt(&ok);
     if (!ok || changeOutputs<=0 || confirmations>=100) {
         control::MessageBox::message( this, "Input", "Please input the change output number in the range from 1 to 100" );
         ui->changeOutputsEdit->setFocus();
