@@ -85,7 +85,7 @@ void InputPassword::submitPassword(const QString & password) {
     }
 
     // Check if we need to logout first. It is very valid case if we in lock mode
-    if ( !inLockMode ) {
+    if ( inLockMode ) {
         context->wallet->logout(true);
         context->wallet->start(false);
         inLockMode = false;

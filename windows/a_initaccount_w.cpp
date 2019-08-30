@@ -67,8 +67,8 @@ void InitAccount::on_submitButton_clicked()
 {
     state::TimeoutLockObject to(state);
 
-    QString pswd1 = ui->password1Edit->text().trimmed();
-    QString pswd2 = ui->password2Edit->text().trimmed();
+    QString pswd1 = ui->password1Edit->text();
+    QString pswd2 = ui->password2Edit->text();
     util::PasswordAnalyser pa(pswd1);
 
     QPair <bool, QString> valRes = util::validateMwc713Str(pswd1, true);

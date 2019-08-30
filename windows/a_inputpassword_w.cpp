@@ -66,7 +66,7 @@ InputPassword::~InputPassword()
 void InputPassword::on_submitButton_clicked() {
     state::TimeoutLockObject to(state);
 
-    QString pswd = ui->passwordEdit->text().trimmed();
+    QString pswd = ui->passwordEdit->text();
 
     QPair <bool, QString> valRes = util::validateMwc713Str(pswd, true);
     if (!valRes.first) {

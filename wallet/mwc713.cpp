@@ -143,6 +143,8 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
 
 // normal start. will require the password
 void MWC713::start(bool loginWithLastKnownPassword)  {
+    qDebug() << "MWC713::start loginWithLastKnownPassword=" << loginWithLastKnownPassword;
+
     startedMode = STARTED_MODE::NORMAL;
 
     // Start the binary
@@ -305,6 +307,8 @@ void MWC713::start2receiveSlate( QString receiveAccount, QString identifier, QSt
 }
 
 void MWC713::processStop(bool exitNicely) {
+    qDebug() << "MWC713::processStop exitNicely=" << exitNicely;
+
     mwc713disconnect();
 
     // reset mwc713 interna; state
@@ -331,12 +335,14 @@ void MWC713::processStop(bool exitNicely) {
 
     if (mwc713process) {
         if (exitNicely) {
+            qDebug() << "start exiting...";
             executeMwc713command("exit", "");
 
             if (!util::processWaitForFinished( mwc713process, 10000, "mwc713")) {
                 mwc713process->terminate();
                 util::processWaitForFinished( mwc713process, 10000, "mwc713");
             }
+            qDebug() << "mwc713 is exited";
         }
         else {
             // init state have to be killed. Otherwise it will create a
@@ -364,6 +370,7 @@ void MWC713::processStop(bool exitNicely) {
 
 // Check signal: onLoginResult(bool ok)
 void MWC713::loginWithPassword(QString password)  {
+    qDebug() << "MWC713::loginWithPassword call";
     walletPassword = password;
     eventCollector->addTask( new TaskUnlock(this, password), TaskUnlock::TIMEOUT );
 }
@@ -371,6 +378,8 @@ void MWC713::loginWithPassword(QString password)  {
 // Exit from the wallet. Expected that state machine will switch to Init state
 // syncCall - stop NOW. Caller suppose to understand what he is doing
 void MWC713::logout(bool syncCall)  {
+    qDebug() << "MWC713::logout syncCall=" << syncCall;
+
     if (syncCall)
         processStop(true);
     else 
