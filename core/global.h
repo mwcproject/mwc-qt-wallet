@@ -16,6 +16,7 @@
 #define GLOBALMWC_H
 
 #include <QObject>
+#include <QVector>
 
 class QApplication;
 class QMainWindow;
@@ -34,6 +35,9 @@ const QString DATETIME_TEMPLATE_MWC713 = "yyyy-MM-dd hh:mm:ss";
 const QString DATETIME_TEMPLATE_THIS = "hh:mm:ss dd-MM-yyyy";
 
 const QString DEL_ACCONT_PREFIX = "del_";
+const QString HODL_ACCONT_PREFIX = "hodl_"; // hodl not in use yet, just reserving
+
+const QVector<QString> BANNED_ACCOUT_PREFIXES = {DEL_ACCONT_PREFIX, HODL_ACCONT_PREFIX};
 
 #ifdef Q_OS_MACOS
 const QString MWC713_DEFAULT_CONFIG = ":/resource/wallet713_mac.toml";

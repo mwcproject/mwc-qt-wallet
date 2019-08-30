@@ -135,6 +135,13 @@ void Accounts::on_addButton_clicked()
     if (!ok || accountName.isEmpty())
         return;
 
+    for ( auto & pref : mwc::BANNED_ACCOUT_PREFIXES ) {
+        if (accountName.startsWith(pref)) {
+            control::MessageBox::message(this, "Wrong account name",  "Please specify account name without prefix '" + pref + "'" );
+            return;
+        }
+    }
+
     QPair <bool, QString> valRes = util::validateMwc713Str( accountName );
     if (!valRes.first) {
         control::MessageBox::message(this, "Account name", valRes.second );
@@ -205,9 +212,11 @@ void Accounts::renameAccount(int idx) {
     }
 
     // check for name collision
-    if ( name.startsWith( mwc::DEL_ACCONT_PREFIX ) ) {
-        control::MessageBox::message(this, "Wrong account name", "Please specify without prefix '" + mwc::DEL_ACCONT_PREFIX + "'" );
-        return;
+    for ( auto & pref : mwc::BANNED_ACCOUT_PREFIXES ) {
+        if (name.startsWith(pref)) {
+            control::MessageBox::message(this, "Wrong account name",  "Please specify account name without prefix '" + pref + "'" );
+            return;
+        }
     }
 
     // Check unoquiness
