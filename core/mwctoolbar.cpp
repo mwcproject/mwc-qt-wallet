@@ -56,6 +56,7 @@ void MwcToolbar::updateButtonsState( state::STATE state ) {
     ui->receiveToolButton->setChecked( state==state::RECEIVE_COINS);
     ui->transactionToolButton->setChecked(state==state::TRANSACTIONS);
     ui->hodlToolButton->setChecked(state==state::HODL);
+    ui->finalizeToolButton->setChecked(state==state::FINALIZE);
 }
 
 void MwcToolbar::paintEvent(QPaintEvent *)
