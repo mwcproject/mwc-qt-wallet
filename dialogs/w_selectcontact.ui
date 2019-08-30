@@ -68,6 +68,9 @@
        <height>40</height>
       </size>
      </property>
+     <property name="maxLength">
+      <number>32</number>
+     </property>
      <property name="placeholderText">
       <string>Search by name</string>
      </property>
@@ -160,14 +163,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ListWithColumns</class>
-   <extends>QTableWidget</extends>
-   <header>control/listwithcolumns.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ListWithColumns</class>
+   <extends>QTableWidget</extends>
+   <header>control/listwithcolumns.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>

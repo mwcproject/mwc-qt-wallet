@@ -37,6 +37,9 @@
      <height>40</height>
     </size>
    </property>
+   <property name="maxLength">
+    <number>4000</number>
+   </property>
   </widget>
   <widget class="control::MwcPushButtonNormal" name="mwc713directorySelect">
    <property name="geometry">

@@ -356,6 +356,9 @@
           <height>40</height>
          </size>
         </property>
+        <property name="maxLength">
+         <number>32</number>
+        </property>
         <property name="placeholderText">
          <string>Amount</string>
         </property>
@@ -558,14 +561,24 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcComboBox</class>
+   <extends>QComboBox</extends>
+   <header>control/MwcComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLine</class>
@@ -579,19 +592,9 @@
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcComboBox</class>
-   <extends>QComboBox</extends>
-   <header>control/MwcComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcCheckedFrame</class>

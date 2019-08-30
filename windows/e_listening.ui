@@ -201,6 +201,9 @@
         <property name="toolTip">
          <string>You mwc MQ address</string>
         </property>
+        <property name="maxLength">
+         <number>1024</number>
+        </property>
         <property name="readOnly">
          <bool>true</bool>
         </property>
@@ -408,14 +411,14 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLine</class>

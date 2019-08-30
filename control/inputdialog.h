@@ -28,10 +28,10 @@ class InputDialog : public MwcDialog
 {
     Q_OBJECT
 public:
-    static QString getText( QWidget *parent, QString title, QString message, QString placeholder, QString text2init, bool * ok = nullptr  );
+    static QString getText( QWidget *parent, QString title, QString message, QString placeholder, QString text2init, int inputMaxLength, bool * ok = nullptr  );
 
 private:
-    explicit InputDialog( QWidget *parent, QString title, QString message, QString placeholder, QString text2init);
+    explicit InputDialog( QWidget *parent, QString title, QString message, QString placeholder, QString text2init, int inputMaxLength );
     virtual ~InputDialog() override;
 
     QString getText() const {return text;}

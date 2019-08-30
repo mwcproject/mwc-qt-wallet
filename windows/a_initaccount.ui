@@ -181,6 +181,9 @@
         <property name="text">
          <string notr="true"/>
         </property>
+        <property name="maxLength">
+         <number>64</number>
+        </property>
         <property name="frame">
          <bool>true</bool>
         </property>
@@ -211,6 +214,9 @@
           <width>30000</width>
           <height>40</height>
          </size>
+        </property>
+        <property name="maxLength">
+         <number>64</number>
         </property>
         <property name="echoMode">
          <enum>QLineEdit::Password</enum>

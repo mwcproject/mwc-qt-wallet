@@ -285,6 +285,8 @@ void WalletConfig::on_applyButton_clicked()
                 return;
             }
         }
+
+        updateButtons();
     }
 }
 

@@ -199,6 +199,9 @@
           <height>40</height>
          </size>
         </property>
+        <property name="maxLength">
+         <number>1024</number>
+        </property>
         <property name="placeholderText">
          <string>Send to</string>
         </property>
@@ -460,6 +463,11 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control/MwcLineEdit.h</header>
@@ -468,11 +476,6 @@
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelLarge</class>

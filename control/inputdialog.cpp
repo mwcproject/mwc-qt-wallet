@@ -18,7 +18,7 @@
 
 namespace control {
 
-InputDialog::InputDialog(QWidget *parent, QString title, QString message, QString placeholder, QString text) :
+InputDialog::InputDialog(QWidget *parent, QString title, QString message, QString placeholder, QString text, int inputMaxLength) :
         MwcDialog(parent),
         ui(new Ui::InputDialog)
 {
@@ -29,6 +29,8 @@ InputDialog::InputDialog(QWidget *parent, QString title, QString message, QStrin
     if (!placeholder.isEmpty())
         ui->edit->setPlaceholderText(placeholder);
 
+    ui->edit->setMaxLength(inputMaxLength);
+
     if (!text.isEmpty())
         ui->edit->setText(text);
 }
@@ -37,8 +39,9 @@ InputDialog::~InputDialog() {
     delete ui;
 }
 
-QString InputDialog::getText(QWidget *parent, QString title, QString message, QString placeholder, QString text2init, bool * ok ) {
-    InputDialog *initDlg = new InputDialog(parent, title, message, placeholder, text2init);
+// static
+QString InputDialog::getText(QWidget *parent, QString title, QString message, QString placeholder, QString text2init, int inputMaxLength, bool * ok ) {
+    InputDialog *initDlg = new InputDialog(parent, title, message, placeholder, text2init, inputMaxLength);
     bool okExit = (initDlg->exec() == QDialog::Accepted);
     QString text = initDlg->getText();
     delete initDlg;

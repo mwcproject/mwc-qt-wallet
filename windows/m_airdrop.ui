@@ -89,6 +89,9 @@
             <height>40</height>
            </size>
           </property>
+          <property name="maxLength">
+           <number>128</number>
+          </property>
           <property name="placeholderText">
            <string>BTC address to claim</string>
           </property>
@@ -107,6 +110,9 @@
             <width>16777215</width>
             <height>40</height>
            </size>
+          </property>
+          <property name="maxLength">
+           <number>128</number>
           </property>
           <property name="echoMode">
            <enum>QLineEdit::Password</enum>
@@ -455,9 +461,9 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
@@ -465,14 +471,14 @@
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>ListWithColumns</class>
    <extends>QTableWidget</extends>
    <header>control/listwithcolumns.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

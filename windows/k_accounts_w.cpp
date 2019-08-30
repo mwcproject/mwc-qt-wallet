@@ -131,7 +131,7 @@ void Accounts::on_addButton_clicked()
     bool ok = false;
     QString accountName = control::InputDialog::getText(this, tr("Add account"),
                                                 tr("Please specify the name of a new account in your wallet"), "account name",
-                                                "", &ok);
+                                                "", 32,  &ok);
     if (!ok || accountName.isEmpty())
         return;
 
@@ -201,7 +201,7 @@ void Accounts::renameAccount(int idx) {
     bool ok = false;
     QString name = control::InputDialog::getText(this, "Rename mwc account",
                                         QString("Input a new name for your account '") + accounts[idx].accountName + "'", "",
-                                        accounts[idx].accountName, &ok);
+                                        accounts[idx].accountName, 32, &ok);
     if (!ok || name.isEmpty() || name==accounts[idx].accountName )
         return;
 

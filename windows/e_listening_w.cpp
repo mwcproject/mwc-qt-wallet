@@ -91,7 +91,7 @@ void Listening::on_mwcMqToIndex_clicked()
     bool ok = false;
     QString index = control::InputDialog::getText(this, tr("Select MWX box address by index"),
                                             tr("Please specify index of mwc mq address"), "integer from 0 to 65000",
-                                            "", &ok);
+                                            "", 5, &ok);
     if (!ok || index.isEmpty())
         return;
 

@@ -86,6 +86,9 @@
          <height>40</height>
         </size>
        </property>
+       <property name="maxLength">
+        <number>128</number>
+       </property>
       </widget>
      </item>
     </layout>
@@ -127,6 +130,9 @@
          <width>20000</width>
          <height>40</height>
         </size>
+       </property>
+       <property name="maxLength">
+        <number>128</number>
        </property>
       </widget>
      </item>
@@ -217,11 +223,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control/MwcPushButton.h</header>
@@ -233,6 +234,11 @@
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>

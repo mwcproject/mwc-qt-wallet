@@ -59,6 +59,9 @@
        <height>40</height>
       </size>
      </property>
+     <property name="maxLength">
+      <number>32</number>
+     </property>
      <property name="placeholderText">
       <string>name</string>
      </property>
@@ -71,6 +74,9 @@
        <width>0</width>
        <height>40</height>
       </size>
+     </property>
+     <property name="maxLength">
+      <number>256</number>
      </property>
      <property name="placeholderText">
       <string>address</string>
