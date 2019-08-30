@@ -126,7 +126,7 @@ QWidget * MainWindow::getMainWindow() {
 
 void MainWindow::updateActionStates(state::STATE actionState) {
 
-    bool isLeftBarVisible = (actionState >= state::STATE::ACCOUNTS);
+    bool isLeftBarVisible = (actionState >= state::STATE::ACCOUNTS && actionState != state::STATE::RESYNC );
 
     updateLeftBar( isLeftBarVisible );
 
