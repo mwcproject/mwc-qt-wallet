@@ -104,6 +104,7 @@ void Mwc713EventManager::connectWith(tries::Mwc713InputParser * inputParser) {
 // Add task (single wallet action) to perform.
 // This tale ownership of object
 // Note:  if timeout <= 0, task will be executed immediately
+// Return: true if task was added.  False - was ignored
 bool Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout, bool cancelIfExist ) {
 
     QMutexLocker l( &taskQMutex );

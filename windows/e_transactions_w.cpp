@@ -25,7 +25,7 @@
 namespace wnd {
 
 Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
-    core::NavWnd(parent, _state->getContext(), true, true ),
+    core::NavWnd(parent, _state->getContext()),
     ui(new Ui::Transactions),
     state(_state)
 {

@@ -9,6 +9,8 @@ FileSlateInfoDlg::FileSlateInfoDlg(QWidget *parent, const QString & title, const
     control::MwcDialog(parent),
     ui(new Ui::FileSlateInfoDlg)
 {
+    Q_ASSERT(false); // Depricated, using page now
+
     ui->setupUi(this);
 
     ui->titleLabel->setText(title);

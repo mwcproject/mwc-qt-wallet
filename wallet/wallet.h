@@ -423,6 +423,10 @@ public:
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
     virtual void getTransactions(QString account, int offset, int number)  = 0;
 
+    // Read all transactions for all accounts. Might tale time...
+    // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
+    virtual void getAllTransactions()  = 0;
+
 
     // ----------- HODL
     // https://github.com/mimblewimble/grin/pull/2374
@@ -497,6 +501,8 @@ signals:
     void onTransactionCount(QString account, int number);
     void onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
     void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
+
+    void onAllTransactions( QVector<WalletTransaction> Transactions);
 
     void onOutputCount(QString account, int number);
     void onOutputs( QString account, int64_t height, QVector<WalletOutput> Transactions);

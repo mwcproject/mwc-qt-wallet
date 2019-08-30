@@ -25,10 +25,10 @@ const int TOP_RIGHT_BTNS_CY = 15;
 
 const int NAV_MENU_WIDTH = 190;
 
-NavWnd::NavWnd(QWidget *parent,  state::StateContext * context, bool createNavigationButtons, bool showFinalizeButton) : QWidget(parent)
+NavWnd::NavWnd(QWidget *parent,  state::StateContext * context, bool createNavigationButtons) : QWidget(parent)
 {
     if (createNavigationButtons) {
-        topRightButtonWnd = new NavBar(this, context, showFinalizeButton);
+        topRightButtonWnd = new NavBar(this, context);
     }
 }
 

@@ -59,7 +59,8 @@ void Receive::updateKeybaseState(bool online) {
     ui->keybaseStatusLabel->setText( online ? "Online" : "Offline" );
 }
 
-void Receive::on_pushButton_clicked() {
+void wnd::Receive::on_recieveFileButton_clicked()
+{
     state::TimeoutLockObject to( state );
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open initial transaction file"),
@@ -116,4 +117,5 @@ void Receive::updateAccountList() {
 }
 
 }
+
 

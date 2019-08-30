@@ -34,7 +34,7 @@ class NavBar : public QWidget {
 Q_OBJECT
 
 public:
-    explicit NavBar( QWidget *parent, state::StateContext * context, bool showFinalizeButton = false );
+    explicit NavBar( QWidget *parent, state::StateContext * context );
 
     ~NavBar();
 
@@ -48,8 +48,6 @@ private slots:
     void onUpdateNonShownWarnings(bool hasNonShownWarns);
 
     void onMenuDestroy();
-    void on_finalizeButton_clicked();
-
 private:
     enum BTN {NONE, NOTIFICATION, SETTINGS, ACCOUNTS};
     void checkButton(BTN b);

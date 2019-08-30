@@ -248,14 +248,17 @@ bool parseTransactionLine( QString str, const TransactionIdxLayout & tl,
     return true;
 }
 
-
-bool TaskTransactions::processTask(const QVector<WEvent> & events) {
-    // We are processing transactions outptu mostly as a raw data
-
+// local utility function that parse transactions output
+static void parseTransactionsOutput(const QVector<WEvent> & events, // in
+                                    QString & account, // out
+                                    int64_t & height,  // out
+                                    QVector<WalletTransaction> & trVector) // out
+{
+    // We are processing transactions mostly as a raw data
     int curEvt = 0;
 
-    QString account;
-    int64_t  height = -1;
+    account = "";
+    height = -1;
 
     for ( ; curEvt < events.size(); curEvt++ ) {
         if (events[curEvt].event == WALLET_EVENTS::S_TRANSACTION_LOG ) {
@@ -333,13 +336,53 @@ bool TaskTransactions::processTask(const QVector<WEvent> & events) {
         }
     }
 
-    QVector<WalletTransaction> trVector;
+    trVector.clear();
     for ( WalletTransaction & trItem : transactions )
         trVector.push_back( trItem );
+}
+
+bool TaskTransactions::processTask(const QVector<WEvent> & events) {
+
+    QString account;
+    int64_t height = -1;
+    QVector<WalletTransaction> trVector;
+
+    parseTransactionsOutput(events, // in
+                           account, height, trVector); // out
 
     wallet713->setTransactions( account, height, trVector );
     return true;
 }
+
+
+
+// Just a callback, not a real task
+bool TaskAllTransactionsStart::processTask(const QVector<WEvent> &events) {
+    Q_UNUSED(events);
+    wallet713->processAllTransactionsStart();
+    return true;
+}
+
+bool TaskAllTransactionsEnd::processTask(const QVector<WEvent> &events) {
+    Q_UNUSED(events);
+    wallet713->processAllTransactionsEnd();
+    return true;
+}
+
+bool TaskAllTransactions::processTask(const QVector<WEvent> & events) {
+    QString account;
+    int64_t height = -1;
+    QVector<WalletTransaction> trVector;
+
+    parseTransactionsOutput(events, // in
+                            account, height, trVector); // out
+
+    wallet713->processAllTransactionsAppend( trVector );
+
+    return true;
+}
+
+
 
 // ------------------------- TaskTransCancel ---------------------------
 

@@ -17,6 +17,7 @@
 
 #include "state.h"
 #include "../wallet/wallet.h"
+#include "../windows/g_filetransaction_w.h"
 
 namespace wnd {
 class Receive;
@@ -24,7 +25,7 @@ class Receive;
 
 namespace state {
 
-class Receive : public QObject, public State {
+class Receive : public QObject, public State, public wnd::FileTransactionWndHandler {
     Q_OBJECT
 public:
     Receive( StateContext * context );
@@ -40,6 +41,14 @@ public:
     void signTransaction( QString fileName );
 
     void deletedWnd(wnd::Receive * w) { if(w==wnd) wnd = nullptr;}
+public:
+    // wnd::FileTransactionWndHandler
+
+    virtual void ftBack() override;
+    virtual void deleteFileTransactionWnd(wnd::FileTransaction * wnd) override {  if (wnd==fileTransWnd) fileTransWnd=nullptr; }
+    virtual void ftContinue(QString fileName) override;
+    virtual state::StateContext * getContext() override;
+
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "receive.html";}
@@ -50,9 +59,12 @@ private slots:
     void onMwcMqListenerStatus(bool online);
     void onKeybaseListenerStatus(bool online);
     void onMwcAddressWithIndex(QString mwcAddress, int idx);
+    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
 private:
     wnd::Receive * wnd = nullptr;
+    wnd::FileTransaction * fileTransWnd = nullptr;
+    int lastNodeHeight = 0;
 };
 
 

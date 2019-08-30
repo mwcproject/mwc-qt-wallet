@@ -593,6 +593,24 @@ void MWC713::getTransactions(QString account, int offset, int number)  {
     eventCollector->addTask( new TaskTransactions(this, offset, number), TaskTransactions::TIMEOUT );
 }
 
+// Read all transactions for all accounts. Might take time...
+// Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
+// Schedule bunch of requests.
+void MWC713::getAllTransactions() {
+    // Requesting transactions for all accounts...
+
+    // By first task only checking if it is exist
+    if ( eventCollector->addTask( new TaskAllTransactionsStart(this), -1, true ) ) {
+        // I f not exist, push the rest with enforcement...
+
+        for (AccountInfo & acc : accountInfo ) {
+            eventCollector->addTask(new TaskAccountSwitch(this, acc.accountName, walletPassword, false), TaskAccountSwitch::TIMEOUT, false);
+            eventCollector->addTask(new TaskAllTransactions(this), TaskAllTransactions::TIMEOUT, false);
+        }
+        eventCollector->addTask( new TaskAllTransactionsEnd(this), -1, false );
+    }
+}
+
 // -------------- Transactions
 
 // Set account that will receive the funds
@@ -951,7 +969,9 @@ void MWC713::setReceiveFile( bool success, QStringList errors, QString inFileNam
 }
 
 void MWC713::setFinalizeFile( bool success, QStringList errors, QString fileName ) {
-    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("File finalized for "+ fileName ));
+    if (success) {
+        appendNotificationMessage(MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("File finalized for " + fileName));
+    }
 
     logger::logEmit( "MWC713", "onFinalizeFile", "success="+QString::number(success) );
     emit onFinalizeFile( success, errors, fileName);
@@ -1017,6 +1037,20 @@ void MWC713::setNodeStatus( bool online, QString errMsg, int nodeHeight, int pee
                           " totalDifficulty=" + QString::number(totalDifficulty) + " connections=" + QString::number(connections) );
     emit onNodeStatus( online, errMsg, nodeHeight, peerHeight, totalDifficulty, connections );
 }
+
+void MWC713::processAllTransactionsStart() {
+    collectedTransactions.clear();
+}
+
+void MWC713::processAllTransactionsAppend(const QVector<WalletTransaction> & trVector) {
+    collectedTransactions.append(trVector);
+}
+
+void MWC713::processAllTransactionsEnd() {
+    emit onAllTransactions(collectedTransactions);
+    collectedTransactions.clear();
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////
 //      mwc713  IOs

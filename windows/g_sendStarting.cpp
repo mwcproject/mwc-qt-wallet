@@ -48,7 +48,7 @@ enum CHECKED_FR_ID {
 };
 
 SendStarting::SendStarting(QWidget *parent, state::Send *_state) :
-        core::NavWnd(parent, _state->getContext(), true, true),
+        core::NavWnd(parent, _state->getContext() ),
         ui(new Ui::SendStarting),
         state(_state) {
     ui->setupUi(this);

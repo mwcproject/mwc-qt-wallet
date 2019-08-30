@@ -30,7 +30,7 @@ QToolButton {
     font-weight: normal;
     font-size: 13px;
 
-    padding: 5px;
+    padding: 7px;
 }
 
 QToolButton:selected {

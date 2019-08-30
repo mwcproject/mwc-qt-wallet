@@ -12,34 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NAVWND_H
-#define NAVWND_H
+#ifndef G_FINALIZE_H
+#define G_FINALIZE_H
 
-#include <QWidget>
+#include "../core/navwnd.h"
 
-namespace state {
-struct StateContext;
+namespace Ui {
+class FinalizeUpload;
 }
 
-namespace core {
+namespace state {
+class Finalize;
+}
 
-class NavBar;
-class NavMenuAccount;
-class AppContext;
+namespace wnd {
 
-// Window with navigation bar
-class NavWnd : public QWidget {
-Q_OBJECT
+class FinalizeUpload : public core::NavWnd
+{
+    Q_OBJECT
+
 public:
-    explicit NavWnd(QWidget *parent, state::StateContext * context, bool createNavigationButtons=true);
+    explicit FinalizeUpload(QWidget *parent, state::Finalize * state);
+    ~FinalizeUpload();
 
-protected:
-    void resizeEvent(QResizeEvent *event);
+private slots:
+    void on_uploadFileBtn_clicked();
 
 private:
-    NavBar * topRightButtonWnd = nullptr;
+    Ui::FinalizeUpload *ui;
+    state::Finalize * state = nullptr;
 };
 
 }
 
-#endif // NAVWND_H
+
+#endif // G_FINALIZE_H

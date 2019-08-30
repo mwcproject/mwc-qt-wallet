@@ -238,6 +238,10 @@ public:
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
     virtual void getTransactions(QString account, int offset, int number)  override;
 
+    // Read all transactions for all accounts. Might take time...
+    // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
+    virtual void getAllTransactions() override;
+
 public:
     // Feed the command to mwc713 process
     void executeMwc713command( QString cmd, QString shadowStr);
@@ -319,6 +323,11 @@ public:
     void setCheckResult(bool ok, QString errors);
 
     void setNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
+
+    //-------------
+    void processAllTransactionsStart();
+    void processAllTransactionsAppend(const QVector<WalletTransaction> & trVector);
+    void processAllTransactionsEnd();
 private:
 
 
@@ -381,6 +390,8 @@ private:
     QString walletPassword;
 
     QVector<AccountInfo> collectedAccountInfo;
+
+    QVector<WalletTransaction> collectedTransactions;
 };
 
 }

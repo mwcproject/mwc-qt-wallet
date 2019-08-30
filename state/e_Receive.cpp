@@ -23,6 +23,7 @@
 #include "../dialogs/fileslateinfodlg.h"
 #include "timeoutlock.h"
 #include "../core/global.h"
+#include "../control/messagebox.h"
 
 namespace state {
 
@@ -41,6 +42,9 @@ Receive::Receive( StateContext * context ) :
     QObject::connect(context->wallet, &wallet::Wallet::onReceiveFile,
                                    this, &Receive::respReceiveFile, Qt::QueuedConnection);
 
+    QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
+                     this, &Receive::onNodeStatus, Qt::QueuedConnection);
+
 }
 
 Receive::~Receive() {}
@@ -50,13 +54,8 @@ NextStateRespond Receive::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     if (wnd==nullptr) {
-        QPair<bool,bool> lsnStatus = context->wallet->getListeningStatus();
         context->wallet->getMwcBoxAddress();
-
-        wnd = (wnd::Receive*) context->wndManager->switchToWindowEx( mwc::PAGE_E_RECEIVE,
-                new wnd::Receive( context->wndManager->getInWndParent(), this,
-                           lsnStatus.first, lsnStatus.second,
-                           context->wallet->getLastKnownMwcBoxAddress() ) );
+        ftBack();
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
@@ -83,29 +82,41 @@ void Receive::signTransaction( QString fileName ) {
         return;
     }
 
-    TimeoutLockObject to( this );
 
-    // Ask for acceptanse...
-    dlg::FileSlateInfoDlg acceptDlg( wnd, "Receive File Transaction", flTrInfo );
-    if ( acceptDlg.exec() != QDialog::Accepted ) {
-        if (wnd) {
-            wnd->stopWaiting();
-        }
-        return;
-    }
+    wallet::WalletTransaction transaction;
+    fileTransWnd = (wnd::FileTransaction*) context->wndManager->switchToWindowEx( mwc::PAGE_G_RECEIVE_TRANS,
+                                                                                  new wnd::FileTransaction( context->wndManager->getInWndParent(), this, fileName, flTrInfo, transaction, lastNodeHeight,
+                                                                                                            "Receive File Transaction", "Generate Respond") );
+}
 
+void Receive::ftBack() {
+    QPair<bool,bool> lsnStatus = context->wallet->getListeningStatus();
+    wnd = (wnd::Receive*) context->wndManager->switchToWindowEx( mwc::PAGE_E_RECEIVE,
+                                                                 new wnd::Receive( context->wndManager->getInWndParent(), this,
+                                                                                   lsnStatus.first, lsnStatus.second,
+                                                                                   context->wallet->getLastKnownMwcBoxAddress() ) );
+}
+
+void Receive::ftContinue(QString fileName) {
+    logger::logInfo("Receive", "Receive file " + fileName);
     context->wallet->receiveFile( fileName );
 }
 
-void Receive::respReceiveFile( bool success, QStringList errors, QString inFileName ) {
-    if (wnd) {
-        QString message;
-        if (success)
-            message = "Transaction file was successfully signed. Resulting transaction located at " + inFileName + ".response";
-        else
-            message = "Unable to sign file transaction.\n" + util::formatErrorMessages(errors);
+state::StateContext * Receive::getContext() {
+    return context;
+}
 
-        wnd->onTransactionActionIsFinished( success, message );
+
+void Receive::respReceiveFile( bool success, QStringList errors, QString inFileName ) {
+    if (fileTransWnd)
+        fileTransWnd->hideProgress();
+
+    if (success) {
+        control::MessageBox::message(nullptr, "Receive File Transaction", "Transaction file was successfully signed. Resulting transaction located at " + inFileName + ".response" );
+        ftBack();
+    }
+    else {
+        control::MessageBox::message(nullptr, "Failure", "Unable to sign file transaction.\n" + util::formatErrorMessages(errors) );
     }
 }
 
@@ -141,6 +152,15 @@ QVector<wallet::AccountInfo>  Receive::getWalletBalance() {
     return context->wallet->getWalletBalance();
 }
 
+void Receive::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
+    Q_UNUSED(errMsg);
+    Q_UNUSED(peerHeight);
+    Q_UNUSED(totalDifficulty);
+    Q_UNUSED(connections);
+
+    if (online)
+        lastNodeHeight = nodeHeight;
+}
 
 
 }

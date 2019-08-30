@@ -58,6 +58,8 @@ private slots:
 
     void onWalletBalanceUpdated();
 
+    void on_finalizeToolButton_clicked();
+
 private:
     Ui::MwcToolbar *ui;
     wallet::Wallet      * wallet = nullptr;

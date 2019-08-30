@@ -27,7 +27,7 @@
 
 namespace core {
 
-NavBar::NavBar(QWidget *parent, state::StateContext * _context, bool showFinalizeButton ) :
+NavBar::NavBar(QWidget *parent, state::StateContext * _context ) :
         QWidget(parent),
         ui(new Ui::NavBar),
         prntWnd(parent),
@@ -41,9 +41,6 @@ NavBar::NavBar(QWidget *parent, state::StateContext * _context, bool showFinaliz
 
     ui->setupUi(this);
 
-    if (!showFinalizeButton)
-        ui->finalizeButton->hide();
-
     onUpdateNonShownWarnings( evtState->hasNonShownWarnings() );
 }
 
@@ -55,7 +52,6 @@ void NavBar::checkButton(BTN b) {
     ui->accountButton->setChecked(b==BTN::ACCOUNTS);
     ui->notificationButton->setChecked(b==BTN::NOTIFICATION);
     ui->settingsButton->setChecked(b==BTN::SETTINGS);
-    ui->finalizeButton->setChecked(false);
 }
 
 void NavBar::onUpdateNonShownWarnings(bool hasNonShownWarns) {
@@ -82,42 +78,6 @@ void NavBar::on_accountButton_clicked()
 
     showNavMenu( new NavMenuAccount( prntWnd, context ) );
 }
-
-void NavBar::on_finalizeButton_clicked()
-{
-    state::Finalize * finalizeState = (state::Finalize *)context->stateMachine->getState(state::STATE::FINALIZE);
-
-    // Logic is implemented into This Window
-    // It is really wrong, but also we don't want to have special state for that.
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Finalize transaction file"),
-                                                    finalizeState->getFileGenerationPath(),
-                                                    tr("MWC response transaction (*.tx.response)"));
-
-    ui->finalizeButton->setChecked(false);
-
-    if (fileName.length()==0) {
-        return;
-    }
-
-    // Update path
-    QFileInfo flInfo(fileName);
-    finalizeState->updateFileGenerationPath( flInfo.path() );
-
-    util::FileTransactionInfo  transInfo;
-
-    if ( !transInfo.parseTransaction(fileName) ) {
-        control::MessageBox::message(this, "Incorrest File", "MWC response transaction file " + fileName + " has a wrong format." );
-        return;
-    }
-
-    dlg::FileSlateInfoDlg acceptDlg( this, "Receive File Transaction", transInfo );
-    if ( acceptDlg.exec() != QDialog::Accepted ) {
-           return;
-    }
-
-    finalizeState->finalizeTransaction( fileName );
-}
-
 
 void NavBar::onMenuDestroy() {
     checkButton(BTN::NONE);

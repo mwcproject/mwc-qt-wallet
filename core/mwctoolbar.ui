@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>157</width>
-    <height>604</height>
+    <height>702</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -29,10 +29,19 @@
    <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
    <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -171,7 +180,7 @@ color: #FFFFFF;</string>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <property name="spacing">
-      <number>10</number>
+      <number>7</number>
      </property>
      <property name="leftMargin">
       <number>12</number>
@@ -184,13 +193,13 @@ color: #FFFFFF;</string>
        <property name="minimumSize">
         <size>
          <width>131</width>
-         <height>71</height>
+         <height>62</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>131</width>
-         <height>71</height>
+         <height>62</height>
         </size>
        </property>
        <property name="cursor">
@@ -213,7 +222,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>24</height>
+         <height>17</height>
         </size>
        </property>
        <property name="checkable">
@@ -232,13 +241,13 @@ color: #FFFFFF;</string>
        <property name="minimumSize">
         <size>
          <width>131</width>
-         <height>71</height>
+         <height>62</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>131</width>
-         <height>71</height>
+         <height>62</height>
         </size>
        </property>
        <property name="cursor">
@@ -260,7 +269,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>24</height>
+         <height>17</height>
         </size>
        </property>
        <property name="checkable">
@@ -279,13 +288,13 @@ color: #FFFFFF;</string>
        <property name="minimumSize">
         <size>
          <width>131</width>
-         <height>71</height>
+         <height>62</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>131</width>
-         <height>71</height>
+         <height>62</height>
         </size>
        </property>
        <property name="cursor">
@@ -307,7 +316,54 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>24</height>
+         <height>17</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
+       </property>
+       <property name="autoRaise">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="finalizeToolButton">
+       <property name="minimumSize">
+        <size>
+         <width>131</width>
+         <height>62</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>131</width>
+         <height>62</height>
+        </size>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::TabFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Finalize File Transaction</string>
+       </property>
+       <property name="text">
+        <string notr="true">Finalize</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources.qrc">
+         <normaloff>:/img/Finalize@2x.svg</normaloff>:/img/Finalize@2x.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>45</width>
+         <height>17</height>
         </size>
        </property>
        <property name="checkable">
@@ -326,13 +382,13 @@ color: #FFFFFF;</string>
        <property name="minimumSize">
         <size>
          <width>131</width>
-         <height>71</height>
+         <height>62</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>131</width>
-         <height>71</height>
+         <height>62</height>
         </size>
        </property>
        <property name="cursor">
@@ -354,7 +410,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>24</height>
+         <height>17</height>
         </size>
        </property>
        <property name="checkable">
@@ -373,13 +429,13 @@ color: #FFFFFF;</string>
        <property name="minimumSize">
         <size>
          <width>131</width>
-         <height>71</height>
+         <height>62</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>131</width>
-         <height>71</height>
+         <height>62</height>
         </size>
        </property>
        <property name="cursor">
@@ -401,7 +457,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>24</height>
+         <height>17</height>
         </size>
        </property>
        <property name="checkable">

@@ -45,10 +45,8 @@ public:
     void stopWaiting();
 
 private slots:
-    void on_pushButton_clicked();
-
     void on_accountComboBox_activated(int index);
-
+    void on_recieveFileButton_clicked();
 private:
     void updateAccountList();
 

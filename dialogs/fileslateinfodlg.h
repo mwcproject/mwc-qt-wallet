@@ -13,6 +13,8 @@ struct FileTransactionInfo;
 
 namespace dlg {
 
+// !!!!! Depricated, using page now
+////////////////////////////////////////////
 class FileSlateInfoDlg : public control::MwcDialog
 {
     Q_OBJECT

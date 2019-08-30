@@ -79,7 +79,11 @@ void MwcToolbar::on_sendToolButton_clicked()
 void MwcToolbar::on_receiveToolButton_clicked()
 {
     stateMachine->setActionWindow( state::STATE::RECEIVE_COINS );
+}
 
+void core::MwcToolbar::on_finalizeToolButton_clicked()
+{
+    stateMachine->setActionWindow( state::STATE::FINALIZE );
 }
 
 void MwcToolbar::on_transactionToolButton_clicked()
