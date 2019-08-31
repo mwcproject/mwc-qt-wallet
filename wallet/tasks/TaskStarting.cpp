@@ -55,7 +55,7 @@ bool TaskStarting::processTask(const QVector<WEvent> & events) {
         if (need2unlock.empty()) {
             wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::GENERIC,
                                                  "Wallet mwc713 has a seed without a password. Did you initialize it manually? "
-                                                 "To fix this problem you will need to reinitialize your seed with a password.");
+                                                 "To fix this problem you will need to reinitialize your wallet with a passphrase and a password.");
             return true;
         }
 

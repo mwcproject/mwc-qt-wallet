@@ -84,7 +84,7 @@
           <bool>false</bool>
          </property>
          <property name="placeholderText">
-          <string>Input seed</string>
+          <string>Input mnemonic passphrase</string>
          </property>
         </widget>
        </item>

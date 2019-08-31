@@ -38,7 +38,7 @@ NewSeed::NewSeed( QWidget *parent, state::SubmitCaller * _state, state::StateCon
         utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()) );
 
     if (!seed.isEmpty()) {
-        updateSeedData("Seed:",seed); // Seed allways comes from ctor. Mean we are created a new account with a seed.
+        updateSeedData("Mnemonic passphrase:",seed); // Seed allways comes from ctor. Mean we are created a new account with a seed.
     }
 
 }
@@ -54,12 +54,10 @@ void NewSeed::showSeedData(const QVector<QString> & seed) {
     state::TimeoutLockObject to( context->stateMachine );
 
     if (seed.size()<2) {
-        control::MessageBox::message( this, "Getting Seed Failure", "Unable to retrieve a seed from mwc713." + (seed.size()>0 ? seed[0] : "") );
+        control::MessageBox::message( this, "Getting Passphrase Failure", "Unable to retrieve a passphrase from mwc713." + (seed.size()>0 ? seed[0] : "") );
         return;
     }
-
-    // By update allways come mnemonic. It is mean that we read the seed from the wallet. That is why it has different name.
-    updateSeedData("Mnemonic:", seed);
+    updateSeedData("Mnemonic passphrase:", seed);
 }
 
 void NewSeed::updateSeedData( const QString & name, const QVector<QString> & seed) {

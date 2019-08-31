@@ -131,9 +131,6 @@
          <property name="acceptRichText">
           <bool>false</bool>
          </property>
-         <property name="placeholderText">
-          <string>Input seed</string>
-         </property>
         </widget>
        </item>
        <item>

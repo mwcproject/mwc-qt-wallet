@@ -73,7 +73,7 @@ p, li { white-space: pre-wrap; }
         <bool>true</bool>
        </property>
        <property name="placeholderText">
-        <string>Waiting for the seed from mwc713...</string>
+        <string>Waiting for the mnemonic passphrase from mwc713...</string>
        </property>
       </widget>
      </item>
@@ -129,11 +129,11 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot;line-height:138%;&quot;&gt;
 &lt;p&gt;
 Please save these words on paper (order is important).&lt;br/&gt;
-This seed will allow you to recover your wallet in case of computer failure.&lt;br/&gt; 
+This passphrase will allow you to recover your wallet in case of computer failure.&lt;br/&gt;
 &lt;br /&gt;
 WARNING:&lt;br/&gt; 
-- Never disclosure your seed.&lt;br/&gt; 
-- Never type it on a website.&lt;br/&gt; 
+- Never disclosure your passphrase.&lt;br/&gt;
+ - Never type it on a website.&lt;br/&gt; 
 - Do not store it electronically.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="wordWrap">

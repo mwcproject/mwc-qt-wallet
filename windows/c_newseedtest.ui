@@ -35,7 +35,7 @@
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot;line-height:138%;&quot;&gt;
 &lt;p&gt;
-Your seed is important! If you lose your seed, your money will be permanently lost. To make sure that you have properly saved your seed, please retype here:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+Your passphrase is important! If you lose your passphrase, your money will be permanently lost. To make sure that you have properly saved your passphrase, please retype here:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Show mnemonic</string>
+    <string>Show passphrase</string>
    </property>
   </widget>
   <widget class="control::MwcFrameWithBorder" name="frame_2">
