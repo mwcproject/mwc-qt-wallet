@@ -208,7 +208,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="control::MwcLabelNormal" name="label_3">
+       <widget class="control::MwcLabelNormal" name="mwcMQlable">
         <property name="geometry">
          <rect>
           <x>20</x>

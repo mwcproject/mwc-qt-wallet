@@ -19,6 +19,7 @@
 #include "../control/inputdialog.h"
 #include <QDebug>
 #include "../state/timeoutlock.h"
+#include "../core/Config.h"
 
 namespace wnd {
 
@@ -35,6 +36,8 @@ Listening::Listening(QWidget *parent, state::Listening * _state, bool mwcMqStatu
     updateMwcMqState(mwcMqStatus);
     updateKeybaseState(keybaseStatus);
     updateMwcMqAddress(mwcMqAddress, mwcMqAddrIdx);
+
+    ui->mwcMQlable->setText( QString("mwc MQ") + (config::getUseMwcMqS() ? "S" : "") );
 }
 
 Listening::~Listening()

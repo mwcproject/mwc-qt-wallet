@@ -428,6 +428,10 @@ QPair<bool,bool> MWC713::getListeningStatus()  {
 void MWC713::listeningStart(bool startMq, bool startKb)  {
     qDebug() << "listeningStart: mq=" << startMq << ",kb=" << startKb;
     eventCollector->addTask( new TaskListeningStart(this, startMq,startKb), TaskListeningStart::TIMEOUT );
+
+    if ( startMq && !config::getUseMwcMqS() ) {
+        appendNotificationMessage( MESSAGE_LEVEL::WARNING, MESSAGE_ID::GENERIC, "You are using non secure version of the MWC MQ. To switch to secure MWC MQS please specify 'useMwcMqS = true' at mwc-qt-wallet config file." );
+    }
 }
 
 // Check signal: onListeningStopResult
@@ -765,7 +769,7 @@ void MWC713::setListeningStopResult(bool mqTry, bool kbTry, // what we try to st
 
 void MWC713::setMwcMqListeningStatus(bool online) {
     if (mwcMqOnline != online) {
-        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, (online ? "Start " : "Stop ") + QString("listening on mwc mq"));
+        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, (online ? "Start " : "Stop ") + QString("listening on mwc mq") + (config::getUseMwcMqS()?"s":"") );
     }
     mwcMqOnline = online;
     logger::logEmit("MWC713", "onMwcMqListenerStatus", QString("online=") + QString::number(online));

@@ -15,6 +15,7 @@
 #include "TaskListening.h"
 #include <QDebug>
 #include "../mwc713.h"
+#include "../../core/Config.h"
 
 namespace wallet {
 
@@ -103,7 +104,12 @@ bool TaskListeningStart::processTask(const QVector<WEvent> &events) {
 QString TaskListeningStart::calcCommand(bool startMq, bool startKeybase) const {
     Q_ASSERT(startMq | startKeybase);
 
-    return QString("listen") + (startMq ? " -m" : "") + (startKeybase ? " -k" : "");
+    // -m, --mwcmq      mwcmq listener
+    // -k, --keybase    keybase listener
+    // -s, --mwcmqs     mwcmqs listener
+    static QString mq2start = config::getUseMwcMqS() ? " -s" : " -m";
+
+    return QString("listen") + (startMq ? mq2start : "") + (startKeybase ? " -k" : "");
 }
 
 // -------------------------------- TaskListeningStop -------------------------------
@@ -132,7 +138,12 @@ bool TaskListeningStop::processTask(const QVector<WEvent> &events) {
 QString TaskListeningStop::calcCommand(bool stopMq, bool stopKeybase) const {
     Q_ASSERT(stopMq | stopKeybase);
 
-    return QString("stop") + (stopMq ? " -m" : "") + (stopKeybase ? " -k" : "");
+    // -m, --mwcmq      mwcmq listener
+    // -k, --keybase    keybase listener
+    // -s, --mwcmqs     mwcmqs listener
+    static QString mq2stop = config::getUseMwcMqS() ? " -s" : " -m";
+
+    return QString("stop") + (stopMq ? mq2stop : "") + (stopKeybase ? " -k" : "");
 }
 
 

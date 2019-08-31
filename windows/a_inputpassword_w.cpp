@@ -25,6 +25,7 @@
 #include "../core/global.h"
 #include "../state/timeoutlock.h"
 #include "../dialogs/x_walletinstances.h"
+#include "../core/Config.h"
 
 namespace wnd {
 
@@ -54,6 +55,8 @@ InputPassword::InputPassword(QWidget *parent, state::InputPassword * _state, sta
     else {
         ui->listeningStatusFrame->hide();
     }
+
+    ui->mwcMQlable->setText( QString("mwc MQ") + (config::getUseMwcMqS() ? "S" : "") );
 }
 
 InputPassword::~InputPassword()

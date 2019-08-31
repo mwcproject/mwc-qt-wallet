@@ -109,6 +109,7 @@ bool readConfig(QApplication & app) {
     QString airdropUrlTestNet = reader.getString("airdrop_url_testnet");
     QString logoutTimeoutStr = reader.getString("logoutTimeout");
     QString timeoutMultiplier = reader.getString("timeoutMultiplier");
+    bool useMwcMqS = reader.getString("useMwcMqS") == "true";
 
     if (main_style_sheet.isEmpty())
         main_style_sheet = ":/resource/mwcwallet_style.css";
@@ -144,7 +145,7 @@ bool readConfig(QApplication & app) {
 #endif
     }
 
-    config::setConfigData( mwc_path, wallet713_path, main_style_sheet, dialogs_style_sheet, airdropUrlMainNet, airdropUrlTestNet, logoutTimeout*1000L, timeoutMultiplierVal );
+    config::setConfigData( mwc_path, wallet713_path, main_style_sheet, dialogs_style_sheet, airdropUrlMainNet, airdropUrlTestNet, logoutTimeout*1000L, timeoutMultiplierVal, useMwcMqS );
     return true;
 }
 
@@ -215,7 +216,7 @@ int main(int argc, char *argv[])
         // Testing semaphore from different thread. Problem that system semaphore doesn't have timeout.
         util::TestSystemSemaphoreThread *testThread = new util::TestSystemSemaphoreThread(&instancesSemaphore);
         testThread->start();
-        if (!testThread->wait( int(500 * std::max(1.0,config::getTimeoutMultiplier()) + 0.5) ) ) {
+        if (!testThread->wait( (unsigned long)(500 * std::max(1.0,config::getTimeoutMultiplier()) + 0.5) ) ) {
             // Seems like we are blocked on global semaphore. It is mean that second instance does exist
             control::MessageBox::message(nullptr, "Second mwc-qt-wallet instance is detected",
                                          "There is another instance of mwc-qt-wallet is already running. It is impossible to run more than one instance of the wallet at the same time.");

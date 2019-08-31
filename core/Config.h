@@ -22,9 +22,22 @@ namespace config {
 void setMwc713conf( QString conf );
 void setMwcGuiWalletConf( QString conf );
 
+/**
+ * COnfiguration for mwc-mq-wallet
+ * @param mwcPath               - path to mwc-node.  Not used now
+ * @param wallet713path         - path to mwc713
+ * @param mainStyleSheetPath    - path to main (non modal) stylesheet
+ * @param dialogsStyleSheetPath - path to modal dialogs stylesheet (changes set to the main stylesheet)
+ * @param airdropUrlMainNetUrl  - Airdrop server claims URL for main net
+ * @param airdropUrlTestNetUrl  - Airdrop server claims URL for floo net
+ * @param logoutTimeMs          - Automatic locking for the wallet
+ * @param timeoutMultiplier     - Multiplier for jobs timeouts. Default is 1.0
+ * @param useMwcMqS             - true: use mwc mqs for slates exchange.  false: using mwc mq (non secure grin box) for slates exchange
+ */
 void setConfigData(QString mwcPath, QString wallet713path,
                    QString mainStyleSheetPath, QString dialogsStyleSheetPath, QString airdropUrlMainNetUrl, QString airdropUrlTestNetUrl, int64_t logoutTimeMs,
-                   double timeoutMultiplier);
+                   double timeoutMultiplier,
+                   bool useMwcMqS);
 
 
 // Note, workflow for config not enforced. Please don't abuse it
@@ -41,6 +54,8 @@ int64_t         getLogoutTimeMs();
 
 double          getTimeoutMultiplier();
 void            increaseTimeoutMultiplier();
+
+bool            getUseMwcMqS();
 
 QString toString();
 

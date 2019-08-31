@@ -26,8 +26,8 @@ static QString airdropUrl;
 static QString airdropUrlMainNetUrl;
 static QString airdropUrlTestNetUrl;
 static int64_t logoutTimeMs = 1000*60*15; // 15 minutes is default
-
-static double timeoutMultiplier = 1.0;
+static double  timeoutMultiplier = 1.0;
+static bool    useMwcMqS = true;
 
 
 void setMwc713conf( QString conf ) {
@@ -37,11 +37,24 @@ void setMwcGuiWalletConf( QString conf ) {
     mwcGuiWalletConf = conf;
 }
 
+/**
+ * COnfiguration for mwc-mq-wallet
+ * @param mwcPath               - path to mwc-node.  Not used now
+ * @param wallet713path         - path to mwc713
+ * @param mainStyleSheetPath    - path to main (non modal) stylesheet
+ * @param dialogsStyleSheetPath - path to modal dialogs stylesheet (changes set to the main stylesheet)
+ * @param airdropUrlMainNetUrl  - Airdrop server claims URL for main net
+ * @param airdropUrlTestNetUrl  - Airdrop server claims URL for floo net
+ * @param logoutTimeMs          - Automatic locking for the wallet
+ * @param timeoutMultiplier     - Multiplier for jobs timeouts. Default is 1.0
+ * @param useMwcMqS             - true: use mwc mqs for slates exchange.  false: using mwc mq (non secure grin box) for slates exchange
+ */
 void setConfigData(QString _mwcPath, QString _wallet713path,
                    QString _mainStyleSheetPath, QString _dialogsStyleSheetPath,
                    QString _airdropUrlMainNetUrl, QString _airdropUrlTestNetUrl,
                    int64_t  _logoutTimeMs,
-                   double _timeoutMultiplier) {
+                   double _timeoutMultiplier,
+                   bool _useMwcMqS) {
     mwcPath = _mwcPath;
     wallet713path = _wallet713path;
     mainStyleSheetPath = _mainStyleSheetPath;
@@ -50,6 +63,7 @@ void setConfigData(QString _mwcPath, QString _wallet713path,
     airdropUrlTestNetUrl = _airdropUrlTestNetUrl;
     logoutTimeMs = _logoutTimeMs;
     timeoutMultiplier = _timeoutMultiplier;
+    useMwcMqS = _useMwcMqS;
 }
 
 
@@ -68,6 +82,8 @@ int64_t         getLogoutTimeMs() {return logoutTimeMs;}
 double          getTimeoutMultiplier() {return timeoutMultiplier;}
 void            increaseTimeoutMultiplier() { timeoutMultiplier *= 1.6; }
 
+bool            getUseMwcMqS() {return useMwcMqS;}
+
 
 QString toString() {
     return "mwc713conf=" + mwc713conf + "\n" +
@@ -75,7 +91,8 @@ QString toString() {
             "mwcPath=" + mwcPath + "\n" +
             "wallet713path=" + wallet713path + "\n" +
             "mainStyleSheetPath=" + mainStyleSheetPath + "\n" +
-            "dialogsStyleSheetPath=" + dialogsStyleSheetPath + "\n";
+            "dialogsStyleSheetPath=" + dialogsStyleSheetPath + "\n" +
+            "useMwcMqS=" + (useMwcMqS?"true":"false") + "\n";
 }
 
 
