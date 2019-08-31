@@ -109,7 +109,7 @@ bool readConfig(QApplication & app) {
     QString airdropUrlTestNet = reader.getString("airdrop_url_testnet");
     QString logoutTimeoutStr = reader.getString("logoutTimeout");
     QString timeoutMultiplier = reader.getString("timeoutMultiplier");
-    bool useMwcMqS = reader.getString("useMwcMqS") == "true";
+    bool useMwcMqS = reader.getString("useMwcMqS") != "false";  // Default expected to be 'true'
 
     if (main_style_sheet.isEmpty())
         main_style_sheet = ":/resource/mwcwallet_style.css";

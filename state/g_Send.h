@@ -18,6 +18,7 @@
 #include "state.h"
 #include "../wallet/wallet.h"
 #include "../core/appcontext.h"
+#include "../util/address.h"
 
 namespace wnd {
 class SendStarting;
@@ -47,7 +48,7 @@ public:
     void processSendRequest( bool isOnline, const wallet::AccountInfo & selectedAccount, int64_t amount );
 
     // Request for MWC to send
-    void sendMwcOnline( const wallet::AccountInfo & account, QString address, int64_t mwcNano, QString message );
+    void sendMwcOnline( const wallet::AccountInfo & account, util::ADDRESS_TYPE type, QString address, int64_t mwcNano, QString message );
 
     void sendMwcOffline(  const wallet::AccountInfo & account, int64_t amount, QString message, QString fileName );
 

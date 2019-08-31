@@ -62,6 +62,7 @@ NextStateRespond Resync::execute() {
     context->stateMachine->blockLogout();
 
     context->wallet->check( prevListeningStatus.first || prevListeningStatus.second );
+    context->wallet->updateWalletBalance();
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 

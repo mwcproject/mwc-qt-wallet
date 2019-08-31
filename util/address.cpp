@@ -15,6 +15,7 @@
 #include "address.h"
 #include <QVector>
 #include <QCryptographicHash>
+#include "../core/Config.h"
 
 namespace util {
 
@@ -124,16 +125,15 @@ static QPair<bool, ADDRESS_TYPE> checkMwcMqAddress( QString address ) {
     return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::MWC_MQ);
 }
 
-
-QPair<bool, ADDRESS_TYPE> verifyAddress(QString address) {
-
+// return: protocol, address.
+// Empty if failed to parse
+static QPair<QString, QString> split2ProtocolAddress(QString address) {
     // Check for protocol name
     int scIdx = address.indexOf(':');
 
     if (scIdx<=0) {
-        // must be mwc mq address
-        // Length is 53
-        return checkMwcMqAddress( address );
+        // No protocol defned...
+        return QPair<QString, QString>( "", address );
     }
 
     // Must have sintax
@@ -141,27 +141,62 @@ QPair<bool, ADDRESS_TYPE> verifyAddress(QString address) {
     int protSepIdx = address.indexOf("://");
     if ( protSepIdx != scIdx ) {
         // Not found correct separator
-        return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
+        return QPair<QString, QString>("",""); // Incorrect format
     }
 
     Q_ASSERT(protSepIdx>0);
 
-    QString protocol = address.left(protSepIdx);
-    address = address.mid( protSepIdx + 3 );
+    return  QPair<QString, QString>( address.left(protSepIdx), address.mid( protSepIdx + 3 ) );
+}
 
-    if ( address.length() ==0 )
+
+QPair<bool, ADDRESS_TYPE> verifyAddress(QString address) {
+
+    // protocol, address
+    QPair<QString, QString>  protAddr = split2ProtocolAddress(address);
+    if (protAddr.second.isEmpty())
         return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
 
-    // Checking protocol
+    if (protAddr.first.isEmpty())
+        return checkMwcMqAddress( protAddr.second );
+
+    QString protocol = protAddr.first;
+    address = protAddr.second;
 
     if ( protocol == "https")
         return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::HTTPS);
     else if ( protocol == "keybase")
         return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::KEYBASE);
-    else if ( protocol == "mwcmq")
+    else if ( protocol == "mwcmq" || protocol == "mwcmqs" )
         return checkMwcMqAddress( address );
     else // Unknown protocol
         return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
 }
+
+// Make an address as a full format
+// type     - type og the address. Currently targeting mwc mq only
+// address  - original address
+QString fullFormalAddress(ADDRESS_TYPE type, QString address) {
+    switch (type) {
+        case ADDRESS_TYPE::MWC_MQ: {
+            // Updating prefix, depend on active transport
+            // protocol, address
+            QPair<QString, QString>  protAddr = split2ProtocolAddress(address);
+            return (config::getUseMwcMqS() ? "mwcmqs://" : "mwcmq://") + protAddr.second;
+        }
+        case ADDRESS_TYPE::KEYBASE:
+        case ADDRESS_TYPE::HTTPS:
+        {
+            return address;
+        }
+        case ADDRESS_TYPE::UNKNOWN:
+        default: {
+            Q_ASSERT(false);
+            return address;
+        }
+    }
+}
+
+
 
 }

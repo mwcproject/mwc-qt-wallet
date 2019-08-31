@@ -135,7 +135,7 @@ void SendOnline::on_sendButton_clicked()
 
     ui->progress->show();
 
-    state->sendMwcOnline( selectedAccount, address, amount, description );
+    state->sendMwcOnline( selectedAccount, res.second, address, amount, description );
 }
 
 void SendOnline::sendRespond( bool success, const QStringList & errors ) {

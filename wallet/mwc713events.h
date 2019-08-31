@@ -36,7 +36,7 @@ enum WALLET_EVENTS {
     S_INIT=3,    // Init choice request. Wallet need seed
     S_PASSWORD_ERROR=4, // Incorrect password error
     S_NEED2UNLOCK=5, // Need to unlock with password and optional account
-    S_BOX_LISTENER=6, // BOX listener is up                 Message: address
+    S_MWC_MQ_LISTENER=6, // Mwc MQ listener is up                 Message: address
     S_GENERIC_ERROR=7, // error printed by wallet           Message: error
     S_GENERIC_WARNING=8, // error printed by wallet           Message: error
     S_GENERIC_INFO=9, // error printed by wallet           Message: error
