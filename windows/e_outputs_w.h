@@ -63,6 +63,9 @@ private:
     QPair<bool,bool> updatePages( int currentPos, int total, int pageSize );
 
     int calcPageSize() const;
+
+    virtual void timerEvent(QTimerEvent *event);
+
 private:
     Ui::Outputs *ui;
     state::Outputs * state;

@@ -52,6 +52,8 @@ struct AccountInfo {
 
     // return true is this account can be concidered as deleted
     bool isDeleted() const;
+
+    bool isAwaitingSomething() const {return awaitingConfirmation>0 || lockedByPrevTransaction>0; }
 };
 
 // Wallet config

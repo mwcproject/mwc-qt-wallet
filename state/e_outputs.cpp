@@ -101,5 +101,10 @@ void Outputs::onWalletBalanceUpdated() {
     }
 }
 
+void Outputs::requestUpdateWalletBalance() {
+    context->wallet->updateWalletBalance();
+}
+
+
 
 }

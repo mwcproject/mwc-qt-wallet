@@ -73,6 +73,8 @@ void SendStarting::updateAccountBalance( QVector<wallet::AccountInfo> _accountIn
     // init accounts
     accountInfo = _accountInfo;
 
+    ui->accountComboBox->clear();
+
     int selectedAccIdx = 0;
     int idx = 0;
     for (auto &info : accountInfo) {

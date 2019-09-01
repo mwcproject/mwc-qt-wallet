@@ -41,6 +41,8 @@ public:
     void signTransaction( QString fileName );
 
     void deletedWnd(wnd::Receive * w) { if(w==wnd) wnd = nullptr;}
+
+    void requestUpdateWalletBalance();
 public:
     // wnd::FileTransactionWndHandler
 
@@ -60,7 +62,7 @@ private slots:
     void onKeybaseListenerStatus(bool online);
     void onMwcAddressWithIndex(QString mwcAddress, int idx);
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
-
+    void onWalletBalanceUpdated();
 private:
     wnd::Receive * wnd = nullptr;
     wnd::FileTransaction * fileTransWnd = nullptr;

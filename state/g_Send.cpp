@@ -121,6 +121,10 @@ void Send::respSendFile( bool success, QStringList errors, QString fileName ) {
 }
 
 
+void Send::requestUpdateWalletBalance() {
+    context->wallet->updateWalletBalance();
+}
+
 // Account info is updated
 void Send::onWalletBalanceUpdated() {
     if (onlineOfflineWnd)

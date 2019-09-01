@@ -37,6 +37,9 @@ Receive::Receive(QWidget *parent, state::Receive * _state, bool mwcMqStatus, boo
     updateMwcMqState(mwcMqStatus);
     updateKeybaseState(keybaseStatus);
     updateMwcMqAddress(mwcMqAddress);
+
+    // Let's update sometimes accounts balances
+    startTimer(20000);
 }
 
 Receive::~Receive() {
@@ -115,6 +118,16 @@ void Receive::updateAccountList() {
     }
     ui->accountComboBox->setCurrentIndex(selectedAccIdx);
 }
+
+void Receive::updateWalletBalance() {
+    updateAccountList();
+}
+
+void Receive::timerEvent(QTimerEvent *event) {
+    Q_UNUSED(event);
+    state->requestUpdateWalletBalance();
+}
+
 
 }
 

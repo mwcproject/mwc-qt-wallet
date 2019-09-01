@@ -512,7 +512,7 @@ void MWC713::createAccount( const QString & accountName )  {
     }
 
     if (delAccIdx<0) {
-        eventCollector->addTask( new TaskAccountCreate(this, accountName), TaskAccountInfo::TIMEOUT );
+        eventCollector->addTask( new TaskAccountCreate(this, accountName), TaskAccountCreate::TIMEOUT );
     }
     else {
         eventCollector->addTask( new TaskAccountRename(this, accountInfo[delAccIdx].accountName, accountName, true ), TaskAccountRename::TIMEOUT );
@@ -817,6 +817,12 @@ void MWC713::updateAccountList( QVector<QString> accounts ) {
 
     core::SendCoinsParams params = appContext->getSendCoinsParams();
 
+    QMap<QString, AccountInfo> accNameMap;
+    for (auto & ai : accountInfo)
+        accNameMap[ai.accountName] = ai;
+
+    QVector<AccountInfo> accountInfo;
+
     bool cancel = false;
     int idx = 0;
     for (QString acc : accounts) {
@@ -824,7 +830,17 @@ void MWC713::updateAccountList( QVector<QString> accounts ) {
             cancel  = true;
             break;
         }
-        eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber, idx>0), TaskAccountInfo::TIMEOUT, false );
+
+        // We can do  --no-refresh  only for accounts that has nothing to waiting for. For others refresh will not work.
+        // Also after login the first run is for total balance only. It is mean that we don't need any sync calls as well.
+
+        bool need2sync = false;
+
+        if (accNameMap.contains(acc)) {
+            need2sync = accNameMap[acc].isAwaitingSomething();
+        }
+
+        eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber, !need2sync ), TaskAccountInfo::TIMEOUT, false );
         eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1, false ); // Updating the progress
     }
     if (!cancel) {

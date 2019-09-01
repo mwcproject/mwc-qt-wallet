@@ -44,11 +44,14 @@ public:
     void onTransactionActionIsFinished( bool success, QString message );
     void stopWaiting();
 
+    void updateWalletBalance();
 private slots:
     void on_accountComboBox_activated(int index);
     void on_recieveFileButton_clicked();
 private:
     void updateAccountList();
+
+    virtual void timerEvent(QTimerEvent *event) override;
 
 private:
     Ui::Receive *ui;

@@ -45,6 +45,8 @@ Receive::Receive( StateContext * context ) :
     QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
                      this, &Receive::onNodeStatus, Qt::QueuedConnection);
 
+    QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &Receive::onWalletBalanceUpdated, Qt::QueuedConnection );
+
 }
 
 Receive::~Receive() {}
@@ -137,6 +139,9 @@ void Receive::onMwcAddressWithIndex(QString mwcAddress, int idx) {
     }
 }
 
+void Receive::requestUpdateWalletBalance() {
+    context->wallet->updateWalletBalance();
+}
 
 QString  Receive::getReceiveAccount() {
     return context->appContext->getReceiveAccount();
@@ -160,6 +165,13 @@ void Receive::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pee
 
     if (online)
         lastNodeHeight = nodeHeight;
+}
+
+
+void Receive::onWalletBalanceUpdated() {
+    if (wnd) {
+        wnd->updateWalletBalance();
+    }
 }
 
 

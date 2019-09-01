@@ -137,6 +137,9 @@ QVector<wallet::AccountInfo> Transactions::getWalletBalance() {
     return context->wallet->getWalletBalance();
 }
 
+void Transactions::requestUpdateWalletBalance() {
+    context->wallet->updateWalletBalance();
+}
 
 void Transactions::onCancelTransacton( bool success, int64_t trIdx, QString errMessage ) {
     if (success)
