@@ -487,8 +487,7 @@ signals:
     // Send results
     void onSend( bool success, QStringList errors );
 
-    void onSlateSend( QString slate, QString mwc, QString sendAddr );
-    void onSlateReceived( QString slate, QString mwc, QString fromAddr );
+    void onSlateSendTo( QString slate, QString mwc, QString sendAddr );
     void onSlateFinalized( QString slate );
 
     // Files operations

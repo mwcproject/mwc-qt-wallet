@@ -298,8 +298,10 @@ public:
 
     void setSendResults(bool success, QStringList errors);
 
-    void reportSlateSend( QString slate, QString mwc, QString sendAddr );
-    void reportSlateReceived( QString slate, QString mwc, QString fromAddr );
+    void reportSlateSendTo( QString slate, QString mwc, QString sendAddr );
+    void reportSlateSendBack( QString slate, QString sendAddr );
+    void reportSlateReceivedFrom( QString slate, QString mwc, QString fromAddr, QString message );
+    void reportSlateReceivedBack( QString slate, QString mwc, QString fromAddr );
     void reportSlateFinalized( QString slate );
 
     void setSendFileResult( bool success, QStringList errors, QString fileName );

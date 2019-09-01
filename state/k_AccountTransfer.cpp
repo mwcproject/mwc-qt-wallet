@@ -30,7 +30,7 @@ AccountTransfer::AccountTransfer( StateContext * context) :
 
     connect( context->wallet, &wallet::Wallet::onSetReceiveAccount, this, &AccountTransfer::onSetReceiveAccount, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onSend, this, &AccountTransfer::onSend, Qt::QueuedConnection );
-    connect( context->wallet, &wallet::Wallet::onSlateSend, this, &AccountTransfer::onSlateSend, Qt::QueuedConnection );
+    connect( context->wallet, &wallet::Wallet::onSlateSendTo, this, &AccountTransfer::onSlateSendTo, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onSlateFinalized, this, &AccountTransfer::onSlateFinalized, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &AccountTransfer::onWalletBalanceUpdated, Qt::QueuedConnection );
 }
@@ -141,7 +141,7 @@ void AccountTransfer::onSend( bool success, QStringList errors ) {
     // Waiting for finalized slate to continue
 }
 
-void AccountTransfer::onSlateSend( QString slate, QString mwc, QString sendAddr ) {
+void AccountTransfer::onSlateSendTo( QString slate, QString mwc, QString sendAddr ) {
     Q_UNUSED(mwc);
     Q_UNUSED(sendAddr);
     if (transferState!=1)

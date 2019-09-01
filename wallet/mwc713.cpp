@@ -958,20 +958,45 @@ void MWC713::setSendResults(bool success, QStringList errors) {
     emit onSend( success, errors );
 }
 
-void MWC713::reportSlateSend( QString slate, QString mwc, QString sendAddr ) {
-    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("You successfully sent " + mwc + " mwc to " + sendAddr ));
+void MWC713::reportSlateSendTo( QString slate, QString mwc, QString sendAddr ) {
+    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("You successfully sent slate " + slate +
+          " with " + mwc + " mwc to " + sendAddr ));
 
     logger::logEmit( "MWC713", "onSlateSend", slate + " with " +mwc + " to " + sendAddr );
-    emit onSlateSend(slate, mwc, sendAddr);
+    emit onSlateSendTo(slate, mwc, sendAddr);
 }
-void MWC713::reportSlateReceived( QString slate, QString mwc, QString fromAddr ) {
+
+void MWC713::reportSlateSendBack( QString slate,  QString sendAddr ) {
+    logger::logEmit("MWC713", "onSlateSendBack", slate + " to " + sendAddr);
+
+    appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
+                                         "Slate " + slate + " sent back to " + sendAddr + " sucessfully" );
+}
+
+void MWC713::reportSlateReceivedBack( QString slate, QString mwc, QString fromAddr ) {
     logger::logEmit( "MWC713", "onSlateReceived", slate + " with " +mwc + " from " + fromAddr );
 
-    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("You received " + mwc+ " mwc form " + fromAddr ));
-
-    emit onSlateReceived( slate, mwc, fromAddr );
+    appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
+                                         "Slate " + slate + " received back from " + fromAddr + " for " + mwc + " mwc");
 
     // Request balace refresh
+    updateWalletBalance();
+}
+
+void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAddr, QString message ) {
+    QString msg = "Congratulations! You recieved " +mwc+ " wmc from " + fromAddr;
+    if (!message.isEmpty()) {
+        msg += " with message '" + message + "'. Slate:" + slate;
+    }
+    appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
+                                         msg );
+
+    // Show message box with congrats. Msaages bot should work from any point. No needs to block locking or what ever we have
+    control::MessageBox::message(nullptr, "Congratulations!",
+           "You recieved <b>" + mwc + "</b> wmc\n\nFrom: " + fromAddr + "\n" +
+                   (message.isEmpty() ? "" : "Description: " + message + "\n" ) +
+                   "Slate: " + slate);
+
     updateWalletBalance();
 }
 

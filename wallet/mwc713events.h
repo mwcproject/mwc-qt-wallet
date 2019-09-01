@@ -71,14 +71,16 @@ enum WALLET_EVENTS {
     S_ACCOUNTS_INFO_SUM = 41, // Account header info. The rest of data will come in lines...
 
     // Send
-    S_SLATE_WAS_SENT = 55,
-    S_SLATE_WAS_RECEIVED = 56,
-    S_SLATE_WAS_FINALIZED = 57,
+    S_SLATE_WAS_SENT_TO = 55,
+    S_SLATE_WAS_SENT_BACK = 56,
+    S_SLATE_WAS_RECEIVED_BACK = 57,
+    S_SLATE_WAS_RECEIVED_FROM = 58,
+    S_SLATE_WAS_FINALIZED = 59,
 
-    S_SET_RECEIVE = 58,
+    S_SET_RECEIVE = 65,
 
-    S_TRANSACTION_LOG = 60,
-    S_OUTPUT_LOG = 61,
+    S_TRANSACTION_LOG = 70,
+    S_OUTPUT_LOG = 71,
 
 
 };

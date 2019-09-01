@@ -29,24 +29,38 @@ bool TaskSlatesListener::processTask(const QVector<WEvent> & events) {
     const WEvent & evt = events[0];
 
     switch (evt.event) {
-    case S_SLATE_WAS_SENT:{
+    case S_SLATE_WAS_SENT_TO:{
         qDebug() << "TaskSlatesListener::processTask with events: " << printEvents(events);
         QStringList prms = evt.message.split('|');
         if (prms.size()==3) {
-            wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
-                       "Send slate " + prms[0] + " for " + util::zeroDbl2Dbl( prms[1] ) + " mwc was sent to " + prms[2] );
-
-            wallet713->reportSlateSend( prms[0], util::zeroDbl2Dbl( prms[1] ), prms[2] );
+            wallet713->reportSlateSendTo( prms[0], util::zeroDbl2Dbl( prms[1] ), prms[2] );
         }
         return true;
     }
-    case S_SLATE_WAS_RECEIVED: {
+    case S_SLATE_WAS_SENT_BACK:{
+        qDebug() << "TaskSlatesListener::processTask with events: " << printEvents(events);
+        QStringList prms = evt.message.split('|');
+        if (prms.size()==2) {
+            wallet713->reportSlateSendBack( prms[0], prms[2] );
+        }
+        return true;
+    }
+
+    case S_SLATE_WAS_RECEIVED_FROM: {
+        // We get some moner from somebody!!!
+        qDebug() << "TaskSlatesListener::processTask with events: " << printEvents(events);
+        QStringList prms = evt.message.split('|');
+        if (prms.size()>=3) {
+            wallet713->reportSlateReceivedFrom( prms[0], util::zeroDbl2Dbl( prms[2] ), prms[1], prms.size()>3 ? prms[3] : "" );
+        }
+        return true;
+    }
+
+    case S_SLATE_WAS_RECEIVED_BACK: {
         qDebug() << "TaskSlatesListener::processTask with events: " << printEvents(events);
         QStringList prms = evt.message.split('|');
         if (prms.size()==3) {
-            wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
-                       "Received slate " + prms[0] + " for " + util::zeroDbl2Dbl( prms[2] ) + " mwc from " + prms[1] );
-            wallet713->reportSlateReceived( prms[0], util::zeroDbl2Dbl( prms[2] ), prms[1] );
+            wallet713->reportSlateReceivedBack( prms[0], util::zeroDbl2Dbl( prms[2] ), prms[1] );
         }
         return true;
     }

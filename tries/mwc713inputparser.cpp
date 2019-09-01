@@ -284,7 +284,7 @@ void Mwc713InputParser::initSend() {
                                                         new TrieAnySection(4000, TrieAnySection::NOT_NEW_LINE, "","\"", 1)
                                                 }));
 
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_SENT,
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_SENT_TO,
     // slate [dd5a7ca7-a023-4fb3-b8fd-93b35ac45c8b] for [0.100000000] MWCs sent successfully to [xmgEvZ4MCCGMJnRnNXKHBbHmSGWQchNr9uZpY5J1XXnsCFS45fsU]
                                                 QVector<BaseTrieSection*>{
                                                         new TrieNewLineSection(),
@@ -297,8 +297,19 @@ void Mwc713InputParser::initSend() {
                                                         new TriePhraseSection("]"),
                                                         new TrieNewLineSection()
                                                 }));
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_SENT_BACK,
+            // slate [dd5a7ca7-a023-4fb3-b8fd-93b35ac45c8b] for [0.100000000] MWCs sent successfully to [xmgEvZ4MCCGMJnRnNXKHBbHmSGWQchNr9uZpY5J1XXnsCFS45fsU]
+                                                QVector<BaseTrieSection*>{
+                                                        new TrieNewLineSection(),
+                                                        new TriePhraseSection("slate ["),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE|TrieAnySection::NOT_SPACES, "","]", 1),
+                                                        new TriePhraseSection("] sent back to ["),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","]", 2),
+                                                        new TriePhraseSection("] successfully"),
+                                                        new TrieNewLineSection()
+                                                }));
 
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_RECEIVED,
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_RECEIVED_BACK,
                                                 QVector<BaseTrieSection*>{
                                                         new TrieNewLineSection(),
                                                         new TriePhraseSection("slate ["),
@@ -308,6 +319,20 @@ void Mwc713InputParser::initSend() {
                                                         new TriePhraseSection("] for ["),
                                                         new TrieAnySection(100, TrieAnySection::NUMBERS, ".","]", 3),
                                                         new TriePhraseSection("] MWCs"),
+                                                        new TrieNewLineSection()
+                                                }));
+
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_RECEIVED_FROM,
+                                                QVector<BaseTrieSection*>{
+                                                        new TrieNewLineSection(),
+                                                        new TriePhraseSection("slate ["),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE|TrieAnySection::NOT_SPACES, "","]", 1),
+                                                        new TriePhraseSection("] received from ["),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","]", 2),
+                                                        new TriePhraseSection("] for ["),
+                                                        new TrieAnySection(100, TrieAnySection::NUMBERS, ".","]", 3),
+                                                        new TriePhraseSection("] MWCs. Message: ["),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","]", 4),
                                                         new TrieNewLineSection()
                                                 }));
 
