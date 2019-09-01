@@ -74,7 +74,7 @@ QString nano2one( int64_t nano ) {
 QString zeroDbl2Dbl(QString  dbl) {
     QString res = dbl.trimmed();
     // remove leading chars
-    while( res.length()>0 && res[0]=='0' )
+    while( res.length()>1 && res[0]=='0' && res[1]!='.' )
         res = res.mid(1);
 
     int ptIdx = res.indexOf('.');

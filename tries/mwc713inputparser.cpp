@@ -323,8 +323,8 @@ void Mwc713InputParser::initSend() {
                                                 }));
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_RECEIVED_FROM,
+     //slate [5a759d16-f6b1-41d4-8d44-49307a50e09a] received from [xmgcJYZG6eG5ajHdZZGh8gXv5Ne4rdArrKwpSajQGhenUXdJQA5V] for [0.111000000] MWCs. Message: ["L to r 0.111 mwc"]
                                                 QVector<BaseTrieSection*>{
-                                                        new TrieNewLineSection(),
                                                         new TriePhraseSection("slate ["),
                                                         new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE|TrieAnySection::NOT_SPACES, "","]", 1),
                                                         new TriePhraseSection("] received from ["),
@@ -332,8 +332,7 @@ void Mwc713InputParser::initSend() {
                                                         new TriePhraseSection("] for ["),
                                                         new TrieAnySection(100, TrieAnySection::NUMBERS, ".","]", 3),
                                                         new TriePhraseSection("] MWCs. Message: ["),
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","]", 4),
-                                                        new TrieNewLineSection()
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","]", 4)
                                                 }));
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_FINALIZED,
