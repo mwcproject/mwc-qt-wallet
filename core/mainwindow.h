@@ -30,7 +30,7 @@ namespace state {
 }
 
 
-#ifdef Q_OS_MACOS
+#ifdef Q_OS_DARWIN
 namespace Cocoa
 {
     void changeTitleBarColor(WId winId, double red, double green, double blue);

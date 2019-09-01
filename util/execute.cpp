@@ -18,9 +18,9 @@
 namespace util {
 
 void openUrlInBrowser(const QString & url) {
-#if defined(Q_OS_MACOS)
+#if defined(Q_OS_DARWIN)
     QProcess::startDetached("open " + url);
-#elif defined(LINUX)
+#elif defined(Q_OS_LINUX)
     QProcess::startDetached("xdg-open " + url);
 #elif defined(Q_OS_WIN)
     Q_UNUSED(url);

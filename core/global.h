@@ -39,7 +39,7 @@ const QString HODL_ACCONT_PREFIX = "hodl_"; // hodl not in use yet, just reservi
 
 const QVector<QString> BANNED_ACCOUT_PREFIXES = {DEL_ACCONT_PREFIX, HODL_ACCONT_PREFIX};
 
-#ifdef Q_OS_MACOS
+#ifdef Q_OS_DARWIN
 const QString MWC713_DEFAULT_CONFIG = ":/resource/wallet713_mac.toml";
 #else
 const QString MWC713_DEFAULT_CONFIG = ":/resource/wallet713_def.toml";

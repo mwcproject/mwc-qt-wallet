@@ -123,7 +123,7 @@ void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pe
                                                            "Wallet lost connection to mwc node");
             }
         }
-        else if ( connections==0 ^ lastNodeStatus.connections==0 ) {
+        else if ( (connections==0) ^ (lastNodeStatus.connections==0) ) {
                 if (connections>0) {
                     context->wallet->appendNotificationMessage(wallet::Wallet::MESSAGE_LEVEL::INFO, wallet::Wallet::MESSAGE_ID::GENERIC,
                                                                "mwc node restored connection to mwc network");

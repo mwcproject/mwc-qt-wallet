@@ -692,6 +692,10 @@ void MWC713::appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QStr
         return;
     }
 
+    // check if it is duplicate message. Duplicates will be ignored.
+    if ( notificationMessages.size()>0 && notificationMessages.last().message == message )
+        return;
+
     // Message is not fatal, adding it into the logs
     WalletNotificationMessages::LEVEL wlevel = WalletNotificationMessages::LEVEL::DEBUG;
     if (level == MESSAGE_LEVEL::CRITICAL) {
