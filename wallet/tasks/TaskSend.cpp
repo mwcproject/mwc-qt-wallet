@@ -41,7 +41,7 @@ bool TaskSlatesListener::processTask(const QVector<WEvent> & events) {
         qDebug() << "TaskSlatesListener::processTask with events: " << printEvents(events);
         QStringList prms = evt.message.split('|');
         if (prms.size()==2) {
-            wallet713->reportSlateSendBack( prms[0], prms[2] );
+            wallet713->reportSlateSendBack( prms[0], prms[1] );
         }
         return true;
     }
