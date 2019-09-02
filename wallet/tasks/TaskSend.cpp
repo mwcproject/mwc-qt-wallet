@@ -68,8 +68,6 @@ bool TaskSlatesListener::processTask(const QVector<WEvent> & events) {
         qDebug() << "TaskSlatesListener::processTask with events: " << printEvents(events);
         QStringList prms = evt.message.split('|');
         if (prms.size()==1) {
-            wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
-                       "Finalized slate " + prms[0] );
             wallet713->reportSlateFinalized( prms[0] );
         }
         return true;

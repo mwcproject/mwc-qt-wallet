@@ -128,8 +128,8 @@ void SendStarting::on_nextButton_clicked() {
     QPair<bool, int64_t> mwcAmount;
     if (sendAmount != "All") {
         mwcAmount = util::one2nano(ui->amountEdit->text().trimmed());
-        if (!mwcAmount.first) {
-            control::MessageBox::message(this, "Incorrect Input", "Please specify correct number of MWC to send");
+        if (!mwcAmount.first || mwcAmount.second<=0) {
+            control::MessageBox::message(this, "Incorrect Input", "Please specify the number of MWC to send");
             ui->amountEdit->setFocus();
             return;
         }
