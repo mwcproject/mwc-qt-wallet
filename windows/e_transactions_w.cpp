@@ -323,6 +323,9 @@ void Transactions::on_generateProofButton_clicked()
     if (fileName.length()==0)
         return;
 
+    if (!fileName.endsWith(".proof"))
+        fileName += ".proof";
+
     // Update path
     QFileInfo flInfo(fileName);
     state->updateProofFilesPath(flInfo.path());

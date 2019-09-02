@@ -228,6 +228,9 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>20</number>
+         </property>
          <item>
           <widget class="control::MwcPushButtonNormal" name="backButton">
            <property name="minimumSize">
@@ -449,6 +452,11 @@
    <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
@@ -457,11 +465,6 @@
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
    <header>control/MwcComboBox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

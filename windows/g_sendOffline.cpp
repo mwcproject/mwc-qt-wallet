@@ -78,6 +78,9 @@ void SendOffline::on_sendButton_clicked()
     if (fileName.length()==0)
         return;
 
+    if (!fileName.endsWith(".tx"))
+        fileName += ".tx";
+
     // Update path
     QFileInfo flInfo(fileName);
     state->updateFileGenerationPath( flInfo.path() );
