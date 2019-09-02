@@ -337,6 +337,8 @@ void Transactions::on_transactionTable_itemSelectionChanged()
 
 void Transactions::on_transactionTable_cellDoubleClicked(int row, int column)
 {
+    Q_UNUSED(row);
+    Q_UNUSED(column);
     state::TimeoutLockObject to( state );
     wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
 
