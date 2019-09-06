@@ -70,7 +70,7 @@ void ContactEditDlg::on_applyButton_clicked()
     for ( auto & cnt : contactList ) {
             if (cnt.name == contact.name) {
                 control::MessageBox::message(this, "Names collision", "Contact with a name "+contact.name+
-                                      " allready exist. Please specify unique name for your contact");
+                                      " already exist. Please specify unique name for your contact");
                 ui->nameEdit->setFocus();
                 return;
             }

@@ -21,6 +21,7 @@
 #include <QDebug>
 #include "../util/Log.h"
 #include "../core/global.h"
+#include "../core/Config.h"
 #include "../control/messagebox.h"
 
 namespace state {
@@ -48,6 +49,8 @@ Listening::Listening(StateContext * context) :
     QObject::connect(context->wallet, &wallet::Wallet::onListenerMqCollision,
                      this, &Listening::onListenerMqCollision, Qt::QueuedConnection);
 
+    QObject::connect(context->wallet, &wallet::Wallet::onNewNotificationMessage,
+                     this, &Listening::onNewNotificationMessage, Qt::QueuedConnection);
 }
 
 Listening::~Listening() {
@@ -132,6 +135,11 @@ void Listening::onListeningStartResults( bool mqTry, bool kbTry, // what we try 
             }
         }
 
+        if (msg.contains("mwcmq") && msg.contains("already started") ) {
+            msg = QString("MWC MQ") + (config::getUseMwcMqS() ? "S" : "") + " listener is running, but it lost connection and trying to reconnect in background to " +
+                    context->wallet->getWalletConfig().getMwcMqHostFull() +".\nPlease check your network connection";
+        }
+
         wnd->showMessage("Start listening Error", msg);
     }
 }
@@ -156,6 +164,14 @@ void Listening::onMwcAddressWithIndex(QString mwcAddress, int idx) {
 
 void Listening::onListenerMqCollision() {
     control::MessageBox::message(nullptr, "MWC MQS new login detected", "New login to MWC MQS detected. Only one instance of your wallet can be connected to MWC MQS.\nListener is stopped. You can activate listener from 'Listening' page.");
+}
+
+// Looking for "Failed to start mwcmqs subscriber. Error connecting to mqs.mwc.mw:443"
+void Listening::onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message) {
+    // We are not relying to the window, but checking if it is active
+    if ( wnd!= nullptr && message.contains("Failed to start mwcmqs subscriber") ) {
+        wnd->showMessage("Start listening Error", message);
+    }
 }
 
 

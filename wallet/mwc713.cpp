@@ -692,10 +692,6 @@ void MWC713::appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QStr
         return;
     }
 
-    // check if it is duplicate message. Duplicates will be ignored.
-    if ( notificationMessages.size()>0 && notificationMessages.last().message == message )
-        return;
-
     // Message is not fatal, adding it into the logs
     WalletNotificationMessages::LEVEL wlevel = WalletNotificationMessages::LEVEL::DEBUG;
     if (level == MESSAGE_LEVEL::CRITICAL) {
@@ -710,10 +706,14 @@ void MWC713::appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QStr
         wlevel = WalletNotificationMessages::INFO;
 
     WalletNotificationMessages msg(wlevel, message);
-    notificationMessages.push_back( msg );
 
-    while(notificationMessages.size()>MESSAGE_SIZE_LIMIT)
-        notificationMessages.pop_front();
+    // check if it is duplicate message. Duplicates will be ignored.
+    if (! ( notificationMessages.size()>0 && notificationMessages.last().message == message ) ) {
+        notificationMessages.push_back(msg);
+
+        while (notificationMessages.size() > MESSAGE_SIZE_LIMIT)
+            notificationMessages.pop_front();
+    }
 
     logger::logEmit( "MWC713", "onNewNotificationMessage", msg.toString() );
     emit onNewNotificationMessage(msg.level, msg.message);

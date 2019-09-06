@@ -225,7 +225,7 @@ void Accounts::renameAccount(int idx) {
             continue;
 
         if ( name == accounts[r].accountName ) {
-            control::MessageBox::message(this, "Wrong account name", "Account name '" + name + "' allready exist. Please specify unique account name." );
+            control::MessageBox::message(this, "Wrong account name", "Account name '" + name + "' already exist. Please specify unique account name." );
             return;
         }
     }

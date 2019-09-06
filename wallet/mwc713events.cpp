@@ -112,7 +112,7 @@ bool Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout, bool cance
 
     QMutexLocker l( &taskQMutex );
 
-    // check if task is allready in the Q.
+    // check if task is already in the Q.
     bool found = false;
     if (cancelIfExist) {
         for ( const taskInfo & ti : taskQ ) {
@@ -124,7 +124,7 @@ bool Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout, bool cance
     }
 
     if (found) {
-        // not execute the task, it is allready in the Q
+        // not execute the task, it is already in the Q
         delete task;
         return false;
     }

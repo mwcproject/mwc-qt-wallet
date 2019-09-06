@@ -133,7 +133,7 @@ bool TaskInitWpressEnter::processTask(const QVector<WEvent> & events) {
 
 bool TaskLogout::processTask(const QVector<WEvent> & events) {
     Q_UNUSED(events);
-    wallet713->logout(false); // async call because task is allready async and called from input thread
+    wallet713->logout(false); // async call because task is already async and called from input thread
     return true;
 }
 

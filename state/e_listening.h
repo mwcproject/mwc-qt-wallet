@@ -62,6 +62,9 @@ private slots:
     // Login from anotehr wallet happens
     void onListenerMqCollision();
 
+    // Looking for "Failed to start mwcmqs subscriber. Error connecting to ..."
+    void onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message);
+
 private:
     wnd::Listening * wnd = nullptr;
 };
