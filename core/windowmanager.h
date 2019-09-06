@@ -37,10 +37,6 @@ public:
     // Parent for windows it can show.
     QWidget * getInWndParent() const;
 
-    //void start();
-
-    //void processNextStep( WalletWindowAction action );
-
 private:
     QString buildWalletTitle(const QString & pageName);
 

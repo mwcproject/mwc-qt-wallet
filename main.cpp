@@ -233,18 +233,27 @@ int main(int argc, char *argv[])
 
     mwc::setApplication(&app, mainWnd);
 
-    wallet::MWC713 wallet( config::getWallet713path(), config::getMwc713conf(), &appContext );
+    wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
 
-    core::WindowManager wndManager( mainWnd, mainWnd->getMainWindow() );
+    core::WindowManager * wndManager = new core::WindowManager( mainWnd, mainWnd->getMainWindow() );
 
     mainWnd->show();
 
-    state::StateContext context( &appContext, &wallet, &wndManager, mainWnd );
+    state::StateContext context( &appContext, wallet, wndManager, mainWnd );
 
-    state::StateMachine machine(&context);
-    mainWnd->setAppEnvironment(&machine, &wallet);
-    machine.start();
+    state::StateMachine * machine = new state::StateMachine(&context);
+    mainWnd->setAppEnvironment( machine, wallet);
+    machine->start();
 
-    return app.exec();
+    int retVal = app.exec();
+
+    // Now we have to stop other object nicely.
+    // Note, the order is different from creation.
+    // mainWnd expected to be dead here.
+    delete machine; machine=nullptr;
+    delete wallet;  wallet = nullptr;
+    delete wndManager; wndManager=nullptr;
+
+    return retVal;
   }
 
