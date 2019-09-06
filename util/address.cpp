@@ -86,9 +86,6 @@ static bool decodeBase58( QString sz, QByteArray & vch)
 // mwc mq address might include the domain
 static QPair<bool, ADDRESS_TYPE> checkMwcMqAddress( QString address ) {
 
-    if ( address.length() != MWC_MQ_ADDR_LEN )
-        return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
-
     if (address.contains('@') ) {
         address = address.left( address.indexOf('@') );
     }
@@ -97,6 +94,9 @@ static QPair<bool, ADDRESS_TYPE> checkMwcMqAddress( QString address ) {
         if (!( address[0] == 'g' || address[0] == 'x' ))
             return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
     }
+
+    if ( address.length() != MWC_MQ_ADDR_LEN )
+        return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
 
     // check alphabet
     for ( auto ch : address ) {

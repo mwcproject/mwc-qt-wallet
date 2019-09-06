@@ -1224,14 +1224,15 @@ WalletConfig MWC713::readWalletConfig(QString source) const {
     QString network = mwc713config.getString("chain");
     QString dataPath = mwc713config.getString("wallet713_data_path");
     QString keyBasePath = mwc713config.getString("keybase_binary");
-    QString mwcmqDomain = mwc713config.getString("mwcmq_domain");
+    QString mwcmqDomain  = mwc713config.getString("mwcmq_domain");
+    QString mwcmqsDomain = mwc713config.getString("mwcmqs_domain");
 
-    if (dataPath.isEmpty() || mwcmqDomain.isEmpty()) {
+    if (dataPath.isEmpty() ) {
         control::MessageBox::message(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + source );
         return WalletConfig();
     }
 
-    return WalletConfig().setData( network, dataPath, mwcmqDomain, keyBasePath,
+    return WalletConfig().setData( network, dataPath, mwcmqDomain, mwcmqsDomain, keyBasePath,
                                   mwc713config.getString("mwc_node_uri"),
                                   mwc713config.getString("mwc_node_secret") );
 }
@@ -1266,7 +1267,7 @@ bool MWC713::setWalletConfig(const WalletConfig & config)  {
         if ( ln.trimmed().isEmpty())
             continue; // skipping empty lines
 
-        if (ln.startsWith("wallet713_data_path") || ln.startsWith("keybase_binary") || ln.startsWith("mwcmq_domain") ||
+        if (ln.startsWith("wallet713_data_path") || ln.startsWith("keybase_binary") || ln.startsWith("mwcmq_domain") || ln.startsWith("mwcmqs_domain") ||
                                 ln.startsWith("mwc_node_uri") || ln.startsWith("mwc_node_secret") || ln.startsWith("chain") ) {
             continue; // skippping the line. Will apply later
         }
@@ -1279,7 +1280,13 @@ bool MWC713::setWalletConfig(const WalletConfig & config)  {
     newConfLines.append("chain = \"" + config.getNetwork() + "\"");
     newConfLines.append("wallet713_data_path = \"" + config.getDataPath() + "\"");
     newConfLines.append("keybase_binary = \"" + config.keyBasePath + "\"");
-    newConfLines.append("mwcmq_domain = \"" + config.mwcmqDomain + "\"");
+
+    if ( !config.mwcmqDomainEx.isEmpty() )
+        newConfLines.append("mwcmq_domain = \"" + config.mwcmqDomainEx + "\"");
+
+    if ( !config.mwcmqsDomainEx.isEmpty() )
+        newConfLines.append("mwcmqs_domain = \"" + config.mwcmqsDomainEx + "\"");
+
     if ( !config.mwcNodeURI.isEmpty() && !config.mwcNodeSecret.isEmpty() ) {
         newConfLines.append("mwc_node_uri = \"" + config.mwcNodeURI + "\"");
         newConfLines.append("mwc_node_secret = \"" + config.mwcNodeSecret + "\"");

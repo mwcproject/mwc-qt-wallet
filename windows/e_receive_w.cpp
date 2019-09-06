@@ -19,14 +19,16 @@
 #include <QFileDialog>
 #include "../control/messagebox.h"
 #include "../state/timeoutlock.h"
+#include "../core/Config.h"
 
 namespace wnd {
 
 Receive::Receive(QWidget *parent, state::Receive * _state, bool mwcMqStatus, bool keybaseStatus,
-                 QString mwcMqAddress) :
+                 QString mwcMqAddress, const wallet::WalletConfig & _walletConfig ) :
         core::NavWnd(parent, _state->getContext() ),
         ui(new Ui::Receive),
-        state(_state)
+        state(_state),
+        walletConfig(_walletConfig)
 {
     ui->setupUi(this);
 
@@ -48,7 +50,7 @@ Receive::~Receive() {
 }
 
 void Receive::updateMwcMqAddress(QString address) {
-    mwcAddress = "mwcmq://" + address;
+    mwcAddress = (config::getUseMwcMqS() ? "mwcmqs://" : "mwcmq://") + address + "@" + walletConfig.getMwcMqHostFull();
     ui->mwcmqAddress->setText( mwcAddress );
 }
 

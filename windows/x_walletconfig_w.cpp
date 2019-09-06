@@ -23,11 +23,13 @@
 #include <QStandardPaths>
 #include "../state/timeoutlock.h"
 #include "../dialogs/networkselectiondlg.h"
+#include "../core/Config.h"
 
 namespace wnd {
 
-const static QString  MWCMW_DOMAIN_DEFAULT_STR = "default MWC MQ Domain";
-const static QString  MWCMW_DOMAIN_DEFAULT_HOST = "mq.mwc.mw";
+static QString calcMWCMW_DOMAIN_DEFAULT_STR() {
+    return QString("default MWC MQ") + (config::getUseMwcMqS() ? "S" : "")  + " Domain";
+}
 
 WalletConfig::WalletConfig(QWidget *parent, state::WalletConfig * _state) :
     core::NavWnd(parent, _state->getContext() ),
@@ -42,7 +44,8 @@ WalletConfig::WalletConfig(QWidget *parent, state::WalletConfig * _state) :
     defaultWalletConfig = state->getDefaultWalletConfig();
 
 
-    setValues(currentWalletConfig.getDataPath(), currentWalletConfig.keyBasePath, currentWalletConfig.mwcmqDomain,
+    setValues(currentWalletConfig.getDataPath(), currentWalletConfig.keyBasePath,
+              currentWalletConfig.getMwcMqHostNorm(),
               sendParams.inputConfirmationNumber, sendParams.changeOutputs);
     updateButtons();
 }
@@ -54,12 +57,12 @@ WalletConfig::~WalletConfig()
 
 void WalletConfig::setValues(const QString & mwc713directory,
                              const QString & keyBasePath,
-                             const QString & mwcmqHost,
+                             const QString & mwcmqHostNorm,
                              int inputConfirmationNumber,
                              int changeOutputs) {
     ui->mwc713directoryEdit->setText( mwc713directory );
     ui->keybasePathEdit->setText( keybasePathConfig2InputStr(keyBasePath) );
-    ui->mwcmqHost->setText( mwcDomainConfig2InputStr(mwcmqHost) );
+    ui->mwcmqHost->setText( mwcDomainConfig2InputStr( mwcmqHostNorm ) );
 
     ui->confirmationNumberEdit->setText( QString::number(inputConfirmationNumber) );
     ui->changeOutputsEdit->setText( QString::number(changeOutputs) );
@@ -71,14 +74,14 @@ void WalletConfig::updateButtons() {
     bool sameWithCurrent =
         ui->mwc713directoryEdit->text().trimmed() == currentWalletConfig.getDataPath() &&
         keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == currentWalletConfig.keyBasePath &&
-        mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == currentWalletConfig.mwcmqDomain &&
+        mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == currentWalletConfig.getMwcMqHostNorm() &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(sendParams.inputConfirmationNumber) &&
         ui->changeOutputsEdit->text().trimmed() == QString::number(sendParams.changeOutputs);
 
     bool sameWithDefault =
         ui->mwc713directoryEdit->text().trimmed() == defaultWalletConfig.getDataPath() &&
         keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == defaultWalletConfig.keyBasePath &&
-        mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == defaultWalletConfig.mwcmqDomain &&
+        mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == defaultWalletConfig.getMwcMqHostNorm() &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(defaultSendParams.inputConfirmationNumber) &&
         ui->changeOutputsEdit->text().trimmed() == QString::number(defaultSendParams.changeOutputs);
 
@@ -88,11 +91,11 @@ void WalletConfig::updateButtons() {
 
 
 QString WalletConfig::mwcDomainConfig2InputStr(QString mwcDomain) {
-    return mwcDomain==MWCMW_DOMAIN_DEFAULT_HOST ? MWCMW_DOMAIN_DEFAULT_STR : mwcDomain;
+    return mwcDomain.isEmpty() ? calcMWCMW_DOMAIN_DEFAULT_STR() : mwcDomain;
 }
 
 QString WalletConfig::mwcDomainInputStr2Config(QString mwcDomain) {
-    return mwcDomain==MWCMW_DOMAIN_DEFAULT_STR ? MWCMW_DOMAIN_DEFAULT_HOST : mwcDomain;
+    return mwcDomain == calcMWCMW_DOMAIN_DEFAULT_STR() ? "" : mwcDomain;
 }
 
 QString WalletConfig::keybasePathConfig2InputStr(QString kbpath) {
@@ -147,14 +150,14 @@ bool WalletConfig::readInputValue( const wallet::WalletConfig & prevWalletConfig
     }
 
     QString mwcmqHost = mwcDomainInputStr2Config(ui->mwcmqHost->text().trimmed());
-    if (mwcmqHost!=MWCMW_DOMAIN_DEFAULT_HOST) {
+    if (!mwcmqHost.isEmpty()) {
         // Checking the host
 
         util::Waiting w; // Host verification might tale time, what is why waiting here
 
         QHostInfo host = QHostInfo::fromName(mwcmqHost);
         if (host.error() != QHostInfo::NoError) {
-            control::MessageBox::message( this, "Input", "MWC MQ host "+mwcmqHost+" is not reachable.\n" + host.errorString() );
+            control::MessageBox::message( this, "Input", "Host "+mwcmqHost+" is not reachable.\n" + host.errorString() );
             ui->mwcmqHost->setFocus();
             return false;
         }
@@ -195,7 +198,8 @@ bool WalletConfig::readInputValue( const wallet::WalletConfig & prevWalletConfig
     // So far we are good
     newWalletConfig.setData( network,
             walletDir,
-            mwcmqHost,
+            config::getUseMwcMqS() ? currentWalletConfig.mwcmqDomainEx : mwcmqHost,
+            config::getUseMwcMqS() ? mwcmqHost : currentWalletConfig.mwcmqsDomainEx,
             keybasePath,
             prevWalletConfig.mwcNodeURI,
             prevWalletConfig.mwcNodeSecret );
@@ -264,7 +268,7 @@ void WalletConfig::on_changeOutputsEdit_textEdited(const QString &)
 
 void WalletConfig::on_restoreDefault_clicked()
 {
-    setValues(defaultWalletConfig.getDataPath(), defaultWalletConfig.keyBasePath, defaultWalletConfig.mwcmqDomain,
+    setValues(defaultWalletConfig.getDataPath(), defaultWalletConfig.keyBasePath, defaultWalletConfig.getMwcMqHostNorm(),
               defaultSendParams.inputConfirmationNumber, defaultSendParams.changeOutputs);
     updateButtons();
 }

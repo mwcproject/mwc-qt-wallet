@@ -63,29 +63,38 @@ private:
     QString dataPath;
 
 public:
-    QString mwcmqDomain;
+    QString mwcmqDomainEx; // empty - default value
+    QString mwcmqsDomainEx;// empty - default value
     QString keyBasePath;
     QString mwcNodeURI; // Connection to alternative MWC node
     QString mwcNodeSecret;
 
-    WalletConfig() : network("Floonet"), dataPath("Undefined"), mwcmqDomain("Undefined"), keyBasePath("Undefined") {}
+    WalletConfig() : network("Floonet"), dataPath("Undefined"), keyBasePath("Undefined") {}
     WalletConfig(const WalletConfig & other) = default;
     WalletConfig &operator = (const WalletConfig & other) = default;
 
-    bool operator == (const WalletConfig & other) const { return dataPath==other.dataPath && mwcmqDomain==other.mwcmqDomain &&
+    bool operator == (const WalletConfig & other) const { return dataPath==other.dataPath &&
+                mwcmqDomainEx==other.mwcmqDomainEx && mwcmqsDomainEx==other.mwcmqsDomainEx &&
                 keyBasePath==other.keyBasePath && mwcNodeURI==other.mwcNodeURI  && mwcNodeSecret==other.mwcNodeSecret; }
 
-    bool isDefined() const { return  dataPath!="Undefined" && mwcmqDomain!="Undefined" && keyBasePath!="Undefined"; }
+    bool isDefined() const { return  dataPath!="Undefined" && keyBasePath!="Undefined"; }
 
     WalletConfig & setData(QString network,
                 QString dataPath,
                 QString mwcmqDomain,
+                QString mwcmqsDomain,
                 QString keyBasePath,
                 QString mwcNodeURI,
                 QString mwcNodeSecret);
 
     QString getDataPath() const {return dataPath;}
     QString getNetwork() const {return network;}
+
+    // Get MQ/MQS host normalized name. Depend on current config
+    QString getMwcMqHostNorm() const;
+
+    // Get MQ/MQS host full name. Depend on current config
+    QString getMwcMqHostFull() const;
 
     // caller is responsible to call saveNetwork2DataPath if needed
     void setDataPathWithNetwork( QString _dataPath, QString _network ) { dataPath=_dataPath; network = _network;}

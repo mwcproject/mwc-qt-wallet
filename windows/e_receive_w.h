@@ -33,7 +33,7 @@ Q_OBJECT
 
 public:
     explicit Receive(QWidget *parent, state::Receive * state, bool mwcMqStatus, bool keybaseStatus,
-                     QString mwcMqAddress);
+                     QString mwcMqAddress, const wallet::WalletConfig & walletConfig);
 
     virtual ~Receive() override ;
 
@@ -56,6 +56,7 @@ private:
 private:
     Ui::Receive *ui;
     state::Receive * state;
+    wallet::WalletConfig walletConfig;
     QVector<wallet::AccountInfo> accountInfo;
     QString mwcAddress;
 };

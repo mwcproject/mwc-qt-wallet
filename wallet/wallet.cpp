@@ -16,6 +16,7 @@
 #include <QDataStream>
 #include <QDateTime>
 #include "../core/global.h"
+#include "../core/Config.h"
 #include <QDir>
 #include "../util/Files.h"
 
@@ -87,18 +88,35 @@ bool AccountInfo::isDeleted() const {
 WalletConfig & WalletConfig::setData(QString _network,
                             QString _dataPath,
                             QString _mwcmqDomain,
+                            QString _mwcmqsDomain,
                             QString _keyBasePath,
                             QString _mwcNodeURI,
                             QString _mwcNodeSecret) {
     network  = _network;
     dataPath = _dataPath;
-    mwcmqDomain = _mwcmqDomain;
+    mwcmqDomainEx = _mwcmqDomain;
+    mwcmqsDomainEx = _mwcmqsDomain;
     keyBasePath = _keyBasePath;
     mwcNodeURI = _mwcNodeURI;
     mwcNodeSecret = _mwcNodeSecret;
 
     return * this;
 }
+
+// Get MQ/MQS host name. Depend on current config
+QString WalletConfig::getMwcMqHostNorm() const {
+    return config::getUseMwcMqS() ? mwcmqsDomainEx : mwcmqDomainEx;
+}
+
+// Get MQ/MQS host full name. Depend on current config
+QString WalletConfig::getMwcMqHostFull() const {
+    QString definedHost = getMwcMqHostNorm();
+    if (!definedHost.isEmpty())
+        return definedHost;
+
+    return config::getUseMwcMqS() ? mwc::DEFAULT_HOST_MWC_MQS : mwc::DEFAULT_HOST_MWC_MQ;
+}
+
 
 // Return empty if not found
 //static

@@ -1,4 +1,3 @@
 chain = "Floonet"
 wallet713_data_path = "gui_wallet713_data"
-mwcmq_domain = "mq.mwc.mw"
 default_keybase_ttl = "24h"
