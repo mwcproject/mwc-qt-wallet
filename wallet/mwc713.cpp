@@ -1097,6 +1097,12 @@ void MWC713::setNodeStatus( bool online, QString errMsg, int nodeHeight, int pee
     emit onNodeStatus( online, errMsg, nodeHeight, peerHeight, totalDifficulty, connections );
 }
 
+void MWC713::notifyListenerMqCollision() {
+    logger::logEmit( "MWC713", "onListenerMqCollision", "" );
+    emit onListenerMqCollision();
+}
+
+
 void MWC713::processAllTransactionsStart() {
     collectedTransactions.clear();
 }

@@ -21,6 +21,7 @@
 #include <QDebug>
 #include "../util/Log.h"
 #include "../core/global.h"
+#include "../control/messagebox.h"
 
 namespace state {
 
@@ -43,6 +44,10 @@ Listening::Listening(StateContext * context) :
 
     QObject::connect(context->wallet, &wallet::Wallet::onMwcAddressWithIndex,
                                          this, &Listening::onMwcAddressWithIndex, Qt::QueuedConnection);
+
+    QObject::connect(context->wallet, &wallet::Wallet::onListenerMqCollision,
+                     this, &Listening::onListenerMqCollision, Qt::QueuedConnection);
+
 }
 
 Listening::~Listening() {
@@ -149,6 +154,9 @@ void Listening::onMwcAddressWithIndex(QString mwcAddress, int idx) {
     }
 }
 
+void Listening::onListenerMqCollision() {
+    control::MessageBox::message(nullptr, "MWC MQS new login detected", "New login to MWC MQS detected. Only one instance of your wallet can be connected to MWC MQS.\nListener is stopped. You can activate listener from 'Listening' page.");
+}
 
 
 }

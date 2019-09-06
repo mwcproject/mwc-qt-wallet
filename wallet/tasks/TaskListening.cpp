@@ -74,6 +74,11 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
             wallet713->setMwcMqListeningStatus(true);
             return true;
         }
+        case S_LISTENER_MQ_COLLISION: {
+            qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
+            wallet713->notifyListenerMqCollision();
+            return true;
+        }
         default:
             return false;
     }

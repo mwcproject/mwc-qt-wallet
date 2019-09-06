@@ -59,6 +59,9 @@ private slots:
 
     void onMwcAddressWithIndex(QString mwcAddress, int idx);
 
+    // Login from anotehr wallet happens
+    void onListenerMqCollision();
+
 private:
     wnd::Listening * wnd = nullptr;
 };

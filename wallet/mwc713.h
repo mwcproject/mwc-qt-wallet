@@ -326,6 +326,8 @@ public:
 
     void setNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
+    void notifyListenerMqCollision();
+
     //-------------
     void processAllTransactionsStart();
     void processAllTransactionsAppend(const QVector<WalletTransaction> & trVector);

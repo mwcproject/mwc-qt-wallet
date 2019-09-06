@@ -521,6 +521,9 @@ signals:
 
     // Node info
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
+
+    // mwc713 get an error  ERROR: new login detected. mwcmqs listener will stop!
+    void onListenerMqCollision();
 };
 
 }

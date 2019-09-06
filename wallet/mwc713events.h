@@ -58,17 +58,18 @@ enum WALLET_EVENTS {
 
     S_LISTENER_MQ_LOST_CONNECTION = 28, // WARNING: listener [XXXX] lost connection. it will...
     S_LISTENER_MQ_GET_CONNECTION = 29, // INFO: listener [XXXXX] reestablished connection.  Message: address
+    S_LISTENER_MQ_COLLISION = 30,  // ERROR: new login detected. mwcmqs listener will stop!
 
     // Recovery
     // from init wallet
-    S_RECOVERY_STARTING = 30, // recovering... please wait as this could take a few minutes to complete
-    S_RECOVERY_DONE = 31,     // wallet restoration done!
-    S_RECOVERY_PROGRESS = 33, // Checking 1000 outputs, up to index 13433. (Highest index: 10235)   Message:  13433|10235
+    S_RECOVERY_STARTING = 35, // recovering... please wait as this could take a few minutes to complete
+    S_RECOVERY_DONE = 36,     // wallet restoration done!
+    S_RECOVERY_PROGRESS = 37, // Checking 1000 outputs, up to index 13433. (Highest index: 10235)   Message:  13433|10235
     // for fresh wallet
-    S_RECOVERY_MNEMONIC = 34, // Recovering from mnemonic => Mnemonic:
+    S_RECOVERY_MNEMONIC = 38, // Recovering from mnemonic => Mnemonic:
 
     // Accounts
-    S_ACCOUNTS_INFO_SUM = 41, // Account header info. The rest of data will come in lines...
+    S_ACCOUNTS_INFO_SUM = 44, // Account header info. The rest of data will come in lines...
 
     // Send
     S_SLATE_WAS_SENT_TO = 55,

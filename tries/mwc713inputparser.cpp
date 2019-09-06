@@ -225,6 +225,12 @@ void Mwc713InputParser::initListening() {
                                                         new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"","", 1), // mwc MQ address
                                                         new TriePhraseSection("] reestablished connection.")
                                                 }));
+
+    // Need to detect a case when listening collision happans. Then we will emit message about that
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_COLLISION,
+                          QVector<BaseTrieSection*>{
+                                   new TriePhraseSection("new login detected. mwcmqs listener will stop!")
+                          }));
 }
 
 void Mwc713InputParser::initRecovery() {
