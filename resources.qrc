@@ -59,5 +59,8 @@
         <file>img/purpRadioOn@2x.svg</file>
         <file>img/Finalize@2x.svg</file>
         <file>img/FinalizeL@2x.svg</file>
+        <file>img/CircGreen@2x.svg</file>
+        <file>img/CircRed@2x.svg</file>
+        <file>img/CircYellow@2x.svg</file>
     </qresource>
 </RCC>

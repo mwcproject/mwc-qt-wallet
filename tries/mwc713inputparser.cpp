@@ -186,7 +186,14 @@ void Mwc713InputParser::initListening() {
                                                         new TriePhraseSection("starting keybase listener...")
                                                 }));
 
-    // for testnet
+    // mwc713 emitting messages 'listener started for: ['  and 'listener started for ['
+    // Let's handle all of them
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_ON,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("listener started for: ["),
+                                                        new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"","", 1), // mwc MQ address
+                                                        new TriePhraseSection("]")
+                                                }));
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_ON,
                                                 QVector<BaseTrieSection*>{
                                                         new TriePhraseSection("listener started for ["),

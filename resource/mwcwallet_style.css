@@ -202,6 +202,12 @@ control--MwcPushButtonRound {
     border: none;
 }
 
+control--MwcPushButtonStatusLine {
+    border: 1px solid #FFFFFF;
+    border-radius: 10px;
+    font-size: 12px;
+    padding: 4px;
+}
 
 QPushButton:focus {
     background: #FFFFFF;

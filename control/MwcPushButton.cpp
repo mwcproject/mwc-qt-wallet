@@ -102,6 +102,20 @@ MwcPushButtonRound::MwcPushButtonRound(const QIcon &icon, const QString &text, Q
 
 MwcPushButtonRound::~MwcPushButtonRound() {}
 
+// ------------------  MwcPushButtonStatusLine  ------------------------
+
+MwcPushButtonStatusLine::MwcPushButtonStatusLine(QWidget *parent) :
+        QPushButton(parent)
+{}
+MwcPushButtonStatusLine::MwcPushButtonStatusLine(const QString &text, QWidget *parent) :
+        QPushButton(text,parent)
+{}
+
+MwcPushButtonStatusLine::MwcPushButtonStatusLine(const QIcon &icon, const QString &text, QWidget *parent)  :
+        QPushButton(icon,text,parent)
+{}
+
+MwcPushButtonStatusLine::~MwcPushButtonStatusLine() {}
 
 
 }

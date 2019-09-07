@@ -21,6 +21,7 @@
 #include "../control/messagebox.h"
 #include "../dialogs/helpdlg.h"
 #include "../core/Config.h"
+#include <QPushButton>
 
 namespace core {
 
@@ -36,13 +37,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->leftTb->hide();
 
-    ui->statusBar->addPermanentWidget(ui->helpButton);
+
+    ui->statusBar->addPermanentWidget(ui->nodeStatusButton);
+    ui->statusBar->addPermanentWidget(ui->listenerStatusButton);
     ui->statusBar->addPermanentWidget(ui->btnSpacerLabel1);
-    ui->statusBar->addPermanentWidget(ui->connectionStatusButton);
-    ui->statusBar->addPermanentWidget(ui->network);
+    ui->statusBar->addPermanentWidget(ui->helpButton);
     ui->statusBar->addPermanentWidget(ui->rightestSpacerLabel);
 
-    ui->network->setText(""); // No network is known
+    setStatusButtonState(ui->nodeStatusButton, STATUS::RED, "Waiting");
+    setStatusButtonState(ui->listenerStatusButton, STATUS::RED, "Listeners");
 
     //ui->statusBar->showMessage("Can show any message here", 2000);
 
@@ -115,11 +118,14 @@ void MainWindow::setAppEnvironment(state::StateMachine * _stateMachine, wallet::
 
     QObject::connect(wallet, &wallet::Wallet::onMwcMqListenerStatus,
                      this, &MainWindow::updateListenerStatus, Qt::QueuedConnection);
-    QObject::connect(wallet, &wallet::Wallet::onMwcMqListenerStatus,
+    QObject::connect(wallet, &wallet::Wallet::onKeybaseListenerStatus,
                      this, &MainWindow::updateListenerStatus, Qt::QueuedConnection);
 
+    QObject::connect(wallet, &wallet::Wallet::onNodeStatus,
+                     this, &MainWindow::updateNodeStatus, Qt::QueuedConnection);
+
     updateListenerBtn();
-    updateNetwork();
+    updateNetworkName();
 }
 
 QWidget * MainWindow::getMainWindow() {
@@ -140,9 +146,14 @@ void MainWindow::updateActionStates(state::STATE actionState) {
 
 }
 
-void MainWindow::on_connectionStatusButton_clicked()
+void core::MainWindow::on_listenerStatusButton_clicked()
 {
     stateMachine->setActionWindow( state::STATE::LISTENING );
+}
+
+void core::MainWindow::on_nodeStatusButton_clicked()
+{
+    stateMachine->setActionWindow( state::STATE::NODE_INFO );
 }
 
 void MainWindow::on_helpButton_clicked()
@@ -163,13 +174,27 @@ void MainWindow::on_helpButton_clicked()
 
 void MainWindow::updateListenerStatus(bool online) {
     Q_UNUSED(online);
-
     updateListenerBtn();
-    updateNetwork();
 }
 
+// Node info
+void MainWindow::updateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
+    Q_UNUSED(errMsg);
+    Q_UNUSED(totalDifficulty);
+    if ( !online ) {
+        setStatusButtonState( ui->nodeStatusButton, STATUS::RED, "" );
+    }
+    else if (connections==0 || nodeHeight==0 || (peerHeight>0 && peerHeight-nodeHeight>5) ) {
+        setStatusButtonState( ui->nodeStatusButton, STATUS::YELLOW, "" );
+    }
+    else {
+        setStatusButtonState( ui->nodeStatusButton, STATUS::GREEN, "" );
+    }
+}
+
+
 void MainWindow::onConfigUpdate() {
-    updateNetwork();
+    updateNetworkName();
 }
 
 
@@ -177,23 +202,47 @@ void MainWindow::updateListenerBtn() {
     QPair<bool,bool> listStatus = wallet->getListeningStatus();
     qDebug() << "updateListenerBtn: " << listStatus;
 
-
     bool listening = listStatus.first | listStatus.second;
+    QString listenerNames;
+    if (listStatus.first)
+        listenerNames +=  QString("MWC MQ") + (config::getUseMwcMqS() ? "S" : "");
 
-    QPixmap pixmap( listening ? ":/img/StatusOk@2x.svg" : ":/img/StatusFail@2x.svg" );
+    if (listStatus.second) {
+        if (!listenerNames.isEmpty())
+            listenerNames += ", ";
+        listenerNames += "Keybase";
+    }
 
-    QIcon ButtonIcon(pixmap);
-    ui->connectionStatusButton->setIcon( ButtonIcon );
-    ui->connectionStatusButton->setToolTip(listening ? "You are listening. Click here to view listener status"
+    setStatusButtonState( ui->listenerStatusButton,
+                          listening ? STATUS::GREEN : STATUS::RED,
+                          listening ? listenerNames : "Listeners");
+    ui->listenerStatusButton->setToolTip(listening ? "You are listening. Click here to view listener status"
                                           : "You are not listening. Click here to view listener status");
 }
 
 
-void MainWindow::updateNetwork() {
-    ui->network->setText( wallet->getWalletConfig().getNetwork() );
+void MainWindow::updateNetworkName() {
+    setStatusButtonState( ui->nodeStatusButton, STATUS::IGNORE, wallet->getWalletConfig().getNetwork() );
 }
 
+void MainWindow::setStatusButtonState(  QPushButton * btn, STATUS status, QString text ) {
+    switch (status) {
+        case STATUS::GREEN:
+            btn->setIcon( QIcon( QPixmap( ":/img/CircGreen@2x.svg" )));
+            break;
+        case STATUS::RED:
+            btn->setIcon( QIcon( QPixmap( ":/img/CircRed@2x.svg" )));
+            break;
+        case STATUS::YELLOW:
+            btn->setIcon( QIcon( QPixmap( ":/img/CircYellow@2x.svg" )));
+            break;
+        default: // Ingnore suppose to be here
+            break;
+    }
 
+    if (!text.isEmpty())
+        btn->setText(" " + text + " ");
+}
 
 }
 

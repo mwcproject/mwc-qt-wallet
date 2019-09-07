@@ -66,6 +66,16 @@ public:
 };
 
 
+class MwcPushButtonStatusLine : public QPushButton {
+Q_OBJECT
+public:
+    explicit MwcPushButtonStatusLine(QWidget *parent = Q_NULLPTR);
+    explicit MwcPushButtonStatusLine(const QString &text, QWidget *parent = Q_NULLPTR);
+    MwcPushButtonStatusLine(const QIcon &icon, const QString &text, QWidget *parent = Q_NULLPTR);
+    virtual ~MwcPushButtonStatusLine() override;
+};
+
+
 }
 
 #endif //GUI_WALLET_MWCPUSHBUTTON_H

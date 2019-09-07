@@ -168,6 +168,7 @@ void Listening::onListenerMqCollision() {
 
 // Looking for "Failed to start mwcmqs subscriber. Error connecting to mqs.mwc.mw:443"
 void Listening::onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message) {
+    Q_UNUSED(level);
     // We are not relying to the window, but checking if it is active
     if ( wnd!= nullptr && message.contains("Failed to start mwcmqs subscriber") ) {
         wnd->showMessage("Start listening Error", message);

@@ -37,6 +37,8 @@ namespace Cocoa
 }
 #endif
 
+class QPushButton;
+
 namespace core {
 
 class WindowManager;
@@ -62,14 +64,20 @@ private slots:
     void onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message);
     void onConfigUpdate();
 
-    void on_connectionStatusButton_clicked();
+    void on_listenerStatusButton_clicked();
+    void on_nodeStatusButton_clicked();
     void on_helpButton_clicked();
 
     void updateListenerStatus(bool online);
+    void updateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
+
 
 private:
     void updateListenerBtn();
-    void updateNetwork();
+    void updateNetworkName();
+
+    enum class STATUS { IGNORE, RED, YELLOW, GREEN };
+    void setStatusButtonState( QPushButton * btn, STATUS status, QString text );
 
 private:
     Ui::MainWindow *ui;
