@@ -62,8 +62,6 @@ public:
 
     void sendMwcOffline(  const wallet::AccountInfo & account, int64_t amount, QString message, QString fileName );
 
-    void requestUpdateWalletBalance();
-
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "send.html";}

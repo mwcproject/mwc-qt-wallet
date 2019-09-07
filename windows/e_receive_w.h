@@ -51,8 +51,6 @@ private slots:
 private:
     void updateAccountList();
 
-    virtual void timerEvent(QTimerEvent *event) override;
-
 private:
     Ui::Receive *ui;
     state::Receive * state;

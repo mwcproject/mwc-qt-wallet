@@ -31,6 +31,8 @@ Accounts::Accounts(StateContext * context) :
     connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &Accounts::onWalletBalanceUpdated, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onAccountCreated, this, &Accounts::onAccountCreated, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onAccountRenamed, this, &Accounts::onAccountRenamed, Qt::QueuedConnection );
+
+    startTimer(37000);
 }
 
 Accounts::~Accounts() {}
@@ -121,7 +123,10 @@ void Accounts::deleteAccount( const wallet::AccountInfo & account ) {
     renameAccount( account, newName );
 }
 
-
+void Accounts::timerEvent(QTimerEvent *event) {
+    Q_UNUSED(event);
+    context->wallet->updateWalletBalance();
+}
 
 }
 

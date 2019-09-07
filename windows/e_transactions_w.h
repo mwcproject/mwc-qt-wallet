@@ -79,8 +79,6 @@ private:
     QString currentSelectedAccount();
 
     int calcPageSize() const;
-
-    virtual void timerEvent(QTimerEvent *event) override;
 private:
     Ui::Transactions *ui;
     state::Transactions * state;

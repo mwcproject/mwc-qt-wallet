@@ -140,10 +140,6 @@ void Receive::onMwcAddressWithIndex(QString mwcAddress, int idx) {
     }
 }
 
-void Receive::requestUpdateWalletBalance() {
-    context->wallet->updateWalletBalance();
-}
-
 QString  Receive::getReceiveAccount() {
     return context->appContext->getReceiveAccount();
 }

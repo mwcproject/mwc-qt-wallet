@@ -246,6 +246,7 @@ public:
     // Feed the command to mwc713 process
     void executeMwc713command( QString cmd, QString shadowStr);
 
+    bool isWalletRunningAndLoggedIn() const { return ! (mwc713process== nullptr || eventCollector== nullptr || startedMode != STARTED_MODE::NORMAL || loggedIn==false ); }
 
 public:
     // Task Reporting methods
@@ -368,6 +369,7 @@ private:
     tries::Mwc713InputParser * inputParser = nullptr; // Parser will generate bunch of signals that wallet will listem on
 
     STARTED_MODE startedMode = STARTED_MODE::OFFLINE;
+    bool   loggedIn = false; // Make sence for startedMode NORMAL. True if login was successfull
 
     Mwc713EventManager * eventCollector = nullptr;
 

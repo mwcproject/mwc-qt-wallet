@@ -62,6 +62,8 @@ private:
 
     virtual void timerEvent(QTimerEvent *event) override;
 
+    bool isLogoutOff( STATE state ) const { return state < STATE::ACCOUNTS || state==STATE::RESYNC; }
+
 private:
     StateContext * context = nullptr;
 

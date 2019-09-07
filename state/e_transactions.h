@@ -54,8 +54,6 @@ public:
     QString getProofFilesPath() const;
     void updateProofFilesPath(QString path);
 
-    void requestUpdateWalletBalance();
-
     QVector<wallet::AccountInfo> getWalletBalance();
 
 protected:

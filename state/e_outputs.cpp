@@ -43,8 +43,6 @@ NextStateRespond Outputs::execute() {
     if (wnd==nullptr) {
         wnd = (wnd::Outputs*) context->wndManager->switchToWindowEx( mwc::PAGE_E_OUTPUTS,
                 new wnd::Outputs( context->wndManager->getInWndParent(), this) );
-        // Requesting wallet balance update because Accounts into is there
-        context->wallet->updateWalletBalance();
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
@@ -58,6 +56,8 @@ void Outputs::requestOutputCount(QString account) {
 void Outputs::requestOutputs(QString account, int offset, int number) {
     context->wallet->getOutputs(account, offset, number);
     // Respond:  onOutputs(...)
+    // Balance need to be updated as well to match outputs state
+    context->wallet->updateWalletBalance();
 }
 
 void Outputs::onOutputCount(QString account, int count) {
@@ -99,10 +99,6 @@ void Outputs::onWalletBalanceUpdated() {
     if (wnd) {
         wnd->updateWalletBalance();
     }
-}
-
-void Outputs::requestUpdateWalletBalance() {
-    context->wallet->updateWalletBalance();
 }
 
 

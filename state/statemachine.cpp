@@ -108,7 +108,7 @@ void StateMachine::executeFrom( STATE nextState ) {
     if (nextState == STATE::NONE)
         nextState = states.firstKey();
 
-    if ( nextState < STATE::ACCOUNTS )
+    if ( isLogoutOff(nextState ) )
         logoutTime = 0;
 
     Q_ASSERT( states.contains(nextState) );
@@ -125,7 +125,7 @@ void StateMachine::executeFrom( STATE nextState ) {
     }
 
     // Resync is blocking logout. We need to respect that.
-    if ( currentState >= STATE::ACCOUNTS && currentState!=STATE::RESYNC )
+    if ( !isLogoutOff(currentState) )
         resetLogoutLimit();
 
     if (currentState == STATE::NONE) {

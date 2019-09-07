@@ -46,9 +46,6 @@ Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
     requestTransactions(accName);
 
     updatePages(-1, -1, -1);
-
-    // Let's update sometimes accounts balances
-    startTimer(20000);
 }
 
 Transactions::~Transactions()
@@ -415,11 +412,6 @@ wallet::AccountInfo Transactions::getSelectedAccount() const {
         idx = 0;
 
     return accountInfo[idx];
-}
-
-void Transactions::timerEvent(QTimerEvent *event) {
-    Q_UNUSED(event);
-    state->requestUpdateWalletBalance();
 }
 
 }

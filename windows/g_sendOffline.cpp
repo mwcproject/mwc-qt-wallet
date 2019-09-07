@@ -34,8 +34,6 @@ SendOffline::SendOffline(QWidget *parent, const wallet::AccountInfo & _selectedA
 
     ui->fromAccount->setText("From account: " + selectedAccount.accountName );
     ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util::nano2one(amount)) + " mwc" );
-
-    startTimer(20000);
 }
 
 SendOffline::~SendOffline()
@@ -97,11 +95,6 @@ void SendOffline::showSendMwcOfflineResult( bool success, QString message ) {
     control::MessageBox::message(this, success ? "Success" : "Failure", message );
 }
 
-
-void SendOffline::timerEvent(QTimerEvent *event) {
-    Q_UNUSED(event);
-    state->requestUpdateWalletBalance();
-}
 
 
 

@@ -47,8 +47,6 @@ public:
     void switchCurrentAccount(const wallet::AccountInfo & account);
     QVector<wallet::AccountInfo> getWalletBalance();
 
-    void requestUpdateWalletBalance();
-
 private slots:
     void onOutputCount(QString account, int count);
     void onOutputs( QString account, int64_t height, QVector<wallet::WalletOutput> outputs);

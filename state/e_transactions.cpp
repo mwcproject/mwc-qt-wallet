@@ -46,8 +46,6 @@ NextStateRespond Transactions::execute() {
     if (wnd==nullptr) {
         wnd = (wnd::Transactions*)context->wndManager->switchToWindowEx( mwc::PAGE_E_TRANSACTION,
                 new wnd::Transactions( context->wndManager->getInWndParent(), this ) );
-        // Requesting wallet balance update because Accounts into is there
-        context->wallet->updateWalletBalance();
     }
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 };
@@ -78,6 +76,7 @@ void Transactions::requestTransactionCount(QString account) {
 void Transactions::requestTransactions(QString account, int offset, int number) {
 
     context->wallet->getTransactions(account, offset, number);
+    context->wallet->updateWalletBalance(); // With transactions refresh, need to update the balance
 }
 
 void Transactions::updateTransactionCount(QString account, int number) {
@@ -135,10 +134,6 @@ void Transactions::updateProofFilesPath(QString path) {
 
 QVector<wallet::AccountInfo> Transactions::getWalletBalance() {
     return context->wallet->getWalletBalance();
-}
-
-void Transactions::requestUpdateWalletBalance() {
-    context->wallet->updateWalletBalance();
 }
 
 void Transactions::onCancelTransacton( bool success, int64_t trIdx, QString errMessage ) {

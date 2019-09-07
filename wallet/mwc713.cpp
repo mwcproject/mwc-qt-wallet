@@ -144,7 +144,7 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
 // normal start. will require the password
 void MWC713::start(bool loginWithLastKnownPassword)  {
     qDebug() << "MWC713::start loginWithLastKnownPassword=" << loginWithLastKnownPassword;
-
+    loggedIn = false;
     startedMode = STARTED_MODE::NORMAL;
 
     // Start the binary
@@ -308,6 +308,7 @@ void MWC713::start2receiveSlate( QString receiveAccount, QString identifier, QSt
 
 void MWC713::processStop(bool exitNicely) {
     qDebug() << "MWC713::processStop exitNicely=" << exitNicely;
+    loggedIn = false;
 
     mwc713disconnect();
 
@@ -489,6 +490,9 @@ QVector<AccountInfo>  MWC713::getWalletBalance(bool filterDeleted) const  {
 // Check signal: onWalletBalanceUpdated
 //          onWalletBalanceProgress
 void MWC713::updateWalletBalance()  {
+    if ( !isWalletRunningAndLoggedIn() )
+        return; // ignoring request
+
     // Steps:
     // 1 - list accounts (this call)
     // 2 - for every account get info ( see updateAccountList call )
@@ -655,8 +659,8 @@ void MWC713::verifyMwcBoxTransactionProof( QString proofFileName )  {
 // Status of the node
 // Check Signal: onNodeSatatus( bool online, QString errMsg, int height, int64_t totalDifficulty, int connections )
 bool MWC713::getNodeStatus() {
-    if (eventCollector== nullptr)
-        return false;
+    if ( !isWalletRunningAndLoggedIn() )
+        return false; // ignoring request
 
     eventCollector->addTask( new TaskNodeInfo(this), TaskNodeInfo::TIMEOUT );
     return true;
@@ -721,6 +725,7 @@ void MWC713::appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QStr
 
 void MWC713::setLoginResult(bool ok) {
     logger::logEmit("MWC713", "onLoginResult", QString::number(ok) );
+    loggedIn = ok;
     emit onLoginResult(ok);
 
 }
@@ -1008,7 +1013,7 @@ void MWC713::reportSlateFinalized( QString slate ) {
     logger::logEmit( "MWC713", "onSlateFinalized", slate );
     emit onSlateFinalized(slate);
 
-    // Request balace refresh
+    // Request balance refresh
     updateWalletBalance();
 }
 

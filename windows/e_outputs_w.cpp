@@ -44,8 +44,6 @@ Outputs::Outputs(QWidget *parent, state::Outputs * _state) :
     ui->outputsTable->setFocus();
 
     updatePages(-1, -1, -1);
-
-    startTimer(20000);
 }
 
 Outputs::~Outputs()
@@ -246,13 +244,6 @@ QString Outputs::updateWalletBalance() {
     ui->accountComboBox->setCurrentIndex(selectedAccIdx);
     return accountInfo[selectedAccIdx].accountName;
 }
-
-void Outputs::timerEvent(QTimerEvent *event) {
-    Q_UNUSED(event);
-    state->requestUpdateWalletBalance();
-}
-
-
 
 }
 

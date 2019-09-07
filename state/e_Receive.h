@@ -42,7 +42,6 @@ public:
 
     void deletedWnd(wnd::Receive * w) { if(w==wnd) wnd = nullptr;}
 
-    void requestUpdateWalletBalance();
 public:
     // wnd::FileTransactionWndHandler
 

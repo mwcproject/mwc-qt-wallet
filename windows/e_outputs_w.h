@@ -64,8 +64,6 @@ private:
 
     int calcPageSize() const;
 
-    virtual void timerEvent(QTimerEvent *event);
-
 private:
     Ui::Outputs *ui;
     state::Outputs * state;

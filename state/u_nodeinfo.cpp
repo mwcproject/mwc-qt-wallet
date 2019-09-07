@@ -94,8 +94,7 @@ void NodeInfo::requestWalletResync() {
 }
 
 void NodeInfo::requestNodeInfo() {
-    if (context->wallet->isRunning())
-        context->wallet->getNodeStatus();
+    context->wallet->getNodeStatus();
 }
 
 wallet::WalletConfig NodeInfo::getWalletConfig() const {

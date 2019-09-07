@@ -116,8 +116,9 @@ void InputPassword::onLoginResult(bool ok) {
             // Set current receive account
             context->wallet->setReceiveAccount(context->appContext->getReceiveAccount());
 
-            // Updating the wallet balance
+            // Updating the wallet balance and a node status
             context->wallet->updateWalletBalance();
+            context->wallet->getNodeStatus();
         }
 
     }
@@ -131,7 +132,7 @@ void InputPassword::onWalletBalanceUpdated() {
         return; // in restart mode
 
     // Using wnd as a flag that we are active
-    if (wnd) {
+    if ( !inLockMode && wnd) {
         context->stateMachine->executeFrom(STATE::INPUT_PASSWORD);
     }
 }

@@ -63,6 +63,8 @@ private slots:
     void onAccountRenamed(bool success, QString errorMessage);
 
 private:
+    virtual void timerEvent(QTimerEvent *event);
+private:
     wnd::Accounts * wnd = nullptr;
 };
 

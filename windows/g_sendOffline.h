@@ -44,9 +44,6 @@ private slots:
     void on_settingsBtn_clicked();
 
 private:
-    virtual void timerEvent(QTimerEvent *event) override;
-
-private:
     Ui::SendOffline * ui;
     state::Send * state;
 
