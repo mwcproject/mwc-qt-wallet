@@ -28,7 +28,7 @@ static QString airdropUrlTestNetUrl;
 static int64_t logoutTimeMs = 1000*60*15; // 15 minutes is default
 static double  timeoutMultiplier = 1.0;
 static bool    useMwcMqS = true;
-
+static int     sendTimeoutMs = 60000; // 1 minute
 
 void setMwc713conf( QString conf ) {
     mwc713conf = conf;
@@ -48,13 +48,15 @@ void setMwcGuiWalletConf( QString conf ) {
  * @param logoutTimeMs          - Automatic locking for the wallet
  * @param timeoutMultiplier     - Multiplier for jobs timeouts. Default is 1.0
  * @param useMwcMqS             - true: use mwc mqs for slates exchange.  false: using mwc mq (non secure grin box) for slates exchange
+ * @param sendTimeoutMs         - timeout for mwc mq send. Expected that 2nd party is online. Otherwise we will ask user if he want to stop waiting and cancel transaction.
  */
 void setConfigData(QString _mwcPath, QString _wallet713path,
                    QString _mainStyleSheetPath, QString _dialogsStyleSheetPath,
                    QString _airdropUrlMainNetUrl, QString _airdropUrlTestNetUrl,
                    int64_t  _logoutTimeMs,
                    double _timeoutMultiplier,
-                   bool _useMwcMqS) {
+                   bool _useMwcMqS,
+                   int _sendTimeoutMs) {
     mwcPath = _mwcPath;
     wallet713path = _wallet713path;
     mainStyleSheetPath = _mainStyleSheetPath;
@@ -64,6 +66,7 @@ void setConfigData(QString _mwcPath, QString _wallet713path,
     logoutTimeMs = _logoutTimeMs;
     timeoutMultiplier = _timeoutMultiplier;
     useMwcMqS = _useMwcMqS;
+    sendTimeoutMs = _sendTimeoutMs;
 }
 
 
@@ -84,6 +87,8 @@ void            increaseTimeoutMultiplier() { timeoutMultiplier *= 1.6; }
 
 bool            getUseMwcMqS() {return useMwcMqS;}
 
+int             getSendTimeoutMs() {return sendTimeoutMs;}
+
 
 QString toString() {
     return "mwc713conf=" + mwc713conf + "\n" +
@@ -92,7 +97,8 @@ QString toString() {
             "wallet713path=" + wallet713path + "\n" +
             "mainStyleSheetPath=" + mainStyleSheetPath + "\n" +
             "dialogsStyleSheetPath=" + dialogsStyleSheetPath + "\n" +
-            "useMwcMqS=" + (useMwcMqS?"true":"false") + "\n";
+            "useMwcMqS=" + (useMwcMqS?"true":"false") + "\n" +
+            "sendTimeoutMs=" + QString::number(sendTimeoutMs) + "\n";
 }
 
 

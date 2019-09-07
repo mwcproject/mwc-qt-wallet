@@ -49,7 +49,7 @@ NodeInfo::NodeInfo(StateContext * context) :
                      this, &NodeInfo::onLoginResult, Qt::QueuedConnection);
 
     // Checking/update node status every 20 seconds...
-    startTimer(20000); // Let's update node info every 20 seconds
+    startTimer(60000); // Let's update node info every 60 seconds. By some reasons it is slow operation...
 }
 
 NodeInfo::~NodeInfo() {

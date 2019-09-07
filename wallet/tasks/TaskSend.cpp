@@ -104,19 +104,55 @@ bool TaskSetReceiveAccount::processTask(const QVector<WEvent> &events) {
 
 bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
 
-    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    // txid=60
+    // slate [2fb9c2a7-abac-4370-b6c8-8e10969902ee] for [0.100000000] MWCs sent successfully to [xmgEvZ4MCCGMJnRnNXKHBbHmSGWQchNr9uZpY5J1XXnsCFS45fsU]
 
-    if (errs.isEmpty() ) {
-        wallet713->setSendResults(true, QStringList());
+    int64_t txId = -1;
+    QString address;
+    QString slate;
+
+    {
+        QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
+        // Parsing for txId  - index of transaction that was created
+        for (auto &ln : lns) {
+            if (ln.message.startsWith("txid=")) {
+                bool ok = false;
+                txId = ln.message.mid(strlen("txid=")).toLongLong(&ok);
+                if (!ok)
+                    txId = -1;
+                else
+                    break;
+            }
+        }
+    }
+
+    {
+        // Let's check for slate
+        QVector< WEvent > sendSlate = filterEvents(events, WALLET_EVENTS::S_SLATE_WAS_SENT_TO);
+
+        if (sendSlate.size()==1) {
+            QStringList prms = sendSlate[0].message.split('|');
+            if (prms.size()==3)
+                slate = prms[0];
+                address = prms[2];
+        }
+    }
+
+    if ( txId>0 && !slate.isEmpty() && !address.isEmpty() ) {
+        wallet713->setSendResults(true, QStringList(), address, txId, slate);
         return true;
     }
 
     QStringList errMsgs;
+    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_ERROR );
 
     for (WEvent & evt : errs)
         errMsgs.push_back( evt.message );
 
-    wallet713->setSendResults(false, errMsgs);
+    if (errMsgs.isEmpty())
+        errMsgs.push_back("Not found expected output from mwc713");
+
+    wallet713->setSendResults( false, errMsgs, "", -1, "" );
     return true;
 }
 

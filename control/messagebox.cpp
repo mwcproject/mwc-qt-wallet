@@ -49,6 +49,9 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, QString
         ui->button2->setDefault(default2);
     }
 
+    ui->button2->adjustSize();
+    ui->button1->adjustSize();
+
     adjustSize();
 }
 

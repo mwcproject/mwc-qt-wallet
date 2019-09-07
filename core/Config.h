@@ -37,7 +37,8 @@ void setMwcGuiWalletConf( QString conf );
 void setConfigData(QString mwcPath, QString wallet713path,
                    QString mainStyleSheetPath, QString dialogsStyleSheetPath, QString airdropUrlMainNetUrl, QString airdropUrlTestNetUrl, int64_t logoutTimeMs,
                    double timeoutMultiplier,
-                   bool useMwcMqS);
+                   bool useMwcMqS,
+                   int sendTimeoutMs);
 
 
 // Note, workflow for config not enforced. Please don't abuse it
@@ -56,6 +57,8 @@ double          getTimeoutMultiplier();
 void            increaseTimeoutMultiplier();
 
 bool            getUseMwcMqS();
+
+int             getSendTimeoutMs();
 
 QString toString();
 

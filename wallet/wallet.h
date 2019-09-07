@@ -494,7 +494,7 @@ signals:
     void onAccountRenamed(bool success, QString errorMessage);
 
     // Send results
-    void onSend( bool success, QStringList errors );
+    void onSend( bool success, QStringList errors, QString address, int64_t txid, QString slate );
 
     void onSlateSendTo( QString slate, QString mwc, QString sendAddr );
     void onSlateFinalized( QString slate );

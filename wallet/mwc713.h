@@ -296,7 +296,7 @@ public:
                       int64_t totalNano, int64_t waitingConfNano, int64_t lockedNano, int64_t spendableNano,
                       bool mwcServerBroken );
 
-    void setSendResults(bool success, QStringList errors);
+    void setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate);
 
     void reportSlateSendTo( QString slate, QString mwc, QString sendAddr );
     void reportSlateSendBack( QString slate, QString sendAddr );

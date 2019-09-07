@@ -953,9 +953,9 @@ void MWC713::infoResults( QString currentAccountName, int64_t height,
     updateAccountInfo( acc, accountInfo, false );
 }
 
-void MWC713::setSendResults(bool success, QStringList errors) {
+void MWC713::setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate) {
     logger::logEmit( "MWC713", "onSend", "success=" + QString::number(success) );
-    emit onSend( success, errors );
+    emit onSend( success, errors, address, txid, slate );
 }
 
 void MWC713::reportSlateSendTo( QString slate, QString mwc, QString sendAddr ) {

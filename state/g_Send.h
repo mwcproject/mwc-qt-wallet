@@ -19,6 +19,7 @@
 #include "../wallet/wallet.h"
 #include "../core/appcontext.h"
 #include "../util/address.h"
+#include <QSet>
 
 namespace wnd {
 class SendStarting;
@@ -27,6 +28,15 @@ class SendOffline;
 }
 
 namespace state {
+
+struct SendEventInfo {
+    QString address;
+    int64_t txid;
+    QString slate;
+    int64_t timestamp;
+
+    void setData(QString address, int64_t txid,  QString slate);
+};
 
 class Send  : public QObject, public State {
     Q_OBJECT
@@ -57,13 +67,16 @@ public:
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "send.html";}
-
+    virtual void timerEvent(QTimerEvent *event) override;
 
 private slots:
     void onWalletBalanceUpdated();
-    void sendRespond( bool success, QStringList errors );
+    void sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate );
+    void onSlateFinalized( QString slate );
+
     void respSendFile( bool success, QStringList errors, QString fileName );
 
+    void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
 private:
     void switchToStartingWindow();
 
@@ -72,7 +85,9 @@ private:
     wnd::SendOnline         * onlineWnd = nullptr;
     wnd::SendOffline  * offlineWnd = nullptr;
 
-
+    // Key, slate
+    QMap<QString, SendEventInfo> waitingFinalization;
+    QSet<int64_t> transactions2cancel;
 };
 
 }

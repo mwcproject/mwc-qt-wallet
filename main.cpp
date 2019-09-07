@@ -110,6 +110,11 @@ bool readConfig(QApplication & app) {
     QString logoutTimeoutStr = reader.getString("logoutTimeout");
     QString timeoutMultiplier = reader.getString("timeoutMultiplier");
     bool useMwcMqS = reader.getString("useMwcMqS") != "false";  // Default expected to be 'true'
+    QString sendTimeoutMsStr = reader.getString("send_online_timeout_ms");
+
+    int sendTimeoutMs = sendTimeoutMsStr.toInt();
+    if (sendTimeoutMs<=0)
+        sendTimeoutMs = 60000; // 1 minutes should be good enough
 
     if (main_style_sheet.isEmpty())
         main_style_sheet = ":/resource/mwcwallet_style.css";
@@ -145,7 +150,7 @@ bool readConfig(QApplication & app) {
 #endif
     }
 
-    config::setConfigData( mwc_path, wallet713_path, main_style_sheet, dialogs_style_sheet, airdropUrlMainNet, airdropUrlTestNet, logoutTimeout*1000L, timeoutMultiplierVal, useMwcMqS );
+    config::setConfigData( mwc_path, wallet713_path, main_style_sheet, dialogs_style_sheet, airdropUrlMainNet, airdropUrlTestNet, logoutTimeout*1000L, timeoutMultiplierVal, useMwcMqS, sendTimeoutMs );
     return true;
 }
 
