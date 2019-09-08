@@ -132,9 +132,10 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
 
         if (sendSlate.size()==1) {
             QStringList prms = sendSlate[0].message.split('|');
-            if (prms.size()==3)
+            if (prms.size()==3) {
                 slate = prms[0];
                 address = prms[2];
+            }
         }
     }
 

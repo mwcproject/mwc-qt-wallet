@@ -155,6 +155,8 @@ void Send::onWalletBalanceUpdated() {
 
 void Send::timerEvent(QTimerEvent *event)
 {
+    Q_UNUSED(event);
+
     int64_t waitingTimeLimit = QDateTime::currentMSecsSinceEpoch() - config::getSendTimeoutMs();
 
     QVector<SendEventInfo> toCancel;

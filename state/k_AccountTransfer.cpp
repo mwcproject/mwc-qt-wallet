@@ -130,6 +130,7 @@ void AccountTransfer::onSetReceiveAccount( bool ok, QString AccountOrMessage ) {
 void AccountTransfer::onSend( bool success, QStringList errors, QString address, int64_t txid, QString slate ) {
     Q_UNUSED(txid);
     Q_UNUSED(slate);
+    Q_UNUSED(address);
 
     if (transferState!=1)
         return;
