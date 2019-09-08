@@ -198,6 +198,8 @@ void Airdrop::sendRequest(HTTP_CALL call, const QString & api,
 
     QNetworkRequest request;
 
+    // sslLibraryVersionString neede as a workaroung for a deadlock at defaultConfiguration, qt v5.9
+    QSslSocket::sslLibraryVersionString();
     QSslConfiguration config = QSslConfiguration::defaultConfiguration();
     config.setProtocol(QSsl::TlsV1_2);
     config.setPeerVerifyMode(QSslSocket::VerifyNone);
