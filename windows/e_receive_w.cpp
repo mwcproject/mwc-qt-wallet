@@ -47,7 +47,12 @@ Receive::~Receive() {
 }
 
 void Receive::updateMwcMqAddress(QString address) {
-    mwcAddress = (config::getUseMwcMqS() ? "mwcmqs://" : "mwcmq://") + address + "@" + walletConfig.getMwcMqHostFull();
+
+    QString mqHost = walletConfig.getMwcMqHostNorm();
+    if (!mqHost.isEmpty())
+        mqHost = "@" + mqHost;
+
+    mwcAddress = (config::getUseMwcMqS() ? "mwcmqs://" : "mwcmq://") + address + mqHost;
     ui->mwcmqAddress->setText( mwcAddress );
 }
 
