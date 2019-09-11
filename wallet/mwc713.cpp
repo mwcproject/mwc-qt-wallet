@@ -989,7 +989,7 @@ void MWC713::reportSlateReceivedBack( QString slate, QString mwc, QString fromAd
 }
 
 void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAddr, QString message ) {
-    QString msg = "Congratulations! You recieved " +mwc+ " wmc from " + fromAddr;
+    QString msg = "Congratulations! You recieved " +mwc+ " mwc from " + fromAddr;
     if (!message.isEmpty()) {
         msg += " with message " + message + ".";
     }
@@ -998,7 +998,7 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
 
     // Show message box with congrats. Msaages bot should work from any point. No needs to block locking or what ever we have
     control::MessageBox::message(nullptr, "Congratulations!",
-           "You recieved <b>" + mwc + "</b> wmc<br>" +
+           "You recieved <b>" + mwc + "</b> mwc<br>" +
            (message.isEmpty() ? "" : "Description: " + message + "<br>" ) +
            "<br>From: " + fromAddr +
            "<br>Slate: " + slate);
@@ -1254,7 +1254,7 @@ WalletConfig MWC713::getDefaultConfig()  {
 }
 
 
-// Update wallet config. Will update config and restart the wmc713.
+// Update wallet config. Will update config and restart the mwc713.
 // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
 //          and caller suppose listen for them
 bool MWC713::setWalletConfig(const WalletConfig & config)  {

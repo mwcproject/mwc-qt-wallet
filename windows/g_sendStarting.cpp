@@ -22,8 +22,8 @@ namespace wnd {
 
 
 QString generateAmountErrorMsg(int64_t mwcAmount, const wallet::AccountInfo &acc, const core::SendCoinsParams &sendParams) {
-    QString msg2print = "You are trying to send " + util::nano2one(mwcAmount) + " wmc, but you only have " +
-                        util::nano2one(acc.currentlySpendable) + " spendable wmc.";
+    QString msg2print = "You are trying to send " + util::nano2one(mwcAmount) + " mwc, but you only have " +
+                        util::nano2one(acc.currentlySpendable) + " spendable mwc.";
     if (acc.awaitingConfirmation > 0)
         msg2print += " " + util::nano2one(acc.awaitingConfirmation) + " coins are awaiting confirmation.";
 
@@ -33,9 +33,9 @@ QString generateAmountErrorMsg(int64_t mwcAmount, const wallet::AccountInfo &acc
     if (acc.awaitingConfirmation > 0 || acc.lockedByPrevTransaction > 0) {
         if (sendParams.inputConfirmationNumber != 1) {
             if (sendParams.inputConfirmationNumber < 0)
-                msg2print += " You can modify settings to spend wmc with less than 10 confirmations (wallet default value).";
+                msg2print += " You can modify settings to spend mwc with less than 10 confirmations (wallet default value).";
             else
-                msg2print += " You can modify settings to spend wmc with less than " +
+                msg2print += " You can modify settings to spend mwc with less than " +
                              QString::number(sendParams.inputConfirmationNumber) + " confirmations.";
         }
     }

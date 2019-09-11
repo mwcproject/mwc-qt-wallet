@@ -65,7 +65,7 @@ namespace logger {
 
     void logParsingEvent(wallet::WALLET_EVENTS event, QString message );
 
-    // Tasks to excecute on wmc713
+    // Tasks to excecute on mwc713
     void logTask( QString who, wallet::Mwc713Task * task, QString comment );
 
     // Events activity

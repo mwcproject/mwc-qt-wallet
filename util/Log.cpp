@@ -117,7 +117,7 @@ void logMwc713in(QString str) {
     logClient->doAppend2logs(true, "mwc713<<", str);
 }
 
-// Tasks to excecute on wmc713
+// Tasks to excecute on mwc713
 void logTask( QString who, wallet::Mwc713Task * task, QString comment ) {
     Q_ASSERT(logClient); // call initLogger first
     if (task == nullptr)

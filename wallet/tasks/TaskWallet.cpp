@@ -116,7 +116,7 @@ bool TaskInitW::processTask(const QVector<WEvent> & events) {
         return true; // Expected respond
 
     // Not expected respond, treat it an internal fatal error
-    wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::GENERIC, "Internal error. Fail to init wmc713 wallet with a password" );
+    wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::GENERIC, "Internal error. Fail to init mwc713 wallet with a password" );
     return true;
 }
 

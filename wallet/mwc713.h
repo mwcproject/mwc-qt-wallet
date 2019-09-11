@@ -175,7 +175,7 @@ public:
     // Get configuration form the resource file.
     virtual WalletConfig getDefaultConfig()  override;
 
-    // Update wallet config. Will update config and restart the wmc713.
+    // Update wallet config. Will update config and restart the mwc713.
     // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
     //          and caller suppose listen for them
     // If return true, expected that wallet will need to have password input.

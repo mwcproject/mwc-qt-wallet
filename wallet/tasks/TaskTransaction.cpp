@@ -113,7 +113,7 @@ bool TaskOutputs::processTask(const QVector<WEvent> & events) {
         }
     }
 
-    // positions for the columns. Note, the columns and the order are hardcoded and come from wmc713 data!!!
+    // positions for the columns. Note, the columns and the order are hardcoded and come from mwc713 data!!!
 
     OutputIdxLayout outLayout;
 
@@ -270,7 +270,7 @@ static void parseTransactionsOutput(const QVector<WEvent> & events, // in
         }
     }
 
-    // positions for the columns. Note, the columns and the order are hardcoded and come from wmc713 data!!!
+    // positions for the columns. Note, the columns and the order are hardcoded and come from mwc713 data!!!
 
     TransactionIdxLayout tl;
 
