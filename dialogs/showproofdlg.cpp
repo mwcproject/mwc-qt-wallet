@@ -15,6 +15,7 @@
 #include "showproofdlg.h"
 #include "ui_showproofdlg.h"
 #include "../util/execute.h"
+#include "../core/global.h"
 
 namespace dlg {
 
@@ -23,7 +24,8 @@ bool ProofInfo::parseProofText(const QString & proof) {
 
     // this file proves that [0.100000000] MWCs was sent to [xmgEvZ4MCCGMJnRnNXKHBbHmSGWQchNr9uZpY5J1XXnsCFS45fsU] from [xmiuyC3sdhXpJnR7pvQ8xNgZLWQRQziZ1FxhEQd8urYWvSusuC69]
     int idx0 = proof.indexOf("this file proves that");
-    Q_ASSERT(idx0>=0);
+    if (idx0<0)
+        return false;
 
     int mwcIdx1 = proof.indexOf('[', idx0);
     int mwcIdx2 = proof.indexOf(']', mwcIdx1);
@@ -66,7 +68,7 @@ bool ProofInfo::parseProofText(const QString & proof) {
 }
 
 
-ShowProofDlg::ShowProofDlg(QWidget *parent, const QString &fileName, const ProofInfo & proofInfo) :
+ShowProofDlg::ShowProofDlg(QWidget *parent, const QString &fileName, const ProofInfo & proofInfo, const wallet::WalletConfig & config ) :
     control::MwcDialog(parent),
         ui(new Ui::ShowProofDlg),
         proof(proofInfo)
@@ -83,6 +85,9 @@ ShowProofDlg::ShowProofDlg(QWidget *parent, const QString &fileName, const Proof
 
     ui->output->setText( proofInfo.output );
     ui->kernel->setText( proofInfo.kernel );
+
+
+    blockExplorerUrl = (config.getNetwork() == "Mainnet") ? mwc::BLOCK_EXPLORER_URL_MAINNET : mwc::BLOCK_EXPLORER_URL_FLOONET;
 }
 
 ShowProofDlg::~ShowProofDlg() {
@@ -91,12 +96,12 @@ ShowProofDlg::~ShowProofDlg() {
 
 void ShowProofDlg::on_viewOutput_clicked()
 {
-    util::openUrlInBrowser( "https://explorer.mwc.mw/#o" + proof.output );
+    util::openUrlInBrowser( "https://"+blockExplorerUrl+"/#o" + proof.output );
 }
 
 void ShowProofDlg::on_viewKernel_clicked()
 {
-    util::openUrlInBrowser( "https://explorer.mwc.mw/#k" + proof.kernel );
+    util::openUrlInBrowser( "https://"+blockExplorerUrl+"/#k" + proof.kernel );
 }
 
 void ShowProofDlg::on_pushButton_clicked()

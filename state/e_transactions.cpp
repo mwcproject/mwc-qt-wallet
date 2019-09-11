@@ -45,7 +45,7 @@ NextStateRespond Transactions::execute() {
 
     if (wnd==nullptr) {
         wnd = (wnd::Transactions*)context->wndManager->switchToWindowEx( mwc::PAGE_E_TRANSACTION,
-                new wnd::Transactions( context->wndManager->getInWndParent(), this ) );
+                new wnd::Transactions( context->wndManager->getInWndParent(), this, context->wallet->getWalletConfig() ) );
     }
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 };

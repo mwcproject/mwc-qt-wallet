@@ -16,6 +16,7 @@
 #define SHOWPROOFDLG_H
 
 #include "../control/mwcdialog.h"
+#include "../wallet/wallet.h"
 
 namespace Ui {
 class ShowProofDlg;
@@ -39,7 +40,7 @@ class ShowProofDlg : public control::MwcDialog {
 Q_OBJECT
 
 public:
-    explicit ShowProofDlg(QWidget *parent, const QString &fileName, const ProofInfo & proofInfo);
+    explicit ShowProofDlg(QWidget *parent, const QString &fileName, const ProofInfo & proofInfo, const wallet::WalletConfig & config);
 
     ~ShowProofDlg();
 
@@ -53,6 +54,7 @@ private slots:
 private:
     Ui::ShowProofDlg *ui;
     ProofInfo proof;
+    QString blockExplorerUrl;
 };
 
 }

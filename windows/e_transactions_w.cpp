@@ -25,10 +25,11 @@
 
 namespace wnd {
 
-Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
+Transactions::Transactions(QWidget *parent, state::Transactions * _state, const wallet::WalletConfig & _walletConfig) :
     core::NavWnd(parent, _state->getContext()),
     ui(new Ui::Transactions),
-    state(_state)
+    state(_state),
+    walletConfig(_walletConfig)
 {
     ui->setupUi(this);
 
@@ -46,6 +47,7 @@ Transactions::Transactions(QWidget *parent, state::Transactions * _state) :
     requestTransactions(accName);
 
     updatePages(-1, -1, -1);
+
 }
 
 Transactions::~Transactions()
@@ -216,7 +218,7 @@ void Transactions::showExportProofResults(bool success, QString fn, QString msg 
     if (success) {
         dlg::ProofInfo proof;
         if (proof.parseProofText(msg)) {
-            dlg::ShowProofDlg dlg(this, fn, proof );
+            dlg::ShowProofDlg dlg(this, fn, proof, walletConfig );
             dlg.exec();
         }
         else {
@@ -233,7 +235,7 @@ void Transactions::showVerifyProofResults(bool success, QString fn, QString msg 
     if (success) {
         dlg::ProofInfo proof;
         if (proof.parseProofText(msg)) {
-            dlg::ShowProofDlg dlg(this, fn, proof );
+            dlg::ShowProofDlg dlg(this, fn, proof, walletConfig );
             dlg.exec();
         }
         else {

@@ -33,7 +33,7 @@ class Transactions : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit Transactions(QWidget *parent, state::Transactions * state);
+    explicit Transactions(QWidget *parent, state::Transactions * state, const wallet::WalletConfig & walletConfig);
     ~Transactions();
 
     void setTransactionCount(QString account, int number);
@@ -84,6 +84,7 @@ private:
     state::Transactions * state;
     QVector<wallet::AccountInfo> accountInfo;
     QVector<wallet::WalletTransaction> transactions;
+    wallet::WalletConfig  walletConfig;
 
     int currentPagePosition = 0; // position at the paging...
     int totalTransactions = 0;
