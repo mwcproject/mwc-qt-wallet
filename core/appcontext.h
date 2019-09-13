@@ -81,8 +81,10 @@ public:
     template <class T>
     T getCookie(QString key);
 
-//    void setPassHash(const QString & pass);
-//    bool checkPassHash(const QString & pass) const;
+
+    double getGuiScale(const double defaultVal);
+    void setGuiScale(double scale) { guiScale = scale; }
+
 
     state::STATE getActiveWndState() const {return activeWndState;}
     void setActiveWndState(state::STATE  state) {activeWndState=state;}
@@ -142,6 +144,8 @@ private:
     // Current Path dirs
     QMap<QString,QString> pathStates;
     QMap<QString,QVector<int> > intVectorStates;
+
+    double guiScale = -1.0;
 
     // Contact list
     QVector<ContactRecord> contactList;

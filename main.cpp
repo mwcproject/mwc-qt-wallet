@@ -37,7 +37,7 @@
 #include <QSystemSemaphore>
 #include <QThread>
 #include <control/messagebox.h>
-#include "util/TestSystemSemaphoreThread.h"
+#include "util/execute.h"
 #include "tests/testStringUtils.h"
 
 // Very first run - init everything
@@ -156,6 +156,7 @@ bool readConfig(QApplication & app) {
 
 int main(int argc, char *argv[])
 {
+ //   qputenv("QT_SCALE_FACTOR", "0.8");
 
 #ifdef QT_DEBUG
     // tests are quick, let's run them in debug
@@ -163,9 +164,46 @@ int main(int argc, char *argv[])
 #endif
 
 
+
     QApplication app(argc, argv);
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+
+    QStringList args = QCoreApplication::arguments();
+    // Checking if we need to do anything with a font scale
+
+    core::AppContext appContext;
+
+#ifndef Q_OS_DARWIN
+
+    if (args.size() > 0 ) {
+        util::setMwcQtWalletPath(args[0]);
+    }
+
+    double scale = -1.0;
+    for ( int t=0; t<args.size()-1; t++ ) {
+        if ( args[t] == "ui_scale" ) {
+            scale = args[t+1].toDouble();
+            break;
+        }
+    }
+
+    if (scale>0.0) {
+        // It is initial call, let's read what does user set and then apply
+        scale = appContext.getGuiScale(scale);
+    }
+
+/*    if ( scale>0.0 ) {
+        // Updating env variable and restart
+        if (!util::restartMwcQtWallet( 1.6 )) {
+            control::MessageBox::message(nullptr, "OS Error",
+                       "Unable to restart mwc qt wallet process to apply UI scale factor.\nThe default scale will be used.");
+        }
+        else {
+            return 1;
+        }
+    }*/
+#endif
 
     // -------------------------------------------
     // Check envoronment variables
@@ -209,28 +247,13 @@ int main(int argc, char *argv[])
         }
     }
 
-    // Ensure that only instance can run
-    // The easiest and error proof way - create global system object, so
-    // OS will manage it's lifecycle.
-    // Shared memory doesn't work for Linux (will work for Windows), Unfortunately it can survive crash and it is not what we need.
-    // QSystemSemaphore fits better. Enen it survive crash on Unix, but OS at least revert back acquire operations.
-    // It is good enough for us, so we can use QSystemSemaphore. Counter will show number of instances
-
-    QSystemSemaphore instancesSemaphore("mwc-qt-wallet-instances", 1);
+    if (!util::acquireAppGlobalLock() )
     {
-        // Testing semaphore from different thread. Problem that system semaphore doesn't have timeout.
-        util::TestSystemSemaphoreThread *testThread = new util::TestSystemSemaphoreThread(&instancesSemaphore);
-        testThread->start();
-        if (!testThread->wait( (unsigned long)(500 * std::max(1.0,config::getTimeoutMultiplier()) + 0.5) ) ) {
-            // Seems like we are blocked on global semaphore. It is mean that second instance does exist
-            control::MessageBox::message(nullptr, "Second mwc-qt-wallet instance is detected",
-                                         "There is another instance of mwc-qt-wallet is already running. It is impossible to run more than one instance of the wallet at the same time.");
-            return 1;
-        }
-        delete testThread;
+        // Seems like we are blocked on global semaphore. It is mean that second instance does exist
+        control::MessageBox::message(nullptr, "Second mwc-qt-wallet instance is detected",
+                                     "There is another instance of mwc-qt-wallet is already running. It is impossible to run more than one instance of the wallet at the same time.");
+        return 1;
     }
-
-    core::AppContext appContext;
 
     //main window has delete on close flag. That is why need to
     // create dynamically. Window will be deleted on close
@@ -258,6 +281,8 @@ int main(int argc, char *argv[])
     delete machine; machine=nullptr;
     delete wallet;  wallet = nullptr;
     delete wndManager; wndManager=nullptr;
+
+    util::releaseAppGlobalLock();
 
     return retVal;
   }

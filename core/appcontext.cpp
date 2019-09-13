@@ -136,7 +136,7 @@ bool AppContext::loadData() {
 
     int id = 0;
     in >> id;
-    if (id!=0x4783)
+    if (id!=0x4783 && id!=0x4784)
          return false;
 
     in >> receiveAccount;
@@ -162,6 +162,9 @@ bool AppContext::loadData() {
             return false;
     }
 
+    if (id>=0x4784)
+        in >> guiScale;
+
     return true;
 }
 
@@ -181,7 +184,7 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x4783;
+    out << 0x4784;
     out << receiveAccount;
     out << currentAccountName;
     out << int(activeWndState);
@@ -194,6 +197,8 @@ void AppContext::saveData() const {
     for ( const auto & c : contactList ) {
         c.saveData(out);
     }
+
+    out << guiScale;
 }
 
 // AirdropRequests will handle differently
@@ -298,6 +303,15 @@ QPair<bool, QString> AppContext::updateContact( const ContactRecord & prevValue,
     }
     return QPair<bool, QString>(false, "Contact '" + prevValue.name + "' not found. Unable to update it.");
 }
+
+double AppContext::getGuiScale(const double defaultVal)
+{
+    if (guiScale <0.0) {
+        guiScale = defaultVal;
+    }
+    return guiScale;
+}
+
 
 
 }

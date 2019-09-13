@@ -20,6 +20,21 @@
 // OS dependent calls
 namespace util {
     void openUrlInBrowser(const QString & url);
+
+    // MwcQtWallet start/stop/checking management
+    // Path to current instance from command line
+    void setMwcQtWalletPath( QString path );
+
+    // Point of restart only with a gui
+    // Return true in
+    bool restartMwcQtWallet( double guiScale );
+
+    // Will try to get a global lock. Return true if lock was obtained
+    bool acquireAppGlobalLock();
+
+    // Destroy global lock object. Other instance can start once.
+    void releaseAppGlobalLock();
+
 }
 
 
