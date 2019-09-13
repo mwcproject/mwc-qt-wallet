@@ -88,7 +88,7 @@ void Receive::signTransaction( QString fileName ) {
     wallet::WalletTransaction transaction;
     fileTransWnd = (wnd::FileTransaction*) context->wndManager->switchToWindowEx( mwc::PAGE_G_RECEIVE_TRANS,
                                                                                   new wnd::FileTransaction( context->wndManager->getInWndParent(), this, fileName, flTrInfo, transaction, lastNodeHeight,
-                                                                                                            "Receive File Transaction", "Generate Respond") );
+                                                                                                            "Receive File Transaction", "Generate Response") );
 }
 
 void Receive::ftBack() {
