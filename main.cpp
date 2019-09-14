@@ -162,106 +162,114 @@ int main(int argc, char *argv[])
     test::testLongLong2ShortStr();
 #endif
 
-    Q_ASSERT(argc>=1);
-    // Process arglist.
-    // Furst argument has to be the app path
-    util::setMwcQtWalletPath(argv[0]);
+    int retVal = 0;
 
-    // !!! Note !!!  Custor arguments must be last in the line. Otherwise all at the right will be truncated.
-    double scale = -1.0;
-    for ( int t=1;t<argc-1; t++) {
-        if ( strcmp("--ui_scale", argv[t])==0 ) {
-            scale = QString(argv[t+1]).toDouble();
-            argc = t;
-            break;
+    {
+
+        Q_ASSERT(argc>=1);
+        // Process arglist.
+        // Furst argument has to be the app path
+        util::setMwcQtWalletPath(argv[0]);
+
+        // !!! Note !!!  Custor arguments must be last in the line. Otherwise all at the right will be truncated.
+        double scale = -1.0;
+        for ( int t=1;t<argc-1; t++) {
+            if ( strcmp("--ui_scale", argv[t])==0 ) {
+                scale = QString(argv[t+1]).toDouble();
+                argc = t;
+                break;
+            }
         }
-    }
-    core::AppContext appContext;
+        core::AppContext appContext;
 
-    if (scale>0.0)
-        appContext.initGuiScale(scale);
-
-
-    // MacOS doesn't process QT_SCALE_FACTOR correctlly. That is why it is disabled here
-#ifndef Q_OS_DARWIN
-    // First let's app the UI scale factor. It must be done before QApplication will be created
-
-    scale = appContext.getGuiScale();
-    if (scale==1.0)
-        scale = 1.001;
-
-    if (scale>0.0)
-        qputenv( "QT_SCALE_FACTOR", QString::number(scale).toLatin1() );
-
-#endif
-
-    QApplication app(argc, argv);
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-
-    logger::initLogger();
-
-    if (!deployFilesFromResources() ) {
-        QMessageBox::critical(nullptr, "Error", "Unable to provision or verify resource files during the first run");
-        return 1;
-    }
-
-    if (!readConfig(app) ) {
-        QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read configuration");
-        return 1;
-    }
-
-    qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
+        if (scale>0.0)
+            appContext.initGuiScale(scale);
 
 
-    { // Apply style sheet
-        QFile file( config::getMainStyleSheetPath() );
-        if (file.open(QFile::ReadOnly | QFile::Text)) {
-               QTextStream ts(&file);
-               app.setStyleSheet(ts.readAll());
-        }
-        else {
-            QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read the stylesheet.");
+        // MacOS doesn't process QT_SCALE_FACTOR correctlly. That is why it is disabled here
+    #ifndef Q_OS_DARWIN
+        // First let's app the UI scale factor. It must be done before QApplication will be created
+
+        scale = appContext.getGuiScale();
+        if (scale==1.0)
+            scale = 1.001;
+
+        if (scale>0.0)
+            qputenv( "QT_SCALE_FACTOR", QString::number(scale).toLatin1() );
+
+    #endif
+
+        QApplication app(argc, argv);
+        QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+        QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+
+        logger::initLogger();
+
+        if (!deployFilesFromResources() ) {
+            QMessageBox::critical(nullptr, "Error", "Unable to provision or verify resource files during the first run");
             return 1;
         }
+
+        if (!readConfig(app) ) {
+            QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read configuration");
+            return 1;
+        }
+
+        qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
+
+
+        { // Apply style sheet
+            QFile file( config::getMainStyleSheetPath() );
+            if (file.open(QFile::ReadOnly | QFile::Text)) {
+                   QTextStream ts(&file);
+                   app.setStyleSheet(ts.readAll());
+            }
+            else {
+                QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read the stylesheet.");
+                return 1;
+            }
+        }
+
+        if (!util::acquireAppGlobalLock() )
+        {
+            // Seems like we are blocked on global semaphore. It is mean that second instance does exist
+            control::MessageBox::message(nullptr, "Second mwc-qt-wallet instance is detected",
+                                         "There is another instance of mwc-qt-wallet is already running. It is impossible to run more than one instance of the wallet at the same time.");
+            return 1;
+        }
+
+        //main window has delete on close flag. That is why need to
+        // create dynamically. Window will be deleted on close
+        core::MainWindow * mainWnd = new core::MainWindow(nullptr);
+
+        mwc::setApplication(&app, mainWnd);
+
+        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
+
+        core::WindowManager * wndManager = new core::WindowManager( mainWnd, mainWnd->getMainWindow() );
+
+        mainWnd->show();
+
+        state::StateContext context( &appContext, wallet, wndManager, mainWnd );
+
+        state::StateMachine * machine = new state::StateMachine(&context);
+        mainWnd->setAppEnvironment( machine, wallet);
+        machine->start();
+
+        retVal = app.exec();
+
+        // Now we have to stop other object nicely.
+        // Note, the order is different from creation.
+        // mainWnd expected to be dead here.
+        delete machine; machine=nullptr;
+        delete wallet;  wallet = nullptr;
+        delete wndManager; wndManager=nullptr;
+
+        util::releaseAppGlobalLock();
     }
 
-    if (!util::acquireAppGlobalLock() )
-    {
-        // Seems like we are blocked on global semaphore. It is mean that second instance does exist
-        control::MessageBox::message(nullptr, "Second mwc-qt-wallet instance is detected",
-                                     "There is another instance of mwc-qt-wallet is already running. It is impossible to run more than one instance of the wallet at the same time.");
-        return 1;
-    }
-
-    //main window has delete on close flag. That is why need to
-    // create dynamically. Window will be deleted on close
-    core::MainWindow * mainWnd = new core::MainWindow(nullptr);
-
-    mwc::setApplication(&app, mainWnd);
-
-    wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
-
-    core::WindowManager * wndManager = new core::WindowManager( mainWnd, mainWnd->getMainWindow() );
-
-    mainWnd->show();
-
-    state::StateContext context( &appContext, wallet, wndManager, mainWnd );
-
-    state::StateMachine * machine = new state::StateMachine(&context);
-    mainWnd->setAppEnvironment( machine, wallet);
-    machine->start();
-
-    int retVal = app.exec();
-
-    // Now we have to stop other object nicely.
-    // Note, the order is different from creation.
-    // mainWnd expected to be dead here.
-    delete machine; machine=nullptr;
-    delete wallet;  wallet = nullptr;
-    delete wndManager; wndManager=nullptr;
-
-    util::releaseAppGlobalLock();
+    // All objets are expected to be released at this point
+    util::restartMwcQtWalletIfRequested();
 
     return retVal;
   }

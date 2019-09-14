@@ -86,8 +86,7 @@ void WalletConfig::updateGuiScale(double scale) {
 
 void WalletConfig::restartMwcQtWallet() {
     // Stopping wallet first
-    context->wallet->logout(true);
-    util::restartMwcQtWallet();
+    util::requestRestartMwcQtWallet();
     QCoreApplication::quit();
 }
 

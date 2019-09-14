@@ -28,11 +28,11 @@
 namespace wnd {
 
 static int scale2Id(double scale) {
-    if (scale < 0.87 )
+    if (scale < 1.15 )
         return 1;
-    else if (scale < 1.25)
+    else if (scale < 1.45)
         return 2;
-    else if (scale < 1.75)
+    else if (scale < 1.8)
         return 3;
     else
         return 4;
@@ -40,9 +40,9 @@ static int scale2Id(double scale) {
 
 static double id2scale(int scale) {
     switch(scale) {
-    case 1: return 0.75;
-    case 2: return 1.0;
-    case 3: return 1.5;
+    case 1: return 1.0;
+    case 2: return 1.3;
+    case 3: return 1.6;
     default: return 2.0;
     }
 }

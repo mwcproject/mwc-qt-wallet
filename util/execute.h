@@ -25,9 +25,11 @@ namespace util {
     // Path to current instance from command line
     void setMwcQtWalletPath( QString path );
 
-    // Point of restart only with a gui
-    // Return true in
-    bool restartMwcQtWallet();
+    // Request to restart mwc qt wallet on exit of this app
+    void requestRestartMwcQtWallet();
+
+    // Start a new instance of the wallet. Expecting that this instance is exiting
+    void restartMwcQtWalletIfRequested();
 
     // Will try to get a global lock. Return true if lock was obtained
     bool acquireAppGlobalLock();

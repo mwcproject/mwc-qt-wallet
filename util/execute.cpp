@@ -57,11 +57,19 @@ static QSystemSemaphore * instancesSemaphore = nullptr;
 // Path to current instance from command line
 void setMwcQtWalletPath( QString path ) {mwcQtWalletPath = path;}
 
+static bool restartRequested = false;
+
+// Request to restart mwc qt wallet on exit of this app
+void requestRestartMwcQtWallet() {restartRequested=true;}
+
+
 // Point of restart only with a gui
-bool restartMwcQtWallet() {
+void restartMwcQtWalletIfRequested() {
+    if (!restartRequested)
+        return;
+
     Q_ASSERT( !mwcQtWalletPath.isEmpty() );
-    releaseAppGlobalLock();
-    return QProcess::startDetached( mwcQtWalletPath, QStringList(), QDir::currentPath() );
+    QProcess::startDetached( mwcQtWalletPath, QStringList(), QDir::currentPath() );
 }
 
 // Will try to get a global lock. Return true if lock was obtained
