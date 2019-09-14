@@ -19,6 +19,8 @@
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../core/global.h"
+#include "../util/execute.h"
+#include <QCoreApplication>
 
 namespace state {
 
@@ -47,15 +49,17 @@ wallet::WalletConfig WalletConfig::getDefaultWalletConfig() const {
     return context->wallet->getDefaultConfig();
 }
 
-bool WalletConfig::setWalletConfig(const wallet::WalletConfig & config) {
+bool WalletConfig::setWalletConfig(const wallet::WalletConfig & config, bool guiWalletRestartExpected) {
     if (context->wallet->setWalletConfig(config)) {
         // restarting the wallet...
+        if (guiWalletRestartExpected)
+            return false; // no need to restart the mwc713. Whole waller need to be restarted soon
+
         context->stateMachine->executeFrom( STATE::NONE );
         return true;
     }
     return false;
 }
-
 
 
 core::SendCoinsParams  WalletConfig::getSendCoinsParams() const {
@@ -68,6 +72,24 @@ void WalletConfig::setSendCoinsParams(const core::SendCoinsParams & params) {
     context->wallet->updateWalletBalance(); // Number of outputs might change, requesting update in background
 }
 
+double WalletConfig::getGuiScale() const {
+    return context->appContext->getGuiScale();
+}
+
+double WalletConfig::getInitGuiScale() const {
+    return context->appContext->getInitGuiScale();
+}
+
+void WalletConfig::updateGuiScale(double scale) {
+    context->appContext->setGuiScale(scale);
+}
+
+void WalletConfig::restartMwcQtWallet() {
+    // Stopping wallet first
+    context->wallet->logout(true);
+    util::restartMwcQtWallet();
+    QCoreApplication::quit();
+}
 
 
 }

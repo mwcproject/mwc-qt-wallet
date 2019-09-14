@@ -304,12 +304,9 @@ QPair<bool, QString> AppContext::updateContact( const ContactRecord & prevValue,
     return QPair<bool, QString>(false, "Contact '" + prevValue.name + "' not found. Unable to update it.");
 }
 
-double AppContext::getGuiScale(const double defaultVal)
+double AppContext::getGuiScale() const
 {
-    if (guiScale <0.0) {
-        guiScale = defaultVal;
-    }
-    return guiScale;
+    return guiScale<0.0 ? initScaleValue : guiScale;
 }
 
 

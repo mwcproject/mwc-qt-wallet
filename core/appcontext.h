@@ -82,7 +82,10 @@ public:
     T getCookie(QString key);
 
 
-    double getGuiScale(const double defaultVal);
+    void initGuiScale(const double _initScaleValue) { initScaleValue = _initScaleValue; }
+    double getInitGuiScale() const {return initScaleValue;}
+
+    double getGuiScale() const;
     void setGuiScale(double scale) { guiScale = scale; }
 
 
@@ -146,6 +149,7 @@ private:
     QMap<QString,QVector<int> > intVectorStates;
 
     double guiScale = -1.0;
+    double initScaleValue = 1.0; // default scale value
 
     // Contact list
     QVector<ContactRecord> contactList;

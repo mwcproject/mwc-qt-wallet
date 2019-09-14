@@ -27,7 +27,7 @@ namespace util {
 
     // Point of restart only with a gui
     // Return true in
-    bool restartMwcQtWallet( double guiScale );
+    bool restartMwcQtWallet();
 
     // Will try to get a global lock. Return true if lock was obtained
     bool acquireAppGlobalLock();

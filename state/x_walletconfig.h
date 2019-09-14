@@ -31,12 +31,17 @@ public:
     wallet::WalletConfig    getDefaultWalletConfig() const;
 
     // return true if mwc713 will be restarted. UI suppose to finish asap
-    bool setWalletConfig(const wallet::WalletConfig & config);
+    bool setWalletConfig(const wallet::WalletConfig & config, bool guiWalletRestartExpected);
 
     core::SendCoinsParams   getSendCoinsParams() const;
     // account refresh will be requested...
     void setSendCoinsParams(const core::SendCoinsParams & params);
 
+    double getGuiScale() const;
+    double getInitGuiScale() const;
+    void updateGuiScale(double scale);
+
+    void restartMwcQtWallet();
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "wallet_configuration.html";}

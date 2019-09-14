@@ -287,9 +287,6 @@ public:
     // syncCall - stop NOW. Caller suppose to understand what he is doing
     virtual void logout(bool syncCall) = 0;
 
-    // Close the wallet and release the process
-    virtual bool close()  = 0;
-
     // Confirm that user write the passphase
     // SYNC command
     virtual void confirmNewSeed()  = 0;

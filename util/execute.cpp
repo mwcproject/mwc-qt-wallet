@@ -58,38 +58,10 @@ static QSystemSemaphore * instancesSemaphore = nullptr;
 void setMwcQtWalletPath( QString path ) {mwcQtWalletPath = path;}
 
 // Point of restart only with a gui
-bool restartMwcQtWallet( double guiScale ) {
+bool restartMwcQtWallet() {
     Q_ASSERT( !mwcQtWalletPath.isEmpty() );
-
-    // Setup the scale Ratio and restart the app.
-
-    // Creating process and starting as detached
-    QProcess * process = new QProcess();
-    process->setWorkingDirectory( QDir::currentPath() );
-
-    QProcessEnvironment env;
-
-    // Patch that is needed for Linux and Windows. This workaround
-    if (guiScale==1.0)
-        guiScale = 1.0001;
-
-    env.insert("QT_SCALE_FACTOR", QString::number( guiScale ) );
-    process->setProcessEnvironment(env);
-
-    process->setProgram( mwcQtWalletPath );
-    process->setArguments( QStringList() ); // No arguments for now
-
-    // expected qt v5.10+
-#if QT_VERSION >= 0x050C00
-
-    // release lock in any case
     releaseAppGlobalLock();
-    qint64 pid  = 0;
-    return process->startDetached(&pid);
-#else
-    Q_ASSERT(false); // Not supported by old QT version
-    return false;
-#endif
+    return QProcess::startDetached( mwcQtWalletPath, QStringList(), QDir::currentPath() );
 }
 
 // Will try to get a global lock. Return true if lock was obtained

@@ -56,6 +56,11 @@ private slots:
 
     void on_mwcmqHost_textEdited(const QString &arg1);
 
+    void on_fontSz1_clicked();
+    void on_fontSz2_clicked();
+    void on_fontSz3_clicked();
+    void on_fontSz4_clicked();
+
 private:
     void setValues(const QString & mwc713directory,
                    const QString & keyBasePath,
@@ -74,12 +79,15 @@ private:
         // Update button state
     void updateButtons();
 
+    void checkSizeButton(int szId); // Id match the control names: 1..4
+    int getcheckedSizeButton() const;
 private:
     Ui::WalletConfig *ui;
     state::WalletConfig * state;
 
     wallet::WalletConfig currentWalletConfig;
     core::SendCoinsParams sendParams;
+    int uiScale = 2; // in the range [1..4]
 
     wallet::WalletConfig defaultWalletConfig;
     core::SendCoinsParams defaultSendParams;

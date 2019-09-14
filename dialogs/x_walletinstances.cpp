@@ -92,7 +92,7 @@ void WalletInstances::on_applyButton_clicked() {
 
     newWalletConfig.setDataPathWithNetwork( dataPath, network );
 
-    if (!state->setWalletConfig(newWalletConfig) )
+    if (!state->setWalletConfig(newWalletConfig, false) )
     {
         control::MessageBox::message( this, "Internal error", "Unable to change the folder for your wallet" );
         return;

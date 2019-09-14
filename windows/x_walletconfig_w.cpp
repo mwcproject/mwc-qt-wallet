@@ -27,6 +27,26 @@
 
 namespace wnd {
 
+static int scale2Id(double scale) {
+    if (scale < 0.87 )
+        return 1;
+    else if (scale < 1.25)
+        return 2;
+    else if (scale < 1.75)
+        return 3;
+    else
+        return 4;
+}
+
+static double id2scale(int scale) {
+    switch(scale) {
+    case 1: return 0.75;
+    case 2: return 1.0;
+    case 3: return 1.5;
+    default: return 2.0;
+    }
+}
+
 static QString calcMWCMW_DOMAIN_DEFAULT_STR() {
     return QString("default MWC MQ") + (config::getUseMwcMqS() ? "S" : "")  + " Domain";
 }
@@ -43,6 +63,17 @@ WalletConfig::WalletConfig(QWidget *parent, state::WalletConfig * _state) :
 
     defaultWalletConfig = state->getDefaultWalletConfig();
 
+    uiScale = scale2Id( state->getGuiScale() );
+    checkSizeButton(uiScale);
+
+#ifdef Q_OS_DARWIN
+    // MacOS doesn't support font scale. Need to hide all the buttons
+    ui->fontSizeLabel->hide();
+    ui->fontSz1->hide();
+    ui->fontSz2->hide();
+    ui->fontSz3->hide();
+    ui->fontSz4->hide();
+#endif
 
     setValues(currentWalletConfig.getDataPath(), currentWalletConfig.keyBasePath,
               currentWalletConfig.getMwcMqHostNorm(),
@@ -72,6 +103,7 @@ void WalletConfig::setValues(const QString & mwc713directory,
 
 void WalletConfig::updateButtons() {
     bool sameWithCurrent =
+        getcheckedSizeButton() == uiScale &&
         ui->mwc713directoryEdit->text().trimmed() == currentWalletConfig.getDataPath() &&
         keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == currentWalletConfig.keyBasePath &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == currentWalletConfig.getMwcMqHostNorm() &&
@@ -79,6 +111,7 @@ void WalletConfig::updateButtons() {
         ui->changeOutputsEdit->text().trimmed() == QString::number(sendParams.changeOutputs);
 
     bool sameWithDefault =
+        getcheckedSizeButton() == scale2Id( state->getInitGuiScale() ) &&
         ui->mwc713directoryEdit->text().trimmed() == defaultWalletConfig.getDataPath() &&
         keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == defaultWalletConfig.keyBasePath &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == defaultWalletConfig.getMwcMqHostNorm() &&
@@ -270,6 +303,9 @@ void WalletConfig::on_restoreDefault_clicked()
 {
     setValues(defaultWalletConfig.getDataPath(), defaultWalletConfig.keyBasePath, defaultWalletConfig.getMwcMqHostNorm(),
               defaultSendParams.inputConfirmationNumber, defaultSendParams.changeOutputs);
+
+    checkSizeButton( scale2Id(state->getInitGuiScale()) );
+
     updateButtons();
 }
 
@@ -284,16 +320,68 @@ void WalletConfig::on_applyButton_clicked()
             sendParams = newSendParams;
         }
 
+        bool need2updateGuiSize = ( getcheckedSizeButton() != uiScale );
+
+        if (need2updateGuiSize) {
+            state->updateGuiScale( id2scale( getcheckedSizeButton() ) );
+        }
+
         if ( ! (currentWalletConfig==newWalletConfig) ) {
-            if (state->setWalletConfig(newWalletConfig)) { // in case of true, we are already dead, don't touch memory and exit!
+            if (state->setWalletConfig(newWalletConfig, need2updateGuiSize)) { // in case of true, we are already dead, don't touch memory and exit!
                 return;
             }
+        }
+
+        if (need2updateGuiSize) {
+            // Restating the wallet
+            state->restartMwcQtWallet();
+            return;
         }
 
         updateButtons();
     }
 }
 
+// Id match the control names: 1..4
+void WalletConfig::checkSizeButton(int szId) {
+    ui->fontSz1->setChecked( szId == 1 );
+    ui->fontSz2->setChecked( szId == 2 );
+    ui->fontSz3->setChecked( szId == 3 );
+    ui->fontSz4->setChecked( szId == 4 );
+
+    updateButtons();
+}
+
+int WalletConfig::getcheckedSizeButton() const {
+    if (ui->fontSz1->isChecked())
+        return 1;
+    if (ui->fontSz2->isChecked())
+        return 2;
+    if (ui->fontSz3->isChecked())
+        return 3;
+
+    return 4;
+}
+
+void WalletConfig::on_fontSz1_clicked()
+{
+    checkSizeButton(1);
+}
+
+void WalletConfig::on_fontSz2_clicked()
+{
+    checkSizeButton(2);
+}
+
+void WalletConfig::on_fontSz3_clicked()
+{
+    checkSizeButton(3);
+}
+
+void WalletConfig::on_fontSz4_clicked()
+{
+    checkSizeButton(4);
+}
 
 }
 

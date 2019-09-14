@@ -95,8 +95,6 @@ public:
     // syncCall - stop NOW. Caller suppose to understand what he is doing
     virtual void logout(bool syncCall) override;
 
-    virtual bool close()  override {return true;}
-
     // Confirm that user write the passphase
     // SYNC command
     virtual void confirmNewSeed()  override;

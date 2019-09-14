@@ -62,5 +62,6 @@
         <file>img/CircGreen@2x.svg</file>
         <file>img/CircRed@2x.svg</file>
         <file>img/CircYellow@2x.svg</file>
+        <file>img/A1@2x.svg</file>
     </qresource>
 </RCC>

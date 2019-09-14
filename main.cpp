@@ -39,6 +39,7 @@
 #include <control/messagebox.h>
 #include "util/execute.h"
 #include "tests/testStringUtils.h"
+#include <QtGlobal>
 
 // Very first run - init everything
 bool deployFilesFromResources() {
@@ -156,69 +157,47 @@ bool readConfig(QApplication & app) {
 
 int main(int argc, char *argv[])
 {
- //   qputenv("QT_SCALE_FACTOR", "0.8");
-
 #ifdef QT_DEBUG
     // tests are quick, let's run them in debug
     test::testLongLong2ShortStr();
 #endif
 
+    Q_ASSERT(argc>=1);
+    // Process arglist.
+    // Furst argument has to be the app path
+    util::setMwcQtWalletPath(argv[0]);
 
+    // !!! Note !!!  Custor arguments must be last in the line. Otherwise all at the right will be truncated.
+    double scale = -1.0;
+    for ( int t=1;t<argc-1; t++) {
+        if ( strcmp("--ui_scale", argv[t])==0 ) {
+            scale = QString(argv[t+1]).toDouble();
+            argc = t;
+            break;
+        }
+    }
+    core::AppContext appContext;
+
+    if (scale>0.0)
+        appContext.initGuiScale(scale);
+
+
+    // MacOS doesn't process QT_SCALE_FACTOR correctlly. That is why it is disabled here
+#ifndef Q_OS_DARWIN
+    // First let's app the UI scale factor. It must be done before QApplication will be created
+
+    scale = appContext.getGuiScale();
+    if (scale==1.0)
+        scale = 1.001;
+
+    if (scale>0.0)
+        qputenv( "QT_SCALE_FACTOR", QString::number(scale).toLatin1() );
+
+#endif
 
     QApplication app(argc, argv);
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-
-    QStringList args = QCoreApplication::arguments();
-    // Checking if we need to do anything with a font scale
-
-    core::AppContext appContext;
-
-#ifndef Q_OS_DARWIN
-
-    if (args.size() > 0 ) {
-        util::setMwcQtWalletPath(args[0]);
-    }
-
-    double scale = -1.0;
-    for ( int t=0; t<args.size()-1; t++ ) {
-        if ( args[t] == "ui_scale" ) {
-            scale = args[t+1].toDouble();
-            break;
-        }
-    }
-
-    if (scale>0.0) {
-        // It is initial call, let's read what does user set and then apply
-        scale = appContext.getGuiScale(scale);
-    }
-
-/*    if ( scale>0.0 ) {
-        // Updating env variable and restart
-        if (!util::restartMwcQtWallet( 1.6 )) {
-            control::MessageBox::message(nullptr, "OS Error",
-                       "Unable to restart mwc qt wallet process to apply UI scale factor.\nThe default scale will be used.");
-        }
-        else {
-            return 1;
-        }
-    }*/
-#endif
-
-    // -------------------------------------------
-    // Check envoronment variables
-/*    {
-        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-        QStringList kk = env.keys();
-        QString reportStr = "Envirinment variable for this process at starting point:\n";
-        for ( const auto & k : kk ) {
-            QString val = env.value( k );
-            reportStr +=  "'" + k + "' => '" + val + "'\n";
-        }
-        QMessageBox::information(nullptr, "Environment variables", reportStr);
-    }*/
-    // -------------------------------------------
-
 
     logger::initLogger();
 
