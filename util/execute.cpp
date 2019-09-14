@@ -20,6 +20,8 @@
 #include "../core/Config.h"
 #include <QDir>
 #include <QtGlobal>
+#include <QDesktopServices>
+#include <QUrl>
 
 namespace util {
 
@@ -37,17 +39,7 @@ class DetarchedProcess : public QProcess {
 
 
 void openUrlInBrowser(const QString & url) {
-#if defined(Q_OS_DARWIN)
-    QProcess::startDetached("open " + url);
-#elif defined(Q_OS_LINUX)
-    QProcess::startDetached("xdg-open " + url);
-#elif defined(Q_OS_WIN)
-    Q_UNUSED(url);
-    Q_ASSERT(false); // support me
-#else
-    Q_UNUSED(url);
-    Q_ASSERT(false); // unexperted OS.
-#endif
+    QDesktopServices::openUrl( QUrl(url) );
 }
 
 
@@ -91,7 +83,11 @@ bool acquireAppGlobalLock() {
     if (!testThread->wait( (unsigned long)(500 * std::max(1.0,config::getTimeoutMultiplier()) + 0.5) ) ) {
             testResult = false;
     }
-    delete testThread;
+    // Windows doesn't liek an idea of deleting running thread. This thread will wait forever, so we can't destroy it
+    if (testResult) {
+        delete testThread;
+    }
+
     return testResult;
 }
 

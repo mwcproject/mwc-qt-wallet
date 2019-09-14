@@ -21,8 +21,13 @@ MwcComboBox::MwcComboBox(QWidget *parent) : QComboBox(parent) {}
 void MwcComboBox::showPopup() {
     QComboBox::showPopup();
     QWidget *popup = this->findChild<QFrame *>();
-    // Using pixels. Will work for used styles that defined in pixels too
-    popup->move(popup->x() + 10, popup->y() + height());
+#ifdef Q_OS_WIN
+   // WIndows doesn;t need to udjust the popup, it is already works great
+   //popup->move(popup->x() + 10, popup->y());
+#else
+   // Using pixels. Will work for used styles that defined in pixels too
+   popup->move(popup->x() + 10, popup->y() + height());
+#endif
 }
 
 }

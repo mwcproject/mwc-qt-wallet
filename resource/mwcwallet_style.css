@@ -18,6 +18,10 @@ QStatusBar {
     font-size: 15px;
 }
 
+QStatusBar::item {
+    border: none;
+}
+
 /* MWC tool bar buttons */
 QToolButton {
     border: none;
@@ -120,6 +124,11 @@ QLineEdit {
     selection-background-color: rgba(255, 255, 255, 0.3);
 }
 
+/* By some reasons Windows needs that for placeholder */
+QLineEdit[text=""] {
+    color: white;
+}
+
 QLineEdit:enabled:!focus::hover
 {
     background-color: rgba(255, 255, 255, 0.3);
@@ -136,6 +145,7 @@ QLineEdit:focus {
     background: rgba(255, 255, 255, 0.15);
 }
 
+
 QTextEdit {
     color: white;
     font-family: Open Sans;
@@ -149,6 +159,11 @@ QTextEdit {
     font-size: 18px;
     border-radius: 6px;
     padding: 10px 6px 10px 15px;
+}
+
+/* By some reasons Windows needs that for placeholder */
+QLineEdit[text=""] {
+    color: white;
 }
 
 QTextEdit:focus {
@@ -338,6 +353,13 @@ QRadioButton {
     font-weight: normal;
     font-size: 15px;
     spacing: 10px;
+
+    border: none;
+    background: none;
+}
+
+QRadioButton:focus {
+    border: none;
 }
 
 QRadioButton::indicator {
