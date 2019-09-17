@@ -128,7 +128,7 @@ bool readConfig(QApplication & app) {
     if (!logoutTimeoutOk || logoutTimeoutStr.isEmpty() )
         logoutTimeout = 15*60;
 
-    double timeoutMultiplierVal = timeoutMultiplier.isEmpty() ? -1.0 : timeoutMultiplier.toDouble();
+    double timeoutMultiplierVal = timeoutMultiplier.isEmpty() ? 2.0 : timeoutMultiplier.toDouble();
     if ( timeoutMultiplierVal < 0.01 )
         timeoutMultiplierVal = 1.0;
 
