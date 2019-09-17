@@ -110,7 +110,7 @@ public:
     virtual QPair<bool,bool> getListeningStatus()  override;
 
     // Start listening through services
-    virtual void listeningStart(bool startMq, bool startKb)  override;
+    virtual void listeningStart(bool startMq, bool startKb, bool initialStart)  override;
     // Check Signal: onStartListening
 
     // Stop listening through services
@@ -269,7 +269,7 @@ public:
     void setGettedSeed( QVector<QString> seed );
 
     void setListeningStartResults( bool mqTry, bool kbTry, // what we try to start
-            QStringList errorMessages );
+            QStringList errorMessages, bool initialStart );
 
     void setListeningStopResult(bool mqTry, bool kbTry, // what we try to stop
                                 QStringList errorMessages );

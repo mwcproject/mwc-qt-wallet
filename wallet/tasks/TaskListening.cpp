@@ -101,7 +101,7 @@ bool TaskListeningStart::processTask(const QVector<WEvent> &events) {
     }
 
     wallet713->setListeningStartResults( mqStaring.size()>0, kbStaring.size()>0, // what we try to start
-                                         errorMessages );
+                                         errorMessages, initialStart );
 
     return true;
 }

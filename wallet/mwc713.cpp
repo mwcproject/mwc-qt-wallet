@@ -412,10 +412,10 @@ void MWC713::getSeed()  {
     eventCollector->addTask( new TaskRecoverShowMnenonic(this, walletPassword ), TaskRecoverShowMnenonic::TIMEOUT );
 
     if (lsnStatus.first)
-        listeningStart(true, false);
+        listeningStart(true, false, true);
 
     if (lsnStatus.second)
-        listeningStart(false, true);
+        listeningStart(false, true, true);
 }
 
 
@@ -426,9 +426,9 @@ QPair<bool,bool> MWC713::getListeningStatus()  {
 }
 
 // Check Signal: onListeningStartResults
-void MWC713::listeningStart(bool startMq, bool startKb)  {
+void MWC713::listeningStart(bool startMq, bool startKb, bool initialStart)  {
     qDebug() << "listeningStart: mq=" << startMq << ",kb=" << startKb;
-    eventCollector->addTask( new TaskListeningStart(this, startMq,startKb), TaskListeningStart::TIMEOUT );
+    eventCollector->addTask( new TaskListeningStart(this, startMq,startKb, initialStart), TaskListeningStart::TIMEOUT );
 
     if ( startMq && !config::getUseMwcMqS() ) {
         appendNotificationMessage( MESSAGE_LEVEL::WARNING, MESSAGE_ID::GENERIC, "You are using non secure version of the MWC MQ. To switch to secure MWC MQS please specify 'useMwcMqS = true' at mwc-qt-wallet config file." );
@@ -762,10 +762,10 @@ void MWC713::setGettedSeed( QVector<QString> seed ) {
 
 
 void MWC713::setListeningStartResults( bool mqTry, bool kbTry, // what we try to start
-                               QStringList errorMessages ) {
+                               QStringList errorMessages, bool initialStart ) {
     logger::logEmit("MWC713", "onListeningStartResults", QString("mqTry=") + QString::number(mqTry) +
-            " kbTry=" + QString::number(kbTry) + " errorMessages size " + QString::number(errorMessages.size()) );
-    emit onListeningStartResults(mqTry, kbTry,errorMessages);
+            " kbTry=" + QString::number(kbTry) + " errorMessages size " + QString::number(errorMessages.size()) + " initStart=" + (initialStart?"True":"False") );
+    emit onListeningStartResults(mqTry, kbTry,errorMessages, initialStart );
 }
 
 void MWC713::setListeningStopResult(bool mqTry, bool kbTry, // what we try to stop

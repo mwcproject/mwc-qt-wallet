@@ -52,7 +52,7 @@ private slots:
 
     // Listening, you will not be able to get a results
     void onListeningStartResults( bool mqTry, bool kbTry, // what we try to start
-                                   QStringList errorMessages ); // error messages, if get some
+                                   QStringList errorMessages, bool initialStart ); // error messages, if get some
 
     void onListeningStopResult(bool mqTry, bool kbTry, // what we try to stop
                                 QStringList errorMessages );

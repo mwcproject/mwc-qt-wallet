@@ -303,7 +303,7 @@ public:
     virtual QPair<bool,bool> getListeningStatus()  = 0;
 
     // Start listening through services
-    virtual void listeningStart(bool startMq, bool startKb)  = 0;
+    virtual void listeningStart(bool startMq, bool startKb, bool initialStart)  = 0;
     // Check Signal: onListeningStartResults
 
     // Stop listening through services
@@ -475,7 +475,7 @@ signals:
 
     // Listening, you will not be able to get a results
     void onListeningStartResults( bool mqTry, bool kbTry, // what we try to start
-                                   QStringList errorMessages ); // error messages, if get some
+                                   QStringList errorMessages, bool initialStart ); // error messages, if get some
 
     void onListeningStopResult(bool mqTry, bool kbTry, // what we try to stop
                                 QStringList errorMessages );

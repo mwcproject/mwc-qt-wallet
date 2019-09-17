@@ -79,7 +79,7 @@ NextStateRespond Listening::execute() {
 void Listening::triggerMwcState() {
     QPair<bool,bool> lsnStatus = context->wallet->getListeningStatus();
     if ( !lsnStatus.first ) {
-        context->wallet->listeningStart(true, false);
+        context->wallet->listeningStart(true, false, false);
     }
     else {
         context->wallet->listeningStop(true, false);
@@ -98,7 +98,7 @@ void Listening::triggerKeybaseState() {
     QPair<bool,bool> lsnStatus = context->wallet->getListeningStatus();
     qDebug() << "lsnStatus: " << lsnStatus.first << " " << lsnStatus.second;
     if ( !lsnStatus.second ) {
-        context->wallet->listeningStart(false, true);
+        context->wallet->listeningStart(false, true, false);
     }
     else {
         context->wallet->listeningStop(false, true);
@@ -118,11 +118,11 @@ void Listening::onKeybaseListenerStatus(bool online) {
 
 // Listening, you will not be able to get a results
 void Listening::onListeningStartResults( bool mqTry, bool kbTry, // what we try to start
-                               QStringList errorMessages ) // error messages, if get some
+                               QStringList errorMessages, bool initialStart ) // error messages, if get some
 {
     Q_UNUSED(mqTry);
     Q_UNUSED(kbTry);
-    if (wnd && !errorMessages.empty()) {
+    if (wnd && !errorMessages.empty() && !initialStart ) {
         QString msg;
         for (auto & s : errorMessages)
             msg += s + '\n';

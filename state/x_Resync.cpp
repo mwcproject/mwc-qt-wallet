@@ -103,9 +103,9 @@ void Resync::onRecoverProgress( int progress, int maxVal ) {
 void Resync::onCheckResult(bool ok, QString errors ) {
 
     if (prevListeningStatus.first)
-        context->wallet->listeningStart(true,false);
+        context->wallet->listeningStart(true,false, true);
     if (prevListeningStatus.second)
-        context->wallet->listeningStart(false,true);
+        context->wallet->listeningStart(false,true, true);
 
     if (wnd) {
         wnd->updateProgress(maxProgrVal, ok? "Done" : "Failed" );

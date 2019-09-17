@@ -110,8 +110,8 @@ void InputPassword::onLoginResult(bool ok) {
         if ( context->wallet->getStartedMode() == wallet::Wallet::STARTED_MODE::NORMAL ) { // Normall start of the wallet. Problem that now we have many cases how wallet started
 
             // Start listening, no feedback interested
-            context->wallet->listeningStart(true, false);
-            context->wallet->listeningStart(false, true);
+            context->wallet->listeningStart(true, false, true);
+            context->wallet->listeningStart(false, true, true);
 
             // Set current receive account
             context->wallet->setReceiveAccount(context->appContext->getReceiveAccount());

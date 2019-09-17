@@ -53,6 +53,9 @@ QWidget * WindowManager::switchToWindowEx( const QString & pageName, QWidget * n
     pageHostWnd->layout()->addWidget(currentWnd);
     currentWnd->show();
 
+    pageHostWnd->repaint();
+    currentWnd->repaint();
+
     mainWnd->setWindowTitle(buildWalletTitle(pageName));
 
     return newWindow;
