@@ -108,7 +108,7 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
         process->setProcessEnvironment(env);
     }
 
-    QStringList params{"--config", mwc713configPath, "-r", mwc::PROMPTS_MWC713 };
+    QStringList params{"--config", mwc713configPath, "--disable-history" ,"-r", mwc::PROMPTS_MWC713 };
     params.append( paramsPlus );
 
     process->start(mwc713Path, params, QProcess::Unbuffered | QProcess::ReadWrite );
