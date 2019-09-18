@@ -347,6 +347,20 @@ void Mwc713InputParser::initSend() {
                                                         new TriePhraseSection("] MWCs. Message: ["),
                                                         new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","]", 4)
                                                 }));
+    // Without message case. Line MUST end
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_RECEIVED_FROM,
+            // slate [b2822262-4760-4907-923f-e2459ed5d554] received from [jbyrer] for [1.000000000] MWCs
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("slate ["),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE|TrieAnySection::NOT_SPACES, "","]", 1),
+                                                        new TriePhraseSection("] received from ["),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","]", 2),
+                                                        new TriePhraseSection("] for ["),
+                                                        new TrieAnySection(100, TrieAnySection::NUMBERS, ".","]", 3),
+                                                        new TriePhraseSection("] MWCs."),
+                                                        new TrieNewLineSection()
+                                                }));
+
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_FINALIZED,
                                                 QVector<BaseTrieSection*>{
