@@ -22,6 +22,9 @@
 #include "../dialogs/helpdlg.h"
 #include "../core/Config.h"
 #include <QPushButton>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QScrollArea>
 
 namespace core {
 

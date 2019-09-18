@@ -3,6 +3,11 @@ core--MainWindow {
                                       stop: 0 #9E00E7, stop: 0.2 #9E00E7, stop: 0.9 #3600C9, stop: 1 #3600C9);
 }
 
+control--MwcMainWndContainer {
+background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                  stop: 0 #9E00E7, stop: 0.9 #3600C9, stop: 1 #3600C9);
+}
+
 core--MwcToolbar {
     background-color: #6F00D6;
 }

@@ -114,7 +114,7 @@ struct WalletOutput {
     bool       coinbase = false;
     QString    numOfConfirms;
     int64_t    valueNano = 0L;
-    QString    txIdx;
+    int64_t    txIdx;
 
     void setData(QString outputCommitment,
             QString     MMRIndex,
@@ -124,7 +124,7 @@ struct WalletOutput {
             bool        coinbase,
             QString     numOfConfirms,
             int64_t     valueNano,
-            QString     txIdx);
+            int64_t     txIdx);
 };
 
 struct WalletTransaction {

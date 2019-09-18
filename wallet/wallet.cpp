@@ -185,7 +185,7 @@ void WalletOutput::setData(QString _outputCommitment,
         bool        _coinbase,
         QString     _numOfConfirms,
         int64_t     _valueNano,
-        QString     _txIdx)
+        int64_t     _txIdx)
 {
     outputCommitment = _outputCommitment;
     MMRIndex = _MMRIndex;

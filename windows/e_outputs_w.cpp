@@ -154,13 +154,13 @@ QString Outputs::currentSelectedAccount() {
 
 
 void Outputs::setOutputsData(QString account, int64_t height, const QVector<wallet::WalletOutput> & outp ) {
+    Q_UNUSED(height)
 
-    qDebug() << "Outputs::setOutputsData for account=" << account << " height=" << height << " outp zs=" << outp.size();
+    qDebug() << "Outputs::setOutputsData for account=" << account << " outp zs=" << outp.size();
 
     ui->progressFrame->hide();
     ui->tableFrame->show();
 
-    Q_UNUSED(height);
 
     if ( account != currentSelectedAccount() ) {
         qDebug() << "Outputs::setOutputsData ignored because of account name";
@@ -178,7 +178,7 @@ void Outputs::setOutputsData(QString account, int64_t height, const QVector<wall
         auto & out = outputs[i];
 
         ui->outputsTable->appendRow( QVector<QString>{
-                                         out.txIdx+1,
+                                         QString::number( out.txIdx+1 ),
                                         // out.status, // Status allways 'unspent', so no reasons to print it.
                                          util::nano2one(out.valueNano),
                                          out.numOfConfirms,

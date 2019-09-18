@@ -54,6 +54,11 @@ bool parseOutputLine( QString str, const OutputIdxLayout & tl,
 
     QPair<bool,int64_t> mwcOne = util::one2nano(strValue);
 
+    bool ok = false;
+    int64_t tx = strTx.toLongLong(&ok);
+    if (!ok)
+        return false;
+
     output.setData(strOutputCommitment,
                    strMmrIndex,
                    strBlockHeight,
@@ -62,7 +67,7 @@ bool parseOutputLine( QString str, const OutputIdxLayout & tl,
             strCoinbase != "false",
             strConfirms,
             mwcOne.second,
-            strTx);
+            tx);
 
     return mwcOne.first;
 }
@@ -358,13 +363,13 @@ bool TaskTransactions::processTask(const QVector<WEvent> & events) {
 
 // Just a callback, not a real task
 bool TaskAllTransactionsStart::processTask(const QVector<WEvent> &events) {
-    Q_UNUSED(events);
+    Q_UNUSED(events)
     wallet713->processAllTransactionsStart();
     return true;
 }
 
 bool TaskAllTransactionsEnd::processTask(const QVector<WEvent> &events) {
-    Q_UNUSED(events);
+    Q_UNUSED(events)
     wallet713->processAllTransactionsEnd();
     return true;
 }
