@@ -72,11 +72,12 @@ void EnterSeed::on_continueButton_clicked()
 
     QString seedStr = ui->seedText->toPlainText().toLower().trimmed();
 
-    QPair <bool, QString> valRes = util::validateMwc713Str( seedStr );
+    // No need to validate symbols because we better validation is down
+    /*QPair <bool, QString> valRes = util::validateMwc713Str( seedStr );
     if (!valRes.first) {
         control::MessageBox::message(this, "Verification error", valRes.second );
         return;
-    }
+    }*/
 
     QVector<QString> seed = util::parsePhrase2Words( seedStr );
 

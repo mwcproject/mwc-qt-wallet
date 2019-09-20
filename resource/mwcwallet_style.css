@@ -23,6 +23,11 @@ QStatusBar {
     font-size: 15px;
 }
 
+/* Needed for Windows */
+QWidget {
+    border: none;
+}
+
 QStatusBar::item {
     border: none;
 }
