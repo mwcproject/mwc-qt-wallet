@@ -37,6 +37,11 @@ class MWC713 : public Wallet
     Q_OBJECT
 public:
 
+    // Read config from the file. By default read from config::getMwc713conf()
+    static WalletConfig readWalletConfig(QString source = "");
+    // Save config into config::getMwc713conf()
+    static bool saveWalletConfig(const WalletConfig & config);
+
 public:
     MWC713(QString mwc713path, QString mwc713configPath, core::AppContext * appContext);
     virtual ~MWC713() override;
@@ -339,9 +344,6 @@ private:
 
     // Update acc value at collection accounts. If account is not founf, we can add it (addIfNotFound) or skip
     void updateAccountInfo( const AccountInfo & acc, QVector<AccountInfo> & accounts, bool addIfNotFound ) const;
-
-    // Read config from the file
-    WalletConfig readWalletConfig(QString source) const;
 
     // pass - provide password through env variable. If pass empty - nothing will be done
     // envVariables - environment variables (key/value). Must be in pairs.

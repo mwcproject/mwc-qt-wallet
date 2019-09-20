@@ -32,7 +32,7 @@ protected:
     virtual ~MessageBox() override;
 
 public:
-    enum RETURN_CODE {BTN1, BTN2};
+    enum class RETURN_CODE {BTN1, BTN2};
 
     // One button, OK box
     static void message( QWidget *parent, QString title, QString message );
@@ -48,7 +48,7 @@ private:
     RETURN_CODE getRetCode() const {return retCode;}
 
     Ui::MessageBox *ui;
-    RETURN_CODE retCode = BTN1;
+    RETURN_CODE retCode = RETURN_CODE::BTN1;
 };
 
 }

@@ -1217,7 +1217,11 @@ void MWC713::updateAccountInfo( const AccountInfo & acc, QVector<AccountInfo> & 
 
 /////////////////////////////////////////////////////////////////////////
 // Read config from the file
-WalletConfig MWC713::readWalletConfig(QString source) const {
+// static
+WalletConfig MWC713::readWalletConfig(QString source) {
+    if (source.isEmpty())
+        source = config::getMwc713conf();
+
     util::ConfigReader  mwc713config;
 
     if (!mwc713config.readConfig(source) ) {
@@ -1244,7 +1248,7 @@ WalletConfig MWC713::readWalletConfig(QString source) const {
 
 // Get current configuration of the wallet. will read from wallet713.toml file
 WalletConfig MWC713::getWalletConfig()  {
-    return readWalletConfig(config::getMwc713conf());
+    return readWalletConfig();
 }
 
 // Get configuration form the resource file.
@@ -1252,13 +1256,10 @@ WalletConfig MWC713::getDefaultConfig()  {
     return readWalletConfig( mwc::MWC713_DEFAULT_CONFIG );
 }
 
-
-// Update wallet config. Will update config and restart the mwc713.
-// Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
-//          and caller suppose listen for them
-bool MWC713::setWalletConfig(const WalletConfig & config)  {
+//static
+bool MWC713::saveWalletConfig(const WalletConfig & config) {
     if (!config.isDefined())
-        return false;
+        return true;
 
     QString mwc713confFN = config::getMwc713conf();
 
@@ -1296,12 +1297,18 @@ bool MWC713::setWalletConfig(const WalletConfig & config)  {
         newConfLines.append("mwc_node_secret = \"" + config.mwcNodeSecret + "\"");
     }
 
-    if (!util::writeTextFile( mwc713confFN, newConfLines )) {
-        control::MessageBox::message(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + mwc713confFN );
+    return util::writeTextFile( mwc713confFN, newConfLines );
+}
+
+// Update wallet config. Will update config and restart the mwc713.
+// Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
+//          and caller suppose listen for them
+bool MWC713::setWalletConfig(const WalletConfig & config)  {
+
+    if (!saveWalletConfig(config)) {
+        control::MessageBox::message(nullptr, "Update Config failure", "Not able to update mwc713 configuration at " + config::getMwc713conf() );
         return false;
     }
-
-    util::Waiting w; // Host verification might take time, that is why waiting here
 
     emit onConfigUpdate();
 

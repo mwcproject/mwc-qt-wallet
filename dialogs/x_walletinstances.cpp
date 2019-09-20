@@ -19,6 +19,7 @@
 #include <QFileDialog>
 #include "../control/messagebox.h"
 #include "../dialogs/networkselectiondlg.h"
+#include "../util/Process.h"
 
 namespace dlg {
 
@@ -48,8 +49,17 @@ void WalletInstances::on_mwc713directorySelect_clicked() {
         return;
 
     QDir baseDir(basePath);
+    QString walletDataDir = baseDir.relativeFilePath(dir);
 
-    ui->mwc713directoryEdit->setText( baseDir.relativeFilePath(dir) );
+    QString runningArc = util::getBuildArch();
+    QString dataArc    = wallet::WalletConfig::readNetworkArchFromDataPath(walletDataDir).second;
+    if ( runningArc != dataArc ) {
+        control::MessageBox::message(nullptr, "Wallet data architecture mismatch",
+                    "Your mwc713 seed at '"+ walletDataDir +"' was created with "+ dataArc+" bits version of the wallet. You are using " + runningArc + " bit version.");
+        return;
+    }
+
+    ui->mwc713directoryEdit->setText( walletDataDir );
 }
 
 void WalletInstances::on_cancelButton_clicked() {
@@ -73,8 +83,17 @@ void WalletInstances::on_applyButton_clicked() {
     }
 
     // Data path need to be updated, as well as a network
-    QString network = wallet::WalletConfig::readNetworkFromDataPath(dataPath); // local path as writen in config
-    if (network.isEmpty()) {
+    QPair<QString,QString> networkArch = wallet::WalletConfig::readNetworkArchFromDataPath(dataPath); // local path as writen in config
+    QString runningArc = util::getBuildArch();
+
+    // Just in case. Normally will never be called
+    if ( runningArc != networkArch.second ) {
+        control::MessageBox::message(nullptr, "Wallet data architecture mismatch",
+                                     "Your mwc713 seed at '"+ dataPath +"' was created with "+ networkArch.second+" bits version of the wallet. You are using " + runningArc + " bit version.");
+        return;
+    }
+
+    if (networkArch.first.isEmpty()) {
         // Check if seed file does exist. Import of the data?
         if ( wallet::WalletConfig::doesSeedExist(dataPath) ) {
 
@@ -82,15 +101,16 @@ void WalletInstances::on_applyButton_clicked() {
             if (nwDlg.exec() != QDialog::Accepted)
                 return;
 
-            network = nwDlg.getNetwork() == state::InitAccount::MWC_NETWORK::MWC_MAIN_NET ? "Mainnet" : "Floonet";
+            networkArch.first = nwDlg.getNetwork() == state::InitAccount::MWC_NETWORK::MWC_MAIN_NET ? "Mainnet" : "Floonet";
 
-            wallet::WalletConfig::saveNetwork2DataPath(dataPath, network);
         }
         else
-            network = "Mainnet"; // will be redefined later in any case...
+            networkArch.first = "Mainnet"; // will be redefined later in any case...
+
+        wallet::WalletConfig::saveNetwork2DataPath(dataPath, networkArch.first, util::getBuildArch() );
     }
 
-    newWalletConfig.setDataPathWithNetwork( dataPath, network );
+    newWalletConfig.setDataPathWithNetwork( dataPath, networkArch.first );
 
     if (!state->setWalletConfig(newWalletConfig, false) )
     {

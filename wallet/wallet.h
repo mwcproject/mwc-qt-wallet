@@ -87,8 +87,10 @@ public:
                 QString mwcNodeURI,
                 QString mwcNodeSecret);
 
-    QString getDataPath() const {return dataPath;}
-    QString getNetwork() const {return network;}
+    void updateDataPath(const QString & path) {dataPath=path;}
+
+    const QString & getDataPath() const {return dataPath;}
+    const QString & getNetwork() const {return network;}
 
     // Get MQ/MQS host normalized name. Depend on current config
     QString getMwcMqHostNorm() const;
@@ -97,11 +99,13 @@ public:
     QString getMwcMqHostFull() const;
 
     // caller is responsible to call saveNetwork2DataPath if needed
-    void setDataPathWithNetwork( QString _dataPath, QString _network ) { dataPath=_dataPath; network = _network;}
+    void setDataPathWithNetwork( QString _dataPath, QString _network ) { dataPath=_dataPath; network = _network;  }
 
-    static QString readNetworkFromDataPath(QString configPath); // local path as writen in config
+    // First Nerwork, Second is Arch
+    static QPair<QString,QString> readNetworkArchFromDataPath(QString configPath); // local path as writen in config
+    static void    saveNetwork2DataPath(QString configPath, QString network, QString arch); // Save the network into the data path
+
     static bool    doesSeedExist(QString configPath);
-    static void    saveNetwork2DataPath(QString configPath, QString network); // Save the network into the data path
 };
 
 struct WalletOutput {

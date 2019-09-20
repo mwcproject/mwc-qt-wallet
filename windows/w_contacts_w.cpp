@@ -159,7 +159,7 @@ void Contacts::on_deleteButton_clicked()
     core::ContactRecord contact2del = contacts[idx];
 
     if (control::MessageBox::question(this, "Remove a contact", "Remove the selected contact for " + contact2del.name +
-                              "? Press 'Yes' to delete.", "Yes", "No", false,true) == control::MessageBox::BTN1 ) {
+                              "? Press 'Yes' to delete.", "Yes", "No", false,true) == control::MessageBox::RETURN_CODE::BTN1 ) {
         QPair<bool, QString> res = state->deleteContact(contact2del);
         if (!res.first) {
             control::MessageBox::message(this, "Error", "Unable to remove the contact '"+ contact2del.name +"'.\nError: " + res.second);

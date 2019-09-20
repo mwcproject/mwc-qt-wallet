@@ -86,7 +86,7 @@ void NodeInfo::onShowNodeConnectionError(QString errorMessage) {
 
 void NodeInfo::on_refreshButton_clicked() {
     if (control::MessageBox::question(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
-                       "Yes", "No", false,true) == control::MessageBox::BTN1 ) {
+                       "Yes", "No", false,true) == control::MessageBox::RETURN_CODE::BTN1 ) {
         state->requestWalletResync();
     }
 }

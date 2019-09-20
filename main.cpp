@@ -38,8 +38,10 @@
 #include <QThread>
 #include <control/messagebox.h>
 #include "util/execute.h"
+#include "util/Process.h"
 #include "tests/testStringUtils.h"
 #include <QtGlobal>
+#include <QFileDialog>
 
 // Very first run - init everything
 bool deployFilesFromResources() {
@@ -228,6 +230,46 @@ int main(int argc, char *argv[])
                 QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read the stylesheet.");
                 return 1;
             }
+        }
+
+        // Checking for Build Architecture.
+        // NOTE!!! Checking is needed for mwc713, not for this app.
+        // We assuming that everything runs from normal install and architectures of mwc713 and mwc-qt-wallet
+        // are the same.
+        QString runningArc = util::getBuildArch();
+        wallet::WalletConfig config = wallet::MWC713::readWalletConfig();
+        QString walletDataPath = config.getDataPath();
+        while (true) {
+            QString arch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDataPath).second;
+
+            if (arch != runningArc) {
+                if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::question(nullptr, "Wallet data architecture mismatch",
+                                             "Your mwc713 seed at '"+ walletDataPath +"' was created with "+arch+" bits version of the wallet. "
+                                             "Please exit and use original version of the wallet, or specify another folder for the seed",
+                                             "Exit", "Select Folder", false, true) ) {
+                    // Exit was selected
+                    return 1;
+                }
+
+                QString basePath = ioutils::getAppDataPath();
+                QString dir = QFileDialog::getExistingDirectory(
+                        nullptr,
+                        "Select your wallet folder name",
+                        basePath);
+                if (dir.isEmpty())
+                    return 1; // Exiting
+
+                QDir baseDir(basePath);
+                walletDataPath = baseDir.relativeFilePath(dir);
+            }
+            else {
+                break; // good to go
+            }
+        }
+
+        if (walletDataPath != config.getDataPath()) {
+            config.updateDataPath(walletDataPath);
+            wallet::MWC713::saveWalletConfig(config);
         }
 
         if (!util::acquireAppGlobalLock() )

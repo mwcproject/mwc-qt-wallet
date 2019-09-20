@@ -28,6 +28,7 @@
 #include "x_walletconfig.h"
 #include "../util/ioutils.h"
 #include "../util/Files.h"
+#include "../util/Process.h"
 #include "../core/global.h"
 
 namespace state {
@@ -83,7 +84,7 @@ void InitAccount::setPassword(const QString & password) {
             new wnd::NewWallet( context->wndManager->getInWndParent(), this ) );
 }
 
-// How to provosion the wallet
+// How to provision the wallet
 void InitAccount::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice, MWC_NETWORK network) {
     // Apply network first
     Q_ASSERT( !context->wallet->isRunning() );
@@ -91,8 +92,8 @@ void InitAccount::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice, MWC_NETW
     QString nwName = network == MWC_NETWORK::MWC_MAIN_NET ? "Mainnet" : "Floonet";
     walletCfg.setDataPathWithNetwork( walletCfg.getDataPath(), nwName );
 
-    // Store the nw name at the data folder
-    walletCfg.saveNetwork2DataPath(walletCfg.getDataPath(), nwName );
+    // Store the nw name with architecture at the data folder.
+    walletCfg.saveNetwork2DataPath(walletCfg.getDataPath(), nwName, util::getBuildArch() );
 
     context->wallet->setWalletConfig(walletCfg);
 

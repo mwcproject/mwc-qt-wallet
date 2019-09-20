@@ -62,13 +62,13 @@ MessageBox::~MessageBox()
 
 void MessageBox::on_button1_clicked()
 {
-    retCode = BTN1;
+    retCode = RETURN_CODE::BTN1;
     accept();
 }
 
 void MessageBox::on_button2_clicked()
 {
-    retCode = BTN2;
+    retCode = RETURN_CODE::BTN2;
     accept();
 }
 

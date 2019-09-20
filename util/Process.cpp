@@ -16,6 +16,7 @@
 #include <QProcess>
 #include "../core/Config.h"
 #include "../control/messagebox.h"
+#include <QSysInfo>
 
 namespace util {
 
@@ -41,6 +42,11 @@ bool processWaitForFinished( QProcess * process, int timeoutMs, const QString & 
     }
 
     return true;
+}
+
+bool isBuild64Bit() {
+    static bool b = QSysInfo::buildCpuArchitecture().contains(QLatin1String("64"));
+    return b;
 }
 
 }

@@ -15,6 +15,8 @@
 #ifndef MWC_QT_WALLET_PROCESS_H
 #define MWC_QT_WALLET_PROCESS_H
 
+#include <QString>
+
 class QProcess;
 class QString;
 
@@ -22,6 +24,12 @@ namespace util {
 
 // return true if exit successfully
 bool processWaitForFinished( QProcess * process, int timeoutMs, const QString & processName );
+
+// What current build type...
+bool isBuild64Bit();
+
+inline QString getBuildArch() { return isBuild64Bit() ? "x64" : "x32"; }
+
 
 }
 

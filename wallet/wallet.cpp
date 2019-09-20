@@ -19,6 +19,7 @@
 #include "../core/Config.h"
 #include <QDir>
 #include "../util/Files.h"
+#include "../util/Process.h"
 
 namespace wallet {
 
@@ -120,16 +121,26 @@ QString WalletConfig::getMwcMqHostFull() const {
 
 // Return empty if not found
 //static
-QString WalletConfig::readNetworkFromDataPath(QString configPath) // local path as writen in config
+QPair<QString,QString> WalletConfig::readNetworkArchFromDataPath(QString configPath) // local path as writen in config
 {
+    QPair<QString,QString> res("", util::getBuildArch() );
+
     QString path = ioutils::getAppDataPath( configPath );
     QStringList lns = util::readTextFile(path + "/net.txt" );
     if (lns.isEmpty())
-        return "";
+        return res;
+
+
     QString nw = lns[0];
     if (!nw.contains("net"))
-        return "";
-    return nw;
+        return res;
+
+    res.first = nw;
+
+    if (lns.size()>1)
+        res.second = lns[1];
+
+    return res;
 }
 
 //static
@@ -139,10 +150,10 @@ bool  WalletConfig::doesSeedExist(QString configPath) {
 }
 
 //static
-void  WalletConfig::saveNetwork2DataPath(QString configPath, QString network) // Save the network into the data path
+void  WalletConfig::saveNetwork2DataPath(QString configPath, QString network, QString arch) // Save the network into the data path
 {
     QString path = ioutils::getAppDataPath( configPath );
-    util::writeTextFile(path + "/net.txt", {network} );
+    util::writeTextFile(path + "/net.txt", {network, arch} );
 }
 
 

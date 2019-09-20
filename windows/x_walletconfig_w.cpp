@@ -19,6 +19,7 @@
 #include <QFileInfo>
 #include <QHostInfo>
 #include "../util/Waiting.h"
+#include "../util/Process.h"
 #include <QFileDialog>
 #include <QStandardPaths>
 #include "../state/timeoutlock.h"
@@ -211,7 +212,17 @@ bool WalletConfig::readInputValue( const wallet::WalletConfig & prevWalletConfig
         return false;
     }
 
-    QString network = wallet::WalletConfig::readNetworkFromDataPath(walletDir); // local path as writen in config
+    QPair<QString,QString> networkArch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDir); // local path as writen in config
+    QString runningArc = util::getBuildArch();
+
+    // Just in case. Normally will never be called
+    if ( runningArc != networkArch.second ) {
+        control::MessageBox::message(nullptr, "Wallet data architecture mismatch",
+                                     "Your mwc713 seed at '"+ walletDir +"' was created with "+ networkArch.second+" bits version of the wallet. You are using " + runningArc + " bit version.");
+        return false;
+    }
+
+    QString network = networkArch.first; // local path as writen in config
     if (network.isEmpty()) {
         // Check if seed file does exist. Import of the data?
         if ( wallet::WalletConfig::doesSeedExist(walletDir) ) {
@@ -222,11 +233,12 @@ bool WalletConfig::readInputValue( const wallet::WalletConfig & prevWalletConfig
 
             network = nwDlg.getNetwork() == state::InitAccount::MWC_NETWORK::MWC_MAIN_NET ? "Mainnet" : "Floonet";
 
-            wallet::WalletConfig::saveNetwork2DataPath(walletDir, network);
         }
         else
             network = "Mainnet"; // will be redefined later in any case...
     }
+
+    wallet::WalletConfig::saveNetwork2DataPath(walletDir, network, runningArc);
 
     // So far we are good
     newWalletConfig.setData( network,
@@ -254,8 +266,19 @@ void WalletConfig::on_mwc713directorySelect_clicked()
         return;
 
     QDir baseDir(basePath);
+    QString walletDir = baseDir.relativeFilePath(dir);
 
-    ui->mwc713directoryEdit->setText( baseDir.relativeFilePath(dir) );
+    QPair<QString,QString> networkArch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDir); // local path as writen in config
+    QString runningArc = util::getBuildArch();
+
+    // Just in case. Normally will never be called
+    if ( runningArc != networkArch.second ) {
+        control::MessageBox::message(nullptr, "Wallet data architecture mismatch",
+                                     "Your mwc713 seed at '"+ walletDir +"' was created with "+ networkArch.second+" bits version of the wallet. You are using " + runningArc + " bit version.");
+        return;
+    }
+
+    ui->mwc713directoryEdit->setText( walletDir );
     updateButtons();
 }
 
