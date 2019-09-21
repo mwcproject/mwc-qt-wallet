@@ -219,25 +219,6 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <widget class="control::MwcLabelSmall" name="label_4">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>22</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Keybase path</string>
-         </property>
-        </widget>
-       </item>
        <item row="2" column="1">
         <widget class="control::MwcPushButtonNormal" name="mwc713directorySelect">
          <property name="minimumSize">
@@ -699,6 +680,25 @@
          </item>
         </layout>
        </item>
+       <item row="5" column="0" colspan="2">
+        <widget class="control::MwcLabelSmall" name="label_4">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>22</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Keybase console client path</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
@@ -738,6 +738,11 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control/MwcLineEdit.h</header>
@@ -750,11 +755,6 @@
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>

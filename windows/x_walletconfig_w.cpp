@@ -183,6 +183,20 @@ bool WalletConfig::readInputValue( const wallet::WalletConfig & prevWalletConfig
         return false;
     }
 
+    #ifdef Q_OS_WIN
+
+        // Under the windows we want user select Client, Not a GUI
+        // C:\Users\XXXX\AppData\Local\Keybase\keybase.exe        - ok
+        // C:\Users\XXXX\AppData\Local\Keybase\Gui\Keybase.exe    - GUI, will not work
+        if (keybasePath.contains("Gui") || keybasePath.contains("gui") ) {
+            if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::question( this, "Keybase path, Warning",
+                               "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
+                               "Cancel", "Use this path", true, false ) )
+                return false;
+        }
+    #endif
+
+
     QString mwcmqHost = mwcDomainInputStr2Config(ui->mwcmqHost->text().trimmed());
     if (!mwcmqHost.isEmpty()) {
         // Checking the host
@@ -307,6 +321,19 @@ void WalletConfig::on_keybasePathSelect_clicked()
                                                    appDirs.isEmpty() ? "" : appDirs[0]);
     if (keybase.isEmpty())
         return;
+
+#ifdef Q_OS_WIN
+
+    // Under the windows we want user select Client, Not a GUI
+    // C:\Users\XXXX\AppData\Local\Keybase\keybase.exe        - ok
+    // C:\Users\XXXX\AppData\Local\Keybase\Gui\Keybase.exe    - GUI, will not work
+    if (keybase.contains("Gui") || keybase.contains("gui") ) {
+        if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::question( this, "Keybase path, Warning",
+                       "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
+                                       "Cancel", "Use this path", true, false ) )
+            return;
+    }
+#endif
 
     ui->keybasePathEdit->setText( keybase );
     updateButtons();
