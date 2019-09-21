@@ -31,7 +31,7 @@ bool ConfigReader::readConfig(QString confPath) {
             if (line.length()<1 || line[0]=='#') // empty or comment
                 continue;
 
-            // Let's fix escaping for \\
+            // Let's fix escaping for '\\'
             line.replace("\\\\", "\\");
 
             int idx = line.indexOf('=');
