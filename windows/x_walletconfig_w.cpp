@@ -48,6 +48,35 @@ static double id2scale(int scale) {
     }
 }
 
+// Check path and show warning is needed
+static bool checkKeyBasePath( QWidget * parent, QString keybasePath ) {
+#ifdef Q_OS_WIN
+
+    // Under the windows we want user select Client, Not a GUI
+        // C:\Users\XXXX\AppData\Local\Keybase\keybase.exe        - ok
+        // C:\Users\XXXX\AppData\Local\Keybase\Gui\Keybase.exe    - GUI, will not work
+        if (keybasePath.contains("Gui") || keybasePath.contains("gui") ) {
+            if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::question( parent, "Keybase path, Warning",
+                               "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
+                               "Cancel", "Use this path", true, false ) )
+                return false;
+        }
+#endif
+#ifdef Q_OS_DARWIN
+    // Mac OS
+    // /Applications/Keybase.app/Contents/MacOS/Keybase              - GUI, not OK
+    // /Applications/Keybase.app/Contents/SharedSupport/bin/keybase  - ok
+    if (!keybasePath.contains("bin") ) {
+        if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::question( parent, "Keybase path, Warning",
+                                                                                      "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
+                                                                                      "Cancel", "Use this path", true, false ) )
+            return false;
+    }
+#endif
+
+    return true;
+}
+
 static QString calcMWCMW_DOMAIN_DEFAULT_STR() {
     return QString("default MWC MQ") + (config::getUseMwcMqS() ? "S" : "")  + " Domain";
 }
@@ -183,19 +212,10 @@ bool WalletConfig::readInputValue( const wallet::WalletConfig & prevWalletConfig
         return false;
     }
 
-    #ifdef Q_OS_WIN
-
-        // Under the windows we want user select Client, Not a GUI
-        // C:\Users\XXXX\AppData\Local\Keybase\keybase.exe        - ok
-        // C:\Users\XXXX\AppData\Local\Keybase\Gui\Keybase.exe    - GUI, will not work
-        if (keybasePath.contains("Gui") || keybasePath.contains("gui") ) {
-            if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::question( this, "Keybase path, Warning",
-                               "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
-                               "Cancel", "Use this path", true, false ) )
-                return false;
-        }
-    #endif
-
+    if (!checkKeyBasePath(this, keybasePath)) {
+        ui->keybasePathEdit->setFocus();
+        return false;
+    }
 
     QString mwcmqHost = mwcDomainInputStr2Config(ui->mwcmqHost->text().trimmed());
     if (!mwcmqHost.isEmpty()) {
@@ -319,21 +339,11 @@ void WalletConfig::on_keybasePathSelect_clicked()
 
     QString keybase = QFileDialog::getOpenFileName(this, tr("Keybase binary location"),
                                                    appDirs.isEmpty() ? "" : appDirs[0]);
-    if (keybase.isEmpty())
+
+    if ( keybase.isEmpty() || !checkKeyBasePath(this, keybase) ) {
+        ui->keybasePathEdit->setFocus();
         return;
-
-#ifdef Q_OS_WIN
-
-    // Under the windows we want user select Client, Not a GUI
-    // C:\Users\XXXX\AppData\Local\Keybase\keybase.exe        - ok
-    // C:\Users\XXXX\AppData\Local\Keybase\Gui\Keybase.exe    - GUI, will not work
-    if (keybase.contains("Gui") || keybase.contains("gui") ) {
-        if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::question( this, "Keybase path, Warning",
-                       "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
-                                       "Cancel", "Use this path", true, false ) )
-            return;
     }
-#endif
 
     ui->keybasePathEdit->setText( keybase );
     updateButtons();
