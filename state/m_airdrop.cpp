@@ -194,7 +194,7 @@ void Airdrop::sendRequest(HTTP_CALL call, const QString & api,
     for (int t=1; t<params.size(); t+=2) {
         query.addQueryItem(params[t-1], params[t]);
     }
-    requestUrl.setQuery(query);
+    requestUrl.setQuery(query.query(QUrl::FullyEncoded), QUrl::StrictMode );
 
     QNetworkRequest request;
 
@@ -205,7 +205,7 @@ void Airdrop::sendRequest(HTTP_CALL call, const QString & api,
     config.setPeerVerifyMode(QSslSocket::VerifyNone);
     request.setSslConfiguration(config);
 
-    qDebug() << "Processing: GET " << requestUrl.toString();
+    qDebug() << "Processing: GET " << requestUrl.toString(QUrl::FullyEncoded);
     logger::logInfo("Airdrop", "Requesting: " + requestUrl.toString());
     request.setUrl( requestUrl );
     request.setHeader(QNetworkRequest::ServerHeader, "application/json");
