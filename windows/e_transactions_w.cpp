@@ -371,7 +371,7 @@ void Transactions::on_deleteButton_clicked()
         return;
     }
     if ( control::MessageBox::question(this, "Transaction cancellation",
-            "Are you sure you want to cancet transaction #" + QString::number(selected->txIdx+1) +
+            "Are you sure you want to cancel transaction #" + QString::number(selected->txIdx+1) +
                                ", TXID " + selected->txid, "No", "Yes", true, false) == control::MessageBox::RETURN_CODE::BTN2 ) {
         state->cancelTransaction(*selected);
     }
