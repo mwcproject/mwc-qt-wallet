@@ -385,7 +385,7 @@ void Transactions::updateCancelTransacton(bool success, int64_t trIdx, QString e
         control::MessageBox::message(this, "Transaction was cancelled", "Transaction number " + QString::number(trIdx+1) + " was successfully cancelled");
     }
     else {
-        control::MessageBox::message(this, "Failed to cancel transaction", "Cancel request for transaction number " + QString::number(trIdx+1) + " was failed.\n\n" + errMessage);
+        control::MessageBox::message(this, "Failed to cancel transaction", "Cancel request for transaction number " + QString::number(trIdx+1) + " has failed.\n\n" + errMessage);
     }
 }
 

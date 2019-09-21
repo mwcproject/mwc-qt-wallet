@@ -157,7 +157,7 @@ void SendOnline::sendRespond( bool success, const QStringList & errors ) {
     else
         errMsg = "Your send request was failed:\n" + errMsg;
 
-    control::MessageBox::message( this, "Send request was failed", errMsg );
+    control::MessageBox::message( this, "Send request failed", errMsg );
 }
 
 

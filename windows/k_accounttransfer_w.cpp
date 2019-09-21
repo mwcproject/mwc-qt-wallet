@@ -66,13 +66,13 @@ void AccountTransfer::showTransferResults(bool ok, QString errMsg) {
     state::TimeoutLockObject to( state );
 
     if (ok) {
-        control::MessageBox::message(this, "Success", "Your funds was successfully transferred");
+        control::MessageBox::message(this, "Success", "Your funds were successfully transferred");
         // reset state
         ui->amountEdit->setText("");
         updateAccounts();
     }
     else {
-        control::MessageBox::message(this, "Transfer failure", "Funds transfer request was failed.\n" + errMsg);
+        control::MessageBox::message(this, "Transfer failure", "Funds transfer request has failed.\n" + errMsg);
     }
 }
 

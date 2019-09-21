@@ -153,7 +153,7 @@ void Accounts::on_addButton_clicked()
         for (auto & acc : accounts) {
             if (acc.accountName == accountName) {
                 control::MessageBox::message(this, "Account name", "Account with name '" + accountName +
-                       "' already exist. Please specify unique account name to create.");
+                       "' already exists. Please specify a unique account name to create.");
                 ok = false;
                 break;
             }

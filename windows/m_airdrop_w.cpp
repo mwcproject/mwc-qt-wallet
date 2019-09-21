@@ -105,7 +105,7 @@ void Airdrop::on_claimAirdropBtn_clicked()
     QString address = ui->btcAddressEdit->text().trimmed().trimmed();
 
     if (address.length()==0) {
-        control::MessageBox::message(this, "Error", "Please input your BTC address that you registered at airdrop");
+        control::MessageBox::message(this, "Error", "Please input your BTC address that you registered during the airdrop");
         return;
     }
 

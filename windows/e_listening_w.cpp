@@ -102,7 +102,7 @@ void Listening::on_mwcMqToIndex_clicked()
     int idx = index.toInt(&ok);
 
     if (!ok || idx<0 || idx>65000) {
-        control::MessageBox::message(this, "Wrong value", "Please input integer on the range from 0 to 65000");
+        control::MessageBox::message(this, "Wrong value", "Please input integer in the range from 0 to 65000");
         return;
     }
 

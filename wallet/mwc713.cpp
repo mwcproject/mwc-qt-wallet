@@ -690,7 +690,7 @@ void MWC713::appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QStr
     Q_UNUSED(id);
     if (level == MESSAGE_LEVEL::FATAL_ERROR) {
         // Fatal error. Display message box and exiting. We don't want to continue
-        control::MessageBox::message(nullptr, "mwc713 Error", "Wallet get a critical error from mwc713 process:\n" + message + "\n\nPress OK to exit the wallet" );
+        control::MessageBox::message(nullptr, "mwc713 Error", "Wallet got a critical error from the mwc713 process:\n" + message + "\n\nPress OK to exit the wallet" );
         mwc::closeApplication();
         return;
     }
