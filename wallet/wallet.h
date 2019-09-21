@@ -499,6 +499,10 @@ signals:
 
     void onSlateSendTo( QString slate, QString mwc, QString sendAddr );
     void onSlateFinalized( QString slate );
+    // I send and I get a responce from the 2nd party
+    void onSlateReceivedBack(QString slate, QString mwc, QString fromAddr);
+    // I get money
+    void onSlateReceivedFrom(QString slate, QString mwc, QString fromAddr, QString message );
 
     // Files operations
     void onSendFile( bool success, QStringList errors, QString fileName );

@@ -27,10 +27,12 @@
 
 namespace state {
 
-void SendEventInfo::setData(QString _address, int64_t _txid,  QString _slate) {
+void SendEventInfo::setData(QString _address, int64_t _txid,  QString _slate, bool _send, bool _respond) {
     address = _address;
     txid    = _txid;
     slate   = _slate;
+    send = _send;
+    respond = _respond;
     timestamp = QDateTime::currentMSecsSinceEpoch();
 }
 
@@ -43,6 +45,8 @@ Send::Send(StateContext * context) :
                      this, &Send::sendRespond, Qt::QueuedConnection);
     QObject::connect(context->wallet, &wallet::Wallet::onSlateFinalized,
                      this, &Send::onSlateFinalized, Qt::QueuedConnection);
+    QObject::connect(context->wallet, &wallet::Wallet::onSlateReceivedBack,
+                     this, &Send::onSlateReceivedBack, Qt::QueuedConnection);
 
     QObject::connect(context->wallet, &wallet::Wallet::onSendFile,
                      this, &Send::respSendFile, Qt::QueuedConnection);
@@ -107,11 +111,8 @@ void Send::sendMwcOnline(const wallet::AccountInfo &account, util::ADDRESS_TYPE 
 
 void Send::sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate ) {
 
-    // Start tracking that send transaction. Expected it to be finalized...
-    SendEventInfo sendEvent;
-    sendEvent.setData(address, txid, slate);
-    waitingFinalization.insert(slate, sendEvent);
-
+    if (success)
+        registerSlate( slate, address, txid, true, false );
 
     if (onlineWnd) {
         onlineWnd->sendRespond(success, errors);
@@ -122,7 +123,13 @@ void Send::sendRespond( bool success, QStringList errors, QString address, int64
 }
 
 void Send::onSlateFinalized( QString slate ) {
-    waitingFinalization.remove(slate);
+    registerSlate( slate, "", -1, false, true );
+}
+
+void Send::onSlateReceivedBack(QString slate, QString mwc, QString fromAddr) {
+    Q_UNUSED(mwc);
+    Q_UNUSED(fromAddr);
+    registerSlate( slate, "", -1, false, true );
 }
 
 void Send::sendMwcOffline(  const wallet::AccountInfo & account, int64_t amount, QString message, QString fileName ) {
@@ -159,30 +166,33 @@ void Send::timerEvent(QTimerEvent *event)
 
     int64_t waitingTimeLimit = QDateTime::currentMSecsSinceEpoch() - config::getSendTimeoutMs();
 
-    QVector<SendEventInfo> toCancel;
+    QVector<SendEventInfo> toReview;
 
-    for ( SendEventInfo & evt : waitingFinalization.values() ) {
+    for ( SendEventInfo & evt : slatePool.values() ) {
         if (evt.timestamp < waitingTimeLimit ) {
-            toCancel.push_back(evt);
+            toReview.push_back(evt);
         }
     }
 
-    for (auto & evt : toCancel) {
-        waitingFinalization.remove(evt.slate);
+    for (auto & evt : toReview) {
+        slatePool.remove(evt.slate);
     }
 
     // Now let's ask user what to do with cancelled
     // Expecting that timer calls are single threaded.
-    for (auto & evt : toCancel) {
-        if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::question(nullptr, "Second party not responded",
-                "We didn't get any respond from the address\n" + evt.address + "\nThere is a high chance that second party is offline and will never respond back.\n" +
-                "Do you want to continue waiting or cancel this transaction?",
-                "   Keep Waiting    ", "   Cancel Transaction   ", false, true) )
-        {
-            // let's cancel transaction. Fortunatelly index is know.
-            // We can just cancel, if error will happen, we will show it
-            context->wallet->cancelTransacton( evt.txid );
-            transactions2cancel += evt.txid;
+    for (auto & evt : toReview) {
+        if (evt.isStaleTransaction()) {
+            if (control::MessageBox::RETURN_CODE::BTN2 ==
+                control::MessageBox::question(nullptr, "Second party not responded",
+                                              "We didn't get any respond from the address\n" + evt.address +
+                                              "\nThere is a high chance that second party is offline and will never respond back.\n" +
+                                              "Do you want to continue waiting or cancel this transaction?",
+                                              "   Keep Waiting    ", "   Cancel Transaction   ", false, true)) {
+                // let's cancel transaction. Fortunately index is known.
+                // We can just cancel, if error will happen, we will show it
+                context->wallet->cancelTransacton(evt.txid);
+                transactions2cancel += evt.txid;
+            }
         }
     }
 }
@@ -193,9 +203,27 @@ void Send::onCancelTransacton( bool success, int64_t trIdx, QString errMessage )
         control::MessageBox::message(nullptr, "Unable to cancel transaction",
                 "We unable to cancel the last transaction.\n"+errMessage+"\n\nPlease check at transaction page the status of your transactions. At notification page you can check the latest event.");
     }
-
+    transactions2cancel.remove(trIdx); // Just, in case, clean up
 }
 
+void Send::registerSlate( const QString & slate, QString address, int64_t txid, bool send, bool respond ) {
+    if (!slatePool.contains( slate ) ) {
+        slatePool[slate].setData( address, txid,  slate, send, respond );
+    }
+    else {
+        SendEventInfo & evtInfo = slatePool[slate];
+        if (send)
+            evtInfo.send = send;
+        if (respond)
+            evtInfo.respond = respond;
+
+        if (!address.isEmpty())
+            evtInfo.address = address;
+
+        if (txid>=0)
+            evtInfo.txid = txid;
+    }
+}
 
 
 }

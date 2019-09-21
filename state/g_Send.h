@@ -31,11 +31,17 @@ namespace state {
 
 struct SendEventInfo {
     QString address;
-    int64_t txid;
+    int64_t txid = -1;
     QString slate;
-    int64_t timestamp;
+    int64_t timestamp = 0;
 
-    void setData(QString address, int64_t txid,  QString slate);
+    bool send = false;
+    bool respond = false;
+
+    void setData(QString address, int64_t txid,  QString slate, bool send, bool respond);
+
+    // was send and was never respond
+    bool isStaleTransaction() const {return send && !respond;}
 };
 
 class Send  : public QObject, public State {
@@ -71,6 +77,7 @@ private slots:
     void onWalletBalanceUpdated();
     void sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate );
     void onSlateFinalized( QString slate );
+    void onSlateReceivedBack(QString slate, QString mwc, QString fromAddr);
 
     void respSendFile( bool success, QStringList errors, QString fileName );
 
@@ -78,13 +85,19 @@ private slots:
 private:
     void switchToStartingWindow();
 
+    // address can be empty - will be ignored
+    // txid  negative - will be ignored
+    void registerSlate( const QString & slate, QString address, int64_t txid, bool send, bool respond );
+
 private:
     wnd::SendStarting  * onlineOfflineWnd = nullptr;
     wnd::SendOnline         * onlineWnd = nullptr;
     wnd::SendOffline  * offlineWnd = nullptr;
 
-    // Key, slate
-    QMap<QString, SendEventInfo> waitingFinalization;
+    // Here we are keeping not only waiting, but also responded back
+    // Messages order in non guaranteed and we need to handle that
+    // Key: slate
+    QMap<QString, SendEventInfo> slatePool;
     QSet<int64_t> transactions2cancel;
 };
 

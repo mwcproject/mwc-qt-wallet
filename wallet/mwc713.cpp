@@ -978,10 +978,12 @@ void MWC713::reportSlateSendBack( QString slate,  QString sendAddr ) {
 }
 
 void MWC713::reportSlateReceivedBack( QString slate, QString mwc, QString fromAddr ) {
-    logger::logEmit( "MWC713", "onSlateReceived", slate + " with " +mwc + " from " + fromAddr );
+    logger::logEmit( "MWC713", "reportSlateReceivedBack", slate + " with " +mwc + " from " + fromAddr );
 
     appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
                                          "Slate " + slate + " received back from " + fromAddr + " for " + mwc + " mwc");
+
+    emit onSlateReceivedBack(slate, mwc, fromAddr);
 
     // Request balace refresh
     updateWalletBalance();
@@ -995,14 +997,17 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
     msg +=  " Slate:" + slate;
     appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC, msg );
 
-    // Show message box with congrats. Msaages bot should work from any point. No needs to block locking or what ever we have
+    emit onSlateReceivedFrom(slate, mwc, fromAddr, message );
+
+    updateWalletBalance();
+
+    // Show message box with congrats. Message bot should work from any point. No needs to block locking or what ever we have
     control::MessageBox::message(nullptr, "Congratulations!",
            "You recieved <b>" + mwc + "</b> mwc<br>" +
            (message.isEmpty() ? "" : "Description: " + message + "<br>" ) +
            "<br>From: " + fromAddr +
            "<br>Slate: " + slate);
 
-    updateWalletBalance();
 }
 
 void MWC713::reportSlateFinalized( QString slate ) {
