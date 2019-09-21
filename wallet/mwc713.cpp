@@ -1297,6 +1297,11 @@ bool MWC713::saveWalletConfig(const WalletConfig & config) {
         newConfLines.append("mwc_node_secret = \"" + config.mwcNodeSecret + "\"");
     }
 
+    // Escape back slashes for toml
+    for (auto & ln : newConfLines) {
+        ln.replace("\\", "\\\\"); // escaping all backslashes
+    }
+
     return util::writeTextFile( mwc713confFN, newConfLines );
 }
 
