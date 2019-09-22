@@ -202,7 +202,7 @@ void MainWindow::onConfigUpdate() {
 
 
 void MainWindow::updateListenerBtn() {
-    QPair<bool,bool> listStatus = wallet->getListeningStatus();
+    QPair<bool,bool> listStatus = wallet->getListenerStatus();
     qDebug() << "updateListenerBtn: " << listStatus;
 
     bool listening = listStatus.first | listStatus.second;

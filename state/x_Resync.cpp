@@ -44,7 +44,7 @@ NextStateRespond Resync::execute() {
         prevState = STATE::TRANSACTIONS;
 
     // Starting recovery process
-    prevListeningStatus = context->wallet->getListeningStatus();
+    prevListeningStatus = context->wallet->getListenerStartState();
 
     if (prevListeningStatus.first)
         context->wallet->listeningStop(true,false);

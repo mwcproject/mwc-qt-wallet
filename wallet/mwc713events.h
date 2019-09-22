@@ -59,6 +59,10 @@ enum WALLET_EVENTS {
     S_LISTENER_MQ_LOST_CONNECTION = 28, // WARNING: listener [XXXX] lost connection. it will...
     S_LISTENER_MQ_GET_CONNECTION = 29, // INFO: listener [XXXXX] reestablished connection.  Message: address
     S_LISTENER_MQ_COLLISION = 30,  // ERROR: new login detected. mwcmqs listener will stop!
+    S_LISTENER_MQ_FAILED_TO_START = 31, // ERROR: Failed to start mwcmqs subscriber. Error connecting to ....
+
+    S_LISTENER_KB_LOST_CONNECTION = 32, // WARNING: listener [keybase] lost connection. it will keep trying to restore connection in the background.
+    S_LISTENER_KB_GET_CONNECTION = 33, // INFO: listener [keybase] reestablished connection.
 
     // Recovery
     // from init wallet

@@ -233,11 +233,26 @@ void Mwc713InputParser::initListening() {
                                                         new TriePhraseSection("] reestablished connection.")
                                                 }));
 
-    // Need to detect a case when listening collision happans. Then we will emit message about that
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_KB_LOST_CONNECTION,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("listener [keybase] lost connection.")
+                                                }));
+
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_KB_GET_CONNECTION,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("listener [keybase] reestablished connection.")
+                                                }));
+
+    // Need to detect a case when listening collision heppans. Then we will emit message about that
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_COLLISION,
                           QVector<BaseTrieSection*>{
                                    new TriePhraseSection("new login detected. mwcmqs listener will stop!")
                           }));
+    // Failed to start detection needed because it will stop to reconnection. Need to handle that
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_FAILED_TO_START,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("Failed to start mwcmqs subscriber.")    // Full message: ERROR: Failed to start mwcmqs subscriber. Error connecting to mqs.mwc.mw:443
+                                                }));
 }
 
 void Mwc713InputParser::initRecovery() {

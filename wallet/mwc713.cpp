@@ -147,6 +147,9 @@ void MWC713::start(bool loginWithLastKnownPassword)  {
     loggedIn = false;
     startedMode = STARTED_MODE::NORMAL;
 
+    mwcMqOnline = keybaseOnline = false;
+    mwcMqStarted = keybaseStarted = false;
+
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
@@ -182,6 +185,9 @@ void MWC713::start2init(QString password) {
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
 
+    mwcMqOnline = keybaseOnline = false;
+    mwcMqStarted = keybaseStarted = false;
+
     qDebug() << "Starting MWC713 as init at " << mwc713Path << " for config " << mwc713configPath;
 
     // Creating process and starting
@@ -207,6 +213,9 @@ void MWC713::start2init(QString password) {
 // Check Signals: onRecoverResult(bool ok, QString newAddress );
 void MWC713::start2recover(const QVector<QString> & seed, QString password) {
     startedMode = STARTED_MODE::RECOVER;
+
+    mwcMqOnline = keybaseOnline = false;
+    mwcMqStarted = keybaseStarted = false;
 
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
@@ -245,6 +254,9 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
 void MWC713::start2getnextkey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) {
     startedMode = STARTED_MODE::GET_NEXTKEY;
 
+    mwcMqOnline = keybaseOnline = false;
+    mwcMqStarted = keybaseStarted = false;
+
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
@@ -274,6 +286,9 @@ void MWC713::start2getnextkey( int64_t amountNano, QString btcaddress, QString a
 // Check Signal: onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
 void MWC713::start2receiveSlate( QString receiveAccount, QString identifier, QString slateFN ) {
     startedMode = STARTED_MODE::RECEIVE_SLATE;
+
+    mwcMqOnline = keybaseOnline = false;
+    mwcMqStarted = keybaseStarted = false;
 
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
@@ -325,8 +340,8 @@ void MWC713::processStop(bool exitNicely) {
     if (keybaseOnline)
         emit onKeybaseListenerStatus(false);
 
-    mwcMqOnline = false;
-    keybaseOnline = false;
+    mwcMqOnline = keybaseOnline = false;
+    mwcMqStarted = keybaseStarted = false;
 
     emit onMwcAddress("");
     emit onMwcAddressWithIndex("",1);
@@ -400,28 +415,32 @@ void MWC713::confirmNewSeed()  {
 void MWC713::getSeed()  {
     // Need stop listeners first
 
-    QPair<bool,bool> lsnStatus = getListeningStatus();
+    QPair<bool,bool> lsnState = getListenerStartState();
 
-    if (lsnStatus.first)
+    if (lsnState.first)
         listeningStop(true, false);
 
-    if (lsnStatus.second)
+    if (lsnState.second)
         listeningStop(false, true);
 
     eventCollector->addTask( new TaskRecoverShowMnenonic(this, walletPassword ), TaskRecoverShowMnenonic::TIMEOUT );
 
-    if (lsnStatus.first)
+    if (lsnState.first)
         listeningStart(true, false, true);
 
-    if (lsnStatus.second)
+    if (lsnState.second)
         listeningStart(false, true, true);
 }
 
 
 // Checking if wallet is listening through services
 // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
-QPair<bool,bool> MWC713::getListeningStatus()  {
+QPair<bool,bool> MWC713::getListenerStatus()  {
     return QPair<bool,bool>(mwcMqOnline, keybaseOnline);
+}
+
+QPair<bool,bool> MWC713::getListenerStartState()  {
+    return QPair<bool,bool>(mwcMqStarted, keybaseStarted);
 }
 
 // Check Signal: onListeningStartResults
@@ -763,7 +782,13 @@ void MWC713::setGettedSeed( QVector<QString> seed ) {
 void MWC713::setListeningStartResults( bool mqTry, bool kbTry, // what we try to start
                                QStringList errorMessages, bool initialStart ) {
     logger::logEmit("MWC713", "onListeningStartResults", QString("mqTry=") + QString::number(mqTry) +
-            " kbTry=" + QString::number(kbTry) + " errorMessages size " + QString::number(errorMessages.size()) + " initStart=" + (initialStart?"True":"False") );
+                                                         " kbTry=" + QString::number(kbTry) + " errorMessages size " + QString::number(errorMessages.size()) + " initStart=" + (initialStart?"True":"False") );
+
+    if (mqTry)
+        mwcMqStarted = true;
+    if (kbTry)
+        keybaseStarted = true;
+
     emit onListeningStartResults(mqTry, kbTry,errorMessages, initialStart );
 }
 
@@ -771,7 +796,24 @@ void MWC713::setListeningStopResult(bool mqTry, bool kbTry, // what we try to st
                             QStringList errorMessages ) {
     logger::logEmit("MWC713", "onListeningStopResult", QString("mqTry=") + QString::number(mqTry) +
              " kbTry=" + QString::number(kbTry) + " errorMessages size " + QString::number(errorMessages.size()) );
+
+    if (mqTry)
+        mwcMqStarted = false;
+    if (kbTry)
+        keybaseStarted = false;
+
     emit onListeningStopResult(mqTry, kbTry,errorMessages);
+
+    if (mqTry) {
+        mwcMqOnline = false;
+        emit onMwcMqListenerStatus(false);
+    }
+
+    if (kbTry) {
+        keybaseOnline = false;
+        emit onKeybaseListenerStatus(false);
+    }
+
 
 }
 
@@ -1107,10 +1149,27 @@ void MWC713::setNodeStatus( bool online, QString errMsg, int nodeHeight, int pee
 }
 
 void MWC713::notifyListenerMqCollision() {
-    logger::logEmit( "MWC713", "onListenerMqCollision", "" );
+    if (!mwcMqOnline && !mwcMqStarted)
+        return;  // False alarm. Can happen with network problems. mwc MQS was already stopped, now we are restarting.
+
+    logger::logEmit("MWC713", "onListenerMqCollision", "");
+
+    mwcMqStarted = false;
     emit onListenerMqCollision();
+
+    if (mwcMqOnline) {
+        mwcMqOnline = false;
+        emit onMwcMqListenerStatus(false);
+    }
 }
 
+void MWC713::notifyMqFailedToStart() {
+    logger::logInfo("MWC713", "notifyMqFailedToStart processed");
+    if (mwcMqStarted) {
+        mwcMqStarted = false;
+        emit onListeningStopResult(true, false, {} );
+    }
+}
 
 void MWC713::processAllTransactionsStart() {
     collectedTransactions.clear();

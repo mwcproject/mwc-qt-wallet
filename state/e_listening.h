@@ -34,13 +34,13 @@ public:
     void wndIsGone(wnd::Listening * w) { if(w==wnd) wnd = nullptr;} // window is closed
 
 
-    void triggerMwcState();
+    void triggerMwcStartState();
 
     void requestNextMwcMqAddress();
 
     void requestNextMwcMqAddressForIndex(int idx);
 
-    void triggerKeybaseState();
+    void triggerKeybaseStartState();
 
 protected:
     virtual NextStateRespond execute() override;

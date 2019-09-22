@@ -304,7 +304,9 @@ public:
 
     // Checking if wallet is listening through services
     // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
-    virtual QPair<bool,bool> getListeningStatus()  = 0;
+    virtual QPair<bool,bool> getListenerStatus()  = 0;
+    // return:  <mwcmq status>, <keybase status>.   true mean was started and need to be stopped, false - never started or was stopped
+    virtual QPair<bool,bool> getListenerStartState()  = 0;
 
     // Start listening through services
     virtual void listeningStart(bool startMq, bool startKb, bool initialStart)  = 0;
@@ -532,12 +534,12 @@ signals:
     // Listener status listeners...
     void onMwcMqListenerStatus(bool online);
     void onKeybaseListenerStatus(bool online);
+    // mwc713 get an error  ERROR: new login detected. mwcmqs listener will stop!
+    void onListenerMqCollision();
 
     // Node info
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
-    // mwc713 get an error  ERROR: new login detected. mwcmqs listener will stop!
-    void onListenerMqCollision();
 };
 
 }

@@ -112,7 +112,9 @@ public:
 
     // Checking if wallet is listening through services
     // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
-    virtual QPair<bool,bool> getListeningStatus()  override;
+    virtual QPair<bool,bool> getListenerStatus() override;
+    // return:  <mwcmq status>, <keybase status>.   true mean was started and need to be stopped, false - never started or was stopped
+    virtual QPair<bool,bool> getListenerStartState() override;
 
     // Start listening through services
     virtual void listeningStart(bool startMq, bool startKb, bool initialStart)  override;
@@ -331,8 +333,9 @@ public:
     void setNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
     void notifyListenerMqCollision();
+    void notifyMqFailedToStart();
 
-    //-------------
+        //-------------
     void processAllTransactionsStart();
     void processAllTransactionsAppend(const QVector<WalletTransaction> & trVector);
     void processAllTransactionsEnd();
@@ -384,6 +387,8 @@ private:
     // listening statuses
     bool mwcMqOnline = false;
     bool keybaseOnline = false;
+    bool mwcMqStarted = false;
+    bool keybaseStarted = false;
 
     // Connections to mwc713process
     QVector< QMetaObject::Connection > mwc713connections; // open connection to mwc713

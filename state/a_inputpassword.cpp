@@ -95,7 +95,7 @@ void InputPassword::submitPassword(const QString & password) {
 }
 
 QPair<bool,bool> InputPassword::getWalletListeningStatus() {
-    return context->wallet->getListeningStatus();
+    return context->wallet->getListenerStatus();
 }
 
 void InputPassword::onLoginResult(bool ok) {

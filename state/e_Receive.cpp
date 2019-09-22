@@ -92,7 +92,7 @@ void Receive::signTransaction( QString fileName ) {
 }
 
 void Receive::ftBack() {
-    QPair<bool,bool> lsnStatus = context->wallet->getListeningStatus();
+    QPair<bool,bool> lsnStatus = context->wallet->getListenerStatus();
     wnd = (wnd::Receive*) context->wndManager->switchToWindowEx( mwc::PAGE_E_RECEIVE,
                                                                  new wnd::Receive( context->wndManager->getInWndParent(), this,
                                                                                    lsnStatus.first, lsnStatus.second,

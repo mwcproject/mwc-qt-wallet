@@ -82,7 +82,7 @@ void AccountTransfer::transferFunds(const wallet::AccountInfo & accountFrom,
     myAddress = context->wallet->getLastKnownMwcBoxAddress();
 
     // mwc mq expected to be online, we will use it for slate exchange
-    if (myAddress.isEmpty() || !context->wallet->getListeningStatus().first) {
+    if (myAddress.isEmpty() || !context->wallet->getListenerStatus().first) {
         wnd->showTransferResults(false, "Please turn on mwc mq listener. We can't transfer funds in offline mode");
         return;
     }

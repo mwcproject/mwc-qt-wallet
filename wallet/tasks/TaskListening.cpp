@@ -74,9 +74,24 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
             wallet713->setMwcMqListeningStatus(true);
             return true;
         }
+        case S_LISTENER_KB_LOST_CONNECTION: {
+            qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
+            wallet713->setKeybaseListeningStatus(false);
+            return true;
+        }
+        case S_LISTENER_KB_GET_CONNECTION: {
+            qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
+            wallet713->setKeybaseListeningStatus(true);
+            return true;
+        }
         case S_LISTENER_MQ_COLLISION: {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
             wallet713->notifyListenerMqCollision();
+            return true;
+        }
+        case S_LISTENER_MQ_FAILED_TO_START: {
+            qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
+            wallet713->notifyMqFailedToStart();
             return true;
         }
         default:

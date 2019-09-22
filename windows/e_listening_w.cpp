@@ -23,7 +23,8 @@
 
 namespace wnd {
 
-Listening::Listening(QWidget *parent, state::Listening * _state, bool mwcMqStatus, bool keybaseStatus,
+Listening::Listening(QWidget *parent, state::Listening * _state,
+                     const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState,
                      QString mwcMqAddress, int mwcMqAddrIdx) :
     core::NavWnd(parent, _state->getContext() ),
     ui(new Ui::Listening),
@@ -33,8 +34,8 @@ Listening::Listening(QWidget *parent, state::Listening * _state, bool mwcMqStatu
 
     //state->setWindowTitle("Listening");
 
-    updateMwcMqState(mwcMqStatus);
-    updateKeybaseState(keybaseStatus);
+    updateStatuses( listenerStatus, listenerStartState );
+
     updateMwcMqAddress(mwcMqAddress, mwcMqAddrIdx);
 
     ui->mwcMQlable->setText( QString("mwc MQ") + (config::getUseMwcMqS() ? "S" : "") );
@@ -58,28 +59,54 @@ void Listening::updateMwcMqAddress(QString address, int addrIdx) {
     ui->mwcMqAddressIndexLabel->setText( addrIdx>=0 ? ("Address Index: " + QString::number(addrIdx)) : "" );
 }
 
-void Listening::updateMwcMqState(bool online) {
-    ui->mwcMqStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
-    ui->mwcMqStatusImg->setToolTip(online ? "Listener connected to mwcmq" : "Listener diconnected from mwcmq");
-    ui->mwcMqStatusTxt->setText( online ? "Online" : "Offline" );
-    ui->mwcMqTriggerButton->setText( online ? "Stop" : "Start" );
-    ui->mwcMqTriggerButton->setToolTip(online ? "Stop the MWC MQ Listener" : "Start the MWC MQ Listener");
-    ui->mwcMqNextAddress->setEnabled(!online);
-    ui->mwcMqToIndex->setEnabled(!online);
-}
+void Listening::updateStatuses( const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState ) {
+    // MWC MQ
+    ui->mwcMqStatusImg->setPixmap(QPixmap(listenerStatus.first ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
+    ui->mwcMqStatusImg->setToolTip(
+            listenerStatus.first ? "Listener connected to mwcmq" : "Listener diconnected from mwcmq");
+    ui->mwcMqStatusTxt->setText(listenerStatus.first ? "Online" : "Offline");
 
-void Listening::updateKeybaseState(bool online) {
+    if (listenerStartState.first) {
+        if (listenerStatus.first) {
+            ui->mwcMqTriggerButton->setText("Stop");
+            ui->mwcMqTriggerButton->setToolTip("Stop the MWC MQS Listener");
+        } else {
+            ui->mwcMqTriggerButton->setText("Stop to retry");
+            ui->mwcMqTriggerButton->setToolTip(
+                    "MWC MQS Listener already running and trying to reconnect. Click to restart the MWC MQS Listener.");
+        }
+    } else {
+        ui->mwcMqTriggerButton->setText("Start");
+        ui->mwcMqTriggerButton->setToolTip("Start the MWC MQS Listener");
+    }
+    ui->mwcMqNextAddress->setEnabled(!listenerStartState.first);
+    ui->mwcMqToIndex->setEnabled(!listenerStartState.first);
 
-    ui->keybaseStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg" ) );
-    ui->keybaseStatusImg->setToolTip(online ? "Listener connected to keybase" : "Listener diconnected from keybase");
-    ui->keybaseStatusTxt->setText( online ? "Online" : "Offline" );
-    ui->keybaseTriggerButton->setToolTip(online ? "Stop the Keybase Listener" : "Start the Keybase Listener");
-    ui->keybaseTriggerButton->setText( online ? "Stop" : "Start" );
+    ui->keybaseStatusImg->setPixmap(
+            QPixmap(listenerStatus.second ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
+    ui->keybaseStatusImg->setToolTip(
+            listenerStatus.second ? "Listener connected to keybase" : "Listener diconnected from keybase");
+    ui->keybaseStatusTxt->setText(listenerStatus.second ? "Online" : "Offline");
+
+    // Keybase
+    if (listenerStartState.second) {
+        if (listenerStatus.second) {
+            ui->keybaseTriggerButton->setText("Stop");
+            ui->keybaseTriggerButton->setToolTip("Stop the Keybase Listener");
+        } else {
+            ui->keybaseTriggerButton->setText("Stop to retry");
+            ui->keybaseTriggerButton->setToolTip(
+                    "Keybase Listener already running and trying to reconnect. Click to restart the Keybase Listener");
+        }
+    } else {
+        ui->keybaseTriggerButton->setText("Start");
+        ui->keybaseTriggerButton->setToolTip("Start the Keybase Listener");
+    }
 }
 
 void Listening::on_mwcMqTriggerButton_clicked()
 {
-    state->triggerMwcState();
+    state->triggerMwcStartState();
 }
 
 void Listening::on_mwcMqNextAddress_clicked()
@@ -111,7 +138,7 @@ void Listening::on_mwcMqToIndex_clicked()
 
 void Listening::on_keybaseTriggerButton_clicked()
 {
-    state->triggerKeybaseState();
+    state->triggerKeybaseStartState();
 }
 
 

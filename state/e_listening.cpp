@@ -62,22 +62,21 @@ NextStateRespond Listening::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     if (wnd==nullptr) {
-        QPair<bool,bool> lsnStatus = context->wallet->getListeningStatus();
-
         context->wallet->getMwcBoxAddress();
         // will get result later and will update the window
 
         wnd = (wnd::Listening*) context->wndManager->switchToWindowEx( mwc::PAGE_E_LISTENING,
                 new wnd::Listening( context->wndManager->getInWndParent(), this,
-                       lsnStatus.first, lsnStatus.second,
+                       context->wallet->getListenerStatus(),
+                       context->wallet->getListenerStartState(),
                        context->wallet->getLastKnownMwcBoxAddress(), -1));
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
-void Listening::triggerMwcState() {
-    QPair<bool,bool> lsnStatus = context->wallet->getListeningStatus();
+void Listening::triggerMwcStartState() {
+    QPair<bool,bool> lsnStatus = context->wallet->getListenerStartState();
     if ( !lsnStatus.first ) {
         context->wallet->listeningStart(true, false, false);
     }
@@ -94,8 +93,8 @@ void Listening::requestNextMwcMqAddressForIndex(int idx) {
     context->wallet->changeMwcBoxAddress(idx);
 }
 
-void Listening::triggerKeybaseState() {
-    QPair<bool,bool> lsnStatus = context->wallet->getListeningStatus();
+void Listening::triggerKeybaseStartState() {
+    QPair<bool,bool> lsnStatus = context->wallet->getListenerStartState();
     qDebug() << "lsnStatus: " << lsnStatus.first << " " << lsnStatus.second;
     if ( !lsnStatus.second ) {
         context->wallet->listeningStart(false, true, false);
@@ -106,13 +105,15 @@ void Listening::triggerKeybaseState() {
 }
 
 void Listening::onMwcMqListenerStatus(bool online) {
+    Q_UNUSED(online)
     if (wnd) {
-        wnd->updateMwcMqState(online);
+        wnd->updateStatuses(context->wallet->getListenerStatus(), context->wallet->getListenerStartState() );
     }
 }
 void Listening::onKeybaseListenerStatus(bool online) {
+    Q_UNUSED(online)
     if (wnd) {
-        wnd->updateKeybaseState(online);
+        wnd->updateStatuses(context->wallet->getListenerStatus(), context->wallet->getListenerStartState() );
     }
 }
 
@@ -120,8 +121,12 @@ void Listening::onKeybaseListenerStatus(bool online) {
 void Listening::onListeningStartResults( bool mqTry, bool kbTry, // what we try to start
                                QStringList errorMessages, bool initialStart ) // error messages, if get some
 {
-    Q_UNUSED(mqTry);
-    Q_UNUSED(kbTry);
+    Q_UNUSED(mqTry)
+    Q_UNUSED(kbTry)
+    if (wnd) {
+        wnd->updateStatuses(context->wallet->getListenerStatus(), context->wallet->getListenerStartState() );
+    }
+
     if (wnd && !errorMessages.empty() && !initialStart ) {
         QString msg;
         for (auto & s : errorMessages)
@@ -146,8 +151,12 @@ void Listening::onListeningStartResults( bool mqTry, bool kbTry, // what we try 
 
 void Listening::onListeningStopResult(bool mqTry, bool kbTry, // what we try to stop
                             QStringList errorMessages ) {
-    Q_UNUSED(mqTry);
-    Q_UNUSED(kbTry);
+    Q_UNUSED(mqTry)
+    Q_UNUSED(kbTry)
+    if (wnd) {
+        wnd->updateStatuses(context->wallet->getListenerStatus(), context->wallet->getListenerStartState() );
+    }
+
     if (wnd && !errorMessages.empty()) {
         QString msg;
         for (auto & s : errorMessages)

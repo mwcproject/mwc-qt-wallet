@@ -32,12 +32,12 @@ class Listening : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit Listening(QWidget *parent, state::Listening * state, bool mwcMqStatus, bool keybaseStatus,
+    explicit Listening(QWidget *parent, state::Listening * state, const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState,
                        QString mwcMqAddress, int mwcMqAddrIdx);
     ~Listening();
 
-    void updateMwcMqState(bool online);
-    void updateKeybaseState(bool online);
+    void updateStatuses( const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState );
+
     void updateMwcMqAddress(QString address, int addrIdx);
 
     void showMessage(QString title, QString message);
