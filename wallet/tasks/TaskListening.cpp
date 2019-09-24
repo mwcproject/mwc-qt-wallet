@@ -40,38 +40,49 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
         case S_LISTENER_ON: {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
 
-            if ( evt.message == "keybase" ) {
+            QStringList prms = evt.message.split('|');
+            if ( prms.size()==0 )
+                return false;
+
+            if ( prms[0] == "keybase" ) {
                 wallet713->setKeybaseListeningStatus(true);
             }
             else {
-                const QString & addrees = evt.message;
+                const QString & addrees = prms[0];
                 // x prefix is for testnet
                 // q - for mainnet
                 if (addrees.size()>0 && (addrees[0]=='x' || addrees[0]=='q') ) {
-                    wallet713->setMwcMqListeningStatus(true);
-                    wallet713->setMwcAddress(evt.message);
+                    wallet713->setMwcMqListeningStatus(true, prms.size()>1 ? prms[1] : "", true);
+                    wallet713->setMwcAddress(prms[0] );
                 }
             }
             return true;
         }
         case S_LISTENER_OFF: {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
-            if ( evt.message == "keybase" ) {
+
+            QStringList prms = evt.message.split('|');
+            if ( prms.size()==0 )
+                return false;
+
+            if ( prms[0] == "keybase" ) {
                 wallet713->setKeybaseListeningStatus(false);
             }
             else {
-                wallet713->setMwcMqListeningStatus(false);
+                wallet713->setMwcMqListeningStatus(false, prms.size()>1 ? prms[1] : "" , true);
             }
             return true;
         }
         case S_LISTENER_MQ_LOST_CONNECTION: {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
-            wallet713->setMwcMqListeningStatus(false);
+            QStringList prms = evt.message.split('|');
+            wallet713->setMwcMqListeningStatus(false, prms.size()>1 ? prms[1] : "", false );
             return true;
         }
         case S_LISTENER_MQ_GET_CONNECTION: {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
-            wallet713->setMwcMqListeningStatus(true);
+            QStringList prms = evt.message.split('|');
+            wallet713->setMwcMqListeningStatus(true, prms.size()>1 ? prms[1] : "", false );
             return true;
         }
         case S_LISTENER_KB_LOST_CONNECTION: {

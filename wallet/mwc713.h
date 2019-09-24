@@ -281,7 +281,8 @@ public:
     void setListeningStopResult(bool mqTry, bool kbTry, // what we try to stop
                                 QStringList errorMessages );
 
-    void setMwcMqListeningStatus(bool online);
+    // tid - thread ID that is responsible for listening. mwc713 can do start/stop async. tid will be used to find who is listening...
+    void setMwcMqListeningStatus(bool online, QString tid, bool startStopEvents); // Start stop event are major, they can change active tid
     void setKeybaseListeningStatus(bool online);
 
 
@@ -389,6 +390,8 @@ private:
     bool keybaseOnline = false;
     bool mwcMqStarted = false;
     bool keybaseStarted = false;
+
+    QString activeMwcMqsTid; // MQS can be managed by many thredas, but only last started is active
 
     // Connections to mwc713process
     QVector< QMetaObject::Connection > mwc713connections; // open connection to mwc713

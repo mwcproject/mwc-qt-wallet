@@ -805,19 +805,29 @@ void MWC713::setListeningStopResult(bool mqTry, bool kbTry, // what we try to st
     emit onListeningStopResult(mqTry, kbTry,errorMessages);
 
     if (mqTry) {
-        mwcMqOnline = false;
-        emit onMwcMqListenerStatus(false);
+        setMwcMqListeningStatus(false, activeMwcMqsTid, true );
     }
 
     if (kbTry) {
-        keybaseOnline = false;
-        emit onKeybaseListenerStatus(false);
+        setKeybaseListeningStatus(false);
     }
 
 
 }
 
-void MWC713::setMwcMqListeningStatus(bool online) {
+void MWC713::setMwcMqListeningStatus(bool online, QString tid, bool startStopEvents) {
+
+    qDebug() <<  "Call setMwcMqListeningStatus: online=" << online << " tid=" << tid << " startStopEvents=" << startStopEvents <<
+                 "  activeMwcMqsTid=" << activeMwcMqsTid << "  mwcMqOnline="<<mwcMqOnline;
+
+    if (tid!=activeMwcMqsTid) {
+        if (! (startStopEvents && online) )
+            return; // ignoring unknown/retired thread events
+    }
+
+    if (startStopEvents)
+        activeMwcMqsTid = tid;
+
     if (mwcMqOnline != online) {
         appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, (online ? "Start " : "Stop ") + QString("listening on mwc mq") + (config::getUseMwcMqS()?"s":"") );
     }
