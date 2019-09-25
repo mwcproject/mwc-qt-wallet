@@ -136,7 +136,7 @@ bool AppContext::loadData() {
 
     int id = 0;
     in >> id;
-    if (id!=0x4783 && id!=0x4784)
+    if (id<0x4783 || id>0x4785)
          return false;
 
     in >> receiveAccount;
@@ -165,6 +165,9 @@ bool AppContext::loadData() {
     if (id>=0x4784)
         in >> guiScale;
 
+    if (id>=0x4785)
+        in >> logsEnabled;
+
     return true;
 }
 
@@ -184,7 +187,7 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x4784;
+    out << 0x4785;
     out << receiveAccount;
     out << currentAccountName;
     out << int(activeWndState);
@@ -199,7 +202,16 @@ void AppContext::saveData() const {
     }
 
     out << guiScale;
+    out << logsEnabled;
 }
+
+void AppContext::setLogsEnabled(bool enabled) {
+    if (enabled == logsEnabled)
+        return;
+    logsEnabled = enabled;
+    saveData();
+}
+
 
 // AirdropRequests will handle differently
 void AppContext::saveAirdropRequests( const QVector<state::AirdropRequests> & data ) {

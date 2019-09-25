@@ -20,7 +20,9 @@
 #include "../state/statemachine.h"
 #include "../core/global.h"
 #include "../util/execute.h"
+#include "../util/Log.h"
 #include <QCoreApplication>
+#include <QFile>
 
 namespace state {
 
@@ -88,6 +90,20 @@ void WalletConfig::restartMwcQtWallet() {
     // Stopping wallet first
     util::requestRestartMwcQtWallet();
     QCoreApplication::quit();
+}
+
+bool WalletConfig::getWalletLogsEnabled() {
+    return context->appContext->isLogsEnabled();
+}
+
+void WalletConfig::updateWalletLogsEnabled(bool enabled, bool needCleanupLogs) {
+    context->appContext->setLogsEnabled(enabled);
+
+    logger::enableLogs(enabled);
+
+    if (needCleanupLogs)  // logs expected to be disabled by this point
+        logger::cleanUpLogs();
+
 }
 
 

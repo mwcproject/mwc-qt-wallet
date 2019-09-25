@@ -56,7 +56,7 @@ namespace logger {
     };
 
     // Must be call before first log usage
-    void initLogger();
+    void initLogger(bool logsEnabled);
 
     // mwc713 IOs
     void blockLogMwc713out(bool blockOutput);
@@ -71,6 +71,11 @@ namespace logger {
     // Events activity
     void logEmit(QString who, QString event, QString params);
     void logInfo(QString who, QString message);
+
+    // enable/disable logs
+    void enableLogs( bool enableLogs );
+    // clean all logs
+    void cleanUpLogs();
 }
 
 

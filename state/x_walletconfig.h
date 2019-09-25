@@ -42,6 +42,9 @@ public:
     void updateGuiScale(double scale);
 
     void restartMwcQtWallet();
+
+    bool getWalletLogsEnabled();
+    void updateWalletLogsEnabled(bool enabled, bool needCleanupLogs);
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "wallet_configuration.html";}

@@ -125,6 +125,9 @@ public:
     // Update contact
     QPair<bool, QString> updateContact( const ContactRecord & prevValue, const ContactRecord & newValue );
 
+    // ----- Logs --------
+    bool isLogsEnabled() const {return logsEnabled;}
+    void setLogsEnabled(bool enabled);
 
 private:
     bool loadData();
@@ -150,6 +153,8 @@ private:
 
     double guiScale = -1.0;
     double initScaleValue = 1.0; // default scale value
+
+    bool logsEnabled = true;
 
     // Contact list
     QVector<ContactRecord> contactList;

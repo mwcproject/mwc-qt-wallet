@@ -31,16 +31,43 @@ static LogReceiver * logServer = nullptr;
 
 static bool logMwc713outBlocked = false;
 
-void initLogger() {
-    logClient = new LogSender(true);
-    logServer = new LogReceiver("mwcwallet.log");
+const QString LOG_FILE_NAME = "mwcwallet.log";
 
-    bool connected = QObject::connect( logClient, &LogSender::doAppend2logs, logServer, &LogReceiver::onAppend2logs, Qt::DirectConnection); // Qt::QueuedConnection );
-    Q_ASSERT(connected);
-    Q_UNUSED(connected);
+void initLogger( bool logsEnabled) {
+    logClient = new LogSender(true);
+
+    enableLogs(logsEnabled);
 
     logClient->doAppend2logs(true, "", "mwc-wallet is started..." );
 }
+
+void cleanUpLogs() {
+    // Logs expected to be disabled first
+    Q_ASSERT(logServer == nullptr );
+    QString logPath = ioutils::getAppDataPath("logs");
+
+    QFile::remove(logPath + "/" + LOG_FILE_NAME);
+    QFile::remove(logPath + "/prev_" + LOG_FILE_NAME);
+}
+
+// enable/disable logs
+void enableLogs( bool enableLogs ) {
+    if (enableLogs) {
+        if (logServer != nullptr )
+            return;
+
+        logServer = new LogReceiver(LOG_FILE_NAME);
+        QObject::connect( logClient, &LogSender::doAppend2logs, logServer, &LogReceiver::onAppend2logs, Qt::DirectConnection); // Qt::QueuedConnection );
+    }
+    else {
+        if (logServer == nullptr)
+            return;
+
+        delete logServer;
+        logServer = nullptr;
+    }
+}
+
 
 void LogSender::log(bool addDate, const QString & prefix, const QString & line) {
     if (asyncLogging) {

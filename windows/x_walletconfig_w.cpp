@@ -96,13 +96,13 @@ WalletConfig::WalletConfig(QWidget *parent, state::WalletConfig * _state) :
     uiScale = scale2Id( state->getGuiScale() );
     checkSizeButton(uiScale);
 
+    walletLogsEnabled = state->getWalletLogsEnabled();
+
+    updateLogsStateUI(walletLogsEnabled);
+
 #ifdef Q_OS_DARWIN
     // MacOS doesn't support font scale. Need to hide all the buttons
-    ui->fontSizeLabel->hide();
-    ui->fontSz1->hide();
-    ui->fontSz2->hide();
-    ui->fontSz3->hide();
-    ui->fontSz4->hide();
+    ui->fontHolder->hide();
 #endif
 
     setValues(currentWalletConfig.getDataPath(), currentWalletConfig.keyBasePath,
@@ -134,6 +134,7 @@ void WalletConfig::setValues(const QString & mwc713directory,
 void WalletConfig::updateButtons() {
     bool sameWithCurrent =
         getcheckedSizeButton() == uiScale &&
+        walletLogsEnabled == ui->logsEnableBtn->isChecked() &&
         ui->mwc713directoryEdit->text().trimmed() == currentWalletConfig.getDataPath() &&
         keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == currentWalletConfig.keyBasePath &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == currentWalletConfig.getMwcMqHostNorm() &&
@@ -142,6 +143,7 @@ void WalletConfig::updateButtons() {
 
     bool sameWithDefault =
         getcheckedSizeButton() == scale2Id( state->getInitGuiScale() ) &&
+        true == ui->logsEnableBtn->isChecked() &&
         ui->mwc713directoryEdit->text().trimmed() == defaultWalletConfig.getDataPath() &&
         keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == defaultWalletConfig.keyBasePath &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == defaultWalletConfig.getMwcMqHostNorm() &&
@@ -366,6 +368,8 @@ void WalletConfig::on_restoreDefault_clicked()
 
     checkSizeButton( scale2Id(state->getInitGuiScale()) );
 
+    updateLogsStateUI(true);
+
     updateButtons();
 }
 
@@ -379,6 +383,23 @@ void WalletConfig::on_applyButton_clicked()
             state->setSendCoinsParams(newSendParams);
             sendParams = newSendParams;
         }
+
+        bool need2updateLogEnabled =  ( walletLogsEnabled != ui->logsEnableBtn->isChecked() );
+        if (need2updateLogEnabled) {
+            bool needCleanupLogs = false;
+            if ( !ui->logsEnableBtn->isChecked() ) {
+                needCleanupLogs = (control::MessageBox::question(this, "Wallet Logs", "You just disabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
+                                              "Please note, the logs can contain private infromation about your transactions and accounts.\n"
+                                              "Do you want to clean up existing logs from your wallet?", "Clean up", "Keep the logs", true, false) == control::MessageBox::RETURN_CODE::BTN1);
+            }
+            else {
+                control::MessageBox::message(this, "Wallet Logs", "You just enabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
+                                              "Please note, the logs can contain private infromation about your transactions and accounts.");
+            }
+            state->updateWalletLogsEnabled(ui->logsEnableBtn->isChecked(), needCleanupLogs);
+        }
+
+        walletLogsEnabled = ui->logsEnableBtn->isChecked();
 
         bool need2updateGuiSize = ( getcheckedSizeButton() != uiScale );
 
@@ -443,6 +464,20 @@ void WalletConfig::on_fontSz4_clicked()
     checkSizeButton(4);
 }
 
+void WalletConfig::on_logsEnableBtn_clicked()
+{
+    // control has 'checked' property, it is expected to be switchable
+    updateLogsStateUI( ui->logsEnableBtn->isChecked() );
+    updateButtons();
 }
+
+void WalletConfig::updateLogsStateUI(bool enabled) {
+    ui->logsEnableBtn->setText( enabled ? "Enabled" : "Disabled" );
+    ui->logsEnableBtn->setChecked(enabled);
+}
+
+
+}
+
 
 

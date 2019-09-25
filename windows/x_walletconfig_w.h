@@ -61,6 +61,8 @@ private slots:
     void on_fontSz3_clicked();
     void on_fontSz4_clicked();
 
+    void on_logsEnableBtn_clicked();
+
 private:
     void setValues(const QString & mwc713directory,
                    const QString & keyBasePath,
@@ -81,6 +83,9 @@ private:
 
     void checkSizeButton(int szId); // Id match the control names: 1..4
     int getcheckedSizeButton() const;
+
+    void updateLogsStateUI(bool enabled);
+
 private:
     Ui::WalletConfig *ui;
     state::WalletConfig * state;
@@ -88,6 +93,8 @@ private:
     wallet::WalletConfig currentWalletConfig;
     core::SendCoinsParams sendParams;
     int uiScale = 2; // in the range [1..4]
+
+    bool walletLogsEnabled = false;
 
     wallet::WalletConfig defaultWalletConfig;
     core::SendCoinsParams defaultSendParams;
