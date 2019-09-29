@@ -444,7 +444,11 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
         else {
             // error status
             reportMessageToUI("Claim request failed", "Unable to finalize claim process." +
-                                                      generateMessage(jsonRespond["error_message"].toString(), jsonRespond["error_code"].toInt( INT_MAX )) );
+                                                      generateMessage(jsonRespond["error_message"].toString(), jsonRespond["error_code"].toInt( INT_MAX )) + "\n\n" +
+                                                      "Please note, your last transaction will not be confirmed and its "
+                                                      "balance will not be spendable. To fix that please go to "
+                                                      "'Transaction' page and cancel the last file based transaction. "
+                                                      "Then you will be able to initiate a new claim when this error is resolved.");
         }
         return;
     }
