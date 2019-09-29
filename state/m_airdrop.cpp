@@ -359,7 +359,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
                 QString slateBase64 = jsonRespond["slate"].toString();
                 // Expected to have a base64 encoded slate
                 if (slateBase64.isEmpty()) {
-                    errMsg = "Not found slate data fropm AirDrop API respond";
+                    errMsg = "Not found slate data from AirDrop API respond";
                     break;
                 }
 
@@ -385,7 +385,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
                     slateFile.write(slate);
                 }
                 else {
-                    errMsg = "Not able save slate at the file " + slateFn;
+                    errMsg = "Not able to save slate at the file " + slateFn;
                     break;
 
                 }
