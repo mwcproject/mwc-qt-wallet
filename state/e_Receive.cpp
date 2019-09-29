@@ -84,11 +84,13 @@ void Receive::signTransaction( QString fileName ) {
         return;
     }
 
-
-    wallet::WalletTransaction transaction;
-    fileTransWnd = (wnd::FileTransaction*) context->wndManager->switchToWindowEx( mwc::PAGE_G_RECEIVE_TRANS,
-                                                                                  new wnd::FileTransaction( context->wndManager->getInWndParent(), this, fileName, flTrInfo, transaction, lastNodeHeight,
-                                                                                                            "Receive File Transaction", "Generate Response") );
+    // We don't want to intercept the action from other windows like AirDrop...
+    if (wnd!=nullptr || fileTransWnd!= nullptr) {
+        wallet::WalletTransaction transaction;
+        fileTransWnd = (wnd::FileTransaction*) context->wndManager->switchToWindowEx( mwc::PAGE_G_RECEIVE_TRANS,
+                                                                                      new wnd::FileTransaction( context->wndManager->getInWndParent(), this, fileName, flTrInfo, transaction, lastNodeHeight,
+                                                                                                                "Receive File Transaction", "Generate Response") );
+    }
 }
 
 void Receive::ftBack() {
@@ -111,15 +113,21 @@ state::StateContext * Receive::getContext() {
 
 
 void Receive::respReceiveFile( bool success, QStringList errors, QString inFileName ) {
-    if (fileTransWnd)
-        fileTransWnd->hideProgress();
+    // Checking if this state is really active on UI level
+    if (wnd!=nullptr || fileTransWnd!= nullptr) {
 
-    if (success) {
-        control::MessageBox::message(nullptr, "Receive File Transaction", "Transaction file was successfully signed. Resulting transaction located at " + inFileName + ".response" );
-        ftBack();
-    }
-    else {
-        control::MessageBox::message(nullptr, "Failure", "Unable to sign file transaction.\n" + util::formatErrorMessages(errors) );
+        if (fileTransWnd)
+            fileTransWnd->hideProgress();
+
+        if (success) {
+            control::MessageBox::message(nullptr, "Receive File Transaction",
+                                         "Transaction file was successfully signed. Resulting transaction located at " +
+                                         inFileName + ".response");
+            ftBack();
+        } else {
+            control::MessageBox::message(nullptr, "Failure",
+                                         "Unable to sign file transaction.\n" + util::formatErrorMessages(errors));
+        }
     }
 }
 
