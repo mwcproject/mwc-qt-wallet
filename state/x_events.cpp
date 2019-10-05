@@ -25,7 +25,7 @@ namespace state {
 Events::Events(StateContext * context):
     State(context, STATE::EVENTS)
 {
-    QObject::connect( context->wallet, &wallet::Wallet::onNewNotificationMessage,
+    QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
             this, &Events::onNewNotificationMessage, Qt::QueuedConnection );
 }
 
@@ -62,25 +62,26 @@ void Events::updateColumnsWidhts(const QVector<int> & widths) {
 
 }
 
-QVector<wallet::WalletNotificationMessages> Events::getWalletNotificationMessages() {
-    return context->wallet->getWalletNotificationMessages();
+// Historical design. UI can call this method now, but not in the past
+QVector<notify::NotificationMessage> Events::getWalletNotificationMessages() {
+    return notify::getNotificationMessages();
 }
 
-void Events::onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message) {
+void Events::onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString message) {
     Q_UNUSED(message);
 
     if (wnd!= nullptr) {
         wnd->updateShowMessages();
     }
     else {
-        if ( wallet::WalletNotificationMessages::isCritical(level) )
+        if ( notify::NotificationMessage::isCritical(level) )
             emit updateNonShownWarnings(true);
     }
 }
 
 // Check if some error/warnings need to be shown
 bool Events::hasNonShownWarnings() const {
-    QVector<wallet::WalletNotificationMessages> msgs = context->wallet->getWalletNotificationMessages();
+    QVector<notify::NotificationMessage> msgs = notify::getNotificationMessages();
 
     for ( int i = msgs.size()-1; i>=0; i-- ) {
         if (msgs[i].time.toMSecsSinceEpoch() <= messageWaterMark )

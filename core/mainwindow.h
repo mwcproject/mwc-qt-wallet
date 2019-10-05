@@ -19,6 +19,7 @@
 #include <QTimer>
 #include "../state/state.h"
 #include "../wallet/wallet.h"
+#include "../core/Notification.h"
 #include "appcontext.h"
 
 namespace Ui {
@@ -61,7 +62,7 @@ public:
     void updateLeftBar(bool show);
 
 private slots:
-    void onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message);
+    void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
     void onConfigUpdate();
 
     void on_listenerStatusButton_clicked();

@@ -61,29 +61,33 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message) {
+void MainWindow::onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message) {
 
     using namespace wallet;
 
     QString prefix;
     int timeout = 3000;
     switch(level) {
-    case WalletNotificationMessages::ERROR:
-        prefix = "Error: ";
-        timeout = 7000;
-        break;
-    case WalletNotificationMessages::WARNING:
-        prefix = "Warning: ";
-        timeout = 7000;
-        break;
-    case WalletNotificationMessages::INFO:
-        prefix = "Info: ";
-        timeout = 4000;
-        break;
-    case WalletNotificationMessages::DEBUG:
-        prefix = "Debug: ";
-        timeout = 2000;
-        break;
+        case notify::MESSAGE_LEVEL::FATAL_ERROR:
+            prefix = "Error: ";
+            timeout = 7000;
+            break;
+        case notify::MESSAGE_LEVEL::CRITICAL:
+            prefix = "Critical: ";
+            timeout = 7000;
+            break;
+        case notify::MESSAGE_LEVEL::WARNING:
+            prefix = "Warning: ";
+            timeout = 7000;
+            break;
+        case notify::MESSAGE_LEVEL::INFO:
+            prefix = "Info: ";
+            timeout = 4000;
+            break;
+        case notify::MESSAGE_LEVEL::DEBUG:
+            prefix = "Debug: ";
+            timeout = 2000;
+            break;
     }
 
     ui->statusBar->showMessage( prefix + message, (int)(timeout * config::getTimeoutMultiplier()) );
@@ -113,7 +117,7 @@ void MainWindow::setAppEnvironment(state::StateMachine * _stateMachine, wallet::
 
     ui->leftTb->setAppEnvironment(stateMachine, wallet);
 
-    QObject::connect(wallet, &wallet::Wallet::onNewNotificationMessage,
+    QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
                      this, &MainWindow::onNewNotificationMessage, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onConfigUpdate,
                      this, &MainWindow::onConfigUpdate, Qt::QueuedConnection);

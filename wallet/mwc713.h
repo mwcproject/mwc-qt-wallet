@@ -46,12 +46,6 @@ public:
     MWC713(QString mwc713path, QString mwc713configPath, core::AppContext * appContext);
     virtual ~MWC713() override;
 
-    // Generic. Reporting fatal error that somebody will process and exit app
-    virtual void reportFatalError( QString message )  override;
-
-    // Get all notification messages
-    virtual const QVector<WalletNotificationMessages> & getWalletNotificationMessages()  override {return notificationMessages;}
-    // Check signal: onNewNotificationMessage
 
     // Return true if wallet is running
     virtual bool isRunning() override {return mwc713process!= nullptr;}
@@ -254,9 +248,6 @@ public:
     bool isWalletRunningAndLoggedIn() const { return ! (mwc713process== nullptr || eventCollector== nullptr || startedMode != STARTED_MODE::NORMAL || loggedIn==false ); }
 
 public:
-    // Task Reporting methods
-    virtual void appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QString message ) override;
-
     // stop mwc713 process nicely
     void processStop(bool exitNicely);
 
@@ -379,9 +370,6 @@ private:
 
     // Stages (flags) of the wallet
     //InitWalletStatus initStatus = InitWalletStatus::NONE;
-
-    const int MESSAGE_SIZE_LIMIT = 10000;
-    QVector<WalletNotificationMessages> notificationMessages;
 
     QString mwcAddress; // Address from mwc listener
 

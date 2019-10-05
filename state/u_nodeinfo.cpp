@@ -21,6 +21,7 @@
 #include <QDebug>
 #include "../util/Log.h"
 #include "../core/global.h"
+#include "../core/Notification.h"
 
 namespace state {
 
@@ -114,31 +115,31 @@ void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pe
         // check if node state was changed. In this case let's emit a message
         if (online != lastNodeStatus.online) {
             if (online) {
-                context->wallet->appendNotificationMessage(wallet::Wallet::MESSAGE_LEVEL::INFO, wallet::Wallet::MESSAGE_ID::GENERIC,
+                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
                         "Wallet restore connection to mwc node");
             }
             else {
-                context->wallet->appendNotificationMessage(wallet::Wallet::MESSAGE_LEVEL::CRITICAL, wallet::Wallet::MESSAGE_ID::GENERIC,
+                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::CRITICAL,
                                                            "Wallet lost connection to mwc node");
             }
         }
         else if ( (connections==0) ^ (lastNodeStatus.connections==0) ) {
                 if (connections>0) {
-                    context->wallet->appendNotificationMessage(wallet::Wallet::MESSAGE_LEVEL::INFO, wallet::Wallet::MESSAGE_ID::GENERIC,
+                    notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
                                                                "mwc node restored connection to mwc network");
                 }
                 else {
-                    context->wallet->appendNotificationMessage(wallet::Wallet::MESSAGE_LEVEL::CRITICAL, wallet::Wallet::MESSAGE_ID::GENERIC,
+                    notify::appendNotificationMessage(notify::MESSAGE_LEVEL::CRITICAL,
                                                                "mwc node lost connection to mwc network");
                 }
         }
         else if ( (nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight) ^ (lastNodeStatus.nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < lastNodeStatus.peerHeight) ) {
             if (nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight) {
-                context->wallet->appendNotificationMessage(wallet::Wallet::MESSAGE_LEVEL::CRITICAL, wallet::Wallet::MESSAGE_ID::GENERIC,
+                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::CRITICAL,
                                                            "mwc node out of sync from mwc network");
             }
             else {
-                context->wallet->appendNotificationMessage(wallet::Wallet::MESSAGE_LEVEL::INFO, wallet::Wallet::MESSAGE_ID::GENERIC,
+                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
                                                            "mwc node finish syncing and runs well now");
             }
         }

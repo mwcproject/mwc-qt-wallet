@@ -19,6 +19,7 @@
 #include <QDateTime>
 #include "../util/Log.h"
 #include "../core/Config.h"
+#include "../core/Notification.h"
 #include "../control/messagebox.h"
 
 namespace wallet {
@@ -212,7 +213,7 @@ void Mwc713EventManager::timerEvent(QTimerEvent *event) {
 
         // report timeout error. Do it once
         taskExecutionTimeLimit = 0;
-        mwc713wallet->appendNotificationMessage(  MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::TASK_TIMEOUT,
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
                 "mwc713 unable to process the task '" + taskName + "'" );
     }
 }

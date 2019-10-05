@@ -17,7 +17,7 @@
 
 namespace dlg {
 
-ShowNotificationDlg::ShowNotificationDlg(wallet::WalletNotificationMessages msg, QWidget *parent) :
+ShowNotificationDlg::ShowNotificationDlg(notify::NotificationMessage msg, QWidget *parent) :
         MwcDialog(parent),
         ui(new Ui::ShowNotificationDlg) {
     ui->setupUi(this);

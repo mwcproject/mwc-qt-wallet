@@ -68,10 +68,10 @@ void Events::updateShowMessages() {
     ui->notificationList->clearData();
 
     for (int i=messages.size()-1; i>=0; i-- ) {
-        wallet::WalletNotificationMessages msg = messages[i];
+        notify::NotificationMessage msg = messages[i];
 
 #ifndef QT_DEBUG
-        if ( msg.level >= wallet::WalletNotificationMessages::DEBUG )
+        if ( msg.level >= notify::MESSAGE_LEVEL::DEBUG )
             continue; // Don't want ot show debug messaged in the release.
 #endif
 

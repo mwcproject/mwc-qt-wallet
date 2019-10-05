@@ -15,6 +15,7 @@
 #include "TaskMwcMqAddress.h"
 #include <QDebug>
 #include "../mwc713.h"
+#include "../../core/Notification.h"
 
 namespace wallet {
 
@@ -26,7 +27,7 @@ bool TaskMwcMqAddress::processTask(const QVector<WEvent> & events) {
     QVector< WEvent > mwcMqAddrIdx = filterEvents(events, WALLET_EVENTS::S_MWC_ADDRESS_INDEX );
 
     if (mwcMqAddr.empty()) {
-        wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::CRITICAL, MWC713::MESSAGE_ID::GENERIC,
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL,
                                              "Unable to get the mwc mq address");
         return true;
     }

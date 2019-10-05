@@ -16,7 +16,7 @@
 #define EVENTS_H
 
 #include "state.h"
-#include "../wallet/wallet.h"
+#include "../core/Notification.h"
 #include <QVector>
 
 namespace wnd {
@@ -37,7 +37,7 @@ public:
     QVector<int> getColumnsWidhts() const;
     void updateColumnsWidhts(const QVector<int> & widths);
 
-    QVector<wallet::WalletNotificationMessages> getWalletNotificationMessages();
+    QVector<notify::NotificationMessage> getWalletNotificationMessages();
     int64_t getWatermarkTime() const {return messageWaterMark;}
 
     // Check if some error/warnings need to be shown
@@ -47,7 +47,7 @@ signals:
     void updateNonShownWarnings(bool hasNonShownWarns);
 
 private slots:
-    void onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message);
+    void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
 
 protected:
     virtual NextStateRespond execute() override;

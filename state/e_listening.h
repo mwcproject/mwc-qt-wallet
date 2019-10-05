@@ -16,7 +16,7 @@
 #define LISTENING_H
 
 #include "state.h"
-#include "../wallet/wallet.h"
+#include "../core/Notification.h"
 
 namespace wnd {
     class Listening;
@@ -63,7 +63,7 @@ private slots:
     void onListenerMqCollision();
 
     // Looking for "Failed to start mwcmqs subscriber. Error connecting to ..."
-    void onNewNotificationMessage(wallet::WalletNotificationMessages::LEVEL level, QString message);
+    void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
 
 private:
     wnd::Listening * wnd = nullptr;

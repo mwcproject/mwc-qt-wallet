@@ -16,6 +16,7 @@
 #include "../mwc713.h"
 #include <QDebug>
 #include "TaskWallet.h"
+#include "../../core/Notification.h"
 
 namespace wallet {
 
@@ -47,13 +48,13 @@ bool TaskStarting::processTask(const QVector<WEvent> & events) {
 
         if ( !init.empty() ) {
             // wallet need to be provisioned
-            wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::GENERIC,
+            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
                                                  "Wallet mwc713 in non initialized state. Internal error.");
             return true; // Done. Now it is UI problem to provision the wallet
         }
 
         if (need2unlock.empty()) {
-            wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::GENERIC,
+            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
                                                  "Wallet mwc713 has a seed without a password. Did you initialize it manually? "
                                                  "To fix this problem you will need to reinitialize your wallet with a passphrase and a password.");
             return true;
@@ -64,7 +65,7 @@ bool TaskStarting::processTask(const QVector<WEvent> & events) {
     }
 
     // Failure path. Just report a error
-    wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::GENERIC,
+    notify::appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
             "Unable to start backed wallet713. Please reinstall this app or clean up its data");
     return true;
 }

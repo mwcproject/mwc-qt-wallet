@@ -15,6 +15,7 @@
 #ifndef EVENTSW_H
 #define EVENTSW_H
 
+#include <core/Notification.h>
 #include "../core/navwnd.h"
 #include "../wallet/wallet.h"
 
@@ -49,7 +50,7 @@ private:
     Ui::Events *ui;
     state::Events * state;
 
-    QVector<wallet::WalletNotificationMessages> messages; // messaged that currently on diplay
+    QVector<notify::NotificationMessage> messages; // messaged that currently on diplay
 };
 
 }

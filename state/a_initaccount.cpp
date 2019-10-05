@@ -30,6 +30,7 @@
 #include "../util/Files.h"
 #include "../util/Process.h"
 #include "../core/global.h"
+#include "../core/Notification.h"
 
 namespace state {
 
@@ -213,7 +214,7 @@ void InitAccount::onLoginResult(bool ok) {
     seed.clear();
 
     if ( !ok  ) {
-        context->wallet->reportFatalError("Unfortunately we unable to login into mwc713 wallet after provisioning. Internal error.");
+        notify::reportFatalError("Unfortunately we unable to login into mwc713 wallet after provisioning. Internal error.");
         return;
     }
 

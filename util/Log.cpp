@@ -144,6 +144,17 @@ void logMwc713in(QString str) {
     logClient->doAppend2logs(true, "mwc713<<", str);
 }
 
+void logMwcNodeOut(QString str) {
+    Q_ASSERT(logClient);
+
+    auto lns = str.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+    for (auto & l: lns) {
+        logClient->doAppend2logs(true, "mwc-node>>", l);
+    }
+
+}
+
+
 // Tasks to excecute on mwc713
 void logTask( QString who, wallet::Mwc713Task * task, QString comment ) {
     Q_ASSERT(logClient); // call initLogger first
@@ -170,7 +181,12 @@ void logParsingEvent(wallet::WALLET_EVENTS event, QString message ) {
         return;
     }
 
-    logClient->doAppend2logs(true, "Event>", toString(event) + " [" + message + "]" );
+    logClient->doAppend2logs(true, "mwc713-Event>", toString(event) + " [" + message + "]" );
+}
+
+void logNodeEvent( tries::NODE_OUTPUT_EVENT event, QString message ) {
+    Q_ASSERT(logClient); // call initLogger first
+    logClient->doAppend2logs(true, "mwc-node-Event>", toString(event) + " [" + message + "]" );
 }
 
 

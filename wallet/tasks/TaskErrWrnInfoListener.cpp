@@ -15,6 +15,7 @@
 #include "TaskErrWrnInfoListener.h"
 #include <QDebug>
 #include "../mwc713.h"
+#include "../../core/Notification.h"
 
 namespace wallet {
 
@@ -34,7 +35,7 @@ bool TaskErrWrnInfoListener::processTask(const QVector<WEvent> &events) {
         case S_GENERIC_ERROR: {
             if (walletIsReady) {
                 qDebug() << "TaskErrWrnInfoListener::processTask with events: " << printEvents(events);
-                wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::CRITICAL, MWC713::MESSAGE_ID::GENERIC,
+                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL,
                                                      evt.message);
             }
             return true;
@@ -42,7 +43,7 @@ bool TaskErrWrnInfoListener::processTask(const QVector<WEvent> &events) {
         case S_GENERIC_WARNING: {
             if (walletIsReady) {
                 qDebug() << "TaskErrWrnInfoListener::processTask with events: " << printEvents(events);
-                wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::WARNING, MWC713::MESSAGE_ID::GENERIC,
+                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING,
                                                      evt.message);
             }
             return true;
@@ -50,7 +51,7 @@ bool TaskErrWrnInfoListener::processTask(const QVector<WEvent> &events) {
         case S_GENERIC_INFO: {
             if (walletIsReady) {
                 qDebug() << "TaskErrWrnInfoListener::processTask with events: " << printEvents(events);
-                wallet713->appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
+                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO,
                                                      evt.message);
             }
             return true;

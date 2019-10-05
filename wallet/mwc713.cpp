@@ -20,6 +20,7 @@
 #include "../tries/mwc713inputparser.h"
 #include "mwc713events.h"
 #include <QApplication>
+#include <core/Notification.h>
 #include "tasks/TaskStarting.h"
 #include "tasks/TaskWallet.h"
 #include "tasks/TaskListening.h"
@@ -57,10 +58,6 @@ MWC713::~MWC713() {
     processStop(startedMode != STARTED_MODE::INIT);
 }
 
-// Generic. Reporting fatal error that somebody will process and exit app
-void MWC713::reportFatalError( QString message )  {
-    appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::GENERIC, message );
-}
 
 // Check if waaled need to be initialized or not. Will run statndalone app, wait for exit and return the result
 // Check signal: onWalletState(bool initialized)
@@ -74,7 +71,7 @@ bool MWC713::checkWalletInitialized() {
         return false; // error expected to be reported by initMwc713process
 
     if (!util::processWaitForFinished( process, 20000, "mwc713")) {
-        appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::INIT_ERROR, "mwc713 failed to invalidate the status.\nPath: " + mwc713Path + "\nConfig:" + mwc713configPath );
+        appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to invalidate the status.\nPath: " + mwc713Path + "\nConfig:" + mwc713configPath );
         return false;
     }
 
@@ -117,10 +114,10 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
         switch (process->error())
         {
             case QProcess::FailedToStart:
-                appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::INIT_ERROR, "mwc713 failed to start mwc713 located at " + mwc713Path );
+                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start mwc713 located at " + mwc713Path );
                 return nullptr;
             case QProcess::Crashed:
-                appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::INIT_ERROR, "mwc713 crashed during start" );
+                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 crashed during start" );
                 return nullptr;
             case QProcess::Timedout:
                 if (control::MessageBox::question(nullptr, "Warning", "Starting for mwc713 process is taking longer than expected.\nContinue to wait?",
@@ -128,10 +125,10 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
                     config::increaseTimeoutMultiplier();
                     continue; // retry with waiting
                 }
-                appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::INIT_ERROR, "mwc713 takes too much time to start. Something wrong with environment." );
+                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 takes too much time to start. Something wrong with environment." );
                 return nullptr;
             default:
-                appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::INIT_ERROR, "mwc713 failed to start because of unknown error" );
+                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start because of unknown error" );
                 return nullptr;
         }
     }
@@ -449,7 +446,7 @@ void MWC713::listeningStart(bool startMq, bool startKb, bool initialStart)  {
     eventCollector->addTask( new TaskListeningStart(this, startMq,startKb, initialStart), TaskListeningStart::TIMEOUT );
 
     if ( startMq && !config::getUseMwcMqS() ) {
-        appendNotificationMessage( MESSAGE_LEVEL::WARNING, MESSAGE_ID::GENERIC, "You are using non secure version of the MWC MQ. To switch to secure MWC MQS please specify 'useMwcMqS = true' at mwc-qt-wallet config file." );
+        appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "You are using non secure version of the MWC MQ. To switch to secure MWC MQS please specify 'useMwcMqS = true' at mwc-qt-wallet config file." );
     }
 }
 
@@ -699,47 +696,7 @@ void MWC713::executeMwc713command(QString cmd, QString shadowStr) {
     mwc713process->write( (cmd + "\n").toLocal8Bit() );
 }
 
-// Message that will be requlified from Critical to Info
-static QSet<QString> falseCriticalMessages{"keybase not found! consider installing keybase locally first."};
 
-// Task Reporting methods
-//enum MESSAGE_LEVEL { FATAL_ERROR, WARNING, INFO, DEBUG }
-//enum MESSAGE_ID {INIT_ERROR, GENERIC, TASK_TIMEOUT };
-void MWC713::appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QString message ) {
-    Q_UNUSED(id);
-    if (level == MESSAGE_LEVEL::FATAL_ERROR) {
-        // Fatal error. Display message box and exiting. We don't want to continue
-        control::MessageBox::message(nullptr, "mwc713 Error", "Wallet got a critical error from the mwc713 process:\n" + message + "\n\nPress OK to exit the wallet" );
-        mwc::closeApplication();
-        return;
-    }
-
-    // Message is not fatal, adding it into the logs
-    WalletNotificationMessages::LEVEL wlevel = WalletNotificationMessages::LEVEL::DEBUG;
-    if (level == MESSAGE_LEVEL::CRITICAL) {
-        if ( falseCriticalMessages.contains(message) )
-            wlevel = WalletNotificationMessages::INFO;
-        else
-            wlevel = WalletNotificationMessages::ERROR;
-    }
-    else if (level == MESSAGE_LEVEL::WARNING)
-        wlevel = WalletNotificationMessages::WARNING;
-    else if (level == MESSAGE_LEVEL::INFO)
-        wlevel = WalletNotificationMessages::INFO;
-
-    WalletNotificationMessages msg(wlevel, message);
-
-    // check if it is duplicate message. Duplicates will be ignored.
-    if (! ( notificationMessages.size()>0 && notificationMessages.last().message == message ) ) {
-        notificationMessages.push_back(msg);
-
-        while (notificationMessages.size() > MESSAGE_SIZE_LIMIT)
-            notificationMessages.pop_front();
-    }
-
-    logger::logEmit( "MWC713", "onNewNotificationMessage", msg.toString() );
-    emit onNewNotificationMessage(msg.level, msg.message);
-}
 
 void MWC713::setLoginResult(bool ok) {
     logger::logEmit("MWC713", "onLoginResult", QString::number(ok) );
@@ -829,7 +786,7 @@ void MWC713::setMwcMqListeningStatus(bool online, QString tid, bool startStopEve
         activeMwcMqsTid = tid;
 
     if (mwcMqOnline != online) {
-        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, (online ? "Start " : "Stop ") + QString("listening on mwc mq") + (config::getUseMwcMqS()?"s":"") );
+        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString("listening on mwc mq") + (config::getUseMwcMqS()?"s":"") );
     }
     mwcMqOnline = online;
     logger::logEmit("MWC713", "onMwcMqListenerStatus", QString("online=") + QString::number(online));
@@ -838,7 +795,7 @@ void MWC713::setMwcMqListeningStatus(bool online, QString tid, bool startStopEve
 }
 void MWC713::setKeybaseListeningStatus(bool online) {
     if (keybaseOnline != online) {
-        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, (online ? "Start " : "Stop ") + QString("listening on keybase"));
+        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString("listening on keybase"));
     }
     keybaseOnline = online;
     logger::logEmit("MWC713", "onKeybaseListenerStatus", QString("online=") + QString::number(online));
@@ -858,10 +815,10 @@ void MWC713::setRecoveryResults( bool started, bool finishedWithSuccess, QString
     }
 
     if (finishedWithSuccess) {
-        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("MWC wallet was successfully recovered from the mnemonic"));
+        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("MWC wallet was successfully recovered from the mnemonic"));
     }
     else {
-        appendNotificationMessage( MESSAGE_LEVEL::WARNING, MESSAGE_ID::GENERIC, QString("Failed to recover from the mnemonic"));
+        appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, QString("Failed to recover from the mnemonic"));
     }
 }
 
@@ -950,7 +907,7 @@ void MWC713::createNewAccount( QString newAccountName ) {
     emit onAccountCreated(newAccountName);
     emit onWalletBalanceUpdated();
 
-    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("New account '" + newAccountName + "' was created" ));
+    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("New account '" + newAccountName + "' was created" ));
 }
 
 void MWC713::switchToAccount( QString switchAccountName, bool makeAccountCurrent ) {
@@ -984,9 +941,9 @@ void MWC713::updateRenameAccount(const QString & oldName, const QString & newNam
     }
 
     if (success)
-        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("Account '" + oldName + "' was renamed to '" + newName + "'" ));
+        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("Account '" + oldName + "' was renamed to '" + newName + "'" ));
     else
-        appendNotificationMessage( MESSAGE_LEVEL::WARNING, MESSAGE_ID::GENERIC, QString("Failed to rename account '" + oldName + "'" ));
+        appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, QString("Failed to rename account '" + oldName + "'" ));
 
     logger::logEmit( "MWC713", "onWalletBalanceUpdated","");
     emit onWalletBalanceUpdated();
@@ -1015,7 +972,7 @@ void MWC713::setSendResults(bool success, QStringList errors, QString address, i
 }
 
 void MWC713::reportSlateSendTo( QString slate, QString mwc, QString sendAddr ) {
-    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("You successfully sent slate " + slate +
+    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("You successfully sent slate " + slate +
           " with " + mwc + " mwc to " + sendAddr ));
 
     logger::logEmit( "MWC713", "onSlateSend", slate + " with " +mwc + " to " + sendAddr );
@@ -1025,14 +982,14 @@ void MWC713::reportSlateSendTo( QString slate, QString mwc, QString sendAddr ) {
 void MWC713::reportSlateSendBack( QString slate,  QString sendAddr ) {
     logger::logEmit("MWC713", "onSlateSendBack", slate + " to " + sendAddr);
 
-    appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
+    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO,
                                          "Slate " + slate + " sent back to " + sendAddr + " sucessfully" );
 }
 
 void MWC713::reportSlateReceivedBack( QString slate, QString mwc, QString fromAddr ) {
     logger::logEmit( "MWC713", "reportSlateReceivedBack", slate + " with " +mwc + " from " + fromAddr );
 
-    appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,
+    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO,
                                          "Slate " + slate + " received back from " + fromAddr + " for " + mwc + " mwc");
 
     emit onSlateReceivedBack(slate, mwc, fromAddr);
@@ -1047,7 +1004,7 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
         msg += " with message " + message + ".";
     }
     msg +=  " Slate:" + slate;
-    appendNotificationMessage(MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC, msg );
+    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, msg );
 
     emit onSlateReceivedFrom(slate, mwc, fromAddr, message );
 
@@ -1064,7 +1021,7 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
 
 void MWC713::reportSlateFinalized( QString slate ) {
 
-    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("Slate finalized : "+slate ));
+    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("Slate finalized : "+slate ));
 
     logger::logEmit( "MWC713", "onSlateFinalized", slate );
     emit onSlateFinalized(slate);
@@ -1075,14 +1032,14 @@ void MWC713::reportSlateFinalized( QString slate ) {
 
 void MWC713::setSendFileResult( bool success, QStringList errors, QString fileName ) {
 
-    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("File transaction was initiated for "+ fileName ));
+    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("File transaction was initiated for "+ fileName ));
 
     logger::logEmit( "MWC713", "onSendFile", "success="+QString::number(success) );
     emit onSendFile(success, errors, fileName);
 }
 
 void MWC713::setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn ) {
-    appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("File receive transaction was processed for "+ inFileName ));
+    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("File receive transaction was processed for "+ inFileName ));
 
     logger::logEmit( "MWC713", "onReceiveFile", "success="+QString::number(success) );
     emit onReceiveFile( success, errors, inFileName, outFn );
@@ -1090,7 +1047,7 @@ void MWC713::setReceiveFile( bool success, QStringList errors, QString inFileNam
 
 void MWC713::setFinalizeFile( bool success, QStringList errors, QString fileName ) {
     if (success) {
-        appendNotificationMessage(MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("File finalized for " + fileName));
+        appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, QString("File finalized for " + fileName));
     }
 
     logger::logEmit( "MWC713", "onFinalizeFile", "success="+QString::number(success) );
@@ -1135,7 +1092,7 @@ void MWC713::setTransCancelResult( bool success, int64_t transId, QString errMsg
 
 void MWC713::setSetReceiveAccount( bool ok, QString accountOrMessage ) {
     if (ok)
-        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, QString("Set receive account: '" + accountOrMessage + "'" ));
+        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("Set receive account: '" + accountOrMessage + "'" ));
 
     logger::logEmit( "MWC713", "onSetReceiveAccount", "ok="+QString::number(ok) );
     emit onSetReceiveAccount(ok, accountOrMessage );
@@ -1144,9 +1101,9 @@ void MWC713::setSetReceiveAccount( bool ok, QString accountOrMessage ) {
 void MWC713::setCheckResult(bool ok, QString errors) {
 
     if (ok)
-        appendNotificationMessage( MESSAGE_LEVEL::INFO, MESSAGE_ID::GENERIC, "Account re-sync was finished successfully.");
+        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Account re-sync was finished successfully.");
     else
-        appendNotificationMessage( MESSAGE_LEVEL::WARNING, MESSAGE_ID::GENERIC, "Account re-sync was failed.");
+        appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Account re-sync was failed.");
 
     logger::logEmit( "MWC713", "onCheckResult", "ok="+QString::number(ok) );
     emit onCheckResult(ok, errors );
@@ -1234,7 +1191,7 @@ void MWC713::mwc713errorOccurred(QProcess::ProcessError error) {
         mwc713process = nullptr;
     }
 
-    appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::MWC7113_ERROR,
+    appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
                                "mwc713 process exited. Process error: "+ QString::number(error) );
 
 }
@@ -1249,7 +1206,7 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
         mwc713process = nullptr;
     }
 
-    appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, MESSAGE_ID::MWC7113_ERROR,
+    appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
                                "mwc713 process exited due some unexpected error. mwc713 exit code: " + QString::number(exitCode) );
 }
 
@@ -1259,7 +1216,7 @@ void MWC713::mwc713readyReadStandardError() {
     if (mwc713process) {
         QString str( ioutils::FilterEscSymbols( mwc713process->readAllStandardError() ) );
 
-        appendNotificationMessage( MESSAGE_LEVEL::CRITICAL, MESSAGE_ID::MWC7113_ERROR,
+        appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL,
                                    "mwc713 process report error:\n" + str );
     }
 }

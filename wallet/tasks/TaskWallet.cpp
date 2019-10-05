@@ -16,6 +16,7 @@
 #include <QDebug>
 #include "../mwc713.h"
 #include "../../util/Log.h"
+#include "../../core/Notification.h"
 
 namespace wallet {
 
@@ -95,7 +96,7 @@ bool TaskUnlock::processTask(const QVector<WEvent> & events) {
     wallet713->setLoginResult( error.empty() );
 
     if (error.empty())
-        wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::INFO, MWC713::MESSAGE_ID::GENERIC,"Successfully logged into the wallet");
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Successfully logged into the wallet");
     return true;
 }
 
@@ -116,7 +117,7 @@ bool TaskInitW::processTask(const QVector<WEvent> & events) {
         return true; // Expected respond
 
     // Not expected respond, treat it an internal fatal error
-    wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::FATAL_ERROR, MWC713::MESSAGE_ID::GENERIC, "Internal error. Fail to init mwc713 wallet with a password" );
+    notify::appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "Internal error. Fail to init mwc713 wallet with a password" );
     return true;
 }
 

@@ -16,6 +16,7 @@
 #include <QDebug>
 #include "../mwc713.h"
 #include "../../core/Config.h"
+#include "../../core/Notification.h"
 
 namespace wallet {
 
@@ -31,7 +32,7 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
         case S_YOUR_MWC_ADDRESS: {
             QString address = evt.message;
             if (address.length()==0) {
-                wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::WARNING, MWC713::MESSAGE_ID::GENERIC,
+                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING,
                                                       "mwc713 responded with empty MWC address" );
             }
             wallet713->setMwcAddress(address);

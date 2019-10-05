@@ -17,6 +17,7 @@
 
 #include <QObject>
 #include "../wallet/mwc713events.h"
+#include "../tries/NodeOutputParser.h"
 
 class QFile;
 
@@ -62,8 +63,10 @@ namespace logger {
     void blockLogMwc713out(bool blockOutput);
     void logMwc713out(QString str); //
     void logMwc713in(QString str); //
+    void logMwcNodeOut(QString str); //
 
     void logParsingEvent(wallet::WALLET_EVENTS event, QString message );
+    void logNodeEvent( tries::NODE_OUTPUT_EVENT event, QString message );
 
     // Tasks to excecute on mwc713
     void logTask( QString who, wallet::Mwc713Task * task, QString comment );

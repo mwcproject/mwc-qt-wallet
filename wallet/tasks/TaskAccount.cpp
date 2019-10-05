@@ -16,6 +16,7 @@
 #include <QDebug>
 #include "../mwc713.h"
 #include <QtAlgorithms>
+#include "../../core/Notification.h"
 
 namespace wallet {
 
@@ -61,7 +62,7 @@ bool TaskAccountList::processTask(const QVector<WEvent> &events) {
     idx++;
 
     if (idx>=lns.size()) {
-        wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::CRITICAL, MWC713::MESSAGE_ID::GENERIC, "Unable to get a list of accounts from mwc713" );
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to get a list of accounts from mwc713" );
         return true; // No data to process.
     }
 
@@ -164,7 +165,7 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
     QVector< WEvent > lns = filterEvents( events, WALLET_EVENTS::S_LINE );
 
     if ( infoEvts.size()!=1 ) {
-        wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::CRITICAL, MWC713::MESSAGE_ID::GENERIC, "Unable to mwc713 'info' about current account" );
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to mwc713 'info' about current account" );
         return false;
     }
 
@@ -212,7 +213,7 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
     }
 
     if ( !ok || totalNano<0 || waitingConfNano<0 || lockedNano<0 || spendableNano<0 ) {
-        wallet713->appendNotificationMessage( MWC713::MESSAGE_LEVEL::CRITICAL, MWC713::MESSAGE_ID::GENERIC, "Unable to parse mwc713 'info' output" );
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to parse mwc713 'info' output" );
         return false;
     }
 

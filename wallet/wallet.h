@@ -206,28 +206,6 @@ struct WalletUtxoSignature {
 };
 
 
-struct WalletNotificationMessages {
-    enum LEVEL {ERROR=1, WARNING=2, INFO=3, DEBUG=4};
-    LEVEL level=DEBUG;
-    QString message;
-    QDateTime time;
-
-    WalletNotificationMessages() {time=QDateTime::currentDateTime();}
-    WalletNotificationMessages(LEVEL _level, QString _message) : level(_level), message(_message) {time=QDateTime::currentDateTime();}
-    WalletNotificationMessages(const WalletNotificationMessages&) = default;
-    WalletNotificationMessages &operator=(const WalletNotificationMessages&) = default;
-
-    QString getLevelStr() const;
-    QString getLevelLongStr() const;
-
-    static bool isCritical(LEVEL l) {return l<=WARNING;}
-    bool isCritical() const {return isCritical(level);}
-
-    // To debug string
-    QString toString() const;
-};
-
-
 // Interface to wallet functionality
 // can throw MwcException to signal errors
 class Wallet : public QObject
@@ -237,19 +215,6 @@ public:
     // network: main | floo
     Wallet();
     virtual ~Wallet();
-
-    // Report Message to the wallet.
-    enum class MESSAGE_LEVEL { FATAL_ERROR, CRITICAL, WARNING, INFO, DEBUG };
-    enum class MESSAGE_ID {INIT_ERROR, GENERIC, MWC7113_ERROR, TASK_TIMEOUT };
-    virtual void appendNotificationMessage( MESSAGE_LEVEL level, MESSAGE_ID id, QString message ) = 0;
-
-    // Generic. Reporting fatal error that somebody will process and exit app
-    virtual void reportFatalError( QString message )  = 0;
-
-
-    // Get all notification messages
-    virtual const QVector<WalletNotificationMessages> & getWalletNotificationMessages()  = 0;
-    // Check signal: onNewNotificationMessage
 
     // Return true if wallet is running
     virtual bool isRunning() = 0;
@@ -451,8 +416,6 @@ public:
 
 private:
 signals:
-    // Notification/error message
-    void onNewNotificationMessage(WalletNotificationMessages::LEVEL level, QString message);
 
     // Config was updated
     void onConfigUpdate();
@@ -544,7 +507,6 @@ signals:
 
 }
 
-Q_DECLARE_METATYPE(wallet::WalletNotificationMessages::LEVEL);
 Q_DECLARE_METATYPE(wallet::WalletTransaction);
 Q_DECLARE_METATYPE(wallet::WalletOutput);
 

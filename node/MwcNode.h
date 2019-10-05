@@ -18,16 +18,30 @@
 #include <QObject>
 #include <QProcess>
 #include <QVector>
+#include "../tries/NodeOutputParser.h"
+
+class QNetworkAccessManager;
+class QNetworkReply;
 
 namespace core {
 class AppContext;
 }
 
 namespace tries{
-class NodeLogsParser;
+class NodeOutputParser;
 }
 
 namespace node {
+
+// Node management timeouts.
+const int64_t CHECK_NODE_PERIOD = 60 * 1000; // Timer check period. API calls to node will be issued
+const int64_t API_FAILURE_LIMIT = 5; // Restart node anter not happy API calls. Note, in cold storage that will be case
+const int64_t START_TIMEOUT   = 90*1000;
+// messages from NodeOutputParser
+const int64_t MWC_NODE_STARTED_TIMEOUT = 180*1000; // It can take some time to find peers
+const int64_t MWC_NODE_SYNC_MESSAGES = 60*1000; // Sync supposed to be agile
+const int64_t RECEIVE_BLOCK_LISTEN = 10*60*1000; // 10 minutes can be delay due non consistancy. API call expected to catch non sync cases
+const int64_t NETWORK_ISSUES = 0; // Let's not consider network issues. API call will restart the node
 
 struct PeerInfo {
     QString address;
@@ -36,13 +50,13 @@ struct PeerInfo {
 
 struct PeerConnectionInfo {
     QVector<PeerInfo>   peerConnections;
-    int64_t             updateTime;
+    int64_t             updateTime       = 0;
 };
 
 struct NodeStatus {
-    int connections = 0;
-    int tipHeight      = 0;
-    int64_t             updateTime;
+    int connections     = 0;
+    int tipHeight       = 0;
+    int64_t updateTime  = 0;
 };
 
 // mwc-node lifecycle management
@@ -51,19 +65,54 @@ Q_OBJECT
 public:
     MwcNode(QString nodePath, QString nodeConfigPath, core::AppContext * appContext);
 
+    void start( const QString & network );
+    void stop();
+
+private:
+    QProcess * initNodeProcess( QString network );
+
+    void nodeProcDisconnect();
+    void nodeProcConnect(QProcess * process);
+
+    void sendRequest( const QString & tag, QString secret, const QString & api);
+
+    QString getNodeSecret();
+private:
+    virtual void timerEvent(QTimerEvent *event) override;
+
+private slots:
+    void nodeErrorOccurred(QProcess::ProcessError error);
+    void nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void mwcNodeReadyReadStandardError();
+    void mwcNodeReadyReadStandardOutput();
+
+    void replyFinished(QNetworkReply* reply);
+
+    void nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString message);
 
 private:
     core::AppContext *appContext; // app context to store current account name
 
-    QString mwc713Path; // path to the backed binary
-    QString mwc713configPath; // config file for mwc713
-    QProcess *mwc713process = nullptr;
-    tries::NodeLogsParser *logsParser = nullptr; // logs will come from stdout
+    QString nodePath; // path to the backed binary
+    QString nodeConfigPath; // config file for mwc713
+    QProcess *nodeProcess = nullptr;
+    tries::NodeOutputParser *nodeOutputParser = nullptr; // logs will come from stdout
 
+    QString lastUsedNetwork;
     PeerConnectionInfo peers; // connected peers. Polling with API
     NodeStatus         nodeStatus;
+    QString nodeSecret;
+    QString nodeWorkDir;
 
-    int64_t respondTimelimit; // Get some respond from node. Will be happy until that time.
+    int64_t respondTimelimit = 0; // Get some respond from node. Will be happy until that time.
+
+    QVector< QMetaObject::Connection > processConnections; // open connection to mwc713
+
+    int nodeCheckFailCounter = 0;
+    int nodeOutOfSyncCounter = 0;
+    int lastKnownHeight = 0;
+
+    QNetworkAccessManager *nwManager;
 
 };
 
