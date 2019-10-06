@@ -45,6 +45,9 @@ const QString MWC713_DEFAULT_CONFIG = ":/resource/wallet713_mac.toml";
 const QString MWC713_DEFAULT_CONFIG = ":/resource/wallet713_def.toml";
 #endif
 
+const QString MWC_NODE_CONFIG_MAIN = ":/resource/mwc-server-main.toml";
+const QString MWC_NODE_CONFIG_FLOO = ":/resource/mwc-server-floo.toml";
+
 const int64_t AIRDROP_TRANS_KEEP_TIME_MS = 1000L*3600L*24L*15; // 15 days should be enough
 
 // Limit for the node height to consider it out of sync. 1 blocks is 1 minute.

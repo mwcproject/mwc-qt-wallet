@@ -39,6 +39,7 @@
 #include "../util/Files.h"
 #include "../util/Waiting.h"
 #include "../util/Process.h"
+#include "../node/MwcNodeConfig.h"
 
 namespace wallet {
 
@@ -1222,6 +1223,9 @@ void MWC713::mwc713readyReadStandardError() {
 }
 
 void MWC713::mwc713readyReadStandardOutput() {
+    if (mwc713process==nullptr)
+        return;
+
     QString str( ioutils::FilterEscSymbols( mwc713process->readAllStandardOutput() ) );
     qDebug() << "Get output:" << str;
     logger::logMwc713out(str);
@@ -1271,9 +1275,11 @@ WalletConfig MWC713::readWalletConfig(QString source) {
         return WalletConfig();
     }
 
-    return WalletConfig().setData( network, dataPath, mwcmqDomain, mwcmqsDomain, keyBasePath,
-                                  mwc713config.getString("mwc_node_uri"),
-                                  mwc713config.getString("mwc_node_secret") );
+    QString nodeURI     = mwc713config.getString("mwc_node_uri");
+    QString nodeSecret  = mwc713config.getString("mwc_node_secret");
+
+
+    return WalletConfig().setData( network, dataPath, mwcmqDomain, mwcmqsDomain, keyBasePath );
 }
 
 
@@ -1288,9 +1294,11 @@ WalletConfig MWC713::getDefaultConfig()  {
 }
 
 //static
-bool MWC713::saveWalletConfig(const WalletConfig & config) {
+bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * appContext ) {
     if (!config.isDefined())
         return true;
+
+    Q_ASSERT(appContext);
 
     QString mwc713confFN = config::getMwc713conf();
 
@@ -1323,9 +1331,23 @@ bool MWC713::saveWalletConfig(const WalletConfig & config) {
     if ( !config.mwcmqsDomainEx.isEmpty() )
         newConfLines.append("mwcmqs_domain = \"" + config.mwcmqsDomainEx + "\"");
 
-    if ( !config.mwcNodeURI.isEmpty() && !config.mwcNodeSecret.isEmpty() ) {
-        newConfLines.append("mwc_node_uri = \"" + config.mwcNodeURI + "\"");
-        newConfLines.append("mwc_node_secret = \"" + config.mwcNodeSecret + "\"");
+    // Update connection node...
+    wallet::MwcNodeConnection connection = appContext->getNodeConnection( config.getNetwork() );
+    switch ( connection.connectionType ) {
+        case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD:
+            break;
+        case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL: {
+            node::MwcNodeConfig nodeConfig = node::getCurrentMwcNodeConfig(config.getNetwork());
+            newConfLines.append("mwc_node_uri = \"127.0.0.1\"");
+            newConfLines.append("mwc_node_secret = \"" + nodeConfig.secret + "\"");
+            break;
+        }
+        case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CUSTOM:
+            newConfLines.append("mwc_node_uri = \"" + connection.mwcNodeURI + "\"");
+            newConfLines.append("mwc_node_secret = \"" + connection.mwcNodeSecret + "\"");
+            break;
+        default:
+            Q_ASSERT(false);
     }
 
     // Escape back slashes for toml
@@ -1339,9 +1361,9 @@ bool MWC713::saveWalletConfig(const WalletConfig & config) {
 // Update wallet config. Will update config and restart the mwc713.
 // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
 //          and caller suppose listen for them
-bool MWC713::setWalletConfig(const WalletConfig & config)  {
+bool MWC713::setWalletConfig(const WalletConfig & config, core::AppContext * appContext)  {
 
-    if (!saveWalletConfig(config)) {
+    if (!saveWalletConfig(config, appContext)) {
         control::MessageBox::message(nullptr, "Update Config failure", "Not able to update mwc713 configuration at " + config::getMwc713conf() );
         return false;
     }

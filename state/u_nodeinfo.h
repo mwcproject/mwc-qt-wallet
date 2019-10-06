@@ -17,6 +17,7 @@
 
 #include "state.h"
 #include "../wallet/wallet.h"
+#include "../node/MwcNodeConfig.h"
 
 namespace wnd {
 class NodeInfo;
@@ -53,8 +54,9 @@ public:
 
     void requestWalletResync();
 
-    wallet::WalletConfig getWalletConfig() const;
-    void updateWalletConfig( const wallet::WalletConfig & config );
+    // Connection with network
+    QPair< wallet::MwcNodeConnection, wallet::WalletConfig > getNodeConnection() const;
+    void updateNodeConnection( const wallet::MwcNodeConnection & nodeConnect, const wallet::WalletConfig & walletConfig );
 
 protected:
     virtual NextStateRespond execute() override;

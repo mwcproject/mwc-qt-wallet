@@ -60,20 +60,38 @@ bool AccountInfo::isDeleted() const {
             total == 0 && awaitingConfirmation==0 && lockedByPrevTransaction==0 && currentlySpendable==0;
 }
 
+void MwcNodeConnection::saveData(QDataStream & out) const {
+    int id = 0x4355a1;
+    out << id;
+    out << (int)connectionType;
+    out << mwcNodeURI;
+    out << mwcNodeSecret;
+}
+
+bool MwcNodeConnection::loadData(QDataStream & in) {
+    int id = 0;
+    in >> id;
+    if (id!=0x4355a1)
+        return false;
+
+    int conType = (int)NODE_CONNECTION_TYPE::CLOUD;
+    in >> conType;
+    connectionType = (NODE_CONNECTION_TYPE) conType;
+    in >> mwcNodeURI;
+    in >> mwcNodeSecret;
+    return true;
+}
+
 WalletConfig & WalletConfig::setData(QString _network,
                             QString _dataPath,
                             QString _mwcmqDomain,
                             QString _mwcmqsDomain,
-                            QString _keyBasePath,
-                            QString _mwcNodeURI,
-                            QString _mwcNodeSecret) {
+                            QString _keyBasePath ) {
     network  = _network;
     dataPath = _dataPath;
     mwcmqDomainEx = _mwcmqDomain;
     mwcmqsDomainEx = _mwcmqsDomain;
     keyBasePath = _keyBasePath;
-    mwcNodeURI = _mwcNodeURI;
-    mwcNodeSecret = _mwcNodeSecret;
 
     return * this;
 }

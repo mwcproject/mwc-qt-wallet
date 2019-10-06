@@ -70,7 +70,7 @@ private:
                    int inputConfirmationNumber,
                    int changeOutputs);
     // return true if data is fine. In case of error will show message for the user
-    bool readInputValue( const wallet::WalletConfig & prevWalletConfig, wallet::WalletConfig & newWalletConfig, core::SendCoinsParams & newSendParams );
+    bool readInputValue( wallet::WalletConfig & newWalletConfig, core::SendCoinsParams & newSendParams );
 
     QString mwcDomainConfig2InputStr(QString mwcDomain);
     QString mwcDomainInputStr2Config(QString mwcDomain);

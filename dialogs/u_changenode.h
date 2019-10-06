@@ -27,10 +27,10 @@ namespace dlg {
 class ChangeNode : public control::MwcDialog {
     Q_OBJECT
 public:
-    explicit ChangeNode(QWidget *parent, const wallet::WalletConfig & config);
+    explicit ChangeNode( QWidget *parent, const wallet::MwcNodeConnection & _nodeConnection, const QString & network );
     ~ChangeNode();
 
-    wallet::WalletConfig getConfig() const {return config;}
+    wallet::MwcNodeConnection getNodeConnectionConfig() const {return nodeConnection;}
 
 private slots:
 
@@ -38,10 +38,16 @@ private slots:
     void on_cancelButton_clicked();
     void on_applyButton_clicked();
 
+    void on_radioCloudNode_clicked();
+
+    void on_radioEmbeddedNode_clicked();
+
+    void on_radioCustomNode_clicked();
+
 private:
     Ui::ChangeNode *ui;
 
-    wallet::WalletConfig config;
+    wallet::MwcNodeConnection nodeConnection;
 };
 
 }

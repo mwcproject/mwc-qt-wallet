@@ -136,7 +136,7 @@ bool AppContext::loadData() {
 
     int id = 0;
     in >> id;
-    if (id<0x4783 || id>0x4785)
+    if (id<0x4783 || id>0x4786)
          return false;
 
     in >> receiveAccount;
@@ -168,8 +168,14 @@ bool AppContext::loadData() {
     if (id>=0x4785)
         in >> logsEnabled;
 
+    if (id>=0x4786) {
+        nodeConnectionMainNet.loadData(in);
+        nodeConnectionFlooNet.loadData(in);
+    }
+
     return true;
 }
+
 
 void AppContext::saveData() const {
     QString dataPath = ioutils::getAppDataPath("context");
@@ -187,7 +193,7 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x4785;
+    out << 0x4786;
     out << receiveAccount;
     out << currentAccountName;
     out << int(activeWndState);
@@ -203,6 +209,9 @@ void AppContext::saveData() const {
 
     out << guiScale;
     out << logsEnabled;
+
+    nodeConnectionMainNet.saveData(out);
+    nodeConnectionFlooNet.saveData(out);
 }
 
 void AppContext::setLogsEnabled(bool enabled) {
@@ -321,6 +330,25 @@ double AppContext::getGuiScale() const
     return guiScale<0.0 ? initScaleValue : guiScale;
 }
 
+wallet::MwcNodeConnection AppContext::getNodeConnection(const QString network) const {
+    return network.toLower().contains("main") ? nodeConnectionMainNet : nodeConnectionFlooNet;
+}
+
+void AppContext::updateMwcNodeConnection(const QString network, const wallet::MwcNodeConnection & connection ) {
+    if (network.toLower().contains("main")) {
+        nodeConnectionMainNet = connection;
+        if (nodeConnectionFlooNet.notCustom() && connection.notCustom() )
+            nodeConnectionFlooNet = connection;
+    }
+    else {
+        nodeConnectionFlooNet = connection;
+        if (nodeConnectionMainNet.notCustom() && connection.notCustom() )
+            nodeConnectionMainNet = connection;
+
+    }
+    // save because it must be in sync with configs that saved now as well
+    saveData();
+}
 
 
 }

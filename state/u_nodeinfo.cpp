@@ -98,15 +98,16 @@ void NodeInfo::requestNodeInfo() {
     context->wallet->getNodeStatus();
 }
 
-wallet::WalletConfig NodeInfo::getWalletConfig() const {
-    return context->wallet->getWalletConfig();
+QPair< wallet::MwcNodeConnection, wallet::WalletConfig > NodeInfo::getNodeConnection() const {
+    wallet::WalletConfig wltConfig = context->wallet->getWalletConfig();
+    return QPair< wallet::MwcNodeConnection, wallet::WalletConfig >(  context->appContext->getNodeConnection( wltConfig.getNetwork() )  , wltConfig );
 }
 
-void NodeInfo::updateWalletConfig( const wallet::WalletConfig & config ) {
-    if ( context->wallet->setWalletConfig(config) ) {
-        // config require to restart
-        context->stateMachine->executeFrom( STATE::NONE );
-    }
+void NodeInfo::updateNodeConnection( const wallet::MwcNodeConnection & nodeConnect, const wallet::WalletConfig & walletConfig ) {
+    context->appContext->updateMwcNodeConnection( walletConfig.getNetwork(), nodeConnect );
+    context->wallet->setWalletConfig( walletConfig, context->appContext );
+    // config require to restart
+    context->stateMachine->executeFrom( STATE::NONE );
 }
 
 void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {

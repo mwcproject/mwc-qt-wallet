@@ -93,10 +93,12 @@ void NodeInfo::on_refreshButton_clicked() {
 
 void NodeInfo::on_chnageNodeButton_clicked() {
     // call dialog the allow to change the
-    dlg::ChangeNode changeNodeDlg(this, state->getWalletConfig() );
+    QPair< wallet::MwcNodeConnection, wallet::WalletConfig > conInfo = state->getNodeConnection();
+
+    dlg::ChangeNode changeNodeDlg(this, conInfo.first, conInfo.second.getNetwork() );
 
     if ( changeNodeDlg.exec() == QDialog::Accepted ) {
-        state->updateWalletConfig( changeNodeDlg.getConfig() );
+        state->updateNodeConnection( changeNodeDlg.getNodeConnectionConfig(), conInfo.second );
     }
 }
 

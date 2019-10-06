@@ -96,7 +96,7 @@ void InitAccount::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice, MWC_NETW
     // Store the nw name with architecture at the data folder.
     walletCfg.saveNetwork2DataPath(walletCfg.getDataPath(), nwName, util::getBuildArch() );
 
-    context->wallet->setWalletConfig(walletCfg);
+    context->wallet->setWalletConfig( walletCfg, context->appContext );
 
     switch (newWalletChoice) {
         case CREATE_NEW:

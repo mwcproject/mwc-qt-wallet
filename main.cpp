@@ -42,9 +42,10 @@
 #include "tests/testStringUtils.h"
 #include <QtGlobal>
 #include <QFileDialog>
+#include "node/MwcNodeConfig.h"
 
 // Very first run - init everything
-bool deployFilesFromResources() {
+bool deployWalletFilesFromResources() {
     QString confPath = ioutils::getAppDataPath();
 
     QString mwc713conf = confPath + "/wallet713v2.toml";
@@ -207,7 +208,7 @@ int main(int argc, char *argv[])
 
         logger::initLogger(appContext.isLogsEnabled());
 
-        if (!deployFilesFromResources() ) {
+        if (!deployWalletFilesFromResources() ) {
             QMessageBox::critical(nullptr, "Error", "Unable to provision or verify resource files during the first run");
             return 1;
         }
@@ -269,7 +270,6 @@ int main(int argc, char *argv[])
 
         if (walletDataPath != config.getDataPath()) {
             config.updateDataPath(walletDataPath);
-            wallet::MWC713::saveWalletConfig(config);
         }
 
         if (!util::acquireAppGlobalLock() )
@@ -279,6 +279,11 @@ int main(int argc, char *argv[])
                                          "There is another instance of mwc-qt-wallet is already running. It is impossible to run more than one instance of the wallet at the same time.");
             return 1;
         }
+
+        // Update Node
+        node::updateMwcNodeConfig( config.getNetwork() );
+
+        wallet::MWC713::saveWalletConfig( config, &appContext );
 
         //main window has delete on close flag. That is why need to
         // create dynamically. Window will be deleted on close

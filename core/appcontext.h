@@ -18,6 +18,7 @@
 #include <QMap>
 #include "../state/state.h"
 #include "../state/m_airdrop.h"
+#include "../wallet/wallet.h"
 
 class QAction;
 
@@ -129,6 +130,9 @@ public:
     bool isLogsEnabled() const {return logsEnabled;}
     void setLogsEnabled(bool enabled);
 
+    wallet::MwcNodeConnection getNodeConnection(const QString network) const;
+    void updateMwcNodeConnection(const QString network, const wallet::MwcNodeConnection & connection );
+
 private:
     bool loadData();
     void saveData() const;
@@ -155,6 +159,10 @@ private:
     double initScaleValue = 1.0; // default scale value
 
     bool logsEnabled = true;
+
+    // Because of Cursom node logic, we have to track config changes
+    wallet::MwcNodeConnection  nodeConnectionMainNet;
+    wallet::MwcNodeConnection  nodeConnectionFlooNet;
 
     // Contact list
     QVector<ContactRecord> contactList;

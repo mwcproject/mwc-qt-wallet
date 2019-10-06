@@ -23,6 +23,10 @@
 #include <QDateTime>
 #include <QObject>
 
+namespace core {
+class AppContext;
+}
+
 namespace wallet {
 
 struct AccountInfo {
@@ -56,6 +60,25 @@ struct AccountInfo {
     bool isAwaitingSomething() const {return awaitingConfirmation>0 || lockedByPrevTransaction>0; }
 };
 
+struct MwcNodeConnection {
+    enum class NODE_CONNECTION_TYPE { CLOUD, LOCAL, CUSTOM }; //
+
+    NODE_CONNECTION_TYPE connectionType = NODE_CONNECTION_TYPE::CLOUD;
+
+    QString mwcNodeURI; // Connection to alternative MWC node
+    QString mwcNodeSecret;
+
+    void setData(NODE_CONNECTION_TYPE _connectionType, QString _mwcNodeURI, QString _mwcNodeSecret) {connectionType = _connectionType; mwcNodeURI = _mwcNodeURI; mwcNodeSecret = _mwcNodeSecret;}
+    void setData(NODE_CONNECTION_TYPE _connectionType) {connectionType = _connectionType;}
+
+    bool operator == (const MwcNodeConnection & itm) const {return connectionType==itm.connectionType && mwcNodeURI==itm.mwcNodeURI && mwcNodeSecret==itm.mwcNodeSecret; }
+
+    void saveData(QDataStream & out) const;
+    bool loadData(QDataStream & in);
+
+    bool notCustom() const { return connectionType != NODE_CONNECTION_TYPE::CUSTOM; }
+};
+
 // Wallet config
 struct WalletConfig {
 private:
@@ -66,8 +89,6 @@ public:
     QString mwcmqDomainEx; // empty - default value
     QString mwcmqsDomainEx;// empty - default value
     QString keyBasePath;
-    QString mwcNodeURI; // Connection to alternative MWC node
-    QString mwcNodeSecret;
 
     WalletConfig() : network("Floonet"), dataPath("Undefined"), keyBasePath("Undefined") {}
     WalletConfig(const WalletConfig & other) = default;
@@ -75,7 +96,7 @@ public:
 
     bool operator == (const WalletConfig & other) const { return dataPath==other.dataPath &&
                 mwcmqDomainEx==other.mwcmqDomainEx && mwcmqsDomainEx==other.mwcmqsDomainEx &&
-                keyBasePath==other.keyBasePath && mwcNodeURI==other.mwcNodeURI  && mwcNodeSecret==other.mwcNodeSecret; }
+                keyBasePath==other.keyBasePath; }
 
     bool isDefined() const { return  dataPath!="Undefined" && keyBasePath!="Undefined"; }
 
@@ -83,9 +104,7 @@ public:
                 QString dataPath,
                 QString mwcmqDomain,
                 QString mwcmqsDomain,
-                QString keyBasePath,
-                QString mwcNodeURI,
-                QString mwcNodeSecret);
+                QString keyBasePath );
 
     void updateDataPath(const QString & path) {dataPath=path;}
 
@@ -342,7 +361,7 @@ public:
     //          and caller suppose listen for them
     // If returns true, expected that wallet will need to have password input.
     // Check signal: onConfigUpdate()
-    virtual bool setWalletConfig(const WalletConfig & config)  = 0;
+    virtual bool setWalletConfig(const WalletConfig & config, core::AppContext * appContext )  = 0;
 
     // Status of the node
     // return true if task was scheduled

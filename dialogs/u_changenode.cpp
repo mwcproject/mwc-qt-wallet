@@ -21,27 +21,27 @@
 
 namespace dlg {
 
-static const QString MWC_NODE_URI_DEFAULT = "Provided by mwc wallet";
-static const QString MWC_NODE_SECRET_DEFAULT = "Provided by mwc wallet";
 
-static const int     MWC_NODE_DEFAULT_PORT = 13413;
-
-
-ChangeNode::ChangeNode(QWidget * parent, const wallet::WalletConfig & _config ) :
+ChangeNode::ChangeNode(QWidget * parent, const wallet::MwcNodeConnection & _nodeConnection, const QString & network ) :
         control::MwcDialog(parent),
         ui(new Ui::ChangeNode),
-        config(_config)
+        nodeConnection( _nodeConnection )
 {
     ui->setupUi(this);
 
-    if (config.mwcNodeURI.isEmpty() || config.mwcNodeSecret.isEmpty() ) {
-        ui->mwcNodeUriEdit->setText(MWC_NODE_URI_DEFAULT);
-        ui->mwcNodeSecretEdit->setText(MWC_NODE_SECRET_DEFAULT);
-    }
-    else {
-        ui->mwcNodeUriEdit->setText( config.mwcNodeURI );
-        ui->mwcNodeSecretEdit->setText( config.mwcNodeSecret );
-    }
+    ui->radioCloudNode->setChecked( nodeConnection.connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD );
+    ui->radioEmbeddedNode->setChecked( nodeConnection.connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
+    ui->radioCustomNode->setChecked( nodeConnection.connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CUSTOM );
+
+    ui->radioCustomNode->setText( network.toLower().contains("main") ? "Custom mwc-node (for mainnet)" : "Custom mwc-node (for floonet)" );
+
+    if ( nodeConnection.connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CUSTOM )
+        ui->customNodeWnd->show();
+    else
+        ui->customNodeWnd->hide();
+
+    ui->mwcNodeUriEdit->setText( nodeConnection.mwcNodeURI );
+    ui->mwcNodeSecretEdit->setText( nodeConnection.mwcNodeSecret );
 }
 
 ChangeNode::~ChangeNode() {
@@ -49,8 +49,23 @@ ChangeNode::~ChangeNode() {
 }
 
 void ChangeNode::on_resetButton_clicked() {
-    ui->mwcNodeUriEdit->setText(MWC_NODE_URI_DEFAULT);
-    ui->mwcNodeSecretEdit->setText(MWC_NODE_SECRET_DEFAULT);
+    ui->radioCloudNode->setChecked(true);
+    ui->customNodeWnd->hide();
+}
+
+void ChangeNode::on_radioCloudNode_clicked()
+{
+    ui->customNodeWnd->hide();
+}
+
+void ChangeNode::on_radioEmbeddedNode_clicked()
+{
+    ui->customNodeWnd->hide();
+}
+
+void ChangeNode::on_radioCustomNode_clicked()
+{
+    ui->customNodeWnd->show();
 }
 
 void ChangeNode::on_cancelButton_clicked() {
@@ -59,73 +74,78 @@ void ChangeNode::on_cancelButton_clicked() {
 
 void ChangeNode::on_applyButton_clicked() {
 
-    // Check parameters first
-    QString mwcNodeUri = ui->mwcNodeUriEdit->text();
-    QString mwcNodeSecret = ui->mwcNodeSecretEdit->text();
+    wallet::MwcNodeConnection resCon = nodeConnection;
 
-    if ( mwcNodeUri == MWC_NODE_URI_DEFAULT )
-        mwcNodeUri = "";
+    if ( ui->radioCloudNode->isChecked() ) {
+        resCon.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD );
+    }
+    else if ( ui->radioEmbeddedNode->isChecked() )
+        resCon.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
+    else if ( ui->radioCustomNode->isChecked() ) {
+        QString mwcNodeUri = ui->mwcNodeUriEdit->text();
+        QString mwcNodeSecret = ui->mwcNodeSecretEdit->text();
 
-    if ( mwcNodeSecret == MWC_NODE_SECRET_DEFAULT )
-        mwcNodeSecret = "";
+        // Validate the input data
+        if ( !mwcNodeUri.isEmpty() || !mwcNodeSecret.isEmpty()) {
+            if ( mwcNodeUri.isEmpty() ) {
+                control::MessageBox::message(this, "Input", "Please specify custom mwc-node URI." );
+                ui->mwcNodeUriEdit->setFocus();
+                return;
+            }
+            if ( mwcNodeSecret.isEmpty() ) {
+                control::MessageBox::message(this, "Input", "Please specify custom mwc-node secret." );
+                ui->mwcNodeSecretEdit->setFocus();
+                return;
+            }
 
-    if ( config.mwcNodeURI == mwcNodeUri && config.mwcNodeSecret == mwcNodeSecret ) {
-        reject(); // nothing was changed. It is a reject.
-        return;
+            if ( ! (mwcNodeUri.startsWith("http://") || mwcNodeUri.startsWith("https://") ) ) {
+                control::MessageBox::message(this, "Input", "Please specify http or https protocol for mwc node connection. Please note, https connection does require CA certificate." );
+                ui->mwcNodeUriEdit->setFocus();
+                return;
+            }
+
+            // Remove the port part to verify the host
+            int uriPortIdx = mwcNodeUri.indexOf(':', std::strlen("https://") );
+            if (uriPortIdx<=0) {
+                control::MessageBox::message(this, "Input", "Please specify a port for mwc-node connection." );
+                ui->mwcNodeUriEdit->setFocus();
+                return;
+            }
+            Q_ASSERT( uriPortIdx>0 );
+
+            bool portok = false;
+            mwcNodeUri.mid(uriPortIdx+1).toInt(&portok);
+            if (uriPortIdx<=0) {
+                control::MessageBox::message(this, "Input", "Please specify valid mwc node URI." );
+                ui->mwcNodeUriEdit->setFocus();
+                return;
+            }
+
+            // Checking if URI is reachable...
+            QUrl url2test(mwcNodeUri);
+            if ( !url2test.isValid() ) {
+                control::MessageBox::message( this, "Input", "mwc node URL "+mwcNodeUri+" is invalid. Please specify a valid URI for mwc node" );
+                ui->mwcNodeUriEdit->setFocus();
+                return;
+            }
+
+            QString hostName = url2test.host();
+            QHostInfo host = QHostInfo::fromName( hostName );
+            if (host.error() != QHostInfo::NoError) {
+
+                control::MessageBox::message(this, "Input",
+                                             "mwc node host " + hostName + " is not reachable.\n" + host.errorString());
+                ui->mwcNodeUriEdit->setFocus();
+                return;
+            }
+        }
+        resCon.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CUSTOM, mwcNodeUri, mwcNodeSecret );
     }
 
-    // Validate the input data
-    if ( !mwcNodeUri.isEmpty() || !mwcNodeSecret.isEmpty()) {
-        if ( mwcNodeUri.isEmpty() ) {
-            control::MessageBox::message(this, "Input", "Please specify mwc node URI or reset all values." );
-            ui->mwcNodeUriEdit->setFocus();
-            return;
-        }
-        if ( mwcNodeSecret.isEmpty() ) {
-            control::MessageBox::message(this, "Input", "Please specify mwc node secret or reset all values." );
-            ui->mwcNodeSecretEdit->setFocus();
-            return;
-        }
 
-        if ( ! (mwcNodeUri.startsWith("http://") || mwcNodeUri.startsWith("https://") ) ) {
-            control::MessageBox::message(this, "Input", "Please specify http or https protocol for mwc node connection. Please note, https connection does require CA certificate" );
-            ui->mwcNodeUriEdit->setFocus();
-            return;
-        }
-
-        // Remove the port part to verify the host
-        int uriPortIdx = mwcNodeUri.indexOf(':', std::strlen("https://") );
-        if (uriPortIdx<=0) {
-            mwcNodeUri += ":" + QString::number(MWC_NODE_DEFAULT_PORT);
-            uriPortIdx = mwcNodeUri.indexOf(':', std::strlen("https://"));
-        }
-        Q_ASSERT( uriPortIdx>0 );
-
-        bool portok = false;
-        mwcNodeUri.mid(uriPortIdx+1).toInt(&portok);
-        if (uriPortIdx<=0) {
-            control::MessageBox::message(this, "Input", "Please specify valid mwc node URI or reset all values." );
-            ui->mwcNodeUriEdit->setFocus();
-            return;
-        }
-
-        // Checking if URI is reachable...
-        QUrl url2test(mwcNodeUri);
-        if ( !url2test.isValid() ) {
-            control::MessageBox::message( this, "Input", "mwc node URL "+mwcNodeUri+" is invalid. Please specify valid URI" );
-            ui->mwcNodeUriEdit->setFocus();
-            return;
-        }
-
-        QString hostName = url2test.host();
-        QHostInfo host = QHostInfo::fromName( hostName );
-        if (host.error() != QHostInfo::NoError) {
-
-            control::MessageBox::message(this, "Input",
-                                         "mwc node host " + hostName + " is not reachable.\n" + host.errorString());
-            ui->mwcNodeUriEdit->setFocus();
-            return;
-        }
+    if ( resCon == nodeConnection ) {
+        reject(); // nothing was changed. It is a reject.
+        return;
     }
 
     if (control::MessageBox::question(this, "Update mwc node connection", "Update of mwc node connection required relogin into the wallet. Than you will be able to verify if your wallet was able to connect to the mwc node.\nWould you like to continue?",
@@ -133,10 +153,12 @@ void ChangeNode::on_applyButton_clicked() {
         return;
     }
 
-    config.mwcNodeURI = mwcNodeUri;
-    config.mwcNodeSecret = mwcNodeSecret;
+    nodeConnection = resCon;
 
     accept();
 }
 
+
+
 }
+

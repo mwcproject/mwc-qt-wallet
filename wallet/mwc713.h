@@ -40,7 +40,7 @@ public:
     // Read config from the file. By default read from config::getMwc713conf()
     static WalletConfig readWalletConfig(QString source = "");
     // Save config into config::getMwc713conf()
-    static bool saveWalletConfig(const WalletConfig & config);
+    static bool saveWalletConfig(const WalletConfig & config, core::AppContext * appContext);
 
 public:
     MWC713(QString mwc713path, QString mwc713configPath, core::AppContext * appContext);
@@ -179,7 +179,7 @@ public:
     //          and caller suppose listen for them
     // If return true, expected that wallet will need to have password input.
     // Check signal: onConfigUpdate()
-    virtual bool setWalletConfig(const WalletConfig & config)  override;
+    virtual bool setWalletConfig( const WalletConfig & config, core::AppContext * appContext )  override;
 
     // Status of the node
     // return true if task was scheduled
