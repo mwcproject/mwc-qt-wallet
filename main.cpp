@@ -45,6 +45,7 @@
 #include <QGuiApplication>
 #include <QScreen>
 #include <QDesktopWidget>
+#include <tgmath.h>
 
 // Very first run - init everything
 bool deployFilesFromResources() {
@@ -236,7 +237,7 @@ int main(int argc, char *argv[])
             else if ( minWidth <= 1800 || minHeight <=950 )
                 scale = std::min(scale, 1.6);
 
-            if ( std::abs(scale-prevScale)>0.01 ) {
+            if ( std::fabs(scale-prevScale)>0.01 ) {
                 // need to update
                 appContext.setGuiScale(scale);
                 retVal = 1;
