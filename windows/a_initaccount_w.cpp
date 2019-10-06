@@ -43,6 +43,7 @@ InitAccount::InitAccount(QWidget *parent, state::InitAccount * _state, state::Wa
     ui->password1Edit->installEventFilter(this);
 
     utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()) );
+    updatePassState();
 }
 
 InitAccount::~InitAccount()
@@ -61,7 +62,30 @@ void InitAccount::on_password1Edit_textChanged(const QString &text)
     util::PasswordAnalyser pa(text);
     ui->strengthLabel->setText(pa.getPasswordQualityStr());
     ui->submitButton->setEnabled( pa.isPasswordOK() );
+
+    updatePassState();
 }
+
+void InitAccount::on_password2Edit_textChanged( const QString &text )
+{
+    Q_UNUSED(text)
+    updatePassState();
+}
+
+void InitAccount::updatePassState() {
+    QString pswd1 = ui->password1Edit->text();
+    QString pswd2 = ui->password2Edit->text();
+
+    if (pswd2.isEmpty()) {
+        ui->confirmPassLable->hide();
+    }
+    else {
+        ui->confirmPassLable->show();
+        ui->confirmPassLable->setPixmap( QPixmap( pswd1==pswd2 ? ":/img/PassOK@2x.svg" : ":/img/PassNotMatch@2x.svg") );
+    }
+}
+
+
 
 void InitAccount::on_submitButton_clicked()
 {
@@ -102,3 +126,4 @@ void InitAccount::on_instancesButton_clicked()
 }
 
 }
+

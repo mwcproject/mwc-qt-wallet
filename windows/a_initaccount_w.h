@@ -43,6 +43,11 @@ private slots:
 
     void on_instancesButton_clicked();
 
+
+    void on_password2Edit_textChanged(const QString &arg1);
+private:
+    void updatePassState();
+
 private:
     Ui::InitAccount *ui;
     state::InitAccount * state;
