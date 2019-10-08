@@ -105,7 +105,7 @@ QPair< wallet::MwcNodeConnection, wallet::WalletConfig > NodeInfo::getNodeConnec
 
 void NodeInfo::updateNodeConnection( const wallet::MwcNodeConnection & nodeConnect, const wallet::WalletConfig & walletConfig ) {
     context->appContext->updateMwcNodeConnection( walletConfig.getNetwork(), nodeConnect );
-    context->wallet->setWalletConfig( walletConfig, context->appContext );
+    context->wallet->setWalletConfig( walletConfig, context->appContext, context->mwcNode );
     // config require to restart
     context->stateMachine->executeFrom( STATE::NONE );
 }

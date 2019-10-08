@@ -27,6 +27,11 @@ namespace core {
 class AppContext;
 }
 
+namespace node {
+class MwcNode;
+}
+
+
 namespace wallet {
 
 struct AccountInfo {
@@ -361,7 +366,7 @@ public:
     //          and caller suppose listen for them
     // If returns true, expected that wallet will need to have password input.
     // Check signal: onConfigUpdate()
-    virtual bool setWalletConfig(const WalletConfig & config, core::AppContext * appContext )  = 0;
+    virtual bool setWalletConfig(const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode  )  = 0;
 
     // Status of the node
     // return true if task was scheduled

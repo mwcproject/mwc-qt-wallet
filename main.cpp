@@ -43,6 +43,7 @@
 #include <QtGlobal>
 #include <QFileDialog>
 #include "node/MwcNodeConfig.h"
+#include "node/MwcNode.h"
 
 // Very first run - init everything
 bool deployWalletFilesFromResources() {
@@ -282,8 +283,10 @@ int main(int argc, char *argv[])
 
         // Update Node
         node::updateMwcNodeConfig( config.getNetwork() );
+        node::MwcNode * mwcNode = new node::MwcNode( config::getMwcpath(), &appContext );
 
-        wallet::MWC713::saveWalletConfig( config, &appContext );
+        wallet::MWC713::saveWalletConfig( config, &appContext, mwcNode );
+
 
         //main window has delete on close flag. That is why need to
         // create dynamically. Window will be deleted on close
@@ -297,7 +300,7 @@ int main(int argc, char *argv[])
 
         mainWnd->show();
 
-        state::StateContext context( &appContext, wallet, wndManager, mainWnd );
+        state::StateContext context( &appContext, wallet, mwcNode, wndManager, mainWnd );
 
         state::StateMachine * machine = new state::StateMachine(&context);
         mainWnd->setAppEnvironment( machine, wallet);
@@ -311,6 +314,12 @@ int main(int argc, char *argv[])
         delete machine; machine=nullptr;
         delete wallet;  wallet = nullptr;
         delete wndManager; wndManager=nullptr;
+
+        if (mwcNode->isRunning()) {
+            mwcNode->stop();
+        }
+
+        delete mwcNode; mwcNode = nullptr;
 
         util::releaseAppGlobalLock();
     }

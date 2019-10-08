@@ -52,7 +52,7 @@ wallet::WalletConfig WalletConfig::getDefaultWalletConfig() const {
 }
 
 bool WalletConfig::setWalletConfig(const wallet::WalletConfig & config, bool guiWalletRestartExpected) {
-    if (context->wallet->setWalletConfig(config, context->appContext)) {
+    if (context->wallet->setWalletConfig(config, context->appContext, context->mwcNode)) {
         // restarting the wallet...
         if (guiWalletRestartExpected)
             return false; // no need to restart the mwc713. Whole waller need to be restarted soon

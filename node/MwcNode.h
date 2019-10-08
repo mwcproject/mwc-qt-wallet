@@ -63,7 +63,11 @@ struct NodeStatus {
 class MwcNode : public QObject {
 Q_OBJECT
 public:
-    MwcNode(QString nodePath, QString nodeConfigPath, core::AppContext * appContext);
+    MwcNode(QString nodePath, core::AppContext * appContext);
+    virtual ~MwcNode() override;
+
+    bool isRunning() const {return nodeProcess!= nullptr;}
+    const QString & getCurrentNetwork() const { return lastUsedNetwork; }
 
     void start( const QString & network );
     void stop();
@@ -94,7 +98,6 @@ private:
     core::AppContext *appContext; // app context to store current account name
 
     QString nodePath; // path to the backed binary
-    QString nodeConfigPath; // config file for mwc713
     QProcess *nodeProcess = nullptr;
     tries::NodeOutputParser *nodeOutputParser = nullptr; // logs will come from stdout
 

@@ -74,6 +74,7 @@ void setConfigData(QString _mwcPath, QString _wallet713path,
 const QString & getMwc713conf() {return mwc713conf;}
 const QString & getMwcGuiWalletConf() {return mwcGuiWalletConf;}
 
+const QString & getMwcpath() {return mwcPath;}
 const QString & getWallet713path() {return wallet713path;}
 const QString & getMainStyleSheetPath() {return mainStyleSheetPath;}
 const QString & getDialogsStyleSheetPath() {return dialogsStyleSheetPath;}

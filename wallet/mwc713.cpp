@@ -40,6 +40,7 @@
 #include "../util/Waiting.h"
 #include "../util/Process.h"
 #include "../node/MwcNodeConfig.h"
+#include "../node/MwcNode.h"
 
 namespace wallet {
 
@@ -1294,7 +1295,7 @@ WalletConfig MWC713::getDefaultConfig()  {
 }
 
 //static
-bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * appContext ) {
+bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode ) {
     if (!config.isDefined())
         return true;
 
@@ -1331,6 +1332,8 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
     if ( !config.mwcmqsDomainEx.isEmpty() )
         newConfLines.append("mwcmqs_domain = \"" + config.mwcmqsDomainEx + "\"");
 
+    bool needLocalMwcNode = false;
+
     // Update connection node...
     wallet::MwcNodeConnection connection = appContext->getNodeConnection( config.getNetwork() );
     switch ( connection.connectionType ) {
@@ -1338,8 +1341,9 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
             break;
         case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL: {
             node::MwcNodeConfig nodeConfig = node::getCurrentMwcNodeConfig(config.getNetwork());
-            newConfLines.append("mwc_node_uri = \"127.0.0.1\"");
+            newConfLines.append("mwc_node_uri = \"http://127.0.0.1:13413\"");
             newConfLines.append("mwc_node_secret = \"" + nodeConfig.secret + "\"");
+            needLocalMwcNode = true;
             break;
         }
         case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CUSTOM:
@@ -1349,6 +1353,18 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
         default:
             Q_ASSERT(false);
     }
+
+    if (needLocalMwcNode) {
+        if ( !mwcNode->isRunning() ) {
+            mwcNode->start( config.getNetwork() );
+        }
+    }
+    else {
+        if ( mwcNode->isRunning() ) {
+            mwcNode->stop();
+        }
+    }
+
 
     // Escape back slashes for toml
     for (auto & ln : newConfLines) {
@@ -1361,9 +1377,9 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
 // Update wallet config. Will update config and restart the mwc713.
 // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
 //          and caller suppose listen for them
-bool MWC713::setWalletConfig(const WalletConfig & config, core::AppContext * appContext)  {
+bool MWC713::setWalletConfig( const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode ) {
 
-    if (!saveWalletConfig(config, appContext)) {
+    if ( !saveWalletConfig( config, appContext, mwcNode ) ) {
         control::MessageBox::message(nullptr, "Update Config failure", "Not able to update mwc713 configuration at " + config::getMwc713conf() );
         return false;
     }

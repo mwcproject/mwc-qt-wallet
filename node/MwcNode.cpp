@@ -31,19 +31,24 @@
 
 namespace node {
 
-MwcNode::MwcNode(QString _nodePath, QString _nodeConfigPath, core::AppContext * _appContext) :
+MwcNode::MwcNode(QString _nodePath, core::AppContext * _appContext) :
         QObject(),
         appContext(_appContext),
-        nodePath(_nodePath),
-        nodeConfigPath(_nodeConfigPath)
+        nodePath(_nodePath)
 {
     // Let's check node status every minute
     startTimer( CHECK_NODE_PERIOD );
 
-    connect( nwManager, &QNetworkAccessManager::finished, this, &MwcNode::replyFinished, Qt::QueuedConnection );
     nwManager = new QNetworkAccessManager();
-
+    connect( nwManager, &QNetworkAccessManager::finished, this, &MwcNode::replyFinished, Qt::QueuedConnection );
 }
+
+MwcNode::~MwcNode() {
+    if (isRunning()) {
+        stop();
+    }
+}
+
 
 void MwcNode::start( const QString & network ) {
     qDebug() << "MwcNode::start for network " + network;
@@ -56,7 +61,7 @@ void MwcNode::start( const QString & network ) {
     Q_ASSERT(nodeProcess == nullptr);
     Q_ASSERT(nodeOutputParser == nullptr);
 
-    qDebug() << "Starting mwc-node  " << nodePath << " for config " << nodeConfigPath;
+    qDebug() << "Starting mwc-node  " << nodePath;
 
     respondTimelimit = QDateTime::currentMSecsSinceEpoch() + START_TIMEOUT * config::getTimeoutMultiplier();
 
@@ -130,7 +135,7 @@ QProcess * MwcNode::initNodeProcess( QString network ) {
     if (network.startsWith("floo"))
         params.push_back("--floonet");
 
-    process->start(nodeWorkDir, params, QProcess::Unbuffered | QProcess::ReadWrite );
+    process->start(nodePath, params, QProcess::Unbuffered | QProcess::ReadWrite );
 
     while ( ! process->waitForStarted( (int)(10000 * config::getTimeoutMultiplier()) ) ) {
         switch (process->error())

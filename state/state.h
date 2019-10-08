@@ -18,7 +18,6 @@
 #include <QString>
 
 namespace core {
-    class WalletWindow;
     class WindowManager;
     class MainWindow;
     class AppContext;
@@ -26,6 +25,10 @@ namespace core {
 
 namespace wallet {
     class Wallet;
+}
+
+namespace node {
+class MwcNode;
 }
 
 namespace state {
@@ -70,13 +73,15 @@ struct NextStateRespond {
 struct StateContext {
     core::AppContext    * const appContext;
     wallet::Wallet      * const wallet; //wallet caller interface
+    node::MwcNode       * const mwcNode;
     core::WindowManager * const wndManager;
     core::MainWindow    * const mainWnd;
     StateMachine        * stateMachine;
 
     StateContext(core::AppContext * _appContext, wallet::Wallet * _wallet,
+                 node::MwcNode * _mwcNode,
                  core::WindowManager * _wndManager, core::MainWindow * _mainWnd) :
-        appContext(_appContext), wallet(_wallet), wndManager(_wndManager),
+        appContext(_appContext), wallet(_wallet), mwcNode(_mwcNode), wndManager(_wndManager),
         mainWnd(_mainWnd), stateMachine(nullptr) {}
 
     void setStateMachine(StateMachine * sm) {stateMachine=sm;}
