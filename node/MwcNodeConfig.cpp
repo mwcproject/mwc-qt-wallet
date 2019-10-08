@@ -35,29 +35,7 @@ void MwcNodeConfig::setData(QString _network, QString _host, QString _port, QStr
     secret  = _secret;
 }
 
-
-MwcNodeConfig getCurrentMwcNodeConfig(const QString & network) {
-    QString walletPath = getMwcNodePath(network);
-
-    // Note, asserts are disabled because of the first run.
-
-    QStringList lines = util::readTextFile( walletPath + "api_secret" );
-    //Q_ASSERT( lines.size()>0 && !lines[0].isEmpty() );
-
-    QString secret;
-    if ( lines.size()>0 && !lines[0].isEmpty() )
-        secret = lines[0];
-
-    util::ConfigReader reader;
-    reader.readConfig(walletPath + "mwc-server.toml");
-    //Q_ASSERT( reader.readConfig("chain_type") == network );
-
-    MwcNodeConfig result;
-    result.setData( network, reader.getString("host"), reader.getString("port"), secret);
-    return result;
-}
-
-void updateMwcNodeConfig( const QString & network ) {
+static void updateMwcNodeConfig( const QString & network ) {
     QString walletPath = getMwcNodePath(network);
 
     if ( ! QDir(walletPath).exists() ) {
@@ -88,5 +66,31 @@ void updateMwcNodeConfig( const QString & network ) {
         QFile::setPermissions( mwcServerTomlFN, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup );
     }
 }
+
+
+MwcNodeConfig getCurrentMwcNodeConfig(const QString & network) {
+
+    updateMwcNodeConfig( network );
+
+    QString walletPath = getMwcNodePath(network);
+
+    // Note, asserts are disabled because of the first run.
+
+    QStringList lines = util::readTextFile( walletPath + "api_secret" );
+    //Q_ASSERT( lines.size()>0 && !lines[0].isEmpty() );
+
+    QString secret;
+    if ( lines.size()>0 && !lines[0].isEmpty() )
+        secret = lines[0];
+
+    util::ConfigReader reader;
+    reader.readConfig(walletPath + "mwc-server.toml");
+    //Q_ASSERT( reader.readConfig("chain_type") == network );
+
+    MwcNodeConfig result;
+    result.setData( network, reader.getString("host"), reader.getString("port"), secret);
+    return result;
+}
+
 
 }

@@ -108,7 +108,6 @@ void MwcNode::stop() {
 QProcess * MwcNode::initNodeProcess( QString network ) {
 
     nodeWorkDir = getMwcNodePath(network);
-    updateMwcNodeConfig( network );
     MwcNodeConfig nodeConf = getCurrentMwcNodeConfig( network );
 
     // Creating process and starting

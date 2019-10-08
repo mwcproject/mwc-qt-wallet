@@ -30,10 +30,8 @@ struct MwcNodeConfig {
 
 QString getMwcNodePath(const QString & network);
 
+// Update first and then get.
 MwcNodeConfig getCurrentMwcNodeConfig( const QString & network );
-
-void updateMwcNodeConfig( const QString & network );
-
 
 }
 
