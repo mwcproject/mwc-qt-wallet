@@ -28,6 +28,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include "MwcNodeConfig.h"
 
 namespace node {
 
@@ -56,6 +57,7 @@ void MwcNode::start( const QString & network ) {
     lastUsedNetwork = network;
     nodeSecret = "";
     nodeWorkDir = "";
+    lastProcessedEvent = tries::NODE_OUTPUT_EVENT::NONE;
 
     // Start the binary
     Q_ASSERT(nodeProcess == nullptr);
@@ -88,6 +90,8 @@ void MwcNode::stop() {
         }
         qDebug() << "mwc-node is exited";
 
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node is stopped" );
+
         nodeProcess->deleteLater();
         nodeProcess = nullptr;
     }
@@ -103,40 +107,23 @@ void MwcNode::stop() {
 // paramsPlus - additional parameters for the process
 QProcess * MwcNode::initNodeProcess( QString network ) {
 
-    network = network.toLower();
-    if (network.endsWith("net"))
-        network = network.left(network.size()-3);
+    nodeWorkDir = getMwcNodePath(network);
+    updateMwcNodeConfig( network );
+    MwcNodeConfig nodeConf = getCurrentMwcNodeConfig( network );
 
     // Creating process and starting
     QProcess * process = new QProcess();
     process->setProcessChannelMode(QProcess::MergedChannels);
 
     // Let's check if we are fine with directories
-    nodeWorkDir = ioutils::getAppDataPath( QString("mwc-node") + QDir::separator() + network );
-    QDir().mkpath(nodeWorkDir);
 
-    const QString configPath = nodeWorkDir + QDir::separator() + "mwc-server.toml";
-
-    const QString srcConfigName = ":/resource/mwc-server-"+network+".toml";
-
-    // Checking if config does exist
-    if ( !QFile::exists(configPath)) {
-        bool ok = true;
-        ok = ok && QFile::copy(srcConfigName, configPath);
-        if (ok)
-            QFile::setPermissions(configPath, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup);
-
-        if (!ok) {
-            control::MessageBox::message(nullptr, "Start mwc node error", "Unable to create mwc node config file at " + configPath );
-            return nullptr;
-        }
-    }
+    nodeSecret = nodeConf.secret;
 
     // Working dir must match config file
     process->setWorkingDirectory(nodeWorkDir);
 
     QStringList params;
-    if (network.startsWith("floo"))
+    if (network.toLower().startsWith("floo"))
         params.push_back("--floonet");
 
     process->start(nodePath, params, QProcess::Unbuffered | QProcess::ReadWrite );
@@ -230,7 +217,9 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
         nodeProcess = nullptr;
     }
 
-    notify::reportFatalError( "mwc713 process exited due some unexpected error. mwc713 exit code: " + QString::number(exitCode) );
+    notify::reportFatalError( "mwc-node process exited due some unexpected error. The exit code: " + QString::number(exitCode) + "\n\n"
+                              "Please check if another instance of mwc-node is already running. In this case please terminate that process, or just reboot your computer.\n\n"
+                              "If reboot doesn't help, please try to clean up mwc-node data at\n" + nodeWorkDir);
 }
 
 void MwcNode::mwcNodeReadyReadStandardError() {
@@ -244,10 +233,12 @@ void MwcNode::mwcNodeReadyReadStandardError() {
 }
 
 void MwcNode::mwcNodeReadyReadStandardOutput() {
-    QString str( ioutils::FilterEscSymbols( nodeProcess->readAllStandardOutput() ) );
-    qDebug() << "Get output:" << str;
-    logger::logMwcNodeOut(str);
-    nodeOutputParser->processInput(str);
+    if (nodeProcess) {
+        QString str( ioutils::FilterEscSymbols( nodeProcess->readAllStandardOutput() ) );
+        qDebug() << "Get output:" << str;
+        logger::logMwcNodeOut(str);
+        nodeOutputParser->processInput(str);
+    }
 }
 
 void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString message) {
@@ -259,14 +250,46 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
         case tries::NODE_OUTPUT_EVENT::MWC_NODE_STARTED:
             nextTimeLimit += MWC_NODE_STARTED_TIMEOUT * config::getTimeoutMultiplier();
             nodeOutOfSyncCounter = 0;
+            lastProcessedEvent = event;
+            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node was started" );
             break;
         case tries::NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_HEADER:
+            if (lastProcessedEvent < event) {
+                lastProcessedEvent = event;
+                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node requesting headers to sync up" );
+            }
+            // expected no break
         case tries::NODE_OUTPUT_EVENT::ASK_FOR_TXHASHSET_ARCHIVE:
+            if (lastProcessedEvent < event) {
+                lastProcessedEvent = event;
+                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node requesting transaction archive" );
+            }
+            // expected no break
         case tries::NODE_OUTPUT_EVENT::HANDLE_TXHASHSET_ARCHIVE:
+            if (lastProcessedEvent < event) {
+                lastProcessedEvent = event;
+                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node processing transaction archive" );
+            }
+            // expected no break
         case tries::NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET:
+            if (lastProcessedEvent < event) {
+                lastProcessedEvent = event;
+                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node validating range proofs" );
+            }
+            // expected no break
         case tries::NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES:
+            if (lastProcessedEvent < event) {
+                lastProcessedEvent = event;
+                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node validating kernel signatures" );
+            }
+            // expected no break
         case tries::NODE_OUTPUT_EVENT::RECIEVE_BLOCK_HEADERS_START:
         case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_START:
+            if (  lastProcessedEvent < event) {
+                lastProcessedEvent = event;
+                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node proocessing blocks to sync up" );
+            }
+            // expected no break
             nextTimeLimit += MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier();
             nodeOutOfSyncCounter = 0;
             break;
@@ -274,6 +297,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             nextTimeLimit += RECEIVE_BLOCK_LISTEN * config::getTimeoutMultiplier();
             break;
         case tries::NODE_OUTPUT_EVENT::NETWORK_ISSUES:
+            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Embedded mwc-node experiencing network issues" );
             nextTimeLimit += NETWORK_ISSUES * config::getTimeoutMultiplier();
             break;
         case tries::NODE_OUTPUT_EVENT::ADDRESS_ALREADY_IN_USE:

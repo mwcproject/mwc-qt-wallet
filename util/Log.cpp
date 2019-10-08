@@ -38,7 +38,7 @@ void initLogger( bool logsEnabled) {
 
     enableLogs(logsEnabled);
 
-    logClient->doAppend2logs(true, "", "mwc-wallet is started..." );
+    logClient->doAppend2logs(true, "", "mwc-qt-wallet is started..." );
 }
 
 void cleanUpLogs() {

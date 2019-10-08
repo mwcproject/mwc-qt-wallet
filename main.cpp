@@ -282,7 +282,6 @@ int main(int argc, char *argv[])
         }
 
         // Update Node
-        node::updateMwcNodeConfig( config.getNetwork() );
         node::MwcNode * mwcNode = new node::MwcNode( config::getMwcpath(), &appContext );
 
         wallet::MWC713::saveWalletConfig( config, &appContext, mwcNode );

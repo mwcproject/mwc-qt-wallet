@@ -353,7 +353,7 @@ void MWC713::processStop(bool exitNicely) {
             qDebug() << "start exiting...";
             executeMwc713command("exit", "");
 
-            if (!util::processWaitForFinished( mwc713process, 60000, "mwc713")) {
+            if (!util::processWaitForFinished( mwc713process, 10000, "mwc713")) {
                 mwc713process->terminate();
             }
             qDebug() << "mwc713 is exited";

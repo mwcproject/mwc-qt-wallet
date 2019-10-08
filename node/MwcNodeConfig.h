@@ -28,6 +28,8 @@ struct MwcNodeConfig {
     void setData(QString network, QString host, QString port, QString secret);
 };
 
+QString getMwcNodePath(const QString & network);
+
 MwcNodeConfig getCurrentMwcNodeConfig( const QString & network );
 
 void updateMwcNodeConfig( const QString & network );

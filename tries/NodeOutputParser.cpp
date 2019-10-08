@@ -21,6 +21,7 @@ namespace tries {
 
 QString toString(NODE_OUTPUT_EVENT event) {
     switch (event) {
+        case NODE_OUTPUT_EVENT::NONE: return "NONE";
         case NODE_OUTPUT_EVENT::MWC_NODE_STARTED:  return "MWC_NODE_STARTED";
         // Very first sync events. Archive processing
         case NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_HEADER:  return "MWC_NODE_RECEIVE_HEADER";

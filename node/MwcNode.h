@@ -117,6 +117,7 @@ private:
 
     QNetworkAccessManager *nwManager;
 
+    tries::NODE_OUTPUT_EVENT lastProcessedEvent = tries::NODE_OUTPUT_EVENT::NONE;
 };
 
 }

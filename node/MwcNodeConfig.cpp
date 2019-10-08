@@ -23,7 +23,7 @@
 
 namespace node {
 
-static QString getMwcNodePath(const QString & network) {
+QString getMwcNodePath(const QString & network) {
     QString nwPath = network.toLower().contains("main") ? "main" : "floo";
     return ioutils::getAppDataPath("mwc-node") + QDir::separator() + nwPath + QDir::separator();
 }
@@ -39,7 +39,7 @@ void MwcNodeConfig::setData(QString _network, QString _host, QString _port, QStr
 MwcNodeConfig getCurrentMwcNodeConfig(const QString & network) {
     QString walletPath = getMwcNodePath(network);
 
-    // Note, asserts are disbaled because of the first run.
+    // Note, asserts are disabled because of the first run.
 
     QStringList lines = util::readTextFile( walletPath + "api_secret" );
     //Q_ASSERT( lines.size()>0 && !lines[0].isEmpty() );

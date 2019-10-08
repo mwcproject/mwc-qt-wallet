@@ -20,7 +20,7 @@
 
 namespace tries {
 
-enum class NODE_OUTPUT_EVENT {MWC_NODE_STARTED,
+enum class NODE_OUTPUT_EVENT {NONE, MWC_NODE_STARTED,
         // Very first sync events. Archive processing
         MWC_NODE_RECEIVE_HEADER, ASK_FOR_TXHASHSET_ARCHIVE,
         HANDLE_TXHASHSET_ARCHIVE, VERIFY_RANGEPROOFS_FOR_TXHASHSET,
