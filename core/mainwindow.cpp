@@ -25,6 +25,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QScrollArea>
+#include <QStyle>
 
 namespace core {
 
@@ -54,6 +55,28 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Want to delete children when they close
     setAttribute( Qt::WA_DeleteOnClose, true );
+
+    // Update size by max screen size
+    QSize wndSize = frameSize();
+    QSize newSize = wndSize;
+    QRect screenRc = QDesktopWidget().availableGeometry(this);
+
+    const int DX = 10;
+    const int DY = 30;
+
+    if (newSize.width() > screenRc.width() - DX )
+        newSize.setWidth( screenRc.width() - DX );
+
+    if (newSize.height() > screenRc.height() - DY )
+        newSize.setHeight( screenRc.height() - DY );
+
+    if ( newSize != wndSize ) {
+        QSize newSz = size() - ( wndSize - newSize );
+
+        setGeometry( (screenRc.width() - newSize.width())/2,
+                     (screenRc.height() - newSize.height())/2,
+                     newSz.width(), newSz.height() );
+    }
 }
 
 MainWindow::~MainWindow()
@@ -180,14 +203,14 @@ void MainWindow::on_helpButton_clicked()
 }
 
 void MainWindow::updateListenerStatus(bool online) {
-    Q_UNUSED(online);
+    Q_UNUSED(online)
     updateListenerBtn();
 }
 
 // Node info
 void MainWindow::updateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
-    Q_UNUSED(errMsg);
-    Q_UNUSED(totalDifficulty);
+    Q_UNUSED(errMsg)
+    Q_UNUSED(totalDifficulty)
     if ( !online ) {
         setStatusButtonState( ui->nodeStatusButton, STATUS::RED, "" );
     }

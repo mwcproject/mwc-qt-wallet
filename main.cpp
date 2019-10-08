@@ -42,6 +42,10 @@
 #include "tests/testStringUtils.h"
 #include <QtGlobal>
 #include <QFileDialog>
+#include <QGuiApplication>
+#include <QScreen>
+#include <QDesktopWidget>
+#include <tgmath.h>
 #include "node/MwcNodeConfig.h"
 #include "node/MwcNode.h"
 
@@ -168,6 +172,7 @@ int main(int argc, char *argv[])
 
     int retVal = 0;
 
+    while (true)
     {
 
         Q_ASSERT(argc>=1);
@@ -201,11 +206,48 @@ int main(int argc, char *argv[])
         if (scale>0.0)
             qputenv( "QT_SCALE_FACTOR", QString::number(scale).toLatin1() );
 
+    #else
+        scale = 1.0; // Mac OS, not applicable, mean 1.0
     #endif
 
         QApplication app(argc, argv);
         QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
         QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+
+        // Update scale if screen resolution is low...
+        // Unfortunatelly we can't do that before QApplication inited because Scree res API doesn't work
+        // That is why update now is pretty costly, we will need to testart the all because of that.
+        {
+            int minWidth = 10000;
+            int minHeight = 10000;
+
+            QList<QScreen *> screens = QGuiApplication::screens();
+            for ( QScreen * s : screens) {
+                QSize scrSz = s->availableSize() * scale;
+                minWidth = std::min( minWidth, scrSz.width() );
+                minHeight = std::min( minHeight, scrSz.height() );
+            }
+
+            double prevScale = scale;
+
+            if ( minWidth <= 1000 || minHeight <=600 )
+                scale = 1.0;
+            else if ( minWidth <= 1300 || minHeight <=700 )
+                scale = std::min(scale, 1.2);
+            else if ( minWidth <= 1500 || minHeight <=800 )
+                scale = std::min(scale, 1.4);
+            else if ( minWidth <= 1800 || minHeight <=950 )
+                scale = std::min(scale, 1.6);
+
+            if ( std::fabs(scale-prevScale)>0.01 ) {
+                // need to update
+                appContext.setGuiScale(scale);
+                retVal = 1;
+                util::requestRestartMwcQtWallet();
+                break;
+            }
+        }
+
 
         logger::initLogger(appContext.isLogsEnabled());
 
@@ -286,7 +328,6 @@ int main(int argc, char *argv[])
 
         wallet::MWC713::saveWalletConfig( config, &appContext, mwcNode );
 
-
         //main window has delete on close flag. That is why need to
         // create dynamically. Window will be deleted on close
         core::MainWindow * mainWnd = new core::MainWindow(nullptr);
@@ -321,6 +362,8 @@ int main(int argc, char *argv[])
         delete mwcNode; mwcNode = nullptr;
 
         util::releaseAppGlobalLock();
+
+        break;
     }
 
     // All objets are expected to be released at this point

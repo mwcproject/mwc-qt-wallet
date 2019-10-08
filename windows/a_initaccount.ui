@@ -14,6 +14,21 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="2,0,1,0,3">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <spacer name="verticalSpacer_3">
      <property name="orientation">
@@ -103,6 +118,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer_4">
        <property name="orientation">
@@ -123,13 +141,13 @@
       <widget class="QFrame" name="frame">
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>400</width>
          <height>272</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>300</width>
+         <width>400</width>
          <height>272</height>
         </size>
        </property>
@@ -142,7 +160,7 @@
        <widget class="control::MwcLineEditNormal" name="password1Edit">
         <property name="geometry">
          <rect>
-          <x>0</x>
+          <x>48</x>
           <y>3</y>
           <width>300</width>
           <height>40</height>
@@ -197,7 +215,7 @@
        <widget class="control::MwcLineEditNormal" name="password2Edit">
         <property name="geometry">
          <rect>
-          <x>0</x>
+          <x>48</x>
           <y>63</y>
           <width>300</width>
           <height>40</height>
@@ -228,7 +246,7 @@
        <widget class="control::MwcLabelSmall" name="strengthLabel">
         <property name="geometry">
          <rect>
-          <x>0</x>
+          <x>48</x>
           <y>105</y>
           <width>300</width>
           <height>30</height>
@@ -265,7 +283,7 @@
        <widget class="control::MwcPushButtonNormal" name="submitButton">
         <property name="geometry">
          <rect>
-          <x>72</x>
+          <x>120</x>
           <y>150</y>
           <width>150</width>
           <height>40</height>
@@ -302,7 +320,7 @@
        <widget class="control::MwcPushButtonTinyUnderline" name="instancesButton">
         <property name="geometry">
          <rect>
-          <x>81</x>
+          <x>129</x>
           <y>249</y>
           <width>140</width>
           <height>20</height>
@@ -333,6 +351,25 @@
         </property>
         <property name="text">
          <string>Wallet instances</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="confirmPassLable">
+        <property name="geometry">
+         <rect>
+          <x>363</x>
+          <y>69</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../resources.qrc">:/img/PassNotMatch@2x.svg</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>

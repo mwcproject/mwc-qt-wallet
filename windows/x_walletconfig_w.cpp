@@ -50,6 +50,9 @@ static double id2scale(int scale) {
 
 // Check path and show warning is needed
 static bool checkKeyBasePath( QWidget * parent, QString keybasePath ) {
+    Q_UNUSED(parent)
+    Q_UNUSED(keybasePath)
+
 #ifdef Q_OS_WIN
 
     // Under the windows we want user select Client, Not a GUI
