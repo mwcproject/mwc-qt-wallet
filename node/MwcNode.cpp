@@ -65,7 +65,7 @@ void MwcNode::start( const QString & network ) {
 
     qDebug() << "Starting mwc-node  " << nodePath;
 
-    respondTimelimit = QDateTime::currentMSecsSinceEpoch() + START_TIMEOUT * config::getTimeoutMultiplier();
+    respondTimelimit = QDateTime::currentMSecsSinceEpoch() + int64_t(START_TIMEOUT * config::getTimeoutMultiplier());
 
     nodeCheckFailCounter = 0;
     nodeOutOfSyncCounter = 0;
@@ -247,7 +247,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
 
     switch (event) {
         case tries::NODE_OUTPUT_EVENT::MWC_NODE_STARTED:
-            nextTimeLimit += MWC_NODE_STARTED_TIMEOUT * config::getTimeoutMultiplier();
+            nextTimeLimit += int64_t(MWC_NODE_STARTED_TIMEOUT * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
             lastProcessedEvent = event;
             notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node was started" );
@@ -258,46 +258,46 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
                 notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node requesting headers to sync up" );
             }
             // expected no break
-        case tries::NODE_OUTPUT_EVENT::ASK_FOR_TXHASHSET_ARCHIVE:
+        [[clang::fallthrough]]; case tries::NODE_OUTPUT_EVENT::ASK_FOR_TXHASHSET_ARCHIVE:
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
                 notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node requesting transaction archive" );
             }
             // expected no break
-        case tries::NODE_OUTPUT_EVENT::HANDLE_TXHASHSET_ARCHIVE:
+        [[clang::fallthrough]]; case tries::NODE_OUTPUT_EVENT::HANDLE_TXHASHSET_ARCHIVE:
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
                 notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node processing transaction archive" );
             }
             // expected no break
-        case tries::NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET:
+        [[clang::fallthrough]]; case tries::NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET:
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
                 notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node validating range proofs" );
             }
             // expected no break
-        case tries::NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES:
+        [[clang::fallthrough]]; case tries::NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES:
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
                 notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node validating kernel signatures" );
             }
             // expected no break
-        case tries::NODE_OUTPUT_EVENT::RECIEVE_BLOCK_HEADERS_START:
+        [[clang::fallthrough]]; case tries::NODE_OUTPUT_EVENT::RECIEVE_BLOCK_HEADERS_START:
         case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_START:
             if (  lastProcessedEvent < event) {
                 lastProcessedEvent = event;
                 notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node proocessing blocks to sync up" );
             }
             // expected no break
-            nextTimeLimit += MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier();
+            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
             break;
         case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_LISTEN:
-            nextTimeLimit += RECEIVE_BLOCK_LISTEN * config::getTimeoutMultiplier();
+            nextTimeLimit += int64_t(RECEIVE_BLOCK_LISTEN * config::getTimeoutMultiplier());
             break;
         case tries::NODE_OUTPUT_EVENT::NETWORK_ISSUES:
             notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Embedded mwc-node experiencing network issues" );
-            nextTimeLimit += NETWORK_ISSUES * config::getTimeoutMultiplier();
+            nextTimeLimit += int64_t(NETWORK_ISSUES * config::getTimeoutMultiplier());
             break;
         case tries::NODE_OUTPUT_EVENT::ADDRESS_ALREADY_IN_USE:
             notify::reportFatalError("Unable to start local mwc-node because of error:\n"
