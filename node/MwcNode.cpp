@@ -65,6 +65,10 @@ void MwcNode::start( const QString & network ) {
 
     respondTimelimit = QDateTime::currentMSecsSinceEpoch() + START_TIMEOUT * config::getTimeoutMultiplier();
 
+    nodeCheckFailCounter = 0;
+    nodeOutOfSyncCounter = 0;
+    lastKnownHeight = 0;
+
     // Creating process and starting
     nodeProcess = initNodeProcess(network);
     nodeOutputParser = new tries::NodeOutputParser();
@@ -289,7 +293,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
 
 
 void MwcNode::timerEvent(QTimerEvent *event) {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 
     if ( nodeProcess== nullptr || nodeOutputParser== nullptr )
         return;
