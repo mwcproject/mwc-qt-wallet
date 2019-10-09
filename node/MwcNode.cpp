@@ -286,7 +286,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
         case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_START:
             if (  lastProcessedEvent < event) {
                 lastProcessedEvent = event;
-                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node proocessing blocks to sync up" );
+                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node processing blocks to sync up" );
             }
             // expected no break
             nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
