@@ -17,6 +17,7 @@
 #include "../util/Process.h"
 #include "../util/ioutils.h"
 #include <QDir>
+#include "../core/appcontext.h"
 #include "../core/global.h"
 #include "../core/Config.h"
 #include "../control/messagebox.h"
@@ -31,6 +32,8 @@
 #include "MwcNodeConfig.h"
 
 namespace node {
+
+
 
 MwcNode::MwcNode(QString _nodePath, core::AppContext * _appContext) :
         QObject(),
@@ -57,6 +60,7 @@ void MwcNode::start( const QString & network ) {
     lastUsedNetwork = network;
     nodeSecret = "";
     nodeWorkDir = "";
+    nonEmittedOutput = "";
     lastProcessedEvent = tries::NODE_OUTPUT_EVENT::NONE;
 
     // Start the binary
@@ -131,10 +135,10 @@ QProcess * MwcNode::initNodeProcess( QString network ) {
         switch (process->error())
         {
             case QProcess::FailedToStart:
-                notify::reportFatalError( "mwc-node failed to start. Mwc node expected location at " + nodePath );
+                reportNodeFatalError( "mwc-node failed to start. Mwc node expected location at " + nodePath );
                 return nullptr;
             case QProcess::Crashed:
-                notify::reportFatalError( "mwc-node crashed during start" );
+                reportNodeFatalError( "mwc-node crashed during start" );
                 return nullptr;
             case QProcess::Timedout:
                 if (control::MessageBox::question(nullptr, "Warning", "Starting for mwc-node process is taking longer than expected.\nContinue to wait?",
@@ -142,10 +146,10 @@ QProcess * MwcNode::initNodeProcess( QString network ) {
                     config::increaseTimeoutMultiplier();
                     continue; // retry with waiting
                 }
-                notify::reportFatalError( "mwc-node takes too much time to start. Something wrong with environment." );
+                reportNodeFatalError( "mwc-node takes too much time to start. Something wrong with environment." );
                 return nullptr;
             default:
-                notify::reportFatalError( "mwc-node failed to start because of unknown error" );
+                reportNodeFatalError( "mwc-node failed to start because of unknown error" );
                 return nullptr;
         }
     }
@@ -202,7 +206,7 @@ void MwcNode::nodeErrorOccurred(QProcess::ProcessError error) {
         nodeProcess = nullptr;
     }
 
-    notify::reportFatalError( "mwc-node process exited. Process error: "+ QString::number(error) );
+    reportNodeFatalError( "mwc-node process exited. Process error: "+ QString::number(error) );
 
 }
 
@@ -216,7 +220,7 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
         nodeProcess = nullptr;
     }
 
-    notify::reportFatalError( "mwc-node process exited due some unexpected error. The exit code: " + QString::number(exitCode) + "\n\n"
+    reportNodeFatalError( "mwc-node process exited due some unexpected error. The exit code: " + QString::number(exitCode) + "\n\n"
                               "Please check if another instance of mwc-node is already running. In this case please terminate that process, or just reboot your computer.\n\n"
                               "If reboot doesn't help, please try to clean up mwc-node data at\n" + nodeWorkDir);
 }
@@ -227,7 +231,7 @@ void MwcNode::mwcNodeReadyReadStandardError() {
     if (nodeProcess) {
         QString str( ioutils::FilterEscSymbols( nodeProcess->readAllStandardError() ) );
 
-        notify::reportFatalError( "mwc713 process report error:\n" + str );
+        reportNodeFatalError( "mwc-node process report error:\n" + str );
     }
 }
 
@@ -237,6 +241,25 @@ void MwcNode::mwcNodeReadyReadStandardOutput() {
         qDebug() << "Get output:" << str;
         logger::logMwcNodeOut(str);
         nodeOutputParser->processInput(str);
+
+        nonEmittedOutput += str;
+
+        QString ln;
+
+        for (int t=0; t<nonEmittedOutput.length(); t++) {
+            QChar ch = nonEmittedOutput[t];
+            if ( ch=='\r' || ch=='\n' ) {
+                if (!ln.isEmpty()) {
+                    emit onMwcOutputLine(ln);
+                    ln = "";
+                }
+            }
+            else {
+                ln += ch;
+            }
+        }
+
+        nonEmittedOutput = ln;
     }
 }
 
@@ -300,7 +323,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             nextTimeLimit += int64_t(NETWORK_ISSUES * config::getTimeoutMultiplier());
             break;
         case tries::NODE_OUTPUT_EVENT::ADDRESS_ALREADY_IN_USE:
-            notify::reportFatalError("Unable to start local mwc-node because of error:\n"
+            reportNodeFatalError("Unable to start local mwc-node because of error:\n"
                                      "'Address already in use'\n"
                                      "It is likely that another mwc-node instance is still running, "
                                      "or there is another app "
@@ -448,6 +471,23 @@ void MwcNode::replyFinished(QNetworkReply* reply) {
     }
 
 }
+
+void MwcNode::reportNodeFatalError( QString message ) {
+
+    if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::question(nullptr, "Embedded MWC-Node Error",
+            message + "\n\nIf Embedded mwc-node doesn't work for you, please switch to MWC Cloud node before exit", "Keep Embedded", "Switch to Cloud", false, true ) ) {
+
+        // Switching to the cloud node
+        wallet::MwcNodeConnection mwcNodeConnection = appContext->getNodeConnection( lastUsedNetwork );
+        mwcNodeConnection.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD );
+        appContext->updateMwcNodeConnection(lastUsedNetwork, mwcNodeConnection );
+    }
+
+
+    mwc::closeApplication();
+
+}
+
 
 
 

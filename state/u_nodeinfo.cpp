@@ -22,6 +22,7 @@
 #include "../util/Log.h"
 #include "../core/global.h"
 #include "../core/Notification.h"
+#include "../node/MwcNode.h"
 
 namespace state {
 
@@ -49,8 +50,11 @@ NodeInfo::NodeInfo(StateContext * context) :
     QObject::connect(context->wallet, &wallet::Wallet::onLoginResult,
                      this, &NodeInfo::onLoginResult, Qt::QueuedConnection);
 
+    QObject::connect(context->mwcNode, &node::MwcNode::onMwcOutputLine,
+                     this, &NodeInfo::onMwcOutputLine, Qt::QueuedConnection);
+
     // Checking/update node status every 20 seconds...
-    startTimer(60000); // Let's update node info every 60 seconds. By some reasons it is slow operation...
+    startTimer(3000); // Let's update node info every 60 seconds. By some reasons it is slow operation...
 }
 
 NodeInfo::~NodeInfo() {
@@ -67,6 +71,7 @@ NextStateRespond NodeInfo::execute() {
                 new wnd::NodeInfo( context->wndManager->getInWndParent(), this));
 
         wnd->setNodeStatus( lastNodeStatus );
+        updateMwcNodeForWnd();
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
@@ -75,6 +80,7 @@ NextStateRespond NodeInfo::execute() {
 // After login - let's check the node status
 void NodeInfo::onLoginResult(bool ok) {
     if (ok) {
+        currentNodeConnection = getNodeConnection().first;
         requestNodeInfo();
         justLogin = true;
     }
@@ -84,9 +90,34 @@ void NodeInfo::onLoginResult(bool ok) {
 void NodeInfo::timerEvent(QTimerEvent *event) {
     Q_UNUSED(event);
 
-    // Don't request for inti or lock states.
-    if ( context->stateMachine->getCurrentStateId() >= STATE::ACCOUNTS )
-        requestNodeInfo();
+    timerCounter++;
+
+    // Don't request for init or lock states.
+    if ( context->stateMachine->getCurrentStateId() >= STATE::ACCOUNTS ) {
+        int div = 1;
+        if ( currentNodeConnection.connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD ) {
+            // timer is 3 seconds.
+            div = 20; // want to update onece in a minute
+        }
+        else if (!lastNodeStatus.online) {
+            div = 5; // oflline node, doesn't make sense to update too often
+        }
+        else if (lastNodeStatus.connections==0) {
+            div = 5; // no peers, likely an issue,  doesn't make sense to update too often
+        }
+        else if (lastNodeStatus.nodeHeight < lastNodeStatus.peerHeight - 3) {
+            // must be in sync mode...
+            div = 1;
+        }
+        else {
+            // normal running mode, local node
+            div =3;
+        }
+
+        if (timerCounter%div == 0) {
+            requestNodeInfo();
+        }
+    }
 }
 
 void NodeInfo::requestWalletResync() {
@@ -107,6 +138,7 @@ void NodeInfo::updateNodeConnection( const wallet::MwcNodeConnection & nodeConne
     context->appContext->updateMwcNodeConnection( walletConfig.getNetwork(), nodeConnect );
     context->wallet->setWalletConfig( walletConfig, context->appContext, context->mwcNode );
     // config require to restart
+    currentNodeConnection = nodeConnect;
     context->stateMachine->executeFrom( STATE::NONE );
 }
 
@@ -164,6 +196,28 @@ void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pe
         return;
 
     wnd->setNodeStatus( lastNodeStatus );
+}
+
+void NodeInfo::updateMwcNodeForWnd() {
+    if (wnd!= nullptr) {
+        int lnNum = wnd->getLogLineNumber();
+        QStringList lns;
+        for ( int i = std::max(0, logLines.size() - lnNum); i<logLines.size(); i++ ) {
+            lns.push_back(logLines.at(i));
+        }
+
+        wnd->updateEmbeddedMwcNodeLogs(lns.join("\n"));
+    }
+}
+
+
+void NodeInfo::onMwcOutputLine(QString line) {
+    logLines.push_back(line);
+
+    while(logLines.size()>100)
+        logLines.pop_front();
+
+    updateMwcNodeForWnd();
 }
 
 

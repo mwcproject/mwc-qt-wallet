@@ -81,8 +81,13 @@ private:
     void sendRequest( const QString & tag, QString secret, const QString & api);
 
     QString getNodeSecret();
+
+    void reportNodeFatalError( QString message );
 private:
     virtual void timerEvent(QTimerEvent *event) override;
+
+private: signals:
+    void onMwcOutputLine(QString line);
 
 private slots:
     void nodeErrorOccurred(QProcess::ProcessError error);
@@ -118,6 +123,8 @@ private:
     QNetworkAccessManager *nwManager;
 
     tries::NODE_OUTPUT_EVENT lastProcessedEvent = tries::NODE_OUTPUT_EVENT::NONE;
+
+    QString nonEmittedOutput;
 };
 
 }

@@ -16,6 +16,7 @@
 #define U_NODEINFO_H
 
 #include "../core/navwnd.h"
+#include "../wallet/wallet.h"
 
 namespace Ui {
 class NodeInfo;
@@ -38,6 +39,15 @@ public:
 
     void setNodeStatus( const state::NodeStatus & status );
 
+    // How many logs lines are visible
+    int getLogLineNumber() const;
+
+    // logs to show, multi like output
+    void updateEmbeddedMwcNodeLogs( QString logs );
+private:
+    // Empty string to hide warning...
+    void showWarning(QString warning);
+
 private slots:
 
     void on_refreshButton_clicked();
@@ -53,6 +63,9 @@ signals:
 private:
     Ui::NodeInfo *ui;
     state::NodeInfo * state;
+
+    wallet::MwcNodeConnection::NODE_CONNECTION_TYPE connectionType;
+    QString currentWarning = "?";
 
     // Cache for latest error. We don't want spam user with messages about the node connection
     static QString lastShownErrorMessage;

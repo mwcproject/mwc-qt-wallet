@@ -67,13 +67,20 @@ private slots:
 
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
+    void onMwcOutputLine(QString line);
+
 private:
     virtual void timerEvent(QTimerEvent *event) override;
 
+    void updateMwcNodeForWnd();
 private:
     wnd::NodeInfo * wnd = nullptr;
     bool  justLogin = false;
     NodeStatus lastNodeStatus;
+    int timerCounter = 0; // update is different in different modes.
+    wallet::MwcNodeConnection currentNodeConnection;
+
+    QStringList logLines;
 };
 
 }

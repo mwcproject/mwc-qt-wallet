@@ -18,6 +18,7 @@
 #include "../state/u_nodeinfo.h"
 #include "../control/messagebox.h"
 #include "../dialogs/u_changenode.h"
+#include <QScrollBar>
 
 namespace wnd {
 
@@ -32,11 +33,19 @@ NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
 {
     ui->setupUi(this);
 
-    // progress is active because of node info request
-    ui->progress->initLoader(true);
+    ui->warningLine->hide();
 
     // Need simulate post message. Using events for that
     connect(this, &NodeInfo::showNodeConnectionError, this,  &NodeInfo::onShowNodeConnectionError, Qt::QueuedConnection );
+
+    connectionType = state->getNodeConnection().first.connectionType;
+
+    if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL) {
+        ui->embeddedNodeOutputLabel->hide();
+        ui->nodeLogs->hide();
+    }
+
+    showWarning("");
 }
 
 NodeInfo::~NodeInfo() {
@@ -44,12 +53,41 @@ NodeInfo::~NodeInfo() {
     delete ui;
 }
 
+// How many logs lines are visible
+int NodeInfo::getLogLineNumber() const {
+    // Expected that control is visible...
+    return std::max( 1, (ui->nodeLogs->size().height()-12 + 4 ) / 15 );
+}
+
+// logs to show, multi like output
+void NodeInfo::updateEmbeddedMwcNodeLogs( QString logs ) {
+    ui->nodeLogs->setPlainText(logs);
+}
+// Empty string to hide warning...
+void NodeInfo::showWarning(QString warning) {
+    if (currentWarning == warning)
+        return;
+
+    currentWarning = warning;
+
+    if (warning.isEmpty()) {
+        ui->lineSeparator->show();
+        ui->warningLine->hide();
+    }
+    else {
+        ui->lineSeparator->hide();
+        ui->warningLine->show();
+        ui->warningLine->setText(warning);
+    }
+}
+
+
 static QString toBoldAndYellow(QString text) {
     return "<span style=\" font-weight:900; color:#CCFF33;\">" + text + "</span>";
 }
 
 void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
-    ui->progress->hide();
+    QString warning;
 
     if (!status.online) {
         ui->statusInfo->setText( toBoldAndYellow("Offline") );
@@ -63,20 +101,27 @@ void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
         }
     }
     else {
-
         if ( status.nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < status.peerHeight )
             ui->statusInfo->setText(toBoldAndYellow("Syncing") );
         else
             ui->statusInfo->setText("Online");
 
-        if (status.connections <= 0)
+        if (status.connections <= 0) {
             ui->connectionsInfo->setText( toBoldAndYellow("None") ); // Two offline is confusing and doesn't look good. Let's keep zero and highlight it.
-        else
+
+            if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD) {
+                warning = toBoldAndYellow("Please note. You can't run two mwc-node with same public IP.<br>That might be a reason why node unable to find any peers.");
+            }
+        }
+        else {
             ui->connectionsInfo->setText( util::longLong2Str(status.connections) );
+        }
 
         ui->heightInfo->setText( util::longLong2Str(status.nodeHeight) );
         ui->difficultyInfo->setText( util::longLong2ShortStr(status.totalDifficulty, 9) );
     }
+
+    showWarning(warning);
 }
 
 void NodeInfo::onShowNodeConnectionError(QString errorMessage) {

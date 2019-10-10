@@ -123,6 +123,8 @@ QListView::item {
   padding: 10px;
 }
 
+/* ------------------------------ */
+
 QLineEdit {
     color: white;
     font-family: Open Sans;
@@ -132,6 +134,7 @@ QLineEdit {
     border: transparent;
     background: rgba(255, 255, 255, 0.2);
     selection-background-color: rgba(255, 255, 255, 0.3);
+    selection-color: white;
 }
 
 /* By some reasons Windows needs that for placeholder */
@@ -155,6 +158,12 @@ QLineEdit:focus {
     background: rgba(255, 255, 255, 0.15);
 }
 
+/* By some reasons Windows needs that for placeholder */
+QLineEdit[text=""] {
+    color: white;
+}
+
+/* ------------------------------ */
 
 QTextEdit {
     color: white;
@@ -165,16 +174,14 @@ QTextEdit {
     border: transparent;
     background: rgba(255, 255, 255, 0.2);
     selection-background-color: rgba(255, 255, 255, 0.3);
+    selection-color: white;
 
     font-size: 18px;
     border-radius: 6px;
     padding: 10px 6px 10px 15px;
 }
 
-/* By some reasons Windows needs that for placeholder */
-QLineEdit[text=""] {
-    color: white;
-}
+
 
 QTextEdit:focus {
     border: 2px solid #CCFF33;
@@ -185,6 +192,47 @@ QTextEdit:enabled:!focus::hover
 {
     background-color: rgba(255, 255, 255, 0.3);
 }
+
+/* ------------------------------ */
+QPlainTextEdit {
+    color: white;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+
+    border: transparent;
+    background: rgba(255, 255, 255, 0.2);
+    selection-background-color: rgba(255, 255, 255, 0.3);
+    selection-color: white;
+}
+
+/* By some reasons Windows needs that for placeholder */
+QPlainTextEdit[text=""] {
+    color: white;
+}
+
+QPlainTextEdit:enabled:!focus::hover
+{
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+QPlainTextEdit:focus {
+    border: 2px solid #CCFF33;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+control--MwcPlainEditLogs {
+    font-size: 12px;
+    border-radius: 4px;
+    padding: 1px;
+}
+
+control--MwcPlainEditLogs:focus {
+    border: transparent;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* --------------------------------------- */
 
 QPushButton
 {
@@ -503,3 +551,4 @@ QToolTip {
     padding: 1px;
     background: #9E00E7;
 }
+
