@@ -71,9 +71,14 @@ void MwcNode::start( const QString & network ) {
 
     respondTimelimit = QDateTime::currentMSecsSinceEpoch() + int64_t(START_TIMEOUT * config::getTimeoutMultiplier());
 
-    nodeCheckFailCounter = 0;
+    nodeNoPeersFailCounter = 0;
     nodeOutOfSyncCounter = 0;
-    lastKnownHeight = 0;
+    nodeHeight = 0;
+    peersMaxHeight = 0;
+    txhashsetHeight = 0;
+    syncIsDone = false;
+    maxBlockHeight = 0;
+    initChainHeight = 0;
 
     // Creating process and starting
     nodeProcess = initNodeProcess(network);
@@ -264,7 +269,6 @@ void MwcNode::mwcNodeReadyReadStandardOutput() {
 }
 
 void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString message) {
-    Q_UNUSED(message)
 
     int64_t nextTimeLimit = QDateTime::currentMSecsSinceEpoch();
 
@@ -275,59 +279,225 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             lastProcessedEvent = event;
             notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node was started" );
             break;
-        case tries::NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_HEADER:
+        case tries::NODE_OUTPUT_EVENT::WAITING_FOR_PEERS:
+            lastProcessedEvent = event;
+            nodeStatusString = "Waiting for peers to join";
+            emit onMwcStatusUpdate(nodeStatusString);
+            break;
+
+        case tries::NODE_OUTPUT_EVENT::INITIAL_CHAIN_HEIGHT: {
+            // update initial chain height
+
+            // message: 365479725 @ 117749 [0099c40fb902]
+            int idx1 = message.indexOf(" @ ");
+            int idx2 = message.indexOf("[", idx1);
+            Q_ASSERT(idx1>0 && idx2>0);
+            if (idx1>0 && idx2>0) {
+                idx1 += strlen(" @ ");
+                initChainHeight = message.mid(idx1, idx2-idx1).trimmed().toInt();
+                maxBlockHeight = initChainHeight;
+            }
+            break;
+        }
+
+        case tries::NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_HEADER: {
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
-                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node requesting headers to sync up" );
+                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                                                  "Embedded mwc-node requesting headers to sync up");
             }
-            // expected no break
-        [[clang::fallthrough]]; case tries::NODE_OUTPUT_EVENT::ASK_FOR_TXHASHSET_ARCHIVE:
+            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
+            nodeOutOfSyncCounter = 0;
+
+            // We are getting headers during all stages. But we want to display progress only for the step 1.
+            if (lastProcessedEvent <= event) {
+                // for progress need to parse the second element
+                QStringList params = message.split('|');
+                int height = 0;
+                if (params.size() >= 2) {
+                    // 3.226.135.253:13414, height 31361
+                    QString heightInfo = params[1].trimmed();
+                    int pos = heightInfo.lastIndexOf(' ');
+                    if (pos > 0) {
+                        height = heightInfo.mid(pos + 1).toInt();
+                    }
+                }
+
+                nodeStatusString = "Step 1 of 3, getting headers...";
+                if (height > 0 && peersMaxHeight > 0)
+                    nodeStatusString +=
+                            " " + QString::number(double(std::max(0, height - initChainHeight)) /
+                                                  double(std::max(1, peersMaxHeight - initChainHeight)) * 100.0, 'f',
+                                                  1) + "%";
+
+                emit onMwcStatusUpdate(nodeStatusString);
+            }
+            break;
+        }
+        case tries::NODE_OUTPUT_EVENT::ASK_FOR_TXHASHSET_ARCHIVE: {
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
-                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node requesting transaction archive" );
+                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                                                  "Embedded mwc-node requesting transaction archive");
             }
+            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
+            nodeOutOfSyncCounter = 0;
+
+            // for progress need to parse the second element
+            QStringList params = message.split('|');
+            if (params.size() >= 2) {
+                // 114586 0a78e3f9d6c5.
+                QString heightInfo = params[1].trimmed();
+                int pos = heightInfo.indexOf(' ');
+                if (pos > 0) {
+                    txhashsetHeight = heightInfo.left(pos).toInt();
+                }
+            }
+
+            nodeStatusString = "Step 2 of 3, requesting txhashset archive... 0.5%";
+            emit onMwcStatusUpdate(nodeStatusString);
+            break;
+        }
             // expected no break
-        [[clang::fallthrough]]; case tries::NODE_OUTPUT_EVENT::HANDLE_TXHASHSET_ARCHIVE:
+        case tries::NODE_OUTPUT_EVENT::HANDLE_TXHASHSET_ARCHIVE: {
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
-                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node processing transaction archive" );
+                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                                                  "Embedded mwc-node processing transaction archive");
             }
+            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
+            nodeOutOfSyncCounter = 0;
+
+            if (! message.contains("DONE") ) {
+                nodeStatusString = "Step 2 of 3, extracting txhashset archive... 2.5%";
+                emit onMwcStatusUpdate(nodeStatusString);
+            }
+            break;
+        }
             // expected no break
-        [[clang::fallthrough]]; case tries::NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET:
+        case tries::NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET: {
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
-                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node validating range proofs" );
+                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                                                  "Embedded mwc-node validating range proofs");
             }
-            // expected no break
-        [[clang::fallthrough]]; case tries::NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES:
+
+            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
+            nodeOutOfSyncCounter = 0;
+
+            int handledH = message.trimmed().toInt();
+            if (handledH>0 && handledH<txhashsetHeight) {
+                double progress = 5.0 + double( std::max(0, handledH-initChainHeight) ) / double( std::max(1, txhashsetHeight-initChainHeight) ) * 60.0; // 5-65 range
+                nodeStatusString = "Step 2 of 3, verifying rangeproofs... " + QString::number(progress, 'f', 1) + "%";
+                emit onMwcStatusUpdate(nodeStatusString);
+            }
+            break;
+        }
+        case tries::NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES: {
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
-                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node validating kernel signatures" );
+                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                                                  "Embedded mwc-node validating kernel signatures");
             }
-            // expected no break
-        [[clang::fallthrough]]; case tries::NODE_OUTPUT_EVENT::RECIEVE_BLOCK_HEADERS_START:
-        case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_START:
-            if (  lastProcessedEvent < event) {
+
+            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
+            nodeOutOfSyncCounter = 0;
+
+            int handledH = message.trimmed().toInt();
+            if (handledH>0 && handledH<txhashsetHeight) {
+                double progress = 65.0 + double( std::max(0, handledH-initChainHeight) ) / double( std::max(1, txhashsetHeight-initChainHeight) ) * 35.0; // 65-100 range
+                nodeStatusString = "Step 2 of 3, verifying kernels... " + QString::number(progress, 'f', 1) + "%";
+                emit onMwcStatusUpdate(nodeStatusString);
+            }
+            break;
+        }
+        case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_START: {
+            if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
-                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node processing blocks to sync up" );
+                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                                                  "Embedded mwc-node processing blocks to sync up");
             }
             // expected no break
             nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
+
+            if (!syncIsDone) { // Async process, order is not guaranteed
+
+                // Message: 140e019e22d0 at 114601 from 52.13.204.202:13414 [in/out/kern: 0/1/1] going to process.
+                int idx1 = message.indexOf("at ");
+                int idx2 = message.indexOf(" from ");
+                if (idx1 > 0 && idx2 > 0) {
+                    idx1 += strlen("at ");
+                    int handledH = message.mid(idx1, idx2 - idx1).toInt();
+
+                    if (handledH>maxBlockHeight) {
+                        maxBlockHeight = handledH;
+                        if (handledH > 0 && handledH >= txhashsetHeight && handledH < peersMaxHeight) {
+                            double progress =
+                                    double( std::max(0, handledH - std::max(initChainHeight, txhashsetHeight) )) /
+                                        double( std::max(1, peersMaxHeight - std::max(initChainHeight, txhashsetHeight)) ) *
+                                    100.0;
+                            nodeStatusString = "Step 3 of 3, getting blocks... " + QString::number(progress, 'f', 1) + "%";
+                            emit onMwcStatusUpdate(nodeStatusString);
+                        }
+                    }
+                }
+            }
+
             break;
-        case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_LISTEN:
+        }
+        case tries::NODE_OUTPUT_EVENT::SYNC_IS_DONE:{
+            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
+            nodeOutOfSyncCounter = 0;
+
+            syncIsDone = true;
+
+            // message: 365444412 @ 117485 [0d4879faafaa]
+            int idx1 = message.indexOf(" @ ");
+            int idx2 = message.indexOf("[", idx1);
+            Q_ASSERT(idx1>0 && idx2>0);
+            if (idx1>0 && idx2>0) {
+                idx1 += strlen(" @ ");
+                int syncHeight = message.mid(idx1, idx2-idx1).trimmed().toInt();
+                maxBlockHeight = std::max( maxBlockHeight, syncHeight );
+            }
+
+            updateRunningStatus();
+            break;
+        }
+
+        case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_LISTEN: {
             nextTimeLimit += int64_t(RECEIVE_BLOCK_LISTEN * config::getTimeoutMultiplier());
+
+            // message: 2a695957b396 at 102204 from 34.238.121.224:13414 [in/out/kern: 0/1/1] going to process.
+            int idx1 = message.indexOf("at ");
+            int idx2 = message.indexOf(" from ");
+            if (idx1 > 0 && idx2 > 0) {
+                idx1 += strlen("at ");
+                int handledH = message.mid(idx1, idx2 - idx1).toInt();
+
+                if (handledH > maxBlockHeight) {
+                    maxBlockHeight = handledH;
+
+                    updateRunningStatus();
+                }
+            }
             break;
+        }
         case tries::NODE_OUTPUT_EVENT::NETWORK_ISSUES:
             notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Embedded mwc-node experiencing network issues" );
             nextTimeLimit += int64_t(NETWORK_ISSUES * config::getTimeoutMultiplier());
+
+            nodeStatusString = "Unable connect to peers. Waiting for peers to connect...";
+            emit onMwcStatusUpdate(nodeStatusString);
+
             break;
         case tries::NODE_OUTPUT_EVENT::ADDRESS_ALREADY_IN_USE:
             reportNodeFatalError("Unable to start local mwc-node because of error:\n"
                                      "'Address already in use'\n"
                                      "It is likely that another mwc-node instance is still running, "
-                                     "or there is another app "
-                                     "that is using the same ports.");
+                                     "or there is another app active "
+                                     "and using the same ports.");
             break;
         default:
             Q_ASSERT(false);
@@ -335,6 +505,24 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
     }
 
     respondTimelimit = std::max(respondTimelimit, nextTimeLimit);
+}
+
+void MwcNode::updateRunningStatus() {
+    Q_ASSERT(syncIsDone);
+
+    QString newStatus;
+
+    // tolerance - two blocks
+    if (maxBlockHeight >= peersMaxHeight - 2) {
+        newStatus = "In sync and running...";
+    } else {
+        newStatus = "Running and waiting for " + QString::number(peersMaxHeight - maxBlockHeight) + " top blocks...";
+    }
+
+    if (nodeStatusString != newStatus) {
+        nodeStatusString = newStatus;
+        emit onMwcStatusUpdate(nodeStatusString);
+    }
 }
 
 
@@ -355,7 +543,7 @@ void MwcNode::timerEvent(QTimerEvent *event) {
         need2restart = true;
     }
 
-    if ( nodeCheckFailCounter > API_FAILURE_LIMIT || nodeOutOfSyncCounter>API_FAILURE_LIMIT ) {
+    if ( nodeNoPeersFailCounter > NODE_NO_PEERS_FAILURE_LIMITS || nodeOutOfSyncCounter > NODE_OUT_OF_SYNC_FAILURE_LIMIT ) {
         // need to restart
         logger::logInfo("MwcNode", "Restarting node because API didn't get expected info from the node during long time period");
         need2restart = true;
@@ -366,8 +554,6 @@ void MwcNode::timerEvent(QTimerEvent *event) {
         start(lastUsedNetwork);
         return;
     }
-
-
 
     // Let's make API calls to verify the node status
     sendRequest( "Peers", getNodeSecret(), "/v1/peers/connected");
@@ -414,7 +600,7 @@ void MwcNode::replyFinished(QNetworkReply* reply) {
     reply = nullptr;
 
     if (errCode != QNetworkReply::NoError) {
-        nodeCheckFailCounter++;
+        nodeNoPeersFailCounter++;
         return;
     }
 
@@ -422,7 +608,7 @@ void MwcNode::replyFinished(QNetworkReply* reply) {
     QJsonDocument   jsonDoc = QJsonDocument::fromJson(strReply.toUtf8(), &error);
 
     if (error.error != QJsonParseError::NoError) {
-        nodeCheckFailCounter++;
+        nodeNoPeersFailCounter++;
         return;
     }
 
@@ -435,14 +621,26 @@ void MwcNode::replyFinished(QNetworkReply* reply) {
 
         QJsonArray  jsonRespond = jsonDoc.array();
 
-        for ( int p=0; p<jsonRespond.size(); p++ ) {
-            QJsonObject peer = jsonRespond[p].toObject();
-            int peerHeight = peer["heihgt"].toInt();
-            if ( peerHeight > lastKnownHeight - 3 ) {
+        if (jsonRespond.size()>0) {
+            for (int p = 0; p < jsonRespond.size(); p++) {
+                QJsonObject peer = jsonRespond[p].toObject();
+                int peerHeight = peer["height"].toInt();
+                peersMaxHeight = std::max(peersMaxHeight , peerHeight);
+            }
+
+            if (peersMaxHeight > nodeHeight - 3) {
                 nodeOutOfSyncCounter++;
-                break;
+            }
+
+            if (syncIsDone)
+                updateRunningStatus();
+
+            if (nodeStatusString.contains("peers")) {
+                nodeStatusString = "Connected to " + QString::number(jsonRespond.size()) + " peers, waiting for data...";
+                emit onMwcStatusUpdate(nodeStatusString);
             }
         }
+
     }
     else if (tag == "Status") {
         /*
@@ -462,12 +660,12 @@ void MwcNode::replyFinished(QNetworkReply* reply) {
         QJsonObject   jsonRespond = jsonDoc.object();
 
         int connections =   jsonRespond["connections"].toInt(0);
-        lastKnownHeight =        jsonRespond["tip"].toObject()["height"].toInt(0);
+        nodeHeight =        jsonRespond["tip"].toObject()["height"].toInt(0);
         logger::logInfo("MwcNode", "mwc node status: connections=" + QString::number(connections) +
-                " height="+QString::number(lastKnownHeight));
+                " height="+QString::number(nodeHeight));
 
         if (connections == 0)
-            nodeCheckFailCounter++;
+            nodeNoPeersFailCounter++;
     }
 
 }

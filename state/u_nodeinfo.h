@@ -58,6 +58,7 @@ public:
     QPair< wallet::MwcNodeConnection, wallet::WalletConfig > getNodeConnection() const;
     void updateNodeConnection( const wallet::MwcNodeConnection & nodeConnect, const wallet::WalletConfig & walletConfig );
 
+    QString getMwcNodeStatus();
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "node_overview.html";}
@@ -67,20 +68,16 @@ private slots:
 
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
-    void onMwcOutputLine(QString line);
+    void onMwcStatusUpdate(QString status);
 
 private:
     virtual void timerEvent(QTimerEvent *event) override;
-
-    void updateMwcNodeForWnd();
 private:
     wnd::NodeInfo * wnd = nullptr;
     bool  justLogin = false;
     NodeStatus lastNodeStatus;
     int timerCounter = 0; // update is different in different modes.
     wallet::MwcNodeConnection currentNodeConnection;
-
-    QStringList logLines;
 };
 
 }

@@ -42,16 +42,16 @@ void NodeStatus::setData(bool _online,
 
 ////////////////////////////////////////////////////
 
-NodeInfo::NodeInfo(StateContext * context) :
-        State(context, STATE::NODE_INFO )
+NodeInfo::NodeInfo(StateContext * _context) :
+        State(_context, STATE::NODE_INFO )
 {
-    QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
+    QObject::connect(_context->wallet, &wallet::Wallet::onNodeStatus,
                      this, &NodeInfo::onNodeStatus, Qt::QueuedConnection);
-    QObject::connect(context->wallet, &wallet::Wallet::onLoginResult,
+    QObject::connect(_context->wallet, &wallet::Wallet::onLoginResult,
                      this, &NodeInfo::onLoginResult, Qt::QueuedConnection);
 
-    QObject::connect(context->mwcNode, &node::MwcNode::onMwcOutputLine,
-                     this, &NodeInfo::onMwcOutputLine, Qt::QueuedConnection);
+    QObject::connect(_context->mwcNode, &node::MwcNode::onMwcStatusUpdate,
+                     this, &NodeInfo::onMwcStatusUpdate, Qt::QueuedConnection);
 
     // Checking/update node status every 20 seconds...
     startTimer(3000); // Let's update node info every 60 seconds. By some reasons it is slow operation...
@@ -61,6 +61,9 @@ NodeInfo::~NodeInfo() {
 
 }
 
+QString NodeInfo::getMwcNodeStatus() {
+    return "Embedded mwc node status: " + context->mwcNode->getMwcStatus();
+}
 
 NextStateRespond NodeInfo::execute() {
     if ( context->appContext->getActiveWndState() != STATE::NODE_INFO )
@@ -71,7 +74,6 @@ NextStateRespond NodeInfo::execute() {
                 new wnd::NodeInfo( context->wndManager->getInWndParent(), this));
 
         wnd->setNodeStatus( lastNodeStatus );
-        updateMwcNodeForWnd();
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
@@ -88,7 +90,7 @@ void NodeInfo::onLoginResult(bool ok) {
 
 
 void NodeInfo::timerEvent(QTimerEvent *event) {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 
     timerCounter++;
 
@@ -198,26 +200,13 @@ void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pe
     wnd->setNodeStatus( lastNodeStatus );
 }
 
-void NodeInfo::updateMwcNodeForWnd() {
-    if (wnd!= nullptr) {
-        int lnNum = wnd->getLogLineNumber();
-        QStringList lns;
-        for ( int i = std::max(0, logLines.size() - lnNum); i<logLines.size(); i++ ) {
-            lns.push_back(logLines.at(i));
-        }
 
-        wnd->updateEmbeddedMwcNodeLogs(lns.join("\n"));
+
+void NodeInfo::onMwcStatusUpdate( QString status ) {
+    logger::logInfo("NodeInfo", "embedded mwc-node status: " + status);
+    if (wnd != nullptr) {
+        wnd->updateEmbeddedMwcNodeStatus(getMwcNodeStatus());
     }
-}
-
-
-void NodeInfo::onMwcOutputLine(QString line) {
-    logLines.push_back(line);
-
-    while(logLines.size()>100)
-        logLines.pop_front();
-
-    updateMwcNodeForWnd();
 }
 
 

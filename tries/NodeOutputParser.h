@@ -21,12 +21,18 @@
 namespace tries {
 
 enum class NODE_OUTPUT_EVENT {NONE, MWC_NODE_STARTED,
+        WAITING_FOR_PEERS,
+        INITIAL_CHAIN_HEIGHT,
         // Very first sync events. Archive processing
         MWC_NODE_RECEIVE_HEADER, ASK_FOR_TXHASHSET_ARCHIVE,
         HANDLE_TXHASHSET_ARCHIVE, VERIFY_RANGEPROOFS_FOR_TXHASHSET,
         VERIFY_KERNEL_SIGNATURES,
         // End of sync up (no archive)
-        RECIEVE_BLOCK_HEADERS_START, RECEIVE_BLOCK_START,
+        RECEIVE_BLOCK_START,
+
+        // Finish with syncronization
+        SYNC_IS_DONE,
+
         // Normal Workflow
         RECEIVE_BLOCK_LISTEN,
         // Errors

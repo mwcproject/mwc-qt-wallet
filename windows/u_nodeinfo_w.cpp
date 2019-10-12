@@ -19,6 +19,7 @@
 #include "../control/messagebox.h"
 #include "../dialogs/u_changenode.h"
 #include <QScrollBar>
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
@@ -40,9 +41,10 @@ NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
 
     connectionType = state->getNodeConnection().first.connectionType;
 
+    ui->embeddedNodeStatus->setText( state->getMwcNodeStatus() );
+
     if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL) {
-        ui->embeddedNodeOutputLabel->hide();
-        ui->nodeLogs->hide();
+        ui->embeddedNodeStatus->hide();
     }
 
     showWarning("");
@@ -53,16 +55,12 @@ NodeInfo::~NodeInfo() {
     delete ui;
 }
 
-// How many logs lines are visible
-int NodeInfo::getLogLineNumber() const {
-    // Expected that control is visible...
-    return std::max( 1, (ui->nodeLogs->size().height()-12 + 4 ) / 15 );
-}
 
 // logs to show, multi like output
-void NodeInfo::updateEmbeddedMwcNodeLogs( QString logs ) {
-    ui->nodeLogs->setPlainText(logs);
+void NodeInfo::updateEmbeddedMwcNodeStatus( const QString & status ) {
+    ui->embeddedNodeStatus->setText(status);
 }
+
 // Empty string to hide warning...
 void NodeInfo::showWarning(QString warning) {
     if (currentWarning == warning)
@@ -137,6 +135,8 @@ void NodeInfo::on_refreshButton_clicked() {
 }
 
 void NodeInfo::on_chnageNodeButton_clicked() {
+    state::TimeoutLockObject to( state );
+
     // call dialog the allow to change the
     QPair< wallet::MwcNodeConnection, wallet::WalletConfig > conInfo = state->getNodeConnection();
 

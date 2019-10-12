@@ -34,8 +34,10 @@ class NodeOutputParser;
 namespace node {
 
 // Node management timeouts.
-const int64_t CHECK_NODE_PERIOD = 60 * 1000; // Timer check period. API calls to node will be issued
-const int64_t API_FAILURE_LIMIT = 5; // Restart node anter not happy API calls. Note, in cold storage that will be case
+const int64_t CHECK_NODE_PERIOD = 5 * 1000; // Timer check period. API calls to node will be issued
+const int64_t NODE_OUT_OF_SYNC_FAILURE_LIMIT = 60; // Node ouf of sync and nothing was updated...
+const int64_t NODE_NO_PEERS_FAILURE_LIMITS = 60; // Let's wait 5 minutes before restarts
+
 const int64_t START_TIMEOUT   = 90*1000;
 // messages from NodeOutputParser
 const int64_t MWC_NODE_STARTED_TIMEOUT = 180*1000; // It can take some time to find peers
@@ -72,6 +74,8 @@ public:
     void start( const QString & network );
     void stop();
 
+    QString getMwcStatus() const { return nodeStatusString; }
+
 private:
     QProcess * initNodeProcess( QString network );
 
@@ -83,11 +87,14 @@ private:
     QString getNodeSecret();
 
     void reportNodeFatalError( QString message );
+
+    void updateRunningStatus();
 private:
     virtual void timerEvent(QTimerEvent *event) override;
 
 private: signals:
     void onMwcOutputLine(QString line);
+    void onMwcStatusUpdate(QString status);
 
 private slots:
     void nodeErrorOccurred(QProcess::ProcessError error);
@@ -116,15 +123,22 @@ private:
 
     QVector< QMetaObject::Connection > processConnections; // open connection to mwc713
 
-    int nodeCheckFailCounter = 0;
+    int nodeNoPeersFailCounter = 0;
     int nodeOutOfSyncCounter = 0;
-    int lastKnownHeight = 0;
+    int nodeHeight = 0;
+    int peersMaxHeight = 0;
+    int initChainHeight = 0;
 
     QNetworkAccessManager *nwManager;
 
     tries::NODE_OUTPUT_EVENT lastProcessedEvent = tries::NODE_OUTPUT_EVENT::NONE;
 
     QString nonEmittedOutput;
+
+    QString nodeStatusString;
+    int     txhashsetHeight = 0;
+    int     maxBlockHeight = 0; // backing stopper for getted blocks.
+    bool    syncIsDone = false;
 };
 
 }

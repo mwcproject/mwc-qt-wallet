@@ -39,11 +39,7 @@ public:
 
     void setNodeStatus( const state::NodeStatus & status );
 
-    // How many logs lines are visible
-    int getLogLineNumber() const;
-
-    // logs to show, multi like output
-    void updateEmbeddedMwcNodeLogs( QString logs );
+    void updateEmbeddedMwcNodeStatus( const QString & status );
 private:
     // Empty string to hide warning...
     void showWarning(QString warning);
