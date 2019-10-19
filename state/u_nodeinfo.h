@@ -59,6 +59,8 @@ public:
     void updateNodeConnection( const wallet::MwcNodeConnection & nodeConnect, const wallet::WalletConfig & walletConfig );
 
     QString getMwcNodeStatus();
+
+    node::MwcNode * getMwcNode() const;
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "node_overview.html";}

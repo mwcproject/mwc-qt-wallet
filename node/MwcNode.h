@@ -76,6 +76,11 @@ public:
 
     QString getMwcStatus() const { return nodeStatusString; }
 
+    // Last Many node output lines. There are many of them.
+    // Call from the same thread
+    const QStringList & getOutputLines() const {return outputLines;}
+
+    QString getLogsLocation() const;
 private:
     QProcess * initNodeProcess( QString network );
 
@@ -139,6 +144,9 @@ private:
     int     txhashsetHeight = 0;
     int     maxBlockHeight = 0; // backing stopper for getted blocks.
     bool    syncIsDone = false;
+
+    // Last Many node output lines
+    QStringList outputLines;
 };
 
 }

@@ -45,12 +45,10 @@ private:
     void showWarning(QString warning);
 
 private slots:
-
     void on_refreshButton_clicked();
-
-    void on_chnageNodeButton_clicked();
-
     void onShowNodeConnectionError(QString errorMessage);
+    void on_showLogsButton_clicked();
+    void on_changeNodeButton_clicked();
 
 private:
 signals:

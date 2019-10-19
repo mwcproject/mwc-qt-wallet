@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>949</width>
-    <height>594</height>
+    <width>828</width>
+    <height>470</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,16 +18,16 @@
     <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>1</number>
+    <number>10</number>
    </property>
    <property name="topMargin">
-    <number>1</number>
+    <number>10</number>
    </property>
    <property name="rightMargin">
-    <number>1</number>
+    <number>10</number>
    </property>
    <property name="bottomMargin">
-    <number>1</number>
+    <number>10</number>
    </property>
    <item>
     <spacer name="verticalSpacer_2">
@@ -37,7 +37,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>123</height>
+       <height>0</height>
       </size>
      </property>
     </spacer>
@@ -83,10 +83,10 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <widget class="control::MwcPushButtonNormal" name="chnageNodeButton">
+       <widget class="control::MwcPushButtonNormal" name="changeNodeButton">
         <property name="geometry">
          <rect>
-          <x>405</x>
+          <x>306</x>
           <y>297</y>
           <width>166</width>
           <height>40</height>
@@ -231,10 +231,10 @@
         <widget class="control::MwcLabelLarge" name="statusInfo">
          <property name="geometry">
           <rect>
-           <x>30</x>
-           <y>144</y>
-           <width>103</width>
-           <height>25</height>
+           <x>9</x>
+           <y>132</y>
+           <width>148</width>
+           <height>52</height>
           </rect>
          </property>
          <property name="text">
@@ -242,6 +242,9 @@
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
          </property>
         </widget>
         <widget class="control::MwcLine" name="frame_2">
@@ -363,7 +366,7 @@
        <widget class="control::MwcPushButtonNormal" name="refreshButton">
         <property name="geometry">
          <rect>
-          <x>201</x>
+          <x>513</x>
           <y>297</y>
           <width>166</width>
           <height>40</height>
@@ -506,6 +509,34 @@
          <bool>true</bool>
         </property>
        </widget>
+       <widget class="control::MwcPushButtonNormal" name="showLogsButton">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>297</y>
+          <width>166</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Re-sync your wallet with a full node. Please note, resync process will take time.</string>
+        </property>
+        <property name="text">
+         <string>Status Details</string>
+        </property>
+       </widget>
       </widget>
      </item>
      <item>
@@ -524,57 +555,17 @@
     </layout>
    </item>
    <item>
-    <widget class="QFrame" name="bottomPlaceholder">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="leftMargin">
-       <number>20</number>
-      </property>
-      <property name="topMargin">
-       <number>30</number>
-      </property>
-      <property name="rightMargin">
-       <number>20</number>
-      </property>
-      <property name="bottomMargin">
-       <number>20</number>
-      </property>
-      <item>
-       <widget class="control::MwcLabelNormal" name="embeddedNodeStatus">
-        <property name="text">
-         <string>Embedded node status</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>56</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </widget>
+    </spacer>
    </item>
   </layout>
  </widget>
@@ -590,15 +581,15 @@
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLine</class>
    <extends>QFrame</extends>
    <header>control/MwcFrameWithBorder.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelNormal</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcFrameWithBorder</class>
@@ -607,6 +598,11 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>showLogsButton</tabstop>
+  <tabstop>changeNodeButton</tabstop>
+  <tabstop>refreshButton</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources.qrc"/>
  </resources>

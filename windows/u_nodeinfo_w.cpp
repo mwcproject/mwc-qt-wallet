@@ -20,11 +20,19 @@
 #include "../dialogs/u_changenode.h"
 #include <QScrollBar>
 #include "../state/timeoutlock.h"
+#include "../dialogs/u_mwcnodelogs.h"
 
 namespace wnd {
 
 //static
 QString NodeInfo::lastShownErrorMessage;
+
+static QString toBoldAndYellow(QString text) {
+    if (text == "Ready")
+        return text;
+
+    return "<span style=\" font-weight:900; color:#CCFF33;\">" + text + "</span>";
+}
 
 
 NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
@@ -41,11 +49,10 @@ NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
 
     connectionType = state->getNodeConnection().first.connectionType;
 
-    ui->embeddedNodeStatus->setText( state->getMwcNodeStatus() );
+    if (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL)
+        ui->statusInfo->setText( toBoldAndYellow( state->getMwcNodeStatus() ) );
 
-    if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL) {
-        ui->embeddedNodeStatus->hide();
-    }
+    ui->showLogsButton->setEnabled( connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
 
     showWarning("");
 }
@@ -58,7 +65,8 @@ NodeInfo::~NodeInfo() {
 
 // logs to show, multi like output
 void NodeInfo::updateEmbeddedMwcNodeStatus( const QString & status ) {
-    ui->embeddedNodeStatus->setText(status);
+    if (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL)
+        ui->statusInfo->setText( toBoldAndYellow(status) );
 }
 
 // Empty string to hide warning...
@@ -80,10 +88,6 @@ void NodeInfo::showWarning(QString warning) {
 }
 
 
-static QString toBoldAndYellow(QString text) {
-    return "<span style=\" font-weight:900; color:#CCFF33;\">" + text + "</span>";
-}
-
 void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
     QString warning;
 
@@ -99,10 +103,14 @@ void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
         }
     }
     else {
-        if ( status.nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < status.peerHeight )
-            ui->statusInfo->setText(toBoldAndYellow("Syncing") );
-        else
-            ui->statusInfo->setText("Online");
+        if ( status.nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < status.peerHeight ) {
+            if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL)
+                ui->statusInfo->setText(toBoldAndYellow("Syncing") );
+        }
+        else {
+            if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL)
+                ui->statusInfo->setText("Online");
+        }
 
         if (status.connections <= 0) {
             ui->connectionsInfo->setText( toBoldAndYellow("None") ); // Two offline is confusing and doesn't look good. Let's keep zero and highlight it.
@@ -134,7 +142,16 @@ void NodeInfo::on_refreshButton_clicked() {
     }
 }
 
-void NodeInfo::on_chnageNodeButton_clicked() {
+void NodeInfo::on_showLogsButton_clicked()
+{
+    state::TimeoutLockObject to( state );
+
+    dlg::MwcNodeLogs logsDlg(this, state->getMwcNode() );
+    logsDlg.exec();
+}
+
+void NodeInfo::on_changeNodeButton_clicked()
+{
     state::TimeoutLockObject to( state );
 
     // call dialog the allow to change the
@@ -148,5 +165,3 @@ void NodeInfo::on_chnageNodeButton_clicked() {
 }
 
 }
-
-

@@ -62,7 +62,7 @@ NodeInfo::~NodeInfo() {
 }
 
 QString NodeInfo::getMwcNodeStatus() {
-    return "Embedded mwc node status: " + context->mwcNode->getMwcStatus();
+    return context->mwcNode->getMwcStatus();
 }
 
 NextStateRespond NodeInfo::execute() {
@@ -78,6 +78,11 @@ NextStateRespond NodeInfo::execute() {
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
+
+node::MwcNode * NodeInfo::getMwcNode() const {
+    return context->mwcNode;
+}
+
 
 // After login - let's check the node status
 void NodeInfo::onLoginResult(bool ok) {

@@ -53,6 +53,10 @@ MwcNode::~MwcNode() {
     }
 }
 
+QString MwcNode::getLogsLocation() const {
+    return getMwcNodePath(lastUsedNetwork) + "mwc-server.log";
+}
+
 
 void MwcNode::start( const QString & network ) {
     qDebug() << "MwcNode::start for network " + network;
@@ -256,6 +260,10 @@ void MwcNode::mwcNodeReadyReadStandardOutput() {
             if ( ch=='\r' || ch=='\n' ) {
                 if (!ln.isEmpty()) {
                     emit onMwcOutputLine(ln);
+                    outputLines.push_front(ln);
+                    while( outputLines.size() > 10000 ) // List should be OK with that. It is optimized for head/tail ops.
+                        outputLines.pop_back();
+
                     ln = "";
                 }
             }
@@ -266,6 +274,67 @@ void MwcNode::mwcNodeReadyReadStandardOutput() {
 
         nonEmittedOutput = ln;
     }
+}
+
+enum class SYNC_STATE {GETTING_HEADERS, TXHASHSET_REQUEST, TXHASHSET_GET, VERIFY_RANGEPROOFS_FOR_TXHASHSET, VERIFY_KERNEL_SIGNATURES, GETTING_BLOCKS };
+// return progress in the range [0-1.0]
+static QString calcProgressStr( int initChainHeight , int txhashsetHeight, int peersMaxHeight, SYNC_STATE syncState, int value ) {
+    const double getHeadersShare = 0.2;
+    // Calculating shares for operations. Note, txHash stage is optional.
+    double getTxHashShare, verifyRangeProofsShare, verifyKernelSignaturesShare;
+    if (txhashsetHeight>0) {
+        getTxHashShare = 0.02;
+        double hashSetW = (txhashsetHeight - initChainHeight);
+        double blocksSet = (peersMaxHeight - txhashsetHeight) * 100.0;
+        double txShare = hashSetW / ( hashSetW + blocksSet );
+        double totalShare = (1.0 - getHeadersShare-getTxHashShare);
+        verifyRangeProofsShare = 0.65 * totalShare * txShare;
+        verifyKernelSignaturesShare = 0.35 * totalShare * txShare;
+    }
+    else {
+        getTxHashShare = 0.0;
+        verifyRangeProofsShare = 0.0;
+        verifyKernelSignaturesShare = 0.0;
+    }
+
+    const double gettingBlocksShare = 1.0 - (getHeadersShare + getTxHashShare + verifyRangeProofsShare + verifyKernelSignaturesShare);
+    Q_ASSERT( gettingBlocksShare >= 0.0 );
+
+    double progressRes = 0.0;
+
+    switch( syncState ) {
+        case SYNC_STATE::GETTING_HEADERS: {
+            //
+            progressRes = double(std::max(0, value - initChainHeight)) / double(std::max(1, peersMaxHeight - initChainHeight)) * getHeadersShare  + 0.0;
+            break;
+        }
+        case SYNC_STATE::TXHASHSET_REQUEST:
+            progressRes = getHeadersShare;
+            break;
+        case SYNC_STATE::TXHASHSET_GET:
+            progressRes = getHeadersShare + getTxHashShare;
+            break;
+        case SYNC_STATE::VERIFY_RANGEPROOFS_FOR_TXHASHSET:
+            progressRes = getHeadersShare + getTxHashShare +
+                          double( std::max(0, value-initChainHeight) ) / double( std::max(1, txhashsetHeight-initChainHeight) ) * verifyRangeProofsShare;
+            break;
+        case SYNC_STATE::VERIFY_KERNEL_SIGNATURES:
+            progressRes = getHeadersShare + getTxHashShare + verifyRangeProofsShare +
+                          double( std::max(0, value-initChainHeight) ) / double( std::max(1, txhashsetHeight-initChainHeight) ) * verifyKernelSignaturesShare;
+            break;
+        case SYNC_STATE::GETTING_BLOCKS:
+            progressRes = getHeadersShare + getTxHashShare + verifyRangeProofsShare + verifyKernelSignaturesShare +
+                    double( std::max(0, value - std::max(initChainHeight, txhashsetHeight) )) / double( std::max(1, peersMaxHeight - std::max(initChainHeight, txhashsetHeight)) ) * gettingBlocksShare;
+            break;
+    }
+
+    if (progressRes<0.0)
+        progressRes = 0.0;
+    if (progressRes>1.0)
+        progressRes = 1.0;
+
+
+    return "Syncing " + QString::number( progressRes * 100.0, 'f', 1 ) + "%";
 }
 
 void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString message) {
@@ -281,7 +350,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             break;
         case tries::NODE_OUTPUT_EVENT::WAITING_FOR_PEERS:
             lastProcessedEvent = event;
-            nodeStatusString = "Waiting for peers to join";
+            nodeStatusString = "Waiting for peers";
             emit onMwcStatusUpdate(nodeStatusString);
             break;
 
@@ -295,7 +364,6 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             if (idx1>0 && idx2>0) {
                 idx1 += strlen(" @ ");
                 initChainHeight = message.mid(idx1, idx2-idx1).trimmed().toInt();
-                maxBlockHeight = initChainHeight;
             }
             break;
         }
@@ -320,15 +388,14 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
                     int pos = heightInfo.lastIndexOf(' ');
                     if (pos > 0) {
                         height = heightInfo.mid(pos + 1).toInt();
+
+                        initChainHeight = std::min(initChainHeight, height);
                     }
                 }
 
-                nodeStatusString = "Step 1 of 3, getting headers...";
+                nodeStatusString = "Getting headers";
                 if (height > 0 && peersMaxHeight > 0)
-                    nodeStatusString +=
-                            " " + QString::number(double(std::max(0, height - initChainHeight)) /
-                                                  double(std::max(1, peersMaxHeight - initChainHeight)) * 100.0, 'f',
-                                                  1) + "%";
+                    nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::GETTING_HEADERS, height );
 
                 emit onMwcStatusUpdate(nodeStatusString);
             }
@@ -354,7 +421,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
                 }
             }
 
-            nodeStatusString = "Step 2 of 3, requesting txhashset archive... 0.5%";
+            nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::TXHASHSET_REQUEST, 0 );
             emit onMwcStatusUpdate(nodeStatusString);
             break;
         }
@@ -369,7 +436,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             nodeOutOfSyncCounter = 0;
 
             if (! message.contains("DONE") ) {
-                nodeStatusString = "Step 2 of 3, extracting txhashset archive... 2.5%";
+                nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::TXHASHSET_GET, 0 );
                 emit onMwcStatusUpdate(nodeStatusString);
             }
             break;
@@ -387,8 +454,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
 
             int handledH = message.trimmed().toInt();
             if (handledH>0 && handledH<txhashsetHeight) {
-                double progress = 5.0 + double( std::max(0, handledH-initChainHeight) ) / double( std::max(1, txhashsetHeight-initChainHeight) ) * 60.0; // 5-65 range
-                nodeStatusString = "Step 2 of 3, verifying rangeproofs... " + QString::number(progress, 'f', 1) + "%";
+                nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::VERIFY_RANGEPROOFS_FOR_TXHASHSET, handledH );
                 emit onMwcStatusUpdate(nodeStatusString);
             }
             break;
@@ -405,8 +471,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
 
             int handledH = message.trimmed().toInt();
             if (handledH>0 && handledH<txhashsetHeight) {
-                double progress = 65.0 + double( std::max(0, handledH-initChainHeight) ) / double( std::max(1, txhashsetHeight-initChainHeight) ) * 35.0; // 65-100 range
-                nodeStatusString = "Step 2 of 3, verifying kernels... " + QString::number(progress, 'f', 1) + "%";
+                nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::VERIFY_KERNEL_SIGNATURES, handledH );
                 emit onMwcStatusUpdate(nodeStatusString);
             }
             break;
@@ -430,15 +495,14 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
                     idx1 += strlen("at ");
                     int handledH = message.mid(idx1, idx2 - idx1).toInt();
 
+                    initChainHeight = std::min(initChainHeight, handledH);
+
                     if (handledH>maxBlockHeight) {
                         maxBlockHeight = handledH;
+
                         if (handledH > 0 && handledH >= txhashsetHeight && handledH < peersMaxHeight) {
-                            double progress =
-                                    double( std::max(0, handledH - std::max(initChainHeight, txhashsetHeight) )) /
-                                        double( std::max(1, peersMaxHeight - std::max(initChainHeight, txhashsetHeight)) ) *
-                                    100.0;
-                            nodeStatusString = "Step 3 of 3, getting blocks... " + QString::number(progress, 'f', 1) + "%";
-                            emit onMwcStatusUpdate(nodeStatusString);
+                                nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::GETTING_BLOCKS, handledH );
+                                emit onMwcStatusUpdate(nodeStatusString);
                         }
                     }
                 }
@@ -475,6 +539,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             if (idx1 > 0 && idx2 > 0) {
                 idx1 += strlen("at ");
                 int handledH = message.mid(idx1, idx2 - idx1).toInt();
+                initChainHeight = std::min(initChainHeight, handledH);
 
                 if (handledH > maxBlockHeight) {
                     maxBlockHeight = handledH;
@@ -488,7 +553,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Embedded mwc-node experiencing network issues" );
             nextTimeLimit += int64_t(NETWORK_ISSUES * config::getTimeoutMultiplier());
 
-            nodeStatusString = "Unable connect to peers. Waiting for peers to connect...";
+            nodeStatusString = "Waiting for peers";
             emit onMwcStatusUpdate(nodeStatusString);
 
             break;
@@ -514,9 +579,9 @@ void MwcNode::updateRunningStatus() {
 
     // tolerance - two blocks
     if (maxBlockHeight >= peersMaxHeight - 2) {
-        newStatus = "In sync and running...";
+        newStatus = "Ready";
     } else {
-        newStatus = "Running and waiting for " + QString::number(peersMaxHeight - maxBlockHeight) + " top blocks...";
+        newStatus = "waiting for " + QString::number(peersMaxHeight - maxBlockHeight) + " top blocks...";
     }
 
     if (nodeStatusString != newStatus) {
@@ -636,7 +701,7 @@ void MwcNode::replyFinished(QNetworkReply* reply) {
                 updateRunningStatus();
 
             if (nodeStatusString.contains("peers")) {
-                nodeStatusString = "Connected to " + QString::number(jsonRespond.size()) + " peers, waiting for data...";
+                nodeStatusString = "Found " + QString::number(jsonRespond.size()) + " peers";
                 emit onMwcStatusUpdate(nodeStatusString);
             }
         }
