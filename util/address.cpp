@@ -91,7 +91,7 @@ static QPair<bool, ADDRESS_TYPE> checkMwcMqAddress( QString address ) {
     }
     else {
         // Checking the prefix
-        if (!( address[0] == 'g' || address[0] == 'x' ))
+        if (!( address[0] == 'q' || address[0] == 'x' ))
             return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
     }
 
