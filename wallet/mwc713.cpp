@@ -1230,7 +1230,29 @@ void MWC713::mwc713readyReadStandardOutput() {
     QString str( ioutils::FilterEscSymbols( mwc713process->readAllStandardOutput() ) );
     qDebug() << "Get output:" << str;
     logger::logMwc713out(str);
-    inputParser->processInput(str);
+
+    // Let's filter out the possible prompt from the editor it can be located anywhere
+    // To filter out:  'wallet713>'
+    auto lns = str.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+
+    QString filteredStr;
+    for (auto ln : lns) {
+        if (ln.startsWith("wallet713>"))
+            ln = ln.mid(strlen("wallet713>")).trimmed();
+
+        if (!filteredStr.isEmpty())
+            filteredStr += "\n";
+        filteredStr += ln;
+    }
+
+    if (str.size()>0 && (str[0] == '\n' || str[0] == '\r') )
+        filteredStr = "\n" + filteredStr;
+
+    if ( str.size()>0 && (str[str.size()-1] == '\n' || str[str.size()-1] == '\r') ) {
+        filteredStr += "\n";
+    }
+
+    inputParser->processInput(filteredStr);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////

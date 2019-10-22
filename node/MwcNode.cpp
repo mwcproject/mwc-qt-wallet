@@ -30,6 +30,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "MwcNodeConfig.h"
+#include <QTimer>
 
 namespace node {
 
@@ -229,10 +230,36 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
         nodeProcess = nullptr;
     }
 
-    reportNodeFatalError( "mwc-node process exited due some unexpected error. The exit code: " + QString::number(exitCode) + "\n\n"
+    stop();
+
+    if (restartCounter<2) {
+        MwcNodeConfig mainnetConfig = getCurrentMwcNodeConfig( "Mainnet" );
+        MwcNodeConfig floonetConfig = getCurrentMwcNodeConfig( "Floonet" );
+
+        // Let's request other embedded local node to stop. There is a high chance that it is running and take the port.
+        if (!mainnetConfig.secret.isEmpty())
+            sendRequest( "StopMainNet", mainnetConfig.secret, "/v1/status?action=stop_node", REQUEST_TYPE::POST);
+
+        if (!floonetConfig.secret.isEmpty())
+            sendRequest( "StopFlooNet", floonetConfig.secret, "/v1/status?action=stop_node", REQUEST_TYPE::POST);
+
+        restartCounter++;
+
+        // restart the node in 2 seconds
+        QTimer::singleShot( 1000*2, this, &MwcNode::onRestartNode );
+    }
+    else {
+        reportNodeFatalError( "mwc-node process exited due some unexpected error. The exit code: " + QString::number(exitCode) + "\n\n"
                               "Please check if another instance of mwc-node is already running. In this case please terminate that process, or just reboot your computer.\n\n"
                               "If reboot doesn't help, please try to clean up mwc-node data at\n" + nodeWorkDir);
+    }
 }
+
+// One short timer to restart the node. Usinng instead of sleep
+void MwcNode::onRestartNode() {
+    start( lastUsedNetwork );
+}
+
 
 void MwcNode::mwcNodeReadyReadStandardError() {
     qDebug() << "get mwcNodeReadyReadStandardError call !!!";
@@ -627,7 +654,7 @@ void MwcNode::timerEvent(QTimerEvent *event) {
 
 // Very simple request. No params, no body, no ssl
 void MwcNode::sendRequest( const QString & tag, QString secret,
-                const QString & api) {
+                const QString & api, REQUEST_TYPE reqType) {
 
     QString url = "http://localhost:13413" + api;
 
@@ -647,7 +674,14 @@ void MwcNode::sendRequest( const QString & tag, QString secret,
     QString headerData = "Basic " + data;
     request.setRawHeader("Authorization", headerData.toLocal8Bit());
 
-    QNetworkReply *reply = nwManager->get(request);
+    QNetworkReply *reply = nullptr;
+    if (reqType == REQUEST_TYPE::GET) {
+        reply = nwManager->get(request);
+    }
+    else {
+        // So far body is allways empty for us
+        reply = nwManager->post(request, QByteArray() );
+    }
     Q_ASSERT(reply);
 
     if (reply) {

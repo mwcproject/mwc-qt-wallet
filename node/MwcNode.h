@@ -87,7 +87,8 @@ private:
     void nodeProcDisconnect();
     void nodeProcConnect(QProcess * process);
 
-    void sendRequest( const QString & tag, QString secret, const QString & api);
+    enum class REQUEST_TYPE { GET, POST };
+    void sendRequest( const QString & tag, QString secret, const QString & api, REQUEST_TYPE reqType = REQUEST_TYPE::GET);
 
     QString getNodeSecret();
 
@@ -111,6 +112,8 @@ private slots:
 
     void nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString message);
 
+    // One short timer to restart the node. Usinng instead of sleep
+    void onRestartNode();
 private:
     core::AppContext *appContext; // app context to store current account name
 
@@ -147,6 +150,10 @@ private:
 
     // Last Many node output lines
     QStringList outputLines;
+
+    // Will try to restart the node several times.
+    // The reason that because of another instance is running
+    int restartCounter = 0;
 };
 
 }
