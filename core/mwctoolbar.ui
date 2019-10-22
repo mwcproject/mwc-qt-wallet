@@ -222,7 +222,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>17</height>
+         <height>18</height>
         </size>
        </property>
        <property name="checkable">
@@ -269,7 +269,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>17</height>
+         <height>18</height>
         </size>
        </property>
        <property name="checkable">
@@ -316,7 +316,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>17</height>
+         <height>18</height>
         </size>
        </property>
        <property name="checkable">
@@ -363,7 +363,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>17</height>
+         <height>18</height>
         </size>
        </property>
        <property name="checkable">
@@ -410,7 +410,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>17</height>
+         <height>18</height>
         </size>
        </property>
        <property name="checkable">
@@ -457,7 +457,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>17</height>
+         <height>18</height>
         </size>
        </property>
        <property name="checkable">

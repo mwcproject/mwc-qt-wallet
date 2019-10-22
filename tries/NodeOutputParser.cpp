@@ -40,6 +40,7 @@ QString toString(NODE_OUTPUT_EVENT event) {
         case NODE_OUTPUT_EVENT::NETWORK_ISSUES:  return "NETWORK_ISSUES";
         case NODE_OUTPUT_EVENT::ADDRESS_ALREADY_IN_USE:  return "ADDRESS_ALREADY_IN_USE";
     }
+    return "UNKNOWN_NODE_OUTPUT_EVENT";
 }
 
 
