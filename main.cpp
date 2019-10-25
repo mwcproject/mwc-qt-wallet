@@ -78,7 +78,9 @@ bool deployWalletFilesFromResources() {
 }
 
 // Read configs
-bool readConfig(QApplication & app) {
+// first - success flag
+// second - error message
+QPair<bool, QString> readConfig(QApplication & app) {
     QCoreApplication::setApplicationName("mwc-qt-wallet");
     QCoreApplication::setApplicationVersion("v0.1");
 
@@ -107,7 +109,7 @@ bool readConfig(QApplication & app) {
     util::ConfigReader reader;
     if ( !reader.readConfig(config) ) {
         qDebug() << "Failed to read config file " << config;
-        return false;
+        return QPair<bool, QString>(false, "Unable to parse config file " + config);
     }
 
     QString mwc_path = reader.getString("mwc_path");
@@ -120,6 +122,15 @@ bool readConfig(QApplication & app) {
     QString timeoutMultiplier = reader.getString("timeoutMultiplier");
     bool useMwcMqS = reader.getString("useMwcMqS") != "false";  // Default expected to be 'true'
     QString sendTimeoutMsStr = reader.getString("send_online_timeout_ms");
+
+    QString runningMode = reader.getString("running_mode");
+    if (runningMode.isEmpty())
+        runningMode = "online_wallet";
+
+    QPair<bool, config::WALLET_RUN_MODE> runMode = config::runModeFromString(runningMode);
+    if (!runMode.first) {
+        return QPair<bool, QString>(false, "Found invalid value for 'running_mode'");
+    }
 
     int sendTimeoutMs = sendTimeoutMsStr.toInt();
     if (sendTimeoutMs<=0)
@@ -142,7 +153,7 @@ bool readConfig(QApplication & app) {
 
     if ( mwc_path.isEmpty() || wallet713_path.isEmpty() || main_style_sheet.isEmpty() || dialogs_style_sheet.isEmpty() || airdropUrlMainNet.isEmpty() || airdropUrlTestNet.isEmpty() ) {
         qDebug() << "Failed to read all expected data from config file " << config;
-        return false;
+        return QPair<bool, QString>(false, "Not found all expected fields at config file " + config);
     }
 
     if (wallet713_path == "build in") {
@@ -159,8 +170,9 @@ bool readConfig(QApplication & app) {
 #endif
     }
 
-    config::setConfigData( mwc_path, wallet713_path, main_style_sheet, dialogs_style_sheet, airdropUrlMainNet, airdropUrlTestNet, logoutTimeout*1000L, timeoutMultiplierVal, useMwcMqS, sendTimeoutMs );
-    return true;
+    Q_ASSERT(runMode.first);
+    config::setConfigData( runMode.second, mwc_path, wallet713_path, main_style_sheet, dialogs_style_sheet, airdropUrlMainNet, airdropUrlTestNet, logoutTimeout*1000L, timeoutMultiplierVal, useMwcMqS, sendTimeoutMs );
+    return QPair<bool, QString>(true, "");
 }
 
 int main(int argc, char *argv[])
@@ -256,8 +268,9 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        if (!readConfig(app) ) {
-            QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read configuration");
+        QPair<bool, QString> readConfRes = readConfig(app);
+        if (! readConfRes.first ) {
+            QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read configuration.\n" + readConfRes.second );
             return 1;
         }
 

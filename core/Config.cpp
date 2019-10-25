@@ -16,6 +16,7 @@
 
 namespace config {
 
+static WALLET_RUN_MODE runMode = WALLET_RUN_MODE::ONLINE_WALLET;
 static QString mwc713conf;
 static QString mwcGuiWalletConf;
 static QString mwcPath;
@@ -29,6 +30,22 @@ static int64_t logoutTimeMs = 1000*60*15; // 15 minutes is default
 static double  timeoutMultiplier = 1.0;
 static bool    useMwcMqS = true;
 static int     sendTimeoutMs = 60000; // 1 minute
+
+
+QPair<bool, WALLET_RUN_MODE> runModeFromString(QString str) {
+    if (str == "online_wallet")
+        return QPair<bool, WALLET_RUN_MODE>(true, WALLET_RUN_MODE::ONLINE_WALLET);
+    else if (str == "online_node")
+        return QPair<bool, WALLET_RUN_MODE>(true, WALLET_RUN_MODE::ONLINE_NODE);
+    else if (str == "cold_wallet")
+        return QPair<bool, WALLET_RUN_MODE>(true, WALLET_RUN_MODE::COLD_WALLET);
+    else
+        return QPair<bool, WALLET_RUN_MODE>(false, WALLET_RUN_MODE::ONLINE_WALLET);
+}
+bool isOnlineWallet() {return runMode == WALLET_RUN_MODE::ONLINE_WALLET;}
+bool isOnlineNode()   {return runMode == WALLET_RUN_MODE::ONLINE_NODE;}
+bool isColdWallet()   {return runMode == WALLET_RUN_MODE::COLD_WALLET;}
+
 
 void setMwc713conf( QString conf ) {
     mwc713conf = conf;
@@ -50,13 +67,14 @@ void setMwcGuiWalletConf( QString conf ) {
  * @param useMwcMqS             - true: use mwc mqs for slates exchange.  false: using mwc mq (non secure grin box) for slates exchange
  * @param sendTimeoutMs         - timeout for mwc mq send. Expected that 2nd party is online. Otherwise we will ask user if he want to stop waiting and cancel transaction.
  */
-void setConfigData(QString _mwcPath, QString _wallet713path,
+void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet713path,
                    QString _mainStyleSheetPath, QString _dialogsStyleSheetPath,
                    QString _airdropUrlMainNetUrl, QString _airdropUrlTestNetUrl,
                    int64_t  _logoutTimeMs,
                    double _timeoutMultiplier,
                    bool _useMwcMqS,
                    int _sendTimeoutMs) {
+    runMode = _runMode;
     mwcPath = _mwcPath;
     wallet713path = _wallet713path;
     mainStyleSheetPath = _mainStyleSheetPath;
