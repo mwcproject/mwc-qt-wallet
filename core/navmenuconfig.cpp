@@ -14,22 +14,37 @@
 
 #include <state/state.h>
 #include "navmenuconfig.h"
-#include "ui_navmenuconfig.h"
+#include "ui_navmenuconfigwallet.h"
+#include "ui_navmenuconfignode.h"
 #include "../state/statemachine.h"
 #include "../core/appcontext.h"
+#include "../core/Config.h"
 #include "../control/messagebox.h"
 
 namespace core {
 
 NavMenuConfig::NavMenuConfig(QWidget *parent, state::StateContext * _context ) :
         NavMenu(parent),
-        ui(new Ui::NavMenuConfig),
         context(_context) {
-    ui->setupUi(this);
+
+    if (config::isOnlineNode()) {
+        uiNode = new Ui::NavMenuConfigNode;
+        uiNode->setupUi(this);
+
+    }
+    else {
+        uiWallet = new Ui::NavMenuConfigWallet;
+        uiWallet->setupUi(this);
+
+    }
 }
 
 NavMenuConfig::~NavMenuConfig() {
-    delete ui;
+    if (uiWallet)
+        delete uiWallet;
+
+    if (uiNode)
+        delete uiNode;
 }
 
 void NavMenuConfig::on_walletConfigButton_clicked()

@@ -41,6 +41,7 @@
 #include "../util/Process.h"
 #include "../node/MwcNodeConfig.h"
 #include "../node/MwcNode.h"
+#include <QCoreApplication>
 
 namespace wallet {
 
@@ -67,19 +68,17 @@ bool MWC713::checkWalletInitialized() {
 
     qDebug() << "checkWalletState with " << mwc713Path << " and " << mwc713configPath;
 
-    QProcess * process = initMwc713process( {}, {"state"}, false );
+    Q_ASSERT(mwc713process==nullptr);
+    mwc713process = initMwc713process( {}, {"state"}, false );
 
-    if (process==nullptr)
-        return false; // error expected to be reported by initMwc713process
-
-    if (!util::processWaitForFinished( process, 20000, "mwc713")) {
-        appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to invalidate the status.\nPath: " + mwc713Path + "\nConfig:" + mwc713configPath );
-        return false;
+    if (!util::processWaitForFinished( mwc713process, 3000, "mwc713")) {
+        mwc713process->terminate();
+        util::processWaitForFinished( mwc713process, 3000, "mwc713");
     }
 
-    QString output = process->readAll();
+    QString output = mwc713process->readAll();
 
-    delete process;
+    processStop(false);
 
     bool uninit = output.contains("Uninitialized");
 
@@ -95,6 +94,8 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
     QProcess * process = new QProcess();
     process->setProcessChannelMode(QProcess::MergedChannels);
     process->setWorkingDirectory( QDir::homePath() );
+
+    mwc713connect(process, trackProcessExit);
 
     if (!envVariables.isEmpty()) {
         Q_ASSERT(envVariables.size()%2==0);
@@ -134,8 +135,6 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
                 return nullptr;
         }
     }
-
-    mwc713connect(process, trackProcessExit);
 
     return process;
 }
@@ -353,8 +352,9 @@ void MWC713::processStop(bool exitNicely) {
             qDebug() << "start exiting...";
             executeMwc713command("exit", "");
 
-            if (!util::processWaitForFinished( mwc713process, 10000, "mwc713")) {
+            if (!util::processWaitForFinished( mwc713process, 5000, "mwc713")) {
                 mwc713process->terminate();
+                util::processWaitForFinished( mwc713process, 5000, "mwc713");
             }
             qDebug() << "mwc713 is exited";
         }
@@ -379,7 +379,7 @@ void MWC713::processStop(bool exitNicely) {
         eventCollector = nullptr;
     }
 
-
+    QCoreApplication::processEvents();
 }
 
 // Check signal: onLoginResult(bool ok)
@@ -597,6 +597,12 @@ void MWC713::receiveFile( QString fileTx)  {
 // Check signal:  onFinalizeFile
 void MWC713::finalizeFile( QString fileTxResponse )  {
     eventCollector->addTask( new TaskFinalizeFile(this, fileTxResponse), TaskFinalizeFile::TIMEOUT );
+}
+
+// submit finalized transaction. Make sense for cold storage => online node operation
+// Check Signal: onSubmitFile(bool ok, String message)
+void MWC713::submitFile( QString fileTx ) {
+    eventCollector->addTask( new TaskSubmitFile(this, fileTx), TaskSubmitFile::TIMEOUT );
 }
 
 // Get total number of Outputs
@@ -1056,6 +1062,15 @@ void MWC713::setFinalizeFile( bool success, QStringList errors, QString fileName
     emit onFinalizeFile( success, errors, fileName);
 }
 
+void MWC713::setSubmitFile(bool success, QString message, QString fileName) {
+    if (success) {
+        appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, QString("Published transaction for " + fileName));
+    }
+
+    logger::logEmit( "MWC713", "setSubmitFile", "success="+QString::number(success) );
+    emit onSubmitFile(success, message, fileName);
+}
+
 // Transactions
 void MWC713::updateTransactionCount(QString account, int number) {
     logger::logEmit( "MWC713", "onTransactionCount", "number=" + QString::number(number) );
@@ -1188,10 +1203,9 @@ void MWC713::mwc713errorOccurred(QProcess::ProcessError error) {
 
     qDebug() << "ERROR OCCURRED. Error = " << error;
 
-    if (mwc713process) {
-        mwc713process->deleteLater();
-        mwc713process = nullptr;
-    }
+    processStop(false);
+
+    Q_ASSERT( mwc713process == nullptr);
 
     appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
                                "mwc713 process exited. Process error: "+ QString::number(error) );
@@ -1199,17 +1213,18 @@ void MWC713::mwc713errorOccurred(QProcess::ProcessError error) {
 }
 
 void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
-    logger::logMwc713out("Exit with exit code " + QString::number(exitCode) + ", Exit status:" + QString::number(exitStatus) );
+    if (startedMode == STARTED_MODE::OFFLINE) {
+        logger::logMwc713out("Exit with exit code " + QString::number(exitCode) + ", Exit status:" + QString::number(exitStatus) );
 
-    qDebug() << "mwc713 is exiting with exit code " << exitCode << ", exitStatus=" << exitStatus;
+        qDebug() << "mwc713 is exiting with exit code " << exitCode << ", exitStatus=" << exitStatus;
 
-    if (mwc713process) {
-        mwc713process->deleteLater();
-        mwc713process = nullptr;
+        appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
+                                   "mwc713 process exited due some unexpected error. mwc713 exit code: " + QString::number(exitCode) );
     }
 
-    appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
-                               "mwc713 process exited due some unexpected error. mwc713 exit code: " + QString::number(exitCode) );
+    processStop(false);
+
+    Q_ASSERT( mwc713process == nullptr );
 }
 
 void MWC713::mwc713readyReadStandardError() {
@@ -1335,7 +1350,8 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
             continue; // skipping empty lines
 
         if (ln.startsWith("wallet713_data_path") || ln.startsWith("keybase_binary") || ln.startsWith("mwcmq_domain") || ln.startsWith("mwcmqs_domain") ||
-                                ln.startsWith("mwc_node_uri") || ln.startsWith("mwc_node_secret") || ln.startsWith("chain") ) {
+                                ln.startsWith("mwc_node_uri") || ln.startsWith("mwc_node_secret") || ln.startsWith("chain") ||
+                                ln.startsWith("grinbox_listener_auto_start") || ln.startsWith("keybase_listener_auto_start") ) {
             continue; // skippping the line. Will apply later
         }
         else {
@@ -1387,6 +1403,10 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
         }
     }
 
+    if (config::isOnlineNode()) {
+        newConfLines.append("grinbox_listener_auto_start = false");
+        newConfLines.append("keybase_listener_auto_start = false");
+    }
 
     // Escape back slashes for toml
     for (auto & ln : newConfLines) {

@@ -21,6 +21,8 @@
 #include <QScrollBar>
 #include "../state/timeoutlock.h"
 #include "../dialogs/u_mwcnodelogs.h"
+#include "../core/Config.h"
+#include <QFileDialog>
 
 namespace wnd {
 
@@ -44,6 +46,8 @@ NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
 
     ui->warningLine->hide();
 
+    ui->progress->initLoader(false);
+
     // Need simulate post message. Using events for that
     connect(this, &NodeInfo::showNodeConnectionError, this,  &NodeInfo::onShowNodeConnectionError, Qt::QueuedConnection );
 
@@ -53,6 +57,15 @@ NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
         ui->statusInfo->setText( toBoldAndYellow( state->getMwcNodeStatus() ) );
 
     ui->showLogsButton->setEnabled( connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
+
+    if ( !config::isOnlineWallet() )
+        ui->onlineWalletBtns->hide();
+
+    if ( !config::isOnlineNode() )
+        ui->onlineNodeBtns->hide();
+
+    if ( !config::isColdWallet() )
+        ui->coldWalletBtns->hide();
 
     showWarning("");
 }
@@ -97,9 +110,12 @@ void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
         ui->heightInfo->setText("-");
         ui->difficultyInfo->setText("-");
 
-         if (lastShownErrorMessage != status.errMsg) {
-             emit showNodeConnectionError(status.errMsg);
-             lastShownErrorMessage = status.errMsg;
+        // Don't show message for the local because starting local node might take a while. Error likely will be recoverable
+        if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL ) {
+            if (lastShownErrorMessage != status.errMsg) {
+                 emit showNodeConnectionError(status.errMsg);
+                 lastShownErrorMessage = status.errMsg;
+            }
         }
     }
     else {
@@ -142,13 +158,16 @@ void NodeInfo::on_refreshButton_clicked() {
     }
 }
 
-void NodeInfo::on_showLogsButton_clicked()
-{
+void NodeInfo::showNodeLogs() {
     state::TimeoutLockObject to( state );
 
     dlg::MwcNodeLogs logsDlg(this, state->getMwcNode() );
     logsDlg.exec();
 }
+
+void NodeInfo::on_showLogsButton_clicked() { showNodeLogs(); }
+void NodeInfo::on_showLogsButton_5_clicked() { showNodeLogs(); }
+void NodeInfo::on_showLogsButton_8_clicked() { showNodeLogs(); }
 
 void NodeInfo::on_changeNodeButton_clicked()
 {
@@ -163,5 +182,52 @@ void NodeInfo::on_changeNodeButton_clicked()
         state->updateNodeConnection( changeNodeDlg.getNodeConnectionConfig(), conInfo.second );
     }
 }
+
+void NodeInfo::hideProgress() {
+    ui->progress->hide();
+}
+
+void NodeInfo::on_saveBlockchianData_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Blockchain Data"),
+                                                       state->getBlockchainDataPath(),
+                                                       tr("MWC Blockchain Data (*.mwcblc)"));
+
+    if (fileName.length()==0)
+          return;
+
+    ui->progress->show();
+    state->updateBlockchainDataPath( QFileInfo(fileName).absolutePath() );
+    state->saveBlockchainData(fileName);
+}
+
+void NodeInfo::on_loadBlockchainData_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Blockchain Data"),
+                                                       state->getBlockchainDataPath(),
+                                                       tr("MWC Blockchain Data (*.mwcblc)"));
+
+    if (fileName.length()==0)
+          return;
+
+    ui->progress->show();
+    state->updateBlockchainDataPath( QFileInfo(fileName).absolutePath() );
+    state->loadBlockchainData(fileName);
+}
+
+void NodeInfo::on_publishTransaction_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Blockchain Data"),
+                                                       state->getPublishTransactionPath(),
+                                                       tr("MWC transaction (*.mwctx)"));
+
+    if (fileName.length()==0)
+          return;
+
+    ui->progress->show();
+    state->updatePublishTransactionPath( QFileInfo(fileName).absolutePath() );
+    state->publishTransaction(fileName);
+}
+
 
 }

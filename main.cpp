@@ -294,8 +294,8 @@ int main(int argc, char *argv[])
         // We assuming that everything runs from normal install and architectures of mwc713 and mwc-qt-wallet
         // are the same.
         QString runningArc = util::getBuildArch();
-        wallet::WalletConfig config = wallet::MWC713::readWalletConfig();
-        QString walletDataPath = config.getDataPath();
+        wallet::WalletConfig walletConfig = wallet::MWC713::readWalletConfig();
+        QString walletDataPath = walletConfig.getDataPath();
         while (true) {
             QString arch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDataPath).second;
 
@@ -324,8 +324,28 @@ int main(int argc, char *argv[])
             }
         }
 
-        if (walletDataPath != config.getDataPath()) {
-            config.updateDataPath(walletDataPath);
+        // Prepare wallet to run as online Node
+        if (config::isOnlineNode())
+        {
+            QString network = walletConfig.getNetwork();
+            // mwc713 should run without any password with some account.
+            // Account not expected for use, so no protection is needed. Instead will use the special directory for that
+            walletDataPath = QString("tmp") + QDir::separator() + "online_node_wallet"  + QDir::separator() + network;
+
+            // Node must be embedded local.
+            wallet::MwcNodeConnection mwcNodeConnection = appContext.getNodeConnection( network );
+            if ( !mwcNodeConnection.isLocalNode() ) {
+                mwcNodeConnection.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
+                appContext.updateMwcNodeConnection(walletConfig.getNetwork(), mwcNodeConnection );
+            }
+
+            // Start page will be always the node status
+            appContext.setActiveWndState( state::STATE::NODE_INFO );
+        }
+
+
+        if (walletDataPath != walletConfig.getDataPath()) {
+            walletConfig.updateDataPath(walletDataPath);
         }
 
         if (!util::acquireAppGlobalLock() )
@@ -339,7 +359,7 @@ int main(int argc, char *argv[])
         // Update Node
         node::MwcNode * mwcNode = new node::MwcNode( config::getMwcpath(), &appContext );
 
-        wallet::MWC713::saveWalletConfig( config, &appContext, mwcNode );
+        wallet::MWC713::saveWalletConfig( walletConfig, &appContext, mwcNode );
 
         //main window has delete on close flag. That is why need to
         // create dynamically. Window will be deleted on close

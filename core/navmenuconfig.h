@@ -19,7 +19,8 @@
 #include "navmenu.h"
 
 namespace Ui {
-class NavMenuConfig;
+class NavMenuConfigWallet;
+class NavMenuConfigNode;
 }
 
 
@@ -50,7 +51,8 @@ private slots:
     void on_nodeOverviewButton_clicked();
 
 private:
-    Ui::NavMenuConfig *ui;
+    Ui::NavMenuConfigWallet *uiWallet = nullptr;
+    Ui::NavMenuConfigNode   *uiNode = nullptr;
     state::StateContext * context = nullptr;
 };
 

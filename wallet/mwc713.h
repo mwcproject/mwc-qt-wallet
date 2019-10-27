@@ -215,6 +215,10 @@ public:
     // Check signal:  onFinalizeFile
     virtual void finalizeFile( QString fileTxResponse )  override;
 
+    // submit finalized transaction. Make sense for cold storage => online node operation
+    // Check Signal: onSubmitFile(bool ok, String message)
+    virtual void submitFile( QString fileTx ) override;
+
 
     // Send some coins to address.
     // Before send, wallet always do the switch to account to make it active
@@ -306,6 +310,7 @@ public:
     void setSendFileResult( bool success, QStringList errors, QString fileName );
     void setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
     void setFinalizeFile( bool success, QStringList errors, QString fileName );
+    void setSubmitFile(bool success, QString message, QString fileName);
 
     // Transactions
     void updateTransactionCount(QString account, int number);

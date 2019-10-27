@@ -80,7 +80,7 @@ bool TaskInit::processTask(const QVector<WEvent> & events) {
 //////////////////////////////////////////////////
 // TaskStop
 bool TaskStop::processTask(const QVector<WEvent> &events) {
-    Q_UNUSED(events);
+    Q_UNUSED(events)
     wallet713->processStop(true);
     return true;
 }
@@ -125,7 +125,7 @@ bool TaskInitW::processTask(const QVector<WEvent> & events) {
 //   TaskInitWpressEnter
 
 bool TaskInitWpressEnter::processTask(const QVector<WEvent> & events) {
-    Q_UNUSED(events);
+    Q_UNUSED(events)
     return true;
 }
 
@@ -133,7 +133,7 @@ bool TaskInitWpressEnter::processTask(const QVector<WEvent> & events) {
 //  TaskLogout
 
 bool TaskLogout::processTask(const QVector<WEvent> & events) {
-    Q_UNUSED(events);
+    Q_UNUSED(events)
     wallet713->logout(false); // async call because task is already async and called from input thread
     return true;
 }
@@ -187,7 +187,7 @@ bool TaskNodeInfo::processTask(const QVector<WEvent> & events) {
 
     int peerHeight = 0; // max from all peers
 
-    for ( const auto evt : events ) {
+    for ( const auto & evt : events ) {
         if (evt.event != WALLET_EVENTS::S_LINE)
             continue;
 
@@ -240,6 +240,29 @@ bool TaskNodeInfo::processTask(const QVector<WEvent> & events) {
     wallet713->setNodeStatus( height>=0 && difficulty>=0 && connections>=0, errors, height, peerHeight, difficulty, connections );
     return true;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+//    TaskSubmitFile
+
+bool TaskSubmitFile::processTask(const QVector<WEvent> & events) {
+
+    // Just show the respond. There is not much what we can do...
+    QString respondStr;
+
+    QVector<WEvent> lines = filterEvents(events, WALLET_EVENTS::S_LINE);
+    for (WEvent ln : lines) {
+        if (!respondStr.isEmpty())
+            respondStr += "\n";
+
+        respondStr += ln.message;
+    }
+
+    // TODO: Never see success so far, but really need to provide correct value
+    wallet713->setSubmitFile( false, respondStr, fileTx );
+    return true;
+}
+
+
 
 
 }

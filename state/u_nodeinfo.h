@@ -61,6 +61,15 @@ public:
     QString getMwcNodeStatus();
 
     node::MwcNode * getMwcNode() const;
+
+    QString getBlockchainDataPath() const;
+    void    updateBlockchainDataPath(QString path);
+    QString getPublishTransactionPath() const;
+    void    updatePublishTransactionPath(QString path);
+
+    void saveBlockchainData(QString fileName);
+    void loadBlockchainData(QString fileName);
+    void publishTransaction(QString fileName);
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "node_overview.html";}
@@ -71,6 +80,8 @@ private slots:
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
     void onMwcStatusUpdate(QString status);
+
+    void onSubmitFile(bool success, QString message, QString fileName);
 
 private:
     virtual void timerEvent(QTimerEvent *event) override;

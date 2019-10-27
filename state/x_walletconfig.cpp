@@ -15,10 +15,12 @@
 #include "x_walletconfig.h"
 #include "../wallet/wallet.h"
 #include "../windows/x_walletconfig_w.h"
+#include "../windows/x_nodeconfig_w.h"
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../core/global.h"
+#include "../core/Config.h"
 #include "../util/execute.h"
 #include "../util/Log.h"
 #include <QCoreApplication>
@@ -26,8 +28,8 @@
 
 namespace state {
 
-WalletConfig::WalletConfig( StateContext * context) :
-    State (context, STATE::WALLET_CONFIG) {
+WalletConfig::WalletConfig( StateContext * _context) :
+    State (_context, STATE::WALLET_CONFIG) {
 }
 
 WalletConfig::~WalletConfig() {}
@@ -36,8 +38,15 @@ NextStateRespond WalletConfig::execute() {
     if (context->appContext->getActiveWndState() != STATE::WALLET_CONFIG)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context->wndManager->switchToWindowEx( mwc::PAGE_X_WALLET_CONFIG,
+    if ( config::isOnlineNode() ) {
+        context->wndManager->switchToWindowEx( mwc::PAGE_X_WALLET_CONFIG,
+                new wnd::NodeConfig( context->wndManager->getInWndParent(), this ) );
+
+    }
+    else {
+        context->wndManager->switchToWindowEx( mwc::PAGE_X_WALLET_CONFIG,
                 new wnd::WalletConfig( context->wndManager->getInWndParent(), this ) );
+    }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }

@@ -48,6 +48,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->statusBar->addPermanentWidget(ui->helpButton);
     ui->statusBar->addPermanentWidget(ui->rightestSpacerLabel);
 
+    if (config::isOnlineNode()) {
+        ui->helpButton->hide();
+        ui->listenerStatusButton->hide();
+        ui->btnSpacerLabel1->hide();
+    }
+
     setStatusButtonState(ui->nodeStatusButton, STATUS::RED, "Waiting");
     setStatusButtonState(ui->listenerStatusButton, STATUS::RED, "Listeners");
 

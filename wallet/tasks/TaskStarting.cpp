@@ -17,6 +17,7 @@
 #include <QDebug>
 #include "TaskWallet.h"
 #include "../../core/Notification.h"
+#include "../../core/Config.h"
 
 namespace wallet {
 
@@ -36,7 +37,7 @@ bool TaskStarting::processTask(const QVector<WEvent> & events) {
         if (welcome.empty())
             break;
 
-        if (need2unlock.empty() && init.empty())
+        if ( need2unlock.empty() && init.empty() && !config::isOnlineNode() )
             break;
 
         // check version of the wallet
@@ -54,9 +55,11 @@ bool TaskStarting::processTask(const QVector<WEvent> & events) {
         }
 
         if (need2unlock.empty()) {
-            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
+            if (!config::isOnlineNode())
+                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
                                                  "Wallet mwc713 has a seed without a password. Did you initialize it manually? "
                                                  "To fix this problem you will need to reinitialize your wallet with a passphrase and a password.");
+            wallet713->setLoginResult(true);
             return true;
         }
 

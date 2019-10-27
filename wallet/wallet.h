@@ -82,6 +82,7 @@ struct MwcNodeConnection {
     bool loadData(QDataStream & in);
 
     bool notCustom() const { return connectionType != NODE_CONNECTION_TYPE::CUSTOM; }
+    bool isLocalNode() const { return connectionType == NODE_CONNECTION_TYPE::LOCAL; }
 };
 
 // Wallet config
@@ -404,6 +405,10 @@ public:
     // Check signal:  onFinalizeFile
     virtual void finalizeFile( QString fileTxResponse )  = 0;
 
+    // submit finalized transaction. Make sense for cold storage => online node operation
+    // Check Signal: onSubmitFile(bool ok, String message)
+    virtual void submitFile( QString fileTx )  = 0;
+
     // Send some coins to address.
     // Before send, wallet always do the switch to account to make it active
     // coinNano == -1  - mean All
@@ -497,6 +502,7 @@ signals:
     void onSendFile( bool success, QStringList errors, QString fileName );
     void onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
     void onFinalizeFile( bool success, QStringList errors, QString fileName );
+    void onSubmitFile(bool success, QString message, QString fileName);
 
     // set receive account name results
     void onSetReceiveAccount( bool ok, QString AccountOrMessage );

@@ -20,11 +20,13 @@
 #include "../state/statemachine.h"
 #include "../util/Log.h"
 #include "../core/global.h"
+#include "../core/Config.h"
+#include <QCoreApplication>
 
 namespace state {
 
-InputPassword::InputPassword( StateContext * context) :
-    State(context, STATE::INPUT_PASSWORD)
+InputPassword::InputPassword( StateContext * _context) :
+    State(_context, STATE::INPUT_PASSWORD)
 {
     // Result of the login
     QObject::connect( context->wallet, &wallet::Wallet::onLoginResult, this, &InputPassword::onLoginResult, Qt::QueuedConnection );
@@ -52,9 +54,17 @@ NextStateRespond InputPassword::execute() {
     if ( !running ) {
         // We are at the right place. Let's start the wallet
 
+        // Processing all pending to clean up the processes
+        QCoreApplication::processEvents();
+
         // Starting the wallet normally. The password is needed and it will be provided.
         // It is a first run, just need to login
         context->wallet->start(false);
+
+        // As a node we can exit becuase no password is expected
+        if (config::isOnlineNode()) {
+            return NextStateRespond( NextStateRespond::RESULT::DONE );
+        }
 
         wnd = (wnd::InputPassword*)context->wndManager->switchToWindowEx( mwc::PAGE_A_ACCOUNT_LOGIN,
                 new wnd::InputPassword( context->wndManager->getInWndParent(), this,
@@ -107,7 +117,8 @@ void InputPassword::onLoginResult(bool ok) {
     }
     else {
         // Going forward by initializing the wallet
-        if ( context->wallet->getStartedMode() == wallet::Wallet::STARTED_MODE::NORMAL ) { // Normall start of the wallet. Problem that now we have many cases how wallet started
+        if ( !config::isOnlineNode() &&
+                context->wallet->getStartedMode() == wallet::Wallet::STARTED_MODE::NORMAL ) { // Normall start of the wallet. Problem that now we have many cases how wallet started
 
             // Start listening, no feedback interested
             context->wallet->listeningStart(true, false, true);

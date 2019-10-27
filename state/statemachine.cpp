@@ -44,25 +44,34 @@ StateMachine::StateMachine(StateContext * _context) :
 {
     context->setStateMachine(this);
 
+    // Those states are mandatory because that manage wallet lifecycle
     states[ STATE::START_WALLET ]   = new StartWallet(context);
     states[ STATE::STATE_INIT ]     = new InitAccount(context);
     states[ STATE::INPUT_PASSWORD ] = new InputPassword(context);
-    states[ STATE::ACCOUNTS ]       = new Accounts(context);
-    states[ STATE::ACCOUNT_TRANSFER ] = new AccountTransfer(context);
+
+    // Pages
+
+    if (config::isOnlineWallet() || config::isColdWallet()) {
+        states[ STATE::ACCOUNTS ]       = new Accounts(context);
+        states[ STATE::ACCOUNT_TRANSFER ] = new AccountTransfer(context);
+        states[ STATE::SEND ]           = new Send(context);
+        states[ STATE::RECEIVE_COINS ]  = new Receive(context);
+        states[ STATE::TRANSACTIONS ]   = new Transactions(context);
+        states[ STATE::OUTPUTS ]        = new Outputs(context);
+        states[ STATE::CONTACTS ]       = new Contacts(context);
+        states[ STATE::SHOW_SEED ]      = new ShowSeed(context);
+        states[ STATE::RESYNC ]         = new Resync(context);
+    }
+    if (config::isOnlineWallet() ) {
+        states[ STATE::HODL ]           = new Hodl(context);
+        states[ STATE::LISTENING ]      = new Listening(context);
+        states[ STATE::AIRDRDOP_MAIN ]  = new Airdrop(context);
+        states[ STATE::FINALIZE ]       = new Finalize(context);
+    }
+
     states[ STATE::EVENTS ]         = new Events(context);
-    states[ STATE::HODL ]           = new Hodl(context);
-    states[ STATE::SEND ]           = new Send(context);
-    states[ STATE::RECEIVE_COINS ]  = new Receive(context);
-    states[ STATE::LISTENING ]      = new Listening(context);
-    states[ STATE::TRANSACTIONS ]   = new Transactions(context);
-    states[ STATE::OUTPUTS ]        = new Outputs(context);
-    states[ STATE::CONTACTS ]       = new Contacts(context);
     states[ STATE::WALLET_CONFIG ]  = new WalletConfig(context);
-    states[ STATE::AIRDRDOP_MAIN ]  = new Airdrop(context);
-    states[ STATE::SHOW_SEED ]      = new ShowSeed(context);
-    states[ STATE::RESYNC ]         = new Resync(context);
     states[ STATE::NODE_INFO ]      = new NodeInfo(context);
-    states[ STATE::FINALIZE ]       = new Finalize(context);
 
     startTimer(1000);
 }
@@ -94,8 +103,10 @@ void StateMachine::start() {
 
         currentState = it.key();
         context->mainWnd->updateActionStates(currentState);
-        break;
+        return;
     }
+
+    executeFrom( STATE::NONE );
 }
 
 void StateMachine::executeFrom( STATE nextState ) {
@@ -130,7 +141,7 @@ void StateMachine::executeFrom( STATE nextState ) {
 
     if (currentState == STATE::NONE) {
         // Selecting the send page if nothing found
-        context->appContext->setActiveWndState( STATE::SEND );
+        context->appContext->setActiveWndState( STATE::NODE_INFO );
         executeFrom(STATE::NONE);
     }
 

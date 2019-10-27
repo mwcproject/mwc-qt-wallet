@@ -23,6 +23,10 @@
 #include "../core/global.h"
 #include "../core/Notification.h"
 #include "../node/MwcNode.h"
+#include "../node/MwcNodeConfig.h"
+#include "../util/FolderCompressor.h"
+#include <QCoreApplication>
+#include <control/messagebox.h>
 
 namespace state {
 
@@ -45,13 +49,16 @@ void NodeStatus::setData(bool _online,
 NodeInfo::NodeInfo(StateContext * _context) :
         State(_context, STATE::NODE_INFO )
 {
-    QObject::connect(_context->wallet, &wallet::Wallet::onNodeStatus,
+    QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
                      this, &NodeInfo::onNodeStatus, Qt::QueuedConnection);
-    QObject::connect(_context->wallet, &wallet::Wallet::onLoginResult,
+    QObject::connect(context->wallet, &wallet::Wallet::onLoginResult,
                      this, &NodeInfo::onLoginResult, Qt::QueuedConnection);
 
-    QObject::connect(_context->mwcNode, &node::MwcNode::onMwcStatusUpdate,
+    QObject::connect(context->mwcNode, &node::MwcNode::onMwcStatusUpdate,
                      this, &NodeInfo::onMwcStatusUpdate, Qt::QueuedConnection);
+
+    QObject::connect(context->wallet, &wallet::Wallet::onSubmitFile,
+                     this, &NodeInfo::onSubmitFile, Qt::QueuedConnection);
 
     // Checking/update node status every 20 seconds...
     startTimer(3000); // Let's update node info every 60 seconds. By some reasons it is slow operation...
@@ -82,7 +89,6 @@ NextStateRespond NodeInfo::execute() {
 node::MwcNode * NodeInfo::getMwcNode() const {
     return context->mwcNode;
 }
-
 
 // After login - let's check the node status
 void NodeInfo::onLoginResult(bool ok) {
@@ -213,6 +219,116 @@ void NodeInfo::onMwcStatusUpdate( QString status ) {
         wnd->updateEmbeddedMwcNodeStatus(getMwcNodeStatus());
     }
 }
+
+QString NodeInfo::getBlockchainDataPath() const {
+    return context->appContext->getPathFor("BlockchainData");
+}
+
+void    NodeInfo::updateBlockchainDataPath(QString path) {
+    context->appContext->updatePathFor("BlockchainData", path);
+}
+
+QString NodeInfo::getPublishTransactionPath() const {
+    return context->appContext->getPathFor("PublishTransaction");
+}
+void    NodeInfo::updatePublishTransactionPath(QString path) {
+    context->appContext->updatePathFor("PublishTransaction", path);
+}
+
+void NodeInfo::saveBlockchainData(QString fileName) {
+    // 1. stop the mwc node
+    // 2. Export node data
+    // 3. start mwc-node
+
+    QCoreApplication::processEvents();
+
+    context->mwcNode->stop();
+
+    QString network = context->mwcNode->getCurrentNetwork();
+
+    QString nodePath = node::getMwcNodePath(network);
+
+    QCoreApplication::processEvents();
+
+    QPair<bool, QString> res = compress::compressFolder( nodePath + "chain_data/", fileName, network );
+
+
+    QCoreApplication::processEvents();
+
+    context->mwcNode->start(network);
+
+    QCoreApplication::processEvents();
+
+    if (wnd)
+        wnd->hideProgress();
+
+    QCoreApplication::processEvents();
+
+    if (res.first) {
+        control::MessageBox::message(wnd, "MWC Blockchain data is ready", "MWC blockchain data was successfully exported to the archive " + fileName);
+    }
+    else {
+        control::MessageBox::message(wnd, "Failed to export MWC Blockchain data", "Unable to export the blockchain data. Error:\n" + res.second);
+    }
+}
+
+void NodeInfo::loadBlockchainData(QString fileName) {
+    // 1. stop the mwc node
+    // 2. Import node data
+    // 3. start mwc-node
+
+    QCoreApplication::processEvents();
+
+    context->mwcNode->stop();
+
+    QString network = context->mwcNode->getCurrentNetwork();
+    QString nodePath = node::getMwcNodePath(network);
+
+    QCoreApplication::processEvents();
+
+    QPair<bool, QString> res = compress::decompressFolder( fileName,  nodePath + "chain_data/", network );
+
+    QCoreApplication::processEvents();
+
+    context->mwcNode->start(network);
+
+    QCoreApplication::processEvents();
+
+    if (wnd)
+        wnd->hideProgress();
+
+    QCoreApplication::processEvents();
+
+    if (res.first) {
+        control::MessageBox::message(wnd, "MWC Blockchain data is ready", "MWC blockchain data was successfully imported from the archive " + fileName);
+    }
+    else {
+        control::MessageBox::message(wnd, "Failed to import MWC Blockchain data", "Unable to import the blockchain data. Error:\n" + res.second);
+    }
+}
+
+void NodeInfo::publishTransaction(QString fileName) {
+    //   dssfddf
+    context->wallet->submitFile(fileName);
+    // Respond at onSubmitFile
+}
+
+void NodeInfo::onSubmitFile(bool success, QString message, QString fileName) {
+    if (wnd)
+        wnd->hideProgress();
+
+    if (success) {
+        control::MessageBox::message(wnd, "Transaction published", "You transaction at " + fileName +
+        " was successfully delivered to your local node. Please keep your node running for some time to deliver it to MWC blockchain.\n" + message);
+    }
+    else {
+        control::MessageBox::message(wnd, "Transaction failed", "Transaction from " + fileName +
+                  " was not delivered to your local node.\n\n" + message);
+    }
+}
+
+
+
 
 
 }

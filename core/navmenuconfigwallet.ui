@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NavMenuConfig</class>
+ <class>NavMenuConfigWallet</class>
  <widget class="QFrame" name="NavMenuConfig">
   <property name="geometry">
    <rect>
