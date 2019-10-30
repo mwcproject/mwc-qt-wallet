@@ -23,7 +23,7 @@ class QMainWindow;
 
 namespace mwc {
 
-const QString APP_NAME = "mwc wallet";
+QString get_APP_NAME();
 
 // We not checking mwc713 versions because so far there is no benefits from that.
 // MWC version that we are expecting to ship

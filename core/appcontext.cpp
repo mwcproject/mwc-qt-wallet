@@ -14,6 +14,7 @@
 
 #include "appcontext.h"
 #include "../util/ioutils.h"
+#include "../util/Files.h"
 #include <QFile>
 #include <QTextStream>
 #include <QDataStream>
@@ -26,6 +27,7 @@ namespace core {
 
 const static QString settingsFileName("context.dat");
 const static QString airdropRequestsFileName("requests.dat");
+const static QString setupDoneFileName("setup.dat");
 
 
 void SendCoinsParams::saveData(QDataStream & out) const {
@@ -281,6 +283,15 @@ QVector<state::AirdropRequests> AppContext::loadAirdropRequests() const {
     return res;
 }
 
+// First run for a new version flags support...
+bool AppContext::isSetupDone(QString version) {
+    QStringList lns = util::readTextFile(ioutils::getAppDataPath("context") + "/" + airdropRequestsFileName );
+    return lns.size()>0 && lns[0]==version;
+}
+
+void AppContext::updateSetupDone(QString version) {
+    util::writeTextFile(ioutils::getAppDataPath("context") + "/" + airdropRequestsFileName, QStringList{version} );
+}
 
 // -------------- Contacts
 

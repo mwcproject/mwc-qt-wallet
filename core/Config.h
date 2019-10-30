@@ -48,7 +48,7 @@ void setMwcGuiWalletConf( QString conf );
  * @param useMwcMqS             - true: use mwc mqs for slates exchange.  false: using mwc mq (non secure grin box) for slates exchange
  */
 void setConfigData(WALLET_RUN_MODE runMode, QString mwcPath, QString wallet713path,
-                   QString mainStyleSheetPath, QString dialogsStyleSheetPath, QString airdropUrlMainNetUrl, QString airdropUrlTestNetUrl, int64_t logoutTimeMs,
+                   QString airdropUrlMainNetUrl, QString airdropUrlTestNetUrl, int64_t logoutTimeMs,
                    double timeoutMultiplier,
                    bool useMwcMqS,
                    int sendTimeoutMs);
@@ -60,8 +60,6 @@ const QString & getMwcGuiWalletConf();
 
 const QString & getMwcpath(); // Not using now because so far there is no local node is running
 const QString & getWallet713path();
-const QString & getMainStyleSheetPath();
-const QString & getDialogsStyleSheetPath();
 const QString & getAirdropMainNetUrl();
 const QString & getAirdropTestNetUrl();
 int64_t         getLogoutTimeMs();

@@ -16,6 +16,7 @@
 #include "navmenuconfig.h"
 #include "ui_navmenuconfigwallet.h"
 #include "ui_navmenuconfignode.h"
+#include "ui_navmenuconfigcoldwlt.h"
 #include "../state/statemachine.h"
 #include "../core/appcontext.h"
 #include "../core/Config.h"
@@ -30,7 +31,10 @@ NavMenuConfig::NavMenuConfig(QWidget *parent, state::StateContext * _context ) :
     if (config::isOnlineNode()) {
         uiNode = new Ui::NavMenuConfigNode;
         uiNode->setupUi(this);
-
+    }
+    else if (config::isColdWallet()) {
+        uiColdWallet  = new Ui::NavMenuConfigColdWallet;
+        uiColdWallet ->setupUi(this);
     }
     else {
         uiWallet = new Ui::NavMenuConfigWallet;

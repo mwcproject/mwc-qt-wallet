@@ -322,6 +322,9 @@ void NodeInfo::onSubmitFile(bool success, QString message, QString fileName) {
         " was successfully delivered to your local node. Please keep your node running for some time to deliver it to MWC blockchain.\n" + message);
     }
     else {
+        if (message.contains("Post TX Error: Request error: Wrong response code: 500 Internal Server Error with data Body(Streaming)"))
+            message = "MWC node unable to publish this transaction. Probably this transaction is already published or original output doesn't exist any more";
+
         control::MessageBox::message(wnd, "Transaction failed", "Transaction from " + fileName +
                   " was not delivered to your local node.\n\n" + message);
     }

@@ -1403,7 +1403,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
         }
     }
 
-    if (config::isOnlineNode()) {
+    if ( !config::isOnlineWallet()) {
         newConfLines.append("grinbox_listener_auto_start = false");
         newConfLines.append("keybase_listener_auto_start = false");
     }

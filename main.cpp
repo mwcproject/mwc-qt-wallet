@@ -48,6 +48,8 @@
 #include <tgmath.h>
 #include "node/MwcNodeConfig.h"
 #include "node/MwcNode.h"
+#include "build_version.h"
+#include "dialogs/selectmodedlg.h"
 
 // Very first run - init everything
 bool deployWalletFilesFromResources() {
@@ -80,7 +82,7 @@ bool deployWalletFilesFromResources() {
 // Read configs
 // first - success flag
 // second - error message
-QPair<bool, QString> readConfig(QApplication & app) {
+QPair<bool, QString> readConfig(QApplication & app, bool isFirstRun) {
     QCoreApplication::setApplicationName("mwc-qt-wallet");
     QCoreApplication::setApplicationVersion("v0.1");
 
@@ -112,10 +114,35 @@ QPair<bool, QString> readConfig(QApplication & app) {
         return QPair<bool, QString>(false, "Unable to parse config file " + config);
     }
 
+    if (isFirstRun) {
+        dlg::SelectModeDlg selectModeDlg(nullptr);
+        if(selectModeDlg.exec() == QDialog::Rejected)
+            return QPair<bool, QString>(false, ""); // just exit
+
+        // Accept the setting
+        bool updateOk = true;
+        switch (selectModeDlg.getRunMod()) {
+        case config::WALLET_RUN_MODE::ONLINE_WALLET:
+            updateOk = reader.updateConfig("running_mode", "\"online_wallet\"" );
+            break;
+        case config::WALLET_RUN_MODE::ONLINE_NODE:
+            updateOk = reader.updateConfig("running_mode", "\"online_node\"" );
+            break;
+        case config::WALLET_RUN_MODE::COLD_WALLET:
+            updateOk = reader.updateConfig("running_mode", "\"cold_wallet\"" );
+            break;
+        default:
+            Q_ASSERT(false);
+        }
+
+        if (!updateOk) {
+            control::MessageBox::message(nullptr, "Error", "Wallet unable to switch to the selected mode" );
+            return QPair<bool, QString>(false, ""); // just exit
+        }
+    }
+
     QString mwc_path = reader.getString("mwc_path");
     QString wallet713_path = reader.getString("wallet713_path");
-    QString main_style_sheet = reader.getString("main_style_sheet");
-    QString dialogs_style_sheet = reader.getString("dialogs_style_sheet");
     QString airdropUrlMainNet = reader.getString("airdrop_url_mainnet");
     QString airdropUrlTestNet = reader.getString("airdrop_url_testnet");
     QString logoutTimeoutStr = reader.getString("logoutTimeout");
@@ -136,12 +163,6 @@ QPair<bool, QString> readConfig(QApplication & app) {
     if (sendTimeoutMs<=0)
         sendTimeoutMs = 60000; // 1 minutes should be good enough
 
-    if (main_style_sheet.isEmpty())
-        main_style_sheet = ":/resource/mwcwallet_style.css";
-
-    if (dialogs_style_sheet.isEmpty())
-        dialogs_style_sheet = ":/resource/dialogs_style.css";
-
     bool logoutTimeoutOk = false;
     int     logoutTimeout = logoutTimeoutStr.toInt(&logoutTimeoutOk);
     if (!logoutTimeoutOk || logoutTimeoutStr.isEmpty() )
@@ -151,7 +172,7 @@ QPair<bool, QString> readConfig(QApplication & app) {
     if ( timeoutMultiplierVal < 0.01 )
         timeoutMultiplierVal = 1.0;
 
-    if ( mwc_path.isEmpty() || wallet713_path.isEmpty() || main_style_sheet.isEmpty() || dialogs_style_sheet.isEmpty() || airdropUrlMainNet.isEmpty() || airdropUrlTestNet.isEmpty() ) {
+    if ( mwc_path.isEmpty() || wallet713_path.isEmpty() || airdropUrlMainNet.isEmpty() || airdropUrlTestNet.isEmpty() ) {
         qDebug() << "Failed to read all expected data from config file " << config;
         return QPair<bool, QString>(false, "Not found all expected fields at config file " + config);
     }
@@ -171,7 +192,7 @@ QPair<bool, QString> readConfig(QApplication & app) {
     }
 
     Q_ASSERT(runMode.first);
-    config::setConfigData( runMode.second, mwc_path, wallet713_path, main_style_sheet, dialogs_style_sheet, airdropUrlMainNet, airdropUrlTestNet, logoutTimeout*1000L, timeoutMultiplierVal, useMwcMqS, sendTimeoutMs );
+    config::setConfigData( runMode.second, mwc_path, wallet713_path, airdropUrlMainNet, airdropUrlTestNet, logoutTimeout*1000L, timeoutMultiplierVal, useMwcMqS, sendTimeoutMs );
     return QPair<bool, QString>(true, "");
 }
 
@@ -268,17 +289,8 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        QPair<bool, QString> readConfRes = readConfig(app);
-        if (! readConfRes.first ) {
-            QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read configuration.\n" + readConfRes.second );
-            return 1;
-        }
-
-        qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
-
-
         { // Apply style sheet
-            QFile file( config::getMainStyleSheetPath() );
+            QFile file(":/resource/mwcwallet_style.css" );
             if (file.open(QFile::ReadOnly | QFile::Text)) {
                    QTextStream ts(&file);
                    app.setStyleSheet(ts.readAll());
@@ -289,6 +301,20 @@ int main(int argc, char *argv[])
             }
         }
 
+        bool firstRun = !appContext.isSetupDone( BUILD_VERSION );
+
+        QPair<bool, QString> readConfRes = readConfig(app, firstRun );
+        if (! readConfRes.first ) {
+            if (!readConfRes.second.isEmpty())
+                control::MessageBox::message(nullptr, "Error", "MWC GUI Wallet unable to read configuration.\n" + readConfRes.second );
+            return 1;
+        }
+
+        if (firstRun)
+            appContext.updateSetupDone(BUILD_VERSION);
+
+        qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
+
         // Checking for Build Architecture.
         // NOTE!!! Checking is needed for mwc713, not for this app.
         // We assuming that everything runs from normal install and architectures of mwc713 and mwc-qt-wallet
@@ -296,6 +322,25 @@ int main(int argc, char *argv[])
         QString runningArc = util::getBuildArch();
         wallet::WalletConfig walletConfig = wallet::MWC713::readWalletConfig();
         QString walletDataPath = walletConfig.getDataPath();
+
+        if (!config::isOnlineNode())
+        {
+            // Check if wallet point to the right location
+            if ( walletDataPath.contains("tmp") && walletDataPath.contains("online_node_wallet") ) {
+                // ned to switch to the normal wallet path
+                walletDataPath = "gui_wallet713_data";
+
+                // Node must be cloud - default one
+                QString network = walletConfig.getNetwork();
+                wallet::MwcNodeConnection mwcNodeConnection = appContext.getNodeConnection( network );
+                if ( !mwcNodeConnection.isCloudNode() ) {
+                    mwcNodeConnection.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD );
+                    appContext.updateMwcNodeConnection(network, mwcNodeConnection );
+                }
+            }
+        }
+
+
         while (true) {
             QString arch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDataPath).second;
 
@@ -336,7 +381,21 @@ int main(int argc, char *argv[])
             wallet::MwcNodeConnection mwcNodeConnection = appContext.getNodeConnection( network );
             if ( !mwcNodeConnection.isLocalNode() ) {
                 mwcNodeConnection.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
-                appContext.updateMwcNodeConnection(walletConfig.getNetwork(), mwcNodeConnection );
+                appContext.updateMwcNodeConnection(network, mwcNodeConnection );
+            }
+
+            // Start page will be always the node status
+            appContext.setActiveWndState( state::STATE::NODE_INFO );
+        }
+
+
+        if (config::isColdWallet()) {
+            // Node must be local
+            QString network = walletConfig.getNetwork();
+            wallet::MwcNodeConnection mwcNodeConnection = appContext.getNodeConnection( network );
+            if ( !mwcNodeConnection.isLocalNode() ) {
+                mwcNodeConnection.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
+                appContext.updateMwcNodeConnection(network, mwcNodeConnection );
             }
 
             // Start page will be always the node status

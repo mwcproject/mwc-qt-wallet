@@ -83,6 +83,7 @@ struct MwcNodeConnection {
 
     bool notCustom() const { return connectionType != NODE_CONNECTION_TYPE::CUSTOM; }
     bool isLocalNode() const { return connectionType == NODE_CONNECTION_TYPE::LOCAL; }
+    bool isCloudNode() const { return connectionType == NODE_CONNECTION_TYPE::CLOUD; }
 };
 
 // Wallet config

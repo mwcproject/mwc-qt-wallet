@@ -54,6 +54,10 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->btnSpacerLabel1->hide();
     }
 
+    if (config::isColdWallet()) {
+        ui->listenerStatusButton->hide();
+    }
+
     setStatusButtonState(ui->nodeStatusButton, STATUS::RED, "Waiting");
     setStatusButtonState(ui->listenerStatusButton, STATUS::RED, "Listeners");
 

@@ -131,8 +131,11 @@ void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
         if (status.connections <= 0) {
             ui->connectionsInfo->setText( toBoldAndYellow("None") ); // Two offline is confusing and doesn't look good. Let's keep zero and highlight it.
 
-            if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD) {
-                warning = toBoldAndYellow("Please note. You can't run two mwc-node with same public IP.<br>That might be a reason why node unable to find any peers.");
+            if (!config::isColdWallet()) {
+                if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD) {
+                    warning = toBoldAndYellow(
+                            "Please note. You can't run two mwc-node with same public IP.<br>That might be a reason why node unable to find any peers.");
+                }
             }
         }
         else {
@@ -217,7 +220,7 @@ void NodeInfo::on_loadBlockchainData_clicked()
 
 void NodeInfo::on_publishTransaction_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Blockchain Data"),
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Publish MWC transaction"),
                                                        state->getPublishTransactionPath(),
                                                        tr("MWC transaction (*.mwctx)"));
 

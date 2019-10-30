@@ -39,6 +39,8 @@ struct FileTransactionInfo {
     int     height;
     int     lock_height;
 
+    QString resultingFN; // cookie data
+
     bool parseTransaction( QString fileName );
 };
 

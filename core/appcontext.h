@@ -133,6 +133,10 @@ public:
     wallet::MwcNodeConnection getNodeConnection(const QString network) const;
     void updateMwcNodeConnection(const QString network, const wallet::MwcNodeConnection & connection );
 
+    // First run for a new version flags support...
+    bool isSetupDone(QString version);
+    void updateSetupDone(QString version);
+
 private:
     bool loadData();
     void saveData() const;

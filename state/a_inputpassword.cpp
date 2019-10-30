@@ -117,18 +117,22 @@ void InputPassword::onLoginResult(bool ok) {
     }
     else {
         // Going forward by initializing the wallet
-        if ( !config::isOnlineNode() &&
-                context->wallet->getStartedMode() == wallet::Wallet::STARTED_MODE::NORMAL ) { // Normall start of the wallet. Problem that now we have many cases how wallet started
+        if ( context->wallet->getStartedMode() == wallet::Wallet::STARTED_MODE::NORMAL ) { // Normall start of the wallet. Problem that now we have many cases how wallet started
 
-            // Start listening, no feedback interested
-            context->wallet->listeningStart(true, false, true);
-            context->wallet->listeningStart(false, true, true);
+            if ( config::isOnlineWallet() ) {
+                // Start listening, no feedback interested
+                context->wallet->listeningStart(true, false, true);
+                context->wallet->listeningStart(false, true, true);
+            }
 
-            // Set current receive account
-            context->wallet->setReceiveAccount(context->appContext->getReceiveAccount());
+            if (! config::isOnlineNode()) {
+                // Set current receive account
+                context->wallet->setReceiveAccount(context->appContext->getReceiveAccount());
 
-            // Updating the wallet balance and a node status
-            context->wallet->updateWalletBalance();
+                // Updating the wallet balance and a node status
+                context->wallet->updateWalletBalance();
+            }
+
             context->wallet->getNodeStatus();
         }
 

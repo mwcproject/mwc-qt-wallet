@@ -61,12 +61,12 @@ StateMachine::StateMachine(StateContext * _context) :
         states[ STATE::CONTACTS ]       = new Contacts(context);
         states[ STATE::SHOW_SEED ]      = new ShowSeed(context);
         states[ STATE::RESYNC ]         = new Resync(context);
+        states[ STATE::FINALIZE ]       = new Finalize(context);
     }
     if (config::isOnlineWallet() ) {
         states[ STATE::HODL ]           = new Hodl(context);
         states[ STATE::LISTENING ]      = new Listening(context);
         states[ STATE::AIRDRDOP_MAIN ]  = new Airdrop(context);
-        states[ STATE::FINALIZE ]       = new Finalize(context);
     }
 
     states[ STATE::EVENTS ]         = new Events(context);

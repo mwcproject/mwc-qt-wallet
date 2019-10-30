@@ -21,6 +21,7 @@
 namespace Ui {
 class NavMenuConfigWallet;
 class NavMenuConfigNode;
+class NavMenuConfigColdWallet;
 }
 
 
@@ -53,6 +54,7 @@ private slots:
 private:
     Ui::NavMenuConfigWallet *uiWallet = nullptr;
     Ui::NavMenuConfigNode   *uiNode = nullptr;
+    Ui::NavMenuConfigColdWallet *uiColdWallet = nullptr;
     state::StateContext * context = nullptr;
 };
 

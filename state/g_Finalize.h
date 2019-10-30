@@ -17,6 +17,7 @@
 
 #include "state.h"
 #include <QObject>
+#include <QMap>
 #include "../util/Json.h"
 #include "../wallet/wallet.h"
 #include "../windows/g_filetransaction_w.h"
@@ -49,7 +50,12 @@ public:
     virtual void ftBack() override;
     virtual void deleteFileTransactionWnd(wnd::FileTransaction * wnd) override { if (wnd==fileTransWnd) fileTransWnd = nullptr; }
     // Expected that user already made all possible appruvals
-    virtual void ftContinue(QString fileName) override;
+    virtual void ftContinue(QString fileName, QString resultTxFileName) override;
+
+    virtual bool needResultTxFileName() override;
+
+    virtual QString getResultTxPath() override;
+    virtual void updateResultTxPath(QString path) override;
 
     virtual state::StateContext * getContext() override;
 
@@ -68,6 +74,9 @@ private:
     // We can use transactions to obtain additional data about send to address, transaction Date
     QVector<wallet::WalletTransaction> allTransactions;
     int lastNodeHeight = 0;
+
+    // History of submitted file transactions
+    QMap<QString, util::FileTransactionInfo> file2TransactionsInfo;
 };
 
 
