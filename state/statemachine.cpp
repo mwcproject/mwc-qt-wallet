@@ -198,7 +198,12 @@ bool StateMachine::processState(State* st) {
 }
 
 void StateMachine::timerEvent(QTimerEvent *event) {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
+
+    // No locking make sense for the node.
+    if (config::isOnlineNode())
+        return;
+
     // Check if timer expired and we need to logout...
     if (logoutTime==0)
         return;

@@ -250,15 +250,22 @@ bool TaskSubmitFile::processTask(const QVector<WEvent> & events) {
     QString respondStr;
 
     QVector<WEvent> lines = filterEvents(events, WALLET_EVENTS::S_LINE);
+    bool hasError = false;
     for (WEvent ln : lines) {
+        if (ln.message.trimmed().size()<1)
+            continue;
+
         if (!respondStr.isEmpty())
             respondStr += "\n";
 
         respondStr += ln.message;
+
+        if ( ln.message.contains("error", Qt::CaseInsensitive) )
+            hasError = true;
     }
 
     // TODO: Never see success so far, but really need to provide correct value
-    wallet713->setSubmitFile( false, respondStr, fileTx );
+    wallet713->setSubmitFile( !hasError, respondStr, fileTx );
     return true;
 }
 
