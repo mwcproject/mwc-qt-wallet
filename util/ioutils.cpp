@@ -27,13 +27,29 @@ QString getAppDataPath(QString localPath )
         throw core::MwcException("Qt error. Cannot determine home dir location.");
     path += "/mwc-qt-wallet/";
 
-     QDir d(path);
-     QString dataPath = QDir::cleanPath( d.absolutePath() + QDir::separator() + localPath );
-     if ( !d.mkpath(dataPath) )
-         throw core::MwcException("Unable create app data directory: " + d.absolutePath());
+    // Update the windows we can't just append paths because of the drive.
+    // path can be c:/Users/....
+    // localPath:  e:/data
+    // In this case we can't append them, we have to use local path
 
-     return dataPath;
+    // localPath can be appended only if it doesn't start with drive...
+    bool localPathIsRoot = false;
+    for ( const QFileInfo & drive : QDir::drives() ) {
+        if ( localPath.startsWith( drive.path() ) ) {
+            localPathIsRoot = true;
+            break;
+        }
+    }
+
+    QDir d(path);
+    QString dataPath = localPathIsRoot ? localPath : (d.absolutePath() + QDir::separator() + localPath);
+    dataPath = QDir::cleanPath( dataPath );
+    if ( !d.mkpath(dataPath) )
+        throw core::MwcException("Unable create app data directory: " + d.absolutePath());
+
+    return dataPath;
 }
+
 
 QByteArray FilterEscSymbols( const QByteArray & data ) {
     QByteArray res;
