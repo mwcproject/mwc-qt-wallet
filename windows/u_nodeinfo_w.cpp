@@ -88,18 +88,26 @@ void NodeInfo::showWarning(QString warning) {
 }
 
 
-void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
+void NodeInfo::setNodeStatus( const QString & localNodeStatus, const state::NodeStatus & status ) {
     QString warning;
 
     if (!status.online) {
-        ui->statusInfo->setText( toBoldAndYellow("Offline") );
+        QString statusStr = "Offline";
+
+        if (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL && localNodeStatus!="Ready") {
+            statusStr = localNodeStatus;
+        }
+
+        ui->statusInfo->setText( toBoldAndYellow(statusStr) );
         ui->connectionsInfo->setText("-");
         ui->heightInfo->setText("-");
         ui->difficultyInfo->setText("-");
 
-         if (lastShownErrorMessage != status.errMsg) {
-             emit showNodeConnectionError(status.errMsg);
-             lastShownErrorMessage = status.errMsg;
+        if ( statusStr == "Offline" ) {
+             if (lastShownErrorMessage != status.errMsg) {
+                 emit showNodeConnectionError(status.errMsg);
+                 lastShownErrorMessage = status.errMsg;
+             }
         }
     }
     else {

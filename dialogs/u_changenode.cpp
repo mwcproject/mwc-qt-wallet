@@ -18,6 +18,9 @@
 #include <QHostInfo>
 #include <QUrl>
 #include <cstring>
+#include <QFileDialog>
+#include "../util/ioutils.h"
+#include <QDir>
 
 namespace dlg {
 
@@ -40,8 +43,15 @@ ChangeNode::ChangeNode(QWidget * parent, const wallet::MwcNodeConnection & _node
     else
         ui->customNodeWnd->hide();
 
+    if ( nodeConnection.connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL )
+        ui->embeddedNodeWnd->show();
+    else
+        ui->embeddedNodeWnd->hide();
+
     ui->mwcNodeUriEdit->setText( nodeConnection.mwcNodeURI );
     ui->mwcNodeSecretEdit->setText( nodeConnection.mwcNodeSecret );
+
+    ui->nodeDataLocation->setText( nodeConnection.localNodeDataPath );
 }
 
 ChangeNode::~ChangeNode() {
@@ -51,21 +61,41 @@ ChangeNode::~ChangeNode() {
 void ChangeNode::on_resetButton_clicked() {
     ui->radioCloudNode->setChecked(true);
     ui->customNodeWnd->hide();
+    ui->embeddedNodeWnd->hide();
 }
 
 void ChangeNode::on_radioCloudNode_clicked()
 {
     ui->customNodeWnd->hide();
+    ui->embeddedNodeWnd->hide();
 }
 
 void ChangeNode::on_radioEmbeddedNode_clicked()
 {
     ui->customNodeWnd->hide();
+    ui->embeddedNodeWnd->show();
 }
 
 void ChangeNode::on_radioCustomNode_clicked()
 {
     ui->customNodeWnd->show();
+    ui->embeddedNodeWnd->hide();
+}
+
+void ChangeNode::on_selectNodeDataLocationBtn_clicked()
+{
+    QString basePath = ioutils::getAppDataPath();
+    QString dir = QFileDialog::getExistingDirectory(
+            nullptr,
+            "Select your embedded node data folder",
+            basePath);
+    if (dir.isEmpty())
+        return;
+
+    QDir baseDir(basePath);
+    QString nodeDir = baseDir.relativeFilePath(dir);
+
+    ui->nodeDataLocation->setText( nodeDir );
 }
 
 void ChangeNode::on_cancelButton_clicked() {
@@ -77,10 +107,23 @@ void ChangeNode::on_applyButton_clicked() {
     wallet::MwcNodeConnection resCon = nodeConnection;
 
     if ( ui->radioCloudNode->isChecked() ) {
-        resCon.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD );
+        resCon.setAsCloud();
     }
-    else if ( ui->radioEmbeddedNode->isChecked() )
-        resCon.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
+    else if ( ui->radioEmbeddedNode->isChecked() ) {
+        QString nodeDataPath = ui->nodeDataLocation->text();
+        // Let's create a directory and validate it...
+        QString fullPath = ioutils::getAppDataPath( nodeDataPath );
+
+        QDir d(fullPath);
+
+        if (! ( d.exists() || d.mkdir(fullPath)) ) {
+            control::MessageBox::message(this, "Input", "Please specify correct directory for thr node data. Directory\n" + fullPath + "\nis not accessible" );
+            ui->nodeDataLocation->setFocus();
+            return;
+        }
+
+        resCon.setAsLocal(nodeDataPath );
+    }
     else if ( ui->radioCustomNode->isChecked() ) {
         QString mwcNodeUri = ui->mwcNodeUriEdit->text();
         QString mwcNodeSecret = ui->mwcNodeSecretEdit->text();
@@ -139,7 +182,7 @@ void ChangeNode::on_applyButton_clicked() {
                 return;
             }
         }
-        resCon.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CUSTOM, mwcNodeUri, mwcNodeSecret );
+        resCon.setAsCustom( mwcNodeUri, mwcNodeSecret );
     }
 
 

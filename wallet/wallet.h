@@ -70,13 +70,21 @@ struct MwcNodeConnection {
 
     NODE_CONNECTION_TYPE connectionType = NODE_CONNECTION_TYPE::CLOUD;
 
-    QString mwcNodeURI; // Connection to alternative MWC node
-    QString mwcNodeSecret;
+    // Cloud - no data
 
-    void setData(NODE_CONNECTION_TYPE _connectionType, QString _mwcNodeURI, QString _mwcNodeSecret) {connectionType = _connectionType; mwcNodeURI = _mwcNodeURI; mwcNodeSecret = _mwcNodeSecret;}
-    void setData(NODE_CONNECTION_TYPE _connectionType) {connectionType = _connectionType;}
+    // Local:
+    QString localNodeDataPath = "mwc-node"; // location for the node data
 
-    bool operator == (const MwcNodeConnection & itm) const {return connectionType==itm.connectionType && mwcNodeURI==itm.mwcNodeURI && mwcNodeSecret==itm.mwcNodeSecret; }
+    // Custom
+    QString mwcNodeURI; // URL
+    QString mwcNodeSecret; // Secret for the node
+
+    void setAsCloud() { connectionType = NODE_CONNECTION_TYPE::CLOUD; }
+    void setAsLocal( const QString & _localNodeDataPath ) { connectionType = NODE_CONNECTION_TYPE::LOCAL; localNodeDataPath = _localNodeDataPath; }
+    void setAsCustom( const QString & _mwcNodeURI, const QString & _mwcNodeSecret ) { connectionType = NODE_CONNECTION_TYPE::CUSTOM; mwcNodeURI = _mwcNodeURI; mwcNodeSecret = _mwcNodeSecret; }
+
+    bool operator == (const MwcNodeConnection & itm) const {return connectionType==itm.connectionType && mwcNodeURI==itm.mwcNodeURI &&
+                mwcNodeSecret==itm.mwcNodeSecret && localNodeDataPath==itm.localNodeDataPath; }
 
     void saveData(QDataStream & out) const;
     bool loadData(QDataStream & in);

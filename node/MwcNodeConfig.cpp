@@ -23,9 +23,9 @@
 
 namespace node {
 
-QString getMwcNodePath(const QString & network) {
+QString getMwcNodePath( const QString & nodeDataPath,  const QString & network) {
     QString nwPath = network.toLower().contains("main") ? "main" : "floo";
-    return ioutils::getAppDataPath("mwc-node") + QDir::separator() + nwPath + QDir::separator();
+    return ioutils::getAppDataPath(nodeDataPath) + QDir::separator() + nwPath + QDir::separator();
 }
 
 void MwcNodeConfig::setData(QString _network, QString _host, QString _port, QString _secret) {
@@ -35,8 +35,8 @@ void MwcNodeConfig::setData(QString _network, QString _host, QString _port, QStr
     secret  = _secret;
 }
 
-static void updateMwcNodeConfig( const QString & network ) {
-    QString walletPath = getMwcNodePath(network);
+static void updateMwcNodeConfig(const QString & nodeDataPath, const QString & network ) {
+    QString walletPath = getMwcNodePath(nodeDataPath, network);
 
     if ( ! QDir(walletPath).exists() ) {
         QDir().mkpath(walletPath);
@@ -68,11 +68,11 @@ static void updateMwcNodeConfig( const QString & network ) {
 }
 
 
-MwcNodeConfig getCurrentMwcNodeConfig(const QString & network) {
+MwcNodeConfig getCurrentMwcNodeConfig(const QString & nodeDataPath, const QString & network) {
 
-    updateMwcNodeConfig( network );
+    updateMwcNodeConfig( nodeDataPath, network );
 
-    QString walletPath = getMwcNodePath(network);
+    QString walletPath = getMwcNodePath(nodeDataPath, network);
 
     // Note, asserts are disabled because of the first run.
 

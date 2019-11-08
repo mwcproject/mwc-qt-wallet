@@ -73,7 +73,7 @@ NextStateRespond NodeInfo::execute() {
         wnd = (wnd::NodeInfo*) context->wndManager->switchToWindowEx( mwc::PAGE_U_NODE_STATUS,
                 new wnd::NodeInfo( context->wndManager->getInWndParent(), this));
 
-        wnd->setNodeStatus( lastNodeStatus );
+        wnd->setNodeStatus( lastLocalNodeStatus,  lastNodeStatus );
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
@@ -88,6 +88,7 @@ node::MwcNode * NodeInfo::getMwcNode() const {
 void NodeInfo::onLoginResult(bool ok) {
     if (ok) {
         currentNodeConnection = getNodeConnection().first;
+        lastLocalNodeStatus = "Waiting";
         requestNodeInfo();
         justLogin = true;
     }
@@ -202,12 +203,13 @@ void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pe
     if (wnd== nullptr)
         return;
 
-    wnd->setNodeStatus( lastNodeStatus );
+    wnd->setNodeStatus( lastLocalNodeStatus, lastNodeStatus );
 }
 
 
 
 void NodeInfo::onMwcStatusUpdate( QString status ) {
+    lastLocalNodeStatus = status;
     logger::logInfo("NodeInfo", "embedded mwc-node status: " + status);
     if (wnd != nullptr) {
         wnd->updateEmbeddedMwcNodeStatus(getMwcNodeStatus());

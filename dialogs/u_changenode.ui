@@ -316,6 +316,91 @@ by MWC Project Developers</string>
     </item>
    </layout>
   </widget>
+  <widget class="QWidget" name="embeddedNodeWnd" native="true">
+   <property name="geometry">
+    <rect>
+     <x>354</x>
+     <y>93</y>
+     <width>253</width>
+     <height>163</height>
+    </rect>
+   </property>
+   <widget class="QWidget" name="layoutWidget1_3">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>27</y>
+      <width>252</width>
+      <height>63</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_5">
+     <property name="spacing">
+      <number>5</number>
+     </property>
+     <item>
+      <widget class="control::MwcLabelSmall" name="label_3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>22</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>local node data location</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="control::MwcLineEditNormal" name="nodeDataLocation">
+       <property name="minimumSize">
+        <size>
+         <width>250</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>20000</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maxLength">
+        <number>128</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="control::MwcPushButtonNormal" name="selectNodeDataLocationBtn">
+    <property name="geometry">
+     <rect>
+      <x>102</x>
+      <y>105</y>
+      <width>150</width>
+      <height>40</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>150</width>
+      <height>40</height>
+     </size>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::StrongFocus</enum>
+    </property>
+    <property name="text">
+     <string>Select</string>
+    </property>
+   </widget>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -324,17 +409,17 @@ by MWC Project Developers</string>
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>

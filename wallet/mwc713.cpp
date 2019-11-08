@@ -1362,7 +1362,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
         case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD:
             break;
         case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL: {
-            node::MwcNodeConfig nodeConfig = node::getCurrentMwcNodeConfig(config.getNetwork());
+            node::MwcNodeConfig nodeConfig = node::getCurrentMwcNodeConfig( connection.localNodeDataPath, config.getNetwork());
             newConfLines.append("mwc_node_uri = \"http://127.0.0.1:13413\"");
             newConfLines.append("mwc_node_secret = \"" + nodeConfig.secret + "\"");
             needLocalMwcNode = true;
@@ -1378,7 +1378,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
 
     if (needLocalMwcNode) {
         if ( !mwcNode->isRunning() ) {
-            mwcNode->start( config.getNetwork() );
+            mwcNode->start( connection.localNodeDataPath, config.getNetwork() );
         }
     }
     else {

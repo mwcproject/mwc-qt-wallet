@@ -36,7 +36,7 @@ namespace node {
 
 
 
-MwcNode::MwcNode(QString _nodePath, core::AppContext * _appContext) :
+MwcNode::MwcNode(const QString & _nodePath, core::AppContext * _appContext) :
         QObject(),
         appContext(_appContext),
         nodePath(_nodePath)
@@ -55,11 +55,11 @@ MwcNode::~MwcNode() {
 }
 
 QString MwcNode::getLogsLocation() const {
-    return getMwcNodePath(lastUsedNetwork) + "mwc-server.log";
+    return getMwcNodePath(lastDataPath, lastUsedNetwork) + "mwc-server.log";
 }
 
 
-void MwcNode::start( const QString & network ) {
+void MwcNode::start(const QString & dataPath, const QString & network ) {
     qDebug() << "MwcNode::start for network " + network;
 
     lastUsedNetwork = network;
@@ -86,7 +86,7 @@ void MwcNode::start( const QString & network ) {
     initChainHeight = 0;
 
     // Creating process and starting
-    nodeProcess = initNodeProcess(network);
+    nodeProcess = initNodeProcess(dataPath, network);
     nodeOutputParser = new tries::NodeOutputParser();
 
     connect( nodeOutputParser, &tries::NodeOutputParser::nodeOutputGenericEvent, this, &MwcNode::nodeOutputGenericEvent, Qt::QueuedConnection);
@@ -119,10 +119,10 @@ void MwcNode::stop() {
 
 // pass - provide password through env variable. If pass empty - nothing will be done
 // paramsPlus - additional parameters for the process
-QProcess * MwcNode::initNodeProcess( QString network ) {
-
-    nodeWorkDir = getMwcNodePath(network);
-    MwcNodeConfig nodeConf = getCurrentMwcNodeConfig( network );
+QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & network ) {
+    lastDataPath = dataPath;
+    nodeWorkDir = getMwcNodePath(dataPath, network);
+    MwcNodeConfig nodeConf = getCurrentMwcNodeConfig( dataPath, network );
 
     // Creating process and starting
     QProcess * process = new QProcess();
@@ -141,7 +141,7 @@ QProcess * MwcNode::initNodeProcess( QString network ) {
 
     process->start(nodePath, params, QProcess::Unbuffered | QProcess::ReadWrite );
 
-    while ( ! process->waitForStarted( (int)(10000 * config::getTimeoutMultiplier()) ) ) {
+    while ( ! process->waitForStarted( (int)( 10000 * config::getTimeoutMultiplier()) ) ) {
         switch (process->error())
         {
             case QProcess::FailedToStart:
@@ -233,8 +233,8 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
     stop();
 
     if (restartCounter<2) {
-        MwcNodeConfig mainnetConfig = getCurrentMwcNodeConfig( "Mainnet" );
-        MwcNodeConfig floonetConfig = getCurrentMwcNodeConfig( "Floonet" );
+        MwcNodeConfig mainnetConfig = getCurrentMwcNodeConfig( lastDataPath, "Mainnet" );
+        MwcNodeConfig floonetConfig = getCurrentMwcNodeConfig( lastDataPath, "Floonet" );
 
         // Let's request other embedded local node to stop. There is a high chance that it is running and take the port.
         if (!mainnetConfig.secret.isEmpty())
@@ -257,7 +257,7 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
 // One short timer to restart the node. Usinng instead of sleep
 void MwcNode::onRestartNode() {
-    start( lastUsedNetwork );
+    start( lastDataPath, lastUsedNetwork );
 }
 
 
@@ -643,7 +643,7 @@ void MwcNode::timerEvent(QTimerEvent *event) {
 
     if (need2restart) {
         stop();
-        start(lastUsedNetwork);
+        start(lastDataPath, lastUsedNetwork);
         return;
     }
 
@@ -776,7 +776,7 @@ void MwcNode::reportNodeFatalError( QString message ) {
 
         // Switching to the cloud node
         wallet::MwcNodeConnection mwcNodeConnection = appContext->getNodeConnection( lastUsedNetwork );
-        mwcNodeConnection.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD );
+        mwcNodeConnection.setAsCloud();
         appContext->updateMwcNodeConnection(lastUsedNetwork, mwcNodeConnection );
     }
 
