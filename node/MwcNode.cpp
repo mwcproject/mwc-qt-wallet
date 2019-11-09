@@ -67,6 +67,7 @@ void MwcNode::start(const QString & dataPath, const QString & network ) {
     nodeWorkDir = "";
     nonEmittedOutput = "";
     lastProcessedEvent = tries::NODE_OUTPUT_EVENT::NONE;
+    nodeStatusString = "Waiting";
 
     // Start the binary
     Q_ASSERT(nodeProcess == nullptr);
