@@ -1376,14 +1376,14 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
             Q_ASSERT(false);
     }
 
+    // allways stop because config migth change
+    if ( mwcNode->isRunning() ) {
+        mwcNode->stop();
+    }
+
     if (needLocalMwcNode) {
         if ( !mwcNode->isRunning() ) {
             mwcNode->start( connection.localNodeDataPath, config.getNetwork() );
-        }
-    }
-    else {
-        if ( mwcNode->isRunning() ) {
-            mwcNode->stop();
         }
     }
 
