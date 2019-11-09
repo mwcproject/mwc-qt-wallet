@@ -144,7 +144,7 @@ private:
 
     QString nonEmittedOutput;
 
-    QString nodeStatusString;
+    QString nodeStatusString= "Waiting";
     int     txhashsetHeight = 0;
     int     maxBlockHeight = 0; // backing stopper for getted blocks.
     bool    syncIsDone = false;

@@ -605,10 +605,15 @@ void MwcNode::updateRunningStatus() {
     QString newStatus;
 
     // tolerance - two blocks
-    if (maxBlockHeight >= peersMaxHeight - 2) {
-        newStatus = "Ready";
-    } else {
-        newStatus = "waiting for " + QString::number(peersMaxHeight - maxBlockHeight) + " top blocks...";
+    if (maxBlockHeight > 0) {
+        if (maxBlockHeight >= peersMaxHeight - 2) {
+            newStatus = "Ready";
+        } else {
+            newStatus = "waiting for " + QString::number(peersMaxHeight - maxBlockHeight) + " top blocks...";
+        }
+    }
+    else {
+        newStatus = "Waiting";
     }
 
     if (nodeStatusString != newStatus) {
