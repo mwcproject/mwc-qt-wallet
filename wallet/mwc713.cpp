@@ -1346,7 +1346,8 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
 
     newConfLines.append("chain = \"" + config.getNetwork() + "\"");
     newConfLines.append("wallet713_data_path = \"" + config.getDataPath() + "\"");
-    newConfLines.append("keybase_binary = \"" + config.keyBasePath + "\"");
+    if (config.keyBasePath.length() > 0)
+        newConfLines.append("keybase_binary = "" + config.keyBasePath + """);
 
     if ( !config.mwcmqDomainEx.isEmpty() )
         newConfLines.append("mwcmq_domain = \"" + config.mwcmqDomainEx + "\"");
