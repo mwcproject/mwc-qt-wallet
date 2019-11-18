@@ -18,7 +18,7 @@
 #include "../control/messagebox.h"
 #include "../state/a_initaccount.h"
 #include "../util/widgetutils.h"
-#include "../util/Dictionary.h"
+#include "util/Bip39.h"
 #include "../state/timeoutlock.h"
 
 namespace wnd {

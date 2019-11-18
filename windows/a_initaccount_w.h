@@ -16,6 +16,7 @@
 #define InitAccountW_H
 
 #include <QWidget>
+#include "../util/passwordanalyser.h"
 
 namespace Ui {
 class InitAccount;
@@ -52,6 +53,7 @@ private:
     Ui::InitAccount *ui;
     state::InitAccount * state;
     state::WalletConfig * configState;
+    util::PasswordAnalyser passwordAnalyser;
 };
 
 }

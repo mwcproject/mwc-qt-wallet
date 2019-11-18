@@ -48,6 +48,10 @@
 #include <tgmath.h>
 #include "node/MwcNodeConfig.h"
 #include "node/MwcNode.h"
+#include "tests/testWordSequenser.h"
+#include "tests/testWordDictionary.h"
+#include "tests/testPasswordAnalyser.h"
+#include "misk/DictionaryInit.h"
 
 // Very first run - init everything
 bool deployWalletFilesFromResources() {
@@ -166,8 +170,16 @@ bool readConfig(QApplication & app) {
 int main(int argc, char *argv[])
 {
 #ifdef QT_DEBUG
+    // Generation of the dictionaries.
+    // Don't uncomment it!
+    // misk::provisionDictionary();
+
+
     // tests are quick, let's run them in debug
     test::testLongLong2ShortStr();
+    test::testWordSequences();
+    test::testWordDictionary();
+    test::testPasswordAnalyser();
 #endif
 
     int retVal = 0;

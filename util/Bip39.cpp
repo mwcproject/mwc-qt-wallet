@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Dictionary.h"
+#include "Bip39.h"
 #include <QApplication>
 #include "../control/messagebox.h"
 #include <QFile>

@@ -31,8 +31,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}"
 # Input files
 #
 
-file(GLOB SOURCE_FILES ./*.cpp ./control/*.cpp ./core/*.cpp ./state/*.cpp ./test/*.cpp ./tries/*.cpp ./util/*.cpp ./wallet/*.cpp ./node/*.cpp  ./wallet/tasks/*.cpp ./windows/*.cpp ./dialogs/*.cpp ./tests/*.cpp )
-file(GLOB HEADER_FILES         ./control/*.h   ./core/*.h   ./state/*.h   ./test/*.h   ./tries/*.h   ./util/*.h   ./wallet/*.h   ./node/*.h    ./wallet/tasks/*.h   ./windows/*.h   ./dialogs/*.h   ./tests/*.h  )
+file(GLOB SOURCE_FILES ./*.cpp ./control/*.cpp ./core/*.cpp ./state/*.cpp ./test/*.cpp ./tries/*.cpp ./util/*.cpp ./wallet/*.cpp ./node/*.cpp  ./wallet/tasks/*.cpp ./windows/*.cpp ./dialogs/*.cpp ./tests/*.cpp ./misk/*.cpp)
+file(GLOB HEADER_FILES         ./control/*.h   ./core/*.h   ./state/*.h   ./test/*.h   ./tries/*.h   ./util/*.h   ./wallet/*.h   ./node/*.h    ./wallet/tasks/*.h   ./windows/*.h   ./dialogs/*.h   ./tests/*.h   ./misk/*.cpp)
 
 # Generate necessary headers from .ui files. (qmake lets `uic` do this job.)
 # hint from [Cross-platform Qt5 project using cmake](http://stackoverflow.com/questions/21174586/)
