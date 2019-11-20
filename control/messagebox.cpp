@@ -33,8 +33,6 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, QString
     textOption.setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
     ui->text3->document()->setDefaultTextOption( textOption );
 
-    double dpi = QGuiApplication::primaryScreen()->physicalDotsPerInch();
-
     // prepare for rendering
     QSize curSz = ui->text3->size();
 
