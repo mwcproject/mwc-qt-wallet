@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>624</width>
-    <height>296</height>
+    <width>625</width>
+    <height>188</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -26,18 +26,6 @@
    <string>Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="leftMargin">
-    <number>20</number>
-   </property>
-   <property name="topMargin">
-    <number>20</number>
-   </property>
-   <property name="rightMargin">
-    <number>20</number>
-   </property>
-   <property name="bottomMargin">
-    <number>20</number>
-   </property>
    <item>
     <widget class="control::MwcLabelLarge" name="title">
      <property name="minimumSize">
@@ -66,29 +54,33 @@
     </widget>
    </item>
    <item>
-    <widget class="control::MwcLabelNormal" name="text">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <widget class="control::MwcTextEditDlg" name="text3">
+     <property name="minimumSize">
+      <size>
+       <width>600</width>
+       <height>0</height>
+      </size>
      </property>
-     <property name="font">
-      <font>
-       <pointsize>18</pointsize>
-      </font>
+     <property name="maximumSize">
+      <size>
+       <width>600</width>
+       <height>16777215</height>
+      </size>
      </property>
-     <property name="text">
-      <string>Text</string>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>
-     <property name="wordWrap">
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustIgnored</enum>
+     </property>
+     <property name="undoRedoEnabled">
+      <bool>false</bool>
+     </property>
+     <property name="readOnly">
       <bool>true</bool>
-     </property>
-     <property name="margin">
-      <number>40</number>
      </property>
     </widget>
    </item>
@@ -186,11 +178,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control/MwcPushButton.h</header>
@@ -199,6 +186,11 @@
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcTextEditDlg</class>
+   <extends>QTextEdit</extends>
+   <header>control/MwcPlainEditLogs.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

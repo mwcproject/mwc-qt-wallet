@@ -110,27 +110,36 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
     QStringList params{"--config", mwc713configPath, "--disable-history" ,"-r", mwc::PROMPTS_MWC713 };
     params.append( paramsPlus );
 
+    walletStartTime = QDateTime::currentMSecsSinceEpoch();
+    commandLine = "'" + QFileInfo(mwc713Path).canonicalFilePath() + "'";
+    for (auto & p : params) {
+        if (p=="-r")
+            break; // skipping prompt parameter. It is not needed for troubleshouting
+        commandLine += " '" + p + "'";
+    }
+
     process->start(mwc713Path, params, QProcess::Unbuffered | QProcess::ReadWrite );
 
     while ( ! process->waitForStarted( (int)(10000 * config::getTimeoutMultiplier()) ) ) {
         switch (process->error())
         {
             case QProcess::FailedToStart:
-                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start mwc713 located at " + mwc713Path );
+                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start mwc713 located at " + mwc713Path + "\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
             case QProcess::Crashed:
-                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 crashed during start" );
+                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 crashed during start\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
             case QProcess::Timedout:
-                if (control::MessageBox::question(nullptr, "Warning", "Starting for mwc713 process is taking longer than expected.\nContinue to wait?",
+                if (control::MessageBox::question(nullptr, "Warning", QString("Starting for mwc713 process is taking longer than expected.\nContinue to wait?") +
+                                                  "\n\nCommand line:\n\n" + commandLine,
                                                   "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
                     config::increaseTimeoutMultiplier();
                     continue; // retry with waiting
                 }
-                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 takes too much time to start. Something wrong with environment." );
+                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 takes too much time to start. Something wrong with environment.\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
             default:
-                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start because of unknown error" );
+                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start because of unknown error.\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
         }
     }
@@ -795,6 +804,7 @@ void MWC713::setMwcMqListeningStatus(bool online, QString tid, bool startStopEve
     emit onMwcMqListenerStatus(online);
 
 }
+
 void MWC713::setKeybaseListeningStatus(bool online) {
     if (keybaseOnline != online) {
         appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString("listening on keybase"));
@@ -1194,7 +1204,8 @@ void MWC713::mwc713errorOccurred(QProcess::ProcessError error) {
     }
 
     appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
-                               "mwc713 process exited. Process error: "+ QString::number(error) );
+                     "mwc713 process exited. Process error: "+ QString::number(error) +
+                     + "\n\nCommand line:\n\n" + commandLine);
 
 }
 
@@ -1208,8 +1219,16 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
         mwc713process = nullptr;
     }
 
+    QString errorMessage = "mwc713 process exited due some unexpected error.\nmwc713 exit code: " + QString::number(exitCode);
+
+    if (QDateTime::currentMSecsSinceEpoch() - walletStartTime < 1000L * 15) {
+        // Very likely that wallet wasn't be able to start. Lets update the message with mode details
+        errorMessage += "\n\nPlease check if you have enough space at your home disk or there are any antivirus preventing mwc713 to start."
+                        "\n\nYou might use command line for troubleshooting:\n\n" + commandLine;
+    }
+
     appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
-                               "mwc713 process exited due some unexpected error. mwc713 exit code: " + QString::number(exitCode) );
+                               errorMessage );
 }
 
 void MWC713::mwc713readyReadStandardError() {
@@ -1347,7 +1366,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
     newConfLines.append("chain = \"" + config.getNetwork() + "\"");
     newConfLines.append("wallet713_data_path = \"" + config.getDataPath() + "\"");
     if (config.keyBasePath.length() > 0)
-        newConfLines.append("keybase_binary = "" + config.keyBasePath + """);
+        newConfLines.append("keybase_binary = \"" + config.keyBasePath + "\"");
 
     if ( !config.mwcmqDomainEx.isEmpty() )
         newConfLines.append("mwcmq_domain = \"" + config.mwcmqDomainEx + "\"");

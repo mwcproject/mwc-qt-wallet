@@ -14,6 +14,9 @@
 
 #include "control/messagebox.h"
 #include "ui_messagebox.h"
+#include <Qt>
+#include <QTextDocument>
+#include <QScreen>
 
 namespace control {
 
@@ -23,7 +26,29 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, QString
 {
     ui->setupUi(this);
     ui->title->setText(title);
-    ui->text->setText(message);
+
+    // Setting text option
+    QTextOption textOption;
+    textOption.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+    textOption.setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
+    ui->text3->document()->setDefaultTextOption( textOption );
+
+    double dpi = QGuiApplication::primaryScreen()->physicalDotsPerInch();
+
+    // prepare for rendering
+    QSize curSz = ui->text3->size();
+
+    // text as a data should work for as.
+    ui->text3->setPlainText(message);
+
+    // size is the wierdest part. We are renderind document to get a size form it.
+    // Document tolk in Pt, so need to convert into px. Conversion is not very accurate
+    ui->text3->document()->setTextWidth( curSz.width() );
+    ui->text3->document()->adjustSize();
+    QSizeF docSz = ui->text3->document()->size();
+    int h = int(docSz.height()*1.1);
+    ui->text3->setMaximumHeight( h );
+    ui->text3->setMinimumHeight( h );
 
     if (btn1.isEmpty()) {
         ui->button1->hide();

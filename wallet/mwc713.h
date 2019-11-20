@@ -395,6 +395,9 @@ private:
     QVector<AccountInfo> collectedAccountInfo;
 
     QVector<WalletTransaction> collectedTransactions;
+
+    int64_t walletStartTime = 0;
+    QString commandLine;
 };
 
 }

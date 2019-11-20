@@ -157,6 +157,9 @@ private:
     int restartCounter = 0;
 
     QString lastDataPath;
+
+    int64_t nodeStartTime = 0;
+    QString commandLine;
 };
 
 }

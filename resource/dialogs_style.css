@@ -227,5 +227,25 @@ control--MwcPlainEditLogs {
     font-size: 12px;
     border-radius: 4px;
     padding: 1px;
+    border: transparent;
+    background: transparent;
+}
+
+control--MwcTextEditDlg {
+    font-size: 15px;
+    border-radius: 6px;
+    padding: 8px;
+    border: transparent;
+    background: transparent;
+}
+
+control--MwcPlainEditLogs:focus {
+    border: transparent;
+    background: transparent;
+}
+
+control--MwcTextEditDlg:focus {
+    border: transparent;
+    background: transparent;
 }
 

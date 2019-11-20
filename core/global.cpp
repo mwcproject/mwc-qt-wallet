@@ -26,13 +26,20 @@ void setApplication(QApplication * app, QMainWindow * mainWindow) {
     mwcMainWnd = mainWindow;
 }
 
+static bool nonClosed = true;
+
 void closeApplication() {
     Q_ASSERT(mwcApp);
     Q_ASSERT(mwcMainWnd);
 
-    // Async call is the only way to close App nicely !!!!
-    // Alternatively we can call app::quit slot
-    QMetaObject::invokeMethod(mwcMainWnd, "close", Qt::QueuedConnection);
+    if (nonClosed) {
+
+        nonClosed = false;
+
+        // Async call is the only way to close App nicely !!!!
+        // Alternatively we can call app::quit slot
+        QMetaObject::invokeMethod(mwcMainWnd, "close", Qt::QueuedConnection);
+    }
 }
 
 }
