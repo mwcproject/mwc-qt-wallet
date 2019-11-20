@@ -124,7 +124,7 @@ QPair<QString, bool> PasswordAnalyser::getPasswordQualityReport(const QString & 
     for (auto w : weight)
         weightsSum += w;
 
-    if (weightsSum >= PASS_MIN_WEIGHT) {
+    if (weightsSum+0.01 >= PASS_MIN_WEIGHT) {
         // we are good to go!
         if ( seqWords.isEmpty() && dictWords.isEmpty() )
             return QPair<QString, bool>("",true); // Great password
