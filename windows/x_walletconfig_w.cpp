@@ -59,7 +59,7 @@ static bool checkKeyBasePath( QWidget * parent, QString keybasePath ) {
         // C:\Users\XXXX\AppData\Local\Keybase\keybase.exe        - ok
         // C:\Users\XXXX\AppData\Local\Keybase\Gui\Keybase.exe    - GUI, will not work
         if (keybasePath.contains("Gui") || keybasePath.contains("gui") ) {
-            if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::question( parent, "Keybase path, Warning",
+            if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::questionText( parent, "Keybase path, Warning",
                                "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
                                "Cancel", "Use this path", true, false ) )
                 return false;
