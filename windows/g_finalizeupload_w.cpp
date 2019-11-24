@@ -53,7 +53,7 @@ void FinalizeUpload::on_uploadFileBtn_clicked() {
     util::FileTransactionInfo transInfo;
 
     if (!transInfo.parseTransaction(fileName)) {
-        control::MessageBox::message(this, "Incorrect File",
+        control::MessageBox::messageText(this, "Incorrect File",
                                      "MWC response transaction file " + fileName + " has a wrong format.");
         return;
     }

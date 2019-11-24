@@ -201,7 +201,7 @@ void Mwc713EventManager::timerEvent(QTimerEvent *event) {
 
     if (QDateTime::currentMSecsSinceEpoch() > taskExecutionTimeLimit) {
 
-        if (control::MessageBox::question(nullptr, "Warning", "mwc713 command execution is taking longer than expected.\nContinue to wait?",
+        if (control::MessageBox::questionText(nullptr, "Warning", "mwc713 command execution is taking longer than expected.\nContinue to wait?",
                                           "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
             config::increaseTimeoutMultiplier();
             // Update the waiting time

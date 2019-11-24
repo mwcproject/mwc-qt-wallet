@@ -120,12 +120,12 @@ void Receive::respReceiveFile( bool success, QStringList errors, QString inFileN
             fileTransWnd->hideProgress();
 
         if (success) {
-            control::MessageBox::message(nullptr, "Receive File Transaction",
+            control::MessageBox::messageText(nullptr, "Receive File Transaction",
                                          "Transaction file was successfully signed. Resulting transaction located at " +
                                          inFileName + ".response");
             ftBack();
         } else {
-            control::MessageBox::message(nullptr, "Failure",
+            control::MessageBox::messageText(nullptr, "Failure",
                                          "Unable to sign file transaction.\n" + util::formatErrorMessages(errors));
         }
     }

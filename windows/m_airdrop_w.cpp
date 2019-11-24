@@ -105,13 +105,13 @@ void Airdrop::on_claimAirdropBtn_clicked()
     QString address = ui->btcAddressEdit->text().trimmed().trimmed();
 
     if (address.length()==0) {
-        control::MessageBox::message(this, "Error", "Please input your BTC address that you registered during the airdrop");
+        control::MessageBox::messageText(this, "Error", "Please input your BTC address that you registered during the airdrop");
         return;
     }
 
     QString password = ui->passwordAirdrop->text();
     if (password.isEmpty()) {
-        control::MessageBox::message(this, "Error", "Please specify your password from your Airdrop account at www.mwc.mw");
+        control::MessageBox::messageText(this, "Error", "Please specify your password from your Airdrop account at www.mwc.mw");
         return;
     }
 
@@ -125,7 +125,7 @@ void Airdrop::reportMessage( QString title, QString message ) {
 
     hideProgress();
 
-    control::MessageBox::message(this, title, message);
+    control::MessageBox::messageText(this, title, message);
 }
 
 // true if status is active

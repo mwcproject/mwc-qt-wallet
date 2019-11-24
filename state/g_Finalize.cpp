@@ -108,11 +108,11 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
         fileTransWnd->hideProgress();
 
     if (success) {
-        control::MessageBox::message(nullptr, "Finalize File Transaction", "File Transaction was finalized successfully.");
+        control::MessageBox::messageText(nullptr, "Finalize File Transaction", "File Transaction was finalized successfully.");
         ftBack();
     }
     else {
-        control::MessageBox::message(nullptr, "Failure", "File Transaction failed to finalize.\n" + errors.join("\n") );
+        control::MessageBox::messageText(nullptr, "Failure", "File Transaction failed to finalize.\n" + errors.join("\n") );
     }
 }
 

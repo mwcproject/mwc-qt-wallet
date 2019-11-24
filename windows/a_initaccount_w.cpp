@@ -101,7 +101,7 @@ void InitAccount::on_submitButton_clicked()
 
     QPair <bool, QString> valRes = util::validateMwc713Str(pswd1, true);
     if (!valRes.first) {
-        control::MessageBox::message(this, "Password", valRes.second );
+        control::MessageBox::messageText(this, "Password", valRes.second );
         return;
     }
 
@@ -113,12 +113,12 @@ void InitAccount::on_submitButton_clicked()
         return;
 
     if (pswd1!=pswd2) {
-        control::MessageBox::message(this, "Password", "Password doesn't match confirm string. Please retype the password correctly");
+        control::MessageBox::messageText(this, "Password", "Password doesn't match confirm string. Please retype the password correctly");
         return;
     }
 
     if (! paResp.second ) {
-        control::MessageBox::message(this, "Password", "Your password is not strong enough. Please input stronger password");
+        control::MessageBox::messageText(this, "Password", "Your password is not strong enough. Please input stronger password");
         return;
     }
 

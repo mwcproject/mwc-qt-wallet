@@ -172,7 +172,7 @@ void Listening::onMwcAddressWithIndex(QString mwcAddress, int idx) {
 }
 
 void Listening::onListenerMqCollision() {
-    control::MessageBox::message(nullptr, "MWC MQS new login detected", "New login to MWC MQS detected. Only one instance of your wallet can be connected to MWC MQS.\nListener is stopped. You can activate listener from 'Listening' page.");
+    control::MessageBox::messageText(nullptr, "MWC MQS new login detected", "New login to MWC MQS detected. Only one instance of your wallet can be connected to MWC MQS.\nListener is stopped. You can activate listener from 'Listening' page.");
 }
 
 // Looking for "Failed to start mwcmqs subscriber. Error connecting to mqs.mwc.mw:443"

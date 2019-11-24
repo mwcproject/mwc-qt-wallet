@@ -117,7 +117,7 @@ void ChangeNode::on_applyButton_clicked() {
         QDir d(fullPath);
 
         if (! ( d.exists() || d.mkdir(fullPath)) ) {
-            control::MessageBox::message(this, "Input", "Please specify correct directory for thr node data. Directory\n" + fullPath + "\nis not accessible" );
+            control::MessageBox::messageText(this, "Input", "Please specify correct directory for thr node data. Directory\n" + fullPath + "\nis not accessible" );
             ui->nodeDataLocation->setFocus();
             return;
         }
@@ -131,18 +131,18 @@ void ChangeNode::on_applyButton_clicked() {
         // Validate the input data
         if ( !mwcNodeUri.isEmpty() || !mwcNodeSecret.isEmpty()) {
             if ( mwcNodeUri.isEmpty() ) {
-                control::MessageBox::message(this, "Input", "Please specify custom mwc-node URI." );
+                control::MessageBox::messageText(this, "Input", "Please specify custom mwc-node URI." );
                 ui->mwcNodeUriEdit->setFocus();
                 return;
             }
             if ( mwcNodeSecret.isEmpty() ) {
-                control::MessageBox::message(this, "Input", "Please specify custom mwc-node secret." );
+                control::MessageBox::messageText(this, "Input", "Please specify custom mwc-node secret." );
                 ui->mwcNodeSecretEdit->setFocus();
                 return;
             }
 
             if ( ! (mwcNodeUri.startsWith("http://") || mwcNodeUri.startsWith("https://") ) ) {
-                control::MessageBox::message(this, "Input", "Please specify http or https protocol for mwc node connection. Please note, https connection does require CA certificate." );
+                control::MessageBox::messageText(this, "Input", "Please specify http or https protocol for mwc node connection. Please note, https connection does require CA certificate." );
                 ui->mwcNodeUriEdit->setFocus();
                 return;
             }
@@ -150,7 +150,7 @@ void ChangeNode::on_applyButton_clicked() {
             // Remove the port part to verify the host
             int uriPortIdx = mwcNodeUri.indexOf(':', std::strlen("https://") );
             if (uriPortIdx<=0) {
-                control::MessageBox::message(this, "Input", "Please specify a port for mwc-node connection." );
+                control::MessageBox::messageText(this, "Input", "Please specify a port for mwc-node connection." );
                 ui->mwcNodeUriEdit->setFocus();
                 return;
             }
@@ -159,7 +159,7 @@ void ChangeNode::on_applyButton_clicked() {
             bool portok = false;
             mwcNodeUri.mid(uriPortIdx+1).toInt(&portok);
             if (uriPortIdx<=0) {
-                control::MessageBox::message(this, "Input", "Please specify valid mwc node URI." );
+                control::MessageBox::messageText(this, "Input", "Please specify valid mwc node URI." );
                 ui->mwcNodeUriEdit->setFocus();
                 return;
             }
@@ -167,7 +167,7 @@ void ChangeNode::on_applyButton_clicked() {
             // Checking if URI is reachable...
             QUrl url2test(mwcNodeUri);
             if ( !url2test.isValid() ) {
-                control::MessageBox::message( this, "Input", "mwc node URL "+mwcNodeUri+" is invalid. Please specify a valid URI for mwc node" );
+                control::MessageBox::messageText( this, "Input", "mwc node URL "+mwcNodeUri+" is invalid. Please specify a valid URI for mwc node" );
                 ui->mwcNodeUriEdit->setFocus();
                 return;
             }
@@ -176,7 +176,7 @@ void ChangeNode::on_applyButton_clicked() {
             QHostInfo host = QHostInfo::fromName( hostName );
             if (host.error() != QHostInfo::NoError) {
 
-                control::MessageBox::message(this, "Input",
+                control::MessageBox::messageText(this, "Input",
                                              "mwc node host " + hostName + " is not reachable.\n" + host.errorString());
                 ui->mwcNodeUriEdit->setFocus();
                 return;
@@ -191,7 +191,7 @@ void ChangeNode::on_applyButton_clicked() {
         return;
     }
 
-    if (control::MessageBox::question(this, "Update mwc node connection", "Update of mwc node connection required relogin into the wallet. Than you will be able to verify if your wallet was able to connect to the mwc node.\nWould you like to continue?",
+    if (control::MessageBox::questionText(this, "Update mwc node connection", "Update of mwc node connection required relogin into the wallet. Than you will be able to verify if your wallet was able to connect to the mwc node.\nWould you like to continue?",
                                       "Yes", "No", true, false) != control::MessageBox::RETURN_CODE::BTN1 ) {
         return;
     }

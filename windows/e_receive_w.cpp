@@ -91,7 +91,7 @@ void Receive::onTransactionActionIsFinished( bool success, QString message ) {
     state::TimeoutLockObject to( state );
 
     ui->progress->hide();
-    control::MessageBox::message(this, success ? "Success" : "Failure", message );
+    control::MessageBox::messageText(this, success ? "Success" : "Failure", message );
 }
 
 void Receive::stopWaiting() {

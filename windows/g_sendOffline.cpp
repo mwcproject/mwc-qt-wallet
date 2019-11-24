@@ -63,7 +63,7 @@ void SendOffline::on_sendButton_clicked()
     {
         QPair<bool, QString> valRes = util::validateMwc713Str(description);
         if (!valRes.first) {
-            control::MessageBox::message(this, "Incorrect Input", valRes.second);
+            control::MessageBox::messageText(this, "Incorrect Input", valRes.second);
             ui->descriptionEdit->setFocus();
             return;
         }
@@ -92,7 +92,7 @@ void SendOffline::showSendMwcOfflineResult( bool success, QString message ) {
     state::TimeoutLockObject to( state );
 
     ui->progress->hide();
-    control::MessageBox::message(this, success ? "Success" : "Failure", message );
+    control::MessageBox::messageText(this, success ? "Success" : "Failure", message );
 }
 
 

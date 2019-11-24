@@ -222,11 +222,11 @@ void Transactions::showExportProofResults(bool success, QString fn, QString msg 
             dlg.exec();
         }
         else {
-            control::MessageBox::message(this, "Failure", "Internal error. Unable to decode the results of the proof located at  " + fn + "\n\n" + msg );
+            control::MessageBox::messageText(this, "Failure", "Internal error. Unable to decode the results of the proof located at  " + fn + "\n\n" + msg );
         }
     }
     else {
-        control::MessageBox::message(this, "Failure", msg );
+        control::MessageBox::messageText(this, "Failure", msg );
     }
 
 }
@@ -239,11 +239,11 @@ void Transactions::showVerifyProofResults(bool success, QString fn, QString msg 
             dlg.exec();
         }
         else {
-            control::MessageBox::message(this, "Failure", "Internal error. Unable to decode the results of the proof from the file " + fn + "\n\n" + msg );
+            control::MessageBox::messageText(this, "Failure", "Internal error. Unable to decode the results of the proof from the file " + fn + "\n\n" + msg );
         }
     }
     else {
-        control::MessageBox::message(this, "Failure", msg );
+        control::MessageBox::messageText(this, "Failure", msg );
     }
 }
 
@@ -310,7 +310,7 @@ void Transactions::on_generateProofButton_clicked()
     wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
 
     if (! ( selected!=nullptr && selected->proof ) ) {
-        control::MessageBox::message(this, "Need info",
+        control::MessageBox::messageText(this, "Need info",
                               "Please select qualify transaction to generate a proof.");
         return;
     }
@@ -366,11 +366,11 @@ void Transactions::on_deleteButton_clicked()
     wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
 
     if (! ( selected!=nullptr && !selected->confirmed ) ) {
-        control::MessageBox::message(this, "Need info",
+        control::MessageBox::messageText(this, "Need info",
                               "Please select qualify transaction to cancel.");
         return;
     }
-    if ( control::MessageBox::question(this, "Transaction cancellation",
+    if ( control::MessageBox::questionText(this, "Transaction cancellation",
             "Are you sure you want to cancel transaction #" + QString::number(selected->txIdx+1) +
                                ", TXID " + selected->txid, "No", "Yes", true, false) == control::MessageBox::RETURN_CODE::BTN2 ) {
         state->cancelTransaction(*selected);
@@ -382,10 +382,10 @@ void Transactions::updateCancelTransacton(bool success, int64_t trIdx, QString e
     if (success) {
         requestTransactions(getSelectedAccount().accountName);
 
-        control::MessageBox::message(this, "Transaction was cancelled", "Transaction number " + QString::number(trIdx+1) + " was successfully cancelled");
+        control::MessageBox::messageText(this, "Transaction was cancelled", "Transaction number " + QString::number(trIdx+1) + " was successfully cancelled");
     }
     else {
-        control::MessageBox::message(this, "Failed to cancel transaction", "Cancel request for transaction number " + QString::number(trIdx+1) + " has failed.\n\n" + errMessage);
+        control::MessageBox::messageText(this, "Failed to cancel transaction", "Cancel request for transaction number " + QString::number(trIdx+1) + " has failed.\n\n" + errMessage);
     }
 }
 

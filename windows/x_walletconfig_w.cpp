@@ -70,7 +70,7 @@ static bool checkKeyBasePath( QWidget * parent, QString keybasePath ) {
     // /Applications/Keybase.app/Contents/MacOS/Keybase              - GUI, not OK
     // /Applications/Keybase.app/Contents/SharedSupport/bin/keybase  - ok
     if (!keybasePath.contains("bin") ) {
-        if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::question( parent, "Keybase path, Warning",
+        if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::questionText( parent, "Keybase path, Warning",
                                                                                       "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
                                                                                       "Cancel", "Use this path", true, false ) )
             return false;
@@ -196,14 +196,14 @@ bool WalletConfig::readInputValue(
     // mwc713 directory
     QString walletDir = ui->mwc713directoryEdit->text().trimmed();
     if (walletDir.isEmpty()) {
-        control::MessageBox::message(this, "Input", "Please specify non empty wallet folder name");
+        control::MessageBox::messageText(this, "Input", "Please specify non empty wallet folder name");
         ui->mwc713directoryEdit->setFocus();
         return false;
     }
 
     QPair <bool, QString> res = util::validateMwc713Str(walletDir);
     if (!res.first) {
-        control::MessageBox::message( this, "Input", res.second );
+        control::MessageBox::messageText( this, "Input", res.second );
         ui->mwc713directoryEdit->setFocus();
         return false;
     }
@@ -212,7 +212,7 @@ bool WalletConfig::readInputValue(
     QString keybasePath = keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() );
     res = util::validateMwc713Str(keybasePath);
     if (!res.first) {
-        control::MessageBox::message( this, "Input", res.second );
+        control::MessageBox::messageText( this, "Input", res.second );
         ui->keybasePathEdit->setFocus();
         return false;
     }
@@ -230,7 +230,7 @@ bool WalletConfig::readInputValue(
 
         QHostInfo host = QHostInfo::fromName(mwcmqHost);
         if (host.error() != QHostInfo::NoError) {
-            control::MessageBox::message( this, "Input", "Host "+mwcmqHost+" is not reachable.\n" + host.errorString() );
+            control::MessageBox::messageText( this, "Input", "Host "+mwcmqHost+" is not reachable.\n" + host.errorString() );
             ui->mwcmqHost->setFocus();
             return false;
         }
@@ -239,14 +239,14 @@ bool WalletConfig::readInputValue(
     bool ok = false;
     int confirmations = ui->confirmationNumberEdit->text().trimmed().toInt(&ok);
     if (!ok || confirmations<=0 || confirmations>10) {
-        control::MessageBox::message( this, "Input", "Please input the number of confirmations in the range from 1 to 10" );
+        control::MessageBox::messageText( this, "Input", "Please input the number of confirmations in the range from 1 to 10" );
         ui->confirmationNumberEdit->setFocus();
         return false;
     }
 
     int changeOutputs = ui->changeOutputsEdit->text().trimmed().toInt(&ok);
     if (!ok || changeOutputs<=0 || confirmations>=100) {
-        control::MessageBox::message( this, "Input", "Please input the change output number in the range from 1 to 100" );
+        control::MessageBox::messageText( this, "Input", "Please input the change output number in the range from 1 to 100" );
         ui->changeOutputsEdit->setFocus();
         return false;
     }
@@ -256,7 +256,7 @@ bool WalletConfig::readInputValue(
 
     // Just in case. Normally will never be called
     if ( runningArc != networkArch.second ) {
-        control::MessageBox::message(nullptr, "Wallet data architecture mismatch",
+        control::MessageBox::messageText(nullptr, "Wallet data architecture mismatch",
                                      "Your mwc713 seed at '"+ walletDir +"' was created with "+ networkArch.second+" bits version of the wallet. You are using " + runningArc + " bit version.");
         return false;
     }
@@ -310,7 +310,7 @@ void WalletConfig::on_mwc713directorySelect_clicked()
 
     // Just in case. Normally will never be called
     if ( runningArc != networkArch.second ) {
-        control::MessageBox::message(nullptr, "Wallet data architecture mismatch",
+        control::MessageBox::messageText(nullptr, "Wallet data architecture mismatch",
                                      "Your mwc713 seed at '"+ walletDir +"' was created with "+ networkArch.second+" bits version of the wallet. You are using " + runningArc + " bit version.");
         return;
     }
@@ -389,12 +389,12 @@ void WalletConfig::on_applyButton_clicked()
         if (need2updateLogEnabled) {
             bool needCleanupLogs = false;
             if ( !ui->logsEnableBtn->isChecked() ) {
-                needCleanupLogs = (control::MessageBox::question(this, "Wallet Logs", "You just disabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
+                needCleanupLogs = (control::MessageBox::questionText(this, "Wallet Logs", "You just disabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
                                               "Please note, the logs can contain private infromation about your transactions and accounts.\n"
                                               "Do you want to clean up existing logs from your wallet?", "Clean up", "Keep the logs", true, false) == control::MessageBox::RETURN_CODE::BTN1);
             }
             else {
-                control::MessageBox::message(this, "Wallet Logs", "You just enabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
+                control::MessageBox::messageText(this, "Wallet Logs", "You just enabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
                                               "Please note, the logs can contain private infromation about your transactions and accounts.");
             }
             state->updateWalletLogsEnabled(ui->logsEnableBtn->isChecked(), needCleanupLogs);

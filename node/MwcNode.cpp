@@ -158,7 +158,7 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
                 reportNodeFatalError( "mwc-node crashed during start\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
             case QProcess::Timedout:
-                if (control::MessageBox::question(nullptr, "Warning", "Starting for mwc-node process is taking longer than expected.\nContinue to wait?"
+                if (control::MessageBox::questionText(nullptr, "Warning", "Starting for mwc-node process is taking longer than expected.\nContinue to wait?"
                                                                       "\n\nCommand line:\n\n" + commandLine,
                                                   "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
                     config::increaseTimeoutMultiplier();
@@ -786,7 +786,7 @@ void MwcNode::replyFinished(QNetworkReply* reply) {
 
 void MwcNode::reportNodeFatalError( QString message ) {
 
-    if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::question(nullptr, "Embedded MWC-Node Error",
+    if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(nullptr, "Embedded MWC-Node Error",
             message + "\n\nIf Embedded mwc-node doesn't work for you, please switch to MWC Cloud node before exit", "Keep Embedded", "Switch to Cloud", false, true ) ) {
 
         // Switching to the cloud node

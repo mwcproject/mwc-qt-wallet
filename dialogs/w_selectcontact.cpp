@@ -98,7 +98,7 @@ void SelectContact::on_selectButton_clicked()
     int idx = SelectContact::getSelectedContactIndex();
 
     if ( idx<0 || idx>=contacts.size() ) {
-        control::MessageBox::message(this, "Need info", "Please select a contact that you are going to use");
+        control::MessageBox::messageText(this, "Need info", "Please select a contact that you are going to use");
         return;
     }
 

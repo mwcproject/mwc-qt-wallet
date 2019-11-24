@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
             QString arch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDataPath).second;
 
             if (arch != runningArc) {
-                if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::question(nullptr, "Wallet data architecture mismatch",
+                if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::questionText(nullptr, "Wallet data architecture mismatch",
                                              "Your mwc713 seed at '"+ walletDataPath +"' was created with "+arch+" bits version of the wallet. "
                                              "Please exit and use original version of the wallet, or specify another folder for the seed",
                                              "Exit", "Select Folder", false, true) ) {
@@ -332,7 +332,7 @@ int main(int argc, char *argv[])
         if (!util::acquireAppGlobalLock() )
         {
             // Seems like we are blocked on global semaphore. It is mean that second instance does exist
-            control::MessageBox::message(nullptr, "Second mwc-qt-wallet instance is detected",
+            control::MessageBox::messageText(nullptr, "Second mwc-qt-wallet instance is detected",
                                          "There is another instance of mwc-qt-wallet is already running. It is impossible to run more than one instance of the wallet at the same time.");
             return 1;
         }

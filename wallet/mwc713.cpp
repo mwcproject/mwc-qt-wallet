@@ -130,7 +130,7 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
                 appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 crashed during start\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
             case QProcess::Timedout:
-                if (control::MessageBox::question(nullptr, "Warning", QString("Starting for mwc713 process is taking longer than expected.\nContinue to wait?") +
+                if (control::MessageBox::questionText(nullptr, "Warning", QString("Starting for mwc713 process is taking longer than expected.\nContinue to wait?") +
                                                   "\n\nCommand line:\n\n" + commandLine,
                                                   "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
                     config::increaseTimeoutMultiplier();
@@ -1023,7 +1023,7 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
     updateWalletBalance();
 
     // Show message box with congrats. Message bot should work from any point. No needs to block locking or what ever we have
-    control::MessageBox::message(nullptr, "Congratulations!",
+    control::MessageBox::messageHTML(nullptr, "Congratulations!",
            "You recieved <b>" + mwc + "</b> mwc<br>" +
            (message.isEmpty() ? "" : "Description: " + message + "<br>" ) +
            "<br>From: " + fromAddr +
@@ -1302,7 +1302,7 @@ WalletConfig MWC713::readWalletConfig(QString source) {
     util::ConfigReader  mwc713config;
 
     if (!mwc713config.readConfig(source) ) {
-        control::MessageBox::message(nullptr, "Read failure", "Unable to read mwc713 configuration from " + source );
+        control::MessageBox::messageText(nullptr, "Read failure", "Unable to read mwc713 configuration from " + source );
         return WalletConfig();
     }
 
@@ -1313,7 +1313,7 @@ WalletConfig MWC713::readWalletConfig(QString source) {
     QString mwcmqsDomain = mwc713config.getString("mwcmqs_domain");
 
     if (dataPath.isEmpty() ) {
-        control::MessageBox::message(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + source );
+        control::MessageBox::messageText(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + source );
         return WalletConfig();
     }
 
@@ -1422,7 +1422,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
 bool MWC713::setWalletConfig( const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode ) {
 
     if ( !saveWalletConfig( config, appContext, mwcNode ) ) {
-        control::MessageBox::message(nullptr, "Update Config failure", "Not able to update mwc713 configuration at " + config::getMwc713conf() );
+        control::MessageBox::messageText(nullptr, "Update Config failure", "Not able to update mwc713 configuration at " + config::getMwc713conf() );
         return false;
     }
 

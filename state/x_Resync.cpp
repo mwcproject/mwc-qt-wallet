@@ -112,9 +112,9 @@ void Resync::onCheckResult(bool ok, QString errors ) {
     }
 
     if (ok)
-        control::MessageBox::message(nullptr, "Success", "Account re-sync finished successfully.");
+        control::MessageBox::messageText(nullptr, "Success", "Account re-sync finished successfully.");
     else
-        control::MessageBox::message(nullptr, "Failure", "Account re-sync failed.\n" + errors);
+        control::MessageBox::messageText(nullptr, "Failure", "Account re-sync failed.\n" + errors);
 
     if (context->appContext->getActiveWndState() == STATE::RESYNC ) {
         context->stateMachine->setActionWindow( (STATE)prevState );

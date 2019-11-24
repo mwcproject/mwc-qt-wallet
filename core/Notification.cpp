@@ -91,7 +91,7 @@ void reportFatalError( QString message )  {
 void appendNotificationMessage( MESSAGE_LEVEL level, QString message ) {
     if (level == MESSAGE_LEVEL::FATAL_ERROR) {
         // Fatal error. Display message box and exiting. We don't want to continue
-        control::MessageBox::message(nullptr, "Wallet Error", "Wallet got a critical error:\n" + message + "\n\nPress OK to exit the wallet" );
+        control::MessageBox::messageText(nullptr, "Wallet Error", "Wallet got a critical error:\n" + message + "\n\nPress OK to exit the wallet" );
         mwc::closeApplication();
         return;
     }

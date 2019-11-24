@@ -54,7 +54,7 @@ void NewSeed::showSeedData(const QVector<QString> & seed) {
     state::TimeoutLockObject to( context->stateMachine );
 
     if (seed.size()<2) {
-        control::MessageBox::message( this, "Getting Passphrase Failure", "Unable to retrieve a passphrase from mwc713." + (seed.size()>0 ? seed[0] : "") );
+        control::MessageBox::messageText( this, "Getting Passphrase Failure", "Unable to retrieve a passphrase from mwc713." + (seed.size()>0 ? seed[0] : "") );
         return;
     }
     updateSeedData("Mnemonic passphrase:", seed);

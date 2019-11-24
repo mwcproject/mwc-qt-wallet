@@ -139,12 +139,12 @@ void NodeInfo::setNodeStatus( const QString & localNodeStatus, const state::Node
 }
 
 void NodeInfo::onShowNodeConnectionError(QString errorMessage) {
-    control::MessageBox::message(this, "mwc node connection error",
+    control::MessageBox::messageText(this, "mwc node connection error",
         "Unable to retrieve mwc node status.\n" + errorMessage);
 }
 
 void NodeInfo::on_refreshButton_clicked() {
-    if (control::MessageBox::question(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
+    if (control::MessageBox::questionText(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
                        "Yes", "No", false,true) == control::MessageBox::RETURN_CODE::BTN1 ) {
         state->requestWalletResync();
     }

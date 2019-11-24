@@ -49,7 +49,7 @@ Listening::~Listening()
 
 void Listening::showMessage(QString title, QString message) {
     state::TimeoutLockObject to( state );
-    control::MessageBox::message(this, title, message);
+    control::MessageBox::messageText(this, title, message);
 }
 
 
@@ -129,7 +129,7 @@ void Listening::on_mwcMqToIndex_clicked()
     int idx = index.toInt(&ok);
 
     if (!ok || idx<0 || idx>65000) {
-        control::MessageBox::message(this, "Wrong value", "Please input integer in the range from 0 to 65000");
+        control::MessageBox::messageText(this, "Wrong value", "Please input integer in the range from 0 to 65000");
         return;
     }
 

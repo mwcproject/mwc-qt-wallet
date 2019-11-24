@@ -28,16 +28,18 @@ class MessageBox : public MwcDialog
     Q_OBJECT
 protected:
     // btnX if empty, the button will be hidden
-    explicit MessageBox(QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2 );
+    explicit MessageBox(QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2, bool default1, bool default2 );
     virtual ~MessageBox() override;
 
 public:
     enum class RETURN_CODE {BTN1, BTN2};
 
     // One button, OK box
-    static void message( QWidget *parent, QString title, QString message );
+    static void messageText( QWidget *parent, QString title, QString message );
+    static void messageHTML( QWidget *parent, QString title, QString message );
     // Two button box
-    static RETURN_CODE question( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1=false, bool default2=true );
+    static RETURN_CODE questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1=false, bool default2=true );
+    static RETURN_CODE questionHTML( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1=false, bool default2=true );
 
 private slots:
     void on_button1_clicked();

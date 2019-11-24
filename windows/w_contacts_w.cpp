@@ -103,7 +103,7 @@ void Contacts::on_addButton_clicked()
         QPair<bool, QString> res = state->addContact(dlg.getContact());
 
         if (!res.first) {
-            control::MessageBox::message(this, "Error", "Unable to add a new contact.\n" + res.second);
+            control::MessageBox::messageText(this, "Error", "Unable to add a new contact.\n" + res.second);
         }
 
         updateContactTable();
@@ -132,7 +132,7 @@ void Contacts::on_editButton_clicked()
         QPair<bool, QString> res = state->updateContact( oldContact, contact );
 
         if (!res.first)
-            control::MessageBox::message(this, "Error", "Unable to update the contact data. Error: " + res.second);
+            control::MessageBox::messageText(this, "Error", "Unable to update the contact data. Error: " + res.second);
 
         updateContactTable();
     }
@@ -158,11 +158,11 @@ void Contacts::on_deleteButton_clicked()
 
     core::ContactRecord contact2del = contacts[idx];
 
-    if (control::MessageBox::question(this, "Remove a contact", "Remove the selected contact for " + contact2del.name +
+    if (control::MessageBox::questionText(this, "Remove a contact", "Remove the selected contact for " + contact2del.name +
                               "? Press 'Yes' to delete.", "Yes", "No", false,true) == control::MessageBox::RETURN_CODE::BTN1 ) {
         QPair<bool, QString> res = state->deleteContact(contact2del);
         if (!res.first) {
-            control::MessageBox::message(this, "Error", "Unable to remove the contact '"+ contact2del.name +"'.\nError: " + res.second);
+            control::MessageBox::messageText(this, "Error", "Unable to remove the contact '"+ contact2del.name +"'.\nError: " + res.second);
         }
 
         updateContactTable();

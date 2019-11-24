@@ -92,14 +92,14 @@ void SendOnline::on_sendButton_clicked()
     {
         QPair<bool, QString> valRes = util::validateMwc713Str(sendTo);
         if (!valRes.first) {
-            control::MessageBox::message(this, "Incorrect Input", valRes.second);
+            control::MessageBox::messageText(this, "Incorrect Input", valRes.second);
             ui->sendEdit->setFocus();
             return;
         }
     }
 
     if (sendTo.size() == 0 ) {
-        control::MessageBox::message(this, "Incorrect Input",
+        control::MessageBox::messageText(this, "Incorrect Input",
                                      "Please specify a valid address." );
         ui->sendEdit->setFocus();
         return;
@@ -111,7 +111,7 @@ void SendOnline::on_sendButton_clicked()
     // Let's  verify address first
     QPair< bool, util::ADDRESS_TYPE > res = util::verifyAddress(address);
         if ( !res.first ) {
-            control::MessageBox::message(this, "Incorrect Input",
+            control::MessageBox::messageText(this, "Incorrect Input",
                                          "Please specify correct address to send your MWC" );
             ui->sendEdit->setFocus();
             return;
@@ -122,14 +122,14 @@ void SendOnline::on_sendButton_clicked()
     {
         QPair<bool, QString> valRes = util::validateMwc713Str(description);
         if (!valRes.first) {
-            control::MessageBox::message(this, "Incorrect Input", valRes.second);
+            control::MessageBox::messageText(this, "Incorrect Input", valRes.second);
             ui->descriptionEdit->setFocus();
             return;
         }
     }
 
     // Ask for confirmation
-    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::question(this,"Confirm Send request",
+    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this,"Confirm Send request",
                                   "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " mwc to address\n" + address, "Decline", "Confirm", false, true ) )
         return;
 
@@ -144,7 +144,7 @@ void SendOnline::sendRespond( bool success, const QStringList & errors ) {
     ui->progress->hide();
 
     if (success) {
-        control::MessageBox::message(this, "Success", "Your mwc was successfully sent to recipient");
+        control::MessageBox::messageText(this, "Success", "Your mwc was successfully sent to recipient");
         ui->sendEdit->setText("");
         ui->descriptionEdit->setText("");
         return;
@@ -157,7 +157,7 @@ void SendOnline::sendRespond( bool success, const QStringList & errors ) {
     else
         errMsg = "Your send request was failed:\n" + errMsg;
 
-    control::MessageBox::message( this, "Send request failed", errMsg );
+    control::MessageBox::messageText( this, "Send request failed", errMsg );
 }
 
 
