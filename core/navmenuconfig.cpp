@@ -33,7 +33,7 @@ NavMenuConfig::NavMenuConfig(QWidget *parent, state::StateContext * _context ) :
         uiNode->setupUi(this);
     }
     else if (config::isColdWallet()) {
-        uiColdWallet  = new Ui::NavMenuConfigColdWallet;
+        uiColdWallet  = new Ui::NavMenuConfigColdWlt;
         uiColdWallet ->setupUi(this);
     }
     else {
@@ -72,6 +72,11 @@ void NavMenuConfig::on_mwcmqButton_clicked()
 void NavMenuConfig::on_nodeOverviewButton_clicked()
 {
     context->stateMachine->setActionWindow( state::STATE::NODE_INFO );
+    close();
+}
+
+void NavMenuConfig::on_selectRunningModeButton_clicked() {
+    context->stateMachine->setActionWindow( state::STATE::RUNNING_MODE );
     close();
 }
 

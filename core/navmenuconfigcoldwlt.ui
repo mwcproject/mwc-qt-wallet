@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NavMenuConfigColdWallet</class>
+ <class>NavMenuConfigColdWlt</class>
  <widget class="QFrame" name="NavMenuConfig">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>187</width>
-    <height>198</height>
+    <height>247</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -114,6 +114,35 @@
    </property>
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="control::MwcFrameWithBorder" name="frame_6">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>195</y>
+     <width>156</width>
+     <height>2</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="control::NavMenuButton" name="selectRunningModeButton">
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>201</y>
+     <width>170</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Select Running Mode</string>
    </property>
   </widget>
  </widget>

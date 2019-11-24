@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>187</width>
-    <height>244</height>
+    <height>292</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -134,6 +134,35 @@
     <rect>
      <x>15</x>
      <y>192</y>
+     <width>156</width>
+     <height>2</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="control::NavMenuButton" name="selectRunningModeButton">
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>246</y>
+     <width>170</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Select Running Mode</string>
+   </property>
+  </widget>
+  <widget class="control::MwcFrameWithBorder" name="frame_6">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>240</y>
      <width>156</width>
      <height>2</height>
     </rect>

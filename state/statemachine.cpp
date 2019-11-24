@@ -73,6 +73,8 @@ StateMachine::StateMachine(StateContext * _context) :
     states[ STATE::WALLET_CONFIG ]  = new WalletConfig(context);
     states[ STATE::NODE_INFO ]      = new NodeInfo(context);
 
+    states[ RUNNING_MODE ]          = new RunningMode(context);
+
     startTimer(1000);
 }
 
