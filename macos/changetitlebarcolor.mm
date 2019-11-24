@@ -27,4 +27,19 @@ void changeTitleBarColor(WId winId, double red, double green, double blue)
     window.appearance = [NSAppearance appearanceNamed:NSAppearanceNameVibrantDark];
 }
 
+bool isRetinaDisplay() {
+
+    float displayScale = 1;
+    if ([[NSScreen mainScreen] respondsToSelector:@selector(backingScaleFactor)]) {
+        NSArray *screens = [NSScreen screens];
+        NSUInteger screenCount = screens.count;
+        for (int i = 0; i < screenCount; i++) {
+            float s = [screens[i] backingScaleFactor];
+            if (s > displayScale)
+                displayScale = s;
+        }
+    }
+    return displayScale>1.001;
+}
+
 }

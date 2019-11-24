@@ -53,6 +53,13 @@
 #include "tests/testPasswordAnalyser.h"
 #include "misk/DictionaryInit.h"
 
+#ifdef Q_OS_DARWIN
+namespace Cocoa
+{
+bool isRetinaDisplay();
+}
+#endif
+
 // Very first run - init everything
 bool deployWalletFilesFromResources() {
     QString confPath = ioutils::getAppDataPath();
@@ -221,7 +228,10 @@ int main(int argc, char *argv[])
     #else
         scale = 1.0; // Mac OS, not applicable, mean 1.0
         // But scale factor still needed to fix the non retina cases on mac OS
-        qputenv( "QT_SCALE_FACTOR", "1.001" );
+
+        if (! Cocoa::isRetinaDisplay()) {
+            qputenv("QT_SCALE_FACTOR", "1.001");
+        }
     #endif
 
         QApplication app(argc, argv);
