@@ -165,7 +165,7 @@ void InitAccount::submit(QString word) {
         // retry with submit call
     }
     else {
-        control::MessageBox::message(nullptr, "Wrong word",
+        control::MessageBox::messageText(nullptr, "Wrong word",
                                      "The word number " + QString::number(tasks[0].getWordIndex()) +
                                      " was typed incorrectly. " +
                                      "Please review your passphrase.");

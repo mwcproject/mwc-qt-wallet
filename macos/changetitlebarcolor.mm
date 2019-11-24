@@ -32,7 +32,7 @@ bool isRetinaDisplay() {
     float displayScale = 1;
     if ([[NSScreen mainScreen] respondsToSelector:@selector(backingScaleFactor)]) {
         NSArray *screens = [NSScreen screens];
-        NSUInteger screenCount = screens.count;
+        int screenCount = screens.count;
         for (int i = 0; i < screenCount; i++) {
             float s = [screens[i] backingScaleFactor];
             if (s > displayScale)
