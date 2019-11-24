@@ -134,7 +134,6 @@ void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
         }
 
         if (status.connections <= 0) {
-            nodeIsReady = false;
             ui->connectionsInfo->setText( toBoldAndYellow("None") ); // Two offline is confusing and doesn't look good. Let's keep zero and highlight it.
 
             if (!config::isColdWallet()) {
@@ -151,6 +150,9 @@ void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
         ui->heightInfo->setText( util::longLong2Str(status.nodeHeight) );
         ui->difficultyInfo->setText( util::longLong2ShortStr(status.totalDifficulty, 9) );
     }
+
+    if (status.peerHeight==0 || status.connections==0)
+        nodeIsReady = false;
 
     updateNodeReadyButtons(nodeIsReady);
 
