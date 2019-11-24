@@ -1360,6 +1360,11 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
         }
     }
 
+    if ( !config::isOnlineNode() ) {
+        // point of that setting to restore for switch from online node to wallet
+        appContext->setWallet713DataPathWithNetwork(config.getDataPath(), config.getNetwork() );
+    }
+
     newConfLines.append("chain = \"" + config.getNetwork() + "\"");
     newConfLines.append("wallet713_data_path = \"" + config.getDataPath() + "\"");
     newConfLines.append("keybase_binary = \"" + config.keyBasePath + "\"");

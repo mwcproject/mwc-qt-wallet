@@ -35,6 +35,7 @@
 #include "../core/Config.h"
 #include "u_nodeinfo.h"
 #include "g_Finalize.h"
+#include "y_selectmode.h"
 
 
 namespace state {
@@ -73,7 +74,7 @@ StateMachine::StateMachine(StateContext * _context) :
     states[ STATE::WALLET_CONFIG ]  = new WalletConfig(context);
     states[ STATE::NODE_INFO ]      = new NodeInfo(context);
 
-    states[ RUNNING_MODE ]          = new RunningMode(context);
+    states[ WALLET_RUNNING_MODE ]   = new SelectMode(context);
 
     startTimer(1000);
 }

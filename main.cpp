@@ -49,7 +49,6 @@
 #include "node/MwcNodeConfig.h"
 #include "node/MwcNode.h"
 #include "build_version.h"
-#include "dialogs/selectmodedlg.h"
 
 // Very first run - init everything
 bool deployWalletFilesFromResources() {
@@ -82,7 +81,7 @@ bool deployWalletFilesFromResources() {
 // Read configs
 // first - success flag
 // second - error message
-QPair<bool, QString> readConfig(QApplication & app, bool isFirstRun) {
+QPair<bool, QString> readConfig(QApplication & app) {
     QCoreApplication::setApplicationName("mwc-qt-wallet");
     QCoreApplication::setApplicationVersion("v0.1");
 
@@ -114,6 +113,7 @@ QPair<bool, QString> readConfig(QApplication & app, bool isFirstRun) {
         return QPair<bool, QString>(false, "Unable to parse config file " + config);
     }
 
+/*  Dialog functionality works, but for UX we move it into the pages
     if (isFirstRun) {
         dlg::SelectModeDlg selectModeDlg(nullptr);
         if(selectModeDlg.exec() == QDialog::Rejected)
@@ -139,7 +139,7 @@ QPair<bool, QString> readConfig(QApplication & app, bool isFirstRun) {
             control::MessageBox::message(nullptr, "Error", "Wallet unable to switch to the selected mode" );
             return QPair<bool, QString>(false, ""); // just exit
         }
-    }
+    }*/
 
     QString mwc_path = reader.getString("mwc_path");
     QString wallet713_path = reader.getString("wallet713_path");
@@ -301,9 +301,10 @@ int main(int argc, char *argv[])
             }
         }
 
+        // first run flag is not used, but let's keep it.
         bool firstRun = !appContext.isSetupDone( BUILD_VERSION );
 
-        QPair<bool, QString> readConfRes = readConfig(app, firstRun );
+        QPair<bool, QString> readConfRes = readConfig(app);
         if (! readConfRes.first ) {
             if (!readConfRes.second.isEmpty())
                 control::MessageBox::message(nullptr, "Error", "MWC GUI Wallet unable to read configuration.\n" + readConfRes.second );
@@ -328,10 +329,14 @@ int main(int argc, char *argv[])
             // Check if wallet point to the right location
             if ( walletDataPath.contains("tmp") && walletDataPath.contains("online_node_wallet") ) {
                 // ned to switch to the normal wallet path
-                walletDataPath = "gui_wallet713_data";
 
-                // Node must be cloud - default one
-                QString network = walletConfig.getNetwork();
+                // Try to restore the last valid wallet path and a network...
+                QString network;
+                if (!appContext.getWallet713DataPathWithNetwork(walletDataPath, network) )
+                {
+                    walletDataPath = "gui_wallet713_data";
+                    network = walletConfig.getNetwork();
+                }
                 wallet::MwcNodeConnection mwcNodeConnection = appContext.getNodeConnection( network );
                 if ( !mwcNodeConnection.isCloudNode() ) {
                     mwcNodeConnection.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD );

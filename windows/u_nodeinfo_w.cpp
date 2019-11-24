@@ -67,6 +67,8 @@ NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
     if ( !config::isColdWallet() )
         ui->coldWalletBtns->hide();
 
+    updateNodeReadyButtons(false);
+
     showWarning("");
 }
 
@@ -74,7 +76,6 @@ NodeInfo::~NodeInfo() {
     state->wndIsGone(this);
     delete ui;
 }
-
 
 // logs to show, multi like output
 void NodeInfo::updateEmbeddedMwcNodeStatus( const QString & status ) {
@@ -104,6 +105,8 @@ void NodeInfo::showWarning(QString warning) {
 void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
     QString warning;
 
+    bool nodeIsReady = false;
+
     if (!status.online) {
         ui->statusInfo->setText( toBoldAndYellow("Offline") );
         ui->connectionsInfo->setText("-");
@@ -126,9 +129,12 @@ void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
         else {
             if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL)
                 ui->statusInfo->setText("Online");
+
+            nodeIsReady = true;
         }
 
         if (status.connections <= 0) {
+            nodeIsReady = false;
             ui->connectionsInfo->setText( toBoldAndYellow("None") ); // Two offline is confusing and doesn't look good. Let's keep zero and highlight it.
 
             if (!config::isColdWallet()) {
@@ -145,6 +151,8 @@ void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
         ui->heightInfo->setText( util::longLong2Str(status.nodeHeight) );
         ui->difficultyInfo->setText( util::longLong2ShortStr(status.totalDifficulty, 9) );
     }
+
+    updateNodeReadyButtons(nodeIsReady);
 
     showWarning(warning);
 }
@@ -232,5 +240,10 @@ void NodeInfo::on_publishTransaction_clicked()
     state->publishTransaction(fileName);
 }
 
+void NodeInfo::updateNodeReadyButtons(bool nodeIsReady) {
+    ui->publishTransaction->setEnabled(nodeIsReady);
+    ui->saveBlockchianData->setEnabled(nodeIsReady);
+    ui->refreshButton->setEnabled(nodeIsReady);
+}
 
 }

@@ -89,7 +89,7 @@ struct MwcNodeConnection {
 // Wallet config
 struct WalletConfig {
 private:
-    QString network; // Name of the network as wallet undertand: "Floonet" or "Mainnet"
+    QString network; // Name of the network as wallet understand: "Floonet" or "Mainnet"
     QString dataPath;
 
 public:

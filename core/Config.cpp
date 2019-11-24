@@ -40,6 +40,7 @@ QPair<bool, WALLET_RUN_MODE> runModeFromString(QString str) {
     else
         return QPair<bool, WALLET_RUN_MODE>(false, WALLET_RUN_MODE::ONLINE_WALLET);
 }
+WALLET_RUN_MODE getWalletRunMode() {return runMode;}
 bool isOnlineWallet() {return runMode == WALLET_RUN_MODE::ONLINE_WALLET;}
 bool isOnlineNode()   {return runMode == WALLET_RUN_MODE::ONLINE_NODE;}
 bool isColdWallet()   {return runMode == WALLET_RUN_MODE::COLD_WALLET;}

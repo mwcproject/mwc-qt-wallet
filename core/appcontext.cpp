@@ -138,7 +138,7 @@ bool AppContext::loadData() {
 
     int id = 0;
     in >> id;
-    if (id<0x4783 || id>0x4786)
+    if (id<0x4783 || id>0x4787)
          return false;
 
     in >> receiveAccount;
@@ -175,6 +175,11 @@ bool AppContext::loadData() {
         nodeConnectionFlooNet.loadData(in);
     }
 
+    if (id>=0x4787) {
+        in >> wallet713DataPath;
+        in >> network;
+    }
+
     return true;
 }
 
@@ -195,7 +200,7 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x4786;
+    out << 0x4787;
     out << receiveAccount;
     out << currentAccountName;
     out << int(activeWndState);
@@ -214,6 +219,9 @@ void AppContext::saveData() const {
 
     nodeConnectionMainNet.saveData(out);
     nodeConnectionFlooNet.saveData(out);
+
+    out << wallet713DataPath;
+    out << network;
 }
 
 void AppContext::setLogsEnabled(bool enabled) {
@@ -358,6 +366,24 @@ void AppContext::updateMwcNodeConnection(const QString network, const wallet::Mw
 
     }
     // save because it must be in sync with configs that saved now as well
+    saveData();
+}
+
+bool AppContext::getWallet713DataPathWithNetwork( QString & _wallet713DataPath, QString & _network) {
+    if ( wallet713DataPath.isEmpty() || network.isEmpty() )
+        return false;
+
+    _wallet713DataPath = wallet713DataPath;
+    _network = network;
+    return true;
+}
+
+void AppContext::setWallet713DataPathWithNetwork( const QString & _wallet713DataPath, const QString & _network ) {
+    if ( wallet713DataPath == _wallet713DataPath && network == _network )
+        return;
+
+    wallet713DataPath = _wallet713DataPath;
+    network = _network;
     saveData();
 }
 

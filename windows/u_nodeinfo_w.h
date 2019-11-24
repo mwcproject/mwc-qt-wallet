@@ -47,6 +47,8 @@ private:
 
     void showNodeLogs();
 
+    void updateNodeReadyButtons(bool nodeIsReady);
+
 private slots:
     void on_refreshButton_clicked();
     void onShowNodeConnectionError(QString errorMessage);

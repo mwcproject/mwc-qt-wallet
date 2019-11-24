@@ -133,6 +133,10 @@ public:
     wallet::MwcNodeConnection getNodeConnection(const QString network) const;
     void updateMwcNodeConnection(const QString network, const wallet::MwcNodeConnection & connection );
 
+    // return false if value not set
+    bool getWallet713DataPathWithNetwork( QString & wallet713DataPath, QString & network);
+    void setWallet713DataPathWithNetwork( const QString & wallet713DataPath, const QString & network );
+
     // First run for a new version flags support...
     bool isSetupDone(QString version);
     void updateSetupDone(QString version);
@@ -170,6 +174,10 @@ private:
 
     // Contact list
     QVector<ContactRecord> contactList;
+
+    // wallet 713 path need to be duplicated because of the running mode.
+    QString wallet713DataPath;
+    QString network;
 };
 
 template <class T>

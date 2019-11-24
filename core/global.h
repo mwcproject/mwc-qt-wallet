@@ -100,6 +100,8 @@ const QString PAGE_X_SHOW_PASSPHRASE= "Wallet mnemonic passphrase";
 const QString PAGE_X_WALLET_CONFIG  = "Wallet Config";
 const QString PAGE_X_RESYNC         = "Re-sync wallet with mwc node";
 
+const QString PAGE_Y_SELECT_RUNNING_MODE = "Select Running Mode";
+
 const QString PAGE_HODL             = "HODL";
 
 void setApplication(QApplication * app, QMainWindow * mainWindow);

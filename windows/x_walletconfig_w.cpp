@@ -58,7 +58,7 @@ static bool checkKeyBasePath( QWidget * parent, QString keybasePath ) {
     // Under the windows we want user select Client, Not a GUI
         // C:\Users\XXXX\AppData\Local\Keybase\keybase.exe        - ok
         // C:\Users\XXXX\AppData\Local\Keybase\Gui\Keybase.exe    - GUI, will not work
-        if (keybasePath.contains("Gui") || keybasePath.contains("gui") ) {
+        if (!keybasePath.isEmpty() && (keybasePath.contains("Gui") || keybasePath.contains("gui")) ) {
             if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::question( parent, "Keybase path, Warning",
                                "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
                                "Cancel", "Use this path", true, false ) )
@@ -69,7 +69,7 @@ static bool checkKeyBasePath( QWidget * parent, QString keybasePath ) {
     // Mac OS
     // /Applications/Keybase.app/Contents/MacOS/Keybase              - GUI, not OK
     // /Applications/Keybase.app/Contents/SharedSupport/bin/keybase  - ok
-    if (!keybasePath.contains("bin") ) {
+    if (!keybasePath.isEmpty() && !keybasePath.contains("bin") ) {
         if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::question( parent, "Keybase path, Warning",
                                                                                       "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
                                                                                       "Cancel", "Use this path", true, false ) )
@@ -390,7 +390,7 @@ void WalletConfig::on_applyButton_clicked()
             bool needCleanupLogs = false;
             if ( !ui->logsEnableBtn->isChecked() ) {
                 needCleanupLogs = (control::MessageBox::question(this, "Wallet Logs", "You just disabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
-                                              "Please note, the logs can contain private infromation about your transactions and accounts.\n"
+                                              "Please note, the logs can contain private information about your transactions and accounts.\n"
                                               "Do you want to clean up existing logs from your wallet?", "Clean up", "Keep the logs", true, false) == control::MessageBox::RETURN_CODE::BTN1);
             }
             else {

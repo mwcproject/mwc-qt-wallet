@@ -27,6 +27,8 @@ namespace config {
 //                         operations will be available
 enum class WALLET_RUN_MODE { ONLINE_WALLET, ONLINE_NODE, COLD_WALLET };
 QPair<bool, WALLET_RUN_MODE> runModeFromString(QString str);
+
+WALLET_RUN_MODE getWalletRunMode();
 bool isOnlineWallet();
 bool isOnlineNode();
 bool isColdWallet();

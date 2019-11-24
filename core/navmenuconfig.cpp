@@ -76,7 +76,7 @@ void NavMenuConfig::on_nodeOverviewButton_clicked()
 }
 
 void NavMenuConfig::on_selectRunningModeButton_clicked() {
-    context->stateMachine->setActionWindow( state::STATE::RUNNING_MODE );
+    context->stateMachine->setActionWindow( state::STATE::WALLET_RUNNING_MODE );
     close();
 }
 
