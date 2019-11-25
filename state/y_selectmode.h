@@ -37,7 +37,9 @@ public:
     config::WALLET_RUN_MODE getWalletRunMode() const;
 
     // Will require restart
-    void updateWalletRunMode( config::WALLET_RUN_MODE newRunMode );
+    // Note, it is used by many parties as a helper method that apply a new mode and restart the wallet
+    static void updateWalletRunMode( config::WALLET_RUN_MODE newRunMode );
+
 
 protected:
     virtual NextStateRespond execute() override;

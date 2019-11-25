@@ -45,6 +45,8 @@ private slots:
 
 
     void on_password2Edit_textChanged(const QString &arg1);
+    void on_runOnlineNodeButton_clicked();
+
 private:
     void updatePassState();
 
