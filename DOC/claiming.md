@@ -10,5 +10,7 @@ If you click it before the claims period is open, you will see the message, "Cla
 
 After claims are open, you will see something like this:
 
+![Airdrop Enabled](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/airdrop_enabled.png "Airdrop Enabled")
+
 
 
