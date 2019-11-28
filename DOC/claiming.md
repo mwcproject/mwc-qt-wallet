@@ -4,5 +4,5 @@ https://github.com/mwcproject/mwc-qt-wallet/releases
 
 Once you have obtained the wallet you will notice the airdrop tab on the top left side.
 
-![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+![Airdrop Tab](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/airdrop_tab.png "Airdrop Tab")
 
