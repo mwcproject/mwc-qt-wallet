@@ -16,6 +16,8 @@ Note: the "BTC Address to claim" field and the "Airdrop Account Password" fields
 
 After correctly entering this information, you click "Request Airdrop", you will be taken to a page where you sign a message to prove control of the address. The same process used to sign your message for registering will be used on this page.
 
+![Claim](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/claim.png "Claim")
+
 At this point, if successful you will see a message in the Airdrop tab that looks like the one below:
 
 ![Airdrop Awaiting](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/awaiting_finalization2.png
