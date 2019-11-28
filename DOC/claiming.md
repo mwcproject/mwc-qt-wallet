@@ -26,3 +26,7 @@ Please note that it may take up to 48 hours to finalize your airdrop claim and y
 Once your claim is finalized, your funds will be available and you should see a status message like the following:
 
 
+![Claims Complete](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/complete.png
+ "Claims complete")
+
+
