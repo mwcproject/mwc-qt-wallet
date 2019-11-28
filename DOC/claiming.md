@@ -18,5 +18,11 @@ After correctly entering this information, you click "Request Airdrop", you will
 
 At this point, if successful you will see a message in the Airdrop tab that looks like the one below:
 
+![Airdrop Awaiting](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/awaiting_finalization.png
+ "Airdrop Awaiting")
+
+Please note that it may take up to 48 hours to finalize your airdrop claim and your funds will not be available until it is finalized. Also, note that to see the full message, you may need to resize the text area and the wallet.
+
+Once your claim is finalized, your funds will be available and you should see a status message like the following:
 
 
