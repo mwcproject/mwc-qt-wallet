@@ -6,6 +6,11 @@ https://github.com/mwcproject/mwc-qt-wallet/releases
 
 Before you start ensure you have the ability to sign a message from the BTC address that you registered (i.e. have your hardware wallet ready or any tools you need).
 
+  Checklist:
+  [] Latest MWC QT Wallet installed (https://mwc.mw/downloads/)
+  [] Your bitcoin signing wallet ready (e.g. Trezor, Ledger, Coinomi)
+  [] A quiet and private spot to claim the airdrop without distractions
+
 # Claiming Process
 
 Once you have obtained the wallet you will notice the airdrop tab on the top left side.
