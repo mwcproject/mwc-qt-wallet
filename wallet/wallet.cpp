@@ -160,6 +160,7 @@ void WalletTransaction::setData(int64_t _txIdx,
     QString _address,
     QString _creationTime,
     bool    _confirmed,
+    int64_t _height,
     QString _confirmationTime,
     int64_t    _coinNano,
     bool    _proof)
@@ -170,6 +171,7 @@ void WalletTransaction::setData(int64_t _txIdx,
     address = _address;
     creationTime = util::mwc713time2ThisTime(_creationTime);
     confirmed = _confirmed;
+    height = _height;
     confirmationTime = util::mwc713time2ThisTime(_confirmationTime);
     coinNano = _coinNano;
     proof = _proof;

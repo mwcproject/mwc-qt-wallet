@@ -62,10 +62,10 @@ void Transactions::initTableHeaders() {
     // Disabling to show the grid
     // Creatign columns
     QVector<int> widths = state->getColumnsWidhts();
-    if ( widths.size() != 7 ) {
-        widths = QVector<int>{30,90,100,200,160,90,70};
+    if ( widths.size() != 8 ) {
+        widths = QVector<int>{30,90,100,200,160,90,70,90};
     }
-    Q_ASSERT( widths.size() == 7 );
+    Q_ASSERT( widths.size() == 8 );
 
     ui->transactionTable->setColumnWidths( widths );
 }
@@ -203,7 +203,8 @@ void Transactions::setTransactionData(QString account, int64_t height, const QVe
                 trans.address,
                 trans.creationTime,
                 util::nano2one(trans.coinNano),
-                (trans.confirmed ? "YES":"NO")
+                (trans.confirmed ? "YES":"NO"),
+                trans.height<=0 ? "" : QString::number(trans.height)
         }, selection );
     }
 

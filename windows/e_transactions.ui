@@ -107,6 +107,11 @@
            <string>CONFIRM</string>
           </property>
          </column>
+         <column>
+          <property name="text">
+           <string>HEIGHT</string>
+          </property>
+         </column>
         </widget>
        </item>
        <item>

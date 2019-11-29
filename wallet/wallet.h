@@ -172,8 +172,9 @@ struct WalletTransaction {
     QString address;
     QString creationTime;
     bool    confirmed = false;
+    int64_t height = 0;
     QString confirmationTime;
-    int64_t    coinNano=0; // Net diffrence
+    int64_t coinNano = 0; // Net diffrence
     bool    proof=false;
 
     void setData(int64_t txIdx,
@@ -182,6 +183,7 @@ struct WalletTransaction {
         QString address,
         QString creationTime,
         bool    confirmed,
+        int64_t height,
         QString confirmationTime,
         int64_t    coinNano,
         bool    proof);
