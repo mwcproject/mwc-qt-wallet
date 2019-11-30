@@ -36,8 +36,7 @@ public:
                                         QStringList & dictWords);
 
 private:
-    static const int PASS_MIN_LEN   = 10;
-    constexpr static const double PASS_MIN_WEIGHT = 8.0;
+    static const int PASS_MIN_LEN   = 8;
     static const int DICTS_NUM      = 4;
 
     QString attentinColor;

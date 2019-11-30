@@ -48,18 +48,21 @@ QVector<core::TestSeedTask> generateSeedTasks( const QVector<QString> & seed ) {
 
     // Generate tasks. Need to review the words one by one
     QVector< QPair<int,QString> > words;
-    for ( int i=0;i<seed.size();i++ )
-        words.push_back( QPair<int,QString>(i+1, seed[i]) );
-
     QVector<core::TestSeedTask> confirmTasks;
+    for ( int i=0;i<seed.size();i++ ) {
+        words.push_back(QPair<int, QString>(i + 1, seed[i]));
+        confirmTasks.push_back( core::TestSeedTask( i + 1, seed[i]) );
+    }
 
-    srand (time(nullptr));
+/* Tasks will go in random order
+   srand (time(nullptr));
 
     while( words.size()>0 ) {
         int idx = rand() % words.size();
         confirmTasks.push_back( core::TestSeedTask( words[idx].first, words[idx].second) );
         words.remove(idx);
-    }
+    }*/
+
     return confirmTasks;
 }
 

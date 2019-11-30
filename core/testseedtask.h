@@ -38,7 +38,7 @@ public:
 private:
     int wordIndex;
     QString word;
-    int failures;
+    int failures;  // not used, currently task is easy, so failure counter is global, not per word. This one kept in case if we will need to switch back
 };
 
 QVector<core::TestSeedTask> generateSeedTasks( const QVector<QString> & seed );

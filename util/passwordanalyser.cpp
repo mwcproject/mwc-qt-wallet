@@ -14,6 +14,7 @@
 
 #include "passwordanalyser.h"
 #include <QMap>
+#include <math.h>
 
 namespace util {
 
@@ -73,20 +74,25 @@ QPair<QString, bool> PasswordAnalyser::getPasswordQualityReport(const QString & 
         hasSpecialSymbols = true;
     }
 
-    double startWeight = 1.0;
-    if (!hasUpperCase)
-        startWeight *= 0.8;
-    if (!hasLowerCase)
-        startWeight *= 0.8;
-    if (!hasNumbers)
-        startWeight *= 0.9;
-    if (!hasSpecialSymbols)
-        startWeight *= 0.9;
+    int alphabetSz = 1;
+    if (hasUpperCase)
+        alphabetSz += 32;
+    if (hasLowerCase)
+        alphabetSz += 32;
+    if (hasNumbers)
+        alphabetSz += 10;
+    if (hasSpecialSymbols)
+        alphabetSz += 32;
 
-    // init all letterst with a start weight
+    // Minimum number of effective bits needed for the password to pass.
+    double bitsMinSum = log2( 32.0 * 3 + 10 ) * 7;
+
+    double singleCharBitWeight = log2(alphabetSz);
+
+    // init all letters with a start weight
     weight.resize(pass.length());
     for (auto & w : weight)
-        w = startWeight;
+        w = singleCharBitWeight;
 
     seqWords.clear();
     dictWords.clear();
@@ -96,13 +102,13 @@ QPair<QString, bool> PasswordAnalyser::getPasswordQualityReport(const QString & 
                  QString::number(PASS_MIN_LEN)+" symbols</font>", false);
 
     // Let's check for sequences. All sequence has a weight 1
-    for ( auto s : sequenceAnalyzer.detectSequences(pass, weight, 1.0) )
+    for ( auto s : sequenceAnalyzer.detectSequences(pass, weight, singleCharBitWeight) )
         if (s.length()>2)
             seqWords << s;
 
     // Let's check dictionary words
     for ( int t=0; t<DICTS_NUM; t++ ) {
-        dictWords += dictionaries[t]->detectDictionaryWords(pass, weight, dictionaryWeight[t]);
+        dictWords += dictionaries[t]->detectDictionaryWords(pass, weight, dictionaryWeight[t] * 7.0 ); // dictionary has the full alphabet - 7 bits
     }
 
     // Let's pack the dictionary words...
@@ -124,7 +130,7 @@ QPair<QString, bool> PasswordAnalyser::getPasswordQualityReport(const QString & 
     for (auto w : weight)
         weightsSum += w;
 
-    if (weightsSum+0.01 >= PASS_MIN_WEIGHT) {
+    if (weightsSum+0.01 >= bitsMinSum) {
         // we are good to go!
         if ( seqWords.isEmpty() && dictWords.isEmpty() )
             return QPair<QString, bool>("",true); // Great password

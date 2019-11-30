@@ -116,6 +116,7 @@ void InitAccount::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice, MWC_NETW
 void InitAccount::onNewSeed(QVector<QString> sd) {
     seed = sd;
     tasks = core::generateSeedTasks( seed ); // generate tasks
+    seedTestWrongAnswers = 0;
 
 #ifdef QT_DEBUG
     // We really don't want go trough all words
@@ -165,19 +166,28 @@ void InitAccount::submit(QString word) {
         // retry with submit call
     }
     else {
+        seedTestWrongAnswers++;
+        bool restart = seedTestWrongAnswers>=3;
+
         control::MessageBox::messageText(nullptr, "Wrong word",
                                      "The word number " + QString::number(tasks[0].getWordIndex()) +
                                      " was typed incorrectly. " +
-                                     "Please review your passphrase.");
+                                     "Please review your passphrase and we will try again starting " +
+                                     (restart ? "from the beginning." : "where we left off.") );
 
         // regenerate if totally failed
-        if (tasks[0].isTestCompletelyFailed()) {
+        //  Test on per word basis. Used for random words order.  if (tasks[0].isTestCompletelyFailed()) {
+        if (restart) {
             // generate a new tasks for a wallet
             tasks = core::generateSeedTasks(seed);
+            seedTestWrongAnswers = 0;
         } else {
+         /* In case of random order, put the failed order at the end of the Q.
             // add to the Q
             tasks.push_back( tasks[0] );
-            tasks.remove(0);
+            tasks.remove(0);*/
+
+           // normal order - just do nothing. The same word will be requested.
         }
 
         // switch to 'show seed' window

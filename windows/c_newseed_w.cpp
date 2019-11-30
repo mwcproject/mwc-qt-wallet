@@ -18,6 +18,7 @@
 #include "../util/widgetutils.h"
 #include "../control/messagebox.h"
 #include "../state/timeoutlock.h"
+#include "../util/stringutils.h"
 
 namespace wnd {
 
@@ -61,12 +62,20 @@ void NewSeed::showSeedData(const QVector<QString> & seed) {
 }
 
 void NewSeed::updateSeedData( const QString & name, const QVector<QString> & seed) {
+    int maxWrdLen = 0;
+    for (const auto & s : seed)
+        maxWrdLen = std::max(maxWrdLen, s.length());
+
+    maxWrdLen += 3;
+
     QString thePhrase = "";
-    for (const auto & s : seed) {
-        if (thePhrase.length()>0)
-            thePhrase+=" ";
-        thePhrase+=s;
+
+    for (int i=0;i<seed.size();i++) {
+        thePhrase += util::expandStrR(seed[i], maxWrdLen);
+        if (i % 6==5)
+            thePhrase += "\n";
     }
+
     ui->seedText->setPlainText( name + "\n" + thePhrase);
     ui->seedText->setFocus();
 }
