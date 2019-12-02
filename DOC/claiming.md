@@ -45,4 +45,4 @@ Once your claim is finalized, your funds will be available and you should see a 
 ![Claims Complete](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/complete.png
  "Claims complete")
 
-Congratulations!
+Congratulations! Stay tuned for details regarding the MWC HODL program which rewards hodlers with additional MWC.
