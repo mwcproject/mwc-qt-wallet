@@ -28,6 +28,23 @@ static QSet<QString> falseCriticalMessages{"keybase not found! consider installi
 const int MESSAGE_SIZE_LIMIT = 1000;
 static QVector<NotificationMessage> notificationMessages;
 
+// Enum to string
+QString toString(MESSAGE_LEVEL level) {
+    switch (level) {
+        case MESSAGE_LEVEL::FATAL_ERROR:
+            return "FATAL ERROR";
+        case MESSAGE_LEVEL::CRITICAL:
+            return "CRITICAL";
+        case MESSAGE_LEVEL::WARNING:
+            return "WARNING";
+        case MESSAGE_LEVEL::INFO:
+            return "INFO";
+        case MESSAGE_LEVEL::DEBUG:
+            return "DEBUG";
+    }
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////////
 //      NotificationMessage
 
@@ -89,6 +106,9 @@ void reportFatalError( QString message )  {
 }
 
 void appendNotificationMessage( MESSAGE_LEVEL level, QString message ) {
+
+    logger::logInfo("Notification", toString(level) + "  " + message );
+
     if (level == MESSAGE_LEVEL::FATAL_ERROR) {
         // Fatal error. Display message box and exiting. We don't want to continue
         control::MessageBox::messageText(nullptr, "Wallet Error", "Wallet got a critical error:\n" + message + "\n\nPress OK to exit the wallet" );

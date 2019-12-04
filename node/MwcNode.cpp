@@ -95,6 +95,7 @@ void MwcNode::start(const QString & dataPath, const QString & network ) {
 
 void MwcNode::stop() {
     qDebug() << "MwcNode::stop ...";
+    logger::logInfo( "MWC-NODE", "Stopping mwc-node process" );
 
     nodeProcDisconnect();
 
@@ -146,9 +147,12 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
         commandLine += " '" + p + "'";
     }
 
+    logger::logInfo( "MWC-NODE", "Starting mwc-node process: " + commandLine );
+
     process->start(nodePath, params, QProcess::Unbuffered | QProcess::ReadWrite );
 
     while ( ! process->waitForStarted( (int)( 10000 * config::getTimeoutMultiplier()) ) ) {
+        logger::logInfo( "MWC-NODE", "Failed to start mwc-node process" );
         switch (process->error())
         {
             case QProcess::FailedToStart:
@@ -215,7 +219,8 @@ void MwcNode::nodeProcConnect(QProcess * process) {
 
 
 void MwcNode::nodeErrorOccurred(QProcess::ProcessError error) {
-    logger::logMwcNodeOut("ERROR OCCURRED. Error = " + QString::number(error)  );
+    logger::logInfo("MWC-NODE", "Unable to start mwc-node process. ProcessError=" + QString::number(error) );
+    qDebug() << "Unable to start mwc-node process. ProcessError=" << error;
 
     qDebug() << "ERROR OCCURRED. Error = " << error;
 
@@ -229,8 +234,7 @@ void MwcNode::nodeErrorOccurred(QProcess::ProcessError error) {
 }
 
 void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus) {
-    logger::logMwcNodeOut("Exit with exit code " + QString::number(exitCode) + ", Exit status:" + QString::number(exitStatus) );
-
+    logger::logInfo("MWC-NODE", "Exit with exit code " + QString::number(exitCode) + ", Exit status:" + QString::number(exitStatus) );
     qDebug() << "mwc-node is exiting with exit code " << exitCode << ", exitStatus=" << exitStatus;
 
     if (nodeProcess) {

@@ -52,6 +52,7 @@
 #include "tests/testWordDictionary.h"
 #include "tests/testPasswordAnalyser.h"
 #include "misk/DictionaryInit.h"
+#include "util/stringutils.h"
 
 #ifdef Q_OS_DARWIN
 namespace Cocoa
@@ -285,8 +286,8 @@ int main(int argc, char *argv[])
             return 1;
         }
 
+        logger::logInfo("mwc-qt-wallet", "Starting mwc-gui-wallet with config:\n" + config::toString());
         qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
-
 
         { // Apply style sheet
             QFile file( config::getMainStyleSheetPath() );
@@ -296,6 +297,22 @@ int main(int argc, char *argv[])
             }
             else {
                 QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read the stylesheet.");
+                return 1;
+            }
+        }
+
+        {
+            // Checking if home path is ascii (Latin1) symbols only
+            QString homePath = ioutils::getAppDataPath();
+            int idx = homePath.indexOf("mwc-qt-wallet");
+            if (idx<0)
+                idx = homePath.length();
+
+            homePath = homePath.left(idx-1);
+
+            if ( !util::validateMwc713Str(homePath, false).first ) {
+                control::MessageBox::messageText(nullptr, "Setup Issue", "Your home directory\n" + homePath + "\ncontains Unicode symbols. Unfortunatelly mwc713 unable to handle that.\n\n"
+                                         "Please reinstall mwc-qt-wallet under different user name with basic ASCII (Latin1) symbols only.");
                 return 1;
             }
         }

@@ -206,7 +206,7 @@ void Airdrop::sendRequest(HTTP_CALL call, const QString & api,
     request.setSslConfiguration(config);
 
     qDebug() << "Processing: GET " << requestUrl.toString(QUrl::FullyEncoded);
-    logger::logInfo("Airdrop", "Requesting: " + requestUrl.toString());
+    logger::logInfo("Airdrop", "Requesting: " + url );
     request.setUrl( requestUrl );
     request.setHeader(QNetworkRequest::ServerHeader, "application/json");
 

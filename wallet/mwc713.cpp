@@ -113,14 +113,19 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
     walletStartTime = QDateTime::currentMSecsSinceEpoch();
     commandLine = "'" + QFileInfo(mwc713Path).canonicalFilePath() + "'";
     for (auto & p : params) {
-        if (p=="-r")
-            break; // skipping prompt parameter. It is not needed for troubleshouting
+        if (p=="-r" ||  p==mwc::PROMPTS_MWC713 )
+            continue; // skipping prompt parameter. It is not needed for troubleshouting
         commandLine += " '" + p + "'";
     }
+
+    logger::logInfo("MWC713", "Starting new process: " + commandLine);
 
     process->start(mwc713Path, params, QProcess::Unbuffered | QProcess::ReadWrite );
 
     while ( ! process->waitForStarted( (int)(10000 * config::getTimeoutMultiplier()) ) ) {
+
+        logger::logInfo("MWC713", "mwc713 process failed to start");
+
         switch (process->error())
         {
             case QProcess::FailedToStart:
@@ -293,6 +298,12 @@ void MWC713::start2getnextkey( int64_t amountNano, QString btcaddress, QString a
 // identifier  - output from start2getnextkey
 // Check Signal: onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
 void MWC713::start2receiveSlate( QString receiveAccount, QString identifier, QString slateFN ) {
+
+    if ( ! util::validateMwc713Str(slateFN, false).first ) {
+        setReceiveFile( false, QStringList{"Slate file name '"+slateFN+"' has non ASCII (Latin1) symbols"}, slateFN, "" );
+        return;
+    }
+
     startedMode = STARTED_MODE::RECEIVE_SLATE;
 
     mwcMqOnline = keybaseOnline = false;
@@ -331,6 +342,9 @@ void MWC713::start2receiveSlate( QString receiveAccount, QString identifier, QSt
 
 void MWC713::processStop(bool exitNicely) {
     qDebug() << "MWC713::processStop exitNicely=" << exitNicely;
+
+    logger::logInfo("MWC713", QString("mwc713 process exiting ") + (exitNicely? "nicely" : "by killing") );
+
     loggedIn = false;
 
     mwc713disconnect();
@@ -402,6 +416,8 @@ void MWC713::loginWithPassword(QString password)  {
 // syncCall - stop NOW. Caller suppose to understand what he is doing
 void MWC713::logout(bool syncCall)  {
     qDebug() << "MWC713::logout syncCall=" << syncCall;
+
+    logger::logInfo("MWC713", QString("mwc713 process exiting with logout. syncCall=") + (syncCall?"Yes":"No") );
 
     if (syncCall)
         processStop(true);
@@ -590,6 +606,12 @@ void MWC713::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const
 // Init send transaction with file output
 // Check signal:  onSendFile
 void MWC713::sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs )  {
+
+    if ( ! util::validateMwc713Str(fileTx, false).first ) {
+        setSendFileResult( false, QStringList{"Unable to create file with name '"+fileTx+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."} , fileTx );
+        return;
+    }
+
     // switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account.accountName, walletPassword, true), TaskAccountSwitch::TIMEOUT );
 
@@ -599,12 +621,23 @@ void MWC713::sendFile( const wallet::AccountInfo &account, int64_t coinNano, QSt
 // Receive transaction. Will generate *.response file in the same dir
 // Check signal:  onReceiveFile
 void MWC713::receiveFile( QString fileTx)  {
+    if ( ! util::validateMwc713Str(fileTx, false).first ) {
+        setReceiveFile( false, QStringList{"Unable to process file with name '"+fileTx+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."}, fileTx, "" );
+        return;
+    }
+
     eventCollector->addTask( new TaskReceiveFile(this, fileTx), TaskReceiveFile::TIMEOUT );
 }
 
 // finalize transaction and broadcast it
 // Check signal:  onFinalizeFile
 void MWC713::finalizeFile( QString fileTxResponse )  {
+    if ( ! util::validateMwc713Str(fileTxResponse, false).first ) {
+        setFinalizeFile( false, QStringList{"Unable to process file with name '"+fileTxResponse+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."}, fileTxResponse );
+        return;
+    }
+
+
     eventCollector->addTask( new TaskFinalizeFile(this, fileTxResponse), TaskFinalizeFile::TIMEOUT );
 }
 
@@ -673,12 +706,22 @@ void MWC713::cancelTransacton(int64_t transactionID)  {
 // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
 // Check Signal: onExportProof( bool success, QString fn, QString msg );
 void MWC713::generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName )  {
+    if ( ! util::validateMwc713Str(resultingFileName, false).first ) {
+        setExportProofResults( false, resultingFileName, "Unable to store file with name '"+resultingFileName+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only." );
+        return;
+    }
+
     eventCollector->addTask( new TaskTransExportProof(this, resultingFileName, transactionId), TaskTransExportProof::TIMEOUT );
 }
 
 // Verify the proof for transaction
 // Check Signal: onVerifyProof( bool success, QString msg );
 void MWC713::verifyMwcBoxTransactionProof( QString proofFileName )  {
+    if ( ! util::validateMwc713Str(proofFileName, false).first ) {
+        setVerifyProofResults( false, proofFileName, "Unable to process '"+proofFileName+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only." );
+        return;
+    }
+
     eventCollector->addTask( new TaskTransVerifyProof(this, proofFileName), TaskTransExportProof::TIMEOUT );
 }
 
@@ -1051,7 +1094,9 @@ void MWC713::setSendFileResult( bool success, QStringList errors, QString fileNa
 }
 
 void MWC713::setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn ) {
-    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("File receive transaction was processed for "+ inFileName ));
+    if (success) {
+        appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, QString("File receive transaction was processed for " + inFileName));
+    }
 
     logger::logEmit( "MWC713", "onReceiveFile", "success="+QString::number(success) );
     emit onReceiveFile( success, errors, inFileName, outFn );
@@ -1194,9 +1239,8 @@ void MWC713::mwc713disconnect() {
 }
 
 void MWC713::mwc713errorOccurred(QProcess::ProcessError error) {
-    logger::logMwc713out("ERROR OCCURRED. Error = " + QString::number(error)  );
-
-    qDebug() << "ERROR OCCURRED. Error = " << error;
+    logger::logInfo("MWC713", "Unable to start mwc713 process. ProcessError=" + QString::number(error) );
+    qDebug() << "Unable to start mwc713 process. ProcessError=" << error;
 
     if (mwc713process) {
         mwc713process->deleteLater();
@@ -1210,7 +1254,7 @@ void MWC713::mwc713errorOccurred(QProcess::ProcessError error) {
 }
 
 void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
-    logger::logMwc713out("Exit with exit code " + QString::number(exitCode) + ", Exit status:" + QString::number(exitStatus) );
+    logger::logInfo("MWC713", "mwc713 exited with exit code " + QString::number(exitCode) + ", Exit status:" + QString::number(exitStatus) );
 
     qDebug() << "mwc713 is exiting with exit code " << exitCode << ", exitStatus=" << exitStatus;
 
