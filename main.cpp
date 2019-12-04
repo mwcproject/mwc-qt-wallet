@@ -53,6 +53,7 @@
 #include "tests/testPasswordAnalyser.h"
 #include "misk/DictionaryInit.h"
 #include "util/stringutils.h"
+#include "build_version.h"
 
 #ifdef Q_OS_DARWIN
 namespace Cocoa
@@ -287,7 +288,8 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        logger::logInfo("mwc-qt-wallet", "Starting mwc-gui-wallet with config:\n" + config::toString());
+        logger::logInfo("mwc-qt-wallet", QString("Starting mwc-gui-wallet version ") + BUILD_VERSION );
+        logger::logInfo("mwc-qt-wallet", config::toString());
         qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
 
         { // Apply style sheet
