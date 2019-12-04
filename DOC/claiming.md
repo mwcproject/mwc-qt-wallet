@@ -28,7 +28,7 @@ After claims are open, you will see something like this:
 
 Note: the "BTC Address to claim" field and the "Airdrop Account Password" fields. These are the Bitcoin address you registered during the registration process and the password you set during the registration process. If you forgot your password, you can reset it on this page: https://wallet.mwc.mw/registration.html?v5. You will be prompted to sign an additional message to prove you control the address that is specified.
 
-After correctly entering this information, you click "Request Airdrop", you will be taken to a page where you sign a message to prove control of the address. The same process used to sign your message for registering will be used on this page.
+After correctly entering this information, you click "Request Airdrop", you will be taken to a page where you sign a message to prove control of the address. The same process used to sign your message for registering will be used on this page. Please note that in the section of the wallet that is labeled "Signed Message" you need to put the signature of the message that's provided. It will look something like this, "IBn2qPtqae9kS1c/qehsJXkOnjiK3rBUQ2ncRmLPwDCppfp3UooxJiev9vPNUuCtiGJo9+4Bw01v5fFFPEnTQgk="
 
 ![Claim](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/claim.png "Claim")
 
