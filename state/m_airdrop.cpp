@@ -192,9 +192,11 @@ void Airdrop::sendRequest(HTTP_CALL call, const QString & api,
     Q_ASSERT( params.size()%2==0 );
     QUrlQuery query;
     for (int t=1; t<params.size(); t+=2) {
-        query.addQueryItem(params[t-1], params[t]);
+        query.addQueryItem( util::urlEncode(params[t-1]), util::urlEncode(params[t]));
     }
-    requestUrl.setQuery(query.query(QUrl::FullyEncoded), QUrl::StrictMode );
+    // Note: QT encoding has issues, some symbols will be skipped.
+    // No encoding needed because we encode params with out code.
+    requestUrl.setQuery(query.query(QUrl::PrettyDecoded), QUrl::StrictMode );
 
     QNetworkRequest request;
 

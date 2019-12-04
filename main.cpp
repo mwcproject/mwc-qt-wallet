@@ -185,6 +185,7 @@ int main(int argc, char *argv[])
 
     // tests are quick, let's run them in debug
     test::testLongLong2ShortStr();
+    test::testUtils();
     test::testWordSequences();
     test::testWordDictionary();
     test::testPasswordAnalyser();

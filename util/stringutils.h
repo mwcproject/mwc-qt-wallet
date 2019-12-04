@@ -72,6 +72,10 @@ QString longLong2Str(int64_t n);
 // Formal long number to string with length Limit. Example 1123123123, 9 => 1123.12 M
 QString longLong2ShortStr(int64_t n, int length);
 
+// Encode String into URL format. Expected that it is param or value
+// https://en.wikipedia.org/wiki/Percent-encoding#Percent-encoding_in_a_URI
+// All not unreserved MUST be encoded.
+QString urlEncode( QString str );
 
 }
 
