@@ -1243,6 +1243,9 @@ void MWC713::mwc713errorOccurred(QProcess::ProcessError error) {
     qDebug() << "Unable to start mwc713 process. ProcessError=" << error;
 
     if (mwc713process) {
+        logger::logInfo("MWC713", "stdout: " + mwc713process->readAllStandardOutput() );
+        logger::logInfo("MWC713", "stderr: " + mwc713process->readAllStandardError() );
+
         mwc713process->deleteLater();
         mwc713process = nullptr;
     }
@@ -1259,6 +1262,9 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
     qDebug() << "mwc713 is exiting with exit code " << exitCode << ", exitStatus=" << exitStatus;
 
     if (mwc713process) {
+        logger::logInfo("MWC713", "stdout: " + mwc713process->readAllStandardOutput() );
+        logger::logInfo("MWC713", "stderr: " + mwc713process->readAllStandardError() );
+
         mwc713process->deleteLater();
         mwc713process = nullptr;
     }

@@ -225,6 +225,9 @@ void MwcNode::nodeErrorOccurred(QProcess::ProcessError error) {
     qDebug() << "ERROR OCCURRED. Error = " << error;
 
     if (nodeProcess) {
+        logger::logInfo("MWC-NODE", "stdout: " + nodeProcess->readAllStandardOutput() );
+        logger::logInfo("MWC-NODE", "stderr: " + nodeProcess->readAllStandardError() );
+
         nodeProcess->deleteLater();
         nodeProcess = nullptr;
     }
@@ -238,6 +241,9 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
     qDebug() << "mwc-node is exiting with exit code " << exitCode << ", exitStatus=" << exitStatus;
 
     if (nodeProcess) {
+        logger::logInfo("MWC-NODE", "stdout: " + nodeProcess->readAllStandardOutput() );
+        logger::logInfo("MWC-NODE", "stderr: " + nodeProcess->readAllStandardError() );
+
         nodeProcess->deleteLater();
         nodeProcess = nullptr;
     }
