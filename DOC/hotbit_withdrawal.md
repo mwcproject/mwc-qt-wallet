@@ -8,8 +8,7 @@ It is reccomended that you use chrome on hotbit. Other browsers may work, but ev
 
 Click on the "Fund" tab then "Deposits & Withdrawals".
 
-https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/Screen%20Shot%202019-12-04%20at%204.57.38%20PM.png
-
+![Deposits and Withdrawals](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/Screen%20Shot%202019-12-04%20at%204.57.38%20PM.png)
 
 # Select the receive tab from your wallet.
 
