@@ -22,13 +22,9 @@ First click "Withdrawals" under MWC. You will see a section that looks like this
 
 Click the +Add button you will now see two text areas: "Label" and "Withdraw Address". You may put anything you want in the "label" field. For "Withdraw address" enter the exact address you saw in the "Select the receive tab from your wallet section" of this tutorial. This is very important as if you put ANYTHING other than this address, the withdrawal process will fail and you will have to open a support issue with Hotbit to complete your withdrawal. Also note: you must include the "mwcmqs://" part of the address. So for instance your address that you enter into Hotbit may look something like this: "mwmqs://q5XLmBpaqstWg5S4S3m4umwgiYxF49tC4GkJ26QvvmkRA7HU7wXM". Also note that to save the address, you will need to have an amount set in the "MWC Withdrawal" field to proceed. Once you have added you may click "submit". You will see a dialog box that looks like this:
 
-
 ![Dialog](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/Screen%20Shot%202019-12-04%20at%205.18.29%20PM.png)
 
-
 Follow the instructions in the dialog box by entering your email and submitting the code sent to you via email and enter your google authenticator code.
-
-
 
 Once complete you can click "Confirm". Before clicking confirm make sure your MWC qt wallet is open. If you are locked out of the wallet due to innactivity it is ok because you will still be listening, but do not exit the wallet. After your order is processed you will see a dialog box like this in your mwc-qt-wallet:
 
@@ -36,4 +32,6 @@ Once complete you can click "Confirm". Before clicking confirm make sure your MW
 
 You now have the funds in your wallet.
 
+At this point you may want to look into our cold storage option project here: https://github.com/mwcproject/coldstorage
 
+This version uses command line, but we are working on a GUI version of cold storage as well.
