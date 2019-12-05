@@ -32,6 +32,6 @@ Once complete you can click "Confirm". Before clicking confirm make sure your MW
 
 You now have the funds in your wallet.
 
-At this point you may want to look into our cold storage option project here: https://github.com/mwcproject/coldstorage
+At this point you may want to look into our cold storage project here: https://github.com/mwcproject/coldstorage
 
 This version uses command line, but we are working on a GUI version of cold storage as well.
