@@ -70,24 +70,6 @@ public:
     // Check Signals: onRecoverResult(bool ok, QString newAddress );
     virtual void start2recover(const QVector<QString> & seed, QString password) override;
 
-    // Need for claiming process only
-    // Starting the wallet and get the next key
-    // wallet713> getnextkey --amount 1000000
-    // "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
-    // Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage);
-    virtual void start2getnextkey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) override;
-
-    // it is a distructive command, that will process only this command and wallet will exit.
-    // respond will go with
-    // Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage);
-    //void processGetNextKey(int64_t amountNano, QString btcaddress, QString airDropAccPassword);
-
-    // Need for claiming process only
-    // identifier  - output from start2getnextkey
-    // Check Signal: onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
-    virtual void start2receiveSlate( QString receiveAccount,  QString identifier, QString slateFN ) override;
-
-
     // Check signal: onLoginResult(bool ok)
     virtual void loginWithPassword(QString password)  override;
 
@@ -210,11 +192,16 @@ public:
     virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs )  override;
     // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
-    virtual void receiveFile( QString fileTx)  override;
+    virtual void receiveFile( QString fileTx, QString identifier = "")  override;
     // finalize transaction and broadcast it
     // Check signal:  onFinalizeFile
     virtual void finalizeFile( QString fileTxResponse )  override;
 
+    // Airdrop special. Generating the next Pablic key for transaction
+    // wallet713> getnextkey --amount 1000000
+    // "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
+    // Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPasswor);
+    virtual void getNextKey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) override;
 
     // Send some coins to address.
     // Before send, wallet always do the switch to account to make it active

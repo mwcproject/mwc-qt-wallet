@@ -112,21 +112,8 @@ void Airdrop::onLoginResult(bool ok) {
 }
 
 
-void Airdrop::exitingState() {
-    // Start wallet normally...
-    if (!context->wallet->isRunning()) {
-        context->wallet->start(true);
-    }
-}
-
-
 void Airdrop::startClaimingProcess( const QString & btcAddress, const QString & passwordAirdrop ) {
     // From here we suppose to call Rest API and get the info
-
-    // Stopping the wallet. Claiming process is mostly offline.
-    if (context->wallet->isRunning()) {
-        context->wallet->logout(true);
-    }
 
     // First, let's get amount.
     sendRequest( HTTP_CALL::GET, "/v1/getAmount" ,
@@ -315,7 +302,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
 
             // Preparing for the getChallenge...
             // Expected that walllet is offline
-            context->wallet->start2getnextkey( amount, address, password );
+            context->wallet->getNextKey( amount, address, password );
             // see onGetNextKeyResult to continue...
         }
         else {
@@ -415,7 +402,8 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
 
                 // Starting the slate processing transaction...
                 // wallet expected to be offline...
-                context->wallet->start2receiveSlate( context->appContext->getReceiveAccount(), identifier, slateFn );
+                context->wallet->setReceiveAccount(context->appContext->getReceiveAccount());
+                context->wallet->receiveFile( slateFn, identifier );
 
                 // Continue at onReceiveFile
                 break;
@@ -551,9 +539,6 @@ void Airdrop::onReceiveFile( bool success, QStringList errors, QString inFileNam
     }
 
 }
-
-
-
 
 
 // Respond with error to UI. UI expected to stop waiting

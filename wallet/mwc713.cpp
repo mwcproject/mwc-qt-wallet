@@ -259,87 +259,6 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
     eventCollector->addListener( new TaskRecoverProgressListener(this) );
 }
 
-// Need for claiming process only
-// Starting the wallet and get the next key
-// wallet713> getnextkey --amount 1000000
-// "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
-// Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage);
-void MWC713::start2getnextkey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) {
-    startedMode = STARTED_MODE::GET_NEXTKEY;
-
-    mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = keybaseStarted = false;
-
-    // Start the binary
-    Q_ASSERT(mwc713process == nullptr);
-    Q_ASSERT(inputParser == nullptr);
-
-    qDebug() << "Starting MWC713 for getnextkey at " << mwc713Path << " for config " << mwc713configPath;
-
-    // Creating process and starting
-    // Mnemonic will moved into variables
-    // !!!!! Security breach
-    mwc713process = initMwc713process({}, {} );
-    inputParser = new tries::Mwc713InputParser();
-    eventCollector = new Mwc713EventManager(this);
-    eventCollector->connectWith(inputParser);
-
-    // Excuting the single command and then read all output
-
-    eventCollector->addTask( new TaskStarting(this), TaskStarting::TIMEOUT );
-    eventCollector->addTask( new TaskInitW(this, walletPassword ), TaskInitW::TIMEOUT );
-    eventCollector->addTask( new TaskInitWpressEnter(this ), TaskInitWpressEnter::TIMEOUT );
-    eventCollector->addTask( new TaskGetNextKey(this,amountNano, btcaddress, airDropAccPassword ), TaskGetNextKey::TIMEOUT );
-    // then exit
-    eventCollector->addTask( new TaskLogout(this), TaskLogout::TIMEOUT);
-}
-
-// Need for claiming process only
-// identifier  - output from start2getnextkey
-// Check Signal: onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
-void MWC713::start2receiveSlate( QString receiveAccount, QString identifier, QString slateFN ) {
-
-    if ( ! util::validateMwc713Str(slateFN, false).first ) {
-        setReceiveFile( false, QStringList{"Slate file name '"+slateFN+"' has non ASCII (Latin1) symbols"}, slateFN, "" );
-        return;
-    }
-
-    startedMode = STARTED_MODE::RECEIVE_SLATE;
-
-    mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = keybaseStarted = false;
-
-    // Start the binary
-    Q_ASSERT(mwc713process == nullptr);
-    Q_ASSERT(inputParser == nullptr);
-
-    qDebug() << "Starting MWC713 receiveSlate at " << mwc713Path << " for config " << mwc713configPath;
-
-    // Creating process and starting
-    // Mnemonic will moved into variables
-    mwc713process = initMwc713process({}, {} );
-
-    inputParser = new tries::Mwc713InputParser();
-
-    eventCollector = new Mwc713EventManager(this);
-    eventCollector->connectWith(inputParser);
-
-    // Adding permanent listeners
-    eventCollector->addListener( new TaskErrWrnInfoListener(this) );
-
-
-    // Add first init task
-    eventCollector->addTask( new TaskStarting(this), TaskStarting::TIMEOUT );
-    // log in
-    eventCollector->addTask( new TaskUnlock(this, walletPassword), TaskUnlock::TIMEOUT );
-
-    eventCollector->addTask( new TaskSetReceiveAccount(this, receiveAccount, walletPassword), TaskSetReceiveAccount::TIMEOUT );
-    // Receive file first
-    eventCollector->addTask( new TaskReceiveFile( this, slateFN, identifier ), TaskReceiveFile::TIMEOUT );
-    // then exit
-    eventCollector->addTask( new TaskLogout(this), TaskLogout::TIMEOUT);
-}
-
 void MWC713::processStop(bool exitNicely) {
     qDebug() << "MWC713::processStop exitNicely=" << exitNicely;
 
@@ -620,13 +539,13 @@ void MWC713::sendFile( const wallet::AccountInfo &account, int64_t coinNano, QSt
 
 // Receive transaction. Will generate *.response file in the same dir
 // Check signal:  onReceiveFile
-void MWC713::receiveFile( QString fileTx)  {
+void MWC713::receiveFile( QString fileTx, QString identifier)  {
     if ( ! util::validateMwc713Str(fileTx, false).first ) {
         setReceiveFile( false, QStringList{"Unable to process file with name '"+fileTx+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."}, fileTx, "" );
         return;
     }
 
-    eventCollector->addTask( new TaskReceiveFile(this, fileTx), TaskReceiveFile::TIMEOUT );
+    eventCollector->addTask( new TaskReceiveFile(this, fileTx, identifier), TaskReceiveFile::TIMEOUT );
 }
 
 // finalize transaction and broadcast it
@@ -735,6 +654,13 @@ bool MWC713::getNodeStatus() {
     return true;
 }
 
+// Airdrop special. Generating the next Pablic key for transaction
+// wallet713> getnextkey --amount 1000000
+// "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
+// Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPasswor);
+void MWC713::getNextKey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) {
+    eventCollector->addTask( new TaskGetNextKey(this,amountNano, btcaddress, airDropAccPassword ), TaskGetNextKey::TIMEOUT );
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
