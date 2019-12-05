@@ -2,7 +2,7 @@ This page will explain how to withdraw from Hotbit into the mwc-qt-wallet.
 
 # Before you start
 
-It is reccomended that you use chrome on hotbit. Other browsers may work, but everything in this tutorial has been tested using chrome.
+It is recommended that you use chrome on hotbit. Other browsers may work, but everything in this tutorial has been tested using chrome.
 
 # Go to withdrawals page.
 
