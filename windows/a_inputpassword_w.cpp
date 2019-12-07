@@ -77,6 +77,11 @@ void InputPassword::on_submitButton_clicked() {
         return;
     }
 
+    if (pswd.startsWith("-")) {
+        control::MessageBox::messageText(this, "Password", "You can't start your password from '-' symbol." );
+        return;
+    }
+
     // Submit the password and wait until state will push us.
     state->submitPassword(pswd);
     // Because of event driven, the flow is not linear

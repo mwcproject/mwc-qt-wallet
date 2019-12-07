@@ -51,6 +51,10 @@ QPair<QString, bool> PasswordAnalyser::getPasswordQualityReport(const QString & 
               QStringList & seqWords,
               QStringList & dictWords)
 {
+    // mwc713 password can't from '-',  config parser doesn't handle that
+    if (pass.startsWith("-")) {
+        return QPair<QString, bool>("<font color="+attentinColor+">Password can't be started from '-' symbol.</font>", false);
+    }
 
     // Check if all capital or lower case
     bool hasUpperCase = false;

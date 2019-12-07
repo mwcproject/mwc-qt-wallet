@@ -135,6 +135,11 @@ void Accounts::on_addButton_clicked()
     if (!ok || accountName.isEmpty())
         return;
 
+    if (accountName.startsWith("-")) {
+        control::MessageBox::messageText(this, "Wrong account name",  "You can't start account name from '-' symbol." );
+        return;
+    }
+
     for ( auto & pref : mwc::BANNED_ACCOUT_PREFIXES ) {
         if (accountName.startsWith(pref)) {
             control::MessageBox::messageText(this, "Wrong account name",  "Please specify account name without prefix '" + pref + "'" );
