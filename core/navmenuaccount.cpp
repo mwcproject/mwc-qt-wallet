@@ -43,10 +43,12 @@ void NavMenuAccount::on_seedButton_clicked()
 {
     // need to logout first, than switch to the seed
 
-    // State where to go after login
-    context->appContext->setActiveWndState(state::STATE::SHOW_SEED);
-    context->wallet->logout(true);
-    context->stateMachine->executeFrom( state::STATE::NONE);
+    if (context->stateMachine->canSwitchState()) {
+        // State where to go after login
+        context->appContext->setActiveWndState(state::STATE::SHOW_SEED);
+        context->wallet->logout(true);
+        context->stateMachine->executeFrom(state::STATE::NONE);
+    }
     close();
 }
 

@@ -255,6 +255,11 @@ control--MwcTextEditDlg:focus {
     background: transparent;
 }
 
+control--MwcTextEditDlg:enabled:!focus::hover
+{
+    border: transparent;
+}
+
 /* --------------------------------------- */
 
 QPushButton

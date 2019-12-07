@@ -71,6 +71,7 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
     else {
         ui->button1->setText(btn1);
         ui->button1->setDefault(default1);
+        ui->button1->setFocus();
     }
 
     if (btn2.isEmpty()) {
@@ -84,6 +85,7 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
     else {
         ui->button2->setText(btn2);
         ui->button2->setDefault(default2);
+        ui->button2->setFocus();
     }
 
     ui->button2->adjustSize();

@@ -98,6 +98,19 @@ void StateMachine::start() {
     }
 }
 
+// Check if current state agree to switch the state
+bool StateMachine::canSwitchState() {
+    State* prevState = states.value(currentState, nullptr);
+
+    if (prevState) {
+        return prevState->canExitState();
+    }
+    return true;
+}
+
+// Try to chnage the state.
+// return: true - if was changes
+//         false - operation was cancelled and can't be done...
 void StateMachine::executeFrom( STATE nextState ) {
 
     // notify current state
@@ -133,12 +146,14 @@ void StateMachine::executeFrom( STATE nextState ) {
         context->appContext->setActiveWndState( STATE::SEND );
         executeFrom(STATE::NONE);
     }
-
 }
 
 bool StateMachine::setActionWindow( STATE actionWindowState, bool enforce ) {
     if (!enforce && !isActionWindowMode() )
             return false;
+
+    if (!canSwitchState())
+        return false;
 
     context->appContext->setActiveWndState(actionWindowState);
     executeFrom(actionWindowState);

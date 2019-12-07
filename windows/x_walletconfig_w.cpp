@@ -116,8 +116,23 @@ WalletConfig::WalletConfig(QWidget *parent, state::WalletConfig * _state) :
 
 WalletConfig::~WalletConfig()
 {
+    state->deleteWnd(this);
     delete ui;
 }
+
+// If data can be apllied, ask user about that. Issue that people expect auto apply by exit
+// Return false - if data can't be applied and we have to stay here
+//        true  - no changes or we accept everything
+bool WalletConfig::askUserForChanges() {
+    if ( ui->applyButton->isEnabled() ) {
+        if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(this, "Apply config changes", "Configuration changes was made for the wallet. Do you want to apply them?",
+                "Cancel", "Apply", false, true) ) {
+            return applyChanges();
+        }
+    }
+    return true;
+}
+
 
 void WalletConfig::setValues(const QString & mwc713directory,
                              const QString & keyBasePath,
@@ -374,8 +389,10 @@ void WalletConfig::on_restoreDefault_clicked()
     updateButtons();
 }
 
-void WalletConfig::on_applyButton_clicked()
-{
+// return true if no chnages need to be made.
+// false - need to be made or was made and wallet need to be restarted
+bool WalletConfig::applyChanges() {
+
     wallet::WalletConfig newWalletConfig;
     core::SendCoinsParams newSendParams;
 
@@ -390,12 +407,12 @@ void WalletConfig::on_applyButton_clicked()
             bool needCleanupLogs = false;
             if ( !ui->logsEnableBtn->isChecked() ) {
                 needCleanupLogs = (control::MessageBox::questionText(this, "Wallet Logs", "You just disabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
-                                              "Please note, the logs can contain private infromation about your transactions and accounts.\n"
-                                              "Do you want to clean up existing logs from your wallet?", "Clean up", "Keep the logs", true, false) == control::MessageBox::RETURN_CODE::BTN1);
+                                                                                          "Please note, the logs can contain private infromation about your transactions and accounts.\n"
+                                                                                          "Do you want to clean up existing logs from your wallet?", "Clean up", "Keep the logs", true, false) == control::MessageBox::RETURN_CODE::BTN1);
             }
             else {
                 control::MessageBox::messageText(this, "Wallet Logs", "You just enabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
-                                              "Please note, the logs can contain private infromation about your transactions and accounts.");
+                                                                      "Please note, the logs can contain private infromation about your transactions and accounts.");
             }
             state->updateWalletLogsEnabled(ui->logsEnableBtn->isChecked(), needCleanupLogs);
         }
@@ -410,18 +427,26 @@ void WalletConfig::on_applyButton_clicked()
 
         if ( ! (currentWalletConfig==newWalletConfig) ) {
             if (state->setWalletConfig(newWalletConfig, need2updateGuiSize)) { // in case of true, we are already dead, don't touch memory and exit!
-                return;
+                return false; // need to be restarted. Just want to cancell caller of caller changes state operation
             }
         }
 
         if (need2updateGuiSize) {
             // Restating the wallet
             state->restartMwcQtWallet();
-            return;
+            return false;   // need to be restarted. Just want to cancell caller of caller changes state operation
         }
 
         updateButtons();
+        return true; // We are good. Changes was applied
     }
+
+    return false;
+}
+
+void WalletConfig::on_applyButton_clicked()
+{
+    applyChanges();
 }
 
 // Id match the control names: 1..4
