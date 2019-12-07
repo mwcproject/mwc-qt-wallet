@@ -77,9 +77,11 @@ void Receive::signTransaction( QString fileName ) {
 
     // Let's parse transaction first
     util::FileTransactionInfo flTrInfo;
-    if (!flTrInfo.parseTransaction(fileName)) {
+    QPair<bool, QString> perseResult = flTrInfo.parseTransaction( fileName, util::FileTransactionType::RECEIVE );
+
+    if (!perseResult.first) {
         if (wnd) {
-            wnd->onTransactionActionIsFinished( false, "Unable to parse mwc transaction data at file: " + fileName );
+            wnd->onTransactionActionIsFinished( false, perseResult.second );
         }
         return;
     }

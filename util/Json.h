@@ -29,6 +29,9 @@ QJsonValue readValueFromJson(const QJsonObject & jsonObj, QString path);
 QString readStringFromJson(const QJsonObject & jsonObj, QString path, const QString * const defaultValue = nullptr );
 
 
+// Transaction type as intention - what we want ot do with that.
+enum class FileTransactionType { RECEIVE, FINALIZE };
+
 /////// ------------------ File Transaction processing ---------------------
 struct FileTransactionInfo {
     QString fileName;
@@ -39,7 +42,7 @@ struct FileTransactionInfo {
     int     height;
     int     lock_height;
 
-    bool parseTransaction( QString fileName );
+    QPair<bool, QString> parseTransaction( QString fileName, FileTransactionType type );
 };
 
 
