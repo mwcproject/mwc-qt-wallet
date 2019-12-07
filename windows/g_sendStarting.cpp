@@ -53,8 +53,6 @@ SendStarting::SendStarting(QWidget *parent, state::Send *_state) :
         state(_state) {
     ui->setupUi(this);
 
-    ui->progress->initLoader(true); // waiting for account balance update
-
     ui->fileChecked->setId(FILE_ID);
     ui->onlineChecked->setId(ONLINE_ID);
 
@@ -68,8 +66,6 @@ SendStarting::SendStarting(QWidget *parent, state::Send *_state) :
 }
 
 void SendStarting::updateAccountBalance( QVector<wallet::AccountInfo> _accountInfo, const QString & selectedAccount ) {
-    ui->progress->hide();
-
     // init accounts
     accountInfo = _accountInfo;
 
