@@ -26,31 +26,32 @@ namespace control {
 class MessageBox : public MwcDialog
 {
     Q_OBJECT
+public:
+    enum class RETURN_CODE {BTN1, BTN2};
 protected:
     // btnX if empty, the button will be hidden
-    explicit MessageBox(QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2, bool default1, bool default2 );
+    explicit MessageBox(QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2, bool default1, bool default2, QString password, RETURN_CODE passBlockButton );
     virtual ~MessageBox() override;
 
 public:
-    enum class RETURN_CODE {BTN1, BTN2};
-
     // One button, OK box
-    static void messageText( QWidget *parent, QString title, QString message );
-    static void messageHTML( QWidget *parent, QString title, QString message );
+    static void messageText( QWidget *parent, QString title, QString message, QString password = "");
+    static void messageHTML( QWidget *parent, QString title, QString message, QString password = "" );
     // Two button box
-    static RETURN_CODE questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1=false, bool default2=true );
-    static RETURN_CODE questionHTML( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1=false, bool default2=true );
+    static RETURN_CODE questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1=false, bool default2=true, QString password = "", RETURN_CODE blockButton = RETURN_CODE::BTN1 );
+    static RETURN_CODE questionHTML( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1=false, bool default2=true, QString password = "", RETURN_CODE blockButton = RETURN_CODE::BTN1 );
 
 private slots:
+    void on_passwordEdit_textChanged(const QString &str);
     void on_button1_clicked();
-
     void on_button2_clicked();
-
 private:
     RETURN_CODE getRetCode() const {return retCode;}
 
     Ui::MessageBox *ui;
     RETURN_CODE retCode = RETURN_CODE::BTN1;
+    QString blockingPassword;
+    RETURN_CODE passBlockButton = RETURN_CODE::BTN1;
 };
 
 }

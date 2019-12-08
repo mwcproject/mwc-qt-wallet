@@ -85,6 +85,9 @@ public:
     // Check Signals: onGetSeed(QVector<QString> seed);
     virtual void getSeed()  override;
 
+    // Get last used password. Just don't export from DLL
+    virtual QString getPassword() override;
+
     //--------------- Listening
 
     // Checking if wallet is listening through services

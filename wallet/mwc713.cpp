@@ -376,6 +376,9 @@ void MWC713::getSeed()  {
         listeningStart(false, true, true);
 }
 
+QString MWC713::getPassword() {
+    return walletPassword;
+}
 
 // Checking if wallet is listening through services
 // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline

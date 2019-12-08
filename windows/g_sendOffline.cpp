@@ -69,6 +69,12 @@ void SendOffline::on_sendButton_clicked()
         }
     }
 
+    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this,"Confirm Send request",
+                         "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) +
+                         " mwc offline.\nYour init transaction slate will be stored at the file.", "Decline", "Confirm", false, true,
+                         state->getWalletPassword(), control::MessageBox::RETURN_CODE::BTN2 ) )
+        return;
+
     QString fileName = QFileDialog::getSaveFileName(this, tr("Create initial transaction file"),
                                                     state->getFileGenerationPath(),
                                                     tr("MWC init transaction (*.tx)"));

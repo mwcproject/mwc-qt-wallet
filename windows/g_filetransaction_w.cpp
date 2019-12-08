@@ -16,6 +16,7 @@
 #include "ui_g_filetransaction.h"
 #include "../state/g_Finalize.h"
 #include "../util/stringutils.h"
+#include "../control/messagebox.h"
 
 namespace wnd {
 
@@ -30,7 +31,7 @@ FileTransaction::FileTransaction(QWidget *parent, FileTransactionWndHandler * _h
         handler(_handler),
         transactionFileName(fileName)
 {
-    Q_UNUSED(transaction);
+    Q_UNUSED(transaction)
 
     ui->setupUi(this);
 
@@ -56,8 +57,15 @@ void FileTransaction::on_cancelButton_clicked() {
 
 void FileTransaction::on_processButton_clicked()
 {
-    ui->progress->show();
-    handler->ftContinue( transactionFileName );
+    QString walletPassword = handler->getContext()->wallet->getPassword();
+    if (walletPassword.isEmpty() ||
+        control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(this,"Confirm Finalize request",
+                                      "You are finalizing transaction for " + ui->mwcLabel->text(), "Decline", "Confirm",
+                                      false, true, walletPassword, control::MessageBox::RETURN_CODE::BTN2 ) )
+    {
+            ui->progress->show();
+            handler->ftContinue( transactionFileName );
+    }
 }
 
 void FileTransaction::hideProgress() {

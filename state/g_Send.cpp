@@ -91,6 +91,11 @@ void Send::updateFileGenerationPath(QString path) {
     context->appContext->updatePathFor("fileGen", path);
 }
 
+QString Send::getWalletPassword() {
+    return context->wallet->getPassword();
+}
+
+
 // onlineOffline => Next step
 void Send::processSendRequest( bool isOnline, const wallet::AccountInfo & selectedAccount, int64_t amount ) {
     if (isOnline) {
