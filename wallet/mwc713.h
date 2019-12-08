@@ -340,6 +340,7 @@ private slots:
     void	mwc713readyReadStandardError();
     void	mwc713readyReadStandardOutput();
 
+    void    restartMQsListener();
 
 private:
 
@@ -366,6 +367,8 @@ private:
     bool keybaseOnline = false;
     bool mwcMqStarted = false;
     bool keybaseStarted = false;
+    // MWC MQS will try to start forever.
+    bool mwcMqStartRequested = false;
 
     QString activeMwcMqsTid; // MQS can be managed by many thredas, but only last started is active
 

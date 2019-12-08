@@ -17,6 +17,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QThread>
+#include <QTimer>
 #include "../tries/mwc713inputparser.h"
 #include "mwc713events.h"
 #include <QApplication>
@@ -161,7 +162,7 @@ void MWC713::start(bool loginWithLastKnownPassword)  {
     startedMode = STARTED_MODE::NORMAL;
 
     mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = keybaseStarted = false;
+    mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
 
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
@@ -199,7 +200,7 @@ void MWC713::start2init(QString password) {
     Q_ASSERT(inputParser == nullptr);
 
     mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = keybaseStarted = false;
+    mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
 
     qDebug() << "Starting MWC713 as init at " << mwc713Path << " for config " << mwc713configPath;
 
@@ -228,7 +229,7 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
     startedMode = STARTED_MODE::RECOVER;
 
     mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = keybaseStarted = false;
+    mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
 
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
@@ -282,7 +283,7 @@ void MWC713::processStop(bool exitNicely) {
         emit onKeybaseListenerStatus(false);
 
     mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = keybaseStarted = false;
+    mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
 
     emit onMwcAddress("");
     emit onMwcAddressWithIndex("",1);
@@ -391,6 +392,9 @@ void MWC713::listeningStart(bool startMq, bool startKb, bool initialStart)  {
     qDebug() << "listeningStart: mq=" << startMq << ",kb=" << startKb;
     eventCollector->addTask( new TaskListeningStart(this, startMq,startKb, initialStart), TaskListeningStart::TIMEOUT );
 
+    if (startMq)
+        mwcMqStartRequested = true;
+
     if ( startMq && !config::getUseMwcMqS() ) {
         appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "You are using non secure version of the MWC MQ. To switch to secure MWC MQS please specify 'useMwcMqS = true' at mwc-qt-wallet config file." );
     }
@@ -399,6 +403,10 @@ void MWC713::listeningStart(bool startMq, bool startKb, bool initialStart)  {
 // Check signal: onListeningStopResult
 void MWC713::listeningStop(bool stopMq, bool stopKb)  {
     qDebug() << "listeningStop: mq=" << stopMq << ",kb=" << stopKb;
+
+    if (stopMq)
+        mwcMqStartRequested = false;
+
     eventCollector->addTask( new TaskListeningStop(this, stopMq,stopKb), TaskListeningStop::TIMEOUT );
 }
 
@@ -1105,6 +1113,7 @@ void MWC713::notifyListenerMqCollision() {
     logger::logEmit("MWC713", "onListenerMqCollision", "");
 
     mwcMqStarted = false;
+    mwcMqStartRequested = false;
     emit onListenerMqCollision();
 
     if (mwcMqOnline) {
@@ -1119,7 +1128,21 @@ void MWC713::notifyMqFailedToStart() {
         mwcMqStarted = false;
         emit onListeningStopResult(true, false, {} );
     }
+
+    if (mwcMqStartRequested ) {
+        // schedule the restart in 5 seconds
+        QTimer::singleShot( 1000*5, this, &MWC713::restartMQsListener );
+    }
 }
+
+void  MWC713::restartMQsListener() {
+    if (mwcMqStartRequested && !mwcMqStarted) {
+        qDebug() << "Try to restart MQs Listener after failure";
+        eventCollector->addTask( new TaskListeningStart(this, true,false, false), TaskListeningStart::TIMEOUT );
+
+    }
+}
+
 
 void MWC713::processAllTransactionsStart() {
     collectedTransactions.clear();

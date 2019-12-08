@@ -78,6 +78,7 @@ NextStateRespond Listening::execute() {
 void Listening::triggerMwcStartState() {
     QPair<bool,bool> lsnStatus = context->wallet->getListenerStartState();
     if ( !lsnStatus.first ) {
+        lastShownErrorMessage = "";
         context->wallet->listeningStart(true, false, false);
     }
     else {
@@ -180,7 +181,11 @@ void Listening::onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString me
     Q_UNUSED(level);
     // We are not relying to the window, but checking if it is active
     if ( wnd!= nullptr && message.contains("Failed to start mwcmqs subscriber") ) {
-        wnd->showMessage("Start listening Error", message);
+        if (lastShownErrorMessage!=message) {
+            wnd->showMessage("Start listening Error", message);
+            lastShownErrorMessage=message;
+        }
+
     }
 }
 

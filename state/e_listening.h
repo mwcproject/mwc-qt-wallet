@@ -67,6 +67,7 @@ private slots:
 
 private:
     wnd::Listening * wnd = nullptr;
+    QString lastShownErrorMessage;
 };
 
 }
