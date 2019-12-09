@@ -32,8 +32,6 @@ After correctly entering this information, you click "Request Airdrop", you will
 
 Note: some wallets like the Ledger include the address in front of the signature. Please take out the address part of the signature. For instance if the signature looks like this:
 
------BEGIN BITCOIN SIGNED MESSAGE-----
-This is an example of a signed message.
 -----BEGIN SIGNATURE-----
 1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN
 HNWsH/EpIj40CcJwK0o9Mndbx6ZNqi5uLWA9XOv2sT+9qpopn4wfqG99cIwQ/ws0XSAX8vdBiRle5PtrOshEmgo=
