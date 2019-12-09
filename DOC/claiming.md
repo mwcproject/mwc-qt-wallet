@@ -30,6 +30,17 @@ Note: the "BTC Address to claim" field and the "Airdrop Account Password" fields
 
 After correctly entering this information, you click "Request Airdrop", you will be taken to a page where you sign a message to prove control of the address. The same process used to sign your message for registering will be used on this page. Please note that in the section of the wallet that is labeled "Signed Message" you need to put the signature of the message that's provided. It will look something like this, "IBn2qPtqae9kS1c/qehsJXkOnjiK3rBUQ2ncRmLPwDCppfp3UooxJiev9vPNUuCtiGJo9+4Bw01v5fFFPEnTQgk="
 
+Note: some wallets like the Ledger include the address in front of the signature. Please take out the address part of the signature. For instance if the signature looks like this:
+
+-----BEGIN BITCOIN SIGNED MESSAGE-----
+This is an example of a signed message.
+-----BEGIN SIGNATURE-----
+1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN
+HNWsH/EpIj40CcJwK0o9Mndbx6ZNqi5uLWA9XOv2sT+9qpopn4wfqG99cIwQ/ws0XSAX8vdBiRle5PtrOshEmgo=
+-----END BITCOIN SIGNED MESSAGE-----
+
+You should submit "HNWsH/EpIj40CcJwK0o9Mndbx6ZNqi5uLWA9XOv2sT+9qpopn4wfqG99cIwQ/ws0XSAX8vdBiRle5PtrOshEmgo="
+
 ![Claim](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/claim.png "Claim")
 
 At this point, if successful you will see a message in the Airdrop tab that looks like the one below:
