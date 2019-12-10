@@ -39,6 +39,7 @@ QString toString(WALLET_EVENTS event) {
         case S_INIT_WANT_ENTER: return "S_INIT_WANT_ENTER";
         case S_ERROR:           return "S_ERROR";
         case S_LINE:            return "S_LINE";
+        case S_NODE_API_ERROR:  return "S_NODE_ERROR";
 
         case S_LISTENER_MQ_STARTING: return "S_LISTENER_MQ_STARTING";
         case S_LISTENER_KB_STARTING: return "S_LISTENER_KB_STARTING";

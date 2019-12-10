@@ -130,6 +130,17 @@ void Mwc713InputParser::initGenericError() {
                                                         new TriePhraseSection("error: "),
                                                         new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","", 1)
                                                 } ));
+
+    // Post TX Error: Request error: Error code: 500 Internal Server Error; Description: failed: Internal error: Failed to update pool
+    // API errors:  Request error: Error code: 500 Internal Server Error; Description: failed: Internal error: Failed to update pool
+    // Error code: {}; Description: {}
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_NODE_API_ERROR,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("Error code: "),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE | TrieAnySection::START_NEXT_EVERY_TRY, "","", 1),
+                                                        new TriePhraseSection("; Description: "),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","", 2),
+                                                } ));
 }
 
 
