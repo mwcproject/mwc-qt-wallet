@@ -317,10 +317,19 @@ bool TaskFinalizeFile::processTask(const QVector<WEvent> &events) {
         }
     }
 
+    QVector< WEvent > apiErrs = filterEvents(events, WALLET_EVENTS::S_NODE_API_ERROR);
     QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_ERROR );
     QStringList errMsg;
-    for (auto & er:errs)
-        errMsg.push_back(er.message);
+    // We prefer API messages from the node. Wallet doesn't provide details
+    for (auto & er:apiErrs) {
+        QStringList prms = er.message.split('|');
+        if (prms.size()==2)
+            errMsg.push_back("MWC-NODE failed to publish the slate. " + prms[1]);
+    }
+    if (errMsg.isEmpty()) {
+        for (auto &er:errs)
+            errMsg.push_back(er.message);
+    }
 
     wallet713->setFinalizeFile(false, errMsg, "");
     return true;
