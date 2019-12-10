@@ -65,13 +65,14 @@ struct NodeStatus {
 class MwcNode : public QObject {
 Q_OBJECT
 public:
-    MwcNode(QString nodePath, core::AppContext * appContext);
+    // nodePath - path to the executable
+    MwcNode(const QString & nodePath, core::AppContext * appContext);
     virtual ~MwcNode() override;
 
     bool isRunning() const {return nodeProcess!= nullptr;}
     const QString & getCurrentNetwork() const { return lastUsedNetwork; }
 
-    void start( const QString & network );
+    void start( const QString & dataPath, const QString & network );
     void stop();
 
     QString getMwcStatus() const { return nodeStatusString; }
@@ -82,7 +83,7 @@ public:
 
     QString getLogsLocation() const;
 private:
-    QProcess * initNodeProcess( QString network );
+    QProcess * initNodeProcess( const QString & dataPath, const QString & network );
 
     void nodeProcDisconnect();
     void nodeProcConnect(QProcess * process);
@@ -143,7 +144,7 @@ private:
 
     QString nonEmittedOutput;
 
-    QString nodeStatusString;
+    QString nodeStatusString= "Waiting";
     int     txhashsetHeight = 0;
     int     maxBlockHeight = 0; // backing stopper for getted blocks.
     bool    syncIsDone = false;
@@ -154,6 +155,11 @@ private:
     // Will try to restart the node several times.
     // The reason that because of another instance is running
     int restartCounter = 0;
+
+    QString lastDataPath;
+
+    int64_t nodeStartTime = 0;
+    QString commandLine;
 };
 
 }

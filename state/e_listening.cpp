@@ -78,6 +78,7 @@ NextStateRespond Listening::execute() {
 void Listening::triggerMwcStartState() {
     QPair<bool,bool> lsnStatus = context->wallet->getListenerStartState();
     if ( !lsnStatus.first ) {
+        lastShownErrorMessage = "";
         context->wallet->listeningStart(true, false, false);
     }
     else {
@@ -172,7 +173,7 @@ void Listening::onMwcAddressWithIndex(QString mwcAddress, int idx) {
 }
 
 void Listening::onListenerMqCollision() {
-    control::MessageBox::message(nullptr, "MWC MQS new login detected", "New login to MWC MQS detected. Only one instance of your wallet can be connected to MWC MQS.\nListener is stopped. You can activate listener from 'Listening' page.");
+    control::MessageBox::messageText(nullptr, "MWC MQS new login detected", "New login to MWC MQS detected. Only one instance of your wallet can be connected to MWC MQS.\nListener is stopped. You can activate listener from 'Listening' page.");
 }
 
 // Looking for "Failed to start mwcmqs subscriber. Error connecting to mqs.mwc.mw:443"
@@ -180,7 +181,11 @@ void Listening::onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString me
     Q_UNUSED(level);
     // We are not relying to the window, but checking if it is active
     if ( wnd!= nullptr && message.contains("Failed to start mwcmqs subscriber") ) {
-        wnd->showMessage("Start listening Error", message);
+        if (lastShownErrorMessage!=message) {
+            wnd->showMessage("Start listening Error", message);
+            lastShownErrorMessage=message;
+        }
+
     }
 }
 

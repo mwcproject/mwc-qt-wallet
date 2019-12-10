@@ -37,6 +37,9 @@ public:
     explicit WalletConfig(QWidget *parent, state::WalletConfig * state);
     ~WalletConfig();
 
+    // If data can be apllied, ask user about that. Issue that people expect auto apply by exit
+    bool askUserForChanges();
+
 private slots:
     void on_mwc713directorySelect_clicked();
     void on_mwc713directoryEdit_textEdited(const QString &arg1);
@@ -80,6 +83,10 @@ private:
     int getcheckedSizeButton() const;
 
     void updateLogsStateUI(bool enabled);
+
+    // return true if no chnages need to be made.
+    // false - need to be made or was made and wallet need to be restarted
+    bool applyChanges();
 
 private:
     Ui::WalletConfig *ui;

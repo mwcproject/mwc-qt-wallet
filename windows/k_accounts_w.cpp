@@ -112,7 +112,7 @@ void Accounts::onAccountRenamed(bool success, QString errorMessage) {
 
     refreshWalletBalance();
     if (!success) {
-        control::MessageBox::message(this, "Account rename faulure", "Your account wasn't renamed.\n" + errorMessage);
+        control::MessageBox::messageText(this, "Account rename faulure", "Your account wasn't renamed.\n" + errorMessage);
     }
 }
 
@@ -140,16 +140,21 @@ void Accounts::on_addButton_clicked()
     if (!ok || accountName.isEmpty())
         return;
 
+    if (accountName.startsWith("-")) {
+        control::MessageBox::messageText(this, "Wrong account name",  "You can't start account name from '-' symbol." );
+        return;
+    }
+
     for ( auto & pref : mwc::BANNED_ACCOUT_PREFIXES ) {
         if (accountName.startsWith(pref)) {
-            control::MessageBox::message(this, "Wrong account name",  "Please specify account name without prefix '" + pref + "'" );
+            control::MessageBox::messageText(this, "Wrong account name",  "Please specify account name without prefix '" + pref + "'" );
             return;
         }
     }
 
     QPair <bool, QString> valRes = util::validateMwc713Str( accountName );
     if (!valRes.first) {
-        control::MessageBox::message(this, "Account name", valRes.second );
+        control::MessageBox::messageText(this, "Account name", valRes.second );
         return;
     }
 
@@ -157,7 +162,7 @@ void Accounts::on_addButton_clicked()
     {
         for (auto & acc : accounts) {
             if (acc.accountName == accountName) {
-                control::MessageBox::message(this, "Account name", "Account with name '" + accountName +
+                control::MessageBox::messageText(this, "Account name", "Account with name '" + accountName +
                        "' already exists. Please specify a unique account name to create.");
                 ok = false;
                 break;
@@ -183,7 +188,7 @@ void Accounts::on_deleteButton_clicked()
 
     int idx = ui->accountList->getSelectedRow();
     if (idx>=0 && idx<accounts.size() && accounts[idx].canDelete()) {
-        MessageBox::RETURN_CODE res = MessageBox::question( this, "Delete account", "Are you sure that you want to delete this account?", "Yes", "No", false, true );
+        MessageBox::RETURN_CODE res = MessageBox::questionText( this, "Delete account", "Are you sure that you want to delete this account?", "Yes", "No", false, true );
         if (res == MessageBox::RETURN_CODE::BTN1 ) {
             state->deleteAccount( accounts[idx] );
             startWaiting();
@@ -212,14 +217,14 @@ void Accounts::renameAccount(int idx) {
 
     QPair <bool, QString> valRes = util::validateMwc713Str( name );
     if (!valRes.first) {
-        control::MessageBox::message(this, "Account name", valRes.second );
+        control::MessageBox::messageText(this, "Account name", valRes.second );
         return;
     }
 
     // check for name collision
     for ( auto & pref : mwc::BANNED_ACCOUT_PREFIXES ) {
         if (name.startsWith(pref)) {
-            control::MessageBox::message(this, "Wrong account name",  "Please specify account name without prefix '" + pref + "'" );
+            control::MessageBox::messageText(this, "Wrong account name",  "Please specify account name without prefix '" + pref + "'" );
             return;
         }
     }
@@ -230,7 +235,7 @@ void Accounts::renameAccount(int idx) {
             continue;
 
         if ( name == accounts[r].accountName ) {
-            control::MessageBox::message(this, "Wrong account name", "Account name '" + name + "' already exist. Please specify unique account name." );
+            control::MessageBox::messageText(this, "Wrong account name", "Account name '" + name + "' already exist. Please specify unique account name." );
             return;
         }
     }

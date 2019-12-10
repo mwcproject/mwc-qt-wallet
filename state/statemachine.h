@@ -31,6 +31,9 @@ public:
 
     void start();
 
+    // Check if current state agree to switch the state
+    bool canSwitchState();
+
     void executeFrom( STATE nextState );
 
     // set current action winodow if possible

@@ -140,7 +140,7 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
         const util::FileTransactionInfo & trInfo = file2TransactionsInfo[fileName];
         if (trInfo.resultingFN.isEmpty()) {
             // Online wallet case. The normal workflow
-            control::MessageBox::message(nullptr, "Finalize File Transaction", "File Transaction was finalized successfully.");
+            control::MessageBox::messageText(nullptr, "Finalize File Transaction", "File Transaction was finalized successfully.");
         }
         else {
             // Cold wallet workflow, let's copy the transaction file
@@ -148,7 +148,7 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
             QString transactionFN = ioutils::getAppDataPath( context->wallet->getWalletConfig().getDataPath() ) + "/saved_txs/" + trInfo.transactionId + ".grintx";
             if ( !QFile(transactionFN).exists() ) {
 
-                control::MessageBox::message(nullptr, "Internal Error", "Transaction file for id '" + trInfo.transactionId + "' not found. wmc713 didn't create expected file.");
+                control::MessageBox::messageText(nullptr, "Internal Error", "Transaction file for id '" + trInfo.transactionId + "' not found. wmc713 didn't create expected file.");
             }
 
 
@@ -158,11 +158,11 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
             bool copyOk = QFile::copy(transactionFN, trInfo.resultingFN);
 
             if (copyOk) {
-                control::MessageBox::message(nullptr, "Finalize File Transaction", "File Transaction was finalized successfully but it is not published because you are running Cold Wallet.\n"
+                control::MessageBox::messageText(nullptr, "Finalize File Transaction", "File Transaction was finalized successfully but it is not published because you are running Cold Wallet.\n"
                                              "Resulting transaction located at " + trInfo.resultingFN+ ". Please publish at with mwc node, so it will be propagated to the blockchain network.");
             }
             else {
-                control::MessageBox::message(nullptr, "IO Error", "File Transaction was finalized successfully but we wasn't be able to save file at the requested location. Please note, you need publish this transaction with mwc node, so it will be propagated to the blockchain network."
+                control::MessageBox::messageText(nullptr, "IO Error", "File Transaction was finalized successfully but we wasn't be able to save file at the requested location. Please note, you need publish this transaction with mwc node, so it will be propagated to the blockchain network."
                                              "Your transaction location:\n" + transactionFN);
             }
         }
@@ -170,7 +170,7 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
         ftBack();
     }
     else {
-        control::MessageBox::message(nullptr, "Failure", "File Transaction failed to finalize.\n" + errors.join("\n") );
+        control::MessageBox::messageText(nullptr, "Failure", "File Transaction failed to finalize.\n" + errors.join("\n") );
     }
 }
 

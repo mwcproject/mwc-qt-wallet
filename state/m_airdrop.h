@@ -92,8 +92,6 @@ protected:
 
     virtual NextStateRespond execute() override;
 
-    virtual void exitingState() override;
-
     virtual QString getHelpDocName() override {return "airdrop.html";}
 
 private slots:

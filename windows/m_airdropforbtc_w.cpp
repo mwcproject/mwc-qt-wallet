@@ -51,7 +51,7 @@ void AirdropForBTC::on_claimButton_clicked()
     QString signature = ui->signatureEdit->toPlainText().trimmed();
 
     if ( signature.length() == 0 ) {
-        control::MessageBox::message(this, "MWC claim", "Please input the signature for the challenge");
+        control::MessageBox::messageText(this, "MWC claim", "Please input the signature for the challenge");
         return;
     }
 
@@ -69,7 +69,7 @@ void AirdropForBTC::reportMessage( QString title, QString message ) {
     state::TimeoutLockObject to( state );
 
     ui->progress->hide();
-    control::MessageBox::message(this, title, message);
+    control::MessageBox::messageText(this, title, message);
 }
 
 

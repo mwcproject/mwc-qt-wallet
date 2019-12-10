@@ -44,6 +44,8 @@ private slots:
 
     void on_radioCustomNode_clicked();
 
+    void on_selectNodeDataLocationBtn_clicked();
+
 private:
     Ui::ChangeNode *ui;
 

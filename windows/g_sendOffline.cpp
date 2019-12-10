@@ -63,11 +63,17 @@ void SendOffline::on_sendButton_clicked()
     {
         QPair<bool, QString> valRes = util::validateMwc713Str(description);
         if (!valRes.first) {
-            control::MessageBox::message(this, "Incorrect Input", valRes.second);
+            control::MessageBox::messageText(this, "Incorrect Input", valRes.second);
             ui->descriptionEdit->setFocus();
             return;
         }
     }
+
+    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this,"Confirm Send request",
+                         "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) +
+                         " mwc offline.\nYour init transaction slate will be stored at the file.", "Decline", "Confirm", false, true,
+                         state->getWalletPassword(), control::MessageBox::RETURN_CODE::BTN2 ) )
+        return;
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Create initial transaction file"),
                                                     state->getFileGenerationPath(),
@@ -92,7 +98,7 @@ void SendOffline::showSendMwcOfflineResult( bool success, QString message ) {
     state::TimeoutLockObject to( state );
 
     ui->progress->hide();
-    control::MessageBox::message(this, success ? "Success" : "Failure", message );
+    control::MessageBox::messageText(this, success ? "Success" : "Failure", message );
 }
 
 

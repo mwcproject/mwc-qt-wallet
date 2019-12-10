@@ -66,13 +66,13 @@ void AccountTransfer::showTransferResults(bool ok, QString errMsg) {
     state::TimeoutLockObject to( state );
 
     if (ok) {
-        control::MessageBox::message(this, "Success", "Your funds were successfully transferred");
+        control::MessageBox::messageText(this, "Success", "Your funds were successfully transferred");
         // reset state
         ui->amountEdit->setText("");
         updateAccounts();
     }
     else {
-        control::MessageBox::message(this, "Transfer failure", "Funds transfer request has failed.\n" + errMsg);
+        control::MessageBox::messageText(this, "Transfer failure", "Funds transfer request has failed.\n" + errMsg);
     }
 }
 
@@ -101,7 +101,7 @@ void AccountTransfer::on_transferButton_clicked()
     auto fromDt = ui->accountFromCB->currentData();
     auto toDt = ui->accountToCB->currentData();
     if ( !fromDt.isValid() || !toDt.isValid() ) {
-        control::MessageBox::message(this, "Incorrect Input", "Please select pair of accounts to transfer coins.");
+        control::MessageBox::messageText(this, "Incorrect Input", "Please select pair of accounts to transfer coins.");
         return;
     }
 
@@ -109,7 +109,7 @@ void AccountTransfer::on_transferButton_clicked()
     int toI = toDt.toInt();
 
     if (fromI == toI || fromI<0 || toI<0 || fromI>accountInfo.size() || toI>accountInfo.size()) {
-        control::MessageBox::message(this, "Incorrect Input", "Please select pair of different accounts to transfer coins.");
+        control::MessageBox::messageText(this, "Incorrect Input", "Please select pair of different accounts to transfer coins.");
         return;
     }
 
@@ -119,7 +119,7 @@ void AccountTransfer::on_transferButton_clicked()
     if (sendAmount != "All") {
         mwcAmount = util::one2nano(ui->amountEdit->text().trimmed());
         if (!mwcAmount.first) {
-            control::MessageBox::message(this, "Incorrect Input", "Please specify correct number of MWC to send");
+            control::MessageBox::messageText(this, "Incorrect Input", "Please specify correct number of MWC to send");
             ui->amountEdit->setFocus();
             return;
         }
@@ -133,7 +133,7 @@ void AccountTransfer::on_transferButton_clicked()
 
         QString msg2print = generateAmountErrorMsg( mwcAmount.second, acc, state->getSendCoinsParams() );
 
-        control::MessageBox::message(this, "Incorrect Input",
+        control::MessageBox::messageText(this, "Incorrect Input",
                                      msg2print );
         ui->amountEdit->setFocus();
         return;

@@ -54,7 +54,7 @@ void WalletInstances::on_mwc713directorySelect_clicked() {
     QString runningArc = util::getBuildArch();
     QString dataArc    = wallet::WalletConfig::readNetworkArchFromDataPath(walletDataDir).second;
     if ( runningArc != dataArc ) {
-        control::MessageBox::message(nullptr, "Wallet data architecture mismatch",
+        control::MessageBox::messageText(nullptr, "Wallet data architecture mismatch",
                     "Your mwc713 seed at '"+ walletDataDir +"' was created with "+ dataArc+" bits version of the wallet. You are using " + runningArc + " bit version.");
         return;
     }
@@ -71,7 +71,7 @@ void WalletInstances::on_applyButton_clicked() {
     QString dataPath = ui->mwc713directoryEdit->text();
 
     if (dataPath.isEmpty()) {
-        control::MessageBox::message( this, "Input error", "Please specify folder name for your wallet" );
+        control::MessageBox::messageText( this, "Input error", "Please specify folder name for your wallet" );
         ui-> mwc713directoryEdit->setFocus();
         return;
     }
@@ -88,7 +88,7 @@ void WalletInstances::on_applyButton_clicked() {
 
     // Just in case. Normally will never be called
     if ( runningArc != networkArch.second ) {
-        control::MessageBox::message(nullptr, "Wallet data architecture mismatch",
+        control::MessageBox::messageText(nullptr, "Wallet data architecture mismatch",
                                      "Your mwc713 seed at '"+ dataPath +"' was created with "+ networkArch.second+" bits version of the wallet. You are using " + runningArc + " bit version.");
         return;
     }
@@ -114,7 +114,7 @@ void WalletInstances::on_applyButton_clicked() {
 
     if (!state->setWalletConfig(newWalletConfig, false) )
     {
-        control::MessageBox::message( this, "Internal error", "Unable to change the folder for your wallet" );
+        control::MessageBox::messageText( this, "Internal error", "Unable to change the folder for your wallet" );
         return;
     }
     accept();

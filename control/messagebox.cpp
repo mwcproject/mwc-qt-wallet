@@ -14,16 +14,68 @@
 
 #include "control/messagebox.h"
 #include "ui_messagebox.h"
+#include <Qt>
+#include <QTextDocument>
+#include <QScreen>
+#include <QTextBlock>
+#include <QScrollBar>
+#include <QThread>
 
 namespace control {
 
-MessageBox::MessageBox( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2 ) :
+MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2, bool default1, bool default2, QString password, RETURN_CODE _passBlockButton ) :
     MwcDialog(parent),
-    ui(new Ui::MessageBox)
+    ui(new Ui::MessageBox),
+    blockingPassword(password),
+    passBlockButton(_passBlockButton)
+
 {
     ui->setupUi(this);
     ui->title->setText(title);
-    ui->text->setText(message);
+
+    // Setting text option
+    QTextOption textOption;
+    textOption.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+    textOption.setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
+    ui->text3->document()->setDefaultTextOption( textOption );
+
+    // prepare for rendering
+    QSize curSz = ui->text3->size();
+
+    // text as a data should work for as.
+    if (htmlMsg)
+        ui->text3->setHtml( "<center>" + message + "</center>" );
+    else
+        ui->text3->setPlainText(message);
+
+    // size is the wierdest part. We are renderind document to get a size form it.
+    // Document tolk in Pt, so need to convert into px. Conversion is not very accurate
+    ui->text3->document()->adjustSize();
+    int h = int(curSz.height());
+    ui->text3->adjustSize();
+
+    // Second Ajustment with a scroll br that works great
+    QScrollBar * vSb = ui->text3->verticalScrollBar();
+    int scrollDiff = vSb->maximum() - vSb->minimum();
+    int page = vSb->pageStep();
+
+    if (scrollDiff >0) {
+        h = int( h * double(scrollDiff + page)/page + 1);
+    }
+    ui->text3->setMaximumHeight( h );
+    ui->text3->setMinimumHeight( h );
+    ui->text3->adjustSize();
+
+    if (blockingPassword.isEmpty()) {
+        ui->passwordFrame->hide();
+    }
+    else {
+        // disable blocking button
+        if (passBlockButton == RETURN_CODE::BTN1)
+            ui->button1->setEnabled(false);
+        else
+            ui->button2->setEnabled(false);
+    }
 
     if (btn1.isEmpty()) {
         ui->button1->hide();
@@ -34,6 +86,7 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, QString
     else {
         ui->button1->setText(btn1);
         ui->button1->setDefault(default1);
+        ui->button1->setFocus();
     }
 
     if (btn2.isEmpty()) {
@@ -47,17 +100,30 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, QString
     else {
         ui->button2->setText(btn2);
         ui->button2->setDefault(default2);
+        ui->button2->setFocus();
     }
 
     ui->button2->adjustSize();
     ui->button1->adjustSize();
 
     adjustSize();
+
+    if (!blockingPassword.isEmpty()) {
+        ui->passwordEdit->setFocus();
+    }
 }
 
 MessageBox::~MessageBox()
 {
     delete ui;
+}
+
+
+void MessageBox::on_passwordEdit_textChanged(const QString &str)
+{
+    QThread::msleep(200); // Ok for human and will prevent brute force from UI attack (really crasy scenario, better to attack mwc713 if you already get the host).
+    control::MwcPushButtonNormal * btn2lock = passBlockButton == RETURN_CODE::BTN1 ? ui->button1 : ui->button2;
+    btn2lock->setEnabled(str == blockingPassword);
 }
 
 void MessageBox::on_button1_clicked()
@@ -74,16 +140,29 @@ void MessageBox::on_button2_clicked()
 
 // One button, OK box
 //static
-void MessageBox::message( QWidget *parent, QString title, QString message ) {
-    MessageBox * msgBox = new MessageBox(parent, title, message, "OK", "", true,false);
+void MessageBox::messageText( QWidget *parent, QString title, QString message, QString password ) {
+    MessageBox * msgBox = new MessageBox(parent, title, message, false, "OK", "", true,false, password, RETURN_CODE::BTN1 );
+    msgBox->exec();
+    delete msgBox;
+}
+
+void MessageBox::messageHTML( QWidget *parent, QString title, QString message, QString password ) {
+    MessageBox * msgBox = new MessageBox(parent, title, message, true, "OK", "", true,false, password, RETURN_CODE::BTN1 );
     msgBox->exec();
     delete msgBox;
 }
 
 // Two button box
 //static
-MessageBox::RETURN_CODE MessageBox::question( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2 ) {
-    MessageBox * msgBox = new MessageBox(parent, title, message, btn1, btn2, default1, default2);
+MessageBox::RETURN_CODE MessageBox::questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, QString password, RETURN_CODE blockButton ) {
+    MessageBox * msgBox = new MessageBox(parent, title, message, false, btn1, btn2, default1, default2, password, blockButton);
+    msgBox->exec();
+    RETURN_CODE  res = msgBox->getRetCode();
+    delete msgBox;
+    return res;
+}
+MessageBox::RETURN_CODE MessageBox::questionHTML( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, QString password, RETURN_CODE blockButton  ) {
+    MessageBox * msgBox = new MessageBox(parent, title, message, true, btn1, btn2, default1, default2, password, blockButton);
     msgBox->exec();
     RETURN_CODE  res = msgBox->getRetCode();
     delete msgBox;

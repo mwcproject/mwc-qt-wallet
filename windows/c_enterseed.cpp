@@ -18,7 +18,7 @@
 #include "../control/messagebox.h"
 #include "../state/a_initaccount.h"
 #include "../util/widgetutils.h"
-#include "../util/Dictionary.h"
+#include "util/Bip39.h"
 #include "../state/timeoutlock.h"
 
 namespace wnd {
@@ -82,7 +82,7 @@ void EnterSeed::on_continueButton_clicked()
     QVector<QString> seed = util::parsePhrase2Words( seedStr );
 
     if (seed.size()!=24) {
-        control::MessageBox::message(this, "Verification error",
+        control::MessageBox::messageText(this, "Verification error",
                              "Your phrase should contain 24 words. You entered " + QString::number(seed.size()) +  " words." );
         return;
     }
@@ -99,7 +99,7 @@ void EnterSeed::on_continueButton_clicked()
     }
 
     if (!nonDictWord.isEmpty()) {
-        control::MessageBox::message(this, "Verification error",
+        control::MessageBox::messageText(this, "Verification error",
                                      "Your phrase contains non dictionary words: " + nonDictWord );
         return;
     }

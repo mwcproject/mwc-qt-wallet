@@ -191,28 +191,30 @@ struct TransactionIdxLayout {
     int posAddress = -1;
     int posCrTime = -1;
     int posConf = -1;
+    int posHeight = -1;
     int posConfTime = -1;
     int posNetDiff = -1;
     int posProof = -1;
 
     bool isDefined() const {
         return posId>=0 && posType>0 && posTxid>0 && posAddress>0 && posCrTime>0 &&
-                            posConf>0 && posConfTime>0 && posNetDiff>0 && posProof>0;
+                            posConf>0 && posHeight>0 && posConfTime>0 && posNetDiff>0 && posProof>0;
     }
 };
 
 bool parseTransactionLine( QString str, const TransactionIdxLayout & tl,
                            WalletTransaction & trans) {
 
-    QString strId = util::getSubString(str, tl.posId, tl.posType);
-    QString strType = util::getSubString(str, tl.posType, tl.posTxid);
-    QString strTxid = util::getSubString(str, tl.posTxid, tl.posAddress);
-    QString strAddress = util::getSubString(str, tl.posAddress, tl.posCrTime);
-    QString strCrTime = util::getSubString(str, tl.posCrTime, tl.posConf);
-    QString strConf = util::getSubString(str, tl.posConf, tl.posConfTime);
+    QString strId       = util::getSubString(str, tl.posId, tl.posType);
+    QString strType     = util::getSubString(str, tl.posType, tl.posTxid);
+    QString strTxid     = util::getSubString(str, tl.posTxid, tl.posAddress);
+    QString strAddress  = util::getSubString(str, tl.posAddress, tl.posCrTime);
+    QString strCrTime   = util::getSubString(str, tl.posCrTime, tl.posConf);
+    QString strConf     = util::getSubString(str, tl.posConf, tl.posHeight);
+    QString strHeight   = util::getSubString(str, tl.posHeight, tl.posConfTime);
     QString strConfTime = util::getSubString(str, tl.posConfTime, tl.posNetDiff);
-    QString strNetDiff = util::getSubString(str, tl.posNetDiff, tl.posProof);
-    QString strProof = util::getSubString(str, tl.posProof, str.length());
+    QString strNetDiff  = util::getSubString(str, tl.posNetDiff, tl.posProof);
+    QString strProof    = util::getSubString(str, tl.posProof, str.length());
 
     if (strId.length() == 0)
         return false;
@@ -236,6 +238,8 @@ bool parseTransactionLine( QString str, const TransactionIdxLayout & tl,
 
     bool conf = strConf.startsWith("yes", Qt::CaseInsensitive);
 
+    int64_t height = strHeight.isEmpty() ? 0 : strHeight.toLongLong();
+
     QPair<bool, int64_t> net = util::one2nano(strNetDiff);
     if ( !net.first )
         return false;
@@ -247,6 +251,7 @@ bool parseTransactionLine( QString str, const TransactionIdxLayout & tl,
                   strAddress,
                   strCrTime,
                   conf,
+                  height,
                   strConfTime,
                   net.second,
                   proof);
@@ -291,6 +296,7 @@ static void parseTransactionsOutput(const QVector<WEvent> & events, // in
                 tl.posAddress = str.indexOf("Address", tl.posTxid);
                 tl.posCrTime = str.indexOf("Creation Time", tl.posAddress);
                 tl.posConf = str.indexOf("Confirmed?", tl.posCrTime);
+                tl.posHeight = str.indexOf("Height", tl.posConf);
                 tl.posConfTime = str.indexOf("Confirmation Time", tl.posConf);
                 tl.posNetDiff = str.indexOf("Net", tl.posConfTime);
                 tl.posProof = str.indexOf("Proof?", tl.posNetDiff);

@@ -190,7 +190,7 @@ void AppContext::saveData() const {
     QString filePath = dataPath + "/" + settingsFileName;
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
-        control::MessageBox::message(nullptr,
+        control::MessageBox::messageText(nullptr,
               "ERROR",
               "Unable to save gui-wallet settings to " + filePath +
               "\nError: " + file.errorString());
@@ -239,7 +239,7 @@ void AppContext::saveAirdropRequests( const QVector<state::AirdropRequests> & da
     QString filePath = dataPath + "/" + airdropRequestsFileName;
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
-        control::MessageBox::message(nullptr,
+        control::MessageBox::messageText(nullptr,
                                      "ERROR",
                                      "Unable to aidrop requests to " + filePath +
                                      "\nError: " + file.errorString());

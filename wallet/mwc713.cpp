@@ -17,6 +17,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QThread>
+#include <QTimer>
 #include "../tries/mwc713inputparser.h"
 #include "mwc713events.h"
 #include <QApplication>
@@ -111,27 +112,41 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
     QStringList params{"--config", mwc713configPath, "--disable-history" ,"-r", mwc::PROMPTS_MWC713 };
     params.append( paramsPlus );
 
+    walletStartTime = QDateTime::currentMSecsSinceEpoch();
+    commandLine = "'" + QFileInfo(mwc713Path).canonicalFilePath() + "'";
+    for (auto & p : params) {
+        if (p=="-r" ||  p==mwc::PROMPTS_MWC713 )
+            continue; // skipping prompt parameter. It is not needed for troubleshouting
+        commandLine += " '" + p + "'";
+    }
+
+    logger::logInfo("MWC713", "Starting new process: " + commandLine);
+
     process->start(mwc713Path, params, QProcess::Unbuffered | QProcess::ReadWrite );
 
     while ( ! process->waitForStarted( (int)(10000 * config::getTimeoutMultiplier()) ) ) {
+
+        logger::logInfo("MWC713", "mwc713 process failed to start");
+
         switch (process->error())
         {
             case QProcess::FailedToStart:
-                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start mwc713 located at " + mwc713Path );
+                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start mwc713 located at " + mwc713Path + "\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
             case QProcess::Crashed:
-                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 crashed during start" );
+                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 crashed during start\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
             case QProcess::Timedout:
-                if (control::MessageBox::question(nullptr, "Warning", "Starting for mwc713 process is taking longer than expected.\nContinue to wait?",
+                if (control::MessageBox::questionText(nullptr, "Warning", QString("Starting for mwc713 process is taking longer than expected.\nContinue to wait?") +
+                                                  "\n\nCommand line:\n\n" + commandLine,
                                                   "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
                     config::increaseTimeoutMultiplier();
                     continue; // retry with waiting
                 }
-                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 takes too much time to start. Something wrong with environment." );
+                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 takes too much time to start. Something wrong with environment.\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
             default:
-                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start because of unknown error" );
+                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start because of unknown error.\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
         }
     }
@@ -146,7 +161,7 @@ void MWC713::start(bool loginWithLastKnownPassword)  {
     startedMode = STARTED_MODE::NORMAL;
 
     mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = keybaseStarted = false;
+    mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
 
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
@@ -184,7 +199,7 @@ void MWC713::start2init(QString password) {
     Q_ASSERT(inputParser == nullptr);
 
     mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = keybaseStarted = false;
+    mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
 
     qDebug() << "Starting MWC713 as init at " << mwc713Path << " for config " << mwc713configPath;
 
@@ -213,7 +228,7 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
     startedMode = STARTED_MODE::RECOVER;
 
     mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = keybaseStarted = false;
+    mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
 
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
@@ -244,83 +259,11 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
     eventCollector->addListener( new TaskRecoverProgressListener(this) );
 }
 
-// Need for claiming process only
-// Starting the wallet and get the next key
-// wallet713> getnextkey --amount 1000000
-// "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
-// Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage);
-void MWC713::start2getnextkey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) {
-    startedMode = STARTED_MODE::GET_NEXTKEY;
-
-    mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = keybaseStarted = false;
-
-    // Start the binary
-    Q_ASSERT(mwc713process == nullptr);
-    Q_ASSERT(inputParser == nullptr);
-
-    qDebug() << "Starting MWC713 for getnextkey at " << mwc713Path << " for config " << mwc713configPath;
-
-    // Creating process and starting
-    // Mnemonic will moved into variables
-    // !!!!! Security breach
-    mwc713process = initMwc713process({}, {} );
-    inputParser = new tries::Mwc713InputParser();
-    eventCollector = new Mwc713EventManager(this);
-    eventCollector->connectWith(inputParser);
-
-    // Excuting the single command and then read all output
-
-    eventCollector->addTask( new TaskStarting(this), TaskStarting::TIMEOUT );
-    eventCollector->addTask( new TaskInitW(this, walletPassword ), TaskInitW::TIMEOUT );
-    eventCollector->addTask( new TaskInitWpressEnter(this ), TaskInitWpressEnter::TIMEOUT );
-    eventCollector->addTask( new TaskGetNextKey(this,amountNano, btcaddress, airDropAccPassword ), TaskGetNextKey::TIMEOUT );
-    // then exit
-    eventCollector->addTask( new TaskLogout(this), TaskLogout::TIMEOUT);
-}
-
-// Need for claiming process only
-// identifier  - output from start2getnextkey
-// Check Signal: onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
-void MWC713::start2receiveSlate( QString receiveAccount, QString identifier, QString slateFN ) {
-    startedMode = STARTED_MODE::RECEIVE_SLATE;
-
-    mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = keybaseStarted = false;
-
-    // Start the binary
-    Q_ASSERT(mwc713process == nullptr);
-    Q_ASSERT(inputParser == nullptr);
-
-    qDebug() << "Starting MWC713 receiveSlate at " << mwc713Path << " for config " << mwc713configPath;
-
-    // Creating process and starting
-    // Mnemonic will moved into variables
-    mwc713process = initMwc713process({}, {} );
-
-    inputParser = new tries::Mwc713InputParser();
-
-    eventCollector = new Mwc713EventManager(this);
-    eventCollector->connectWith(inputParser);
-
-    // Adding permanent listeners
-    eventCollector->addListener( new TaskErrWrnInfoListener(this) );
-
-
-    // Add first init task
-    eventCollector->addTask( new TaskStarting(this), TaskStarting::TIMEOUT );
-    // log in
-    eventCollector->addTask( new TaskUnlock(this, walletPassword), TaskUnlock::TIMEOUT );
-
-    eventCollector->addTask( new TaskSetReceiveAccount(this, receiveAccount, walletPassword), TaskSetReceiveAccount::TIMEOUT );
-    // Receive file first
-    eventCollector->addTask( new TaskReceiveFile( this, slateFN, identifier ), TaskReceiveFile::TIMEOUT );
-    // then exit
-    eventCollector->addTask( new TaskLogout(this), TaskLogout::TIMEOUT);
-}
-
 void MWC713::processStop(bool exitNicely) {
     qDebug() << "MWC713::processStop exitNicely=" << exitNicely;
+
+    logger::logInfo("MWC713", QString("mwc713 process exiting ") + (exitNicely? "nicely" : "by killing") );
+
     loggedIn = false;
 
     mwc713disconnect();
@@ -339,7 +282,7 @@ void MWC713::processStop(bool exitNicely) {
         emit onKeybaseListenerStatus(false);
 
     mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = keybaseStarted = false;
+    mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
 
     emit onMwcAddress("");
     emit onMwcAddressWithIndex("",1);
@@ -394,6 +337,8 @@ void MWC713::loginWithPassword(QString password)  {
 void MWC713::logout(bool syncCall)  {
     qDebug() << "MWC713::logout syncCall=" << syncCall;
 
+    logger::logInfo("MWC713", QString("mwc713 process exiting with logout. syncCall=") + (syncCall?"Yes":"No") );
+
     if (syncCall)
         processStop(true);
     else 
@@ -431,6 +376,9 @@ void MWC713::getSeed()  {
         listeningStart(false, true, true);
 }
 
+QString MWC713::getPassword() {
+    return walletPassword;
+}
 
 // Checking if wallet is listening through services
 // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
@@ -447,6 +395,9 @@ void MWC713::listeningStart(bool startMq, bool startKb, bool initialStart)  {
     qDebug() << "listeningStart: mq=" << startMq << ",kb=" << startKb;
     eventCollector->addTask( new TaskListeningStart(this, startMq,startKb, initialStart), TaskListeningStart::TIMEOUT );
 
+    if (startMq)
+        mwcMqStartRequested = true;
+
     if ( startMq && !config::getUseMwcMqS() ) {
         appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "You are using non secure version of the MWC MQ. To switch to secure MWC MQS please specify 'useMwcMqS = true' at mwc-qt-wallet config file." );
     }
@@ -455,6 +406,10 @@ void MWC713::listeningStart(bool startMq, bool startKb, bool initialStart)  {
 // Check signal: onListeningStopResult
 void MWC713::listeningStop(bool stopMq, bool stopKb)  {
     qDebug() << "listeningStop: mq=" << stopMq << ",kb=" << stopKb;
+
+    if (stopMq)
+        mwcMqStartRequested = false;
+
     eventCollector->addTask( new TaskListeningStop(this, stopMq,stopKb), TaskListeningStop::TIMEOUT );
 }
 
@@ -581,6 +536,12 @@ void MWC713::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const
 // Init send transaction with file output
 // Check signal:  onSendFile
 void MWC713::sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs )  {
+
+    if ( ! util::validateMwc713Str(fileTx, false).first ) {
+        setSendFileResult( false, QStringList{"Unable to create file with name '"+fileTx+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."} , fileTx );
+        return;
+    }
+
     // switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account.accountName, walletPassword, true), TaskAccountSwitch::TIMEOUT );
 
@@ -589,13 +550,24 @@ void MWC713::sendFile( const wallet::AccountInfo &account, int64_t coinNano, QSt
 
 // Receive transaction. Will generate *.response file in the same dir
 // Check signal:  onReceiveFile
-void MWC713::receiveFile( QString fileTx)  {
-    eventCollector->addTask( new TaskReceiveFile(this, fileTx), TaskReceiveFile::TIMEOUT );
+void MWC713::receiveFile( QString fileTx, QString identifier)  {
+    if ( ! util::validateMwc713Str(fileTx, false).first ) {
+        setReceiveFile( false, QStringList{"Unable to process file with name '"+fileTx+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."}, fileTx, "" );
+        return;
+    }
+
+    eventCollector->addTask( new TaskReceiveFile(this, fileTx, identifier), TaskReceiveFile::TIMEOUT );
 }
 
 // finalize transaction and broadcast it
 // Check signal:  onFinalizeFile
 void MWC713::finalizeFile( QString fileTxResponse )  {
+    if ( ! util::validateMwc713Str(fileTxResponse, false).first ) {
+        setFinalizeFile( false, QStringList{"Unable to process file with name '"+fileTxResponse+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."}, fileTxResponse );
+        return;
+    }
+
+
     eventCollector->addTask( new TaskFinalizeFile(this, fileTxResponse), TaskFinalizeFile::TIMEOUT );
 }
 
@@ -670,12 +642,22 @@ void MWC713::cancelTransacton(int64_t transactionID)  {
 // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
 // Check Signal: onExportProof( bool success, QString fn, QString msg );
 void MWC713::generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName )  {
+    if ( ! util::validateMwc713Str(resultingFileName, false).first ) {
+        setExportProofResults( false, resultingFileName, "Unable to store file with name '"+resultingFileName+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only." );
+        return;
+    }
+
     eventCollector->addTask( new TaskTransExportProof(this, resultingFileName, transactionId), TaskTransExportProof::TIMEOUT );
 }
 
 // Verify the proof for transaction
 // Check Signal: onVerifyProof( bool success, QString msg );
 void MWC713::verifyMwcBoxTransactionProof( QString proofFileName )  {
+    if ( ! util::validateMwc713Str(proofFileName, false).first ) {
+        setVerifyProofResults( false, proofFileName, "Unable to process '"+proofFileName+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only." );
+        return;
+    }
+
     eventCollector->addTask( new TaskTransVerifyProof(this, proofFileName), TaskTransExportProof::TIMEOUT );
 }
 
@@ -689,6 +671,13 @@ bool MWC713::getNodeStatus() {
     return true;
 }
 
+// Airdrop special. Generating the next Pablic key for transaction
+// wallet713> getnextkey --amount 1000000
+// "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
+// Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPasswor);
+void MWC713::getNextKey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) {
+    eventCollector->addTask( new TaskGetNextKey(this,amountNano, btcaddress, airDropAccPassword ), TaskGetNextKey::TIMEOUT );
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -801,6 +790,7 @@ void MWC713::setMwcMqListeningStatus(bool online, QString tid, bool startStopEve
     emit onMwcMqListenerStatus(online);
 
 }
+
 void MWC713::setKeybaseListeningStatus(bool online) {
     if (keybaseOnline != online) {
         appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString("listening on keybase"));
@@ -1019,7 +1009,7 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
     updateWalletBalance();
 
     // Show message box with congrats. Message bot should work from any point. No needs to block locking or what ever we have
-    control::MessageBox::message(nullptr, "Congratulations!",
+    control::MessageBox::messageHTML(nullptr, "Congratulations!",
            "You recieved <b>" + mwc + "</b> mwc<br>" +
            (message.isEmpty() ? "" : "Description: " + message + "<br>" ) +
            "<br>From: " + fromAddr +
@@ -1047,7 +1037,9 @@ void MWC713::setSendFileResult( bool success, QStringList errors, QString fileNa
 }
 
 void MWC713::setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn ) {
-    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("File receive transaction was processed for "+ inFileName ));
+    if (success) {
+        appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, QString("File receive transaction was processed for " + inFileName));
+    }
 
     logger::logEmit( "MWC713", "onReceiveFile", "success="+QString::number(success) );
     emit onReceiveFile( success, errors, inFileName, outFn );
@@ -1139,6 +1131,7 @@ void MWC713::notifyListenerMqCollision() {
     logger::logEmit("MWC713", "onListenerMqCollision", "");
 
     mwcMqStarted = false;
+    mwcMqStartRequested = false;
     emit onListenerMqCollision();
 
     if (mwcMqOnline) {
@@ -1153,7 +1146,21 @@ void MWC713::notifyMqFailedToStart() {
         mwcMqStarted = false;
         emit onListeningStopResult(true, false, {} );
     }
+
+    if (mwcMqStartRequested ) {
+        // schedule the restart in 5 seconds
+        QTimer::singleShot( 1000*5, this, &MWC713::restartMQsListener );
+    }
 }
+
+void  MWC713::restartMQsListener() {
+    if (mwcMqStartRequested && !mwcMqStarted) {
+        qDebug() << "Try to restart MQs Listener after failure";
+        eventCollector->addTask( new TaskListeningStart(this, true,false, false), TaskListeningStart::TIMEOUT );
+
+    }
+}
+
 
 void MWC713::processAllTransactionsStart() {
     collectedTransactions.clear();
@@ -1199,32 +1206,46 @@ void MWC713::mwc713disconnect() {
 }
 
 void MWC713::mwc713errorOccurred(QProcess::ProcessError error) {
-    logger::logMwc713out("ERROR OCCURRED. Error = " + QString::number(error)  );
+    logger::logInfo("MWC713", "Unable to start mwc713 process. ProcessError=" + QString::number(error) );
+    qDebug() << "Unable to start mwc713 process. ProcessError=" << error;
 
-    qDebug() << "ERROR OCCURRED. Error = " << error;
+    if (mwc713process) {
+        logger::logInfo("MWC713", "stdout: " + mwc713process->readAllStandardOutput() );
+        logger::logInfo("MWC713", "stderr: " + mwc713process->readAllStandardError() );
 
-    processStop(false);
-
-    Q_ASSERT( mwc713process == nullptr);
+        mwc713process->deleteLater();
+        mwc713process = nullptr;
+    }
 
     appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
-                               "mwc713 process exited. Process error: "+ QString::number(error) );
+                     "mwc713 process exited. Process error: "+ QString::number(error) +
+                     + "\n\nCommand line:\n\n" + commandLine);
 
 }
 
 void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
-    if (startedMode == STARTED_MODE::OFFLINE) {
-        logger::logMwc713out("Exit with exit code " + QString::number(exitCode) + ", Exit status:" + QString::number(exitStatus) );
+    logger::logInfo("MWC713", "mwc713 exited with exit code " + QString::number(exitCode) + ", Exit status:" + QString::number(exitStatus) );
 
-        qDebug() << "mwc713 is exiting with exit code " << exitCode << ", exitStatus=" << exitStatus;
+    qDebug() << "mwc713 is exiting with exit code " << exitCode << ", exitStatus=" << exitStatus;
 
-        appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
-                                   "mwc713 process exited due some unexpected error. mwc713 exit code: " + QString::number(exitCode) );
+    if (mwc713process) {
+        logger::logInfo("MWC713", "stdout: " + mwc713process->readAllStandardOutput() );
+        logger::logInfo("MWC713", "stderr: " + mwc713process->readAllStandardError() );
+
+        mwc713process->deleteLater();
+        mwc713process = nullptr;
     }
 
-    processStop(false);
+    QString errorMessage = "mwc713 process exited due some unexpected error.\nmwc713 exit code: " + QString::number(exitCode);
 
-    Q_ASSERT( mwc713process == nullptr );
+    if (QDateTime::currentMSecsSinceEpoch() - walletStartTime < 1000L * 15) {
+        // Very likely that wallet wasn't be able to start. Lets update the message with mode details
+        errorMessage += "\n\nPlease check if you have enough space at your home disk or there are any antivirus preventing mwc713 to start."
+                        "\n\nYou might use command line for troubleshooting:\n\n" + commandLine;
+    }
+
+    appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
+                               errorMessage );
 }
 
 void MWC713::mwc713readyReadStandardError() {
@@ -1298,7 +1319,7 @@ WalletConfig MWC713::readWalletConfig(QString source) {
     util::ConfigReader  mwc713config;
 
     if (!mwc713config.readConfig(source) ) {
-        control::MessageBox::message(nullptr, "Read failure", "Unable to read mwc713 configuration from " + source );
+        control::MessageBox::messageText(nullptr, "Read failure", "Unable to read mwc713 configuration from " + source );
         return WalletConfig();
     }
 
@@ -1309,7 +1330,7 @@ WalletConfig MWC713::readWalletConfig(QString source) {
     QString mwcmqsDomain = mwc713config.getString("mwcmqs_domain");
 
     if (dataPath.isEmpty() ) {
-        control::MessageBox::message(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + source );
+        control::MessageBox::messageText(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + source );
         return WalletConfig();
     }
 
@@ -1367,7 +1388,8 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
 
     newConfLines.append("chain = \"" + config.getNetwork() + "\"");
     newConfLines.append("wallet713_data_path = \"" + config.getDataPath() + "\"");
-    newConfLines.append("keybase_binary = \"" + config.keyBasePath + "\"");
+    if (config.keyBasePath.length() > 0)
+        newConfLines.append("keybase_binary = \"" + config.keyBasePath + "\"");
 
     if ( !config.mwcmqDomainEx.isEmpty() )
         newConfLines.append("mwcmq_domain = \"" + config.mwcmqDomainEx + "\"");
@@ -1383,7 +1405,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
         case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD:
             break;
         case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL: {
-            node::MwcNodeConfig nodeConfig = node::getCurrentMwcNodeConfig(config.getNetwork());
+            node::MwcNodeConfig nodeConfig = node::getCurrentMwcNodeConfig( connection.localNodeDataPath, config.getNetwork());
             newConfLines.append("mwc_node_uri = \"http://127.0.0.1:13413\"");
             newConfLines.append("mwc_node_secret = \"" + nodeConfig.secret + "\"");
             needLocalMwcNode = true;
@@ -1397,14 +1419,14 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
             Q_ASSERT(false);
     }
 
+    // allways stop because config migth change
+    if ( mwcNode->isRunning() ) {
+        mwcNode->stop();
+    }
+
     if (needLocalMwcNode) {
         if ( !mwcNode->isRunning() ) {
-            mwcNode->start( config.getNetwork() );
-        }
-    }
-    else {
-        if ( mwcNode->isRunning() ) {
-            mwcNode->stop();
+            mwcNode->start( connection.localNodeDataPath, config.getNetwork() );
         }
     }
 
@@ -1427,7 +1449,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
 bool MWC713::setWalletConfig( const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode ) {
 
     if ( !saveWalletConfig( config, appContext, mwcNode ) ) {
-        control::MessageBox::message(nullptr, "Update Config failure", "Not able to update mwc713 configuration at " + config::getMwc713conf() );
+        control::MessageBox::messageText(nullptr, "Update Config failure", "Not able to update mwc713 configuration at " + config::getMwc713conf() );
         return false;
     }
 

@@ -37,10 +37,12 @@ InitAccount::InitAccount(QWidget *parent, state::InitAccount * _state, state::Wa
 {
     ui->setupUi(this);
 
-    util::PasswordAnalyser pa( ui->password1Edit->text().trimmed() );
-    ui->strengthLabel->setText(pa.getPasswordQualityStr());
+    QVector<double> weight;
+    QStringList seqWords, dictWords;
+    QPair<QString, bool> paResp = passwordAnalyser.getPasswordQualityReport( ui->password1Edit->text(), weight, seqWords, dictWords );
 
-    ui->submitButton->setEnabled( pa.isPasswordOK() );
+    ui->strengthLabel->setText( paResp.first );
+    ui->submitButton->setEnabled( paResp.second );
 
     ui->password1Edit->installEventFilter(this);
 
@@ -61,9 +63,12 @@ void InitAccount::on_password1Edit_textChanged(const QString &text)
         ui->submitButton->setEnabled( false );
     }
 
-    util::PasswordAnalyser pa(text);
-    ui->strengthLabel->setText(pa.getPasswordQualityStr());
-    ui->submitButton->setEnabled( pa.isPasswordOK() );
+    QVector<double> weight;
+    QStringList seqWords, dictWords;
+    QPair<QString, bool> paResp = passwordAnalyser.getPasswordQualityReport( text, weight, seqWords, dictWords );
+
+    ui->strengthLabel->setText(paResp.first);
+    ui->submitButton->setEnabled( paResp.second );
 
     updatePassState();
 }
@@ -95,24 +100,27 @@ void InitAccount::on_submitButton_clicked()
 
     QString pswd1 = ui->password1Edit->text();
     QString pswd2 = ui->password2Edit->text();
-    util::PasswordAnalyser pa(pswd1);
 
     QPair <bool, QString> valRes = util::validateMwc713Str(pswd1, true);
     if (!valRes.first) {
-        control::MessageBox::message(this, "Password", valRes.second );
+        control::MessageBox::messageText(this, "Password", valRes.second );
         return;
     }
 
-    if (!pa.isPasswordOK())
+    QVector<double> weight;
+    QStringList seqWords, dictWords;
+    QPair<QString, bool> paResp = passwordAnalyser.getPasswordQualityReport( pswd1, weight, seqWords, dictWords );
+
+    if (!paResp.second)
         return;
 
     if (pswd1!=pswd2) {
-        control::MessageBox::message(this, "Password", "Password doesn't match confirm string. Please retype the password correctly");
+        control::MessageBox::messageText(this, "Password", "Password doesn't match confirm string. Please retype the password correctly");
         return;
     }
 
-    if (! pa.isPasswordOK() ) {
-        control::MessageBox::message(this, "Password", "Your password is not strong enough. Please input stronger password");
+    if (! paResp.second ) {
+        control::MessageBox::messageText(this, "Password", "Your password is not strong enough. Please input stronger password");
         return;
     }
 

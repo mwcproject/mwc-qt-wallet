@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Dictionary.h"
+#include "Bip39.h"
 #include <QApplication>
 #include "../control/messagebox.h"
 #include <QFile>
@@ -27,7 +27,7 @@ const QSet<QString> & getBip39words() {
         // load the words
         QFile file(":/txt/bip39_words.txt");
         if (!file.open(QFile::ReadOnly)) {
-            control::MessageBox::message(nullptr, "Fatal Error", "Unable to read bip39 dictionary from the resources");
+            control::MessageBox::messageText(nullptr, "Fatal Error", "Unable to read bip39 dictionary from the resources");
             QApplication::quit();
             return bip39words;
         }

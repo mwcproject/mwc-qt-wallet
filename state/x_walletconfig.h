@@ -19,6 +19,10 @@
 #include "../wallet/wallet.h"
 #include "../core/appcontext.h"
 
+namespace wnd {
+class WalletConfig;
+}
+
 namespace state {
 
 class WalletConfig : public State
@@ -26,6 +30,8 @@ class WalletConfig : public State
 public:
     WalletConfig( StateContext * context);
     virtual ~WalletConfig() override;
+
+    void deleteWnd(wnd::WalletConfig * w) {if (wnd==w) wnd=nullptr;}
 
     wallet::WalletConfig    getWalletConfig() const;
     wallet::WalletConfig    getDefaultWalletConfig() const;
@@ -48,6 +54,10 @@ public:
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "wallet_configuration.html";}
+    // State can block the stare change. Wallet config is the first usage.
+    virtual bool canExitState() override;
+private:
+    wnd::WalletConfig * wnd = nullptr;
 };
 
 }

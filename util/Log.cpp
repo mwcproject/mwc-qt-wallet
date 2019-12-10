@@ -97,7 +97,7 @@ LogReceiver::LogReceiver(const QString & filename) {
 
     logFile = new QFile( logFn );
     if (! logFile->open( QFile::WriteOnly | QFile::Append ) ) {
-        control::MessageBox::message(nullptr, "Critical Error", "Unable to open the logger file: " + logPath );
+        control::MessageBox::messageText(nullptr, "Critical Error", "Unable to open the logger file: " + logPath );
         QApplication::quit();
         return;
     }

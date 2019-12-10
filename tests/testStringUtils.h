@@ -21,6 +21,8 @@ namespace test {
     // Currently it works in debug only because of Asserts
     void testLongLong2ShortStr();
 
+    void testUtils();
+
 }
 
 

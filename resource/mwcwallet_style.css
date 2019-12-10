@@ -232,6 +232,34 @@ control--MwcPlainEditLogs:focus {
     background: rgba(255, 255, 255, 0.05);
 }
 
+control--MwcPlainEditDlg {
+    font-size: 15px;
+    border-radius: 6px;
+    padding: 8px;
+    border: transparent;
+    background: transparent;
+}
+control--MwcPlainEditDlg:focus {
+    border: transparent;
+    background: transparent;
+}
+control--MwcTextEditDlg {
+    font-size: 15px;
+    border-radius: 6px;
+    padding: 8px;
+    border: transparent;
+    background: transparent;
+}
+control--MwcTextEditDlg:focus {
+    border: transparent;
+    background: transparent;
+}
+
+control--MwcTextEditDlg:enabled:!focus::hover
+{
+    border: transparent;
+}
+
 /* --------------------------------------- */
 
 QPushButton

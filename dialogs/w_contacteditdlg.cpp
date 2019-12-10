@@ -46,21 +46,21 @@ void ContactEditDlg::on_applyButton_clicked()
 
     if ( contact.name.isEmpty() )
     {
-        control::MessageBox::message(this, "Need Info", "Please specify a name for your contact");
+        control::MessageBox::messageText(this, "Need Info", "Please specify a name for your contact");
         ui->nameEdit->setFocus();
         return;
     }
 
     if ( contact.address.isEmpty() )
     {
-        control::MessageBox::message(this, "Need info", "Please specify an address for your contact");
+        control::MessageBox::messageText(this, "Need info", "Please specify an address for your contact");
         ui->addressEdit->setFocus();
         return;
     }
 
     QPair< bool, util::ADDRESS_TYPE > res = util::verifyAddress(contact.address);
     if ( !res.first ) {
-        control::MessageBox::message(this, "Incorrect Input",
+        control::MessageBox::messageText(this, "Incorrect Input",
                                      "Please specify correct address for your contact" );
         ui->addressEdit->setFocus();
         return;
@@ -69,7 +69,7 @@ void ContactEditDlg::on_applyButton_clicked()
 
     for ( auto & cnt : contactList ) {
             if (cnt.name == contact.name) {
-                control::MessageBox::message(this, "Names collision", "Contact with a name "+contact.name+
+                control::MessageBox::messageText(this, "Names collision", "Contact with a name "+contact.name+
                                       " already exist. Please specify unique name for your contact");
                 ui->nameEdit->setFocus();
                 return;

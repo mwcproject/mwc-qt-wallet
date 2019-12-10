@@ -129,6 +129,7 @@ void InitAccount::onNewSeed(QVector<QString> sd) {
 
     seed = sd;
     tasks = core::generateSeedTasks( seed ); // generate tasks
+    seedTestWrongAnswers = 0;
 
 #ifdef QT_DEBUG
     // We really don't want go trough all words
@@ -178,19 +179,28 @@ void InitAccount::submit(QString word) {
         // retry with submit call
     }
     else {
-        control::MessageBox::message(nullptr, "Wrong word",
+        seedTestWrongAnswers++;
+        bool restart = seedTestWrongAnswers>=3;
+
+        control::MessageBox::messageText(nullptr, "Wrong word",
                                      "The word number " + QString::number(tasks[0].getWordIndex()) +
                                      " was typed incorrectly. " +
-                                     "Please review your passphrase.");
+                                     "Please review your passphrase and we will try again starting " +
+                                     (restart ? "from the beginning." : "where we left off.") );
 
         // regenerate if totally failed
-        if (tasks[0].isTestCompletelyFailed()) {
+        //  Test on per word basis. Used for random words order.  if (tasks[0].isTestCompletelyFailed()) {
+        if (restart) {
             // generate a new tasks for a wallet
             tasks = core::generateSeedTasks(seed);
+            seedTestWrongAnswers = 0;
         } else {
+         /* In case of random order, put the failed order at the end of the Q.
             // add to the Q
             tasks.push_back( tasks[0] );
-            tasks.remove(0);
+            tasks.remove(0);*/
+
+           // normal order - just do nothing. The same word will be requested.
         }
 
         // switch to 'show seed' window
@@ -213,7 +223,7 @@ bool InitAccount::finishSeedVerification() {
             context->wallet->start(false);
             context->wallet->loginWithPassword(pass);
 
-            control::MessageBox::message(nullptr, "Congratulations!", "Thank you for confirming all words from your passphrase. Your wallet was successfully created");
+            control::MessageBox::messageText(nullptr, "Congratulations!", "Thank you for confirming all words from your passphrase. Your wallet was successfully created");
             // onLoginResult - will be the next step
             return true;
     }
@@ -288,14 +298,14 @@ void InitAccount::onRecoverResult(bool started, bool finishedWithSuccess, QStrin
     bool success = false;
 
     if (!started) {
-        control::MessageBox::message(nullptr, "Recover failure", "Account recovery failed to start." + errorMsg);
+        control::MessageBox::messageText(nullptr, "Recover failure", "Account recovery failed to start." + errorMsg);
     }
     else if (!finishedWithSuccess) {
-        control::MessageBox::message(nullptr, "Recover failure", "Account recovery failed to finish." + errorMsg);
+        control::MessageBox::messageText(nullptr, "Recover failure", "Account recovery failed to finish." + errorMsg);
     }
     else {
         success = true;
-        control::MessageBox::message(nullptr, "Success", "Your account was successfully recovered from the passphrase." + errorMsg);
+        control::MessageBox::messageText(nullptr, "Success", "Your account was successfully recovered from the passphrase." + errorMsg);
     }
 
     if (success) {

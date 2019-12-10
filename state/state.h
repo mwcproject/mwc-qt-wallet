@@ -108,6 +108,9 @@ public:
     // process/verify the state
     virtual NextStateRespond execute() = 0;
 
+    // State can block the stare change. Wallet config is the first usage.
+    virtual bool canExitState() {return true;}
+
     // Executing another state
     virtual void exitingState() {};
 

@@ -92,6 +92,7 @@ private:
     QString pass;
     QVector<QString> seed;
     QVector<core::TestSeedTask> tasks;
+    int  seedTestWrongAnswers = 0;
 };
 
 

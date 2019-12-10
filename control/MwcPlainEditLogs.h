@@ -27,6 +27,22 @@ public:
     virtual ~MwcPlainEditLogs() override;
 };
 
+class MwcPlainEditDlg : public QPlainTextEdit {
+Q_OBJECT
+public:
+    explicit MwcPlainEditDlg(QWidget *parent = Q_NULLPTR);
+    explicit MwcPlainEditDlg(const QString &text, QWidget *parent = Q_NULLPTR);
+    virtual ~MwcPlainEditDlg() override;
+};
+
+class MwcTextEditDlg : public QTextEdit {
+Q_OBJECT
+public:
+    explicit MwcTextEditDlg(QWidget *parent = Q_NULLPTR);
+    explicit MwcTextEditDlg(const QString &text, QWidget *parent = Q_NULLPTR);
+    virtual ~MwcTextEditDlg() override;
+};
+
 }
 
 #endif //MWC_QT_WALLET_MWCPLAINEDITLOGS_H

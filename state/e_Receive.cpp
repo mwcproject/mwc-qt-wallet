@@ -77,9 +77,11 @@ void Receive::signTransaction( QString fileName ) {
 
     // Let's parse transaction first
     util::FileTransactionInfo flTrInfo;
-    if (!flTrInfo.parseTransaction(fileName)) {
+    QPair<bool, QString> perseResult = flTrInfo.parseTransaction( fileName, util::FileTransactionType::RECEIVE );
+
+    if (!perseResult.first) {
         if (wnd) {
-            wnd->onTransactionActionIsFinished( false, "Unable to parse mwc transaction data at file: " + fileName );
+            wnd->onTransactionActionIsFinished( false, perseResult.second );
         }
         return;
     }
@@ -121,12 +123,12 @@ void Receive::respReceiveFile( bool success, QStringList errors, QString inFileN
             fileTransWnd->hideProgress();
 
         if (success) {
-            control::MessageBox::message(nullptr, "Receive File Transaction",
+            control::MessageBox::messageText(nullptr, "Receive File Transaction",
                                          "Transaction file was successfully signed. Resulting transaction located at " +
                                          inFileName + ".response");
             ftBack();
         } else {
-            control::MessageBox::message(nullptr, "Failure",
+            control::MessageBox::messageText(nullptr, "Failure",
                                          "Unable to sign file transaction.\n" + util::formatErrorMessages(errors));
         }
     }

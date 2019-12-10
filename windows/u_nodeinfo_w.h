@@ -37,7 +37,8 @@ public:
 
     ~NodeInfo();
 
-    void setNodeStatus( const state::NodeStatus & status );
+    void setNodeStatus( const QString & localNodeStatus, const state::NodeStatus & status );
+
     void updateEmbeddedMwcNodeStatus( const QString & status );
 
     void hideProgress();

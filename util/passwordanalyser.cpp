@@ -14,88 +14,156 @@
 
 #include "passwordanalyser.h"
 #include <QMap>
+#include <math.h>
 
 namespace util {
 
-const int PASS_MIN_LEN      = 10;
-const int PASS_MIN_NON_LETTER = 1;
-const int PASS_MIN_CAPITAL  = 1;
-const int PASS_MIN_LOWCASE  = 1;
 
-PasswordAnalyser::PasswordAnalyser(const QString & password) :
-    pass2check(password)
+PasswordAnalyser::PasswordAnalyser(QString _attentinColor, QString _happyColor ) :
+        attentinColor(_attentinColor),
+        happyColor(_happyColor),
+        sequenceAnalyzer( dict::buldPasswordChackWordSequences() ) {
+
+    Q_ASSERT(DICTS_NUM==4);
+
+    dictionaries[0] = new dict::WordDictionary(":/resource/passwords-1k.dat");
+    dictionaryWeight[0] = 1.0; // 1 k include 10 & 100.  Let's ban it to one symbol. In any case it is lett than 2 symbols
+
+    dictionaries[1] = new dict::WordDictionary(":/resource/passwords-10k.dat");
+    dictionaryWeight[1] = 2.0; // 13.2 bits
+
+    dictionaries[2] = new dict::WordDictionary(":/resource/passwords-100k.dat");
+    dictionaryWeight[2] = 2.5; // 16.6 bits  (7 per char is ok)
+
+    dictionaries[3] = new dict::WordDictionary(":/resource/passwords-1M.dat");
+    dictionaryWeight[3] = 3.0; // 20 bits
+}
+
+PasswordAnalyser::~PasswordAnalyser() {
+    for ( auto d : dictionaries ) {
+        delete d;
+    }
+}
+
+// return String to print
+QPair<QString, bool> PasswordAnalyser::getPasswordQualityReport(const QString & pass, // in
+              QVector<double> & weight,
+              QStringList & seqWords,
+              QStringList & dictWords)
 {
-    len = pass2check.length();
+    // mwc713 password can't from '-',  config parser doesn't handle that
+    if (pass.startsWith("-")) {
+        return QPair<QString, bool>("<font color="+attentinColor+">Password can't be started from '-' symbol.</font>", false);
+    }
 
-    letters = nonLetters = capitals = locase = 0;
-
-    // want to keep keys sorted
-    QMap<int, int> entropy;
-    for ( QChar ch : pass2check )
-    {
-        entropy[ch.unicode()]=ch.unicode();
+    // Check if all capital or lower case
+    bool hasUpperCase = false;
+    bool hasLowerCase = false;
+    bool hasNumbers = false;
+    bool hasSpecialSymbols = false;
+    for (auto ch : pass) {
         if (ch.isLetter()) {
-            letters++;
-
             if (ch.isUpper())
-                capitals++;
+                hasUpperCase = true;
             else
-                locase++;
+                hasLowerCase = true;
+            continue;
         }
-        else {
-            nonLetters++;
+
+        if (ch.isNumber()) {
+            hasNumbers = true;
+            continue;
         }
-    }
-    if (entropy.size()<1)
-        entropy[0]=0;
 
-    // Calculating entropy by apply the same operation once (twice is too strict)
-    for (int t=0;t<1;t++)
-    {
-        QMap<int, int> buffer;
-        buffer.swap(entropy);
-
-        Q_ASSERT(entropy.size()==0);
-
-        int prev=0;
-        for ( auto bi = buffer.begin(); bi != buffer.end(); bi++ ) {
-            int diff = bi.key() - prev;
-            Q_ASSERT(diff>=0);
-            entropy[ diff ] = diff;
-            prev = bi.key();
-        }
+        hasSpecialSymbols = true;
     }
 
-    entropyLen = entropy.size();
-}
+    int alphabetSz = 1;
+    if (hasUpperCase)
+        alphabetSz += 32;
+    if (hasLowerCase)
+        alphabetSz += 32;
+    if (hasNumbers)
+        alphabetSz += 10;
+    if (hasSpecialSymbols)
+        alphabetSz += 32;
 
+    // Minimum number of effective bits needed for the password to pass.
+    double bitsMinSum = log2( 32.0 * 3 + 10 ) * 7;
 
-// return string that describe the quality of the password
-// Example: <font color="red">aaaa</font>
-QString PasswordAnalyser::getPasswordQualityStr()
-{
-    if (len<PASS_MIN_LEN)
-        return "<font color=#CCFF33>Password minimum length is "+QString::number(PASS_MIN_LEN)+" symbols</font>";
+    double singleCharBitWeight = log2(alphabetSz);
 
-    if (nonLetters<PASS_MIN_NON_LETTER )
-        return "<font color=#CCFF33>Password require at least "+ QString::number(PASS_MIN_NON_LETTER) +" non letter symbols</font>";
+    // init all letters with a start weight
+    weight.resize(pass.length());
+    for (auto & w : weight)
+        w = singleCharBitWeight;
 
-    if (capitals<PASS_MIN_CAPITAL )
-        return "<font color=#CCFF33>Password require at least "+ QString::number(PASS_MIN_CAPITAL) +" capital letter</font>";
+    seqWords.clear();
+    dictWords.clear();
 
-    if (locase<PASS_MIN_LOWCASE )
-        return "<font color=#CCFF33>Password require at least "+ QString::number(PASS_MIN_LOWCASE) +" low case symbol</font>";
+    if (pass.size()<PASS_MIN_LEN)
+        return QPair<QString, bool>("<font color="+attentinColor+">Password must be at least "+
+                 QString::number(PASS_MIN_LEN)+" symbols</font>", false);
 
-    if (entropyLen < len/2) {
-        return "<font color=#CCFF33>Your password phrase has low entropy. Please choose another phrase</font>";
+    // Let's check for sequences. All sequence has a weight 1
+    for ( auto s : sequenceAnalyzer.detectSequences(pass, weight, singleCharBitWeight) )
+        if (s.length()>2)
+            seqWords << s;
+
+    // Let's check dictionary words
+    for ( int t=0; t<DICTS_NUM; t++ ) {
+        dictWords += dictionaries[t]->detectDictionaryWords(pass, weight, dictionaryWeight[t] * 7.0 ); // dictionary has the full alphabet - 7 bits
     }
 
-    return "";// "<font color=\"green\">OK</font>";
-}
+    // Let's pack the dictionary words...
+    for (int i=dictWords.size()-1; i>=0; i--) {
 
-bool PasswordAnalyser::isPasswordOK() const {
-    return len>=PASS_MIN_LEN && nonLetters>=PASS_MIN_NON_LETTER  &&
-            capitals >= PASS_MIN_CAPITAL && locase>=PASS_MIN_LOWCASE && entropyLen >= len/2;
+        bool included = false;
+        for (int j = 0; j < dictWords.size(); j++) {
+            if (i == j)
+                continue;
+
+            included = included || dictWords[j].contains(dictWords[i]);
+        }
+        if (included)
+            dictWords.removeAt(i);
+    }
+
+    // Check if the password good enough
+    double weightsSum = 0.0;
+    for (auto w : weight)
+        weightsSum += w;
+
+    if (weightsSum+0.01 >= bitsMinSum) {
+        // we are good to go!
+        if ( seqWords.isEmpty() && dictWords.isEmpty() )
+            return QPair<QString, bool>("",true); // Great password
+
+        QString respondStr = "<font color="+happyColor+">Your password is acceptable. But please note that it has:";
+        if (seqWords.size()>0)
+            respondStr += "<br>Sequences: " + seqWords.join(", ");
+        if (dictWords.size()>0)
+            respondStr += "<br>Dictionary words: " + dictWords.join(", ");
+
+        respondStr += "</font>";
+
+        return QPair<QString, bool>(respondStr, true);
+    }
+
+    // Here we are not good to go at all.
+    if ( seqWords.isEmpty() && dictWords.isEmpty() ) {
+        return QPair<QString, bool>("<font color="+attentinColor+">Please specify longer password or use more symbols variation.</font>", false);
+    }
+
+    QString respondStr = "<font color="+attentinColor+">Please specify longer password or don't use:";
+    if (seqWords.size()>0)
+        respondStr += "<br>Sequences: " + seqWords.join(", ");
+    if (dictWords.size()>0)
+        respondStr += "<br>Dictionary words: " + dictWords.join(", ");
+
+    respondStr += "</font>";
+
+    return QPair<QString, bool>(respondStr, false);
 }
 
 }

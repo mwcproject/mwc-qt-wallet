@@ -102,22 +102,30 @@ void NodeInfo::showWarning(QString warning) {
 }
 
 
-void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
+void NodeInfo::setNodeStatus( const QString & localNodeStatus, const state::NodeStatus & status ) {
     QString warning;
 
     bool nodeIsReady = false;
 
     if (!status.online) {
-        ui->statusInfo->setText( toBoldAndYellow("Offline") );
+        QString statusStr = "Offline";
+
+        if (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL && localNodeStatus!="Ready") {
+            statusStr = localNodeStatus;
+        }
+
+        ui->statusInfo->setText( toBoldAndYellow(statusStr) );
         ui->connectionsInfo->setText("-");
         ui->heightInfo->setText("-");
         ui->difficultyInfo->setText("-");
 
         // Don't show message for the local because starting local node might take a while. Error likely will be recoverable
         if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL ) {
-            if (lastShownErrorMessage != status.errMsg) {
-                 emit showNodeConnectionError(status.errMsg);
-                 lastShownErrorMessage = status.errMsg;
+            if ( statusStr == "Offline" ) {
+                 if (lastShownErrorMessage != status.errMsg) {
+                     emit showNodeConnectionError(status.errMsg);
+                     lastShownErrorMessage = status.errMsg;
+                 }
             }
         }
     }
@@ -160,12 +168,12 @@ void NodeInfo::setNodeStatus( const state::NodeStatus & status ) {
 }
 
 void NodeInfo::onShowNodeConnectionError(QString errorMessage) {
-    control::MessageBox::message(this, "mwc node connection error",
+    control::MessageBox::messageText(this, "mwc node connection error",
         "Unable to retrieve mwc node status.\n" + errorMessage);
 }
 
 void NodeInfo::on_refreshButton_clicked() {
-    if (control::MessageBox::question(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
+    if (control::MessageBox::questionText(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
                        "Yes", "No", false,true) == control::MessageBox::RETURN_CODE::BTN1 ) {
         state->requestWalletResync();
     }

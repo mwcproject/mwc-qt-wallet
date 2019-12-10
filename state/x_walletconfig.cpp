@@ -39,18 +39,25 @@ NextStateRespond WalletConfig::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     if ( config::isOnlineNode() ) {
-        context->wndManager->switchToWindowEx( mwc::PAGE_X_WALLET_CONFIG,
+        wnd = (wnd::NodeConfig *) context->wndManager->switchToWindowEx( mwc::PAGE_X_WALLET_CONFIG,
                 new wnd::NodeConfig( context->wndManager->getInWndParent(), this ) );
 
     }
     else {
-        context->wndManager->switchToWindowEx( mwc::PAGE_X_WALLET_CONFIG,
+        wnd = (wnd::WalletConfig *) context->wndManager->switchToWindowEx( mwc::PAGE_X_WALLET_CONFIG,
                 new wnd::WalletConfig( context->wndManager->getInWndParent(), this ) );
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
+// State can block the state change. Wallet config is the first usage.
+bool WalletConfig::canExitState() {
+    if ( wnd != nullptr ) {
+        return wnd->askUserForChanges();
+    }
+    return true;
+}
 
 wallet::WalletConfig WalletConfig::getWalletConfig() const {
     return context->wallet->getWalletConfig();

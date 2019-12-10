@@ -70,13 +70,21 @@ struct MwcNodeConnection {
 
     NODE_CONNECTION_TYPE connectionType = NODE_CONNECTION_TYPE::CLOUD;
 
-    QString mwcNodeURI; // Connection to alternative MWC node
-    QString mwcNodeSecret;
+    // Cloud - no data
 
-    void setData(NODE_CONNECTION_TYPE _connectionType, QString _mwcNodeURI, QString _mwcNodeSecret) {connectionType = _connectionType; mwcNodeURI = _mwcNodeURI; mwcNodeSecret = _mwcNodeSecret;}
-    void setData(NODE_CONNECTION_TYPE _connectionType) {connectionType = _connectionType;}
+    // Local:
+    QString localNodeDataPath = "mwc-node"; // location for the node data
 
-    bool operator == (const MwcNodeConnection & itm) const {return connectionType==itm.connectionType && mwcNodeURI==itm.mwcNodeURI && mwcNodeSecret==itm.mwcNodeSecret; }
+    // Custom
+    QString mwcNodeURI; // URL
+    QString mwcNodeSecret; // Secret for the node
+
+    void setAsCloud() { connectionType = NODE_CONNECTION_TYPE::CLOUD; }
+    void setAsLocal( const QString & _localNodeDataPath ) { connectionType = NODE_CONNECTION_TYPE::LOCAL; localNodeDataPath = _localNodeDataPath; }
+    void setAsCustom( const QString & _mwcNodeURI, const QString & _mwcNodeSecret ) { connectionType = NODE_CONNECTION_TYPE::CUSTOM; mwcNodeURI = _mwcNodeURI; mwcNodeSecret = _mwcNodeSecret; }
+
+    bool operator == (const MwcNodeConnection & itm) const {return connectionType==itm.connectionType && mwcNodeURI==itm.mwcNodeURI &&
+                mwcNodeSecret==itm.mwcNodeSecret && localNodeDataPath==itm.localNodeDataPath; }
 
     void saveData(QDataStream & out) const;
     bool loadData(QDataStream & in);
@@ -166,8 +174,9 @@ struct WalletTransaction {
     QString address;
     QString creationTime;
     bool    confirmed = false;
+    int64_t height = 0;
     QString confirmationTime;
-    int64_t    coinNano=0; // Net diffrence
+    int64_t coinNano = 0; // Net diffrence
     bool    proof=false;
 
     void setData(int64_t txIdx,
@@ -176,6 +185,7 @@ struct WalletTransaction {
         QString address,
         QString creationTime,
         bool    confirmed,
+        int64_t height,
         QString confirmationTime,
         int64_t    coinNano,
         bool    proof);
@@ -263,18 +273,6 @@ public:
     // Check Signals: onRecoverResult(bool ok, QString newAddress );
     virtual void start2recover(const QVector<QString> & seed, QString password)   = 0;
 
-    // Need for claiming process only
-    // Starting the wallet and get the next key
-    // wallet713> getnextkey --amount 1000000
-    // "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
-    // Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPasswor);
-    virtual void start2getnextkey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) = 0;
-
-    // Need for claiming process only
-    // identifier  - output from start2getnextkey
-    // Check Signal: onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
-    virtual void start2receiveSlate( QString receiveAccount, QString identifier, QString slateFN ) = 0;
-
     // Check signal: onLoginResult(bool ok)
     virtual void loginWithPassword(QString password)   = 0;
 
@@ -290,6 +288,9 @@ public:
     // Current seed for runnign wallet
     // Check Signals: onGetSeed(QVector<QString> seed);
     virtual void getSeed()  = 0;
+
+    // Get last used password. Just don't export from DLL
+    virtual QString getPassword() = 0;
 
     //--------------- Listening
 
@@ -401,7 +402,7 @@ public:
     virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs )  = 0;
     // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
-    virtual void receiveFile( QString fileTx)  = 0;
+    virtual void receiveFile( QString fileTx, QString identifier = "")  = 0;
     // finalize transaction and broadcast it
     // Check signal:  onFinalizeFile
     virtual void finalizeFile( QString fileTxResponse )  = 0;
@@ -413,8 +414,15 @@ public:
     // Send some coins to address.
     // Before send, wallet always do the switch to account to make it active
     // coinNano == -1  - mean All
-    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs )  = 0;
     // Check signal:  onSend
+    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs )  = 0;
+
+    // Airdrop special. Generating the next Pablic key for transaction
+    // wallet713> getnextkey --amount 1000000
+    // "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
+    // Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPasswor);
+    virtual void getNextKey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) = 0;
+
 
     // Get total number of Outputs
     // Check Signal: onOutputCount(int number)

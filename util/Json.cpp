@@ -72,12 +72,16 @@ QString readStringFromJson(const QJsonObject & jsonObj, QString path, const QStr
 
 //////////////////////////////////////////////// FILE TRANSACTIONS ///////////////////////////////////////
 
-bool FileTransactionInfo::parseTransaction( QString fn ) {
+QPair<bool, QString> FileTransactionInfo::parseTransaction( QString fn, FileTransactionType type ) {
     QString jsonStr = readTextFile(fn).join(' ');
 
     qDebug() << "parseTransaction for " << fn << " Body:" << jsonStr;
 
     QJsonObject json = jsonFromString(jsonStr);
+
+    if (json.length()==0 ) {
+        return QPair<bool, QString>(false, "Content of the file " + fn + " has wrong format. It is not a mwc slate.");
+    }
 
     bool ok1 = true, ok2 = true, ok3 = true, ok4 = true;
 
@@ -112,23 +116,57 @@ bool FileTransactionInfo::parseTransaction( QString fn ) {
             lock_height = readStringFromJson( json, "lock_height" ).toInt(&ok4);
             break;
         default:
-            qDebug() << "Transaction has unknown version " << version;
-            return false;
+            qDebug() << "Transaction file has unknown version " << version;
+            return QPair<bool, QString>(false, "Content of the file " + fn + " has unknown version. We unable to process this mwc slate.");
     }
+
+    if (! (ok1 && ok2 && ok3 && ok4 && !transactionId.isEmpty() && amount>0 && fee>0 && height>0 && lock_height>=0) )
+        return  QPair<bool, QString>(false, "Content of the file " + fn + " is non complete mwc slate. Transaction details are not found.");
 
     // Same for v0, v1 & v2
     QJsonArray participant_data = readValueFromJson( json, "participant_data" ).toArray();
-    for (int i=0; i<participant_data.size(); i++ ) {
+    int pdSz = participant_data.size();
+    for (int i=0; i<pdSz; i++ ) {
          QString m = readStringFromJson( participant_data[i].toObject(), "message" );
          if (! m.isEmpty()) {
              if (!message.isEmpty())
                  message += "; ";
              message += m;
          }
-
     }
 
-    return ok1 && ok2 && ok3 && ok4 && !transactionId.isEmpty() && amount>0 && fee>0 && height>0 && lock_height>=0;
+    // Verify the type of the transaction.
+    // For now receive has 1 participant_data item and no 'part_sig' at participant_data
+    //  Finalize mast have part_sig
+    // participant_data with part_sig exist for all slate versions...
+    if ( pdSz==0 ) {
+        return QPair<bool, QString>(false, "Content of the file " + fn + " is non complete mwc slate, 'participant_data' not found.");
+    }
+
+    bool hasPartSig = false;
+    for (int i=0; i<pdSz; i++ ) {
+        QString part_sig = readStringFromJson( participant_data[i].toObject(), "part_sig" );
+        if (!part_sig.isEmpty()) {
+            hasPartSig = true;
+        }
+    }
+
+    switch (type) {
+        case FileTransactionType::RECEIVE:
+            if (pdSz>1 || hasPartSig) {
+                return QPair<bool, QString>(false, "You can't recieve the slate from the file " + fn + "\n\nThis slate was already received and need to be 'Finalized' now.");
+            }
+            break;
+        case FileTransactionType::FINALIZE:
+            if (!hasPartSig) {
+                return QPair<bool, QString>(false, "You can't finalize the slate from the file " + fn + "\n\nThis slate need to be signed with 'Recieve' operation first.");
+            }
+            break;
+        default:
+            Q_ASSERT(false);
+    }
+
+    return  QPair<bool, QString>(true, "");
 }
 
 

@@ -52,4 +52,10 @@ void testLongLong2ShortStr() {
 
 }
 
+void testUtils() {
+    Q_ASSERT( util::urlEncode("abc") == "abc");
+    Q_ASSERT( util::urlEncode("а") == "%D0%B0");
+    Q_ASSERT( util::urlEncode("%abcа") == "%25abc%D0%B0");
+}
+
 }

@@ -68,5 +68,9 @@
         <file>img/A1@2x.svg</file>
         <file>img/PassNotMatch@2x.svg</file>
         <file>img/PassOK@2x.svg</file>
+        <file>resource/passwords-1k.dat</file>
+        <file>resource/passwords-1M.dat</file>
+        <file>resource/passwords-10k.dat</file>
+        <file>resource/passwords-100k.dat</file>
     </qresource>
 </RCC>

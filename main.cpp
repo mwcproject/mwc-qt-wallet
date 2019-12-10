@@ -48,7 +48,19 @@
 #include <tgmath.h>
 #include "node/MwcNodeConfig.h"
 #include "node/MwcNode.h"
+#include "tests/testWordSequenser.h"
+#include "tests/testWordDictionary.h"
+#include "tests/testPasswordAnalyser.h"
+#include "misk/DictionaryInit.h"
+#include "util/stringutils.h"
 #include "build_version.h"
+
+#ifdef Q_OS_DARWIN
+namespace Cocoa
+{
+bool isRetinaDisplay();
+}
+#endif
 
 // Very first run - init everything
 bool deployWalletFilesFromResources() {
@@ -199,8 +211,17 @@ QPair<bool, QString> readConfig(QApplication & app) {
 int main(int argc, char *argv[])
 {
 #ifdef QT_DEBUG
+    // Generation of the dictionaries.
+    // Don't uncomment it!
+    // misk::provisionDictionary();
+
+
     // tests are quick, let's run them in debug
     test::testLongLong2ShortStr();
+    test::testUtils();
+    test::testWordSequences();
+    test::testWordDictionary();
+    test::testPasswordAnalyser();
 #endif
 
     int retVal = 0;
@@ -241,6 +262,11 @@ int main(int argc, char *argv[])
 
     #else
         scale = 1.0; // Mac OS, not applicable, mean 1.0
+        // But scale factor still needed to fix the non retina cases on mac OS
+
+        if (! Cocoa::isRetinaDisplay()) {
+            qputenv("QT_SCALE_FACTOR", "1.001");
+        }
     #endif
 
         QApplication app(argc, argv);
@@ -289,6 +315,15 @@ int main(int argc, char *argv[])
             return 1;
         }
 
+        if (!readConfig(app) ) {
+            QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read configuration");
+            return 1;
+        }
+
+        logger::logInfo("mwc-qt-wallet", QString("Starting mwc-gui-wallet version ") + BUILD_VERSION );
+        logger::logInfo("mwc-qt-wallet", config::toString());
+        qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
+
         { // Apply style sheet
             QFile file(":/resource/mwcwallet_style.css" );
             if (file.open(QFile::ReadOnly | QFile::Text)) {
@@ -301,20 +336,21 @@ int main(int argc, char *argv[])
             }
         }
 
-        // first run flag is not used, but let's keep it.
-        bool firstRun = !appContext.isSetupDone( BUILD_VERSION );
+        {
+            // Checking if home path is ascii (Latin1) symbols only
+            QString homePath = ioutils::getAppDataPath();
+            int idx = homePath.indexOf("mwc-qt-wallet");
+            if (idx<0)
+                idx = homePath.length();
 
-        QPair<bool, QString> readConfRes = readConfig(app);
-        if (! readConfRes.first ) {
-            if (!readConfRes.second.isEmpty())
-                control::MessageBox::message(nullptr, "Error", "MWC GUI Wallet unable to read configuration.\n" + readConfRes.second );
-            return 1;
+            homePath = homePath.left(idx-1);
+
+            if ( !util::validateMwc713Str(homePath, false).first ) {
+                control::MessageBox::messageText(nullptr, "Setup Issue", "Your home directory\n" + homePath + "\ncontains Unicode symbols. Unfortunatelly mwc713 unable to handle that.\n\n"
+                                         "Please reinstall mwc-qt-wallet under different user name with basic ASCII (Latin1) symbols only.");
+                return 1;
+            }
         }
-
-        if (firstRun)
-            appContext.updateSetupDone(BUILD_VERSION);
-
-        qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
 
         // Checking for Build Architecture.
         // NOTE!!! Checking is needed for mwc713, not for this app.
@@ -350,7 +386,7 @@ int main(int argc, char *argv[])
             QString arch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDataPath).second;
 
             if (arch != runningArc) {
-                if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::question(nullptr, "Wallet data architecture mismatch",
+                if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::questionText(nullptr, "Wallet data architecture mismatch",
                                              "Your mwc713 seed at '"+ walletDataPath +"' was created with "+arch+" bits version of the wallet. "
                                              "Please exit and use original version of the wallet, or specify another folder for the seed",
                                              "Exit", "Select Folder", false, true) ) {
@@ -415,7 +451,7 @@ int main(int argc, char *argv[])
         if (!util::acquireAppGlobalLock() )
         {
             // Seems like we are blocked on global semaphore. It is mean that second instance does exist
-            control::MessageBox::message(nullptr, "Second mwc-qt-wallet instance is detected",
+            control::MessageBox::messageText(nullptr, "Second mwc-qt-wallet instance is detected",
                                          "There is another instance of mwc-qt-wallet is already running. It is impossible to run more than one instance of the wallet at the same time.");
             return 1;
         }

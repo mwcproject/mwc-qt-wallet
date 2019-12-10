@@ -24,6 +24,9 @@ namespace notify {
 // Report Message to the wallet.
 enum class MESSAGE_LEVEL { FATAL_ERROR, CRITICAL, WARNING, INFO, DEBUG };
 
+// Enum to string
+QString toString(MESSAGE_LEVEL level);
+
 struct NotificationMessage {
     MESSAGE_LEVEL level = MESSAGE_LEVEL::DEBUG;
     QString message;

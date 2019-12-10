@@ -127,7 +127,7 @@ public:
 const static int64_t TIMEOUT = 3000;
 
 TaskGetNextKey( MWC713 * wallet713, int64_t amountNano, QString _btcaddress, QString _airDropAccPassword) :
-        Mwc713Task("TaskGetNextKey","getnextkey --amount " + QString::number(amountNano), wallet713, ""), btcaddress(_btcaddress), airDropAccPassword(_airDropAccPassword) {}
+        Mwc713Task("TaskGetNextKey","getnextkey --amount " + QString::number(amountNano), wallet713, "getnextkey is executed"), btcaddress(_btcaddress), airDropAccPassword(_airDropAccPassword) {}
 
 virtual ~TaskGetNextKey() override {}
 

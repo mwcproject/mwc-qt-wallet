@@ -61,17 +61,18 @@ bool AccountInfo::isDeleted() const {
 }
 
 void MwcNodeConnection::saveData(QDataStream & out) const {
-    int id = 0x4355a1;
+    int id = 0x4355a2;
     out << id;
     out << (int)connectionType;
     out << mwcNodeURI;
     out << mwcNodeSecret;
+    out << localNodeDataPath;
 }
 
 bool MwcNodeConnection::loadData(QDataStream & in) {
     int id = 0;
     in >> id;
-    if (id!=0x4355a1)
+    if (id<0x4355a1 || id>0x4355a2)
         return false;
 
     int conType = (int)NODE_CONNECTION_TYPE::CLOUD;
@@ -79,6 +80,10 @@ bool MwcNodeConnection::loadData(QDataStream & in) {
     connectionType = (NODE_CONNECTION_TYPE) conType;
     in >> mwcNodeURI;
     in >> mwcNodeSecret;
+
+    if (id>=0x4355a2)
+        in >> localNodeDataPath;
+
     return true;
 }
 
@@ -155,6 +160,7 @@ void WalletTransaction::setData(int64_t _txIdx,
     QString _address,
     QString _creationTime,
     bool    _confirmed,
+    int64_t _height,
     QString _confirmationTime,
     int64_t    _coinNano,
     bool    _proof)
@@ -165,6 +171,7 @@ void WalletTransaction::setData(int64_t _txIdx,
     address = _address;
     creationTime = util::mwc713time2ThisTime(_creationTime);
     confirmed = _confirmed;
+    height = _height;
     confirmationTime = util::mwc713time2ThisTime(_confirmationTime);
     coinNano = _coinNano;
     proof = _proof;

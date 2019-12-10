@@ -45,10 +45,11 @@ QString getAppDataPath(QString localPath )
     QString dataPath = localPathIsRoot ? localPath : (d.absolutePath() + QDir::separator() + localPath);
     dataPath = QDir::cleanPath( dataPath );
     if ( !d.mkpath(dataPath) )
-         throw core::MwcException("Unable create app data directory: " + d.absolutePath());
+        throw core::MwcException("Unable create app data directory: " + d.absolutePath());
 
-     return dataPath;
+    return dataPath;
 }
+
 
 QByteArray FilterEscSymbols( const QByteArray & data ) {
     QByteArray res;

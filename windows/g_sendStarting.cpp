@@ -54,8 +54,6 @@ SendStarting::SendStarting(QWidget *parent, state::Send *_state) :
         state(_state) {
     ui->setupUi(this);
 
-    ui->progress->initLoader(true); // waiting for account balance update
-
     ui->fileChecked->setId(FILE_ID);
     ui->onlineChecked->setId(ONLINE_ID);
 
@@ -79,8 +77,6 @@ SendStarting::SendStarting(QWidget *parent, state::Send *_state) :
 }
 
 void SendStarting::updateAccountBalance( QVector<wallet::AccountInfo> _accountInfo, const QString & selectedAccount ) {
-    ui->progress->hide();
-
     // init accounts
     accountInfo = _accountInfo;
 
@@ -129,7 +125,7 @@ void SendStarting::on_nextButton_clicked() {
     wallet::AccountInfo acc = accountInfo[accountIdx];
 
     if (acc.currentlySpendable == 0) {
-        control::MessageBox::message(this, "Incorrect Input", "Your account doesn't have any spendable MWC to send");
+        control::MessageBox::messageText(this, "Incorrect Input", "Your account doesn't have any spendable MWC to send");
         ui->accountComboBox->setFocus();
         return;
     }
@@ -140,7 +136,7 @@ void SendStarting::on_nextButton_clicked() {
     if (sendAmount != "All") {
         mwcAmount = util::one2nano(ui->amountEdit->text().trimmed());
         if (!mwcAmount.first || mwcAmount.second<=0) {
-            control::MessageBox::message(this, "Incorrect Input", "Please specify the number of MWC to send");
+            control::MessageBox::messageText(this, "Incorrect Input", "Please specify the number of MWC to send");
             ui->amountEdit->setFocus();
             return;
         }
@@ -154,7 +150,7 @@ void SendStarting::on_nextButton_clicked() {
 
         QString msg2print = generateAmountErrorMsg( mwcAmount.second, acc, state->getSendCoinsParams() );
 
-        control::MessageBox::message(this, "Incorrect Input",
+        control::MessageBox::messageText(this, "Incorrect Input",
                                      msg2print );
         ui->amountEdit->setFocus();
         return;

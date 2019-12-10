@@ -26,4 +26,30 @@ MwcPlainEditLogs::MwcPlainEditLogs(const QString &text, QWidget *parent ) :
 
 MwcPlainEditLogs::~MwcPlainEditLogs()  {}
 
+///////////////////////////////////////////////////////////////
+
+MwcPlainEditDlg::MwcPlainEditDlg(QWidget *parent ) :
+            QPlainTextEdit(parent)
+{}
+
+MwcPlainEditDlg::MwcPlainEditDlg(const QString &text, QWidget *parent ) :
+    QPlainTextEdit(text, parent)
+{}
+
+MwcPlainEditDlg::~MwcPlainEditDlg() {}
+
+////////////////////////////////////////////////////////////////
+
+MwcTextEditDlg::MwcTextEditDlg( QWidget *parent ) :
+        QTextEdit(parent)
+{}
+
+MwcTextEditDlg::MwcTextEditDlg(const QString &text, QWidget *parent ) :
+        QTextEdit(text, parent)
+{}
+
+MwcTextEditDlg::~MwcTextEditDlg() {}
+
+
 }
+

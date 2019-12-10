@@ -88,7 +88,8 @@ private:
 private:
     wnd::NodeInfo * wnd = nullptr;
     bool  justLogin = false;
-    NodeStatus lastNodeStatus;
+    NodeStatus lastNodeStatus; // Satus as mwc713 see the node
+    QString lastLocalNodeStatus = "Waiting"; // Status from the embedded node
     int timerCounter = 0; // update is different in different modes.
     wallet::MwcNodeConnection currentNodeConnection;
 };

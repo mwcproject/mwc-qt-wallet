@@ -39,14 +39,14 @@ void SendCoinsParamsDialog::on_okButton_clicked()
     bool ok = false;
     int confNumber = ui->inputsConfEdit->text().trimmed().toInt(&ok);
     if (!ok || confNumber<=0) {
-        control::MessageBox::message(this, "Need info", "Please input correct value for minimum number of confirmations");
+        control::MessageBox::messageText(this, "Need info", "Please input correct value for minimum number of confirmations");
         return;
     }
 
     ok = false;
     int changeOutputs = ui->changeOutputsEdit->text().trimmed().toInt(&ok);
     if (!ok || changeOutputs<=0) {
-        control::MessageBox::message(this, "Need info", "Please input correct value for change outputs");
+        control::MessageBox::messageText(this, "Need info", "Please input correct value for change outputs");
         return;
     }
 

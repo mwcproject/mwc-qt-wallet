@@ -78,7 +78,12 @@ void InputPassword::on_submitButton_clicked() {
 
     QPair <bool, QString> valRes = util::validateMwc713Str(pswd, true);
     if (!valRes.first) {
-        control::MessageBox::message(this, "Password", valRes.second );
+        control::MessageBox::messageText(this, "Password", valRes.second );
+        return;
+    }
+
+    if (pswd.startsWith("-")) {
+        control::MessageBox::messageText(this, "Password", "You can't start your password from '-' symbol." );
         return;
     }
 
@@ -97,7 +102,7 @@ void InputPassword::stopWaiting() {
 
 void InputPassword::reportWrongPassword() {
     state::TimeoutLockObject to(state);
-    control::MessageBox::message(this, "Password", "Password supplied was incorrect. Please input correct password.");
+    control::MessageBox::messageText(this, "Password", "Password supplied was incorrect. Please input correct password.");
 
     QThread::sleep(1); // sleep to prevent brute force attack.
     // Note, we are using small hash, so the brute force attach will likely

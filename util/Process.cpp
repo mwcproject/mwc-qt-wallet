@@ -32,7 +32,7 @@ bool processWaitForFinished( QProcess * process, int timeoutMs, const QString & 
 
         QProcess::ProcessError errCode = process->error();
         if (errCode == QProcess::Timedout) {
-            if (control::MessageBox::question(nullptr, "Warning", "Stopping process " + processName +
+            if (control::MessageBox::questionText(nullptr, "Warning", "Stopping process " + processName +
                                                                    " is taking longer than expected.\nContinue to wait?",
                                               "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
                 config::increaseTimeoutMultiplier();

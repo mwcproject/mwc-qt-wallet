@@ -52,9 +52,10 @@ void FinalizeUpload::on_uploadFileBtn_clicked() {
 
     util::FileTransactionInfo transInfo;
 
-    if (!transInfo.parseTransaction(fileName)) {
-        control::MessageBox::message(this, "Incorrect File",
-                                     "MWC response transaction file " + fileName + " has a wrong format.");
+    QPair<bool, QString> perseResult = transInfo.parseTransaction(fileName, util::FileTransactionType::FINALIZE );
+
+    if (!perseResult.first) {
+        control::MessageBox::messageText(this, "Slate File", perseResult.second );
         return;
     }
 
