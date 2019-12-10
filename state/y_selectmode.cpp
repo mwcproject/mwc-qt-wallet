@@ -53,7 +53,7 @@ config::WALLET_RUN_MODE SelectMode::getWalletRunMode() const {
 // Will require restart
 void SelectMode::updateWalletRunMode( config::WALLET_RUN_MODE newRunMode ) {
     if (config::getWalletRunMode() == newRunMode) {
-        control::MessageBox::message(nullptr, "Running Mode", "You allready running wallet in selected mode. Nothing need to done." );
+        control::MessageBox::messageText(nullptr, "Running Mode", "You allready running wallet in selected mode. Nothing need to done." );
         return;
     }
 
@@ -62,7 +62,7 @@ void SelectMode::updateWalletRunMode( config::WALLET_RUN_MODE newRunMode ) {
     util::ConfigReader reader;
     QString configFN = config::getMwcGuiWalletConf();
     if ( !reader.readConfig( configFN ) ) {
-        control::MessageBox::message(nullptr, "Internal Error",
+        control::MessageBox::messageText(nullptr, "Internal Error",
                                      "Unable to update wallet config file " + configFN );
     }
 
@@ -82,7 +82,7 @@ void SelectMode::updateWalletRunMode( config::WALLET_RUN_MODE newRunMode ) {
     }
 
     if (!updateOk) {
-        control::MessageBox::message(nullptr, "Error", "Wallet unable to switch to the selected mode." );
+        control::MessageBox::messageText(nullptr, "Error", "Wallet unable to switch to the selected mode." );
         return;
     }
 

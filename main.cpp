@@ -315,8 +315,9 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        if (!readConfig(app) ) {
-            QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read configuration");
+        QPair<bool, QString> readRes = readConfig(app);
+        if (!readRes.first) {
+            QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read configuration.\n" + readRes.second);
             return 1;
         }
 
@@ -375,7 +376,7 @@ int main(int argc, char *argv[])
                 }
                 wallet::MwcNodeConnection mwcNodeConnection = appContext.getNodeConnection( network );
                 if ( !mwcNodeConnection.isCloudNode() ) {
-                    mwcNodeConnection.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD );
+                    mwcNodeConnection.setAsCloud();
                     appContext.updateMwcNodeConnection(network, mwcNodeConnection );
                 }
             }
@@ -421,7 +422,7 @@ int main(int argc, char *argv[])
             // Node must be embedded local.
             wallet::MwcNodeConnection mwcNodeConnection = appContext.getNodeConnection( network );
             if ( !mwcNodeConnection.isLocalNode() ) {
-                mwcNodeConnection.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
+                mwcNodeConnection.setAsLocal( "mwc-node" );
                 appContext.updateMwcNodeConnection(network, mwcNodeConnection );
             }
 
@@ -435,7 +436,7 @@ int main(int argc, char *argv[])
             QString network = walletConfig.getNetwork();
             wallet::MwcNodeConnection mwcNodeConnection = appContext.getNodeConnection( network );
             if ( !mwcNodeConnection.isLocalNode() ) {
-                mwcNodeConnection.setData( wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
+                mwcNodeConnection.setAsLocal( "mwc-node" );
                 appContext.updateMwcNodeConnection(network, mwcNodeConnection );
             }
 

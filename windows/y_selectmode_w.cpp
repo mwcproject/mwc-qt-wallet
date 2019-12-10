@@ -70,7 +70,7 @@ void SelectMode::updateButtons() {
 }
 
 void SelectMode::on_applyButton_clicked() {
-    if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::question(this, "Waller Run Mode",
+    if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(this, "Waller Run Mode",
             "Changing running mode required restart.",
                 "Cancel", "Continue", false, true) ) {
         state->updateWalletRunMode(SelectMode::getRunMode());

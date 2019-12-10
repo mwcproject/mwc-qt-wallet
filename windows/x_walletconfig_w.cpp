@@ -116,7 +116,7 @@ WalletConfig::WalletConfig(QWidget *parent, state::WalletConfig * _state) :
 
 WalletConfig::~WalletConfig()
 {
-    state->deleteWnd(this);
+    state->deleteWndWallet(this);
     delete ui;
 }
 

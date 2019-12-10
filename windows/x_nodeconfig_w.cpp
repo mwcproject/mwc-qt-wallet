@@ -15,6 +15,7 @@
 #include "windows/x_nodeconfig_w.h"
 #include "ui_x_nodeconfig_w.h"
 #include "../state/x_walletconfig.h"
+#include "../control/messagebox.h"
 
 namespace wnd {
 
@@ -41,6 +42,22 @@ NodeConfig::~NodeConfig()
     delete ui;
 }
 
+// If data can be apllied, ask user about that. Issue that people expect auto apply by exit
+// Return false - if data can't be applied and we have to stay here
+//        true  - no changes or we accept everything
+bool NodeConfig::askUserForChanges() {
+    if ( ui->applyButton->isEnabled() ) {
+        if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(this,
+                "Apply config changes",
+                "Configuration changes was made for the wallet. Do you want to apply them?",
+                "Cancel", "Apply", false, true) ) {
+            return applyChanges();
+        }
+    }
+    return true;
+}
+
+
 void NodeConfig::updateApplyBtn() {
     ui->applyButton->setEnabled( walletCfg.getNetwork() != getSelectedNetwork() );
 }
@@ -65,12 +82,19 @@ void NodeConfig::on_radioFloonet_clicked()
 
 void NodeConfig::on_applyButton_clicked()
 {
+    applyChanges();
+}
+
+bool NodeConfig::applyChanges() {
     // data path is expected to be updated on the start.
     walletCfg.setDataPathWithNetwork( "Fixme", getSelectedNetwork() );
 
     state->setWalletConfig(walletCfg, true);
     state->restartMwcQtWallet();
-}
 
+    updateApplyBtn();
+
+    return true;
+}
 
 }

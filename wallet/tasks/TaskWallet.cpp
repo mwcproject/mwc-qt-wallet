@@ -248,23 +248,37 @@ bool TaskSubmitFile::processTask(const QVector<WEvent> & events) {
 
     // Just show the respond. There is not much what we can do...
     QString respondStr;
-
-    QVector<WEvent> lines = filterEvents(events, WALLET_EVENTS::S_LINE);
     bool hasError = false;
-    for (WEvent ln : lines) {
-        if (ln.message.trimmed().size()<1)
-            continue;
+    QVector< WEvent > apiErrs = filterEvents(events, WALLET_EVENTS::S_NODE_API_ERROR);
 
-        if (!respondStr.isEmpty())
-            respondStr += "\n";
+    if (!apiErrs.isEmpty()) {
+        for (auto & er:apiErrs) {
+            QStringList prms = er.message.split('|');
+            if (prms.size()==2) {
+                if (!respondStr.isEmpty())
+                    respondStr += "\n";
 
-        respondStr += ln.message;
+                respondStr += "MWC-NODE failed to publish the slate. " + prms[1];
+            }
+        }
+        hasError = true;
+    }
+    else {
+        QVector<WEvent> lines = filterEvents(events, WALLET_EVENTS::S_LINE);
+        for (WEvent ln : lines) {
+            if (ln.message.trimmed().size() < 1)
+                continue;
 
-        if ( ln.message.contains("error", Qt::CaseInsensitive) )
-            hasError = true;
+            if (!respondStr.isEmpty())
+                respondStr += "\n";
+
+            respondStr += ln.message;
+
+            if (ln.message.contains("error", Qt::CaseInsensitive))
+                hasError = true;
+        }
     }
 
-    // TODO: Never see success so far, but really need to provide correct value
     wallet713->setSubmitFile( !hasError, respondStr, fileTx );
     return true;
 }

@@ -38,6 +38,7 @@ public:
     explicit NodeConfig(QWidget *parent, state::WalletConfig * state );
     virtual ~NodeConfig() override;
 
+    bool askUserForChanges();
 private slots:
     void on_radioMainNet_clicked();
     void on_radioFloonet_clicked();
@@ -47,6 +48,7 @@ private:
     void updateApplyBtn();
     QString getSelectedNetwork() const;
 
+    bool applyChanges();
 private:
     Ui::NodeConfig          *ui = nullptr;
     state::WalletConfig     * state  = nullptr;

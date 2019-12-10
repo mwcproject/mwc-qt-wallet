@@ -87,14 +87,14 @@ void FileTransaction::on_processButton_clicked()
     if ( handler->needResultTxFileName() ) {
         resTxFN = ui->resultingTxFileName->text();
         if (resTxFN.isEmpty()) {
-            control::MessageBox::message( this, "Input value", "Please specify the file name for the resulting transaction." );
+            control::MessageBox::messageText( this, "Input value", "Please specify the file name for the resulting transaction." );
             ui->resultingTxFileName->setFocus();
             return;
         }
 
         QPair <bool, QString> res = util::validateMwc713Str(resTxFN);
         if (!res.first) {
-            control::MessageBox::message( this, "Input", res.second );
+            control::MessageBox::messageText( this, "Input", res.second );
             ui->resultingTxFileName->setFocus();
             return;
         }
@@ -108,7 +108,7 @@ void FileTransaction::on_processButton_clicked()
                                       false, true, walletPassword, control::MessageBox::RETURN_CODE::BTN2 ) )
     {
             ui->progress->show();
-            handler->ftContinue( transactionFileName );
+            handler->ftContinue( transactionFileName, resTxFN );
     }
 }
 

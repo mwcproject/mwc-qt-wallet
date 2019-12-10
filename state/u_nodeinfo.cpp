@@ -111,7 +111,7 @@ void NodeInfo::timerEvent(QTimerEvent *event) {
         int div = 1;
         if ( currentNodeConnection.connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD ) {
             // timer is 3 seconds.
-            div = 20; // want to update onece in a minute
+            div = 20; // want to update once in a minute
         }
         else if (!lastNodeStatus.online) {
             div = 5; // oflline node, doesn't make sense to update too often
@@ -248,7 +248,8 @@ void NodeInfo::saveBlockchainData(QString fileName) {
 
     QString network = context->mwcNode->getCurrentNetwork();
 
-    QString nodePath = node::getMwcNodePath(network);
+    Q_ASSERT(currentNodeConnection.isLocalNode());
+    QString nodePath = node::getMwcNodePath( currentNodeConnection.localNodeDataPath, network);
 
     QCoreApplication::processEvents();
 
@@ -257,7 +258,7 @@ void NodeInfo::saveBlockchainData(QString fileName) {
 
     QCoreApplication::processEvents();
 
-    context->mwcNode->start(network);
+    context->mwcNode->start(currentNodeConnection.localNodeDataPath, network);
 
     QCoreApplication::processEvents();
 
@@ -267,10 +268,10 @@ void NodeInfo::saveBlockchainData(QString fileName) {
     QCoreApplication::processEvents();
 
     if (res.first) {
-        control::MessageBox::message(wnd, "MWC Blockchain data is ready", "MWC blockchain data was successfully exported to the archive " + fileName);
+        control::MessageBox::messageText(wnd, "MWC Blockchain data is ready", "MWC blockchain data was successfully exported to the archive " + fileName);
     }
     else {
-        control::MessageBox::message(wnd, "Failed to export MWC Blockchain data", "Unable to export the blockchain data. Error:\n" + res.second);
+        control::MessageBox::messageText(wnd, "Failed to export MWC Blockchain data", "Unable to export the blockchain data. Error:\n" + res.second);
     }
 }
 
@@ -283,8 +284,9 @@ void NodeInfo::loadBlockchainData(QString fileName) {
 
     context->mwcNode->stop();
 
+    Q_ASSERT(currentNodeConnection.isLocalNode());
     QString network = context->mwcNode->getCurrentNetwork();
-    QString nodePath = node::getMwcNodePath(network);
+    QString nodePath = node::getMwcNodePath(currentNodeConnection.localNodeDataPath, network);
 
     QCoreApplication::processEvents();
 
@@ -292,7 +294,7 @@ void NodeInfo::loadBlockchainData(QString fileName) {
 
     QCoreApplication::processEvents();
 
-    context->mwcNode->start(network);
+    context->mwcNode->start(currentNodeConnection.localNodeDataPath, network);
 
     QCoreApplication::processEvents();
 
@@ -302,10 +304,10 @@ void NodeInfo::loadBlockchainData(QString fileName) {
     QCoreApplication::processEvents();
 
     if (res.first) {
-        control::MessageBox::message(wnd, "MWC Blockchain data is ready", "MWC blockchain data was successfully imported from the archive " + fileName);
+        control::MessageBox::messageText(wnd, "MWC Blockchain data is ready", "MWC blockchain data was successfully imported from the archive " + fileName);
     }
     else {
-        control::MessageBox::message(wnd, "Failed to import MWC Blockchain data", "Unable to import the blockchain data. Error:\n" + res.second);
+        control::MessageBox::messageText(wnd, "Failed to import MWC Blockchain data", "Unable to import the blockchain data. Error:\n" + res.second);
     }
 }
 
@@ -320,14 +322,14 @@ void NodeInfo::onSubmitFile(bool success, QString message, QString fileName) {
         wnd->hideProgress();
 
     if (success) {
-        control::MessageBox::message(wnd, "Transaction published", "You transaction at " + fileName +
+        control::MessageBox::messageText(wnd, "Transaction published", "You transaction at " + fileName +
         " was successfully delivered to your local node. Please keep your node running for some time to deliver it to MWC blockchain.\n" + message);
     }
     else {
         if (message.contains("Post TX Error: Request error: Wrong response code: 500 Internal Server Error with data Body(Streaming)"))
             message = "MWC node unable to publish this transaction. Probably this transaction is already published or original output doesn't exist any more";
 
-        control::MessageBox::message(wnd, "Transaction failed", "Transaction from " + fileName +
+        control::MessageBox::messageText(wnd, "Transaction failed", "Transaction from " + fileName +
                   " was not delivered to your local node.\n\n" + message);
     }
 }

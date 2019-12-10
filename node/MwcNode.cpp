@@ -806,7 +806,7 @@ void MwcNode::replyFinished(QNetworkReply* reply) {
 void MwcNode::reportNodeFatalError( QString message ) {
 
     if ( config::isOnlineNode() ) {
-        control::MessageBox::message(nullptr, "Embedded MWC-Node Error", message);
+        control::MessageBox::messageText(nullptr, "Embedded MWC-Node Error", message);
     }
     else
     {

@@ -15,6 +15,7 @@
 #ifndef WALLETCONFIG_H
 #define WALLETCONFIG_H
 
+#include <windows/x_nodeconfig_w.h>
 #include "state.h"
 #include "../wallet/wallet.h"
 #include "../core/appcontext.h"
@@ -31,7 +32,8 @@ public:
     WalletConfig( StateContext * context);
     virtual ~WalletConfig() override;
 
-    void deleteWnd(wnd::WalletConfig * w) {if (wnd==w) wnd=nullptr;}
+    void deleteWndWallet(wnd::WalletConfig * w) {if (wndWallet==w) wndWallet=nullptr;}
+    void deleteWndNode(wnd::NodeConfig * w) {if (wndNode==w) wndNode=nullptr;}
 
     wallet::WalletConfig    getWalletConfig() const;
     wallet::WalletConfig    getDefaultWalletConfig() const;
@@ -57,7 +59,8 @@ protected:
     // State can block the stare change. Wallet config is the first usage.
     virtual bool canExitState() override;
 private:
-    wnd::WalletConfig * wnd = nullptr;
+    wnd::WalletConfig * wndWallet = nullptr;
+    wnd::NodeConfig   * wndNode = nullptr;
 };
 
 }
