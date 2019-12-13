@@ -24,6 +24,8 @@
 #include "../util/stringutils.h"
 #include "../state/timeoutlock.h"
 #include "../dialogs/x_walletinstances.h"
+#include "../state/y_selectmode.h"
+#include "../core/Config.h"
 
 namespace wnd {
 
@@ -133,5 +135,18 @@ void InitAccount::on_instancesButton_clicked()
     walletInstances.exec();
 }
 
+void wnd::InitAccount::on_runOnlineNodeButton_clicked()
+{
+    state::TimeoutLockObject to(state);
+    if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(this, "Running Mode",
+                          "You are switching to 'Online Node'.\nOnline Node can be used as a data provider for Cols Wallet.",
+                                  "Cancel", "Continue", false, true) ) {
+        // Restarting wallet in a right mode...
+        // First, let's upadte a config
+        state::SelectMode::updateWalletRunMode( config::WALLET_RUN_MODE::ONLINE_NODE );
+    }
 }
+
+}
+
 

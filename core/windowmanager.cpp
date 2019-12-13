@@ -64,7 +64,7 @@ QWidget * WindowManager::switchToWindowEx( const QString & pageName, QWidget * n
 QString WindowManager::buildWalletTitle(const QString & pageName) {
     QString buildNumber = BUILD_VERSION;
 
-    QString title = mwc::APP_NAME + " v" + buildNumber;
+    QString title = mwc::get_APP_NAME() + " v" + buildNumber;
 
     if (!pageName.isEmpty()) {
         title += " - " + pageName;

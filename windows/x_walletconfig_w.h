@@ -42,30 +42,25 @@ public:
 
 private slots:
     void on_mwc713directorySelect_clicked();
-
     void on_mwc713directoryEdit_textEdited(const QString &arg1);
 
     void on_keybasePathEdit_textChanged(const QString &arg1);
-
     void on_keybasePathSelect_clicked();
 
     void on_confirmationNumberEdit_textChanged(const QString &arg1);
-
     void on_changeOutputsEdit_textEdited(const QString &arg1);
 
-    void on_restoreDefault_clicked();
-
-    void on_applyButton_clicked();
-
     void on_mwcmqHost_textEdited(const QString &arg1);
+    void on_logsEnableBtn_clicked();
 
     void on_fontSz1_clicked();
     void on_fontSz2_clicked();
     void on_fontSz3_clicked();
     void on_fontSz4_clicked();
 
-    void on_logsEnableBtn_clicked();
+    void on_restoreDefault_clicked();
 
+    void on_applyButton_clicked();
 private:
     void setValues(const QString & mwc713directory,
                    const QString & keyBasePath,

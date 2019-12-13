@@ -35,7 +35,12 @@ class FileTransactionWndHandler {
 public:
     virtual void ftBack() = 0;
     virtual void deleteFileTransactionWnd(FileTransaction * wnd) = 0;
-    virtual void ftContinue(QString fileName) = 0;
+    virtual void ftContinue(QString fileName, QString resultTxFileName) = 0;
+
+    virtual bool needResultTxFileName() = 0;
+
+    virtual QString getResultTxPath() = 0;
+    virtual void updateResultTxPath(QString path) = 0;
 
     virtual state::StateContext * getContext() = 0;
 };
@@ -59,6 +64,8 @@ public:
 private slots:
     void on_cancelButton_clicked();
     void on_processButton_clicked();
+
+    void on_resultTransFileNameSelect_clicked();
 
 private:
     Ui::FileTransaction *ui;

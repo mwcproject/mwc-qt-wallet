@@ -35,6 +35,7 @@
 #include "../core/Config.h"
 #include "u_nodeinfo.h"
 #include "g_Finalize.h"
+#include "y_selectmode.h"
 
 
 namespace state {
@@ -44,25 +45,36 @@ StateMachine::StateMachine(StateContext * _context) :
 {
     context->setStateMachine(this);
 
+    // Those states are mandatory because that manage wallet lifecycle
     states[ STATE::START_WALLET ]   = new StartWallet(context);
     states[ STATE::STATE_INIT ]     = new InitAccount(context);
     states[ STATE::INPUT_PASSWORD ] = new InputPassword(context);
-    states[ STATE::ACCOUNTS ]       = new Accounts(context);
-    states[ STATE::ACCOUNT_TRANSFER ] = new AccountTransfer(context);
+
+    // Pages
+
+    if (config::isOnlineWallet() || config::isColdWallet()) {
+        states[ STATE::ACCOUNTS ]       = new Accounts(context);
+        states[ STATE::ACCOUNT_TRANSFER ] = new AccountTransfer(context);
+        states[ STATE::SEND ]           = new Send(context);
+        states[ STATE::RECEIVE_COINS ]  = new Receive(context);
+        states[ STATE::TRANSACTIONS ]   = new Transactions(context);
+        states[ STATE::OUTPUTS ]        = new Outputs(context);
+        states[ STATE::CONTACTS ]       = new Contacts(context);
+        states[ STATE::SHOW_SEED ]      = new ShowSeed(context);
+        states[ STATE::RESYNC ]         = new Resync(context);
+        states[ STATE::FINALIZE ]       = new Finalize(context);
+    }
+    if (config::isOnlineWallet() ) {
+        states[ STATE::HODL ]           = new Hodl(context);
+        states[ STATE::LISTENING ]      = new Listening(context);
+        states[ STATE::AIRDRDOP_MAIN ]  = new Airdrop(context);
+    }
+
     states[ STATE::EVENTS ]         = new Events(context);
-    states[ STATE::HODL ]           = new Hodl(context);
-    states[ STATE::SEND ]           = new Send(context);
-    states[ STATE::RECEIVE_COINS ]  = new Receive(context);
-    states[ STATE::LISTENING ]      = new Listening(context);
-    states[ STATE::TRANSACTIONS ]   = new Transactions(context);
-    states[ STATE::OUTPUTS ]        = new Outputs(context);
-    states[ STATE::CONTACTS ]       = new Contacts(context);
     states[ STATE::WALLET_CONFIG ]  = new WalletConfig(context);
-    states[ STATE::AIRDRDOP_MAIN ]  = new Airdrop(context);
-    states[ STATE::SHOW_SEED ]      = new ShowSeed(context);
-    states[ STATE::RESYNC ]         = new Resync(context);
     states[ STATE::NODE_INFO ]      = new NodeInfo(context);
-    states[ STATE::FINALIZE ]       = new Finalize(context);
+
+    states[ WALLET_RUNNING_MODE ]   = new SelectMode(context);
 
     startTimer(1000);
 }
@@ -94,8 +106,10 @@ void StateMachine::start() {
 
         currentState = it.key();
         context->mainWnd->updateActionStates(currentState);
-        break;
+        return;
     }
+
+    executeFrom( STATE::NONE );
 }
 
 // Check if current state agree to switch the state
@@ -143,7 +157,7 @@ void StateMachine::executeFrom( STATE nextState ) {
 
     if (currentState == STATE::NONE) {
         // Selecting the send page if nothing found
-        context->appContext->setActiveWndState( STATE::SEND );
+        context->appContext->setActiveWndState( STATE::NODE_INFO );
         executeFrom(STATE::NONE);
     }
 }
@@ -202,7 +216,12 @@ bool StateMachine::processState(State* st) {
 }
 
 void StateMachine::timerEvent(QTimerEvent *event) {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
+
+    // No locking make sense for the node.
+    if (config::isOnlineNode())
+        return;
+
     // Check if timer expired and we need to logout...
     if (logoutTime==0)
         return;

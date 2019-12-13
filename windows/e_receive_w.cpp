@@ -36,6 +36,11 @@ Receive::Receive(QWidget *parent, state::Receive * _state, bool mwcMqStatus, boo
 
     updateAccountList();
 
+    if (config::isColdWallet()) {
+        ui->frameQs->hide();
+        ui->mwcmqAddress->hide();
+    }
+
     updateMwcMqState(mwcMqStatus);
     updateKeybaseState(keybaseStatus);
     updateMwcMqAddress(mwcMqAddress);

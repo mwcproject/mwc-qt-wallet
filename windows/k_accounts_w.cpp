@@ -19,6 +19,7 @@
 #include "../control/messagebox.h"
 #include "../control/inputdialog.h"
 #include "../core/global.h"
+#include "../core/Config.h"
 #include "../state/timeoutlock.h"
 
 namespace wnd {
@@ -37,6 +38,10 @@ Accounts::Accounts(QWidget *parent, state::Accounts * _state) :
     ui->accountList->setStripeAlfaDelta( 5 ); // very small number
 
     ui->accountList->setFocus();
+
+    if (config::isColdWallet()) {
+        ui->transferButton->hide();
+    }
 
     initTableHeaders();
 

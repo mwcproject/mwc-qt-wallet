@@ -24,6 +24,7 @@
 #include "../util/Json.h"
 #include "../control/messagebox.h"
 #include "../dialogs/fileslateinfodlg.h"
+#include "../core/Config.h"
 
 namespace core {
 
@@ -33,15 +34,22 @@ NavBar::NavBar(QWidget *parent, state::StateContext * _context ) :
         prntWnd(parent),
         context(_context)
 {
-    state::Events * evtState = (state::Events *)context->stateMachine->getState(state::STATE::EVENTS);
-    Q_ASSERT(evtState);
+    if (config::isOnlineNode()) {
+        ui->setupUi(this);
 
-    QObject::connect( evtState, &state::Events::updateNonShownWarnings,
-                      this, &NavBar::onUpdateNonShownWarnings, Qt::QueuedConnection );
+        ui->accountButton->hide();
+    }
+    else {
+        state::Events * evtState = (state::Events *)context->stateMachine->getState(state::STATE::EVENTS);
+        Q_ASSERT(evtState);
 
-    ui->setupUi(this);
+        QObject::connect( evtState, &state::Events::updateNonShownWarnings,
+                          this, &NavBar::onUpdateNonShownWarnings, Qt::QueuedConnection );
 
-    onUpdateNonShownWarnings( evtState->hasNonShownWarnings() );
+        ui->setupUi(this);
+
+        onUpdateNonShownWarnings( evtState->hasNonShownWarnings() );
+    }
 }
 
 NavBar::~NavBar() {

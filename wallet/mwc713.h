@@ -200,6 +200,10 @@ public:
     // Check signal:  onFinalizeFile
     virtual void finalizeFile( QString fileTxResponse )  override;
 
+     // submit finalized transaction. Make sense for cold storage => online node operation
+    // Check Signal: onSubmitFile(bool ok, String message)
+    virtual void submitFile( QString fileTx ) override;
+
     // Airdrop special. Generating the next Pablic key for transaction
     // wallet713> getnextkey --amount 1000000
     // "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
@@ -296,6 +300,7 @@ public:
     void setSendFileResult( bool success, QStringList errors, QString fileName );
     void setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
     void setFinalizeFile( bool success, QStringList errors, QString fileName );
+    void setSubmitFile(bool success, QString message, QString fileName);
 
     // Transactions
     void updateTransactionCount(QString account, int number);

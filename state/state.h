@@ -56,7 +56,8 @@ enum STATE {
     SHOW_SEED,      // Show Seed
     NODE_INFO,      // Show node info
     RESYNC,         // Re-sync account with a node
-    FINALIZE        // Finalize transaction. Windowless state
+    FINALIZE,       // Finalize transaction. Windowless state
+    WALLET_RUNNING_MODE  // Running mode as a node, wallet or cold wallet
 };
 
 struct NextStateRespond {

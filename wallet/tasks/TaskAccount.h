@@ -17,6 +17,7 @@
 
 #include "../mwc713task.h"
 #include "../../util/stringutils.h"
+#include "../../core/Config.h"
 
 namespace wallet {
 
@@ -25,8 +26,8 @@ class TaskAccountList : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*7;
 
-    TaskAccountList( MWC713 *wallet713 ) :
-            Mwc713Task("TaskAccountList", "accounts", wallet713,"") {}
+    TaskAccountList( MWC713 * _wallet713 ) :
+            Mwc713Task("TaskAccountList", "accounts", _wallet713,"") {}
 
     virtual ~TaskAccountList() override {}
 
@@ -42,8 +43,8 @@ public:
     const static int64_t TIMEOUT = 1000*7;
 
     // Expected that account is unique. Account must meet mwc713 expectations
-    TaskAccountCreate( MWC713 * wallet713, QString account ) :
-            Mwc713Task("TaskAccountCreate", "account create " + util::toMwc713input(account), wallet713,""), newAccountName(account) { Q_ASSERT(account.length()>0); }
+    TaskAccountCreate( MWC713 * _wallet713, QString account ) :
+            Mwc713Task("TaskAccountCreate", "account create " + util::toMwc713input(account), _wallet713,""), newAccountName(account) { Q_ASSERT(account.length()>0); }
 
     virtual ~TaskAccountCreate() override {}
 
@@ -58,9 +59,13 @@ class TaskAccountSwitch : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*7;
 
-    TaskAccountSwitch( MWC713 * wallet713, QString accountName, QString password, bool _makeAccountCurrent ) :
-            Mwc713Task("TaskAccountSwitch", "account switch " +  util::toMwc713input(accountName) + " -p " +  util::toMwc713input(password), wallet713, "account switch " + accountName ),
-            switchAccountName(accountName), makeAccountCurrent(_makeAccountCurrent) { Q_ASSERT(accountName.length()>0); Q_ASSERT(password.length()>0); }
+    TaskAccountSwitch( MWC713 * _wallet713, QString accountName, QString password, bool _makeAccountCurrent ) :
+            Mwc713Task("TaskAccountSwitch", "account switch " +  util::toMwc713input(accountName) +
+                       (password.isEmpty() ? "" : " -p " +  util::toMwc713input(password)), _wallet713, "account switch " + accountName ),
+            switchAccountName(accountName), makeAccountCurrent(_makeAccountCurrent)
+    {
+        Q_ASSERT(accountName.length()>0); Q_ASSERT( config::isOnlineNode() || password.length()>0);
+    }
 
     virtual ~TaskAccountSwitch() override {}
 
@@ -78,8 +83,8 @@ public:
     const static int64_t TIMEOUT = 1000*5;
 
     // createSimulation is true if user expect create account instead of rename deleted
-    TaskAccountRename( MWC713 * wallet713, QString oldAccountName, QString newAccountName, bool createSimulation ) :
-            Mwc713Task("TaskAccountRename", "account rename " +  util::toMwc713input(oldAccountName) + " " + util::toMwc713input(newAccountName), wallet713, ""),
+    TaskAccountRename( MWC713 * _wallet713, QString oldAccountName, QString newAccountName, bool createSimulation ) :
+            Mwc713Task("TaskAccountRename", "account rename " +  util::toMwc713input(oldAccountName) + " " + util::toMwc713input(newAccountName), _wallet713, ""),
             oldName(oldAccountName),
             newName(newAccountName),
             createAccountSimulation(createSimulation) { }
@@ -101,8 +106,8 @@ public:
     const static int64_t TIMEOUT = 1000*10;
 
     // noRefresh can be used for sequenced calls
-    TaskAccountInfo( MWC713 * wallet713, int confimations, bool noRefresh ) :
-    Mwc713Task("TaskAccountInfo", QString("info -c ") + QString::number(confimations) + (noRefresh ? " --no-refresh":""), wallet713,"") {}
+    TaskAccountInfo( MWC713 * _wallet713, int confimations, bool noRefresh ) :
+    Mwc713Task("TaskAccountInfo", QString("info -c ") + QString::number(confimations) + (noRefresh ? " --no-refresh":""), _wallet713,"") {}
 
     virtual ~TaskAccountInfo() override {}
 
@@ -128,8 +133,8 @@ private:
 // Just a callback, not a real task
 class TaskAccountListFinal : public Mwc713Task {
 public:
-    TaskAccountListFinal( MWC713 * wallet713, QString _accountName2switch ) :
-            Mwc713Task("TaskAccountListFinal", "", wallet713,""), accountName2switch(_accountName2switch) {}
+    TaskAccountListFinal( MWC713 * _wallet713, QString _accountName2switch ) :
+            Mwc713Task("TaskAccountListFinal", "", _wallet713,""), accountName2switch(_accountName2switch) {}
 
     virtual bool processTask(const QVector<WEvent> &events) override;
 

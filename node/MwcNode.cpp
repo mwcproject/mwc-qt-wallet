@@ -22,6 +22,7 @@
 #include "../core/Config.h"
 #include "../control/messagebox.h"
 #include "../core/Notification.h"
+#include "../core/Config.h"
 #include "../util/Log.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -31,6 +32,7 @@
 #include <QJsonArray>
 #include "MwcNodeConfig.h"
 #include <QTimer>
+#include <QCoreApplication>
 
 namespace node {
 
@@ -97,16 +99,22 @@ void MwcNode::stop() {
     qDebug() << "MwcNode::stop ...";
     logger::logInfo( "MWC-NODE", "Stopping mwc-node process" );
 
+    QCoreApplication::processEvents();
+
     nodeProcDisconnect();
 
     if (nodeProcess) {
-        nodeProcess->kill();
-        if (!util::processWaitForFinished( nodeProcess, 30000, "mwc-node")) {
-            nodeProcess->terminate();
+
+        if (nodeProcess->state() == QProcess::Running) {
+            qDebug() << "killing mwc-node";
+            nodeProcess->kill();
+            if (!util::processWaitForFinished( nodeProcess, 30000, "mwc-node")) {
+                nodeProcess->terminate();
+            }
         }
         qDebug() << "mwc-node is exited";
 
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node is stopped" );
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node is stopped" + (restartCounter>0 ? ". Attempt " + QString::number(restartCounter+1) : "") );
 
         nodeProcess->deleteLater();
         nodeProcess = nullptr;
@@ -117,6 +125,7 @@ void MwcNode::stop() {
         nodeOutputParser = nullptr;
     }
 
+    QCoreApplication::processEvents();
 }
 
 // pass - provide password through env variable. If pass empty - nothing will be done
@@ -136,6 +145,8 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
 
     // Working dir must match config file
     process->setWorkingDirectory(nodeWorkDir);
+
+    nodeProcConnect(process);
 
     QStringList params;
     if (network.toLower().startsWith("floo"))
@@ -175,8 +186,6 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
                 return nullptr;
         }
     }
-
-    nodeProcConnect(process);
 
     return process;
 }
@@ -263,8 +272,8 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
         restartCounter++;
 
-        // restart the node in 2 seconds
-        QTimer::singleShot( 1000*2, this, &MwcNode::onRestartNode );
+        // restart the node in 4 seconds
+        QTimer::singleShot( 1000*4, this, &MwcNode::onRestartNode );
     }
     else {
         reportNodeFatalError( "mwc-node process exited due some unexpected error. The exit code: " + QString::number(exitCode) + "\n\n"
@@ -796,15 +805,20 @@ void MwcNode::replyFinished(QNetworkReply* reply) {
 
 void MwcNode::reportNodeFatalError( QString message ) {
 
-    if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(nullptr, "Embedded MWC-Node Error",
-            message + "\n\nIf Embedded mwc-node doesn't work for you, please switch to MWC Cloud node before exit", "Keep Embedded", "Switch to Cloud", false, true ) ) {
-
-        // Switching to the cloud node
-        wallet::MwcNodeConnection mwcNodeConnection = appContext->getNodeConnection( lastUsedNetwork );
-        mwcNodeConnection.setAsCloud();
-        appContext->updateMwcNodeConnection(lastUsedNetwork, mwcNodeConnection );
+    if ( config::isOnlineNode() ) {
+        control::MessageBox::messageText(nullptr, "Embedded MWC-Node Error", message);
     }
+    else
+    {
+        if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(nullptr, "Embedded MWC-Node Error",
+                message + "\n\nIf Embedded mwc-node doesn't work for you, please switch to MWC Cloud node before exit", "Keep Embedded", "Switch to Cloud", false, true ) ) {
 
+            // Switching to the cloud node
+            wallet::MwcNodeConnection mwcNodeConnection = appContext->getNodeConnection( lastUsedNetwork );
+            mwcNodeConnection.setAsCloud();
+            appContext->updateMwcNodeConnection(lastUsedNetwork, mwcNodeConnection );
+        }
+    }
 
     mwc::closeApplication();
 

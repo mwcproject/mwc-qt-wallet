@@ -19,19 +19,36 @@
 
 namespace util {
 
+struct KeyInfo {
+    QString key;
+    QString value;
+    int lineIdx = 0;
+
+    KeyInfo(QString _key, QString _value, int _lineIdx) : key(_key), value(_value), lineIdx(_lineIdx) {}
+
+    KeyInfo() = default;
+    KeyInfo( const KeyInfo & other ) = default;
+    KeyInfo & operator = ( const KeyInfo & other ) = default;
+};
+
 class ConfigReader {
 public:
     ConfigReader();
 
     // Config is reading toml format. We are persing it manually, so details might be different from toml
-    bool readConfig(QString confPath);
+    bool readConfig(const QString & confPath);
 
-    bool isDefined(QString key) const;
-    QString getString(QString key) const;
+    bool isDefined(const QString & key) const;
+    QString getString(const QString & key) const;
 
+    // Update the value and rewrite the config.
+    // Many IOs are not expected
+    // Note!!!!  value MUST respoct toml even it is not critical for now
+    bool updateConfig( const QString & key, const QString & value );
 private:
-
-    QMap<QString, QString>  config;
+    QString configFN;
+    QMap<QString, KeyInfo>  config;
+    QStringList lines;
 };
 
 }

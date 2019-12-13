@@ -45,10 +45,15 @@ InputPassword::InputPassword(QWidget *parent, state::InputPassword * _state, sta
     utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()) );
 
     if (lockMode) {
-        QPair<bool,bool> status = state->getWalletListeningStatus();
+        if ( config::isOnlineWallet() ) {
+            QPair<bool,bool> status = state->getWalletListeningStatus();
 
-        updateMwcMqState(status.first);
-        updateKeybaseState(status.second);
+            updateMwcMqState(status.first);
+            updateKeybaseState(status.second);
+        }
+        else {
+            ui->listeningStatusFrame->hide();
+        }
 
         ui->instancesButton->hide();
     }

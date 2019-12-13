@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NavMenuConfig</class>
+ <class>NavMenuConfigColdWlt</class>
  <widget class="QFrame" name="NavMenuConfig">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>187</width>
-    <height>242</height>
+    <height>247</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <rect>
      <x>16</x>
      <y>48</y>
-     <width>154</width>
+     <width>156</width>
      <height>2</height>
     </rect>
    </property>
@@ -37,7 +37,7 @@
     <rect>
      <x>16</x>
      <y>96</y>
-     <width>154</width>
+     <width>156</width>
      <height>2</height>
     </rect>
    </property>
@@ -74,40 +74,11 @@
     <string>Outputs</string>
    </property>
   </widget>
-  <widget class="control::NavMenuButton" name="mwcmqButton">
-   <property name="geometry">
-    <rect>
-     <x>9</x>
-     <y>102</y>
-     <width>170</width>
-     <height>38</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>mwc mq</string>
-   </property>
-  </widget>
-  <widget class="control::MwcFrameWithBorder" name="frame_4">
-   <property name="geometry">
-    <rect>
-     <x>16</x>
-     <y>144</y>
-     <width>154</width>
-     <height>2</height>
-    </rect>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::StyledPanel</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-  </widget>
   <widget class="control::NavMenuButton" name="nodeOverviewButton">
    <property name="geometry">
     <rect>
      <x>9</x>
-     <y>150</y>
+     <y>102</y>
      <width>170</width>
      <height>38</height>
     </rect>
@@ -120,7 +91,7 @@
    <property name="geometry">
     <rect>
      <x>8</x>
-     <y>198</y>
+     <y>150</y>
      <width>170</width>
      <height>38</height>
     </rect>
@@ -133,8 +104,8 @@
    <property name="geometry">
     <rect>
      <x>15</x>
-     <y>192</y>
-     <width>154</width>
+     <y>144</y>
+     <width>156</width>
      <height>2</height>
     </rect>
    </property>
@@ -143,6 +114,35 @@
    </property>
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="control::MwcFrameWithBorder" name="frame_6">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>195</y>
+     <width>156</width>
+     <height>2</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="control::NavMenuButton" name="selectRunningModeButton">
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>201</y>
+     <width>170</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Select Running Mode</string>
    </property>
   </widget>
  </widget>

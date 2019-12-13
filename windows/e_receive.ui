@@ -46,7 +46,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QFrame" name="frame">
+      <widget class="QFrame" name="frameQs">
        <property name="minimumSize">
         <size>
          <width>259</width>

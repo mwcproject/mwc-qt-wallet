@@ -124,7 +124,7 @@ virtual QSet<WALLET_EVENTS> getReadyEvents() override {return {};}
 // get next key is end the wallet life. It is similar to logout
 class TaskGetNextKey: public Mwc713Task {
 public:
-const static int64_t TIMEOUT = 3000; // execute now
+const static int64_t TIMEOUT = 3000;
 
 TaskGetNextKey( MWC713 * wallet713, int64_t amountNano, QString _btcaddress, QString _airDropAccPassword) :
         Mwc713Task("TaskGetNextKey","getnextkey --amount " + QString::number(amountNano), wallet713, "getnextkey is executed"), btcaddress(_btcaddress), airDropAccPassword(_airDropAccPassword) {}
@@ -142,7 +142,7 @@ private:
 // node info command
 class TaskNodeInfo: public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 30000; // execute now
+    const static int64_t TIMEOUT = 30000;
 
     TaskNodeInfo( MWC713 * wallet713) :
             Mwc713Task("TaskNodeInfo","nodeinfo", wallet713, "") {}
@@ -152,6 +152,23 @@ public:
     virtual bool processTask(const QVector<WEvent> & events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+};
+
+// submit file - posts a transaction that has been finalized. Primarily for use with cold storage.
+class TaskSubmitFile: public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 10000;
+
+    TaskSubmitFile( MWC713 * wallet713, const QString & fileName) :
+            Mwc713Task("TaskSubmitFile","submit --file '" + fileName + "'", wallet713, ""), fileTx(fileName) {}
+
+    virtual ~TaskSubmitFile() override {}
+
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+private:
+    QString fileTx;
 };
 
 

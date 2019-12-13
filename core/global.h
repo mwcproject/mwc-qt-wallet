@@ -23,7 +23,7 @@ class QMainWindow;
 
 namespace mwc {
 
-const QString APP_NAME = "mwc wallet";
+QString get_APP_NAME();
 
 // We not checking mwc713 versions because so far there is no benefits from that.
 // MWC version that we are expecting to ship
@@ -99,6 +99,8 @@ const QString PAGE_X_EVENTS         = "Event log";
 const QString PAGE_X_SHOW_PASSPHRASE= "Wallet mnemonic passphrase";
 const QString PAGE_X_WALLET_CONFIG  = "Wallet Config";
 const QString PAGE_X_RESYNC         = "Re-sync wallet with mwc node";
+
+const QString PAGE_Y_SELECT_RUNNING_MODE = "Select Running Mode";
 
 const QString PAGE_HODL             = "HODL";
 

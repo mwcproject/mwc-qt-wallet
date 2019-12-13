@@ -80,7 +80,7 @@ bool TaskInit::processTask(const QVector<WEvent> & events) {
 //////////////////////////////////////////////////
 // TaskStop
 bool TaskStop::processTask(const QVector<WEvent> &events) {
-    Q_UNUSED(events);
+    Q_UNUSED(events)
     wallet713->processStop(true);
     return true;
 }
@@ -125,7 +125,7 @@ bool TaskInitW::processTask(const QVector<WEvent> & events) {
 //   TaskInitWpressEnter
 
 bool TaskInitWpressEnter::processTask(const QVector<WEvent> & events) {
-    Q_UNUSED(events);
+    Q_UNUSED(events)
     return true;
 }
 
@@ -133,7 +133,7 @@ bool TaskInitWpressEnter::processTask(const QVector<WEvent> & events) {
 //  TaskLogout
 
 bool TaskLogout::processTask(const QVector<WEvent> & events) {
-    Q_UNUSED(events);
+    Q_UNUSED(events)
     wallet713->logout(false); // async call because task is already async and called from input thread
     return true;
 }
@@ -187,7 +187,7 @@ bool TaskNodeInfo::processTask(const QVector<WEvent> & events) {
 
     int peerHeight = 0; // max from all peers
 
-    for ( const auto evt : events ) {
+    for ( const auto & evt : events ) {
         if (evt.event != WALLET_EVENTS::S_LINE)
             continue;
 
@@ -240,6 +240,50 @@ bool TaskNodeInfo::processTask(const QVector<WEvent> & events) {
     wallet713->setNodeStatus( height>=0 && difficulty>=0 && connections>=0, errors, height, peerHeight, difficulty, connections );
     return true;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+//    TaskSubmitFile
+
+bool TaskSubmitFile::processTask(const QVector<WEvent> & events) {
+
+    // Just show the respond. There is not much what we can do...
+    QString respondStr;
+    bool hasError = false;
+    QVector< WEvent > apiErrs = filterEvents(events, WALLET_EVENTS::S_NODE_API_ERROR);
+
+    if (!apiErrs.isEmpty()) {
+        for (auto & er:apiErrs) {
+            QStringList prms = er.message.split('|');
+            if (prms.size()==2) {
+                if (!respondStr.isEmpty())
+                    respondStr += "\n";
+
+                respondStr += "MWC-NODE failed to publish the slate. " + prms[1];
+            }
+        }
+        hasError = true;
+    }
+    else {
+        QVector<WEvent> lines = filterEvents(events, WALLET_EVENTS::S_LINE);
+        for (WEvent ln : lines) {
+            if (ln.message.trimmed().size() < 1)
+                continue;
+
+            if (!respondStr.isEmpty())
+                respondStr += "\n";
+
+            respondStr += ln.message;
+
+            if (ln.message.contains("error", Qt::CaseInsensitive))
+                hasError = true;
+        }
+    }
+
+    wallet713->setSubmitFile( !hasError, respondStr, fileTx );
+    return true;
+}
+
+
 
 
 }

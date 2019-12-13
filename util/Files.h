@@ -25,7 +25,7 @@ namespace util {
 QStringList readTextFile(QString fileName,  std::function<void()> openErrorCallback = [](){} );
 
 // Write text lines into the file
-bool writeTextFile(QString fileName, QStringList lines );
+bool writeTextFile(QString fileName, const QStringList & lines );
 
 
 }

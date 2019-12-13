@@ -17,6 +17,7 @@
 #include "../state/g_Send.h"
 #include "../state/timeoutlock.h"
 #include "../control/messagebox.h"
+#include "../core/Config.h"
 
 namespace wnd {
 
@@ -61,7 +62,17 @@ SendStarting::SendStarting(QWidget *parent, state::Send *_state) :
     connect(ui->onlineChecked, &control::MwcCheckedFrame::onChecked, this, &SendStarting::onChecked,
             Qt::QueuedConnection);
 
-    onChecked(ONLINE_ID);
+    if (config::isColdWallet()) {
+        // Hide 'online option to send'
+        ui->onlineChecked->hide();
+        QRect rc = ui->fileChecked->frameGeometry();
+        ui->fileChecked->move( QPoint( (rc.right() - rc.width())/2, rc.top() ) );
+
+        onChecked(FILE_ID);
+    }
+    else {
+        onChecked(ONLINE_ID);
+    }
 
 }
 

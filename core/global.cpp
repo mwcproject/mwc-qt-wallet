@@ -15,11 +15,23 @@
 #include "global.h"
 #include <QApplication>
 #include <QMainWindow>
+#include "../core/Config.h"
 
 namespace mwc {
 
 static QApplication * mwcApp = nullptr;
 static QMainWindow * mwcMainWnd = nullptr;
+
+QString get_APP_NAME() {
+    if (config::isOnlineWallet())
+        return "mwc wallet";
+    else if (config::isOnlineNode())
+        return "mwc node";
+    else if (config::isColdWallet())
+        return "mwc cold wallet";
+    else
+        return "Unknown mode";
+}
 
 void setApplication(QApplication * app, QMainWindow * mainWindow) {
     mwcApp = app;

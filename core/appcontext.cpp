@@ -14,6 +14,7 @@
 
 #include "appcontext.h"
 #include "../util/ioutils.h"
+#include "../util/Files.h"
 #include <QFile>
 #include <QTextStream>
 #include <QDataStream>
@@ -26,6 +27,7 @@ namespace core {
 
 const static QString settingsFileName("context.dat");
 const static QString airdropRequestsFileName("requests.dat");
+const static QString setupDoneFileName("setup.dat");
 
 
 void SendCoinsParams::saveData(QDataStream & out) const {
@@ -136,7 +138,7 @@ bool AppContext::loadData() {
 
     int id = 0;
     in >> id;
-    if (id<0x4783 || id>0x4786)
+    if (id<0x4783 || id>0x4787)
          return false;
 
     in >> receiveAccount;
@@ -173,6 +175,11 @@ bool AppContext::loadData() {
         nodeConnectionFlooNet.loadData(in);
     }
 
+    if (id>=0x4787) {
+        in >> wallet713DataPath;
+        in >> network;
+    }
+
     return true;
 }
 
@@ -193,7 +200,7 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x4786;
+    out << 0x4787;
     out << receiveAccount;
     out << currentAccountName;
     out << int(activeWndState);
@@ -212,6 +219,9 @@ void AppContext::saveData() const {
 
     nodeConnectionMainNet.saveData(out);
     nodeConnectionFlooNet.saveData(out);
+
+    out << wallet713DataPath;
+    out << network;
 }
 
 void AppContext::setLogsEnabled(bool enabled) {
@@ -281,6 +291,15 @@ QVector<state::AirdropRequests> AppContext::loadAirdropRequests() const {
     return res;
 }
 
+// First run for a new version flags support...
+bool AppContext::isSetupDone(QString version) {
+    QStringList lns = util::readTextFile(ioutils::getAppDataPath("context") + "/" + airdropRequestsFileName );
+    return lns.size()>0 && lns[0]==version;
+}
+
+void AppContext::updateSetupDone(QString version) {
+    util::writeTextFile(ioutils::getAppDataPath("context") + "/" + airdropRequestsFileName, QStringList{version} );
+}
 
 // -------------- Contacts
 
@@ -347,6 +366,24 @@ void AppContext::updateMwcNodeConnection(const QString network, const wallet::Mw
 
     }
     // save because it must be in sync with configs that saved now as well
+    saveData();
+}
+
+bool AppContext::getWallet713DataPathWithNetwork( QString & _wallet713DataPath, QString & _network) {
+    if ( wallet713DataPath.isEmpty() || network.isEmpty() )
+        return false;
+
+    _wallet713DataPath = wallet713DataPath;
+    _network = network;
+    return true;
+}
+
+void AppContext::setWallet713DataPathWithNetwork( const QString & _wallet713DataPath, const QString & _network ) {
+    if ( wallet713DataPath == _wallet713DataPath && network == _network )
+        return;
+
+    wallet713DataPath = _wallet713DataPath;
+    network = _network;
     saveData();
 }
 

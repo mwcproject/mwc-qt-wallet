@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>890</width>
-    <height>599</height>
+    <width>904</width>
+    <height>679</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,24 +58,24 @@
       </spacer>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
+      <widget class="QWidget" name="primaryFrame" native="true">
        <property name="minimumSize">
         <size>
          <width>778</width>
-         <height>430</height>
+         <height>475</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>778</width>
-         <height>430</height>
+         <height>475</height>
         </size>
        </property>
        <widget class="control::MwcPushButtonNormal" name="processButton">
         <property name="geometry">
          <rect>
           <x>414</x>
-          <y>384</y>
+          <y>429</y>
           <width>175</width>
           <height>40</height>
          </rect>
@@ -109,7 +109,7 @@
         <property name="geometry">
          <rect>
           <x>270</x>
-          <y>183</y>
+          <y>168</y>
           <width>500</width>
           <height>16</height>
          </rect>
@@ -122,7 +122,7 @@
         <property name="geometry">
          <rect>
           <x>270</x>
-          <y>114</y>
+          <y>99</y>
           <width>500</width>
           <height>19</height>
          </rect>
@@ -135,7 +135,7 @@
         <property name="geometry">
          <rect>
           <x>264</x>
-          <y>48</y>
+          <y>33</y>
           <width>388</width>
           <height>31</height>
          </rect>
@@ -151,7 +151,7 @@
         <property name="geometry">
          <rect>
           <x>104</x>
-          <y>147</y>
+          <y>132</y>
           <width>131</width>
           <height>20</height>
          </rect>
@@ -167,7 +167,7 @@
         <property name="geometry">
          <rect>
           <x>114</x>
-          <y>219</y>
+          <y>204</y>
           <width>121</width>
           <height>20</height>
          </rect>
@@ -183,7 +183,7 @@
         <property name="geometry">
          <rect>
           <x>180</x>
-          <y>18</y>
+          <y>3</y>
           <width>52</width>
           <height>61</height>
          </rect>
@@ -202,7 +202,7 @@
         <property name="geometry">
          <rect>
           <x>104</x>
-          <y>180</y>
+          <y>165</y>
           <width>131</width>
           <height>20</height>
          </rect>
@@ -218,7 +218,7 @@
         <property name="geometry">
          <rect>
           <x>104</x>
-          <y>117</y>
+          <y>102</y>
           <width>131</width>
           <height>20</height>
          </rect>
@@ -234,7 +234,7 @@
         <property name="geometry">
          <rect>
           <x>270</x>
-          <y>150</y>
+          <y>135</y>
           <width>500</width>
           <height>16</height>
          </rect>
@@ -247,7 +247,7 @@
         <property name="geometry">
          <rect>
           <x>195</x>
-          <y>384</y>
+          <y>429</y>
           <width>175</width>
           <height>40</height>
          </rect>
@@ -281,9 +281,9 @@
         <property name="geometry">
          <rect>
           <x>270</x>
-          <y>222</y>
+          <y>207</y>
           <width>500</width>
-          <height>120</height>
+          <height>97</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -314,8 +314,8 @@
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'.SF NS Text'; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'.SF NS Text';&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="acceptRichText">
          <bool>false</bool>
@@ -323,6 +323,119 @@ p, li { white-space: pre-wrap; }
         <property name="placeholderText">
          <string/>
         </property>
+       </widget>
+       <widget class="QWidget" name="resultLocationFrame" native="true">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>315</y>
+          <width>778</width>
+          <height>91</height>
+         </rect>
+        </property>
+        <widget class="control::MwcPushButtonNormal" name="resultTransFileNameSelect">
+         <property name="geometry">
+          <rect>
+           <x>654</x>
+           <y>42</y>
+           <width>118</width>
+           <height>40</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Select Keybase binary location</string>
+         </property>
+         <property name="text">
+          <string>Select</string>
+         </property>
+        </widget>
+        <widget class="control::MwcLineEditNormal" name="resultingTxFileName">
+         <property name="geometry">
+          <rect>
+           <x>264</x>
+           <y>42</y>
+           <width>376</width>
+           <height>40</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
+         <property name="maxLength">
+          <number>1024</number>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="placeholderText">
+          <string>Resulting transaction file name</string>
+         </property>
+        </widget>
+        <widget class="control::MwcLabelSmall" name="label_2">
+         <property name="geometry">
+          <rect>
+           <x>267</x>
+           <y>0</y>
+           <width>490</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Your resulting transaction need to be published at the online node. Please specify the resulting transaction file name.</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="control::MwcLabelNormal" name="label_8">
+         <property name="geometry">
+          <rect>
+           <x>104</x>
+           <y>51</y>
+           <width>131</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>&lt;b&gt;Result location:&lt;/b&gt;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
        </widget>
       </widget>
      </item>
@@ -473,16 +586,33 @@ p, li { white-space: pre-wrap; }
    <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>message</tabstop>
+  <tabstop>resultingTxFileName</tabstop>
+  <tabstop>resultTransFileNameSelect</tabstop>
+  <tabstop>cancelButton</tabstop>
+  <tabstop>processButton</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources.qrc"/>
  </resources>

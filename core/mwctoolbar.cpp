@@ -20,6 +20,7 @@
 #include "../state/statemachine.h"
 #include "../wallet/wallet.h"
 #include <QDebug>
+#include "../core/Config.h"
 
 namespace core {
 
@@ -31,6 +32,11 @@ MwcToolbar::MwcToolbar(QWidget *parent) :
 
     //setAutoFillBackground(true);
     //setStyleSheet("background-color: #6F00D6;");
+
+    if (config::isColdWallet()) {
+        ui->hodlToolButton->hide();
+        ui->airdropToolButton->hide();
+    }
 }
 
 MwcToolbar::~MwcToolbar()

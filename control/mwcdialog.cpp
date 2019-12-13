@@ -26,7 +26,7 @@ namespace control {
 MwcDialog::MwcDialog( QWidget * parent )
 {
     { // Apply style sheet
-        QFile file( config::getDialogsStyleSheetPath() );
+        QFile file(":/resource/dialogs_style.css");
         if (file.open(QFile::ReadOnly | QFile::Text)) {
                QTextStream ts( &file );
                setStyleSheet( ts.readAll() );

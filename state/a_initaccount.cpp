@@ -31,6 +31,7 @@
 #include "../util/Process.h"
 #include "../core/global.h"
 #include "../core/Notification.h"
+#include "../core/Config.h"
 
 namespace state {
 
@@ -59,14 +60,23 @@ NextStateRespond InitAccount::execute() {
     // Need to provision the wallet. If it is not running, mean that we wasn't be able to login.
     // So we have to init the wallet
     if ( !running && context->appContext->pullCookie<QString>("checkWalletInitialized")=="FAILED" ) {
-        context->wndManager->switchToWindowEx( mwc::PAGE_A_INIT_ACCOUNT,
-                    new wnd::InitAccount( context->wndManager->getInWndParent(), this,
-                            (state::WalletConfig *) context->stateMachine->getState(STATE::WALLET_CONFIG) ) );
+        if (config::isOnlineNode()) {
+            // Very first run. Need to create the wallet without any passwords
+            // Let's not wait for anyhting
+            context->wallet->start2init("");
+            context->wallet->confirmNewSeed();
+            return NextStateRespond( NextStateRespond::RESULT::DONE );
+        }
+        else {
+            context->wndManager->switchToWindowEx( mwc::PAGE_A_INIT_ACCOUNT,
+                        new wnd::InitAccount( context->wndManager->getInWndParent(), this,
+                                (state::WalletConfig *) context->stateMachine->getState(STATE::WALLET_CONFIG) ) );
 
-        // Provosion of new wallet, need to block locking
-        context->stateMachine->blockLogout();
+            // Provosion of new wallet, need to block locking
+            context->stateMachine->blockLogout();
 
-        return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
+            return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
+        }
     }
 
     // Just skip that step
@@ -114,6 +124,9 @@ void InitAccount::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice, MWC_NETW
 
 // New see was created....
 void InitAccount::onNewSeed(QVector<QString> sd) {
+    if (config::isOnlineNode())
+        return; // Online seed - just ignore it
+
     seed = sd;
     tasks = core::generateSeedTasks( seed ); // generate tasks
     seedTestWrongAnswers = 0;

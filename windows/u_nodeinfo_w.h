@@ -40,15 +40,29 @@ public:
     void setNodeStatus( const QString & localNodeStatus, const state::NodeStatus & status );
 
     void updateEmbeddedMwcNodeStatus( const QString & status );
+
+    void hideProgress();
 private:
     // Empty string to hide warning...
     void showWarning(QString warning);
 
+    void showNodeLogs();
+
+    void updateNodeReadyButtons(bool nodeIsReady);
+
 private slots:
     void on_refreshButton_clicked();
     void onShowNodeConnectionError(QString errorMessage);
-    void on_showLogsButton_clicked();
     void on_changeNodeButton_clicked();
+
+    void on_showLogsButton_clicked();
+    void on_showLogsButton_5_clicked();
+    void on_showLogsButton_8_clicked();
+
+    void on_saveBlockchianData_clicked();
+    void on_loadBlockchainData_clicked();
+
+    void on_publishTransaction_clicked();
 
 private:
 signals:

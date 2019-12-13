@@ -27,8 +27,8 @@
 
 namespace state {
 
-Receive::Receive( StateContext * context ) :
-        State(context, STATE::RECEIVE_COINS) {
+Receive::Receive( StateContext * _context ) :
+        State(_context, STATE::RECEIVE_COINS) {
 
     QObject::connect(context->wallet, &wallet::Wallet::onMwcMqListenerStatus,
                      this, &Receive::onMwcMqListenerStatus, Qt::QueuedConnection);
@@ -104,7 +104,8 @@ void Receive::ftBack() {
                                                                                    context->wallet->getWalletConfig() ) );
 }
 
-void Receive::ftContinue(QString fileName) {
+void Receive::ftContinue(QString fileName, QString resultTxFileName) {
+    Q_UNUSED(resultTxFileName)
     logger::logInfo("Receive", "Receive file " + fileName);
     context->wallet->receiveFile( fileName );
 }
@@ -144,7 +145,7 @@ void Receive::onKeybaseListenerStatus(bool online) {
     }
 }
 void Receive::onMwcAddressWithIndex(QString mwcAddress, int idx) {
-    Q_UNUSED(idx);
+    Q_UNUSED(idx)
     if (wnd) {
         wnd->updateMwcMqAddress(mwcAddress);
     }
@@ -165,10 +166,10 @@ QVector<wallet::AccountInfo>  Receive::getWalletBalance() {
 }
 
 void Receive::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
-    Q_UNUSED(errMsg);
-    Q_UNUSED(peerHeight);
-    Q_UNUSED(totalDifficulty);
-    Q_UNUSED(connections);
+    Q_UNUSED(errMsg)
+    Q_UNUSED(peerHeight)
+    Q_UNUSED(totalDifficulty)
+    Q_UNUSED(connections)
 
     if (online)
         lastNodeHeight = nodeHeight;

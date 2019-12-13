@@ -21,6 +21,8 @@
 #include <QScrollBar>
 #include "../state/timeoutlock.h"
 #include "../dialogs/u_mwcnodelogs.h"
+#include "../core/Config.h"
+#include <QFileDialog>
 
 namespace wnd {
 
@@ -44,6 +46,8 @@ NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
 
     ui->warningLine->hide();
 
+    ui->progress->initLoader(false);
+
     // Need simulate post message. Using events for that
     connect(this, &NodeInfo::showNodeConnectionError, this,  &NodeInfo::onShowNodeConnectionError, Qt::QueuedConnection );
 
@@ -54,6 +58,17 @@ NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
 
     ui->showLogsButton->setEnabled( connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
 
+    if ( !config::isOnlineWallet() )
+        ui->onlineWalletBtns->hide();
+
+    if ( !config::isOnlineNode() )
+        ui->onlineNodeBtns->hide();
+
+    if ( !config::isColdWallet() )
+        ui->coldWalletBtns->hide();
+
+    updateNodeReadyButtons(false);
+
     showWarning("");
 }
 
@@ -61,7 +76,6 @@ NodeInfo::~NodeInfo() {
     state->wndIsGone(this);
     delete ui;
 }
-
 
 // logs to show, multi like output
 void NodeInfo::updateEmbeddedMwcNodeStatus( const QString & status ) {
@@ -91,6 +105,8 @@ void NodeInfo::showWarning(QString warning) {
 void NodeInfo::setNodeStatus( const QString & localNodeStatus, const state::NodeStatus & status ) {
     QString warning;
 
+    bool nodeIsReady = false;
+
     if (!status.online) {
         QString statusStr = "Offline";
 
@@ -103,11 +119,14 @@ void NodeInfo::setNodeStatus( const QString & localNodeStatus, const state::Node
         ui->heightInfo->setText("-");
         ui->difficultyInfo->setText("-");
 
-        if ( statusStr == "Offline" ) {
-             if (lastShownErrorMessage != status.errMsg) {
-                 emit showNodeConnectionError(status.errMsg);
-                 lastShownErrorMessage = status.errMsg;
-             }
+        // Don't show message for the local because starting local node might take a while. Error likely will be recoverable
+        if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL ) {
+            if ( statusStr == "Offline" ) {
+                 if (lastShownErrorMessage != status.errMsg) {
+                     emit showNodeConnectionError(status.errMsg);
+                     lastShownErrorMessage = status.errMsg;
+                 }
+            }
         }
     }
     else {
@@ -118,13 +137,18 @@ void NodeInfo::setNodeStatus( const QString & localNodeStatus, const state::Node
         else {
             if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL)
                 ui->statusInfo->setText("Online");
+
+            nodeIsReady = true;
         }
 
         if (status.connections <= 0) {
             ui->connectionsInfo->setText( toBoldAndYellow("None") ); // Two offline is confusing and doesn't look good. Let's keep zero and highlight it.
 
-            if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD) {
-                warning = toBoldAndYellow("Please note. You can't run two mwc-node with same public IP.<br>That might be a reason why node unable to find any peers.");
+            if (!config::isColdWallet()) {
+                if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD) {
+                    warning = toBoldAndYellow(
+                            "Please note. You can't run two mwc-node with same public IP.<br>That might be a reason why node unable to find any peers.");
+                }
             }
         }
         else {
@@ -134,6 +158,11 @@ void NodeInfo::setNodeStatus( const QString & localNodeStatus, const state::Node
         ui->heightInfo->setText( util::longLong2Str(status.nodeHeight) );
         ui->difficultyInfo->setText( util::longLong2ShortStr(status.totalDifficulty, 9) );
     }
+
+    if (status.peerHeight==0 || status.connections==0)
+        nodeIsReady = false;
+
+    updateNodeReadyButtons(nodeIsReady);
 
     showWarning(warning);
 }
@@ -150,13 +179,16 @@ void NodeInfo::on_refreshButton_clicked() {
     }
 }
 
-void NodeInfo::on_showLogsButton_clicked()
-{
+void NodeInfo::showNodeLogs() {
     state::TimeoutLockObject to( state );
 
     dlg::MwcNodeLogs logsDlg(this, state->getMwcNode() );
     logsDlg.exec();
 }
+
+void NodeInfo::on_showLogsButton_clicked() { showNodeLogs(); }
+void NodeInfo::on_showLogsButton_5_clicked() { showNodeLogs(); }
+void NodeInfo::on_showLogsButton_8_clicked() { showNodeLogs(); }
 
 void NodeInfo::on_changeNodeButton_clicked()
 {
@@ -170,6 +202,58 @@ void NodeInfo::on_changeNodeButton_clicked()
     if ( changeNodeDlg.exec() == QDialog::Accepted ) {
         state->updateNodeConnection( changeNodeDlg.getNodeConnectionConfig(), conInfo.second );
     }
+}
+
+void NodeInfo::hideProgress() {
+    ui->progress->hide();
+}
+
+void NodeInfo::on_saveBlockchianData_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Blockchain Data"),
+                                                       state->getBlockchainDataPath(),
+                                                       tr("MWC Blockchain Data (*.mwcblc)"));
+
+    if (fileName.length()==0)
+          return;
+
+    ui->progress->show();
+    state->updateBlockchainDataPath( QFileInfo(fileName).absolutePath() );
+    state->saveBlockchainData(fileName);
+}
+
+void NodeInfo::on_loadBlockchainData_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Blockchain Data"),
+                                                       state->getBlockchainDataPath(),
+                                                       tr("MWC Blockchain Data (*.mwcblc)"));
+
+    if (fileName.length()==0)
+          return;
+
+    ui->progress->show();
+    state->updateBlockchainDataPath( QFileInfo(fileName).absolutePath() );
+    state->loadBlockchainData(fileName);
+}
+
+void NodeInfo::on_publishTransaction_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Publish MWC transaction"),
+                                                       state->getPublishTransactionPath(),
+                                                       tr("MWC transaction (*.mwctx)"));
+
+    if (fileName.length()==0)
+          return;
+
+    ui->progress->show();
+    state->updatePublishTransactionPath( QFileInfo(fileName).absolutePath() );
+    state->publishTransaction(fileName);
+}
+
+void NodeInfo::updateNodeReadyButtons(bool nodeIsReady) {
+    ui->publishTransaction->setEnabled(nodeIsReady);
+    ui->saveBlockchianData->setEnabled(nodeIsReady);
+    ui->refreshButton->setEnabled(nodeIsReady);
 }
 
 }
