@@ -176,7 +176,7 @@ p, li { white-space: pre-wrap; }
           </size>
          </property>
          <property name="toolTip">
-          <string>Open Sugn Up page in your browser</string>
+          <string>Open Sign Up page in your browser</string>
          </property>
          <property name="text">
           <string>Sign up for Updates</string>
