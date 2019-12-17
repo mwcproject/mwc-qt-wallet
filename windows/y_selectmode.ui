@@ -92,8 +92,8 @@ full functionality. Internet connection is required.</string>
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="text">
-         <string>Cold Wallet - Offline MWC wallet with limited functionality
-(mainly used by exchanges)</string>
+         <string>Cold Wallet - Offline MWC wallet for use in conjunction with
+an &quot;Online Node&quot; in order to implement cold storage.</string>
         </property>
        </widget>
        <widget class="QRadioButton" name="radioOnlineNode">
