@@ -18,6 +18,7 @@
 #include "TaskWallet.h"
 #include "../../core/Notification.h"
 #include "../../core/Config.h"
+#include "../../util/Log.h"
 
 namespace wallet {
 
@@ -37,8 +38,10 @@ bool TaskStarting::processTask(const QVector<WEvent> & events) {
         if (welcome.empty())
             break;
 
-        if ( need2unlock.empty() && init.empty() && !config::isOnlineNode() )
+        if ( need2unlock.empty() && init.empty() && !config::isOnlineNode() ) {
+            logger::logInfo("TaskStarting", "Found wallet without a password state. It is fine for the 'Online Node' only.");
             break;
+        }
 
         // check version of the wallet
         /*if (welcome[0].message != mwc::MWC_713_VERSION) {

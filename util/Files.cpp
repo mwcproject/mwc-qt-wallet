@@ -45,6 +45,7 @@ bool writeTextFile(QString fileName, const QStringList & lines ) {
 
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly | QFile::Truncate)) {
+        Q_ASSERT(false);
         return false;
     }
 

@@ -321,8 +321,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        logger::logInfo("mwc-qt-wallet", QString("Starting mwc-gui-wallet version ") + BUILD_VERSION );
-        logger::logInfo("mwc-qt-wallet", config::toString());
+        logger::logInfo("mwc-qt-wallet", QString("Starting mwc-gui-wallet version ") + BUILD_VERSION + " with config:\n" + config::toString() );
         qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
 
         { // Apply style sheet
@@ -365,7 +364,7 @@ int main(int argc, char *argv[])
         {
             // Check if wallet point to the right location
             if ( walletDataPath.contains("tmp") && walletDataPath.contains("online_node_wallet") ) {
-                // ned to switch to the normal wallet path
+                // need to switch to the normal wallet path
 
                 // Try to restore the last valid wallet path and a network...
                 QString network;

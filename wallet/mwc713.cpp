@@ -1354,8 +1354,11 @@ WalletConfig MWC713::getDefaultConfig()  {
 
 //static
 bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode ) {
-    if (!config.isDefined())
+    if (!config.isDefined()) {
+        Q_ASSERT(false);
+        logger::logInfo("MWC713", "Failed to update the config, because it is invalid:\n" + config.toString() );
         return true;
+    }
 
     Q_ASSERT(appContext);
 
@@ -1439,6 +1442,8 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
     for (auto & ln : newConfLines) {
         ln.replace("\\", "\\\\"); // escaping all backslashes
     }
+
+    logger::logInfo("MWC713", "Updating mwc713 config with:\n" + newConfLines.join("\n") );
 
     return util::writeTextFile( mwc713confFN, newConfLines );
 }

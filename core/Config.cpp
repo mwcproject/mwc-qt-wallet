@@ -21,7 +21,6 @@ static QString mwc713conf;
 static QString mwcGuiWalletConf;
 static QString mwcPath;
 static QString wallet713path;
-static QString airdropUrl;
 static QString airdropUrlMainNetUrl;
 static QString airdropUrlTestNetUrl;
 static int64_t logoutTimeMs = 1000*60*15; // 15 minutes is default
@@ -102,13 +101,31 @@ int             getSendTimeoutMs() {return sendTimeoutMs;}
 
 
 QString toString() {
+
+    QString runModeStr = "Unknown";
+    switch(runMode) {
+        case WALLET_RUN_MODE::ONLINE_WALLET:
+            runModeStr = "online_wallet";
+            break;
+        case WALLET_RUN_MODE::ONLINE_NODE:
+            runModeStr = "online_node";
+            break;
+        case WALLET_RUN_MODE::COLD_WALLET:
+            runModeStr = "cold_wallet";
+            break;
+    }
+
     return "mwc713conf=" + mwc713conf + "\n" +
             "mwcGuiWalletConf=" + mwcGuiWalletConf + "\n" +
             "mwcPath=" + mwcPath + "\n" +
             "wallet713path=" + wallet713path + "\n" +
             "useMwcMqS=" + (useMwcMqS?"true":"false") + "\n" +
-            "sendTimeoutMs=" + QString::number(sendTimeoutMs) + "\n";
+            "sendTimeoutMs=" + QString::number(sendTimeoutMs) + "\n" +
+            "run_mode=" + runModeStr + "\n" +
+            "airdropUrlMainNetUrl=" + airdropUrlMainNetUrl + "\n" +
+            "airdropUrlTestNetUrl=" + airdropUrlTestNetUrl + "\n" +
+            "timeoutMultiplier=" + QString::number(timeoutMultiplier) + "\n" +
+            "logoutTimeMs=" + QString::number(logoutTimeMs);
 }
-
 
 }

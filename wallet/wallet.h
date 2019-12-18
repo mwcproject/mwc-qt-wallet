@@ -140,6 +140,8 @@ public:
     static void    saveNetwork2DataPath(QString configPath, QString network, QString arch); // Save the network into the data path
 
     static bool    doesSeedExist(QString configPath);
+
+    QString toString() const;
 };
 
 struct WalletOutput {
