@@ -78,7 +78,7 @@
         <item>
          <widget class="control::MwcLabelLarge" name="label_2">
           <property name="text">
-           <string>Important: Claims will close on January 2, 2020. Pleasure ensure you complete the process before then.</string>
+           <string>Important: Claims will close on January 2, 2020. Please ensure you complete the process before then.</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -326,7 +326,7 @@
           <property name="text">
            <string>Important!
 Claims will close on January 2, 2020.
-Pleasure ensure you complete the process before then.</string>
+Please ensure you complete the process before then.</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
