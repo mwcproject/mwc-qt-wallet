@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>759</width>
-    <height>517</height>
+    <height>605</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -75,6 +75,19 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
+        <item>
+         <widget class="control::MwcLabelLarge" name="label_2">
+          <property name="text">
+           <string>Important: Claims will close on January 2, 2020. Pleasure ensure you complete the process before then.</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="control::MwcLineEditNormal" name="btcAddressEdit">
           <property name="minimumSize">
@@ -279,7 +292,7 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,1,0,2">
+       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0,0,1,0,2">
         <property name="spacing">
          <number>0</number>
         </property>
@@ -304,6 +317,34 @@
            <size>
             <width>20</width>
             <height>72</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="control::MwcLabelLarge" name="label">
+          <property name="text">
+           <string>Important!
+Claims will close on January 2, 2020.
+Pleasure ensure you complete the process before then.</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
            </size>
           </property>
          </spacer>
@@ -461,14 +502,19 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>ListWithColumns</class>
