@@ -72,6 +72,9 @@ bool MWC713::checkWalletInitialized() {
     Q_ASSERT(mwc713process==nullptr);
     mwc713process = initMwc713process( {}, {"state"}, false );
 
+    if (mwc713process==nullptr)
+        return false;
+
     if (!util::processWaitForFinished( mwc713process, 3000, "mwc713")) {
         mwc713process->terminate();
         util::processWaitForFinished( mwc713process, 3000, "mwc713");
@@ -113,7 +116,18 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
     params.append( paramsPlus );
 
     walletStartTime = QDateTime::currentMSecsSinceEpoch();
-    commandLine = "'" + QFileInfo(mwc713Path).canonicalFilePath() + "'";
+
+    QString filePath = QFileInfo(mwc713Path).canonicalFilePath();
+    if (filePath.isEmpty()) {
+        // file not found. Let's  report it clear way
+        logger::logInfo("MWC713", "error. mwc713 canonical path is empty");
+
+        appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 executable is not found. Expected location at:\n\n" + mwc713Path );
+        return nullptr;
+
+    }
+
+    commandLine = "'" + filePath + "'";
     for (auto & p : params) {
         if (p=="-r" ||  p==mwc::PROMPTS_MWC713 )
             continue; // skipping prompt parameter. It is not needed for troubleshouting
@@ -171,6 +185,8 @@ void MWC713::start(bool loginWithLastKnownPassword)  {
 
     // Creating process and starting
     mwc713process = initMwc713process({}, {} );
+    if (mwc713process==nullptr)
+        return;
 
     inputParser = new tries::Mwc713InputParser();
 
@@ -206,6 +222,8 @@ void MWC713::start2init(QString password) {
     // Creating process and starting
 
     mwc713process = initMwc713process({"MWC_PASSWORD", password}, {"init"} );
+    if (mwc713process==nullptr)
+        return;
 
     inputParser = new tries::Mwc713InputParser();
 
@@ -246,6 +264,8 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
     // Creating process and starting
     // Mnemonic will moved into variables
     mwc713process = initMwc713process({"MWC_PASSWORD", password, "MWC_MNEMONIC", seedStr}, {"recover", "--mnemonic", "env" } );
+    if (mwc713process==nullptr)
+        return;
 
     inputParser = new tries::Mwc713InputParser();
 

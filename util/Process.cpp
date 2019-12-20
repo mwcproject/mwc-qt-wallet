@@ -22,6 +22,9 @@ namespace util {
 
 
 bool processWaitForFinished( QProcess * process, int timeoutMs, const QString & processName ) {
+    if (process==nullptr)
+        return true;
+
     if (process->state() != QProcess::Running)
         return true;
 
