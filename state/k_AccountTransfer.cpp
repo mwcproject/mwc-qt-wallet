@@ -123,7 +123,7 @@ void AccountTransfer::onSetReceiveAccount( bool ok, QString AccountOrMessage ) {
     transferState=1;
 
     core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
-    context->wallet->sendTo( trAccountFrom, trNanoCoins, util::fullFormalAddress( util::ADDRESS_TYPE::MWC_MQ, myAddress), "", prms.inputConfirmationNumber, prms.changeOutputs );
+    context->wallet->sendTo( trAccountFrom, trNanoCoins, util::fullFormalAddress( util::ADDRESS_TYPE::MWC_MQ, myAddress), "", "", prms.inputConfirmationNumber, prms.changeOutputs );
 }
 
 

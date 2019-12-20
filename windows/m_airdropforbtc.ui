@@ -410,13 +410,13 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="minimumSize">
         <size>
-         <width>50</width>
+         <width>100</width>
          <height>50</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>50</width>
+         <width>100</width>
          <height>50</height>
         </size>
        </property>

@@ -38,6 +38,7 @@ SendOnline::SendOnline(QWidget *parent,
     ui->progress->initLoader(false);
 
     ui->contactNameLable->setText("");
+    ui->apiSecretEdit->hide();
 
     ui->fromAccount->setText("From account: " + selectedAccount.accountName );
     ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util::nano2one(amount)) + " mwc" );
@@ -117,6 +118,17 @@ void SendOnline::on_sendButton_clicked()
             return;
     }
 
+    QString apiSecret;
+    if (res.second == util::ADDRESS_TYPE::HTTPS) {
+        apiSecret = ui->apiSecretEdit->text();
+        QPair<bool, QString> valRes = util::validateMwc713Str(apiSecret);
+        if (!valRes.first) {
+            control::MessageBox::messageText(this, "Incorrect Input", valRes.second);
+            ui->apiSecretEdit->setFocus();
+            return;
+        }
+    }
+
     QString description = ui->descriptionEdit->toPlainText().trimmed();
 
     {
@@ -135,7 +147,7 @@ void SendOnline::on_sendButton_clicked()
 
     ui->progress->show();
 
-    state->sendMwcOnline( selectedAccount, res.second, address, amount, description );
+    state->sendMwcOnline( selectedAccount, res.second, address, amount, description, apiSecret );
 }
 
 void SendOnline::sendRespond( bool success, const QStringList & errors ) {
@@ -160,6 +172,17 @@ void SendOnline::sendRespond( bool success, const QStringList & errors ) {
     control::MessageBox::messageText( this, "Send request failed", errMsg );
 }
 
+void SendOnline::on_sendEdit_textChanged(const QString & address)
+{
+    QPair< bool, util::ADDRESS_TYPE > res = util::verifyAddress(address);
+
+    if (res.first && res.second==util::ADDRESS_TYPE::HTTPS)
+        ui->apiSecretEdit->show();
+    else
+        ui->apiSecretEdit->hide();
+}
+
 
 }
+
 

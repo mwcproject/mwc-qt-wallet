@@ -417,7 +417,8 @@ public:
     // Before send, wallet always do the switch to account to make it active
     // coinNano == -1  - mean All
     // Check signal:  onSend
-    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs )  = 0;
+    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, const QString & apiSecret,
+                         QString message, int inputConfirmationNumber, int changeOutputs )  = 0;
 
     // Airdrop special. Generating the next Pablic key for transaction
     // wallet713> getnextkey --amount 1000000

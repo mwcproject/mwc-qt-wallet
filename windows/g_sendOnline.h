@@ -50,6 +50,8 @@ private slots:
     void on_sendEdit_textEdited(const QString &arg1);
     void on_settingsBtn_clicked();
 
+    void on_sendEdit_textChanged(const QString &arg1);
+
 private:
     Ui::SendOnline *ui;
     state::Send * state = nullptr;

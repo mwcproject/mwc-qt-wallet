@@ -157,7 +157,7 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
     return true;
 }
 
-QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address,
+QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, const QString & apiSecret,
         QString message, int inputConfirmationNumber, int changeOutputs ) const {
 
     QString cmd = "send ";// + util::nano2one(coinNano);
@@ -176,6 +176,10 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address,
 
     // So far documentation doesn't specify difference between protocols
     cmd += " --to " + util::toMwc713input(address);
+
+    if (!apiSecret.isEmpty()) {
+        cmd += " --apisecret " + util::toMwc713input(apiSecret);
+    }
 
     if (coinNano<0)
         cmd += " ALL";

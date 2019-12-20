@@ -214,7 +214,9 @@ public:
     // Before send, wallet always do the switch to account to make it active
     // Check signal:  onSend
     // coinNano == -1  - mean All
-    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, QString message, int inputConfirmationNumber, int changeOutputs )  override;
+    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address,
+                         const QString & apiSecret,
+                         QString message, int inputConfirmationNumber, int changeOutputs )  override;
 
     // Get total number of Outputs
     // Check Signal: onOutputCount(int number)

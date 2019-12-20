@@ -56,13 +56,13 @@
        <property name="minimumSize">
         <size>
          <width>424</width>
-         <height>394</height>
+         <height>400</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>424</width>
-         <height>394</height>
+         <height>400</height>
         </size>
        </property>
        <property name="frameShape">
@@ -136,40 +136,6 @@
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-       <widget class="QTextEdit" name="descriptionEdit">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>207</y>
-          <width>421</width>
-          <height>120</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>200</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>120</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Input message for this transaction.</string>
-        </property>
-        <property name="placeholderText">
-         <string>Description</string>
         </property>
        </widget>
        <widget class="control::MwcLineEditNormal" name="sendEdit">
@@ -269,7 +235,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>351</y>
+          <y>360</y>
           <width>187</width>
           <height>40</height>
          </rect>
@@ -300,7 +266,7 @@
         <property name="geometry">
          <rect>
           <x>237</x>
-          <y>351</y>
+          <y>360</y>
           <width>187</width>
           <height>40</height>
          </rect>
@@ -326,6 +292,110 @@
         <property name="text">
          <string>Send</string>
         </property>
+       </widget>
+       <widget class="QWidget" name="widget_2" native="true">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>204</y>
+          <width>424</width>
+          <height>136</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>424</width>
+          <height>136</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>424</width>
+          <height>136</height>
+         </size>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="spacing">
+          <number>20</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="control::MwcLineEditNormal" name="apiSecretEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="maxLength">
+            <number>1024</number>
+           </property>
+           <property name="placeholderText">
+            <string>Recipient wallet foreign api secret (optional)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QTextEdit" name="descriptionEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>150</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Input message for this transaction.</string>
+           </property>
+           <property name="placeholderText">
+            <string>Description</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
      </item>
@@ -390,13 +460,13 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>50</width>
+           <width>100</width>
            <height>50</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>50</width>
+           <width>100</width>
            <height>50</height>
           </size>
          </property>
@@ -463,6 +533,11 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control/MwcLabelProgress.h</header>
@@ -474,11 +549,6 @@
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
