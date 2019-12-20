@@ -42,6 +42,7 @@ QString toString(MESSAGE_LEVEL level) {
         case MESSAGE_LEVEL::DEBUG:
             return "DEBUG";
     }
+    return "UNKNOWN";
 }
 
 
