@@ -101,6 +101,15 @@ WalletConfig & WalletConfig::setData(QString _network,
     return * this;
 }
 
+QString WalletConfig::toString() const {
+    return "network=" + network + "\n" +
+            "dataPath=" + dataPath + "\n" +
+            "mwcmqDomainEx=" + mwcmqDomainEx + "\n" +
+            "mwcmqsDomainEx=" + mwcmqsDomainEx + "\n" +
+            "keyBasePath=" + keyBasePath;
+}
+
+
 // Get MQ/MQS host name. Depend on current config
 QString WalletConfig::getMwcMqHostNorm() const {
     return config::getUseMwcMqS() ? mwcmqsDomainEx : mwcmqDomainEx;
