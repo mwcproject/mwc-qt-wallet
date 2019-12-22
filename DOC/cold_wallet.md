@@ -41,7 +41,7 @@ Full explanation is out of scope for this document.
 
 A second pc/laptop with internet access will be needed to run a online MWC Node. Internet access is required for that host.
 
-The Cold Wallet and the Online Node can be different OS. Data is compatible on OS level.
+The Cold Wallet and the Online Node can run on different OSes. Data is compatible on the OS level.
 
 Please note, this online host will never have access to your wallet passphrase or other sensitive data.
 
@@ -62,7 +62,7 @@ Press 'Continue'
 
     ![](cold_wallet_images/node_in_sync.png)
 
-Until your node finished syncing, 'Save Blockchain Data' and 'Publish Transaction' will be disabled.
+Until your node finishes syncing, 'Save Blockchain Data' and 'Publish Transaction' will be disabled.
 
 4) You can select the Node network from the Configuration menu.
 
@@ -93,7 +93,7 @@ Because your host is offline, you will see several messages about that. Please i
     ![](cold_wallet_images/switch_to_cold_wallet.png)
 
 8) Switch to 'Node Overiview' page. You should see that the node is not able to sync, it has 0 blocks.
-Now, we should move data from the 'Online Node' to your offline host.
+Now, move data from the 'Online Node' to your offline host.
 
 # Transfer Node Data
 
