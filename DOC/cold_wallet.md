@@ -27,10 +27,10 @@ never connect to the internet. In this case, install the OS and ensure the Qt li
 There is some information on how to do this on this page: 
 [https://askubuntu.com/questions/974/how-can-i-install-software-or-packages-without-internet-offline].
 
-If dedicated hardware doesn't work for you, you might concider more light weight option by installing Ubuntu 
-on a USB stick. For occasional usage it might work. [https://linuxhint.com/run-ubuntu-18-04-from-usb-stick/]
+If dedicated hardware doesn't work for you, you might consider a more light weight option by installing Ubuntu 
+on a USB stick. The downside of this option is you will need to recover from passphrase each time you use the cold storage and transaction history will not be saved. [https://linuxhint.com/run-ubuntu-18-04-from-usb-stick/]
 
-Please note, by running Ubuntu on USB stick you might get the following issues:
+Please note, by running Ubuntu on a USB stick you might run into the following issues:
  - UEFI Bios might not handle the removable boot drive well.
  - USB stick will wear relatively fast.
  - You will need to install needed packages offline. For example qt libraries need to be installed. 
@@ -39,7 +39,7 @@ Full explanation is out of scope for this document.
 
 ### Online Node Host
 
-A second pc/laptop with internet access will be needed to run a online MWC Node. Internet access is required for that host.
+A second pc/laptop with internet access will be needed to run an online MWC Node. Internet access is required for that host.
 
 The Cold Wallet and the Online Node can run on different OSes. Data is compatible on the OS level.
 
