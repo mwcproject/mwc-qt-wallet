@@ -27,6 +27,14 @@ never connect to the internet. In this case, install the OS and ensure the Qt li
 There is some information on how to do this on this page: 
 [https://askubuntu.com/questions/974/how-can-i-install-software-or-packages-without-internet-offline].
 
+If dedicated hardware doesn't work for you, you might concider more light option by installing Ubuntu 
+on USB stick. For accasional usage it might work. [https://linuxhint.com/run-ubuntu-18-04-from-usb-stick/]
+
+Please note, by running Ubuntu on USB stick you might get issues:
+ - UEFI Bios might not handle well removable boot drive.
+ - USB stick will wear relatively fast.
+ - You will to install needed packages offline. For example qt libraries need to be installed. 
+
 Full explanation is out of scope for this document.
 
 ### Online Node Host
