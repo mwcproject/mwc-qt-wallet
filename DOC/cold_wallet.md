@@ -13,9 +13,21 @@ this here: https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-
 stick will contain the binary to mwc-qt-wallet. 
 
 This USB stick also will be used to transfer the data between this Cold Wallet Host and Online Node Host.
-Currently for testnet almost any size will be fine since the chain state is very small, but at some 
-point a larger size might be required. I suggest getting a 128 GB stick for now which will be 
+Currently for mainnet almost any size will be fine since the chain state is very small, but at some 
+point a larger size might be required. We suggest getting a 128 GB stick for now which will be 
 sufficient for the foreseable future and since they cost about $25 or less it is fairly reasonable. 
+
+When installing Ubuntu, qt libraries are required. If you boot from USB, you need to use try-ubuntu 
+which will have the qt libraries installed. **Please note, try-ubuntu doesn't have any permanent storage.
+As a result you will not be able to keep your transaction history or any other historical data.
+You will need to recover from the recovery seed each time to get access to your coins.** 
+
+The better option is probably to dedicate a laptop or other hardware device that you will 
+never connect to the internet. In this case, install the OS and ensure the Qt libraries are present. 
+There is some information on how to do this on this page: 
+[https://askubuntu.com/questions/974/how-can-i-install-software-or-packages-without-internet-offline].
+
+Full explanation is out of scope for this document.
 
 ### Online Node Host
 
@@ -38,7 +50,7 @@ Please note, this online host will never have access to your wallet secrets.
 
 Press 'Continue'
 
-3) After restart you shoudl see:
+3) After restart you should see:
 
     ![](cold_wallet_images/node_in_sync.png)
 
@@ -48,7 +60,7 @@ Until your node finish syncing, 'Save Blockchain Data' and 'Publish Transaction'
 
     ![](cold_wallet_images/node_network.png)
 
-5) Switch back to 'Node overview' and please wait until synchronization process will be finished.
+5) Switch back to 'Node overview' and please wait until synchronization process is finished.
 
 ### Cold Wallet Setup
 
