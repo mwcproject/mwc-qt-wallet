@@ -108,7 +108,7 @@ Press this button and save the blockchain to your USB drive.
 
     You should see that your node numbers, like the block number, are updated.
 
-4) Now, you can veiw your transaction's, output. The data will be updated with the new blockchain data.
+4) Now, you can view your transaction's, output. The data will be updated with the new blockchain data.
 
 # Receive/Send MWC
 
@@ -149,7 +149,7 @@ The initial transaction file should have an extention '.tx'.
 
 2) From the online host send Transaction file to the person whom you want to send MWC.
 
-3) Wait for singed transaction file to be returned and save to USB stick.
+3) Wait for signed transaction file to be returned and save to USB stick.
 
 4) Move the USB stick to the "Cold Wallet".
 
