@@ -473,7 +473,8 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
                 notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
                                                   "Embedded mwc-node requesting transaction archive");
             }
-            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
+            // archive can be large, let's wait extra
+            nextTimeLimit += int64_t( 3 * MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
 
             // for progress need to parse the second element
@@ -498,7 +499,8 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
                 notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
                                                   "Embedded mwc-node processing transaction archive");
             }
-            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
+            // tx Hash really might take a while to process
+            nextTimeLimit += int64_t( 10 * MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
 
             if (! message.contains("DONE") ) {
@@ -515,7 +517,8 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
                                                   "Embedded mwc-node validating range proofs");
             }
 
-            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
+            // tx Hash really might take a while to process
+            nextTimeLimit += int64_t( 10 * MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
 
             int handledH = message.trimmed().toInt();
