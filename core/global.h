@@ -108,6 +108,8 @@ void setApplication(QApplication * app, QMainWindow * mainWindow);
 
 void closeApplication();
 
+bool isAppNonClosed();
+
 }
 
 

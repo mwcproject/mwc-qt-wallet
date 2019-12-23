@@ -29,7 +29,7 @@ namespace util {
     void requestRestartMwcQtWallet();
 
     // Start a new instance of the wallet. Expecting that this instance is exiting
-    void restartMwcQtWalletIfRequested();
+    void restartMwcQtWalletIfRequested(double uiScale);
 
     // Will try to get a global lock. Return true if lock was obtained
     bool acquireAppGlobalLock();

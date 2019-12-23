@@ -40,7 +40,14 @@ void setApplication(QApplication * app, QMainWindow * mainWindow) {
 
 static bool nonClosed = true;
 
+bool isAppNonClosed() {return nonClosed;}
+
 void closeApplication() {
+    if (mwcApp == nullptr || mwcMainWnd==nullptr) {
+        nonClosed = false;
+        return; // posible if error detected during the start of the app. Nothing is there yet
+    }
+
     Q_ASSERT(mwcApp);
     Q_ASSERT(mwcMainWnd);
 

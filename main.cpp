@@ -226,6 +226,8 @@ int main(int argc, char *argv[])
 
     int retVal = 0;
 
+    double uiScale = 1.0;
+
     while (true)
     {
 
@@ -234,26 +236,26 @@ int main(int argc, char *argv[])
         // Furst argument has to be the app path
         util::setMwcQtWalletPath(argv[0]);
 
-        // !!! Note !!!  Custor arguments must be last in the line. Otherwise all at the right will be truncated.
-        double scale = -1.0;
+        // !!! Note !!!  Custom arguments must be last in the line. Otherwise all at the right will be truncated.
+        core::AppContext appContext;
         for ( int t=1;t<argc-1; t++) {
             if ( strcmp("--ui_scale", argv[t])==0 ) {
-                scale = QString(argv[t+1]).toDouble();
+                double scale = QString(argv[t+1]).toDouble();
+                if (scale>0.5 && scale <= 4.0) {
+                    appContext.initGuiScale(scale);
+                    uiScale = scale;
+                }
+
                 argc = t;
                 break;
             }
         }
-        core::AppContext appContext;
-
-        if (scale>0.0)
-            appContext.initGuiScale(scale);
-
 
         // MacOS doesn't process QT_SCALE_FACTOR correctlly. That is why it is disabled here
     #ifndef Q_OS_DARWIN
         // First let's app the UI scale factor. It must be done before QApplication will be created
 
-        scale = appContext.getGuiScale();
+        double scale = appContext.getGuiScale();
         if (scale==1.0)
             scale = 1.001;
 
@@ -477,9 +479,12 @@ int main(int argc, char *argv[])
 
         state::StateMachine * machine = new state::StateMachine(&context);
         mainWnd->setAppEnvironment( machine, wallet);
-        machine->start();
 
-        retVal = app.exec();
+        if (mwc::isAppNonClosed()) {
+            machine->start();
+
+            retVal = app.exec();
+        }
 
         // Now we have to stop other object nicely.
         // Note, the order is different from creation.
@@ -500,7 +505,7 @@ int main(int argc, char *argv[])
     }
 
     // All objets are expected to be released at this point
-    util::restartMwcQtWalletIfRequested();
+    util::restartMwcQtWalletIfRequested(uiScale);
 
     return retVal;
   }

@@ -56,12 +56,19 @@ void requestRestartMwcQtWallet() {restartRequested=true;}
 
 
 // Point of restart only with a gui
-void restartMwcQtWalletIfRequested() {
+void restartMwcQtWalletIfRequested(double uiScale) {
     if (!restartRequested)
         return;
 
     Q_ASSERT( !mwcQtWalletPath.isEmpty() );
-    QProcess::startDetached( mwcQtWalletPath, QStringList(), QDir::currentPath() );
+
+    QStringList argList;
+    if (uiScale!=1.0) {
+        argList.push_back("--ui_scale");
+        argList.push_back(QString::number(uiScale));
+    }
+
+    QProcess::startDetached( mwcQtWalletPath, argList, QDir::currentPath() );
 }
 
 // Will try to get a global lock. Return true if lock was obtained

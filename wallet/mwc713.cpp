@@ -706,6 +706,9 @@ void MWC713::getNextKey( int64_t amountNano, QString btcaddress, QString airDrop
 
 // Feed the command to mwc713 process
 void MWC713::executeMwc713command(QString cmd, QString shadowStr) {
+    if (mwc713process==nullptr)
+        return;
+
     Q_ASSERT(mwc713process);
     if (shadowStr.size()==0)
         logger::logMwc713in(cmd);

@@ -135,6 +135,15 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
     nodeWorkDir = getMwcNodePath(dataPath, network);
     MwcNodeConfig nodeConf = getCurrentMwcNodeConfig( dataPath, network );
 
+    QString nodeExecutablePath = QFileInfo(nodePath).canonicalFilePath();
+    if (nodeExecutablePath.isEmpty()) {
+        // file not found. Let's  report it clear way
+        logger::logInfo("MWC-NODE", "error. mwc-node canonical path is empty");
+
+        reportNodeFatalError( "mwc-node executable is not found. Expected location at:\n\n" + nodePath );
+        return nullptr;
+    }
+
     // Creating process and starting
     QProcess * process = new QProcess();
     process->setProcessChannelMode(QProcess::MergedChannels);
@@ -153,15 +162,6 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
         params.push_back("--floonet");
 
     nodeStartTime = QDateTime::currentMSecsSinceEpoch();
-
-    QString nodeExecutablePath = QFileInfo(nodePath).canonicalFilePath();
-    if (nodeExecutablePath.isEmpty()) {
-        // file not found. Let's  report it clear way
-        logger::logInfo("MWC-NODE", "error. mwc-node canonical path is empty");
-
-        reportNodeFatalError( "mwc-node executable is not found. Expected location at:\n\n" + nodeExecutablePath );
-        return nullptr;
-    }
 
     commandLine = nodeExecutablePath;
     for (auto & p : params) {
