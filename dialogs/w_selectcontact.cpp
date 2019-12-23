@@ -18,6 +18,8 @@
 #include <QListWidgetItem>
 #include "../control/messagebox.h"
 #include "../state/w_contacts.h"
+#include "../state/timeoutlock.h"
+#include "w_contacteditdlg.h"
 
 namespace dlg {
 
@@ -30,12 +32,23 @@ SelectContact::SelectContact(QWidget *parent, state::Contacts * _state ) :
 
     initTableHeaders();
     updateContactTable("");
+
+    updateButtons();
 }
 
 SelectContact::~SelectContact()
 {
     delete ui;
 }
+
+void SelectContact::updateButtons() {
+    int idx = getSelectedContactIndex();
+
+    ui->addButton->setEnabled(true);
+    ui->editButton->setEnabled(idx>=0);
+    ui->deleteButton->setEnabled(idx>=0);
+}
+
 
 void SelectContact::on_cancelButton_clicked()
 {
@@ -88,7 +101,7 @@ int  SelectContact::getSelectedContactIndex() const {
     return -1;
 }
 
-void SelectContact::on_lineEdit_textChanged(const QString &str)
+void SelectContact::on_searchStr_textEdited(const QString & str)
 {
     updateContactTable(str);
 }
@@ -112,7 +125,81 @@ void SelectContact::on_contactsTable_itemDoubleClicked(QTableWidgetItem *item)
     on_selectButton_clicked();
 }
 
+void SelectContact::on_deleteButton_clicked()
+{
+    state::TimeoutLockObject to( state );
+
+    int idx = getSelectedContactIndex();
+    if (idx<0) // expected to be disabled
+        return;
+
+    core::ContactRecord contact2del = contacts[idx];
+
+    if (control::MessageBox::questionText(this, "Remove a contact", "Remove the selected contact for " + contact2del.name +
+                              "? Press 'Yes' to delete.", "Yes", "No", false,true) == control::MessageBox::RETURN_CODE::BTN1 ) {
+        QPair<bool, QString> res = state->deleteContact(contact2del);
+        if (!res.first) {
+            control::MessageBox::messageText(this, "Error", "Unable to remove the contact '"+ contact2del.name +"'.\nError: " + res.second);
+        }
+
+        ui->searchStr->setText("");
+        updateContactTable("");
+    }
+
 }
 
+void SelectContact::on_addButton_clicked()
+{
+    state::TimeoutLockObject to( state );
 
+    ContactEditDlg dlg(this, core::ContactRecord(),
+                                   contacts, false );
+    if (dlg.exec() == QDialog::Accepted) {
+        QPair<bool, QString> res = state->addContact(dlg.getContact());
+
+        if (!res.first) {
+            control::MessageBox::messageText(this, "Error", "Unable to add a new contact.\n" + res.second);
+        }
+
+        ui->searchStr->setText("");
+        updateContactTable("");
+    }
+
+}
+
+void SelectContact::on_editButton_clicked()
+{
+    state::TimeoutLockObject to( state );
+
+    int idx = getSelectedContactIndex();
+    if (idx<0) // expected to be disabled
+        return;
+
+    core::ContactRecord oldContact = contacts[idx];
+    QVector<core::ContactRecord> contacts2check = contacts;
+    contacts2check.remove(idx);
+
+    ContactEditDlg dlg(this, oldContact,
+                       contacts2check, true );
+    if (dlg.exec() == QDialog::Accepted) {
+        auto contact = dlg.getContact();
+
+        // Update is not atomic. There is a chnce to lost the contact.
+        QPair<bool, QString> res = state->updateContact( oldContact, contact );
+
+        if (!res.first)
+            control::MessageBox::messageText(this, "Error", "Unable to update the contact data. Error: " + res.second);
+
+        ui->searchStr->setText("");
+        updateContactTable("");
+    }
+
+}
+
+void SelectContact::on_contactsTable_itemSelectionChanged()
+{
+    updateButtons();
+}
+
+}
 

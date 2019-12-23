@@ -72,5 +72,8 @@
         <file>resource/passwords-1M.dat</file>
         <file>resource/passwords-10k.dat</file>
         <file>resource/passwords-100k.dat</file>
+        <file>img/AddDlg@2x.svg</file>
+        <file>img/DeleteDlg@2x.svg</file>
+        <file>img/EditDlg@2x.svg</file>
     </qresource>
 </RCC>

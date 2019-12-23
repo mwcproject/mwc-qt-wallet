@@ -47,9 +47,17 @@ private slots:
 
     void on_selectButton_clicked();
 
-    void on_lineEdit_textChanged(const QString &str);
-
     void on_contactsTable_itemDoubleClicked(QTableWidgetItem *item);
+
+    void on_deleteButton_clicked();
+
+    void on_addButton_clicked();
+
+    void on_editButton_clicked();
+
+    void on_contactsTable_itemSelectionChanged();
+
+    void on_searchStr_textEdited(const QString & str);
 
 private:
     void initTableHeaders();
@@ -57,6 +65,8 @@ private:
     void updateContactTable(const QString & searchStr);
 
     int  getSelectedContactIndex() const;
+
+    void updateButtons();
 
 private:
     Ui::SelectContact *ui;

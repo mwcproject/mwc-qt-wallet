@@ -49,8 +49,15 @@ void MwcDialog::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
-        cursor = event->globalPos() - geometry().topLeft();
-        event->accept();
+        cursor = QPoint(0,0);
+
+        QPoint pos = event->globalPos();
+        QRect rc = geometry();
+        rc = rc.marginsRemoved( QMargins(5,5,5,5) );
+        if ( rc.contains(pos) ) {
+            cursor = event->globalPos() - geometry().topLeft();
+            event->accept();
+        }
     }
 }
 
@@ -58,8 +65,13 @@ void MwcDialog::mouseMoveEvent(QMouseEvent *event)
 {
     if(event->buttons() & Qt::LeftButton)
     {
-        move(event->globalPos() - cursor);
-        event->accept();
+        if (cursor.x()!=0 && cursor.y()!=0 ) {
+            move(event->globalPos() - cursor);
+            event->accept();
+        }
+    }
+    else {
+        cursor = QPoint(0,0);
     }
 }
 

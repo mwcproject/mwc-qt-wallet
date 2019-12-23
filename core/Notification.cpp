@@ -22,6 +22,20 @@
 
 namespace notify {
 
+static uint notificationState = 0;
+void notificationStateSet(NOTIFICATION_STATES state) {
+    notificationState |= state;
+}
+
+void notificationStateClean(NOTIFICATION_STATES state) {
+    notificationState &=  ~uint(state);
+}
+
+bool notificationStateCheck(NOTIFICATION_STATES state) {
+    return notificationState & state ? true : false;
+}
+
+
 // Message that will be requlified from Critical to Info
 static QSet<QString> falseCriticalMessages{"keybase not found! consider installing keybase locally first."};
 

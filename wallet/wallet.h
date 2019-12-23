@@ -105,7 +105,7 @@ public:
     QString mwcmqsDomainEx;// empty - default value
     QString keyBasePath;
 
-    WalletConfig() : network("Floonet"), dataPath("Undefined"), keyBasePath("Undefined") {}
+    WalletConfig() : network("Mainnet"), dataPath("Undefined"), keyBasePath("Undefined") {}
     WalletConfig(const WalletConfig & other) = default;
     WalletConfig &operator = (const WalletConfig & other) = default;
 

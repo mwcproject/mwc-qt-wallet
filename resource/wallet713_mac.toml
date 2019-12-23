@@ -1,4 +1,4 @@
-chain = "Floonet"
+chain = "Mainnet"
 wallet713_data_path = "gui_wallet713_data"
 default_keybase_ttl = "24h"
 keybase_binary = "/Applications/Keybase.app/Contents/SharedSupport/bin/keybase"

@@ -97,7 +97,7 @@ void Contacts::on_addButton_clicked()
 {
     state::TimeoutLockObject to( state );
 
-    ContactEditDlg dlg(this, core::ContactRecord(),
+    dlg::ContactEditDlg dlg(this, core::ContactRecord(),
                                    contacts, false );
     if (dlg.exec() == QDialog::Accepted) {
         QPair<bool, QString> res = state->addContact(dlg.getContact());
@@ -123,7 +123,7 @@ void Contacts::on_editButton_clicked()
     QVector<core::ContactRecord> contacts2check = contacts;
     contacts2check.remove(idx);
 
-    ContactEditDlg dlg(this, oldContact,
+    dlg::ContactEditDlg dlg(this, oldContact,
                        contacts2check, true );
     if (dlg.exec() == QDialog::Accepted) {
         auto contact = dlg.getContact();

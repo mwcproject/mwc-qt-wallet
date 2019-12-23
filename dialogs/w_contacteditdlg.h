@@ -24,7 +24,7 @@ namespace Ui {
 class ContactEditDlg;
 }
 
-namespace wnd {
+namespace dlg {
 
 class ContactEditDlg : public control::MwcDialog
 {

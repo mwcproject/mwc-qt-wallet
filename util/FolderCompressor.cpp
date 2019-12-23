@@ -23,6 +23,7 @@ namespace compress {
 const int ARCH_VERSION = 0x9265DB;
 const int ARCH_DIR_VER      = 0x587634;
 const int ARCH_FILE_VER     = 0x823AD1;
+const int ARCH_END          = 0x000100; // end of archive.
 
 // return: <success, Error Message>
 static QPair<bool, QString> compress(QDataStream & dataStream, // target
@@ -100,6 +101,9 @@ QPair<bool, QString> compressFolder(QString sourceFolder, QString destinationFil
     dataStream << archiveTag;
 
     QPair<bool, QString> compResult = compress(dataStream, sourceFolder, "", callProcessEvents);
+
+    dataStream << int(ARCH_END);
+
     file.close();
 
     return compResult;
@@ -147,6 +151,8 @@ QPair<bool, QString> decompressFolder(QString sourceFile, QString destinationFol
         return QPair<bool, QString>( false, "Unable to create destination directory " + destinationFolder );
     }
 
+    bool foundEndOfArchive = false;
+
     while (!dataStream.atEnd()) {
         if (callProcessEvents)
             QCoreApplication::processEvents();
@@ -177,10 +183,18 @@ QPair<bool, QString> decompressFolder(QString sourceFile, QString destinationFol
             outFile.write(qUncompress(data));
             outFile.close();
         }
+        else if ( dataId == ARCH_END ) {
+            foundEndOfArchive = true;
+            break;
+        }
         else {
             return QPair<bool, QString>( false, "File " + sourceFile + " corrupted or has wrong format. Unable to finish extraction." );
         }
 
+    }
+
+    if (!foundEndOfArchive) {
+        return QPair<bool, QString>( false, "File " + sourceFile + " is corrupted, end of archive marker not found. Unable to finish extraction." );
     }
 
     return QPair<bool, QString>( true,"");

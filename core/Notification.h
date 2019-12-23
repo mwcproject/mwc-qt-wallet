@@ -27,6 +27,12 @@ enum class MESSAGE_LEVEL { FATAL_ERROR, CRITICAL, WARNING, INFO, DEBUG };
 // Enum to string
 QString toString(MESSAGE_LEVEL level);
 
+// Some notifications can have different meaning because of the state. For example when we stop/start node, mwc713 error connection messages are expected.
+enum NOTIFICATION_STATES { ONLINE_NODE_IMPORT_EXPORT_DATA = 0x0001 };
+void notificationStateSet(NOTIFICATION_STATES state);
+void notificationStateClean(NOTIFICATION_STATES state);
+bool notificationStateCheck(NOTIFICATION_STATES state);
+
 struct NotificationMessage {
     MESSAGE_LEVEL level = MESSAGE_LEVEL::DEBUG;
     QString message;

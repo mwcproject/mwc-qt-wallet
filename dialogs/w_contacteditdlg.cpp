@@ -17,7 +17,7 @@
 #include "../control/messagebox.h"
 #include "../util/address.h"
 
-namespace wnd {
+namespace dlg {
 
 ContactEditDlg::ContactEditDlg(QWidget *parent, const core::ContactRecord & _contact,
                                const QVector<core::ContactRecord> & contacts, bool editMode ) :

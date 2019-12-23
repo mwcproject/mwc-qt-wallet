@@ -166,7 +166,8 @@ void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pe
                         "Wallet restore connection to mwc node");
             }
             else {
-                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::CRITICAL,
+                if ( ! notify::notificationStateCheck( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA) )
+                    notify::appendNotificationMessage(notify::MESSAGE_LEVEL::CRITICAL,
                                                            "Wallet lost connection to mwc node");
             }
         }
@@ -244,6 +245,8 @@ void NodeInfo::saveBlockchainData(QString fileName) {
 
     QCoreApplication::processEvents();
 
+    notify::notificationStateSet( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
+
     context->mwcNode->stop();
 
     QString network = context->mwcNode->getCurrentNetwork();
@@ -267,6 +270,8 @@ void NodeInfo::saveBlockchainData(QString fileName) {
 
     QCoreApplication::processEvents();
 
+    notify::notificationStateClean( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
+
     if (res.first) {
         control::MessageBox::messageText(wnd, "MWC Blockchain data is ready", "MWC blockchain data was successfully exported to the archive " + fileName);
     }
@@ -281,6 +286,8 @@ void NodeInfo::loadBlockchainData(QString fileName) {
     // 3. start mwc-node
 
     QCoreApplication::processEvents();
+
+    notify::notificationStateSet( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
     context->mwcNode->stop();
 
@@ -297,6 +304,8 @@ void NodeInfo::loadBlockchainData(QString fileName) {
     context->mwcNode->start(currentNodeConnection.localNodeDataPath, network);
 
     QCoreApplication::processEvents();
+
+    notify::notificationStateClean( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
     if (wnd)
         wnd->hideProgress();

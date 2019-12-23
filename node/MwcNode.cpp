@@ -163,12 +163,12 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
         return nullptr;
     }
 
-    commandLine = "'" + nodeExecutablePath + "'";
+    commandLine = nodeExecutablePath;
     for (auto & p : params) {
         commandLine += " '" + p + "'";
     }
 
-    logger::logInfo( "MWC-NODE", "Starting mwc-node process: " + commandLine );
+    logger::logInfo( "MWC-NODE", "Starting mwc-node process: " + commandLine + "  at working dir:" + nodeWorkDir );
 
     process->start(nodePath, params, QProcess::Unbuffered | QProcess::ReadWrite );
 
@@ -177,22 +177,22 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
         switch (process->error())
         {
             case QProcess::FailedToStart:
-                reportNodeFatalError( "mwc-node failed to start. Mwc node expected location at " + nodePath+ "\n\nCommand line:\n\n" + commandLine  );
+                reportNodeFatalError( "mwc-node failed to start. Mwc node expected location at " + nodePath+ "\n\nCommand line:\n\n" + ">> cd '"+nodeWorkDir+"'\n>> " + commandLine  );
                 return nullptr;
             case QProcess::Crashed:
-                reportNodeFatalError( "mwc-node crashed during start\n\nCommand line:\n\n" + commandLine );
+                reportNodeFatalError( QString("mwc-node crashed during start\n\nCommand line:\n\n") + ">> cd '" + nodeWorkDir+"'\n>> " + commandLine );
                 return nullptr;
             case QProcess::Timedout:
                 if (control::MessageBox::questionText(nullptr, "Warning", "Starting for mwc-node process is taking longer than expected.\nContinue to wait?"
-                                                                      "\n\nCommand line:\n\n" + commandLine,
+                                                                      "\n\nCommand line:\n\n" + QString(">> cd '") + nodeWorkDir+"'\n>> " + commandLine,
                                                   "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
                     config::increaseTimeoutMultiplier();
                     continue; // retry with waiting
                 }
-                reportNodeFatalError( "mwc-node takes too much time to start. Something wrong with environment.\n\nCommand line:\n\n" + commandLine );
+                reportNodeFatalError( QString("mwc-node takes too much time to start. Something wrong with environment.\n\nCommand line:\n\n") + ">> cd '"+nodeWorkDir+"'\n>> " + commandLine );
                 return nullptr;
             default:
-                reportNodeFatalError( "mwc-node failed to start because of unknown error\n\nCommand line:\n\n" + commandLine );
+                reportNodeFatalError( QString("mwc-node failed to start because of unknown error\n\nCommand line:\n\n") + ">> cd '"+nodeWorkDir+"'\n>> " + commandLine );
                 return nullptr;
         }
     }
@@ -252,7 +252,7 @@ void MwcNode::nodeErrorOccurred(QProcess::ProcessError error) {
     }
 
     reportNodeFatalError( "mwc-node process exited. Process error: "+ QString::number(error) +
-                                  + "\n\nCommand line:\n\n" + commandLine);
+                                  + "\n\nCommand line:\n\n" + ">> cd '"+nodeWorkDir+"'\n>> " + commandLine);
 }
 
 void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus) {
@@ -290,7 +290,7 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
                               "Please check if you have enough disk space, and no antivirus preventing mwc-node to start.\n"
                               "Check if another instance of mwc-node is already running. In this case please terminate that process, or reboot your computer.\n\n"
                               "If steps above didn't help, please try to clean up mwc-node data at\n" + nodeWorkDir +
-                              "\n\nYou might use command line for troubleshooting:\n\ncd '" + nodeWorkDir + "'; " +  commandLine + "\n\n");
+                              "\n\nYou might use command line for troubleshooting:\n\n>> cd '" + nodeWorkDir + "'\n>> " +  commandLine + "\n\n");
     }
 }
 

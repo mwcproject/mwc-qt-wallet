@@ -89,6 +89,12 @@ QPushButton:pressed {
     background: #8500c3;
 }
 
+control--MwcPushButtonRound {
+    font-size: 15px;
+    border-radius: 18px;
+    border: none;
+}
+
 /* ----------- Frame with a white border -----------------*/
 
 MwcFrameWithBorder {

@@ -24,7 +24,7 @@
 namespace control {
 
 MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2, bool default1, bool default2, QString password, RETURN_CODE _passBlockButton ) :
-    MwcDialog(parent),
+     MwcDialog(parent),
     ui(new Ui::MessageBox),
     blockingPassword(password),
     passBlockButton(_passBlockButton)
