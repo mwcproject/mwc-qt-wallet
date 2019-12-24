@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
             qputenv( "QT_SCALE_FACTOR", QString::number(scale).toLatin1() );
 
     #else
-        scale = 1.0; // Mac OS, not applicable, mean 1.0
+        double scale = 1.0; // Mac OS, not applicable, mean 1.0
         // But scale factor still needed to fix the non retina cases on mac OS
 
         if (! Cocoa::isRetinaDisplay()) {
