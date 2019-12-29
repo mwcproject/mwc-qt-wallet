@@ -1022,7 +1022,7 @@ void MWC713::reportSlateReceivedBack( QString slate, QString mwc, QString fromAd
 }
 
 void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAddr, QString message ) {
-    QString msg = "Congratulations! You recieved " +mwc+ " mwc from " + fromAddr;
+    QString msg = "Congratulations! You received " +mwc+ " mwc from " + fromAddr;
     if (!message.isEmpty()) {
         msg += " with message " + message + ".";
     }
@@ -1035,7 +1035,7 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
 
     // Show message box with congrats. Message bot should work from any point. No needs to block locking or what ever we have
     control::MessageBox::messageHTML(nullptr, "Congratulations!",
-           "You recieved <b>" + mwc + "</b> mwc<br>" +
+           "You received <b>" + mwc + "</b> mwc<br>" +
            (message.isEmpty() ? "" : "Description: " + message + "<br>" ) +
            "<br>From: " + fromAddr +
            "<br>Slate: " + slate);
