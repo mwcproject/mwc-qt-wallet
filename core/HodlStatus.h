@@ -33,6 +33,12 @@ struct HodlOutputInfo {
     int        height = 0;
 
     void setData( const QString & outputCommitment, int64_t valueNano, int height );
+
+    static HodlOutputInfo create(const QString & outputCommitment, int64_t valueNano, int height) {
+        HodlOutputInfo item;
+        item.setData(outputCommitment, valueNano, height);
+        return item;
+    }
 };
 
 struct HodlClaimStatus {

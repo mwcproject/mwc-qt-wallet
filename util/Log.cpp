@@ -165,8 +165,9 @@ void logTask( QString who, wallet::Mwc713Task * task, QString comment ) {
 
 // Events activity
 void logEmit(QString who, QString event, QString params) {
-    Q_ASSERT(logClient); // call initLogger first
-    logClient->doAppend2logs(true, who, "emit " + event + (params.length()==0 ? "" : (" with "+params)) );
+    // in tests there is no logger
+    if (logClient) // call initLogger first
+        logClient->doAppend2logs(true, who, "emit " + event + (params.length()==0 ? "" : (" with "+params)) );
 }
 
 void logInfo(QString who, QString message) {

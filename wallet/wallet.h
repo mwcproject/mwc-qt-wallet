@@ -166,6 +166,23 @@ struct WalletOutput {
             int64_t     valueNano,
             int64_t     txIdx);
 
+    static WalletOutput create(QString outputCommitment,
+                               QString     MMRIndex,
+                               QString     blockHeight,
+                               QString     lockedUntil,
+                               QString     status,
+                               bool        coinbase,
+                               QString     numOfConfirms,
+                               int64_t     valueNano,
+                               int64_t     txIdx) {
+        WalletOutput item;
+        item.setData(outputCommitment,
+                MMRIndex, blockHeight, lockedUntil,
+                status, coinbase, numOfConfirms,
+                valueNano, txIdx);
+        return item;
+    }
+
     QString toString() const;
 };
 

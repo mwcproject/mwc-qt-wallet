@@ -111,10 +111,8 @@ bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> 
     std::sort(outputs.begin(), outputs.end(), [](const wallet::WalletOutput &o1, const wallet::WalletOutput &o2) {return o1.valueNano < o2.valueNano;});
 
     QPair< int64_t, QVector<wallet::WalletOutput> >  oneCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 0 );
-    Q_ASSERT(!oneCommitRes.second.isEmpty());
-
     QPair< int64_t, QVector<wallet::WalletOutput> >  twoCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 1 );
-    QPair< int64_t, QVector<wallet::WalletOutput> >  threeCommitRes = twoCommitRes.second.isEmpty() ? QPair<int64_t,QVector<wallet::WalletOutput>>( -1L, {}) : calcOutputsToSpend( nanoCoins, outputs, 0, 2 );
+    QPair< int64_t, QVector<wallet::WalletOutput> >  threeCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 2 );
 
     // It is a case with bunch of small outptus.
     if ( oneCommitRes.second.isEmpty() && twoCommitRes.second.isEmpty()  && threeCommitRes.second.isEmpty() ) {

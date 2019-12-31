@@ -216,21 +216,6 @@ QPair<bool, QString> readConfig(QApplication & app) {
 
 int main(int argc, char *argv[])
 {
-#ifdef QT_DEBUG
-    // Generation of the dictionaries.
-    // Don't uncomment it!
-    // misk::provisionDictionary();
-
-
-    // tests are quick, let's run them in debug
-    test::testCalcOutputsToSpend();
-    test::testLongLong2ShortStr();
-    test::testUtils();
-    test::testWordSequences();
-    test::testWordDictionary();
-    test::testPasswordAnalyser();
-#endif
-
     int retVal = 0;
 
     double uiScale = 1.0;
@@ -281,6 +266,22 @@ int main(int argc, char *argv[])
         QApplication app(argc, argv);
         QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
         QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+
+
+#ifdef QT_DEBUG
+    // Generation of the dictionaries.
+    // Don't uncomment it!
+    // misk::provisionDictionary();
+
+    // tests are quick, let's run them in debug
+    // test::testCalcOutputsToSpend();  // This test is long and show about 8 Message boxes.
+    test::testLongLong2ShortStr();
+    test::testUtils();
+    test::testWordSequences();
+    test::testWordDictionary();
+    test::testPasswordAnalyser();
+#endif
+
 
         // Update scale if screen resolution is low...
         // Unfortunatelly we can't do that before QApplication inited because Scree res API doesn't work

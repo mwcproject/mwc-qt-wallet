@@ -41,8 +41,10 @@ void HodlClaimStatus::setData( int64_t _HodlAmount, int64_t _claimedMwc, const Q
 // HodlStatus
 
 HodlStatus::HodlStatus( state::StateContext * _context ) : context(_context) {
-    connect( context->wallet , &wallet::Wallet::onLoginResult,   this, &HodlStatus::onLoginResult, Qt::QueuedConnection );
-    connect( context->wallet , &wallet::Wallet::onLogout,        this, &HodlStatus::onLogout,      Qt::QueuedConnection );
+    if (context) {
+        connect(context->wallet, &wallet::Wallet::onLoginResult, this, &HodlStatus::onLoginResult, Qt::QueuedConnection);
+        connect(context->wallet, &wallet::Wallet::onLogout, this, &HodlStatus::onLogout, Qt::QueuedConnection);
+    }
 
     resetData();
 }
