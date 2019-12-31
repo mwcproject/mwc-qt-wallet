@@ -23,6 +23,8 @@ static QString mwcPath;
 static QString wallet713path;
 static QString airdropUrlMainNetUrl;
 static QString airdropUrlTestNetUrl;
+static QString hodlUrlMainNetUrl;
+static QString hodlUrlTestNetUrl;
 static int64_t logoutTimeMs = 1000*60*15; // 15 minutes is default
 static double  timeoutMultiplier = 1.0;
 static bool    useMwcMqS = true;
@@ -65,6 +67,7 @@ void setMwcGuiWalletConf( QString conf ) {
  */
 void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet713path,
                    QString _airdropUrlMainNetUrl, QString _airdropUrlTestNetUrl,
+                   QString _hodlUrlMainNetUrl, QString _hodlUrlTestNetUrl,
                    int64_t  _logoutTimeMs,
                    double _timeoutMultiplier,
                    bool _useMwcMqS,
@@ -74,6 +77,8 @@ void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet71
     wallet713path = _wallet713path;
     airdropUrlMainNetUrl = _airdropUrlMainNetUrl;
     airdropUrlTestNetUrl = _airdropUrlTestNetUrl;
+    hodlUrlMainNetUrl = _hodlUrlMainNetUrl;
+    hodlUrlTestNetUrl = _hodlUrlTestNetUrl;
     logoutTimeMs = _logoutTimeMs;
     timeoutMultiplier = _timeoutMultiplier;
     useMwcMqS = _useMwcMqS;
@@ -89,6 +94,10 @@ const QString & getMwcpath() {return mwcPath;}
 const QString & getWallet713path() {return wallet713path;}
 const QString & getAirdropMainNetUrl() {return airdropUrlMainNetUrl;}
 const QString & getAirdropTestNetUrl() {return airdropUrlTestNetUrl;}
+
+const QString & getHodlMainNetUrl() { return hodlUrlMainNetUrl;}
+const QString & getHodlTestNetUrl() { return hodlUrlTestNetUrl;}
+
 int64_t         getLogoutTimeMs() {return logoutTimeMs;}
 
 

@@ -18,6 +18,7 @@
 #include "wallet.h"
 #include <QObject>
 #include <QProcess>
+#include <core/HodlStatus.h>
 #include "../core/global.h"
 
 namespace tries {
@@ -46,6 +47,8 @@ public:
 public:
     MWC713(QString mwc713path, QString mwc713configPath, core::AppContext * appContext);
     virtual ~MWC713() override;
+
+    void setHodlStatus(core::HodlStatus * _hodlStatus) {hodlStatus = _hodlStatus; Q_ASSERT(hodlStatus);}
 
 
     // Return true if wallet is running
@@ -192,7 +195,9 @@ public:
 
     // Init send transaction with file output
     // Check signal:  onSendFile
-    virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs )  override;
+    virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx,
+            int inputConfirmationNumber, int changeOutputs,
+            const QStringList & outputs )  override;
     // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
     virtual void receiveFile( QString fileTx, QString identifier = "")  override;
@@ -216,7 +221,8 @@ public:
     // coinNano == -1  - mean All
     virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address,
                          const QString & apiSecret,
-                         QString message, int inputConfirmationNumber, int changeOutputs )  override;
+                         QString message, int inputConfirmationNumber, int changeOutputs,
+                         const QStringList & outputs )  override;
 
     // Get total number of Outputs
     // Check Signal: onOutputCount(int number)
@@ -237,6 +243,10 @@ public:
     // Read all transactions for all accounts. Might take time...
     // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
     virtual void getAllTransactions() override;
+
+    // Get root public key with signed message. Message is optional, can be empty
+    // Check Signal: onRootPublicKey( QString rootPubKey, QString message, QString signature )
+    virtual void getRootPublicKey( QString message2sign ) override;
 
 public:
     // Feed the command to mwc713 process
@@ -322,6 +332,9 @@ public:
 
     void setNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
+    void setRootPublicKey( bool success, QString errMsg,
+            QString rootPubKey, QString message, QString signature );
+
     void notifyListenerMqCollision();
     void notifyMqFailedToStart();
 
@@ -356,6 +369,7 @@ private:
 
 private:
     core::AppContext * appContext; // app context to store current account name
+    core::HodlStatus * hodlStatus = nullptr;
 
     QString mwc713Path; // path to the backed binary
     QString mwc713configPath; // config file for mwc713

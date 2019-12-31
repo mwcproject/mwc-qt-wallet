@@ -21,7 +21,7 @@ namespace util {
 
 QVector<QString> parsePhrase2Words( const QString & phrase );
 
-// convert nano items to dtirng that represent that fraction as a double
+// convert nano items to string that represent that fraction as a double
 QString nano2one( int64_t nano );
 
 // Trim string that represent double. 23434.32345, len 7 => 23434.32; 23434.32345, len 5 => 23434

@@ -158,7 +158,8 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
 }
 
 QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, const QString & apiSecret,
-        QString message, int inputConfirmationNumber, int changeOutputs ) const {
+        QString message, int inputConfirmationNumber, int changeOutputs,
+        const QStringList & outputs ) const {
 
     QString cmd = "send ";// + util::nano2one(coinNano);
     if (coinNano>0)
@@ -167,6 +168,10 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, co
         // TODO Message symbols MUST be escaped
     if ( !message.isEmpty() )
         cmd += " --message " + util::toMwc713input(message); // Message symbols MUST be escaped.
+
+    if (!outputs.isEmpty()) {
+        cmd += " --outputs " + outputs.join(",");
+    }
 
     if (inputConfirmationNumber > 0)
         cmd += " --confirmations " + QString::number(inputConfirmationNumber);
@@ -212,13 +217,17 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, co
 
 // ----------------------- TaskSendFile --------------------------
 
-QString TaskSendFile::buildCommand( int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs ) const {
+QString TaskSendFile::buildCommand( int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs ) const {
     QString cmd = "send ";// + util::nano2one(coinNano);
     if (coinNano > 0)
         cmd += util::nano2one(coinNano);
 
     if (!message.isEmpty())
         cmd += " --message " + util::toMwc713input(message); // Message symbols MUST be escaped.
+
+    if (!outputs.isEmpty()) {
+        cmd += " --outputs " + outputs.join(",");
+    }
 
     if (inputConfirmationNumber > 0)
         cmd += " --confirmations " + QString::number(inputConfirmationNumber);

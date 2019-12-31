@@ -20,6 +20,7 @@
 #include "../state/g_Send.h"
 #include "../state/timeoutlock.h"
 #include "../dialogs/w_selectcontact.h"
+#include "../util/ui.h"
 
 namespace wnd {
 
@@ -140,6 +141,10 @@ void SendOnline::on_sendButton_clicked()
         }
     }
 
+    QStringList outputs;
+    if (! util::getOutputsToSend( selectedAccount.accountName, amount, state->getContext()->hodlStatus, this, outputs ) )
+        return; // User reject something
+
     // Ask for confirmation
     if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this,"Confirm Send request",
                                   "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " mwc to address\n" + address, "Decline", "Confirm", false, true, state->getWalletPassword(), control::MessageBox::RETURN_CODE::BTN2 ) )
@@ -147,7 +152,7 @@ void SendOnline::on_sendButton_clicked()
 
     ui->progress->show();
 
-    state->sendMwcOnline( selectedAccount, res.second, address, amount, description, apiSecret );
+    state->sendMwcOnline( selectedAccount, res.second, address, amount, description, apiSecret, outputs );
 }
 
 void SendOnline::sendRespond( bool success, const QStringList & errors ) {

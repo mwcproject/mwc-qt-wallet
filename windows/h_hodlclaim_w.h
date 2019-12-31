@@ -12,38 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef HODLW_H
-#define HODLW_H
+#ifndef H_HODLCLAIM_W_H
+#define H_HODLCLAIM_W_H
 
+#include <QWidget>
 #include "../core/navwnd.h"
-#include "../wallet/wallet.h"
 
 namespace Ui {
-class Hodl;
+class HodlClaim;
 }
 
 namespace state {
-    class Hodl;
+class Hodl;
 }
 
 namespace wnd {
 
-class Hodl : public core::NavWnd
-{
-    Q_OBJECT
-
+class HodlClaim : public core::NavWnd {
+Q_OBJECT
 public:
-    explicit Hodl(QWidget *parent, state::Hodl * state );
-    ~Hodl();
+    explicit HodlClaim( QWidget *parent, state::Hodl * state );
+    ~HodlClaim();
+
+    void reportMessage(const QString &title, const QString &message);
+
+    void updateHodlState();
+
+    void updateClaimsRequests();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_claimMwcButton_clicked();
 
 private:
-    Ui::Hodl *ui;
+    void initTableHeaders();
+    void saveTableHeaders();
+
+private:
+    Ui::HodlClaim *ui;
     state::Hodl * state;
 };
 
 }
 
-#endif // HODL_H
+#endif // H_HODLCLAIM_W_H

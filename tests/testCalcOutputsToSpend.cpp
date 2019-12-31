@@ -12,31 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef HODL_H
-#define HODL_H
+#include "testCalcOutputsToSpend.h"
+#include <QDebug>
 
+namespace test {
 
-#include "state.h"
-#include "../wallet/wallet.h"
-#include <QVector>
+void testCalcOutputsToSpend() {
+//    sddssddsfds
 
-namespace state {
+    // need to implement the tests for   util/ui.h !!!!
 
-class Hodl : public State
-{
-public:
-    Hodl(StateContext * context);
-    virtual ~Hodl() override;
-
-    QVector<wallet::WalletTransaction> getTransactions();
-
-    void submitForHodl( const QVector<QString> & transactions );
-
-protected:
-    virtual NextStateRespond execute() override;
-    virtual QString getHelpDocName() override {return "hodl.html";}
-};
-
+  //  Q_ASSERT(false);
 }
 
-#endif // HODL_H
+}

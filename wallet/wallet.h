@@ -146,7 +146,7 @@ public:
 
 struct WalletOutput {
 
-    QString     outputCommitment;
+    QString    outputCommitment;
     QString    MMRIndex;
     QString    blockHeight;
     QString    lockedUntil;
@@ -165,6 +165,8 @@ struct WalletOutput {
             QString     numOfConfirms,
             int64_t     valueNano,
             int64_t     txIdx);
+
+    QString toString() const;
 };
 
 struct WalletTransaction {
@@ -401,7 +403,9 @@ public:
 
     // Init send transaction with file output
     // Check signal:  onSendFile
-    virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs )  = 0;
+    virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx,
+            int inputConfirmationNumber, int changeOutputs, const QStringList & outputs )  = 0;
+
     // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
     virtual void receiveFile( QString fileTx, QString identifier = "")  = 0;
@@ -418,7 +422,7 @@ public:
     // coinNano == -1  - mean All
     // Check signal:  onSend
     virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, const QString & apiSecret,
-                         QString message, int inputConfirmationNumber, int changeOutputs )  = 0;
+                         QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs )  = 0;
 
     // Airdrop special. Generating the next Pablic key for transaction
     // wallet713> getnextkey --amount 1000000
@@ -455,6 +459,10 @@ public:
     // Late this signature can be used for verification of ounewship
     //virtual WalletUtxoSignature sign_utxo( const QString & utxo, const QString & hash ) = 0;
 
+    // Get root public key with signed message. Message is optional, can be empty
+    // Check Signal: onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature );
+    virtual void getRootPublicKey( QString message2sign ) = 0;
+
 private:
 signals:
 
@@ -466,6 +474,9 @@ signals:
 
     // Result of the login
     void onLoginResult(bool ok);
+
+    // Logout event
+    void onLogout();
 
     // Get MWC updated address. Normally you don't need that
     void onMwcAddress(QString mwcAddress);
@@ -545,6 +556,8 @@ signals:
     // Node info
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
+    // getRootPublicKey
+    void onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature );
 };
 
 }

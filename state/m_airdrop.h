@@ -97,11 +97,8 @@ protected:
 private slots:
     // Need to get a network info
     void onLoginResult(bool ok);
-
     void replyFinished(QNetworkReply* reply);
-
     void onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPasswor);
-
     void onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
 private:
     QVector<AirdropRequests> airdropRequests;

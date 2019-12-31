@@ -12,37 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "hodl_w.h"
-#include "ui_hodl.h"
-#include "../state/hodl.h"
-#include "../control/messagebox.h"
-#include <QAbstractItemView>
-#include "../state/timeoutlock.h"
-#include <QProcess>
-#include "../util/execute.h"
+#ifndef MWC_QT_WALLET_CRYPTO_H
+#define MWC_QT_WALLET_CRYPTO_H
 
-namespace wnd {
+#include <QByteArray>
 
-Hodl::Hodl(QWidget *parent, state::Hodl * _state) :
-    core::NavWnd(parent, _state->getContext()),
-    ui(new Ui::Hodl),
-    state(_state)
-{
-    ui->setupUi(this);
+// bunch of crypto related utils
+namespace crypto {
 
-}
+    // Hex string -> bytes
+    // return empty array in case of error
+    QByteArray str2hex(const QString & hexStr);
+    // bytes -> hex string
+    QString hex2str(const QByteArray & data);
 
-Hodl::~Hodl()
-{
-    delete ui;
-}
+    // Appy hash to the data once
+    // return data is 256 bits
+    QByteArray HSA256(const QByteArray & data);
 
-void Hodl::on_pushButton_clicked()
-{
-    util::openUrlInBrowser("https://www.mwc.mw/contact");
-}
+};
 
 
-}
-
-
+#endif //MWC_QT_WALLET_CRYPTO_H

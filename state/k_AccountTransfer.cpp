@@ -20,6 +20,7 @@
 #include "../state/statemachine.h"
 #include "../core/global.h"
 #include "../util/address.h"
+#include "../util/ui.h"
 
 namespace state {
 
@@ -87,6 +88,12 @@ void AccountTransfer::transferFunds(const wallet::AccountInfo & accountFrom,
         return;
     }
 
+    // Check if HODL outputs will be affected
+    QStringList outputs; // empty is valid value. Empty - mwc713 will use default algorithm.
+    // nanoCoins < 0  - All
+    if (! util::getOutputsToSend( accountFrom.accountName, nanoCoins, getContext()->hodlStatus, nullptr, outputs) )
+        return; // User cancel transaction
+
     // Expected that everything is fine, but will do operation step by step
     // 1. set-recv to accountTo
     // 3. Send funds (will switch to account).
@@ -99,6 +106,7 @@ void AccountTransfer::transferFunds(const wallet::AccountInfo & accountFrom,
     trAccountTo = accountTo;
     trNanoCoins = nanoCoins;
     trSlate = "";
+    outputs2use = outputs;
 
     transferState = 0;
     context->wallet->setReceiveAccount( trAccountTo.accountName );
@@ -123,7 +131,7 @@ void AccountTransfer::onSetReceiveAccount( bool ok, QString AccountOrMessage ) {
     transferState=1;
 
     core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
-    context->wallet->sendTo( trAccountFrom, trNanoCoins, util::fullFormalAddress( util::ADDRESS_TYPE::MWC_MQ, myAddress), "", "", prms.inputConfirmationNumber, prms.changeOutputs );
+    context->wallet->sendTo( trAccountFrom, trNanoCoins, util::fullFormalAddress( util::ADDRESS_TYPE::MWC_MQ, myAddress), "", "", prms.inputConfirmationNumber, prms.changeOutputs, outputs2use );
 }
 
 

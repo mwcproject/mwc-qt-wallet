@@ -103,6 +103,7 @@ const QString PAGE_X_RESYNC         = "Re-sync wallet with mwc node";
 const QString PAGE_Y_SELECT_RUNNING_MODE = "Select Running Mode";
 
 const QString PAGE_HODL             = "HODL";
+const QString PAGE_HODL_CLAIM       = "Claim HODL coins";
 
 void setApplication(QApplication * app, QMainWindow * mainWindow);
 

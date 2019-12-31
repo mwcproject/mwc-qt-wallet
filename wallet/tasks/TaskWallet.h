@@ -16,6 +16,7 @@
 #define MWC_QT_WALLET_TASKWALLET_H
 
 #include "../mwc713task.h"
+#include "../../util/stringutils.h"
 
 namespace wallet {
 
@@ -169,6 +170,26 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
 private:
     QString fileTx;
+};
+
+
+class TaskRootPublicKey: public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 2000;
+
+    TaskRootPublicKey( MWC713 * wallet713, const QString & msg) :
+            Mwc713Task("TaskSubmitFile", "getrootpublickey" +
+                    (msg.isEmpty() ? "" : " --message " + util::toMwc713input(msg)),
+                wallet713, ""),
+            message(msg) {}
+
+    virtual ~TaskRootPublicKey() override {}
+
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+private:
+    QString message;
 };
 
 

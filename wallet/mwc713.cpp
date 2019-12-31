@@ -359,6 +359,9 @@ void MWC713::logout(bool syncCall)  {
 
     logger::logInfo("MWC713", QString("mwc713 process exiting with logout. syncCall=") + (syncCall?"Yes":"No") );
 
+    logger::logEmit("MWC713", "onLogout", "" );
+    emit onLogout();
+
     if (syncCall)
         processStop(true);
     else 
@@ -544,12 +547,12 @@ void MWC713::check(bool wait4listeners)  {
 // Check signal:  onSend
 void MWC713::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address,
                      const QString & apiSecret,
-                     QString message, int inputConfirmationNumber, int changeOutputs )  {
+                     QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs )  {
     // switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account.accountName, walletPassword, true), TaskAccountSwitch::TIMEOUT );
     // If listening, strting...
 
-    eventCollector->addTask( new TaskSendMwc(this, coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs), TaskSendMwc::TIMEOUT );
+    eventCollector->addTask( new TaskSendMwc(this, coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs, outputs), TaskSendMwc::TIMEOUT );
     // Set some funds
 
 }
@@ -557,7 +560,7 @@ void MWC713::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const
 
 // Init send transaction with file output
 // Check signal:  onSendFile
-void MWC713::sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs )  {
+void MWC713::sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs )  {
 
     if ( ! util::validateMwc713Str(fileTx, false).first ) {
         setSendFileResult( false, QStringList{"Unable to create file with name '"+fileTx+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."} , fileTx );
@@ -567,7 +570,7 @@ void MWC713::sendFile( const wallet::AccountInfo &account, int64_t coinNano, QSt
     // switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account.accountName, walletPassword, true), TaskAccountSwitch::TIMEOUT );
 
-    eventCollector->addTask( new TaskSendFile(this, coinNano, message, fileTx, inputConfirmationNumber, changeOutputs ), TaskSendFile::TIMEOUT );
+    eventCollector->addTask( new TaskSendFile(this, coinNano, message, fileTx, inputConfirmationNumber, changeOutputs, outputs ), TaskSendFile::TIMEOUT );
 }
 
 // Receive transaction. Will generate *.response file in the same dir
@@ -644,6 +647,13 @@ void MWC713::getAllTransactions() {
         eventCollector->addTask( new TaskAllTransactionsEnd(this), -1, false );
     }
 }
+
+// Get root public key with signed message. Message is optional, can be empty
+// Check Signal: onRootPublicKey( QString rootPubKey, QString message, QString signature )
+void MWC713::getRootPublicKey( QString message2sign ) {
+    eventCollector->addTask( new TaskRootPublicKey(this, message2sign ), TaskRootPublicKey::TIMEOUT );
+}
+
 
 // -------------- Transactions
 
@@ -851,7 +861,7 @@ void MWC713::setRecoveryProgress( int64_t progress, int64_t limit ) {
     emit onRecoverProgress( int(progress), int(limit) );
 }
 
-// Apply accout list. Explory what does wallet has
+// Apply acconut list. Exploring what does wallet has
 void MWC713::updateAccountList( QVector<QString> accounts ) {
     collectedAccountInfo.clear();
 
@@ -881,6 +891,7 @@ void MWC713::updateAccountList( QVector<QString> accounts ) {
         }
 
         eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber, !need2sync ), TaskAccountInfo::TIMEOUT, false );
+        eventCollector->addTask( new TaskOutputsForHODL(this, acc, hodlStatus), TaskOutputsForHODL::TIMEOUT, false );
         eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1, false ); // Updating the progress
     }
     if (!cancel) {
@@ -1148,6 +1159,12 @@ void MWC713::setNodeStatus( bool online, QString errMsg, int nodeHeight, int pee
                           " totalDifficulty=" + QString::number(totalDifficulty) + " connections=" + QString::number(connections) );
     emit onNodeStatus( online, errMsg, nodeHeight, peerHeight, totalDifficulty, connections );
 }
+
+void MWC713::setRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature ) {
+    logger::logEmit( "MWC713", "onRootPublicKey", "rootPubKey="+rootPubKey + " message=" + message + " signature=" + signature );
+    emit onRootPublicKey( success, errMsg, rootPubKey, message, signature );
+}
+
 
 void MWC713::notifyListenerMqCollision() {
     if (!mwcMqOnline && !mwcMqStarted)

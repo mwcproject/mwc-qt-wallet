@@ -19,6 +19,7 @@
 #include "../control/messagebox.h"
 #include "../state/timeoutlock.h"
 #include <QFileDialog>
+#include "../util/ui.h"
 
 namespace wnd {
 
@@ -69,6 +70,10 @@ void SendOffline::on_sendButton_clicked()
         }
     }
 
+    QStringList outputs;
+    if (! util::getOutputsToSend( selectedAccount.accountName, amount, state->getContext()->hodlStatus, this, outputs ) )
+        return; // User reject something
+
     if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this,"Confirm Send request",
                          "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) +
                          " mwc offline.\nYour init transaction slate will be stored at the file.", "Decline", "Confirm", false, true,
@@ -91,7 +96,7 @@ void SendOffline::on_sendButton_clicked()
 
     ui->progress->show();
 
-    state->sendMwcOffline(  selectedAccount, amount, description, fileName );
+    state->sendMwcOffline(  selectedAccount, amount, description, fileName, outputs );
 }
 
 void SendOffline::showSendMwcOfflineResult( bool success, QString message ) {

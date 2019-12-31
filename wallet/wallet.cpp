@@ -194,7 +194,8 @@ int64_t WalletTransaction::calculateTransactionAge( const QDateTime & current ) 
     return setTime.secsTo(current);
 }
 
-
+//////////////////////////////////////////////////////////////////////////////////////////
+//  WalletOutput
 
 void WalletOutput::setData(QString _outputCommitment,
         QString     _MMRIndex,
@@ -216,6 +217,14 @@ void WalletOutput::setData(QString _outputCommitment,
     valueNano = _valueNano;
     txIdx = _txIdx;
 }
+
+QString WalletOutput::toString() const {
+    return  "Output(" + outputCommitment + ", MMR=" + MMRIndex + ", Height=" + blockHeight + ", Locked=" + lockedUntil + ", status=" +
+            status + ", coinbase=" + (coinbase?"true":"false") + ", confirms=" + numOfConfirms, ", value=" + QString::number(valueNano) + ", txIdx=" + txIdx + ")";
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//  WalletUtxoSignature
 
 void WalletUtxoSignature::setData(int64_t _coinNano, // Output amount
         QString _messageHash,

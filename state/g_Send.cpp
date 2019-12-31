@@ -109,9 +109,9 @@ void Send::processSendRequest( bool isOnline, const wallet::AccountInfo & select
     }
 }
 // Request for MWC to send
-void Send::sendMwcOnline(const wallet::AccountInfo &account, util::ADDRESS_TYPE type, QString address, int64_t mwcNano, QString message, QString apiSecret ) {
+void Send::sendMwcOnline(const wallet::AccountInfo &account, util::ADDRESS_TYPE type, QString address, int64_t mwcNano, QString message, QString apiSecret, const QStringList & outputs ) {
     core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
-    context->wallet->sendTo( account, mwcNano, util::fullFormalAddress( type, address), apiSecret, message, prms.inputConfirmationNumber, prms.changeOutputs );
+    context->wallet->sendTo( account, mwcNano, util::fullFormalAddress( type, address), apiSecret, message, prms.inputConfirmationNumber, prms.changeOutputs, outputs );
 }
 
 void Send::sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate ) {
@@ -137,9 +137,9 @@ void Send::onSlateReceivedBack(QString slate, QString mwc, QString fromAddr) {
     registerSlate( slate, "", -1, false, true );
 }
 
-void Send::sendMwcOffline(  const wallet::AccountInfo & account, int64_t amount, QString message, QString fileName ) {
+void Send::sendMwcOffline(  const wallet::AccountInfo & account, int64_t amount, QString message, QString fileName, const QStringList & outputs ) {
     core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
-    context->wallet->sendFile( account, amount, message, fileName,prms.inputConfirmationNumber, prms.changeOutputs );
+    context->wallet->sendFile( account, amount, message, fileName,prms.inputConfirmationNumber, prms.changeOutputs, outputs );
 }
 void Send::respSendFile( bool success, QStringList errors, QString fileName ) {
     if (offlineWnd) {

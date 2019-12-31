@@ -21,6 +21,7 @@ namespace core {
     class WindowManager;
     class MainWindow;
     class AppContext;
+    class HodlStatus;
 }
 
 namespace wallet {
@@ -77,7 +78,8 @@ struct StateContext {
     node::MwcNode       * const mwcNode;
     core::WindowManager * const wndManager;
     core::MainWindow    * const mainWnd;
-    StateMachine        * stateMachine;
+    StateMachine        * stateMachine = nullptr;
+    core::HodlStatus    * hodlStatus = nullptr;
 
     StateContext(core::AppContext * _appContext, wallet::Wallet * _wallet,
                  node::MwcNode * _mwcNode,
@@ -86,6 +88,7 @@ struct StateContext {
         mainWnd(_mainWnd), stateMachine(nullptr) {}
 
     void setStateMachine(StateMachine * sm) {stateMachine=sm;}
+    void setHodlStatus(core::HodlStatus* hs) {hodlStatus=hs;}
 };
 
 

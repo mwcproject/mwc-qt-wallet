@@ -15,6 +15,7 @@
 #include "TaskTransaction.h"
 #include "../mwc713.h"
 #include <QDebug>
+#include "../../core/HodlStatus.h"
 
 namespace wallet {
 
@@ -36,7 +37,7 @@ struct OutputIdxLayout {
     }
 };
 
-bool parseOutputLine( QString str, const OutputIdxLayout & tl,
+static bool parseOutputLine( QString str, const OutputIdxLayout & tl,
                            WalletOutput & output) {
 
     QString strOutputCommitment = util::getSubString(str, tl.outputCommitment, tl.mmrIndex );
@@ -99,14 +100,14 @@ bool TaskTransactionCount::processTask(const QVector<WEvent> & events) {
     return true;
 }
 
-
-bool TaskOutputs::processTask(const QVector<WEvent> & events) {
-    // We are processing transactions outptu mostly as a raw data
-
+static void parseOutputData( const QVector<WEvent> & events, // in
+        QString & account, int64_t & height, QVector<WalletOutput> & outputs ) // out
+{
     int curEvt = 0;
 
-    QString account;
-    int64_t  height = -1;
+    account = "";
+    height = -1;
+    outputs.clear();
 
     for ( ; curEvt < events.size(); curEvt++ ) {
         if (events[curEvt].event == WALLET_EVENTS::S_OUTPUT_LOG ) {
@@ -159,8 +160,6 @@ bool TaskOutputs::processTask(const QVector<WEvent> & events) {
         }
     }
 
-    QVector< WalletOutput > outputResult;
-
     // Processing transactions
     for ( ; curEvt < events.size(); curEvt++ ) {
         if (events[curEvt].event == WALLET_EVENTS::S_LINE ) {
@@ -170,14 +169,40 @@ bool TaskOutputs::processTask(const QVector<WEvent> & events) {
                 continue;
 
             // Expected to be a normal line
-            WalletOutput output;
-            if ( parseOutputLine(str, outLayout, output) ) {
-                outputResult.push_back(output);
+            WalletOutput outpt;
+            if ( parseOutputLine(str, outLayout, outpt) ) {
+                outputs.push_back(outpt);
             }
         }
     }
+}
+
+
+bool TaskOutputs::processTask(const QVector<WEvent> & events) {
+    // We are processing transactions outptu mostly as a raw data
+
+    QString account;
+    int64_t  height = -1;
+    QVector< WalletOutput > outputResult;
+
+    parseOutputData( events, // in
+        account, height, outputResult );
 
     wallet713->setOutputs(account, height, outputResult );
+    return true;
+}
+
+bool TaskOutputsForHODL::processTask(const QVector<WEvent> & events) {
+    Q_ASSERT(hodlStatus);
+
+    QString account;
+    int64_t  height = -1;
+    QVector< WalletOutput > outputResult;
+
+    parseOutputData( events, // in
+                     account, height, outputResult );
+
+    hodlStatus->setWalletOutputs( account, outputResult, "walletOutputs" );
     return true;
 }
 

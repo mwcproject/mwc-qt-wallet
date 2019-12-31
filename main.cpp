@@ -28,6 +28,7 @@
 #include "util/ioutils.h"
 #include "util/Log.h"
 #include "core/Config.h"
+#include "core/HodlStatus.h"
 #include "util/ConfigReader.h"
 #include <QFileDevice>
 #include <QJsonDocument>
@@ -51,6 +52,7 @@
 #include "tests/testWordSequenser.h"
 #include "tests/testWordDictionary.h"
 #include "tests/testPasswordAnalyser.h"
+#include "tests/testCalcOutputsToSpend.h"
 #include "misk/DictionaryInit.h"
 #include "util/stringutils.h"
 #include "build_version.h"
@@ -157,6 +159,10 @@ QPair<bool, QString> readConfig(QApplication & app) {
     QString wallet713_path = reader.getString("wallet713_path");
     QString airdropUrlMainNet = reader.getString("airdrop_url_mainnet");
     QString airdropUrlTestNet = reader.getString("airdrop_url_testnet");
+
+    QString hodlUrlMainnet = reader.getString("hodl_url_mainnet");
+    QString hodlUrlTestnet = reader.getString("hodl_url_testnet");
+
     QString logoutTimeoutStr = reader.getString("logoutTimeout");
     QString timeoutMultiplier = reader.getString("timeoutMultiplier");
     bool useMwcMqS = reader.getString("useMwcMqS") != "false";  // Default expected to be 'true'
@@ -184,7 +190,7 @@ QPair<bool, QString> readConfig(QApplication & app) {
     if ( timeoutMultiplierVal < 0.01 )
         timeoutMultiplierVal = 1.0;
 
-    if ( mwc_path.isEmpty() || wallet713_path.isEmpty() || airdropUrlMainNet.isEmpty() || airdropUrlTestNet.isEmpty() ) {
+    if ( mwc_path.isEmpty() || wallet713_path.isEmpty() || airdropUrlMainNet.isEmpty() || airdropUrlTestNet.isEmpty() || hodlUrlMainnet.isEmpty() || hodlUrlTestnet.isEmpty() ) {
         qDebug() << "Failed to read all expected data from config file " << config;
         return QPair<bool, QString>(false, "Not found all expected fields at config file " + config);
     }
@@ -204,7 +210,7 @@ QPair<bool, QString> readConfig(QApplication & app) {
     }
 
     Q_ASSERT(runMode.first);
-    config::setConfigData( runMode.second, mwc_path, wallet713_path, airdropUrlMainNet, airdropUrlTestNet, logoutTimeout*1000L, timeoutMultiplierVal, useMwcMqS, sendTimeoutMs );
+    config::setConfigData( runMode.second, mwc_path, wallet713_path, airdropUrlMainNet, airdropUrlTestNet, hodlUrlMainnet, hodlUrlTestnet, logoutTimeout*1000L, timeoutMultiplierVal, useMwcMqS, sendTimeoutMs );
     return QPair<bool, QString>(true, "");
 }
 
@@ -217,6 +223,7 @@ int main(int argc, char *argv[])
 
 
     // tests are quick, let's run them in debug
+    test::testCalcOutputsToSpend();
     test::testLongLong2ShortStr();
     test::testUtils();
     test::testWordSequences();
@@ -263,7 +270,7 @@ int main(int argc, char *argv[])
             qputenv( "QT_SCALE_FACTOR", QString::number(scale).toLatin1() );
 
     #else
-        scale = 1.0; // Mac OS, not applicable, mean 1.0
+        double scale = 1.0; // Mac OS, not applicable, mean 1.0
         // But scale factor still needed to fix the non retina cases on mac OS
 
         if (! Cocoa::isRetinaDisplay()) {
@@ -476,6 +483,10 @@ int main(int argc, char *argv[])
         mainWnd->show();
 
         state::StateContext context( &appContext, wallet, mwcNode, wndManager, mainWnd );
+
+        core::HodlStatus hodlStatus(&context);
+        context.setHodlStatus(&hodlStatus);
+        wallet->setHodlStatus(&hodlStatus);
 
         state::StateMachine * machine = new state::StateMachine(&context);
         mainWnd->setAppEnvironment( machine, wallet);

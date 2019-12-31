@@ -18,6 +18,10 @@
 #include "../mwc713task.h"
 #include "../../util/stringutils.h"
 
+namespace core {
+class HodlStatus;
+}
+
 namespace wallet {
 
 class TaskOutputCount : public Mwc713Task {
@@ -50,6 +54,26 @@ public:
     virtual bool processTask(const QVector<WEvent> & events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+};
+
+// Get outputs and deliver them directly to HODL status
+class TaskOutputsForHODL : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*15;
+
+    TaskOutputsForHODL( MWC713 * wallet713, QString _accountName, core::HodlStatus * _hodlStatus ) :
+            Mwc713Task("Outputs", "outputs", wallet713, ""),
+            accountName(_accountName),
+            hodlStatus(_hodlStatus) {Q_ASSERT(hodlStatus!=nullptr);}
+
+    virtual ~TaskOutputsForHODL() override {}
+
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+private:
+    QString accountName;
+    core::HodlStatus * hodlStatus;
 };
 
 class TaskTransactionCount : public Mwc713Task {

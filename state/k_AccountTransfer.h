@@ -69,6 +69,7 @@ private:
     wallet::AccountInfo trAccountTo;
     int64_t trNanoCoins = 0;
     QString trSlate;
+    QStringList outputs2use;
 };
 
 }

@@ -284,6 +284,49 @@ bool TaskSubmitFile::processTask(const QVector<WEvent> & events) {
 }
 
 
+/////////////////////////////////////////////////////////////////////////////////////
+//  TaskRootPublicKey
+
+bool TaskRootPublicKey::processTask(const QVector<WEvent> & events) {
+    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_INIT_WANT_ENTER );
+
+    if (!error.isEmpty()) {
+        QString errMsg;
+        for ( WEvent & e : error ) {
+            if (errMsg.isEmpty()>0)
+                errMsg += "; ";
+            errMsg += e.message;
+        }
+
+        wallet713->setRootPublicKey( false, "Unable to retrieve root public key from the wallet. " + errMsg, "","","");
+        return true;
+    }
+
+    //wallet713> getrootpublickey --message '1--message'
+    //Root public key: 0361fb6806dba1d80f96c750998e705588b87656b6c1eaf9250d5f6cb6a07369aa
+    //Signature: 3045022100bbd5da82419c639e84a56e3e0bd5deacaf2d4bb5349d10da6ba8ad28a62d32ee02204f84d9de553db40218f7e2cc2881f5ac19950f383c8aeff63ab19739e64fed68
+
+    QVector< WEvent > lines = filterEvents(events, WALLET_EVENTS::S_LINE );
+    QString pubKey;
+    QString signature;
+
+    for ( const auto & ln : lines ) {
+        if (ln.message.startsWith( "Root public key:" )) {
+            pubKey = ln.message.mid( strlen("Root public key:") ).trimmed();
+        }
+        else if (ln.message.startsWith( "Signature:" )) {
+            signature = ln.message.mid( strlen("Signature:") ).trimmed();
+        }
+    }
+
+    if (pubKey.isEmpty() || ( !message.isEmpty() && signature.isEmpty() ) ) {
+        wallet713->setRootPublicKey( false, "Unable to retrieve root public key from the wallet because of mwc713 respond format.", "","","");
+        return true;
+    }
+
+    wallet713->setRootPublicKey( true, "", pubKey, message, signature );
+    return true;
+}
 
 
 }
