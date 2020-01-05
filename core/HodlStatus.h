@@ -59,7 +59,7 @@ public:
     HodlStatus( state::StateContext * context );
 
     void setHodlStatus( const QString & hodlStatus, const QString & errKey );
-    void setHodlOutputs( const QVector<HodlOutputInfo> & hodlOutputs, const QString & errKey ); //
+    void setHodlOutputs( bool inHodl, const QVector<HodlOutputInfo> & hodlOutputs, const QString & errKey ); //
     void setWalletOutputs( const QString & account, const QVector<wallet::WalletOutput> & outputs, const QString & errKey ); //
     void setClaimAmount( int64_t amount2claim, const QString & errKey );
 
@@ -71,6 +71,7 @@ public:
     // Hex representation of HSA256 hash from rootpublickey binary representation
     QString getRootPubKeyHash() const {return rootPubKeyHash;}
 
+    bool isInHodl() const {return inHodl;}
     bool hasHodlStatus() const;
     bool hasHodlOutputs() const;
     bool hasAmountToClaim() const;
@@ -113,6 +114,7 @@ private:
 
     uint availableData = 0;
 
+    bool inHodl = false; // If accountin HODL. May in in Hodl but no outputs are there
     QMap<QString, QVector<wallet::WalletOutput> > walletOutputs; // Available outputs from the wallet. Key: account name, value outputs for this account
     QVector<HodlOutputInfo>    hodlOutputs;
     QSet<QString>              hodlOutputCommitment;

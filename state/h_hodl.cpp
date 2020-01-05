@@ -344,7 +344,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
         if (requestOk) {
             const QVector<core::HodlOutputInfo> hodlOutputs;
             Q_ASSERT(false); // Implement me json to hodlOutputs
-            context->hodlStatus->setHodlOutputs( hodlOutputs, TAG_GET_ADDRESS );
+            context->hodlStatus->setHodlOutputs( true, hodlOutputs, TAG_GET_ADDRESS );
         } else {
             context->hodlStatus->setError( TAG_GET_ADDRESS, "Unable to request the HODL output info from " + hodlUrl +
                                                                     ".\nGet communication error: " + requestErrorMessage);

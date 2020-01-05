@@ -17,6 +17,7 @@
 #include "../state/e_outputs.h"
 #include "../util/stringutils.h"
 #include <QDebug>
+#include "../core/HodlStatus.h"
 
 namespace wnd {
 
@@ -36,6 +37,8 @@ Outputs::Outputs(QWidget *parent, state::Outputs * _state) :
     ui->progressFrame->hide();
 
     QString accName = updateWalletBalance();
+
+    inHodl = state->getContext()->hodlStatus->isInHodl();
 
     initTableHeaders();
 
@@ -64,10 +67,19 @@ void Outputs::initTableHeaders() {
     Q_ASSERT( widths.size() == 7 );
 
     ui->outputsTable->setColumnWidths(widths);
+
+    if (inHodl) {
+        ui->outputsTable->setColumnCount(widths.size()+1);
+        ui->outputsTable->setColumnWidth(widths.size(),60);
+        ui->outputsTable->horizontalHeaderItem( widths.size() )->setText( "HODL" );
+    }
 }
 
 void Outputs::saveTableHeaders() {
-    state->updateColumnsWidhts( ui->outputsTable->getColumnWidths() );
+    QVector<int>  width = ui->outputsTable->getColumnWidths();
+    if (inHodl)
+        width.pop_back();
+    state->updateColumnsWidhts( width );
 }
 
 int Outputs::calcPageSize() const {
@@ -177,16 +189,22 @@ void Outputs::setOutputsData(QString account, int64_t height, const QVector<wall
     for ( int i=0; i<rowNum; i++ ) {
         auto & out = outputs[i];
 
-        ui->outputsTable->appendRow( QVector<QString>{
-                                         QString::number( out.txIdx+1 ),
-                                        // out.status, // Status allways 'unspent', so no reasons to print it.
-                                         util::nano2one(out.valueNano),
-                                         out.numOfConfirms,
-                                         out.coinbase ? "Yes":"No",
-                                         out.outputCommitment,
-                                         out.MMRIndex,
-                                         out.lockedUntil
-                                     } );
+        QVector<QString> rowData{
+            QString::number( out.txIdx+1 ),
+           // out.status, // Status allways 'unspent', so no reasons to print it.
+            util::nano2one(out.valueNano),
+            out.numOfConfirms,
+            out.coinbase ? "Yes":"No",
+            out.outputCommitment,
+            out.MMRIndex,
+            out.lockedUntil
+        };
+
+        if (inHodl) {
+            rowData.push_back( state->getContext()->hodlStatus->isOutputInHODL( out.outputCommitment ) ? "Yes" : "No" );
+        }
+
+        ui->outputsTable->appendRow( rowData );
     }
 
     ui->prevBtn->setEnabled( buttonState.first );

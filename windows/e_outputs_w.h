@@ -74,6 +74,8 @@ private:
     int totalOutputs = 0;
 
     QPair<bool,bool> buttonState = QPair<bool,bool>(false, false);
+
+    bool inHodl = false; // If acount enrolled in HODL. Requested once to eliminate race conditions
 };
 
 }

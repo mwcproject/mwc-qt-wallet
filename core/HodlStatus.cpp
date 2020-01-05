@@ -57,8 +57,9 @@ void HodlStatus::setHodlStatus( const QString & _hodlStatus, const QString & err
     emit onHodlStatusWasChanged();
 }
 
-void HodlStatus::setHodlOutputs( const QVector<HodlOutputInfo> & _hodlOutputs, const QString & errKey ) {
+void HodlStatus::setHodlOutputs( bool _inHodl, const QVector<HodlOutputInfo> & _hodlOutputs, const QString & errKey ) {
     availableData |= DATA_HODL_OUTPUTS;
+    inHodl = _inHodl;
     hodlOutputs = _hodlOutputs;
     requestErrors.remove(errKey);
 
@@ -157,6 +158,7 @@ void HodlStatus::resetData() {
 
     availableData = 0;
 
+    inHodl = false;
     walletOutputs.clear(); // Available outputs from the wallet.
     hodlOutputs.clear();
 
