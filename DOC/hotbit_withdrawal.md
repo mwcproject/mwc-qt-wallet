@@ -68,6 +68,8 @@ After your Withdrawal is processed by Hotbit you will see a dialog box like this
 
 You should now have the funds in your wallet.
 
+IMPORTANT: After an hour or so, please make sure to resync with your full node. You can do this from the menu at the top right of the screen. This will ensure the funds are really there in case there was a reorg on the network.
+
 # Cold Storage
 
 At this point you may want to look into our cold storage project here: https://github.com/mwcproject/coldstorage
