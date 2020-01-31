@@ -114,20 +114,20 @@ void Mwc713InputParser::initGenericError() {
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_GENERIC_WARNING,
                                                 QVector<BaseTrieSection*>{
                                                         new TrieNewLineSection(),
-                                                        new TriePhraseSection("WARNING: "),
+                                                        new TriePhraseSection("WARNING: ", true),
                                                         new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","", 1)
                                                         } ));
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_GENERIC_INFO,
                                                 QVector<BaseTrieSection*>{
                                                         new TrieNewLineSection(),
-                                                        new TriePhraseSection("INFO: "),
+                                                        new TriePhraseSection("INFO: ", true),
                                                         new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","", 1)
                                                         } ));
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_ERROR,
                                                 QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("error: "),
+                                                        new TriePhraseSection("error: ", true),
                                                         new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","", 1)
                                                 } ));
 

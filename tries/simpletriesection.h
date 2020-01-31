@@ -23,10 +23,12 @@ namespace tries {
 class TriePhraseSection : public BaseTrieSection {
 public:
     TriePhraseSection(QString phrase, int accumulateId=-1);
+    TriePhraseSection(QString phrase, bool ignoreCase, int accumulateId=-1);
 
     virtual uint32_t processChar(TrieContext & context, QChar ch) override;
 protected:
     QString phrase;
+    bool ignoreCase = false;
 };
 
 // Parsing the version like: '2.0.0'

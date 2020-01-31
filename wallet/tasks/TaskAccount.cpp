@@ -181,7 +181,7 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
     int lnIdx = 0;
     int64_t totalNano = -1;
     for ( ; lnIdx<lns.size(); lnIdx++ ) {
-        if ( lns[lnIdx].message.contains("Total ") ) {
+        if ( lns[lnIdx].message.contains("Confirmed Total ") ) {
             totalNano = extractMwc(lns[lnIdx].message);
             break;
         }
