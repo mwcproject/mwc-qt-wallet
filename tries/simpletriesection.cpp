@@ -18,15 +18,22 @@ namespace tries {
 
 
 // Parsing the fixed phrase
+TriePhraseSection::TriePhraseSection(QString _phrase, bool _ignoreCase, int accumulateId) :
+    BaseTrieSection(accumulateId), phrase(_phrase), ignoreCase(_ignoreCase)
+{
+}
+
 TriePhraseSection::TriePhraseSection(QString _phrase, int accumulateId) :
-    BaseTrieSection(accumulateId), phrase(_phrase)
-{}
+        TriePhraseSection(_phrase, false, accumulateId)
+{
+}
 
 uint32_t TriePhraseSection::processChar(TrieContext & context, QChar ch) {
     Q_ASSERT( context.pos>=0 );
     Q_ASSERT( context.pos < phrase.length() );
 
-    bool ok = (ch == phrase[context.pos]);
+    bool ok = ignoreCase ? (ch.toLower() == phrase[context.pos].toLower()) : (ch == phrase[context.pos]);
+
     if (!ok)
         return PROCESS_RESULT::FAIL;
 

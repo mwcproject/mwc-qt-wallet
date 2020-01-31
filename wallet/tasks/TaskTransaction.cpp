@@ -236,7 +236,8 @@ bool parseTransactionLine( QString str, const TransactionIdxLayout & tl,
     if ( strCrTime.isEmpty())
         return false;
 
-    bool conf = strConf.startsWith("yes", Qt::CaseInsensitive);
+    // At v3.0.0 we have: true, false
+    bool conf = strConf.startsWith("yes", Qt::CaseInsensitive) || strConf.startsWith("true", Qt::CaseInsensitive);
 
     int64_t height = strHeight.isEmpty() ? 0 : strHeight.toLongLong();
 
@@ -244,7 +245,8 @@ bool parseTransactionLine( QString str, const TransactionIdxLayout & tl,
     if ( !net.first )
         return false;
 
-    bool proof = strProof.startsWith("yes", Qt::CaseInsensitive);
+    // At v3.0.0 we have: Yes,None
+    bool proof = strProof.startsWith("yes", Qt::CaseInsensitive) || strProof.startsWith("true", Qt::CaseInsensitive);
 
     trans.setData(id, tansType,
                   strTxid,
