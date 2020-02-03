@@ -73,10 +73,10 @@ void Transactions::requestTransactionCount(QString account) {
 }
 
 // Current transactions that wallet has
-void Transactions::requestTransactions(QString account, int offset, int number) {
+void Transactions::requestTransactions(QString account, int offset, int number, bool enforceSync) {
 
-    context->wallet->getTransactions(account, offset, number);
-    context->wallet->updateWalletBalance(); // With transactions refresh, need to update the balance
+    context->wallet->getTransactions(account, offset, number, enforceSync);
+    context->wallet->updateWalletBalance(false,false); // With transactions refresh, need to update the balance
 }
 
 void Transactions::updateTransactionCount(QString account, int number) {
@@ -138,7 +138,7 @@ QVector<wallet::AccountInfo> Transactions::getWalletBalance() {
 
 void Transactions::onCancelTransacton( bool success, int64_t trIdx, QString errMessage ) {
     if (success)
-        context->wallet->updateWalletBalance(); // Updating balance, Likely something will be unblocked
+        context->wallet->updateWalletBalance(false,false); // Updating balance, Likely something will be unblocked
 
     if (wnd) {
         wnd->updateCancelTransacton(success, trIdx, errMessage);

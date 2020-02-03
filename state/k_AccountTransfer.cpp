@@ -63,6 +63,8 @@ core::SendCoinsParams AccountTransfer::getSendCoinsParams() {
 
 void AccountTransfer::updateSendCoinsParams(const core::SendCoinsParams &params) {
     context->appContext->setSendCoinsParams(params);
+    // Need to update the balances because number of confirmations affect the spendable balance.
+    context->wallet->updateWalletBalance(true, true);
 }
 
 
@@ -164,13 +166,16 @@ void AccountTransfer::onSlateFinalized( QString slate ) {
         transferState=2;
 
         context->wallet->setReceiveAccount( context->appContext->getReceiveAccount() );
-        context->wallet->updateWalletBalance();
+        context->wallet->updateWalletBalance(true, true);
     }
 }
 
 void AccountTransfer::onWalletBalanceUpdated() {
-    if (transferState!=2)
+    if (transferState!=2) {
+        if (wnd)
+            wnd->updateAccounts();
         return;
+    }
 
     if (wnd)
         wnd->showTransferResults(true, "" );

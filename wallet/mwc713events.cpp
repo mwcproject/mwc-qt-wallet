@@ -52,6 +52,8 @@ QString toString(WALLET_EVENTS event) {
         case S_RECOVERY_PROGRESS: return "S_RECOVERY_PROGRESS";
         case S_RECOVERY_MNEMONIC: return "S_RECOVERY_MNEMONIC";
 
+        case S_SYNC_PROGRESS:     return "S_SYNC_PROGRESS";
+
         case S_GENERIC_WARNING: return "S_GENERIC_WARNING";
         case S_GENERIC_INFO:    return "S_GENERIC_INFO";
 

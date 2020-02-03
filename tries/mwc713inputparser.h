@@ -58,6 +58,8 @@ private:
     void initSend();
     void initTransactions();
 
+    void initSyncProgress(); // Special listeners that don't emit simple events, instead update the progress at the status line
+
     void initGenericError(); // All error messages
 
 signals:

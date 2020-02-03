@@ -36,7 +36,7 @@ public:
 
     // request wallet for outputs
     void requestOutputCount(QString account);
-    void requestOutputs(QString account, int offset, int number);
+    void requestOutputs(QString account, int offset, int number, bool enforceSync);
 
     QString getCurrentAccountName() const;
 

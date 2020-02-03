@@ -71,7 +71,7 @@ NextStateRespond Send::execute() {
 void Send::switchToStartingWindow() {
     onlineOfflineWnd = (wnd::SendStarting*)context->wndManager->switchToWindowEx( mwc::PAGE_G_SEND,
             new wnd::SendStarting( context->wndManager->getInWndParent(), this ) );
-    context->wallet->updateWalletBalance(); // request update, respond at onWalletBalanceUpdated
+    context->wallet->updateWalletBalance(true,true); // request update, respond at onWalletBalanceUpdated
 }
 
 

@@ -63,6 +63,9 @@ struct AccountInfo {
     bool isDeleted() const;
 
     bool isAwaitingSomething() const {return awaitingConfirmation>0 || lockedByPrevTransaction>0; }
+
+    // Debug/Log printing
+    QString toString() const;
 };
 
 struct MwcNodeConnection {
@@ -334,8 +337,12 @@ public:
 
     virtual QString getCurrentAccountName()  = 0;
 
+    // Request sync (update_wallet_state) for the
+    virtual void sync(bool showSyncProgress, bool enforce) = 0;
+
+
     // Request Wallet balance update. It is a multistep operation
-    virtual void updateWalletBalance()  = 0;
+    virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress)  = 0;
     // Check signal: onWalletBalanceUpdated
     //          onWalletBalanceProgress
     //          onAccountSwitched - multiple calls, please ignore
@@ -433,7 +440,7 @@ public:
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
-    virtual void getOutputs(QString account, int offset, int number)  = 0;
+    virtual void getOutputs(QString account, int offset, int number, bool enforceSync)  = 0;
 
     // Get total number of Transactions
     // Check Signal: onTransactionCount(int number)
@@ -441,7 +448,7 @@ public:
 
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
-    virtual void getTransactions(QString account, int offset, int number)  = 0;
+    virtual void getTransactions(QString account, int offset, int number, bool enforceSync)  = 0;
 
     // Read all transactions for all accounts. Might tale time...
     // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
@@ -544,6 +551,9 @@ signals:
 
     // Node info
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
+
+    // Progress update regarding Sync progress. NOTE, THIS SUGNAL doesn't have caller, it can be emitted background.
+    void onUpdateSyncProgress(double progressPercent);
 
 };
 

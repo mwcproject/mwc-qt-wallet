@@ -181,6 +181,9 @@ void logParsingEvent(wallet::WALLET_EVENTS event, QString message ) {
         return;
     }
 
+    if (event == wallet::WALLET_EVENTS::S_LINE) // Lines are reliable and not needed into the nogs. Let's keep logs less noisy.
+        return;
+
     logClient->doAppend2logs(true, "mwc713-Event>", toString(event) + " [" + message + "]" );
 }
 

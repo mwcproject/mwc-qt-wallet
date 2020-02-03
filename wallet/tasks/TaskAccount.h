@@ -106,8 +106,8 @@ public:
     const static int64_t TIMEOUT = 1000*10;
 
     // noRefresh can be used for sequenced calls
-    TaskAccountInfo( MWC713 * _wallet713, int confimations, bool noRefresh ) :
-    Mwc713Task("TaskAccountInfo", QString("info -c ") + QString::number(confimations) + (noRefresh ? " --no-refresh":""), _wallet713,"") {}
+    TaskAccountInfo( MWC713 * _wallet713, int confimations ) :
+                Mwc713Task("TaskAccountInfo", QString("info -c ") + QString::number(confimations) + " --no-refresh", _wallet713,"") {}
 
     virtual ~TaskAccountInfo() override {}
 

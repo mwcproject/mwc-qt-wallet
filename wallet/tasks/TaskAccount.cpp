@@ -196,6 +196,14 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
         }
     }
 
+    int64_t waitingFinalizetinNano = -1;
+    for ( ; lnIdx<lns.size(); lnIdx++ ) {
+        if ( lns[lnIdx].message.contains("Awaiting Finalization ") ) {
+            waitingFinalizetinNano = extractMwc(lns[lnIdx].message);
+            break;
+        }
+    }
+
     int64_t lockedNano = -1;
     for ( ; lnIdx<lns.size(); lnIdx++ ) {
         if ( lns[lnIdx].message.contains("Locked by previous transaction") ) {
@@ -218,7 +226,7 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
     }
 
     wallet713->infoResults( currentAccountName, height,
-            totalNano, waitingConfNano, lockedNano, spendableNano,
+            totalNano, waitingConfNano, waitingFinalizetinNano, lockedNano, spendableNano,
             warnings.size()>0 );
     return true;
 }

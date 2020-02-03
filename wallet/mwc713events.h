@@ -73,6 +73,8 @@ enum WALLET_EVENTS {
     // for fresh wallet
     S_RECOVERY_MNEMONIC = 38, // Recovering from mnemonic => Mnemonic:
 
+    S_SYNC_PROGRESS = 39, // Checking 1000 outputs, up to index 13433. (Highest index: 10235)   Message:  13433|10235
+
     // Accounts
     S_ACCOUNTS_INFO_SUM = 44, // Account header info. The rest of data will come in lines...
 

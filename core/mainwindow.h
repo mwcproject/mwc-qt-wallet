@@ -72,6 +72,7 @@ private slots:
     void updateListenerStatus(bool online);
     void updateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
+    void onUpdateSyncProgress(double progressPercent);
 
 private:
     void updateListenerBtn();

@@ -38,6 +38,8 @@ Mwc713InputParser::Mwc713InputParser() {
 
     initListening();
     initRecovery();
+
+    initSyncProgress();
 }
 
 Mwc713InputParser::~Mwc713InputParser() {}
@@ -367,6 +369,42 @@ void Mwc713InputParser::initRecovery() {
 
     //
 }
+
+void Mwc713InputParser::initSyncProgress() {
+
+    //Starting UTXO scan, 0% complete
+    //Checking 125 outputs, up to index 564667. (Highest index: 564667), 99% complete
+    //Identified 0 wallet_outputs as belonging to this wallet, 99% complete
+    //Scanning Complete
+
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SYNC_PROGRESS,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("Starting UTXO scan, "),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE,"","", 1)  // 0% complete
+                                                }));
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SYNC_PROGRESS,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("Checking "),
+                                                        new TrieAnySection(100, TrieAnySection::NUMBERS,"",""),
+                                                        new TriePhraseSection(" outputs, up to index "),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE,"","", 1) //  564667. (Highest index: 564667), 99% complete
+                                                }));
+
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SYNC_PROGRESS,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("Identified "),
+                                                        new TrieAnySection(100, TrieAnySection::NUMBERS,"",""),
+                                                        new TriePhraseSection(" wallet_outputs as belonging to this wallet, "),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE,"","", 1) // 99% complete
+                                                }));
+
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SYNC_PROGRESS,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("Scanning Complete", 1)
+                                                }));
+}
+
+
 
 void Mwc713InputParser::initAccount() {
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_ACCOUNTS_INFO_SUM,

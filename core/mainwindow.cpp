@@ -18,6 +18,7 @@
 #include <QDebug>
 #include "../state/statemachine.h"
 #include "util/widgetutils.h"
+#include "util/stringutils.h"
 #include "../control/messagebox.h"
 #include "../dialogs/helpdlg.h"
 #include "../core/Config.h"
@@ -164,6 +165,9 @@ void MainWindow::setAppEnvironment(state::StateMachine * _stateMachine, wallet::
     QObject::connect(wallet, &wallet::Wallet::onNodeStatus,
                      this, &MainWindow::updateNodeStatus, Qt::QueuedConnection);
 
+    QObject::connect(wallet, &wallet::Wallet::onUpdateSyncProgress,
+                     this, &MainWindow::onUpdateSyncProgress, Qt::QueuedConnection);
+
     updateListenerBtn();
     updateNetworkName();
 }
@@ -230,6 +234,11 @@ void MainWindow::updateNodeStatus( bool online, QString errMsg, int nodeHeight, 
     else {
         setStatusButtonState( ui->nodeStatusButton, STATUS::GREEN, "" );
     }
+}
+
+void MainWindow::onUpdateSyncProgress(double progressPercent) {
+    onNewNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                             "Wallet state update, " + util::trimStrAsDouble( QString::number(progressPercent), 4 ) + "% complete"  );
 }
 
 

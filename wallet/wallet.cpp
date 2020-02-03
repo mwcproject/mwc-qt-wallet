@@ -60,6 +60,16 @@ bool AccountInfo::isDeleted() const {
             total == 0 && awaitingConfirmation==0 && lockedByPrevTransaction==0 && currentlySpendable==0;
 }
 
+
+// Debug/Log printing
+QString AccountInfo::toString() const {
+    return "AccountInfo(acc=" + accountName + ", total=" + util::nano2one(total) +
+               " spend=" + util::nano2one(currentlySpendable) + " locked=" +
+               util::nano2one(lockedByPrevTransaction) +
+               " awaiting=" + util::nano2one(awaitingConfirmation) + ")";
+}
+
+
 void MwcNodeConnection::saveData(QDataStream & out) const {
     int id = 0x4355a2;
     out << id;

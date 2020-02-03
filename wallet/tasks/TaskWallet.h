@@ -171,6 +171,42 @@ private:
     QString fileTx;
 };
 
+// Sync call - do 'update_wallet_state' by request...
+class TaskSync: public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 3600*1000*5; // long task, put 5 hours to be sure
+
+    TaskSync( MWC713 * wallet713, bool _showProgress) :
+            Mwc713Task("TaskSync","sync -a", wallet713, ""), showProgress(_showProgress) {}
+
+    virtual ~TaskSync() override {}
+
+    virtual void onStarted() override;
+
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+private:
+    bool showProgress;
+};
+
+// It is listener task. No input can be defined
+// This test dependent on TaskSync by global variable, see implementation.
+class TaskSyncProgressListener : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = -1; // NA
+
+    // Start one listen per request. mwc713 doesn't support both
+    TaskSyncProgressListener( MWC713 *wallet713 ) :
+            Mwc713Task("TaskSyncProgressListener", "", wallet713,"") {}
+
+    virtual ~TaskSyncProgressListener() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>();}
+};
+
 
 }
 

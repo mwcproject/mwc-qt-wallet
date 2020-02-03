@@ -55,7 +55,7 @@ QVector<wallet::AccountInfo> Accounts::getWalletBalance() {
 }
 
 void Accounts::updateWalletBalance() {
-    context->wallet->updateWalletBalance();
+    context->wallet->updateWalletBalance(true,true);
 }
 
 void Accounts::doTransferFunds() {
@@ -125,7 +125,7 @@ void Accounts::deleteAccount( const wallet::AccountInfo & account ) {
 
 void Accounts::timerEvent(QTimerEvent *event) {
     Q_UNUSED(event);
-    context->wallet->updateWalletBalance();
+    context->wallet->updateWalletBalance(true, false);
 }
 
 }

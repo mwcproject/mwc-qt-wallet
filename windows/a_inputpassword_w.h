@@ -49,6 +49,7 @@ private slots:
 
     void on_instancesButton_clicked();
 
+    void onUpdateSyncProgress(double progressPercent);
 private:
     Ui::InputPassword *ui;
     state::InputPassword * state;

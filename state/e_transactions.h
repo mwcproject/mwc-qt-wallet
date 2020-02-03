@@ -35,7 +35,7 @@ public:
 
     // Current transactions that wallet has
     void requestTransactionCount(QString account);
-    void requestTransactions(QString account, int offset, int number);
+    void requestTransactions(QString account, int offset, int number, bool enforceSync);
 
     void switchCurrentAccount(const wallet::AccountInfo & account);
 

@@ -53,11 +53,11 @@ void Outputs::requestOutputCount(QString account) {
 }
 
 // request wallet for outputs
-void Outputs::requestOutputs(QString account, int offset, int number) {
-    context->wallet->getOutputs(account, offset, number);
+void Outputs::requestOutputs(QString account, int offset, int number, bool enforceSync) {
+    context->wallet->getOutputs(account, offset, number, enforceSync);
     // Respond:  onOutputs(...)
     // Balance need to be updated as well to match outputs state
-    context->wallet->updateWalletBalance();
+    context->wallet->updateWalletBalance(false,false);
 }
 
 void Outputs::onOutputCount(QString account, int count) {

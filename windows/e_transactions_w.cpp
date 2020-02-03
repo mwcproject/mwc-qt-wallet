@@ -97,7 +97,7 @@ void Transactions::setTransactionCount(QString account, int count) {
     buttonState = updatePages(currentPagePosition, totalTransactions, pageSize);
 
     // Requesting the output data
-    state->requestTransactions(account, currentPagePosition, pageSize);
+    state->requestTransactions(account, currentPagePosition, pageSize, true); // refresh call, sync need to be enforced
 }
 
 void Transactions::on_prevBtn_clicked()
@@ -107,7 +107,7 @@ void Transactions::on_prevBtn_clicked()
         currentPagePosition = std::max( 0, currentPagePosition-pageSize );
 
         buttonState = updatePages(currentPagePosition, totalTransactions, pageSize);
-        state->requestTransactions(currentSelectedAccount(), currentPagePosition, pageSize);
+        state->requestTransactions(currentSelectedAccount(), currentPagePosition, pageSize, false);
     }
 }
 
@@ -118,7 +118,7 @@ void Transactions::on_nextBtn_clicked()
         currentPagePosition = std::min( totalTransactions-pageSize, currentPagePosition+pageSize );
 
         buttonState = updatePages(currentPagePosition, totalTransactions, pageSize);
-        state->requestTransactions(currentSelectedAccount(), currentPagePosition, pageSize);
+        state->requestTransactions(currentSelectedAccount(), currentPagePosition, pageSize, false);
     }
 }
 

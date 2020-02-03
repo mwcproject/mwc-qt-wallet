@@ -128,9 +128,11 @@ public:
 
     virtual QString getCurrentAccountName()  override {return currentAccount;}
 
+    // Request sync (update_wallet_state) for the
+    virtual void sync(bool showSyncProgress, bool enforce) override;
 
     // Request Wallet balance update. It is a multistep operation
-    virtual void updateWalletBalance()  override;
+    virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress) override;
     // Check signal: onWalletBalanceUpdated
     //          onWalletBalanceProgress
 
@@ -224,7 +226,7 @@ public:
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
-    virtual void getOutputs(QString account, int offset, int number)  override;
+    virtual void getOutputs(QString account, int offset, int number, bool enforceSync)  override;
 
     // Get total number of Transactions
     // Check Signal: onTransactionCount(int number)
@@ -232,7 +234,7 @@ public:
 
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
-    virtual void getTransactions(QString account, int offset, int number)  override;
+    virtual void getTransactions(QString account, int offset, int number, bool enforceSync)  override;
 
     // Read all transactions for all accounts. Might take time...
     // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
@@ -288,7 +290,9 @@ public:
                              bool success, QString errorMessage);
 
     void infoResults( QString currentAccountName, int64_t height,
-                      int64_t totalNano, int64_t waitingConfNano, int64_t lockedNano, int64_t spendableNano,
+                      int64_t totalConfirmedNano, int64_t waitingConfNano,
+                      int64_t waitingFinalizetinNano, int64_t lockedNano,
+                      int64_t spendableNano,
                       bool mwcServerBroken );
 
     void setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate);
@@ -325,10 +329,15 @@ public:
     void notifyListenerMqCollision();
     void notifyMqFailedToStart();
 
-        //-------------
+    //-------------
     void processAllTransactionsStart();
     void processAllTransactionsAppend(const QVector<WalletTransaction> & trVector);
     void processAllTransactionsEnd();
+
+    // -----------------
+    void updateSyncProgress(double progressPercent);
+
+    void updateSyncAsDone();
 private:
 
 
@@ -388,6 +397,8 @@ private:
     // Accounts with balances info
     QVector<AccountInfo> accountInfo;
     QString currentAccount = "default"; // Keep current account by name. It fit better to mwc713 interactions.
+
+    int64_t lastSyncTime = 0;
 private:
     // Temprary values, local values for states
     QString walletPassword;

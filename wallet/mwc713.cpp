@@ -200,6 +200,7 @@ void MWC713::start(bool loginWithLastKnownPassword)  {
     eventCollector->addListener( new TaskErrWrnInfoListener(this) );
     eventCollector->addListener( new TaskListeningListener(this) );
     eventCollector->addListener( new TaskSlatesListener(this) );
+    eventCollector->addListener( new TaskSyncProgressListener(this) );
 
     // And eventing magic should begin...
     if (loginWithLastKnownPassword)
@@ -477,11 +478,21 @@ QVector<AccountInfo>  MWC713::getWalletBalance(bool filterDeleted) const  {
     return res;
 }
 
+void MWC713::sync(bool showSyncProgress, bool enforce)  {
+    if (enforce || QDateTime::currentMSecsSinceEpoch() - lastSyncTime > 30*1000 ) // sync interval 30 seconds - half of block mining interval
+    {
+        if (showSyncProgress) {
+            int rrr=0;
+        }
+
+        eventCollector->addTask( new TaskSync(this, showSyncProgress), TaskSync::TIMEOUT );
+    }
+}
 
 // Request Wallet balance update. It is a multistep operation
 // Check signal: onWalletBalanceUpdated
 //          onWalletBalanceProgress
-void MWC713::updateWalletBalance()  {
+void MWC713::updateWalletBalance(bool enforceSync, bool showSyncProgress)  {
     if ( !isWalletRunningAndLoggedIn() )
         return; // ignoring request
 
@@ -489,6 +500,8 @@ void MWC713::updateWalletBalance()  {
     // 1 - list accounts (this call)
     // 2 - for every account get info ( see updateAccountList call )
     // 3 - restore back current account
+
+    sync(showSyncProgress, enforceSync);
 
     eventCollector->addTask( new TaskAccountList(this), TaskAccountList::TIMEOUT );
 }
@@ -608,7 +621,8 @@ void MWC713::getOutputCount(QString account)  {
 
 // Show outputs for the wallet
 // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> Transactions)
-void MWC713::getOutputs(QString account, int offset, int number)  {
+void MWC713::getOutputs(QString account, int offset, int number, bool enforceSync)  {
+    sync(true, enforceSync);
     // Need to switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskOutputs(this, offset, number), TaskOutputs::TIMEOUT );
@@ -621,7 +635,8 @@ void MWC713::getTransactionCount(QString account) {
     eventCollector->addTask( new TaskTransactionCount(this, account), TaskTransactions::TIMEOUT );
 }
 
-void MWC713::getTransactions(QString account, int offset, int number)  {
+void MWC713::getTransactions(QString account, int offset, int number, bool enforceSync)  {
+    sync(true, enforceSync);
     // Need to switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskTransactions(this, offset, number), TaskTransactions::TIMEOUT );
@@ -871,16 +886,7 @@ void MWC713::updateAccountList( QVector<QString> accounts ) {
             break;
         }
 
-        // We can do  --no-refresh  only for accounts that has nothing to waiting for. For others refresh will not work.
-        // Also after login the first run is for total balance only. It is mean that we don't need any sync calls as well.
-
-        bool need2sync = false;
-
-        if (accNameMap.contains(acc)) {
-            need2sync = accNameMap[acc].isAwaitingSomething();
-        }
-
-        eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber, !need2sync ), TaskAccountInfo::TIMEOUT, false );
+        eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber ), TaskAccountInfo::TIMEOUT, false );
         eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1, false ); // Updating the progress
     }
     if (!cancel) {
@@ -897,7 +903,14 @@ void MWC713::updateAccountProgress(int accountIdx, int totalAccounts) {
 void MWC713::updateAccountFinalize(QString prevCurrentAccount) {
     accountInfo = collectedAccountInfo;
     collectedAccountInfo.clear();
-    logger::logEmit( "MWC713", "updateAccountFinalize","");
+
+    QString accountBalanceStr;
+
+    for (const auto & acc: accountInfo) {
+        accountBalanceStr += acc.toString() + ";";
+    }
+
+    logger::logEmit( "MWC713", "updateAccountFinalize",accountBalanceStr );
     emit onWalletBalanceUpdated();
 
     // Set back the current account
@@ -975,11 +988,11 @@ void MWC713::updateRenameAccount(const QString & oldName, const QString & newNam
 
 // Update with account info
 void MWC713::infoResults( QString currentAccountName, int64_t height,
-                  int64_t totalNano, int64_t waitingConfNano, int64_t lockedNano, int64_t spendableNano, bool mwcServerBroken ) {
+                  int64_t totalConfirmedNano, int64_t waitingConfNano, int64_t waitingFinalizetinNano, int64_t lockedNano, int64_t spendableNano, bool mwcServerBroken ) {
     AccountInfo acc;
     acc.setData(currentAccountName,
-                totalNano,
-                waitingConfNano,
+                totalConfirmedNano + waitingFinalizetinNano,   // we need "Total", not "Confirmed Total"
+                waitingConfNano + waitingFinalizetinNano,
                 lockedNano,
                 spendableNano,
                 height,
@@ -1018,7 +1031,7 @@ void MWC713::reportSlateReceivedBack( QString slate, QString mwc, QString fromAd
     emit onSlateReceivedBack(slate, mwc, fromAddr);
 
     // Request balace refresh
-    updateWalletBalance();
+    updateWalletBalance(false,true);
 }
 
 void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAddr, QString message ) {
@@ -1031,7 +1044,7 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
 
     emit onSlateReceivedFrom(slate, mwc, fromAddr, message );
 
-    updateWalletBalance();
+    updateWalletBalance(false,true);
 
     // Show message box with congrats. Message bot should work from any point. No needs to block locking or what ever we have
     control::MessageBox::messageHTML(nullptr, "Congratulations!",
@@ -1050,7 +1063,7 @@ void MWC713::reportSlateFinalized( QString slate ) {
     emit onSlateFinalized(slate);
 
     // Request balance refresh
-    updateWalletBalance();
+    updateWalletBalance(false,true);
 }
 
 void MWC713::setSendFileResult( bool success, QStringList errors, QString fileName ) {
@@ -1199,6 +1212,17 @@ void MWC713::processAllTransactionsEnd() {
     emit onAllTransactions(collectedTransactions);
     collectedTransactions.clear();
 }
+
+void MWC713::updateSyncProgress(double progressPercent) {
+    logger::logEmit("MWC713", "onUpdateSyncProgress", QString::number(progressPercent) );
+
+    emit onUpdateSyncProgress(progressPercent);
+}
+
+void MWC713::updateSyncAsDone() {
+    lastSyncTime = QDateTime::currentMSecsSinceEpoch();
+}
+
 
 
 /////////////////////////////////////////////////////////////////////////////////

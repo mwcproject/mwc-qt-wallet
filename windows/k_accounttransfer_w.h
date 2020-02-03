@@ -26,6 +26,10 @@ namespace state {
 class AccountTransfer;
 }
 
+namespace control {
+class MwcComboBox;
+}
+
 namespace wnd {
 
 class AccountTransfer : public core::NavWnd
@@ -37,8 +41,10 @@ public:
     ~AccountTransfer();
 
     void showTransferResults(bool ok, QString errMsg);
-protected:
     void updateAccounts();
+protected:
+    // return -1 if not seleted or not valid
+    int getAccountSelectionComboBoxCurrentIndex( control::MwcComboBox * combo, bool showInputErrMessage );
 
 private slots:
     void on_allAmountButton_clicked();

@@ -92,7 +92,7 @@ void Outputs::setOutputCount(QString account, int count) {
     buttonState = updatePages(currentPagePosition, totalOutputs, pageSize);
 
     // Requesting the output data
-    state->requestOutputs(account, currentPagePosition, pageSize);
+    state->requestOutputs(account, currentPagePosition, pageSize, true); // It is a refresh call, want to sync enforcement
 }
 
 void Outputs::on_prevBtn_clicked()
@@ -102,7 +102,7 @@ void Outputs::on_prevBtn_clicked()
         currentPagePosition = std::max( 0, currentPagePosition-pageSize );
 
         buttonState = updatePages(currentPagePosition, totalOutputs, pageSize);
-        state->requestOutputs(currentSelectedAccount(), currentPagePosition, pageSize);
+        state->requestOutputs(currentSelectedAccount(), currentPagePosition, pageSize, false);
 
         ui->progressFrame->show();
         ui->tableFrame->hide();
@@ -116,7 +116,7 @@ void Outputs::on_nextBtn_clicked()
         currentPagePosition = std::min( totalOutputs-pageSize, currentPagePosition+pageSize );
 
         buttonState = updatePages(currentPagePosition, totalOutputs, pageSize);
-        state->requestOutputs(currentSelectedAccount(), currentPagePosition, pageSize);
+        state->requestOutputs(currentSelectedAccount(), currentPagePosition, pageSize, false);
 
         ui->progressFrame->show();
         ui->tableFrame->hide();
