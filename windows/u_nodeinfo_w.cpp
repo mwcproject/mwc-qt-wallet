@@ -217,6 +217,9 @@ void NodeInfo::on_saveBlockchianData_clicked()
     if (fileName.length()==0)
           return;
 
+    if (!fileName.endsWith(".mwcblc"))
+        fileName += ".mwcblc";
+
     ui->progress->show();
     state->updateBlockchainDataPath( QFileInfo(fileName).absolutePath() );
     state->saveBlockchainData(fileName);
