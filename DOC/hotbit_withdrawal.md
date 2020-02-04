@@ -46,7 +46,7 @@ Note: you must include the "mwcmqs://" part of the address.
 
 So for instance your address that you enter into Hotbit may look something like this:
 
-"mwmqs://q5XLmBpaqstWg5S4S3m4umwgiYxF49tC4GkJ26QvvmkRA7HU7wXM"
+"mwcmqs://q5XLmBpaqstWg5S4S3m4umwgiYxF49tC4GkJ26QvvmkRA7HU7wXM"
 
 To save the address, you will need to have an amount set in the "MWC Withdrawal" field to proceed. Once you have added you may click "Submit".
 
