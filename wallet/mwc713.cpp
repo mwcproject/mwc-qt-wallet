@@ -1413,15 +1413,12 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
 
     QString mwc713confFN = config::getMwc713conf();
 
-    QStringList confLines = util::readTextFile( mwc713confFN );
+    QStringList confLines = util::readTextFile( mwc713confFN, false );
     // Updating the config with new values
 
     QStringList newConfLines;
 
     for (QString & ln : confLines) {
-        if ( ln.trimmed().isEmpty())
-            continue; // skipping empty lines
-
         if (ln.startsWith("wallet713_data_path") || ln.startsWith("keybase_binary") || ln.startsWith("mwcmq_domain") || ln.startsWith("mwcmqs_domain") ||
                                 ln.startsWith("mwc_node_uri") || ln.startsWith("mwc_node_secret") || ln.startsWith("chain") ||
                                 ln.startsWith("grinbox_listener_auto_start") || ln.startsWith("keybase_listener_auto_start") ) {
