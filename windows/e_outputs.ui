@@ -123,7 +123,7 @@
             </column>
             <column>
              <property name="text">
-              <string>MMR IDX</string>
+              <string>HEIGHT</string>
              </property>
             </column>
             <column>

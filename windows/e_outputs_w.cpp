@@ -184,7 +184,7 @@ void Outputs::setOutputsData(QString account, int64_t height, const QVector<wall
                                          out.numOfConfirms,
                                          out.coinbase ? "Yes":"No",
                                          out.outputCommitment,
-                                         out.MMRIndex,
+                                         out.blockHeight,
                                          out.lockedUntil
                                      } );
     }
