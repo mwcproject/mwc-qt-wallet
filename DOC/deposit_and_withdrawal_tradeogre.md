@@ -10,9 +10,9 @@ It is recommended that you use Chrome on TradeOgre. Other browsers may work but 
 
 Click on the send tab in your Qt wallet.
 
-![TradeOgre](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/trade_ogre_1.png)
+![TradeOgre](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/trade_ogre_9.png)
 
-Make sure to select "File (manual process)".
+Select "File (manual process)" to send via file.
 
 Enter the amount and click "Next". Finally click "Send".
 
