@@ -4,9 +4,9 @@ This page will explain how to deposit and withdraw MWC from TradeOgre using the 
 
 It is recommended that you use Chrome on TradeOgre. Other browsers may work but everything in this tutorial has been tested using Chrome.
 
-## Deposits
+# Deposits
 
-# Create a send file in your Qt wallet.
+## Create a send file in your Qt wallet.
 
 Click on the send tab in your Qt wallet.
 
@@ -16,7 +16,7 @@ Enter the amount and click "Next". Finally click "Send".
 
 You will be asked for your password and then you will create a file. Call it tradeogre.tx and click "save".
 
-# Go to the deposits page on TradeOgre.
+## Go to the deposits page on TradeOgre.
 
 After logging into TradeOgre, go to the balances page and search for MWC.
 
@@ -36,6 +36,6 @@ Your slate file will be finalized and once your transaction confirms, it will sh
 
 Congratulations, you have deposited to TradeOgre.
 
-## Withdrawals
+# Withdrawals
 
 More to come.
