@@ -51,4 +51,4 @@ Congratulations, you have deposited to TradeOgre.
 
 # Withdrawals
 
-More to come.
+The withdrawal process is similar to deposits except that instead of finalizing the slate file provided by TradeOgre, you need to "receive" it. This can be done in the receive tab of the wallet.
