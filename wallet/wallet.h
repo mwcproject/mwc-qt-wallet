@@ -195,7 +195,7 @@ struct WalletTransaction {
         int64_t    coinNano,
         bool    proof);
 
-    bool isValid() const {return txIdx>=0 && transactionType!=TRANSACTION_TYPE::NONE && !txid.isEmpty();}
+    bool isValid() const {return txIdx>=0 && transactionType!=TRANSACTION_TYPE::NONE;}
 
     bool canBeCancelled() const { return (transactionType & TRANSACTION_TYPE::CANCELLED)==0 && !confirmed; }
 
