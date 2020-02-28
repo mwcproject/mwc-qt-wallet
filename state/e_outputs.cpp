@@ -32,6 +32,8 @@ Outputs::Outputs(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onOutputs, this, &Outputs::onOutputs );
     QObject::connect( context->wallet, &wallet::Wallet::onOutputCount, this, &Outputs::onOutputCount );
 
+    QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
+                      this, &Outputs::onNewNotificationMessage, Qt::QueuedConnection );
 }
 
 Outputs::~Outputs() {}
@@ -98,6 +100,14 @@ void Outputs::updateColumnsWidhts(const QVector<int> & widths) {
 void Outputs::onWalletBalanceUpdated() {
     if (wnd) {
         wnd->updateWalletBalance();
+    }
+}
+
+void Outputs::onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString message) {
+    Q_UNUSED(level)
+
+    if (wnd && message.contains("Changing status for output")) {
+        wnd->triggerRefresh();
     }
 }
 

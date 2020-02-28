@@ -17,6 +17,7 @@
 
 #include "state.h"
 #include "../wallet/wallet.h"
+#include "../core/Notification.h"
 
 namespace wnd {
 class Transactions;
@@ -70,6 +71,8 @@ private slots:
 
     void updateExportProof( bool success, QString fn, QString msg );
     void updateVerifyProof( bool success, QString fn, QString msg );
+
+    void onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString message);
 
 private:
     wnd::Transactions * wnd = nullptr;

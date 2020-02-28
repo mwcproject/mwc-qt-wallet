@@ -17,6 +17,7 @@
 
 #include "state.h"
 #include "../wallet/wallet.h"
+#include "../core/Notification.h"
 
 namespace wnd {
 class Outputs;
@@ -53,6 +54,7 @@ private slots:
 
     void onWalletBalanceUpdated();
 
+    void onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString message);
 
 protected:
     virtual NextStateRespond execute() override;

@@ -42,6 +42,8 @@ public:
     // return selected account
     QString updateWalletBalance();
 
+    void triggerRefresh();
+
 private slots:
     void on_accountComboBox_activated(int index);
 

@@ -280,6 +280,11 @@ void Transactions::updateButtons() {
     ui->deleteButton->setEnabled( selected!=nullptr && selected->canBeCancelled() );
 }
 
+void Transactions::triggerRefresh() {
+    if ( ui->progressFrame->isHidden() )
+        on_refreshButton_clicked();
+}
+
 
 void Transactions::on_refreshButton_clicked()
 {

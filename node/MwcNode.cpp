@@ -345,17 +345,24 @@ void MwcNode::mwcNodeReadyReadStandardOutput() {
 enum class SYNC_STATE {GETTING_HEADERS, TXHASHSET_REQUEST, TXHASHSET_GET, VERIFY_RANGEPROOFS_FOR_TXHASHSET, VERIFY_KERNEL_SIGNATURES, GETTING_BLOCKS };
 // return progress in the range [0-1.0]
 static QString calcProgressStr( int initChainHeight , int txhashsetHeight, int peersMaxHeight, SYNC_STATE syncState, int value ) {
-    const double getHeadersShare = 0.2;
+    // timing:
+    // Headers: 11:00
+    // range proofs download & anpack: 0:34
+    // Verify ranges: 3:23
+    // Getting Blocks: 2:50
+    // Total time: 18:00
+
+    const double getHeadersShare = 0.6;
     // Calculating shares for operations. Note, txHash stage is optional.
     double getTxHashShare, verifyRangeProofsShare, verifyKernelSignaturesShare;
     if (txhashsetHeight>0) {
-        getTxHashShare = 0.02;
+        getTxHashShare = 0.05;
         double hashSetW = (txhashsetHeight - initChainHeight);
         double blocksSet = (peersMaxHeight - txhashsetHeight) * 100.0;
         double txShare = hashSetW / ( hashSetW + blocksSet );
         double totalShare = (1.0 - getHeadersShare-getTxHashShare);
-        verifyRangeProofsShare = 0.65 * totalShare * txShare;
-        verifyKernelSignaturesShare = 0.35 * totalShare * txShare;
+        verifyRangeProofsShare = 0.6 * totalShare * txShare;
+        verifyKernelSignaturesShare = 0.4 * totalShare * txShare;
     }
     else {
         getTxHashShare = 0.0;

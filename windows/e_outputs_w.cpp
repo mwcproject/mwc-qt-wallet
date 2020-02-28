@@ -193,7 +193,14 @@ void Outputs::setOutputsData(QString account, int64_t height, const QVector<wall
     ui->nextBtn->setEnabled( buttonState.second );
 }
 
-void wnd::Outputs::on_refreshButton_clicked()
+void Outputs::triggerRefresh() {
+    if ( ui->progressFrame->isHidden() ) {
+        on_refreshButton_clicked();
+    }
+}
+
+
+void Outputs::on_refreshButton_clicked()
 {
     ui->progressFrame->show();
     ui->tableFrame->hide();

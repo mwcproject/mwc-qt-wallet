@@ -45,7 +45,7 @@ public:
     void updateCancelTransacton(bool success, int64_t trIdx, QString errMessage);
     QString updateWalletBalance();
 
-
+    void triggerRefresh();
 private slots:
     void on_transactionTable_itemSelectionChanged();
     void on_transactionTable_cellDoubleClicked(int row, int column);
