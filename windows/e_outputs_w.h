@@ -53,6 +53,10 @@ private slots:
 
     void on_refreshButton_clicked();
 
+    void on_showAll_clicked();
+
+    void on_showUnspent_clicked();
+
 private:
     void initTableHeaders();
     void saveTableHeaders();
@@ -65,6 +69,8 @@ private:
     QPair<bool,bool> updatePages( int currentPos, int total, int pageSize );
 
     int calcPageSize() const;
+
+    bool isShowUnspent() const;
 
 private:
     Ui::Outputs *ui;

@@ -138,7 +138,7 @@ bool AppContext::loadData() {
 
     int id = 0;
     in >> id;
-    if (id<0x4783 || id>0x4787)
+    if (id<0x4783 || id>0x4788)
          return false;
 
     in >> receiveAccount;
@@ -180,6 +180,10 @@ bool AppContext::loadData() {
         in >> network;
     }
 
+    if (id>=0x4788) {
+        in >> showOutputAll;
+    }
+
     return true;
 }
 
@@ -200,7 +204,7 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x4787;
+    out << 0x4788;
     out << receiveAccount;
     out << currentAccountName;
     out << int(activeWndState);
@@ -222,6 +226,8 @@ void AppContext::saveData() const {
 
     out << wallet713DataPath;
     out << network;
+
+    out << showOutputAll;
 }
 
 void AppContext::setLogsEnabled(bool enabled) {
@@ -229,6 +235,10 @@ void AppContext::setLogsEnabled(bool enabled) {
         return;
     logsEnabled = enabled;
     saveData();
+}
+
+void AppContext::setShowOutputAll(bool all) {
+    showOutputAll = all;
 }
 
 

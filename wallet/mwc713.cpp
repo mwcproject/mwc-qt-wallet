@@ -614,18 +614,18 @@ void MWC713::submitFile( QString fileTx ) {
 
 // Get total number of Outputs
 // Check Signal: onOutputCount(int number)
-void MWC713::getOutputCount(QString account)  {
+void MWC713::getOutputCount(bool show_spent, QString account)  {
     eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
-    eventCollector->addTask( new TaskOutputCount(this, account), TaskOutputCount::TIMEOUT );
+    eventCollector->addTask( new TaskOutputCount(this, show_spent, account), TaskOutputCount::TIMEOUT );
 }
 
 // Show outputs for the wallet
 // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> Transactions)
-void MWC713::getOutputs(QString account, int offset, int number, bool enforceSync)  {
+void MWC713::getOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync)  {
     sync(true, enforceSync);
     // Need to switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
-    eventCollector->addTask( new TaskOutputs(this, offset, number), TaskOutputs::TIMEOUT );
+    eventCollector->addTask( new TaskOutputs(this, offset, number, show_spent), TaskOutputs::TIMEOUT );
 }
 
 // Get total number of Transactions

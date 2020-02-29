@@ -222,11 +222,11 @@ public:
 
     // Get total number of Outputs
     // Check Signal: onOutputCount(int number)
-    virtual void getOutputCount(QString account)  override;
+    virtual void getOutputCount(bool show_spent, QString account)  override;
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
-    virtual void getOutputs(QString account, int offset, int number, bool enforceSync)  override;
+    virtual void getOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync)  override;
 
     // Get total number of Transactions
     // Check Signal: onTransactionCount(int number)

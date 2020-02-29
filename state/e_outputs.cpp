@@ -50,13 +50,13 @@ NextStateRespond Outputs::execute() {
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
-void Outputs::requestOutputCount(QString account) {
-    context->wallet->getOutputCount(account);
+void Outputs::requestOutputCount(bool show_spent, QString account) {
+    context->wallet->getOutputCount(show_spent, account);
 }
 
 // request wallet for outputs
-void Outputs::requestOutputs(QString account, int offset, int number, bool enforceSync) {
-    context->wallet->getOutputs(account, offset, number, enforceSync);
+void Outputs::requestOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync) {
+    context->wallet->getOutputs(account, offset, number, show_spent, enforceSync);
     // Respond:  onOutputs(...)
     // Balance need to be updated as well to match outputs state
     context->wallet->updateWalletBalance(false,false);
