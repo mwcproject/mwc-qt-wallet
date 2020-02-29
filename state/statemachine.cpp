@@ -229,10 +229,14 @@ void StateMachine::timerEvent(QTimerEvent *event) {
     if (QDateTime::currentMSecsSinceEpoch() > logoutTime ) {
         // logout
         logoutTime = 0;
-        context->appContext->pushCookie<QString>("LockWallet", "lock");
-        context->stateMachine->executeFrom(STATE::NONE);
+        logout();
     }
 }
 
+// logout now
+void StateMachine::logout() {
+    context->appContext->pushCookie<QString>("LockWallet", "lock");
+    context->stateMachine->executeFrom(STATE::NONE);
+}
 
 }
