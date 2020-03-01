@@ -55,7 +55,7 @@ public:
     virtual QString getResultTxPath() override {return "";}
     virtual void updateResultTxPath(QString path)  override {Q_UNUSED(path)}
 
-
+    virtual bool isNodeHealthy() const override {return false;}
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "receive.html";}

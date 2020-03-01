@@ -11,13 +11,13 @@
 <p style="line-height:150%;">There are several types of addresses that are supported.</p>
 
 <ol style="-qt-list-indent: 1; margin: 10pt">
-    <li style="line-height:150%;">mwcmq - This is MWC Message Queue. This is the main way to send funds in the QT wallet. We are using a fork of Grinbox
+    <li style="line-height:150%;">mwcmqs://&lt;address&gt; - This is MWC Message Queue. This is the main way to send funds in the QT wallet. We are using a fork of Grinbox
         to allow for users to quickly and easily send funds. The addresses may appear similar to Bitcoin addresses, but the main difference
         is that in order to send/receive both wallets must be online at the time the funds are sent. This is the default for the wallet.</li>
-    <li style="line-height:150%;">keybase - Keybase is a tool that allows people to manage keys. It also has an instant messenger functionality.
+    <li style="line-height:150%;">keybase://&lt;user_name&gt; - Keybase is a tool that allows people to manage keys. It also has an instant messenger functionality.
         If you install keybase on the system that is running your MWC-QT-Wallet you will be able to send via Keybase.
         To use this, specify keybase://&lt;user_name&gt; to send to a recipient.</li>
-    <li style="line-height:150%;">http/https - You can send to HTTP/HTTPS address. This requires that the
+    <li style="line-height:150%;">http(s)://&lt;hos&gt;:&lt;port&gt; - You can send to HTTP/HTTPS address. This requires that the
         host/ip specified be running the MWC full node wallet listener.</li>
 </ol>
 

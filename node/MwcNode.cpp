@@ -157,9 +157,16 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
 
     nodeProcConnect(process);
 
+    // >  mwc --floonet server --allow_to_stop run
+
     QStringList params;
     if (network.toLower().startsWith("floo"))
         params.push_back("--floonet");
+
+    // Running as server with stop_node API
+    params.push_back("server");
+    params.push_back("--allow_to_stop");
+    params.push_back("run");
 
     nodeStartTime = QDateTime::currentMSecsSinceEpoch();
 

@@ -439,7 +439,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot;line-height:138%;&quot;&gt;
 &lt;p&gt;
 - Transaction will not be finalized if the destination wallet is offline and not listening for the destination address.&lt;br/&gt;
-- Your fund at that output will be blocked until your transaction is finalized&lt;br/&gt;
+- Your funds at that output will be blocked until your transaction is finalized&lt;br/&gt;
 - You can cancel any non finalized transaction to unblock your funds at 'Transactions'&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="wordWrap">
@@ -485,7 +485,7 @@ p, li { white-space: pre-wrap; }
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
+   <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
@@ -495,20 +495,20 @@ p, li { white-space: pre-wrap; }
    <header>control/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLine</class>
-   <extends>QFrame</extends>
-   <header>control/MwcFrameWithBorder.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLine</class>
+   <extends>QFrame</extends>
+   <header>control/MwcFrameWithBorder.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>control::MwcComboBox</class>

@@ -261,6 +261,9 @@ public:
     // Return true if wallet is running
     virtual bool isRunning() = 0;
 
+    // Just a helper method
+    virtual bool isWalletRunningAndLoggedIn() const = 0;
+
     // Check if wallet need to be initialized or not. Will run standalone app, wait for exit and return the result
     // Call might take few seconds
     virtual bool checkWalletInitialized() = 0;
@@ -343,7 +346,7 @@ public:
 
 
     // Request Wallet balance update. It is a multistep operation
-    virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress)  = 0;
+    virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress, bool skipSync=false)  = 0;
     // Check signal: onWalletBalanceUpdated
     //          onWalletBalanceProgress
     //          onAccountSwitched - multiple calls, please ignore

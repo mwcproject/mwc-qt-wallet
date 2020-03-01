@@ -132,7 +132,7 @@ public:
     virtual void sync(bool showSyncProgress, bool enforce) override;
 
     // Request Wallet balance update. It is a multistep operation
-    virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress) override;
+    virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress, bool skipSync=false) override;
     // Check signal: onWalletBalanceUpdated
     //          onWalletBalanceProgress
 
@@ -244,7 +244,7 @@ public:
     // Feed the command to mwc713 process
     void executeMwc713command( QString cmd, QString shadowStr);
 
-    bool isWalletRunningAndLoggedIn() const { return ! (mwc713process== nullptr || eventCollector== nullptr || startedMode != STARTED_MODE::NORMAL || loggedIn==false ); }
+    virtual bool isWalletRunningAndLoggedIn() const override { return ! (mwc713process== nullptr || eventCollector== nullptr || startedMode != STARTED_MODE::NORMAL || loggedIn==false ); }
 
 public:
     // stop mwc713 process nicely

@@ -54,6 +54,10 @@ Send::Send(StateContext * context) :
     QObject::connect(context->wallet, &wallet::Wallet::onCancelTransacton,
                      this, &Send::onCancelTransacton, Qt::QueuedConnection);
 
+    // Need to update mwc node status because send can fail if node is not healthy.
+    QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
+                     this, &Send::onNodeStatus, Qt::QueuedConnection);
+
     startTimer(1000); // Respond from send checking timer
 }
 
@@ -228,6 +232,11 @@ void Send::registerSlate( const QString & slate, QString address, int64_t txid, 
         if (txid>=0)
             evtInfo.txid = txid;
     }
+}
+
+void Send::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
+    nodeIsHealthy = online &&
+                    ((config::isColdWallet() || connections > 0) && totalDifficulty > 0 && nodeHeight > peerHeight - 5);
 }
 
 

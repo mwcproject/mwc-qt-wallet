@@ -58,6 +58,12 @@ void SendOffline::on_sendButton_clicked()
 {
     state::TimeoutLockObject to( state );
 
+    if ( !state->isNodeHealthy() ) {
+        control::MessageBox::messageText(this, "Unable to send", "Your MWC-Node, that wallet connected to, is not ready.\n"
+                                                                     "MWC-Node need to be connected to few peers and finish blocks synchronization process");
+        return;
+    }
+
     QString description = ui->descriptionEdit->toPlainText().trimmed();
 
     {

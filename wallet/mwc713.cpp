@@ -481,10 +481,6 @@ QVector<AccountInfo>  MWC713::getWalletBalance(bool filterDeleted) const  {
 void MWC713::sync(bool showSyncProgress, bool enforce)  {
     if (enforce || QDateTime::currentMSecsSinceEpoch() - lastSyncTime > 30*1000 ) // sync interval 30 seconds - half of block mining interval
     {
-        if (showSyncProgress) {
-            int rrr=0;
-        }
-
         eventCollector->addTask( new TaskSync(this, showSyncProgress), TaskSync::TIMEOUT );
     }
 }
@@ -492,7 +488,7 @@ void MWC713::sync(bool showSyncProgress, bool enforce)  {
 // Request Wallet balance update. It is a multistep operation
 // Check signal: onWalletBalanceUpdated
 //          onWalletBalanceProgress
-void MWC713::updateWalletBalance(bool enforceSync, bool showSyncProgress)  {
+void MWC713::updateWalletBalance(bool enforceSync, bool showSyncProgress, bool skipSync)  {
     if ( !isWalletRunningAndLoggedIn() )
         return; // ignoring request
 
@@ -501,7 +497,8 @@ void MWC713::updateWalletBalance(bool enforceSync, bool showSyncProgress)  {
     // 2 - for every account get info ( see updateAccountList call )
     // 3 - restore back current account
 
-    sync(showSyncProgress, enforceSync);
+    if (!skipSync)
+        sync(showSyncProgress, enforceSync);
 
     eventCollector->addTask( new TaskAccountList(this), TaskAccountList::TIMEOUT );
 }
