@@ -125,7 +125,7 @@ public:
                 QString keyBasePath );
 
     void updateDataPath(const QString & path) {dataPath=path;}
-    void updateNetwork(const QString & mw) {network=mw;}
+    void updateNetwork(const QString & mw) { Q_ASSERT(!mw.isEmpty()); network=mw;}
 
     const QString & getDataPath() const {return dataPath;}
     const QString & getNetwork() const {return network;}

@@ -386,7 +386,8 @@ int main(int argc, char *argv[])
         while (true) {
             QPair<QString,QString> network_arch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDataPath);
 
-            walletConfig.updateNetwork(network_arch.first);
+            if (!network_arch.first.isEmpty())
+                walletConfig.updateNetwork(network_arch.first);
 
             QString arh = network_arch.second;
 
