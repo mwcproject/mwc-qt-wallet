@@ -1,5 +1,5 @@
-#include "dialogs/showtransactiondlg.h"
-#include "ui_showtransactiondlg.h"
+#include "dialogs/e_showtransactiondlg.h"
+#include "ui_e_showtransactiondlg.h"
 #include "../wallet/wallet.h"
 #include "../util/stringutils.h"
 

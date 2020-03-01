@@ -20,8 +20,8 @@
 #include "../control/messagebox.h"
 #include "../state/timeoutlock.h"
 #include <QDebug>
-#include "../dialogs/showproofdlg.h"
-#include "../dialogs/showtransactiondlg.h"
+#include "dialogs/e_showproofdlg.h"
+#include "dialogs/e_showtransactiondlg.h"
 
 namespace wnd {
 

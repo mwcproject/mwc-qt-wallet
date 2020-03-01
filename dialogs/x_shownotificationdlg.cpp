@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dialogs/shownotificationdlg.h"
-#include "ui_shownotificationdlg.h"
+#include "dialogs/x_shownotificationdlg.h"
+#include "ui_x_shownotificationdlg.h"
 
 namespace dlg {
 
