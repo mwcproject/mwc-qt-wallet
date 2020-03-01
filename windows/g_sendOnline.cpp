@@ -38,6 +38,7 @@ SendOnline::SendOnline(QWidget *parent,
     ui->progress->initLoader(false);
 
     ui->contactNameLable->setText("");
+    ui->contactNameLable->hide();
     ui->apiSecretEdit->hide();
 
     ui->fromAccount->setText("From account: " + selectedAccount.accountName );
@@ -62,6 +63,8 @@ void SendOnline::on_contactsButton_clicked()
         core::ContactRecord selectedContact = dlg.getSelectedContact();
         ui->sendEdit->setText( selectedContact.address );
         ui->contactNameLable->setText("     Contact: " + selectedContact.name );
+        ui->contactNameLable->show();
+        ui->formatsLable->hide();
     }
 
 }
@@ -70,6 +73,8 @@ void SendOnline::on_contactsButton_clicked()
 void SendOnline::on_sendEdit_textEdited(const QString &)
 {
     ui->contactNameLable->setText("");
+    ui->contactNameLable->hide();
+    ui->formatsLable->show();
 }
 
 void SendOnline::on_settingsBtn_clicked()
