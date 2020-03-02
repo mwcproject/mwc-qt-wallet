@@ -274,7 +274,7 @@ wallet::WalletTransaction * Transactions::getSelectedTransaction() {
 }
 
 void Transactions::updateButtons() {
-    wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
+    wallet::WalletTransaction * selected = getSelectedTransaction();
 
     ui->generateProofButton->setEnabled( selected!=nullptr && selected->proof );
     ui->deleteButton->setEnabled( selected!=nullptr && selected->canBeCancelled() );
@@ -313,7 +313,7 @@ void Transactions::on_generateProofButton_clicked()
 {
     state::TimeoutLockObject to( state );
 
-    wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
+    wallet::WalletTransaction * selected = getSelectedTransaction();
 
     if (! ( selected!=nullptr && selected->proof ) ) {
         control::MessageBox::messageText(this, "Need info",
@@ -348,7 +348,7 @@ void Transactions::on_transactionTable_cellDoubleClicked(int row, int column)
     Q_UNUSED(row);
     Q_UNUSED(column);
     state::TimeoutLockObject to( state );
-    wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
+    wallet::WalletTransaction * selected = getSelectedTransaction();
 
     if (selected==nullptr)
         return;
@@ -369,7 +369,7 @@ void Transactions::on_accountComboBox_activated(int index)
 void Transactions::on_deleteButton_clicked()
 {
     state::TimeoutLockObject to( state );
-    wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
+    wallet::WalletTransaction * selected = getSelectedTransaction();
 
     if (! ( selected!=nullptr && !selected->confirmed ) ) {
         control::MessageBox::messageText(this, "Need info",

@@ -18,6 +18,8 @@
 #include "../util/stringutils.h"
 #include "../core/appcontext.h"
 #include <QDebug>
+#include "../dialogs/e_showoutputdlg.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
@@ -271,5 +273,26 @@ bool Outputs::isShowUnspent() const {
     return !ui->showAll->isEnabled();
 }
 
+// return null if nothing was selected
+wallet::WalletOutput * Outputs::getSelectedOutput() {
+    int row = ui->outputsTable->getSelectedRow();
+    if (row<0 || row>=outputs.size())
+        return nullptr;
+
+    return &outputs[outputs.size()-1-row];
+}
+
+void Outputs::on_outputsTable_cellDoubleClicked(int row, int column)
+{
+    Q_UNUSED(row);
+    Q_UNUSED(column);
+    state::TimeoutLockObject to( state );
+    wallet::WalletOutput * selected = getSelectedOutput();
+
+    if (selected==nullptr)
+        return;
+
+    dlg::ShowOutputDlg showOutputDlg(this, *selected, state->getContext()->wallet->getWalletConfig() );
+    showOutputDlg.exec();}
 
 }

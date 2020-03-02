@@ -12,36 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SHOWTRANSACTIONDLG_H
-#define SHOWTRANSACTIONDLG_H
+#ifndef E_SHOWOUTPUTDLG_H
+#define E_SHOWOUTPUTDLG_H
 
 #include "../control/mwcdialog.h"
 
 namespace Ui {
-class ShowTransactionDlg;
+class ShowOutputDlg;
 }
 
 namespace wallet {
-    struct WalletTransaction;
+struct WalletOutput;
+struct WalletConfig;
 }
 
 namespace dlg {
 
-class ShowTransactionDlg : public control::MwcDialog
-{
-    Q_OBJECT
-
+class ShowOutputDlg : public control::MwcDialog {
+Q_OBJECT
 public:
-    explicit ShowTransactionDlg(QWidget *parent,  const wallet::WalletTransaction & transaction);
-    ~ShowTransactionDlg();
+    explicit ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output, const wallet::WalletConfig &config);
+
+    ~ShowOutputDlg();
 
 private slots:
+
+    void on_viewOutput_clicked();
+
     void on_pushButton_clicked();
 
 private:
-    Ui::ShowTransactionDlg *ui;
+    Ui::ShowOutputDlg *ui;
+
+    QString blockExplorerUrl;
+    QString commitment;
 };
 
 }
 
-#endif // SHOWTRANSACTIONDLG_H
+#endif // E_SHOWOUTPUTDLG_H

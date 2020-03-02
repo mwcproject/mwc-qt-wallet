@@ -57,6 +57,8 @@ private slots:
 
     void on_showUnspent_clicked();
 
+    void on_outputsTable_cellDoubleClicked(int row, int column);
+
 private:
     void initTableHeaders();
     void saveTableHeaders();
@@ -71,6 +73,8 @@ private:
     int calcPageSize() const;
 
     bool isShowUnspent() const;
+
+    wallet::WalletOutput * getSelectedOutput();
 
 private:
     Ui::Outputs *ui;

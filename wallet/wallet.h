@@ -150,7 +150,7 @@ public:
 
 struct WalletOutput {
 
-    QString     outputCommitment;
+    QString    outputCommitment;
     QString    MMRIndex;
     QString    blockHeight;
     QString    lockedUntil;
