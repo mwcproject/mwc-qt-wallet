@@ -46,6 +46,11 @@ public:
     QString updateWalletBalance();
 
     void triggerRefresh();
+
+    void updateTransactionById(bool success, QString account, int64_t height,
+                          wallet::WalletTransaction transaction,
+                          QVector<wallet::WalletOutput> outputs,
+                          QVector<QString> messages);
 private slots:
     void on_transactionTable_itemSelectionChanged();
     void on_transactionTable_cellDoubleClicked(int row, int column);

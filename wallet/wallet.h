@@ -169,32 +169,51 @@ struct WalletOutput {
             QString     numOfConfirms,
             int64_t     valueNano,
             int64_t     txIdx);
+
+    bool isValid() const {
+        return !(outputCommitment.isEmpty() || status.isEmpty());
+    }
 };
 
 struct WalletTransaction {
-    enum TRANSACTION_TYPE { NONE=0, SEND=1, RECEIVE=2, CANCELLED=0x8000};
+    enum TRANSACTION_TYPE { NONE=0, SEND=1, RECEIVE=2, COIN_BASE=4, CANCELLED=0x8000};
 
     int64_t    txIdx = -1;
     uint    transactionType = TRANSACTION_TYPE::NONE;
-    QString txid;
+    QString txid; // Full tx UUIS
     QString address;
     QString creationTime;
+    int64_t ttlCutoffHeight = -1;
     bool    confirmed = false;
     int64_t height = 0;
     QString confirmationTime;
-    int64_t coinNano = 0; // Net diffrence
+    int     numInputs = -1;
+    int     numOutputs = -1;
+    int64_t credited = -1;
+    int64_t debited = -1;
+    int64_t fee = -1;
+    int64_t coinNano = 0; // Net diffrence, transaction weight
     bool    proof=false;
+    QString kernel;
 
     void setData(int64_t txIdx,
-        uint    transactionType,
-        QString txid,
-        QString address,
-        QString creationTime,
-        bool    confirmed,
-        int64_t height,
-        QString confirmationTime,
-        int64_t    coinNano,
-        bool    proof);
+                      uint    transactionType,
+                      QString txid,
+                      QString address,
+                      QString creationTime,
+                      bool    confirmed,
+                      int64_t ttlCutoffHeight,
+                      int64_t height,
+                      QString confirmationTime,
+                      int     numInputs,
+                      int     numOutputs,
+                      int64_t credited,
+                      int64_t debited,
+                      int64_t fee,
+                      int64_t coinNano,
+                      bool    proof,
+                      QString kernel);
+
 
     bool isValid() const {return txIdx>=0 && transactionType!=TRANSACTION_TYPE::NONE;}
 
@@ -215,6 +234,8 @@ struct WalletTransaction {
             res += "Send";
         if ( transactionType & TRANSACTION_TYPE::RECEIVE )
             res += "Receive";
+        if ( transactionType & TRANSACTION_TYPE::COIN_BASE )
+            res += "CoinBase";
 
         if ( transactionType & TRANSACTION_TYPE::CANCELLED ) {
             if (!res.isEmpty())
@@ -454,9 +475,13 @@ public:
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
     virtual void getTransactions(QString account, int offset, int number, bool enforceSync)  = 0;
 
-    // Read all transactions for all accounts. Might tale time...
+    // get Extended info for specific transaction
+    // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
+    virtual void getTransactionById(QString account, int64_t txIdx ) = 0;
+
+    // Read all transactions for all accounts. Might take time...
     // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
-    virtual void getAllTransactions()  = 0;
+    virtual void getAllTransactions() = 0;
 
 
     // ----------- HODL
@@ -534,6 +559,8 @@ signals:
     void onTransactionCount(QString account, int number);
     void onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
     void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
+
+    void onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages );
 
     void onAllTransactions( QVector<WalletTransaction> Transactions);
 

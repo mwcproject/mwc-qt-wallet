@@ -18,48 +18,78 @@
 
 namespace wallet {
 
+////////////////////// Common routine ///////////////////////////////////////////////////
+
+static QVector<int> parseHeadersLine( const QString & str, const QVector<QString> & headers ) {
+    Q_ASSERT(headers.size()>0);
+
+    QVector<int> res;
+
+    int curPos = 0;
+    for ( const auto & hdr : headers ) {
+        int pos = str.indexOf(hdr, curPos);
+        if (pos<0)
+            break;
+        res.push_back(pos);
+        curPos = pos + hdr.length();
+    }
+
+    if (res.size()<headers.size())
+        res.clear();
+
+    return res;
+}
+
+static QVector<QString> parseDataLine( const QString & str, const QVector<int> & offsets ) {
+    Q_ASSERT(offsets.size()>0);
+
+    QVector<QString> res;
+
+    for (int i=0; i<offsets.size(); i++) {
+        int idx1 = offsets[i];
+        int idx2 = str.length();
+        if (i+1<offsets.size())
+            idx2 = offsets[i+1];
+
+        res.push_back(util::getSubString(str, idx1, idx2));
+    }
+    return res;
+}
+
+
+
+
 // ------------------------------------ TaskOutputs -------------------------------------------
 
-struct OutputIdxLayout {
-    int outputCommitment = -1;
-    int mmrIndex = -1;
-    int blockHeight = -1;
-    int lockedUntil = -1;
-    int status = -1;
-    int coinbase = -1;
-    int confirms= -1;
-    int value = -1;
-    int tx = -1;
+WalletOutput parseOutputLine( QString str, const QVector<int> & outputLayout) {
 
-    bool isDefined() const {
-        return outputCommitment>=0 && mmrIndex>0 && blockHeight>0 && lockedUntil>0 && status >0 && coinbase>0 && confirms>0 && value>0 && tx>0;
-    }
-};
+    WalletOutput res; // invalid until data is set
 
-bool parseOutputLine( QString str, const OutputIdxLayout & tl,
-                           WalletOutput & output) {
+    QVector<QString> values = parseDataLine(str, outputLayout);
+    if (values.isEmpty())
+        return res;
 
-    QString strOutputCommitment = util::getSubString(str, tl.outputCommitment, tl.mmrIndex );
-    QString strMmrIndex = util::getSubString(str, tl.mmrIndex, tl.blockHeight);
-    QString strBlockHeight = util::getSubString(str, tl.blockHeight, tl.lockedUntil);
-    QString strLockedUntil = util::getSubString(str, tl.lockedUntil, tl.status);
-    QString strStatus = util::getSubString(str, tl.status, tl.coinbase);
-    QString strCoinbase = util::getSubString(str, tl.coinbase, tl.confirms);
-    QString strConfirms = util::getSubString(str, tl.confirms, tl.value);
-    QString strValue = util::getSubString(str, tl.value, tl.tx);
-    QString strTx = util::getSubString(str, tl.tx, str.length());
+    Q_ASSERT(values.size()==9);
 
-    if (strOutputCommitment.isEmpty() )
-        return false;
+    QString strOutputCommitment = values[0];
+    QString strMmrIndex     = values[1];
+    QString strBlockHeight  = values[2];
+    QString strLockedUntil  = values[3];
+    QString strStatus       = values[4];
+    QString strCoinbase     = values[5];
+    QString strConfirms     = values[6];
+    QString strValue        = values[7];
+    QString strTx           = values[8];
 
     QPair<bool,int64_t> mwcOne = util::one2nano(strValue);
 
     bool ok = false;
     int64_t tx = strTx.toLongLong(&ok);
-    if (!ok)
-        return false;
 
-    output.setData(strOutputCommitment,
+    if ( strOutputCommitment.isEmpty() || !ok || !mwcOne.first )
+        return res;
+
+    res.setData(strOutputCommitment,
                    strMmrIndex,
                    strBlockHeight,
             strLockedUntil,
@@ -69,7 +99,7 @@ bool parseOutputLine( QString str, const OutputIdxLayout & tl,
             mwcOne.second,
             tx);
 
-    return mwcOne.first;
+    return res;
 }
 
 static int getNumberFromEvents(const QVector<WEvent> & events) {
@@ -99,14 +129,12 @@ bool TaskTransactionCount::processTask(const QVector<WEvent> & events) {
     return true;
 }
 
-
-bool TaskOutputs::processTask(const QVector<WEvent> & events) {
-    // We are processing transactions outptu mostly as a raw data
-
+static void parseOutputs(const QVector<WEvent> & events, // in
+                              QString & account, // out
+                              int64_t & height,  // out
+                              QVector<WalletOutput> & outputVector) // out
+{
     int curEvt = 0;
-
-    QString account;
-    int64_t  height = -1;
 
     for ( ; curEvt < events.size(); curEvt++ ) {
         if (events[curEvt].event == WALLET_EVENTS::S_OUTPUT_LOG ) {
@@ -120,7 +148,7 @@ bool TaskOutputs::processTask(const QVector<WEvent> & events) {
 
     // positions for the columns. Note, the columns and the order are hardcoded and come from mwc713 data!!!
 
-    OutputIdxLayout outLayout;
+    QVector<int> outputLayout;
 
     // Continue with transaction output
     // Search for Header first
@@ -129,17 +157,10 @@ bool TaskOutputs::processTask(const QVector<WEvent> & events) {
             auto & str = events[curEvt].message;
             if ( str.contains("Output Commitment") && str.contains("Block Height") ) {
 
-                outLayout.outputCommitment = str.indexOf("Output Commitment");
-                outLayout.mmrIndex = str.indexOf("MMR Index", outLayout.outputCommitment);
-                outLayout.blockHeight = str.indexOf("Block Height", outLayout.mmrIndex);
-                outLayout.lockedUntil = str.indexOf("Locked Until", outLayout.blockHeight);
-                outLayout.status = str.indexOf("Status", outLayout.lockedUntil);
-                outLayout.coinbase = str.indexOf("Coinbase", outLayout.status);
-                outLayout.confirms= str.indexOf("# Confirms", outLayout.coinbase);
-                outLayout.value = str.indexOf("Value", outLayout.confirms);
-                outLayout.tx = str.indexOf("Tx", outLayout.value);
+                outputLayout = parseHeadersLine( str, {"Output Commitment", "MMR Index", "Block Height",
+                                                       "Locked Until", "Status", "Coinbase?", "# Confirms", "Value", "Tx"} );
 
-                if ( outLayout.isDefined() ) {
+                if ( outputLayout.size()>0 ) {
                     curEvt++;
                     break;
                 }
@@ -159,8 +180,6 @@ bool TaskOutputs::processTask(const QVector<WEvent> & events) {
         }
     }
 
-    QVector< WalletOutput > outputResult;
-
     // Processing transactions
     for ( ; curEvt < events.size(); curEvt++ ) {
         if (events[curEvt].event == WALLET_EVENTS::S_LINE ) {
@@ -169,13 +188,27 @@ bool TaskOutputs::processTask(const QVector<WEvent> & events) {
             if (str.startsWith("--------------------"))
                 continue;
 
+            if (str.startsWith("=============="))
+                break; // multiple data types case, nned to handle without surprises
+
             // Expected to be a normal line
-            WalletOutput output;
-            if ( parseOutputLine(str, outLayout, output) ) {
-                outputResult.push_back(output);
+            WalletOutput output = parseOutputLine(str, outputLayout);
+            if ( output.isValid() ) {
+                outputVector.push_back(output);
             }
         }
     }
+}
+
+bool TaskOutputs::processTask(const QVector<WEvent> & events) {
+    // We are processing transactions outptu mostly as a raw data
+
+    QString account;
+    int64_t  height = -1;
+    QVector< WalletOutput > outputResult;
+
+    parseOutputs(events, // in
+           account, height, outputResult); // out
 
     wallet713->setOutputs(account, height, outputResult );
     return true;
@@ -184,84 +217,91 @@ bool TaskOutputs::processTask(const QVector<WEvent> & events) {
 
 // ------------------------------------ TaskTransactions -------------------------------------------
 
-struct TransactionIdxLayout {
-    int posId = -1;
-    int posType = -1;
-    int posTxid = -1;
-    int posAddress = -1;
-    int posCrTime = -1;
-    int posConf = -1;
-    int posHeight = -1;
-    int posConfTime = -1;
-    int posNetDiff = -1;
-    int posProof = -1;
+static WalletTransaction parseTransactionLine( const QString & str, const QVector<int> & txLayout) {
 
-    bool isDefined() const {
-        return posId>=0 && posType>0 && posTxid>0 && posAddress>0 && posCrTime>0 &&
-                            posConf>0 && posHeight>0 && posConfTime>0 && posNetDiff>0 && posProof>0;
-    }
-};
+    Q_ASSERT(txLayout.size()==18);
 
-bool parseTransactionLine( QString str, const TransactionIdxLayout & tl,
-                           WalletTransaction & trans) {
+    WalletTransaction res; // invalid until data is set
 
-    QString strId       = util::getSubString(str, tl.posId, tl.posType);
-    QString strType     = util::getSubString(str, tl.posType, tl.posTxid);
-    QString strTxid     = util::getSubString(str, tl.posTxid, tl.posAddress);
-    QString strAddress  = util::getSubString(str, tl.posAddress, tl.posCrTime);
-    QString strCrTime   = util::getSubString(str, tl.posCrTime, tl.posConf);
-    QString strConf     = util::getSubString(str, tl.posConf, tl.posHeight);
-    QString strHeight   = util::getSubString(str, tl.posHeight, tl.posConfTime);
-    QString strConfTime = util::getSubString(str, tl.posConfTime, tl.posNetDiff);
-    QString strNetDiff  = util::getSubString(str, tl.posNetDiff, tl.posProof);
-    QString strProof    = util::getSubString(str, tl.posProof, str.length());
+    QVector<QString> values = parseDataLine(str, txLayout);
+    if (values.isEmpty())
+        return res;
 
-    if (strId.length() == 0)
-        return false;
+    Q_ASSERT(values.size()==18);
 
-    bool ok = false;
-    int64_t id = -1;
-    id = strId.toLongLong(&ok);
-    if (!ok || id < 0)
-        return false;
+    QString strId       = values[0];
+    QString strType     = values[1];
+    QString strTxid     = values[2];
+    QString strAddress  = values[3];
+    QString strCrTime   = values[4];
+    QString strTtlCutOff = values[5];
+    QString strConf     = values[6];
+    QString strHeight   = values[7];
+    QString strConfTime = values[8];
+    QString strNumInputs = values[9];
+    QString strNumOutputs = values[10];
+    QString strCredited = values[11];
+    QString strDebited  = values[12];
+    QString strFee      = values[13];
+    QString strNetDiff  = values[14];
+    QString strProof    = values[15];
+    QString strKernel   = values[16];
+    // Last 'Tx Data' we don't need
+
+    bool txIdx_ok = false;
+    int64_t txIdx = strId.toLongLong(&txIdx_ok);
 
     WalletTransaction::TRANSACTION_TYPE tansType = WalletTransaction::TRANSACTION_TYPE::NONE;
     if (strType.startsWith("Sent") || strType.startsWith("Send"))
         tansType = WalletTransaction::TRANSACTION_TYPE::SEND;
     else if (strType.startsWith("Received"))
         tansType = WalletTransaction::TRANSACTION_TYPE::RECEIVE;
-    else
-        return false;
-
-    if ( strCrTime.isEmpty())
-        return false;
+    else if (strType.startsWith("Confirmed"))
+        tansType = WalletTransaction::TRANSACTION_TYPE::COIN_BASE;
 
     // At v3.0.0 we have: true, false
     bool conf = strConf.startsWith("yes", Qt::CaseInsensitive) || strConf.startsWith("true", Qt::CaseInsensitive);
 
     int64_t height = strHeight.isEmpty() ? 0 : strHeight.toLongLong();
 
+    int64_t ttlCutOff = strHeight.isEmpty() || strHeight=="None" ? -1 :  strTtlCutOff.toLongLong();
+
+    int numInputs = strNumInputs.isEmpty() ? -1 : strNumInputs.toInt();
+    int numOutputs = strNumOutputs.isEmpty() ? -1 : strNumOutputs.toInt();
+
+    // one2nano return 0 if not able to parce. It is what we need for empty values
+    QPair<bool, int64_t> credited = util::one2nano(strCredited);
+    QPair<bool, int64_t> debited = util::one2nano(strDebited);
+    QPair<bool, int64_t> fee = util::one2nano(strFee);
     QPair<bool, int64_t> net = util::one2nano(strNetDiff);
-    if ( !net.first )
-        return false;
 
-    // At v3.0.0 we have: Yes,None
-    bool proof = strProof.startsWith("yes", Qt::CaseInsensitive) || strProof.startsWith("true", Qt::CaseInsensitive);
+    // Check if critical fields was prsed correctly. Other fields can be invalid.
+    if ( strId.isEmpty() || !txIdx_ok || txIdx < 0 || strCrTime.isEmpty() || !net.first )
+        return res;
 
-    trans.setData(id, tansType,
-                  strTxid,
-                  strAddress,
-                  strCrTime,
-                  conf,
-                  height,
-                  strConfTime,
-                  net.second,
-                  proof);
-    return true;
+    res.setData(txIdx,
+            tansType,
+            strTxid,
+            strAddress,
+            strCrTime,
+            strConf.startsWith("yes", Qt::CaseInsensitive) || strConf.startsWith("true", Qt::CaseInsensitive),
+            ttlCutOff,
+            height,
+            strConfTime,
+            numInputs,
+            numOutputs,
+            credited.second,
+            debited.second,
+            fee.second,
+            net.second,
+            strProof.startsWith("yes", Qt::CaseInsensitive) || strProof.startsWith("true", Qt::CaseInsensitive),
+            strKernel);
+
+    return res;
 }
 
 // local utility function that parse transactions output
-static void parseTransactionsOutput(const QVector<WEvent> & events, // in
+static void parseTransactions(const QVector<WEvent> & events, // in
                                     QString & account, // out
                                     int64_t & height,  // out
                                     QVector<WalletTransaction> & trVector) // out
@@ -284,7 +324,7 @@ static void parseTransactionsOutput(const QVector<WEvent> & events, // in
 
     // positions for the columns. Note, the columns and the order are hardcoded and come from mwc713 data!!!
 
-    TransactionIdxLayout tl;
+    QVector<int> txLayout;
 
     // Continue with transaction output
     // Search for Header first
@@ -292,18 +332,11 @@ static void parseTransactionsOutput(const QVector<WEvent> & events, // in
         if (events[curEvt].event == WALLET_EVENTS::S_LINE ) {
             auto & str = events[curEvt].message;
             if ( str.contains("Creation Time") && str.contains("Confirmed?") ) {
-                tl.posId = str.indexOf("Id");
-                tl.posType = str.indexOf("Type", tl.posId);
-                tl.posTxid = str.indexOf("TXID", tl.posType);
-                tl.posAddress = str.indexOf("Address", tl.posTxid);
-                tl.posCrTime = str.indexOf("Creation Time", tl.posAddress);
-                tl.posConf = str.indexOf("Confirmed?", tl.posCrTime);
-                tl.posHeight = str.indexOf("Height", tl.posConf);
-                tl.posConfTime = str.indexOf("Confirmation Time", tl.posConf);
-                tl.posNetDiff = str.indexOf("Net", tl.posConfTime);
-                tl.posProof = str.indexOf("Proof?", tl.posNetDiff);
 
-                if ( tl.isDefined() ) {
+                txLayout = parseHeadersLine( str, {"Id", "Type", "Shared Transaction Id", "Address", "Creation Time",
+                               "TTL Cutoff Height", "Confirmed?", "Height", "Confirmation Time",  "Num.",  "Num.", "Amount", "Amount", "Fee", "Net", "Payment", "Kernel", "Tx"} );
+
+                if ( txLayout.size()>0 ) {
                     curEvt++;
                     break;
                 }
@@ -334,6 +367,10 @@ static void parseTransactionsOutput(const QVector<WEvent> & events, // in
             if (str.startsWith("--------------------"))
                 continue;
 
+            if (str.startsWith("=============="))
+                break; // multiple data types case, nned to handle without surprises
+
+
             // mwc713 has a special line for 'cancelled'
             if (str.contains("- Cancelled")) {
                 transactions[lastTransId].cancelled();
@@ -341,8 +378,8 @@ static void parseTransactionsOutput(const QVector<WEvent> & events, // in
             }
 
             // Expected to be a normal line
-            WalletTransaction trans;
-            if ( parseTransactionLine(str, tl, trans) ) {
+            WalletTransaction trans = parseTransactionLine(str, txLayout);
+            if ( trans.isValid() ) {
                 lastTransId = trans.txIdx;
                 transactions[trans.txIdx] = trans;
             }
@@ -360,13 +397,111 @@ bool TaskTransactions::processTask(const QVector<WEvent> & events) {
     int64_t height = -1;
     QVector<WalletTransaction> trVector;
 
-    parseTransactionsOutput(events, // in
+    parseTransactions(events, // in
                            account, height, trVector); // out
 
     wallet713->setTransactions( account, height, trVector );
     return true;
 }
 
+// Just parse the messages
+static void parseMessages(const QVector<WEvent> & events, // in
+                         QVector<QString> & messages) // out
+{
+    int curEvt = 0;
+
+    // positions for the columns. Note, the columns and the order are hardcoded and come from mwc713 data!!!
+
+    QVector<int> messagesLayout;
+
+    // Continue with transaction output
+    // Search for Header first
+    for ( ; curEvt < events.size(); curEvt++ ) {
+        if (events[curEvt].event == WALLET_EVENTS::S_LINE ) {
+            auto & str = events[curEvt].message;
+            if ( str.contains("Participant Id") &&  str.contains("Message") && str.contains("Public Key") && str.contains("Signature") ) {
+
+                messagesLayout = parseHeadersLine( str, {"Participant Id", "Message", "Public Key" , "Signature"} );
+
+                if ( messagesLayout.size()>0 ) {
+                    curEvt++;
+                    break;
+                }
+                Q_ASSERT(false); // There is a small chance, but it is really not likely it is ok
+            }
+        }
+    }
+
+    // Skip header
+    for ( ; curEvt < events.size(); curEvt++ ) {
+        if (events[curEvt].event == WALLET_EVENTS::S_LINE) {
+            auto &str = events[curEvt].message;
+            if (str.startsWith("==============")) {
+                curEvt++; // skipping this
+                break;
+            }
+        }
+    }
+
+    // Processing transactions messages
+    for ( ; curEvt < events.size(); curEvt++ ) {
+        if (events[curEvt].event == WALLET_EVENTS::S_LINE ) {
+            auto &str = events[curEvt].message;
+
+            if (str.startsWith("--------------------"))
+                continue;
+
+            if (str.startsWith("=============="))
+                break; // multiple data types case, nned to handle without surprises
+
+            QVector<QString> values = parseDataLine(str, messagesLayout);
+            if (values.isEmpty())
+                continue;
+
+            Q_ASSERT(values.size()==4);
+
+            // We don't care about other fields, just messages
+            const QString & strMessage = values[1];
+
+            if (strMessage.isEmpty() || strMessage.compare("None", Qt::CaseInsensitive)==0)
+                continue;
+
+            messages.push_back(strMessage);
+        }
+    }
+}
+
+
+bool TaskTransactionsById::processTask(const QVector<WEvent> & events) {
+    // Parcing Transaction data. Expected 1 item into the list
+    // In not found - there will be empty data, no errors/warnings will come from the wallet
+
+    QString account;
+    int64_t height = -1;
+    QVector<WalletTransaction> trVector;
+
+    parseTransactions(events, // in
+         account, height, trVector); // out
+
+    if ( trVector.size()!=1 ) {
+        wallet713->setTransactionById(false,  account, height, WalletTransaction(), {}, {} );
+    }
+
+    Q_ASSERT(trVector.size()==1);
+    const WalletTransaction & tx = trVector[0];
+
+    // Continue with outputs
+    QVector< WalletOutput > outputResult;
+    parseOutputs(events, // in
+                 account, height, outputResult); // out
+
+    QVector<QString> messages;
+    parseMessages(events, messages);
+
+    wallet713->setTransactionById( true,  account, height, tx, outputResult, messages );
+
+    return true;
+}
 
 
 // Just a callback, not a real task
@@ -387,8 +522,8 @@ bool TaskAllTransactions::processTask(const QVector<WEvent> & events) {
     int64_t height = -1;
     QVector<WalletTransaction> trVector;
 
-    parseTransactionsOutput(events, // in
-                            account, height, trVector); // out
+    parseTransactions(events, // in
+                    account, height, trVector); // out
 
     wallet713->processAllTransactionsAppend( trVector );
 

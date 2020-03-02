@@ -236,6 +236,10 @@ public:
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
     virtual void getTransactions(QString account, int offset, int number, bool enforceSync)  override;
 
+    // get Extended info for specific transaction
+    // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
+    virtual void getTransactionById(QString account, int64_t txIdx )  override;
+
     // Read all transactions for all accounts. Might take time...
     // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
     virtual void getAllTransactions() override;
@@ -311,6 +315,9 @@ public:
     // Transactions
     void updateTransactionCount(QString account, int number);
     void setTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
+
+    void setTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages );
+
     // Outputs results
     void updateOutputCount(QString account, int number);
     void setOutputs( QString account, int64_t height, QVector<WalletOutput> outputs);

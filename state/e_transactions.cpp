@@ -34,6 +34,7 @@ Transactions::Transactions( StateContext * context) :
 
     QObject::connect( context->wallet, &wallet::Wallet::onTransactionCount, this, &Transactions::updateTransactionCount, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onTransactions, this, &Transactions::updateTransactions, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onTransactionById, this, &Transactions::onTransactionById, Qt::QueuedConnection );
 
     QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
                       this, &Transactions::onNewNotificationMessage, Qt::QueuedConnection );
@@ -158,6 +159,21 @@ void Transactions::onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QStrin
 
     if (wnd && message.contains("Changing transaction")) {
         wnd->triggerRefresh();
+    }
+}
+
+
+// Request full info for the transaction
+void Transactions::getTransactionById(QString account, int64_t txIdx) const {
+    context->wallet->getTransactionById(account, txIdx);
+}
+
+void Transactions::onTransactionById( bool success, QString account, int64_t height,
+        wallet::WalletTransaction transaction,
+        QVector<wallet::WalletOutput> outputs,
+        QVector<QString> messages ) {
+    if (wnd) {
+        wnd->updateTransactionById(success, account, height, transaction, outputs, messages);
     }
 }
 

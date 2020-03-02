@@ -37,6 +37,8 @@ public:
     // Current transactions that wallet has
     void requestTransactionCount(QString account);
     void requestTransactions(QString account, int offset, int number, bool enforceSync);
+    // Request full info for the transaction
+    void getTransactionById(QString account, int64_t txIdx) const;
 
     void switchCurrentAccount(const wallet::AccountInfo & account);
 
@@ -73,6 +75,8 @@ private slots:
     void updateVerifyProof( bool success, QString fn, QString msg );
 
     void onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString message);
+
+    void onTransactionById( bool success, QString account, int64_t height, wallet::WalletTransaction transaction, QVector<wallet::WalletOutput> outputs, QVector<QString> messages );
 
 private:
     wnd::Transactions * wnd = nullptr;

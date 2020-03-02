@@ -353,7 +353,33 @@ void Transactions::on_transactionTable_cellDoubleClicked(int row, int column)
     if (selected==nullptr)
         return;
 
-    dlg::ShowTransactionDlg showTransDlg(this, *selected);
+    // respond will come at updateTransactionById
+    state->getTransactionById(getSelectedAccount().accountName, selected->txIdx );
+
+    ui->progressFrame->show();
+    ui->transactionTable->hide();
+}
+
+void Transactions::updateTransactionById(bool success, QString account, int64_t height,
+                               wallet::WalletTransaction transaction,
+                               QVector<wallet::WalletOutput> outputs,
+                               QVector<QString> messages) {
+
+    Q_UNUSED(account)
+    Q_UNUSED(height)
+
+    ui->progressFrame->hide();
+    ui->transactionTable->show();
+
+    state::TimeoutLockObject to( state );
+
+    if (!success) {
+        control::MessageBox::messageText(this, "Transaction details",
+                                         "Internal error. Transaction details are not found.");
+        return;
+    }
+
+    dlg::ShowTransactionDlg showTransDlg(this, transaction, outputs, messages);
     showTransDlg.exec();
 }
 

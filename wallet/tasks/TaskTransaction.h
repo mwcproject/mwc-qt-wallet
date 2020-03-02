@@ -75,10 +75,25 @@ public:
 
     // Transactions run with no-refresh because wallet responsible to call sync first
     TaskTransactions( MWC713 * wallet713, int offset, int number) :
-            Mwc713Task("Transactions", "txs -o " + QString::number(offset) + " -l " + QString::number(number) + " --no-refresh", wallet713, "")
+            Mwc713Task("Transactions", "txs -o " + QString::number(offset) + " -l " + QString::number(number) + " --show-full --no-refresh", wallet713, "")
             { Q_ASSERT(offset>=0); Q_ASSERT(number>0);}
 
     virtual ~TaskTransactions() override {}
+
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+};
+
+class TaskTransactionsById : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*60;
+
+    // Transactions run with no-refresh because wallet responsible to call sync first
+    TaskTransactionsById( MWC713 * wallet713, int txId) :
+            Mwc713Task("Transactions", "txs --id " + QString::number(txId) +" --no-refresh", wallet713, "")  {}
+
+    virtual ~TaskTransactionsById() override {}
 
     virtual bool processTask(const QVector<WEvent> & events) override;
 

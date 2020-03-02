@@ -16,13 +16,10 @@
 #define SHOWTRANSACTIONDLG_H
 
 #include "../control/mwcdialog.h"
+#include "../wallet/wallet.h"
 
 namespace Ui {
 class ShowTransactionDlg;
-}
-
-namespace wallet {
-    struct WalletTransaction;
 }
 
 namespace dlg {
@@ -32,7 +29,11 @@ class ShowTransactionDlg : public control::MwcDialog
     Q_OBJECT
 
 public:
-    explicit ShowTransactionDlg(QWidget *parent,  const wallet::WalletTransaction & transaction);
+    explicit ShowTransactionDlg(QWidget *parent,
+            const wallet::WalletTransaction transaction,
+            const QVector<wallet::WalletOutput> & outputs,
+            const QVector<QString> & messages);
+
     ~ShowTransactionDlg();
 
 private slots:

@@ -19,7 +19,10 @@
 
 namespace dlg {
 
-ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,  const wallet::WalletTransaction & transaction) :
+ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,
+                                       const wallet::WalletTransaction transaction,
+                                       const QVector<wallet::WalletOutput> & outputs,
+                                       const QVector<QString> & messages) :
     control::MwcDialog(parent),
     ui(new Ui::ShowTransactionDlg)
 {
