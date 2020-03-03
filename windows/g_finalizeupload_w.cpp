@@ -50,7 +50,7 @@ void FinalizeUpload::on_uploadFileBtn_clicked() {
     // It is really wrong, but also we don't want to have special state for that.
     QString fileName = QFileDialog::getOpenFileName(this, tr("Finalize transaction file"),
                                                     state->getFileGenerationPath(),
-                                                    tr("MWC response transaction (*.tx.response)"));
+                                                    tr("MWC response transaction (*.tx.response);;All files (*.*)"));
 
     if (fileName.length() == 0) {
         return;

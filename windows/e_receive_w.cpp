@@ -77,7 +77,7 @@ void wnd::Receive::on_recieveFileButton_clicked()
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open initial transaction file"),
                                                     state->getFileGenerationPath(),
-                                                    tr("MWC transaction (*.tx)"));
+                                                    tr("MWC transaction (*.tx);;All files (*.*)"));
 
     if (fileName.length()==0)
         return;
