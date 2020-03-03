@@ -30,17 +30,30 @@ class ShowTransactionDlg : public control::MwcDialog
 
 public:
     explicit ShowTransactionDlg(QWidget *parent,
+            const wallet::WalletConfig &config,
             const wallet::WalletTransaction transaction,
             const QVector<wallet::WalletOutput> & outputs,
             const QVector<QString> & messages);
 
     ~ShowTransactionDlg();
 
+private:
+    void updateOutputData();
+
 private slots:
-    void on_pushButton_clicked();
+    void on_okButton_clicked();
+
+    void on_viewKernel_clicked();
+
+    void on_viewCommit_clicked();
+
+    void on_commitsComboBox_currentIndexChanged(int index);
 
 private:
     Ui::ShowTransactionDlg *ui;
+
+    QVector<wallet::WalletOutput> outputs;
+    QString blockExplorerUrl;
 };
 
 }

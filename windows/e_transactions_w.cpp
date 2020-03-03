@@ -379,7 +379,7 @@ void Transactions::updateTransactionById(bool success, QString account, int64_t 
         return;
     }
 
-    dlg::ShowTransactionDlg showTransDlg(this, transaction, outputs, messages);
+    dlg::ShowTransactionDlg showTransDlg(this, walletConfig, transaction, outputs, messages);
     showTransDlg.exec();
 }
 

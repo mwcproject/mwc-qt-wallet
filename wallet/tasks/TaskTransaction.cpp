@@ -259,9 +259,6 @@ static WalletTransaction parseTransactionLine( const QString & str, const QVecto
     else if (strType.startsWith("Confirmed"))
         tansType = WalletTransaction::TRANSACTION_TYPE::COIN_BASE;
 
-    // At v3.0.0 we have: true, false
-    bool conf = strConf.startsWith("yes", Qt::CaseInsensitive) || strConf.startsWith("true", Qt::CaseInsensitive);
-
     int64_t height = strHeight.isEmpty() ? 0 : strHeight.toLongLong();
 
     int64_t ttlCutOff = strHeight.isEmpty() || strHeight=="None" ? -1 :  strTtlCutOff.toLongLong();
@@ -459,6 +456,9 @@ static void parseMessages(const QVector<WEvent> & events, // in
                 continue;
 
             Q_ASSERT(values.size()==4);
+
+            if ( values[3].length()<140 )
+                continue;
 
             // We don't care about other fields, just messages
             const QString & strMessage = values[1];
