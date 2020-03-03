@@ -485,6 +485,7 @@ bool TaskTransactionsById::processTask(const QVector<WEvent> & events) {
 
     if ( trVector.size()!=1 ) {
         wallet713->setTransactionById(false,  account, height, WalletTransaction(), {}, {} );
+        return true;
     }
 
     Q_ASSERT(trVector.size()==1);
