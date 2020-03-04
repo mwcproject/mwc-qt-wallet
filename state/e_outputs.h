@@ -17,6 +17,7 @@
 
 #include "state.h"
 #include "../wallet/wallet.h"
+#include "../core/Notification.h"
 
 namespace wnd {
 class Outputs;
@@ -35,8 +36,8 @@ public:
     void deleteWnd(wnd::Outputs * w) { if(w==wnd) wnd = nullptr;}
 
     // request wallet for outputs
-    void requestOutputCount(QString account);
-    void requestOutputs(QString account, int offset, int number, bool enforceSync);
+    void requestOutputCount(bool show_spent, QString account);
+    void requestOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync);
 
     QString getCurrentAccountName() const;
 
@@ -53,6 +54,7 @@ private slots:
 
     void onWalletBalanceUpdated();
 
+    void onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString message);
 
 protected:
     virtual NextStateRespond execute() override;

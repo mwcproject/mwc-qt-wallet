@@ -44,6 +44,8 @@ private slots:
 
     void on_contactsButton_clicked();
 
+    void on_logoutButton_clicked();
+
 private:
     Ui::NavMenuAccount *ui;
     state::StateContext * context = nullptr;

@@ -304,30 +304,15 @@ Identified 0 wallet_outputs as belonging to this wallet, 99% complete
 Scanning Complete
      */
 
-    int idx = 0;
-
-    for ( ; idx<lns.size(); idx++ ) {
-        if (lns[idx].message.contains("Updating outputs from node"))
-            break;
-    }
-    for ( ; idx<lns.size(); idx++ ) {
-        if (lns[idx].message.contains("Updating transactions"))
-            break;
-    }
-    for ( ; idx<lns.size(); idx++ ) {
-        if (lns[idx].message.contains("Starting UTXO scan"))
-            break;
-    }
-
-    bool foundComplete = false;
-    for ( ; idx<lns.size(); idx++ ) {
-        if (lns[idx].message.contains("Scanning Complete")) {
-            foundComplete = true;
+    bool foundDone = false;
+    for (int idx=0; idx<lns.size(); idx++ ) {
+        if (lns[idx].message.contains("Your wallet data successfully synchronized with a node")) {
+            foundDone = true;
             break;
         }
     }
 
-    if (!foundComplete) {
+    if (!foundDone) {
         // Scan was failed, let emit the warning
         notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Wallet unable refresh the wallet state. Your balance might be out if sync." );
     }

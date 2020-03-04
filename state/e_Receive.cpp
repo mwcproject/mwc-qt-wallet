@@ -20,7 +20,6 @@
 #include "../state/statemachine.h"
 #include "../util/Log.h"
 #include "../util/Json.h"
-#include "../dialogs/fileslateinfodlg.h"
 #include "timeoutlock.h"
 #include "../core/global.h"
 #include "../control/messagebox.h"

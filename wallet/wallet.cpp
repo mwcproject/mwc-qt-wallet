@@ -174,15 +174,22 @@ void  WalletConfig::saveNetwork2DataPath(QString configPath, QString network, QS
 
 
 void WalletTransaction::setData(int64_t _txIdx,
-    uint    _transactionType,
-    QString _txid,
-    QString _address,
-    QString _creationTime,
-    bool    _confirmed,
-    int64_t _height,
-    QString _confirmationTime,
-    int64_t    _coinNano,
-    bool    _proof)
+                                uint    _transactionType,
+                                QString _txid,
+                                QString _address,
+                                QString _creationTime,
+                                bool    _confirmed,
+                                int64_t _ttlCutoffHeight,
+                                int64_t _height,
+                                QString _confirmationTime,
+                                int     _numInputs,
+                                int     _numOutputs,
+                                int64_t _credited,
+                                int64_t _debited,
+                                int64_t _fee,
+                                int64_t _coinNano,
+                                bool    _proof,
+                                QString _kernel)
 {
     txIdx = _txIdx;
     transactionType = _transactionType;
@@ -194,6 +201,13 @@ void WalletTransaction::setData(int64_t _txIdx,
     confirmationTime = util::mwc713time2ThisTime(_confirmationTime);
     coinNano = _coinNano;
     proof = _proof;
+    ttlCutoffHeight = _ttlCutoffHeight;
+    numInputs = _numInputs;
+    numOutputs = _numOutputs;
+    credited = _credited;
+    debited = _debited;
+    fee = _fee;
+    kernel = _kernel;
 }
 
 // return transaction age (time interval from creation moment) in Seconds.

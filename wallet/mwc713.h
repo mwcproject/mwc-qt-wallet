@@ -132,7 +132,7 @@ public:
     virtual void sync(bool showSyncProgress, bool enforce) override;
 
     // Request Wallet balance update. It is a multistep operation
-    virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress) override;
+    virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress, bool skipSync=false) override;
     // Check signal: onWalletBalanceUpdated
     //          onWalletBalanceProgress
 
@@ -222,11 +222,11 @@ public:
 
     // Get total number of Outputs
     // Check Signal: onOutputCount(int number)
-    virtual void getOutputCount(QString account)  override;
+    virtual void getOutputCount(bool show_spent, QString account)  override;
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
-    virtual void getOutputs(QString account, int offset, int number, bool enforceSync)  override;
+    virtual void getOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync)  override;
 
     // Get total number of Transactions
     // Check Signal: onTransactionCount(int number)
@@ -236,6 +236,10 @@ public:
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
     virtual void getTransactions(QString account, int offset, int number, bool enforceSync)  override;
 
+    // get Extended info for specific transaction
+    // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
+    virtual void getTransactionById(QString account, int64_t txIdx )  override;
+
     // Read all transactions for all accounts. Might take time...
     // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
     virtual void getAllTransactions() override;
@@ -244,7 +248,7 @@ public:
     // Feed the command to mwc713 process
     void executeMwc713command( QString cmd, QString shadowStr);
 
-    bool isWalletRunningAndLoggedIn() const { return ! (mwc713process== nullptr || eventCollector== nullptr || startedMode != STARTED_MODE::NORMAL || loggedIn==false ); }
+    virtual bool isWalletRunningAndLoggedIn() const override { return ! (mwc713process== nullptr || eventCollector== nullptr || startedMode != STARTED_MODE::NORMAL || loggedIn==false ); }
 
 public:
     // stop mwc713 process nicely
@@ -311,6 +315,9 @@ public:
     // Transactions
     void updateTransactionCount(QString account, int number);
     void setTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
+
+    void setTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages );
+
     // Outputs results
     void updateOutputCount(QString account, int number);
     void setOutputs( QString account, int64_t height, QVector<WalletOutput> outputs);

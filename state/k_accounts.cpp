@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/global.h>
 #include "k_accounts.h"
 #include "../wallet/wallet.h"
 #include "../windows/k_accounts_w.h"
@@ -20,6 +19,7 @@
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../core/global.h"
+#include "../core/Config.h"
 
 
 namespace state {
@@ -31,6 +31,12 @@ Accounts::Accounts(StateContext * context) :
     connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &Accounts::onWalletBalanceUpdated, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onAccountCreated, this, &Accounts::onAccountCreated, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onAccountRenamed, this, &Accounts::onAccountRenamed, Qt::QueuedConnection );
+    connect( context->wallet, &wallet::Wallet::onLoginResult, this, &Accounts::onLoginResult, Qt::QueuedConnection );
+
+    connect(context->wallet, &wallet::Wallet::onNodeStatus,
+                     this, &Accounts::onNodeStatus, Qt::QueuedConnection);
+
+    startingTime = 0;
 
     startTimer(37000);
 }
@@ -125,8 +131,49 @@ void Accounts::deleteAccount( const wallet::AccountInfo & account ) {
 
 void Accounts::timerEvent(QTimerEvent *event) {
     Q_UNUSED(event);
-    context->wallet->updateWalletBalance(true, false);
+
+    // Skipping first 5 seconds after start. Let's mwc-node get online
+    if ( startingTime==0 || QDateTime::currentMSecsSinceEpoch() - startingTime < 5000 )
+        return;
+
+    if ( !context->wallet->isWalletRunningAndLoggedIn() ) {
+        startingTime=0;
+        return;
+    }
+
+
+    if ( isNodeHealthy() ) {
+        if (!lastNodeIsHealty) {
+            notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                                              "MWC-Node that wallet connected to is healthy now. Wallet can validate stored data with blockchain.");
+            lastNodeIsHealty = true;
+        }
+        else {
+            context->wallet->updateWalletBalance(true, false);
+        }
+    }
+    else {
+        if (lastNodeIsHealty) {
+            notify::appendNotificationMessage(notify::MESSAGE_LEVEL::WARNING,
+                                              "Wallet connected to not healthy MWC-Node. Your balance, transactions and output status might be not accurate");
+            lastNodeIsHealty = false;
+        }
+        context->wallet->updateWalletBalance(false, false);
+    };
+
 }
+
+void Accounts::onLoginResult(bool ok) {
+    startingTime = QDateTime::currentMSecsSinceEpoch();
+}
+
+
+void Accounts::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
+    nodeIsHealthy = online &&
+                    ((config::isColdWallet() || connections > 0) && totalDifficulty > 0 && nodeHeight > peerHeight - 5);
+}
+
+
 
 }
 

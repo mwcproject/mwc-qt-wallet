@@ -130,6 +130,10 @@ public:
     bool isLogsEnabled() const {return logsEnabled;}
     void setLogsEnabled(bool enabled);
 
+    // ----- Outputs: All/Unspent
+    bool isShowOutputAll() const {return showOutputAll;}
+    void setShowOutputAll(bool all);
+
     wallet::MwcNodeConnection getNodeConnection(const QString network) const;
     void updateMwcNodeConnection(const QString network, const wallet::MwcNodeConnection & connection );
 
@@ -178,6 +182,8 @@ private:
     // wallet 713 path need to be duplicated because of the running mode.
     QString wallet713DataPath;
     QString network;
+
+    bool showOutputAll = false; // Show all or Unspent outputs
 };
 
 template <class T>

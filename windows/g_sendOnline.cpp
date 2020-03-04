@@ -38,6 +38,7 @@ SendOnline::SendOnline(QWidget *parent,
     ui->progress->initLoader(false);
 
     ui->contactNameLable->setText("");
+    ui->contactNameLable->hide();
     ui->apiSecretEdit->hide();
 
     ui->fromAccount->setText("From account: " + selectedAccount.accountName );
@@ -62,6 +63,8 @@ void SendOnline::on_contactsButton_clicked()
         core::ContactRecord selectedContact = dlg.getSelectedContact();
         ui->sendEdit->setText( selectedContact.address );
         ui->contactNameLable->setText("     Contact: " + selectedContact.name );
+        ui->contactNameLable->show();
+        ui->formatsLable->hide();
     }
 
 }
@@ -70,6 +73,8 @@ void SendOnline::on_contactsButton_clicked()
 void SendOnline::on_sendEdit_textEdited(const QString &)
 {
     ui->contactNameLable->setText("");
+    ui->contactNameLable->hide();
+    ui->formatsLable->show();
 }
 
 void SendOnline::on_settingsBtn_clicked()
@@ -87,6 +92,13 @@ void SendOnline::on_settingsBtn_clicked()
 void SendOnline::on_sendButton_clicked()
 {
     state::TimeoutLockObject to( state );
+
+    if ( !state->isNodeHealthy() ) {
+        control::MessageBox::messageText(this, "Unable to send", "Your MWC-Node, that wallet connected to, is not ready.\n"
+                                                                     "MWC-Node need to be connected to few peers and finish blocks synchronization process");
+        return;
+    }
+
 
     QString sendTo = ui->sendEdit->text().trimmed();
 

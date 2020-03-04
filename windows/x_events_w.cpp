@@ -16,7 +16,7 @@
 #include "ui_x_events.h"
 #include "../state/x_events.h"
 #include "../wallet/wallet.h"
-#include "../dialogs/shownotificationdlg.h"
+#include "dialogs/x_shownotificationdlg.h"
 #include "../state/timeoutlock.h"
 
 namespace wnd {

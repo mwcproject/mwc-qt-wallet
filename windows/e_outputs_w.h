@@ -42,6 +42,8 @@ public:
     // return selected account
     QString updateWalletBalance();
 
+    void triggerRefresh();
+
 private slots:
     void on_accountComboBox_activated(int index);
 
@@ -50,6 +52,12 @@ private slots:
     void on_nextBtn_clicked();
 
     void on_refreshButton_clicked();
+
+    void on_showAll_clicked();
+
+    void on_showUnspent_clicked();
+
+    void on_outputsTable_cellDoubleClicked(int row, int column);
 
 private:
     void initTableHeaders();
@@ -63,6 +71,10 @@ private:
     QPair<bool,bool> updatePages( int currentPos, int total, int pageSize );
 
     int calcPageSize() const;
+
+    bool isShowUnspent() const;
+
+    wallet::WalletOutput * getSelectedOutput();
 
 private:
     Ui::Outputs *ui;

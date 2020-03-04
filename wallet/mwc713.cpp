@@ -481,10 +481,6 @@ QVector<AccountInfo>  MWC713::getWalletBalance(bool filterDeleted) const  {
 void MWC713::sync(bool showSyncProgress, bool enforce)  {
     if (enforce || QDateTime::currentMSecsSinceEpoch() - lastSyncTime > 30*1000 ) // sync interval 30 seconds - half of block mining interval
     {
-        if (showSyncProgress) {
-            int rrr=0;
-        }
-
         eventCollector->addTask( new TaskSync(this, showSyncProgress), TaskSync::TIMEOUT );
     }
 }
@@ -492,7 +488,7 @@ void MWC713::sync(bool showSyncProgress, bool enforce)  {
 // Request Wallet balance update. It is a multistep operation
 // Check signal: onWalletBalanceUpdated
 //          onWalletBalanceProgress
-void MWC713::updateWalletBalance(bool enforceSync, bool showSyncProgress)  {
+void MWC713::updateWalletBalance(bool enforceSync, bool showSyncProgress, bool skipSync)  {
     if ( !isWalletRunningAndLoggedIn() )
         return; // ignoring request
 
@@ -501,7 +497,8 @@ void MWC713::updateWalletBalance(bool enforceSync, bool showSyncProgress)  {
     // 2 - for every account get info ( see updateAccountList call )
     // 3 - restore back current account
 
-    sync(showSyncProgress, enforceSync);
+    if (!skipSync)
+        sync(showSyncProgress, enforceSync);
 
     eventCollector->addTask( new TaskAccountList(this), TaskAccountList::TIMEOUT );
 }
@@ -614,18 +611,18 @@ void MWC713::submitFile( QString fileTx ) {
 
 // Get total number of Outputs
 // Check Signal: onOutputCount(int number)
-void MWC713::getOutputCount(QString account)  {
+void MWC713::getOutputCount(bool show_spent, QString account)  {
     eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
-    eventCollector->addTask( new TaskOutputCount(this, account), TaskOutputCount::TIMEOUT );
+    eventCollector->addTask( new TaskOutputCount(this, show_spent, account), TaskOutputCount::TIMEOUT );
 }
 
 // Show outputs for the wallet
 // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> Transactions)
-void MWC713::getOutputs(QString account, int offset, int number, bool enforceSync)  {
+void MWC713::getOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync)  {
     sync(true, enforceSync);
     // Need to switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
-    eventCollector->addTask( new TaskOutputs(this, offset, number), TaskOutputs::TIMEOUT );
+    eventCollector->addTask( new TaskOutputs(this, offset, number, show_spent), TaskOutputs::TIMEOUT );
 }
 
 // Get total number of Transactions
@@ -640,6 +637,13 @@ void MWC713::getTransactions(QString account, int offset, int number, bool enfor
     // Need to switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskTransactions(this, offset, number), TaskTransactions::TIMEOUT );
+}
+
+// get Extended info for specific transaction
+// Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
+void MWC713::getTransactionById(QString account, int64_t txIdx ) {
+    eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
+    eventCollector->addTask( new TaskTransactionsById(this, txIdx), TaskTransactions::TIMEOUT );
 }
 
 // Read all transactions for all accounts. Might take time...
@@ -1111,6 +1115,12 @@ void MWC713::setTransactions( QString account, int64_t height, QVector<WalletTra
     logger::logEmit( "MWC713", "onTransactions", "account="+account );
     emit onTransactions( account, height, Transactions );
 }
+
+void MWC713::setTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages ) {
+    logger::logEmit( "MWC713", "onTransactionById", QString("success=")+(success?"true":"false") + " transaction=" + transaction.toStringShort() + " outputs: " + QString::number(outputs.size()) + " messages: " + QString::number(messages.size()) );
+    emit onTransactionById( success, account, height, transaction, outputs, messages );
+}
+
 
 void MWC713::updateOutputCount(QString account, int number) {
     logger::logEmit( "MWC713", "onOutputCount", "number=" + QString::number(number) );

@@ -163,7 +163,8 @@ QPair<bool, ADDRESS_TYPE> verifyAddress(QString address) {
     QString protocol = protAddr.first;
     address = protAddr.second;
 
-    if ( protocol == "https")
+    // both http and https are required
+    if ( protocol == "https" || protocol == "http" )
         return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::HTTPS);
     else if ( protocol == "keybase")
         return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::KEYBASE);

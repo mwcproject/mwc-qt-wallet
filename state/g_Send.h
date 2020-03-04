@@ -70,6 +70,7 @@ public:
 
     QString getWalletPassword();
 
+    bool isNodeHealthy() const {return nodeIsHealthy;}
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "send.html";}
@@ -84,6 +85,9 @@ private slots:
     void respSendFile( bool success, QStringList errors, QString fileName );
 
     void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
+
+    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
+
 private:
     void switchToStartingWindow();
 
@@ -101,6 +105,8 @@ private:
     // Key: slate
     QMap<QString, SendEventInfo> slatePool;
     QSet<int64_t> transactions2cancel;
+
+    bool nodeIsHealthy = false;
 };
 
 }
