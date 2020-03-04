@@ -55,6 +55,7 @@ private slots:
     void on_refreshButton_clicked();
     void on_validateProofButton_clicked();
     void on_generateProofButton_clicked();
+    void on_exportButton_clicked();
     void on_deleteButton_clicked();
     void on_prevBtn_clicked();
     void on_nextBtn_clicked();

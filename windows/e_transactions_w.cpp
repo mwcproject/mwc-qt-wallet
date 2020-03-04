@@ -15,6 +15,7 @@
 #include "e_transactions_w.h"
 #include "ui_e_transactions.h"
 #include "state/e_transactions.h"
+#include "../util/Files.h"
 #include "../util/stringutils.h"
 #include <QFileDialog>
 #include "../control/messagebox.h"
@@ -331,6 +332,49 @@ void Transactions::on_generateProofButton_clicked()
     state->updateProofFilesPath(flInfo.path());
 
     state->generateMwcBoxTransactionProof( selected->txIdx, fileName );
+}
+
+void Transactions::on_exportButton_clicked()
+{
+    state::TimeoutLockObject to( state );
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Transactions"),
+                                                          state->getProofFilesPath(),
+                                                          tr("Export Options (*.csv"));
+
+    if (fileName.length()==0)
+        return;
+
+    // check to ensure a file extension was specified as getSaveFileName
+    // allows files without an extension to be specified
+    if (!fileName.endsWith(".csv", Qt::CaseInsensitive))
+    {
+        // if no file extension is specified, default to exporting CSV files
+        fileName += ".csv";
+    }
+
+    QStringList exportRecords;
+    // export the transactions in the order they are displayed (last to first)
+    for ( int idx = transactions.size()-1; idx>=0; idx--) {
+        wallet::WalletTransaction trans = transactions[idx];
+        QString exportLine = trans.toStringCSV();
+        exportRecords << exportLine;
+    }
+    // warning: When using a debug build, avoid testing with an existing file which has
+    //          read-only permissions. writeTextFile will hit a Q_ASSERT causing qt-wallet
+    //          to crash.
+    bool exportOk = util::writeTextFile(fileName, exportRecords);
+    if (!exportOk)
+    {
+        control::MessageBox::messageText(nullptr, "Error", "Export unable to write to file: " + fileName);
+    }
+    else
+    {
+        // some users may have a large number of transactions which take time to write to the file
+        // so indicate when the file write has completed
+        control::MessageBox::messageText(nullptr, "Success", "Exported transactions to file: " + fileName);
+    }
+    return;
 }
 
 void Transactions::on_transactionTable_itemSelectionChanged()

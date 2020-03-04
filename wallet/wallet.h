@@ -232,6 +232,22 @@ struct WalletTransaction {
                 expandStrR( string2shortStrR(txid, 12), 12) +
                 " " + creationTime;
     }
+
+    QString toStringCSV() {
+        using namespace util;
+        QString separator = ",";
+        QString csvStr = QString::number(txIdx) + separator +
+                          getTypeAsStr() + separator +
+                          txid + separator +
+                          address + separator +
+                          creationTime + separator +
+                          nano2one(coinNano) + separator +
+                          (confirmed ? "YES" : "NO") + separator +
+                          QString::number(height) + separator +
+                          confirmationTime + separator +
+                          (proof ? "yes" : "no");
+        return csvStr;
+    }
 };
 
 struct WalletUtxoSignature {
