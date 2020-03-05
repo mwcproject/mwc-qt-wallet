@@ -77,6 +77,8 @@ private:
     void initTableHeaders();
     void saveTableHeaders();
 
+    QString getCsvHeaders();
+
     wallet::AccountInfo getSelectedAccount() const;
 
     // return enable state for the buttons

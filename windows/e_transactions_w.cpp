@@ -339,6 +339,22 @@ void Transactions::on_generateProofButton_clicked()
     state->generateMwcBoxTransactionProof( selected->txIdx, fileName );
 }
 
+QString Transactions::getCsvHeaders()
+{
+    // when exporting, use the headers as displayed using 'txs -f'  with mwc713 wallet
+    // these headers are different than the headers qt-wallet uses to display transactions
+    // so they are only coded here
+    QString separator = ",";
+    QString csvHeaders = "Id" + separator + "Type" + separator + "Shared Transaction Id" + separator +
+                         "Address" + separator + "Creation Time" + separator + "TTL Cutoff Height" +  separator +
+                         "Confirmed?" + separator + "Height" + separator + "Confirmation Time" + separator +
+                         "Num. Inputs" + separator + "Num. Outputs" + separator +
+                         "Amount Credited" + separator + "Amount Debited" + separator + "Fee" + separator +
+                         "Net Difference" + separator + "Payment Proof" + separator + "Kernel";
+
+    return csvHeaders;
+}
+
 void Transactions::on_exportButton_clicked()
 {
     state::TimeoutLockObject to( state );
@@ -359,8 +375,12 @@ void Transactions::on_exportButton_clicked()
     }
 
     QStringList exportRecords;
-    // export the transactions in the order they are displayed (last to first)
-    for ( int idx = transactions.size()-1; idx>=0; idx--) {
+
+    QString headers = getCsvHeaders();
+    exportRecords << headers;
+    // qt-wallet displays the transactions last to first
+    // however when exporting the transactions, we want to export first to last
+    for ( int idx=0; idx < transactions.size(); idx++) {
         wallet::WalletTransaction trans = transactions[idx];
         QString exportLine = trans.toStringCSV();
         exportRecords << exportLine;
