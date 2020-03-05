@@ -172,6 +172,12 @@ void  WalletConfig::saveNetwork2DataPath(QString configPath, QString network, QS
     util::writeTextFile(path + "/net.txt", {network, arch} );
 }
 
+// initialize static csvHeaders
+// the CSV headers must match the output from mwc713 for 'txs --show-full'
+QString WalletTransaction::csvHeaders = "Id,Type,Shared Transaction Id,Address,Creation Time,TTL Cutoff Height,"
+                                        "Confirmed?,Height,Confirmation Time,Num. Inputs,Num. Outputs,Amount Credited,"
+                                        "Amount Debited,Fee,Net Difference,Payment Proof,Kernel";
+
 
 void WalletTransaction::setData(int64_t _txIdx,
                                 uint    _transactionType,

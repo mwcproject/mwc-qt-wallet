@@ -339,22 +339,6 @@ void Transactions::on_generateProofButton_clicked()
     state->generateMwcBoxTransactionProof( selected->txIdx, fileName );
 }
 
-QString Transactions::getCsvHeaders()
-{
-    // when exporting, use the headers as displayed using 'txs -f'  with mwc713 wallet
-    // these headers are different than the headers qt-wallet uses to display transactions
-    // so they are only coded here
-    QString separator = ",";
-    QString csvHeaders = "Id" + separator + "Type" + separator + "Shared Transaction Id" + separator +
-                         "Address" + separator + "Creation Time" + separator + "TTL Cutoff Height" +  separator +
-                         "Confirmed?" + separator + "Height" + separator + "Confirmation Time" + separator +
-                         "Num. Inputs" + separator + "Num. Outputs" + separator +
-                         "Amount Credited" + separator + "Amount Debited" + separator + "Fee" + separator +
-                         "Net Difference" + separator + "Payment Proof" + separator + "Kernel";
-
-    return csvHeaders;
-}
-
 void Transactions::on_exportButton_clicked()
 {
     state::TimeoutLockObject to( state );
@@ -374,16 +358,22 @@ void Transactions::on_exportButton_clicked()
         fileName += ".csv";
     }
 
-    QStringList exportRecords;
-
-    QString headers = getCsvHeaders();
-    exportRecords << headers;
     // qt-wallet displays the transactions last to first
     // however when exporting the transactions, we want to export first to last
-    for ( int idx=0; idx < transactions.size(); idx++) {
+    QStringList exportRecords;
+
+    // retrieve the first transaction and get the CSV headers
+    wallet::WalletTransaction trans = transactions[0];
+    QString csvHeaders = trans.getCSVHeaders();
+    exportRecords << csvHeaders;
+    QString csvValues = trans.toStringCSV();
+    exportRecords << csvValues;
+
+    // now retrieve the remaining transactions and add them to our list
+    for ( int idx=1; idx < transactions.size(); idx++) {
         wallet::WalletTransaction trans = transactions[idx];
-        QString exportLine = trans.toStringCSV();
-        exportRecords << exportLine;
+        QString csvValues = trans.toStringCSV();
+        exportRecords << csvValues;
     }
     // warning: When using a debug build, avoid testing with an existing file which has
     //          read-only permissions. writeTextFile will hit a Q_ASSERT causing qt-wallet

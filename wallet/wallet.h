@@ -196,6 +196,8 @@ struct WalletTransaction {
     bool    proof=false;
     QString kernel;
 
+    static QString csvHeaders;
+
     void setData(int64_t txIdx,
                       uint    transactionType,
                       QString txid,
@@ -253,6 +255,10 @@ struct WalletTransaction {
                 expandStrR(nano2one(coinNano), 8) +
                 expandStrR( string2shortStrR(txid, 12), 12) +
                 " " + creationTime;
+    }
+
+    static QString getCSVHeaders() {
+        return csvHeaders;
     }
 
     QString toStringCSV() {
