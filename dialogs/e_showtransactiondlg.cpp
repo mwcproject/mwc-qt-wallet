@@ -35,7 +35,7 @@ ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,
     blockExplorerUrl = (config.getNetwork() == "Mainnet") ? mwc::BLOCK_EXPLORER_URL_MAINNET
                                                           : mwc::BLOCK_EXPLORER_URL_FLOONET;
 
-    ui->titleLabel->setText("Transaction #" + QString::number(transaction.txIdx) );
+    ui->titleLabel->setText("Transaction #" + QString::number(transaction.txIdx+1) ); // Need to show 1 base indexes, instead of 0 based.
     ui->type->setText( transaction.getTypeAsStr() );
     ui->id->setText( transaction.txid );
     ui->address->setText(transaction.address);
