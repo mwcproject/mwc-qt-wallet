@@ -261,34 +261,8 @@ struct WalletTransaction {
         return csvHeaders;
     }
 
-    QString toStringCSV() {
-        using namespace util;
-        QString separator = ",";
-        QString txTypeStr = getTypeAsStr();
-        if (txTypeStr.contains(','))
-        {
-            // enclose the type string in quotes
-            txTypeStr = "\"" + txTypeStr + "\"";
-        }
-        QString csvStr = QString::number(txIdx) + separator +       // Id
-                          txTypeStr + separator +                   // Type
-                          txid + separator +                        // Shared Transaction Id
-                          address + separator +                     // Address
-                          creationTime + separator +                // Creation Time
-                          QString::number(ttlCutoffHeight) + separator + // TTL Cutoff Height
-                          (confirmed ? "YES" : "NO") + separator +  // Confirmed?
-                          QString::number(height) + separator +     // height
-                          confirmationTime + separator +            // Confirmation Time
-                          QString::number(numInputs) + separator +  // Num. Inputs
-                          QString::number(numOutputs) + separator + // Num. Outputs
-                          nano2one(credited) + separator +          // Amount Credited
-                          nano2one(debited) + separator +           // Amount Debited
-                          nano2one(fee) + separator +               // Fee
-                          nano2one(coinNano) + separator +          // Net Difference
-                          (proof ? "yes" : "no") + separator +      // Payment Proof
-                          kernel;                                   // Kernel
-        return csvStr;
-    }
+    // return transactions values formatted into a CSV string
+    QString toStringCSV();
 };
 
 struct WalletUtxoSignature {

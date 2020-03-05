@@ -224,6 +224,30 @@ int64_t WalletTransaction::calculateTransactionAge( const QDateTime & current ) 
     return setTime.secsTo(current);
 }
 
+QString WalletTransaction::toStringCSV() {
+    QString separator = ",";
+    // always enclose the type string in quotes as it could contain a comma
+    QString txTypeStr = "\"" + getTypeAsStr() + "\"";
+    QString csvStr = QString::number(txIdx) + separator +       // Id
+                      txTypeStr + separator +                   // Type
+                      txid + separator +                        // Shared Transaction Id
+                      address + separator +                     // Address
+                      creationTime + separator +                // Creation Time
+                      QString::number(ttlCutoffHeight) + separator + // TTL Cutoff Height
+                      (confirmed ? "YES" : "NO") + separator +  // Confirmed?
+                      QString::number(height) + separator +     // height
+                      confirmationTime + separator +            // Confirmation Time
+                      QString::number(numInputs) + separator +  // Num. Inputs
+                      QString::number(numOutputs) + separator + // Num. Outputs
+                      util::nano2one(credited) + separator +    // Amount Credited
+                      util::nano2one(debited) + separator +     // Amount Debited
+                      util::nano2one(fee) + separator +         // Fee
+                      util::nano2one(coinNano) + separator +    // Net Difference
+                      (proof ? "yes" : "no") + separator +      // Payment Proof
+                      kernel;                                   // Kernel
+    return csvStr;
+}
+
 
 
 void WalletOutput::setData(QString _outputCommitment,
