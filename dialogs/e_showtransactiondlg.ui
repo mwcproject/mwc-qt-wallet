@@ -32,12 +32,12 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>408</x>
+     <x>459</x>
      <y>75</y>
-     <width>424</width>
+     <width>373</width>
      <height>63</height>
     </rect>
    </property>
@@ -88,7 +88,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>36</x>
@@ -144,12 +144,12 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>288</x>
+     <x>351</x>
      <y>75</y>
-     <width>94</width>
+     <width>82</width>
      <height>63</height>
     </rect>
    </property>
@@ -200,12 +200,12 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>165</x>
+     <x>159</x>
      <y>75</y>
-     <width>97</width>
+     <width>169</width>
      <height>63</height>
     </rect>
    </property>
@@ -445,7 +445,7 @@
   <widget class="QWidget" name="layoutWidget_3">
    <property name="geometry">
     <rect>
-     <x>369</x>
+     <x>372</x>
      <y>441</y>
      <width>121</width>
      <height>63</height>
@@ -503,7 +503,7 @@
     <rect>
      <x>177</x>
      <y>441</y>
-     <width>121</width>
+     <width>157</width>
      <height>63</height>
     </rect>
    </property>
@@ -557,9 +557,9 @@
   <widget class="QWidget" name="layoutWidget_5">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>513</x>
      <y>441</y>
-     <width>121</width>
+     <width>157</width>
      <height>63</height>
     </rect>
    </property>
@@ -738,12 +738,12 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>186</x>
      <y>648</y>
-     <width>106</width>
+     <width>157</width>
      <height>63</height>
     </rect>
    </property>
@@ -794,7 +794,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>39</x>
@@ -850,10 +850,10 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>372</x>
      <y>648</y>
      <width>112</width>
      <height>63</height>
@@ -906,12 +906,12 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>453</x>
+     <x>513</x>
      <y>648</y>
-     <width>106</width>
+     <width>94</width>
      <height>63</height>
     </rect>
    </property>
@@ -962,12 +962,12 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>732</x>
+     <x>747</x>
      <y>648</y>
-     <width>103</width>
+     <width>88</width>
      <height>63</height>
     </rect>
    </property>
@@ -1018,12 +1018,12 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>594</x>
+     <x>633</x>
      <y>648</y>
-     <width>112</width>
+     <width>88</width>
      <height>63</height>
     </rect>
    </property>
@@ -1105,7 +1105,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>36</x>
@@ -1161,7 +1161,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>39</x>
