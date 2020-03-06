@@ -345,7 +345,7 @@ void Transactions::on_exportButton_clicked()
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export Transactions"),
                                                           state->getProofFilesPath(),
-                                                          tr("Export Options (*.csv"));
+                                                          tr("Export Options (*.csv)"));
 
     if (fileName.length()==0)
         return;
