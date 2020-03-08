@@ -235,6 +235,7 @@ void Send::registerSlate( const QString & slate, QString address, int64_t txid, 
 }
 
 void Send::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
+    Q_UNUSED(errMsg)
     nodeIsHealthy = online &&
                     ((config::isColdWallet() || connections > 0) && totalDifficulty > 0 && nodeHeight > peerHeight - 5);
 }

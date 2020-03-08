@@ -341,7 +341,7 @@
           <property name="text">
            <string>Airdrop complete.
 
-Check http://mwc.mw/ for updates
+Check https://www.mwc.mw/airdrop-info for updates
 about potential future airdrops.</string>
           </property>
           <property name="alignment">
@@ -419,14 +419,14 @@ about potential future airdrops.</string>
             </property>
             <property name="minimumSize">
              <size>
-              <width>100</width>
-              <height>50</height>
+              <width>50</width>
+              <height>25</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>100</width>
-              <height>50</height>
+              <width>50</width>
+              <height>25</height>
              </size>
             </property>
             <property name="text">
@@ -439,13 +439,13 @@ about potential future airdrops.</string>
             <property name="minimumSize">
              <size>
               <width>1</width>
-              <height>50</height>
+              <height>25</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
               <width>1</width>
-              <height>50</height>
+              <height>25</height>
              </size>
             </property>
            </widget>
@@ -523,7 +523,7 @@ about potential future airdrops.</string>
           <property name="text">
            <string>Airdrop complete.
 
-Check http://mwc.mw/ for updates
+Check https://www.mwc.mw/airdrop-info for updates
 about potential future airdrops.</string>
           </property>
           <property name="alignment">
