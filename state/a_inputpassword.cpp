@@ -148,34 +148,36 @@ void InputPassword::onLoginResult(bool ok) {
 
             context->wallet->getNodeStatus();
 
-            if (!foreignAPIwasReported) {
-                // Check if foregn API is activated and it is not safe
-                wallet::WalletConfig config = context->wallet->getWalletConfig();
+            if (! config::isOnlineNode()) {
+                if (!foreignAPIwasReported) {
+                    // Check if foregn API is activated and it is not safe
+                    wallet::WalletConfig config = context->wallet->getWalletConfig();
 
 
-                if (config.hasForeignApi()) {
-                    QString message;
+                    if (config.hasForeignApi()) {
+                        QString message;
 
-                    if (config.foreignApiSecret.isEmpty())
-                        message += "without any authorization";
+                        if (config.foreignApiSecret.isEmpty())
+                            message += "without any authorization";
 
-                    if (!config.hasTls()) {
-                        if (!message.isEmpty())
-                            message += " and ";
+                        if (!config.hasTls()) {
+                            if (!message.isEmpty())
+                                message += " and ";
 
-                        message += "with non secure HTTP connection. Please consider to setup TLS certificates for your security.";
+                            message += "with non secure HTTP connection. Please consider to setup TLS certificates for your security.";
+                        }
+
+                        if (!message.isEmpty()) {
+                            message = "Your wallet has activated foreign API " + message;
+                            message += "\n\nFor your security MWC team recommends setup your wallet properly and safe.";
+
+                            control::MessageBox::messageText(nullptr, "WARNING", message);
+
+                            context->stateMachine->setActionWindow( state::STATE::LISTENING );
+                        }
                     }
-
-                    if (!message.isEmpty()) {
-                        message = "Your wallet has activated foreign API " + message;
-                        message += "\n\nFor your security MWC team recommends setup your wallet properly and safe.";
-
-                        control::MessageBox::messageText(nullptr, "WARNING", message);
-
-                        context->stateMachine->setActionWindow( state::STATE::LISTENING );
-                    }
+                    foreignAPIwasReported = true;
                 }
-                foreignAPIwasReported = true;
             }
         }
 
