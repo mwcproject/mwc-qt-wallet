@@ -97,19 +97,58 @@ bool MwcNodeConnection::loadData(QDataStream & in) {
     return true;
 }
 
+bool WalletConfig::operator == (const WalletConfig & other) const {
+    bool ok = dataPath==other.dataPath &&
+              mwcmqDomainEx==other.mwcmqDomainEx && mwcmqsDomainEx==other.mwcmqsDomainEx &&
+              keyBasePath==other.keyBasePath && foreignApi==other.foreignApi;
+
+    if (ok)
+        return ok;
+
+    ok = foreignApiAddress == other.foreignApiAddress && foreignApiSecret == other.foreignApiSecret &&
+            tlsCertificateFile == other.tlsCertificateFile && tlsCertificateKey == other.tlsCertificateKey;
+
+    return ok;
+}
+
+
 WalletConfig & WalletConfig::setData(QString _network,
                             QString _dataPath,
                             QString _mwcmqDomain,
                             QString _mwcmqsDomain,
-                            QString _keyBasePath ) {
+                            QString _keyBasePath,
+                            bool    _foreignApi,
+                            QString _foreignApiAddress,
+                            QString _foreignApiSecret,
+                            QString _tlsCertificateFile,
+                            QString _tlsCertificateKey) {
+
+    setDataWalletCfg(_network,_dataPath,_mwcmqDomain,_mwcmqsDomain,_keyBasePath);
+
+    foreignApi = _foreignApi;
+    foreignApiAddress = _foreignApiAddress;
+    foreignApiSecret = _foreignApiSecret;
+    tlsCertificateFile = _tlsCertificateFile;
+    tlsCertificateKey = _tlsCertificateKey;
+
+    return * this;
+}
+
+WalletConfig & WalletConfig::setDataWalletCfg(QString _network,
+                                QString _dataPath,
+                                QString _mwcmqDomain,
+                                QString _mwcmqsDomain,
+                                QString _keyBasePath)
+{
     network  = _network;
     dataPath = _dataPath;
     mwcmqDomainEx = _mwcmqDomain;
     mwcmqsDomainEx = _mwcmqsDomain;
     keyBasePath = _keyBasePath;
 
-    return * this;
+    return *this;
 }
+
 
 QString WalletConfig::toString() const {
     return "network=" + network + "\n" +

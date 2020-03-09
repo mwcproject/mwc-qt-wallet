@@ -45,7 +45,7 @@ static void updateMwcNodeConfig(const QString & nodeDataPath, const QString & ne
     QString apiSecretFN = walletPath + "api_secret";
     if (!QFile::exists(apiSecretFN) ) {
         QString secret;
-        // Since we are targeting 5.9, we can use QRandomGenerator
+        // Since we are targeting 5.9, we can't use QRandomGenerator
         // Note: qsrand is not secure at All. For this case it is fine because Local node not expected to be secure,
         // in any case HTTP is used. Secret is mostly for preventing of node usage from wrong network.
         qsrand( static_cast<quint64>( QTime::currentTime().msecsSinceStartOfDay() ) );

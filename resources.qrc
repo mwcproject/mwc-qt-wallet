@@ -76,5 +76,11 @@
         <file>img/AddDlg@2x.svg</file>
         <file>img/DeleteDlg@2x.svg</file>
         <file>img/EditDlg@2x.svg</file>
+        <file>img/CheckOff@2x.svg</file>
+        <file>img/CheckOn@2x.svg</file>
+        <file>img/purpleCheckOff@2x.svg</file>
+        <file>img/purpleCheckOn@2x.svg</file>
+        <file>img/disabledCheckOff@2x.svg</file>
+        <file>img/disabledCheckOn@2x.svg</file>
     </qresource>
 </RCC>

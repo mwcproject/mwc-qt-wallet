@@ -37,6 +37,9 @@ Listening::Listening(StateContext * context) :
     QObject::connect(context->wallet, &wallet::Wallet::onKeybaseListenerStatus,
                                          this, &Listening::onKeybaseListenerStatus, Qt::QueuedConnection);
 
+    QObject::connect(context->wallet, &wallet::Wallet::onHttpListeningStatus,
+                     this, &Listening::onHttpListeningStatus, Qt::QueuedConnection);
+
     QObject::connect(context->wallet, &wallet::Wallet::onListeningStartResults,
                                          this, &Listening::onListeningStartResults, Qt::QueuedConnection);
 
@@ -69,6 +72,7 @@ NextStateRespond Listening::execute() {
                 new wnd::Listening( context->wndManager->getInWndParent(), this,
                        context->wallet->getListenerStatus(),
                        context->wallet->getListenerStartState(),
+                       context->wallet->getHttpListeningStatus(),
                        context->wallet->getLastKnownMwcBoxAddress(), -1));
     }
 
@@ -105,16 +109,38 @@ void Listening::triggerKeybaseStartState() {
     }
 }
 
+wallet::WalletConfig Listening::getWalletConfig() {
+    return context->wallet->getWalletConfig();
+}
+
+// require wallet restart
+void Listening::setHttpConfig( const wallet::WalletConfig & config ) {
+    if (context->wallet->setWalletConfig(config, context->appContext, context->mwcNode)) {
+        context->stateMachine->executeFrom( STATE::NONE );
+    }
+}
+
+
 void Listening::onMwcMqListenerStatus(bool online) {
     Q_UNUSED(online)
-    if (wnd) {
-        wnd->updateStatuses(context->wallet->getListenerStatus(), context->wallet->getListenerStartState() );
-    }
+    wndUpdateStatuses();
 }
 void Listening::onKeybaseListenerStatus(bool online) {
     Q_UNUSED(online)
+    wndUpdateStatuses();
+}
+
+void Listening::onHttpListeningStatus(bool listening, QString additionalInfo) {
+    Q_UNUSED(listening)
+    Q_UNUSED(additionalInfo)
+    wndUpdateStatuses();
+}
+
+void Listening::wndUpdateStatuses() {
     if (wnd) {
-        wnd->updateStatuses(context->wallet->getListenerStatus(), context->wallet->getListenerStartState() );
+        wallet::Wallet * wallet = context->wallet;
+        wnd->updateStatuses(wallet->getListenerStatus(), wallet->getListenerStartState(),
+                wallet->getHttpListeningStatus() );
     }
 }
 
@@ -124,9 +150,7 @@ void Listening::onListeningStartResults( bool mqTry, bool kbTry, // what we try 
 {
     Q_UNUSED(mqTry)
     Q_UNUSED(kbTry)
-    if (wnd) {
-        wnd->updateStatuses(context->wallet->getListenerStatus(), context->wallet->getListenerStartState() );
-    }
+    wndUpdateStatuses();
 
     if (wnd && !errorMessages.empty() && !initialStart ) {
         QString msg;
@@ -154,9 +178,7 @@ void Listening::onListeningStopResult(bool mqTry, bool kbTry, // what we try to 
                             QStringList errorMessages ) {
     Q_UNUSED(mqTry)
     Q_UNUSED(kbTry)
-    if (wnd) {
-        wnd->updateStatuses(context->wallet->getListenerStatus(), context->wallet->getListenerStartState() );
-    }
+    wndUpdateStatuses();
 
     if (wnd && !errorMessages.empty()) {
         QString msg;

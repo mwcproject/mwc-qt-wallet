@@ -28,7 +28,6 @@ Mwc713InputParser::Mwc713InputParser() {
     initInit();
     initNeedUnlock();
     initPasswordError(); // notification about the wrong password.
-    initBoxListener();
     initGenericError(); // All error messages
     initMwcMqAddress();//
     initInitWalletWorkflow();
@@ -153,17 +152,6 @@ void Mwc713InputParser::initNeedUnlock() {
                 new TrieNewLineSection() }));
 }
 
-void Mwc713InputParser::initBoxListener() {
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_MWC_MQ_LISTENER,
-          QVector<BaseTrieSection*>{
-                config::getUseMwcMqS() ? new TriePhraseSection("starting mwcmqs listener...") : new TriePhraseSection("starting mwcmq listener..."),
-                new TrieNewLineSection(),
-                config::getUseMwcMqS() ? new TriePhraseSection("mwcmqs listener started for [") : new TriePhraseSection("listener started for ["),
-                new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"","", 1), // mwc MQ address
-                new TriePhraseSection("]")
-            }));
-}
-
 void Mwc713InputParser::initMwcMqAddress() {
         parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_YOUR_MWC_ADDRESS,
               QVector<BaseTrieSection*>{
@@ -200,11 +188,11 @@ void Mwc713InputParser::initListening() {
                                                 }));
 
     // mwc713 emitting messages 'listener started for: ['  and 'listener started for ['
-    // mwcmqs listener started for: [xmjJGkX9U75Vo8Ro26gTm2i4k4CD39Q24qvQqAPeQVeWuo36YVFh] tid=[xa5ktaMRCEmj151Rfxr7a]
+    // mwcmqs listener started for [xmjJGkX9U75Vo8Ro26gTm2i4k4CD39Q24qvQqAPeQVeWuo36YVFh] tid=[xa5ktaMRCEmj151Rfxr7a]
     if (config::getUseMwcMqS()) {
         parser.appendLineParser(new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_ON,
                                                    QVector<BaseTrieSection *>{
-                                                           new TriePhraseSection("mwcmqs listener started for: ["),
+                                                           new TriePhraseSection("mwcmqs listener started for ["),
                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE, "", "", 1), // mwc MQ address
                                                            new TriePhraseSection("] tid=["),
                                                            new TrieAnySection(100, TrieAnySection::NOT_SPACES, "", "]", 3), // thread ID
@@ -333,6 +321,19 @@ void Mwc713InputParser::initListening() {
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_FAILED_TO_START,
                                                 QVector<BaseTrieSection*>{
                                                         new TriePhraseSection("Failed to start mwcmqs subscriber.")    // Full message: ERROR: Failed to start mwcmqs subscriber. Error connecting to mqs.mwc.mw:443
+                                                }));
+
+
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_HTTP_STARTING,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("starting listener for foreign api on ["),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE,"","]", 1), // addrees that is listening on...
+                                                }));
+
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_HTTP_FAILED,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("thread 'foreign-api-gotham' panicked at '"),
+                                                        new TrieAnySection(500, TrieAnySection::NOT_NEW_LINE,"","'", 1), // Error message, not user friendly (rust way)
                                                 }));
 }
 

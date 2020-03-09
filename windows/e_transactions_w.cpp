@@ -297,7 +297,7 @@ void Transactions::on_validateProofButton_clicked()
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open proof file"),
                                  state->getProofFilesPath(),
-                                 tr("transaction proof (*.proof)"));
+                                 tr("transaction proof (*.proof);;All files (*.*)"));
 
     if (fileName.length()==0)
         return;

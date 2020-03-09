@@ -142,6 +142,10 @@ QLineEdit[text=""] {
     color: white;
 }
 
+QLineEdit::disabled {
+    color: #E2CCF7;
+}
+
 QLineEdit:enabled:!focus::hover
 {
     background-color: rgba(255, 255, 255, 0.3);
@@ -181,6 +185,9 @@ QTextEdit {
     padding: 10px 6px 10px 15px;
 }
 
+QTextEdit::disabled {
+    color: #E2CCF7;
+}
 
 
 QTextEdit:focus {
@@ -578,5 +585,45 @@ QToolTip {
     border-radius: 3px;
     padding: 1px;
     background: #9E00E7;
+}
+
+/* ---------  QCheckBox  ------- */
+
+QCheckBox {
+    color: white;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 15px;
+    spacing: 10px;
+
+    border: none;
+    background: none;
+}
+
+QCheckBox::disabled {
+    color: #E2CCF7;
+}
+
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(:/img/CheckOff.svg);
+}
+
+QCheckBox::indicator:checked {
+    image: url(:/img/CheckOn.svg);
+}
+
+QCheckBox::indicator:disabled:unchecked {
+    image: url(:/img/disabledCheckOff.svg);
+}
+
+QCheckBox::indicator:disabled:checked {
+    image: url(:/img/disabledCheckOn.svg);
 }
 

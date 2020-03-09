@@ -43,6 +43,7 @@ public:
 
     void updateMwcMqState(bool online);
     void updateKeybaseState(bool online);
+    void updateHttpState(bool online);
 
 private slots:
     void on_submitButton_clicked();

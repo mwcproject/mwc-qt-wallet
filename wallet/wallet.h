@@ -108,13 +108,19 @@ public:
     QString mwcmqsDomainEx;// empty - default value
     QString keyBasePath;
 
+    // Http listening params...
+    bool foreignApi = false; // Is foreign API is enabled
+    QString foreignApiAddress; // Example: 0.0.0.0:3416
+    QString foreignApiSecret;  // Secret value
+    // For https configuration.
+    QString tlsCertificateFile;
+    QString tlsCertificateKey;
+
     WalletConfig() : network("Mainnet"), dataPath("Undefined"), keyBasePath("Undefined") {}
     WalletConfig(const WalletConfig & other) = default;
     WalletConfig &operator = (const WalletConfig & other) = default;
 
-    bool operator == (const WalletConfig & other) const { return dataPath==other.dataPath &&
-                mwcmqDomainEx==other.mwcmqDomainEx && mwcmqsDomainEx==other.mwcmqsDomainEx &&
-                keyBasePath==other.keyBasePath; }
+    bool operator == (const WalletConfig & other) const;
 
     bool isDefined() const { return  dataPath!="Undefined" && keyBasePath!="Undefined"; }
 
@@ -122,10 +128,26 @@ public:
                 QString dataPath,
                 QString mwcmqDomain,
                 QString mwcmqsDomain,
-                QString keyBasePath );
+                QString keyBasePath,
+                bool foreignApi,
+                QString foreignApiAddress,
+                QString foreignApiSecret,
+                QString tlsCertificateFile,
+                QString tlsCertificateKey);
+
+    WalletConfig & setDataWalletCfg(QString network,
+                           QString dataPath,
+                           QString mwcmqDomain,
+                           QString mwcmqsDomain,
+                           QString keyBasePath);
 
     void updateDataPath(const QString & path) {dataPath=path;}
-    void updateNetwork(const QString & mw) { Q_ASSERT(!mw.isEmpty()); network=mw;}
+    void updateNetwork(const QString & mw) { Q_ASSERT(!mw.isEmpty()); network=mw; }
+
+    bool hasForeignApi() const { return foreignApi && !foreignApiAddress.isEmpty(); }
+
+
+    bool hasTls() const {return !tlsCertificateFile.isEmpty() && !tlsCertificateKey.isEmpty(); }
 
     const QString & getDataPath() const {return dataPath;}
     const QString & getNetwork() const {return network;}
@@ -353,6 +375,14 @@ public:
     virtual void nextBoxAddress()  = 0;
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
 
+    // Request http(s) listening status.
+    // bool - true is listening. Then next will be the address
+    // bool - false, not listening. Then next will be error or empty if listening is not active.
+    virtual QPair<bool, QString> getHttpListeningStatus() const = 0;
+    // Check signal: onHttpListeningStatus(bool listening, QString additionalInfo)
+
+    // Return true if Tls is setted up for the wallet for http connections.
+    virtual bool hasTls() const = 0;
 
     // -------------- Accounts
 
@@ -579,6 +609,9 @@ signals:
     void onKeybaseListenerStatus(bool online);
     // mwc713 get an error  ERROR: new login detected. mwcmqs listener will stop!
     void onListenerMqCollision();
+
+    // Http listener status
+    void onHttpListeningStatus(bool listening, QString additionalInfo);
 
     // Node info
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
