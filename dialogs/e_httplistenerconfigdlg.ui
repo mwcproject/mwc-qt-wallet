@@ -125,7 +125,7 @@
      <number>5</number>
     </property>
     <item>
-     <widget class="control::MwcLabelSmall" name="label_2">
+     <widget class="control::MwcLabelSmall" name="listeningAddress_label">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -191,7 +191,7 @@
      <number>5</number>
     </property>
     <item>
-     <widget class="control::MwcLabelSmall" name="label_6">
+     <widget class="control::MwcLabelSmall" name="apiSecret_label">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -299,7 +299,7 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
      <number>5</number>
     </property>
     <item>
-     <widget class="control::MwcLabelSmall" name="label_7">
+     <widget class="control::MwcLabelSmall" name="tlsPrivateKey_label">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -345,7 +345,7 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
    <property name="geometry">
     <rect>
      <x>705</x>
-     <y>480</y>
+     <y>478</y>
      <width>150</width>
      <height>40</height>
     </rect>
@@ -367,7 +367,7 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
    <property name="geometry">
     <rect>
      <x>705</x>
-     <y>565</y>
+     <y>563</y>
      <width>150</width>
      <height>40</height>
     </rect>
@@ -399,7 +399,7 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
      <number>5</number>
     </property>
     <item>
-     <widget class="control::MwcLabelSmall" name="label_8">
+     <widget class="control::MwcLabelSmall" name="tlsFullchain_label">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -445,7 +445,7 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
    <property name="geometry">
     <rect>
      <x>705</x>
-     <y>335</y>
+     <y>338</y>
      <width>150</width>
      <height>40</height>
     </rect>

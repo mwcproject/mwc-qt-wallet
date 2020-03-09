@@ -11,6 +11,10 @@ QLabel {
     color: #3600C9;
 }
 
+QLabel::disabled {
+    color: #E2CCF7;
+}
+
 QLineEdit {
     color: #3600C9;
 

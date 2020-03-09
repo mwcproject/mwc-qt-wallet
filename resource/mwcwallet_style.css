@@ -86,6 +86,10 @@ QLabel {
     font-weight: normal;
 }
 
+QLabel::disabled {
+    color: #E2CCF7;
+}
+
 control--MwcLabelTiny {
     font-size: 9px;
 }

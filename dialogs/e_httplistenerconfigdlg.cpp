@@ -110,13 +110,17 @@ void HttpListenerConfigDlg::updateControlState() {
     bool tls = ui->useTlsCheck->isChecked();
 
     ui->listeningAddressEdit->setEnabled(api);
+    ui->listeningAddress_label->setEnabled(api);
     ui->useBasicAutorization->setEnabled(api);
     ui->apiSecretEdit->setEnabled(api && auth);
+    ui->apiSecret_label->setEnabled(api && auth);
     ui->generateSecretButton->setEnabled(api && auth);
 
     ui->useTlsCheck->setEnabled(api);
     ui->tlsPrivateKeyEdit->setEnabled(api && tls);
+    ui->tlsPrivateKey_label->setEnabled(api && tls);
     ui->tlsFullchainEdit->setEnabled(api && tls);
+    ui->tlsFullchain_label->setEnabled(api && tls);
     ui->selectPrivKeyButton->setEnabled(api && tls);
     ui->selectFullchainButton->setEnabled(api && tls);
 
@@ -140,6 +144,15 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
             ui->listeningAddressEdit->setFocus();
             return;
         }
+
+        // Need to check the inputs
+        QPair <bool, QString> valRes = util::validateMwc713Str( listenAddress );
+        if (!valRes.first) {
+            control::MessageBox::messageText(this, "Listening Address", valRes.second );
+            ui->listeningAddressEdit->setFocus();
+            return;
+        }
+
         // Check if port is here
         int semicolonPos = listenAddress.lastIndexOf(':');
         if (semicolonPos<=0) {
@@ -171,6 +184,15 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
                 ui->apiSecretEdit->setFocus();
                 return;
             }
+
+            // Need to check the inputs
+            QPair <bool, QString> valRes = util::validateMwc713Str( apiSecret );
+            if (!valRes.first) {
+                control::MessageBox::messageText(this, "API Secret", valRes.second );
+                ui->apiSecretEdit->setFocus();
+                return;
+            }
+
             config.foreignApiSecret = apiSecret;
         }
         else {
@@ -181,6 +203,23 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
 
             QString privKey = ui->tlsPrivateKeyEdit->text();
             QString chain = ui->tlsFullchainEdit->text();
+
+            // Need to check the inputs
+            QPair <bool, QString> valRes = util::validateMwc713Str( privKey );
+            if (!valRes.first) {
+                control::MessageBox::messageText(this, "file name", valRes.second );
+                ui->tlsPrivateKeyEdit->setFocus();
+                return;
+            }
+
+            // Need to check the inputs
+            valRes = util::validateMwc713Str( chain );
+            if (!valRes.first) {
+                control::MessageBox::messageText(this, "file name", valRes.second );
+                ui->tlsFullchainEdit->setFocus();
+                return;
+            }
+
 
             if ( privKey.isEmpty() || !QFileInfo::exists(privKey) ) {
                 control::MessageBox::messageText(this, "Incorrect Input", "Please tls private key file" );
@@ -196,6 +235,10 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
 
             config.tlsCertificateFile = chain;
             config.tlsCertificateKey = privKey;
+        }
+        else {
+            config.tlsCertificateFile = "";
+            config.tlsCertificateKey = "";
         }
 
     }

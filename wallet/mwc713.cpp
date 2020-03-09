@@ -1530,7 +1530,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
         newConfLines.append("foreign_api = true");
         newConfLines.append("foreign_api_address = \"" + config.foreignApiAddress + "\"");
 
-        if (!config.foreignApiAddress.isEmpty())
+        if (!config.foreignApiSecret.isEmpty())
             newConfLines.append("foreign_api_secret = \"" + config.foreignApiSecret + "\"");
 
         if (!config.tlsCertificateFile.isEmpty() && !config.tlsCertificateKey.isEmpty()) {
