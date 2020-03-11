@@ -65,6 +65,10 @@ protected:
 private slots:
     void onMwcMqListenerStatus(bool online);
     void onKeybaseListenerStatus(bool online);
+
+    // Http listener
+    void onHttpListeningStatus(bool listening, QString additionalInfo);
+
     void onMwcAddressWithIndex(QString mwcAddress, int idx);
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
     void onWalletBalanceUpdated();

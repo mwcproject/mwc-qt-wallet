@@ -1296,14 +1296,14 @@
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
    <header>control/MwcComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLine</class>
@@ -1314,10 +1314,27 @@
  </customwidgets>
  <tabstops>
   <tabstop>type</tabstop>
-  <tabstop>id</tabstop>
-  <tabstop>address</tabstop>
   <tabstop>mwc</tabstop>
   <tabstop>confirm</tabstop>
+  <tabstop>id</tabstop>
+  <tabstop>address</tabstop>
+  <tabstop>messages</tabstop>
+  <tabstop>kernel</tabstop>
+  <tabstop>viewKernel</tabstop>
+  <tabstop>numInputs</tabstop>
+  <tabstop>debited</tabstop>
+  <tabstop>numOutputs</tabstop>
+  <tabstop>credited</tabstop>
+  <tabstop>fee</tabstop>
+  <tabstop>commitsComboBox</tabstop>
+  <tabstop>viewCommit</tabstop>
+  <tabstop>out_status</tabstop>
+  <tabstop>out_mwc</tabstop>
+  <tabstop>out_height</tabstop>
+  <tabstop>out_confirms</tabstop>
+  <tabstop>out_coinBase</tabstop>
+  <tabstop>out_tx</tabstop>
+  <tabstop>okButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

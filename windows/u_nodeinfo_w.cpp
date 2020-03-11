@@ -229,7 +229,7 @@ void NodeInfo::on_loadBlockchainData_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load Blockchain Data"),
                                                        state->getBlockchainDataPath(),
-                                                       tr("MWC Blockchain Data (*.mwcblc)"));
+                                                       tr("MWC Blockchain Data (*.mwcblc);;All files (*.*)"));
 
     if (fileName.length()==0)
           return;

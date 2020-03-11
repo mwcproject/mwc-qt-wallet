@@ -36,7 +36,6 @@ enum WALLET_EVENTS {
     S_INIT=3,    // Init choice request. Wallet need seed
     S_PASSWORD_ERROR=4, // Incorrect password error
     S_NEED2UNLOCK=5, // Need to unlock with password and optional account
-    S_MWC_MQ_LISTENER=6, // Mwc MQ listener is up                 Message: address
     S_GENERIC_ERROR=7, // error printed by wallet           Message: error
     S_GENERIC_WARNING=8, // error printed by wallet           Message: error
     S_GENERIC_INFO=9, // error printed by wallet           Message: error
@@ -65,30 +64,33 @@ enum WALLET_EVENTS {
     S_LISTENER_KB_LOST_CONNECTION = 32, // WARNING: listener [keybase] lost connection. it will keep trying to restore connection in the background.
     S_LISTENER_KB_GET_CONNECTION = 33, // INFO: listener [keybase] reestablished connection.
 
+    S_LISTENER_HTTP_STARTING = 35, // starting listener for foreign api on [host:port]
+    S_LISTENER_HTTP_FAILED   = 36, // thread 'foreign-api-gotham' panicked at XXXXXXXXX
+
     // Recovery
     // from init wallet
-    S_RECOVERY_STARTING = 35, // recovering... please wait as this could take a few minutes to complete
-    S_RECOVERY_DONE = 36,     // wallet restoration done!
-    S_RECOVERY_PROGRESS = 37, // Checking 1000 outputs, up to index 13433. (Highest index: 10235)   Message:  13433|10235
+    S_RECOVERY_STARTING = 45, // recovering... please wait as this could take a few minutes to complete
+    S_RECOVERY_DONE     = 46,     // wallet restoration done!
+    S_RECOVERY_PROGRESS = 47, // Checking 1000 outputs, up to index 13433. (Highest index: 10235)   Message:  13433|10235
     // for fresh wallet
-    S_RECOVERY_MNEMONIC = 38, // Recovering from mnemonic => Mnemonic:
+    S_RECOVERY_MNEMONIC = 48, // Recovering from mnemonic => Mnemonic:
 
-    S_SYNC_PROGRESS = 39, // Checking 1000 outputs, up to index 13433. (Highest index: 10235)   Message:  13433|10235
+    S_SYNC_PROGRESS = 49, // Checking 1000 outputs, up to index 13433. (Highest index: 10235)   Message:  13433|10235
 
     // Accounts
-    S_ACCOUNTS_INFO_SUM = 44, // Account header info. The rest of data will come in lines...
+    S_ACCOUNTS_INFO_SUM = 54, // Account header info. The rest of data will come in lines...
 
     // Send
-    S_SLATE_WAS_SENT_TO = 55,
-    S_SLATE_WAS_SENT_BACK = 56,
-    S_SLATE_WAS_RECEIVED_BACK = 57,
-    S_SLATE_WAS_RECEIVED_FROM = 58,
-    S_SLATE_WAS_FINALIZED = 59,
+    S_SLATE_WAS_SENT_TO = 65,
+    S_SLATE_WAS_SENT_BACK = 66,
+    S_SLATE_WAS_RECEIVED_BACK = 67,
+    S_SLATE_WAS_RECEIVED_FROM = 68,
+    S_SLATE_WAS_FINALIZED = 69,
 
-    S_SET_RECEIVE = 65,
+    S_SET_RECEIVE = 75,
 
-    S_TRANSACTION_LOG = 70,
-    S_OUTPUT_LOG = 71,
+    S_TRANSACTION_LOG = 80,
+    S_OUTPUT_LOG = 81,
 
 
 };

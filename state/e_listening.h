@@ -17,6 +17,7 @@
 
 #include "state.h"
 #include "../core/Notification.h"
+#include "../wallet/mwc713.h"
 
 namespace wnd {
     class Listening;
@@ -42,6 +43,11 @@ public:
 
     void triggerKeybaseStartState();
 
+    wallet::WalletConfig getWalletConfig();
+
+    // Set config require wallet restart
+    void setHttpConfig( const wallet::WalletConfig & config );
+
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "listener.html";}
@@ -62,8 +68,14 @@ private slots:
     // Login from anotehr wallet happens
     void onListenerMqCollision();
 
+    // Http listener
+    void onHttpListeningStatus(bool listening, QString additionalInfo);
+
     // Looking for "Failed to start mwcmqs subscriber. Error connecting to ..."
     void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
+
+private:
+    void wndUpdateStatuses();
 
 private:
     wnd::Listening * wnd = nullptr;

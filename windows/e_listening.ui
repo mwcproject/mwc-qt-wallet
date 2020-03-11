@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>663</width>
-    <height>516</height>
+    <width>778</width>
+    <height>546</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,13 +53,13 @@
        <property name="minimumSize">
         <size>
          <width>550</width>
-         <height>281</height>
+         <height>400</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>550</width>
-         <height>281</height>
+         <height>400</height>
         </size>
        </property>
        <property name="frameShape">
@@ -375,6 +375,126 @@
          <enum>QFrame::Raised</enum>
         </property>
        </widget>
+       <widget class="control::MwcLine" name="frame_3">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>300</y>
+          <width>201</width>
+          <height>2</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+       <widget class="control::MwcLabelNormal" name="label_http">
+        <property name="geometry">
+         <rect>
+          <x>34</x>
+          <y>320</y>
+          <width>85</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Http</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="httpStatusImg">
+        <property name="geometry">
+         <rect>
+          <x>124</x>
+          <y>330</y>
+          <width>21</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Keybase listener status</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../resources.qrc">:/img/StatusOk@2x.svg</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="control::MwcLabelTiny" name="httpStatusTxt">
+        <property name="geometry">
+         <rect>
+          <x>34</x>
+          <y>345</y>
+          <width>81</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Online</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="control::MwcPushButtonNormal" name="httpConfigButton">
+        <property name="geometry">
+         <rect>
+          <x>370</x>
+          <y>330</y>
+          <width>175</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Configure Wallet foreign REST API</string>
+        </property>
+        <property name="text">
+         <string>Configure</string>
+        </property>
+       </widget>
+       <widget class="control::MwcLabelSmall" name="http_warnings">
+        <property name="geometry">
+         <rect>
+          <x>155</x>
+          <y>305</y>
+          <width>211</width>
+          <height>91</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
      </item>
      <item>
@@ -414,25 +534,30 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
+   <class>control::MwcLabelTiny</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLine</class>
    <extends>QFrame</extends>
    <header>control/MwcFrameWithBorder.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelTiny</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources>

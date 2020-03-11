@@ -295,11 +295,11 @@ bool WalletConfig::readInputValue(
     wallet::WalletConfig::saveNetwork2DataPath(walletDir, network, runningArc);
 
     // So far we are good
-    newWalletConfig.setData( network,
+    newWalletConfig.setDataWalletCfg( network,
             walletDir,
             config::getUseMwcMqS() ? currentWalletConfig.mwcmqDomainEx : mwcmqHost,
             config::getUseMwcMqS() ? mwcmqHost : currentWalletConfig.mwcmqsDomainEx,
-            keybasePath );
+            keybasePath);
     newSendParams.setData( confirmations, changeOutputs );
     return true;
 }

@@ -16,6 +16,7 @@
 #define LISTENINGW_H
 
 #include "../core/navwnd.h"
+#include "../wallet/wallet.h"
 
 namespace Ui {
 class Listening;
@@ -33,10 +34,12 @@ class Listening : public core::NavWnd
 
 public:
     explicit Listening(QWidget *parent, state::Listening * state, const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState,
+                       const QPair<bool, QString> & httpListener,
                        QString mwcMqAddress, int mwcMqAddrIdx);
     ~Listening();
 
-    void updateStatuses( const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState );
+    void updateStatuses( const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState,
+            const QPair<bool, QString> & httpStatus );
 
     void updateMwcMqAddress(QString address, int addrIdx);
 
@@ -51,12 +54,15 @@ private slots:
 
     void on_keybaseTriggerButton_clicked();
 
+    void on_httpConfigButton_clicked();
+
 private:
 
 
 private:
     Ui::Listening *ui;
     state::Listening * state;
+    wallet::WalletConfig walletConfig;
 };
 
 }
