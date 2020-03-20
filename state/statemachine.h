@@ -47,10 +47,11 @@ public:
     // Reset logout time.
     void resetLogoutLimit();
 
-
     // Logout must be blocked for modal dialogs
     void blockLogout();
     void unblockLogout();
+    // logout now
+    void logout();
 
     // Please use carefully, don't abuse this interface since no type control can be done
     State* getState(STATE state) const;

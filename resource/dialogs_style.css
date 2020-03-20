@@ -11,12 +11,20 @@ QLabel {
     color: #3600C9;
 }
 
+QLabel::disabled {
+    color: #E2CCF7;
+}
+
 QLineEdit {
     color: #3600C9;
 
     border: 2px solid #E2CCF7;
     background: transparent;
     selection-background-color: #cc9afb;
+}
+
+QLineEdit::disabled {
+    color: #E2CCF7;
 }
 
 QLineEdit:enabled:!focus::hover
@@ -34,6 +42,10 @@ QTextEdit {
     border: 2px solid #E2CCF7;
     background: transparent;
     selection-background-color: #cc9afb;
+}
+
+QTextEdit::disabled {
+    color: #E2CCF7;
 }
 
 QTextEdit:focus {
@@ -62,9 +74,9 @@ QTextBrowser:enabled:!focus::hover
 
 QPushButton
 {
-    color: #6F00D6;
+    color: #3600C9;
 
-    border: 2px solid #6F00D6;
+    border: 2px solid #3600C9;
     border-radius: 6px;
     background: transparent;
 }
@@ -99,13 +111,13 @@ control--MwcPushButtonRound {
 
 MwcFrameWithBorder {
     background: transparent;
-    border: 2px solid #6F00D6;
+    border: 2px solid #3600C9;
     border-radius: 6px;
 }
 
 /* ----------  QRadioButton  ------------*/
 QRadioButton {
-    color: #6F00D6;
+    color: #3600C9;
 }
 
 QRadioButton::indicator:unchecked {
@@ -121,7 +133,7 @@ QRadioButton::indicator:checked {
 
 ListWithColumns
 {
-    color: #6F00D6;
+    color: #3600C9;
     border: 2px solid #E2CCF7;
     background: transparent;
 }
@@ -137,7 +149,7 @@ ListWithColumns:focus {
 
 ListWithColumns::item
 {
-    color: #6F00D6;
+    color: #3600C9;
 }
 
 ListWithColumns::item:selected
@@ -258,4 +270,102 @@ control--MwcTextEditDlg:focus {
 control--MwcTextEditDlg:enabled:!focus::hover
 {
     border: transparent;
+}
+
+/* ------------------------------ */
+control--MwcLine {
+    background: #cc9afb;
+    border: transparent;
+}
+
+/* ------------  MwcComboBox ------- */
+
+control--MwcComboBox
+{
+    border: transparent;
+    border-radius: 6px;
+    padding: 0px 1px 0px 20px;
+
+    border: 2px solid #E2CCF7;
+    background: transparent;
+    selection-background-color: #cc9afb;
+
+    color: #3600C9;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 15px;
+
+    subcontrol-origin: padding;
+    subcontrol-position: bottom right;
+}
+
+control--MwcComboBox:enabled:!focus::hover
+{
+    border: 2px solid #cc9afb;
+}
+
+control--MwcComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: bottom right;
+    width: 30px;
+
+    background: transparent;
+    border: transparent;
+
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+control--MwcComboBox::down-arrow {
+    image: url(:/img/ComboBoxArrowDlg.svg);
+    border: transparent;
+}
+
+QListView {
+    color: #6F00D6;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+
+    border: #cc9afb;
+    background: white;
+
+    selection-color: #6F00D6;
+    selection-background-color: white;
+
+    font-size: 15px;
+    /*padding: 5px;*/
+}
+
+QListView::item {
+    /*  color: white;*/
+    height: 30px;
+    padding: 10px;
+}
+
+/* ---------  QCheckBox  ------- */
+
+QCheckBox {
+    color: #3600C9;
+}
+
+QCheckBox::disabled {
+    color: #E2CCF7;
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(:/img/purpleCheckOff.svg);
+}
+
+QCheckBox::indicator:checked {
+    image: url(:/img/purpleCheckOn.svg);
+}
+
+QCheckBox::indicator:disabled:unchecked {
+    image: url(:/img/disabledCheckOff.svg);
+}
+
+QCheckBox::indicator:disabled:checked {
+    image: url(:/img/disabledCheckOn.svg);
 }

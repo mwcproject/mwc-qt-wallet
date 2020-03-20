@@ -58,5 +58,9 @@ void NavMenuAccount::on_contactsButton_clicked()
     close();
 }
 
+void NavMenuAccount::on_logoutButton_clicked()
+{
+    context->stateMachine->logout();
 }
 
+}

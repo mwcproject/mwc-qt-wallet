@@ -22,6 +22,30 @@
 
 namespace state {
 
+QVector<wallet::WalletTransaction>& CachedTransactionInfo::requestTransactions(int offset, int number)
+{
+    requestedTransactions.clear();
+
+    // offset is the number of the first transaction to display (txn numbers start with 0)
+    // number is the number of transactions to display
+    if (offset >= 0 && offset < transactions.size())
+    {
+        int count = number;
+        if ((offset + number) > transactions.size())
+        {
+            count = transactions.size() - offset;
+        }
+        requestedTransactions.resize(count);
+
+        int j = offset;
+        for (int i=0; i < count; i++)
+        {
+            requestedTransactions[i] = transactions[j++];
+        }
+    }
+    return requestedTransactions;
+}
+
 Transactions::Transactions( StateContext * context) :
     State(context, STATE::TRANSACTIONS)
 {
@@ -34,7 +58,10 @@ Transactions::Transactions( StateContext * context) :
 
     QObject::connect( context->wallet, &wallet::Wallet::onTransactionCount, this, &Transactions::updateTransactionCount, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onTransactions, this, &Transactions::updateTransactions, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onTransactionById, this, &Transactions::onTransactionById, Qt::QueuedConnection );
 
+    QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
+                      this, &Transactions::onNewNotificationMessage, Qt::QueuedConnection );
 }
 
 Transactions::~Transactions() {}
@@ -69,17 +96,33 @@ void Transactions::switchCurrentAccount(const wallet::AccountInfo & account) {
 }
 
 void Transactions::requestTransactionCount(QString account) {
+    cachedTxs.resetCache(account);
     context->wallet->getTransactionCount(account);
 }
 
 // Current transactions that wallet has
-void Transactions::requestTransactions(QString account, int offset, int number) {
+void Transactions::requestTransactions(QString account, int offset, int number, bool enforceSync) {
+    // the transaction count needs to always be requested first
+    Q_ASSERT(cachedTxs.totalTransactions >= 0);
+    Q_ASSERT(cachedTxs.currentAccount == account);
 
-    context->wallet->getTransactions(account, offset, number);
-    context->wallet->updateWalletBalance(); // With transactions refresh, need to update the balance
+    if (enforceSync)
+    {
+        // request all transactions so we can cache them
+        context->wallet->getTransactions(account, 0, cachedTxs.totalTransactions, enforceSync);
+        context->wallet->updateWalletBalance(false,false); // With transactions refresh, need to update the balance
+        cachedTxs.saveTransactionsRequest(offset, number);
+    }
+    else if (wnd)
+    {
+        // pass the subset of transactions the windows needs
+        QVector<wallet::WalletTransaction>& wndTxs = cachedTxs.requestTransactions(offset, number);
+        wnd->setTransactionData(account, cachedTxs.height, wndTxs);
+    }
 }
 
 void Transactions::updateTransactionCount(QString account, int number) {
+    cachedTxs.totalTransactions = number;
     if (wnd) {
         wnd->setTransactionCount(account, number);
     }
@@ -87,8 +130,12 @@ void Transactions::updateTransactionCount(QString account, int number) {
 
 
 void Transactions::updateTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> transactions) {
+    cachedTxs.transactions = transactions;
+    cachedTxs.height = height;
+
     if (wnd) {
-        wnd->setTransactionData(account, height, transactions);
+        QVector<wallet::WalletTransaction>& wndTxs = cachedTxs.requestTransactions(cachedTxs.requestedOffset, cachedTxs.requestedCount);
+        wnd->setTransactionData(account, height, wndTxs);
     }
 }
 
@@ -138,7 +185,7 @@ QVector<wallet::AccountInfo> Transactions::getWalletBalance() {
 
 void Transactions::onCancelTransacton( bool success, int64_t trIdx, QString errMessage ) {
     if (success)
-        context->wallet->updateWalletBalance(); // Updating balance, Likely something will be unblocked
+        context->wallet->updateWalletBalance(false,false); // Updating balance, Likely something will be unblocked
 
     if (wnd) {
         wnd->updateCancelTransacton(success, trIdx, errMessage);
@@ -148,6 +195,29 @@ void Transactions::onCancelTransacton( bool success, int64_t trIdx, QString errM
 void Transactions::onWalletBalanceUpdated() {
     if (wnd) {
         wnd->updateWalletBalance();
+    }
+}
+
+void Transactions::onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString message) {
+    Q_UNUSED(level)
+
+    if (wnd && message.contains("Changing transaction")) {
+        wnd->triggerRefresh();
+    }
+}
+
+
+// Request full info for the transaction
+void Transactions::getTransactionById(QString account, int64_t txIdx) const {
+    context->wallet->getTransactionById(account, txIdx);
+}
+
+void Transactions::onTransactionById( bool success, QString account, int64_t height,
+        wallet::WalletTransaction transaction,
+        QVector<wallet::WalletOutput> outputs,
+        QVector<QString> messages ) {
+    if (wnd) {
+        wnd->updateTransactionById(success, account, height, transaction, outputs, messages);
     }
 }
 

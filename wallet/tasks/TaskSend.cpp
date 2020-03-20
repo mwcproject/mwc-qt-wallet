@@ -192,27 +192,6 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, co
     qDebug() << "sendCommand: '" << cmd << "'";
 
     return cmd;
-
-/*    QPair<bool, util::ADDRESS_TYPE> addressType = util::verifyAddress(address);
-    if (!addressType.first) {
-        wallet713->setSendResults(false, QStringList{"Unable to parse the address: " + address});
-        return "";
-    }
-
-
-
-    switch (addressType.second) {
-        case util::ADDRESS_TYPE::UNKNOWN:
-            Q_ASSERT(false);
-        case util::ADDRESS_TYPE::MWC_MQ:
-        case util::ADDRESS_TYPE::KEYBASE:
-        case util::ADDRESS_TYPE::HTTPS:
-        default:
-            Q_ASSERT(false);
-    }
-
-    if ()*/
-
 }
 
 // ----------------------- TaskSendFile --------------------------

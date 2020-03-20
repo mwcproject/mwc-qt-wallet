@@ -60,6 +60,16 @@ bool AccountInfo::isDeleted() const {
             total == 0 && awaitingConfirmation==0 && lockedByPrevTransaction==0 && currentlySpendable==0;
 }
 
+
+// Debug/Log printing
+QString AccountInfo::toString() const {
+    return "AccountInfo(acc=" + accountName + ", total=" + util::nano2one(total) +
+               " spend=" + util::nano2one(currentlySpendable) + " locked=" +
+               util::nano2one(lockedByPrevTransaction) +
+               " awaiting=" + util::nano2one(awaitingConfirmation) + ")";
+}
+
+
 void MwcNodeConnection::saveData(QDataStream & out) const {
     int id = 0x4355a2;
     out << id;
@@ -87,19 +97,58 @@ bool MwcNodeConnection::loadData(QDataStream & in) {
     return true;
 }
 
+bool WalletConfig::operator == (const WalletConfig & other) const {
+    bool ok = dataPath==other.dataPath &&
+              mwcmqDomainEx==other.mwcmqDomainEx && mwcmqsDomainEx==other.mwcmqsDomainEx &&
+              keyBasePath==other.keyBasePath && foreignApi==other.foreignApi;
+
+    if (ok)
+        return ok;
+
+    ok = foreignApiAddress == other.foreignApiAddress && foreignApiSecret == other.foreignApiSecret &&
+            tlsCertificateFile == other.tlsCertificateFile && tlsCertificateKey == other.tlsCertificateKey;
+
+    return ok;
+}
+
+
 WalletConfig & WalletConfig::setData(QString _network,
                             QString _dataPath,
                             QString _mwcmqDomain,
                             QString _mwcmqsDomain,
-                            QString _keyBasePath ) {
+                            QString _keyBasePath,
+                            bool    _foreignApi,
+                            QString _foreignApiAddress,
+                            QString _foreignApiSecret,
+                            QString _tlsCertificateFile,
+                            QString _tlsCertificateKey) {
+
+    setDataWalletCfg(_network,_dataPath,_mwcmqDomain,_mwcmqsDomain,_keyBasePath);
+
+    foreignApi = _foreignApi;
+    foreignApiAddress = _foreignApiAddress;
+    foreignApiSecret = _foreignApiSecret;
+    tlsCertificateFile = _tlsCertificateFile;
+    tlsCertificateKey = _tlsCertificateKey;
+
+    return * this;
+}
+
+WalletConfig & WalletConfig::setDataWalletCfg(QString _network,
+                                QString _dataPath,
+                                QString _mwcmqDomain,
+                                QString _mwcmqsDomain,
+                                QString _keyBasePath)
+{
     network  = _network;
     dataPath = _dataPath;
     mwcmqDomainEx = _mwcmqDomain;
     mwcmqsDomainEx = _mwcmqsDomain;
     keyBasePath = _keyBasePath;
 
-    return * this;
+    return *this;
 }
+
 
 QString WalletConfig::toString() const {
     return "network=" + network + "\n" +
@@ -162,17 +211,30 @@ void  WalletConfig::saveNetwork2DataPath(QString configPath, QString network, QS
     util::writeTextFile(path + "/net.txt", {network, arch} );
 }
 
+// initialize static csvHeaders
+// the CSV headers must match the output from mwc713 for 'txs --show-full'
+QString WalletTransaction::csvHeaders = "Id,Type,Shared Transaction Id,Address,Creation Time,TTL Cutoff Height,"
+                                        "Confirmed?,Height,Confirmation Time,Num. Inputs,Num. Outputs,Amount Credited,"
+                                        "Amount Debited,Fee,Net Difference,Payment Proof,Kernel";
+
 
 void WalletTransaction::setData(int64_t _txIdx,
-    uint    _transactionType,
-    QString _txid,
-    QString _address,
-    QString _creationTime,
-    bool    _confirmed,
-    int64_t _height,
-    QString _confirmationTime,
-    int64_t    _coinNano,
-    bool    _proof)
+                                uint    _transactionType,
+                                QString _txid,
+                                QString _address,
+                                QString _creationTime,
+                                bool    _confirmed,
+                                int64_t _ttlCutoffHeight,
+                                int64_t _height,
+                                QString _confirmationTime,
+                                int     _numInputs,
+                                int     _numOutputs,
+                                int64_t _credited,
+                                int64_t _debited,
+                                int64_t _fee,
+                                int64_t _coinNano,
+                                bool    _proof,
+                                QString _kernel)
 {
     txIdx = _txIdx;
     transactionType = _transactionType;
@@ -184,6 +246,13 @@ void WalletTransaction::setData(int64_t _txIdx,
     confirmationTime = util::mwc713time2ThisTime(_confirmationTime);
     coinNano = _coinNano;
     proof = _proof;
+    ttlCutoffHeight = _ttlCutoffHeight;
+    numInputs = _numInputs;
+    numOutputs = _numOutputs;
+    credited = _credited;
+    debited = _debited;
+    fee = _fee;
+    kernel = _kernel;
 }
 
 // return transaction age (time interval from creation moment) in Seconds.
@@ -194,8 +263,31 @@ int64_t WalletTransaction::calculateTransactionAge( const QDateTime & current ) 
     return setTime.secsTo(current);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//  WalletOutput
+QString WalletTransaction::toStringCSV() {
+    QString separator = ",";
+    // always enclose the type string in quotes as it could contain a comma
+    QString txTypeStr = "\"" + getTypeAsStr() + "\"";
+    QString csvStr = QString::number(txIdx) + separator +       // Id
+                      txTypeStr + separator +                   // Type
+                      txid + separator +                        // Shared Transaction Id
+                      address + separator +                     // Address
+                      creationTime + separator +                // Creation Time
+                      QString::number(ttlCutoffHeight) + separator + // TTL Cutoff Height
+                      (confirmed ? "YES" : "NO") + separator +  // Confirmed?
+                      QString::number(height) + separator +     // height
+                      confirmationTime + separator +            // Confirmation Time
+                      QString::number(numInputs) + separator +  // Num. Inputs
+                      QString::number(numOutputs) + separator + // Num. Outputs
+                      util::nano2one(credited) + separator +    // Amount Credited
+                      util::nano2one(debited) + separator +     // Amount Debited
+                      util::nano2one(fee) + separator +         // Fee
+                      util::nano2one(coinNano) + separator +    // Net Difference
+                      (proof ? "yes" : "no") + separator +      // Payment Proof
+                      kernel;                                   // Kernel
+    return csvStr;
+}
+
+
 
 void WalletOutput::setData(QString _outputCommitment,
         QString     _MMRIndex,

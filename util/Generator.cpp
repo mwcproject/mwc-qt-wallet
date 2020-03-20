@@ -12,29 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dialogs/shownotificationdlg.h"
-#include "ui_shownotificationdlg.h"
+#include "Generator.h"
+#include <QTime>
 
-namespace dlg {
+namespace util {
 
-ShowNotificationDlg::ShowNotificationDlg(notify::NotificationMessage msg, QWidget *parent) :
-        MwcDialog(parent),
-        ui(new Ui::ShowNotificationDlg) {
-    ui->setupUi(this);
+static const QString Base58Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-    ui->timeText->setText( msg.time.toString("ddd MMMM d yyyy HH:mm:ss") );
-    ui->levelText->setText( msg.getLevelLongStr() );
-    ui->messageText->setPlainText( msg.message );
-}
+// Genrate a secret. Note, random number generator is not cryptography secure because of QT version
+QString generateSecret(int length) {
+    qsrand( static_cast<quint64>( QTime::currentTime().msecsSinceStartOfDay() ) );
+    QString result;
+    for ( int t=0;t<length; t++) {
+        result.append( Base58Alphabet[qrand()%Base58Alphabet.length()] );
+    }
 
-ShowNotificationDlg::~ShowNotificationDlg() {
-    delete ui;
-}
-
-void ShowNotificationDlg::on_pushButton_clicked()
-{
-    accept();
+    return result;
 }
 
 }
-

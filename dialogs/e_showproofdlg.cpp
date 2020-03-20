@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "showproofdlg.h"
-#include "ui_showproofdlg.h"
+#include "e_showproofdlg.h"
+#include "ui_e_showproofdlg.h"
 #include "../util/execute.h"
 #include "../core/global.h"
 

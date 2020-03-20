@@ -43,6 +43,9 @@ AccountTransfer::~AccountTransfer()
 void AccountTransfer::updateAccounts() {
     accountInfo = state->getWalletBalance();
 
+    int fromI = getAccountSelectionComboBoxCurrentIndex( ui->accountFromCB, false );
+    int toI   = getAccountSelectionComboBoxCurrentIndex( ui->accountToCB, false );
+
     ui->accountFromCB->clear();
     ui->accountToCB->clear();
 
@@ -54,8 +57,8 @@ void AccountTransfer::updateAccounts() {
 
         idx++;
     }
-    ui->accountFromCB->setCurrentIndex(-1);
-    ui->accountToCB->setCurrentIndex(-1);
+    ui->accountFromCB->setCurrentIndex(fromI);
+    ui->accountToCB->setCurrentIndex(toI);
 }
 
 
@@ -94,21 +97,35 @@ void AccountTransfer::on_settingsBtn_clicked()
     }
 }
 
+// return -1 if not seleted or not valid
+int AccountTransfer::getAccountSelectionComboBoxCurrentIndex( control::MwcComboBox * combo, bool showInputErrMessage ) {
+    auto dt = combo->currentData();
+    if ( !dt.isValid() ) {
+        if (showInputErrMessage)
+            control::MessageBox::messageText(this, "Incorrect Input", "Please select pair of accounts to transfer coins.");
+        return -1;
+    }
+
+    int idxVal = dt.toInt();
+
+    if (idxVal<0 || idxVal>accountInfo.size() ) {
+        if (showInputErrMessage)
+            control::MessageBox::messageText(this, "Incorrect Input", "Please select pair of different accounts to transfer coins.");
+        return -1;
+    }
+
+    return idxVal;
+}
+
+
 void AccountTransfer::on_transferButton_clicked()
 {
     state::TimeoutLockObject to( state );
 
-    auto fromDt = ui->accountFromCB->currentData();
-    auto toDt = ui->accountToCB->currentData();
-    if ( !fromDt.isValid() || !toDt.isValid() ) {
-        control::MessageBox::messageText(this, "Incorrect Input", "Please select pair of accounts to transfer coins.");
-        return;
-    }
+    int fromI = getAccountSelectionComboBoxCurrentIndex( ui->accountFromCB, true );
+    int toI   = getAccountSelectionComboBoxCurrentIndex( ui->accountToCB, true );
 
-    int fromI = fromDt.toInt();
-    int toI = toDt.toInt();
-
-    if (fromI == toI || fromI<0 || toI<0 || fromI>accountInfo.size() || toI>accountInfo.size()) {
+    if (fromI == toI) {
         control::MessageBox::messageText(this, "Incorrect Input", "Please select pair of different accounts to transfer coins.");
         return;
     }

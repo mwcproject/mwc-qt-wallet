@@ -38,6 +38,8 @@ public:
     void submitPassword(const QString & password);
 
     QPair<bool,bool> getWalletListeningStatus();
+    QPair<bool,QString> getWalletHttpListeningStatus();
+    bool getWalletTls();
 
 protected:
     virtual NextStateRespond execute() override;
@@ -50,6 +52,7 @@ protected slots:
 
     void onMwcMqListenerStatus(bool online);
     void onKeybaseListenerStatus(bool online);
+    void onHttpListeningStatus(bool listening, QString additionalInfo);
 
 private:
     wnd::InputPassword * wnd = nullptr;

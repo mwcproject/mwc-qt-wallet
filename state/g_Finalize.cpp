@@ -185,9 +185,8 @@ void Finalize::onAllTransactions( QVector<wallet::WalletTransaction> transaction
 
 void Finalize::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
     Q_UNUSED(errMsg)
-    Q_UNUSED(peerHeight)
-    Q_UNUSED(totalDifficulty)
-    Q_UNUSED(connections)
+
+    nodeIsHealthy = online && ( (config::isColdWallet() || connections>0) && totalDifficulty>0 && nodeHeight>peerHeight-5); // 5 blocks difference will be tolerated
 
     if (online)
         lastNodeHeight = nodeHeight;

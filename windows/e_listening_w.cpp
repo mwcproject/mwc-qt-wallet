@@ -20,11 +20,13 @@
 #include <QDebug>
 #include "../state/timeoutlock.h"
 #include "../core/Config.h"
+#include "../dialogs/e_httplistenerconfigdlg.h"
 
 namespace wnd {
 
 Listening::Listening(QWidget *parent, state::Listening * _state,
                      const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState,
+                     const QPair<bool, QString> & httpListener,
                      QString mwcMqAddress, int mwcMqAddrIdx) :
     core::NavWnd(parent, _state->getContext() ),
     ui(new Ui::Listening),
@@ -32,9 +34,11 @@ Listening::Listening(QWidget *parent, state::Listening * _state,
 {
     ui->setupUi(this);
 
+    walletConfig = state->getWalletConfig();
+
     //state->setWindowTitle("Listening");
 
-    updateStatuses( listenerStatus, listenerStartState );
+    updateStatuses( listenerStatus, listenerStartState, httpListener );
 
     updateMwcMqAddress(mwcMqAddress, mwcMqAddrIdx);
 
@@ -59,7 +63,8 @@ void Listening::updateMwcMqAddress(QString address, int addrIdx) {
     ui->mwcMqAddressIndexLabel->setText( addrIdx>=0 ? ("Address Index: " + QString::number(addrIdx)) : "" );
 }
 
-void Listening::updateStatuses( const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState ) {
+void Listening::updateStatuses( const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState,
+                                const QPair<bool, QString> & httpStatus ) {
     // MWC MQ
     ui->mwcMqStatusImg->setPixmap(QPixmap(listenerStatus.first ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
     ui->mwcMqStatusImg->setToolTip(
@@ -102,6 +107,32 @@ void Listening::updateStatuses( const QPair<bool,bool> & listenerStatus, const Q
         ui->keybaseTriggerButton->setText("Start");
         ui->keybaseTriggerButton->setToolTip("Start the Keybase Listener");
     }
+
+    // -------------   HTTP(S)  ------------------
+    ui->httpStatusImg->setPixmap( QPixmap( httpStatus.first ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg" ) );
+    ui->httpStatusImg->setToolTip(httpStatus.first ? "Wallet http(s) foreign REST API is online" : "Wallet foreign REST API is offline");
+    ui->httpStatusTxt->setText( httpStatus.first ? "Online" : "Offline" );
+
+    if (walletConfig.hasTls())
+        ui->label_http->setText("Https");
+
+    if (httpStatus.first) {
+        QString warningStr;
+
+        if ( !walletConfig.hasTls() )
+            warningStr += "WARNING: You are using non secure http connection.";
+
+        if (walletConfig.foreignApiSecret.isEmpty() ) {
+            if (!warningStr.isEmpty())
+                warningStr+="\n";
+
+            warningStr += "WARNING: Authorization with api secret is disabled.";
+        }
+
+        ui->http_warnings->setText(warningStr);
+    } else {
+        ui->http_warnings->setText(httpStatus.second); // String param will an error or nothing if it is disabled. That what we need.
+    }
 }
 
 void Listening::on_mwcMqTriggerButton_clicked()
@@ -141,8 +172,16 @@ void Listening::on_keybaseTriggerButton_clicked()
     state->triggerKeybaseStartState();
 }
 
+void wnd::Listening::on_httpConfigButton_clicked()
+{
+    state::TimeoutLockObject to( state );
 
+    dlg::HttpListenerConfigDlg optionDlg(this, walletConfig);
+    if ( optionDlg.exec() == QDialog::Accepted ) {
+        // dsdfs
+        state->setHttpConfig(optionDlg.getConfig());
+    }
 }
 
 
-
+}

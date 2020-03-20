@@ -59,6 +59,7 @@ public:
 
     virtual state::StateContext * getContext() override;
 
+    virtual bool isNodeHealthy() const override {return nodeIsHealthy;}
 
 protected:
     virtual NextStateRespond execute() override;
@@ -77,6 +78,8 @@ private:
 
     // History of submitted file transactions
     QMap<QString, util::FileTransactionInfo> file2TransactionsInfo;
+
+    bool nodeIsHealthy = false;
 };
 
 

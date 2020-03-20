@@ -20,7 +20,6 @@
 #include "../state/statemachine.h"
 #include "../util/Log.h"
 #include "../util/Json.h"
-#include "../dialogs/fileslateinfodlg.h"
 #include "timeoutlock.h"
 #include "../core/global.h"
 #include "../control/messagebox.h"
@@ -35,6 +34,9 @@ Receive::Receive( StateContext * _context ) :
 
     QObject::connect(context->wallet, &wallet::Wallet::onKeybaseListenerStatus,
                      this, &Receive::onKeybaseListenerStatus, Qt::QueuedConnection);
+
+    QObject::connect(context->wallet, &wallet::Wallet::onHttpListeningStatus,
+                     this, &Receive::onHttpListeningStatus, Qt::QueuedConnection);
 
     QObject::connect(context->wallet, &wallet::Wallet::onMwcAddressWithIndex,
                      this, &Receive::onMwcAddressWithIndex, Qt::QueuedConnection);
@@ -97,11 +99,13 @@ void Receive::signTransaction( QString fileName ) {
 
 void Receive::ftBack() {
     QPair<bool,bool> lsnStatus = context->wallet->getListenerStatus();
+    QPair<bool, QString> httpStatus = context->wallet->getHttpListeningStatus();
     wnd = (wnd::Receive*) context->wndManager->switchToWindowEx( mwc::PAGE_E_RECEIVE,
-                                                                 new wnd::Receive( context->wndManager->getInWndParent(), this,
-                                                                                   lsnStatus.first, lsnStatus.second,
-                                                                                   context->wallet->getLastKnownMwcBoxAddress(),
-                                                                                   context->wallet->getWalletConfig() ) );
+                          new wnd::Receive( context->wndManager->getInWndParent(), this,
+                                     lsnStatus.first, lsnStatus.second,
+                                     httpStatus.first,
+                                     context->wallet->getLastKnownMwcBoxAddress(),
+                                     context->wallet->getWalletConfig() ) );
 }
 
 void Receive::ftContinue(QString fileName, QString resultTxFileName) {
@@ -144,6 +148,15 @@ void Receive::onKeybaseListenerStatus(bool online) {
         wnd->updateKeybaseState(online);
     }
 }
+
+// Http listener
+void Receive::onHttpListeningStatus(bool listening, QString additionalInfo) {
+    Q_UNUSED(additionalInfo)
+    if (wnd) {
+        wnd->updateHttpState(listening);
+    }
+}
+
 void Receive::onMwcAddressWithIndex(QString mwcAddress, int idx) {
     Q_UNUSED(idx)
     if (wnd) {

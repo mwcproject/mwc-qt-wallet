@@ -108,12 +108,12 @@
             </column>
             <column>
              <property name="text">
-              <string>CONF</string>
+              <string>STATUS</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>CB</string>
+              <string>CONF</string>
              </property>
             </column>
             <column>
@@ -123,7 +123,12 @@
             </column>
             <column>
              <property name="text">
-              <string>MMR IDX</string>
+              <string>CB</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>HEIGHT</string>
              </property>
             </column>
             <column>
@@ -135,6 +140,62 @@
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="control::MwcPushButtonNormal" name="showAll">
+              <property name="minimumSize">
+               <size>
+                <width>150</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::NoFocus</enum>
+              </property>
+              <property name="toolTip">
+               <string>Restore default settings for the wallet.</string>
+              </property>
+              <property name="text">
+               <string>Show All</string>
+              </property>
+              <property name="autoDefault">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="control::MwcPushButtonNormal" name="showUnspent">
+              <property name="minimumSize">
+               <size>
+                <width>150</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::NoFocus</enum>
+              </property>
+              <property name="toolTip">
+               <string>Restore default settings for the wallet.</string>
+              </property>
+              <property name="text">
+               <string>Show Unspent</string>
+              </property>
+              <property name="autoDefault">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
             <item>
              <spacer name="horizontalSpacer">
               <property name="orientation">
@@ -416,14 +477,14 @@
              <widget class="control::MwcLabelProgress" name="progress">
               <property name="minimumSize">
                <size>
-                <width>100</width>
-                <height>50</height>
+                <width>50</width>
+                <height>25</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>100</width>
-                <height>50</height>
+                <width>50</width>
+                <height>25</height>
                </size>
               </property>
               <property name="text">
@@ -436,13 +497,13 @@
               <property name="minimumSize">
                <size>
                 <width>1</width>
-                <height>50</height>
+                <height>25</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>1</width>
-                <height>50</height>
+                <height>25</height>
                </size>
               </property>
              </widget>
@@ -512,14 +573,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <class>control::MwcPushButtonNormal</class>
+   <extends>QPushButton</extends>
+   <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>ListWithColumns</class>

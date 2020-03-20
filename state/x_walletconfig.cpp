@@ -91,7 +91,7 @@ core::SendCoinsParams  WalletConfig::getSendCoinsParams() const {
 // account refresh will be requested...
 void WalletConfig::setSendCoinsParams(const core::SendCoinsParams & params) {
     context->appContext->setSendCoinsParams(params);
-    context->wallet->updateWalletBalance(); // Number of outputs might change, requesting update in background
+    context->wallet->updateWalletBalance(false,false); // Number of outputs might change, requesting update in background
 }
 
 double WalletConfig::getGuiScale() const {

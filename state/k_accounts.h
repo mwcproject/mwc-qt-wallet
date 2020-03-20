@@ -62,10 +62,22 @@ private slots:
 
     void onAccountRenamed(bool success, QString errorMessage);
 
+    void onLoginResult(bool ok);
+
+    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
+
 private:
     virtual void timerEvent(QTimerEvent *event) override;
+
+    bool isNodeHealthy() const {return nodeIsHealthy;}
 private:
     wnd::Accounts * wnd = nullptr;
+
+    bool nodeIsHealthy = false;
+
+    bool lastNodeIsHealty = true;
+
+    int64_t startingTime = 0;
 };
 
 }

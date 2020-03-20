@@ -50,6 +50,15 @@ InputPassword::InputPassword(QWidget *parent, state::InputPassword * _state, sta
 
             updateMwcMqState(status.first);
             updateKeybaseState(status.second);
+
+            QPair<bool,QString> http = state->getWalletHttpListeningStatus();
+            bool tls = state->getWalletTls();
+
+            if (tls) {
+                ui->label_http->setText("Https");
+            }
+            updateHttpState(http.first);
+
         }
         else {
             ui->listeningStatusFrame->hide();
@@ -62,6 +71,11 @@ InputPassword::InputPassword(QWidget *parent, state::InputPassword * _state, sta
     }
 
     ui->mwcMQlable->setText( QString("mwc MQ") + (config::getUseMwcMqS() ? "S" : "") );
+
+    ui->syncStatusMsg->setText("");
+
+    QObject::connect( state->getContext()->wallet, &wallet::Wallet::onUpdateSyncProgress,
+                     this, &InputPassword::onUpdateSyncProgress, Qt::QueuedConnection);
 }
 
 InputPassword::~InputPassword()
@@ -131,6 +145,16 @@ void InputPassword::updateKeybaseState(bool online) {
     ui->keybaseStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg" ) );
     ui->keybaseStatusImg->setToolTip(online ? "Listener connected to keybase" : "Listener diconnected from keybase");
     ui->keybaseStatusTxt->setText( online ? "Online" : "Offline" );
+}
+
+void InputPassword::updateHttpState(bool online) {
+    ui->httpStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg" ) );
+    ui->httpStatusImg->setToolTip(online ? "Wallet http(s) foreign REST API is online" : "Wallet foreign REST API is offline");
+    ui->httpStatusTxt->setText( online ? "Online" : "Offline" );
+}
+
+void InputPassword::onUpdateSyncProgress(double progressPercent) {
+    ui->syncStatusMsg->setText( "Wallet state update, " + util::trimStrAsDouble( QString::number(progressPercent), 4 ) + "% complete" );
 }
 
 

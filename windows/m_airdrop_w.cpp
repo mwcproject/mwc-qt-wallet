@@ -19,6 +19,7 @@
 #include "../util/stringutils.h"
 #include "../state/timeoutlock.h"
 
+
 namespace wnd {
 
 Airdrop::Airdrop(QWidget *parent, state::Airdrop * _state) :
@@ -30,14 +31,16 @@ Airdrop::Airdrop(QWidget *parent, state::Airdrop * _state) :
 
     ui->progress->initLoader(true);
     ui->progressFrame->hide();
+    ui->claimFrame->hide();
+    // Static frame is visible
 
-    if ( updateAirDropStatus( state->getAirDropStatus() ) ) {
+/*    if ( updateAirDropStatus( state->getAirDropStatus() ) ) {
         initTableHeaders();
         updateClaimStatus();
         ui->btcAddressEdit->setFocus();
         ui->claimAirdropBtn->setEnabled(false);
         ui->refreshClaimsButton->setEnabled( state->hasAirdropRequests());
-    }
+    }*/
 }
 
 Airdrop::~Airdrop()
@@ -151,8 +154,8 @@ bool Airdrop::updateAirDropStatus( const state::AirDropStatus & status ) {
 
 bool Airdrop::updateClaimStatus( int idx, const state::AirdropRequests & request,
                         QString status, QString message, int64_t amount, int errCode) {
-    Q_UNUSED(message);
-    Q_UNUSED(errCode);
+    Q_UNUSED(message)
+    Q_UNUSED(errCode)
 
     int rows = ui->claimsTable->rowCount();
     if (idx!=rows)

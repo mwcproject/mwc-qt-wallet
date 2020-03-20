@@ -42,6 +42,8 @@ public:
     virtual QString getResultTxPath() = 0;
     virtual void updateResultTxPath(QString path) = 0;
 
+    virtual bool isNodeHealthy() const = 0;
+
     virtual state::StateContext * getContext() = 0;
 };
 

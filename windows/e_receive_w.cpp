@@ -23,7 +23,7 @@
 
 namespace wnd {
 
-Receive::Receive(QWidget *parent, state::Receive * _state, bool mwcMqStatus, bool keybaseStatus,
+Receive::Receive(QWidget *parent, state::Receive * _state, bool mwcMqStatus, bool keybaseStatus, bool httpStatus,
                  QString mwcMqAddress, const wallet::WalletConfig & _walletConfig ) :
         core::NavWnd(parent, _state->getContext() ),
         ui(new Ui::Receive),
@@ -41,8 +41,12 @@ Receive::Receive(QWidget *parent, state::Receive * _state, bool mwcMqStatus, boo
         ui->mwcmqAddress->hide();
     }
 
+    if (walletConfig.hasTls())
+        ui->httpLabel->setText("Https");
+
     updateMwcMqState(mwcMqStatus);
     updateKeybaseState(keybaseStatus);
+    updateHttpState(httpStatus);
     updateMwcMqAddress(mwcMqAddress);
 }
 
@@ -71,13 +75,19 @@ void Receive::updateKeybaseState(bool online) {
     ui->keybaseStatusLabel->setText( online ? "Online" : "Offline" );
 }
 
+void Receive::updateHttpState(bool online) {
+    ui->httpStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
+    ui->httpStatusLabel->setText( online ? "Online" : "Offline" );
+}
+
+
 void wnd::Receive::on_recieveFileButton_clicked()
 {
     state::TimeoutLockObject to( state );
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open initial transaction file"),
                                                     state->getFileGenerationPath(),
-                                                    tr("MWC transaction (*.tx)"));
+                                                    tr("MWC transaction (*.tx *.input);;All files (*.*)"));
 
     if (fileName.length()==0)
         return;

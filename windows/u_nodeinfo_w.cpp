@@ -217,6 +217,9 @@ void NodeInfo::on_saveBlockchianData_clicked()
     if (fileName.length()==0)
           return;
 
+    if (!fileName.endsWith(".mwcblc"))
+        fileName += ".mwcblc";
+
     ui->progress->show();
     state->updateBlockchainDataPath( QFileInfo(fileName).absolutePath() );
     state->saveBlockchainData(fileName);
@@ -226,7 +229,7 @@ void NodeInfo::on_loadBlockchainData_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load Blockchain Data"),
                                                        state->getBlockchainDataPath(),
-                                                       tr("MWC Blockchain Data (*.mwcblc)"));
+                                                       tr("MWC Blockchain Data (*.mwcblc);;All files (*.*)"));
 
     if (fileName.length()==0)
           return;

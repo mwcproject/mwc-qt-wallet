@@ -18,6 +18,7 @@
 #include <QFileDialog>
 #include "../util/Json.h"
 #include "../control/messagebox.h"
+#include "../state/timeoutlock.h"
 
 namespace wnd {
 
@@ -36,11 +37,20 @@ FinalizeUpload::~FinalizeUpload()
 }
 
 void FinalizeUpload::on_uploadFileBtn_clicked() {
+
+    state::TimeoutLockObject to( state );
+
+    if ( !state->isNodeHealthy() ) {
+        control::MessageBox::messageText(this, "Unable to finalize", "Your MWC-Node, that wallet connected to, is not ready to finalize transactions.\n"
+                                                                     "MWC-Node need to be connected to few peers and finish blocks synchronization process");
+        return;
+    }
+
     // Logic is implemented into This Window
     // It is really wrong, but also we don't want to have special state for that.
     QString fileName = QFileDialog::getOpenFileName(this, tr("Finalize transaction file"),
                                                     state->getFileGenerationPath(),
-                                                    tr("MWC response transaction (*.tx.response)"));
+                                                    tr("MWC response transaction (*.tx.response *.response);;All files (*.*)"));
 
     if (fileName.length() == 0) {
         return;

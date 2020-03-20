@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>759</width>
+    <width>987</width>
     <height>605</height>
    </rect>
   </property>
@@ -19,7 +19,22 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,5,1">
+  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,5,1">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>3</number>
+   </property>
+   <property name="topMargin">
+    <number>3</number>
+   </property>
+   <property name="rightMargin">
+    <number>3</number>
+   </property>
+   <property name="bottomMargin">
+    <number>3</number>
+   </property>
    <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -28,13 +43,13 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>48</height>
+       <height>54</height>
       </size>
      </property>
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,5,5,1">
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,5,5,0,1">
      <property name="spacing">
       <number>0</number>
      </property>
@@ -324,9 +339,10 @@
         <item>
          <widget class="control::MwcLabelLarge" name="label">
           <property name="text">
-           <string>Important!
-Claims will close on January 2, 2020.
-Please ensure you complete the process before then.</string>
+           <string>Airdrop complete.
+
+Check https://www.mwc.mw/airdrop-info for updates
+about potential future airdrops.</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -403,14 +419,14 @@ Please ensure you complete the process before then.</string>
             </property>
             <property name="minimumSize">
              <size>
-              <width>100</width>
-              <height>50</height>
+              <width>50</width>
+              <height>25</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>100</width>
-              <height>50</height>
+              <width>50</width>
+              <height>25</height>
              </size>
             </property>
             <property name="text">
@@ -419,17 +435,17 @@ Please ensure you complete the process before then.</string>
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="widget" native="true">
+           <widget class="QWidget" name="widget5" native="true">
             <property name="minimumSize">
              <size>
               <width>1</width>
-              <height>50</height>
+              <height>25</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
               <width>1</width>
-              <height>50</height>
+              <height>25</height>
              </size>
             </property>
            </widget>
@@ -466,6 +482,75 @@ Please ensure you complete the process before then.</string>
       </widget>
      </item>
      <item>
+      <widget class="QFrame" name="staticMessageFrame">
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0,2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <spacer name="verticalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>72</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="control::MwcLabelLarge" name="label_3">
+          <property name="text">
+           <string>Airdrop complete.
+
+Check https://www.mwc.mw/airdrop-info for updates
+about potential future airdrops.</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_6">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -488,7 +573,7 @@ Please ensure you complete the process before then.</string>
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>48</height>
+       <height>53</height>
       </size>
      </property>
     </spacer>
@@ -502,9 +587,19 @@ Please ensure you complete the process before then.</string>
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelLarge</class>
@@ -512,19 +607,9 @@ Please ensure you complete the process before then.</string>
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>ListWithColumns</class>
    <extends>QTableWidget</extends>
    <header>control/listwithcolumns.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -283,6 +283,94 @@ bool TaskSubmitFile::processTask(const QVector<WEvent> & events) {
     return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// TaskSync
+
+static bool TaskSyncShowProgress = false;
+
+void TaskSync::onStarted() {
+    TaskSyncShowProgress = showProgress;
+}
+
+bool TaskSync::processTask(const QVector<WEvent> & events) {
+    QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
+
+    /*
+Updating outputs from node
+Updating transactions
+Starting UTXO scan, 0% complete
+Checking 106 outputs, up to index 564619. (Highest index: 564619), 99% complete
+Identified 0 wallet_outputs as belonging to this wallet, 99% complete
+Scanning Complete
+     */
+
+    bool foundDone = false;
+    for (int idx=0; idx<lns.size(); idx++ ) {
+        if (lns[idx].message.contains("Your wallet data successfully synchronized with a node")) {
+            foundDone = true;
+            break;
+        }
+    }
+
+    if (!foundDone) {
+        // Scan was failed, let emit the warning
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Wallet unable refresh the wallet state. Your balance might be out if sync." );
+    }
+
+    // restore back to 'true'
+    TaskSyncShowProgress  = true;
+
+    wallet713->updateSyncAsDone();
+
+    return true;
+}
+
+// ----------------------------------- TaskRecoverProgressListener ---------------------------------
+
+bool TaskSyncProgressListener::processTask(const QVector<WEvent> &events) {
+    // It is listener, one by one processing only
+    Q_ASSERT(events.size()==1);
+
+    const WEvent & evt = events[0];
+    if (evt.event != S_SYNC_PROGRESS)
+        return false;
+
+    qDebug() << "TaskSyncProgressListener::processTask with events: " << printEvents(events) << " TaskSyncShowProgress=" << TaskSyncShowProgress;
+
+    if (!TaskSyncShowProgress)
+        return true;
+
+    // See Mwc713InputParser::initSyncProgress()  for details
+    QStringList lst = evt.message.split('|');
+    Q_ASSERT(lst.size()==1);
+    if (lst.size()!=1)
+        return false;
+
+    const QString & msg = lst[0];
+
+    if (msg.contains("Scanning Complet")) {
+        wallet713->updateSyncProgress(100.0);
+    }
+    else {
+        int comIdx = msg.lastIndexOf("% complete");
+        Q_ASSERT(comIdx>0);
+        if (comIdx>0) {
+            int startIdx = msg.lastIndexOf(" ",comIdx)+1;
+            Q_ASSERT(startIdx>=0);
+            Q_ASSERT(startIdx<comIdx);
+
+            QString percent = msg.mid(startIdx, comIdx - startIdx);
+            bool ok = false;
+            double prc = percent.toDouble(&ok);
+            Q_ASSERT(ok);
+            if (ok)
+                wallet713->updateSyncProgress(prc);
+        }
+    }
+
+    return true;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 //  TaskRootPublicKey

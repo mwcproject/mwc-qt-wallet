@@ -18,6 +18,8 @@
 #include "../util/stringutils.h"
 #include <QFileDialog>
 #include "../control/messagebox.h"
+#include "../state/timeoutlock.h"
+
 
 namespace wnd {
 
@@ -83,6 +85,8 @@ void FileTransaction::on_cancelButton_clicked() {
 
 void FileTransaction::on_processButton_clicked()
 {
+    state::TimeoutLockObject to( handler->getContext()->stateMachine );
+
     QString resTxFN;
     if ( handler->needResultTxFileName() ) {
         resTxFN = ui->resultingTxFileName->text();
@@ -98,7 +102,14 @@ void FileTransaction::on_processButton_clicked()
             ui->resultingTxFileName->setFocus();
             return;
         }
-
+    }
+    else {
+        // Check if node healthy first
+        if (!handler->isNodeHealthy()) {
+            control::MessageBox::messageText(this, "Unable to finalize", "Your MWC-Node, that wallet connected to, is not ready to finalize transactions.\n"
+                                                                         "MWC-Node need to be connected to few peers and finish blocks synchronization process");
+            return;
+        }
     }
 
     QString walletPassword = handler->getContext()->wallet->getPassword();

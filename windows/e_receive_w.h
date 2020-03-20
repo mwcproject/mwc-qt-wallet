@@ -32,7 +32,7 @@ class Receive : public core::NavWnd {
 Q_OBJECT
 
 public:
-    explicit Receive(QWidget *parent, state::Receive * state, bool mwcMqStatus, bool keybaseStatus,
+    explicit Receive(QWidget *parent, state::Receive * state, bool mwcMqStatus, bool keybaseStatus, bool httpStatus,
                      QString mwcMqAddress, const wallet::WalletConfig & walletConfig);
 
     virtual ~Receive() override ;
@@ -40,6 +40,7 @@ public:
     void updateMwcMqAddress(QString address);
     void updateMwcMqState(bool online);
     void updateKeybaseState(bool online);
+    void updateHttpState(bool online);
 
     void onTransactionActionIsFinished( bool success, QString message );
     void stopWaiting();

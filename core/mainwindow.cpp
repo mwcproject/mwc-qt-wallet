@@ -18,6 +18,7 @@
 #include <QDebug>
 #include "../state/statemachine.h"
 #include "util/widgetutils.h"
+#include "util/stringutils.h"
 #include "../control/messagebox.h"
 #include "../dialogs/helpdlg.h"
 #include "../core/Config.h"
@@ -160,9 +161,14 @@ void MainWindow::setAppEnvironment(state::StateMachine * _stateMachine, wallet::
                      this, &MainWindow::updateListenerStatus, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onKeybaseListenerStatus,
                      this, &MainWindow::updateListenerStatus, Qt::QueuedConnection);
+    QObject::connect(wallet, &wallet::Wallet::onHttpListeningStatus,
+                     this, &MainWindow::onHttpListeningStatus, Qt::QueuedConnection);
 
     QObject::connect(wallet, &wallet::Wallet::onNodeStatus,
                      this, &MainWindow::updateNodeStatus, Qt::QueuedConnection);
+
+    QObject::connect(wallet, &wallet::Wallet::onUpdateSyncProgress,
+                     this, &MainWindow::onUpdateSyncProgress, Qt::QueuedConnection);
 
     updateListenerBtn();
     updateNetworkName();
@@ -217,6 +223,12 @@ void MainWindow::updateListenerStatus(bool online) {
     updateListenerBtn();
 }
 
+void MainWindow::onHttpListeningStatus(bool listening, QString additionalInfo) {
+    Q_UNUSED(listening)
+    Q_UNUSED(additionalInfo)
+    updateListenerBtn();
+}
+
 // Node info
 void MainWindow::updateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
     Q_UNUSED(errMsg)
@@ -230,6 +242,11 @@ void MainWindow::updateNodeStatus( bool online, QString errMsg, int nodeHeight, 
     else {
         setStatusButtonState( ui->nodeStatusButton, STATUS::GREEN, "" );
     }
+}
+
+void MainWindow::onUpdateSyncProgress(double progressPercent) {
+    onNewNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                             "Wallet state update, " + util::trimStrAsDouble( QString::number(progressPercent), 4 ) + "% complete"  );
 }
 
 
@@ -251,6 +268,16 @@ void MainWindow::updateListenerBtn() {
         if (!listenerNames.isEmpty())
             listenerNames += ", ";
         listenerNames += "Keybase";
+    }
+
+    QPair<bool,QString> httpListenerStatus = wallet->getHttpListeningStatus();
+    if (httpListenerStatus.first) {
+        listening = true;
+        if (!listenerNames.isEmpty())
+            listenerNames += ", ";
+        listenerNames += "Http";
+        if (wallet->hasTls())
+            listenerNames += "s";
     }
 
     setStatusButtonState( ui->listenerStatusButton,

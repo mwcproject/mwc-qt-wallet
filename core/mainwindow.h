@@ -70,8 +70,10 @@ private slots:
     void on_helpButton_clicked();
 
     void updateListenerStatus(bool online);
+    void onHttpListeningStatus(bool listening, QString additionalInfo);
     void updateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
+    void onUpdateSyncProgress(double progressPercent);
 
 private:
     void updateListenerBtn();

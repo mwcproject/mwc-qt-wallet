@@ -122,6 +122,14 @@ public:
     virtual void nextBoxAddress()  override;
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
 
+    // Request http(s) listening status.
+    // bool - true is listening. Then next will be the address
+    // bool - false, not listening. Then next will be error or empty if listening is not active.
+    virtual QPair<bool, QString> getHttpListeningStatus() const override;
+    // Check signal: onHttpListeningStatus(bool listening, QString additionalInfo)
+
+    // Return true if Tls is setted up for the wallet for http connections.
+    virtual bool hasTls() const override;
 
     // -------------- Accounts
 
@@ -131,9 +139,11 @@ public:
 
     virtual QString getCurrentAccountName()  override {return currentAccount;}
 
+    // Request sync (update_wallet_state) for the
+    virtual void sync(bool showSyncProgress, bool enforce) override;
 
     // Request Wallet balance update. It is a multistep operation
-    virtual void updateWalletBalance()  override;
+    virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress, bool skipSync=false) override;
     // Check signal: onWalletBalanceUpdated
     //          onWalletBalanceProgress
 
@@ -164,7 +174,7 @@ public:
     virtual WalletConfig getDefaultConfig()  override;
 
     // Update wallet config. Will update config and restart the mwc713.
-    // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
+    // Note!!! Caller is fully responsible for input validation. Normally mwc713 will start, but some problems might exist
     //          and caller suppose listen for them
     // If return true, expected that wallet will need to have password input.
     // Check signal: onConfigUpdate()
@@ -226,11 +236,11 @@ public:
 
     // Get total number of Outputs
     // Check Signal: onOutputCount(int number)
-    virtual void getOutputCount(QString account)  override;
+    virtual void getOutputCount(bool show_spent, QString account)  override;
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
-    virtual void getOutputs(QString account, int offset, int number)  override;
+    virtual void getOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync)  override;
 
     // Get total number of Transactions
     // Check Signal: onTransactionCount(int number)
@@ -238,7 +248,11 @@ public:
 
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
-    virtual void getTransactions(QString account, int offset, int number)  override;
+    virtual void getTransactions(QString account, int offset, int number, bool enforceSync)  override;
+
+    // get Extended info for specific transaction
+    // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
+    virtual void getTransactionById(QString account, int64_t txIdx )  override;
 
     // Read all transactions for all accounts. Might take time...
     // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
@@ -252,7 +266,7 @@ public:
     // Feed the command to mwc713 process
     void executeMwc713command( QString cmd, QString shadowStr);
 
-    bool isWalletRunningAndLoggedIn() const { return ! (mwc713process== nullptr || eventCollector== nullptr || startedMode != STARTED_MODE::NORMAL || loggedIn==false ); }
+    virtual bool isWalletRunningAndLoggedIn() const override { return ! (mwc713process== nullptr || eventCollector== nullptr || startedMode != STARTED_MODE::NORMAL || loggedIn==false ); }
 
 public:
     // stop mwc713 process nicely
@@ -283,6 +297,8 @@ public:
     void setMwcMqListeningStatus(bool online, QString tid, bool startStopEvents); // Start stop event are major, they can change active tid
     void setKeybaseListeningStatus(bool online);
 
+    // info: if online  - Address, offlone - Error message or empty.
+    void setHttpListeningStatus(bool online, QString info);
 
     void setRecoveryResults( bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages );
     void setRecoveryProgress( int64_t progress, int64_t limit );
@@ -298,7 +314,9 @@ public:
                              bool success, QString errorMessage);
 
     void infoResults( QString currentAccountName, int64_t height,
-                      int64_t totalNano, int64_t waitingConfNano, int64_t lockedNano, int64_t spendableNano,
+                      int64_t totalConfirmedNano, int64_t waitingConfNano,
+                      int64_t waitingFinalizetinNano, int64_t lockedNano,
+                      int64_t spendableNano,
                       bool mwcServerBroken );
 
     void setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate);
@@ -317,6 +335,9 @@ public:
     // Transactions
     void updateTransactionCount(QString account, int number);
     void setTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
+
+    void setTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages );
+
     // Outputs results
     void updateOutputCount(QString account, int number);
     void setOutputs( QString account, int64_t height, QVector<WalletOutput> outputs);
@@ -338,10 +359,15 @@ public:
     void notifyListenerMqCollision();
     void notifyMqFailedToStart();
 
-        //-------------
+    //-------------
     void processAllTransactionsStart();
     void processAllTransactionsAppend(const QVector<WalletTransaction> & trVector);
     void processAllTransactionsEnd();
+
+    // -----------------
+    void updateSyncProgress(double progressPercent);
+
+    void updateSyncAsDone();
 private:
 
 
@@ -355,6 +381,9 @@ private:
     // envVariables - environment variables (key/value). Must be in pairs.
     // paramsPlus - additional parameters for the process
     QProcess * initMwc713process( const QStringList & envVariables, const QStringList & paramsPlus, bool trackProcessExit = true );
+
+    // Reset data as wallet not started yet
+    void resetData(STARTED_MODE startedMode);
 
 private slots:
     // mwc713 Process IOs
@@ -394,6 +423,10 @@ private:
     // MWC MQS will try to start forever.
     bool mwcMqStartRequested = false;
 
+    bool httpOnline = false;
+    QString httpInfo = "";
+    bool hasHttpTls = false;
+
     QString activeMwcMqsTid; // MQS can be managed by many thredas, but only last started is active
 
     // Connections to mwc713process
@@ -402,6 +435,8 @@ private:
     // Accounts with balances info
     QVector<AccountInfo> accountInfo;
     QString currentAccount = "default"; // Keep current account by name. It fit better to mwc713 interactions.
+
+    int64_t lastSyncTime = 0;
 private:
     // Temprary values, local values for states
     QString walletPassword;

@@ -168,14 +168,25 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
     return process;
 }
 
+void MWC713::resetData(STARTED_MODE _startedMode ) {
+    loggedIn = false;
+    startedMode = _startedMode;
+    mwcMqOnline = keybaseOnline = false;
+    mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
+    httpOnline = false;
+    httpInfo = "";
+    hasHttpTls = false;
+}
+
 // normal start. will require the password
 void MWC713::start(bool loginWithLastKnownPassword)  {
     qDebug() << "MWC713::start loginWithLastKnownPassword=" << loginWithLastKnownPassword;
-    loggedIn = false;
-    startedMode = STARTED_MODE::NORMAL;
 
-    mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
+    resetData(STARTED_MODE::NORMAL);
+
+    // Need to check if Tls active
+    WalletConfig config = getWalletConfig();
+    hasHttpTls = !config.tlsCertificateKey.isEmpty() && !config.tlsCertificateFile.isEmpty();
 
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
@@ -200,6 +211,7 @@ void MWC713::start(bool loginWithLastKnownPassword)  {
     eventCollector->addListener( new TaskErrWrnInfoListener(this) );
     eventCollector->addListener( new TaskListeningListener(this) );
     eventCollector->addListener( new TaskSlatesListener(this) );
+    eventCollector->addListener( new TaskSyncProgressListener(this) );
 
     // And eventing magic should begin...
     if (loginWithLastKnownPassword)
@@ -209,13 +221,11 @@ void MWC713::start(bool loginWithLastKnownPassword)  {
 // start to init. Expected that we will exit pretty quckly
 // Check signal: onNewSeed( seed [] )
 void MWC713::start2init(QString password) {
-    startedMode = STARTED_MODE::INIT;
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
 
-    mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
+    resetData(STARTED_MODE::INIT);
 
     qDebug() << "Starting MWC713 as init at " << mwc713Path << " for config " << mwc713configPath;
 
@@ -243,10 +253,8 @@ void MWC713::start2init(QString password) {
 // Check Signals: onRecoverProgress( int progress, int maxVal );
 // Check Signals: onRecoverResult(bool ok, QString newAddress );
 void MWC713::start2recover(const QVector<QString> & seed, QString password) {
-    startedMode = STARTED_MODE::RECOVER;
 
-    mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
+    resetData(STARTED_MODE::RECOVER);
 
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
@@ -303,6 +311,9 @@ void MWC713::processStop(bool exitNicely) {
 
     mwcMqOnline = keybaseOnline = false;
     mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
+
+    httpOnline = false;
+    httpInfo = "";
 
     emit onMwcAddress("");
     emit onMwcAddressWithIndex("",1);
@@ -459,6 +470,19 @@ void MWC713::nextBoxAddress()  {
     eventCollector->addTask( new TaskMwcMqAddress(this,true, -1), TaskMwcMqAddress::TIMEOUT );
 }
 
+// Request http(s) listening status.
+// bool - true is listening. Then next will be the address
+// bool - false, not listening. Then next will be error or empty if listening is not active.
+// Check signal: onHttpListeningStatus(bool listening, QString additionalInfo)
+QPair<bool, QString> MWC713::getHttpListeningStatus() const {
+    return QPair<bool, QString>(httpOnline, httpInfo);
+}
+
+// Return true if Tls is setted up for the wallet for http connections.
+bool MWC713::hasTls() const {
+    return hasHttpTls;
+}
+
 QVector<AccountInfo>  MWC713::getWalletBalance(bool filterDeleted) const  {
     if (!filterDeleted)
         return accountInfo;
@@ -480,11 +504,17 @@ QVector<AccountInfo>  MWC713::getWalletBalance(bool filterDeleted) const  {
     return res;
 }
 
+void MWC713::sync(bool showSyncProgress, bool enforce)  {
+    if (enforce || QDateTime::currentMSecsSinceEpoch() - lastSyncTime > 30*1000 ) // sync interval 30 seconds - half of block mining interval
+    {
+        eventCollector->addTask( new TaskSync(this, showSyncProgress), TaskSync::TIMEOUT );
+    }
+}
 
 // Request Wallet balance update. It is a multistep operation
 // Check signal: onWalletBalanceUpdated
 //          onWalletBalanceProgress
-void MWC713::updateWalletBalance()  {
+void MWC713::updateWalletBalance(bool enforceSync, bool showSyncProgress, bool skipSync)  {
     if ( !isWalletRunningAndLoggedIn() )
         return; // ignoring request
 
@@ -492,6 +522,9 @@ void MWC713::updateWalletBalance()  {
     // 1 - list accounts (this call)
     // 2 - for every account get info ( see updateAccountList call )
     // 3 - restore back current account
+
+    if (!skipSync)
+        sync(showSyncProgress, enforceSync);
 
     eventCollector->addTask( new TaskAccountList(this), TaskAccountList::TIMEOUT );
 }
@@ -604,17 +637,18 @@ void MWC713::submitFile( QString fileTx ) {
 
 // Get total number of Outputs
 // Check Signal: onOutputCount(int number)
-void MWC713::getOutputCount(QString account)  {
+void MWC713::getOutputCount(bool show_spent, QString account)  {
     eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
-    eventCollector->addTask( new TaskOutputCount(this, account), TaskOutputCount::TIMEOUT );
+    eventCollector->addTask( new TaskOutputCount(this, show_spent, account), TaskOutputCount::TIMEOUT );
 }
 
 // Show outputs for the wallet
 // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> Transactions)
-void MWC713::getOutputs(QString account, int offset, int number)  {
+void MWC713::getOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync)  {
+    sync(true, enforceSync);
     // Need to switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
-    eventCollector->addTask( new TaskOutputs(this, offset, number), TaskOutputs::TIMEOUT );
+    eventCollector->addTask( new TaskOutputs(this, offset, number, show_spent), TaskOutputs::TIMEOUT );
 }
 
 // Get total number of Transactions
@@ -624,10 +658,18 @@ void MWC713::getTransactionCount(QString account) {
     eventCollector->addTask( new TaskTransactionCount(this, account), TaskTransactions::TIMEOUT );
 }
 
-void MWC713::getTransactions(QString account, int offset, int number)  {
+void MWC713::getTransactions(QString account, int offset, int number, bool enforceSync)  {
+    sync(true, enforceSync);
     // Need to switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskTransactions(this, offset, number), TaskTransactions::TIMEOUT );
+}
+
+// get Extended info for specific transaction
+// Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
+void MWC713::getTransactionById(QString account, int64_t txIdx ) {
+    eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
+    eventCollector->addTask( new TaskTransactionsById(this, txIdx), TaskTransactions::TIMEOUT );
 }
 
 // Read all transactions for all accounts. Might take time...
@@ -835,6 +877,19 @@ void MWC713::setKeybaseListeningStatus(bool online) {
     emit onKeybaseListenerStatus(online);
 }
 
+// info: if online  - Address, offlone - Error message or empty.
+void MWC713::setHttpListeningStatus(bool online, QString info) {
+    if (online==httpOnline && info==httpInfo)
+        return;
+
+    httpOnline = online;
+    httpInfo = info;
+
+    logger::logEmit("MWC713", "onHttpListeningStatus", QString("online=") + QString::number(online) + " info="+info);
+    emit onHttpListeningStatus(online, info);
+}
+
+
 void MWC713::setRecoveryResults( bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages ) {
     logger::logEmit("MWC713", "onRecoverResult", QString("started=") + QString::number(started) +
            " finishedWithSuccess=" + QString::number(finishedWithSuccess) +
@@ -881,16 +936,7 @@ void MWC713::updateAccountList( QVector<QString> accounts ) {
             break;
         }
 
-        // We can do  --no-refresh  only for accounts that has nothing to waiting for. For others refresh will not work.
-        // Also after login the first run is for total balance only. It is mean that we don't need any sync calls as well.
-
-        bool need2sync = false;
-
-        if (accNameMap.contains(acc)) {
-            need2sync = accNameMap[acc].isAwaitingSomething();
-        }
-
-        eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber, !need2sync ), TaskAccountInfo::TIMEOUT, false );
+        eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber ), TaskAccountInfo::TIMEOUT, false );
         eventCollector->addTask( new TaskOutputsForHODL(this, acc, hodlStatus), TaskOutputsForHODL::TIMEOUT, false );
         eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1, false ); // Updating the progress
     }
@@ -908,7 +954,14 @@ void MWC713::updateAccountProgress(int accountIdx, int totalAccounts) {
 void MWC713::updateAccountFinalize(QString prevCurrentAccount) {
     accountInfo = collectedAccountInfo;
     collectedAccountInfo.clear();
-    logger::logEmit( "MWC713", "updateAccountFinalize","");
+
+    QString accountBalanceStr;
+
+    for (const auto & acc: accountInfo) {
+        accountBalanceStr += acc.toString() + ";";
+    }
+
+    logger::logEmit( "MWC713", "updateAccountFinalize",accountBalanceStr );
     emit onWalletBalanceUpdated();
 
     // Set back the current account
@@ -986,11 +1039,11 @@ void MWC713::updateRenameAccount(const QString & oldName, const QString & newNam
 
 // Update with account info
 void MWC713::infoResults( QString currentAccountName, int64_t height,
-                  int64_t totalNano, int64_t waitingConfNano, int64_t lockedNano, int64_t spendableNano, bool mwcServerBroken ) {
+                  int64_t totalConfirmedNano, int64_t waitingConfNano, int64_t waitingFinalizetinNano, int64_t lockedNano, int64_t spendableNano, bool mwcServerBroken ) {
     AccountInfo acc;
     acc.setData(currentAccountName,
-                totalNano,
-                waitingConfNano,
+                totalConfirmedNano + waitingFinalizetinNano,   // we need "Total", not "Confirmed Total"
+                waitingConfNano + waitingFinalizetinNano,
                 lockedNano,
                 spendableNano,
                 height,
@@ -1029,11 +1082,11 @@ void MWC713::reportSlateReceivedBack( QString slate, QString mwc, QString fromAd
     emit onSlateReceivedBack(slate, mwc, fromAddr);
 
     // Request balace refresh
-    updateWalletBalance();
+    updateWalletBalance(false,true);
 }
 
 void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAddr, QString message ) {
-    QString msg = "Congratulations! You recieved " +mwc+ " mwc from " + fromAddr;
+    QString msg = "Congratulations! You received " +mwc+ " mwc from " + fromAddr;
     if (!message.isEmpty()) {
         msg += " with message " + message + ".";
     }
@@ -1042,11 +1095,11 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
 
     emit onSlateReceivedFrom(slate, mwc, fromAddr, message );
 
-    updateWalletBalance();
+    updateWalletBalance(false,true);
 
     // Show message box with congrats. Message bot should work from any point. No needs to block locking or what ever we have
     control::MessageBox::messageHTML(nullptr, "Congratulations!",
-           "You recieved <b>" + mwc + "</b> mwc<br>" +
+           "You received <b>" + mwc + "</b> mwc<br>" +
            (message.isEmpty() ? "" : "Description: " + message + "<br>" ) +
            "<br>From: " + fromAddr +
            "<br>Slate: " + slate);
@@ -1061,7 +1114,7 @@ void MWC713::reportSlateFinalized( QString slate ) {
     emit onSlateFinalized(slate);
 
     // Request balance refresh
-    updateWalletBalance();
+    updateWalletBalance(false,true);
 }
 
 void MWC713::setSendFileResult( bool success, QStringList errors, QString fileName ) {
@@ -1109,6 +1162,12 @@ void MWC713::setTransactions( QString account, int64_t height, QVector<WalletTra
     logger::logEmit( "MWC713", "onTransactions", "account="+account );
     emit onTransactions( account, height, Transactions );
 }
+
+void MWC713::setTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages ) {
+    logger::logEmit( "MWC713", "onTransactionById", QString("success=")+(success?"true":"false") + " transaction=" + transaction.toStringShort() + " outputs: " + QString::number(outputs.size()) + " messages: " + QString::number(messages.size()) );
+    emit onTransactionById( success, account, height, transaction, outputs, messages );
+}
+
 
 void MWC713::updateOutputCount(QString account, int number) {
     logger::logEmit( "MWC713", "onOutputCount", "number=" + QString::number(number) );
@@ -1217,6 +1276,17 @@ void MWC713::processAllTransactionsEnd() {
     collectedTransactions.clear();
 }
 
+void MWC713::updateSyncProgress(double progressPercent) {
+    logger::logEmit("MWC713", "onUpdateSyncProgress", QString::number(progressPercent) );
+
+    emit onUpdateSyncProgress(progressPercent);
+}
+
+void MWC713::updateSyncAsDone() {
+    lastSyncTime = QDateTime::currentMSecsSinceEpoch();
+}
+
+
 
 /////////////////////////////////////////////////////////////////////////////////
 //      mwc713  IOs
@@ -1278,12 +1348,22 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
         mwc713process = nullptr;
     }
 
+    // Check if foreign API is enabled. That might be a problem for start. Example, pem Keys
+    WalletConfig config = getWalletConfig();
     QString errorMessage = "mwc713 process exited due some unexpected error.\nmwc713 exit code: " + QString::number(exitCode);
 
-    if (QDateTime::currentMSecsSinceEpoch() - walletStartTime < 1000L * 15) {
-        // Very likely that wallet wasn't be able to start. Lets update the message with mode details
-        errorMessage += "\n\nPlease check if you have enough space at your home disk or there are any antivirus preventing mwc713 to start."
-                        "\n\nYou might use command line for troubleshooting:\n\n" + commandLine;
+    if (config.hasForeignApi()) {
+        errorMessage += "\n\nYou have activated foreign API and it might be a reason for this issue. Foreign API is deactivated, please try to restart the wallet";
+        config.foreignApi = false;
+        saveWalletConfig(config, nullptr, nullptr );
+    }
+    else {
+        if (QDateTime::currentMSecsSinceEpoch() - walletStartTime < 1000L * 15) {
+            // Very likely that wallet wasn't be able to start. Lets update the message with mode details
+            errorMessage +=
+                    "\n\nPlease check if you have enough space at your home disk or there are any antivirus preventing mwc713 to start."
+                    "\n\nYou might use command line for troubleshooting:\n\n" + commandLine;
+        }
     }
 
     appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
@@ -1371,6 +1451,15 @@ WalletConfig MWC713::readWalletConfig(QString source) {
     QString mwcmqDomain  = mwc713config.getString("mwcmq_domain");
     QString mwcmqsDomain = mwc713config.getString("mwcmqs_domain");
 
+    bool foreignApi = mwc713config.getString("foreign_api") == "true";
+    QString foreignApiAddress = mwc713config.getString("foreign_api_address");
+    QString foreignApiSecret = mwc713config.getString("foreign_api_secret");
+    QString tlsCertificateFile = mwc713config.getString("tls_certificate_file");
+    QString tlsCertificateKey = mwc713config.getString("tls_certificate_key");
+
+    if (foreignApiAddress.isEmpty())
+        foreignApi = false;
+
     if (dataPath.isEmpty() ) {
         control::MessageBox::messageText(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + source );
         return WalletConfig();
@@ -1379,8 +1468,8 @@ WalletConfig MWC713::readWalletConfig(QString source) {
     QString nodeURI     = mwc713config.getString("mwc_node_uri");
     QString nodeSecret  = mwc713config.getString("mwc_node_secret");
 
-
-    return WalletConfig().setData( network, dataPath, mwcmqDomain, mwcmqsDomain, keyBasePath );
+    return WalletConfig().setData( network, dataPath, mwcmqDomain, mwcmqsDomain, keyBasePath,
+            foreignApi, foreignApiAddress, foreignApiSecret, tlsCertificateFile, tlsCertificateKey );
 }
 
 
@@ -1394,41 +1483,53 @@ WalletConfig MWC713::getDefaultConfig()  {
     return readWalletConfig( mwc::MWC713_DEFAULT_CONFIG );
 }
 
+
 //static
 bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode ) {
     if (!config.isDefined()) {
         Q_ASSERT(false);
-        logger::logInfo("MWC713", "Failed to update the config, because it is invalid:\n" + config.toString() );
+        logger::logInfo("MWC713", "Failed to update the config, because it is invalid:\n" + config.toString());
         return true;
     }
 
-    Q_ASSERT(appContext);
-
     QString mwc713confFN = config::getMwc713conf();
 
-    QStringList confLines = util::readTextFile( mwc713confFN );
+    QStringList confLines = util::readTextFile(mwc713confFN, false);
     // Updating the config with new values
 
     QStringList newConfLines;
 
-    for (QString & ln : confLines) {
-        if ( ln.trimmed().isEmpty())
-            continue; // skipping empty lines
+    QStringList prefixesToCheck{"wallet713_data_path", "keybase_binary", "mwcmq_domain", "mwcmqs_domain",
+                                "chain", "grinbox_listener_auto_start", "keybase_listener_auto_start",
+                                "foreign_api", "foreign_api_address", "foreign_api_secret",
+                                "tls_certificate_file", "tls_certificate_key"};
 
-        if (ln.startsWith("wallet713_data_path") || ln.startsWith("keybase_binary") || ln.startsWith("mwcmq_domain") || ln.startsWith("mwcmqs_domain") ||
-                                ln.startsWith("mwc_node_uri") || ln.startsWith("mwc_node_secret") || ln.startsWith("chain") ||
-                                ln.startsWith("grinbox_listener_auto_start") || ln.startsWith("keybase_listener_auto_start") ) {
-            continue; // skippping the line. Will apply later
+    if ((appContext != nullptr)) {
+        prefixesToCheck.push_back("mwc_node_uri");
+        prefixesToCheck.push_back("mwc_node_secret");
+    }
+
+    bool hasMwcNodeInfo = (appContext != nullptr);
+
+    for (QString &ln : confLines) {
+
+        bool hasPrefix = false;
+        for (const auto &prefix : prefixesToCheck) {
+            if (ln.startsWith(prefix)) {
+                hasPrefix = true;
+                break;
+            }
         }
-        else {
+
+        if (!hasPrefix) {
             // keep whatever we have here
             newConfLines.append(ln);
         }
     }
 
-    if ( !config::isOnlineNode() ) {
+    if (!config::isOnlineNode() && appContext != nullptr) {
         // point of that setting to restore for switch from online node to wallet
-        appContext->setWallet713DataPathWithNetwork(config.getDataPath(), config.getNetwork() );
+        appContext->setWallet713DataPathWithNetwork(config.getDataPath(), config.getNetwork());
     }
 
     newConfLines.append("chain = \"" + config.getNetwork() + "\"");
@@ -1436,48 +1537,64 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
     if (config.keyBasePath.length() > 0)
         newConfLines.append("keybase_binary = \"" + config.keyBasePath + "\"");
 
-    if ( !config.mwcmqDomainEx.isEmpty() )
+    if (!config.mwcmqDomainEx.isEmpty())
         newConfLines.append("mwcmq_domain = \"" + config.mwcmqDomainEx + "\"");
 
-    if ( !config.mwcmqsDomainEx.isEmpty() )
+    if (!config.mwcmqsDomainEx.isEmpty())
         newConfLines.append("mwcmqs_domain = \"" + config.mwcmqsDomainEx + "\"");
 
-    bool needLocalMwcNode = false;
+    if (config.hasForeignApi() && !config.foreignApiAddress.isEmpty()) {
+        newConfLines.append("foreign_api = true");
+        newConfLines.append("foreign_api_address = \"" + config.foreignApiAddress + "\"");
 
-    // Update connection node...
-    wallet::MwcNodeConnection connection = appContext->getNodeConnection( config.getNetwork() );
-    switch ( connection.connectionType ) {
-        case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD:
-            break;
-        case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL: {
-            node::MwcNodeConfig nodeConfig = node::getCurrentMwcNodeConfig( connection.localNodeDataPath, config.getNetwork());
-            newConfLines.append("mwc_node_uri = \"http://127.0.0.1:13413\"");
-            newConfLines.append("mwc_node_secret = \"" + nodeConfig.secret + "\"");
-            needLocalMwcNode = true;
-            break;
-        }
-        case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CUSTOM:
-            newConfLines.append("mwc_node_uri = \"" + connection.mwcNodeURI + "\"");
-            newConfLines.append("mwc_node_secret = \"" + connection.mwcNodeSecret + "\"");
-            break;
-        default:
-            Q_ASSERT(false);
-    }
+        if (!config.foreignApiSecret.isEmpty())
+            newConfLines.append("foreign_api_secret = \"" + config.foreignApiSecret + "\"");
 
-    // allways stop because config migth change
-    if ( mwcNode->isRunning() ) {
-        mwcNode->stop();
-    }
-
-    if (needLocalMwcNode) {
-        if ( !mwcNode->isRunning() ) {
-            mwcNode->start( connection.localNodeDataPath, config.getNetwork() );
+        if (!config.tlsCertificateFile.isEmpty() && !config.tlsCertificateKey.isEmpty()) {
+            newConfLines.append("tls_certificate_file = \"" + config.tlsCertificateFile + "\"");
+            newConfLines.append("tls_certificate_key = \"" + config.tlsCertificateKey + "\"");
         }
     }
 
     if ( !config::isOnlineWallet()) {
         newConfLines.append("grinbox_listener_auto_start = false");
         newConfLines.append("keybase_listener_auto_start = false");
+    }
+
+    // Update connection node...
+    if (appContext != nullptr && mwcNode != nullptr) {
+        bool needLocalMwcNode = false;
+
+        wallet::MwcNodeConnection connection = appContext->getNodeConnection(config.getNetwork());
+        switch (connection.connectionType) {
+            case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD:
+                break;
+            case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL: {
+                node::MwcNodeConfig nodeConfig = node::getCurrentMwcNodeConfig(connection.localNodeDataPath,
+                                                                               config.getNetwork());
+                newConfLines.append("mwc_node_uri = \"http://127.0.0.1:13413\"");
+                newConfLines.append("mwc_node_secret = \"" + nodeConfig.secret + "\"");
+                needLocalMwcNode = true;
+                break;
+            }
+            case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CUSTOM:
+                newConfLines.append("mwc_node_uri = \"" + connection.mwcNodeURI + "\"");
+                newConfLines.append("mwc_node_secret = \"" + connection.mwcNodeSecret + "\"");
+                break;
+            default:
+                Q_ASSERT(false);
+        }
+
+        // allways stop because config migth change
+        if (mwcNode->isRunning()) {
+            mwcNode->stop();
+        }
+
+        if (needLocalMwcNode) {
+            if (!mwcNode->isRunning()) {
+                mwcNode->start(connection.localNodeDataPath, config.getNetwork());
+            }
+        }
     }
 
     // Escape back slashes for toml

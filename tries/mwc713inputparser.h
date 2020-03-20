@@ -49,7 +49,6 @@ private:
     void initInit();
     void initNeedUnlock();
     void initPasswordError(); // notification about the wrong password.
-    void initBoxListener();
     void initMwcMqAddress();
     void initInitWalletWorkflow();
     void initListening();
@@ -58,13 +57,15 @@ private:
     void initSend();
     void initTransactions();
 
+    void initSyncProgress(); // Special listeners that don't emit simple events, instead update the progress at the status line
+
     void initGenericError(); // All error messages
 
 signals:
     void sgGenericEvent( wallet::WALLET_EVENTS event, QString message);
 
 protected:
-    InputParser parser; // Work horse thet is parsing all inputs
+    InputParser parser; // Work horse that is parsing all inputs
 };
 
 }

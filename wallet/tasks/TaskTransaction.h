@@ -28,8 +28,8 @@ class TaskOutputCount : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*10;
 
-    TaskOutputCount( MWC713 * wallet713, QString _account ) :
-            Mwc713Task("Outputs", "output_count", wallet713, ""), account(_account) {}
+    TaskOutputCount( MWC713 * wallet713, bool show_spent, QString _account ) :
+            Mwc713Task("Outputs", QString("output_count") + (show_spent?" --show-spent":""), wallet713, ""), account(_account) {}
 
     virtual ~TaskOutputCount() override {}
 
@@ -45,8 +45,9 @@ class TaskOutputs : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*15;
 
-    TaskOutputs( MWC713 * wallet713, int offset, int number ) :
-            Mwc713Task("Outputs", "outputs -o " + QString::number(offset) + " -l " + QString::number(number), wallet713, "")
+    // Outputs run with no-refresh because wallet responsible to call sync first
+    TaskOutputs( MWC713 * wallet713, int offset, int number, bool show_spent ) :
+            Mwc713Task("Outputs", "outputs -o " + QString::number(offset) + " -l " + QString::number(number) + (show_spent?" --show-spent":"") + " --no-refresh", wallet713, "")
             { Q_ASSERT(offset>=0); Q_ASSERT(number>0);}
 
     virtual ~TaskOutputs() override {}
@@ -62,7 +63,7 @@ public:
     const static int64_t TIMEOUT = 1000*15;
 
     TaskOutputsForHODL( MWC713 * wallet713, QString _accountName, core::HodlStatus * _hodlStatus ) :
-            Mwc713Task("Outputs", "outputs", wallet713, ""),
+            Mwc713Task("Outputs", "outputs --no-refresh", wallet713, ""),
             accountName(_accountName),
             hodlStatus(_hodlStatus) {Q_ASSERT(hodlStatus!=nullptr);}
 
@@ -96,11 +97,27 @@ class TaskTransactions : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*60;
 
+    // Transactions run with no-refresh because wallet responsible to call sync first
     TaskTransactions( MWC713 * wallet713, int offset, int number) :
-            Mwc713Task("Transactions", "txs -o " + QString::number(offset) + " -l " + QString::number(number), wallet713, "")
+            Mwc713Task("Transactions", "txs -o " + QString::number(offset) + " -l " + QString::number(number) + " --show-full --no-refresh", wallet713, "")
             { Q_ASSERT(offset>=0); Q_ASSERT(number>0);}
 
     virtual ~TaskTransactions() override {}
+
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+};
+
+class TaskTransactionsById : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*60;
+
+    // Transactions run with no-refresh because wallet responsible to call sync first
+    TaskTransactionsById( MWC713 * wallet713, int txId) :
+            Mwc713Task("Transactions", "txs --id " + QString::number(txId) +" --no-refresh", wallet713, "")  {}
+
+    virtual ~TaskTransactionsById() override {}
 
     virtual bool processTask(const QVector<WEvent> & events) override;
 

@@ -45,7 +45,12 @@ public:
     void updateCancelTransacton(bool success, int64_t trIdx, QString errMessage);
     QString updateWalletBalance();
 
+    void triggerRefresh();
 
+    void updateTransactionById(bool success, QString account, int64_t height,
+                          wallet::WalletTransaction transaction,
+                          QVector<wallet::WalletOutput> outputs,
+                          QVector<QString> messages);
 private slots:
     void on_transactionTable_itemSelectionChanged();
     void on_transactionTable_cellDoubleClicked(int row, int column);
@@ -55,6 +60,7 @@ private slots:
     void on_refreshButton_clicked();
     void on_validateProofButton_clicked();
     void on_generateProofButton_clicked();
+    void on_exportButton_clicked();
     void on_deleteButton_clicked();
     void on_prevBtn_clicked();
     void on_nextBtn_clicked();
@@ -70,6 +76,8 @@ private:
 
     void initTableHeaders();
     void saveTableHeaders();
+
+    QString getCsvHeaders();
 
     wallet::AccountInfo getSelectedAccount() const;
 

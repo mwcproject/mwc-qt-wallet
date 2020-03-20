@@ -22,6 +22,7 @@
 #include "../core/global.h"
 #include "../core/Config.h"
 #include <QCoreApplication>
+#include <control/messagebox.h>
 
 namespace state {
 
@@ -40,6 +41,8 @@ InputPassword::InputPassword( StateContext * _context) :
     QObject::connect(context->wallet, &wallet::Wallet::onKeybaseListenerStatus,
                                          this, &InputPassword::onKeybaseListenerStatus, Qt::QueuedConnection);
 
+    QObject::connect(context->wallet, &wallet::Wallet::onHttpListeningStatus,
+                     this, &InputPassword::onHttpListeningStatus, Qt::QueuedConnection);
 }
 
 InputPassword::~InputPassword() {
@@ -108,6 +111,16 @@ QPair<bool,bool> InputPassword::getWalletListeningStatus() {
     return context->wallet->getListenerStatus();
 }
 
+QPair<bool,QString> InputPassword::getWalletHttpListeningStatus() {
+    return context->wallet->getHttpListeningStatus();
+}
+
+bool InputPassword::getWalletTls() {
+    return context->wallet->hasTls();
+}
+
+static bool foreignAPIwasReported = false;
+
 void InputPassword::onLoginResult(bool ok) {
     if (!ok) {
         if (wnd) {
@@ -130,10 +143,42 @@ void InputPassword::onLoginResult(bool ok) {
                 context->wallet->setReceiveAccount(context->appContext->getReceiveAccount());
 
                 // Updating the wallet balance and a node status
-                context->wallet->updateWalletBalance();
+                context->wallet->updateWalletBalance(true, true);
             }
 
             context->wallet->getNodeStatus();
+
+            if (! config::isOnlineNode()) {
+                if (!foreignAPIwasReported) {
+                    // Check if foregn API is activated and it is not safe
+                    wallet::WalletConfig config = context->wallet->getWalletConfig();
+
+
+                    if (config.hasForeignApi()) {
+                        QString message;
+
+                        if (config.foreignApiSecret.isEmpty())
+                            message += "without any authorization";
+
+                        if (!config.hasTls()) {
+                            if (!message.isEmpty())
+                                message += " and ";
+
+                            message += "with non secure HTTP connection. Please consider to setup TLS certificates for your security.";
+                        }
+
+                        if (!message.isEmpty()) {
+                            message = "Your wallet has activated foreign API " + message;
+                            message += "\n\nFor your security MWC team recommends setup your wallet properly and safe.";
+
+                            control::MessageBox::messageText(nullptr, "WARNING", message);
+
+                            context->stateMachine->setActionWindow( state::STATE::LISTENING );
+                        }
+                    }
+                    foreignAPIwasReported = true;
+                }
+            }
         }
 
     }
@@ -160,6 +205,13 @@ void InputPassword::onMwcMqListenerStatus(bool online) {
 void InputPassword::onKeybaseListenerStatus(bool online) {
     if (wnd) {
         wnd->updateKeybaseState(online);
+    }
+}
+
+void InputPassword::onHttpListeningStatus(bool listening, QString additionalInfo) {
+    Q_UNUSED(additionalInfo)
+    if (wnd) {
+        wnd->updateHttpState(listening);
     }
 }
 

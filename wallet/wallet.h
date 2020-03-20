@@ -63,6 +63,9 @@ struct AccountInfo {
     bool isDeleted() const;
 
     bool isAwaitingSomething() const {return awaitingConfirmation>0 || lockedByPrevTransaction>0; }
+
+    // Debug/Log printing
+    QString toString() const;
 };
 
 struct MwcNodeConnection {
@@ -105,13 +108,19 @@ public:
     QString mwcmqsDomainEx;// empty - default value
     QString keyBasePath;
 
+    // Http listening params...
+    bool foreignApi = false; // Is foreign API is enabled
+    QString foreignApiAddress; // Example: 0.0.0.0:3416
+    QString foreignApiSecret;  // Secret value
+    // For https configuration.
+    QString tlsCertificateFile;
+    QString tlsCertificateKey;
+
     WalletConfig() : network("Mainnet"), dataPath("Undefined"), keyBasePath("Undefined") {}
     WalletConfig(const WalletConfig & other) = default;
     WalletConfig &operator = (const WalletConfig & other) = default;
 
-    bool operator == (const WalletConfig & other) const { return dataPath==other.dataPath &&
-                mwcmqDomainEx==other.mwcmqDomainEx && mwcmqsDomainEx==other.mwcmqsDomainEx &&
-                keyBasePath==other.keyBasePath; }
+    bool operator == (const WalletConfig & other) const;
 
     bool isDefined() const { return  dataPath!="Undefined" && keyBasePath!="Undefined"; }
 
@@ -119,9 +128,26 @@ public:
                 QString dataPath,
                 QString mwcmqDomain,
                 QString mwcmqsDomain,
-                QString keyBasePath );
+                QString keyBasePath,
+                bool foreignApi,
+                QString foreignApiAddress,
+                QString foreignApiSecret,
+                QString tlsCertificateFile,
+                QString tlsCertificateKey);
+
+    WalletConfig & setDataWalletCfg(QString network,
+                           QString dataPath,
+                           QString mwcmqDomain,
+                           QString mwcmqsDomain,
+                           QString keyBasePath);
 
     void updateDataPath(const QString & path) {dataPath=path;}
+    void updateNetwork(const QString & mw) { Q_ASSERT(!mw.isEmpty()); network=mw; }
+
+    bool hasForeignApi() const { return foreignApi && !foreignApiAddress.isEmpty(); }
+
+
+    bool hasTls() const {return !tlsCertificateFile.isEmpty() && !tlsCertificateKey.isEmpty(); }
 
     const QString & getDataPath() const {return dataPath;}
     const QString & getNetwork() const {return network;}
@@ -184,34 +210,55 @@ struct WalletOutput {
     }
 
     QString toString() const;
+
+    bool isValid() const {
+        return !(outputCommitment.isEmpty() || status.isEmpty());
+    }
 };
 
 struct WalletTransaction {
-    enum TRANSACTION_TYPE { NONE=0, SEND=1, RECEIVE=2, CANCELLED=0x8000};
+    enum TRANSACTION_TYPE { NONE=0, SEND=1, RECEIVE=2, COIN_BASE=4, CANCELLED=0x8000};
 
     int64_t    txIdx = -1;
     uint    transactionType = TRANSACTION_TYPE::NONE;
-    QString txid;
+    QString txid; // Full tx UUIS
     QString address;
     QString creationTime;
+    int64_t ttlCutoffHeight = -1;
     bool    confirmed = false;
     int64_t height = 0;
     QString confirmationTime;
-    int64_t coinNano = 0; // Net diffrence
+    int     numInputs = -1;
+    int     numOutputs = -1;
+    int64_t credited = -1;
+    int64_t debited = -1;
+    int64_t fee = -1;
+    int64_t coinNano = 0; // Net diffrence, transaction weight
     bool    proof=false;
+    QString kernel;
+
+    static QString csvHeaders;
 
     void setData(int64_t txIdx,
-        uint    transactionType,
-        QString txid,
-        QString address,
-        QString creationTime,
-        bool    confirmed,
-        int64_t height,
-        QString confirmationTime,
-        int64_t    coinNano,
-        bool    proof);
+                      uint    transactionType,
+                      QString txid,
+                      QString address,
+                      QString creationTime,
+                      bool    confirmed,
+                      int64_t ttlCutoffHeight,
+                      int64_t height,
+                      QString confirmationTime,
+                      int     numInputs,
+                      int     numOutputs,
+                      int64_t credited,
+                      int64_t debited,
+                      int64_t fee,
+                      int64_t coinNano,
+                      bool    proof,
+                      QString kernel);
 
-    bool isValid() const {return txIdx>=0 && transactionType!=TRANSACTION_TYPE::NONE && !txid.isEmpty();}
+
+    bool isValid() const {return txIdx>=0 && transactionType!=TRANSACTION_TYPE::NONE;}
 
     bool canBeCancelled() const { return (transactionType & TRANSACTION_TYPE::CANCELLED)==0 && !confirmed; }
 
@@ -230,6 +277,8 @@ struct WalletTransaction {
             res += "Send";
         if ( transactionType & TRANSACTION_TYPE::RECEIVE )
             res += "Receive";
+        if ( transactionType & TRANSACTION_TYPE::COIN_BASE )
+            res += "CoinBase";
 
         if ( transactionType & TRANSACTION_TYPE::CANCELLED ) {
             if (!res.isEmpty())
@@ -248,6 +297,13 @@ struct WalletTransaction {
                 expandStrR( string2shortStrR(txid, 12), 12) +
                 " " + creationTime;
     }
+
+    static QString getCSVHeaders() {
+        return csvHeaders;
+    }
+
+    // return transactions values formatted into a CSV string
+    QString toStringCSV();
 };
 
 struct WalletUtxoSignature {
@@ -275,6 +331,9 @@ public:
 
     // Return true if wallet is running
     virtual bool isRunning() = 0;
+
+    // Just a helper method
+    virtual bool isWalletRunningAndLoggedIn() const = 0;
 
     // Check if wallet need to be initialized or not. Will run standalone app, wait for exit and return the result
     // Call might take few seconds
@@ -344,6 +403,14 @@ public:
     virtual void nextBoxAddress()  = 0;
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
 
+    // Request http(s) listening status.
+    // bool - true is listening. Then next will be the address
+    // bool - false, not listening. Then next will be error or empty if listening is not active.
+    virtual QPair<bool, QString> getHttpListeningStatus() const = 0;
+    // Check signal: onHttpListeningStatus(bool listening, QString additionalInfo)
+
+    // Return true if Tls is setted up for the wallet for http connections.
+    virtual bool hasTls() const = 0;
 
     // -------------- Accounts
 
@@ -353,8 +420,12 @@ public:
 
     virtual QString getCurrentAccountName()  = 0;
 
+    // Request sync (update_wallet_state) for the
+    virtual void sync(bool showSyncProgress, bool enforce) = 0;
+
+
     // Request Wallet balance update. It is a multistep operation
-    virtual void updateWalletBalance()  = 0;
+    virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress, bool skipSync=false)  = 0;
     // Check signal: onWalletBalanceUpdated
     //          onWalletBalanceProgress
     //          onAccountSwitched - multiple calls, please ignore
@@ -450,11 +521,11 @@ public:
 
     // Get total number of Outputs
     // Check Signal: onOutputCount(int number)
-    virtual void getOutputCount(QString account)  = 0;
+    virtual void getOutputCount(bool show_spent, QString account)  = 0;
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
-    virtual void getOutputs(QString account, int offset, int number)  = 0;
+    virtual void getOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync)  = 0;
 
     // Get total number of Transactions
     // Check Signal: onTransactionCount(int number)
@@ -462,11 +533,15 @@ public:
 
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
-    virtual void getTransactions(QString account, int offset, int number)  = 0;
+    virtual void getTransactions(QString account, int offset, int number, bool enforceSync)  = 0;
 
-    // Read all transactions for all accounts. Might tale time...
+    // get Extended info for specific transaction
+    // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
+    virtual void getTransactionById(QString account, int64_t txIdx ) = 0;
+
+    // Read all transactions for all accounts. Might take time...
     // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
-    virtual void getAllTransactions()  = 0;
+    virtual void getAllTransactions() = 0;
 
 
     // ----------- HODL
@@ -552,6 +627,8 @@ signals:
     void onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
     void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
 
+    void onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages );
+
     void onAllTransactions( QVector<WalletTransaction> Transactions);
 
     void onOutputCount(QString account, int number);
@@ -570,11 +647,17 @@ signals:
     // mwc713 get an error  ERROR: new login detected. mwcmqs listener will stop!
     void onListenerMqCollision();
 
+    // Http listener status
+    void onHttpListeningStatus(bool listening, QString additionalInfo);
+
     // Node info
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
     // getRootPublicKey
     void onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature );
+
+    // Progress update regarding Sync progress. NOTE, THIS SUGNAL doesn't have caller, it can be emitted background.
+    void onUpdateSyncProgress(double progressPercent);
 };
 
 }

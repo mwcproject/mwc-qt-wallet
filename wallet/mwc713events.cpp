@@ -32,7 +32,6 @@ QString toString(WALLET_EVENTS event) {
         case S_INIT:            return "S_INIT";
         case S_PASSWORD_ERROR:  return "S_PASSWORD_ERROR";
         case S_NEED2UNLOCK:     return "S_NEED2UNLOCK";
-        case S_MWC_MQ_LISTENER: return "S_MWC_MQ_LISTENER";
         case S_GENERIC_ERROR:   return "S_GENERIC_ERROR";
         case S_YOUR_MWC_ADDRESS:return "S_YOUR_MWC_ADDRESS";
         case S_MWC_ADDRESS_INDEX:return "S_MWC_ADDRESS_INDEX";
@@ -52,6 +51,8 @@ QString toString(WALLET_EVENTS event) {
         case S_RECOVERY_PROGRESS: return "S_RECOVERY_PROGRESS";
         case S_RECOVERY_MNEMONIC: return "S_RECOVERY_MNEMONIC";
 
+        case S_SYNC_PROGRESS:     return "S_SYNC_PROGRESS";
+
         case S_GENERIC_WARNING: return "S_GENERIC_WARNING";
         case S_GENERIC_INFO:    return "S_GENERIC_INFO";
 
@@ -62,6 +63,9 @@ QString toString(WALLET_EVENTS event) {
 
         case S_LISTENER_KB_LOST_CONNECTION:  return "S_LISTENER_KB_LOST_CONNECTION";
         case S_LISTENER_KB_GET_CONNECTION:   return "S_LISTENER_KB_GET_CONNECTION";
+
+        case S_LISTENER_HTTP_STARTING:       return "S_LISTENER_HTTP_STARTING";
+        case S_LISTENER_HTTP_FAILED:         return "S_LISTENER_HTTP_FAILED";
 
         case S_ACCOUNTS_INFO_SUM: return "S_ACCOUNTS_INFO_SUM";
 

@@ -15,13 +15,14 @@
 #include "e_transactions_w.h"
 #include "ui_e_transactions.h"
 #include "state/e_transactions.h"
+#include "../util/Files.h"
 #include "../util/stringutils.h"
 #include <QFileDialog>
 #include "../control/messagebox.h"
 #include "../state/timeoutlock.h"
 #include <QDebug>
-#include "../dialogs/showproofdlg.h"
-#include "../dialogs/showtransactiondlg.h"
+#include "dialogs/e_showproofdlg.h"
+#include "dialogs/e_showtransactiondlg.h"
 
 namespace wnd {
 
@@ -97,7 +98,7 @@ void Transactions::setTransactionCount(QString account, int count) {
     buttonState = updatePages(currentPagePosition, totalTransactions, pageSize);
 
     // Requesting the output data
-    state->requestTransactions(account, currentPagePosition, pageSize);
+    state->requestTransactions(account, currentPagePosition, pageSize, true); // refresh call, sync need to be enforced
 }
 
 void Transactions::on_prevBtn_clicked()
@@ -107,7 +108,7 @@ void Transactions::on_prevBtn_clicked()
         currentPagePosition = std::max( 0, currentPagePosition-pageSize );
 
         buttonState = updatePages(currentPagePosition, totalTransactions, pageSize);
-        state->requestTransactions(currentSelectedAccount(), currentPagePosition, pageSize);
+        state->requestTransactions(currentSelectedAccount(), currentPagePosition, pageSize, false);
     }
 }
 
@@ -118,7 +119,7 @@ void Transactions::on_nextBtn_clicked()
         currentPagePosition = std::min( totalTransactions-pageSize, currentPagePosition+pageSize );
 
         buttonState = updatePages(currentPagePosition, totalTransactions, pageSize);
-        state->requestTransactions(currentSelectedAccount(), currentPagePosition, pageSize);
+        state->requestTransactions(currentSelectedAccount(), currentPagePosition, pageSize, false);
     }
 }
 
@@ -274,10 +275,15 @@ wallet::WalletTransaction * Transactions::getSelectedTransaction() {
 }
 
 void Transactions::updateButtons() {
-    wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
+    wallet::WalletTransaction * selected = getSelectedTransaction();
 
     ui->generateProofButton->setEnabled( selected!=nullptr && selected->proof );
     ui->deleteButton->setEnabled( selected!=nullptr && selected->canBeCancelled() );
+}
+
+void Transactions::triggerRefresh() {
+    if ( ui->progressFrame->isHidden() )
+        on_refreshButton_clicked();
 }
 
 
@@ -292,7 +298,7 @@ void Transactions::on_validateProofButton_clicked()
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open proof file"),
                                  state->getProofFilesPath(),
-                                 tr("transaction proof (*.proof)"));
+                                 tr("transaction proof (*.proof);;All files (*.*)"));
 
     if (fileName.length()==0)
         return;
@@ -308,7 +314,7 @@ void Transactions::on_generateProofButton_clicked()
 {
     state::TimeoutLockObject to( state );
 
-    wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
+    wallet::WalletTransaction * selected = getSelectedTransaction();
 
     if (! ( selected!=nullptr && selected->proof ) ) {
         control::MessageBox::messageText(this, "Need info",
@@ -333,6 +339,60 @@ void Transactions::on_generateProofButton_clicked()
     state->generateMwcBoxTransactionProof( selected->txIdx, fileName );
 }
 
+void Transactions::on_exportButton_clicked()
+{
+    state::TimeoutLockObject to( state );
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Transactions"),
+                                                          state->getProofFilesPath(),
+                                                          tr("Export Options (*.csv)"));
+
+    if (fileName.length()==0)
+        return;
+
+    // check to ensure a file extension was specified as getSaveFileName
+    // allows files without an extension to be specified
+    if (!fileName.endsWith(".csv", Qt::CaseInsensitive))
+    {
+        // if no file extension is specified, default to exporting CSV files
+        fileName += ".csv";
+    }
+
+    // qt-wallet displays the transactions last to first
+    // however when exporting the transactions, we want to export first to last
+    QStringList exportRecords;
+
+    const QVector<wallet::WalletTransaction>& currentTxs = state->getTransactions();
+    // retrieve the first transaction and get the CSV headers
+    wallet::WalletTransaction trans = currentTxs[0];
+    QString csvHeaders = trans.getCSVHeaders();
+    exportRecords << csvHeaders;
+    QString csvValues = trans.toStringCSV();
+    exportRecords << csvValues;
+
+    // now retrieve the remaining transactions and add them to our list
+    for ( int idx=1; idx < currentTxs.size(); idx++) {
+        wallet::WalletTransaction trans = currentTxs[idx];
+        QString csvValues = trans.toStringCSV();
+        exportRecords << csvValues;
+    }
+    // warning: When using a debug build, avoid testing with an existing file which has
+    //          read-only permissions. writeTextFile will hit a Q_ASSERT causing qt-wallet
+    //          to crash.
+    bool exportOk = util::writeTextFile(fileName, exportRecords);
+    if (!exportOk)
+    {
+        control::MessageBox::messageText(nullptr, "Error", "Export unable to write to file: " + fileName);
+    }
+    else
+    {
+        // some users may have a large number of transactions which take time to write to the file
+        // so indicate when the file write has completed
+        control::MessageBox::messageText(nullptr, "Success", "Exported transactions to file: " + fileName);
+    }
+    return;
+}
+
 void Transactions::on_transactionTable_itemSelectionChanged()
 {
     updateButtons();
@@ -343,12 +403,38 @@ void Transactions::on_transactionTable_cellDoubleClicked(int row, int column)
     Q_UNUSED(row);
     Q_UNUSED(column);
     state::TimeoutLockObject to( state );
-    wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
+    wallet::WalletTransaction * selected = getSelectedTransaction();
 
     if (selected==nullptr)
         return;
 
-    dlg::ShowTransactionDlg showTransDlg(this, *selected);
+    // respond will come at updateTransactionById
+    state->getTransactionById(getSelectedAccount().accountName, selected->txIdx );
+
+    ui->progressFrame->show();
+    ui->transactionTable->hide();
+}
+
+void Transactions::updateTransactionById(bool success, QString account, int64_t height,
+                               wallet::WalletTransaction transaction,
+                               QVector<wallet::WalletOutput> outputs,
+                               QVector<QString> messages) {
+
+    Q_UNUSED(account)
+    Q_UNUSED(height)
+
+    ui->progressFrame->hide();
+    ui->transactionTable->show();
+
+    state::TimeoutLockObject to( state );
+
+    if (!success) {
+        control::MessageBox::messageText(this, "Transaction details",
+                                         "Internal error. Transaction details are not found.");
+        return;
+    }
+
+    dlg::ShowTransactionDlg showTransDlg(this, walletConfig, transaction, outputs, messages);
     showTransDlg.exec();
 }
 
@@ -364,7 +450,7 @@ void Transactions::on_accountComboBox_activated(int index)
 void Transactions::on_deleteButton_clicked()
 {
     state::TimeoutLockObject to( state );
-    wallet::WalletTransaction * selected = Transactions::getSelectedTransaction();
+    wallet::WalletTransaction * selected = getSelectedTransaction();
 
     if (! ( selected!=nullptr && !selected->confirmed ) ) {
         control::MessageBox::messageText(this, "Need info",
@@ -386,7 +472,7 @@ void Transactions::updateCancelTransacton(bool success, int64_t trIdx, QString e
         control::MessageBox::messageText(this, "Transaction was cancelled", "Transaction number " + QString::number(trIdx+1) + " was successfully cancelled");
     }
     else {
-        control::MessageBox::messageText(this, "Failed to cancel transaction", "Cancel request for transaction number " + QString::number(trIdx+1) + " has failed.\n\n" + errMessage);
+        control::MessageBox::messageText(this, "Failed to cancel transaction", "Cancel request for transaction number " + QString::number(trIdx+1) + " has failed.\n\n");
     }
 }
 

@@ -32,6 +32,8 @@ Outputs::Outputs(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onOutputs, this, &Outputs::onOutputs );
     QObject::connect( context->wallet, &wallet::Wallet::onOutputCount, this, &Outputs::onOutputCount );
 
+    QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
+                      this, &Outputs::onNewNotificationMessage, Qt::QueuedConnection );
 }
 
 Outputs::~Outputs() {}
@@ -48,16 +50,16 @@ NextStateRespond Outputs::execute() {
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
-void Outputs::requestOutputCount(QString account) {
-    context->wallet->getOutputCount(account);
+void Outputs::requestOutputCount(bool show_spent, QString account) {
+    context->wallet->getOutputCount(show_spent, account);
 }
 
 // request wallet for outputs
-void Outputs::requestOutputs(QString account, int offset, int number) {
-    context->wallet->getOutputs(account, offset, number);
+void Outputs::requestOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync) {
+    context->wallet->getOutputs(account, offset, number, show_spent, enforceSync);
     // Respond:  onOutputs(...)
     // Balance need to be updated as well to match outputs state
-    context->wallet->updateWalletBalance();
+    context->wallet->updateWalletBalance(false,false);
 }
 
 void Outputs::onOutputCount(QString account, int count) {
@@ -98,6 +100,14 @@ void Outputs::updateColumnsWidhts(const QVector<int> & widths) {
 void Outputs::onWalletBalanceUpdated() {
     if (wnd) {
         wnd->updateWalletBalance();
+    }
+}
+
+void Outputs::onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString message) {
+    Q_UNUSED(level)
+
+    if (wnd && message.contains("Changing status for output")) {
+        wnd->triggerRefresh();
     }
 }
 

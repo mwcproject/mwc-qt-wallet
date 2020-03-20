@@ -391,13 +391,17 @@ int main(int argc, char *argv[])
             }
         }
 
-
         while (true) {
-            QString arch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDataPath).second;
+            QPair<QString,QString> network_arch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDataPath);
 
-            if (arch != runningArc) {
+            if (!network_arch.first.isEmpty())
+                walletConfig.updateNetwork(network_arch.first);
+
+            QString arh = network_arch.second;
+
+            if (arh != runningArc) {
                 if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::questionText(nullptr, "Wallet data architecture mismatch",
-                                             "Your mwc713 seed at '"+ walletDataPath +"' was created with "+arch+" bits version of the wallet. "
+                                             "Your mwc713 seed at '"+ walletDataPath +"' was created with "+arh+" bits version of the wallet. "
                                              "Please exit and use original version of the wallet, or specify another folder for the seed",
                                              "Exit", "Select Folder", false, true) ) {
                     // Exit was selected

@@ -46,7 +46,7 @@ Note: you must include the "mwcmqs://" part of the address.
 
 So for instance your address that you enter into Hotbit may look something like this:
 
-"mwmqs://q5XLmBpaqstWg5S4S3m4umwgiYxF49tC4GkJ26QvvmkRA7HU7wXM"
+"mwcmqs://q5XLmBpaqstWg5S4S3m4umwgiYxF49tC4GkJ26QvvmkRA7HU7wXM"
 
 To save the address, you will need to have an amount set in the "MWC Withdrawal" field to proceed. Once you have added you may click "Submit".
 
@@ -67,6 +67,8 @@ After your Withdrawal is processed by Hotbit you will see a dialog box like this
 ![Confirm](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/Screen%20Shot%202019-12-04%20at%205.20.58%20PM.png)
 
 You should now have the funds in your wallet.
+
+IMPORTANT: After an hour or so, please make sure to resync with your full node. You can do this from the menu at the top right of the screen. This will ensure the funds are really there in case there was a reorg on the network.
 
 # Cold Storage
 
