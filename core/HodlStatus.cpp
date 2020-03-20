@@ -100,7 +100,7 @@ void HodlStatus::setError( const QString & errKey, const QString & error ) {
 void HodlStatus::setRootPubKey( const QString & pubKey )
 {
     rootPubKey = pubKey;
-    QByteArray keyHex = crypto::str2hex(pubKey);
+    QByteArray keyHex = pubKey.toUtf8();// crypto::str2hex(pubKey);
     if (!keyHex.isEmpty()) {
         rootPubKeyHash = crypto::hex2str( crypto::HSA256( keyHex ) );
     }

@@ -30,6 +30,7 @@ Hodl::Hodl(QWidget *parent, state::Hodl * _state) :
     ui->setupUi(this);
 
     ui->progress->initLoader(false);
+    ui->claimMwcButton->setEnabled(false);
 
     updateHodlState();
 }
@@ -42,7 +43,7 @@ Hodl::~Hodl()
 
 void Hodl::on_learnMoreButton_clicked()
 {
-    util::openUrlInBrowser("https://www.mwc.mw/mimblewimble-coin-whitepaper");
+    util::openUrlInBrowser("https://www.mwc.mw/hodl");
 }
 
 void Hodl::on_signInButton_clicked()

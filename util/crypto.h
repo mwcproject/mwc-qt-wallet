@@ -26,7 +26,7 @@ namespace crypto {
     // bytes -> hex string
     QString hex2str(const QByteArray & data);
 
-    // Appy hash to the data once
+    // Apply hash to the data once
     // return data is 256 bits
     QByteArray HSA256(const QByteArray & data);
 

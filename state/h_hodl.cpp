@@ -34,7 +34,7 @@
 
 namespace state {
 
-static const QString TAG_GET_NEXT_START_DATE  = "getNextStartDate";
+static const QString TAG_GET_HODL_STATUS      = "getHODLstatus";
 static const QString TAG_GET_ADDRESS          = "checkAddresses";
 static const QString TAG_GET_AMOUNT           = "getAmount";
 static const QString TAG_GET_CHALLENGE        = "getChallenge";
@@ -125,7 +125,10 @@ void Hodl::startChallengeWorkflow(HODL_WORKFLOW workflow, QString publicKey, int
         params.push_back( QString::number(claimAmount) );
     }
 
-    sendRequest( HTTP_CALL::GET, "/v1/getChallenge", params, "", TAG_GET_CHALLENGE );
+    // Currently doing and checking registration only. getHODLChallenge support registration only..
+    Q_ASSERT(publicKey.isEmpty());
+
+    sendRequest( HTTP_CALL::GET, "/v1/getHODLChallenge", params, "", TAG_GET_CHALLENGE );
     // Continue at TAG_GET_CHALLENGE
 }
 
@@ -138,7 +141,7 @@ void Hodl::onLoginResult(bool ok) {
     hodlUrl = (context->wallet->getWalletConfig().getNetwork() == "Mainnet") ?
                  config::getHodlMainNetUrl() : config::getHodlTestNetUrl();
 
-    sendRequest( HTTP_CALL::GET, "/v1/getNextStartDate", {}, "", TAG_GET_NEXT_START_DATE );
+    sendRequest( HTTP_CALL::GET, "/v1/getHODLstatus", {}, "", TAG_GET_HODL_STATUS );
 
     context->wallet->getRootPublicKey( "" );
     // continue at  onRootPublicKey( QString rootPubKey, QString message, QString signature )
@@ -160,12 +163,12 @@ void Hodl::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QS
             context->hodlStatus->setRootPubKey(rootPubKey);
 
             if (!context->hodlStatus->hasHodlOutputs() ) {
-                sendRequest( HTTP_CALL::GET, "/v1/checkAddresses",
+                sendRequest( HTTP_CALL::GET, "/v1/checkOutputs",
                              {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_GET_ADDRESS );
             }
 
             if (!context->hodlStatus->hasAmountToClaim() ) {
-                sendRequest( HTTP_CALL::GET, "/v1/getAmount",
+                sendRequest( HTTP_CALL::GET, "/v1/getAmountHODL",
                              {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_GET_AMOUNT );
             }
             break;
@@ -181,6 +184,7 @@ void Hodl::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QS
                           "challenge", message},
                          "", TAG_REGISTER_HODL );
             // TO be continue at respond step
+            break;
         }
         case HODL_WORKFLOW::CLAIM: {
             Q_ASSERT( rootPubKey == context->hodlStatus->getRootPubKey() );
@@ -194,7 +198,7 @@ void Hodl::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QS
                           "challenge", message},
                          "", TAG_CLAIM_MWC,
                          message, signature);
-
+            break;
         }
         default: {
             Q_ASSERT(false);
@@ -329,11 +333,11 @@ void Hodl::replyFinished(QNetworkReply* reply) {
     reply->deleteLater();
 
     // Done with reply. Now processing the results by tags
-    if ( TAG_GET_NEXT_START_DATE == tag) {
+    if ( TAG_GET_HODL_STATUS == tag) {
         if (requestOk) {
-            context->hodlStatus->setHodlStatus( jsonRespond["message"].toString(), TAG_GET_NEXT_START_DATE );
+            context->hodlStatus->setHodlStatus( jsonRespond["message"].toString(), TAG_GET_HODL_STATUS );
         } else {
-            context->hodlStatus->setError( TAG_GET_NEXT_START_DATE, "Unable to request the status info from " + hodlUrl +
+            context->hodlStatus->setError( TAG_GET_HODL_STATUS, "Unable to request the status info from " + hodlUrl +
                                     ".\nGet communication error: " + requestErrorMessage);
         }
 
@@ -343,7 +347,6 @@ void Hodl::replyFinished(QNetworkReply* reply) {
     if ( TAG_GET_ADDRESS == tag) {
         if (requestOk) {
             const QVector<core::HodlOutputInfo> hodlOutputs;
-            Q_ASSERT(false); // Implement me json to hodlOutputs
             context->hodlStatus->setHodlOutputs( true, hodlOutputs, TAG_GET_ADDRESS );
         } else {
             context->hodlStatus->setError( TAG_GET_ADDRESS, "Unable to request the HODL output info from " + hodlUrl +
