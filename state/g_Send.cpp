@@ -193,7 +193,7 @@ void Send::timerEvent(QTimerEvent *event)
         if (evt.isStaleTransaction()) {
             if (control::MessageBox::RETURN_CODE::BTN2 ==
                 control::MessageBox::questionText(nullptr, "Second party didn't respond",
-                                              "We didn't get any respond from the address\n" + evt.address +
+                                              "We didn't get any response from the address\n" + evt.address +
                                               "\nThere is a high chance that second party is offline and will never respond back.\n" +
                                               "Do you want to continue waiting or cancel this transaction?",
                                               "   Keep Waiting    ", "   Cancel Transaction   ", false, true)) {
@@ -207,10 +207,11 @@ void Send::timerEvent(QTimerEvent *event)
 }
 
 void Send::onCancelTransacton( bool success, int64_t trIdx, QString errMessage ) {
+    Q_UNUSED(errMessage);
     if ( !success &&  transactions2cancel.contains(trIdx) ) {
         // Cancellation was failed, let's display the message about that
         control::MessageBox::messageText(nullptr, "Unable to cancel transaction",
-                "We unable to cancel the last transaction.\n"+errMessage+"\n\nPlease check at transaction page the status of your transactions. At notification page you can check the latest event.");
+                "We unable to cancel the last transaction.\n\nPlease check at transaction page the status of your transactions. At notification page you can check the latest event.");
     }
     transactions2cancel.remove(trIdx); // Just, in case, clean up
 }
