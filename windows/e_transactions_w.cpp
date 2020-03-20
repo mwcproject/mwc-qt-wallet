@@ -362,16 +362,17 @@ void Transactions::on_exportButton_clicked()
     // however when exporting the transactions, we want to export first to last
     QStringList exportRecords;
 
+    const QVector<wallet::WalletTransaction>& currentTxs = state->getTransactions();
     // retrieve the first transaction and get the CSV headers
-    wallet::WalletTransaction trans = transactions[0];
+    wallet::WalletTransaction trans = currentTxs[0];
     QString csvHeaders = trans.getCSVHeaders();
     exportRecords << csvHeaders;
     QString csvValues = trans.toStringCSV();
     exportRecords << csvValues;
 
     // now retrieve the remaining transactions and add them to our list
-    for ( int idx=1; idx < transactions.size(); idx++) {
-        wallet::WalletTransaction trans = transactions[idx];
+    for ( int idx=1; idx < currentTxs.size(); idx++) {
+        wallet::WalletTransaction trans = currentTxs[idx];
         QString csvValues = trans.toStringCSV();
         exportRecords << csvValues;
     }

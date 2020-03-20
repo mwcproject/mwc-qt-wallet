@@ -25,6 +25,21 @@ class Transactions;
 
 namespace state {
 
+struct CachedTransactionInfo {
+    QString currentAccount;
+    int totalTransactions = -1;
+    int requestedOffset = 0;
+    int requestedCount = 0;
+
+    int64_t height;
+    QVector<wallet::WalletTransaction> transactions;
+    QVector<wallet::WalletTransaction> requestedTransactions;
+
+    void resetCache(QString account) { currentAccount = account; totalTransactions = -1; requestedOffset = 0; requestedCount = 0; requestedTransactions.clear(); }
+    void saveTransactionsRequest(int offset, int number) { requestedOffset = offset; requestedCount = number; }
+    QVector<wallet::WalletTransaction>& requestTransactions(int offset, int number);
+};
+
 class Transactions : public QObject, public State
 {
     Q_OBJECT
@@ -39,6 +54,7 @@ public:
     void requestTransactions(QString account, int offset, int number, bool enforceSync);
     // Request full info for the transaction
     void getTransactionById(QString account, int64_t txIdx) const;
+    const QVector<wallet::WalletTransaction>& getTransactions() { return cachedTxs.transactions; }
 
     void switchCurrentAccount(const wallet::AccountInfo & account);
 
@@ -81,6 +97,8 @@ private slots:
 private:
     wnd::Transactions * wnd = nullptr;
     QMetaObject::Connection slotConn;
+
+    CachedTransactionInfo cachedTxs;
 };
 
 }
