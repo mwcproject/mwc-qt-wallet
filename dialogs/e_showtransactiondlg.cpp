@@ -86,7 +86,7 @@ void ShowTransactionDlg::updateOutputData() {
     ui->out_height->setText( out.blockHeight );
     ui->out_confirms->setText( out.numOfConfirms );
     ui->out_coinBase->setText(out.coinbase?"Yes":"No");
-    ui->out_tx->setText(out.txIdx<0 ? "None" : QString::number(out.txIdx) );
+    ui->out_tx->setText(out.txIdx<0 ? "None" : QString::number(out.txIdx+1) );
 }
 
 void ShowTransactionDlg::on_viewKernel_clicked()
