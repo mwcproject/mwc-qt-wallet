@@ -94,6 +94,8 @@ private slots:
 
     void onTransactionById( bool success, QString account, int64_t height, wallet::WalletTransaction transaction, QVector<wallet::WalletOutput> outputs, QVector<QString> messages );
 
+    void onUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
+
 private:
     wnd::Transactions * wnd = nullptr;
     QMetaObject::Connection slotConn;

@@ -60,6 +60,8 @@ Transactions::Transactions( StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onTransactions, this, &Transactions::updateTransactions, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onTransactionById, this, &Transactions::onTransactionById, Qt::QueuedConnection );
 
+    QObject::connect( context->wallet, &wallet::Wallet::onNodeStatus, this, &Transactions::onUpdateNodeStatus, Qt::QueuedConnection);
+
     QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
                       this, &Transactions::onNewNotificationMessage, Qt::QueuedConnection );
 }
@@ -108,6 +110,10 @@ void Transactions::requestTransactions(QString account, int offset, int number, 
 
     if (enforceSync)
     {
+        // request node status so we can get the node height to use when calculating confirmations
+        context->wallet->getNodeStatus();
+        // request outputs for the transactions so we can calculate the confirmations
+        context->wallet->getOutputs(account, 0, cachedTxs.totalTransactions, false, enforceSync);
         // request all transactions so we can cache them
         context->wallet->getTransactions(account, 0, std::max(1,cachedTxs.totalTransactions), enforceSync);
         context->wallet->updateWalletBalance(false,false); // With transactions refresh, need to update the balance
@@ -218,6 +224,20 @@ void Transactions::onTransactionById( bool success, QString account, int64_t hei
         QVector<QString> messages ) {
     if (wnd) {
         wnd->updateTransactionById(success, account, height, transaction, outputs, messages);
+    }
+}
+
+void Transactions::onUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
+    Q_UNUSED(errMsg)
+    if (wnd) {
+        // gather settings needed to calculate transaction confirmations
+        int64_t height = 0;
+        if (online && connections > 0 && totalDifficulty > 0 && (nodeHeight > peerHeight - mwc::NODE_HEIGHT_DIFF_LIMIT)) {
+            // node is online and synced, use the current node height to determine transaction confirmations
+            height = nodeHeight;
+        }
+        int confirmNumber = context->appContext->getSendCoinsParams().inputConfirmationNumber;
+        wnd->setConfirmData(height, confirmNumber);
     }
 }
 

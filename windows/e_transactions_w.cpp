@@ -23,6 +23,7 @@
 #include <QDebug>
 #include "dialogs/e_showproofdlg.h"
 #include "dialogs/e_showtransactiondlg.h"
+#include "../core/global.h"
 
 namespace wnd {
 
@@ -197,6 +198,18 @@ void Transactions::setTransactionData(QString account, int64_t height, const QVe
                 1.0 : (double(age) / double(60 * 60));
         }
 
+        QString transConfirmedStr = trans.confirmed ? "YES" : "NO";
+        // if the node is online and in sync, display the number of confirmations instead
+        // nodeHeight will be 0 if the node is offline or out of sync
+        if (trans.confirmed && nodeHeight > 0 && trans.height > 0) {
+            int confirms = confirmNumber;
+            if (trans.isCoinbase()) {
+                confirms = mwc::COIN_BASE_CONFIRM_NUMBER;
+            }
+            // confirmations are 1 more than the difference between the node and transaction heights
+            transConfirmedStr = QString::number(nodeHeight - trans.height + 1) + "/" + QString::number(confirms);
+        }
+
         ui->transactionTable->appendRow( QVector<QString>{
                 QString::number(  trans.txIdx+1 ),
                 trans.getTypeAsStr(),
@@ -204,7 +217,7 @@ void Transactions::setTransactionData(QString account, int64_t height, const QVe
                 trans.address,
                 trans.creationTime,
                 util::nano2one(trans.coinNano),
-                (trans.confirmed ? "YES":"NO"),
+                transConfirmedStr,
                 trans.height<=0 ? "" : QString::number(trans.height)
         }, selection );
     }
@@ -438,6 +451,10 @@ void Transactions::updateTransactionById(bool success, QString account, int64_t 
     showTransDlg.exec();
 }
 
+void Transactions::setConfirmData(int64_t _nodeHeight, int _confirmNumber) {
+    nodeHeight    = _nodeHeight;
+    confirmNumber = _confirmNumber;
+}
 
 void Transactions::on_accountComboBox_activated(int index)
 {

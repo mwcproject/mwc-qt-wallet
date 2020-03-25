@@ -262,6 +262,8 @@ struct WalletTransaction {
 
     bool canBeCancelled() const { return (transactionType & TRANSACTION_TYPE::CANCELLED)==0 && !confirmed; }
 
+    bool isCoinbase() const { return transactionType==TRANSACTION_TYPE::COIN_BASE; }
+
     // return transaction age (time interval from creation moment) in Seconds.
     int64_t calculateTransactionAge( const QDateTime & current ) const;
 

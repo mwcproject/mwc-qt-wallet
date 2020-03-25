@@ -51,6 +51,9 @@ public:
                           wallet::WalletTransaction transaction,
                           QVector<wallet::WalletOutput> outputs,
                           QVector<QString> messages);
+
+    void setConfirmData(int64_t nodeHeight, int confirmNumber);
+
 private slots:
     void on_transactionTable_itemSelectionChanged();
     void on_transactionTable_cellDoubleClicked(int row, int column);
@@ -96,6 +99,8 @@ private:
 
     int currentPagePosition = 0; // position at the paging...
     int totalTransactions = 0;
+    int64_t nodeHeight    = 0;
+    int     confirmNumber = 0;
 
     QPair<bool,bool> buttonState = QPair<bool,bool>(false, false);
 };

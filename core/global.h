@@ -53,6 +53,8 @@ const int64_t AIRDROP_TRANS_KEEP_TIME_MS = 1000L*3600L*24L*15; // 15 days should
 // Limit for the node height to consider it out of sync. 1 blocks is 1 minute.
 const int NODE_HEIGHT_DIFF_LIMIT = 5;
 
+const int COIN_BASE_CONFIRM_NUMBER = 1440;
+
 // Default MQ servers
 const QString DEFAULT_HOST_MWC_MQ  = "mq.mwc.mw";
 const QString DEFAULT_HOST_MWC_MQS = "mqs.mwc.mw";
