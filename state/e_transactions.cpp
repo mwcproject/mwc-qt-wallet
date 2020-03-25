@@ -112,8 +112,6 @@ void Transactions::requestTransactions(QString account, int offset, int number, 
     {
         // request node status so we can get the node height to use when calculating confirmations
         context->wallet->getNodeStatus();
-        // request outputs for the transactions so we can calculate the confirmations
-        context->wallet->getOutputs(account, 0, cachedTxs.totalTransactions, false, enforceSync);
         // request all transactions so we can cache them
         context->wallet->getTransactions(account, 0, std::max(1,cachedTxs.totalTransactions), enforceSync);
         context->wallet->updateWalletBalance(false,false); // With transactions refresh, need to update the balance

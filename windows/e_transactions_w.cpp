@@ -201,7 +201,7 @@ void Transactions::setTransactionData(QString account, int64_t height, const QVe
         QString transConfirmedStr = trans.confirmed ? "YES" : "NO";
         // if the node is online and in sync, display the number of confirmations instead
         // nodeHeight will be 0 if the node is offline or out of sync
-        if (trans.confirmed && nodeHeight > 0 && trans.height > 0) {
+        if (nodeHeight > 0 && trans.height > 0) {
             int confirms = confirmNumber;
             if (trans.isCoinbase()) {
                 confirms = mwc::COIN_BASE_CONFIRM_NUMBER;
