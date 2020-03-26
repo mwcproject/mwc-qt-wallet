@@ -54,6 +54,9 @@ SendStarting::SendStarting(QWidget *parent, state::Send *_state) :
         state(_state) {
     ui->setupUi(this);
 
+    // Waiting for account data
+    ui->progress->initLoader(true);
+
     ui->fileChecked->setId(FILE_ID);
     ui->onlineChecked->setId(ONLINE_ID);
 
@@ -92,6 +95,7 @@ void SendStarting::updateAccountBalance( QVector<wallet::AccountInfo> _accountIn
     }
     ui->accountComboBox->setCurrentIndex(selectedAccIdx);
 
+    ui->progress->hide();
 }
 
 void SendStarting::onChecked(int id) {
