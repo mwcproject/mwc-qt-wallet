@@ -20,7 +20,7 @@ QStatusBar {
     font-family: Open Sans;
     font-style: normal;
     font-weight: normal;
-    font-size: 15px;
+    font-size: 13px;
 }
 
 /* Needed for Windows */
@@ -437,6 +437,12 @@ control--MwcComboBox::drop-down {
 
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
+}
+
+/*  By default selected item has yellow color */
+control--MwcComboBox:item:selected
+{
+    color: white;
 }
 
 control--MwcComboBox::down-arrow {
