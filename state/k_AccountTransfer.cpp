@@ -93,8 +93,10 @@ void AccountTransfer::transferFunds(const wallet::AccountInfo & accountFrom,
     // Check if HODL outputs will be affected
     QStringList outputs; // empty is valid value. Empty - mwc713 will use default algorithm.
     // nanoCoins < 0  - All
-    if (! util::getOutputsToSend( accountFrom.accountName, nanoCoins, getContext()->hodlStatus, nullptr, outputs) )
+    if (! util::getOutputsToSend( accountFrom.accountName, nanoCoins, getContext()->hodlStatus, nullptr, outputs) ) {
+        wnd->hideProgress();
         return; // User cancel transaction
+    }
 
     // Expected that everything is fine, but will do operation step by step
     // 1. set-recv to accountTo

@@ -79,6 +79,9 @@ void AccountTransfer::showTransferResults(bool ok, QString errMsg) {
     }
 }
 
+void AccountTransfer::hideProgress() {
+    ui->progress->hide();
+}
 
 void AccountTransfer::on_allAmountButton_clicked()
 {

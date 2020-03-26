@@ -42,6 +42,8 @@ public:
 
     void showTransferResults(bool ok, QString errMsg);
     void updateAccounts();
+
+    void hideProgress();
 protected:
     // return -1 if not seleted or not valid
     int getAccountSelectionComboBoxCurrentIndex( control::MwcComboBox * combo, bool showInputErrMessage );
