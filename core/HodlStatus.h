@@ -29,14 +29,14 @@ namespace core {
 // currently submitted HODL outputs as a server see them
 struct HodlOutputInfo {
     QString    outputCommitment;
-    int64_t    valueNano = 0L;
-    int        height = 0;
+    double     value  = 0.0;
+    double     weight = 0.0;
 
-    void setData( const QString & outputCommitment, int64_t valueNano, int height );
+    void setData( const QString & outputCommitment, double value, double weight );
 
-    static HodlOutputInfo create(const QString & outputCommitment, int64_t valueNano, int height) {
+    static HodlOutputInfo create(const QString & outputCommitment, double value, double weight) {
         HodlOutputInfo item;
-        item.setData(outputCommitment, valueNano, height);
+        item.setData(outputCommitment, value, weight);
         return item;
     }
 };
@@ -61,7 +61,7 @@ public:
     void setHodlStatus( const QString & hodlStatus, const QString & errKey );
     void setHodlOutputs( bool inHodl, const QVector<HodlOutputInfo> & hodlOutputs, const QString & errKey ); //
     void setWalletOutputs( const QString & account, const QVector<wallet::WalletOutput> & outputs, const QString & errKey ); //
-    void setClaimAmount( int64_t amount2claim, const QString & errKey );
+    void finishWalletOutputs(bool done);
 
     void setError( const QString & errKey, const QString & error );
 
@@ -72,18 +72,21 @@ public:
     QString getRootPubKeyHash() const {return rootPubKeyHash;}
 
     bool isInHodl() const {return inHodl;}
-    bool hasHodlStatus() const;
     bool hasHodlOutputs() const;
-    bool hasAmountToClaim() const;
+    //bool hasAmountToClaim() const;
 
 
-    bool hasErrors() const;
-    QString getErrorsAsString() const; //
+//    bool hasErrors() const;
+//    QString getErrorsAsString() const; //
 
     int64_t getAmountToClaim() const { return amount2claim; }
 
     QString getHodlStatus() const {return hodlStatus;}
-    QString getAccountStatus() const {return accountStatus;}
+    // Calculates what we have for account
+    QString getWalletHodlStatus() const;
+
+    QVector<HodlOutputInfo> getHodlOutputs() {return hodlOutputs;}
+
 
     QVector<HodlClaimStatus> getClaimsRequestStatus() const;
 
@@ -91,6 +94,12 @@ public:
     bool hasAnyOutputsInHODL() const { return !hodlOutputs.isEmpty();}
     QVector<wallet::WalletOutput> getWalltOutputsForAccount(QString accountName) const {return walletOutputs.value(accountName);}
     bool isOutputInHODL(const QString & output) const {return hodlOutputCommitment.contains(output);}
+
+    // registration was sucessfull, let's update it
+    void updateRegistrationTime();
+
+    // Return true if we can trust the outputs that we get from HODL server. Likely scan was happens and data is updated
+    bool isHodlRegistrationTimeLongEnough() const;
 
 private slots:
     void onLoginResult(bool ok);
@@ -110,7 +119,6 @@ private:
     QString rootPubKeyHash; // HSA256 hash
 
     QString hodlStatus; // Replay from /v1/getNextStartDate
-    QString accountStatus; // Replay from checkAddresses
 
     uint availableData = 0;
 

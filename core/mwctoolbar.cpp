@@ -34,7 +34,7 @@ MwcToolbar::MwcToolbar(QWidget *parent) :
     //setStyleSheet("background-color: #6F00D6;");
 
     if (config::isColdWallet()) {
-        ui->hodlToolButton->hide();
+        //ui->hodlToolButton->hide();
         ui->airdropToolButton->hide();
     }
 }

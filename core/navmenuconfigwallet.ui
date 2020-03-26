@@ -84,7 +84,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>mwc mq</string>
+    <string>Listeners</string>
    </property>
   </widget>
   <widget class="control::MwcFrameWithBorder" name="frame_4">

@@ -1,19 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Hodl</class>
- <widget class="QWidget" name="Hodl">
+ <class>HodlCold</class>
+ <widget class="QWidget" name="HodlCold">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>830</width>
-    <height>564</height>
+    <width>710</width>
+    <height>540</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,5,1">
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,7,1">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>1</number>
+   </property>
+   <property name="topMargin">
+    <number>1</number>
+   </property>
+   <property name="rightMargin">
+    <number>1</number>
+   </property>
+   <property name="bottomMargin">
+    <number>1</number>
+   </property>
    <item>
     <spacer name="horizontalSpacer">
      <property name="orientation">
@@ -21,16 +36,16 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>109</width>
+       <width>0</width>
        <height>20</height>
       </size>
      </property>
     </spacer>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="2,0,0,0,0,0,0,3">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1,0,0,1,0,0,0,2">
      <property name="spacing">
-      <number>20</number>
+      <number>10</number>
      </property>
      <item>
       <spacer name="verticalSpacer">
@@ -40,7 +55,7 @@
        <property name="sizeHint" stdset="0">
         <size>
          <width>337</width>
-         <height>19</height>
+         <height>0</height>
         </size>
        </property>
       </spacer>
@@ -64,14 +79,14 @@
         <widget class="QLabel" name="label_4">
          <property name="minimumSize">
           <size>
-           <width>70</width>
-           <height>80</height>
+           <width>80</width>
+           <height>95</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>70</width>
-           <height>80</height>
+           <width>80</width>
+           <height>95</height>
           </size>
          </property>
          <property name="text">
@@ -101,6 +116,19 @@
       </layout>
      </item>
      <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="control::MwcLabelLarge" name="label_3">
        <property name="text">
         <string>HODL</string>
@@ -113,7 +141,10 @@
      <item>
       <widget class="control::MwcLabelNormal" name="hodlStatus">
        <property name="text">
-        <string>Requesting HODL status...</string>
+        <string>You can register your Cold Wallet funds for the HODL program.
+Please check Cold Wallet Guide for the HODL registration workflow
+
+Warning! Wallet public key allows any 3rd party to discover MWC amount that belong to this wallet.</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -124,144 +155,211 @@
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <spacer name="verticalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="spacing">
+        <number>5</number>
+       </property>
        <item>
-        <spacer name="horizontalSpacer_7">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+        <widget class="control::MwcLabelSmall" name="label_7">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="sizeHint" stdset="0">
+         <property name="maximumSize">
           <size>
-           <width>40</width>
-           <height>20</height>
+           <width>16777215</width>
+           <height>22</height>
           </size>
          </property>
-        </spacer>
+         <property name="text">
+          <string>Wallet public key</string>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="control::MwcPushButtonNormal" name="learnMoreButton">
+        <widget class="control::MwcLineEditNormal" name="publicKey">
          <property name="minimumSize">
           <size>
-           <width>160</width>
+           <width>650</width>
            <height>40</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>160</width>
+           <width>16777215</width>
            <height>40</height>
           </size>
          </property>
-         <property name="toolTip">
-          <string>Open Sign Up page in your browser</string>
-         </property>
          <property name="text">
-          <string>Learn More</string>
+          <string/>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
          </property>
         </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_8">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </item>
      <item>
-      <widget class="control::MwcLabelNormal" name="accountStatus">
-       <property name="text">
-        <string>Requesting Account status...</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <property name="spacing">
+          <number>5</number>
+         </property>
+         <item>
+          <widget class="control::MwcLabelSmall" name="label_11">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>22</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Message</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="control::MwcLineEditNormal" name="message">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="readOnly">
+            <bool>false</bool>
+           </property>
+           <property name="placeholderText">
+            <string>message to sign</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="control::MwcLabelSmall" name="label_12">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>22</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="control::MwcPushButtonNormal" name="sign">
+           <property name="minimumSize">
+            <size>
+             <width>106</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>106</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Open output details with MWC block explorer</string>
+           </property>
+           <property name="text">
+            <string>Sign</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout_5">
        <property name="spacing">
-        <number>30</number>
+        <number>5</number>
        </property>
        <item>
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="control::MwcPushButtonNormal" name="signInButton">
-         <property name="minimumSize">
-          <size>
-           <width>160</width>
-           <height>40</height>
-          </size>
+        <widget class="control::MwcLabelSmall" name="label_8">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <property name="maximumSize">
           <size>
-           <width>160</width>
-           <height>40</height>
+           <width>16777215</width>
+           <height>22</height>
           </size>
          </property>
-         <property name="toolTip">
-          <string>Open Sign Up page in your browser</string>
-         </property>
          <property name="text">
-          <string>Register</string>
+          <string>Signature</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="control::MwcPushButtonNormal" name="claimMwcButton">
-         <property name="minimumSize">
-          <size>
-           <width>160</width>
-           <height>40</height>
-          </size>
-         </property>
+        <widget class="QPlainTextEdit" name="signature">
          <property name="maximumSize">
           <size>
-           <width>160</width>
-           <height>40</height>
+           <width>16777215</width>
+           <height>60</height>
           </size>
          </property>
-         <property name="toolTip">
-          <string>Open Sign Up page in your browser</string>
-         </property>
-         <property name="text">
-          <string>Claim MWC</string>
+         <property name="readOnly">
+          <bool>true</bool>
          </property>
         </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </item>
@@ -294,7 +392,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>28</height>
+            <height>0</height>
            </size>
           </property>
          </spacer>
@@ -375,7 +473,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>25</height>
+            <height>0</height>
            </size>
           </property>
          </spacer>
@@ -392,7 +490,7 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>109</width>
+       <width>0</width>
        <height>20</height>
       </size>
      </property>
@@ -405,6 +503,16 @@
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelLarge</class>

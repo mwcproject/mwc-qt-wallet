@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>187</width>
-    <height>146</height>
+    <height>195</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -85,6 +85,35 @@
    </property>
    <property name="text">
     <string>Select Running Mode</string>
+   </property>
+  </widget>
+  <widget class="control::NavMenuButton" name="hodlButton">
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>151</y>
+     <width>170</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>HODL</string>
+   </property>
+  </widget>
+  <widget class="control::MwcFrameWithBorder" name="frame_7">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>145</y>
+     <width>156</width>
+     <height>2</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
    </property>
   </widget>
  </widget>

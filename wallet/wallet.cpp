@@ -102,7 +102,7 @@ bool WalletConfig::operator == (const WalletConfig & other) const {
               mwcmqDomainEx==other.mwcmqDomainEx && mwcmqsDomainEx==other.mwcmqsDomainEx &&
               keyBasePath==other.keyBasePath && foreignApi==other.foreignApi;
 
-    if (ok)
+    if (!ok)
         return ok;
 
     ok = foreignApiAddress == other.foreignApiAddress && foreignApiSecret == other.foreignApiSecret &&

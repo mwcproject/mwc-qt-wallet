@@ -92,5 +92,11 @@ void NavMenuConfig::on_resyncButton_clicked()
     close();
 }
 
+void NavMenuConfig::on_hodlButton_clicked() {
+    context->stateMachine->setActionWindow( state::STATE::HODL );
+    close();
+}
+
+
 }
 

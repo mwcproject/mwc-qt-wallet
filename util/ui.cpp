@@ -30,18 +30,22 @@ static QString generateMessageHtmlOutputsToSpend( const QVector<wallet::WalletOu
     <th>Commitment</th>
     <th></th>
     <th>MWC</th>
+    <th>&nbsp;&nbsp;&nbsp;</th>
   </tr>
   <tr>
     <td>089e22b5084906e5da629272d487eaeb67138366faf28865fcde7599d5ed5410af</td>
-    <td></td>
+    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
     <td>0.154</td>
+    <th></th>
   </tr>
   <tr>
     <td>0932084ef0b3cf60c62cb65d054beafba5ae0e5cf8a7890208d714bf20b36d257d</td>
     <td></td>
     <td>0.154</td>
+    <th></th>
   </tr>
 </table>
+<br><br>
 <br>Please press 'Continue' if you want to withdraw those outputs from HODL and spend them now.
 */
     QString result = "This transaction will include outputs registered for HODL<br>"
@@ -50,6 +54,7 @@ static QString generateMessageHtmlOutputsToSpend( const QVector<wallet::WalletOu
                      "    <th>Commitment</th>"
                      "    <th></th>"
                      "    <th>MWC</th>"
+                     "    <th>&nbsp;&nbsp;&nbsp;</th>"
                      "  </tr>"
                      "  <tr>";
 
@@ -58,14 +63,15 @@ static QString generateMessageHtmlOutputsToSpend( const QVector<wallet::WalletOu
         limit--;
         if (limit==0) {
             result += "<tr><td> .......... </td><td></td><td> ... </td></tr>";
+            break;
         }
         else {
-            result += "<tr><td>" + outpt.outputCommitment + "</td><td></td><td>" + util::nano2one(outpt.valueNano) +
-                      "</td></tr>";
+            result += "<tr><td>" + outpt.outputCommitment + "</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>" + util::nano2one(outpt.valueNano) +
+                      "</td><td></td></tr>";
         }
 
     }
-    result += "</table><br>Please press 'Continue' if you want to withdraw those outputs from HODL and spend them now.";
+    result += "</table><br><br><br>Please press 'Continue' if you want to withdraw those outputs from HODL and spend them now.";
     return result;
 }
 
@@ -194,7 +200,7 @@ bool getOutputsToSend( const QString & accountName, int64_t nanoCoins, core::Hod
         // Ask user if he want ot spend all and continue...
         return control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(parent, "HODL Output spending",
                 generateMessageHtmlOutputsToSpend( hodlOuts ),
-                "Cancel", "Continue", true, false);
+                "Cancel", "Continue", true, false, 1.3);
     }
 
     Q_ASSERT(nanoCoins>0);
@@ -238,7 +244,7 @@ bool getOutputsToSend( const QString & accountName, int64_t nanoCoins, core::Hod
 
     if (control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionHTML(parent, "HODL Output spending",
                         generateMessageHtmlOutputsToSpend( hodlOuts2ask ),
-                        "Cancel", "Continue", true, false) )
+                        "Cancel", "Continue", true, false, 1.3) )
         return false;
 
     // User approve the spending, preparing the list of outputs...

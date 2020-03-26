@@ -116,7 +116,7 @@ void FileTransaction::on_processButton_clicked()
     if (walletPassword.isEmpty() ||
         control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(this,"Confirm Finalize request",
                                       "You are finalizing transaction for " + ui->mwcLabel->text(), "Decline", "Confirm",
-                                      false, true, walletPassword, control::MessageBox::RETURN_CODE::BTN2 ) )
+                                      false, true, 1.0, walletPassword, control::MessageBox::RETURN_CODE::BTN2 ) )
     {
             ui->progress->show();
             handler->ftContinue( transactionFileName, resTxFN );

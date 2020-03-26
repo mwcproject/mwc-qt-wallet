@@ -145,6 +145,9 @@ public:
     bool isSetupDone(QString version);
     void updateSetupDone(QString version);
 
+    // HODL registration time.
+    int64_t getHodlRegistrationTime(const QString & hash) const;
+    void    setHodlRegistrationTime(const QString & hash, int64_t time);
 private:
     bool loadData();
     void saveData() const;
@@ -184,6 +187,8 @@ private:
     QString network;
 
     bool showOutputAll = false; // Show all or Unspent outputs
+
+    QMap<QString, qulonglong> hodlRegistrations;
 };
 
 template <class T>

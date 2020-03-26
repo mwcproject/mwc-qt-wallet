@@ -170,10 +170,10 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, co
         cmd += " --message " + util::toMwc713input(message); // Message symbols MUST be escaped.
 
     if (!outputs.isEmpty()) {
-        cmd += " --outputs " + outputs.join(",");
+        cmd += " --confirmations 1 --strategy custom --outputs " + outputs.join(",");
     }
 
-    if (inputConfirmationNumber > 0)
+    if (outputs.isEmpty() && inputConfirmationNumber > 0)
         cmd += " --confirmations " + QString::number(inputConfirmationNumber);
 
     if (changeOutputs > 0)
@@ -205,10 +205,10 @@ QString TaskSendFile::buildCommand( int64_t coinNano, QString message, QString f
         cmd += " --message " + util::toMwc713input(message); // Message symbols MUST be escaped.
 
     if (!outputs.isEmpty()) {
-        cmd += " --outputs " + outputs.join(",");
+        cmd += " --confirmations 1 --strategy custom --outputs " + outputs.join(",");
     }
 
-    if (inputConfirmationNumber > 0)
+    if (outputs.isEmpty() && inputConfirmationNumber > 0)
         cmd += " --confirmations " + QString::number(inputConfirmationNumber);
 
     if (changeOutputs > 0)

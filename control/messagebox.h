@@ -30,16 +30,17 @@ public:
     enum class RETURN_CODE {BTN1, BTN2};
 protected:
     // btnX if empty, the button will be hidden
-    explicit MessageBox(QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2, bool default1, bool default2, QString password, RETURN_CODE passBlockButton );
+    explicit MessageBox(QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2, bool default1, bool default2, double widthScale, QString password, RETURN_CODE passBlockButton );
     virtual ~MessageBox() override;
 
 public:
+    // widthScale - Horizontal scale for the message box. Sometimes we need it wider.
     // One button, OK box
-    static void messageText( QWidget *parent, QString title, QString message, QString password = "");
-    static void messageHTML( QWidget *parent, QString title, QString message, QString password = "" );
+    static void messageText( QWidget *parent, QString title, QString message, double widthScale = 1.0, QString password = "");
+    static void messageHTML( QWidget *parent, QString title, QString message, double widthScale = 1.0, QString password = "" );
     // Two button box
-    static RETURN_CODE questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1=false, bool default2=true, QString password = "", RETURN_CODE blockButton = RETURN_CODE::BTN1 );
-    static RETURN_CODE questionHTML( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1=false, bool default2=true, QString password = "", RETURN_CODE blockButton = RETURN_CODE::BTN1 );
+    static RETURN_CODE questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1=false, bool default2=true, double widthScale = 1.0, QString password = "", RETURN_CODE blockButton = RETURN_CODE::BTN1 );
+    static RETURN_CODE questionHTML( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1=false, bool default2=true, double widthScale = 1.0, QString password = "", RETURN_CODE blockButton = RETURN_CODE::BTN1 );
 
 private slots:
     void on_passwordEdit_textChanged(const QString &str);

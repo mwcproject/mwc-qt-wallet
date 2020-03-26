@@ -16,6 +16,8 @@
 #include "../state/state.h"
 #include "../util/crypto.h"
 #include "../util/Log.h"
+#include "../core/appcontext.h"
+#include "../core/Config.h"
 
 namespace core {
 
@@ -24,10 +26,10 @@ const uint DATA_HODL_OUTPUTS    = 0x0002;
 const uint DATA_AMOUNT_TO_CLAIM = 0x0004;
 
 // currently submitted HODL outputs as a server see them
-void HodlOutputInfo::setData( const QString & _outputCommitment, int64_t _valueNano, int _height ) {
+void HodlOutputInfo::setData( const QString & _outputCommitment, double _value, double _weight ) {
     outputCommitment = _outputCommitment;
-    valueNano = _valueNano;
-    height = _height;
+    value = _value;
+    weight = _weight;
 }
 
 void HodlClaimStatus::setData( int64_t _HodlAmount, int64_t _claimedMwc, const QString & _status, const QString & _date ) {
@@ -72,14 +74,23 @@ void HodlStatus::setHodlOutputs( bool _inHodl, const QVector<HodlOutputInfo> & _
 }
 
 void HodlStatus::setWalletOutputs( const QString & account, const QVector<wallet::WalletOutput> & outputs, const QString & errKey ) {
-    availableData |= DATA_WALLET_OUTPUTS;
     walletOutputs[account] = outputs;
     requestErrors.remove(errKey);
+}
 
-    logger::logEmit("HODL", "onHodlStatusWasChanged", "setWalletOutputs");
+void HodlStatus::finishWalletOutputs(bool done) {
+    if (!done) {
+        walletOutputs.clear();
+        availableData &= ~DATA_WALLET_OUTPUTS;
+    }
+    else {
+        availableData |= DATA_WALLET_OUTPUTS;
+        logger::logEmit("HODL", "onHodlStatusWasChanged", "setWalletOutputs");
+    }
     emit onHodlStatusWasChanged();
 }
 
+/*
 void HodlStatus::setClaimAmount( int64_t _amount2claim, const QString & errKey ) {
     availableData |= DATA_AMOUNT_TO_CLAIM;
     amount2claim = _amount2claim;
@@ -87,12 +98,13 @@ void HodlStatus::setClaimAmount( int64_t _amount2claim, const QString & errKey )
 
     logger::logEmit("HODL", "onHodlStatusWasChanged", "setClaimAmount");
     emit onHodlStatusWasChanged();
-}
+}*/
 
 void HodlStatus::setError( const QString & errKey, const QString & error ) {
     requestErrors[errKey] = error;
 
     logger::logEmit("HODL", "onHodlStatusWasChanged", "setError");
+
     emit onHodlStatusWasChanged();
 }
 
@@ -107,22 +119,31 @@ void HodlStatus::setRootPubKey( const QString & pubKey )
     else {
         rootPubKeyHash = "";
     }
+
+    // reseting account related data
+    inHodl = false;
+    availableData &= ~(DATA_HODL_OUTPUTS | DATA_AMOUNT_TO_CLAIM);
+    hodlOutputs.clear();
+    hodlOutputCommitment.clear();
+    amount2claim = 0;
+
+    emit onHodlStatusWasChanged();
 }
 
 
-bool HodlStatus::hasHodlStatus() const {
+/*bool HodlStatus::hasHodlStatus() const {
     return !hodlStatus.isEmpty();
-}
+}*/
 
 bool HodlStatus::hasHodlOutputs() const {
     return (availableData & DATA_HODL_OUTPUTS)!=0;
 }
 
-bool HodlStatus::hasAmountToClaim() const {
+/*bool HodlStatus::hasAmountToClaim() const {
     return (availableData & DATA_AMOUNT_TO_CLAIM)!=0;
-}
+}*/
 
-bool HodlStatus::hasErrors() const {
+/*bool HodlStatus::hasErrors() const {
     return !requestErrors.isEmpty();
 }
 QString HodlStatus::getErrorsAsString() const {
@@ -133,7 +154,7 @@ QString HodlStatus::getErrorsAsString() const {
         errsStr += errValues;
     }
     return errsStr;
-}
+}*/
 
 QVector<HodlClaimStatus> HodlStatus::getClaimsRequestStatus() const {
     return QVector<HodlClaimStatus>();
@@ -154,7 +175,6 @@ void HodlStatus::resetData() {
     rootPubKeyHash = "";
 
     hodlStatus = "Waiting for HODL data..."; // Replay from /v1/getNextStartDate
-    accountStatus = "Waiting for Account Data"; // Replay from checkAddresses
 
     availableData = 0;
 
@@ -167,5 +187,82 @@ void HodlStatus::resetData() {
     requestErrors.clear();
 }
 
+// Calculates what we have for account
+QString HodlStatus::getWalletHodlStatus() const {
+
+    bool canSkipWalletData = config::isOnlineNode();
+
+    if ( !rootPubKeyHash.isEmpty() && (availableData & DATA_HODL_OUTPUTS)!=0 && (canSkipWalletData || (availableData & DATA_WALLET_OUTPUTS)!=0 )) {
+        if (!inHodl) {
+            return "Wallet not registered for HODL";
+        }
+
+        if ( hodlOutputCommitment.isEmpty() && !isHodlRegistrationTimeLongEnough() ) {
+            return "Waiting for HODL server to scan outputs, can take up to 24 hours";
+        }
+
+        // in nano coins
+        int64_t hodlBalance = 0.0;
+
+        if (canSkipWalletData) {
+            for ( auto & ho : hodlOutputs ) {
+                hodlBalance += int64_t(ho.value * 1000000000.0 + 0.5);
+            }
+        }
+        else {
+            for ( auto o = walletOutputs.constBegin(); o != walletOutputs.constEnd(); ++o ) {
+                for ( const auto & walletOutput : o.value() ) {
+                    // Counting only exist outputs. Unconfirmed doesn't make sense to count
+                    if ( (walletOutput.status=="Unspent" || walletOutput.status=="Locked") && hodlOutputCommitment.contains(walletOutput.outputCommitment) ) {
+                        hodlBalance += walletOutput.valueNano;
+                    }
+                }
+            }
+        }
+
+        return "Your HODL amount: " + util::nano2one(hodlBalance) + " MWC";
+    }
+    else {
+        if (config::isOnlineNode()) {
+            if (rootPubKeyHash.isEmpty()) {
+                return "";
+            }
+        }
+
+        if (requestErrors.isEmpty()) {
+            return "Waiting for Account Data";
+        }
+        else {
+            return "HODL request error: " + requestErrors.values().join(", ");
+        }
+
+    }
+}
+
+// registration was sucessfull, let's update it
+void HodlStatus::updateRegistrationTime() {
+    Q_ASSERT(context);
+    Q_ASSERT(context->appContext);
+    Q_ASSERT(!rootPubKeyHash.isEmpty());
+
+    if (rootPubKeyHash.isEmpty())
+        return;
+
+    if (context->appContext->getHodlRegistrationTime(rootPubKeyHash)==0){
+        context->appContext->setHodlRegistrationTime(rootPubKeyHash, QDateTime::currentMSecsSinceEpoch() );
+    }
+
+}
+
+// Return true if we can trust the outputs that we get from HODL server. Likely scan was happens and data is updated
+bool HodlStatus::isHodlRegistrationTimeLongEnough() const {
+    if (rootPubKeyHash.isEmpty())
+        return false;
+    int64_t t = context->appContext->getHodlRegistrationTime(rootPubKeyHash);
+    if (t==0)
+        return false;
+
+    return (QDateTime::currentMSecsSinceEpoch() - t) > 1000L*3600L*26; // Let's wait 2 extra hours for scan. Scan job might take time
+}
 
 }

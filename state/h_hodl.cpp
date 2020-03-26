@@ -15,6 +15,8 @@
 #include "h_hodl.h"
 #include "../wallet/wallet.h"
 #include "windows/h_hodl_w.h"
+#include "windows/h_hodlcold_w.h"
+#include "windows/h_hodlnode_w.h"
 #include "windows/h_hodlclaim_w.h"
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
@@ -28,15 +30,18 @@
 #include <QNetworkReply>
 #include "../util/Log.h"
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QJsonParseError>
 #include <control/messagebox.h>
 #include <QFile>
+#include "../util/crypto.h"
+#include "../dialogs/h_hodlgetsignature.h"
 
 namespace state {
 
-static const QString TAG_GET_HODL_STATUS      = "getHODLstatus";
-static const QString TAG_GET_ADDRESS          = "checkAddresses";
-static const QString TAG_GET_AMOUNT           = "getAmount";
+static const QString TAG_GET_HODL_STATUS      = "getHODLStatus";
+static const QString TAG_CHECK_OUTPUTS        = "checkOutputs";
+//static const QString TAG_GET_AMOUNT           = "getAmount";
 static const QString TAG_GET_CHALLENGE        = "getChallenge";
 static const QString TAG_REGISTER_HODL        = "registerHODL";
 static const QString TAG_CLAIM_MWC            = "claimMWC";
@@ -73,13 +78,49 @@ void Hodl::moveToClaimPage() {
 }
 
 void Hodl::moveToStartHODLPage() {
-    hodlWnd = (wnd::Hodl *)context->wndManager->switchToWindowEx( mwc::PAGE_HODL,
-                      new wnd::Hodl( context->wndManager->getInWndParent(), this ) );
+    if (config::isOnlineWallet()) {
+        hodlNormWnd = (wnd::Hodl *) context->wndManager->switchToWindowEx(mwc::PAGE_HODL,
+                      new wnd::Hodl(context->wndManager->getInWndParent(),this));
+    } else if (config::isOnlineNode()) {
+        hodlNodeWnd = (wnd::HodlNode *) context->wndManager->switchToWindowEx(mwc::PAGE_HODL,
+                      new wnd::HodlNode(context->wndManager->getInWndParent(),this));
+    }
+    else if (config::isColdWallet()) {
+        hodlColdWnd = (wnd::HodlCold *) context->wndManager->switchToWindowEx(mwc::PAGE_HODL,
+                      new wnd::HodlCold(context->wndManager->getInWndParent(),this));
+        context->wallet->getRootPublicKey("");
+    }
+    else {
+        Q_ASSERT(false);
+    }
 }
 
+// Set cold wallet public key. That can initiate all status workflow.
+void Hodl::setColdWalletPublicKey(QString pubKey) {
+    if (pubKey.isEmpty()) {
+        context->hodlStatus->setRootPubKey("");
+        return;
+    }
+
+    Q_ASSERT(config::isOnlineNode());
+    Q_ASSERT(crypto::isPublicKeyValid(pubKey));
+    if (crypto::isPublicKeyValid(pubKey)) {
+        context->hodlStatus->setRootPubKey(pubKey);
+        retrieveHodlBalance();
+    }
+}
 
 // Request registration for HODL program
 void Hodl::registerAccountForHODL() {
+
+    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(nullptr, "HODL Registration",
+                                      "Registering for the HODL Program requires the wallet's root public key. This enables outputs and values for the wallet instance to be tracked. Do you wish to continue?",
+                                      "Reject", "Accept", false, true) )
+    {
+        hideWaitingStatus();
+        return;
+    }
+
     // REST API workflow...
     // https://<api_endpoint>/v1/getChallenge?root_pub_key=<pubkey>
     // https://<api_endpoint>/v1/registerHODL?root_pub_key_hash=<pubkeyhash>&signature=<signature>&challenge=<challenge>
@@ -90,7 +131,10 @@ void Hodl::registerAccountForHODL() {
 
 void Hodl::claimMWC() {
 
-    if (  !context->hodlStatus->hasAmountToClaim()) {
+    control::MessageBox::messageText(nullptr,"HODL Claims", "Sorry, your wallet doesn't support claiming for HODL program. Please upgrade it to the latest version.");
+    return;
+
+/*    if (  !context->hodlStatus->hasAmountToClaim()) {
         control::MessageBox::messageText(nullptr, "HODL Claim", "No HODL reward found to be claimed.");
         return;
     }
@@ -98,8 +142,10 @@ void Hodl::claimMWC() {
     // Public key expected to be ready,
     hodlWorkflow = HODL_WORKFLOW::CLAIM;
 
+    Q_ASSERT(config::isOnlineWallet() || config::isColdWallet());
     context->wallet->getNextKey( context->hodlStatus->getAmountToClaim(), "", "" );
     // Continue at onGetNextKeyResult
+    */
 }
 
 void Hodl::startChallengeWorkflow(HODL_WORKFLOW workflow, QString publicKey, int64_t claimAmount ) {
@@ -136,21 +182,63 @@ void Hodl::startChallengeWorkflow(HODL_WORKFLOW workflow, QString publicKey, int
 void Hodl::onLoginResult(bool ok) {
     Q_UNUSED(ok)
 
-    hodlWorkflow = HODL_WORKFLOW::INIT;
-
     hodlUrl = (context->wallet->getWalletConfig().getNetwork() == "Mainnet") ?
                  config::getHodlMainNetUrl() : config::getHodlTestNetUrl();
 
-    sendRequest( HTTP_CALL::GET, "/v1/getHODLstatus", {}, "", TAG_GET_HODL_STATUS );
+    sendRequest( HTTP_CALL::GET, "/v1/getHODLStatus", {}, "", TAG_GET_HODL_STATUS );
 
-    context->wallet->getRootPublicKey( "" );
+    if (config::isOnlineWallet()) {
+        hodlWorkflow = HODL_WORKFLOW::INIT;
+        Q_ASSERT(config::isOnlineWallet() || config::isColdWallet());
+        context->wallet->getRootPublicKey("");
+        // continue at  onRootPublicKey( QString rootPubKey, QString message, QString signature )
+    }
+}
+
+
+// request message to sign, respond expected to be delivered to the window
+void Hodl::requestSignMessage(const QString & message) {
+    Q_ASSERT(!message.isEmpty());
+    Q_ASSERT(config::isColdWallet());
+    Q_ASSERT(config::isOnlineWallet() || config::isColdWallet());
+    context->wallet->getRootPublicKey(message);
     // continue at  onRootPublicKey( QString rootPubKey, QString message, QString signature )
+}
+
+
+void Hodl::retrieveHodlBalance() {
+    QString rootPubKey = context->hodlStatus->getRootPubKey();
+
+    if (rootPubKey.isEmpty()) {
+        Q_ASSERT(false);
+        return;
+    }
+
+
+    if (!context->hodlStatus->hasHodlOutputs() ) {
+        sendRequest( HTTP_CALL::GET, "/v1/checkOutputs",
+                     {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_CHECK_OUTPUTS );
+    }
+
+/*    if (!context->hodlStatus->hasAmountToClaim() ) {
+        sendRequest( HTTP_CALL::GET, "/v1/getAmountHODL",
+                     {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_GET_AMOUNT );
+    }*/
 }
 
 void Hodl::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature ) {
     if (!success) {
         // Let's rise the error.
         notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, errMsg );
+        hideWaitingStatus();
+        return;
+    }
+
+    // Cold wallet - just display the signature
+    if (config::isColdWallet()) {
+        if ( hodlColdWnd ) {
+            hodlColdWnd->setRootPubKeyWithSignature(rootPubKey, message,  signature);
+        }
         return;
     }
 
@@ -164,13 +252,13 @@ void Hodl::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QS
 
             if (!context->hodlStatus->hasHodlOutputs() ) {
                 sendRequest( HTTP_CALL::GET, "/v1/checkOutputs",
-                             {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_GET_ADDRESS );
+                             {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_CHECK_OUTPUTS );
             }
 
-            if (!context->hodlStatus->hasAmountToClaim() ) {
+            /*if (!context->hodlStatus->hasAmountToClaim() ) {
                 sendRequest( HTTP_CALL::GET, "/v1/getAmountHODL",
                              {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_GET_AMOUNT );
-            }
+            }*/
             break;
         }
         case HODL_WORKFLOW::REGISTER: {
@@ -344,12 +432,47 @@ void Hodl::replyFinished(QNetworkReply* reply) {
         return;
     }
 
-    if ( TAG_GET_ADDRESS == tag) {
+    if ( TAG_CHECK_OUTPUTS == tag) {
         if (requestOk) {
-            const QVector<core::HodlOutputInfo> hodlOutputs;
-            context->hodlStatus->setHodlOutputs( true, hodlOutputs, TAG_GET_ADDRESS );
+            bool success = jsonRespond["success"].toBool(false);
+            if (success) {
+                //  {"success":true,"outputs_qualified":[{"amount":0.1,"commit":"0939bd49fd3ebecf94846762e164ab83db50ebdb7d1e9b5178e745cfb8fa83caea","weight":1},{"amount":0.3,"commit":"087382855d829290ed292163dd120149bfe08b1cc56822c013b35b26ba5b9a2830","weight":1}]}
+                QJsonArray outputs_qualified = jsonRespond["outputs_qualified"].toArray();
+                QVector<core::HodlOutputInfo> hodlOutputs;
+
+                for ( const auto outputRef : outputs_qualified ) {
+                    auto output = outputRef.toObject();
+
+                    double amount = output["amount"].toDouble();
+                    QString commit = output["commit"].toString();
+                    double weight = output["weight"].toDouble();
+
+                    if (!commit.isEmpty())
+                        hodlOutputs.push_back( core::HodlOutputInfo::create(commit, amount, weight) );
+                }
+
+                context->hodlStatus->setHodlOutputs( true, hodlOutputs, TAG_CHECK_OUTPUTS );
+                context->hodlStatus->updateRegistrationTime();
+            }
+            else {
+                // {"success": false, "error_code": 1, "error_message": "Please reigster first."}
+                int errorCode = jsonRespond["error_code"].toInt();
+                QString errorMessage = jsonRespond["error_message"].toString();
+
+                if (errorCode==1) {
+                    context->hodlStatus->setHodlOutputs( false, QVector<core::HodlOutputInfo>(), TAG_CHECK_OUTPUTS);
+                }
+                else if (errorCode==2) {
+                    // {"success": false, "error_code": 2, "error_message": "Registration accepted, but not processed."}
+                    context->hodlStatus->setHodlOutputs( true, QVector<core::HodlOutputInfo>(), TAG_CHECK_OUTPUTS);
+                }
+                else {
+                    context->hodlStatus->setError( TAG_CHECK_OUTPUTS, errorMessage);
+                    notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to get HODL output list. " + errorMessage );
+                }
+            }
         } else {
-            context->hodlStatus->setError( TAG_GET_ADDRESS, "Unable to request the HODL output info from " + hodlUrl +
+            context->hodlStatus->setError( TAG_CHECK_OUTPUTS, "Unable to request the HODL output info from " + hodlUrl +
                                                                     ".\nGet communication error: " + requestErrorMessage);
             notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to get HODL output list. We can't manage your outputs for sending" );
         }
@@ -357,7 +480,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
         return;
     }
 
-    if ( TAG_GET_AMOUNT == tag ) {
+    /*if ( TAG_GET_AMOUNT == tag ) {
         if (requestOk) {
             Q_ASSERT(false); // Implement me json to amount + period
             context->hodlStatus->setClaimAmount( 0L, TAG_GET_AMOUNT );
@@ -366,7 +489,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                                                             ".\nGet communication error: " + requestErrorMessage);
             notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to get available to claim HODL amount." );
         }
-    }
+    }*/
 
     if (!requestOk) {
         reportMessageToUI("Network error", "Unable to communicate with " + hodlUrl + ".\nGet communication error: " + requestErrorMessage);
@@ -385,9 +508,24 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                 return;
             }
 
-            // Requesting wallet for the signature. It is true for all workflows...
-            context->wallet->getRootPublicKey(challenge);
-            // Continue at onRootPublicKey
+            if (config::isOnlineNode()) {
+                // We can't call wallet, we need to ask user for the Signature...
+                dlg::HodlGetSignature signatureDlg(nullptr, challenge);
+                if ( signatureDlg.exec() == QDialog::Accepted) {
+                    Hodl::onRootPublicKey( true, "",  context->hodlStatus->getRootPubKey(), challenge, signatureDlg.getSignature() );
+                }
+                else {
+                    Hodl::onRootPublicKey( false, "Signature wasn't provided by user", "", "", "" );
+                }
+                return;
+            }
+            else {
+
+                // Requesting wallet for the signature. It is true for all workflows...
+                Q_ASSERT(config::isOnlineWallet() || config::isColdWallet());
+                context->wallet->getRootPublicKey(challenge);
+                // Continue at onRootPublicKey
+            }
             return;
         }
         else {
@@ -405,9 +543,12 @@ void Hodl::replyFinished(QNetworkReply* reply) {
         if ( success ) {
             // it is end point. Done...
             reportMessageToUI("HODL registration succeeded",
-                    "Congratulations! Your account successfully registered for HODL.\n"
-                    "When next HODL period will be started, you will see outputs that are registered." );
+                    "Congratulations! Your account successfully registered for HODL.\n\n"
+                    "During next 24 hours you should see if HODL server was able to discover your wallet outputs." );
 
+            // Updating the registration time
+            context->hodlStatus->updateRegistrationTime();
+            context->hodlStatus->setHodlOutputs( true, QVector<core::HodlOutputInfo>(), TAG_CHECK_OUTPUTS);
             return;
         }
         else {
@@ -465,6 +606,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
 
                 // Starting the slate processing transaction...
                 // wallet expected to be offline...
+                Q_ASSERT(config::isOnlineWallet() || config::isColdWallet());
                 context->wallet->setReceiveAccount(context->appContext->getReceiveAccount());
                 context->wallet->receiveFile( slateFn, claimNextTransIdentifier );
 
@@ -564,20 +706,35 @@ void Hodl::onReceiveFile( bool success, QStringList errors, QString inFileName, 
 
 
 void Hodl::onHodlStatusWasChanged() {
-    if (hodlWnd)
-        hodlWnd->updateHodlState();
+    if (hodlNormWnd)
+        hodlNormWnd->updateHodlState();
+    else if (hodlNodeWnd)
+        hodlNodeWnd->updateHodlState();
     else if (hodlClaimWnd)
         hodlClaimWnd->updateHodlState();
-
 }
 
 // Respond with error to UI. UI expected to stop waiting
 void Hodl::reportMessageToUI( const QString & title, const QString & message ) {
-    if (hodlWnd)
-        hodlWnd->reportMessage(title, message);
+    if (hodlNormWnd)
+        hodlNormWnd->reportMessage(title, message);
+    else if (hodlNodeWnd)
+        hodlNodeWnd->reportMessage(title, message);
+    else if (hodlColdWnd)
+        hodlColdWnd->reportMessage(title, message);
     else if (hodlClaimWnd)
         hodlClaimWnd->reportMessage(title, message);
 }
+
+void Hodl::hideWaitingStatus() {
+    if (hodlNormWnd)
+        hodlNormWnd->hideWaitingStatus();
+    else if (hodlNodeWnd)
+        hodlNodeWnd->hideWaitingStatus();
+    else if (hodlColdWnd)
+        hodlColdWnd->hideWaitingStatus();
+}
+
 
 QVector<int> Hodl::getColumnsWidhts() {
     return context->appContext->getIntVectorFor("HodlTblWidth");

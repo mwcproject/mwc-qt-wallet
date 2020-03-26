@@ -49,7 +49,7 @@ void HodlClaim::reportMessage(const QString & title, const QString & message) {
 
 // Hodl object changed it's state, need to refresh
 void HodlClaim::updateHodlState() {
-    ui->accountStatus->setText( state->getContext()->hodlStatus->getAccountStatus() );
+    ui->accountStatus->setText( state->getContext()->hodlStatus->getWalletHodlStatus() );
 }
 
 void HodlClaim::on_claimMwcButton_clicked()

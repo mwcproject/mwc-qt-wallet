@@ -465,6 +465,8 @@ void Transactions::on_deleteButton_clicked()
 }
 
 void Transactions::updateCancelTransacton(bool success, int64_t trIdx, QString errMessage) {
+    Q_UNUSED(errMessage)
+
     state::TimeoutLockObject to( state );
     if (success) {
         requestTransactions(getSelectedAccount().accountName);

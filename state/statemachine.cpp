@@ -65,11 +65,11 @@ StateMachine::StateMachine(StateContext * _context) :
         states[ STATE::FINALIZE ]       = new Finalize(context);
     }
     if (config::isOnlineWallet() ) {
-        states[ STATE::HODL ]           = new Hodl(context);
         states[ STATE::LISTENING ]      = new Listening(context);
         states[ STATE::AIRDRDOP_MAIN ]  = new Airdrop(context);
     }
 
+    states[ STATE::HODL ]           = new Hodl(context);
     states[ STATE::EVENTS ]         = new Events(context);
     states[ STATE::WALLET_CONFIG ]  = new WalletConfig(context);
     states[ STATE::NODE_INFO ]      = new NodeInfo(context);

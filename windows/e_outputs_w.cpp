@@ -77,7 +77,9 @@ void Outputs::initTableHeaders() {
     if (inHodl) {
         ui->outputsTable->setColumnCount(widths.size()+1);
         ui->outputsTable->setColumnWidth(widths.size(),60);
-        ui->outputsTable->horizontalHeaderItem( widths.size() )->setText( "HODL" );
+        QTableWidgetItem * itm = new QTableWidgetItem("HODL") ;
+        ui->outputsTable->setHorizontalHeaderItem( widths.size(), itm );
+//                horizontalHeaderItem( widths.size() )->setText( "HODL" );
     }
 }
 

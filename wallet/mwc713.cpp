@@ -176,6 +176,9 @@ void MWC713::resetData(STARTED_MODE _startedMode ) {
     httpOnline = false;
     httpInfo = "";
     hasHttpTls = false;
+
+    Q_ASSERT(hodlStatus);
+    hodlStatus->finishWalletOutputs(false);
 }
 
 // normal start. will require the password
@@ -955,6 +958,10 @@ void MWC713::updateAccountFinalize(QString prevCurrentAccount) {
     accountInfo = collectedAccountInfo;
     collectedAccountInfo.clear();
 
+    Q_ASSERT(hodlStatus);
+    hodlStatus->finishWalletOutputs(true);
+
+
     QString accountBalanceStr;
 
     for (const auto & acc: accountInfo) {
@@ -1509,7 +1516,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
         prefixesToCheck.push_back("mwc_node_secret");
     }
 
-    bool hasMwcNodeInfo = (appContext != nullptr);
+    //bool hasMwcNodeInfo = (appContext != nullptr);
 
     for (QString &ln : confLines) {
 

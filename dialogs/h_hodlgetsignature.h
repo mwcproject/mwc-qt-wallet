@@ -12,46 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef HODLW_H
-#define HODLW_H
+#ifndef H_HODLGETSIGNATURE_H
+#define H_HODLGETSIGNATURE_H
 
-#include "../core/navwnd.h"
+#include "../control/mwcdialog.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
-class Hodl;
+class HodlGetSignature;
 }
 
-namespace state {
-    class Hodl;
-}
+namespace dlg {
 
-namespace wnd {
-
-class Hodl : public core::NavWnd
+class HodlGetSignature : public control::MwcDialog
 {
     Q_OBJECT
 
 public:
-    explicit Hodl(QWidget *parent, state::Hodl * state );
-    ~Hodl();
+    explicit HodlGetSignature(QWidget *parent, QString message);
+    ~HodlGetSignature();
 
-    // Hodl object changed it's state, need to refresh
-    void updateHodlState();
+    const QString & getSignature() const {return signature;}
 
-    void reportMessage(const QString & title, const QString & message);
-
-    void hideWaitingStatus();
 private slots:
-    void on_learnMoreButton_clicked();
-    void on_signInButton_clicked();
-    void on_claimMwcButton_clicked();
-
+    void on_cancelButton_clicked();
+    void on_continueButton_clicked();
+    void on_signature_textChanged();
 private:
-    Ui::Hodl *ui;
-    state::Hodl * state;
+    Ui::HodlGetSignature *ui;
+    QString signature;
 };
 
 }
 
-#endif // HODL_H
+#endif // H_HODLGETSIGNATURE_H

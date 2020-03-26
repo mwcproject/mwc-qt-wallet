@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef HODLW_H
-#define HODLW_H
+#ifndef H_HODLNODE_W_H
+#define H_HODLNODE_W_H
 
 #include "../core/navwnd.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
-class Hodl;
+class HodlNode;
 }
 
 namespace state {
@@ -28,30 +28,33 @@ namespace state {
 
 namespace wnd {
 
-class Hodl : public core::NavWnd
+class HodlNode : public core::NavWnd
 {
     Q_OBJECT
 
 public:
-    explicit Hodl(QWidget *parent, state::Hodl * state );
-    ~Hodl();
+    explicit HodlNode(QWidget *parent, state::Hodl * state );
+    ~HodlNode();
 
     // Hodl object changed it's state, need to refresh
     void updateHodlState();
 
     void reportMessage(const QString & title, const QString & message);
-
     void hideWaitingStatus();
 private slots:
-    void on_learnMoreButton_clicked();
     void on_signInButton_clicked();
+
     void on_claimMwcButton_clicked();
 
+    void on_publicKey_textChanged(const QString &arg1);
+
+    void on_viewOutputsButton_clicked();
+
 private:
-    Ui::Hodl *ui;
+    Ui::HodlNode *ui;
     state::Hodl * state;
 };
 
 }
 
-#endif // HODL_H
+#endif // H_HODLNODE_W_H

@@ -53,6 +53,8 @@ private slots:
 
     void on_selectRunningModeButton_clicked();
 
+    void on_hodlButton_clicked();
+
 private:
     Ui::NavMenuConfigWallet *uiWallet = nullptr;
     Ui::NavMenuConfigNode   *uiNode = nullptr;

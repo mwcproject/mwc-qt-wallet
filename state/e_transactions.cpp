@@ -109,7 +109,7 @@ void Transactions::requestTransactions(QString account, int offset, int number, 
     if (enforceSync)
     {
         // request all transactions so we can cache them
-        context->wallet->getTransactions(account, 0, cachedTxs.totalTransactions, enforceSync);
+        context->wallet->getTransactions(account, 0, std::max(1,cachedTxs.totalTransactions), enforceSync);
         context->wallet->updateWalletBalance(false,false); // With transactions refresh, need to update the balance
         cachedTxs.saveTransactionsRequest(offset, number);
     }

@@ -31,13 +31,14 @@ Hodl::Hodl(QWidget *parent, state::Hodl * _state) :
 
     ui->progress->initLoader(false);
     ui->claimMwcButton->setEnabled(false);
+    ui->claimMwcButton->setVisible(false);
 
     updateHodlState();
 }
 
 Hodl::~Hodl()
 {
-    state->deleteHodlWnd(this);
+    state->deleteHodlNormWnd(this);
     delete ui;
 }
 
@@ -48,8 +49,8 @@ void Hodl::on_learnMoreButton_clicked()
 
 void Hodl::on_signInButton_clicked()
 {
-    state->registerAccountForHODL();
     ui->progress->show();
+    state->registerAccountForHODL();
 }
 
 void Hodl::on_claimMwcButton_clicked()
@@ -66,10 +67,15 @@ void Hodl::reportMessage(const QString & title, const QString & message) {
 
 // Hodl object changed it's state, need to refresh
 void Hodl::updateHodlState() {
+    ui->signInButton->setEnabled(!state->getContext()->hodlStatus->isInHodl());
+
     ui->hodlStatus->setText( state->getContext()->hodlStatus->getHodlStatus() );
-    ui->accountStatus->setText( state->getContext()->hodlStatus->getAccountStatus() );
+    ui->accountStatus->setText( state->getContext()->hodlStatus->getWalletHodlStatus() );
 }
 
+void Hodl::hideWaitingStatus() {
+    ui->progress->hide();
+}
 
 
 }

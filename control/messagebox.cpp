@@ -23,7 +23,7 @@
 
 namespace control {
 
-MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2, bool default1, bool default2, QString password, RETURN_CODE _passBlockButton ) :
+MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2, bool default1, bool default2, double widthScale, QString password, RETURN_CODE _passBlockButton ) :
      MwcDialog(parent),
     ui(new Ui::MessageBox),
     blockingPassword(password),
@@ -31,6 +31,21 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
 
 {
     ui->setupUi(this);
+
+    if (widthScale!=1.0) {
+        // Let's ujust Width first
+        int w = maximumWidth();
+        w = int(w*widthScale);
+        setMaximumWidth(w);
+
+        QSize sz = size();
+        sz.setWidth( sz.width()*widthScale );
+        resize(sz);
+        setMinimumWidth(sz.width());
+
+        adjustSize();
+    }
+
     ui->title->setText(title);
 
     // Setting text option
@@ -140,29 +155,29 @@ void MessageBox::on_button2_clicked()
 
 // One button, OK box
 //static
-void MessageBox::messageText( QWidget *parent, QString title, QString message, QString password ) {
-    MessageBox * msgBox = new MessageBox(parent, title, message, false, "OK", "", true,false, password, RETURN_CODE::BTN1 );
+void MessageBox::messageText( QWidget *parent, QString title, QString message, double widthScale, QString password ) {
+    MessageBox * msgBox = new MessageBox(parent, title, message, false, "OK", "", true,false, widthScale, password, RETURN_CODE::BTN1 );
     msgBox->exec();
     delete msgBox;
 }
 
-void MessageBox::messageHTML( QWidget *parent, QString title, QString message, QString password ) {
-    MessageBox * msgBox = new MessageBox(parent, title, message, true, "OK", "", true,false, password, RETURN_CODE::BTN1 );
+void MessageBox::messageHTML( QWidget *parent, QString title, QString message, double widthScale, QString password ) {
+    MessageBox * msgBox = new MessageBox(parent, title, message, true, "OK", "", true,false, widthScale, password, RETURN_CODE::BTN1 );
     msgBox->exec();
     delete msgBox;
 }
 
 // Two button box
 //static
-MessageBox::RETURN_CODE MessageBox::questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, QString password, RETURN_CODE blockButton ) {
-    MessageBox * msgBox = new MessageBox(parent, title, message, false, btn1, btn2, default1, default2, password, blockButton);
+MessageBox::RETURN_CODE MessageBox::questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, double widthScale, QString password, RETURN_CODE blockButton ) {
+    MessageBox * msgBox = new MessageBox(parent, title, message, false, btn1, btn2, default1, default2, widthScale, password, blockButton);
     msgBox->exec();
     RETURN_CODE  res = msgBox->getRetCode();
     delete msgBox;
     return res;
 }
-MessageBox::RETURN_CODE MessageBox::questionHTML( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, QString password, RETURN_CODE blockButton  ) {
-    MessageBox * msgBox = new MessageBox(parent, title, message, true, btn1, btn2, default1, default2, password, blockButton);
+MessageBox::RETURN_CODE MessageBox::questionHTML( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, double widthScale, QString password, RETURN_CODE blockButton  ) {
+    MessageBox * msgBox = new MessageBox(parent, title, message, true, btn1, btn2, default1, default2, widthScale, password, blockButton);
     msgBox->exec();
     RETURN_CODE  res = msgBox->getRetCode();
     delete msgBox;

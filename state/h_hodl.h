@@ -25,6 +25,8 @@ class QNetworkReply;
 
 namespace wnd {
 class Hodl;
+class HodlCold;
+class HodlNode;
 class HodlClaim;
 }
 
@@ -42,10 +44,16 @@ public:
     Hodl(StateContext * context);
     virtual ~Hodl() override;
 
-    void deleteHodlWnd(wnd::Hodl * wnd) { if (wnd == hodlWnd) {hodlWnd = nullptr;} }
+    void deleteHodlNormWnd(wnd::Hodl * wnd) { if (wnd == hodlNormWnd) {hodlNormWnd = nullptr;} }
+    void deleteHodlColdWnd(wnd::HodlCold * wnd) { if (wnd == hodlColdWnd) {hodlColdWnd = nullptr;} }
+    void deleteHodlNodeWnd(wnd::HodlNode * wnd) { if (wnd == hodlNodeWnd) {hodlNodeWnd = nullptr;} }
     void deleteHodlClaimWnd(wnd::HodlClaim * wnd) { if (wnd == hodlClaimWnd) {hodlClaimWnd = nullptr;} }
 
-    // Request registration for HODL program
+    // Set cold wallet public key. That can initiate all status workflow.
+    // Epmty String  - reset
+    void setColdWalletPublicKey(QString pubKey);
+
+    // Request registration for HODL program, normal online automatic way
     void registerAccountForHODL();
 
     void moveToClaimPage();
@@ -55,6 +63,9 @@ public:
 
     QVector<int> getColumnsWidhts();
     void updateColumnsWidhts(QVector<int> widths);
+
+    // request message to sign, respond expected to be delivered to the window
+    void requestSignMessage(const QString & message);
 
 protected:
     virtual NextStateRespond execute() override;
@@ -69,9 +80,12 @@ protected:
                      const QString & param3="", const QString & param4="");
 
     void reportMessageToUI( const QString & title, const QString & message );
+    void hideWaitingStatus();
 
     // Note, publicKey & claimAmount are for claiming only!!!
     void startChallengeWorkflow(HODL_WORKFLOW workflow, QString publicKey, int64_t claimAmount );
+
+    void retrieveHodlBalance();
 
 private slots:
     // Need to get a network info
@@ -85,7 +99,9 @@ private slots:
 private:
     QNetworkAccessManager *nwManager = nullptr;
 
-    wnd::Hodl * hodlWnd = nullptr;
+    wnd::Hodl * hodlNormWnd = nullptr;
+    wnd::HodlCold * hodlColdWnd = nullptr;
+    wnd::HodlNode * hodlNodeWnd = nullptr;
     wnd::HodlClaim * hodlClaimWnd = nullptr;
 
     QString hodlUrl; // Url for airdrop requests. Url depend on current network.

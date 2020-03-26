@@ -69,4 +69,42 @@ namespace crypto {
         return hash.result();
     }
 
+    // Verify Public Key.
+    // Checking the length and Hex Symbols
+    bool isPublicKeyValid( const QString & key ) {
+        const int pubkeyLen = 66; // mwc713 return 33 byte key.
+
+        if (key.length()!=pubkeyLen)
+            return false;
+
+        for ( int i=0;i<key.length(); i++ ) {
+            QChar ch = key[i];
+            if (ch>='0' && ch<='9')
+                continue;
+            if (ch>='a' && ch<='f')
+                continue;
+            return false;
+        }
+        return true;
+    }
+
+    // Verify Signature .
+    // Checking the length and Hex Symbols
+    bool isSignatureValid( const QString & signature ) {
+        if (signature.length()<138 || signature.length()>148)
+            return false;
+
+        for ( int i=0;i<signature.length(); i++ ) {
+            QChar ch = signature[i];
+            if (ch>='0' && ch<='9')
+                continue;
+            if (ch>='a' && ch<='f')
+                continue;
+            return false;
+        }
+        return true;
+
+    }
+
+
 };

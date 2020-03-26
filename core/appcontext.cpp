@@ -138,7 +138,7 @@ bool AppContext::loadData() {
 
     int id = 0;
     in >> id;
-    if (id<0x4783 || id>0x4788)
+    if (id<0x4783 || id>0x4789)
          return false;
 
     in >> receiveAccount;
@@ -184,6 +184,10 @@ bool AppContext::loadData() {
         in >> showOutputAll;
     }
 
+    if (id>=0x4789) {
+        in >> hodlRegistrations;
+    }
+
     return true;
 }
 
@@ -204,7 +208,7 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x4788;
+    out << 0x4789;
     out << receiveAccount;
     out << currentAccountName;
     out << int(activeWndState);
@@ -228,6 +232,8 @@ void AppContext::saveData() const {
     out << network;
 
     out << showOutputAll;
+
+    out << hodlRegistrations;
 }
 
 void AppContext::setLogsEnabled(bool enabled) {
@@ -395,6 +401,15 @@ void AppContext::setWallet713DataPathWithNetwork( const QString & _wallet713Data
     wallet713DataPath = _wallet713DataPath;
     network = _network;
     saveData();
+}
+
+// HODL registration time.
+int64_t AppContext::getHodlRegistrationTime(const QString & hash) const {
+    return hodlRegistrations.value(hash, 0);
+}
+
+void AppContext::setHodlRegistrationTime(const QString & hash, int64_t time) {
+    hodlRegistrations.insert( hash, qlonglong(time) );
 }
 
 
