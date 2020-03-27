@@ -57,6 +57,8 @@ private slots:
     void on_hodlToolButton_clicked();
 
     void onWalletBalanceUpdated();
+    void onLoginResult(bool ok);
+    void onLogout();
 
     void on_finalizeToolButton_clicked();
 

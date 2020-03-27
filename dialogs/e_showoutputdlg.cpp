@@ -18,10 +18,11 @@
 #include "../util/stringutils.h"
 #include "../util/execute.h"
 #include "../core/global.h"
+#include "../core/HodlStatus.h"
 
 namespace dlg {
 
-ShowOutputDlg::ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output, const wallet::WalletConfig &config) :
+ShowOutputDlg::ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output, const wallet::WalletConfig &config, core::HodlStatus * hodlStatus) :
         control::MwcDialog(parent),
         ui(new Ui::ShowOutputDlg) {
     ui->setupUi(this);
@@ -37,6 +38,14 @@ ShowOutputDlg::ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output
 
     blockExplorerUrl = (config.getNetwork() == "Mainnet") ? mwc::BLOCK_EXPLORER_URL_MAINNET
                                                           : mwc::BLOCK_EXPLORER_URL_FLOONET;
+
+    if (hodlStatus==nullptr || !hodlStatus->isInHodl()) {
+        ui->hodl->setText("N/A");
+    }
+    else {
+        ui->hodl->setText( hodlStatus->isOutputInHODL(output.outputCommitment) ? "Yes" : "No" );
+    }
+
     commitment = output.outputCommitment;
 }
 

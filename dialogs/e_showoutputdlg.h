@@ -26,12 +26,16 @@ struct WalletOutput;
 struct WalletConfig;
 }
 
+namespace core {
+class HodlStatus;
+}
+
 namespace dlg {
 
 class ShowOutputDlg : public control::MwcDialog {
 Q_OBJECT
 public:
-    explicit ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output, const wallet::WalletConfig &config);
+    explicit ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output, const wallet::WalletConfig &config, core::HodlStatus * hodlStatus);
 
     ~ShowOutputDlg();
 

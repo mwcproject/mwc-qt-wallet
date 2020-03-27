@@ -87,20 +87,26 @@ bool TaskStop::processTask(const QVector<WEvent> &events) {
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //  TaskUnlock
+void TaskUnlock::onStarted() {
+    notify::addFalseMessage("wallet already unlocked");
+}
 
 bool TaskUnlock::processTask(const QVector<WEvent> & events) {
     qDebug() << "TaskUnlock::processTask with events: " << printEvents(events);
 
-    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_PASSWORD_ERROR );
+    // In case of no password, no action is needed
+    if (hasPassword) {
+        QVector<WEvent> error = filterEvents(events, WALLET_EVENTS::S_PASSWORD_ERROR);
 
-    wallet713->setLoginResult( error.empty() );
+        wallet713->setLoginResult(error.empty());
 
-    if (error.empty())
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Successfully logged into the wallet");
+        if (error.empty())
+            notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, "Successfully logged into the wallet");
+    }
+    notify::remeoveFalseMessage("wallet already unlocked");
     return true;
 }
 
-// static
 QString TaskUnlock::buildWalletRequest(QString password) {
     QString res = "unlock";
     if (password.length() > 0)

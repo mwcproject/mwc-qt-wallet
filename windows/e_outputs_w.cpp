@@ -312,7 +312,7 @@ void Outputs::on_outputsTable_cellDoubleClicked(int row, int column)
     if (selected==nullptr)
         return;
 
-    dlg::ShowOutputDlg showOutputDlg(this, *selected, state->getContext()->wallet->getWalletConfig() );
+    dlg::ShowOutputDlg showOutputDlg(this, *selected, state->getContext()->wallet->getWalletConfig(), state->getContext()->hodlStatus );
     showOutputDlg.exec();}
 
 }

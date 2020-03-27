@@ -33,6 +33,9 @@ void notificationStateSet(NOTIFICATION_STATES state);
 void notificationStateClean(NOTIFICATION_STATES state);
 bool notificationStateCheck(NOTIFICATION_STATES state);
 
+void addFalseMessage(const QString & msg);
+void remeoveFalseMessage(const QString & msg);
+
 struct NotificationMessage {
     MESSAGE_LEVEL level = MESSAGE_LEVEL::DEBUG;
     QString message;

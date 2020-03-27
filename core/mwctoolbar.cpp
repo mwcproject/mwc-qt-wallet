@@ -51,8 +51,11 @@ void MwcToolbar::setAppEnvironment(state::StateMachine * _stateMachine, wallet::
     Q_ASSERT(wallet);
 
     QObject::connect( wallet, &wallet::Wallet::onWalletBalanceUpdated,
-                                 this, &MwcToolbar::onWalletBalanceUpdated, Qt::QueuedConnection );
-
+                      this, &MwcToolbar::onWalletBalanceUpdated, Qt::QueuedConnection );
+    QObject::connect( wallet, &wallet::Wallet::onLoginResult,
+                      this, &MwcToolbar::onLoginResult, Qt::QueuedConnection );
+    QObject::connect( wallet, &wallet::Wallet::onLogout,
+                      this, &MwcToolbar::onLogout, Qt::QueuedConnection );
 }
 
 
@@ -116,6 +119,15 @@ void MwcToolbar::onWalletBalanceUpdated() {
 
     ui->totalMwc->setText( util::trimStrAsDouble( util::nano2one(mwcSum), 5) + " mwc" );
 }
+
+void MwcToolbar::onLoginResult(bool ok) {
+    Q_UNUSED(ok)
+    ui->totalMwc->setText("");
+}
+void MwcToolbar::onLogout() {
+    ui->totalMwc->setText("");
+}
+
 
 
 }
