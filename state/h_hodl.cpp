@@ -543,7 +543,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
         if ( success ) {
             // it is end point. Done...
             reportMessageToUI("HODL registration succeeded",
-                    "Congratulations! Your account successfully registered for HODL.\n\n"
+                    "Congratulations! Your wallet instance is successfully registered for the HODL Program.\n\n"
                     "During next 24 hours you should see if HODL server was able to discover your wallet outputs." );
 
             // Updating the registration time
