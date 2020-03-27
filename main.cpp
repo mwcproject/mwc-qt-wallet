@@ -190,6 +190,18 @@ QPair<bool, QString> readConfig(QApplication & app) {
     if ( timeoutMultiplierVal < 0.01 )
         timeoutMultiplierVal = 1.0;
 
+    if (airdropUrlMainNet.isEmpty())
+        airdropUrlMainNet = "https://wallet.mwc.mw";
+
+    if (airdropUrlTestNet.isEmpty())
+        airdropUrlTestNet = "https://seed2.mwc.mw:8443";
+
+    if (hodlUrlMainnet.isEmpty())
+        hodlUrlMainnet = "https://wallet.mwc.mw";
+
+    if (hodlUrlTestnet.isEmpty())
+        hodlUrlTestnet = "https://seed2.mwc.mw:8443";
+
     if ( mwc_path.isEmpty() || wallet713_path.isEmpty() || airdropUrlMainNet.isEmpty() || airdropUrlTestNet.isEmpty() || hodlUrlMainnet.isEmpty() || hodlUrlTestnet.isEmpty() ) {
         qDebug() << "Failed to read all expected data from config file " << config;
         return QPair<bool, QString>(false, "Not found all expected fields at config file " + config);
