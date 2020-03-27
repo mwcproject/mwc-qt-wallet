@@ -366,6 +366,12 @@ void MWC713::loginWithPassword(QString password)  {
     eventCollector->addTask( new TaskUnlock(this, password), TaskUnlock::TIMEOUT );
 }
 
+// Return true if wallet has password. Wallet might not have password if it was created manually.
+bool MWC713::hasPassword() const {
+    return !walletPassword.isEmpty();
+}
+
+
 // Exit from the wallet. Expected that state machine will switch to Init state
 // syncCall - stop NOW. Caller suppose to understand what he is doing
 void MWC713::logout(bool syncCall)  {

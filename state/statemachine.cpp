@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <control/messagebox.h>
 #include "statemachine.h"
 #include "a_initaccount.h"
 #include "a_inputpassword.h"
@@ -222,6 +223,10 @@ void StateMachine::timerEvent(QTimerEvent *event) {
     if (config::isOnlineNode())
         return;
 
+    // no password - no locks.
+    if(!context->wallet->hasPassword())
+        return;
+
     // Check if timer expired and we need to logout...
     if (logoutTime==0)
         return;
@@ -235,6 +240,11 @@ void StateMachine::timerEvent(QTimerEvent *event) {
 
 // logout now
 void StateMachine::logout() {
+    if(!context->wallet->hasPassword()) {
+        control::MessageBox::messageText(nullptr, "Logout", "Your wallet doesn't protected with a password. Because of that you can't do a logout.");
+        return;
+    }
+
     context->appContext->pushCookie<QString>("LockWallet", "lock");
     context->stateMachine->executeFrom(STATE::NONE);
 }

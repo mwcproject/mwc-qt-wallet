@@ -122,6 +122,10 @@ bool InputPassword::getWalletTls() {
 static bool foreignAPIwasReported = false;
 
 void InputPassword::onLoginResult(bool ok) {
+
+    if (wnd)
+        wnd->onLoginResult(ok);
+
     if (!ok) {
         if (wnd) {
             wnd->stopWaiting();
@@ -132,7 +136,7 @@ void InputPassword::onLoginResult(bool ok) {
         // Going forward by initializing the wallet
         if ( context->wallet->getStartedMode() == wallet::Wallet::STARTED_MODE::NORMAL ) { // Normall start of the wallet. Problem that now we have many cases how wallet started
 
-            if ( config::isOnlineWallet() ) {
+            if ( config::isOnlineWallet() && context->wallet->hasPassword() ) {
                 // Start listening, no feedback interested
                 context->wallet->listeningStart(true, false, true);
                 context->wallet->listeningStart(false, true, true);

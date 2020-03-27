@@ -39,6 +39,8 @@ public:
     void startWaiting();
     void stopWaiting();
 
+    void onLoginResult(bool ok);
+
     void reportWrongPassword();
 
     void updateMwcMqState(bool online);
