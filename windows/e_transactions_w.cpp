@@ -207,7 +207,11 @@ void Transactions::setTransactionData(QString account, int64_t height, const QVe
                 confirms = mwc::COIN_BASE_CONFIRM_NUMBER;
             }
             // confirmations are 1 more than the difference between the node and transaction heights
-            transConfirmedStr = QString::number(nodeHeight - trans.height + 1) + "/" + QString::number(confirms);
+            int64_t confirmations = nodeHeight - trans.height + 1;
+            transConfirmedStr = QString::number(confirmations);
+            if (confirms >= confirmations) {
+                transConfirmedStr += "/" + QString::number(confirms);
+            }
         }
 
         ui->transactionTable->appendRow( QVector<QString>{
