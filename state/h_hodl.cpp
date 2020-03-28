@@ -408,14 +408,14 @@ void Hodl::replyFinished(QNetworkReply* reply) {
         QJsonDocument jsonDoc = QJsonDocument::fromJson(strReply.toUtf8(), &error);
         if (error.error != QJsonParseError::NoError) {
             requestOk = false;
-            requestErrorMessage = "Unable to parse respond Json at position " + QString::number(error.offset) +
+            requestErrorMessage = tag + " Unable to parse respond Json at position " + QString::number(error.offset) +
                                   "\nJson string: " + strReply;
         }
         jsonRespond = jsonDoc.object();
     }
     else  {
         requestOk = false;
-        requestErrorMessage = reply->errorString();
+        requestErrorMessage = tag + " " + reply->errorString();
         logger::logInfo("HODL", "Fail respond for Tag: " + tag + "  requestErrorMessage: " + requestErrorMessage);
     }
     reply->deleteLater();
@@ -467,7 +467,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                     context->hodlStatus->setHodlOutputs( true, QVector<core::HodlOutputInfo>(), TAG_CHECK_OUTPUTS);
                 }
                 else {
-                    context->hodlStatus->setError( TAG_CHECK_OUTPUTS, errorMessage);
+                    context->hodlStatus->setError( TAG_CHECK_OUTPUTS, tag + " " + errorMessage);
                     notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to get HODL output list. " + errorMessage );
                 }
             }
@@ -531,7 +531,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
         else {
             hodlWorkflow = HODL_WORKFLOW::INIT;
             // error status
-            reportMessageToUI("HODL request failed", "HODL server returned error:\n" +
+            reportMessageToUI("HODL request failed", "HODL server getChallenge API returned error:\n" +
                            generateMessage(jsonRespond["error_message"].toString(), jsonRespond["error_code"].toInt( INT_MAX )) );
         }
         return;

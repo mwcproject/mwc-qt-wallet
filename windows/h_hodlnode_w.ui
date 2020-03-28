@@ -236,7 +236,7 @@ Warning! Wallet public key allows any 3rd party to discover MWC amount that belo
           </size>
          </property>
          <property name="toolTip">
-          <string>Open Sign Up page in your browser</string>
+          <string>Register Wallet for HODL</string>
          </property>
          <property name="text">
           <string>Register</string>
@@ -258,7 +258,7 @@ Warning! Wallet public key allows any 3rd party to discover MWC amount that belo
           </size>
          </property>
          <property name="toolTip">
-          <string>Open Sign Up page in your browser</string>
+          <string>View outputs discovered by HODL Server</string>
          </property>
          <property name="text">
           <string>View Outputs</string>
@@ -280,7 +280,7 @@ Warning! Wallet public key allows any 3rd party to discover MWC amount that belo
           </size>
          </property>
          <property name="toolTip">
-          <string>Open Sign Up page in your browser</string>
+          <string>Claim HODL coins</string>
          </property>
          <property name="text">
           <string>Claim MWC</string>
@@ -444,7 +444,12 @@ Warning! Wallet public key allows any 3rd party to discover MWC amount that belo
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
@@ -459,12 +464,7 @@ Warning! Wallet public key allows any 3rd party to discover MWC amount that belo
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelSmall</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>

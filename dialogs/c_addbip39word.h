@@ -1,4 +1,4 @@
-// Copyright 2019 The MWC Developers
+// Copyright 2020 The MWC Developers
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,45 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ENTERSEED_H
-#define ENTERSEED_H
+#ifndef C_ADDBIP39WORD_H
+#define C_ADDBIP39WORD_H
 
-#include <QWidget>
+#include "../control/mwcdialog.h"
 
 namespace Ui {
-class EnterSeed;
+class AddBip39Word;
 }
 
-namespace state {
-    class InitAccount;
-}
+class QCompleter;
 
-namespace wnd {
+namespace dlg {
 
-class EnterSeed : public QWidget
+class AddBip39Word : public control::MwcDialog
 {
     Q_OBJECT
 
 public:
-    explicit EnterSeed(QWidget *parent, state::InitAccount * state );
-    virtual ~EnterSeed() override;
+    explicit AddBip39Word(QWidget *parent, int wordNumber);
+    ~AddBip39Word();
 
-    void updateProgress(bool show);
+    QString getResultWord() const {return resultWord;}
 
 private slots:
-    void on_Enter();
+    void on_wordEdit_textChanged(const QString &str);
 
     void on_cancelButton_clicked();
 
-    void on_continueButton_clicked();
-
-    void on_addWordButton_clicked();
+    void on_submitButton_clicked();
 
 private:
-    Ui::EnterSeed *ui;
-    state::InitAccount * state;
+    Ui::AddBip39Word *ui;
+    QCompleter * completer = nullptr;
+    QStringList words;
+    QString resultWord;
 };
 
 }
 
-#endif // ENTERSEED_H
+#endif // C_ADDBIP39WORD_H

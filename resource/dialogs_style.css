@@ -369,3 +369,25 @@ QCheckBox::indicator:disabled:unchecked {
 QCheckBox::indicator:disabled:checked {
     image: url(:/img/disabledCheckOn.svg);
 }
+
+/* popup for completer. NOTE. completer doesn't pick it up, for completer it is setup manually */
+QListView {
+    color: #6F00D6;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+
+    border: transparent;
+    background: white;
+
+    selection-color: #6F00D6;
+    selection-background-color: #cc9afb;
+
+    font-size: 15px;
+}
+
+QListView::item {
+    height: 30px;
+    padding: 10px;
+}
+

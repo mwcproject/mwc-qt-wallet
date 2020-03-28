@@ -153,7 +153,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Open Sign Up page in your browser</string>
+          <string>Open URL to learn more about HODL</string>
          </property>
          <property name="text">
           <string>Learn More</string>
@@ -221,7 +221,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Open Sign Up page in your browser</string>
+          <string>Wallet HODL registration</string>
          </property>
          <property name="text">
           <string>Register</string>
@@ -243,7 +243,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Open Sign Up page in your browser</string>
+          <string>Claim HODL coins</string>
          </property>
          <property name="text">
           <string>Claim MWC</string>
@@ -407,17 +407,17 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
