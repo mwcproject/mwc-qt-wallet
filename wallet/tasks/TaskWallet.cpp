@@ -64,7 +64,7 @@ QVector<QString> calcSeedFromEvents(const QVector<WEvent> &events) {
 
 
 void TaskInit::onStarted() {
-   logger::blockLogMwc713out( true );
+    logger::blockLogMwc713out( true );
 }
 
 bool TaskInit::processTask(const QVector<WEvent> & events) {
@@ -380,9 +380,14 @@ bool TaskSyncProgressListener::processTask(const QVector<WEvent> &events) {
 
 /////////////////////////////////////////////////////////////////////////////////////
 //  TaskRootPublicKey
+void TaskRootPublicKey::onStarted() {
+    logger::blockLogMwc713out(true);
+}
 
 bool TaskRootPublicKey::processTask(const QVector<WEvent> & events) {
     QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_INIT_WANT_ENTER );
+
+    logger::blockLogMwc713out(false);
 
     if (!error.isEmpty()) {
         QString errMsg;

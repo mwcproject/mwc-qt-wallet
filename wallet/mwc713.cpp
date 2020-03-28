@@ -1239,7 +1239,7 @@ void MWC713::setNodeStatus( bool online, QString errMsg, int nodeHeight, int pee
 }
 
 void MWC713::setRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature ) {
-    logger::logEmit( "MWC713", "onRootPublicKey", "rootPubKey="+rootPubKey + " message=" + message + " signature=" + signature );
+    logger::logEmit( "MWC713", "onRootPublicKey", "rootPubKey=XXXXX message=" + message + " signature=" + signature );
     emit onRootPublicKey( success, errMsg, rootPubKey, message, signature );
 }
 

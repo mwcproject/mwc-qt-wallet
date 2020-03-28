@@ -225,6 +225,8 @@ public:
 
     virtual ~TaskRootPublicKey() override {}
 
+    virtual void onStarted() override;
+
     virtual bool processTask(const QVector<WEvent> & events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
