@@ -78,6 +78,9 @@ void Hodl::moveToClaimPage() {
 }
 
 void Hodl::moveToStartHODLPage() {
+    // Request HODL details once more for refresh
+    onLoginResult(true);
+
     if (config::isOnlineWallet()) {
         hodlNormWnd = (wnd::Hodl *) context->wndManager->switchToWindowEx(mwc::PAGE_HODL,
                       new wnd::Hodl(context->wndManager->getInWndParent(),this));
