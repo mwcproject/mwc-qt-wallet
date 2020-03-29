@@ -83,7 +83,7 @@ void NavMenuConfig::on_selectRunningModeButton_clicked() {
 void NavMenuConfig::on_resyncButton_clicked()
 {
     if (control::MessageBox::questionText(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
-                       "No", "Yes", true, false) == control::MessageBox::RETURN_CODE::BTN1 ) {
+                       "No", "Yes", true, false) == control::MessageBox::RETURN_CODE::BTN2 ) {
         // Starting resync
 
         context->appContext->pushCookie("PrevState", (int)context->appContext->getActiveWndState() );
