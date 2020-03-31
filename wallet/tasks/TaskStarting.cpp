@@ -38,10 +38,11 @@ bool TaskStarting::processTask(const QVector<WEvent> & events) {
         if (welcome.empty())
             break;
 
-        if ( need2unlock.empty() && init.empty() && !config::isOnlineNode() ) {
+        // Allow all wallets to be no password
+        /*if ( need2unlock.empty() && init.empty() && !config::isOnlineNode() ) {
             logger::logInfo("TaskStarting", "Found wallet without a password state. It is fine for the 'Online Node' only.");
             break;
-        }
+        }*/
 
         // check version of the wallet
         /*if (welcome[0].message != mwc::MWC_713_VERSION) {
@@ -58,10 +59,11 @@ bool TaskStarting::processTask(const QVector<WEvent> & events) {
         }
 
         if (need2unlock.empty()) {
-            if (!config::isOnlineNode())
+            // Allow all wallets to be no password
+            /*if (!config::isOnlineNode())
                 notify::appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
                                                  "Wallet mwc713 has a seed without a password. Did you initialize it manually? "
-                                                 "To fix this problem you will need to reinitialize your wallet with a passphrase and a password.");
+                                                 "To fix this problem you will need to reinitialize your wallet with a passphrase and a password.");*/
             wallet713->setLoginResult(true);
             return true;
         }

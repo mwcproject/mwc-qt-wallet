@@ -112,17 +112,14 @@ QListView {
 
     border: transparent;
     background: #6F00D6;
-    /*background: #9E00E7;*/
 
     selection-color: white;
     selection-background-color: #3600C9;
 
     font-size: 15px;
-    /*padding: 5px;*/
 }
 
 QListView::item {
-/*  color: white;*/
   height: 30px;
   padding: 10px;
 }

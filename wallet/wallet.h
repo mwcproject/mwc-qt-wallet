@@ -358,6 +358,9 @@ public:
     // Check signal: onLoginResult(bool ok)
     virtual void loginWithPassword(QString password)   = 0;
 
+    // Return true if wallet has password. Wallet might not have password if it was created manually.
+    virtual bool hasPassword() const  = 0;
+
     // Exit from the wallet. Expected that state machine will switch to Init state
     // syncCall - stop NOW. Caller suppose to understand what he is doing
     virtual void logout(bool syncCall) = 0;

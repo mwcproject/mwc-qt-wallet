@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>729</width>
+    <width>796</width>
     <height>561</height>
    </rect>
   </property>
@@ -89,9 +89,9 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="2,1,2">
+        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0,0">
          <property name="spacing">
-          <number>0</number>
+          <number>30</number>
          </property>
          <property name="topMargin">
           <number>20</number>
@@ -106,7 +106,7 @@
            </property>
            <property name="maximumSize">
             <size>
-             <width>300</width>
+             <width>160</width>
              <height>40</height>
             </size>
            </property>
@@ -117,7 +117,7 @@
             <string>Cancel</string>
            </property>
            <property name="autoDefault">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -138,6 +138,31 @@
           </spacer>
          </item>
          <item>
+          <widget class="control::MwcPushButtonNormal" name="addWordButton">
+           <property name="minimumSize">
+            <size>
+             <width>160</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>160</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Add new Bip 39 word to your mnemonic passphrase</string>
+           </property>
+           <property name="text">
+            <string>Add Bip39 Word</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="control::MwcPushButtonNormal" name="continueButton">
            <property name="minimumSize">
             <size>
@@ -147,7 +172,7 @@
            </property>
            <property name="maximumSize">
             <size>
-             <width>300</width>
+             <width>160</width>
              <height>40</height>
             </size>
            </property>
@@ -158,7 +183,7 @@
             <string>Continue</string>
            </property>
            <property name="autoDefault">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -225,7 +250,7 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>=50</width>
+         <width>0</width>
          <height>25</height>
         </size>
        </property>

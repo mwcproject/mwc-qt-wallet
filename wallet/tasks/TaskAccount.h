@@ -64,7 +64,7 @@ public:
                        (password.isEmpty() ? "" : " -p " +  util::toMwc713input(password)), _wallet713, "account switch " + accountName ),
             switchAccountName(accountName), makeAccountCurrent(_makeAccountCurrent)
     {
-        Q_ASSERT(accountName.length()>0); Q_ASSERT( config::isOnlineNode() || password.length()>0);
+        Q_ASSERT(accountName.length()>0);
     }
 
     virtual ~TaskAccountSwitch() override {}

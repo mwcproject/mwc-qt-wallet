@@ -78,6 +78,9 @@ void Hodl::moveToClaimPage() {
 }
 
 void Hodl::moveToStartHODLPage() {
+    // Request HODL details once more for refresh
+    onLoginResult(true);
+
     if (config::isOnlineWallet()) {
         hodlNormWnd = (wnd::Hodl *) context->wndManager->switchToWindowEx(mwc::PAGE_HODL,
                       new wnd::Hodl(context->wndManager->getInWndParent(),this));
@@ -408,14 +411,14 @@ void Hodl::replyFinished(QNetworkReply* reply) {
         QJsonDocument jsonDoc = QJsonDocument::fromJson(strReply.toUtf8(), &error);
         if (error.error != QJsonParseError::NoError) {
             requestOk = false;
-            requestErrorMessage = "Unable to parse respond Json at position " + QString::number(error.offset) +
+            requestErrorMessage = tag + " Unable to parse respond Json at position " + QString::number(error.offset) +
                                   "\nJson string: " + strReply;
         }
         jsonRespond = jsonDoc.object();
     }
     else  {
         requestOk = false;
-        requestErrorMessage = reply->errorString();
+        requestErrorMessage = tag + " " + reply->errorString();
         logger::logInfo("HODL", "Fail respond for Tag: " + tag + "  requestErrorMessage: " + requestErrorMessage);
     }
     reply->deleteLater();
@@ -467,7 +470,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                     context->hodlStatus->setHodlOutputs( true, QVector<core::HodlOutputInfo>(), TAG_CHECK_OUTPUTS);
                 }
                 else {
-                    context->hodlStatus->setError( TAG_CHECK_OUTPUTS, errorMessage);
+                    context->hodlStatus->setError( TAG_CHECK_OUTPUTS, tag + " " + errorMessage);
                     notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to get HODL output list. " + errorMessage );
                 }
             }
@@ -531,7 +534,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
         else {
             hodlWorkflow = HODL_WORKFLOW::INIT;
             // error status
-            reportMessageToUI("HODL request failed", "HODL server returned error:\n" +
+            reportMessageToUI("HODL request failed", "HODL server getChallenge API returned error:\n" +
                            generateMessage(jsonRespond["error_message"].toString(), jsonRespond["error_code"].toInt( INT_MAX )) );
         }
         return;
@@ -543,7 +546,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
         if ( success ) {
             // it is end point. Done...
             reportMessageToUI("HODL registration succeeded",
-                    "Congratulations! Your account successfully registered for HODL.\n\n"
+                    "Congratulations! Your wallet instance is successfully registered for the HODL Program.\n\n"
                     "During next 24 hours you should see if HODL server was able to discover your wallet outputs." );
 
             // Updating the registration time

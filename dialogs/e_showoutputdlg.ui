@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_10">
+  <layout class="QVBoxLayout" name="verticalLayout_11">
    <property name="spacing">
     <number>35</number>
    </property>
@@ -46,7 +46,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,0,0,0">
      <property name="spacing">
       <number>40</number>
      </property>
@@ -172,6 +172,54 @@
        </item>
        <item>
         <widget class="control::MwcLineEditNormal" name="confirms">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>120</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <property name="spacing">
+        <number>5</number>
+       </property>
+       <item>
+        <widget class="control::MwcLabelSmall" name="label_13">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>22</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>HODL</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="control::MwcLineEditNormal" name="hodl">
          <property name="minimumSize">
           <size>
            <width>120</width>
@@ -465,7 +513,7 @@
           </size>
          </property>
          <property name="text">
-          <string> </string>
+          <string/>
          </property>
         </widget>
        </item>

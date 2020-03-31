@@ -114,6 +114,11 @@ void InputPassword::stopWaiting() {
     ui->progress->hide();
 }
 
+void InputPassword::onLoginResult(bool ok) {
+    ui->passwordEdit->setEnabled(!ok);
+    ui->submitButton->setEnabled(!ok);
+}
+
 void InputPassword::reportWrongPassword() {
     state::TimeoutLockObject to(state);
     control::MessageBox::messageText(this, "Password", "Password supplied was incorrect. Please input correct password.");

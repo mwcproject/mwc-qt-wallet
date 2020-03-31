@@ -63,16 +63,20 @@ public:
     const static int64_t TIMEOUT = 5000;
 
     TaskUnlock( MWC713 * wallet713, QString password) :
-            Mwc713Task("Unlocking", buildWalletRequest(password), wallet713, "unlock") {}
+            Mwc713Task("Unlocking", buildWalletRequest(password), wallet713, "unlock") { hasPassword = !password.isEmpty(); }
 
     virtual ~TaskUnlock() override {}
+
+    virtual void onStarted() override;
 
     virtual bool processTask(const QVector<WEvent> & events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_PASSWORD_ERROR, WALLET_EVENTS::S_READY };}
 
 private:
-    static QString buildWalletRequest(QString password);
+    QString buildWalletRequest(QString password);
+
+    bool hasPassword;
 };
 
 // InitW is similar to unlock
@@ -220,6 +224,8 @@ public:
             message(msg) {}
 
     virtual ~TaskRootPublicKey() override {}
+
+    virtual void onStarted() override;
 
     virtual bool processTask(const QVector<WEvent> & events) override;
 

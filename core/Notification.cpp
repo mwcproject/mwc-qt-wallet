@@ -35,9 +35,17 @@ bool notificationStateCheck(NOTIFICATION_STATES state) {
     return notificationState & state ? true : false;
 }
 
-
 // Message that will be requlified from Critical to Info
 static QSet<QString> falseCriticalMessages{"keybase not found! consider installing keybase locally first."};
+static QSet<QString> falseMessages;
+
+void addFalseMessage(const QString & msg) {
+    falseMessages.insert(msg);
+}
+void remeoveFalseMessage(const QString & msg) {
+    falseMessages.remove(msg);
+}
+
 
 const int MESSAGE_SIZE_LIMIT = 1000;
 static QVector<NotificationMessage> notificationMessages;
@@ -123,6 +131,10 @@ void reportFatalError( QString message )  {
 void appendNotificationMessage( MESSAGE_LEVEL level, QString message ) {
 
     logger::logInfo("Notification", toString(level) + "  " + message );
+
+    if (falseMessages.contains(message)) {
+        return;
+    }
 
     if (level == MESSAGE_LEVEL::FATAL_ERROR) {
         // Fatal error. Display message box and exiting. We don't want to continue

@@ -44,6 +44,8 @@ private slots:
 
     void on_continueButton_clicked();
 
+    void on_addWordButton_clicked();
+
 private:
     Ui::EnterSeed *ui;
     state::InitAccount * state;

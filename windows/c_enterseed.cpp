@@ -20,6 +20,7 @@
 #include "../util/widgetutils.h"
 #include "util/Bip39.h"
 #include "../state/timeoutlock.h"
+#include "../dialogs/c_addbip39word.h"
 
 namespace wnd {
 
@@ -50,7 +51,16 @@ EnterSeed::~EnterSeed()
 void EnterSeed::on_Enter() {
     if ( ui->seedText->hasFocus() )
         return;
-    on_continueButton_clicked();
+
+    QString seedStr = ui->seedText->toPlainText().toLower().trimmed();
+    QVector<QString> seed = util::parsePhrase2Words( seedStr );
+
+    if (seed.size()>=24) {
+        on_continueButton_clicked();
+    }
+    else {
+        on_addWordButton_clicked();
+    }
 }
 
 void EnterSeed::updateProgress(bool show) {
@@ -107,4 +117,26 @@ void EnterSeed::on_continueButton_clicked()
     state->createWalletWithSeed(seed);
 }
 
+void wnd::EnterSeed::on_addWordButton_clicked()
+{
+    state::TimeoutLockObject to(state);
+
+    QString seedStrOrig = ui->seedText->toPlainText();
+    QString seedStr = seedStrOrig.toLower().trimmed();
+
+    QVector<QString> seed = util::parsePhrase2Words( seedStr );
+
+    dlg::AddBip39Word addWordDlg(this, seed.length()+1 );
+
+    if (addWordDlg.exec() == QDialog::Accepted) {
+        if (seedStrOrig.length()>0 && seedStrOrig[seedStrOrig.length()-1].isLetterOrNumber())
+            seedStrOrig += " ";
+        seedStrOrig += addWordDlg.getResultWord();
+        ui->seedText->setText(seedStrOrig);
+    }
+
+
 }
+
+}
+

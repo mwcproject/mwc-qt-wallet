@@ -310,7 +310,7 @@ Warning! Wallet public key allows any 3rd party to discover MWC amount that belo
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Open output details with MWC block explorer</string>
+            <string>Sign message with wallet root key</string>
            </property>
            <property name="text">
             <string>Sign</string>
@@ -515,17 +515,17 @@ Warning! Wallet public key allows any 3rd party to discover MWC amount that belo
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>

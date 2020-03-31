@@ -176,6 +176,7 @@ void MWC713::resetData(STARTED_MODE _startedMode ) {
     httpOnline = false;
     httpInfo = "";
     hasHttpTls = false;
+    walletPassword = "";
 
     Q_ASSERT(hodlStatus);
     hodlStatus->finishWalletOutputs(false);
@@ -366,6 +367,12 @@ void MWC713::loginWithPassword(QString password)  {
     eventCollector->addTask( new TaskUnlock(this, password), TaskUnlock::TIMEOUT );
 }
 
+// Return true if wallet has password. Wallet might not have password if it was created manually.
+bool MWC713::hasPassword() const {
+    return !walletPassword.isEmpty();
+}
+
+
 // Exit from the wallet. Expected that state machine will switch to Init state
 // syncCall - stop NOW. Caller suppose to understand what he is doing
 void MWC713::logout(bool syncCall)  {
@@ -525,6 +532,11 @@ void MWC713::updateWalletBalance(bool enforceSync, bool showSyncProgress, bool s
     // 1 - list accounts (this call)
     // 2 - for every account get info ( see updateAccountList call )
     // 3 - restore back current account
+
+    if (!hasPassword()) {
+        // By some reasons wallet without password can be locked by itself
+        eventCollector->addTask( new TaskUnlock(this, ""), TaskUnlock::TIMEOUT );
+    }
 
     if (!skipSync)
         sync(showSyncProgress, enforceSync);
@@ -1227,7 +1239,7 @@ void MWC713::setNodeStatus( bool online, QString errMsg, int nodeHeight, int pee
 }
 
 void MWC713::setRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature ) {
-    logger::logEmit( "MWC713", "onRootPublicKey", "rootPubKey="+rootPubKey + " message=" + message + " signature=" + signature );
+    logger::logEmit( "MWC713", "onRootPublicKey", "rootPubKey=XXXXX message=" + message + " signature=" + signature );
     emit onRootPublicKey( success, errMsg, rootPubKey, message, signature );
 }
 

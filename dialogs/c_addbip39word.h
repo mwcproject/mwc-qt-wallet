@@ -12,46 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef E_SHOWOUTPUTDLG_H
-#define E_SHOWOUTPUTDLG_H
+#ifndef C_ADDBIP39WORD_H
+#define C_ADDBIP39WORD_H
 
 #include "../control/mwcdialog.h"
 
 namespace Ui {
-class ShowOutputDlg;
+class AddBip39Word;
 }
 
-namespace wallet {
-struct WalletOutput;
-struct WalletConfig;
-}
-
-namespace core {
-class HodlStatus;
-}
+class QCompleter;
 
 namespace dlg {
 
-class ShowOutputDlg : public control::MwcDialog {
-Q_OBJECT
-public:
-    explicit ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output, const wallet::WalletConfig &config, core::HodlStatus * hodlStatus);
+class AddBip39Word : public control::MwcDialog
+{
+    Q_OBJECT
 
-    ~ShowOutputDlg();
+public:
+    explicit AddBip39Word(QWidget *parent, int wordNumber);
+    ~AddBip39Word();
+
+    QString getResultWord() const {return resultWord;}
 
 private slots:
+    void on_wordEdit_textChanged(const QString &str);
 
-    void on_viewOutput_clicked();
+    void on_cancelButton_clicked();
 
-    void on_pushButton_clicked();
+    void on_submitButton_clicked();
 
 private:
-    Ui::ShowOutputDlg *ui;
-
-    QString blockExplorerUrl;
-    QString commitment;
+    Ui::AddBip39Word *ui;
+    QCompleter * completer = nullptr;
+    QStringList words;
+    QString resultWord;
 };
 
 }
 
-#endif // E_SHOWOUTPUTDLG_H
+#endif // C_ADDBIP39WORD_H
