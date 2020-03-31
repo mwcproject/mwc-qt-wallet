@@ -24,7 +24,7 @@ static QMainWindow * mwcMainWnd = nullptr;
 
 QString get_APP_NAME() {
     if (config::isOnlineWallet())
-        return "mwc wallet";
+        return "MWC Qt Wallet";
     else if (config::isOnlineNode())
         return "mwc node";
     else if (config::isColdWallet())

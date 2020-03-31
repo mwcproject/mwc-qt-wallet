@@ -495,7 +495,7 @@ int main(int argc, char *argv[])
 
         wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
 
-        core::WindowManager * wndManager = new core::WindowManager( mainWnd, mainWnd->getMainWindow() );
+        core::WindowManager * wndManager = new core::WindowManager( mainWnd, mainWnd->getMainWindow(), walletDataPath );
 
         mainWnd->show();
 

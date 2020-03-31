@@ -24,9 +24,10 @@
 
 namespace core {
 
-WindowManager::WindowManager(core::MainWindow * _mainWnd, QWidget * _pageHostWnd) :
+WindowManager::WindowManager(core::MainWindow * _mainWnd, QWidget * _pageHostWnd, QString _walletDataPath) :
     mainWnd(_mainWnd),
-    pageHostWnd(_pageHostWnd)
+    pageHostWnd(_pageHostWnd),
+    walletDataPath(_walletDataPath)
 {
     Q_ASSERT(mainWnd);
     Q_ASSERT(pageHostWnd);
@@ -64,7 +65,7 @@ QWidget * WindowManager::switchToWindowEx( const QString & pageName, QWidget * n
 QString WindowManager::buildWalletTitle(const QString & pageName) {
     QString buildNumber = BUILD_VERSION;
 
-    QString title = mwc::get_APP_NAME() + " v" + buildNumber;
+    QString title = mwc::get_APP_NAME() + " v" + buildNumber + " [" + walletDataPath + "]";
 
     if (!pageName.isEmpty()) {
         title += " - " + pageName;

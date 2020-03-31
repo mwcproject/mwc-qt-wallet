@@ -30,7 +30,7 @@ class WindowManager : public QObject
 {
     Q_OBJECT
 public:
-    WindowManager( core::MainWindow * mainWnd, QWidget * pageHostWnd );
+    WindowManager( core::MainWindow * mainWnd, QWidget * pageHostWnd, QString walletDataPath );
 
     // Show new window and return it
     QWidget * switchToWindowEx( const QString & pageName, QWidget * newWindow );
@@ -44,6 +44,7 @@ private:
     core::MainWindow * mainWnd;     // App main wnd
     QWidget * pageHostWnd;          // Parent windows for pages.
     QWidget * currentWnd = nullptr; // Current active page. Single page can be active at a time
+    QString   walletDataPath;       // Used in window title
 };
 
 }
