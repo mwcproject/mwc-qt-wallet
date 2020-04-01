@@ -144,6 +144,8 @@ public:
     // Return: true if task was added.  False - was ignored
     bool addTask( Mwc713Task * task, int64_t timeout, bool cancelIfExist = true );
 
+    bool addFirstTask( Mwc713Task * task, int64_t timeout);
+
 //    void addEvent(WALLET_EVENTS event) { events.push_back(WEvent(event)); }
   //  void addEvent(WALLET_EVENTS event, QString message) { events.push_back(WEvent(event, message)); }
 //    void reset() { events.clear(); }

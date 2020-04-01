@@ -90,6 +90,11 @@ void InputPassword::on_submitButton_clicked() {
 
     QString pswd = ui->passwordEdit->text();
 
+    if (pswd.isEmpty()) {
+        control::MessageBox::messageText(this, "Password", "Please input your wallet password");
+        return;
+    }
+
     QPair <bool, QString> valRes = util::validateMwc713Str(pswd, true);
     if (!valRes.first) {
         control::MessageBox::messageText(this, "Password", valRes.second );

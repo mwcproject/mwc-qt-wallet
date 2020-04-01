@@ -151,6 +151,17 @@ bool Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout, bool cance
     return true;
 }
 
+bool Mwc713EventManager::addFirstTask( Mwc713Task * task, int64_t timeout) {
+    QMutexLocker l( &taskQMutex );
+
+    // timeout multiplier will be applyed to the task because we want apply this value as late as posiible.
+    // User might change it at any moment.
+    taskQ.insert(0,taskInfo(task,timeout));
+
+    return true;
+}
+
+
 // Process next task
 void Mwc713EventManager::processNextTask() {
     QMutexLocker l( &taskQMutex );

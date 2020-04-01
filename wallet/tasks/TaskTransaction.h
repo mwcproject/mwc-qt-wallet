@@ -48,7 +48,9 @@ public:
     // Outputs run with no-refresh because wallet responsible to call sync first
     TaskOutputs( MWC713 * wallet713, int offset, int number, bool show_spent ) :
             Mwc713Task("Outputs", "outputs -o " + QString::number(offset) + " -l " + QString::number(number) + (show_spent?" --show-spent":"") + " --no-refresh", wallet713, "")
-            { Q_ASSERT(offset>=0); Q_ASSERT(number>0);}
+    {
+        Q_ASSERT(offset>=0); Q_ASSERT(number>0);
+    }
 
     virtual ~TaskOutputs() override {}
 
@@ -65,7 +67,9 @@ public:
     TaskOutputsForHODL( MWC713 * wallet713, QString _accountName, core::HodlStatus * _hodlStatus ) :
             Mwc713Task("Outputs", "outputs --no-refresh", wallet713, ""),
             accountName(_accountName),
-            hodlStatus(_hodlStatus) {Q_ASSERT(hodlStatus!=nullptr);}
+            hodlStatus(_hodlStatus) {
+        Q_ASSERT(hodlStatus!=nullptr);
+    }
 
     virtual ~TaskOutputsForHODL() override {}
 

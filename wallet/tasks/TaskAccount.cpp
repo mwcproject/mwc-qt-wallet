@@ -17,6 +17,7 @@
 #include "../mwc713.h"
 #include <QtAlgorithms>
 #include "../../core/Notification.h"
+#include "TaskTransaction.h"
 
 namespace wallet {
 
@@ -225,9 +226,27 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
         return false;
     }
 
+    // Check if need to update the HODL outputs. Do that is balance was changed
+    AccountInfo acc;
+    QVector<AccountInfo> accounts = wallet713->getWalletBalance();
+    for (const AccountInfo & ai : accounts) {
+        if (currentAccountName == ai.accountName) {
+            acc = ai;
+            break;
+        }
+    }
+    bool noChange = ( totalNano + waitingFinalizetinNano == acc.total &&
+            waitingConfNano + waitingFinalizetinNano == acc.awaitingConfirmation &&
+            lockedNano == acc.lockedByPrevTransaction &&
+            spendableNano == acc.currentlySpendable);
+
+    if (!noChange)
+        wallet713->getEventCollector()->addFirstTask( new TaskOutputsForHODL(wallet713, acc.accountName, wallet713->getHodlStatus()), TaskOutputsForHODL::TIMEOUT );
+
     wallet713->infoResults( currentAccountName, height,
-            totalNano, waitingConfNano, waitingFinalizetinNano, lockedNano, spendableNano,
-            warnings.size()>0 );
+                            totalNano, waitingConfNano, waitingFinalizetinNano, lockedNano, spendableNano,
+                            warnings.size()>0 );
+
     return true;
 }
 

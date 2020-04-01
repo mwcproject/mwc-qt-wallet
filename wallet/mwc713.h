@@ -371,6 +371,10 @@ public:
     void updateSyncProgress(double progressPercent);
 
     void updateSyncAsDone();
+
+    Mwc713EventManager * getEventCollector() {return eventCollector;}
+    core::HodlStatus *   getHodlStatus() {return hodlStatus;}
+
 private:
 
 

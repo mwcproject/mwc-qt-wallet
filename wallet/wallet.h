@@ -66,6 +66,8 @@ struct AccountInfo {
 
     // Debug/Log printing
     QString toString() const;
+
+    bool balancesAreEquals(const AccountInfo & accInfo) const;
 };
 
 struct MwcNodeConnection {

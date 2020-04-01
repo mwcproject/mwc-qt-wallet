@@ -697,7 +697,7 @@ void MWC713::getAllTransactions() {
     if ( eventCollector->addTask( new TaskAllTransactionsStart(this), -1, true ) ) {
         // I f not exist, push the rest with enforcement...
 
-        for (AccountInfo & acc : accountInfo ) {
+        for (const AccountInfo & acc : accountInfo ) {
             eventCollector->addTask(new TaskAccountSwitch(this, acc.accountName, walletPassword, false), TaskAccountSwitch::TIMEOUT, false);
             eventCollector->addTask(new TaskAllTransactions(this), TaskAllTransactions::TIMEOUT, false);
         }
@@ -952,7 +952,6 @@ void MWC713::updateAccountList( QVector<QString> accounts ) {
         }
 
         eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber ), TaskAccountInfo::TIMEOUT, false );
-        eventCollector->addTask( new TaskOutputsForHODL(this, acc, hodlStatus), TaskOutputsForHODL::TIMEOUT, false );
         eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1, false ); // Updating the progress
     }
     if (!cancel) {
@@ -972,7 +971,6 @@ void MWC713::updateAccountFinalize(QString prevCurrentAccount) {
 
     Q_ASSERT(hodlStatus);
     hodlStatus->finishWalletOutputs(true);
-
 
     QString accountBalanceStr;
 
