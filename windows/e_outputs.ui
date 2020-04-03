@@ -219,13 +219,13 @@
               </property>
               <property name="minimumSize">
                <size>
-                <width>230</width>
+                <width>270</width>
                 <height>42</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>230</width>
+                <width>270</width>
                 <height>42</height>
                </size>
               </property>
@@ -240,7 +240,7 @@
                 <rect>
                  <x>0</x>
                  <y>3</y>
-                 <width>124</width>
+                 <width>171</width>
                  <height>34</height>
                 </rect>
                </property>
@@ -254,7 +254,7 @@
               <widget class="control::MwcPushButtonRound" name="nextBtn">
                <property name="geometry">
                 <rect>
-                 <x>138</x>
+                 <x>175</x>
                  <y>0</y>
                  <width>40</width>
                  <height>40</height>
@@ -307,7 +307,7 @@
               <widget class="control::MwcPushButtonRound" name="prevBtn">
                <property name="geometry">
                 <rect>
-                 <x>186</x>
+                 <x>225</x>
                  <y>0</y>
                  <width>40</width>
                  <height>40</height>

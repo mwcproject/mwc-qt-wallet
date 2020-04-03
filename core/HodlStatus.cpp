@@ -234,7 +234,7 @@ QString HodlStatus::getWalletHodlStatus() const {
 
         QString resultStr = "Your HODL amount:\n";
         for (auto balance = hodlBalancePerClass.begin(); balance != hodlBalancePerClass.end(); balance++ ) {
-            resultStr += balance.key() + " : " + util::nano2one(balance.value()) + " MWC";
+            resultStr += balance.key() + " : " + util::nano2one(balance.value()) + " MWC\n";
         }
 
         return resultStr;

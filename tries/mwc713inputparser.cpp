@@ -393,6 +393,12 @@ void Mwc713InputParser::initSyncProgress() {
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SYNC_PROGRESS,
                                                 QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("Validating outputs, "),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE,"","", 1) //  564667. (Highest index: 564667), 99% complete
+                                                }));
+
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SYNC_PROGRESS,
+                                                QVector<BaseTrieSection*>{
                                                         new TriePhraseSection("Checking "),
                                                         new TrieAnySection(100, TrieAnySection::NUMBERS,"",""),
                                                         new TriePhraseSection(" blocks, Height: "),
