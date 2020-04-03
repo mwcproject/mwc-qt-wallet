@@ -153,8 +153,10 @@ void SendOnline::on_sendButton_clicked()
         }
     }
 
+    core::SendCoinsParams sendParams = state->getSendCoinsParams();
+
     QStringList outputs;
-    if (! util::getOutputsToSend( selectedAccount.accountName, amount, state->getContext()->hodlStatus, this, outputs ) )
+    if (! util::getOutputsToSend( selectedAccount.accountName, sendParams.changeOutputs, amount, state->getContext()->hodlStatus, this, outputs ) )
         return; // User reject something
 
     // Ask for confirmation
@@ -164,7 +166,7 @@ void SendOnline::on_sendButton_clicked()
 
     ui->progress->show();
 
-    state->sendMwcOnline( selectedAccount, res.second, address, amount, description, apiSecret, outputs );
+    state->sendMwcOnline( selectedAccount, res.second, address, amount, description, apiSecret, outputs, sendParams.changeOutputs );
 }
 
 void SendOnline::sendRespond( bool success, const QStringList & errors ) {

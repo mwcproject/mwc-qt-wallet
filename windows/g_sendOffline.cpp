@@ -76,8 +76,10 @@ void SendOffline::on_sendButton_clicked()
         }
     }
 
+    core::SendCoinsParams sendParams = state->getSendCoinsParams();
+
     QStringList outputs;
-    if (! util::getOutputsToSend( selectedAccount.accountName, amount, state->getContext()->hodlStatus, this, outputs ) )
+    if (! util::getOutputsToSend( selectedAccount.accountName, sendParams.changeOutputs, amount, state->getContext()->hodlStatus, this, outputs ) )
         return; // User reject something
 
     if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this,"Confirm Send request",
@@ -102,7 +104,7 @@ void SendOffline::on_sendButton_clicked()
 
     ui->progress->show();
 
-    state->sendMwcOffline(  selectedAccount, amount, description, fileName, outputs );
+    state->sendMwcOffline(  selectedAccount, amount, description, fileName, outputs, sendParams.changeOutputs );
 }
 
 void SendOffline::showSendMwcOfflineResult( bool success, QString message ) {

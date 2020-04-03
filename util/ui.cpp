@@ -121,11 +121,11 @@ bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> 
     std::sort(outputs.begin(), outputs.end(), [](const wallet::WalletOutput &o1, const wallet::WalletOutput &o2) {return o1.valueNano < o2.valueNano;});
 
     QPair< int64_t, QVector<wallet::WalletOutput> >  oneCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 0 );
-    QPair< int64_t, QVector<wallet::WalletOutput> >  twoCommitRes;
+    QPair< int64_t, QVector<wallet::WalletOutput> >  twoCommitRes = QPair< int64_t, QVector<wallet::WalletOutput> >(LONG_MAX, QVector<wallet::WalletOutput>() );
     if (outputs.size()<1000)
         twoCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 1 );
 
-    QPair< int64_t, QVector<wallet::WalletOutput> >  threeCommitRes;
+    QPair< int64_t, QVector<wallet::WalletOutput> >  threeCommitRes = QPair< int64_t, QVector<wallet::WalletOutput> >(LONG_MAX, QVector<wallet::WalletOutput>() );
     if (outputs.size()<50)
         threeCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 2 );
 
@@ -174,7 +174,8 @@ bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> 
 // in: nanoCoins < 0 - ALL
 // out: resultOutputs - what we want include into transaction. If
 // return false if User cancel this action.
-bool getOutputsToSend( const QString & accountName, int64_t nanoCoins, core::HodlStatus * hodlStatus, QWidget * parent, QStringList & resultOutputs ) {
+bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins, core::HodlStatus * hodlStatus,
+        QWidget * parent, QStringList & resultOutputs ) {
     Q_ASSERT(hodlStatus);
     resultOutputs.clear();
 
@@ -227,7 +228,7 @@ bool getOutputsToSend( const QString & accountName, int64_t nanoCoins, core::Hod
     Q_ASSERT(nanoCoins>0);
 
     // Update with possible fee. QT wallet doens't know the fee amount, that is why put 0.02 fee that cover everything possible
-    nanoCoins += util::one2nano("0.02").second;
+    nanoCoins += 8000000L + std::max(0,outputsNumber-1) * 4000000L;
 
     // Calculate what outputs need to be selected...
     if (freeNanoCoins >= nanoCoins) {
@@ -254,7 +255,7 @@ bool getOutputsToSend( const QString & accountName, int64_t nanoCoins, core::Hod
     QVector<wallet::WalletOutput> spentOuts;
     double lastW = 0.0;
     int hodlOutsIdx=0;
-    for (;hodlOutsIdx<hodlOuts.size() && hodlCoins>0; hodlCoins++) {
+    for (;hodlOutsIdx<hodlOuts.size() && hodlCoins>0; hodlOutsIdx++) {
         spentOuts.push_back( hodlOuts[hodlOutsIdx].first );
         lastW = hodlOuts[hodlOutsIdx].second.weight;
         hodlCoins -= hodlOuts[hodlOutsIdx].first.valueNano;
@@ -268,7 +269,7 @@ bool getOutputsToSend( const QString & accountName, int64_t nanoCoins, core::Hod
     bool res = calcOutputsToSpend( nanoCoins - freeNanoCoins, spentOuts, hodlResultOutputs );
     if (!res) {
         // spend all case, very possible because we don't control the balance
-        return getOutputsToSend( accountName, -1, hodlStatus, parent, resultOutputs );
+        return getOutputsToSend( accountName, outputsNumber, -1, hodlStatus, parent, resultOutputs );
     }
 
     // Let's ask for outptus

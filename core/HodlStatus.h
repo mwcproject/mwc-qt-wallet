@@ -72,7 +72,7 @@ public:
 
     QString getRootPubKey() const {return rootPubKey;}
     // return true if new key was set
-    bool setRootPubKey( const QString & pubKey );
+    void setRootPubKey( const QString & pubKey );
 
     // Hex representation of HSA256 hash from rootpublickey binary representation
     QString getRootPubKeyHash() const {return rootPubKeyHash;}

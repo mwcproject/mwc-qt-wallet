@@ -112,10 +112,13 @@ void Send::processSendRequest( bool isOnline, const wallet::AccountInfo & select
                 new wnd::SendOffline( context->wndManager->getInWndParent(), selectedAccount, amount, this ) );
     }
 }
+
 // Request for MWC to send
-void Send::sendMwcOnline(const wallet::AccountInfo &account, util::ADDRESS_TYPE type, QString address, int64_t mwcNano, QString message, QString apiSecret, const QStringList & outputs ) {
+void Send::sendMwcOnline(const wallet::AccountInfo &account, util::ADDRESS_TYPE type, QString address, int64_t mwcNano,
+        QString message, QString apiSecret, const QStringList & outputs, int changeOutputs ) {
     core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
-    context->wallet->sendTo( account, mwcNano, util::fullFormalAddress( type, address), apiSecret, message, prms.inputConfirmationNumber, prms.changeOutputs, outputs );
+    context->wallet->sendTo( account, mwcNano, util::fullFormalAddress( type, address), apiSecret, message,
+            prms.inputConfirmationNumber, changeOutputs, outputs );
 }
 
 void Send::sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate ) {
@@ -141,10 +144,12 @@ void Send::onSlateReceivedBack(QString slate, QString mwc, QString fromAddr) {
     registerSlate( slate, "", -1, false, true );
 }
 
-void Send::sendMwcOffline(  const wallet::AccountInfo & account, int64_t amount, QString message, QString fileName, const QStringList & outputs ) {
+void Send::sendMwcOffline(  const wallet::AccountInfo & account, int64_t amount, QString message, QString fileName,
+        const QStringList & outputs, int changeOutputs ) {
     core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
-    context->wallet->sendFile( account, amount, message, fileName,prms.inputConfirmationNumber, prms.changeOutputs, outputs );
+    context->wallet->sendFile( account, amount, message, fileName,prms.inputConfirmationNumber, changeOutputs, outputs );
 }
+
 void Send::respSendFile( bool success, QStringList errors, QString fileName ) {
     if (offlineWnd) {
         QString message;
