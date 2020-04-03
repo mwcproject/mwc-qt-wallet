@@ -67,6 +67,7 @@ private:
 private:
     Ui::Accounts *ui;
     state::Accounts * state;
+    bool inHodl = false;
     QString currentAccountName;
     QVector<wallet::AccountInfo> accounts; // current shown data
 };

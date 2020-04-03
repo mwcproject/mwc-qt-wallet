@@ -446,12 +446,13 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                 for ( const auto outputRef : outputs_qualified ) {
                     auto output = outputRef.toObject();
 
-                    double amount = output["amount"].toDouble();
+                    double amount  = output["amount"].toString().toDouble();
                     QString commit = output["commit"].toString();
-                    double weight = output["weight"].toDouble();
+                    double weight  = output["weight"].toDouble();
+                    QString cls    = output["class"].toString();
 
                     if (!commit.isEmpty())
-                        hodlOutputs.push_back( core::HodlOutputInfo::create(commit, amount, weight) );
+                        hodlOutputs.push_back( core::HodlOutputInfo::create(commit, amount, weight, cls) );
                 }
 
                 context->hodlStatus->setHodlOutputs( true, hodlOutputs, TAG_CHECK_OUTPUTS );

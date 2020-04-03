@@ -185,9 +185,9 @@ static void dotest_getOutputsToSend() {
     const int64_t nano = 1000000000L;
 
     QVector<HodlOutputInfo> hodlOutputs{
-        HodlOutputInfo::create("10", 10*nano, 10),
-        HodlOutputInfo::create("50", 50*nano, 11), // not in wallet
-        HodlOutputInfo::create("90", 90*nano, 12),
+        HodlOutputInfo::create("10", 10*nano, 10, "Class 1"),
+        HodlOutputInfo::create("50", 50*nano, 11, "Class 2"), // not in wallet
+        HodlOutputInfo::create("90", 90*nano, 12, "Class 3"),
     };
 
     QVector<wallet::WalletOutput> walletOutputs{

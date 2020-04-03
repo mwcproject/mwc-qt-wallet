@@ -31,13 +31,18 @@ struct HodlOutputInfo {
     QString    outputCommitment;
     double     value  = 0.0;
     double     weight = 0.0;
+    QString    cls; // class
 
-    void setData( const QString & outputCommitment, double value, double weight );
+    void setData( const QString & outputCommitment, double value, double weight, const QString & cls );
 
-    static HodlOutputInfo create(const QString & outputCommitment, double value, double weight) {
+    static HodlOutputInfo create(const QString & outputCommitment, double value, double weight, const QString & cls) {
         HodlOutputInfo item;
-        item.setData(outputCommitment, value, weight);
+        item.setData(outputCommitment, value, weight, cls);
         return item;
+    }
+
+    bool isValid() const {
+        return !outputCommitment.isEmpty() && value>0.0;
     }
 };
 
@@ -85,15 +90,18 @@ public:
     // Calculates what we have for account
     QString getWalletHodlStatus() const;
 
-    QVector<HodlOutputInfo> getHodlOutputs() {return hodlOutputs;}
-
+    QVector<HodlOutputInfo> getHodlOutputs() const;
 
     QVector<HodlClaimStatus> getClaimsRequestStatus() const;
 
 
     bool hasAnyOutputsInHODL() const { return !hodlOutputs.isEmpty();}
     QVector<wallet::WalletOutput> getWalltOutputsForAccount(QString accountName) const {return walletOutputs.value(accountName);}
-    bool isOutputInHODL(const QString & output) const {return hodlOutputCommitment.contains(output);}
+
+    bool isOutputInHODL(const QString & output) const {return hodlOutputs.contains(output);}
+
+    // return empty if not exist
+    HodlOutputInfo getHodlOutput(const QString & output) const {return hodlOutputs.value(output);}
 
     // registration was sucessfull, let's update it
     void updateRegistrationTime();
@@ -124,8 +132,7 @@ private:
 
     bool inHodl = false; // If accountin HODL. May in in Hodl but no outputs are there
     QMap<QString, QVector<wallet::WalletOutput> > walletOutputs; // Available outputs from the wallet. Key: account name, value outputs for this account
-    QVector<HodlOutputInfo>    hodlOutputs;
-    QSet<QString>              hodlOutputCommitment;
+    QMap<QString, HodlOutputInfo> hodlOutputs;
 
     int64_t amount2claim = 0;
 

@@ -21,6 +21,7 @@
 #include "../core/global.h"
 #include "../core/Config.h"
 #include "../state/timeoutlock.h"
+#include "../core/HodlStatus.h"
 
 namespace wnd {
 
@@ -42,6 +43,8 @@ Accounts::Accounts(QWidget *parent, state::Accounts * _state) :
     if (config::isColdWallet()) {
         ui->transferButton->hide();
     }
+
+    inHodl = state->getContext()->hodlStatus->isInHodl();
 
     initTableHeaders();
 
@@ -76,10 +79,21 @@ void Accounts::initTableHeaders() {
     Q_ASSERT( widths.size() == 5 );
 
     ui->accountList->setColumnWidths( widths );
+
+    if (inHodl) {
+        ui->accountList->setColumnCount(widths.size()+1);
+        ui->accountList->setColumnWidth(widths.size(),60);
+        QTableWidgetItem * itm = new QTableWidgetItem("HODL") ;
+        ui->accountList->setHorizontalHeaderItem( widths.size(), itm );
+    }
 }
 
 void Accounts::saveTableHeaders() {
-    state->updateColumnsWidhts(ui->accountList->getColumnWidths());
+    QVector<int>  width = ui->accountList->getColumnWidths();
+    if (inHodl)
+        width.pop_back();
+
+    state->updateColumnsWidhts(width);
 }
 
 
@@ -97,9 +111,26 @@ void Accounts::refreshWalletBalance()
     // update the list with accounts
     ui->accountList->clearData();
 
+    core::HodlStatus * hodlStatus = state->getContext()->hodlStatus;
+
     for (auto & acc : accounts) {
         QVector<QString> data{ acc.accountName, util::nano2one(acc.currentlySpendable), util::nano2one(acc.awaitingConfirmation),
                                util::nano2one(acc.lockedByPrevTransaction), util::nano2one(acc.total) };
+
+        if ( inHodl ) {
+            QVector<wallet::WalletOutput> walletOutputs = hodlStatus->getWalltOutputsForAccount(acc.accountName);
+
+            int64_t hodlBalancePerClass = 0;
+
+            for (const auto & out : walletOutputs) {
+                core::HodlOutputInfo hOut = hodlStatus->getHodlOutput( out.outputCommitment );
+                if ( hOut.isValid() ) {
+                    hodlBalancePerClass += out.valueNano;
+                }
+            }
+
+            data.push_back( util::nano2one(hodlBalancePerClass) );
+        }
 
         ui->accountList->appendRow( data, acc.accountName.startsWith("HODL") ? 0.8 : 0.0 );
     }

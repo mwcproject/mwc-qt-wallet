@@ -22,7 +22,7 @@
 
 namespace util {
 
-static QString generateMessageHtmlOutputsToSpend( const QVector<wallet::WalletOutput> & outputs ) {
+static QString generateMessageHtmlOutputsToSpend( const QVector<core::HodlOutputInfo> & outputs ) {
     /*
   This transaction will include outputs registered for HODL<br>
 <table>
@@ -53,20 +53,24 @@ static QString generateMessageHtmlOutputsToSpend( const QVector<wallet::WalletOu
                      "  <tr>"
                      "    <th>Commitment</th>"
                      "    <th></th>"
+                     "    <th>Class</th>"
+                     "    <th></th>"
                      "    <th>MWC</th>"
                      "    <th>&nbsp;&nbsp;&nbsp;</th>"
                      "  </tr>"
                      "  <tr>";
 
     int limit = 7;
-    for (const wallet::WalletOutput & outpt : outputs) {
+    for (const core::HodlOutputInfo & outpt : outputs) {
         limit--;
         if (limit==0) {
-            result += "<tr><td> .......... </td><td></td><td> ... </td></tr>";
+            result += "<tr><td> .......... </td><td></td><td></td><td></td><td> ... </td></tr>";
             break;
         }
         else {
-            result += "<tr><td>" + outpt.outputCommitment + "</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>" + util::nano2one(outpt.valueNano) +
+            result += "<tr><td>" + outpt.outputCommitment + "</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>" +
+                    outpt.cls + "</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>" +
+                    util::trimStrAsDouble( QString::number(outpt.value), 7) +
                       "</td><td></td></tr>";
         }
 
@@ -174,7 +178,7 @@ bool getOutputsToSend( const QString & accountName, int64_t nanoCoins, core::Hod
 
     QVector<wallet::WalletOutput>  outputs = hodlStatus->getWalltOutputsForAccount(accountName);
 
-    QVector<wallet::WalletOutput> hodlOuts;
+    QVector<QPair<wallet::WalletOutput, core::HodlOutputInfo>> hodlOuts;
     QVector<wallet::WalletOutput> freeOuts;
 
     int64_t freeNanoCoins = 0;
@@ -183,8 +187,10 @@ bool getOutputsToSend( const QString & accountName, int64_t nanoCoins, core::Hod
         if ( o.status != "Unspent" ) // Interesting only in Unspent outputs
             continue;
 
-        if ( hodlStatus->isOutputInHODL(o.outputCommitment) )
-            hodlOuts.push_back(o);
+        core::HodlOutputInfo ho = hodlStatus->getHodlOutput(o.outputCommitment);
+
+        if ( ho.weight > 0.0 )
+            hodlOuts.push_back( QPair<wallet::WalletOutput, core::HodlOutputInfo>(o, ho) );
         else {
             freeOuts.push_back(o);
             freeNanoCoins += o.valueNano;
@@ -197,11 +203,19 @@ bool getOutputsToSend( const QString & accountName, int64_t nanoCoins, core::Hod
     }
 
     if (nanoCoins<0) {
+        QVector<core::HodlOutputInfo> spentOuts;
+        for (const auto & ho : hodlOuts )
+            spentOuts.push_back(ho.second);
+
         // Ask user if he want ot spend all and continue...
         return control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(parent, "HODL Output spending",
-                generateMessageHtmlOutputsToSpend( hodlOuts ),
-                "Cancel", "Continue", true, false, 1.3);
+                generateMessageHtmlOutputsToSpend( spentOuts ),
+                "Cancel", "Continue", true, false, 1.4);
     }
+
+    std::sort( hodlOuts.begin(), hodlOuts.end(), [](const QPair<wallet::WalletOutput, core::HodlOutputInfo> & a, const QPair<wallet::WalletOutput, core::HodlOutputInfo> & b) {
+        return a.second.weight < b.second.weight;
+    });
 
     Q_ASSERT(nanoCoins>0);
 
@@ -228,23 +242,40 @@ bool getOutputsToSend( const QString & accountName, int64_t nanoCoins, core::Hod
 
     // Need to spend some HODL outputs
     QStringList hodlResultOutputs;
-    bool res = calcOutputsToSpend( nanoCoins - freeNanoCoins, hodlOuts, hodlResultOutputs );
+
+    int64_t hodlCoins = nanoCoins - freeNanoCoins;
+    QVector<wallet::WalletOutput> spentOuts;
+    double lastW = 0.0;
+    int hodlOutsIdx=0;
+    for (;hodlOutsIdx<hodlOuts.size() && hodlCoins>0; hodlCoins++) {
+        spentOuts.push_back( hodlOuts[hodlOutsIdx].first );
+        lastW = hodlOuts[hodlOutsIdx].second.weight;
+        hodlCoins -= hodlOuts[hodlOutsIdx].first.valueNano;
+    }
+    for (;hodlOutsIdx<hodlOuts.size();hodlOutsIdx++) {
+        if ( lastW < hodlOuts[hodlOutsIdx].second.weight)
+            break;
+        spentOuts.push_back( hodlOuts[hodlOutsIdx].first );
+    }
+
+    bool res = calcOutputsToSpend( nanoCoins - freeNanoCoins, spentOuts, hodlResultOutputs );
     if (!res) {
         // spend all case, very possible because we don't control the balance
         return getOutputsToSend( accountName, -1, hodlStatus, parent, resultOutputs );
     }
 
     // Let's ask for outptus
-    QVector<wallet::WalletOutput> hodlOuts2ask;
-    for (const auto & o : hodlOuts) {
-        if ( hodlResultOutputs.contains(o.outputCommitment) )
-            hodlOuts2ask.push_back(o);
+    QVector<core::HodlOutputInfo> hodlOuts2ask;
+    for (int i=0;i<hodlOutsIdx;i++) {
+        core::HodlOutputInfo & ho = hodlOuts[i].second;
+        if ( hodlResultOutputs.contains( ho.outputCommitment) )
+            hodlOuts2ask.push_back(ho);
     }
     Q_ASSERT( hodlOuts2ask.size() == hodlResultOutputs.size() );
 
     if (control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionHTML(parent, "HODL Output spending",
                         generateMessageHtmlOutputsToSpend( hodlOuts2ask ),
-                        "Cancel", "Continue", true, false, 1.3) )
+                        "Cancel", "Continue", true, false, 1.4) )
         return false;
 
     // User approve the spending, preparing the list of outputs...

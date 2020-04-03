@@ -209,7 +209,8 @@ void Outputs::setOutputsData(QString account, int64_t height, const QVector<wall
         };
 
         if (inHodl) {
-            rowData.push_back( state->getContext()->hodlStatus->isOutputInHODL( out.outputCommitment ) ? "Yes" : "No" );
+            core::HodlOutputInfo hodlOut = state->getContext()->hodlStatus->getHodlOutput( out.outputCommitment );
+            rowData.push_back( hodlOut.cls.isEmpty() ? "No" : hodlOut.cls );
         }
 
         ui->outputsTable->appendRow( rowData );

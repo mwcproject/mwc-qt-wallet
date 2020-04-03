@@ -26,10 +26,11 @@ const uint DATA_HODL_OUTPUTS    = 0x0002;
 const uint DATA_AMOUNT_TO_CLAIM = 0x0004;
 
 // currently submitted HODL outputs as a server see them
-void HodlOutputInfo::setData( const QString & _outputCommitment, double _value, double _weight ) {
+void HodlOutputInfo::setData( const QString & _outputCommitment, double _value, double _weight, const QString & _cls ) {
     outputCommitment = _outputCommitment;
     value = _value;
     weight = _weight;
+    cls = _cls;
 }
 
 void HodlClaimStatus::setData( int64_t _HodlAmount, int64_t _claimedMwc, const QString & _status, const QString & _date ) {
@@ -51,6 +52,14 @@ HodlStatus::HodlStatus( state::StateContext * _context ) : context(_context) {
     resetData();
 }
 
+QVector<HodlOutputInfo> HodlStatus::getHodlOutputs() const {
+    QVector<HodlOutputInfo> res;
+    for ( auto out = hodlOutputs.begin(); out!=hodlOutputs.end(); out++)
+        res.push_back(out.value());
+
+    return res;
+}
+
 void HodlStatus::setHodlStatus( const QString & _hodlStatus, const QString & errKey ) {
     hodlStatus = _hodlStatus;
     requestErrors.remove(errKey);
@@ -62,12 +71,11 @@ void HodlStatus::setHodlStatus( const QString & _hodlStatus, const QString & err
 void HodlStatus::setHodlOutputs( bool _inHodl, const QVector<HodlOutputInfo> & _hodlOutputs, const QString & errKey ) {
     availableData |= DATA_HODL_OUTPUTS;
     inHodl = _inHodl;
-    hodlOutputs = _hodlOutputs;
-    requestErrors.remove(errKey);
 
-    hodlOutputCommitment.clear();
-    for (const auto & ho : hodlOutputs)
-        hodlOutputCommitment += ho.outputCommitment;
+    for (const auto & out : _hodlOutputs) {
+        hodlOutputs.insert(out.outputCommitment, out);
+    }
+    requestErrors.remove(errKey);
 
     logger::logEmit("HODL", "onHodlStatusWasChanged", "setHodlOutputs");
     emit onHodlStatusWasChanged();
@@ -124,7 +132,6 @@ void HodlStatus::setRootPubKey( const QString & pubKey )
     inHodl = false;
     availableData &= ~(DATA_HODL_OUTPUTS | DATA_AMOUNT_TO_CLAIM);
     hodlOutputs.clear();
-    hodlOutputCommitment.clear();
     amount2claim = 0;
 
     emit onHodlStatusWasChanged();
@@ -197,30 +204,40 @@ QString HodlStatus::getWalletHodlStatus() const {
             return "Wallet not registered for HODL";
         }
 
-        if ( hodlOutputCommitment.isEmpty() && !isHodlRegistrationTimeLongEnough() ) {
+        if ( hodlOutputs.isEmpty() && !isHodlRegistrationTimeLongEnough() ) {
             return "Waiting for HODL server to scan outputs, can take up to 24 hours";
         }
 
         // in nano coins
-        int64_t hodlBalance = 0.0;
+        QMap<QString, int64_t> hodlBalancePerClass;
 
         if (canSkipWalletData) {
             for ( auto & ho : hodlOutputs ) {
-                hodlBalance += int64_t(ho.value * 1000000000.0 + 0.5);
+                int64_t balance = hodlBalancePerClass.value( ho.cls, 0 );
+                balance += int64_t(ho.value * 1000000000.0 + 0.5);
+                hodlBalancePerClass.insert( ho.cls, balance );
             }
         }
         else {
             for ( auto o = walletOutputs.constBegin(); o != walletOutputs.constEnd(); ++o ) {
                 for ( const auto & walletOutput : o.value() ) {
                     // Counting only exist outputs. Unconfirmed doesn't make sense to count
-                    if ( (walletOutput.status=="Unspent" || walletOutput.status=="Locked") && hodlOutputCommitment.contains(walletOutput.outputCommitment) ) {
-                        hodlBalance += walletOutput.valueNano;
+                    if ( (walletOutput.status=="Unspent" || walletOutput.status=="Locked") && hodlOutputs.contains(walletOutput.outputCommitment) ) {
+                        auto ho = hodlOutputs[walletOutput.outputCommitment];
+                        int64_t balance = hodlBalancePerClass.value( ho.cls, 0 );
+                        balance += int64_t(ho.value * 1000000000.0 + 0.5);
+                        hodlBalancePerClass.insert( ho.cls, balance );
                     }
                 }
             }
         }
 
-        return "Your HODL amount: " + util::nano2one(hodlBalance) + " MWC";
+        QString resultStr = "Your HODL amount:\n";
+        for (auto balance = hodlBalancePerClass.begin(); balance != hodlBalancePerClass.end(); balance++ ) {
+            resultStr += balance.key() + " : " + util::nano2one(balance.value()) + " MWC";
+        }
+
+        return resultStr;
     }
     else {
         if (config::isOnlineNode()) {
