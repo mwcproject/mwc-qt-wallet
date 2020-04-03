@@ -121,8 +121,13 @@ bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> 
     std::sort(outputs.begin(), outputs.end(), [](const wallet::WalletOutput &o1, const wallet::WalletOutput &o2) {return o1.valueNano < o2.valueNano;});
 
     QPair< int64_t, QVector<wallet::WalletOutput> >  oneCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 0 );
-    QPair< int64_t, QVector<wallet::WalletOutput> >  twoCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 1 );
-    QPair< int64_t, QVector<wallet::WalletOutput> >  threeCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 2 );
+    QPair< int64_t, QVector<wallet::WalletOutput> >  twoCommitRes;
+    if (outputs.size()<1000)
+        twoCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 1 );
+
+    QPair< int64_t, QVector<wallet::WalletOutput> >  threeCommitRes;
+    if (outputs.size()<50)
+        threeCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 2 );
 
     // It is a case with bunch of small outptus.
     if ( oneCommitRes.second.isEmpty() && twoCommitRes.second.isEmpty()  && threeCommitRes.second.isEmpty() ) {
@@ -185,6 +190,8 @@ bool getOutputsToSend( const QString & accountName, int64_t nanoCoins, core::Hod
 
     for ( const auto & o : outputs) {
         if ( o.status != "Unspent" ) // Interesting only in Unspent outputs
+            continue;
+        if (o.coinbase && o.numOfConfirms.toLong()<=1440 )
             continue;
 
         core::HodlOutputInfo ho = hodlStatus->getHodlOutput(o.outputCommitment);

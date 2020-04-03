@@ -71,7 +71,8 @@ public:
     void setError( const QString & errKey, const QString & error );
 
     QString getRootPubKey() const {return rootPubKey;}
-    void setRootPubKey( const QString & pubKey );
+    // return true if new key was set
+    bool setRootPubKey( const QString & pubKey );
 
     // Hex representation of HSA256 hash from rootpublickey binary representation
     QString getRootPubKeyHash() const {return rootPubKeyHash;}

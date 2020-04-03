@@ -117,8 +117,11 @@ void HodlStatus::setError( const QString & errKey, const QString & error ) {
 }
 
 
-void HodlStatus::setRootPubKey( const QString & pubKey )
+bool HodlStatus::setRootPubKey( const QString & pubKey )
 {
+    if (rootPubKey == pubKey)
+        return false;
+
     rootPubKey = pubKey;
     QByteArray keyHex = pubKey.toUtf8();// crypto::str2hex(pubKey);
     if (!keyHex.isEmpty()) {
@@ -135,6 +138,7 @@ void HodlStatus::setRootPubKey( const QString & pubKey )
     amount2claim = 0;
 
     emit onHodlStatusWasChanged();
+    return true;
 }
 
 

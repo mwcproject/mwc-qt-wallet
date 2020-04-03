@@ -251,7 +251,8 @@ void Hodl::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QS
             Q_ASSERT(message.isEmpty());
             Q_ASSERT(signature.isEmpty());
 
-            context->hodlStatus->setRootPubKey(rootPubKey);
+            if (!context->hodlStatus->setRootPubKey(rootPubKey))
+                break;
 
             if (!context->hodlStatus->hasHodlOutputs() ) {
                 sendRequest( HTTP_CALL::GET, "/v1/checkOutputs",
