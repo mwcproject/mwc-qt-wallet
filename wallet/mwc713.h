@@ -237,13 +237,9 @@ public:
                          QString message, int inputConfirmationNumber, int changeOutputs,
                          const QStringList & outputs )  override;
 
-    // Get total number of Outputs
-    // Check Signal: onOutputCount(int number)
-    virtual void getOutputCount(bool show_spent, QString account)  override;
-
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
-    virtual void getOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync)  override;
+    virtual void getOutputs(QString account, bool show_spent, bool enforceSync)  override;
 
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
@@ -337,7 +333,6 @@ public:
     void setTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages );
 
     // Outputs results
-    void updateOutputCount(QString account, int number);
     void setOutputs( QString account, int64_t height, QVector<WalletOutput> outputs);
 
     void setExportProofResults( bool success, QString fn, QString msg );

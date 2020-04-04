@@ -24,33 +24,14 @@ class HodlStatus;
 
 namespace wallet {
 
-class TaskOutputCount : public Mwc713Task {
-public:
-    const static int64_t TIMEOUT = 1000*10;
-
-    TaskOutputCount( MWC713 * wallet713, bool show_spent, QString _account ) :
-            Mwc713Task("Outputs", QString("output_count") + (show_spent?" --show-spent":""), wallet713, ""), account(_account) {}
-
-    virtual ~TaskOutputCount() override {}
-
-    virtual bool processTask(const QVector<WEvent> & events) override;
-
-    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
-private:
-    QString account;
-};
-
 
 class TaskOutputs : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*15;
 
     // Outputs run with no-refresh because wallet responsible to call sync first
-    TaskOutputs( MWC713 * wallet713, int offset, int number, bool show_spent ) :
-            Mwc713Task("Outputs", "outputs -o " + QString::number(offset) + " -l " + QString::number(number) + (show_spent?" --show-spent":"") + " --no-refresh", wallet713, "")
-    {
-        Q_ASSERT(offset>=0); Q_ASSERT(number>0);
-    }
+    TaskOutputs( MWC713 * wallet713, bool show_spent ) :
+        Mwc713Task("Outputs", QString("outputs") + (show_spent?" --show-spent":"") + " --no-refresh" , wallet713, "") { }
 
     virtual ~TaskOutputs() override {}
 

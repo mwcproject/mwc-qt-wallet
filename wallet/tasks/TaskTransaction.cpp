@@ -103,27 +103,6 @@ WalletOutput parseOutputLine( QString str, const QVector<int> & outputLayout) {
     return res;
 }
 
-static int getNumberFromEvents(const QVector<WEvent> & events) {
-    // Searching for the last line with just a number
-    int number = 0; // in case if not found...
-    for (int i=events.size()-1; i>=0; i--) {
-        if ( events[i].event == WALLET_EVENTS::S_LINE ) {
-            bool ok = false;
-            int n = events[i].message.toInt(&ok);
-            if (ok && n>=0) {
-                number = n;
-                break;
-            }
-        }
-    }
-    return number;
-}
-
-
-bool TaskOutputCount::processTask(const QVector<WEvent> & events) {
-    wallet713->updateOutputCount( account, getNumberFromEvents(events));
-    return true;
-}
 
 static void parseOutputs(const QVector<WEvent> & events, // in
                               QString & account, // out

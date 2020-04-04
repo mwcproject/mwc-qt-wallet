@@ -63,6 +63,25 @@ struct ContactRecord {
     bool loadData( QDataStream & in);
 };
 
+struct OutputNotes {
+    // (walletId => (account within wallet => (output committment => note)))
+    QString walletId;
+    QMap<QString, QMap<QString, QMap<QString, QString>>> outputNotesByWallet;
+
+    bool cleanupNotes(const QString& account, const QVector<wallet::WalletOutput> & outputs);
+
+    const QMap<QString, QString>& getOutputNotes(const QString& account);
+    void updateOutputNote(const QString& account, const QString& commitment, const QString& note);
+    void deleteOutputNote(const QString& account, const QString& commitment);
+
+private:
+    QMap<QString, QList<QString>> cleanedUpAccounts;
+    QMap<QString, QString> emptyOutputNotes;
+
+    bool notesNeedCleanup(const QString& walletId, const QString& account);
+    void recordNotesCleanup(const QString& walletId, const QString& account);
+};
+
 
 // State that applicable to all application.
 class AppContext
@@ -161,6 +180,14 @@ public:
     // HODL outputs data
     void saveHodlOutputs( const QString & rootPubKeyHash, const QMap<QString, core::HodlOutputInfo> & hodlOutputs );
     QMap<QString, core::HodlOutputInfo> loadHodlOutputs(const QString & rootPubKeyHash );
+
+    // output note
+    void setOutputNotesWalletId(QString walletId);
+    void initOutputNotes(const QString & account, const QVector<wallet::WalletOutput> & outputs);
+    const QMap<QString, QString>& getOutputNotes(const QString& account);
+    void updateOutputNote(const QString& account, const QString& outputCommitment, const QString& newNote);
+    void deleteOutputNote(const QString& account, const QString& outputCommitment);
+
 private:
     bool loadData();
     void saveData() const;
@@ -205,6 +232,8 @@ private:
     bool showOutputAll = false; // Show all or Unspent outputs
 
     QMap<QString, qulonglong> hodlRegistrations;
+
+    OutputNotes outputNotes;
 };
 
 template <class T>

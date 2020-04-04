@@ -25,6 +25,20 @@ class Outputs;
 
 namespace state {
 
+const QString OUTPUT_SPENT_STATUS    = "Spent";
+
+struct CachedOutputInfo {
+    QString currentAccount;
+    bool showSpent = false;
+    int64_t height = -1;
+
+    QVector<wallet::WalletOutput> allAccountOutputs;
+    QVector<wallet::WalletOutput> unspentOutputs;
+
+    void resetCache(QString account, bool showSpent);
+    void setCache(QString account, int64_t height, QVector<wallet::WalletOutput> outputs);
+};
+
 
 class Outputs : public QObject, public State
 {
@@ -36,8 +50,7 @@ public:
     void deleteWnd(wnd::Outputs * w) { if(w==wnd) wnd = nullptr;}
 
     // request wallet for outputs
-    void requestOutputCount(bool show_spent, QString account);
-    void requestOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync);
+    void requestOutputs(QString account, bool show_spent, bool enforceSync);
 
     QString getCurrentAccountName() const;
 
@@ -49,12 +62,14 @@ public:
     QVector<wallet::AccountInfo> getWalletBalance();
 
 private slots:
-    void onOutputCount(QString account, int count);
     void onOutputs( QString account, int64_t height, QVector<wallet::WalletOutput> outputs);
 
     void onWalletBalanceUpdated();
 
     void onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString message);
+
+    void onLoginResult(bool ok);
+    void onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature );
 
 protected:
     virtual NextStateRespond execute() override;
@@ -62,6 +77,7 @@ protected:
 
 private:
     wnd::Outputs * wnd = nullptr;
+    CachedOutputInfo cachedOutputs;
 };
 
 }

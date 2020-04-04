@@ -73,6 +73,121 @@ bool ContactRecord::loadData( QDataStream & in) {
     return true;
 }
 
+//////////////////////////////////////////////////////////////////
+
+bool OutputNotes::notesNeedCleanup(const QString& walletId, const QString& account) {
+    bool needsCleanup = false;
+    if (!cleanedUpAccounts.contains(walletId)) {
+        needsCleanup = true;
+    }
+    else if (!cleanedUpAccounts.value(walletId).contains(account)) {
+        needsCleanup = true;
+    }
+    return needsCleanup;
+}
+
+void OutputNotes::recordNotesCleanup(const QString& walletId, const QString& account) {
+    if (!cleanedUpAccounts.contains(walletId)) {
+        // record both wallet instance and account
+        QList<QString> accountList;
+        accountList.push_back(account);
+        cleanedUpAccounts.insert(walletId, accountList);
+    }
+    else {
+        // add account to list of cleaned up account for the wallet instance
+        if (!cleanedUpAccounts[walletId].contains(account)) {
+            cleanedUpAccounts[walletId].push_back(account);
+        }
+        // else do nothing, wallet instance and account already cleaned up
+    }
+}
+
+bool OutputNotes::cleanupNotes(const QString& account, const QVector<wallet::WalletOutput> & outputs) {
+    bool outputNotesChanged = false;
+    if (!walletId.isEmpty() && outputNotesByWallet.contains(walletId)) {
+        if (outputNotesByWallet[walletId].contains(account)) {
+            // we have output notes for this wallet instance and account
+            if (notesNeedCleanup(walletId, account)) {
+                QMap<QString, QString>& outputNotes = outputNotesByWallet[walletId][account];
+                if (!outputNotes.isEmpty()) {
+                    // for easy lookup, create a list of commitments from the given outputs
+                    QList<QString> commitmentList;
+                    for (int i=0; i< outputs.size(); i++) {
+                        commitmentList.append(outputs[i].outputCommitment);
+                    }
+                    // check to make sure each output note from the stored list is still around
+                    QList<QString> outputNotesKeys = outputNotes.keys();
+                    for (int i=0; i<outputNotesKeys.size(); ++i) {
+                        if (!commitmentList.contains(outputNotesKeys.at(i))) {
+                            outputNotes.remove(outputNotesKeys.at(i));
+                            outputNotesChanged = true;
+                        }
+                    }
+                }
+                recordNotesCleanup(walletId, account);
+            }
+        }
+        else {
+            // this account doesn't have any output notes
+            // add the account to the wallet instance's list of accounts
+            cleanedUpAccounts[walletId].push_back(account);
+        }
+    }
+    else {
+        // we don't have any output notes for this wallet instance
+        // add the wallet instance and account to the list of cleaned up accounts
+        QList<QString> accountList;
+        accountList.push_back(account);
+        cleanedUpAccounts.insert(walletId, accountList);
+    }
+
+    return outputNotesChanged;
+}
+
+const QMap<QString, QString>& OutputNotes::getOutputNotes(const QString& account) {
+    QMap<QString, QString>& outputs = emptyOutputNotes;
+    if (!walletId.isEmpty() && outputNotesByWallet.contains(walletId)) {
+        if (outputNotesByWallet[walletId].contains(account)) {
+            outputs = outputNotesByWallet[walletId][account];
+        }
+    }
+    return outputs;
+}
+
+void OutputNotes::updateOutputNote(const QString& account, const QString& commitment, const QString& note) {
+    if (!walletId.isEmpty() && outputNotesByWallet.contains(walletId)) {
+        if (outputNotesByWallet[walletId].contains(account)) {
+            QMap<QString, QString>& outputNotes = outputNotesByWallet[walletId][account];
+            // if the commitment doesn't exist, insert will add it
+            // otherwise the current value will be replaced
+            outputNotes.insert(commitment, note);
+        }
+        else {
+            QMap<QString, QString> outputNote;
+            outputNote.insert(commitment, note);
+            outputNotesByWallet[walletId].insert(account, outputNote);
+        }
+    }
+    else if (!walletId.isEmpty()) {
+        QMap<QString, QString> outputNote;
+        outputNote.insert(commitment, note);
+        QMap<QString, QMap<QString, QString>> accountOutputs;
+        accountOutputs.insert(account, outputNote);
+        outputNotesByWallet.insert(walletId, accountOutputs);
+    }
+}
+
+void OutputNotes::deleteOutputNote(const QString& account, const QString& commitment) {
+    if (!walletId.isEmpty() && outputNotesByWallet.contains(walletId)) {
+        if (outputNotesByWallet[walletId].contains(account)) {
+            QMap<QString, QString>& outputNotes = outputNotesByWallet[walletId][account];
+            if (outputNotes.contains(commitment)) {
+                outputNotes.remove(commitment);
+            }
+        }
+    }
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //   AppContext
@@ -138,7 +253,8 @@ bool AppContext::loadData() {
 
     int id = 0;
     in >> id;
-    if (id<0x4783 || id>0x4791)
+
+    if (id<0x4783 || id>0x4792)
          return false;
 
     in >> receiveAccount;
@@ -196,6 +312,10 @@ bool AppContext::loadData() {
         in >> autoStartKeybaseEnabled;
     }
 
+    if (id>=0x4792) {
+        in >> outputNotes.outputNotesByWallet;
+    }
+
     return true;
 }
 
@@ -216,7 +336,7 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x4791;
+    out << 0x4792;
     out << receiveAccount;
     out << currentAccountName;
     out << int(activeWndState);
@@ -245,6 +365,8 @@ void AppContext::saveData() const {
 
     out << autoStartMQSEnabled;
     out << autoStartKeybaseEnabled;
+
+    out << outputNotes.outputNotesByWallet;
 }
 
 void AppContext::setLogsEnabled(bool enabled) {
@@ -495,6 +617,31 @@ QMap<QString, core::HodlOutputInfo> AppContext::loadHodlOutputs(const QString & 
 
     return res;
 
+}
+
+void AppContext::setOutputNotesWalletId(QString walletId) {
+    outputNotes.walletId = walletId;
+}
+
+void AppContext::initOutputNotes(const QString& account, const QVector<wallet::WalletOutput> & outputs) {
+    // perform one-time cleanup of old output notes for this wallet instance and account
+    if (outputNotes.cleanupNotes(account, outputs)) {
+        saveData();
+    }
+}
+
+const QMap<QString, QString>& AppContext::getOutputNotes(const QString& account) {
+    return outputNotes.getOutputNotes(account);
+}
+
+void AppContext::updateOutputNote(const QString& account, const QString& outputCommitment, const QString& newNote) {
+    outputNotes.updateOutputNote(account, outputCommitment, newNote);
+    saveData();
+}
+
+void AppContext::deleteOutputNote(const QString& account, const QString& outputCommitment) {
+    outputNotes.deleteOutputNote(account, outputCommitment);
+    saveData();
 }
 
 

@@ -16,12 +16,36 @@
 #include "../windows/e_outputs_w.h"
 #include "../core/windowmanager.h"
 #include "../core/appcontext.h"
+#include "../core/Config.h"
 #include "../state/statemachine.h"
+#include "../util/crypto.h"
 #include "../util/Log.h"
 #include <QDebug>
 #include "../core/global.h"
 
 namespace state {
+
+void CachedOutputInfo::resetCache(QString account, bool show_spent) {
+    currentAccount = account;
+    showSpent = show_spent;
+    height = -1;
+    unspentOutputs.clear();
+}
+
+void CachedOutputInfo::setCache(QString account, int64_t height, QVector<wallet::WalletOutput> outputs) {
+    Q_UNUSED(account);
+    this->height = height;
+    allAccountOutputs = outputs;
+    // Check if the cache has been reset. If so, we need to regenerate the unspentOutputs.
+    if (showSpent == false && unspentOutputs.isEmpty()) {
+        // create list of any output that isn't spent
+        for (int i=0; i<allAccountOutputs.size(); ++i) {
+            if (allAccountOutputs[i].status != OUTPUT_SPENT_STATUS) {
+                unspentOutputs.append(allAccountOutputs[i]);
+            }
+        }
+    }
+}
 
 
 Outputs::Outputs(StateContext * context) :
@@ -30,10 +54,13 @@ Outputs::Outputs(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &Outputs::onWalletBalanceUpdated, Qt::QueuedConnection );
 
     QObject::connect( context->wallet, &wallet::Wallet::onOutputs, this, &Outputs::onOutputs );
-    QObject::connect( context->wallet, &wallet::Wallet::onOutputCount, this, &Outputs::onOutputCount );
 
     QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
                       this, &Outputs::onNewNotificationMessage, Qt::QueuedConnection );
+
+    QObject::connect( context->wallet , &wallet::Wallet::onLoginResult, this, &Outputs::onLoginResult, Qt::QueuedConnection );
+
+    QObject::connect( context->wallet , &wallet::Wallet::onRootPublicKey, this, &Outputs::onRootPublicKey, Qt::QueuedConnection );
 }
 
 Outputs::~Outputs() {}
@@ -50,28 +77,33 @@ NextStateRespond Outputs::execute() {
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
-void Outputs::requestOutputCount(bool show_spent, QString account) {
-    context->wallet->getOutputCount(show_spent, account);
-}
-
 // request wallet for outputs
-void Outputs::requestOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync) {
-    context->wallet->getOutputs(account, offset, number, show_spent, enforceSync);
-    // Respond:  onOutputs(...)
-    // Balance need to be updated as well to match outputs state
-    context->wallet->updateWalletBalance(false,false);
-}
+void Outputs::requestOutputs(QString account, bool show_spent, bool enforceSync) {
+    if (cachedOutputs.currentAccount != account) {
+        enforceSync = true;
+    }
 
-void Outputs::onOutputCount(QString account, int count) {
-    if (wnd) {
-        wnd->setOutputCount(account, count);
+    if (enforceSync) {
+        // request all outputs, including spent, so we can cache them
+        // Respond:  onOutputs(...)
+        context->wallet->getOutputs(account, true, enforceSync);
+        // Balance needs to be updated as well to match outputs state
+        context->wallet->updateWalletBalance(false,false);
+        cachedOutputs.resetCache(account, show_spent);
+    }
+    else if (wnd) {
+        wnd->setOutputsData(account, cachedOutputs.height, show_spent ? cachedOutputs.allAccountOutputs : cachedOutputs.unspentOutputs);
     }
 }
 
 void Outputs::onOutputs( QString account, int64_t height, QVector<wallet::WalletOutput> outputs) {
     qDebug() << "state onOutputs call for wnd=" << wnd;
+    cachedOutputs.setCache(account, height, outputs);
+    context->appContext->initOutputNotes(account, cachedOutputs.allAccountOutputs);
     if (wnd) {
-        wnd->setOutputsData(account,height, outputs);
+        QVector<wallet::WalletOutput>& wndOutputs = cachedOutputs.showSpent ? cachedOutputs.allAccountOutputs : cachedOutputs.unspentOutputs;
+        wnd->setOutputCount(account, wndOutputs.size());
+        wnd->setOutputsData(account, height, wndOutputs);
     }
 }
 
@@ -108,6 +140,34 @@ void Outputs::onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString mes
 
     if (wnd && message.contains("Changing status for output")) {
         wnd->triggerRefresh();
+    }
+}
+
+void Outputs::onLoginResult(bool ok) {
+    Q_UNUSED(ok)
+
+    if (config::isOnlineWallet()) {
+        Q_ASSERT(config::isOnlineWallet() || config::isColdWallet());
+        context->wallet->getRootPublicKey("");
+    }
+}
+
+void Outputs::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature ) {
+    Q_UNUSED(errMsg)
+    Q_UNUSED(message)
+    Q_UNUSED(signature)
+
+    if (success) {
+        QString rootPubKeyHash;
+        QString rpkey = rootPubKey;
+        QByteArray keyHex = rpkey.toUtf8();
+        if (!keyHex.isEmpty()) {
+            rootPubKeyHash = crypto::hex2str( crypto::HSA256( keyHex ) );
+        }
+        else {
+            rootPubKeyHash = "";
+        }
+        context->appContext->setOutputNotesWalletId(rootPubKeyHash);
     }
 }
 

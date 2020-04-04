@@ -35,9 +35,12 @@ namespace dlg {
 class ShowOutputDlg : public control::MwcDialog {
 Q_OBJECT
 public:
-    explicit ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output, const wallet::WalletConfig &config, core::HodlStatus * hodlStatus);
+    explicit ShowOutputDlg(QWidget *parent, const QString& account, const wallet::WalletOutput &output, const wallet::WalletConfig &config, core::HodlStatus * hodlStatus, QString note);
 
     ~ShowOutputDlg();
+
+signals:
+    void saveOutputNote(const QString& account, const QString& commitment, const QString& note);
 
 private slots:
 
@@ -45,11 +48,20 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_outputNote_textEdited(const QString& text);
+    void on_pushButton_Save_clicked();
+
+private:
+    void updateButtons(bool showOutputEditButtons);
+
 private:
     Ui::ShowOutputDlg *ui;
 
     QString blockExplorerUrl;
     QString commitment;
+    QString account;
+    QString originalOutputNote;
+    QString newOutputNote;
 };
 
 }

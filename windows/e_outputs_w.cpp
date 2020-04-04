@@ -52,7 +52,6 @@ Outputs::Outputs(QWidget *parent, state::Outputs *_state) :
 
     ui->outputsTable->setFocus();
 
-    updatePages(-1, -1, -1);
 }
 
 Outputs::~Outputs() {
@@ -110,10 +109,6 @@ void Outputs::setOutputCount(QString account, int count) {
     int pageSize = calcPageSize();
     currentPagePosition = std::max(0, totalOutputs-pageSize);
     buttonState = updatePages(currentPagePosition, totalOutputs, pageSize);
-
-    // Requesting the output data
-    state->requestOutputs(account, currentPagePosition, pageSize, isShowUnspent(),
-                          true); // It is a refresh call, want to sync enforcement
 }
 
 void Outputs::on_prevBtn_clicked() {
@@ -122,7 +117,7 @@ void Outputs::on_prevBtn_clicked() {
         currentPagePosition = std::max( 0, currentPagePosition-pageSize );
 
         buttonState = updatePages(currentPagePosition, totalOutputs, pageSize);
-        state->requestOutputs(currentSelectedAccount(), currentPagePosition, pageSize, isShowUnspent(), false);
+        state->requestOutputs(currentSelectedAccount(), isShowUnspent(), false);
 
         // progress make it worse
 //        ui->progressFrame->show();
@@ -137,7 +132,7 @@ void Outputs::on_nextBtn_clicked() {
 
         buttonState = updatePages(currentPagePosition, totalOutputs, pageSize);
 
-        state->requestOutputs(currentSelectedAccount(), currentPagePosition, pageSize, isShowUnspent(), false);
+        state->requestOutputs(currentSelectedAccount(), isShowUnspent(), false);
 
         // progress make it worse
 //        ui->progressFrame->show();
@@ -176,19 +171,23 @@ QString Outputs::currentSelectedAccount() {
 
 void Outputs::setOutputsData(QString account, int64_t height, const QVector<wallet::WalletOutput> &outp) {
     Q_UNUSED(height)
+    Q_ASSERT(totalOutputs == outp.size());
 
     qDebug() << "Outputs::setOutputsData for account=" << account << " outp zs=" << outp.size();
 
     ui->progressFrame->hide();
     ui->tableFrame->show();
 
-
     if (account != currentSelectedAccount()) {
         qDebug() << "Outputs::setOutputsData ignored because of account name";
         return;
     }
 
-    outputs = outp;
+    outputs.clear();
+    int pageSize = calcPageSize();
+    for (int i=currentPagePosition; i<outp.size() && pageSize>0; i++, pageSize--) {
+        outputs.push_back(outp[i]);
+    }
 
     ui->outputsTable->clearData();
 
@@ -230,9 +229,7 @@ void Outputs::triggerRefresh() {
 void Outputs::on_refreshButton_clicked() {
     ui->progressFrame->show();
     ui->tableFrame->hide();
-    // Request count and then refresh from current posiotion...
-    state->requestOutputCount(isShowUnspent(), currentSelectedAccount());
-    // count will trigger the page update
+    requestOutputs(currentSelectedAccount());
 }
 
 
@@ -247,7 +244,7 @@ void Outputs::requestOutputs(QString account) {
     updatePages(-1, -1, -1);
 
     ui->outputsTable->clearData();
-    state->requestOutputCount(isShowUnspent(), account);
+    state->requestOutputs(account, isShowUnspent(), true);
 }
 
 void Outputs::on_accountComboBox_activated(int index) {
@@ -313,7 +310,25 @@ void Outputs::on_outputsTable_cellDoubleClicked(int row, int column)
     if (selected==nullptr)
         return;
 
-    dlg::ShowOutputDlg showOutputDlg(this, *selected, state->getContext()->wallet->getWalletConfig(), state->getContext()->hodlStatus );
-    showOutputDlg.exec();}
-
+    QString outputNote;
+    QString account = currentSelectedAccount();
+    if (state->getContext()->appContext->getOutputNotes(account).contains(selected->outputCommitment)) {
+            outputNote = state->getContext()->appContext->getOutputNotes(account).value(selected->outputCommitment);
+    }
+    dlg::ShowOutputDlg showOutputDlg(this, account, *selected, state->getContext()->wallet->getWalletConfig(), state->getContext()->hodlStatus, outputNote );
+    connect(&showOutputDlg, &dlg::ShowOutputDlg::saveOutputNote, this, &Outputs::saveOutputNote);
+    showOutputDlg.exec();
 }
+
+void Outputs::saveOutputNote(const QString& account, const QString& commitment, const QString& note) {
+    if (note.isEmpty()) {
+        state->getContext()->appContext->deleteOutputNote(account, commitment);
+    }
+    else {
+        // add new note or update existing note for this commitment
+        state->getContext()->appContext->updateOutputNote(account, commitment, note);
+    }
+}
+
+}  // end namespace wnd
+

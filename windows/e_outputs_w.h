@@ -59,6 +59,8 @@ private slots:
 
     void on_outputsTable_cellDoubleClicked(int row, int column);
 
+    void saveOutputNote(const QString& account, const QString& commitment, const QString& note);
+
 private:
     void initTableHeaders();
     void saveTableHeaders();

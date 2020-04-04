@@ -529,13 +529,9 @@ public:
     virtual void getNextKey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) = 0;
 
 
-    // Get total number of Outputs
-    // Check Signal: onOutputCount(int number)
-    virtual void getOutputCount(bool show_spent, QString account)  = 0;
-
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
-    virtual void getOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync)  = 0;
+    virtual void getOutputs(QString account, bool show_spent, bool enforceSync)  = 0;
 
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
@@ -636,8 +632,7 @@ signals:
 
     void onAllTransactions( QVector<WalletTransaction> Transactions);
 
-    void onOutputCount(QString account, int number);
-    void onOutputs( QString account, int64_t height, QVector<WalletOutput> Transactions);
+    void onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs);
 
     void onCheckResult(bool ok, QString errors );
 

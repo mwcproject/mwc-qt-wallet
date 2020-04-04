@@ -22,7 +22,7 @@
 
 namespace dlg {
 
-ShowOutputDlg::ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output, const wallet::WalletConfig &config, core::HodlStatus * hodlStatus) :
+ShowOutputDlg::ShowOutputDlg(QWidget *parent, const QString &account, const wallet::WalletOutput &output, const wallet::WalletConfig &config, core::HodlStatus * hodlStatus, QString note) :
         control::MwcDialog(parent),
         ui(new Ui::ShowOutputDlg) {
     ui->setupUi(this);
@@ -47,10 +47,29 @@ ShowOutputDlg::ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output
     }
 
     commitment = output.outputCommitment;
+
+    this->account = account;
+    originalOutputNote = note;
+    newOutputNote = note;
+    ui->outputNote->setText(newOutputNote);
+    updateButtons(false);
 }
 
 ShowOutputDlg::~ShowOutputDlg() {
     delete ui;
+}
+
+void ShowOutputDlg::updateButtons(bool showOutputEditButtons) {
+    ui->pushButton_Save->setEnabled(showOutputEditButtons);
+
+    // disable OK button if save is enabled
+    // forces the user to save any active changes to the note
+    if (showOutputEditButtons) {
+        ui->pushButton->setEnabled(false);
+    }
+    else {
+        ui->pushButton->setEnabled(true);
+    }
 }
 
 void ShowOutputDlg::on_viewOutput_clicked() {
@@ -58,7 +77,23 @@ void ShowOutputDlg::on_viewOutput_clicked() {
 }
 
 void ShowOutputDlg::on_pushButton_clicked() {
+    if (newOutputNote != originalOutputNote) {
+        emit saveOutputNote(account, commitment, newOutputNote);
+    }
     accept();
+}
+
+void ShowOutputDlg::on_outputNote_textEdited(const QString& text) {
+    Q_UNUSED(text);
+    updateButtons(true);
+}
+
+void ShowOutputDlg::on_pushButton_Save_clicked() {
+    QString newNote = ui->outputNote->text();
+    if (newNote != newOutputNote) {
+        newOutputNote = newNote;
+    }
+    updateButtons(false);
 }
 
 }
