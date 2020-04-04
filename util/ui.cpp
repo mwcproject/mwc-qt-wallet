@@ -245,6 +245,14 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
                 "\nOutputs:\n" + outputs2print.join("\n")
             );
         }
+
+        // 1 - resulting output.  outputsNumber - change outputs
+        // Limit 500 will be checked on the waalet side
+        if (resultOutputs.size() + outputsNumber + 1 > 498 ) {
+            control::MessageBox::messageText(parent, "Send Amount", "We can't send such large amount of the coins in a single transaction because your outputs are too small. Please send smaller amount.");
+            return false;
+        }
+
         return res;
     }
 
@@ -285,6 +293,13 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
                         generateMessageHtmlOutputsToSpend( hodlOuts2ask ),
                         "Cancel", "Continue", true, false, 1.4) )
         return false;
+
+    // 1 - resulting output.  outputsNumber - change outputs
+    // Limit 500 will be checked on the waalet side
+    if (hodlResultOutputs.size()+freeOuts.size() + outputsNumber + 1 > 498 ) {
+        control::MessageBox::messageText(parent, "Send Amount", "We can't send such large amount of the coins in a single transaction because your outputs are too small. Please send smaller amount.");
+        return false;
+    }
 
     // User approve the spending, preparing the list of outputs...
     resultOutputs = hodlResultOutputs;
