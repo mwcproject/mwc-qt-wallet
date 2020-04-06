@@ -67,16 +67,51 @@ void Hodl::reportMessage(const QString & title, const QString & message) {
 
 // Hodl object changed it's state, need to refresh
 void Hodl::updateHodlState() {
-    ui->signInButton->setEnabled(!state->getContext()->hodlStatus->isInHodl());
+    core::HodlStatus * hodlStatus = state->getContext()->hodlStatus;
+    Q_ASSERT(hodlStatus);
 
-    ui->hodlStatus->setText( state->getContext()->hodlStatus->getHodlStatus() );
-    ui->accountStatus->setText( state->getContext()->hodlStatus->getWalletHodlStatus() );
+    ui->signInButton->setEnabled(!hodlStatus->isInHodl());
+    ui->hodlStatus->setText( hodlStatus->getHodlStatus() );
+    ui->accountStatus->setText( hodlStatus->getWalletHodlStatus() );
 }
 
 void Hodl::hideWaitingStatus() {
     ui->progress->hide();
 }
 
+void Hodl::mouseDoubleClickEvent( QMouseEvent * e ) {
+    Q_UNUSED(e)
+
+    core::HodlStatus * hodlStatus = state->getContext()->hodlStatus;
+    Q_ASSERT(hodlStatus);
+
+    QString rootPubKey = hodlStatus->getRootPubKey();
+    QString rootPubKeyHash =  hodlStatus->getRootPubKeyHash();
+    QString isInHodlStr = hodlStatus->isInHodl() ? "Yes" : "No";
+
+    QVector<core::HodlOutputInfo> hodlOutputs = hodlStatus->getHodlOutputs();
+    double totalHodlAmount = 0.0;
+    for (const auto & ho : hodlOutputs)
+        totalHodlAmount += ho.value;
+
+    QMap<QString, QString> requestErrors = hodlStatus->getRequestErrors();
+    QString requestErrorsStr;
+    for ( auto re = requestErrors.begin(); re != requestErrors.end(); re++ ) {
+        if (requestErrorsStr.length()>0)
+            requestErrorsStr+="\n";
+        requestErrorsStr += re.key() + " : " + re.value();
+    }
+
+    QString reportStr = "rootpubkey: " + rootPubKey + "\n" +
+            "Hash: " + rootPubKeyHash + "\n" +
+            "In Hodl status: " + isInHodlStr + "\n" +
+            "Hodl amount: " + QString::number(totalHodlAmount) + " at " + QString::number(hodlOutputs.size()) + " outputs\n\n" +
+            "API warnings: " + (requestErrorsStr.isEmpty() ? "None" : requestErrorsStr);
+
+    control::MessageBox::messageText(this, "HODL internal status",
+            "This is internal state of the wallet HODL. This information intended for MWC developer usage. If you accidentally call this dialog, please close it.\n\n" + reportStr,
+            1.3);
+}
 
 }
 

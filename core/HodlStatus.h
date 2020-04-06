@@ -110,6 +110,8 @@ public:
     // Return true if we can trust the outputs that we get from HODL server. Likely scan was happens and data is updated
     bool isHodlRegistrationTimeLongEnough() const;
 
+    QMap<QString, QString> getRequestErrors() const {return requestErrors;}
+
 private slots:
     void onLoginResult(bool ok);
     void onLogout();

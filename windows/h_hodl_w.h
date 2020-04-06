@@ -47,6 +47,9 @@ private slots:
     void on_signInButton_clicked();
     void on_claimMwcButton_clicked();
 
+protected:
+    void mouseDoubleClickEvent( QMouseEvent * e ) override;
+
 private:
     Ui::Hodl *ui;
     state::Hodl * state;
