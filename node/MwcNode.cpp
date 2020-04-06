@@ -106,9 +106,37 @@ void MwcNode::stop() {
     if (nodeProcess) {
 
         if (nodeProcess->state() == QProcess::Running) {
-            qDebug() << "killing mwc-node";
-            nodeProcess->kill();
-            if (!util::processWaitForFinished( nodeProcess, 30000, "mwc-node")) {
+            qDebug() << "Stopping mwc-node...";
+
+            // QT is event based. Here we want to have blocking sync call and it is a problem
+            // Here we are calling process event loop on our own because of that
+            sendRequest("StopMwcNode", getNodeSecret(), "/v1/status?action=stop_node", REQUEST_TYPE::POST);
+
+            QCoreApplication::processEvents();
+
+            // Waiting for ptocess to finish...
+            int64_t startTime = QDateTime::currentMSecsSinceEpoch();
+            int64_t limitTime = startTime + int64_t(1000*20*config::getTimeoutMultiplier()); // about 30 seconds
+
+            while( nodeProcess->state() == QProcess::Running ) {
+                if (QDateTime::currentMSecsSinceEpoch() > limitTime) {
+                    if (control::MessageBox::questionText(nullptr, "Warning", "Stopping mwc-node process takes longer than expected.\nContinue to wait?",
+                                                      "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
+                        config::increaseTimeoutMultiplier();
+                        limitTime = QDateTime::currentMSecsSinceEpoch() + int64_t(1000*20*config::getTimeoutMultiplier());
+                    }
+                    else {
+                        break;
+                    }
+                }
+                if (nodeProcess->waitForFinished( 500 ))
+                    break;
+                QCoreApplication::processEvents();
+            }
+
+            QCoreApplication::processEvents();
+
+            while( nodeProcess->state() == QProcess::Running ) {
                 nodeProcess->terminate();
             }
         }
@@ -276,21 +304,35 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
     stop();
 
-    if (restartCounter<2) {
-        MwcNodeConfig mainnetConfig = getCurrentMwcNodeConfig( lastDataPath, "Mainnet" );
-        MwcNodeConfig floonetConfig = getCurrentMwcNodeConfig( lastDataPath, "Floonet" );
+    if (restartCounter<3) {
+        // First try to stop another instamse if it is there
+        if (restartCounter<2) {
+            MwcNodeConfig mainnetConfig = getCurrentMwcNodeConfig(lastDataPath, "Mainnet");
+            MwcNodeConfig floonetConfig = getCurrentMwcNodeConfig(lastDataPath, "Floonet");
 
-        // Let's request other embedded local node to stop. There is a high chance that it is running and take the port.
-        if (!mainnetConfig.secret.isEmpty())
-            sendRequest( "StopMainNet", mainnetConfig.secret, "/v1/status?action=stop_node", REQUEST_TYPE::POST);
+            // Let's request other embedded local node to stop. There is a high chance that it is running and take the port.
+            if (!mainnetConfig.secret.isEmpty())
+                sendRequest("StopMainNet", mainnetConfig.secret, "/v1/status?action=stop_node", REQUEST_TYPE::POST);
 
-        if (!floonetConfig.secret.isEmpty())
-            sendRequest( "StopFlooNet", floonetConfig.secret, "/v1/status?action=stop_node", REQUEST_TYPE::POST);
+            if (!floonetConfig.secret.isEmpty())
+                sendRequest("StopFlooNet", floonetConfig.secret, "/v1/status?action=stop_node", REQUEST_TYPE::POST);
 
-        restartCounter++;
+            restartCounter++;
 
-        // restart the node in 4 seconds
-        QTimer::singleShot( 1000*4, this, &MwcNode::onRestartNode );
+            // restart the node in 4 seconds
+            QTimer::singleShot(1000 * 4, this, &MwcNode::onRestartNode);
+        }
+        else {
+            Q_ASSERT(restartCounter==2);
+            restartCounter++;
+
+            // Last try. Let's clean the data
+            QDir dir(nodeWorkDir);
+            dir.removeRecursively();
+            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Embedded mwc-node data was cleaned, probably it was corrupted");
+            // restart the node in 1 second
+            QTimer::singleShot(1000 * 1, this, &MwcNode::onRestartNode);
+        }
     }
     else {
         reportNodeFatalError( "mwc-node process exited due some unexpected error. The exit code: " + QString::number(exitCode) + "\n\n"
