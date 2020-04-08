@@ -22,30 +22,6 @@
 
 namespace state {
 
-QVector<wallet::WalletTransaction>& CachedTransactionInfo::requestTransactions(int offset, int number)
-{
-    requestedTransactions.clear();
-
-    // offset is the number of the first transaction to display (txn numbers start with 0)
-    // number is the number of transactions to display
-    if (offset >= 0 && offset < transactions.size())
-    {
-        int count = number;
-        if ((offset + number) > transactions.size())
-        {
-            count = transactions.size() - offset;
-        }
-        requestedTransactions.resize(count);
-
-        int j = offset;
-        for (int i=0; i < count; i++)
-        {
-            requestedTransactions[i] = transactions[j++];
-        }
-    }
-    return requestedTransactions;
-}
-
 Transactions::Transactions( StateContext * context) :
     State(context, STATE::TRANSACTIONS)
 {
@@ -56,7 +32,6 @@ Transactions::Transactions( StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onCancelTransacton, this, &Transactions::onCancelTransacton, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &Transactions::onWalletBalanceUpdated, Qt::QueuedConnection );
 
-    QObject::connect( context->wallet, &wallet::Wallet::onTransactionCount, this, &Transactions::updateTransactionCount, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onTransactions, this, &Transactions::updateTransactions, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onTransactionById, this, &Transactions::onTransactionById, Qt::QueuedConnection );
 
@@ -97,49 +72,40 @@ void Transactions::switchCurrentAccount(const wallet::AccountInfo & account) {
     context->wallet->switchAccount( account.accountName );
 }
 
-void Transactions::requestTransactionCount(QString account) {
-    cachedTxs.resetCache(account);
-    context->wallet->getTransactionCount(account);
-}
-
 // Current transactions that wallet has
-void Transactions::requestTransactions(QString account, int offset, int number, bool enforceSync) {
+void Transactions::requestTransactions(QString account, bool enforceSync) {
     // the transaction count needs to always be requested first
-    Q_ASSERT(cachedTxs.totalTransactions >= 0);
-    Q_ASSERT(cachedTxs.currentAccount == account);
+    if (cachedTxs.currentAccount != account) {
+        cachedTxs.resetCache(account);
+        enforceSync = true;
+    }
 
     if (enforceSync)
     {
         // request node status so we can get the node height to use when calculating confirmations
         context->wallet->getNodeStatus();
         // request all transactions so we can cache them
-        context->wallet->getTransactions(account, 0, std::max(1,cachedTxs.totalTransactions), enforceSync);
+        context->wallet->getTransactions(account, enforceSync);
         context->wallet->updateWalletBalance(false,false); // With transactions refresh, need to update the balance
-        cachedTxs.saveTransactionsRequest(offset, number);
     }
     else if (wnd)
     {
         // pass the subset of transactions the windows needs
-        QVector<wallet::WalletTransaction>& wndTxs = cachedTxs.requestTransactions(offset, number);
-        wnd->setTransactionData(account, cachedTxs.height, wndTxs);
+        wnd->setTransactionData(account, cachedTxs.height, cachedTxs.transactions);
     }
 }
-
-void Transactions::updateTransactionCount(QString account, int number) {
-    cachedTxs.totalTransactions = number;
-    if (wnd) {
-        wnd->setTransactionCount(account, number);
-    }
-}
-
 
 void Transactions::updateTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> transactions) {
-    cachedTxs.transactions = transactions;
-    cachedTxs.height = height;
+    if (cachedTxs.currentAccount != account) {
+        Q_ASSERT(false); // rarely possible if there are many requests in the Q
+        return;
+    }
+
+    cachedTxs.setCache(account, height, transactions);
 
     if (wnd) {
-        QVector<wallet::WalletTransaction>& wndTxs = cachedTxs.requestTransactions(cachedTxs.requestedOffset, cachedTxs.requestedCount);
-        wnd->setTransactionData(account, height, wndTxs);
+        wnd->setTransactionCount(account, cachedTxs.transactions.size());
+        wnd->setTransactionData(account, height, cachedTxs.transactions);
     }
 }
 

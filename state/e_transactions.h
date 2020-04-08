@@ -27,17 +27,11 @@ namespace state {
 
 struct CachedTransactionInfo {
     QString currentAccount;
-    int totalTransactions = -1;
-    int requestedOffset = 0;
-    int requestedCount = 0;
-
     int64_t height;
     QVector<wallet::WalletTransaction> transactions;
-    QVector<wallet::WalletTransaction> requestedTransactions;
 
-    void resetCache(QString account) { currentAccount = account; totalTransactions = -1; requestedOffset = 0; requestedCount = 0; requestedTransactions.clear(); }
-    void saveTransactionsRequest(int offset, int number) { requestedOffset = offset; requestedCount = number; }
-    QVector<wallet::WalletTransaction>& requestTransactions(int offset, int number);
+    void resetCache(QString account) { currentAccount = account; height=0; transactions.clear(); }
+    void setCache(QString account, int64_t _height, const QVector<wallet::WalletTransaction> & _transactions) { currentAccount = account; height = _height; transactions = _transactions;}
 };
 
 class Transactions : public QObject, public State
@@ -50,11 +44,10 @@ public:
     void resetWnd(wnd::Transactions * w) { if(w==wnd) wnd = nullptr;}
 
     // Current transactions that wallet has
-    void requestTransactionCount(QString account);
-    void requestTransactions(QString account, int offset, int number, bool enforceSync);
+    void requestTransactions(QString account, bool enforceSync);
     // Request full info for the transaction
     void getTransactionById(QString account, int64_t txIdx) const;
-    const QVector<wallet::WalletTransaction>& getTransactions() { return cachedTxs.transactions; }
+    const QVector<wallet::WalletTransaction>& getTransactions() const { return cachedTxs.transactions; }
 
     void switchCurrentAccount(const wallet::AccountInfo & account);
 
@@ -81,7 +74,6 @@ protected:
     virtual QString getHelpDocName() override {return "transactions.html";}
 
 private slots:
-    void updateTransactionCount(QString account, int number);
     void updateTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> Transactions);
 
     void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );

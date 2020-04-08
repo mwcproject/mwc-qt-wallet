@@ -245,13 +245,9 @@ public:
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
     virtual void getOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync)  override;
 
-    // Get total number of Transactions
-    // Check Signal: onTransactionCount(int number)
-    virtual void getTransactionCount(QString account) override;
-
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
-    virtual void getTransactions(QString account, int offset, int number, bool enforceSync)  override;
+    virtual void getTransactions(QString account, bool enforceSync)  override;
 
     // get Extended info for specific transaction
     // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
@@ -336,7 +332,6 @@ public:
     void setSubmitFile(bool success, QString message, QString fileName);
 
     // Transactions
-    void updateTransactionCount(QString account, int number);
     void setTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
 
     void setTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages );

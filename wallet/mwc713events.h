@@ -142,7 +142,10 @@ public:
     // This tale ownership of object
     // Note:  if timeout <= 0, task will be executed immediately
     // Return: true if task was added.  False - was ignored
-    bool addTask( Mwc713Task * task, int64_t timeout, bool cancelIfExist = true );
+    void addTask( Mwc713Task * task, int64_t timeout);
+
+    // Check if task already exist
+    bool hasTask(Mwc713Task * task);
 
     bool addFirstTask( Mwc713Task * task, int64_t timeout);
 

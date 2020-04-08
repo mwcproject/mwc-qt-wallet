@@ -97,9 +97,6 @@ void Transactions::setTransactionCount(QString account, int count) {
     int pageSize = calcPageSize();
     currentPagePosition = std::max(0, totalTransactions-pageSize);
     buttonState = updatePages(currentPagePosition, totalTransactions, pageSize);
-
-    // Requesting the output data
-    state->requestTransactions(account, currentPagePosition, pageSize, true); // refresh call, sync need to be enforced
 }
 
 void Transactions::on_prevBtn_clicked()
@@ -109,7 +106,7 @@ void Transactions::on_prevBtn_clicked()
         currentPagePosition = std::max( 0, currentPagePosition-pageSize );
 
         buttonState = updatePages(currentPagePosition, totalTransactions, pageSize);
-        state->requestTransactions(currentSelectedAccount(), currentPagePosition, pageSize, false);
+        state->requestTransactions(currentSelectedAccount(), false);
     }
 }
 
@@ -120,7 +117,7 @@ void Transactions::on_nextBtn_clicked()
         currentPagePosition = std::min( totalTransactions-pageSize, currentPagePosition+pageSize );
 
         buttonState = updatePages(currentPagePosition, totalTransactions, pageSize);
-        state->requestTransactions(currentSelectedAccount(), currentPagePosition, pageSize, false);
+        state->requestTransactions(currentSelectedAccount(), false);
     }
 }
 
@@ -154,11 +151,12 @@ QString Transactions::currentSelectedAccount() {
 }
 
 void Transactions::setTransactionData(QString account, int64_t height, const QVector<wallet::WalletTransaction> & trans) {
-
     ui->progressFrame->hide();
     ui->transactionTable->show();
 
     Q_UNUSED(height);
+
+    Q_ASSERT(totalTransactions == trans.size());
 
     // Update active account just to guarantee be in sync. Normally account should be the same
     int curIdx = ui->accountComboBox->currentIndex();
@@ -180,7 +178,13 @@ void Transactions::setTransactionData(QString account, int64_t height, const QVe
 
     Q_ASSERT(accountOK);
 
-    transactions = trans;
+    //
+    int pageSize = calcPageSize();
+
+    transactions.clear();
+    for (int i=currentPagePosition; i<trans.size() && pageSize>0; i++, pageSize-- ) {
+        transactions.push_back(trans[i]);
+    }
 
     QDateTime current = QDateTime::currentDateTime();
 
@@ -277,7 +281,7 @@ void Transactions::requestTransactions(QString account) {
 
     updatePages(-1, -1, -1);
 
-    state->requestTransactionCount(account);
+    state->requestTransactions(account, true);
 
     updateButtons();
 }

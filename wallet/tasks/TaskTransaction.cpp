@@ -125,11 +125,6 @@ bool TaskOutputCount::processTask(const QVector<WEvent> & events) {
     return true;
 }
 
-bool TaskTransactionCount::processTask(const QVector<WEvent> & events) {
-    wallet713->updateTransactionCount(account, getNumberFromEvents(events));
-    return true;
-}
-
 static void parseOutputs(const QVector<WEvent> & events, // in
                               QString & account, // out
                               int64_t & height,  // out

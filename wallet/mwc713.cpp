@@ -403,6 +403,12 @@ void MWC713::confirmNewSeed()  {
 void MWC713::getSeed()  {
     // Need stop listeners first
 
+    Mwc713Task * task = new TaskRecoverShowMnenonic(this, walletPassword );
+    if ( eventCollector->hasTask(task) ) {
+        delete task;
+        return;
+    }
+
     QPair<bool,bool> lsnState = getListenerStartState();
 
     if (lsnState.first)
@@ -411,7 +417,7 @@ void MWC713::getSeed()  {
     if (lsnState.second)
         listeningStop(false, true);
 
-    eventCollector->addTask( new TaskRecoverShowMnenonic(this, walletPassword ), TaskRecoverShowMnenonic::TIMEOUT );
+    eventCollector->addTask(task , TaskRecoverShowMnenonic::TIMEOUT );
 
     if (lsnState.first)
         listeningStart(true, false, true);
@@ -517,7 +523,12 @@ QVector<AccountInfo>  MWC713::getWalletBalance(bool filterDeleted) const  {
 void MWC713::sync(bool showSyncProgress, bool enforce)  {
     if (enforce || QDateTime::currentMSecsSinceEpoch() - lastSyncTime > 30*1000 ) // sync interval 30 seconds - half of block mining interval
     {
-        eventCollector->addTask( new TaskSync(this, showSyncProgress), TaskSync::TIMEOUT );
+        Mwc713Task * task = new TaskSync(this, showSyncProgress);
+        if ( eventCollector->hasTask(task) ) {
+            delete task;
+            return;
+        }
+        eventCollector->addTask( task, TaskSync::TIMEOUT );
     }
 }
 
@@ -527,6 +538,14 @@ void MWC713::sync(bool showSyncProgress, bool enforce)  {
 void MWC713::updateWalletBalance(bool enforceSync, bool showSyncProgress, bool skipSync)  {
     if ( !isWalletRunningAndLoggedIn() )
         return; // ignoring request
+
+    // Check if already running
+    Mwc713Task * task = new TaskAccountList(this);
+    if ( eventCollector->hasTask(task) ) {
+        delete task;
+        return;
+    }
+
 
     // Steps:
     // 1 - list accounts (this call)
@@ -541,7 +560,7 @@ void MWC713::updateWalletBalance(bool enforceSync, bool showSyncProgress, bool s
     if (!skipSync)
         sync(showSyncProgress, enforceSync);
 
-    eventCollector->addTask( new TaskAccountList(this), TaskAccountList::TIMEOUT );
+    eventCollector->addTask( task, TaskAccountList::TIMEOUT );
 }
 
 // Create another account, note no delete exist for accounts
@@ -565,8 +584,6 @@ void MWC713::createAccount( const QString & accountName )  {
         eventCollector->addTask( new TaskAccountRename(this, accountInfo[delAccIdx].accountName, accountName, true ), TaskAccountRename::TIMEOUT );
     }
 
-
-
 }
 
 // Switch to different account
@@ -586,7 +603,13 @@ void MWC713::renameAccount(const QString & oldName, const QString & newName)  {
 // Check Signals: onRecoverProgress( int progress, int maxVal );
 // Check Signals: onCheckResult(bool ok, QString errors );
 void MWC713::check(bool wait4listeners)  {
-    eventCollector->addTask( new TaskCheck(this,wait4listeners), TaskCheck::TIMEOUT );
+    Mwc713Task * task = new TaskCheck(this,wait4listeners);
+    if ( eventCollector->hasTask(task) ) {
+        delete task;
+        return;
+    }
+
+    eventCollector->addTask( task, TaskCheck::TIMEOUT );
 }
 
 
@@ -602,7 +625,6 @@ void MWC713::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const
 
     eventCollector->addTask( new TaskSendMwc(this, coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs, outputs), TaskSendMwc::TIMEOUT );
     // Set some funds
-
 }
 
 
@@ -640,7 +662,6 @@ void MWC713::finalizeFile( QString fileTxResponse )  {
         return;
     }
 
-
     eventCollector->addTask( new TaskFinalizeFile(this, fileTxResponse), TaskFinalizeFile::TIMEOUT );
 }
 
@@ -666,18 +687,11 @@ void MWC713::getOutputs(QString account, int offset, int number, bool show_spent
     eventCollector->addTask( new TaskOutputs(this, offset, number, show_spent), TaskOutputs::TIMEOUT );
 }
 
-// Get total number of Transactions
-// Check Signal: onTransactionCount(int number)
-void MWC713::getTransactionCount(QString account) {
-    eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
-    eventCollector->addTask( new TaskTransactionCount(this, account), TaskTransactions::TIMEOUT );
-}
-
-void MWC713::getTransactions(QString account, int offset, int number, bool enforceSync)  {
+void MWC713::getTransactions(QString account, bool enforceSync)  {
     sync(true, enforceSync);
     // Need to switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account, walletPassword, true), TaskAccountSwitch::TIMEOUT );
-    eventCollector->addTask( new TaskTransactions(this, offset, number), TaskTransactions::TIMEOUT );
+    eventCollector->addTask( new TaskTransactions(this), TaskTransactions::TIMEOUT );
 }
 
 // get Extended info for specific transaction
@@ -692,17 +706,21 @@ void MWC713::getTransactionById(QString account, int64_t txIdx ) {
 // Schedule bunch of requests.
 void MWC713::getAllTransactions() {
     // Requesting transactions for all accounts...
+    Mwc713Task * task = new TaskAllTransactionsEnd(this);
+    if ( eventCollector->hasTask(task) ) {
+        delete task;
+        return;
+    }
 
     // By first task only checking if it is exist
-    if ( eventCollector->addTask( new TaskAllTransactionsStart(this), -1, true ) ) {
-        // I f not exist, push the rest with enforcement...
+    eventCollector->addTask( new TaskAllTransactionsStart(this), -1);
 
-        for (const AccountInfo & acc : accountInfo ) {
-            eventCollector->addTask(new TaskAccountSwitch(this, acc.accountName, walletPassword, false), TaskAccountSwitch::TIMEOUT, false);
-            eventCollector->addTask(new TaskAllTransactions(this), TaskAllTransactions::TIMEOUT, false);
-        }
-        eventCollector->addTask( new TaskAllTransactionsEnd(this), -1, false );
+    // I f not exist, push the rest with enforcement...
+    for (const AccountInfo & acc : accountInfo ) {
+            eventCollector->addTask(new TaskAccountSwitch(this, acc.accountName, walletPassword, false), TaskAccountSwitch::TIMEOUT);
+            eventCollector->addTask(new TaskAllTransactions(this), TaskAllTransactions::TIMEOUT);
     }
+    eventCollector->addTask( task, -1 );
 }
 
 // Get root public key with signed message. Message is optional, can be empty
@@ -756,7 +774,13 @@ bool MWC713::getNodeStatus() {
     if ( !isWalletRunningAndLoggedIn() )
         return false; // ignoring request
 
-    eventCollector->addTask( new TaskNodeInfo(this), TaskNodeInfo::TIMEOUT );
+    Mwc713Task * task = new TaskNodeInfo(this);
+    if ( eventCollector->hasTask(task) ) {
+        delete task;
+        return true;
+    }
+
+    eventCollector->addTask( task, TaskNodeInfo::TIMEOUT );
     return true;
 }
 
@@ -931,7 +955,7 @@ void MWC713::setRecoveryProgress( int64_t progress, int64_t limit ) {
     emit onRecoverProgress( int(progress), int(limit) );
 }
 
-// Apply acconut list. Exploring what does wallet has
+// Apply account list. Exploring what does wallet has
 void MWC713::updateAccountList( QVector<QString> accounts ) {
     collectedAccountInfo.clear();
 
@@ -943,20 +967,13 @@ void MWC713::updateAccountList( QVector<QString> accounts ) {
 
     QVector<AccountInfo> accountInfo;
 
-    bool cancel = false;
     int idx = 0;
     for (QString acc : accounts) {
-        if (! eventCollector->addTask( new TaskAccountSwitch(this, acc, walletPassword, false), TaskAccountSwitch::TIMEOUT, idx == 0 ) ) {
-            cancel  = true;
-            break;
-        }
-
-        eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber ), TaskAccountInfo::TIMEOUT, false );
-        eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1, false ); // Updating the progress
+        eventCollector->addTask( new TaskAccountSwitch(this, acc, walletPassword, false), TaskAccountSwitch::TIMEOUT );
+        eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber ), TaskAccountInfo::TIMEOUT );
+        eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1 ); // Updating the progress
     }
-    if (!cancel) {
-        eventCollector->addTask( new TaskAccountListFinal(this, currentAccount), -1, false ); // Finalize the task
-    }
+    eventCollector->addTask( new TaskAccountListFinal(this, currentAccount), -1 ); // Finalize the task
     // Final will switch back to current account
 }
 
@@ -1167,12 +1184,6 @@ void MWC713::setSubmitFile(bool success, QString message, QString fileName) {
 
     logger::logEmit( "MWC713", "setSubmitFile", "success="+QString::number(success) );
     emit onSubmitFile(success, message, fileName);
-}
-
-// Transactions
-void MWC713::updateTransactionCount(QString account, int number) {
-    logger::logEmit( "MWC713", "onTransactionCount", "number=" + QString::number(number) );
-    emit onTransactionCount( account, number );
 }
 
 void MWC713::setTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions ) {

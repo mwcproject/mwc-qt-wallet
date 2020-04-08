@@ -534,13 +534,9 @@ public:
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
     virtual void getOutputs(QString account, int offset, int number, bool show_spent, bool enforceSync)  = 0;
 
-    // Get total number of Transactions
-    // Check Signal: onTransactionCount(int number)
-    virtual void getTransactionCount(QString account)  = 0;
-
     // Show all transactions for current account
     // Check Signal: onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions)
-    virtual void getTransactions(QString account, int offset, int number, bool enforceSync)  = 0;
+    virtual void getTransactions(QString account, bool enforceSync)  = 0;
 
     // get Extended info for specific transaction
     // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
@@ -630,7 +626,6 @@ signals:
     void onSetReceiveAccount( bool ok, QString AccountOrMessage );
 
     // Transactions
-    void onTransactionCount(QString account, int number);
     void onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
     void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
 

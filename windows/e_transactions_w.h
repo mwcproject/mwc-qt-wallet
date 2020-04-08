@@ -37,6 +37,7 @@ public:
     ~Transactions();
 
     void setTransactionCount(QString account, int number);
+    // transactions here is a full tx list. Window will copy only needed slice
     void setTransactionData(QString account, int64_t height, const QVector<wallet::WalletTransaction> & transactions);
 
     void showExportProofResults(bool success, QString fn, QString msg );
