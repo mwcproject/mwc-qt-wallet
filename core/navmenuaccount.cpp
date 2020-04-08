@@ -17,6 +17,7 @@
 #include "ui_navmenuaccount.h"
 #include "../state/statemachine.h"
 #include "../core/appcontext.h"
+#include "../control/messagebox.h"
 
 
 namespace core {
@@ -44,10 +45,18 @@ void NavMenuAccount::on_seedButton_clicked()
     // need to logout first, than switch to the seed
 
     if (context->stateMachine->canSwitchState()) {
-        // State where to go after login
-        context->appContext->setActiveWndState(state::STATE::SHOW_SEED);
-        context->wallet->logout(true);
-        context->stateMachine->executeFrom(state::STATE::NONE);
+
+        QString password = context->wallet->getPassword();
+
+        if ( !password.isEmpty() ) {
+            if (control::MessageBox::RETURN_CODE::BTN2 !=
+                control::MessageBox::questionText(this, "Wallet Password",
+                                                  "You are going to view wallet mnemonic passphrase.\n\nPlease input your wallet password to continue", "Cancel", "Confirm", false, true, 1.0,
+                                                  password, control::MessageBox::RETURN_CODE::BTN2))
+                return;
+        }
+
+        context->stateMachine->setActionWindow( state::STATE::SHOW_SEED);
     }
     close();
 }
