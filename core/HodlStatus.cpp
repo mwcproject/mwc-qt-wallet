@@ -18,6 +18,7 @@
 #include "../util/Log.h"
 #include "../core/appcontext.h"
 #include "../core/Config.h"
+#include <QDataStream>
 
 namespace core {
 
@@ -32,6 +33,29 @@ void HodlOutputInfo::setData( const QString & _outputCommitment, double _value, 
     weight = _weight;
     cls = _cls;
 }
+
+void HodlOutputInfo::saveData(QDataStream & out) const {
+    out << int(0x345876);
+    out << outputCommitment;
+    out << value;
+    out << weight;
+    out << cls;
+}
+
+bool HodlOutputInfo::loadData(QDataStream & in) {
+    int id = 0;
+    in >> id;
+
+    if ( id!=0x345876)
+        return false;
+
+    in >> outputCommitment;
+    in >> value;
+    in >> weight;
+    in >> cls;
+    return true;
+}
+
 
 void HodlClaimStatus::setData( int64_t _HodlAmount, int64_t _claimedMwc, const QString & _status, const QString & _date ) {
     HodlAmount = _HodlAmount;
@@ -72,10 +96,15 @@ void HodlStatus::setHodlOutputs( bool _inHodl, const QVector<HodlOutputInfo> & _
     availableData |= DATA_HODL_OUTPUTS;
     inHodl = _inHodl;
 
+    hodlOutputs.clear();
     for (const auto & out : _hodlOutputs) {
         hodlOutputs.insert(out.outputCommitment, out);
     }
     requestErrors.remove(errKey);
+
+    // Updating cache with HODL outputs
+    if (!rootPubKeyHash.isEmpty())
+        context->appContext->saveHodlOutputs(rootPubKeyHash, hodlOutputs);
 
     logger::logEmit("HODL", "onHodlStatusWasChanged", "setHodlOutputs");
     emit onHodlStatusWasChanged();
@@ -131,8 +160,13 @@ void HodlStatus::setRootPubKey( const QString & pubKey )
     // reseting account related data
     inHodl = false;
     availableData &= ~(DATA_HODL_OUTPUTS | DATA_AMOUNT_TO_CLAIM);
-    hodlOutputs.clear();
     amount2claim = 0;
+
+    // HODL outputs updating from the cache. Reason that wallet does manage outputs and we
+    if (!rootPubKeyHash.isEmpty())
+        hodlOutputs = context->appContext->loadHodlOutputs(rootPubKeyHash);
+    else
+        hodlOutputs.clear();
 
     emit onHodlStatusWasChanged();
 }

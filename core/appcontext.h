@@ -19,6 +19,7 @@
 #include "../state/state.h"
 #include "../state/m_airdrop.h"
 #include "../wallet/wallet.h"
+#include "../core/HodlStatus.h"
 
 class QAction;
 
@@ -148,6 +149,10 @@ public:
     // HODL registration time.
     int64_t getHodlRegistrationTime(const QString & hash) const;
     void    setHodlRegistrationTime(const QString & hash, int64_t time);
+
+    // HODL outputs data
+    void saveHodlOutputs( const QString & rootPubKeyHash, const QMap<QString, core::HodlOutputInfo> & hodlOutputs );
+    QMap<QString, core::HodlOutputInfo> loadHodlOutputs(const QString & rootPubKeyHash );
 private:
     bool loadData();
     void saveData() const;

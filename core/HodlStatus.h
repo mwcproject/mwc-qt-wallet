@@ -44,6 +44,9 @@ struct HodlOutputInfo {
     bool isValid() const {
         return !outputCommitment.isEmpty() && value>0.0;
     }
+
+    void saveData(QDataStream & out) const;
+    bool loadData(QDataStream & in);
 };
 
 struct HodlClaimStatus {
@@ -77,7 +80,7 @@ public:
     // Hex representation of HSA256 hash from rootpublickey binary representation
     QString getRootPubKeyHash() const {return rootPubKeyHash;}
 
-    bool isInHodl() const {return inHodl;}
+    bool isInHodl() const {return inHodl || hodlOutputs.size()>0;}
     bool hasHodlOutputs() const;
     //bool hasAmountToClaim() const;
 
@@ -111,6 +114,7 @@ public:
     bool isHodlRegistrationTimeLongEnough() const;
 
     QMap<QString, QString> getRequestErrors() const {return requestErrors;}
+
 
 private slots:
     void onLoginResult(bool ok);

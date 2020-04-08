@@ -27,7 +27,7 @@ namespace core {
 
 const static QString settingsFileName("context.dat");
 const static QString airdropRequestsFileName("requests.dat");
-const static QString setupDoneFileName("setup.dat");
+const static QString hodlOutputsPrefix("ho_");
 
 
 void SendCoinsParams::saveData(QDataStream & out) const {
@@ -257,7 +257,7 @@ void AppContext::saveAirdropRequests( const QVector<state::AirdropRequests> & da
     if (!file.open(QIODevice::WriteOnly)) {
         control::MessageBox::messageText(nullptr,
                                      "ERROR",
-                                     "Unable to aidrop requests to " + filePath +
+                                     "Unable save to aidrop requests to " + filePath +
                                      "\nError: " + file.errorString());
         return;
     }
@@ -410,6 +410,66 @@ int64_t AppContext::getHodlRegistrationTime(const QString & hash) const {
 
 void AppContext::setHodlRegistrationTime(const QString & hash, int64_t time) {
     hodlRegistrations.insert( hash, qlonglong(time) );
+}
+
+void AppContext::saveHodlOutputs( const QString & rootPubKeyHash, const QMap<QString, core::HodlOutputInfo> & hodlOutputs ) {
+    Q_ASSERT(!rootPubKeyHash.isEmpty());
+    QString dataPath = ioutils::getAppDataPath("context");
+    QString filePath = dataPath + "/" + hodlOutputsPrefix+rootPubKeyHash + ".dat";
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly)) {
+        control::MessageBox::messageText(nullptr,
+                                         "ERROR",
+                                         "Unable to store HODL cache to " + filePath +
+                                         "\nError: " + file.errorString());
+        return;
+    }
+
+    QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_5_7);
+
+    out << 0x324745;
+    int sz = hodlOutputs.size();
+    out << sz;
+    for (auto ho = hodlOutputs.begin(); ho!=hodlOutputs.end(); ho++ ) {
+        ho.value().saveData(out);
+    }
+
+}
+QMap<QString, core::HodlOutputInfo> AppContext::loadHodlOutputs(const QString & rootPubKeyHash ) {
+    QMap<QString, core::HodlOutputInfo> res;
+
+    QString dataPath = ioutils::getAppDataPath("context");
+    QString filePath = dataPath + "/" + hodlOutputsPrefix+rootPubKeyHash + ".dat";
+
+    QFile file(filePath);
+    if ( !file.open(QIODevice::ReadOnly) ) {
+        // first run, no file exist
+        return res;
+    }
+
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_5_7);
+
+    int id = 0;
+    in >> id;
+    if (id!=0x324745)
+        return res;
+
+    int sz = 0;
+    in >> sz;
+
+    while(sz>0) {
+        sz--;
+        core::HodlOutputInfo req;
+        if (!req.loadData(in))
+            break;
+        res.insert( req.outputCommitment, req );
+    }
+
+    return res;
+
 }
 
 
