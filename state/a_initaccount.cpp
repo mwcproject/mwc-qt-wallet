@@ -253,6 +253,25 @@ void InitAccount::onLoginResult(bool ok) {
 void InitAccount::createWalletWithSeed( QVector<QString> sd ) {
     seed = sd;
 
+    if (!config::isColdWallet()) {
+        // Check if the node is cloud one. Issue than wallet nned to recover the data and it is problem if wallet will failed..
+        wallet::WalletConfig config = context->wallet->getWalletConfig();
+        wallet::MwcNodeConnection nodeConnection = context->appContext->getNodeConnection(config.getNetwork());
+
+        if (!nodeConnection.isCloudNode()) {
+            if ( control::MessageBox::RETURN_CODE::BTN2 !=
+                 control::MessageBox::questionText(nullptr, "Node connection",
+                             "Because restore process requires connection to the running node, we are switching your wallet to the Cloud mwc-node.\n\n"
+                                                   "If you prefer different setting, please update your node connection after",
+                             "Cancel", "Continue", false, true))
+                return;
+
+            nodeConnection.setAsCloud();
+            context->appContext->updateMwcNodeConnection( config.getNetwork(), nodeConnection );
+            context->wallet->setWalletConfig( config, context->appContext, context->mwcNode );
+        }
+    }
+
     // switching to a progress Wnd
     progressWnd = (wnd::ProgressWnd*) context->wndManager->switchToWindowEx( mwc::PAGE_A_RECOVERY_FROM_PASSPHRASE,
             new wnd::ProgressWnd(context->wndManager->getInWndParent(), this, "Recovering account from the passphrase", "",
@@ -260,8 +279,8 @@ void InitAccount::createWalletWithSeed( QVector<QString> sd ) {
 
     // Stopping listeners first. Not checking if they are running.
     progressWnd->setMsgPlus("Preparing for recovery...");
-    context->wallet->start2recover(seed, pass);
 
+    context->wallet->start2recover(seed, pass);
 }
 
 void InitAccount::onRecoverProgress( int progress, int maxVal ) {

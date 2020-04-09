@@ -180,6 +180,8 @@ void MWC713::resetData(STARTED_MODE _startedMode ) {
 
     Q_ASSERT(hodlStatus);
     hodlStatus->finishWalletOutputs(false);
+
+    outputsLines.clear();
 }
 
 // normal start. will require the password
@@ -1350,8 +1352,13 @@ void MWC713::mwc713errorOccurred(QProcess::ProcessError error) {
     qDebug() << "Unable to start mwc713 process. ProcessError=" << error;
 
     if (mwc713process) {
-        logger::logInfo("MWC713", "stdout: " + mwc713process->readAllStandardOutput() );
-        logger::logInfo("MWC713", "stderr: " + mwc713process->readAllStandardError() );
+        QString stdoutStr = mwc713process->readAllStandardOutput();
+        logger::logInfo("MWC713", "stdout: " + stdoutStr );
+        QString stderrStr = mwc713process->readAllStandardError();
+        logger::logInfo("MWC713", "stderr: " + stderrStr );
+
+        util::updateEventList(outputsLines, stdoutStr);
+        util::updateEventList(outputsLines, stderrStr);
 
         mwc713process->deleteLater();
         mwc713process = nullptr;
@@ -1369,8 +1376,13 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
     qDebug() << "mwc713 is exiting with exit code " << exitCode << ", exitStatus=" << exitStatus;
 
     if (mwc713process) {
-        logger::logInfo("MWC713", "stdout: " + mwc713process->readAllStandardOutput() );
-        logger::logInfo("MWC713", "stderr: " + mwc713process->readAllStandardError() );
+        QString stdoutStr = mwc713process->readAllStandardOutput();
+        logger::logInfo("MWC713", "stdout: " + stdoutStr );
+        QString stderrStr = mwc713process->readAllStandardError();
+        logger::logInfo("MWC713", "stderr: " + stderrStr );
+
+        util::updateEventList(outputsLines, stdoutStr);
+        util::updateEventList(outputsLines, stderrStr);
 
         mwc713process->deleteLater();
         mwc713process = nullptr;
@@ -1388,9 +1400,29 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
     else {
         if (QDateTime::currentMSecsSinceEpoch() - walletStartTime < 1000L * 15) {
             // Very likely that wallet wasn't be able to start. Lets update the message with mode details
+
+            QString walletErrMsg;
+            if (outputsLines.size()>0) {
+                // Check if there are erorrs or warnings...
+                QList<QString> filteredOutput;
+                for (const auto & ln : outputsLines) {
+                    if (ln.contains("Error", Qt::CaseInsensitive) || ln.contains("Warning", Qt::CaseInsensitive))
+                        filteredOutput.push_back(ln);
+                }
+                if ( filteredOutput.isEmpty() )
+                    filteredOutput = outputsLines;
+
+                Q_ASSERT(filteredOutput.size()>0);
+                for (const auto & ln : filteredOutput)
+                    walletErrMsg += ln + "\n";
+            }
+            else {
+                walletErrMsg = "Please check if you have enough space at your home disk or there are any antivirus preventing mwc713 to start.\n";
+            }
+
             errorMessage +=
-                    "\n\nPlease check if you have enough space at your home disk or there are any antivirus preventing mwc713 to start."
-                    "\n\nYou might use command line for troubleshooting:\n\n" + commandLine;
+                    "\n\n" + walletErrMsg + "\n" +
+                    "You might use command line for troubleshooting:\n\n" + commandLine;
         }
     }
 
@@ -1429,6 +1461,13 @@ void MWC713::mwc713readyReadStandardOutput() {
         if (!filteredStr.isEmpty())
             filteredStr += "\n";
         filteredStr += ln;
+
+        if (!ln.isEmpty()) {
+            while(outputsLines.size()>outputsLinesBufferSize)
+                outputsLines.pop_front();
+
+            outputsLines.push_back(ln);
+        }
     }
 
     if (str.size()>0 && (str[0] == '\n' || str[0] == '\r') )

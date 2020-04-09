@@ -50,6 +50,8 @@ public:
 
     virtual ~TaskRecoverFull() override {}
 
+    virtual void onStarted() override;
+
     virtual bool processTask(const QVector<WEvent> &events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}

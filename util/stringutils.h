@@ -77,6 +77,9 @@ QString longLong2ShortStr(int64_t n, int length);
 // All not unreserved MUST be encoded.
 QString urlEncode( QString str );
 
+// Update Event list with lines
+void updateEventList( QList<QString> & events, QString str );
+
 }
 
 #endif // STRINGUTILS_H

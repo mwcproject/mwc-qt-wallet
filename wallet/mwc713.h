@@ -406,6 +406,8 @@ private:
     QString mwc713configPath; // config file for mwc713
     QProcess * mwc713process = nullptr;
     tries::Mwc713InputParser * inputParser = nullptr; // Parser will generate bunch of signals that wallet will listem on
+    const int outputsLinesBufferSize = 15;
+    QList<QString> outputsLines; // Last few output lines. Will print in case of the crash
 
     STARTED_MODE startedMode = STARTED_MODE::OFFLINE;
     bool   loggedIn = false; // Make sence for startedMode NORMAL. True if login was successfull

@@ -393,6 +393,18 @@ QString urlEncode( QString str ) {
     return result;
 }
 
+// Update Event list with lines
+void updateEventList( QList<QString> & events, QString str ) {
+    auto lns = str.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+
+    for (auto ln : lns) {
+        if (ln.isEmpty())
+            continue;
+
+        events.push_back(ln);
+    }
+}
+
 
 }
 

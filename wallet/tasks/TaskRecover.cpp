@@ -77,8 +77,13 @@ bool TaskRecoverProgressListener::processTask(const QVector<WEvent> &events) {
 
 // --------------------------- TaskRecoverFull ---------------------------------
 
+void TaskRecoverFull::onStarted() {
+    logger::blockLogMwc713out( true );
+}
+
 
 bool TaskRecoverFull::processTask(const QVector<WEvent> &events) {
+    logger::blockLogMwc713out( false );
     return ProcessRecoverTask(events, wallet713);
 }
 
