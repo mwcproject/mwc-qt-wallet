@@ -37,6 +37,8 @@ public:
     // Parent for windows it can show.
     QWidget * getInWndParent() const;
 
+    void setDataPath(const QString& dataPath);
+
 private:
     QString buildWalletTitle(const QString & pageName);
 
