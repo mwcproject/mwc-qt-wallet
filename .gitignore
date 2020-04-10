@@ -3,6 +3,17 @@
 CMakeFiles/
 out/
 VS/
+mwc-qt-wallet_autogen
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+mwc-qt-wallet
+mwc713
+QtCore
+QtGui
+QtNetwork
+QtWidgets
+ui_*.h
 
 .qmake.stash
 CMakeSettings.json
