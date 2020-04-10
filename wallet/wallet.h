@@ -183,6 +183,7 @@ struct WalletOutput {
     QString    numOfConfirms;
     int64_t    valueNano = 0L;
     int64_t    txIdx;
+    double     weight = 0.0; // HODL weight, used for ouptus optimization
 
     void setData(QString outputCommitment,
             QString     MMRIndex,
@@ -216,6 +217,8 @@ struct WalletOutput {
     bool isValid() const {
         return !(outputCommitment.isEmpty() || status.isEmpty());
     }
+
+    double getWeightedValue() const {return weight*valueNano; }
 };
 
 struct WalletTransaction {

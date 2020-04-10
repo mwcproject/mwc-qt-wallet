@@ -79,95 +79,155 @@ static QString generateMessageHtmlOutputsToSpend( const QVector<core::HodlOutput
     return result;
 }
 
-// return difference and result
-// If no result was found, put amount is a big number
-static QPair< int64_t, QVector<wallet::WalletOutput> > calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> & inputOutputs, int outputsIdx0, int stackLimit ) {
-    int64_t bestChange = LONG_MAX;
-    QVector<wallet::WalletOutput> walletOutputs;
+static int calcSubstituteIndex( QVector<wallet::WalletOutput> & resultBucket, const wallet::WalletOutput & testOutput, int64_t change ) {
+    double bestWeightedGain = 0.0;
+    int bestIndex = -1;
 
-    for ( int i=outputsIdx0; i<inputOutputs.size(); i++ ) {
-        const wallet::WalletOutput & o = inputOutputs[i];
+    const double testWeightedValue = testOutput.getWeightedValue();
 
-        if (stackLimit>0) {
-            if (o.valueNano < nanoCoins) {
-                QPair<int64_t, QVector<wallet::WalletOutput> > nextRes = calcOutputsToSpend(nanoCoins - o.valueNano,
-                                                           inputOutputs, i + 1, stackLimit - 1);
-                if (!nextRes.second.isEmpty() && nextRes.first < bestChange) {
-                    bestChange = nextRes.first;
-                    walletOutputs = nextRes.second;
-                    walletOutputs.push_back(o);
-                }
-            }
-            else {
-                // Done with stack
-                return QPair< int64_t, QVector<wallet::WalletOutput> >(bestChange, walletOutputs);
-            }
-        }
-        else {
-            if (o.valueNano >= nanoCoins)
-                return QPair< int64_t, QVector<wallet::WalletOutput> >( o.valueNano-nanoCoins,{o} );
+    for (int k=0;k<resultBucket.size();k++) {
+        const auto & out = resultBucket[k];
+        if (out.valueNano - testOutput.valueNano > change)
+            continue;
+
+        double weightedGain = out.getWeightedValue() - testWeightedValue;
+        if (weightedGain>bestWeightedGain) {
+            bestWeightedGain = weightedGain;
+            bestIndex = k;
         }
     }
 
-    return QPair< int64_t, QVector<wallet::WalletOutput> >(bestChange, walletOutputs);
+    return bestIndex;
 }
+
+// Return resulting bucket weighted amount. Reason: we don't case about change, minimization target is weighted amount.
+static double optimizeBucket( QVector<wallet::WalletOutput> & resultBucket, const QVector<wallet::WalletOutput> & inputOutputs, int64_t nanoCoins ) {
+
+    QSet<QString> bucketCommits;
+    int64_t change = -nanoCoins;
+    for (const auto & out: resultBucket) {
+        bucketCommits += out.outputCommitment;
+        change += out.valueNano;
+    }
+    Q_ASSERT(change>=0); // Not enough funds?
+
+    bool foundBetterSolution = true;
+    while (foundBetterSolution) {
+        foundBetterSolution = false;
+        // doing single scan
+        for (wallet::WalletOutput out: inputOutputs) {
+            if ( bucketCommits.contains(out.outputCommitment) )
+                continue;
+
+            // Check if can substitute
+            int idx = calcSubstituteIndex( resultBucket, out, change );
+            while (idx>=0) {
+                wallet::WalletOutput delOutput = resultBucket[idx];
+                resultBucket[idx] = out;
+                Q_ASSERT( out.getWeightedValue() < delOutput.getWeightedValue() );
+                change -= delOutput.valueNano;
+                change += out.valueNano;
+                Q_ASSERT(change>=0);
+
+                bucketCommits -= delOutput.outputCommitment;
+                bucketCommits += out.outputCommitment;
+
+                foundBetterSolution = true;
+
+                out = delOutput;
+                idx = calcSubstituteIndex( resultBucket, out, change );
+            }
+        }
+    }
+
+    double resultWeightedSum = 0.0;
+    for (const auto & out: resultBucket)
+        resultWeightedSum += out.getWeightedValue();
+
+    return resultWeightedSum;
+}
+
 
 // nanoCoins expected to include the fees. Here we are calculating the outputs that will produce minimal change
 bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> & inputOutputs, QStringList & resultOutputs ) {
     // Try 1,2,3 and 4 outputs to spend (sorry, different workflows)
     // Than - first smallest commits
 
+    // Sorting in INC order
     QVector<wallet::WalletOutput> outputs = inputOutputs;
-    std::sort(outputs.begin(), outputs.end(), [](const wallet::WalletOutput &o1, const wallet::WalletOutput &o2) {return o1.valueNano < o2.valueNano;});
+    std::sort(outputs.begin(), outputs.end(), [](const wallet::WalletOutput &o1, const wallet::WalletOutput &o2) {return o2.valueNano < o1.valueNano;});
 
-    QPair< int64_t, QVector<wallet::WalletOutput> >  oneCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 0 );
-    QPair< int64_t, QVector<wallet::WalletOutput> >  twoCommitRes = QPair< int64_t, QVector<wallet::WalletOutput> >(LONG_MAX, QVector<wallet::WalletOutput>() );
-    if (outputs.size()<1000)
-        twoCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 1 );
 
-    QPair< int64_t, QVector<wallet::WalletOutput> >  threeCommitRes = QPair< int64_t, QVector<wallet::WalletOutput> >(LONG_MAX, QVector<wallet::WalletOutput>() );
-    if (outputs.size()<50)
-        threeCommitRes = calcOutputsToSpend( nanoCoins, outputs, 0, 2 );
+    // Let's try to minimize the weighted cost for the outputs.
+    // 1 Select few sets of outputs on the result
+    // 2 Trying to minimize the weight by swapping the outputs from the bucket.
+    // 3 Increas number of ouput by step (1 will not work and our tests show that for 3 outputs. ).
+    // Repeat #2
+    // If new result better or the same, go to #3
+    // Done, prev result is an answer
 
-    // It is a case with bunch of small outptus.
-    if ( oneCommitRes.second.isEmpty() && twoCommitRes.second.isEmpty()  && threeCommitRes.second.isEmpty() ) {
-        // add outputs one by one
-        for ( const auto & o1 : outputs ) {
-            if (nanoCoins<=0)
+    // Calculating min number of outputs.
+    QVector<int> outputsNumber;
+
+    // Min Number of outputs.
+    {
+        int64_t change = nanoCoins; // Expected to be negative
+        int minOutputsNumber = 0;
+        for ( const auto & out : outputs ) {
+            if (change <= 0)
                 break;
-
-            resultOutputs += o1.outputCommitment;
-            nanoCoins -= o1.valueNano;
+            change -= out.valueNano;
+            minOutputsNumber++;
         }
-        // false if not enough outputs. Edge case. Expected that mwc713 will process it
-        return nanoCoins<=0;
+        if(change>0)
+            return false; // not enough funds
+
+        change = nanoCoins; // Expected to be negative
+        int maxOutputsNumber = 0;
+        for ( auto o = outputs.rbegin(); o!=outputs.rend(); o++ ) {
+            if (change <= 0)
+                break;
+            change -= o->valueNano;
+            maxOutputsNumber++;
+        }
+        Q_ASSERT(change<=0);
+
+        Q_ASSERT(minOutputsNumber<=maxOutputsNumber);
+
+        int n=minOutputsNumber;
+        for (; n<std::min(maxOutputsNumber,5); n++)
+            outputsNumber.push_back(n);
+
+        int step = std::max(1,(maxOutputsNumber-minOutputsNumber)/10);
+        for (; n<maxOutputsNumber; n+=step)
+            outputsNumber.push_back(n);
+
+        outputsNumber.push_back(maxOutputsNumber);
+    }
+    Q_ASSERT(!outputsNumber.isEmpty());
+
+    QVector<wallet::WalletOutput> resultBucket;
+    double resultWeightAmount = 100000000.0;
+
+    for ( int outN : outputsNumber ) {
+        QVector<wallet::WalletOutput> bucket;
+        for ( int t=0;t<outN; t++ ) {
+            bucket.push_back(outputs[t]);
+        }
+
+        double weightedAmount = optimizeBucket( bucket, outputs, nanoCoins );
+        if (resultBucket.isEmpty() || weightedAmount < resultWeightAmount) {
+            resultBucket = bucket;
+            resultWeightAmount = weightedAmount;
+        }
     }
 
-    QVector<wallet::WalletOutput> * resOutputs = nullptr;
+    Q_ASSERT(!resultBucket.isEmpty());
 
-    if ( oneCommitRes.first <= twoCommitRes.first && oneCommitRes.first <= threeCommitRes.first ) {
-        resOutputs = &oneCommitRes.second;
-    } else if ( twoCommitRes.first <= oneCommitRes.first && twoCommitRes.first <= threeCommitRes.first ) {
-        resOutputs = &twoCommitRes.second;
-    } else if ( threeCommitRes.first <= twoCommitRes.first && threeCommitRes.first <= oneCommitRes.first ) {
-        resOutputs = &threeCommitRes.second;
-    }
-    else {
-        Q_ASSERT(false); // expected to be full covered
-    }
-
-    Q_ASSERT(resOutputs!= nullptr && resOutputs->size()>0);
-
-    if (resOutputs == nullptr || resOutputs->size()==0) {
-        Q_ASSERT(false);
-        return false;
-    }
-
-    for (const auto & o : *resOutputs) {
+    for (const auto & o : resultBucket) {
         resultOutputs += o.outputCommitment;
     }
     return true;
-
 }
 
 
@@ -189,7 +249,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
 
     int64_t freeNanoCoins = 0;
 
-    for ( const auto & o : outputs) {
+    for ( wallet::WalletOutput o : outputs) {
         if ( o.status != "Unspent" ) // Interesting only in Unspent outputs
             continue;
         if (o.coinbase && o.numOfConfirms.toLong()<=1440 )
@@ -197,9 +257,12 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
 
         core::HodlOutputInfo ho = hodlStatus->getHodlOutput(o.outputCommitment);
 
-        if ( ho.weight > 0.0 )
-            hodlOuts.push_back( QPair<wallet::WalletOutput, core::HodlOutputInfo>(o, ho) );
+        if ( ho.weight > 0.0 ) {
+            o.weight = ho.weight;
+            hodlOuts.push_back(QPair<wallet::WalletOutput, core::HodlOutputInfo>(o, ho));
+        }
         else {
+            o.weight = 0.01;
             freeOuts.push_back(o);
             freeNanoCoins += o.valueNano;
         }

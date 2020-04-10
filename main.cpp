@@ -286,7 +286,7 @@ int main(int argc, char *argv[])
     // misk::provisionDictionary();
 
     // tests are quick, let's run them in debug
-    // test::testCalcOutputsToSpend();  // This test is long and show about 8 Message boxes.
+//    test::testCalcOutputsToSpend();  // This test is long and show about 8 Message boxes.
     test::testLongLong2ShortStr();
     test::testUtils();
     test::testWordSequences();

@@ -78,6 +78,9 @@ static void dotest_calcOutputsToSpend() {
                 WalletOutput::create("c32000", "", "", "", "Unspent", false, "", 32000L, 1L)
         };
 
+        for (auto & o : outputs )
+            o.weight = 1.0;
+
         runForTestSet( 100L, outputs, {"c1000"} );
         runForTestSet( 1000L, outputs, {"c1000"} );
         runForTestSet( 999L, outputs, {"c1000"} );
@@ -96,15 +99,15 @@ static void dotest_calcOutputsToSpend() {
         runForTestSet( 12001L, outputs, {"c8000", "c4000", "c1000"} );
 
 
-        runForTestSet( 31000L, outputs, {"c32000"} ); // Limited by triples... Should found non optimal solution...
+        runForTestSet( 31000L, outputs, {"c1000","c2000","c4000","c8000","c16000"} );
         runForTestSet( 6875L, outputs, {"c1000", "c2000", "c4000"} );
 
-        runForTestSet( 14001L, outputs, {"c16000"} ); // Limited by triples... Should found non optimal solution...
+        runForTestSet( 14001L, outputs, {"c1000","c2000","c4000","c8000"} );
 
         // Must be all...
         runForTestSet( 33000L, outputs, {"c1000","c32000"} );
         runForTestSet( 56000L, outputs, {"c8000","c16000","c32000"} );
-        runForTestSet( 57000L, outputs, {"c1000", "c2000","c4000","c8000","c16000","c32000"} );
+        runForTestSet( 57000L, outputs, {"c1000", "c8000","c16000","c32000"} );
     }
 
     {
@@ -136,6 +139,7 @@ static void dotest_calcOutputsToSpend() {
             int64_t amount = (qrand() % 1000) * 10000 + i;
 
             outputs.push_back( WalletOutput::create( QString::number(amount), "", "", "", "Unspent", false, "", amount, 1L));
+            outputs[i].weight = 1.0;
         }
 
 
@@ -148,32 +152,21 @@ static void dotest_calcOutputsToSpend() {
             runForTestSet2( o1.valueNano-2, outputs, 2 );
         }
 
-        // 2 outputs...
+        // many outputs, solution should be close to optimal value
         for (int k=0;k<testNum;k++) {
-            int idx1 = qrand() % outputs.size();
-            int idx2 = qrand() % outputs.size();
-            if (idx1==idx2)
-                continue;
+            int outNum = qrand() % (outputs.size()-2) + 2;
+            QSet<int> hasOutputs;
 
-            const wallet::WalletOutput & o1 = outputs[idx1];
-            const wallet::WalletOutput & o2 = outputs[idx2];
-            runForTestSet2( o1.valueNano+o2.valueNano, outputs, 0 );
-            runForTestSet2( o1.valueNano+o2.valueNano-2, outputs, 2 );
-        }
+            int64_t amount = 0;
 
-        // 3 outputs...
-        for (int k=0;k<testNum;k++) {
-            int idx1 = qrand() % outputs.size();
-            int idx2 = qrand() % outputs.size();
-            int idx3 = qrand() % outputs.size();
-            if (idx1==idx2 || idx1==idx3 || idx2==idx3)
-                continue;
+            for  (int u=0; u<outNum; u++ ) {
+                if (!hasOutputs.contains(u)) {
+                    hasOutputs += u;
+                    amount += outputs[u].valueNano;
+                }
+            }
 
-            const wallet::WalletOutput & o1 = outputs[idx1];
-            const wallet::WalletOutput & o2 = outputs[idx2];
-            const wallet::WalletOutput & o3 = outputs[idx3];
-            runForTestSet2( o1.valueNano+o2.valueNano+o3.valueNano, outputs,0);
-            runForTestSet2( o1.valueNano+o2.valueNano+o3.valueNano - 3, outputs,3);
+            runForTestSet2( amount, outputs, amount/1000 );
         }
     }
 }
