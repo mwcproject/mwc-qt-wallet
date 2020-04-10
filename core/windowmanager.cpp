@@ -73,6 +73,9 @@ QString WindowManager::buildWalletTitle(const QString & pageName) {
     return title;
 }
 
+void WindowManager::setDataPath(const QString& dataPath) {
+    walletDataPath = dataPath;
+}
 
 
 }
