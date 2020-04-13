@@ -103,6 +103,8 @@ private:
 
     void updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartKeybase);
 
+    void updateAutoLogoutStateUI(int64_t time);
+
     // return true if no chnages need to be made.
     // false - need to be made or was made and wallet need to be restarted
     bool applyChanges();
@@ -118,8 +120,8 @@ private:
     bool walletLogsEnabled = false;
     bool autoStartMQSEnabled = true;
     bool autoStartKeybaseEnabled = true;
-    int autoLogout = 3;
-    int currentAutoLogout = 3;
+    int64_t logoutTimeout = 3 * 60;
+    int64_t currentLogoutTimeout = 3 * 60;
 
     wallet::WalletConfig defaultWalletConfig;
     core::SendCoinsParams defaultSendParams;
