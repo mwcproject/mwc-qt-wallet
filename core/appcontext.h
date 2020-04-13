@@ -131,6 +131,14 @@ public:
     bool isLogsEnabled() const {return logsEnabled;}
     void setLogsEnabled(bool enabled);
 
+    // ----- Auto Start MQS --------
+    bool isAutoStartMQSEnabled() const {return autoStartMQSEnabled;}
+    void setAutoStartMQSEnabled(bool enabled);
+
+    // ----- Auto Start Keybase --------
+    bool isAutoStartKeybaseEnabled() const {return autoStartKeybaseEnabled;}
+    void setAutoStartKeybaseEnabled(bool enabled);
+
     // ----- Outputs: All/Unspent
     bool isShowOutputAll() const {return showOutputAll;}
     void setShowOutputAll(bool all);
@@ -179,6 +187,9 @@ private:
     double initScaleValue = 1.0; // default scale value
 
     bool logsEnabled = true;
+
+    bool autoStartMQSEnabled = true;
+    bool autoStartKeybaseEnabled = true;
 
     // Because of Cursom node logic, we have to track config changes
     wallet::MwcNodeConnection  nodeConnectionMainNet;

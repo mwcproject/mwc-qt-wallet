@@ -100,8 +100,11 @@ WalletConfig::WalletConfig(QWidget *parent, state::WalletConfig * _state) :
     checkSizeButton(uiScale);
 
     walletLogsEnabled = state->getWalletLogsEnabled();
-
     updateLogsStateUI(walletLogsEnabled);
+
+    autoStartMQSEnabled = state->getAutoStartMQSEnabled();
+    autoStartKeybaseEnabled = state->getAutoStartKeybaseEnabled();
+    updateAutoStartStateUI(autoStartMQSEnabled, autoStartKeybaseEnabled);
 
 #ifdef Q_OS_DARWIN
     // MacOS doesn't support font scale. Need to hide all the buttons
@@ -157,7 +160,10 @@ void WalletConfig::updateButtons() {
         keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == currentWalletConfig.keyBasePath &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == currentWalletConfig.getMwcMqHostNorm() &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(sendParams.inputConfirmationNumber) &&
-        ui->changeOutputsEdit->text().trimmed() == QString::number(sendParams.changeOutputs);
+        ui->changeOutputsEdit->text().trimmed() == QString::number(sendParams.changeOutputs) &&
+        autoStartMQSEnabled == ui->start_mqs->isChecked() &&
+        autoStartKeybaseEnabled == ui->start_keybase->isChecked() == true &&
+        autoLogout == currentAutoLogout;
 
     bool sameWithDefault =
         getcheckedSizeButton() == scale2Id( state->getInitGuiScale() ) &&
@@ -166,7 +172,10 @@ void WalletConfig::updateButtons() {
         keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == defaultWalletConfig.keyBasePath &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == defaultWalletConfig.getMwcMqHostNorm() &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(defaultSendParams.inputConfirmationNumber) &&
-        ui->changeOutputsEdit->text().trimmed() == QString::number(defaultSendParams.changeOutputs);
+        ui->changeOutputsEdit->text().trimmed() == QString::number(defaultSendParams.changeOutputs) &&
+        ui->start_mqs->isChecked() == true &&
+        ui->start_keybase->isChecked() == true &&
+        ui->logout_3->isChecked() == true;
 
     ui->restoreDefault->setEnabled( !sameWithDefault );
     ui->applyButton->setEnabled( !sameWithCurrent );
@@ -386,6 +395,8 @@ void WalletConfig::on_restoreDefault_clicked()
 
     updateLogsStateUI(true);
 
+    updateAutoStartStateUI(true, true);
+
     updateButtons();
 }
 
@@ -436,6 +447,18 @@ bool WalletConfig::applyChanges() {
             state->restartMwcQtWallet();
             return false;   // need to be restarted. Just want to cancell caller of caller changes state operation
         }
+
+        bool need2updateAutoStartMQSEnabled = ( autoStartMQSEnabled != ui->start_mqs->isChecked() );
+        if (need2updateAutoStartMQSEnabled) {
+            state->updateAutoStartMQSEnabled(ui->start_mqs->isChecked());
+        }
+        autoStartMQSEnabled = ui->start_mqs->isChecked();
+
+        bool need2updateAutoStartKeybaseEnabled = ( autoStartKeybaseEnabled != ui->start_keybase->isChecked() );
+        if (need2updateAutoStartKeybaseEnabled) {
+            state->updateAutoStartKeybaseEnabled(ui->start_keybase->isChecked());
+        }
+        autoStartKeybaseEnabled = ui->start_keybase->isChecked();
 
         updateButtons();
         return true; // We are good. Changes was applied
@@ -502,8 +525,55 @@ void WalletConfig::updateLogsStateUI(bool enabled) {
     ui->logsEnableBtn->setChecked(enabled);
 }
 
-
+void wnd::WalletConfig::on_logout_3_clicked()
+{
+    currentAutoLogout = 3;
+    updateButtons();
 }
 
+void wnd::WalletConfig::on_logout_5_clicked()
+{
+    currentAutoLogout = 5;
+    updateButtons();
+}
 
+void wnd::WalletConfig::on_logout_10_clicked()
+{
+    currentAutoLogout = 10;
+    updateButtons();
+}
 
+void wnd::WalletConfig::on_logout_20_clicked()
+{
+    currentAutoLogout = 20;
+    updateButtons();
+}
+
+void wnd::WalletConfig::on_logout_30_clicked()
+{
+    currentAutoLogout = 30;
+    updateButtons();
+}
+
+void wnd::WalletConfig::on_logout_never_clicked()
+{
+    currentAutoLogout = 0;
+    updateButtons();
+}
+
+void wnd::WalletConfig::on_start_mqs_clicked()
+{
+    updateButtons();
+}
+
+void wnd::WalletConfig::on_start_keybase_clicked()
+{
+    updateButtons();
+}
+
+void WalletConfig::updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartKeybase) {
+    ui->start_mqs->setChecked(isAutoStartMQS);
+    ui->start_keybase->setChecked(isAutoStartKeybase);
+}
+
+}
