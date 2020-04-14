@@ -53,6 +53,12 @@ public:
 
     bool getWalletLogsEnabled();
     void updateWalletLogsEnabled(bool enabled, bool needCleanupLogs);
+
+    bool getAutoStartMQSEnabled();
+    void updateAutoStartMQSEnabled(bool enabled);
+
+    bool getAutoStartKeybaseEnabled();
+    void updateAutoStartKeybaseEnabled(bool enabled);
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "wallet_configuration.html";}

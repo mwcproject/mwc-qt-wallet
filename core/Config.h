@@ -70,6 +70,7 @@ const QString & getHodlMainNetUrl();
 const QString & getHodlTestNetUrl();
 
 int64_t         getLogoutTimeMs();
+void         setLogoutTimeMs(int64_t timeMs);
 
 double          getTimeoutMultiplier();
 void            increaseTimeoutMultiplier();

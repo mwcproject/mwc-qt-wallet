@@ -641,6 +641,7 @@ QTabWidget::tab-bar{
 }
 
 QTabBar::tab{
+    color: white;
     border-right: 2px solid #FFFFFF;
     background: transparent;
     font-size: 15px;
@@ -659,4 +660,18 @@ QTabBar::tab:hover{
 
 QTabBar::tab:selected{
     font-weight:bold;
+}
+
+QGroupBox {
+    color: white;
+    font: bold;
+    border: 1px solid silver;
+    border-radius: 6px;
+    margin-top: 6px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 7px;
+    padding: 0px 5px 0px 5px;
 }
