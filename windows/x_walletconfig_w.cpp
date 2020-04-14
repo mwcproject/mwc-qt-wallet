@@ -180,7 +180,7 @@ void WalletConfig::updateButtons() {
         ui->changeOutputsEdit->text().trimmed() == QString::number(defaultSendParams.changeOutputs) &&
         ui->start_mqs->isChecked() == true &&
         ui->start_keybase->isChecked() == true &&
-        ui->logout_3->isChecked() == true;
+        ui->logout_20->isChecked() == true;
 
     ui->restoreDefault->setEnabled( !sameWithDefault );
     ui->applyButton->setEnabled( !sameWithCurrent );
@@ -402,7 +402,8 @@ void WalletConfig::on_restoreDefault_clicked()
 
     updateAutoStartStateUI(true, true);
 
-    updateAutoLogoutStateUI(3 * 60);
+    currentLogoutTimeout = 20 * 60;
+    updateAutoLogoutStateUI(20 * 60);
 
     updateButtons();
 }
@@ -468,7 +469,6 @@ bool WalletConfig::applyChanges() {
         autoStartKeybaseEnabled = ui->start_keybase->isChecked();
 
         if (logoutTimeout != currentLogoutTimeout) {
-            // 1. Update the config...
             util::ConfigReader reader;
             QString configFN = config::getMwcGuiWalletConf();
             if ( !reader.readConfig( configFN ) ) {
@@ -480,14 +480,11 @@ bool WalletConfig::applyChanges() {
 
             if (!updateOk) {
                 control::MessageBox::messageText(nullptr, "Error", "Wallet unable to set the selected logout time." );
+            } else {
+                logoutTimeout = currentLogoutTimeout;
+                config::setLogoutTimeMs(logoutTimeout * 1000);
             }
-
-            // 2. Restart
-            // Stopping wallet first
-            // util::requestRestartMwcQtWallet();
-            // QCoreApplication::quit();
         }
-        logoutTimeout = currentLogoutTimeout;
 
         updateButtons();
         return true; // We are good. Changes was applied
@@ -606,25 +603,18 @@ void WalletConfig::updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartK
 }
 
 void WalletConfig::updateAutoLogoutStateUI(int64_t time) {
-    if(time < 0)
+    if (time < 0)
         ui->logout_never->setChecked(true);
-    switch(time) {
-        case 3 * 60:
-            ui->logout_3->setChecked(true);
-            break;
-        case 5 * 60:
-            ui->logout_5->setChecked(true);
-            break;
-        case 10 * 60:
-            ui->logout_10->setChecked(true);
-            break;
-        case 20 * 60:
-            ui->logout_20->setChecked(true);
-            break;
-        case 30 * 60:
-            ui->logout_30->setChecked(true);
-            break;
-    }
+    else if(time < 4 * 60)
+        ui->logout_3->setChecked(true);
+    else if(time < 7.5 * 60)
+        ui->logout_5->setChecked(true);
+    else if(time < 15 * 60)
+        ui->logout_10->setChecked(true);
+    else if(time < 25 * 60)
+        ui->logout_20->setChecked(true);
+    else
+        ui->logout_30->setChecked(true);
 }
 
 }

@@ -120,8 +120,8 @@ private:
     bool walletLogsEnabled = false;
     bool autoStartMQSEnabled = true;
     bool autoStartKeybaseEnabled = true;
-    int64_t logoutTimeout = 3 * 60;
-    int64_t currentLogoutTimeout = 3 * 60;
+    int64_t logoutTimeout = 20 * 60;
+    int64_t currentLogoutTimeout = 20 * 60;
 
     wallet::WalletConfig defaultWalletConfig;
     core::SendCoinsParams defaultSendParams;

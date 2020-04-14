@@ -99,6 +99,7 @@ const QString & getHodlMainNetUrl() { return hodlUrlMainNetUrl;}
 const QString & getHodlTestNetUrl() { return hodlUrlTestNetUrl;}
 
 int64_t         getLogoutTimeMs() {return logoutTimeMs;}
+void         setLogoutTimeMs(int64_t timeMs) {logoutTimeMs = timeMs;}
 
 
 double          getTimeoutMultiplier() {return timeoutMultiplier;}
