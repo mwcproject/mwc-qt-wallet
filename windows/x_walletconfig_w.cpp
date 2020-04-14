@@ -20,6 +20,7 @@
 #include <QHostInfo>
 #include "../util/Waiting.h"
 #include "../util/Process.h"
+#include "../util/ConfigReader.h"
 #include <QFileDialog>
 #include <QStandardPaths>
 #include "../state/timeoutlock.h"
@@ -100,8 +101,15 @@ WalletConfig::WalletConfig(QWidget *parent, state::WalletConfig * _state) :
     checkSizeButton(uiScale);
 
     walletLogsEnabled = state->getWalletLogsEnabled();
-
     updateLogsStateUI(walletLogsEnabled);
+
+    autoStartMQSEnabled = state->getAutoStartMQSEnabled();
+    autoStartKeybaseEnabled = state->getAutoStartKeybaseEnabled();
+    updateAutoStartStateUI(autoStartMQSEnabled, autoStartKeybaseEnabled);
+
+    logoutTimeout = config::getLogoutTimeMs() / 1000;
+    currentLogoutTimeout = logoutTimeout;
+    updateAutoLogoutStateUI(logoutTimeout);
 
 #ifdef Q_OS_DARWIN
     // MacOS doesn't support font scale. Need to hide all the buttons
@@ -157,7 +165,10 @@ void WalletConfig::updateButtons() {
         keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == currentWalletConfig.keyBasePath &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == currentWalletConfig.getMwcMqHostNorm() &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(sendParams.inputConfirmationNumber) &&
-        ui->changeOutputsEdit->text().trimmed() == QString::number(sendParams.changeOutputs);
+        ui->changeOutputsEdit->text().trimmed() == QString::number(sendParams.changeOutputs) &&
+        autoStartMQSEnabled == ui->start_mqs->isChecked() &&
+        autoStartKeybaseEnabled == ui->start_keybase->isChecked() == true &&
+        logoutTimeout == currentLogoutTimeout;
 
     bool sameWithDefault =
         getcheckedSizeButton() == scale2Id( state->getInitGuiScale() ) &&
@@ -166,7 +177,10 @@ void WalletConfig::updateButtons() {
         keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == defaultWalletConfig.keyBasePath &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == defaultWalletConfig.getMwcMqHostNorm() &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(defaultSendParams.inputConfirmationNumber) &&
-        ui->changeOutputsEdit->text().trimmed() == QString::number(defaultSendParams.changeOutputs);
+        ui->changeOutputsEdit->text().trimmed() == QString::number(defaultSendParams.changeOutputs) &&
+        ui->start_mqs->isChecked() == true &&
+        ui->start_keybase->isChecked() == true &&
+        ui->logout_20->isChecked() == true;
 
     ui->restoreDefault->setEnabled( !sameWithDefault );
     ui->applyButton->setEnabled( !sameWithCurrent );
@@ -386,6 +400,11 @@ void WalletConfig::on_restoreDefault_clicked()
 
     updateLogsStateUI(true);
 
+    updateAutoStartStateUI(true, true);
+
+    currentLogoutTimeout = 20 * 60;
+    updateAutoLogoutStateUI(20 * 60);
+
     updateButtons();
 }
 
@@ -435,6 +454,36 @@ bool WalletConfig::applyChanges() {
             // Restating the wallet
             state->restartMwcQtWallet();
             return false;   // need to be restarted. Just want to cancell caller of caller changes state operation
+        }
+
+        bool need2updateAutoStartMQSEnabled = ( autoStartMQSEnabled != ui->start_mqs->isChecked() );
+        if (need2updateAutoStartMQSEnabled) {
+            state->updateAutoStartMQSEnabled(ui->start_mqs->isChecked());
+        }
+        autoStartMQSEnabled = ui->start_mqs->isChecked();
+
+        bool need2updateAutoStartKeybaseEnabled = ( autoStartKeybaseEnabled != ui->start_keybase->isChecked() );
+        if (need2updateAutoStartKeybaseEnabled) {
+            state->updateAutoStartKeybaseEnabled(ui->start_keybase->isChecked());
+        }
+        autoStartKeybaseEnabled = ui->start_keybase->isChecked();
+
+        if (logoutTimeout != currentLogoutTimeout) {
+            util::ConfigReader reader;
+            QString configFN = config::getMwcGuiWalletConf();
+            if ( !reader.readConfig( configFN ) ) {
+                control::MessageBox::messageText(nullptr, "Internal Error",
+                                             "Unable to update wallet config file " + configFN );
+            }
+
+            bool updateOk = reader.updateConfig("logoutTimeout", QString::number(currentLogoutTimeout));
+
+            if (!updateOk) {
+                control::MessageBox::messageText(nullptr, "Error", "Wallet unable to set the selected logout time." );
+            } else {
+                logoutTimeout = currentLogoutTimeout;
+                config::setLogoutTimeMs(logoutTimeout * 1000);
+            }
         }
 
         updateButtons();
@@ -502,8 +551,70 @@ void WalletConfig::updateLogsStateUI(bool enabled) {
     ui->logsEnableBtn->setChecked(enabled);
 }
 
-
+void wnd::WalletConfig::on_logout_3_clicked()
+{
+    currentLogoutTimeout = 3 * 60;
+    updateButtons();
 }
 
+void wnd::WalletConfig::on_logout_5_clicked()
+{
+    currentLogoutTimeout = 5 * 60;
+    updateButtons();
+}
 
+void wnd::WalletConfig::on_logout_10_clicked()
+{
+    currentLogoutTimeout = 10 * 60;
+    updateButtons();
+}
 
+void wnd::WalletConfig::on_logout_20_clicked()
+{
+    currentLogoutTimeout = 20 * 60;
+    updateButtons();
+}
+
+void wnd::WalletConfig::on_logout_30_clicked()
+{
+    currentLogoutTimeout = 30 * 60;
+    updateButtons();
+}
+
+void wnd::WalletConfig::on_logout_never_clicked()
+{
+    currentLogoutTimeout = -1;
+    updateButtons();
+}
+
+void wnd::WalletConfig::on_start_mqs_clicked()
+{
+    updateButtons();
+}
+
+void wnd::WalletConfig::on_start_keybase_clicked()
+{
+    updateButtons();
+}
+
+void WalletConfig::updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartKeybase) {
+    ui->start_mqs->setChecked(isAutoStartMQS);
+    ui->start_keybase->setChecked(isAutoStartKeybase);
+}
+
+void WalletConfig::updateAutoLogoutStateUI(int64_t time) {
+    if (time < 0)
+        ui->logout_never->setChecked(true);
+    else if(time < 4 * 60)
+        ui->logout_3->setChecked(true);
+    else if(time < 7.5 * 60)
+        ui->logout_5->setChecked(true);
+    else if(time < 15 * 60)
+        ui->logout_10->setChecked(true);
+    else if(time < 25 * 60)
+        ui->logout_20->setChecked(true);
+    else
+        ui->logout_30->setChecked(true);
+}
+
+}

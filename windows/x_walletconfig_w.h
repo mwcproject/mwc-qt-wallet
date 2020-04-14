@@ -61,6 +61,23 @@ private slots:
     void on_restoreDefault_clicked();
 
     void on_applyButton_clicked();
+
+    void on_logout_3_clicked();
+
+    void on_logout_5_clicked();
+
+    void on_logout_10_clicked();
+
+    void on_logout_20_clicked();
+
+    void on_logout_30_clicked();
+
+    void on_logout_never_clicked();
+
+    void on_start_mqs_clicked();
+
+    void on_start_keybase_clicked();
+
 private:
     void setValues(const QString & mwc713directory,
                    const QString & keyBasePath,
@@ -84,6 +101,10 @@ private:
 
     void updateLogsStateUI(bool enabled);
 
+    void updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartKeybase);
+
+    void updateAutoLogoutStateUI(int64_t time);
+
     // return true if no chnages need to be made.
     // false - need to be made or was made and wallet need to be restarted
     bool applyChanges();
@@ -97,6 +118,10 @@ private:
     int uiScale = 2; // in the range [1..4]
 
     bool walletLogsEnabled = false;
+    bool autoStartMQSEnabled = true;
+    bool autoStartKeybaseEnabled = true;
+    int64_t logoutTimeout = 20 * 60;
+    int64_t currentLogoutTimeout = 20 * 60;
 
     wallet::WalletConfig defaultWalletConfig;
     core::SendCoinsParams defaultSendParams;

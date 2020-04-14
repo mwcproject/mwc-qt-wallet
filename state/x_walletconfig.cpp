@@ -129,6 +129,22 @@ void WalletConfig::updateWalletLogsEnabled(bool enabled, bool needCleanupLogs) {
 
 }
 
+bool WalletConfig::getAutoStartMQSEnabled() {
+    return context->appContext->isAutoStartMQSEnabled();
+}
+
+void WalletConfig::updateAutoStartMQSEnabled(bool enabled) {
+    context->appContext->setAutoStartMQSEnabled(enabled);
+}
+
+bool WalletConfig::getAutoStartKeybaseEnabled() {
+    return context->appContext->isAutoStartKeybaseEnabled();
+}
+
+void WalletConfig::updateAutoStartKeybaseEnabled(bool enabled) {
+    context->appContext->setAutoStartKeybaseEnabled(enabled);
+}
+
 
 }
 
