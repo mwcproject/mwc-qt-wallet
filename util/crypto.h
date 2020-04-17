@@ -30,6 +30,8 @@ namespace crypto {
     // return data is 256 bits
     QByteArray HSA256(const QByteArray & data);
 
+    QString getHSA256KeyHash(const QString& key);
+
     // Verify Public Key.
     // Checking the length and Hex Symbols
     bool isPublicKeyValid( const QString & key );

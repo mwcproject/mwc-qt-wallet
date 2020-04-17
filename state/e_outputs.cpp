@@ -149,6 +149,7 @@ void Outputs::onLoginResult(bool ok) {
     if (config::isOnlineWallet()) {
         Q_ASSERT(config::isOnlineWallet() || config::isColdWallet());
         context->wallet->getRootPublicKey("");
+        context->appContext->setOutputNotesWalletId("");
     }
 }
 
@@ -158,15 +159,7 @@ void Outputs::onRootPublicKey( bool success, QString errMsg, QString rootPubKey,
     Q_UNUSED(signature)
 
     if (success) {
-        QString rootPubKeyHash;
-        QString rpkey = rootPubKey;
-        QByteArray keyHex = rpkey.toUtf8();
-        if (!keyHex.isEmpty()) {
-            rootPubKeyHash = crypto::hex2str( crypto::HSA256( keyHex ) );
-        }
-        else {
-            rootPubKeyHash = "";
-        }
+        QString rootPubKeyHash = crypto::getHSA256KeyHash(rootPubKey);
         context->appContext->setOutputNotesWalletId(rootPubKeyHash);
     }
 }

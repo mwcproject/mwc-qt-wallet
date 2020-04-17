@@ -69,6 +69,18 @@ namespace crypto {
         return hash.result();
     }
 
+    // Apply hash to given key and return a string
+    QString getHSA256KeyHash(const QString& key) {
+        QString rootPubKeyHash = "";
+        if (!key.isEmpty()) {
+            QByteArray keyHex = key.toUtf8();
+            if (!keyHex.isEmpty()) {
+                rootPubKeyHash = crypto::hex2str( crypto::HSA256( keyHex ) );
+            }
+        }
+        return rootPubKeyHash;
+    }
+
     // Verify Public Key.
     // Checking the length and Hex Symbols
     bool isPublicKeyValid( const QString & key ) {
