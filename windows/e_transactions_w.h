@@ -69,6 +69,7 @@ private slots:
     void on_prevBtn_clicked();
     void on_nextBtn_clicked();
 
+    void saveTransactionNote(const QString& account, int64_t txIdx, const QString& note);
 
 private:
     // return null if nothing was selected

@@ -102,6 +102,7 @@ void Transactions::updateTransactions( QString account, int64_t height, QVector<
     }
 
     cachedTxs.setCache(account, height, transactions);
+    context->appContext->initTransactionNotes(account, cachedTxs.transactions);
 
     if (wnd) {
         wnd->setTransactionCount(account, cachedTxs.transactions.size());

@@ -20,6 +20,7 @@
 #include "../state/m_airdrop.h"
 #include "../wallet/wallet.h"
 #include "../core/HodlStatus.h"
+#include "../core/walletnotes.h"
 
 class QAction;
 
@@ -62,26 +63,6 @@ struct ContactRecord {
     void saveData( QDataStream & out) const;
     bool loadData( QDataStream & in);
 };
-
-struct OutputNotes {
-    // (walletId => (account within wallet => (output committment => note)))
-    QString walletId;
-    QMap<QString, QMap<QString, QMap<QString, QString>>> outputNotesByWallet;
-
-    bool cleanupNotes(const QString& account, const QVector<wallet::WalletOutput> & outputs);
-
-    const QMap<QString, QString>& getOutputNotes(const QString& account);
-    void updateOutputNote(const QString& account, const QString& commitment, const QString& note);
-    void deleteOutputNote(const QString& account, const QString& commitment);
-
-private:
-    QMap<QString, QList<QString>> cleanedUpAccounts;
-    QMap<QString, QString> emptyOutputNotes;
-
-    bool notesNeedCleanup(const QString& walletId, const QString& account);
-    void recordNotesCleanup(const QString& walletId, const QString& account);
-};
-
 
 // State that applicable to all application.
 class AppContext
@@ -181,12 +162,23 @@ public:
     void saveHodlOutputs( const QString & rootPubKeyHash, const QMap<QString, core::HodlOutputInfo> & hodlOutputs );
     QMap<QString, core::HodlOutputInfo> loadHodlOutputs(const QString & rootPubKeyHash );
 
+    // setWalletNotes called in main.cpp after StateContext is created
+    void setWalletNotes(core::WalletNotes* _walletNotes);
+    // these methods are called by WalletNotes whenever the notes have been updated so the maps will always contain the latest notes
+    void setOutputNotesMap(QMap<QString, QMap<QString, QMap<QString, QString>>> _outputNotesMap) { outputNotesMap = _outputNotesMap; }
+    void setTxnNotesMap(QMap<QString, QMap<QString, QMap<QString, QString>>> _txnNotesMap) { txnNotesMap = _txnNotesMap; }
+
     // output note
-    void setOutputNotesWalletId(QString walletId);
     void initOutputNotes(const QString & account, const QVector<wallet::WalletOutput> & outputs);
-    const QMap<QString, QString>& getOutputNotes(const QString& account);
-    void updateOutputNote(const QString& account, const QString& outputCommitment, const QString& newNote);
-    void deleteOutputNote(const QString& account, const QString& outputCommitment);
+    QString getNote(const QString& account, const QString& outputCommitment);
+    void updateNote(const QString& account, const QString& outputCommitment, const QString& newNote);
+    void deleteNote(const QString& account, const QString& outputCommitment);
+
+    // transaction note uses transaction txIdx as note id
+    void initTransactionNotes(const QString & account, const QVector<wallet::WalletTransaction> & transactions);
+    QString getNote(const QString& account, int64_t txIdx);
+    void updateNote(const QString& account, int64_t txIdx, const QString& newNote) const;
+    void deleteNote(const QString& account, int64_t txIdx) const;
 
 private:
     bool loadData();
@@ -233,7 +225,16 @@ private:
 
     QMap<QString, qulonglong> hodlRegistrations;
 
-    OutputNotes outputNotes;
+    WalletNotes* walletNotes;
+    // The app context is created early on in main.cpp and tries to load the app data
+    // but the wallet notes object cannot be created until the StateContext has
+    // been created later in main.cpp. So we store the output and transaction notes
+    // until the wallet notes object gets created at which time they are loaded into
+    // the wallet notes object. Then each time the wallet notes are updated, they
+    // are loaded back into these app context note maps so we don't have to
+    // worry about the wallet notes object getting destroyed before the app context.
+    QMap<QString, QMap<QString, QMap<QString, QString>>> outputNotesMap;
+    QMap<QString, QMap<QString, QMap<QString, QString>>> txnNotesMap;
 };
 
 template <class T>

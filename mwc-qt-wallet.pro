@@ -21,7 +21,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 CONFIG += c++14
 
-CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+#CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+CONFIG += console
 
 macx {
     CONFIG += app_bundle

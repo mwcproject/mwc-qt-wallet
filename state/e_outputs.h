@@ -68,9 +68,6 @@ private slots:
 
     void onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString message);
 
-    void onLoginResult(bool ok);
-    void onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature );
-
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "outputs.html";}

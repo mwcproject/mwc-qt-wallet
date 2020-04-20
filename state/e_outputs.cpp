@@ -57,10 +57,6 @@ Outputs::Outputs(StateContext * context) :
 
     QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
                       this, &Outputs::onNewNotificationMessage, Qt::QueuedConnection );
-
-    QObject::connect( context->wallet , &wallet::Wallet::onLoginResult, this, &Outputs::onLoginResult, Qt::QueuedConnection );
-
-    QObject::connect( context->wallet , &wallet::Wallet::onRootPublicKey, this, &Outputs::onRootPublicKey, Qt::QueuedConnection );
 }
 
 Outputs::~Outputs() {}
@@ -142,28 +138,6 @@ void Outputs::onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString mes
         wnd->triggerRefresh();
     }
 }
-
-void Outputs::onLoginResult(bool ok) {
-    Q_UNUSED(ok)
-
-    if (config::isOnlineWallet()) {
-        Q_ASSERT(config::isOnlineWallet() || config::isColdWallet());
-        context->wallet->getRootPublicKey("");
-        context->appContext->setOutputNotesWalletId("");
-    }
-}
-
-void Outputs::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature ) {
-    Q_UNUSED(errMsg)
-    Q_UNUSED(message)
-    Q_UNUSED(signature)
-
-    if (success) {
-        QString rootPubKeyHash = crypto::getHSA256KeyHash(rootPubKey);
-        context->appContext->setOutputNotesWalletId(rootPubKeyHash);
-    }
-}
-
 
 
 }

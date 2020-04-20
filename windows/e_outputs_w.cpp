@@ -310,11 +310,8 @@ void Outputs::on_outputsTable_cellDoubleClicked(int row, int column)
     if (selected==nullptr)
         return;
 
-    QString outputNote;
     QString account = currentSelectedAccount();
-    if (state->getContext()->appContext->getOutputNotes(account).contains(selected->outputCommitment)) {
-            outputNote = state->getContext()->appContext->getOutputNotes(account).value(selected->outputCommitment);
-    }
+    QString outputNote = state->getContext()->appContext->getNote(account, selected->outputCommitment);
     dlg::ShowOutputDlg showOutputDlg(this, account, *selected, state->getContext()->wallet->getWalletConfig(), state->getContext()->hodlStatus, outputNote );
     connect(&showOutputDlg, &dlg::ShowOutputDlg::saveOutputNote, this, &Outputs::saveOutputNote);
     showOutputDlg.exec();
@@ -322,11 +319,11 @@ void Outputs::on_outputsTable_cellDoubleClicked(int row, int column)
 
 void Outputs::saveOutputNote(const QString& account, const QString& commitment, const QString& note) {
     if (note.isEmpty()) {
-        state->getContext()->appContext->deleteOutputNote(account, commitment);
+        state->getContext()->appContext->deleteNote(account, commitment);
     }
     else {
         // add new note or update existing note for this commitment
-        state->getContext()->appContext->updateOutputNote(account, commitment, note);
+        state->getContext()->appContext->updateNote(account, commitment, note);
     }
 }
 

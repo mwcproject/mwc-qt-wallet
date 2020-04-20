@@ -24,6 +24,7 @@
 #include "dialogs/e_showproofdlg.h"
 #include "dialogs/e_showtransactiondlg.h"
 #include "../core/global.h"
+#include "../core/appcontext.h"
 
 namespace wnd {
 
@@ -455,7 +456,9 @@ void Transactions::updateTransactionById(bool success, QString account, int64_t 
         return;
     }
 
-    dlg::ShowTransactionDlg showTransDlg(this, walletConfig, transaction, outputs, messages);
+    QString txnNote = state->getContext()->appContext->getNote(account, transaction.txIdx);
+    dlg::ShowTransactionDlg showTransDlg(this, account, walletConfig, transaction, outputs, messages, txnNote);
+    connect(&showTransDlg, &dlg::ShowTransactionDlg::saveTransactionNote, this, &Transactions::saveTransactionNote);
     showTransDlg.exec();
 }
 
@@ -528,6 +531,16 @@ wallet::AccountInfo Transactions::getSelectedAccount() const {
         idx = 0;
 
     return accountInfo[idx];
+}
+
+void Transactions::saveTransactionNote(const QString& account, int64_t txIdx, const QString& note) {
+    if (note.isEmpty()) {
+        state->getContext()->appContext->deleteNote(account, txIdx);
+    }
+    else {
+        // add new note or update existing note for this commitment
+        state->getContext()->appContext->updateNote(account, txIdx, note);
+    }
 }
 
 }

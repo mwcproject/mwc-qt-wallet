@@ -22,10 +22,12 @@
 namespace dlg {
 
 ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,
+                                       const QString& account,
                                        const wallet::WalletConfig &config,
                                        const wallet::WalletTransaction transaction,
                                        const QVector<wallet::WalletOutput> & _outputs,
-                                       const QVector<QString> & messages) :
+                                       const QVector<QString> & messages,
+                                       const QString& note) :
     control::MwcDialog(parent),
     ui(new Ui::ShowTransactionDlg),
     outputs(_outputs)
@@ -68,6 +70,13 @@ ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,
         ui->commitsComboBox->setCurrentIndex(0);
         updateOutputData();
     }
+
+    txIdx = transaction.txIdx;
+    this->account = account;
+    originalTransactionNote = note;
+    newTransactionNote = note;
+    ui->transactionNote->setText(newTransactionNote);
+    updateButtons(false);
 }
 
 ShowTransactionDlg::~ShowTransactionDlg()
@@ -87,6 +96,19 @@ void ShowTransactionDlg::updateOutputData() {
     ui->out_confirms->setText( out.numOfConfirms );
     ui->out_coinBase->setText(out.coinbase?"Yes":"No");
     ui->out_tx->setText(out.txIdx<0 ? "None" : QString::number(out.txIdx+1) );
+}
+
+void ShowTransactionDlg::updateButtons(bool showNoteEditButtons) {
+    ui->saveButton->setEnabled(showNoteEditButtons);
+
+    // disable OK button if save is enabled
+    // forces the user to save any active changes to the note
+    if (showNoteEditButtons) {
+        ui->okButton->setEnabled(false);
+    }
+    else {
+        ui->okButton->setEnabled(true);
+    }
 }
 
 void ShowTransactionDlg::on_viewKernel_clicked()
@@ -111,7 +133,23 @@ void ShowTransactionDlg::on_commitsComboBox_currentIndexChanged(int index)
 
 void ShowTransactionDlg::on_okButton_clicked()
 {
+    if (newTransactionNote != originalTransactionNote) {
+        emit saveTransactionNote(account, txIdx, newTransactionNote);
+    }
     accept();
+}
+
+void ShowTransactionDlg::on_transactionNote_textEdited(const QString& text) {
+    Q_UNUSED(text);
+    updateButtons(true);
+}
+
+void ShowTransactionDlg::on_saveButton_clicked() {
+    QString newNote = ui->transactionNote->text();
+    if (newNote != newTransactionNote) {
+        newTransactionNote = newNote;
+    }
+    updateButtons(false);
 }
 
 }

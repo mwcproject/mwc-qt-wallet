@@ -36,7 +36,7 @@
    <property name="geometry">
     <rect>
      <x>459</x>
-     <y>75</y>
+     <y>63</y>
      <width>373</width>
      <height>63</height>
     </rect>
@@ -92,7 +92,7 @@
    <property name="geometry">
     <rect>
      <x>36</x>
-     <y>75</y>
+     <y>63</y>
      <width>103</width>
      <height>63</height>
     </rect>
@@ -148,7 +148,7 @@
    <property name="geometry">
     <rect>
      <x>351</x>
-     <y>75</y>
+     <y>63</y>
      <width>82</width>
      <height>63</height>
     </rect>
@@ -204,7 +204,7 @@
    <property name="geometry">
     <rect>
      <x>159</x>
-     <y>75</y>
+     <y>63</y>
      <width>169</width>
      <height>63</height>
     </rect>
@@ -260,7 +260,7 @@
    <property name="geometry">
     <rect>
      <x>240</x>
-     <y>327</y>
+     <y>380</y>
      <width>400</width>
      <height>2</height>
     </rect>
@@ -276,7 +276,7 @@
    <property name="geometry">
     <rect>
      <x>36</x>
-     <y>354</y>
+     <y>393</y>
      <width>796</width>
      <height>65</height>
     </rect>
@@ -390,7 +390,7 @@
    <property name="geometry">
     <rect>
      <x>36</x>
-     <y>441</y>
+     <y>474</y>
      <width>121</width>
      <height>63</height>
     </rect>
@@ -446,7 +446,7 @@
    <property name="geometry">
     <rect>
      <x>372</x>
-     <y>441</y>
+     <y>474</y>
      <width>121</width>
      <height>63</height>
     </rect>
@@ -502,7 +502,7 @@
    <property name="geometry">
     <rect>
      <x>177</x>
-     <y>441</y>
+     <y>474</y>
      <width>157</width>
      <height>63</height>
     </rect>
@@ -558,7 +558,7 @@
    <property name="geometry">
     <rect>
      <x>513</x>
-     <y>441</y>
+     <y>474</y>
      <width>157</width>
      <height>63</height>
     </rect>
@@ -614,7 +614,7 @@
    <property name="geometry">
     <rect>
      <x>711</x>
-     <y>441</y>
+     <y>474</y>
      <width>121</width>
      <height>63</height>
     </rect>
@@ -670,7 +670,7 @@
    <property name="geometry">
     <rect>
      <x>240</x>
-     <y>528</y>
+     <y>561</y>
      <width>400</width>
      <height>2</height>
     </rect>
@@ -686,7 +686,7 @@
    <property name="geometry">
     <rect>
      <x>36</x>
-     <y>240</y>
+     <y>216</y>
      <width>796</width>
      <height>63</height>
     </rect>
@@ -741,8 +741,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>186</x>
-     <y>648</y>
+     <x>184</x>
+     <y>651</y>
      <width>157</width>
      <height>63</height>
     </rect>
@@ -797,8 +797,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>39</x>
-     <y>648</y>
+     <x>37</x>
+     <y>651</y>
      <width>121</width>
      <height>63</height>
     </rect>
@@ -853,8 +853,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>372</x>
-     <y>648</y>
+     <x>370</x>
+     <y>651</y>
      <width>112</width>
      <height>63</height>
     </rect>
@@ -909,8 +909,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>513</x>
-     <y>648</y>
+     <x>511</x>
+     <y>651</y>
      <width>94</width>
      <height>63</height>
     </rect>
@@ -965,8 +965,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>747</x>
-     <y>648</y>
+     <x>745</x>
+     <y>651</y>
      <width>88</width>
      <height>63</height>
     </rect>
@@ -1021,8 +1021,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>633</x>
-     <y>648</y>
+     <x>631</x>
+     <y>651</y>
      <width>88</width>
      <height>63</height>
     </rect>
@@ -1109,7 +1109,7 @@
    <property name="geometry">
     <rect>
      <x>36</x>
-     <y>159</y>
+     <y>139</y>
      <width>796</width>
      <height>63</height>
     </rect>
@@ -1164,8 +1164,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>39</x>
-     <y>558</y>
+     <x>37</x>
+     <y>573</y>
      <width>796</width>
      <height>62</height>
     </rect>
@@ -1278,12 +1278,143 @@
     </item>
    </layout>
   </widget>
+  <widget class="QWidget" name="layoutWidget_10">
+   <property name="geometry">
+    <rect>
+     <x>37</x>
+     <y>293</y>
+     <width>796</width>
+     <height>65</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_7">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_32">
+      <property name="spacing">
+       <number>5</number>
+      </property>
+      <item>
+       <widget class="control::MwcLabelSmall" name="label_39">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Transaction Note</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="control::MwcLineEditNormal" name="transactionNote">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="maxLength">
+         <number>300</number>
+        </property>
+        <property name="readOnly">
+         <bool>false</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Enter note for transaction</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_33">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="control::MwcLabelSmall" name="label_40">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="control::MwcPushButtonNormal" name="saveButton">
+        <property name="minimumSize">
+         <size>
+          <width>106</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>106</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Save note in wallet. Notes are only visible in MWC-Qt wallet.</string>
+        </property>
+        <property name="text">
+         <string>Save</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcComboBox</class>
+   <extends>QComboBox</extends>
+   <header>control/MwcComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>
@@ -1294,11 +1425,6 @@
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcComboBox</class>
-   <extends>QComboBox</extends>
-   <header>control/MwcComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelLarge</class>

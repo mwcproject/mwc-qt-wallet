@@ -30,15 +30,21 @@ class ShowTransactionDlg : public control::MwcDialog
 
 public:
     explicit ShowTransactionDlg(QWidget *parent,
+            const QString& account,
             const wallet::WalletConfig &config,
             const wallet::WalletTransaction transaction,
             const QVector<wallet::WalletOutput> & outputs,
-            const QVector<QString> & messages);
+            const QVector<QString> & messages,
+            const QString& note);
 
     ~ShowTransactionDlg();
 
 private:
     void updateOutputData();
+    void updateButtons(bool showNoteEditButtons);
+
+signals:
+    void saveTransactionNote(const QString& account, int64_t txIdx, const QString& note);
 
 private slots:
     void on_okButton_clicked();
@@ -49,11 +55,19 @@ private slots:
 
     void on_commitsComboBox_currentIndexChanged(int index);
 
+    void on_transactionNote_textEdited(const QString& text);
+    void on_saveButton_clicked();
+
 private:
     Ui::ShowTransactionDlg *ui;
 
     QVector<wallet::WalletOutput> outputs;
     QString blockExplorerUrl;
+
+    QString account;
+    int64_t txIdx;
+    QString originalTransactionNote;
+    QString newTransactionNote;
 };
 
 }
