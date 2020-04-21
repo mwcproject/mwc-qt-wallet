@@ -56,8 +56,8 @@ MockWallet::~MockWallet() {}
 
 // Create new wallet and generate a seed for it
 // Check signal: onNewSeed( seed [] )
-void MockWallet::start2init(QString password) {
-    Q_UNUSED(password)
+void MockWallet::start2init(QString pass) {
+    password = pass;
     emit onNewSeed( TEST_SEED);
 }
 
@@ -65,10 +65,9 @@ void MockWallet::start2init(QString password) {
 // recover wallet with a passphrase:
 // Check Signals: onRecoverProgress( int progress, int maxVal );
 // Check Signals: onRecoverResult(bool ok, QString newAddress );
-void MockWallet::start2recover(const QVector<QString> &seed, QString password) {
+void MockWallet::start2recover(const QVector<QString> &seed, QString pass) {
     Q_UNUSED(seed)
-    Q_UNUSED(password)
-
+    password = pass;
 
     emit onRecoverProgress( 2, 10 );
     emit onRecoverProgress( 4, 10 );
@@ -79,8 +78,8 @@ void MockWallet::start2recover(const QVector<QString> &seed, QString password) {
 }
 
 // Check signal: onLoginResult(bool ok)
-void MockWallet::loginWithPassword(QString password) {
-    Q_UNUSED(password)
+void MockWallet::loginWithPassword(QString pass) {
+    password = pass;
     emit onLoginResult(true);
 }
 

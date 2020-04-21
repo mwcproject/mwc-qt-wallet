@@ -81,7 +81,7 @@ public:
     virtual void getSeed() override;
 
     // Get last used password. Just don't export from DLL
-    virtual QString getPassword() override {return "password";}
+    virtual QString getPassword() override {return password;}
 
     //--------------- Listening
 
@@ -253,6 +253,7 @@ public:
 private:
     core::AppContext * appContext; // app context to store current account name
 
+    QString password;
     bool running = false;
     bool listener_mwcmqs = false;
     bool listener_keybase = false;
