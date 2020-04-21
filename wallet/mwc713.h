@@ -55,7 +55,7 @@ public:
     virtual bool isRunning() override {return mwc713process!= nullptr;}
 
 
-    // Check if waaled need to be initialized or not. Will run statndalone app, wait for exit and return the result
+    // Check if walled need to be initialized or not. Will run statndalone app, wait for exit and return the result
     // Call might take few seconds
     virtual bool checkWalletInitialized() override;
 

@@ -402,22 +402,22 @@ public:
     virtual QString getLastKnownMwcBoxAddress()  = 0;
 
     // Get MWC box <address, index in the chain>
-    virtual void getMwcBoxAddress()  = 0;
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
+    virtual void getMwcBoxAddress()  = 0;
 
     // Change MWC box address to another from the chain. idx - index in the chain.
-    virtual void changeMwcBoxAddress(int idx)  = 0;
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
+    virtual void changeMwcBoxAddress(int idx)  = 0;
 
     // Generate next box address
-    virtual void nextBoxAddress()  = 0;
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
+    virtual void nextBoxAddress()  = 0;
 
     // Request http(s) listening status.
     // bool - true is listening. Then next will be the address
     // bool - false, not listening. Then next will be error or empty if listening is not active.
-    virtual QPair<bool, QString> getHttpListeningStatus() const = 0;
     // Check signal: onHttpListeningStatus(bool listening, QString additionalInfo)
+    virtual QPair<bool, QString> getHttpListeningStatus() const = 0;
 
     // Return true if Tls is setted up for the wallet for http connections.
     virtual bool hasTls() const = 0;
@@ -435,19 +435,19 @@ public:
 
 
     // Request Wallet balance update. It is a multistep operation
-    virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress, bool skipSync=false)  = 0;
     // Check signal: onWalletBalanceUpdated
     //          onWalletBalanceProgress
     //          onAccountSwitched - multiple calls, please ignore
+    virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress, bool skipSync=false)  = 0;
 
 
     // Create another account, note no delete exist for accounts
-    virtual void createAccount( const QString & accountName )  = 0;
     // Check Signal:  onAccountCreated
+    virtual void createAccount( const QString & accountName )  = 0;
 
     // Switch to different account
-    virtual void switchAccount(const QString & accountName)  = 0;
     // Check Signal: onAccountSwitched
+    virtual void switchAccount(const QString & accountName)  = 0;
 
     // Rename account
     // Check Signal: onAccountRenamed(bool success, QString errorMessage);
