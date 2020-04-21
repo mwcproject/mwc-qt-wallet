@@ -444,18 +444,6 @@ bool WalletConfig::applyChanges() {
             state->updateGuiScale( id2scale( getcheckedSizeButton() ) );
         }
 
-        if ( ! (currentWalletConfig==newWalletConfig) ) {
-            if (state->setWalletConfig(newWalletConfig, need2updateGuiSize)) { // in case of true, we are already dead, don't touch memory and exit!
-                return false; // need to be restarted. Just want to cancell caller of caller changes state operation
-            }
-        }
-
-        if (need2updateGuiSize) {
-            // Restating the wallet
-            state->restartMwcQtWallet();
-            return false;   // need to be restarted. Just want to cancell caller of caller changes state operation
-        }
-
         bool need2updateAutoStartMQSEnabled = ( autoStartMQSEnabled != ui->start_mqs->isChecked() );
         if (need2updateAutoStartMQSEnabled) {
             state->updateAutoStartMQSEnabled(ui->start_mqs->isChecked());
@@ -484,6 +472,18 @@ bool WalletConfig::applyChanges() {
                 logoutTimeout = currentLogoutTimeout;
                 config::setLogoutTimeMs(logoutTimeout * 1000);
             }
+        }
+
+        if ( ! (currentWalletConfig==newWalletConfig) ) {
+            if (state->setWalletConfig(newWalletConfig, need2updateGuiSize)) { // in case of true, we are already dead, don't touch memory and exit!
+                return false; // need to be restarted. Just want to cancell caller of caller changes state operation
+            }
+        }
+
+        if (need2updateGuiSize) {
+            // Restating the wallet
+            state->restartMwcQtWallet();
+            return false;   // need to be restarted. Just want to cancell caller of caller changes state operation
         }
 
         updateButtons();
