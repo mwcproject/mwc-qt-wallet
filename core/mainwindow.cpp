@@ -19,6 +19,7 @@
 #include "../state/statemachine.h"
 #include "util/widgetutils.h"
 #include "util/stringutils.h"
+#include "util/execute.h"
 #include "../control/messagebox.h"
 #include "../dialogs/helpdlg.h"
 #include "../core/Config.h"
@@ -143,11 +144,13 @@ void MainWindow::updateLeftBar(bool show) {
     leftBarShown = show;
 }
 
-void MainWindow::setAppEnvironment(state::StateMachine * _stateMachine, wallet::Wallet * _wallet) {
+void MainWindow::setAppEnvironment(state::StateMachine * _stateMachine, wallet::Wallet * _wallet, core::AppContext * _appContext) {
     stateMachine = _stateMachine;
     Q_ASSERT(stateMachine);
     wallet = _wallet;
     Q_ASSERT(wallet);
+    appContext = _appContext;
+    Q_ASSERT(appContext);
 
     ui->leftTb->setAppEnvironment(stateMachine, wallet);
 
@@ -172,6 +175,7 @@ void MainWindow::setAppEnvironment(state::StateMachine * _stateMachine, wallet::
 
     updateListenerBtn();
     updateNetworkName();
+    updateMenu();
 }
 
 QWidget * MainWindow::getMainWindow() {
@@ -189,7 +193,7 @@ void MainWindow::updateActionStates(state::STATE actionState) {
     }
 
 //    bool enabled = stateMachine->isActionWindowMode();
-
+    updateMenu();
 }
 
 void core::MainWindow::on_listenerStatusButton_clicked()
@@ -309,6 +313,181 @@ void MainWindow::setStatusButtonState(  QPushButton * btn, STATUS status, QStrin
 
     if (!text.isEmpty())
         btn->setText(" " + text + " ");
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+///   Menu commands...
+////
+
+void MainWindow::updateMenu() {
+    if (stateMachine==nullptr)
+        return;
+
+    bool canSwitchState = stateMachine->canSwitchState() && stateMachine->getCurrentStateId() >= state::STATE::ACCOUNTS;
+    bool isOnlineWallet = config::isOnlineWallet();
+    bool isColdWallet = config::isColdWallet();
+    bool isOnlineNode = config::isOnlineNode();
+
+    ui->actionSend->setEnabled(canSwitchState && !isOnlineNode);
+    ui->actionReceive->setEnabled(canSwitchState && !isOnlineNode);
+    ui->actionFinalize->setEnabled(canSwitchState && !isOnlineNode);
+    ui->actionTransactions->setEnabled(canSwitchState && !isOnlineNode);
+    ui->actionListeners->setEnabled(canSwitchState && !isColdWallet && !isOnlineNode);
+    ui->actionNode_Overview->setEnabled(canSwitchState);
+    ui->actionResync_with_full_node->setEnabled(canSwitchState && !isOnlineNode);
+    ui->actionOutputs->setEnabled(canSwitchState && !isOnlineNode);
+    ui->actionAirdrop->setEnabled(canSwitchState && isOnlineWallet);
+    ui->actionHODL->setEnabled(canSwitchState && !isColdWallet);
+    ui->actionWallet_accounts->setEnabled(canSwitchState && !isOnlineNode);
+    ui->actionAccounts->setEnabled(canSwitchState && !isOnlineNode);
+    ui->actionContacts->setEnabled(canSwitchState && !isOnlineNode);
+    ui->actionShow_passphrase->setEnabled(canSwitchState && !isOnlineNode);
+    ui->actionEvent_log->setEnabled(canSwitchState);
+    ui->actionLogout->setEnabled(canSwitchState && !isOnlineNode);
+    ui->actionConfig->setEnabled(canSwitchState);
+    ui->actionRunning_Mode_Cold_Wallet->setEnabled(canSwitchState);
+    ui->actionBlock_Explorer->setEnabled(!isColdWallet);
+    ui->actionWhite_papers->setEnabled(!isColdWallet);
+    ui->actionGood_Money->setEnabled(!isColdWallet);
+    ui->actionRoadmap->setEnabled(!isColdWallet);
+    ui->actionMWC_website->setEnabled(!isColdWallet);
+    ui->actionExchanges->setEnabled(!isColdWallet);
+}
+
+
+void MainWindow::on_actionSend_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::SEND );
+}
+
+void MainWindow::on_actionExchanges_triggered()
+{
+    util::openUrlInBrowser("https://www.mwc.mw/exchanges");
+}
+
+void MainWindow::on_actionReceive_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::RECEIVE_COINS );
+}
+
+void MainWindow::on_actionFinalize_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::FINALIZE );
+}
+
+void MainWindow::on_actionTransactions_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::TRANSACTIONS );
+}
+
+void MainWindow::on_actionListeners_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::LISTENING );
+}
+
+void MainWindow::on_actionNode_Overview_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::NODE_INFO );
+}
+
+void MainWindow::on_actionResync_with_full_node_triggered()
+{
+    if (control::MessageBox::questionText(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
+                       "No", "Yes", true, false) == control::MessageBox::RETURN_CODE::BTN2 ) {
+        // Starting resync
+        appContext->pushCookie("PrevState", (int)appContext->getActiveWndState());
+        stateMachine->setActionWindow( state::STATE::RESYNC );
+    }
+}
+
+void MainWindow::on_actionOutputs_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::OUTPUTS );
+}
+
+void MainWindow::on_actionAirdrop_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::AIRDRDOP_MAIN );
+}
+
+void MainWindow::on_actionHODL_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::HODL );
+}
+
+void MainWindow::on_actionWallet_accounts_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::ACCOUNTS );
+}
+
+void MainWindow::on_actionAccounts_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::ACCOUNTS );
+}
+
+void MainWindow::on_actionContacts_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::CONTACTS );
+}
+
+void MainWindow::on_actionShow_passphrase_triggered()
+{
+    QString password = wallet->getPassword();
+
+    if ( !password.isEmpty() ) {
+        if (control::MessageBox::RETURN_CODE::BTN2 !=
+            control::MessageBox::questionText(this, "Wallet Password",
+                                              "You are going to view wallet mnemonic passphrase.\n\nPlease input your wallet password to continue", "Cancel", "Confirm", false, true, 1.0,
+                                              password, control::MessageBox::RETURN_CODE::BTN2))
+            return;
+    }
+
+    stateMachine->setActionWindow( state::STATE::SHOW_SEED );
+}
+
+void MainWindow::on_actionEvent_log_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::EVENTS );
+}
+
+void MainWindow::on_actionLogout_triggered()
+{
+    stateMachine->logout();
+}
+
+void MainWindow::on_actionConfig_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::WALLET_CONFIG );
+}
+
+void MainWindow::on_actionRunning_Mode_Cold_Wallet_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::WALLET_RUNNING_MODE );
+}
+
+void MainWindow::on_actionBlock_Explorer_triggered()
+{
+    util::openUrlInBrowser("https://explorer.mwc.mw/");
+}
+
+void MainWindow::on_actionWhite_papers_triggered()
+{
+    util::openUrlInBrowser("https://www.mwc.mw/whitepaper");
+}
+
+void MainWindow::on_actionGood_Money_triggered()
+{
+    util::openUrlInBrowser("https://www.mwc.mw/good-money");
+}
+
+void MainWindow::on_actionRoadmap_triggered()
+{
+    util::openUrlInBrowser("https://github.com/mwcproject/mwc-node/blob/master/doc/roadmap.md");
+}
+
+void MainWindow::on_actionMWC_website_triggered()
+{
+    util::openUrlInBrowser("https://www.mwc.mw/");
 }
 
 }

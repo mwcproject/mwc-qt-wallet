@@ -30,14 +30,17 @@ Resync::Resync( StateContext * context) :
     QObject::connect(context->wallet, &wallet::Wallet::onCheckResult,
                      this, &Resync::onCheckResult, Qt::QueuedConnection);
 
+    inSyncProcess = false;
 }
 
 Resync::~Resync() {}
 
 
 NextStateRespond Resync::execute() {
-    if ( context->appContext->getActiveWndState() != STATE::RESYNC )
+    if ( context->appContext->getActiveWndState() != STATE::RESYNC ) {
+        inSyncProcess = false;
         return NextStateRespond(NextStateRespond::RESULT::DONE);
+    }
 
     prevState = context->appContext->pullCookie<int>("PrevState");
     if (prevState<=0)
@@ -57,6 +60,7 @@ NextStateRespond Resync::execute() {
     respondCounter = 0;
     respondZeroLevel = 0;
     progressBase = 0;
+    inSyncProcess = true;
 
     // We can't really be blocked form resync. Result will be looping with locking screen
     context->stateMachine->blockLogout();
@@ -71,6 +75,10 @@ NextStateRespond Resync::execute() {
 
 void Resync::exitingState() {
     context->stateMachine->unblockLogout();
+}
+
+bool Resync::canExitState() {
+    return !inSyncProcess;
 }
 
 
@@ -116,6 +124,8 @@ void Resync::onCheckResult(bool ok, QString errors ) {
         control::MessageBox::messageText(nullptr, "Success", "Account re-sync finished successfully.");
     else
         control::MessageBox::messageText(nullptr, "Failure", "Account re-sync failed.\n" + errors);
+
+    inSyncProcess = false;
 
     if (context->appContext->getActiveWndState() == STATE::RESYNC ) {
         context->stateMachine->setActionWindow( (STATE)prevState );

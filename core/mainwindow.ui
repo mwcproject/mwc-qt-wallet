@@ -62,7 +62,7 @@
          <x>0</x>
          <y>0</y>
          <width>1000</width>
-         <height>623</height>
+         <height>601</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -292,6 +292,197 @@
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuWallet">
+    <property name="title">
+     <string>Wallet</string>
+    </property>
+    <addaction name="actionSend"/>
+    <addaction name="actionReceive"/>
+    <addaction name="actionFinalize"/>
+    <addaction name="separator"/>
+    <addaction name="actionTransactions"/>
+    <addaction name="actionOutputs"/>
+    <addaction name="separator"/>
+    <addaction name="actionAccounts"/>
+    <addaction name="actionEvent_log"/>
+    <addaction name="separator"/>
+    <addaction name="actionConfig"/>
+    <addaction name="separator"/>
+    <addaction name="actionRunning_Mode_Cold_Wallet"/>
+   </widget>
+   <widget class="QMenu" name="menuNetwork">
+    <property name="title">
+     <string>Network</string>
+    </property>
+    <addaction name="actionListeners"/>
+    <addaction name="actionNode_Overview"/>
+    <addaction name="separator"/>
+    <addaction name="actionResync_with_full_node"/>
+   </widget>
+   <widget class="QMenu" name="menuMWC">
+    <property name="title">
+     <string>MWC</string>
+    </property>
+    <addaction name="actionAirdrop"/>
+    <addaction name="actionHODL"/>
+   </widget>
+   <widget class="QMenu" name="menuAccount">
+    <property name="title">
+     <string>Account</string>
+    </property>
+    <addaction name="actionWallet_accounts"/>
+    <addaction name="actionContacts"/>
+    <addaction name="actionShow_passphrase"/>
+    <addaction name="separator"/>
+    <addaction name="actionLogout"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Links</string>
+    </property>
+    <addaction name="actionMWC_website"/>
+    <addaction name="actionBlock_Explorer"/>
+    <addaction name="separator"/>
+    <addaction name="actionWhite_papers"/>
+    <addaction name="actionGood_Money"/>
+    <addaction name="actionRoadmap"/>
+    <addaction name="actionExchanges"/>
+   </widget>
+   <addaction name="menuWallet"/>
+   <addaction name="menuNetwork"/>
+   <addaction name="menuAccount"/>
+   <addaction name="menuMWC"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <action name="actionSend">
+   <property name="text">
+    <string>Send</string>
+   </property>
+  </action>
+  <action name="actionReceive">
+   <property name="text">
+    <string>Receive</string>
+   </property>
+  </action>
+  <action name="actionFinalize">
+   <property name="text">
+    <string>Finalize</string>
+   </property>
+  </action>
+  <action name="actionTransactions">
+   <property name="text">
+    <string>Transactions</string>
+   </property>
+  </action>
+  <action name="actionListeners">
+   <property name="text">
+    <string>Listeners</string>
+   </property>
+  </action>
+  <action name="actionNode_Overview">
+   <property name="text">
+    <string>MWC Node Status</string>
+   </property>
+  </action>
+  <action name="actionResync_with_full_node">
+   <property name="text">
+    <string>Resync with full node</string>
+   </property>
+  </action>
+  <action name="actionOutputs">
+   <property name="text">
+    <string>Outputs</string>
+   </property>
+  </action>
+  <action name="actionAirdrop">
+   <property name="text">
+    <string>Airdrop</string>
+   </property>
+  </action>
+  <action name="actionHODL">
+   <property name="text">
+    <string>HODL</string>
+   </property>
+  </action>
+  <action name="actionWallet_accounts">
+   <property name="text">
+    <string>Wallet accounts</string>
+   </property>
+  </action>
+  <action name="actionAccounts">
+   <property name="text">
+    <string>Accounts</string>
+   </property>
+  </action>
+  <action name="actionContacts">
+   <property name="text">
+    <string>Contacts</string>
+   </property>
+  </action>
+  <action name="actionShow_passphrase">
+   <property name="text">
+    <string>Show passphrase</string>
+   </property>
+  </action>
+  <action name="actionEvent_log">
+   <property name="text">
+    <string>Event log</string>
+   </property>
+  </action>
+  <action name="actionLogout">
+   <property name="text">
+    <string>Logout</string>
+   </property>
+  </action>
+  <action name="actionConfig">
+   <property name="text">
+    <string>Config</string>
+   </property>
+  </action>
+  <action name="actionRunning_Mode_Cold_Wallet">
+   <property name="text">
+    <string>Running Mode (Cold Wallet)</string>
+   </property>
+  </action>
+  <action name="actionBlock_Explorer">
+   <property name="text">
+    <string>Block Explorer</string>
+   </property>
+  </action>
+  <action name="actionWhite_papers">
+   <property name="text">
+    <string>MWC Whitepaper</string>
+   </property>
+  </action>
+  <action name="actionGood_Money">
+   <property name="text">
+    <string>Good Money</string>
+   </property>
+  </action>
+  <action name="actionRoadmap">
+   <property name="text">
+    <string>Roadmap</string>
+   </property>
+  </action>
+  <action name="actionMWC_website">
+   <property name="text">
+    <string>MWC website</string>
+   </property>
+  </action>
+  <action name="actionExchanges">
+   <property name="text">
+    <string>Exchanges</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

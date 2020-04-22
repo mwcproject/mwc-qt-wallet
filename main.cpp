@@ -511,7 +511,7 @@ int main(int argc, char *argv[])
         appContext.setWalletNotes(&walletNotes);
 
         state::StateMachine * machine = new state::StateMachine(&context);
-        mainWnd->setAppEnvironment( machine, wallet);
+        mainWnd->setAppEnvironment( machine, wallet, &appContext);
 
         if (mwc::isAppNonClosed()) {
             machine->start();

@@ -35,6 +35,7 @@ public:
 protected:
     virtual NextStateRespond execute() override;
     virtual void exitingState() override;
+    virtual bool canExitState() override;
 
 private slots:
     void onRecoverProgress( int progress, int maxVal );
@@ -50,6 +51,8 @@ private:
     int respondCounter = 0;
     int respondZeroLevel = 0;
     int progressBase = 0;
+
+    bool inSyncProcess = false;
 };
 
 }
