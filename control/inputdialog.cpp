@@ -33,6 +33,8 @@ InputDialog::InputDialog(QWidget *parent, QString title, QString message, QStrin
 
     if (!text.isEmpty())
         ui->edit->setText(text);
+
+    adjustSize();
 }
 
 InputDialog::~InputDialog() {

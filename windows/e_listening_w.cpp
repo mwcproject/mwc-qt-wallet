@@ -142,8 +142,14 @@ void Listening::on_mwcMqTriggerButton_clicked()
 
 void Listening::on_mwcMqNextAddress_clicked()
 {
-    state->requestNextMwcMqAddress();
+    state::TimeoutLockObject to( state );
 
+    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this, tr("Warning"),
+                                      tr("Please note that your wallet will only listen to one address at a time. You are now setting the wallet to listen to different address.\n\nDo you want to continue?"),
+                                      tr("Cancel"), tr("Continue"), false, true ))
+        return;
+
+    state->requestNextMwcMqAddress();
 }
 
 void Listening::on_mwcMqToIndex_clicked()
@@ -151,7 +157,8 @@ void Listening::on_mwcMqToIndex_clicked()
     state::TimeoutLockObject to( state );
     bool ok = false;
     QString index = control::InputDialog::getText(this, tr("Select MWX box address by index"),
-                                            tr("Please specify index of mwc mq address"), "integer from 0 to 65000",
+                                            tr("Please specify index of mwc mq address\n\nPlease note that your wallet will only listen to one address at a time. You are now setting the wallet to listen to different address."),
+                                            tr("integer from 0 to 65000"),
                                             "", 5, &ok);
     if (!ok || index.isEmpty())
         return;
