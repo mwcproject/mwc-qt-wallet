@@ -30,7 +30,7 @@ HodlClaim::HodlClaim(QWidget *parent, state::Hodl * _state) :
     ui->progress->initLoader(false);
 
     initTableHeaders();
-    updateClaimsRequests();
+    updateHodlState();
 }
 
 HodlClaim::~HodlClaim() {
@@ -50,27 +50,36 @@ void HodlClaim::reportMessage(const QString & title, const QString & message) {
 // Hodl object changed it's state, need to refresh
 void HodlClaim::updateHodlState() {
     ui->accountStatus->setText( state->getContext()->hodlStatus->getWalletHodlStatus() );
-}
 
-void HodlClaim::on_claimMwcButton_clicked()
-{
-    state->claimMWC();
-}
-
-void HodlClaim::updateClaimsRequests() {
     QVector<core::HodlClaimStatus> status = state->getContext()->hodlStatus->getClaimsRequestStatus();
 
     ui->claimsTable->clearData();
 
+    bool hasClaims = false;
+
     int idx = 0;
     for (const auto & st : status) {
+        if (st.status<3)
+            hasClaims = true;
         ui->claimsTable->appendRow(
                 QVector<QString>{QString::number(++idx),
-                                 util::nano2one(st.HodlAmount),
-                                 util::nano2one(st.claimedMwc),
-                                 st.date});
+                                 util::nano2one(st.amount),
+                                 QString::number(st.claimId),
+                                 st.getStatusAsString()});
     }
 
+    ui->claimMwcButton->setEnabled(hasClaims);
+}
+
+void HodlClaim::on_claimMwcButton_clicked()
+{
+    ui->progress->show();
+    state->claimMWC();
+}
+
+void HodlClaim::on_refreshButton_clicked()
+{
+    state->requestHodlInfoRefresh();
 }
 
 void HodlClaim::initTableHeaders() {
@@ -78,10 +87,10 @@ void HodlClaim::initTableHeaders() {
     // Disabling to show the grid
     // Creatign columns
     QVector<int> widths = state->getColumnsWidhts();
-    if ( widths.size() != 5 ) {
-        widths = QVector<int>{30,150,150,300,300};
+    if ( widths.size() != 4 ) {
+        widths = QVector<int>{30,150,150,300};
     }
-    Q_ASSERT( widths.size() == 5 );
+    Q_ASSERT( widths.size() == 4 );
     ui->claimsTable->setColumnWidths( widths );
 }
 

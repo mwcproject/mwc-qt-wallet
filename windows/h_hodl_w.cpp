@@ -30,8 +30,6 @@ Hodl::Hodl(QWidget *parent, state::Hodl * _state) :
     ui->setupUi(this);
 
     ui->progress->initLoader(false);
-    ui->claimMwcButton->setEnabled(false);
-    ui->claimMwcButton->setVisible(false);
 
     updateHodlState();
 }
@@ -73,6 +71,10 @@ void Hodl::updateHodlState() {
     ui->signInButton->setEnabled(!hodlStatus->isInHodl());
     ui->hodlStatus->setText( hodlStatus->getHodlStatus() );
     ui->accountStatus->setText( hodlStatus->getWalletHodlStatus() );
+
+    QVector<core::HodlClaimStatus> claims = hodlStatus->getClaimsRequestStatus();
+    ui->claimMwcButton->setEnabled(!claims.isEmpty());
+    ui->claimMwcButton->setVisible(!claims.isEmpty());
 }
 
 void Hodl::hideWaitingStatus() {

@@ -70,7 +70,6 @@ NextStateRespond Resync::execute() {
     context->wallet->updateWalletBalance(false,false);
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
-
 }
 
 void Resync::exitingState() {

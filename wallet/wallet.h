@@ -522,7 +522,7 @@ public:
     virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, const QString & apiSecret,
                          QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs )  = 0;
 
-    // Airdrop special. Generating the next Pablic key for transaction
+    // Airdrop special. Generating the next Public key for transaction
     // wallet713> getnextkey --amount 1000000
     // "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
     // Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPasswor);

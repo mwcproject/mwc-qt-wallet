@@ -67,6 +67,7 @@ public:
     // request message to sign, respond expected to be delivered to the window
     void requestSignMessage(const QString & message);
 
+    void requestHodlInfoRefresh();
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "hodl.html";}
@@ -83,9 +84,12 @@ protected:
     void hideWaitingStatus();
 
     // Note, publicKey & claimAmount are for claiming only!!!
-    void startChallengeWorkflow(HODL_WORKFLOW workflow, QString publicKey, int64_t claimAmount );
+    void startChallengeWorkflow(HODL_WORKFLOW workflow );
 
     void retrieveHodlBalance();
+
+    // Reset Claim workflow, so no internal data will exist
+    void resetClaimState();
 
 private slots:
     // Need to get a network info
@@ -109,10 +113,13 @@ private:
 private:
     // Local contexts
     HODL_WORKFLOW hodlWorkflow = HODL_WORKFLOW::INIT;
-
-    // Claim workflow states
+    int claimId = -1; // temp for claiming. Using it because we edon't have cookies for our requests.
+    int64_t claimAmount = -1;
+    QString claimChallenge;
+    QString claimSignature;
     QString claimNextTransIdentifier;
     QString claimNextTransPubKey;
+
     int requestCounter = 0;
 };
 

@@ -283,7 +283,7 @@ Warning! Wallet public key allows any 3rd party to discover MWC amount that belo
           <string>Claim HODL coins</string>
          </property>
          <property name="text">
-          <string>Claim MWC</string>
+          <string>Claims</string>
          </property>
         </widget>
        </item>
@@ -444,16 +444,6 @@ Warning! Wallet public key allows any 3rd party to discover MWC amount that belo
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control/MwcLabelProgress.h</header>
@@ -465,6 +455,16 @@ Warning! Wallet public key allows any 3rd party to discover MWC amount that belo
   </customwidget>
   <customwidget>
    <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>

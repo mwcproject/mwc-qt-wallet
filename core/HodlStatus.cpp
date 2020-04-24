@@ -56,13 +56,38 @@ bool HodlOutputInfo::loadData(QDataStream & in) {
     return true;
 }
 
-
-void HodlClaimStatus::setData( int64_t _HodlAmount, int64_t _claimedMwc, const QString & _status, const QString & _date ) {
-    HodlAmount = _HodlAmount;
-    claimedMwc = _claimedMwc;
+void HodlClaimStatus::setData( int64_t _amount, int _claimId, int _status ) {
+    amount = _amount;
+    claimId = _claimId;
     status = _status;
-    date = _date;
 }
+
+QString HodlClaimStatus::getStatusAsString() const {
+    // Status values
+    //    0 - initial state
+    //    1 - challenge requested
+    //    2 - claim complete
+    //    3 - response accepted
+    //    4 - will be for finalized
+
+    switch (status) {
+        case 0:
+            return "Ready to claim";
+        case 1:
+            return "Challenge requested";
+        case 2:
+            return "Slate requested";
+        case 3:
+            return "Response accepted";
+        case 4:
+            return "Finalized";
+        case 5: // Artificial status, from QT wallet
+            return "Claiming in progress";
+        default:
+            return "Unknown State";
+    }
+}
+
 
 ///////////////////////////////////////////////////////////////////////////
 // HodlStatus
@@ -127,15 +152,25 @@ void HodlStatus::finishWalletOutputs(bool done) {
     emit onHodlStatusWasChanged();
 }
 
-/*
-void HodlStatus::setClaimAmount( int64_t _amount2claim, const QString & errKey ) {
-    availableData |= DATA_AMOUNT_TO_CLAIM;
-    amount2claim = _amount2claim;
+void HodlStatus::setHodlClaimStatus(const QVector<HodlClaimStatus> & claims, const QString & errKey) {
+    claimStatus = claims;
     requestErrors.remove(errKey);
-
-    logger::logEmit("HODL", "onHodlStatusWasChanged", "setClaimAmount");
+    availableData |= DATA_AMOUNT_TO_CLAIM;
+    logger::logEmit("HODL", "onHodlStatusWasChanged", "setHodlClaimStatus");
     emit onHodlStatusWasChanged();
-}*/
+}
+
+void HodlStatus::lockClaimsRequestStatus(int claimId) {
+    for (auto & cl : claimStatus) {
+        if (cl.claimId == claimId) {
+            cl.status = 5;
+            logger::logEmit("HODL", "onHodlStatusWasChanged", "lockClaimsRequestStatus");
+            emit onHodlStatusWasChanged();
+            return;
+        }
+    }
+}
+
 
 void HodlStatus::setError( const QString & errKey, const QString & error ) {
     requestErrors[errKey] = error;
@@ -160,7 +195,6 @@ void HodlStatus::setRootPubKey( const QString & pubKey )
     // reseting account related data
     inHodl = false;
     availableData &= ~(DATA_HODL_OUTPUTS | DATA_AMOUNT_TO_CLAIM);
-    amount2claim = 0;
 
     // HODL outputs updating from the cache. Reason that wallet does manage outputs and we
     if (!rootPubKeyHash.isEmpty())
@@ -172,33 +206,12 @@ void HodlStatus::setRootPubKey( const QString & pubKey )
 }
 
 
-/*bool HodlStatus::hasHodlStatus() const {
-    return !hodlStatus.isEmpty();
-}*/
-
 bool HodlStatus::hasHodlOutputs() const {
     return (availableData & DATA_HODL_OUTPUTS)!=0;
 }
 
-/*bool HodlStatus::hasAmountToClaim() const {
+bool HodlStatus::hasAmountToClaim() const {
     return (availableData & DATA_AMOUNT_TO_CLAIM)!=0;
-}*/
-
-/*bool HodlStatus::hasErrors() const {
-    return !requestErrors.isEmpty();
-}
-QString HodlStatus::getErrorsAsString() const {
-    QString errsStr;
-    for ( auto & errValues : requestErrors ) {
-        if (!errsStr.isEmpty())
-            errsStr += "\n";
-        errsStr += errValues;
-    }
-    return errsStr;
-}*/
-
-QVector<HodlClaimStatus> HodlStatus::getClaimsRequestStatus() const {
-    return QVector<HodlClaimStatus>();
 }
 
 void HodlStatus::onLoginResult(bool ok) {
@@ -222,8 +235,7 @@ void HodlStatus::resetData() {
     inHodl = false;
     walletOutputs.clear(); // Available outputs from the wallet.
     hodlOutputs.clear();
-
-    amount2claim = 0;
+    claimStatus.clear();
 
     requestErrors.clear();
 }
@@ -269,6 +281,31 @@ QString HodlStatus::getWalletHodlStatus() const {
         QString resultStr = "Your HODL amount:\n";
         for (auto balance = hodlBalancePerClass.begin(); balance != hodlBalancePerClass.end(); balance++ ) {
             resultStr += balance.key() + " : " + util::nano2one(balance.value()) + " MWC\n";
+        }
+
+        // Check if has something to claim
+        if (!claimStatus.isEmpty()) {
+            int64_t available = 0;
+            int64_t inprogress = 0;
+
+            for (const HodlClaimStatus & status : claimStatus ) {
+                if ( status.status==0 ) {
+                    available += status.amount;
+                }
+                else if ( status.status<4 ) {
+                    inprogress += status.amount;
+                }
+            }
+
+            if ( available > 0 || inprogress > 0 ) {
+                resultStr += "\n";
+
+                if (available>0)
+                    resultStr += "Available for Claim : " + util::nano2one(available) + " MWC\n";
+
+                if (inprogress>0)
+                    resultStr += "Claim in progress : " + util::nano2one(inprogress) + " MWC\n";
+            }
         }
 
         return resultStr;

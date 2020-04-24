@@ -38,10 +38,10 @@ public:
 
     void updateHodlState();
 
-    void updateClaimsRequests();
-
 private slots:
     void on_claimMwcButton_clicked();
+
+    void on_refreshButton_clicked();
 
 private:
     void initTableHeaders();

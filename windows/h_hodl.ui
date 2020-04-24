@@ -246,7 +246,7 @@
           <string>Claim HODL coins</string>
          </property>
          <property name="text">
-          <string>Claim MWC</string>
+          <string>Claims</string>
          </property>
         </widget>
        </item>

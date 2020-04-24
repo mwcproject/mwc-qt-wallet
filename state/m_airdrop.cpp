@@ -33,12 +33,12 @@
 
 namespace state {
 
-static const QString TAG_CLAIMS_AVAIL  = "claimsAvailable";
-static const QString TAG_AMOUNT        = "getAmount";
-static const QString TAG_GET_CHALLENGE = "getChallenge";
-static const QString TAG_CLAIM_MWC     = "claimMwc";
-static const QString TAG_RESPONCE_SLATE = "submitResponseSlate";
-static const QString TAG_STATUS_PREF   = "Status_";
+static const QString TAG_CLAIMS_AVAIL  = "airdrop_claimsAvailable";
+static const QString TAG_AMOUNT        = "airdrop_getAmount";
+static const QString TAG_GET_CHALLENGE = "airdrop_getChallenge";
+static const QString TAG_CLAIM_MWC     = "airdrop_claimMwc";
+static const QString TAG_RESPONCE_SLATE = "airdrop_submitResponseSlate";
+static const QString TAG_STATUS_PREF   = "airdrop_Status_";
 
 void AirdropRequests::setData(const QString & _btcAddress,
              const QString & _challendge, const QString & _signature) {
@@ -473,6 +473,10 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
 
 
 void Airdrop::onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPassword) {
+
+    if (airdropWnd==nullptr && airdropForBtcWnd==nullptr)
+        return; // Not Airdrop workflow
+
     if (success) {
         sendRequest( HTTP_CALL::GET, "/v1/getChallenge" ,
                               {"btcaddress", btcaddress, "password", airDropAccPassword, "pubkey", publicKey },

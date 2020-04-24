@@ -50,12 +50,20 @@ struct HodlOutputInfo {
 };
 
 struct HodlClaimStatus {
-    int64_t HodlAmount;
-    int64_t claimedMwc;
-    QString status;
-    QString date;
+    // Status values
+    //    0 - initial state
+    //    1 - challenge requested
+    //    2 - claim complete
+    //    3 - response accepted
+    //    4 - will be for finalized
 
-    void setData( int64_t HodlAmount, int64_t claimedMwc, const QString & status, const QString & date );
+    int64_t amount = 0;
+    int claimId = -1;
+    int status = -1;
+
+    void setData( int64_t amount, int claimId, int status );
+
+    QString getStatusAsString() const;
 };
 
 // the status of all hodl process.
@@ -82,13 +90,7 @@ public:
 
     bool isInHodl() const {return inHodl || hodlOutputs.size()>0;}
     bool hasHodlOutputs() const;
-    //bool hasAmountToClaim() const;
-
-
-//    bool hasErrors() const;
-//    QString getErrorsAsString() const; //
-
-    int64_t getAmountToClaim() const { return amount2claim; }
+    bool hasAmountToClaim() const;
 
     QString getHodlStatus() const {return hodlStatus;}
     // Calculates what we have for account
@@ -96,8 +98,9 @@ public:
 
     QVector<HodlOutputInfo> getHodlOutputs() const;
 
-    QVector<HodlClaimStatus> getClaimsRequestStatus() const;
-
+    void setHodlClaimStatus(const QVector<HodlClaimStatus> & claims, const QString & errKey);
+    QVector<HodlClaimStatus> getClaimsRequestStatus() const { return claimStatus; }
+    void lockClaimsRequestStatus(int claimId);
 
     bool hasAnyOutputsInHODL() const { return !hodlOutputs.isEmpty();}
     QVector<wallet::WalletOutput> getWalltOutputsForAccount(QString accountName) const {return walletOutputs.value(accountName);}
@@ -140,8 +143,7 @@ private:
     bool inHodl = false; // If accountin HODL. May in in Hodl but no outputs are there
     QMap<QString, QVector<wallet::WalletOutput> > walletOutputs; // Available outputs from the wallet. Key: account name, value outputs for this account
     QMap<QString, HodlOutputInfo> hodlOutputs;
-
-    int64_t amount2claim = 0;
+    QVector<HodlClaimStatus>  claimStatus;
 
     //
     QMap<QString, QString> requestErrors;
