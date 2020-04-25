@@ -115,8 +115,25 @@ namespace crypto {
             return false;
         }
         return true;
-
     }
+
+    // Verify HSA256 hash .
+    // Checking the length and Hex Symbols
+    bool isHashValid( const QString & hash ) {
+        if (hash.length()!=64)
+            return false;
+
+        for ( int i=0;i<hash.length(); i++ ) {
+            QChar ch = hash[i];
+            if (ch>='0' && ch<='9')
+                continue;
+            if (ch>='a' && ch<='f')
+                continue;
+            return false;
+        }
+        return true;
+    }
+
 
 
 };

@@ -17,6 +17,7 @@
 #include "../state/h_hodl.h"
 #include "../control/messagebox.h"
 #include "../state/timeoutlock.h"
+#include "../util/crypto.h"
 
 namespace wnd {
 
@@ -43,6 +44,8 @@ HodlCold::~HodlCold()
 void HodlCold::setRootPubKeyWithSignature(const QString & key, const QString & message, const QString & signature) {
     ui->progress->hide();
     ui->publicKey->setText(key);
+    QByteArray keyHex = key.toUtf8();
+    ui->publicKeyHash->setText( crypto::hex2str( crypto::HSA256( keyHex ) ) );
     if (ui->message->text()==message) {
         ui->signature->setPlainText(signature);
     }

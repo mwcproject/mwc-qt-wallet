@@ -31,9 +31,6 @@ HodlNode::HodlNode(QWidget *parent, state::Hodl * _state) :
     ui->setupUi(this);
     ui->progress->initLoader(false);
 
-    ui->claimMwcButton->setEnabled(false);
-    ui->claimMwcButton->setVisible(false);
-
     ui->accountStatus->setText("");
 
     updateHodlState();
@@ -58,10 +55,10 @@ void HodlNode::updateHodlState() {
         return;
     }
 
-    ui->signInButton->setEnabled( !state->getContext()->hodlStatus->isInHodl() &&
+    ui->signInButton->setEnabled( !state->getContext()->hodlStatus->isInHodl("") &&
                pubKey.length()>0 && crypto::isPublicKeyValid(pubKey) );
-    ui->accountStatus->setText( state->getContext()->hodlStatus->getWalletHodlStatus() );
-    ui->viewOutputsButton->setEnabled(state->getContext()->hodlStatus->hasHodlOutputs() && !state->getContext()->hodlStatus->getHodlOutputs().isEmpty() );
+    ui->accountStatus->setText( state->getContext()->hodlStatus->getWalletHodlStatus("") );
+    ui->viewOutputsButton->setEnabled(state->getContext()->hodlStatus->hasHodlOutputs() && !state->getContext()->hodlStatus->getHodlOutputs("").isEmpty() );
 }
 
 void HodlNode::reportMessage(const QString & title, const QString & message) {
@@ -79,7 +76,7 @@ void HodlNode::on_signInButton_clicked()
 
 void HodlNode::on_viewOutputsButton_clicked()
 {
-    QVector<core::HodlOutputInfo> outputs = state->getContext()->hodlStatus->getHodlOutputs();
+    QVector<core::HodlOutputInfo> outputs = state->getContext()->hodlStatus->getHodlOutputs("");
 
  /*
     Outputs that was discovered by HODL server during last scan:<br>
@@ -125,11 +122,6 @@ void HodlNode::on_viewOutputsButton_clicked()
       result += "</table>";
 
       control::MessageBox::messageHTML(this, "HODL Outputs", result, 1.3);
-}
-
-void HodlNode::on_claimMwcButton_clicked()
-{
-    state->moveToClaimPage();
 }
 
 void HodlNode::on_publicKey_textChanged(const QString &pubKey)

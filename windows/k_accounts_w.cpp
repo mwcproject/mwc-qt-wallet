@@ -44,7 +44,7 @@ Accounts::Accounts(QWidget *parent, state::Accounts * _state) :
         ui->transferButton->hide();
     }
 
-    inHodl = state->getContext()->hodlStatus->isInHodl();
+    inHodl = state->getContext()->hodlStatus->isInHodl("");
 
     initTableHeaders();
 
@@ -123,7 +123,7 @@ void Accounts::refreshWalletBalance()
             int64_t hodlBalancePerClass = 0;
 
             for (const auto & out : walletOutputs) {
-                core::HodlOutputInfo hOut = hodlStatus->getHodlOutput( out.outputCommitment );
+                core::HodlOutputInfo hOut = hodlStatus->getHodlOutput("", out.outputCommitment );
                 if ( hOut.isValid() ) {
                     hodlBalancePerClass += out.valueNano;
                 }

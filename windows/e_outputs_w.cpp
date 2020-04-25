@@ -44,7 +44,7 @@ Outputs::Outputs(QWidget *parent, state::Outputs *_state) :
 
     QString accName = updateWalletBalance();
 
-    inHodl = state->getContext()->hodlStatus->isInHodl();
+    inHodl = state->getContext()->hodlStatus->isInHodl("");
 
     initTableHeaders();
 
@@ -208,7 +208,7 @@ void Outputs::setOutputsData(QString account, int64_t height, const QVector<wall
         };
 
         if (inHodl) {
-            core::HodlOutputInfo hodlOut = state->getContext()->hodlStatus->getHodlOutput( out.outputCommitment );
+            core::HodlOutputInfo hodlOut = state->getContext()->hodlStatus->getHodlOutput( "", out.outputCommitment );
             rowData.push_back( hodlOut.cls.isEmpty() ? "No" : hodlOut.cls );
         }
 

@@ -255,7 +255,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
         if (o.coinbase && o.numOfConfirms.toLong()<=1440 )
             continue;
 
-        core::HodlOutputInfo ho = hodlStatus->getHodlOutput(o.outputCommitment);
+        core::HodlOutputInfo ho = hodlStatus->getHodlOutput("", o.outputCommitment);
 
         if ( ho.weight > 0.0 ) {
             o.weight = ho.weight;

@@ -75,7 +75,7 @@ public:
     HodlStatus( state::StateContext * context );
 
     void setHodlStatus( const QString & hodlStatus, const QString & errKey );
-    void setHodlOutputs( bool inHodl, const QVector<HodlOutputInfo> & hodlOutputs, const QString & errKey ); //
+    void setHodlOutputs( const QString & hash, bool inHodl, const QVector<HodlOutputInfo> & hodlOutputs, const QString & errKey ); //
     void setWalletOutputs( const QString & account, const QVector<wallet::WalletOutput> & outputs, const QString & errKey ); //
     void finishWalletOutputs(bool done);
 
@@ -88,19 +88,19 @@ public:
     // Hex representation of HSA256 hash from rootpublickey binary representation
     QString getRootPubKeyHash() const {return rootPubKeyHash;}
 
-    bool isInHodl() const {return inHodl || hodlOutputs.size()>0;}
+    bool isInHodl( const QString & hash) const {return inHodl.value(getHash(hash), false) || hodlOutputs.size()>0;}
     bool hasHodlOutputs() const;
     bool hasAmountToClaim() const;
 
     QString getHodlStatus() const {return hodlStatus;}
     // Calculates what we have for account
-    QString getWalletHodlStatus() const;
+    QString getWalletHodlStatus(const QString & hash) const;
 
-    QVector<HodlOutputInfo> getHodlOutputs() const;
+    QVector<HodlOutputInfo> getHodlOutputs(const QString & hash) const;
 
-    void setHodlClaimStatus(const QVector<HodlClaimStatus> & claims, const QString & errKey);
-    QVector<HodlClaimStatus> getClaimsRequestStatus() const { return claimStatus; }
-    void lockClaimsRequestStatus(int claimId);
+    void setHodlClaimStatus(const QString & hash, const QVector<HodlClaimStatus> & claims, const QString & errKey);
+    QVector<HodlClaimStatus> getClaimsRequestStatus(const QString & hash) const { return claimStatus.value( getHash(hash)); }
+    void lockClaimsRequestStatus(const QString & hash, int claimId);
 
     bool hasAnyOutputsInHODL() const { return !hodlOutputs.isEmpty();}
     QVector<wallet::WalletOutput> getWalltOutputsForAccount(QString accountName) const {return walletOutputs.value(accountName);}
@@ -108,7 +108,7 @@ public:
     bool isOutputInHODL(const QString & output) const {return hodlOutputs.contains(output);}
 
     // return empty if not exist
-    HodlOutputInfo getHodlOutput(const QString & output) const {return hodlOutputs.value(output);}
+    HodlOutputInfo getHodlOutput(const QString & hash, const QString & output) const {return hodlOutputs.value(getHash(hash)).value(output);}
 
     // registration was sucessfull, let's update it
     void updateRegistrationTime();
@@ -118,7 +118,8 @@ public:
 
     QMap<QString, QString> getRequestErrors() const {return requestErrors;}
 
-
+    // For empty return this wallet root pubKey hash. Otherwise this param.
+    const QString & getHash(const QString & hash) const { return hash.isEmpty() ? rootPubKeyHash : hash; }
 private slots:
     void onLoginResult(bool ok);
     void onLogout();
@@ -130,6 +131,7 @@ signals:
 private:
     // Logout repond
     void resetData();
+
 private:
     state::StateContext * context;
 
@@ -140,14 +142,16 @@ private:
 
     uint availableData = 0;
 
-    bool inHodl = false; // If accountin HODL. May in in Hodl but no outputs are there
-    QMap<QString, QVector<wallet::WalletOutput> > walletOutputs; // Available outputs from the wallet. Key: account name, value outputs for this account
-    QMap<QString, HodlOutputInfo> hodlOutputs;
-    QVector<HodlClaimStatus>  claimStatus;
+    // Key: Hash
+    QMap<QString, bool> inHodl; // If accountin HODL. May in in Hodl but no outputs are there
+    QMap<QString, QVector<wallet::WalletOutput> > walletOutputs; // Available outputs from this wallet. Key: account name, value outputs for this account
+
+    // Key: rootPubKeyHash. We can have several wallets here. Need to cover cold wallet case
+    QMap<QString, QMap<QString, HodlOutputInfo>> hodlOutputs;
+    QMap<QString, QVector<HodlClaimStatus>> claimStatus;
 
     //
     QMap<QString, QString> requestErrors;
-
 };
 
 }

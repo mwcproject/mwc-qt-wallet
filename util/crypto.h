@@ -39,6 +39,10 @@ namespace crypto {
     // Verify Signature .
     // Checking the length and Hex Symbols
     bool isSignatureValid( const QString & signature );
+
+    // Verify HSA256 hash .
+    // Checking the length and Hex Symbols
+    bool isHashValid( const QString & hash );
 };
 
 

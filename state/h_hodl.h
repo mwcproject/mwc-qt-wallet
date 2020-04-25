@@ -56,10 +56,10 @@ public:
     // Request registration for HODL program, normal online automatic way
     void registerAccountForHODL();
 
-    void moveToClaimPage();
+    void moveToClaimPage(const QString & coldWalletHash);
     void moveToStartHODLPage();
 
-    void claimMWC();
+    void claimMWC(const QString & hash);
 
     QVector<int> getColumnsWidhts();
     void updateColumnsWidhts(QVector<int> widths);
@@ -67,7 +67,7 @@ public:
     // request message to sign, respond expected to be delivered to the window
     void requestSignMessage(const QString & message);
 
-    void requestHodlInfoRefresh();
+    void requestHodlInfoRefresh(const QString & hash);
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "hodl.html";}
@@ -86,7 +86,7 @@ protected:
     // Note, publicKey & claimAmount are for claiming only!!!
     void startChallengeWorkflow(HODL_WORKFLOW workflow );
 
-    void retrieveHodlBalance();
+    void retrieveHodlBalance(const QString & hash);
 
     // Reset Claim workflow, so no internal data will exist
     void resetClaimState();
@@ -113,6 +113,7 @@ private:
 private:
     // Local contexts
     HODL_WORKFLOW hodlWorkflow = HODL_WORKFLOW::INIT;
+    QString claimHash;
     int claimId = -1; // temp for claiming. Using it because we edon't have cookies for our requests.
     int64_t claimAmount = -1;
     QString claimChallenge;

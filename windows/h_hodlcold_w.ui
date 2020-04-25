@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>710</width>
-    <height>540</height>
+    <width>794</width>
+    <height>627</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,16 +18,16 @@
     <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>1</number>
+    <number>3</number>
    </property>
    <property name="topMargin">
-    <number>1</number>
+    <number>3</number>
    </property>
    <property name="rightMargin">
-    <number>1</number>
+    <number>3</number>
    </property>
    <property name="bottomMargin">
-    <number>1</number>
+    <number>3</number>
    </property>
    <item>
     <spacer name="horizontalSpacer">
@@ -43,7 +43,7 @@
     </spacer>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1,0,0,1,0,0,0,2">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1,0,0,1,0,0,0,0,2">
      <property name="spacing">
       <number>10</number>
      </property>
@@ -187,12 +187,60 @@ Warning! Wallet public key allows any 3rd party to discover MWC amount that belo
           </size>
          </property>
          <property name="text">
-          <string>Wallet public key</string>
+          <string>Wallet root public key</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="control::MwcLineEditNormal" name="publicKey">
+         <property name="minimumSize">
+          <size>
+           <width>650</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <property name="spacing">
+        <number>5</number>
+       </property>
+       <item>
+        <widget class="control::MwcLabelSmall" name="label_9">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>22</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Wallet root public key hash</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="control::MwcLineEditNormal" name="publicKeyHash">
          <property name="minimumSize">
           <size>
            <width>650</width>
@@ -505,22 +553,22 @@ Warning! Wallet public key allows any 3rd party to discover MWC amount that belo
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>

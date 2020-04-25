@@ -31,7 +31,7 @@ namespace wnd {
 class HodlClaim : public core::NavWnd {
 Q_OBJECT
 public:
-    explicit HodlClaim( QWidget *parent, state::Hodl * state );
+    explicit HodlClaim( QWidget *parent, state::Hodl * state, const QString & coldWalletHash );
     ~HodlClaim();
 
     void reportMessage(const QString &title, const QString &message);
@@ -50,6 +50,7 @@ private:
 private:
     Ui::HodlClaim *ui;
     state::Hodl * state;
+    const QString coldWalletHash;
 };
 
 }

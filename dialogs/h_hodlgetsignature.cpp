@@ -23,7 +23,7 @@ HodlGetSignature::HodlGetSignature(QWidget *parent, QString message) :
     ui(new Ui::HodlGetSignature)
 {
     ui->setupUi(this);
-    ui->message->setText(message);
+    ui->message->setPlainText(message);
     ui->continueButton->setEnabled(false);
 }
 

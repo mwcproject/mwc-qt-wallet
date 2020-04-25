@@ -190,7 +190,7 @@ static void dotest_getOutputsToSend() {
         WalletOutput::create("30", "", "", "", "Unspent", false, "", 30*nano, 1L),
     };
 
-    hodl.setHodlOutputs( true, hodlOutputs, "errKey" );
+    hodl.setHodlOutputs("", true, hodlOutputs, "errKey" );
     hodl.setWalletOutputs( "Bob", walletOutputs, "errKey" ); //
 
     QStringList resultOutputs;

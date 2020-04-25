@@ -21,16 +21,21 @@
 
 namespace wnd {
 
-HodlClaim::HodlClaim(QWidget *parent, state::Hodl * _state) :
+HodlClaim::HodlClaim(QWidget *parent, state::Hodl * _state, const QString & _coldWalletHash) :
         core::NavWnd( parent, _state->getContext() ),
         ui(new Ui::HodlClaim),
-        state(_state) {
+        state(_state),
+        coldWalletHash(_coldWalletHash)
+{
     ui->setupUi(this);
 
     ui->progress->initLoader(false);
 
     initTableHeaders();
     updateHodlState();
+
+    if (!coldWalletHash.isEmpty())
+        state->requestHodlInfoRefresh(coldWalletHash);
 }
 
 HodlClaim::~HodlClaim() {
@@ -49,9 +54,9 @@ void HodlClaim::reportMessage(const QString & title, const QString & message) {
 
 // Hodl object changed it's state, need to refresh
 void HodlClaim::updateHodlState() {
-    ui->accountStatus->setText( state->getContext()->hodlStatus->getWalletHodlStatus() );
+    ui->accountStatus->setText( state->getContext()->hodlStatus->getWalletHodlStatus(coldWalletHash) );
 
-    QVector<core::HodlClaimStatus> status = state->getContext()->hodlStatus->getClaimsRequestStatus();
+    QVector<core::HodlClaimStatus> status = state->getContext()->hodlStatus->getClaimsRequestStatus(coldWalletHash);
 
     ui->claimsTable->clearData();
 
@@ -74,12 +79,12 @@ void HodlClaim::updateHodlState() {
 void HodlClaim::on_claimMwcButton_clicked()
 {
     ui->progress->show();
-    state->claimMWC();
+    state->claimMWC(coldWalletHash);
 }
 
 void HodlClaim::on_refreshButton_clicked()
 {
-    state->requestHodlInfoRefresh();
+    state->requestHodlInfoRefresh(coldWalletHash);
 }
 
 void HodlClaim::initTableHeaders() {

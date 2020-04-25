@@ -44,8 +44,6 @@ public:
 private slots:
     void on_signInButton_clicked();
 
-    void on_claimMwcButton_clicked();
-
     void on_publicKey_textChanged(const QString &arg1);
 
     void on_viewOutputsButton_clicked();

@@ -41,7 +41,7 @@ namespace state {
 
 static const QString TAG_GET_HODL_STATUS      = "hodl_getHODLStatus";
 static const QString TAG_CHECK_OUTPUTS        = "hodl_checkOutputs";
-static const QString TAG_GET_AMOUNT           = "hodl_getAmount";
+static const QString TAG_GET_HODL_REWARD      = "hodl_getPendingHODLRewards";
 static const QString TAG_GET_CHALLENGE        = "hodl_getChallenge";
 static const QString TAG_REGISTER_HODL        = "hodl_registerHODL";
 static const QString TAG_GET_CLAIM_CHALLENGE  = "hodl_getPaymentChallenge";
@@ -73,9 +73,9 @@ NextStateRespond Hodl::execute() {
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
-void Hodl::moveToClaimPage() {
+void Hodl::moveToClaimPage(const QString & coldWalletHash) {
     hodlClaimWnd = (wnd::HodlClaim *)context->wndManager->switchToWindowEx( mwc::PAGE_HODL_CLAIM,
-                        new wnd::HodlClaim( context->wndManager->getInWndParent(), this ) );
+                        new wnd::HodlClaim( context->wndManager->getInWndParent(), this, coldWalletHash ) );
 }
 
 void Hodl::moveToStartHODLPage() {
@@ -99,19 +99,27 @@ void Hodl::moveToStartHODLPage() {
     }
 }
 
-void Hodl::requestHodlInfoRefresh() {
+void Hodl::requestHodlInfoRefresh(const QString & hash) {
     hodlUrl = (context->wallet->getWalletConfig().getNetwork() == "Mainnet") ?
                  config::getHodlMainNetUrl() : config::getHodlTestNetUrl();
 
     sendRequest( HTTP_CALL::GET, "/v1/getHODLStatus", {}, "", TAG_GET_HODL_STATUS );
 
-    if (config::isOnlineWallet()) {
-        hodlWorkflow = HODL_WORKFLOW::INIT;
-        Q_ASSERT(config::isOnlineWallet() || config::isColdWallet());
-        context->wallet->getRootPublicKey("");
-        // continue at  onRootPublicKey( QString rootPubKey, QString message, QString signature )
+    if (hash.isEmpty()) {
+        if (config::isOnlineWallet()) {
+            hodlWorkflow = HODL_WORKFLOW::INIT;
+            Q_ASSERT(config::isOnlineWallet() || config::isColdWallet());
+            context->wallet->getRootPublicKey("");
+            // continue at  onRootPublicKey( QString rootPubKey, QString message, QString signature )
+        }
     }
+    else {
+        sendRequest( HTTP_CALL::GET, "/v1/checkOutputs",
+                     {"root_pub_key_hash", hash }, "", TAG_CHECK_OUTPUTS, hash );
 
+        sendRequest( HTTP_CALL::GET, "/v1/getPendingHODLRewards",
+                     {"root_pub_key_hash", hash }, "", TAG_GET_HODL_REWARD, hash );
+    }
 }
 
 
@@ -126,7 +134,7 @@ void Hodl::setColdWalletPublicKey(QString pubKey) {
     Q_ASSERT(crypto::isPublicKeyValid(pubKey));
     if (crypto::isPublicKeyValid(pubKey)) {
         context->hodlStatus->setRootPubKey(pubKey);
-        retrieveHodlBalance();
+        retrieveHodlBalance("");
     }
 }
 
@@ -145,11 +153,11 @@ void Hodl::registerAccountForHODL() {
     // Continue at TAG_GET_CHALLENGE
 }
 
-void Hodl::claimMWC() {
+void Hodl::claimMWC(const QString & hash) {
 
     // Search for Claim ID...
 
-    QVector<core::HodlClaimStatus> claims = context->hodlStatus->getClaimsRequestStatus();
+    QVector<core::HodlClaimStatus> claims = context->hodlStatus->getClaimsRequestStatus(hash);
     core::HodlClaimStatus claimNow;
     for (const auto & cl : claims) {
         if (cl.status < 3) {
@@ -165,9 +173,10 @@ void Hodl::claimMWC() {
     }
 
     // We want to lock record by status during processing
-    context->hodlStatus->lockClaimsRequestStatus(claimNow.claimId);
+    context->hodlStatus->lockClaimsRequestStatus(hash, claimNow.claimId);
 
     hodlWorkflow = HODL_WORKFLOW::CLAIM;
+    claimHash = hash;
     claimId = claimNow.claimId; // temp for claiming. Using it because we edon't have cookies for our requests.
     claimAmount = claimNow.amount;
 
@@ -198,7 +207,7 @@ void Hodl::onLoginResult(bool ok) {
     if (!ok)
         return;
 
-    requestHodlInfoRefresh();
+    requestHodlInfoRefresh(""); // login - it is current hot wallet only
 }
 
 
@@ -212,7 +221,7 @@ void Hodl::requestSignMessage(const QString & message) {
 }
 
 
-void Hodl::retrieveHodlBalance() {
+void Hodl::retrieveHodlBalance(const QString & hash) {
     QString rootPubKey = context->hodlStatus->getRootPubKey();
 
     if (rootPubKey.isEmpty()) {
@@ -220,15 +229,16 @@ void Hodl::retrieveHodlBalance() {
         return;
     }
 
+    const QString hashVal = context->hodlStatus->getHash(hash);
 
     if (!context->hodlStatus->hasHodlOutputs() ) {
         sendRequest( HTTP_CALL::GET, "/v1/checkOutputs",
-                     {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_CHECK_OUTPUTS );
+                     {"root_pub_key_hash", hashVal }, "", TAG_CHECK_OUTPUTS, hashVal );
     }
 
     if (!context->hodlStatus->hasAmountToClaim() ) {
         sendRequest( HTTP_CALL::GET, "/v1/getPendingHODLRewards",
-                     {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_GET_AMOUNT );
+                     {"root_pub_key_hash", hashVal }, "", TAG_GET_HODL_REWARD, hashVal );
     }
 }
 
@@ -237,6 +247,7 @@ void Hodl::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QS
         // Let's rise the error.
         notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, errMsg );
         hideWaitingStatus();
+        resetClaimState();
         return;
     }
 
@@ -260,12 +271,12 @@ void Hodl::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QS
 
             if (!context->hodlStatus->hasHodlOutputs() ) {
                 sendRequest( HTTP_CALL::GET, "/v1/checkOutputs",
-                             {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_CHECK_OUTPUTS );
+                             {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_CHECK_OUTPUTS, "" );
             }
 
             if (!context->hodlStatus->hasAmountToClaim() ) {
                 sendRequest( HTTP_CALL::GET, "/v1/getPendingHODLRewards",
-                             {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_GET_AMOUNT );
+                             {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_GET_HODL_REWARD, "" );
             }
             break;
         }
@@ -292,7 +303,7 @@ void Hodl::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QS
             claimSignature = signature;
 
             // Now we can claim...
-            QVector<QString> params {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash(),
+            QVector<QString> params {"root_pub_key_hash", context->hodlStatus->getHash(claimHash),
                                      "claim_id", QString::number(claimId),
                                      "pubkey", claimNextTransPubKey,
                                      "challenge", claimChallenge,
@@ -327,7 +338,7 @@ void Hodl::onGetNextKeyResult( bool success, QString identifier, QString publicK
         claimNextTransPubKey = publicKey;
 
         // Requesting challenge...
-        QVector<QString> params{"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash(),
+        QVector<QString> params{"root_pub_key_hash", context->hodlStatus->getHash(claimHash),
                                 "pubkey", claimNextTransPubKey,
                                 "claim_id", QString::number(claimId)};
         sendRequest( HTTP_CALL::GET, "/v1/getPaymentChallenge", params, "", TAG_GET_CLAIM_CHALLENGE, QString::number(claimId) );
@@ -459,6 +470,8 @@ void Hodl::replyFinished(QNetworkReply* reply) {
 
     if ( TAG_CHECK_OUTPUTS == tag) {
         if (requestOk) {
+            QString hash = reply->property("param1").toString();
+
             bool success = jsonRespond["success"].toBool(false);
             if (success) {
                 //  {"success":true,"outputs_qualified":[{"amount":0.1,"commit":"0939bd49fd3ebecf94846762e164ab83db50ebdb7d1e9b5178e745cfb8fa83caea","weight":1},{"amount":0.3,"commit":"087382855d829290ed292163dd120149bfe08b1cc56822c013b35b26ba5b9a2830","weight":1}]}
@@ -477,8 +490,9 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                         hodlOutputs.push_back( core::HodlOutputInfo::create(commit, amount, weight, cls) );
                 }
 
-                context->hodlStatus->setHodlOutputs( true, hodlOutputs, TAG_CHECK_OUTPUTS );
-                context->hodlStatus->updateRegistrationTime();
+                context->hodlStatus->setHodlOutputs(hash, true, hodlOutputs, TAG_CHECK_OUTPUTS );
+                if (hash.isEmpty())
+                    context->hodlStatus->updateRegistrationTime();
             }
             else {
                 // {"success": false, "error_code": 1, "error_message": "Please reigster first."}
@@ -486,11 +500,11 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                 QString errorMessage = jsonRespond["error_message"].toString();
 
                 if (errorCode==1) {
-                    context->hodlStatus->setHodlOutputs( false, QVector<core::HodlOutputInfo>(), TAG_CHECK_OUTPUTS);
+                    context->hodlStatus->setHodlOutputs( hash, false, QVector<core::HodlOutputInfo>(), TAG_CHECK_OUTPUTS);
                 }
                 else if (errorCode==2) {
                     // {"success": false, "error_code": 2, "error_message": "Registration accepted, but not processed."}
-                    context->hodlStatus->setHodlOutputs( true, QVector<core::HodlOutputInfo>(), TAG_CHECK_OUTPUTS);
+                    context->hodlStatus->setHodlOutputs( hash, true, QVector<core::HodlOutputInfo>(), TAG_CHECK_OUTPUTS);
                 }
                 else {
                     context->hodlStatus->setError( TAG_CHECK_OUTPUTS, tag + " " + errorMessage);
@@ -506,11 +520,14 @@ void Hodl::replyFinished(QNetworkReply* reply) {
         return;
     }
 
-    if ( TAG_GET_AMOUNT == tag ) {
+    if ( TAG_GET_HODL_REWARD == tag ) {
         if (requestOk) {
             //{\"success\":true,\"payments\":[{\"amount\":\"1000000000\",\"claim_id\":1,\"status\":0},{\"amount\":\"1100000000\",\"claim_id\":2,\"status\":0},{\"amount\":\"1200000000\",\"claim_id\":3,\"status\":0}]}
             // { "success": false, "error_code": 1, "error_message": "Not registered"}
             bool success = jsonRespond["success"].toBool(false);
+
+            QString hash = reply->property("param1").toString();
+
             QVector<core::HodlClaimStatus> HodlClaimStatus;
             if (success) {
                 QJsonArray rewards = jsonRespond["payments"].toArray();
@@ -527,7 +544,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                         HodlClaimStatus.push_back(hodlStatus);
                     }
                     else {
-                        context->hodlStatus->setError( TAG_GET_AMOUNT, "Unable to process HODL reward data. Not found expected data.");
+                        context->hodlStatus->setError( TAG_GET_HODL_REWARD, "Unable to process HODL reward data. Not found expected data.");
                         notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to process Hodl reward data. Not found expected data." );
                         success = false;
                         break;
@@ -539,15 +556,15 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                 QString errorCode = jsonRespond["error_code"].toString();
 
                 QString error = "Unable to reteive HODL reward data. Error Code: " + errorCode + "; "  + errMsg;
-                context->hodlStatus->setError( TAG_GET_AMOUNT, error);
+                context->hodlStatus->setError( TAG_GET_HODL_REWARD, error);
                 notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, error);
             }
 
             if (success)
-                context->hodlStatus->setHodlClaimStatus(HodlClaimStatus,TAG_GET_AMOUNT);
+                context->hodlStatus->setHodlClaimStatus(hash, HodlClaimStatus,TAG_GET_HODL_REWARD);
 
         } else {
-            context->hodlStatus->setError( TAG_GET_AMOUNT, "Unable to request available to claim HODL amount info from " + hodlUrl +
+            context->hodlStatus->setError( TAG_GET_HODL_REWARD, "Unable to request available to claim HODL amount info from " + hodlUrl +
                                                             ".\nGet communication error: " + requestErrorMessage);
             notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to get available to claim HODL amount." );
         }
@@ -570,7 +587,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                 return;
             }
 
-            if (config::isOnlineNode()) {
+            if (config::isOnlineNode() ) {
                 // We can't call wallet, we need to ask user for the Signature...
                 dlg::HodlGetSignature signatureDlg(nullptr, challenge);
                 if ( signatureDlg.exec() == QDialog::Accepted) {
@@ -610,7 +627,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
 
             // Updating the registration time
             context->hodlStatus->updateRegistrationTime();
-            context->hodlStatus->setHodlOutputs( true, QVector<core::HodlOutputInfo>(), TAG_CHECK_OUTPUTS);
+            context->hodlStatus->setHodlOutputs( "", true, QVector<core::HodlOutputInfo>(), TAG_CHECK_OUTPUTS);
             return;
         }
         else {
@@ -645,9 +662,23 @@ void Hodl::replyFinished(QNetworkReply* reply) {
             // Setting up the context for
             hodlWorkflow = HODL_WORKFLOW::CLAIM;
             claimChallenge = challenge;
-            context->wallet->getRootPublicKey(challenge);
-            // Continue on
-            // onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature );
+
+            if (!claimHash.isEmpty() ) {
+                // We can't call wallet, we need to ask user for the Signature...
+                dlg::HodlGetSignature signatureDlg(nullptr, challenge);
+                if ( signatureDlg.exec() == QDialog::Accepted) {
+                    Hodl::onRootPublicKey( true, "",  context->hodlStatus->getRootPubKey(), challenge, signatureDlg.getSignature() );
+                }
+                else {
+                    Hodl::onRootPublicKey( false, "Signature wasn't provided by user", "", "", "" );
+                }
+                return;
+            }
+            else {
+                context->wallet->getRootPublicKey(challenge);
+                // Continue on
+                // onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature );
+            }
         }
         else {
             reportMessageToUI("Claim request failed", "Unable to request a payment challenge." +
@@ -727,12 +758,13 @@ void Hodl::replyFinished(QNetworkReply* reply) {
 
     if ( TAG_RESPONCE_SLATE == tag ) {
         // End point in any case
+        QString hash = claimHash;
         resetClaimState();
 
         bool success = jsonRespond["success"].toBool(false);
         if ( success ) {
             // Let's update the page status.
-            onLoginResult(true);
+            requestHodlInfoRefresh(hash);
             reportMessageToUI("HODL claim succeeded", "Your claim for this wallet was successfully processed.\nPlease note that finalization will happen after all claims have been processed.");
         }
         else {
@@ -751,6 +783,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
 // Reset Claim workflow, so no internal data will exist
 void Hodl::resetClaimState() {
     hodlWorkflow = HODL_WORKFLOW::INIT; // It is end point in any case
+    claimHash = "";
     claimId = -1; // temp for claiming. Using it because we edon't have cookies for our requests.
     claimAmount = -1;
     claimChallenge = "";
@@ -805,7 +838,7 @@ void Hodl::onReceiveFile( bool success, QStringList errors, QString inFileName, 
 
         sendRequest( HTTP_CALL::POST, "/v1/postHODLResponseSlate" ,
                      {"claim_id", QString::number(claimId),
-                      "root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() },
+                      "root_pub_key_hash", context->hodlStatus->getHash(claimHash) },
                       slateData,
                       TAG_RESPONCE_SLATE );
     }

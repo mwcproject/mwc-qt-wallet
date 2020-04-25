@@ -101,9 +101,10 @@ HodlStatus::HodlStatus( state::StateContext * _context ) : context(_context) {
     resetData();
 }
 
-QVector<HodlOutputInfo> HodlStatus::getHodlOutputs() const {
+QVector<HodlOutputInfo> HodlStatus::getHodlOutputs(const QString & hash) const {
     QVector<HodlOutputInfo> res;
-    for ( auto out = hodlOutputs.begin(); out!=hodlOutputs.end(); out++)
+    QMap<QString, HodlOutputInfo> outputs = hodlOutputs.value(getHash(hash));
+    for ( auto out = outputs.begin(); out!=outputs.end(); out++)
         res.push_back(out.value());
 
     return res;
@@ -117,19 +118,21 @@ void HodlStatus::setHodlStatus( const QString & _hodlStatus, const QString & err
     emit onHodlStatusWasChanged();
 }
 
-void HodlStatus::setHodlOutputs( bool _inHodl, const QVector<HodlOutputInfo> & _hodlOutputs, const QString & errKey ) {
+void HodlStatus::setHodlOutputs( const QString & hash, bool _inHodl, const QVector<HodlOutputInfo> & _hodlOutputs, const QString & errKey ) {
     availableData |= DATA_HODL_OUTPUTS;
-    inHodl = _inHodl;
+    inHodl.insert(getHash(hash), _inHodl);
 
-    hodlOutputs.clear();
+    QMap<QString, HodlOutputInfo> outputs;
     for (const auto & out : _hodlOutputs) {
-        hodlOutputs.insert(out.outputCommitment, out);
+        outputs.insert(out.outputCommitment, out);
     }
     requestErrors.remove(errKey);
 
+    hodlOutputs.insert( getHash(hash), outputs );
+
     // Updating cache with HODL outputs
-    if (!rootPubKeyHash.isEmpty())
-        context->appContext->saveHodlOutputs(rootPubKeyHash, hodlOutputs);
+    if ( hash.isEmpty() && !rootPubKeyHash.isEmpty())
+        context->appContext->saveHodlOutputs(rootPubKeyHash, outputs);
 
     logger::logEmit("HODL", "onHodlStatusWasChanged", "setHodlOutputs");
     emit onHodlStatusWasChanged();
@@ -152,16 +155,17 @@ void HodlStatus::finishWalletOutputs(bool done) {
     emit onHodlStatusWasChanged();
 }
 
-void HodlStatus::setHodlClaimStatus(const QVector<HodlClaimStatus> & claims, const QString & errKey) {
-    claimStatus = claims;
+void HodlStatus::setHodlClaimStatus(const QString & hash, const QVector<HodlClaimStatus> & claims, const QString & errKey) {
+    claimStatus.insert( getHash(hash), claims);
     requestErrors.remove(errKey);
     availableData |= DATA_AMOUNT_TO_CLAIM;
     logger::logEmit("HODL", "onHodlStatusWasChanged", "setHodlClaimStatus");
     emit onHodlStatusWasChanged();
 }
 
-void HodlStatus::lockClaimsRequestStatus(int claimId) {
-    for (auto & cl : claimStatus) {
+void HodlStatus::lockClaimsRequestStatus(const QString & hash, int claimId) {
+    QVector<HodlClaimStatus> & claims = claimStatus[getHash(hash)];
+    for (auto & cl : claims) {
         if (cl.claimId == claimId) {
             cl.status = 5;
             logger::logEmit("HODL", "onHodlStatusWasChanged", "lockClaimsRequestStatus");
@@ -193,12 +197,12 @@ void HodlStatus::setRootPubKey( const QString & pubKey )
     }
 
     // reseting account related data
-    inHodl = false;
+    inHodl.insert( rootPubKeyHash, false );
     availableData &= ~(DATA_HODL_OUTPUTS | DATA_AMOUNT_TO_CLAIM);
 
     // HODL outputs updating from the cache. Reason that wallet does manage outputs and we
     if (!rootPubKeyHash.isEmpty())
-        hodlOutputs = context->appContext->loadHodlOutputs(rootPubKeyHash);
+        hodlOutputs.insert( rootPubKeyHash, context->appContext->loadHodlOutputs(rootPubKeyHash));
     else
         hodlOutputs.clear();
 
@@ -232,7 +236,7 @@ void HodlStatus::resetData() {
 
     availableData = 0;
 
-    inHodl = false;
+    inHodl.clear();
     walletOutputs.clear(); // Available outputs from the wallet.
     hodlOutputs.clear();
     claimStatus.clear();
@@ -241,16 +245,16 @@ void HodlStatus::resetData() {
 }
 
 // Calculates what we have for account
-QString HodlStatus::getWalletHodlStatus() const {
+QString HodlStatus::getWalletHodlStatus(const QString & hash) const {
 
-    bool canSkipWalletData = config::isOnlineNode();
+    bool canSkipWalletData = config::isOnlineNode() || !hash.isEmpty();
 
     if ( !rootPubKeyHash.isEmpty() && (availableData & DATA_HODL_OUTPUTS)!=0 && (canSkipWalletData || (availableData & DATA_WALLET_OUTPUTS)!=0 )) {
-        if (!inHodl) {
+        if (!inHodl.value(getHash(hash), false)) {
             return "Wallet not registered for HODL";
         }
 
-        if ( hodlOutputs.isEmpty() && !isHodlRegistrationTimeLongEnough() ) {
+        if ( hodlOutputs.value(getHash(hash)).isEmpty() && !isHodlRegistrationTimeLongEnough() ) {
             return "Waiting for HODL server to scan outputs, can take up to 24 hours";
         }
 
@@ -258,18 +262,19 @@ QString HodlStatus::getWalletHodlStatus() const {
         QMap<QString, int64_t> hodlBalancePerClass;
 
         if (canSkipWalletData) {
-            for ( auto & ho : hodlOutputs ) {
+            for ( auto & ho : hodlOutputs.value(getHash(hash)) ) {
                 int64_t balance = hodlBalancePerClass.value( ho.cls, 0 );
                 balance += int64_t(ho.value * 1000000000.0 + 0.5);
                 hodlBalancePerClass.insert( ho.cls, balance );
             }
         }
         else {
+            const QMap<QString, HodlOutputInfo> & hodl_outputs = hodlOutputs[getHash(hash)];
             for ( auto o = walletOutputs.constBegin(); o != walletOutputs.constEnd(); ++o ) {
                 for ( const auto & walletOutput : o.value() ) {
                     // Counting only exist outputs. Unconfirmed doesn't make sense to count
-                    if ( (walletOutput.status=="Unspent" || walletOutput.status=="Locked") && hodlOutputs.contains(walletOutput.outputCommitment) ) {
-                        auto ho = hodlOutputs[walletOutput.outputCommitment];
+                    if ( (walletOutput.status=="Unspent" || walletOutput.status=="Locked") && hodl_outputs.contains(walletOutput.outputCommitment) ) {
+                        auto ho = hodl_outputs[walletOutput.outputCommitment];
                         int64_t balance = hodlBalancePerClass.value( ho.cls, 0 );
                         balance += int64_t(ho.value * 1000000000.0 + 0.5);
                         hodlBalancePerClass.insert( ho.cls, balance );
@@ -288,7 +293,7 @@ QString HodlStatus::getWalletHodlStatus() const {
             int64_t available = 0;
             int64_t inprogress = 0;
 
-            for (const HodlClaimStatus & status : claimStatus ) {
+            for (const HodlClaimStatus & status : claimStatus.value(getHash(hash)) ) {
                 if ( status.status==0 ) {
                     available += status.amount;
                 }

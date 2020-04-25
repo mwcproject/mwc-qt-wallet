@@ -19,6 +19,7 @@
 #include "../state/timeoutlock.h"
 #include "../util/execute.h"
 #include "../core/HodlStatus.h"
+#include "../dialogs/h_hodlclaimwallet.h"
 
 namespace wnd {
 
@@ -53,7 +54,14 @@ void Hodl::on_signInButton_clicked()
 
 void Hodl::on_claimMwcButton_clicked()
 {
-    state->moveToClaimPage();
+    dlg::HodlClaimWallet claimWalletHashDlg(this);
+
+    QString coldWalletHash;
+    if (claimWalletHashDlg.exec() == QDialog::Accepted) {
+        coldWalletHash = claimWalletHashDlg.getColdWalletPublicKeyHash();
+    }
+
+    state->moveToClaimPage(coldWalletHash);
 }
 
 void Hodl::reportMessage(const QString & title, const QString & message) {
@@ -68,13 +76,16 @@ void Hodl::updateHodlState() {
     core::HodlStatus * hodlStatus = state->getContext()->hodlStatus;
     Q_ASSERT(hodlStatus);
 
-    ui->signInButton->setEnabled(!hodlStatus->isInHodl());
+    ui->signInButton->setEnabled(!hodlStatus->isInHodl(""));
     ui->hodlStatus->setText( hodlStatus->getHodlStatus() );
-    ui->accountStatus->setText( hodlStatus->getWalletHodlStatus() );
+    ui->accountStatus->setText( hodlStatus->getWalletHodlStatus("") );
 
-    QVector<core::HodlClaimStatus> claims = hodlStatus->getClaimsRequestStatus();
-    ui->claimMwcButton->setEnabled(!claims.isEmpty());
-    ui->claimMwcButton->setVisible(!claims.isEmpty());
+    // We don't want update Claim button status because it is possibel to claim for
+    // another wallet.
+
+    //QVector<core::HodlClaimStatus> claims = hodlStatus->getClaimsRequestStatus();
+    //ui->claimMwcButton->setEnabled(!claims.isEmpty());
+    //ui->claimMwcButton->setVisible(!claims.isEmpty());
 }
 
 void Hodl::hideWaitingStatus() {
@@ -89,9 +100,9 @@ void Hodl::mouseDoubleClickEvent( QMouseEvent * e ) {
 
     QString rootPubKey = hodlStatus->getRootPubKey();
     QString rootPubKeyHash =  hodlStatus->getRootPubKeyHash();
-    QString isInHodlStr = hodlStatus->isInHodl() ? "Yes" : "No";
+    QString isInHodlStr = hodlStatus->isInHodl("") ? "Yes" : "No";
 
-    QVector<core::HodlOutputInfo> hodlOutputs = hodlStatus->getHodlOutputs();
+    QVector<core::HodlOutputInfo> hodlOutputs = hodlStatus->getHodlOutputs("");
     double totalHodlAmount = 0.0;
     for (const auto & ho : hodlOutputs)
         totalHodlAmount += ho.value;

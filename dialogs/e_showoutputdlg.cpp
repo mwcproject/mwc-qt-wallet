@@ -39,7 +39,7 @@ ShowOutputDlg::ShowOutputDlg(QWidget *parent, const QString &account, const wall
     blockExplorerUrl = (config.getNetwork() == "Mainnet") ? mwc::BLOCK_EXPLORER_URL_MAINNET
                                                           : mwc::BLOCK_EXPLORER_URL_FLOONET;
 
-    if (hodlStatus==nullptr || !hodlStatus->isInHodl()) {
+    if (hodlStatus==nullptr || !hodlStatus->isInHodl("")) {
         ui->hodl->setText("N/A");
     }
     else {
