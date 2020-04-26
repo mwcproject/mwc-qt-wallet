@@ -36,6 +36,29 @@ QLineEdit:focus {
     border: 2px solid #9e39ff;
 }
 
+control--MwcLineEditDlg {
+    color: #7755ff;
+    background: transparent;
+    border: none;
+    font-size: 15px;
+}
+
+control--MwcLineEditDlg:!enabled {
+    border: none;
+}
+
+control--MwcLineEditDlg:disabled {
+    border: none;
+}
+
+control--MwcLineEditDlg:enabled:!focus::hover {
+    border: none;
+}
+
+control--MwcLineEditDlg:focus {
+    border: none;
+}
+
 QTextEdit {
     color: #3600C9;
 

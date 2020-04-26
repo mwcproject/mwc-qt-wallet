@@ -75,7 +75,7 @@
         </widget>
        </item>
        <item>
-        <widget class="control::MwcLineEditNormal" name="status">
+        <widget class="control::MwcLineEditDlg" name="status">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -87,6 +87,9 @@
            <width>16777215</width>
            <height>40</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
          </property>
          <property name="text">
           <string/>
@@ -123,7 +126,7 @@
         </widget>
        </item>
        <item>
-        <widget class="control::MwcLineEditNormal" name="height">
+        <widget class="control::MwcLineEditDlg" name="height">
          <property name="minimumSize">
           <size>
            <width>120</width>
@@ -135,6 +138,9 @@
            <width>120</width>
            <height>40</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
          </property>
          <property name="text">
           <string/>
@@ -171,7 +177,7 @@
         </widget>
        </item>
        <item>
-        <widget class="control::MwcLineEditNormal" name="confirms">
+        <widget class="control::MwcLineEditDlg" name="confirms">
          <property name="minimumSize">
           <size>
            <width>120</width>
@@ -183,6 +189,9 @@
            <width>120</width>
            <height>40</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
          </property>
          <property name="text">
           <string/>
@@ -219,7 +228,7 @@
         </widget>
        </item>
        <item>
-        <widget class="control::MwcLineEditNormal" name="hodl">
+        <widget class="control::MwcLineEditDlg" name="hodl">
          <property name="minimumSize">
           <size>
            <width>120</width>
@@ -231,6 +240,9 @@
            <width>120</width>
            <height>40</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
          </property>
          <property name="text">
           <string/>
@@ -274,7 +286,7 @@
         </widget>
        </item>
        <item>
-        <widget class="control::MwcLineEditNormal" name="mwc">
+        <widget class="control::MwcLineEditDlg" name="mwc">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -286,6 +298,9 @@
            <width>16777215</width>
            <height>40</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
          </property>
          <property name="text">
           <string/>
@@ -322,7 +337,7 @@
         </widget>
        </item>
        <item>
-        <widget class="control::MwcLineEditNormal" name="locked">
+        <widget class="control::MwcLineEditDlg" name="locked">
          <property name="minimumSize">
           <size>
            <width>120</width>
@@ -334,6 +349,9 @@
            <width>120</width>
            <height>40</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
          </property>
          <property name="text">
           <string/>
@@ -370,7 +388,7 @@
         </widget>
        </item>
        <item>
-        <widget class="control::MwcLineEditNormal" name="coinBase">
+        <widget class="control::MwcLineEditDlg" name="coinBase">
          <property name="minimumSize">
           <size>
            <width>120</width>
@@ -382,6 +400,9 @@
            <width>120</width>
            <height>40</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
          </property>
          <property name="text">
           <string/>
@@ -418,7 +439,7 @@
         </widget>
        </item>
        <item>
-        <widget class="control::MwcLineEditNormal" name="tx">
+        <widget class="control::MwcLineEditDlg" name="tx">
          <property name="minimumSize">
           <size>
            <width>120</width>
@@ -430,6 +451,9 @@
            <width>120</width>
            <height>40</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
          </property>
          <property name="text">
           <string/>
@@ -470,7 +494,7 @@
         </widget>
        </item>
        <item>
-        <widget class="control::MwcLineEditNormal" name="commitment">
+        <widget class="control::MwcLineEditDlg" name="commitment">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -482,6 +506,9 @@
            <width>16777215</width>
            <height>40</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::ClickFocus</enum>
          </property>
          <property name="text">
           <string/>
@@ -589,6 +616,9 @@
            <height>40</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>Private note for output. Note is only visible in MWC Qt wallet.</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -647,7 +677,7 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Save note in wallet. Notes are only visible in MWC-Qt Wallet </string>
+          <string>Save note in wallet. Note is saved and only accessible in MWC Qt wallet.</string>
          </property>
          <property name="text">
           <string>Save</string>
@@ -664,10 +694,10 @@
    <item>
     <widget class="QCheckBox" name="lockOutput">
      <property name="focusPolicy">
-      <enum>Qt::StrongFocus</enum>
+      <enum>Qt::ClickFocus</enum>
      </property>
      <property name="text">
-      <string>Lock this Output and not spend it</string>
+      <string>Lock this output and do not spend it</string>
      </property>
     </widget>
    </item>
@@ -762,7 +792,19 @@
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditDlg</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEditDlg.h</header>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>viewOutput</tabstop>
+  <tabstop>outputNote</tabstop>
+  <tabstop>pushButton_Save</tabstop>
+  <tabstop>lockOutput</tabstop>
+  <tabstop>okButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>873</width>
-    <height>810</height>
+    <width>870</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,7 +36,7 @@
    <property name="geometry">
     <rect>
      <x>459</x>
-     <y>63</y>
+     <y>60</y>
      <width>373</width>
      <height>63</height>
     </rect>
@@ -65,7 +65,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="id">
+     <widget class="control::MwcLineEditDlg" name="id">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -77,6 +77,9 @@
         <width>16777215</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -91,64 +94,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>36</x>
-     <y>63</y>
-     <width>103</width>
-     <height>63</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_5">
-    <property name="spacing">
-     <number>5</number>
-    </property>
-    <item>
-     <widget class="control::MwcLabelSmall" name="label_4">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>22</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>Type</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="control::MwcLineEditNormal" name="type">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>40</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>40</height>
-       </size>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>351</x>
-     <y>63</y>
+     <x>370</x>
+     <y>60</y>
      <width>82</width>
      <height>63</height>
     </rect>
@@ -177,7 +124,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="confirm">
+     <widget class="control::MwcLineEditDlg" name="confirm">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -189,6 +136,9 @@
         <width>16777215</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -203,9 +153,9 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>159</x>
-     <y>63</y>
-     <width>169</width>
+     <x>200</x>
+     <y>60</y>
+     <width>161</width>
      <height>63</height>
     </rect>
    </property>
@@ -227,13 +177,18 @@
         <height>22</height>
        </size>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>13</pointsize>
+       </font>
+      </property>
       <property name="text">
        <string>Amount, MWC</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="mwc">
+     <widget class="control::MwcLineEditDlg" name="mwc">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -245,6 +200,9 @@
         <width>16777215</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -259,9 +217,9 @@
   <widget class="control::MwcLine" name="frame_2">
    <property name="geometry">
     <rect>
-     <x>240</x>
-     <y>380</y>
-     <width>400</width>
+     <x>90</x>
+     <y>520</y>
+     <width>680</width>
      <height>2</height>
     </rect>
    </property>
@@ -276,7 +234,7 @@
    <property name="geometry">
     <rect>
      <x>36</x>
-     <y>393</y>
+     <y>360</y>
      <width>796</width>
      <height>65</height>
     </rect>
@@ -307,7 +265,7 @@
        </widget>
       </item>
       <item>
-       <widget class="control::MwcLineEditNormal" name="kernel">
+       <widget class="control::MwcLineEditDlg" name="kernel">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -319,6 +277,9 @@
           <width>16777215</width>
           <height>40</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
         </property>
         <property name="text">
          <string/>
@@ -372,7 +333,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Open output details with MWC block explorer</string>
+         <string>Open kernel details with MWC block explorer</string>
         </property>
         <property name="text">
          <string>View</string>
@@ -390,7 +351,7 @@
    <property name="geometry">
     <rect>
      <x>36</x>
-     <y>474</y>
+     <y>440</y>
      <width>121</width>
      <height>63</height>
     </rect>
@@ -419,7 +380,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="numInputs">
+     <widget class="control::MwcLineEditDlg" name="numInputs">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -431,6 +392,9 @@
         <width>16777215</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -445,8 +409,8 @@
   <widget class="QWidget" name="layoutWidget_3">
    <property name="geometry">
     <rect>
-     <x>372</x>
-     <y>474</y>
+     <x>360</x>
+     <y>440</y>
      <width>121</width>
      <height>63</height>
     </rect>
@@ -475,7 +439,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="numOutputs">
+     <widget class="control::MwcLineEditDlg" name="numOutputs">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -487,6 +451,9 @@
         <width>16777215</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -502,7 +469,7 @@
    <property name="geometry">
     <rect>
      <x>177</x>
-     <y>474</y>
+     <y>440</y>
      <width>157</width>
      <height>63</height>
     </rect>
@@ -531,7 +498,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="debited">
+     <widget class="control::MwcLineEditDlg" name="debited">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -543,6 +510,9 @@
         <width>16777215</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -557,8 +527,8 @@
   <widget class="QWidget" name="layoutWidget_5">
    <property name="geometry">
     <rect>
-     <x>513</x>
-     <y>474</y>
+     <x>510</x>
+     <y>440</y>
      <width>157</width>
      <height>63</height>
     </rect>
@@ -587,7 +557,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="credited">
+     <widget class="control::MwcLineEditDlg" name="credited">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -599,6 +569,9 @@
         <width>16777215</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -613,8 +586,8 @@
   <widget class="QWidget" name="layoutWidget_6">
    <property name="geometry">
     <rect>
-     <x>711</x>
-     <y>474</y>
+     <x>690</x>
+     <y>440</y>
      <width>121</width>
      <height>63</height>
     </rect>
@@ -643,7 +616,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="fee">
+     <widget class="control::MwcLineEditDlg" name="fee">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -656,6 +629,9 @@
         <height>40</height>
        </size>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -666,27 +642,11 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcLine" name="frame_3">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>561</y>
-     <width>400</width>
-     <height>2</height>
-    </rect>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::StyledPanel</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-  </widget>
   <widget class="QWidget" name="layoutWidget_8">
    <property name="geometry">
     <rect>
      <x>36</x>
-     <y>216</y>
+     <y>200</y>
      <width>796</width>
      <height>63</height>
     </rect>
@@ -710,12 +670,12 @@
        </size>
       </property>
       <property name="text">
-       <string>Messages</string>
+       <string>Transaction Message</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="messages">
+     <widget class="control::MwcLineEditDlg" name="messages">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -727,6 +687,9 @@
         <width>16777215</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -741,8 +704,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>184</x>
-     <y>651</y>
+     <x>180</x>
+     <y>640</y>
      <width>157</width>
      <height>63</height>
     </rect>
@@ -771,7 +734,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="out_mwc">
+     <widget class="control::MwcLineEditDlg" name="out_mwc">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -783,6 +746,9 @@
         <width>16777215</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -798,7 +764,7 @@
    <property name="geometry">
     <rect>
      <x>37</x>
-     <y>651</y>
+     <y>640</y>
      <width>121</width>
      <height>63</height>
     </rect>
@@ -827,7 +793,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="out_status">
+     <widget class="control::MwcLineEditDlg" name="out_status">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -839,6 +805,9 @@
         <width>16777215</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -853,8 +822,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>370</x>
-     <y>651</y>
+     <x>360</x>
+     <y>640</y>
      <width>112</width>
      <height>63</height>
     </rect>
@@ -883,7 +852,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="out_height">
+     <widget class="control::MwcLineEditDlg" name="out_height">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -895,6 +864,9 @@
         <width>5555555</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -909,8 +881,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>511</x>
-     <y>651</y>
+     <x>500</x>
+     <y>640</y>
      <width>94</width>
      <height>63</height>
     </rect>
@@ -939,7 +911,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="out_confirms">
+     <widget class="control::MwcLineEditDlg" name="out_confirms">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -951,6 +923,9 @@
         <width>888888</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -965,8 +940,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>745</x>
-     <y>651</y>
+     <x>730</x>
+     <y>640</y>
      <width>88</width>
      <height>63</height>
     </rect>
@@ -995,7 +970,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="out_tx">
+     <widget class="control::MwcLineEditDlg" name="out_tx">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -1007,6 +982,9 @@
         <width>88888</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -1021,8 +999,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>631</x>
-     <y>651</y>
+     <x>620</x>
+     <y>640</y>
      <width>88</width>
      <height>63</height>
     </rect>
@@ -1051,7 +1029,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="out_coinBase">
+     <widget class="control::MwcLineEditDlg" name="out_coinBase">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -1063,6 +1041,9 @@
         <width>88888</width>
         <height>40</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string/>
@@ -1078,7 +1059,7 @@
    <property name="geometry">
     <rect>
      <x>366</x>
-     <y>747</y>
+     <y>730</y>
      <width>140</width>
      <height>40</height>
     </rect>
@@ -1109,7 +1090,7 @@
    <property name="geometry">
     <rect>
      <x>36</x>
-     <y>139</y>
+     <y>130</y>
      <width>796</width>
      <height>63</height>
     </rect>
@@ -1138,7 +1119,7 @@
      </widget>
     </item>
     <item>
-     <widget class="control::MwcLineEditNormal" name="address">
+     <widget class="control::MwcLineEditDlg" name="address">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -1151,6 +1132,9 @@
         <height>40</height>
        </size>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -1161,128 +1145,11 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>37</x>
-     <y>573</y>
-     <width>796</width>
-     <height>62</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout_14">
-      <property name="spacing">
-       <number>5</number>
-      </property>
-      <item>
-       <widget class="control::MwcLabelSmall" name="label_17">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Input/Output Commitments</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="control::MwcComboBox" name="commitsComboBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>200</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Account to send mwc from</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout_16">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="control::MwcLabelSmall" name="label_19">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="control::MwcPushButtonNormal" name="viewCommit">
-        <property name="minimumSize">
-         <size>
-          <width>106</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>106</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Open output details with MWC block explorer</string>
-        </property>
-        <property name="text">
-         <string>View</string>
-        </property>
-        <property name="autoDefault">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
-  </widget>
   <widget class="QWidget" name="layoutWidget_10">
    <property name="geometry">
     <rect>
      <x>37</x>
-     <y>293</y>
+     <y>270</y>
      <width>796</width>
      <height>65</height>
     </rect>
@@ -1327,7 +1194,7 @@
          </size>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Private note for transaction. Note is only visible in MWC Qt wallet.</string>
         </property>
         <property name="statusTip">
          <string/>
@@ -1390,10 +1257,195 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Save note in wallet. Notes are only visible in MWC-Qt wallet.</string>
+         <string>Save note in wallet. Note is saved and only accessible in MWC Qt wallet.</string>
         </property>
         <property name="text">
          <string>Save</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>38</x>
+     <y>60</y>
+     <width>151</width>
+     <height>63</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_5">
+    <property name="spacing">
+     <number>5</number>
+    </property>
+    <item>
+     <widget class="control::MwcLabelSmall" name="label_4">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Type</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="control::MwcLineEditDlg" name="type">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>40</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>40</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>.SF NS Text</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>38</x>
+     <y>551</y>
+     <width>791</width>
+     <height>67</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_14">
+      <item>
+       <widget class="control::MwcLabelSmall" name="label_17">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Input/Output Commitments</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="control::MwcComboBox" name="commitsComboBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Select commitment to display</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_16">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="control::MwcLabelSmall" name="label_19">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="control::MwcPushButtonNormal" name="viewCommit">
+        <property name="minimumSize">
+         <size>
+          <width>106</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>106</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Open output details with MWC block explorer</string>
+        </property>
+        <property name="text">
+         <string>View</string>
         </property>
         <property name="autoDefault">
          <bool>false</bool>
@@ -1410,6 +1462,12 @@
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLine</class>
+   <extends>QFrame</extends>
+   <header>control/MwcFrameWithBorder.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>control::MwcComboBox</class>
@@ -1432,34 +1490,17 @@
    <header>control/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLine</class>
-   <extends>QFrame</extends>
-   <header>control/MwcFrameWithBorder.h</header>
-   <container>1</container>
+   <class>control::MwcLineEditDlg</class>
+   <extends>QLineEdit</extends>
+   <header>control/MwcLineEditDlg.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>type</tabstop>
-  <tabstop>mwc</tabstop>
-  <tabstop>confirm</tabstop>
-  <tabstop>id</tabstop>
-  <tabstop>address</tabstop>
-  <tabstop>messages</tabstop>
-  <tabstop>kernel</tabstop>
+  <tabstop>transactionNote</tabstop>
+  <tabstop>saveButton</tabstop>
   <tabstop>viewKernel</tabstop>
-  <tabstop>numInputs</tabstop>
-  <tabstop>debited</tabstop>
-  <tabstop>numOutputs</tabstop>
-  <tabstop>credited</tabstop>
-  <tabstop>fee</tabstop>
   <tabstop>commitsComboBox</tabstop>
   <tabstop>viewCommit</tabstop>
-  <tabstop>out_status</tabstop>
-  <tabstop>out_mwc</tabstop>
-  <tabstop>out_height</tabstop>
-  <tabstop>out_confirms</tabstop>
-  <tabstop>out_coinBase</tabstop>
-  <tabstop>out_tx</tabstop>
   <tabstop>okButton</tabstop>
  </tabstops>
  <resources/>
