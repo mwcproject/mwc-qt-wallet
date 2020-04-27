@@ -22,7 +22,10 @@
 
 namespace dlg {
 
-ShowOutputDlg::ShowOutputDlg(QWidget *parent, const QString &account, const wallet::WalletOutput &output, const wallet::WalletConfig &config, core::HodlStatus * hodlStatus, QString note) :
+ShowOutputDlg::ShowOutputDlg(QWidget *parent, const QString &account, const wallet::WalletOutput &output,
+                             const wallet::WalletConfig &config, core::HodlStatus * hodlStatus,
+                             QString note,
+                             bool canBeLocked, bool _locked) :
         control::MwcDialog(parent),
         ui(new Ui::ShowOutputDlg) {
     ui->setupUi(this);
@@ -52,6 +55,11 @@ ShowOutputDlg::ShowOutputDlg(QWidget *parent, const QString &account, const wall
     originalOutputNote = note;
     newOutputNote = note;
     ui->outputNote->setText(newOutputNote);
+
+    locked = _locked;
+    ui->lockOutput->setChecked(locked);
+    ui->lockOutput->setVisible(canBeLocked && output.isUnspent());
+
     updateButtons(false);
 }
 
@@ -65,10 +73,10 @@ void ShowOutputDlg::updateButtons(bool showOutputEditButtons) {
     // disable OK button if save is enabled
     // forces the user to save any active changes to the note
     if (showOutputEditButtons) {
-        ui->pushButton->setEnabled(false);
+        ui->okButton->setEnabled(false);
     }
     else {
-        ui->pushButton->setEnabled(true);
+        ui->okButton->setEnabled(true);
     }
 }
 
@@ -76,10 +84,11 @@ void ShowOutputDlg::on_viewOutput_clicked() {
     util::openUrlInBrowser("https://" + blockExplorerUrl + "/#o" + commitment);
 }
 
-void ShowOutputDlg::on_pushButton_clicked() {
+void ShowOutputDlg::on_okButton_clicked() {
     if (newOutputNote != originalOutputNote) {
         emit saveOutputNote(account, commitment, newOutputNote);
     }
+    locked = ui->lockOutput->isChecked();
     accept();
 }
 

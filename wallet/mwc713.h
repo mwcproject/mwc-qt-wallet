@@ -140,6 +140,9 @@ public:
     // This info needed in many cases and we don't want spend time every time for that.
     virtual QVector<AccountInfo>  getWalletBalance(bool filterDeleted = true) const  override;
 
+    // Get outputs that was collected for this wallet. Outputs should be ready with balances
+    virtual const QMap<QString, QVector<wallet::WalletOutput> > & getwalletOutputs() const override {return walletOutputs;}
+
     virtual QString getCurrentAccountName()  override {return currentAccount;}
 
     // Request sync (update_wallet_state) for the
@@ -335,6 +338,8 @@ public:
     // Outputs results
     void setOutputs( QString account, int64_t height, QVector<WalletOutput> outputs);
 
+    void setWalletOutputs( const QString & account, const QVector<WalletOutput> & outputs);
+
     void setExportProofResults( bool success, QString fn, QString msg );
     void setVerifyProofResults( bool success, QString fn, QString msg );
 
@@ -371,9 +376,6 @@ private:
     void mwc713connect(QProcess * process, bool trackProcessExit);
     void mwc713disconnect();
 
-    // Update acc value at collection accounts. If account is not founf, we can add it (addIfNotFound) or skip
-    void updateAccountInfo( const AccountInfo & acc, QVector<AccountInfo> & accounts, bool addIfNotFound ) const;
-
     // pass - provide password through env variable. If pass empty - nothing will be done
     // envVariables - environment variables (key/value). Must be in pairs.
     // paramsPlus - additional parameters for the process
@@ -391,7 +393,11 @@ private slots:
 
     void    restartMQsListener();
 
+    void    onOutputLockChanged(QString commit);
 private:
+
+    // process accountInfoNoLocks, apply locked outputs
+    QVector<AccountInfo> applyOutputLocksToBalance() const;
 
 private:
     core::AppContext * appContext; // app context to store current account name
@@ -432,8 +438,10 @@ private:
     QVector< QMetaObject::Connection > mwc713connections; // open connection to mwc713
 
     // Accounts with balances info
-    QVector<AccountInfo> accountInfo;
+    QVector<AccountInfo> accountInfoNoLocks;
     QString currentAccount = "default"; // Keep current account by name. It fit better to mwc713 interactions.
+
+    QMap<QString, QVector<wallet::WalletOutput> > walletOutputs; // Available outputs from this wallet. Key: account name, value outputs for this account
 
     int64_t lastSyncTime = 0;
 private:

@@ -189,8 +189,7 @@ bool TaskOutputs::processTask(const QVector<WEvent> & events) {
     return true;
 }
 
-bool TaskOutputsForHODL::processTask(const QVector<WEvent> & events) {
-    Q_ASSERT(hodlStatus);
+bool TaskOutputsForAccount::processTask(const QVector<WEvent> & events) {
 
     QString account;
     int64_t  height = -1;
@@ -199,7 +198,7 @@ bool TaskOutputsForHODL::processTask(const QVector<WEvent> & events) {
     parseOutputs( events, // in
                      account, height, outputResult );
 
-    hodlStatus->setWalletOutputs( account, outputResult, "walletOutputs" );
+    wallet713->setWalletOutputs( account, outputResult);
     return true;
 }
 

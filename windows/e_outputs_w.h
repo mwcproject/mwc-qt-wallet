@@ -46,20 +46,16 @@ public:
 
 private slots:
     void on_accountComboBox_activated(int index);
-
     void on_prevBtn_clicked();
-
     void on_nextBtn_clicked();
-
     void on_refreshButton_clicked();
-
     void on_showAll_clicked();
-
     void on_showUnspent_clicked();
-
     void on_outputsTable_cellDoubleClicked(int row, int column);
 
     void saveOutputNote(const QString& account, const QString& commitment, const QString& note);
+
+    void on_outputsTable_cellClicked(int row, int column);
 
 private:
     void initTableHeaders();
@@ -78,6 +74,10 @@ private:
 
     wallet::WalletOutput * getSelectedOutput();
 
+    void showLockedState(int row, const wallet::WalletOutput & output);
+
+    // return true if user fine with lock changes
+    bool showLockMessage();
 private:
     Ui::Outputs *ui;
     state::Outputs * state;
@@ -90,6 +90,10 @@ private:
     QPair<bool,bool> buttonState = QPair<bool,bool>(false, false);
 
     bool inHodl = false; // If acount enrolled in HODL. Requested once to eliminate race conditions
+    bool canLockOutputs = false;
+    QString widthPrefix;
+
+    bool lockMessageWasShown = false;
 };
 
 }

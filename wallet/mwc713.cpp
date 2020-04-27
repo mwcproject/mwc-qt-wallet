@@ -56,6 +56,11 @@ MWC713::MWC713(QString _mwc713path, QString _mwc713configPath, core::AppContext 
         appContext(_appContext), mwc713Path(_mwc713path),  mwc713configPath(_mwc713configPath) {
 
     currentAccount = appContext->getCurrentAccountName();
+
+    // Listening for Output Locking changes
+    QObject::connect(appContext, &core::AppContext::onOutputLockChanged, this, &MWC713::onOutputLockChanged, Qt::QueuedConnection);
+
+    void    onOutputLockChanged(QString commit);
 }
 
 MWC713::~MWC713() {
@@ -177,10 +182,6 @@ void MWC713::resetData(STARTED_MODE _startedMode ) {
     httpInfo = "";
     hasHttpTls = false;
     walletPassword = "";
-
-    Q_ASSERT(hodlStatus);
-    hodlStatus->finishWalletOutputs(false);
-
     outputsLines.clear();
 }
 
@@ -305,7 +306,8 @@ void MWC713::processStop(bool exitNicely) {
     // reset mwc713 interna; state
     //initStatus = InitWalletStatus::NONE;
     mwcAddress = "";
-    accountInfo.clear();
+    accountInfoNoLocks.clear();
+    walletOutputs.clear();
     currentAccount = "default"; // Keep current account by name. It fit better to mwc713 interactions.
     collectedAccountInfo.clear();
 
@@ -323,9 +325,6 @@ void MWC713::processStop(bool exitNicely) {
 
     emit onMwcAddress("");
     emit onMwcAddressWithIndex("",1);
-
-    // No balance updated because it is a trigger that wallet is ready
-    // emit onWalletBalanceUpdated();
 
     if (mwc713process) {
         if (exitNicely) {
@@ -502,6 +501,7 @@ bool MWC713::hasTls() const {
 }
 
 QVector<AccountInfo>  MWC713::getWalletBalance(bool filterDeleted) const  {
+    QVector<AccountInfo> accountInfo = applyOutputLocksToBalance();
     if (!filterDeleted)
         return accountInfo;
 
@@ -572,8 +572,8 @@ void MWC713::createAccount( const QString & accountName )  {
     // First try to rename one of deleted accounts.
     int delAccIdx = -1;
 
-    for (int t=0; t<accountInfo.size(); t++) {
-        if ( accountInfo[t].isDeleted() ) {
+    for (int t=0; t<accountInfoNoLocks.size(); t++) {
+        if ( accountInfoNoLocks[t].isDeleted() ) {
             delAccIdx = t;
             break;
         }
@@ -583,7 +583,7 @@ void MWC713::createAccount( const QString & accountName )  {
         eventCollector->addTask( new TaskAccountCreate(this, accountName), TaskAccountCreate::TIMEOUT );
     }
     else {
-        eventCollector->addTask( new TaskAccountRename(this, accountInfo[delAccIdx].accountName, accountName, true ), TaskAccountRename::TIMEOUT );
+        eventCollector->addTask( new TaskAccountRename(this, accountInfoNoLocks[delAccIdx].accountName, accountName, true ), TaskAccountRename::TIMEOUT );
     }
 
 }
@@ -711,7 +711,7 @@ void MWC713::getAllTransactions() {
     eventCollector->addTask( new TaskAllTransactionsStart(this), -1);
 
     // I f not exist, push the rest with enforcement...
-    for (const AccountInfo & acc : accountInfo ) {
+    for (const AccountInfo & acc : accountInfoNoLocks ) {
             eventCollector->addTask(new TaskAccountSwitch(this, acc.accountName, walletPassword, false), TaskAccountSwitch::TIMEOUT);
             eventCollector->addTask(new TaskAllTransactions(this), TaskAllTransactions::TIMEOUT);
     }
@@ -956,10 +956,6 @@ void MWC713::updateAccountList( QVector<QString> accounts ) {
 
     core::SendCoinsParams params = appContext->getSendCoinsParams();
 
-    QMap<QString, AccountInfo> accNameMap;
-    for (auto & ai : accountInfo)
-        accNameMap[ai.accountName] = ai;
-
     QVector<AccountInfo> accountInfo;
 
     int idx = 0;
@@ -978,44 +974,44 @@ void MWC713::updateAccountProgress(int accountIdx, int totalAccounts) {
 }
 
 void MWC713::updateAccountFinalize(QString prevCurrentAccount) {
-    accountInfo = collectedAccountInfo;
+    accountInfoNoLocks = collectedAccountInfo;
     collectedAccountInfo.clear();
 
     Q_ASSERT(hodlStatus);
-    hodlStatus->finishWalletOutputs(true);
+    hodlStatus->finishWalletOutputs();
 
     QString accountBalanceStr;
 
-    for (const auto & acc: accountInfo) {
+    for (const auto & acc: accountInfoNoLocks) {
         accountBalanceStr += acc.toString() + ";";
     }
 
-    logger::logEmit( "MWC713", "updateAccountFinalize",accountBalanceStr );
+    logger::logEmit( "MWC713", "onWalletBalanceUpdated", "origin from updateAccountFinalize, " + accountBalanceStr );
     emit onWalletBalanceUpdated();
 
     // Set back the current account
     bool isDefaultFound = false;
-    for (auto & acc : accountInfo) {
+    for (auto & acc : accountInfoNoLocks) {
         if (acc.accountName == prevCurrentAccount) {
             isDefaultFound = true;
             break;
         }
     }
 
-    if (!isDefaultFound && accountInfo.size()>0) {
-        prevCurrentAccount = accountInfo[0].accountName;
+    if (!isDefaultFound && accountInfoNoLocks.size()>0) {
+        prevCurrentAccount = accountInfoNoLocks[0].accountName;
     }
 
     // !!!!!! NOTE, 'false' mean that we don't save to that account. It make sence because during such long operation
     //  somebody could change account
-    eventCollector->addTask( new TaskAccountSwitch(this, prevCurrentAccount, walletPassword, false), TaskAccountSwitch::TIMEOUT );
+    eventCollector->addFirstTask( new TaskAccountSwitch(this, prevCurrentAccount, walletPassword, false), TaskAccountSwitch::TIMEOUT );
 }
 
 void MWC713::createNewAccount( QString newAccountName ) {
     // Add new account info into the list. New account is allways empty
     AccountInfo acc;
     acc.setData(newAccountName,0,0,0,0,0,false);
-    accountInfo.push_back( acc );
+    accountInfoNoLocks.push_back( acc );
 
     logger::logEmit( "MWC713", "onAccountCreated",newAccountName);
     logger::logEmit( "MWC713", "onWalletBalanceUpdated","");
@@ -1040,9 +1036,11 @@ void MWC713::updateRenameAccount(const QString & oldName, const QString & newNam
                          bool success, QString errorMessage) {
 
     // Apply rename step, we don't want to rescan because of that.
-    for (auto & ai : accountInfo) {
-        if (ai.accountName == oldName)
+    for (auto & ai : accountInfoNoLocks) {
+        if (ai.accountName == oldName) {
             ai.accountName = newName;
+            walletOutputs.insert(newName, walletOutputs.value(oldName));
+        }
     }
 
     if (createSimulation) {
@@ -1078,8 +1076,18 @@ void MWC713::infoResults( QString currentAccountName, int64_t height,
                 height,
                 mwcServerBroken);
 
-    updateAccountInfo( acc, collectedAccountInfo, true );
-    updateAccountInfo( acc, accountInfo, false );
+    int accIdx = 0;
+    for ( ;accIdx<collectedAccountInfo.size(); accIdx++) {
+        if (collectedAccountInfo[accIdx].accountName == currentAccountName)
+            break;
+    }
+
+    if (accIdx<collectedAccountInfo.size()) {
+        collectedAccountInfo[accIdx] = acc;
+    }
+    else {
+        collectedAccountInfo.push_back(acc);
+    }
 }
 
 void MWC713::setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate) {
@@ -1193,6 +1201,7 @@ void MWC713::setTransactionById( bool success, QString account, int64_t height, 
 
 
 void MWC713::setOutputs( QString account, int64_t height, QVector<WalletOutput> outputs) {
+    setWalletOutputs( account, outputs);
     logger::logEmit( "MWC713", "onOutputs", "account="+account );
     emit onOutputs( account, height, outputs );
 }
@@ -1232,7 +1241,7 @@ void MWC713::setCheckResult(bool ok, QString errors) {
 }
 
 void MWC713::setNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
-    logger::logEmit( "MWC713", "onNodeSatatus", "online="+QString::number(online) + " NodeHeight="+QString::number(nodeHeight) + " PeerHeight="+QString::number(peerHeight) +
+    logger::logEmit( "MWC713", "setNodeStatus", "online="+QString::number(online) + " NodeHeight="+QString::number(nodeHeight) + " PeerHeight="+QString::number(peerHeight) +
                           " totalDifficulty=" + QString::number(totalDifficulty) + " connections=" + QString::number(connections) );
     emit onNodeStatus( online, errMsg, nodeHeight, peerHeight, totalDifficulty, connections );
 }
@@ -1468,24 +1477,6 @@ void MWC713::mwc713readyReadStandardOutput() {
     inputParser->processInput(filteredStr);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-//      Utils
-
-// Update acc value at collection accounts. If account is not founf, we can add it (addIfNotFound) or skip
-void MWC713::updateAccountInfo( const AccountInfo & acc, QVector<AccountInfo> & accounts, bool addIfNotFound ) const {
-
-    for (auto & a : accounts) {
-        if (a.accountName == acc.accountName) {
-            a = acc;
-            return;
-        }
-    }
-
-    if (addIfNotFound)
-        accounts.push_back(acc);
-
-}
-
 /////////////////////////////////////////////////////////////////////////
 // Read config from the file
 // static
@@ -1679,6 +1670,46 @@ bool MWC713::setWalletConfig( const WalletConfig & config, core::AppContext * ap
     return true;
 }
 
+void MWC713::onOutputLockChanged(QString commit) {
+    qDebug() << "MWC713 Get onOutputLockChanged for " << commit;
+
+    logger::logEmit( "MWC713", "onWalletBalanceUpdated", "origin from onOutputLockChanged, commit=" + commit );
+    emit onWalletBalanceUpdated();
+
+}
+
+// process accountInfoNoLocks, apply locked outputs
+QVector<AccountInfo> MWC713::applyOutputLocksToBalance() const {
+    if (!appContext->isLockOutputEnabled())
+        return accountInfoNoLocks;
+
+    // Locks are enabled, need to firter all outputs...
+
+    QVector<AccountInfo> accountInfoWithLocks;
+    int confNumber = appContext->getSendCoinsParams().inputConfirmationNumber;
+
+    for (AccountInfo ai : accountInfoNoLocks) {
+
+        // Checking Outputs if they locked
+        const QVector<wallet::WalletOutput> & accountOutputs = walletOutputs.value(ai.accountName);
+        for ( const wallet::WalletOutput & out : accountOutputs ) {
+            int64_t dh = ai.height - out.blockHeight.toLongLong();
+            if (dh < int64_t(confNumber) )
+                continue;
+
+            if (appContext->isLockedOutputs(out.outputCommitment)) {
+                ai.lockedByPrevTransaction += out.valueNano;
+                ai.currentlySpendable -= out.valueNano;
+            }
+        }
+        accountInfoWithLocks.push_back(ai);
+    }
+    return accountInfoWithLocks;
+}
+
+void MWC713::setWalletOutputs( const QString & account, const QVector<wallet::WalletOutput> & outputs) {
+    walletOutputs[account] = outputs;
+}
 
 
 }

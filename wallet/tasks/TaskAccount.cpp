@@ -241,7 +241,7 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
             spendableNano == acc.currentlySpendable);
 
     if (!noChange)
-        wallet713->getEventCollector()->addFirstTask( new TaskOutputsForHODL(wallet713, acc.accountName, wallet713->getHodlStatus()), TaskOutputsForHODL::TIMEOUT );
+        wallet713->getEventCollector()->addFirstTask( new TaskOutputsForAccount( wallet713, acc.accountName), TaskOutputsForAccount::TIMEOUT );
 
     wallet713->infoResults( currentAccountName, height,
                             totalNano, waitingConfNano, waitingFinalizetinNano, lockedNano, spendableNano,

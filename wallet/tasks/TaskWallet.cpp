@@ -320,7 +320,7 @@ Scanning Complete
 
     if (!foundDone) {
         // Scan was failed, let emit the warning
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Wallet unable refresh the wallet state. Your balance might be out if sync." );
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Wallet unable refresh the wallet state. Your balance might be out of sync." );
     }
 
     // restore back to 'true'

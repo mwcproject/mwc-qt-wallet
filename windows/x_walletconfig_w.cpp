@@ -111,6 +111,9 @@ WalletConfig::WalletConfig(QWidget *parent, state::WalletConfig * _state) :
     currentLogoutTimeout = logoutTimeout;
     updateAutoLogoutStateUI(logoutTimeout);
 
+    outputLockingEnabled = state->isOutputLockingEnabled();
+    ui->outputLockingCheck->setChecked(outputLockingEnabled);
+
 #ifdef Q_OS_DARWIN
     // MacOS doesn't support font scale. Need to hide all the buttons
     ui->fontHolder->hide();
@@ -168,7 +171,8 @@ void WalletConfig::updateButtons() {
         ui->changeOutputsEdit->text().trimmed() == QString::number(sendParams.changeOutputs) &&
         autoStartMQSEnabled == ui->start_mqs->isChecked() &&
         autoStartKeybaseEnabled == ui->start_keybase->isChecked() == true &&
-        logoutTimeout == currentLogoutTimeout;
+        logoutTimeout == currentLogoutTimeout &&
+        outputLockingEnabled == ui->outputLockingCheck->isChecked();
 
     bool sameWithDefault =
         getcheckedSizeButton() == scale2Id( state->getInitGuiScale() ) &&
@@ -180,7 +184,8 @@ void WalletConfig::updateButtons() {
         ui->changeOutputsEdit->text().trimmed() == QString::number(defaultSendParams.changeOutputs) &&
         ui->start_mqs->isChecked() == true &&
         ui->start_keybase->isChecked() == true &&
-        ui->logout_20->isChecked() == true;
+        ui->logout_20->isChecked() == true &&
+        ui->outputLockingCheck->isChecked() == false;
 
     ui->restoreDefault->setEnabled( !sameWithDefault );
     ui->applyButton->setEnabled( !sameWithCurrent );
@@ -405,6 +410,8 @@ void WalletConfig::on_restoreDefault_clicked()
     currentLogoutTimeout = 20 * 60;
     updateAutoLogoutStateUI(20 * 60);
 
+    ui->outputLockingCheck->setChecked(false);
+
     updateButtons();
 }
 
@@ -455,6 +462,12 @@ bool WalletConfig::applyChanges() {
             state->updateAutoStartKeybaseEnabled(ui->start_keybase->isChecked());
         }
         autoStartKeybaseEnabled = ui->start_keybase->isChecked();
+
+        bool lockingEnabled = ui->outputLockingCheck->isChecked();
+        if (lockingEnabled != outputLockingEnabled) {
+            state->setOutputLockingEnabled(lockingEnabled);
+            outputLockingEnabled = lockingEnabled;
+        }
 
         if (logoutTimeout != currentLogoutTimeout) {
             util::ConfigReader reader;
@@ -615,6 +628,12 @@ void WalletConfig::updateAutoLogoutStateUI(int64_t time) {
         ui->logout_20->setChecked(true);
     else
         ui->logout_30->setChecked(true);
+}
+
+void WalletConfig::on_outputLockingCheck_stateChanged(int check)
+{
+    Q_UNUSED(check);
+    updateButtons();
 }
 
 }

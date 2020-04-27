@@ -55,12 +55,15 @@ public:
     QString getCurrentAccountName() const;
 
     // IO for columns widhts
-    QVector<int> getColumnsWidhts() const;
-    void updateColumnsWidhts(const QVector<int> & widths);
+    QVector<int> getColumnsWidhts(const QString & prefix) const;
+    void updateColumnsWidhts(const QString & prefix, const QVector<int> & widths);
 
     void switchCurrentAccount(const wallet::AccountInfo & account);
     QVector<wallet::AccountInfo> getWalletBalance();
 
+    bool isLockOutputEnabled();
+    bool isLockedOutput( const wallet::WalletOutput & output );
+    void setLockedOutput( bool locked, const wallet::WalletOutput & output );
 private slots:
     void onOutputs( QString account, int64_t height, QVector<wallet::WalletOutput> outputs);
 

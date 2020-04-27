@@ -57,26 +57,17 @@ private slots:
     void on_fontSz2_clicked();
     void on_fontSz3_clicked();
     void on_fontSz4_clicked();
-
     void on_restoreDefault_clicked();
-
     void on_applyButton_clicked();
-
     void on_logout_3_clicked();
-
     void on_logout_5_clicked();
-
     void on_logout_10_clicked();
-
     void on_logout_20_clicked();
-
     void on_logout_30_clicked();
-
     void on_logout_never_clicked();
-
     void on_start_mqs_clicked();
-
     void on_start_keybase_clicked();
+    void on_outputLockingCheck_stateChanged(int arg1);
 
 private:
     void setValues(const QString & mwc713directory,
@@ -120,6 +111,7 @@ private:
     bool walletLogsEnabled = false;
     bool autoStartMQSEnabled = true;
     bool autoStartKeybaseEnabled = true;
+    bool outputLockingEnabled = false;
     int64_t logoutTimeout = 20 * 60;
     int64_t currentLogoutTimeout = 20 * 60;
 

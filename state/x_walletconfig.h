@@ -59,6 +59,9 @@ public:
 
     bool getAutoStartKeybaseEnabled();
     void updateAutoStartKeybaseEnabled(bool enabled);
+
+    bool isOutputLockingEnabled();
+    void setOutputLockingEnabled(bool lockingEnabled);
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "wallet_configuration.html";}

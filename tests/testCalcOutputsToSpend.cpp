@@ -16,8 +16,10 @@
 #include <QDebug>
 #include "../util/ui.h"
 #include "../wallet/wallet.h"
+#include "../wallet/mwc713.h"
 #include "../core/HodlStatus.h"
 #include "../control/messagebox.h"
+#include "../core/appcontext.h"
 
 namespace test {
 
@@ -173,6 +175,8 @@ static void dotest_calcOutputsToSpend() {
 
 
 static void dotest_getOutputsToSend() {
+    AppContext appContext;
+    wallet::MWC713 mwc713( "", "", &appContext);
     core::HodlStatus hodl(nullptr);
 
     const int64_t nano = 1000000000L;
@@ -191,7 +195,7 @@ static void dotest_getOutputsToSend() {
     };
 
     hodl.setHodlOutputs("", true, hodlOutputs, "errKey" );
-    hodl.setWalletOutputs( "Bob", walletOutputs, "errKey" ); //
+    mwc713.setWalletOutputs( "Bob", walletOutputs);
 
     QStringList resultOutputs;
 
@@ -200,54 +204,54 @@ static void dotest_getOutputsToSend() {
     // NOTE!!! getOutputsToSend reserve some transaction fees.
 
     // No info about this account. Ok to spend, mwc713 supose to handle that
-    bool ok = getOutputsToSend( "John",1, 1000000*nano, &hodl, nullptr, resultOutputs );
+    bool ok = getOutputsToSend( "John",1, 1000000*nano, &mwc713, &hodl, &appContext, nullptr, resultOutputs );
     Q_ASSERT(ok);
     Q_ASSERT(resultOutputs.isEmpty());
 
-    ok = getOutputsToSend( "Bob",1, 9*nano, &hodl, nullptr, resultOutputs );
+    ok = getOutputsToSend( "Bob",1, 9*nano, &mwc713, &hodl, &appContext, nullptr, resultOutputs );
     Q_ASSERT(ok);
     Q_ASSERT( compareStringLists(resultOutputs, {"20"} ) );
 
-    ok = getOutputsToSend( "Bob",1, 19*nano, &hodl, nullptr, resultOutputs );
+    ok = getOutputsToSend( "Bob",1, 19*nano, &mwc713, &hodl, &appContext, nullptr, resultOutputs );
     Q_ASSERT(ok);
     Q_ASSERT( compareStringLists(resultOutputs, {"20"} ) );
 
-    ok = getOutputsToSend( "Bob",1, 39*nano, &hodl, nullptr, resultOutputs );
+    ok = getOutputsToSend( "Bob",1, 39*nano, &mwc713, &hodl, &appContext, nullptr, resultOutputs );
     Q_ASSERT(ok);
     Q_ASSERT( compareStringLists(resultOutputs, {"20","30"} ) );
 
-    ok = getOutputsToSend( "Bob",1, 49*nano, &hodl, nullptr, resultOutputs );
+    ok = getOutputsToSend( "Bob",1, 49*nano, &mwc713, &hodl, &appContext, nullptr, resultOutputs );
     Q_ASSERT(ok);
     Q_ASSERT( compareStringLists(resultOutputs, {"20","30"} ) );
 
     // Message box should be shown.  Expected user will press accept
-    ok = getOutputsToSend( "Bob",1, 51*nano, &hodl, nullptr, resultOutputs );
+    ok = getOutputsToSend( "Bob",1, 51*nano, &mwc713, &hodl, &appContext, nullptr, resultOutputs );
     Q_ASSERT(ok);
     Q_ASSERT( compareStringLists(resultOutputs, {"20","30","10"} ) );
 
     // Message box should be shown.  Expected user will press reject
     control::MessageBox::messageText(nullptr, "TEST", "Reject the nect request!!!" );
-    ok = getOutputsToSend( "Bob",1, 51*nano, &hodl, nullptr, resultOutputs );
+    ok = getOutputsToSend( "Bob",1, 51*nano, &mwc713, &hodl, &appContext, nullptr, resultOutputs );
     Q_ASSERT(!ok);
     Q_ASSERT( compareStringLists(resultOutputs, {} ) );
 
     // Message box should be shown.  Expected user will press accept
-    ok = getOutputsToSend( "Bob",1, 77*nano, &hodl, nullptr, resultOutputs );
+    ok = getOutputsToSend( "Bob",1, 77*nano, &mwc713, &hodl, &appContext, nullptr, resultOutputs );
     Q_ASSERT(ok);
     Q_ASSERT( compareStringLists(resultOutputs, {"20","30","90"} ) );
 
     // Message box should be shown.  Expected user will press accept
-    ok = getOutputsToSend( "Bob",1, 139*nano, &hodl, nullptr, resultOutputs );
+    ok = getOutputsToSend( "Bob",1, 139*nano, &mwc713, &hodl, &appContext, nullptr, resultOutputs );
     Q_ASSERT(ok);
     Q_ASSERT( compareStringLists(resultOutputs, {"20","30","90"} ) );
 
     // Message box should be shown.  Expected user will press accept
-    ok = getOutputsToSend( "Bob",1, 149*nano, &hodl, nullptr, resultOutputs );
+    ok = getOutputsToSend( "Bob",1, 149*nano, &mwc713, &hodl, &appContext, nullptr, resultOutputs );
     Q_ASSERT(ok);
     Q_ASSERT( compareStringLists(resultOutputs, {"20","30","90", "10"} ) );
 
     // Message box should be shown.  Expected user will press accept
-    ok = getOutputsToSend( "Bob",1, 200*nano, &hodl, nullptr, resultOutputs );
+    ok = getOutputsToSend( "Bob",1, 200*nano, &mwc713, &hodl, &appContext, nullptr, resultOutputs );
     Q_ASSERT(ok);
     Q_ASSERT( compareStringLists(resultOutputs, {} ) );
 }

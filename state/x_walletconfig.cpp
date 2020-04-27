@@ -145,6 +145,14 @@ void WalletConfig::updateAutoStartKeybaseEnabled(bool enabled) {
     context->appContext->setAutoStartKeybaseEnabled(enabled);
 }
 
+bool WalletConfig::isOutputLockingEnabled() {
+    return context->appContext->isLockOutputEnabled();
+}
+
+void WalletConfig::setOutputLockingEnabled(bool lockingEnabled) {
+    context->appContext->setLockOutputEnabled(lockingEnabled);
+}
+
 
 }
 

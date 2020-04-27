@@ -662,6 +662,16 @@
     </layout>
    </item>
    <item>
+    <widget class="QCheckBox" name="lockOutput">
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
+     </property>
+     <property name="text">
+      <string>Lock this Output and not spend it</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -690,7 +700,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="control::MwcPushButtonNormal" name="pushButton">
+      <widget class="control::MwcPushButtonNormal" name="okButton">
        <property name="minimumSize">
         <size>
          <width>140</width>

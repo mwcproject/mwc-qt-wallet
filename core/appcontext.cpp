@@ -22,6 +22,7 @@
 #include "../control/messagebox.h"
 #include "../core/global.h"
 #include <QtAlgorithms>
+#include "../util/Log.h"
 
 namespace core {
 
@@ -138,7 +139,7 @@ bool AppContext::loadData() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x4793)
+    if (id<0x4783 || id>0x4794)
          return false;
 
     in >> receiveAccount;
@@ -204,6 +205,11 @@ bool AppContext::loadData() {
         in >> txnNotesMap;
     }
 
+    if (id>=0x4794) {
+        in >> lockOutputEnabled;
+        in >> lockedOutputs;
+    }
+
     return true;
 }
 
@@ -224,7 +230,7 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x4793;
+    out << 0x4794;
     out << receiveAccount;
     out << currentAccountName;
     out << int(activeWndState);
@@ -256,6 +262,9 @@ void AppContext::saveData() const {
 
     out << outputNotesMap;
     out << txnNotesMap;
+
+    out << lockOutputEnabled;
+    out << lockedOutputs;
 }
 
 void AppContext::setLogsEnabled(bool enabled) {
@@ -552,6 +561,39 @@ void AppContext::deleteNote(const QString& account, const QString& outputCommitm
 void AppContext::deleteNote(const QString& account, int64_t txIdx) const {
     walletNotes->deleteNote(account, txIdx);
     saveData();
+}
+
+bool AppContext::isLockedOutputs(const QString & output) const {
+    if (!lockOutputEnabled)
+        return false;
+
+    return lockedOutputs.contains(output);
+}
+
+void AppContext::setLockOutputEnabled(bool enabled) {
+    if (lockOutputEnabled == enabled)
+        return;
+
+    lockOutputEnabled = enabled;
+    saveData();
+}
+
+void AppContext::setLockedOutput(const QString & output, bool lock) {
+    if (lock) {
+        if ( !lockedOutputs.contains(output) ) {
+            lockedOutputs.insert(output);
+            saveData();
+            logger::logEmit("AppContext", "onOutputLockChanged", output + " locked" );
+            emit onOutputLockChanged(output);
+        }
+    }
+    else {
+        if (lockedOutputs.remove(output)) {
+            saveData();
+            logger::logEmit("AppContext", "onOutputLockChanged", output + " unlocked" );
+            emit onOutputLockChanged(output);
+        }
+    }
 }
 
 

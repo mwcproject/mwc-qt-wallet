@@ -125,6 +125,9 @@ void ListWithColumns::appendRow( const QVector<QString> & rowData, double select
             c2set = bkColor2;
         }*/
 
+        if (highlightedColumns.contains(i))
+            c2set = highlightedColumnColor;
+
         itm->setBackground( QBrush(c2set) );
         itm->setTextAlignment( textAlignment );
         setItem(rowIdx , i, itm );
@@ -137,6 +140,15 @@ void ListWithColumns::appendRow( const QVector<QString> & rowData, double select
         }*/
     }
 }
+
+void ListWithColumns::setItemText(int row, int column, QString text) {
+    QTableWidgetItem * itm = item(row, column);
+    Q_ASSERT(itm);
+    if (itm == nullptr)
+        return;
+    itm->setText(text);
+}
+
 
 int ListWithColumns::getSelectedRow() const {
     QList<QTableWidgetItem *> selItms = selectedItems();

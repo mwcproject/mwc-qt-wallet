@@ -112,17 +112,18 @@ void Accounts::refreshWalletBalance()
     ui->accountList->clearData();
 
     core::HodlStatus * hodlStatus = state->getContext()->hodlStatus;
+    const QMap<QString, QVector<wallet::WalletOutput> > & walletOutputs = state->getContext()->wallet->getwalletOutputs();
 
     for (auto & acc : accounts) {
         QVector<QString> data{ acc.accountName, util::nano2one(acc.currentlySpendable), util::nano2one(acc.awaitingConfirmation),
                                util::nano2one(acc.lockedByPrevTransaction), util::nano2one(acc.total) };
 
         if ( inHodl ) {
-            QVector<wallet::WalletOutput> walletOutputs = hodlStatus->getWalltOutputsForAccount(acc.accountName);
+            QVector<wallet::WalletOutput> accountOutputs = walletOutputs.value(acc.accountName);
 
             int64_t hodlBalancePerClass = 0;
 
-            for (const auto & out : walletOutputs) {
+            for (const auto & out : accountOutputs) {
                 core::HodlOutputInfo hOut = hodlStatus->getHodlOutput("", out.outputCommitment );
                 if ( hOut.isValid() ) {
                     hodlBalancePerClass += out.valueNano;

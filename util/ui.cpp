@@ -14,6 +14,7 @@
 
 #include "ui.h"
 #include "../core/HodlStatus.h"
+#include "../core/appcontext.h"
 #include "../control/messagebox.h"
 #include "../util/stringutils.h"
 #include <QVector>
@@ -234,26 +235,41 @@ bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> 
 // in: nanoCoins < 0 - ALL
 // out: resultOutputs - what we want include into transaction. If
 // return false if User cancel this action.
-bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins, core::HodlStatus * hodlStatus,
+bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins,
+        wallet::Wallet * wallet,
+        core::HodlStatus * hodlStatus,
+        core::AppContext * appContext,
         QWidget * parent, QStringList & resultOutputs ) {
     Q_ASSERT(hodlStatus);
+    Q_ASSERT(appContext);
+    Q_ASSERT(wallet);
+
     resultOutputs.clear();
 
-    if ( !hodlStatus->hasAnyOutputsInHODL() )
+    if ( !hodlStatus->hasAnyOutputsInHODL() && !appContext->isLockOutputEnabled() )
         return true; // Nothing in HODL, let's wallet handle it
 
-    QVector<wallet::WalletOutput>  outputs = hodlStatus->getWalltOutputsForAccount(accountName);
+    QVector<wallet::WalletOutput>  outputs = wallet->getwalletOutputs().value(accountName);
 
     QVector<QPair<wallet::WalletOutput, core::HodlOutputInfo>> hodlOuts;
     QVector<wallet::WalletOutput> freeOuts;
 
     int64_t freeNanoCoins = 0;
 
+    QStringList allOutputs;
+
     for ( wallet::WalletOutput o : outputs) {
+        // Keep unspent only
         if ( o.status != "Unspent" ) // Interesting only in Unspent outputs
             continue;
+        // Skip mined that can't spend
         if (o.coinbase && o.numOfConfirms.toLong()<=1440 )
             continue;
+        // Skip locked
+        if (appContext->isLockedOutputs(o.outputCommitment))
+            continue;
+
+        allOutputs.push_back(o.outputCommitment);
 
         core::HodlOutputInfo ho = hodlStatus->getHodlOutput("", o.outputCommitment);
 
@@ -269,7 +285,8 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     }
 
     if (hodlOuts.size()==0) {
-        // nothing on this account in HODL
+        // nothing on this account is in HODL
+        resultOutputs = allOutputs;
         return true;
     }
 
@@ -279,9 +296,15 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
             spentOuts.push_back(ho.second);
 
         // Ask user if he want ot spend all and continue...
-        return control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(parent, "HODL Output spending",
+        if (control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(parent, "HODL Output spending",
                 generateMessageHtmlOutputsToSpend( spentOuts ),
-                "Cancel", "Continue", true, false, 1.4);
+                "Cancel", "Continue", true, false, 1.4) ) {
+            resultOutputs = allOutputs;
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     std::sort( hodlOuts.begin(), hodlOuts.end(), [](const QPair<wallet::WalletOutput, core::HodlOutputInfo> & a, const QPair<wallet::WalletOutput, core::HodlOutputInfo> & b) {
@@ -340,7 +363,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     bool res = calcOutputsToSpend( nanoCoins - freeNanoCoins, spentOuts, hodlResultOutputs );
     if (!res) {
         // spend all case, very possible because we don't control the balance
-        return getOutputsToSend( accountName, outputsNumber, -1, hodlStatus, parent, resultOutputs );
+        return getOutputsToSend( accountName, outputsNumber, -1, wallet, hodlStatus, appContext, parent, resultOutputs );
     }
 
     // Let's ask for outptus

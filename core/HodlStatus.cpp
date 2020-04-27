@@ -22,7 +22,6 @@
 
 namespace core {
 
-const uint DATA_WALLET_OUTPUTS  = 0x0001;
 const uint DATA_HODL_OUTPUTS    = 0x0002;
 const uint DATA_AMOUNT_TO_CLAIM = 0x0004;
 
@@ -138,20 +137,8 @@ void HodlStatus::setHodlOutputs( const QString & hash, bool _inHodl, const QVect
     emit onHodlStatusWasChanged();
 }
 
-void HodlStatus::setWalletOutputs( const QString & account, const QVector<wallet::WalletOutput> & outputs, const QString & errKey ) {
-    walletOutputs[account] = outputs;
-    requestErrors.remove(errKey);
-}
-
-void HodlStatus::finishWalletOutputs(bool done) {
-    if (!done) {
-        walletOutputs.clear();
-        availableData &= ~DATA_WALLET_OUTPUTS;
-    }
-    else {
-        availableData |= DATA_WALLET_OUTPUTS;
-        logger::logEmit("HODL", "onHodlStatusWasChanged", "setWalletOutputs");
-    }
+void HodlStatus::finishWalletOutputs() {
+    logger::logEmit("HODL", "onHodlStatusWasChanged", "setWalletOutputs");
     emit onHodlStatusWasChanged();
 }
 
@@ -237,7 +224,6 @@ void HodlStatus::resetData() {
     availableData = 0;
 
     inHodl.clear();
-    walletOutputs.clear(); // Available outputs from the wallet.
     hodlOutputs.clear();
     claimStatus.clear();
 
@@ -249,7 +235,7 @@ QString HodlStatus::getWalletHodlStatus(const QString & hash) const {
 
     bool canSkipWalletData = config::isOnlineNode() || !hash.isEmpty();
 
-    if ( !rootPubKeyHash.isEmpty() && (availableData & DATA_HODL_OUTPUTS)!=0 && (canSkipWalletData || (availableData & DATA_WALLET_OUTPUTS)!=0 )) {
+    if ( !rootPubKeyHash.isEmpty() && (availableData & DATA_HODL_OUTPUTS)!=0 && canSkipWalletData) {
         if (!inHodl.value(getHash(hash), false)) {
             return "Wallet not registered for HODL";
         }
@@ -270,6 +256,7 @@ QString HodlStatus::getWalletHodlStatus(const QString & hash) const {
         }
         else {
             const QMap<QString, HodlOutputInfo> & hodl_outputs = hodlOutputs[getHash(hash)];
+            const QMap<QString, QVector<wallet::WalletOutput> > & walletOutputs = context->wallet->getwalletOutputs();
             for ( auto o = walletOutputs.constBegin(); o != walletOutputs.constEnd(); ++o ) {
                 for ( const auto & walletOutput : o.value() ) {
                     // Counting only exist outputs. Unconfirmed doesn't make sense to count

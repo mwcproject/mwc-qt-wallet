@@ -156,12 +156,15 @@ void SendOnline::on_sendButton_clicked()
     core::SendCoinsParams sendParams = state->getSendCoinsParams();
 
     QStringList outputs;
-    if (! util::getOutputsToSend( selectedAccount.accountName, sendParams.changeOutputs, amount, state->getContext()->hodlStatus, this, outputs ) )
+    if (! util::getOutputsToSend( selectedAccount.accountName, sendParams.changeOutputs, amount,
+            state->getContext()->wallet, state->getContext()->hodlStatus, state->getContext()->appContext,
+            this, outputs ) )
         return; // User reject something
 
     // Ask for confirmation
     if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this,"Confirm Send request",
-                                  "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " mwc to address\n" + address, "Decline", "Confirm", false, true, 1.0, state->getWalletPassword(), control::MessageBox::RETURN_CODE::BTN2 ) )
+                                  "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " mwc to address\n" + address,
+                                  "Decline", "Confirm", false, true, 1.0, state->getWalletPassword(), control::MessageBox::RETURN_CODE::BTN2 ) )
         return;
 
     ui->progress->show();

@@ -20,6 +20,7 @@
 
 namespace core {
 class HodlStatus;
+class AppContext;
 }
 
 class QWidget;
@@ -30,8 +31,11 @@ namespace util {
     // in: nanoCoins < 0 - ALL
     // out: resultOutputs - what we want include into transaction. If
     // return false if User cancel this action.
-    bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins, core::HodlStatus * hodlStatus,
-            QWidget * parent, QStringList & resultOutputs );
+    bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins,
+                           wallet::Wallet * wallet,
+                           core::HodlStatus * hodlStatus,
+                           core::AppContext * appContext,
+                           QWidget * parent, QStringList & resultOutputs );
 
 
     // Utility method. Exposed to testing only!!!

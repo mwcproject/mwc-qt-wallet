@@ -96,46 +96,6 @@
             <property name="showGrid">
              <bool>false</bool>
             </property>
-            <column>
-             <property name="text">
-              <string>TX #</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>MWC</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>STATUS</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>CONF</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>COMMITMENT</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>CB</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>HEIGHT</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>LOCK H</string>
-             </property>
-            </column>
            </widget>
           </item>
           <item>

@@ -26,6 +26,8 @@ public:
     ListWithColumns(int rows, int columns, QWidget *parent = nullptr);
     virtual ~ListWithColumns() override;
 
+    void addHighlightedColumn(int columnIdx) { highlightedColumns += columnIdx; }
+
     // Note, changes will be applicable to a new data only!!!
   //  void setMultilineColumn(int column) { multilineColumns += column; }
   //  void removeMultilineColumn(int column) { multilineColumns -= column; }
@@ -54,6 +56,7 @@ public:
     // >=1 - highlight a lot
     void appendRow( const QVector<QString> & rowData, double selection = -1.0 );
 
+    void setItemText(int row, int column, QString text);
 protected:
     void setListLook();
 
@@ -66,6 +69,9 @@ protected:
 
     QColor selectedLow = QColor(0,0,0,0);  // Special color for row selection
     QColor selectedHi = QColor(0,0,0,0);
+
+    QColor highlightedColumnColor = QColor(255,255,255,50);
+    QSet<int> highlightedColumns;
 
    // QSet<int> multilineColumns;
 };

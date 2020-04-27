@@ -79,7 +79,9 @@ void SendOffline::on_sendButton_clicked()
     core::SendCoinsParams sendParams = state->getSendCoinsParams();
 
     QStringList outputs;
-    if (! util::getOutputsToSend( selectedAccount.accountName, sendParams.changeOutputs, amount, state->getContext()->hodlStatus, this, outputs ) )
+    if (! util::getOutputsToSend( selectedAccount.accountName, sendParams.changeOutputs, amount,
+                    state->getContext()->wallet, state->getContext()->hodlStatus, state->getContext()->appContext,
+                    this, outputs ) )
         return; // User reject something
 
     if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this,"Confirm Send request",

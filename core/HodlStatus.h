@@ -76,8 +76,7 @@ public:
 
     void setHodlStatus( const QString & hodlStatus, const QString & errKey );
     void setHodlOutputs( const QString & hash, bool inHodl, const QVector<HodlOutputInfo> & hodlOutputs, const QString & errKey ); //
-    void setWalletOutputs( const QString & account, const QVector<wallet::WalletOutput> & outputs, const QString & errKey ); //
-    void finishWalletOutputs(bool done);
+    void finishWalletOutputs();
 
     void setError( const QString & errKey, const QString & error );
 
@@ -103,7 +102,6 @@ public:
     void lockClaimsRequestStatus(const QString & hash, int claimId);
 
     bool hasAnyOutputsInHODL() const { return !hodlOutputs.isEmpty();}
-    QVector<wallet::WalletOutput> getWalltOutputsForAccount(QString accountName) const {return walletOutputs.value(accountName);}
 
     bool isOutputInHODL(const QString & output) const {return hodlOutputs.contains(output);}
 
@@ -144,7 +142,6 @@ private:
 
     // Key: Hash
     QMap<QString, bool> inHodl; // If accountin HODL. May in in Hodl but no outputs are there
-    QMap<QString, QVector<wallet::WalletOutput> > walletOutputs; // Available outputs from this wallet. Key: account name, value outputs for this account
 
     // Key: rootPubKeyHash. We can have several wallets here. Need to cover cold wallet case
     QMap<QString, QMap<QString, HodlOutputInfo>> hodlOutputs;

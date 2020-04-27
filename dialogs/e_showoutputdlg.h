@@ -35,19 +35,20 @@ namespace dlg {
 class ShowOutputDlg : public control::MwcDialog {
 Q_OBJECT
 public:
-    explicit ShowOutputDlg(QWidget *parent, const QString& account, const wallet::WalletOutput &output, const wallet::WalletConfig &config, core::HodlStatus * hodlStatus, QString note);
+    explicit ShowOutputDlg(QWidget *parent, const QString& account, const wallet::WalletOutput &output,
+                           const wallet::WalletConfig &config, core::HodlStatus * hodlStatus,
+                           QString note,
+                           bool canBeLocked, bool locked);
 
     ~ShowOutputDlg();
 
+    bool isLocked() const {return locked;}
 signals:
     void saveOutputNote(const QString& account, const QString& commitment, const QString& note);
 
 private slots:
-
     void on_viewOutput_clicked();
-
-    void on_pushButton_clicked();
-
+    void on_okButton_clicked();
     void on_outputNote_textEdited(const QString& text);
     void on_pushButton_Save_clicked();
 
@@ -62,6 +63,7 @@ private:
     QString account;
     QString originalOutputNote;
     QString newOutputNote;
+    bool    locked;
 };
 
 }

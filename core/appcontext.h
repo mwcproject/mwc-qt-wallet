@@ -65,8 +65,10 @@ struct ContactRecord {
 };
 
 // State that applicable to all application.
-class AppContext
+// Support signal for changes about Locked output
+class AppContext : public QObject
 {
+    Q_OBJECT
 public:
     AppContext();
     ~AppContext();
@@ -180,6 +182,16 @@ public:
     void updateNote(const QString& account, int64_t txIdx, const QString& newNote) const;
     void deleteNote(const QString& account, int64_t txIdx) const;
 
+    // Outputs can be locked from spending.
+    bool isLockOutputEnabled() const {return lockOutputEnabled;}
+    bool isLockedOutputs(const QString & output) const;
+    void setLockOutputEnabled(bool enabled);
+    void setLockedOutput(const QString & output, bool lock);
+
+private:
+signals:
+    void onOutputLockChanged(QString commit);
+
 private:
     bool loadData();
     void saveData() const;
@@ -235,6 +247,10 @@ private:
     // worry about the wallet notes object getting destroyed before the app context.
     QMap<QString, QMap<QString, QMap<QString, QString>>> outputNotesMap;
     QMap<QString, QMap<QString, QMap<QString, QString>>> txnNotesMap;
+
+    // Outputs can be locked from spending.
+    bool lockOutputEnabled = false; // By default it is false
+    QSet<QString> lockedOutputs; // Outputs that was locked (it is manual operation)
 };
 
 template <class T>

@@ -28,7 +28,7 @@ void AccountInfo::setData(QString account,
                         int64_t _awaitingConfirmation,
                         int64_t _lockedByPrevTransaction,
                         int64_t _currentlySpendable,
-                        int64_t _mwcNodeHeight,
+                        int64_t _height,
                         bool _mwcServerBroken)
 {
     accountName = account;
@@ -36,7 +36,7 @@ void AccountInfo::setData(QString account,
     awaitingConfirmation = _awaitingConfirmation;
     lockedByPrevTransaction = _lockedByPrevTransaction;
     currentlySpendable = _currentlySpendable;
-    mwcNodeHeight = _mwcNodeHeight;
+    height = _height;
     mwcServerBroken = _mwcServerBroken;
 }
 

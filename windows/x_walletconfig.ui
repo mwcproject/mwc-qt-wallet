@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_9">
    <item>
     <spacer name="verticalSpacer_5">
      <property name="orientation">
@@ -57,7 +57,7 @@
       <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <property name="minimumSize">
@@ -720,7 +720,16 @@ your wallet activity never stored in the logs.</string>
       <attribute name="title">
        <string>Wallet</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_7">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>35</number>
+       </property>
+       <property name="topMargin">
+        <number>12</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
@@ -732,8 +741,14 @@ your wallet activity never stored in the logs.</string>
             <string>Auto-Start</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
+            <property name="spacing">
+             <number>30</number>
+            </property>
+            <property name="leftMargin">
+             <number>25</number>
+            </property>
             <property name="topMargin">
-             <number>12</number>
+             <number>25</number>
             </property>
             <item>
              <widget class="QCheckBox" name="start_mqs">
@@ -755,6 +770,19 @@ your wallet activity never stored in the logs.</string>
               </property>
              </widget>
             </item>
+            <item>
+             <spacer name="verticalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
            </layout>
           </widget>
          </item>
@@ -767,8 +795,17 @@ your wallet activity never stored in the logs.</string>
             <string>Auto-Logout</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_8">
+            <property name="spacing">
+             <number>15</number>
+            </property>
+            <property name="leftMargin">
+             <number>25</number>
+            </property>
             <property name="topMargin">
-             <number>12</number>
+             <number>20</number>
+            </property>
+            <property name="bottomMargin">
+             <number>20</number>
             </property>
             <item>
              <widget class="QRadioButton" name="logout_3">
@@ -822,6 +859,37 @@ your wallet activity never stored in the logs.</string>
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="outputLockingGroup">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="title">
+          <string>Manual output Locking from spending</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <property name="spacing">
+           <number>30</number>
+          </property>
+          <property name="leftMargin">
+           <number>25</number>
+          </property>
+          <property name="topMargin">
+           <number>25</number>
+          </property>
+          <item>
+           <widget class="QCheckBox" name="outputLockingCheck">
+            <property name="text">
+             <string>Enable manual outputs Locking from spending</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer">
@@ -961,17 +1029,17 @@ your wallet activity never stored in the logs.</string>
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>

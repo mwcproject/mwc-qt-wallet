@@ -18,11 +18,14 @@
 #include "../util/stringutils.h"
 #include "../core/appcontext.h"
 #include <QDebug>
+#include <control/messagebox.h>
 #include "../dialogs/e_showoutputdlg.h"
 #include "../state/timeoutlock.h"
 #include "../core/HodlStatus.h"
 
 namespace wnd {
+
+const int LOCK_OUTPUT_COLUMN_IDX = 3;
 
 Outputs::Outputs(QWidget *parent, state::Outputs *_state) :
         core::NavWnd(parent, _state->getContext()),
@@ -45,6 +48,7 @@ Outputs::Outputs(QWidget *parent, state::Outputs *_state) :
     QString accName = updateWalletBalance();
 
     inHodl = state->getContext()->hodlStatus->isInHodl("");
+    canLockOutputs = state->isLockOutputEnabled();
 
     initTableHeaders();
 
@@ -63,30 +67,40 @@ Outputs::~Outputs() {
 
 void Outputs::initTableHeaders() {
 
-    // Disabling to show the grid
-    // Creatign columns
-    QVector<int> widths = state->getColumnsWidhts();
-    if (widths.size() != 8) {
-        widths = QVector<int>{40, 90, 100, 70, 240, 50, 70, 70};
-    }
-    Q_ASSERT(widths.size() == 8);
+    widthPrefix = "N";
+    QVector<QString> columns{"TX #", "MWC", "STATUS", "CONF", "COMMITMENT", "CB", "HEIGHT", "LOCK H" };
+    QVector<int> widths{40, 90, 100, 70, 240, 50, 70, 70};
 
-    ui->outputsTable->setColumnWidths(widths);
+    if (canLockOutputs) {
+        columns.insert(LOCK_OUTPUT_COLUMN_IDX, "LOCKED");
+        widths.insert(LOCK_OUTPUT_COLUMN_IDX, 60);
+        widthPrefix += "L";
+
+        ui->outputsTable->addHighlightedColumn(LOCK_OUTPUT_COLUMN_IDX);
+    }
 
     if (inHodl) {
-        ui->outputsTable->setColumnCount(widths.size()+1);
-        ui->outputsTable->setColumnWidth(widths.size(),60);
-        QTableWidgetItem * itm = new QTableWidgetItem("HODL") ;
-        ui->outputsTable->setHorizontalHeaderItem( widths.size(), itm );
-//                horizontalHeaderItem( widths.size() )->setText( "HODL" );
+        columns.push_back("HODL");
+        widths.push_back(60);
+        widthPrefix += "H";
+    }
+
+    QVector<int> ww = state->getColumnsWidhts( widthPrefix );
+    if (ww.size() == widths.size()) {
+        widths = ww;
+    }
+
+    ui->outputsTable->setColumnCount(widths.size());
+    for (int t=0; t<widths.size(); t++) {
+        ui->outputsTable->setColumnWidth(t, widths[t]);
+        QTableWidgetItem * itm = new QTableWidgetItem( columns[t]) ;
+        ui->outputsTable->setHorizontalHeaderItem( t, itm );
     }
 }
 
 void Outputs::saveTableHeaders() {
     QVector<int>  width = ui->outputsTable->getColumnWidths();
-    if (inHodl)
-        width.pop_back();
-    state->updateColumnsWidhts( width );
+    state->updateColumnsWidhts( widthPrefix, width );
 }
 
 int Outputs::calcPageSize() const {
@@ -192,6 +206,7 @@ void Outputs::setOutputsData(QString account, int64_t height, const QVector<wall
     ui->outputsTable->clearData();
 
     qDebug() << "updating output table for " << outputs.size() << " rows";
+    int row = 0;
     for (int i = outputs.size()-1; i >= 0; i--) {
         auto &out = outputs[i];
 
@@ -207,12 +222,18 @@ void Outputs::setOutputsData(QString account, int64_t height, const QVector<wall
                 out.lockedUntil
         };
 
+        if (canLockOutputs) {
+            rowData.insert(LOCK_OUTPUT_COLUMN_IDX, "" );
+        }
+
         if (inHodl) {
             core::HodlOutputInfo hodlOut = state->getContext()->hodlStatus->getHodlOutput( "", out.outputCommitment );
             rowData.push_back( hodlOut.cls.isEmpty() ? "No" : hodlOut.cls );
         }
 
         ui->outputsTable->appendRow( rowData );
+
+        showLockedState(row++, out);
     }
 
     ui->prevBtn->setEnabled(buttonState.first);
@@ -310,11 +331,57 @@ void Outputs::on_outputsTable_cellDoubleClicked(int row, int column)
     if (selected==nullptr)
         return;
 
+    bool locked = state->isLockedOutput(*selected);
+
     QString account = currentSelectedAccount();
     QString outputNote = state->getContext()->appContext->getNote(account, selected->outputCommitment);
-    dlg::ShowOutputDlg showOutputDlg(this, account, *selected, state->getContext()->wallet->getWalletConfig(), state->getContext()->hodlStatus, outputNote );
+    dlg::ShowOutputDlg showOutputDlg(this, account, *selected,
+                                     state->getContext()->wallet->getWalletConfig(), state->getContext()->hodlStatus,
+                                     outputNote,
+                                     state->isLockOutputEnabled(), locked );
     connect(&showOutputDlg, &dlg::ShowOutputDlg::saveOutputNote, this, &Outputs::saveOutputNote);
-    showOutputDlg.exec();
+    if (showOutputDlg.exec() == QDialog::Accepted) {
+        if (locked != showOutputDlg.isLocked()) {
+            if (showLockMessage()) {
+                // Updating the state
+                state->setLockedOutput(showOutputDlg.isLocked(), *selected);
+                showLockedState(row, *selected);
+            }
+        }
+    }
+}
+
+void Outputs::on_outputsTable_cellClicked(int row, int column)
+{
+    if (!canLockOutputs)
+        return;
+
+    // We can change the lock flag
+    if (column == LOCK_OUTPUT_COLUMN_IDX) {
+        wallet::WalletOutput * selected = getSelectedOutput();
+        if (selected==nullptr)
+            return;
+
+        if (!selected->isUnspent())
+            return;
+
+        if (showLockMessage()) {
+            bool locked = !state->isLockedOutput(*selected);
+            state->setLockedOutput(locked, *selected);
+            showLockedState(row, *selected);
+        }
+    }
+}
+
+void Outputs::showLockedState(int row, const wallet::WalletOutput & output) {
+    if (!canLockOutputs)
+        return;
+
+    QString lockState = "N/A";
+    if (output.isUnspent()) {
+            lockState = state->isLockedOutput(output) ? "YES" : "NO";
+    }
+    ui->outputsTable->setItemText(row,LOCK_OUTPUT_COLUMN_IDX, lockState);
 }
 
 void Outputs::saveOutputNote(const QString& account, const QString& commitment, const QString& note) {
@@ -326,6 +393,23 @@ void Outputs::saveOutputNote(const QString& account, const QString& commitment, 
         state->getContext()->appContext->updateNote(account, commitment, note);
     }
 }
+
+// return true if user fine with lock changes
+bool Outputs::showLockMessage() {
+    if (lockMessageWasShown)
+        return true;
+
+    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this, "Locking Output",
+            "By manually locking output you are preventing it from spending by QT wallet.\nLocked outputs amount will be shown as Locked balance until you change this.",
+            "Cancel", "Continue", false, true) ) {
+        return false;
+    }
+
+    lockMessageWasShown = true;
+    return lockMessageWasShown;
+}
+
+
 
 }  // end namespace wnd
 

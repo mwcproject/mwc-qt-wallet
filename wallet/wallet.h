@@ -43,7 +43,6 @@ struct AccountInfo {
     int64_t lockedByPrevTransaction = 0;
     int64_t currentlySpendable = 0;
 
-    int64_t mwcNodeHeight = 0;
     bool mwcServerBroken = true;
 
     void setData(QString account,
@@ -51,7 +50,7 @@ struct AccountInfo {
         int64_t awaitingConfirmation,
         int64_t lockedByPrevTransaction,
         int64_t currentlySpendable,
-        int64_t mwcNodeHeight,
+        int64_t height,
         bool mwcServerBroken);
 
     QString getLongAccountName() const;
@@ -219,6 +218,8 @@ struct WalletOutput {
     }
 
     double getWeightedValue() const {return weight*valueNano; }
+
+    bool isUnspent() const {return status == "Unspent";}
 };
 
 struct WalletTransaction {
@@ -424,9 +425,16 @@ public:
 
     // -------------- Accounts
 
+    // NOTE!!!:  It is child implemenation responsibility to process Outputs Locking correctly, so it looks
+    //    like wallet initiate balance updates because of that!!!
+    // Currently mwc713 taking care about that
+
     // Get all accounts with balances. Expected that Wallet allways maintain them in a cache.
     // This info needed in many cases and we don't want spend time every time for that.
     virtual QVector<AccountInfo> getWalletBalance(bool filterDeleted = true) const  = 0;
+
+    // Get outputs that was collected for this wallet. Outputs should be ready with balances
+    virtual const QMap<QString, QVector<wallet::WalletOutput> > & getwalletOutputs() const = 0;
 
     virtual QString getCurrentAccountName()  = 0;
 

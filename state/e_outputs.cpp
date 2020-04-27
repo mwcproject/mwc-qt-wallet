@@ -117,12 +117,12 @@ QString Outputs::getCurrentAccountName() const {
 }
 
 // IO for columns widhts
-QVector<int> Outputs::getColumnsWidhts() const {
-    return context->appContext->getIntVectorFor("OutputsTblColWidth");
+QVector<int> Outputs::getColumnsWidhts(const QString & prefix) const {
+    return context->appContext->getIntVectorFor("OutputsTblColWidth" + prefix);
 }
 
-void Outputs::updateColumnsWidhts(const QVector<int> & widths) {
-    context->appContext->updateIntVectorFor("OutputsTblColWidth", widths);
+void Outputs::updateColumnsWidhts(const QString & prefix, const QVector<int> & widths) {
+    context->appContext->updateIntVectorFor("OutputsTblColWidth" + prefix, widths);
 }
 
 void Outputs::onWalletBalanceUpdated() {
@@ -139,5 +139,22 @@ void Outputs::onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString mes
     }
 }
 
+bool Outputs::isLockOutputEnabled() {
+    return context->appContext->isLockOutputEnabled();
+}
+
+bool Outputs::isLockedOutput(const wallet::WalletOutput & output) {
+    if (!output.isUnspent())
+        return false;
+
+    return context->appContext->isLockedOutputs(output.outputCommitment);
+}
+
+void Outputs::setLockedOutput(bool locked, const wallet::WalletOutput & output) {
+    if (!output.isUnspent())
+        return;
+
+    context->appContext->setLockedOutput(output.outputCommitment, locked);
+}
 
 }

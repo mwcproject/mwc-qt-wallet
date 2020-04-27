@@ -41,25 +41,21 @@ public:
 };
 
 // Get outputs and deliver them directly to HODL status
-class TaskOutputsForHODL : public Mwc713Task {
+class TaskOutputsForAccount : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*15;
 
-    TaskOutputsForHODL( MWC713 * wallet713, QString _accountName, core::HodlStatus * _hodlStatus ) :
+    TaskOutputsForAccount( MWC713 * wallet713, QString _accountName) :
             Mwc713Task("Outputs", "outputs --no-refresh", wallet713, ""),
-            accountName(_accountName),
-            hodlStatus(_hodlStatus) {
-        Q_ASSERT(hodlStatus!=nullptr);
-    }
+            accountName(_accountName) {}
 
-    virtual ~TaskOutputsForHODL() override {}
+    virtual ~TaskOutputsForAccount() override {}
 
     virtual bool processTask(const QVector<WEvent> & events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
 private:
     QString accountName;
-    core::HodlStatus * hodlStatus;
 };
 
 class TaskTransactions : public Mwc713Task {
