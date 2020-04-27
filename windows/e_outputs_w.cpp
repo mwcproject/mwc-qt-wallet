@@ -27,6 +27,9 @@ namespace wnd {
 
 const int LOCK_OUTPUT_COLUMN_IDX = 3;
 
+// static
+bool Outputs::lockMessageWasShown = false;
+
 Outputs::Outputs(QWidget *parent, state::Outputs *_state) :
         core::NavWnd(parent, _state->getContext()),
         ui(new Ui::Outputs),

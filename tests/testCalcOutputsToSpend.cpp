@@ -20,6 +20,7 @@
 #include "../core/HodlStatus.h"
 #include "../control/messagebox.h"
 #include "../core/appcontext.h"
+#include "../util/Log.h"
 
 namespace test {
 
@@ -175,6 +176,8 @@ static void dotest_calcOutputsToSpend() {
 
 
 static void dotest_getOutputsToSend() {
+    logger::initLogger(false);
+
     AppContext appContext;
     wallet::MWC713 mwc713( "", "", &appContext);
     core::HodlStatus hodl(nullptr);

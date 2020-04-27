@@ -286,7 +286,8 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
 
     if (hodlOuts.size()==0) {
         // nothing on this account is in HODL
-        resultOutputs = allOutputs;
+        if (appContext->isLockOutputEnabled())
+            resultOutputs = allOutputs;
         return true;
     }
 
@@ -299,7 +300,8 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
         if (control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(parent, "HODL Output spending",
                 generateMessageHtmlOutputsToSpend( spentOuts ),
                 "Cancel", "Continue", true, false, 1.4) ) {
-            resultOutputs = allOutputs;
+            if (appContext->isLockOutputEnabled())
+                resultOutputs = allOutputs;
             return true;
         }
         else {
