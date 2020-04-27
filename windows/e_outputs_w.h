@@ -93,7 +93,7 @@ private:
     bool canLockOutputs = false;
     QString widthPrefix;
 
-    bool lockMessageWasShown = false;
+    static bool lockMessageWasShown;
 };
 
 }
