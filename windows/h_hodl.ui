@@ -215,7 +215,7 @@
      <item>
       <widget class="control::MwcLabelSmall" name="accountStatus_2">
        <property name="text">
-        <string>Cold Wallet HODL reward can be send to this Hot Wallet</string>
+        <string>Cold Wallet HODL reward can be sent to this Hot Wallet</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

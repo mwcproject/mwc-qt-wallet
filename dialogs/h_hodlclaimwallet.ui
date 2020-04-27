@@ -117,7 +117,7 @@
    </property>
    <property name="text">
     <string>It is possible to claim MWC for another wallet (Cold Wallet).
-Funds will be send to this wallet.</string>
+Funds will be sent to this wallet.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
