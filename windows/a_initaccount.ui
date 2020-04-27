@@ -483,7 +483,7 @@
         </font>
        </property>
        <property name="toolTip">
-        <string>Rin as online MWC Node</string>
+        <string>Run as online MWC Node</string>
        </property>
        <property name="styleSheet">
         <string notr="true"/>
