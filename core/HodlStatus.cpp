@@ -235,7 +235,7 @@ QString HodlStatus::getWalletHodlStatus(const QString & hash) const {
 
     bool canSkipWalletData = config::isOnlineNode() || !hash.isEmpty();
 
-    if ( !rootPubKeyHash.isEmpty() && (availableData & DATA_HODL_OUTPUTS)!=0 && canSkipWalletData) {
+    if ( !rootPubKeyHash.isEmpty() && (availableData & DATA_HODL_OUTPUTS)!=0 && ( canSkipWalletData || !context->wallet->getWalletBalance().isEmpty() ) ) {
         if (!inHodl.value(getHash(hash), false)) {
             return "Wallet not registered for HODL";
         }
