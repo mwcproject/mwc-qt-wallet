@@ -108,8 +108,9 @@ void Receive::ftBack() {
                                      context->wallet->getWalletConfig() ) );
 }
 
-void Receive::ftContinue(QString fileName, QString resultTxFileName) {
+void Receive::ftContinue(QString fileName, QString resultTxFileName, bool fluff) {
     Q_UNUSED(resultTxFileName)
+    Q_UNUSED(fluff)
     logger::logInfo("Receive", "Receive file " + fileName);
     context->wallet->receiveFile( fileName );
 }

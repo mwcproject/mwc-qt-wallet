@@ -139,7 +139,7 @@ bool AppContext::loadData() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x4794)
+    if (id<0x4783 || id>0x4795)
          return false;
 
     in >> receiveAccount;
@@ -210,6 +210,10 @@ bool AppContext::loadData() {
         in >> lockedOutputs;
     }
 
+    if (id>=0x4795) {
+        in >> fluffTransactions;
+    }
+
     return true;
 }
 
@@ -230,7 +234,7 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x4794;
+    out << 0x4795;
     out << receiveAccount;
     out << currentAccountName;
     out << int(activeWndState);
@@ -265,6 +269,8 @@ void AppContext::saveData() const {
 
     out << lockOutputEnabled;
     out << lockedOutputs;
+
+    out << fluffTransactions;
 }
 
 void AppContext::setLogsEnabled(bool enabled) {
@@ -594,6 +600,13 @@ void AppContext::setLockedOutput(const QString & output, bool lock) {
             emit onOutputLockChanged(output);
         }
     }
+}
+
+void AppContext::setFluff(bool fluffSetting) {
+    if (fluffTransactions == fluffSetting)
+        return;
+    fluffTransactions = fluffSetting;
+    saveData();
 }
 
 

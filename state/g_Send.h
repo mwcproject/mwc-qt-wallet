@@ -65,7 +65,7 @@ public:
 
     // Request for MWC to send
     void sendMwcOnline( const wallet::AccountInfo & account, util::ADDRESS_TYPE type, QString address, int64_t mwcNano,
-            QString message, QString apiSecret, const QStringList & outputs, int changeOutputs );
+            QString message, QString apiSecret, const QStringList & outputs, int changeOutputs, bool fluff );
 
     void sendMwcOffline(  const wallet::AccountInfo & account, int64_t amount, QString message, QString fileName,
             const QStringList & outputs, int changeOutputs );

@@ -620,12 +620,12 @@ void MWC713::check(bool wait4listeners)  {
 // Check signal:  onSend
 void MWC713::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address,
                      const QString & apiSecret,
-                     QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs )  {
+                     QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff )  {
     // switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account.accountName, walletPassword, true), TaskAccountSwitch::TIMEOUT );
     // If listening, strting...
 
-    eventCollector->addTask( new TaskSendMwc(this, coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs, outputs), TaskSendMwc::TIMEOUT );
+    eventCollector->addTask( new TaskSendMwc(this, coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs, outputs, fluff), TaskSendMwc::TIMEOUT );
     // Set some funds
 }
 
@@ -658,13 +658,13 @@ void MWC713::receiveFile( QString fileTx, QString identifier)  {
 
 // finalize transaction and broadcast it
 // Check signal:  onFinalizeFile
-void MWC713::finalizeFile( QString fileTxResponse )  {
+void MWC713::finalizeFile( QString fileTxResponse, bool fluff )  {
     if ( ! util::validateMwc713Str(fileTxResponse, false).first ) {
         setFinalizeFile( false, QStringList{"Unable to process file with name '"+fileTxResponse+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."}, fileTxResponse );
         return;
     }
 
-    eventCollector->addTask( new TaskFinalizeFile(this, fileTxResponse), TaskFinalizeFile::TIMEOUT );
+    eventCollector->addTask( new TaskFinalizeFile(this, fileTxResponse, fluff), TaskFinalizeFile::TIMEOUT );
 }
 
 // submit finalized transaction. Make sense for cold storage => online node operation

@@ -52,6 +52,8 @@ private slots:
 
     void on_sendEdit_textChanged(const QString &arg1);
 
+    void saveFluffSetting(bool fluffSetting);
+
 private:
     Ui::SendOnline *ui;
     state::Send * state = nullptr;

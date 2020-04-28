@@ -115,10 +115,10 @@ void Send::processSendRequest( bool isOnline, const wallet::AccountInfo & select
 
 // Request for MWC to send
 void Send::sendMwcOnline(const wallet::AccountInfo &account, util::ADDRESS_TYPE type, QString address, int64_t mwcNano,
-        QString message, QString apiSecret, const QStringList & outputs, int changeOutputs ) {
+        QString message, QString apiSecret, const QStringList & outputs, int changeOutputs, bool fluff ) {
     core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
     context->wallet->sendTo( account, mwcNano, util::fullFormalAddress( type, address), apiSecret, message,
-            prms.inputConfirmationNumber, changeOutputs, outputs );
+            prms.inputConfirmationNumber, changeOutputs, outputs, fluff );
 }
 
 void Send::sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate ) {

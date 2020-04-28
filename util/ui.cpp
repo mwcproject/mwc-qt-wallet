@@ -297,7 +297,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
             spentOuts.push_back(ho.second);
 
         // Ask user if he want ot spend all and continue...
-        if (control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(parent, "HODL Output spending",
+        if (control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(parent, "HODL Output Spending",
                 generateMessageHtmlOutputsToSpend( spentOuts ),
                 "Cancel", "Continue", true, false, 1.4) ) {
             if (appContext->isLockOutputEnabled())
@@ -377,7 +377,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     }
     Q_ASSERT( hodlOuts2ask.size() == hodlResultOutputs.size() );
 
-    if (control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionHTML(parent, "HODL Output spending",
+    if (control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionHTML(parent, "HODL Output Spending",
                         generateMessageHtmlOutputsToSpend( hodlOuts2ask ),
                         "Cancel", "Continue", true, false, 1.4) )
         return false;

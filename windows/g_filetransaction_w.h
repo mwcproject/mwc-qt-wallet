@@ -35,7 +35,7 @@ class FileTransactionWndHandler {
 public:
     virtual void ftBack() = 0;
     virtual void deleteFileTransactionWnd(FileTransaction * wnd) = 0;
-    virtual void ftContinue(QString fileName, QString resultTxFileName) = 0;
+    virtual void ftContinue(QString fileName, QString resultTxFileName, bool fluff) = 0;
 
     virtual bool needResultTxFileName() = 0;
 
@@ -68,6 +68,8 @@ private slots:
     void on_processButton_clicked();
 
     void on_resultTransFileNameSelect_clicked();
+
+    void saveFluffSetting(bool fluffSetting);
 
 private:
     Ui::FileTransaction *ui;
