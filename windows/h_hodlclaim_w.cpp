@@ -54,16 +54,26 @@ void HodlClaim::reportMessage(const QString & title, const QString & message) {
 
 // Hodl object changed it's state, need to refresh
 void HodlClaim::updateHodlState() {
-    ui->accountStatus->setText( state->getContext()->hodlStatus->getWalletHodlStatus(coldWalletHash) );
+    QPair< QString, int64_t> status = state->getContext()->hodlStatus->getWalletHodlStatus(coldWalletHash);
 
-    QVector<core::HodlClaimStatus> status = state->getContext()->hodlStatus->getClaimsRequestStatus(coldWalletHash);
+    ui->accountStatus->setText( status.first );
+
+    QString waitingText = "";
+    if (status.second>0) {
+        waitingText = "Your " + util::nano2one(status.second) + " MWC will be available after finalization. "
+                                 "The finalization process may take a while because finalization is done from an offline wallet and done in batches. "
+                                 "For details on the finalization schedule go to http://www.mwc.mw/hodl";
+    }
+    ui->finalizeWaitingText->setText(waitingText);
+
+    QVector<core::HodlClaimStatus> claimStatus = state->getContext()->hodlStatus->getClaimsRequestStatus(coldWalletHash);
 
     ui->claimsTable->clearData();
 
     bool hasClaims = false;
 
     int idx = 0;
-    for (const auto & st : status) {
+    for (const auto & st : claimStatus) {
         if (st.status<3)
             hasClaims = true;
         ui->claimsTable->appendRow(

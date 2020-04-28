@@ -76,9 +76,19 @@ void Hodl::updateHodlState() {
     core::HodlStatus * hodlStatus = state->getContext()->hodlStatus;
     Q_ASSERT(hodlStatus);
 
+    QPair< QString, int64_t> status = state->getContext()->hodlStatus->getWalletHodlStatus("");
+
     ui->signInButton->setEnabled(!hodlStatus->isInHodl(""));
     ui->hodlStatus->setText( hodlStatus->getHodlStatus() );
-    ui->accountStatus->setText( hodlStatus->getWalletHodlStatus("") );
+    ui->accountStatus->setText( status.first );
+
+    QString waitingText = "";
+    if (status.second>0) {
+        waitingText = "Your " + util::nano2one(status.second) + " MWC will be available after finalization. "
+                                                                "The finalization process may take a while because finalization is done from an offline wallet and done in batches. "
+                                                                "For details on the finalization schedule go to http://www.mwc.mw/hodl";
+    }
+    ui->finalizeWaitingText->setText(waitingText);
 
     // We don't want update Claim button status because it is possibel to claim for
     // another wallet.

@@ -92,8 +92,8 @@ public:
     bool hasAmountToClaim() const;
 
     QString getHodlStatus() const {return hodlStatus;}
-    // Calculates what we have for account
-    QString getWalletHodlStatus(const QString & hash) const;
+    // Calculates what we have for account, , second is number of MWC that awaiting for confirmations
+    QPair< QString, int64_t>  getWalletHodlStatus(const QString & hash) const;
 
     QVector<HodlOutputInfo> getHodlOutputs(const QString & hash) const;
 

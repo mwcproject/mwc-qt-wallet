@@ -57,7 +57,7 @@ void HodlNode::updateHodlState() {
 
     ui->signInButton->setEnabled( !state->getContext()->hodlStatus->isInHodl("") &&
                pubKey.length()>0 && crypto::isPublicKeyValid(pubKey) );
-    ui->accountStatus->setText( state->getContext()->hodlStatus->getWalletHodlStatus("") );
+    ui->accountStatus->setText( state->getContext()->hodlStatus->getWalletHodlStatus("").first );
     ui->viewOutputsButton->setEnabled(state->getContext()->hodlStatus->hasHodlOutputs() && !state->getContext()->hodlStatus->getHodlOutputs("").isEmpty() );
 }
 
