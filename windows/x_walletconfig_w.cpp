@@ -170,7 +170,7 @@ void WalletConfig::updateButtons() {
         ui->confirmationNumberEdit->text().trimmed() == QString::number(sendParams.inputConfirmationNumber) &&
         ui->changeOutputsEdit->text().trimmed() == QString::number(sendParams.changeOutputs) &&
         autoStartMQSEnabled == ui->start_mqs->isChecked() &&
-        autoStartKeybaseEnabled == ui->start_keybase->isChecked() == true &&
+        autoStartKeybaseEnabled == ui->start_keybase->isChecked() &&
         logoutTimeout == currentLogoutTimeout &&
         outputLockingEnabled == ui->outputLockingCheck->isChecked();
 
