@@ -58,7 +58,7 @@ namespace logger {
     private:
         const QString logPath;
         const QString logFileName;
-        QFile * logFile;
+        QFile * logFile = nullptr;
         int counter = 0;
     };
 

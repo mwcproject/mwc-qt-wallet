@@ -75,17 +75,17 @@ void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet71
                    int _sendTimeoutMs) {
     runMode = _runMode;
     mwcPath = _mwcPath;
+    wallet713path = _wallet713path;
 
     if (_mwczipPath.isEmpty()) {
-        int pos = mwcPath.lastIndexOf("mwc713", -1, Qt::CaseInsensitive );
+        int pos = wallet713path.lastIndexOf("mwc713", -1, Qt::CaseInsensitive );
         if (pos>=0)
-            mwczipPath = mwcPath.left(pos) + "mwczip" + mwcPath.right( mwcPath.length() - pos - strlen("mwc713") );
+            mwczipPath = wallet713path.left(pos) + "mwczip" + wallet713path.right( wallet713path.length() - pos - strlen("mwc713") );
     }
     else {
         mwczipPath = _mwczipPath;
     }
 
-    wallet713path = _wallet713path;
     airdropUrlMainNetUrl = _airdropUrlMainNetUrl;
     airdropUrlTestNetUrl = _airdropUrlTestNetUrl;
     hodlUrlMainNetUrl = _hodlUrlMainNetUrl;

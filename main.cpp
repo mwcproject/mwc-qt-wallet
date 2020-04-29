@@ -341,8 +341,6 @@ int main(int argc, char *argv[])
         }
 
 
-        logger::initLogger(appContext.isLogsEnabled());
-
         if (!deployWalletFilesFromResources() ) {
             QMessageBox::critical(nullptr, "Error", "Unable to provision or verify resource files during the first run");
             return 1;
@@ -353,6 +351,9 @@ int main(int argc, char *argv[])
             QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read configuration.\n" + readRes.second);
             return 1;
         }
+
+        // Logger must be start AFTER readConfig because logger require mwczip location and it is defined at the configs
+        logger::initLogger(appContext.isLogsEnabled());
 
         logger::logInfo("mwc-qt-wallet", QString("Starting mwc-gui-wallet version ") + BUILD_VERSION + " with config:\n" + config::toString() );
         qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
