@@ -20,9 +20,15 @@
 #include <QDateTime>
 #include "../wallet/mwc713task.h"
 #include "../control/messagebox.h"
+#include <QProcess>
+#include "../core/Config.h"
 
-// 1 MB is a reasonable size limit.
-#define LOG_SIZE_LIMIT  1000000
+// 10 MB is a reasonable size limit.
+// Compressed will be around 1 MB.
+#define LOG_SIZE_LIMIT  10000000
+// Number of files for rotation
+#define LOG_FILES_POOL_SIZE 50
+
 
 namespace logger {
 
@@ -79,34 +85,94 @@ void LogSender::log(bool addDate, const QString & prefix, const QString & line) 
 }
 
 // Create logger file with some simplest rotation
-LogReceiver::LogReceiver(const QString & filename) {
-    QString logPath = ioutils::getAppDataPath("logs");
-
-    QString logFn = logPath + "/" + filename;
-
-    { // Check if need to rotate
-        QFileInfo fi(logFn);
-
-        if (fi.size() > LOG_SIZE_LIMIT) {
-            const QString prevLogFn = "prev_"+filename;
-            QDir logDir( logPath );
-            logDir.remove(prevLogFn);
-            logDir.rename(filename, prevLogFn);
-        }
-    }
-
-    logFile = new QFile( logFn );
-    if (! logFile->open( QFile::WriteOnly | QFile::Append ) ) {
-        control::MessageBox::messageText(nullptr, "Critical Error", "Unable to open the logger file: " + logPath );
-        QApplication::quit();
-        return;
-    }
+LogReceiver::LogReceiver(const QString & filename) :
+        logPath(ioutils::getAppDataPath("logs")),
+        logFileName(filename)
+{
+    rotateLogFileIfNeeded();
+    openLogFile();
 }
+
 LogReceiver::~LogReceiver() {
     delete logFile;
 }
 
+void LogReceiver::rotateLogFileIfNeeded() {
+    QString logPathName = logPath + "/" + logFileName;
+    QFileInfo fi(logPathName);
+
+    if (fi.size() < LOG_SIZE_LIMIT)
+        return;
+
+    qDebug() << "Rotating logs file: " << logPathName;
+
+    // First check if need to clean up
+    QStringList archives = QDir(logPath).entryList( {"*.zip"} );
+    if (archives.size()>LOG_FILES_POOL_SIZE) {
+        // Need to delete some. Since names can be sorted,
+        archives.sort(Qt::CaseSensitivity::CaseInsensitive);
+        while(archives.size()>LOG_FILES_POOL_SIZE) {
+            qDebug() << "Cleaning up old archive: " << archives.front();
+            QFile::remove(logPath + "/" + archives.front());
+            archives.pop_front();
+        }
+    }
+
+    bool logFileOpen = (logFile != nullptr);
+    if (logFile) {
+        delete logFile;
+        logFile = nullptr;
+    }
+
+    // Generate the file name
+    QDateTime  now = QDateTime::currentDateTime();
+    QString archiveFileName = now.toString("yyyy_MM_dd_hh_mm_ss_zzz")+".zip";
+
+    QString srcFileName = logPath + "/" + logFileName;
+    QString resultFileName = logPath + "/" + archiveFileName;
+
+    // Find the mwczip location. It is expected ta the same directory where mwc713 located
+
+    qDebug() << "Creating zip archive: " << resultFileName;
+
+    // 3 is OK for the
+    int exitCode = QProcess::execute(config::getMwcZipPath(), {srcFileName, resultFileName});
+
+    qDebug() << "mwczip exit code: " << exitCode;
+    QDir logDir( logPath );
+
+    if (exitCode!=3) {
+        control::MessageBox::messageText(nullptr, "Log files rotation", "Unable to rotate log file at "+ logPath +"\nYour previous file will be swapped with a new log data.");
+        const QString prevLogFn = "prev_"+logFileName;
+        logDir.remove(prevLogFn);
+        logDir.rename(logFileName, prevLogFn);
+    }
+    else {
+        logDir.remove(logFileName);
+    }
+
+    if (logFileOpen)
+        openLogFile();
+}
+
+void LogReceiver::openLogFile() {
+    QString logFn = logPath + "/" + logFileName;
+    logFile = new QFile(logFn);
+    if (!logFile->open(QFile::WriteOnly | QFile::Append)) {
+        control::MessageBox::messageText(nullptr, "Critical Error", "Unable to open the logger file: " + logPath);
+        QApplication::quit();
+        return;
+    }
+}
+
+
 void LogReceiver::onAppend2logs(bool addDate, QString prefix, QString line ) {
+    counter++;
+    if (counter>10000) {
+        rotateLogFileIfNeeded();
+    }
+
+
     QString logLine;
     if (addDate)
         logLine += QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz") + " ";
