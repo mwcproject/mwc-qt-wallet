@@ -109,7 +109,8 @@ QVector<HodlOutputInfo> HodlStatus::getHodlOutputs(const QString & hash) const {
     return res;
 }
 
-void HodlStatus::setHodlStatus( const QString & _hodlStatus, const QString & errKey ) {
+void HodlStatus::setHodlStatus( bool _hodlServerActive, const QString & _hodlStatus, const QString & errKey ) {
+    hodlServerActive = _hodlServerActive;
     hodlStatus = _hodlStatus;
     requestErrors.remove(errKey);
 
@@ -118,6 +119,7 @@ void HodlStatus::setHodlStatus( const QString & _hodlStatus, const QString & err
 }
 
 void HodlStatus::setHodlOutputs( const QString & hash, bool _inHodl, const QVector<HodlOutputInfo> & _hodlOutputs, const QString & errKey ) {
+    Q_ASSERT(hodlServerActive);
     availableData |= DATA_HODL_OUTPUTS;
     inHodl.insert(getHash(hash), _inHodl);
 
@@ -143,6 +145,7 @@ void HodlStatus::finishWalletOutputs() {
 }
 
 void HodlStatus::setHodlClaimStatus(const QString & hash, const QVector<HodlClaimStatus> & claims, const QString & errKey) {
+    Q_ASSERT(hodlServerActive);
     claimStatus.insert( getHash(hash), claims);
     requestErrors.remove(errKey);
     availableData |= DATA_AMOUNT_TO_CLAIM;
@@ -219,6 +222,7 @@ void HodlStatus::resetData() {
     rootPubKey = "";
     rootPubKeyHash = "";
 
+    hodlServerActive = false;
     hodlStatus = "Waiting for HODL data..."; // Replay from /v1/getNextStartDate
 
     availableData = 0;
@@ -315,7 +319,10 @@ QPair< QString, int64_t> HodlStatus::getWalletHodlStatus(const QString & hash) c
         }
 
         if (requestErrors.isEmpty()) {
-            return QPair< QString, int64_t>("Waiting for Account Data",0);
+            if (isHodlServerActive())
+                return QPair< QString, int64_t>("Waiting for Account Data",0);
+            else
+                return QPair< QString, int64_t>("HODL Server is under maintenance",0);
         }
         else {
             return QPair< QString, int64_t>("HODL request error: " + requestErrors.values().join(", "), 0);

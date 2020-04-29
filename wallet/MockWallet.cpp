@@ -306,6 +306,7 @@ void MockWallet::receiveFile(QString fileTx, QString identifier) {
 // finalize transaction and broadcast it
 // Check signal:  onFinalizeFile
 void MockWallet::finalizeFile(QString fileTxResponse, bool fluff) {
+    Q_UNUSED(fluff)
     emit onFinalizeFile( true, {}, fileTxResponse );
 }
 

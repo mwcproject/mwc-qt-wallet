@@ -103,7 +103,7 @@ void Hodl::requestHodlInfoRefresh(const QString & hash) {
     hodlUrl = (context->wallet->getWalletConfig().getNetwork() == "Mainnet") ?
                  config::getHodlMainNetUrl() : config::getHodlTestNetUrl();
 
-    sendRequest( HTTP_CALL::GET, "/v1/getHODLStatus", {}, "", TAG_GET_HODL_STATUS );
+    sendRequest( HTTP_CALL::GET, "/v1/getHODLStatus", {}, "", TAG_GET_HODL_STATUS, hash );
 
     if (hash.isEmpty()) {
         if (config::isOnlineWallet()) {
@@ -112,13 +112,6 @@ void Hodl::requestHodlInfoRefresh(const QString & hash) {
             context->wallet->getRootPublicKey("");
             // continue at  onRootPublicKey( QString rootPubKey, QString message, QString signature )
         }
-    }
-    else {
-        sendRequest( HTTP_CALL::GET, "/v1/checkOutputs",
-                     {"root_pub_key_hash", hash }, "", TAG_CHECK_OUTPUTS, hash );
-
-        sendRequest( HTTP_CALL::GET, "/v1/getPendingHODLRewards",
-                     {"root_pub_key_hash", hash }, "", TAG_GET_HODL_REWARD, hash );
     }
 }
 
@@ -229,6 +222,9 @@ void Hodl::retrieveHodlBalance(const QString & hash) {
         return;
     }
 
+    if (!context->hodlStatus->isHodlServerActive())
+        return;
+
     const QString hashVal = context->hodlStatus->getHash(hash);
 
     if (!context->hodlStatus->hasHodlOutputs() ) {
@@ -269,14 +265,18 @@ void Hodl::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QS
             // So we don't want have here checking if we can skip request to HODL server.
             context->hodlStatus->setRootPubKey(rootPubKey);
 
-            if (!context->hodlStatus->hasHodlOutputs() ) {
-                sendRequest( HTTP_CALL::GET, "/v1/checkOutputs",
-                             {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_CHECK_OUTPUTS, "" );
-            }
+            if (context->hodlStatus->isHodlServerActive()) {
+                if (!context->hodlStatus->hasHodlOutputs()) {
+                    sendRequest(HTTP_CALL::GET, "/v1/checkOutputs",
+                                {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash()}, "", TAG_CHECK_OUTPUTS,
+                                "");
+                }
 
-            if (!context->hodlStatus->hasAmountToClaim() ) {
-                sendRequest( HTTP_CALL::GET, "/v1/getPendingHODLRewards",
-                             {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash() }, "", TAG_GET_HODL_REWARD, "" );
+                if (!context->hodlStatus->hasAmountToClaim()) {
+                    sendRequest(HTTP_CALL::GET, "/v1/getPendingHODLRewards",
+                                {"root_pub_key_hash", context->hodlStatus->getRootPubKeyHash()}, "",
+                                TAG_GET_HODL_REWARD, "");
+                }
             }
             break;
         }
@@ -459,10 +459,20 @@ void Hodl::replyFinished(QNetworkReply* reply) {
     // Done with reply. Now processing the results by tags
     if ( TAG_GET_HODL_STATUS == tag) {
         if (requestOk) {
-            context->hodlStatus->setHodlStatus( jsonRespond["message"].toString(), TAG_GET_HODL_STATUS );
+            bool success = jsonRespond["success"].toBool(false);
+            context->hodlStatus->setHodlStatus( success, jsonRespond["message"].toString(), TAG_GET_HODL_STATUS );
         } else {
             context->hodlStatus->setError( TAG_GET_HODL_STATUS, "Unable to request the status info from " + hodlUrl +
                                     ".\nGet communication error: " + requestErrorMessage);
+        }
+
+        QString hash = reply->property("param1").toString();
+        if ( !hash.isEmpty() && context->hodlStatus->isHodlServerActive() ) {
+            sendRequest( HTTP_CALL::GET, "/v1/checkOutputs",
+                         {"root_pub_key_hash", hash }, "", TAG_CHECK_OUTPUTS, hash );
+
+            sendRequest( HTTP_CALL::GET, "/v1/getPendingHODLRewards",
+                         {"root_pub_key_hash", hash }, "", TAG_GET_HODL_REWARD, hash );
         }
 
         return;
