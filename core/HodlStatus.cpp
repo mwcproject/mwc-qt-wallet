@@ -109,7 +109,8 @@ QVector<HodlOutputInfo> HodlStatus::getHodlOutputs(const QString & hash) const {
     return res;
 }
 
-void HodlStatus::setHodlStatus( const QString & _hodlStatus, const QString & errKey ) {
+void HodlStatus::setHodlStatus( bool _hodlServerActive, const QString & _hodlStatus, const QString & errKey ) {
+    hodlServerActive = _hodlServerActive;
     hodlStatus = _hodlStatus;
     requestErrors.remove(errKey);
 
@@ -118,6 +119,7 @@ void HodlStatus::setHodlStatus( const QString & _hodlStatus, const QString & err
 }
 
 void HodlStatus::setHodlOutputs( const QString & hash, bool _inHodl, const QVector<HodlOutputInfo> & _hodlOutputs, const QString & errKey ) {
+    Q_ASSERT(hodlServerActive);
     availableData |= DATA_HODL_OUTPUTS;
     inHodl.insert(getHash(hash), _inHodl);
 
@@ -143,6 +145,7 @@ void HodlStatus::finishWalletOutputs() {
 }
 
 void HodlStatus::setHodlClaimStatus(const QString & hash, const QVector<HodlClaimStatus> & claims, const QString & errKey) {
+    Q_ASSERT(hodlServerActive);
     claimStatus.insert( getHash(hash), claims);
     requestErrors.remove(errKey);
     availableData |= DATA_AMOUNT_TO_CLAIM;
@@ -219,6 +222,7 @@ void HodlStatus::resetData() {
     rootPubKey = "";
     rootPubKeyHash = "";
 
+    hodlServerActive = false;
     hodlStatus = "Waiting for HODL data..."; // Replay from /v1/getNextStartDate
 
     availableData = 0;
@@ -230,18 +234,18 @@ void HodlStatus::resetData() {
     requestErrors.clear();
 }
 
-// Calculates what we have for account
-QString HodlStatus::getWalletHodlStatus(const QString & hash) const {
+// Calculates what we have for account, second is number of MWC that awaiting for confirmations
+QPair< QString, int64_t> HodlStatus::getWalletHodlStatus(const QString & hash) const {
 
     bool canSkipWalletData = config::isOnlineNode() || !hash.isEmpty();
 
-    if ( !rootPubKeyHash.isEmpty() && (availableData & DATA_HODL_OUTPUTS)!=0 && canSkipWalletData) {
+    if ( !rootPubKeyHash.isEmpty() && (availableData & DATA_HODL_OUTPUTS)!=0 && ( canSkipWalletData || !context->wallet->getWalletBalance().isEmpty() ) ) {
         if (!inHodl.value(getHash(hash), false)) {
-            return "Wallet not registered for HODL";
+            return QPair< QString, int64_t>("Wallet not registered for HODL", 0);
         }
 
         if ( hodlOutputs.value(getHash(hash)).isEmpty() && !isHodlRegistrationTimeLongEnough() ) {
-            return "Waiting for HODL server to scan outputs, can take up to 24 hours";
+            return QPair< QString, int64_t>("Waiting for HODL server to scan outputs, can take up to 24 hours",0);
         }
 
         // in nano coins
@@ -270,10 +274,12 @@ QString HodlStatus::getWalletHodlStatus(const QString & hash) const {
             }
         }
 
-        QString resultStr = "Your HODL amount:\n";
+        QString resultStr = "Your HODL amount:";
         for (auto balance = hodlBalancePerClass.begin(); balance != hodlBalancePerClass.end(); balance++ ) {
-            resultStr += balance.key() + " : " + util::nano2one(balance.value()) + " MWC\n";
+            resultStr += "\n" + balance.key() + " : " + util::nano2one(balance.value()) + " MWC";
         }
+
+        int64_t waitingForFinalization = 0;
 
         // Check if has something to claim
         if (!claimStatus.isEmpty()) {
@@ -281,6 +287,9 @@ QString HodlStatus::getWalletHodlStatus(const QString & hash) const {
             int64_t inprogress = 0;
 
             for (const HodlClaimStatus & status : claimStatus.value(getHash(hash)) ) {
+                if (status.status==3)
+                    waitingForFinalization += status.amount;
+
                 if ( status.status==0 ) {
                     available += status.amount;
                 }
@@ -293,27 +302,30 @@ QString HodlStatus::getWalletHodlStatus(const QString & hash) const {
                 resultStr += "\n";
 
                 if (available>0)
-                    resultStr += "Available for Claim : " + util::nano2one(available) + " MWC\n";
+                    resultStr += "\nAvailable for Claim : " + util::nano2one(available) + " MWC";
 
                 if (inprogress>0)
-                    resultStr += "Claim in progress : " + util::nano2one(inprogress) + " MWC\n";
+                    resultStr += "\nClaim in progress : " + util::nano2one(inprogress) + " MWC";
             }
         }
 
-        return resultStr;
+        return QPair< QString, int64_t>(resultStr, waitingForFinalization);
     }
     else {
         if (config::isOnlineNode()) {
             if (rootPubKeyHash.isEmpty()) {
-                return "";
+                return QPair< QString, int64_t>("", 0);
             }
         }
 
         if (requestErrors.isEmpty()) {
-            return "Waiting for Account Data";
+            if (isHodlServerActive())
+                return QPair< QString, int64_t>("Waiting for Account Data",0);
+            else
+                return QPair< QString, int64_t>("HODL Server is under maintenance",0);
         }
         else {
-            return "HODL request error: " + requestErrors.values().join(", ");
+            return QPair< QString, int64_t>("HODL request error: " + requestErrors.values().join(", "), 0);
         }
 
     }

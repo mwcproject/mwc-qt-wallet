@@ -517,7 +517,7 @@ public:
     virtual void receiveFile( QString fileTx, QString identifier = "")  = 0;
     // finalize transaction and broadcast it
     // Check signal:  onFinalizeFile
-    virtual void finalizeFile( QString fileTxResponse )  = 0;
+    virtual void finalizeFile( QString fileTxResponse, bool fluff )  = 0;
 
     // submit finalized transaction. Make sense for cold storage => online node operation
     // Check Signal: onSubmitFile(bool ok, String message)
@@ -528,7 +528,7 @@ public:
     // coinNano == -1  - mean All
     // Check signal:  onSend
     virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, const QString & apiSecret,
-                         QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs )  = 0;
+                         QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff )  = 0;
 
     // Airdrop special. Generating the next Public key for transaction
     // wallet713> getnextkey --amount 1000000

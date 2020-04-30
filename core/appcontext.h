@@ -188,6 +188,10 @@ public:
     void setLockOutputEnabled(bool enabled);
     void setLockedOutput(const QString & output, bool lock);
 
+    // Fluff transactions
+    bool isFluffSet() const { return fluffTransactions; }
+    void setFluff(bool fluffSetting);
+
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -251,6 +255,10 @@ private:
     // Outputs can be locked from spending.
     bool lockOutputEnabled = false; // By default it is false
     QSet<QString> lockedOutputs; // Outputs that was locked (it is manual operation)
+
+    // Allow users to by-pass the stem-phase of the dandelion protocol
+    // and directly fluff their transactions.
+    bool fluffTransactions = false;     // default to normal dandelion protocol
 };
 
 template <class T>

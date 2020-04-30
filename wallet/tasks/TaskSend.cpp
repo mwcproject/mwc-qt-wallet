@@ -159,7 +159,7 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
 
 QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, const QString & apiSecret,
         QString message, int inputConfirmationNumber, int changeOutputs,
-        const QStringList & outputs ) const {
+        const QStringList & outputs, bool fluff ) const {
 
     QString cmd = "send ";// + util::nano2one(coinNano);
     if (coinNano>0)
@@ -184,6 +184,10 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, co
 
     if (!apiSecret.isEmpty()) {
         cmd += " --apisecret " + util::toMwc713input(apiSecret);
+    }
+
+    if (fluff) {
+        cmd += " --fluff";
     }
 
     if (coinNano<0)
@@ -295,6 +299,15 @@ bool TaskReceiveFile::processTask(const QVector<WEvent> &events) {
 }
 
 // ------------------- TaskFinalizeFile -------------------------
+
+QString TaskFinalizeFile::buildCommand(QString fileName, bool fluff) const {
+    QString res("finalize ");
+    res += "--file " + util::toMwc713input(fileName);
+    if (fluff) {
+        res += " --fluff";
+    }
+    return res;
+}
 
 bool TaskFinalizeFile::processTask(const QVector<WEvent> &events) {
 

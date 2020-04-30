@@ -54,6 +54,7 @@
 #include "tests/testWordDictionary.h"
 #include "tests/testPasswordAnalyser.h"
 #include "tests/testCalcOutputsToSpend.h"
+#include "tests/testLogs.h"
 #include "misk/DictionaryInit.h"
 #include "util/stringutils.h"
 #include "build_version.h"
@@ -158,6 +159,7 @@ QPair<bool, QString> readConfig(QApplication & app) {
 
     QString mwc_path = reader.getString("mwc_path");
     QString wallet713_path = reader.getString("wallet713_path");
+    QString mwczip_path = reader.getString("mwczip_path");
     QString airdropUrlMainNet = reader.getString("airdrop_url_mainnet");
     QString airdropUrlTestNet = reader.getString("airdrop_url_testnet");
 
@@ -222,8 +224,15 @@ QPair<bool, QString> readConfig(QApplication & app) {
 #endif
     }
 
+    if (mwczip_path == "build in") {
+        mwczip_path = QCoreApplication::applicationDirPath() + "/" + "mwczip";
+#ifdef Q_OS_WIN
+        mwc_path += ".exe";
+#endif
+    }
+
     Q_ASSERT(runMode.first);
-    config::setConfigData( runMode.second, mwc_path, wallet713_path, airdropUrlMainNet, airdropUrlTestNet, hodlUrlMainnet, hodlUrlTestnet, logoutTimeout*1000L, timeoutMultiplierVal, useMwcMqS, sendTimeoutMs );
+    config::setConfigData( runMode.second, mwc_path, wallet713_path, mwczip_path, airdropUrlMainNet, airdropUrlTestNet, hodlUrlMainnet, hodlUrlTestnet, logoutTimeout*1000L, timeoutMultiplierVal, useMwcMqS, sendTimeoutMs );
     return QPair<bool, QString>(true, "");
 }
 
@@ -288,6 +297,7 @@ int main(int argc, char *argv[])
 
     // tests are quick, let's run them in debug
 //    test::testCalcOutputsToSpend();  // This test is long and show about 8 Message boxes.
+//    test::testLogsRotation();
     test::testLongLong2ShortStr();
     test::testUtils();
     test::testWordSequences();
@@ -331,8 +341,6 @@ int main(int argc, char *argv[])
         }
 
 
-        logger::initLogger(appContext.isLogsEnabled());
-
         if (!deployWalletFilesFromResources() ) {
             QMessageBox::critical(nullptr, "Error", "Unable to provision or verify resource files during the first run");
             return 1;
@@ -343,6 +351,9 @@ int main(int argc, char *argv[])
             QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read configuration.\n" + readRes.second);
             return 1;
         }
+
+        // Logger must be start AFTER readConfig because logger require mwczip location and it is defined at the configs
+        logger::initLogger(appContext.isLogsEnabled());
 
         logger::logInfo("mwc-qt-wallet", QString("Starting mwc-gui-wallet version ") + BUILD_VERSION + " with config:\n" + config::toString() );
         qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
@@ -484,7 +495,7 @@ int main(int argc, char *argv[])
         }
 
         // Update Node
-        node::MwcNode * mwcNode = new node::MwcNode( config::getMwcpath(), &appContext );
+        node::MwcNode * mwcNode = new node::MwcNode( config::getMwcPath(), &appContext );
 
         wallet::MWC713::saveWalletConfig( walletConfig, &appContext, mwcNode );
 

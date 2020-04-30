@@ -50,7 +50,7 @@ public:
     virtual void ftBack() override;
     virtual void deleteFileTransactionWnd(wnd::FileTransaction * wnd) override { if (wnd==fileTransWnd) fileTransWnd = nullptr; }
     // Expected that user already made all possible appruvals
-    virtual void ftContinue(QString fileName, QString resultTxFileName) override;
+    virtual void ftContinue(QString fileName, QString resultTxFileName, bool fluff) override;
 
     virtual bool needResultTxFileName() override;
 

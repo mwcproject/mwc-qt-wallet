@@ -219,7 +219,7 @@ public:
     virtual void receiveFile( QString fileTx, QString identifier = "")  override;
     // finalize transaction and broadcast it
     // Check signal:  onFinalizeFile
-    virtual void finalizeFile( QString fileTxResponse )  override;
+    virtual void finalizeFile( QString fileTxResponse, bool fluff )  override;
 
      // submit finalized transaction. Make sense for cold storage => online node operation
     // Check Signal: onSubmitFile(bool ok, String message)
@@ -238,7 +238,7 @@ public:
     virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address,
                          const QString & apiSecret,
                          QString message, int inputConfirmationNumber, int changeOutputs,
-                         const QStringList & outputs )  override;
+                         const QStringList & outputs, bool fluff )  override;
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)

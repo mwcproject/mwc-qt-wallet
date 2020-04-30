@@ -20,6 +20,7 @@ static WALLET_RUN_MODE runMode = WALLET_RUN_MODE::ONLINE_WALLET;
 static QString mwc713conf;
 static QString mwcGuiWalletConf;
 static QString mwcPath;
+static QString mwczipPath;
 static QString wallet713path;
 static QString airdropUrlMainNetUrl;
 static QString airdropUrlTestNetUrl;
@@ -65,7 +66,7 @@ void setMwcGuiWalletConf( QString conf ) {
  * @param useMwcMqS             - true: use mwc mqs for slates exchange.  false: using mwc mq (non secure grin box) for slates exchange
  * @param sendTimeoutMs         - timeout for mwc mq send. Expected that 2nd party is online. Otherwise we will ask user if he want to stop waiting and cancel transaction.
  */
-void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet713path,
+void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet713path, QString _mwczipPath,
                    QString _airdropUrlMainNetUrl, QString _airdropUrlTestNetUrl,
                    QString _hodlUrlMainNetUrl, QString _hodlUrlTestNetUrl,
                    int64_t  _logoutTimeMs,
@@ -75,6 +76,16 @@ void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet71
     runMode = _runMode;
     mwcPath = _mwcPath;
     wallet713path = _wallet713path;
+
+    if (_mwczipPath.isEmpty()) {
+        int pos = wallet713path.lastIndexOf("mwc713", -1, Qt::CaseInsensitive );
+        if (pos>=0)
+            mwczipPath = wallet713path.left(pos) + "mwczip" + wallet713path.right( wallet713path.length() - pos - strlen("mwc713") );
+    }
+    else {
+        mwczipPath = _mwczipPath;
+    }
+
     airdropUrlMainNetUrl = _airdropUrlMainNetUrl;
     airdropUrlTestNetUrl = _airdropUrlTestNetUrl;
     hodlUrlMainNetUrl = _hodlUrlMainNetUrl;
@@ -85,13 +96,18 @@ void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet71
     sendTimeoutMs = _sendTimeoutMs;
 }
 
+void setMwcZipPath(const QString & _mwcZipPath) {
+    mwczipPath = _mwcZipPath;
+}
+
 
 // Note, workflow for config not enforced. Please don't abuse it
 const QString & getMwc713conf() {return mwc713conf;}
 const QString & getMwcGuiWalletConf() {return mwcGuiWalletConf;}
 
-const QString & getMwcpath() {return mwcPath;}
+const QString & getMwcPath() {return mwcPath;}
 const QString & getWallet713path() {return wallet713path;}
+const QString & getMwcZipPath() {return mwczipPath;}
 const QString & getAirdropMainNetUrl() {return airdropUrlMainNetUrl;}
 const QString & getAirdropTestNetUrl() {return airdropUrlTestNetUrl;}
 

@@ -305,7 +305,8 @@ void MockWallet::receiveFile(QString fileTx, QString identifier) {
 
 // finalize transaction and broadcast it
 // Check signal:  onFinalizeFile
-void MockWallet::finalizeFile(QString fileTxResponse) {
+void MockWallet::finalizeFile(QString fileTxResponse, bool fluff) {
+    Q_UNUSED(fluff)
     emit onFinalizeFile( true, {}, fileTxResponse );
 }
 
@@ -336,7 +337,7 @@ void MockWallet::getNextKey(int64_t amountNano, QString btcaddress, QString airD
 void MockWallet::sendTo(const wallet::AccountInfo &account, int64_t coinNano, const QString &address,
                         const QString &apiSecret,
                         QString message, int inputConfirmationNumber, int changeOutputs,
-                        const QStringList &outputs) {
+                        const QStringList &outputs, bool fluff) {
     Q_UNUSED(account)
     Q_UNUSED(coinNano)
     Q_UNUSED(address)
@@ -345,6 +346,7 @@ void MockWallet::sendTo(const wallet::AccountInfo &account, int64_t coinNano, co
     Q_UNUSED(inputConfirmationNumber)
     Q_UNUSED(changeOutputs)
     Q_UNUSED(outputs)
+    Q_UNUSED(fluff)
 
     emit onSend( true, {}, address, 4, "0000-1111-2222-3333" );
 }

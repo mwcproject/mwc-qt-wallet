@@ -112,7 +112,7 @@ void Finalize::fileTransactionUploaded( const QString & fileName, const util::Fi
 
 
 // Expected that user already made all possible appruvals
-void Finalize::ftContinue(QString fileName, QString resultTxFileName) {
+void Finalize::ftContinue(QString fileName, QString resultTxFileName, bool fluff) {
     if (!file2TransactionsInfo.contains(fileName)) {
         Q_ASSERT(false);
         return;
@@ -121,7 +121,7 @@ void Finalize::ftContinue(QString fileName, QString resultTxFileName) {
     file2TransactionsInfo[fileName].resultingFN = resultTxFileName;
 
     logger::logInfo("Finalize", "finalizing file " + fileName);
-    context->wallet->finalizeFile(fileName);
+    context->wallet->finalizeFile(fileName, fluff);
 }
 
 void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileName ) {

@@ -74,11 +74,13 @@ class HodlStatus : public QObject {
 public:
     HodlStatus( state::StateContext * context );
 
-    void setHodlStatus( const QString & hodlStatus, const QString & errKey );
+    void setHodlStatus( bool hodlServerActive, const QString & hodlStatus, const QString & errKey );
     void setHodlOutputs( const QString & hash, bool inHodl, const QVector<HodlOutputInfo> & hodlOutputs, const QString & errKey ); //
     void finishWalletOutputs();
 
     void setError( const QString & errKey, const QString & error );
+
+    bool isHodlServerActive() const {return hodlServerActive;}
 
     QString getRootPubKey() const {return rootPubKey;}
     // return true if new key was set
@@ -92,8 +94,8 @@ public:
     bool hasAmountToClaim() const;
 
     QString getHodlStatus() const {return hodlStatus;}
-    // Calculates what we have for account
-    QString getWalletHodlStatus(const QString & hash) const;
+    // Calculates what we have for account, , second is number of MWC that awaiting for confirmations
+    QPair< QString, int64_t>  getWalletHodlStatus(const QString & hash) const;
 
     QVector<HodlOutputInfo> getHodlOutputs(const QString & hash) const;
 
@@ -136,6 +138,7 @@ private:
     QString rootPubKey;
     QString rootPubKeyHash; // HSA256 hash
 
+    bool hodlServerActive = false; // Activity of the HODL Server. It cam be false, mean it is on maintaince and we don't want bother it with requests
     QString hodlStatus; // Replay from /v1/getNextStartDate
 
     uint availableData = 0;

@@ -47,7 +47,7 @@ public:
 
     virtual void ftBack() override;
     virtual void deleteFileTransactionWnd(wnd::FileTransaction * wnd) override {  if (wnd==fileTransWnd) fileTransWnd=nullptr; }
-    virtual void ftContinue(QString fileName, QString resultTxFileName) override;
+    virtual void ftContinue(QString fileName, QString resultTxFileName, bool fluff) override;
     virtual state::StateContext * getContext() override;
 
     virtual bool needResultTxFileName() override {return false;}

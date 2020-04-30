@@ -17,7 +17,9 @@
 #include "../state/g_Finalize.h"
 #include "../util/stringutils.h"
 #include <QFileDialog>
+#include "../core/appcontext.h"
 #include "../control/messagebox.h"
+#include "../dialogs/g_sendconfirmationdlg.h"
 #include "../state/timeoutlock.h"
 
 
@@ -113,13 +115,23 @@ void FileTransaction::on_processButton_clicked()
     }
 
     QString walletPassword = handler->getContext()->wallet->getPassword();
-    if (walletPassword.isEmpty() ||
-        control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(this,"Confirm Finalize request",
-                                      "You are finalizing transaction for " + ui->mwcLabel->text(), "Decline", "Confirm",
-                                      false, true, 1.0, walletPassword, control::MessageBox::RETURN_CODE::BTN2 ) )
-    {
-            ui->progress->show();
-            handler->ftContinue( transactionFileName, resTxFN );
+    dlg::SendConfirmationDlg::RETURN_CODE retcode = dlg::SendConfirmationDlg::RETURN_CODE::DECLINE;
+    bool fluff = false;
+    if (!walletPassword.isEmpty()) {
+        dlg::SendConfirmationDlg confirmDlg(this, "Confirm Finalize Request",
+                                            "You are finalizing transaction for " + ui->mwcLabel->text(),
+                                            1.0, walletPassword,
+                                            handler->getContext()->appContext->isFluffSet() );
+        connect(&confirmDlg, &dlg::SendConfirmationDlg::saveFluffSetting, this, &FileTransaction::saveFluffSetting);
+        if (confirmDlg.exec() == QDialog::Accepted) {
+            retcode = confirmDlg.getRetCode();
+            fluff = confirmDlg.getFluffSetting();
+        }
+
+    }
+    if (walletPassword.isEmpty() || retcode == dlg::SendConfirmationDlg::RETURN_CODE::CONFIRM) {
+        ui->progress->show();
+        handler->ftContinue( transactionFileName, resTxFN, fluff );
     }
 }
 
@@ -146,6 +158,10 @@ void FileTransaction::on_resultTransFileNameSelect_clicked()
     handler->updateResultTxPath(flInfo.path());
 
     ui->resultingTxFileName->setText(fileName);
+}
+
+void FileTransaction::saveFluffSetting(bool fluffSetting) {
+    handler->getContext()->appContext->setFluff(fluffSetting);
 }
 
 

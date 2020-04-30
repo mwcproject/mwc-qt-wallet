@@ -19,6 +19,7 @@
 #include "../util/address.h"
 #include "../state/g_Send.h"
 #include "../state/timeoutlock.h"
+#include "../dialogs/g_sendconfirmationdlg.h"
 #include "../dialogs/w_selectcontact.h"
 #include "../util/ui.h"
 
@@ -162,14 +163,18 @@ void SendOnline::on_sendButton_clicked()
         return; // User reject something
 
     // Ask for confirmation
-    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this,"Confirm Send request",
-                                  "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " mwc to address\n" + address,
-                                  "Decline", "Confirm", false, true, 1.0, state->getWalletPassword(), control::MessageBox::RETURN_CODE::BTN2 ) )
-        return;
+    dlg::SendConfirmationDlg confirmDlg(this, "Confirm Send Request",
+                                        "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " mwc to address\n" + address,
+                                        1.0, state->getWalletPassword(), state->getContext()->appContext->isFluffSet() );
+    connect(&confirmDlg, &dlg::SendConfirmationDlg::saveFluffSetting, this, &SendOnline::saveFluffSetting);
+    if (confirmDlg.exec() == QDialog::Accepted) {
+        if (dlg::SendConfirmationDlg::RETURN_CODE::CONFIRM != confirmDlg.getRetCode())
+            return;
 
-    ui->progress->show();
-
-    state->sendMwcOnline( selectedAccount, res.second, address, amount, description, apiSecret, outputs, sendParams.changeOutputs );
+        bool fluff = confirmDlg.getFluffSetting();
+        ui->progress->show();
+        state->sendMwcOnline( selectedAccount, res.second, address, amount, description, apiSecret, outputs, sendParams.changeOutputs, fluff );
+    }
 }
 
 void SendOnline::sendRespond( bool success, const QStringList & errors ) {
@@ -202,6 +207,10 @@ void SendOnline::on_sendEdit_textChanged(const QString & address)
         ui->apiSecretEdit->show();
     else
         ui->apiSecretEdit->hide();
+}
+
+void SendOnline::saveFluffSetting(bool fluffSetting) {
+    state->getContext()->appContext->setFluff(fluffSetting);
 }
 
 

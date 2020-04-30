@@ -41,6 +41,7 @@ void setMwcGuiWalletConf( QString conf );
  * COnfiguration for mwc-mq-wallet
  * @param mwcPath               - path to mwc-node.  Not used now
  * @param wallet713path         - path to mwc713
+ * @param mwczipPath            - path to mwczip, small tool to zip files
  * @param mainStyleSheetPath    - path to main (non modal) stylesheet
  * @param dialogsStyleSheetPath - path to modal dialogs stylesheet (changes set to the main stylesheet)
  * @param airdropUrlMainNetUrl  - Airdrop server claims URL for main net
@@ -49,7 +50,7 @@ void setMwcGuiWalletConf( QString conf );
  * @param timeoutMultiplier     - Multiplier for jobs timeouts. Default is 1.0
  * @param useMwcMqS             - true: use mwc mqs for slates exchange.  false: using mwc mq (non secure grin box) for slates exchange
  */
-void setConfigData(WALLET_RUN_MODE runMode, QString mwcPath, QString wallet713path,
+void setConfigData(WALLET_RUN_MODE runMode, QString mwcPath, QString wallet713path, QString mwczipPath,
                    QString airdropUrlMainNetUrl, QString airdropUrlTestNetUrl,
                    QString hodlUrlMainNetUrl, QString hodlUrlTestNetUrl,
                    int64_t logoutTimeMs,
@@ -57,13 +58,17 @@ void setConfigData(WALLET_RUN_MODE runMode, QString mwcPath, QString wallet713pa
                    bool useMwcMqS,
                    int sendTimeoutMs);
 
+// For Unit tests only
+void setMwcZipPath(const QString & mwcZipPath);
+
 
 // Note, workflow for config not enforced. Please don't abuse it
 const QString & getMwc713conf();
 const QString & getMwcGuiWalletConf();
 
-const QString & getMwcpath(); // Not using now because so far there is no local node is running
+const QString & getMwcPath(); // Not using now because so far there is no local node is running
 const QString & getWallet713path();
+const QString & getMwcZipPath();
 const QString & getAirdropMainNetUrl();
 const QString & getAirdropTestNetUrl();
 const QString & getHodlMainNetUrl();

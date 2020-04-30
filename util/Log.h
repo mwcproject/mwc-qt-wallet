@@ -53,7 +53,13 @@ namespace logger {
     public slots:
         void onAppend2logs(bool addDate, QString prefix, QString line );
     private:
-        QFile * logFile;
+        void rotateLogFileIfNeeded();
+        void openLogFile();
+    private:
+        const QString logPath;
+        const QString logFileName;
+        QFile * logFile = nullptr;
+        int counter = 0;
     };
 
     // Must be call before first log usage
