@@ -79,7 +79,7 @@ void HodlNode::on_viewOutputsButton_clicked()
     QVector<core::HodlOutputInfo> outputs = state->getContext()->hodlStatus->getHodlOutputs("");
 
  /*
-    Outputs that was discovered by HODL server during last scan:<br>
+    Outputs that were discovered by HODL server during last scan:<br>
   <table>
     <tr>
       <th>Commitment</th>
@@ -97,7 +97,7 @@ void HodlNode::on_viewOutputsButton_clicked()
   */
 
       int limit = 50;
-      QString result = "Outputs that was discovered by HODL server during last scan:<br>"
+      QString result = "Outputs that were discovered by HODL server during last scan:<br>"
                        "<table>"
                        "  <tr>"
                        "    <th>Commitment</th>"
