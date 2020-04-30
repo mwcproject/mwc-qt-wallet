@@ -33,8 +33,7 @@ void WalletNotes::onLoginResult(bool ok) {
     Q_UNUSED(ok)
     qDebug("WalletNotes::onLoginResult called");
 
-    if (config::isOnlineWallet()) {
-        Q_ASSERT(config::isOnlineWallet() || config::isColdWallet());
+    if (config::isOnlineWallet() || config::isColdWallet()) {
         context->wallet->getRootPublicKey("");
         walletId = "";
     }
