@@ -175,7 +175,7 @@ void InputPassword::onLoginResult(bool ok) {
 
                         if (!message.isEmpty()) {
                             message = "Your wallet has activated foreign API " + message;
-                            message += "\n\nFor your security MWC team recommends setup your wallet properly and safe.";
+                            message += "\n\nIt is reccomended that you use standard security guidelines.";
 
                             control::MessageBox::messageText(nullptr, "WARNING", message);
 
