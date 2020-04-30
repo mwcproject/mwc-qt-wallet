@@ -130,6 +130,9 @@ public:
     // This info needed in many cases and we don't want spend time every time for that.
     virtual QVector<AccountInfo>  getWalletBalance(bool filterDeleted) const  override;
 
+    // Get outputs that was collected for this wallet. Outputs should be ready with balances
+    virtual const QMap<QString, QVector<wallet::WalletOutput> > & getwalletOutputs() const override;
+
     virtual QString getCurrentAccountName()  override {return currentAccount;}
 
     // Request sync (update_wallet_state) for the

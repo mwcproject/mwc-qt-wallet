@@ -154,6 +154,13 @@ QVector<AccountInfo> MockWallet::getWalletBalance(bool filterDeleted) const {
     return accountInfo;
 }
 
+static QMap<QString, QVector<wallet::WalletOutput> > emptyOutputs;
+
+// Get outputs that was collected for this wallet. Outputs should be ready with balances
+const QMap<QString, QVector<wallet::WalletOutput> > &  MockWallet::getwalletOutputs() const {
+    return emptyOutputs;
+}
+
 // Request Wallet balance update. It is a multistep operation
 // Check signal: onWalletBalanceUpdated
 //          onWalletBalanceProgress

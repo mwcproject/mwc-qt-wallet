@@ -675,3 +675,24 @@ QGroupBox::title {
     left: 7px;
     padding: 0px 5px 0px 5px;
 }
+
+QMenuBar {
+    color: white;
+}
+QMenuBar::item:selected { /* when selected using mouse or keyboard */
+    background: #9759d0;
+}
+
+QMenu {
+    background-color: #9759d0;
+    color: white;
+}
+
+QMenu::item:disabled {
+    color: #cc9afb;
+}
+
+QMenu::item:selected {
+    background: #E2CCF7;
+    color: #3600C9;
+}
