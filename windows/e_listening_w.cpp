@@ -122,12 +122,13 @@ void Listening::updateStatuses( const QPair<bool,bool> & listenerStatus, const Q
         if ( !walletConfig.hasTls() )
             warningStr += "WARNING: You are using non secure http connection.";
 
+        /*  API secret normally is off and it is a vulnarability. non tls/ssl conneciton is the only issue
         if (walletConfig.foreignApiSecret.isEmpty() ) {
             if (!warningStr.isEmpty())
                 warningStr+="\n";
 
             warningStr += "WARNING: Authorization with api secret is disabled.";
-        }
+        } */
 
         ui->http_warnings->setText(warningStr);
     } else {

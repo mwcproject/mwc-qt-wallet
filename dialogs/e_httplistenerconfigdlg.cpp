@@ -250,8 +250,26 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
         config.tlsCertificateKey = "";
     }
 
+    QString message;
+    if (config.hasForeignApi()) {
+        if (config.foreignApiSecret.isEmpty())
+            message += "without any authorization";
+
+        if (!config.hasTls()) {
+            if (!message.isEmpty())
+                message += " and ";
+
+            message += "with non secure HTTP connection. Please consider to setup TLS certificates for your security.";
+        }
+
+        if (!message.isEmpty()) {
+            message = "Warning. Your wallet has activated foreign API " + message + "\n\n";
+        }
+    }
+
+
     if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText( this, "Warning",
-            "Foreign API configuration require to relogin. If mwc713 will not be able to start with those settings, they will be reverted back to default.",
+            message + "Foreign API configuration require to relogin. If mwc713 will not be able to start with those settings, they will be reverted back to default.",
             "Cancel", "Continue", false, true ) ) {
         accept();
     }

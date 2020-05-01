@@ -154,7 +154,8 @@ void InputPassword::onLoginResult(bool ok) {
 
             context->wallet->getNodeStatus();
 
-            if (! config::isOnlineNode()) {
+            /*  Users don't want that. It is too much to show that every start
+              if (! config::isOnlineNode()) {
                 if (!foreignAPIwasReported) {
                     // Check if foregn API is activated and it is not safe
                     wallet::WalletConfig config = context->wallet->getWalletConfig();
@@ -184,7 +185,7 @@ void InputPassword::onLoginResult(bool ok) {
                     }
                     foreignAPIwasReported = true;
                 }
-            }
+            }*/
         }
 
     }
