@@ -657,6 +657,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
 
         case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_LISTEN: {
             nextTimeLimit += int64_t(RECEIVE_BLOCK_LISTEN * config::getTimeoutMultiplier());
+            nodeOutOfSyncCounter = 0; // It is still normal syncronization, need to reset the counter
 
             // message: 2a695957b396 at 102204 from 34.238.121.224:13414 [in/out/kern: 0/1/1] going to process.
             int idx1 = message.indexOf("at ");
