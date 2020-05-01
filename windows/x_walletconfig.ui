@@ -57,9 +57,9 @@
       <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tab_main">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -716,7 +716,7 @@ your wallet activity never stored in the logs.</string>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="tab_wallet">
       <attribute name="title">
        <string>Wallet</string>
       </attribute>
