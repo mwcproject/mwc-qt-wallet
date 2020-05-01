@@ -640,6 +640,16 @@ QTabWidget::tab-bar{
 	left: 52px;
 }
 
+QWidget#tab_main {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                  stop: 0 #9E00E7, stop: 0.9 #3600C9, stop: 1 #3600C9);
+}
+
+QWidget#tab_wallet {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                  stop: 0 #9E00E7, stop: 0.9 #3600C9, stop: 1 #3600C9);
+}
+
 QTabBar::tab{
     color: white;
     border-right: 2px solid #FFFFFF;
