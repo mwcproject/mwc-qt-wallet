@@ -1,11 +1,11 @@
-# Claimong process for HODL
+# Claiming process for HODL
 
-Here is a guide how to claim your MWC for HODL program. 
-Claims should be processed with Online Wallet (Hot Wallet), but it is possible to claim for Cold Wallet instance for that.
+This guide will explain how to claim HODL rewards.
+Claims are normally processed with an Online Wallet (Hot Wallet), but it is possible to claim with a Cold Wallet instance.
 
 ## Claim MWC for Online Wallet
 
-Start your online hot wallet nad select HODL page. If your wallet is enrolled into the HODL program, you should see non zero "HODL amount" and something available to claim.
+Start your online hot wallet and select the HODL tab. If your wallet is enrolled in the HODL program, you should see non-zero "HODL amount" and something available to claim.
 
 ![](hodl_claims_images/hodl_page.png)
 
@@ -25,19 +25,19 @@ Press OK. You are done. You should see the transaction status "Response accepted
 
 ![](hodl_claims_images/claiming_done.png)
 
-Finalization process will take a long time because it will be done manually offline. When your transaction will be processed,
+Finalization process may take a while because it will be done manually offline. When your transaction is processed,
 status will be changed to 'Finalized'.
 
 
 ## Claim MWC for Cold (OFFLINE) wallet.
 
-Please note, this workflow required 2 wallets. Your offline Cold Wallet that you will need to sign the message and Online Hot Wallet that 
+Please note, this workflow requires 2 wallets. Your offline cold wallet that you will need to sign the message and your online hot wallet that 
 will be used for claims. Coins will be sent to your hot wallet. Then you can transfer them to your cold wallet as usual.
 
-Start your online hot wallet. You you don't have it, please create a new wallet for claiming.
+Start your online hot wallet. If you don't have it, please create a new hot wallet for claiming.
 
-Select HODL page at hot wallet. HODL server said that this wallet is not registered and it is expected. You will claim for another wallet.
-Press "Claims" button to continue.  
+Select the HODL tab in the hot wallet. HODL server will say that this wallet is not registered and it is expected. You will claim for another wallet.
+Press "Claims" button to continue.
 
 ![](hodl_claims_images/Hodl_not_registered.png)
 
@@ -45,7 +45,7 @@ Uncheck the "I am claiming MWC for this wallet". Now you need to obtain public k
 
 ![](hodl_claims_images/claim_for_cold1.png)
 
-Start your Cold Wallet and select HODL Page there. Please copy 'Wallet root public key hash' into your Hot wallet at the form above
+Start your Cold Wallet and select HODL tab there. Please copy 'Wallet root public key hash' into your Hot wallet at the form above
 
 ![](hodl_claims_images/hodl_cold1.png)
 
@@ -61,15 +61,15 @@ During claiming process you will be asked to sign the message with your Cold wal
 
 ![](hodl_claims_images/hot_sign_massage.png)
 
-At your Cold wallet, HODL Page, input the message to sign and press "Sign" button
+In your cold wallet, HODL Page, input the message to sign and press "Sign" button
 
 ![](hodl_claims_images/cold_sign1.png)
 
-Copy "Signature" value to your Hot wallet at the form above.
+Copy "Signature" value to your hot wallet at the form above.
 
 ![](hodl_claims_images/Cold_sign2.png)
 
-Input the signature into the Hot Wallet and press "Continue"
+Input the signature into the hot wallet and press "Continue"
 
 ![](hodl_claims_images/hot_signature.png)
 
@@ -81,5 +81,5 @@ Press OK. You are done. You should see the transaction status "Response accepted
 
 ![](hodl_claims_images/claiming_done.png)
 
-Finalization process will take a long time because it will be done manually offline. When your transaction will be processed,
+Finalization process may take a while because it will be done manually offline. When your transaction is processed,
 status will be changed to 'Finalized'.
