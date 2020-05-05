@@ -121,6 +121,9 @@
          <height>40</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Refresh claim status data</string>
+       </property>
        <property name="text">
         <string>Refresh</string>
        </property>
@@ -141,7 +144,7 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>Open Sign Up page in your browser</string>
+        <string>Start claiming process</string>
        </property>
        <property name="text">
         <string>Claim MWC</string>
@@ -318,14 +321,14 @@ t</string>
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>ListWithColumns</class>
