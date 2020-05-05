@@ -1,16 +1,16 @@
 # Contents : 
 
+## Claiming Rewards
+
+- [Claiming HODL Rewards](/hodl_claims.md)
+
+- [Claiming Airdrop Rewards](/claiming.md)
+
 ## Building
 
 - [Building MAC](/BUILDING_MAC.md)
 
 - [Building Windows](/BUILD_WINDOWS.md)
-
-## Building
-
-- [Claiming HODL Rewards](/hodl_claims.md)
-
-- [Claiming Airdrop Rewards](/claiming.md)
 
 ## Setup Cold Wallet 
 
