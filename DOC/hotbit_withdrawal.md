@@ -25,17 +25,17 @@ Hotbit usually processes the MWC withdrawals within a few minutes, usually less 
 
 Click on the "Fund" tab then "Deposits & Withdrawals".
 
-![Deposits and Withdrawals](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/Screen%20Shot%202019-12-04%20at%204.57.38%20PM.png)
+![Deposits and Withdrawals](exchange_images/Screen%20Shot%202019-12-04%20at%204.57.38%20PM.png)
 
 # Select the Receive tab from your wallet.
 
-![Receive Tab](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/Screen_Shot_2019-12-04_at_8.45.02_AM_50.png)
+![Receive Tab](exchange_images/Screen_Shot_2019-12-04_at_8.45.02_AM_50.png)
 
 # Enter your http(s) receiving address into Hotbit's UI.
 
 First click "Withdrawals" under MWC. You will see a section that looks like this:
 
-![Withdrawals](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/Screen%20Shot%202019-12-04%20at%205.11.18%20PM.png)
+![Withdrawals](exchange_images/Screen%20Shot%202019-12-04%20at%205.11.18%20PM.png)
 
 Click the +Add button you will now see two text areas: "Label" and "Withdraw Address".
 You may put anything you want in the "label" field.
@@ -57,7 +57,7 @@ To save the new address, you will need to have an amount set in the "MWC Withdra
 
 You will see a dialog box that looks like this:
 
-![Dialog](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/Screen%20Shot%202019-12-04%20at%205.18.29%20PM.png)
+![Dialog](exchange_images/Screen%20Shot%202019-12-04%20at%205.18.29%20PM.png)
 
 Follow the instructions in the dialog box by entering your email and submitting the code sent to you via email and enter your Google authenticator code.
 
@@ -69,7 +69,7 @@ Your wallet will still be listening even if you are locked out due to inactivity
 
 After your Withdrawal is processed by Hotbit you will see a dialog box like this in your mwc-qt-wallet:
 
-![Confirm](https://raw.githubusercontent.com/mwcproject/mwc-qt-wallet/master/DOC/Screen%20Shot%202019-12-04%20at%205.20.58%20PM.png)
+![Confirm](exchange_images/Screen%20Shot%202019-12-04%20at%205.20.58%20PM.png)
 
 You should now have the funds in your wallet.
 
