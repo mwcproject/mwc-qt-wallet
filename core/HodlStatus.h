@@ -89,7 +89,7 @@ public:
     // Hex representation of HSA256 hash from rootpublickey binary representation
     QString getRootPubKeyHash() const {return rootPubKeyHash;}
 
-    bool isInHodl( const QString & hash) const {return inHodl.value(getHash(hash), false) || hodlOutputs.size()>0;}
+    bool isInHodl( const QString & hash) const {return inHodl.value(getHash(hash), false) || hodlOutputs.value(getHash(hash)).size()>0;}
     bool hasHodlOutputs() const;
     bool hasAmountToClaim() const;
 
@@ -103,9 +103,9 @@ public:
     QVector<HodlClaimStatus> getClaimsRequestStatus(const QString & hash) const { return claimStatus.value( getHash(hash)); }
     void lockClaimsRequestStatus(const QString & hash, int claimId);
 
-    bool hasAnyOutputsInHODL() const { return !hodlOutputs.isEmpty();}
+    bool hasAnyOutputsInHODL() const { return ! hodlOutputs.value(getHash("")).isEmpty();}
 
-    bool isOutputInHODL(const QString & output) const {return hodlOutputs.contains(output);}
+    bool isOutputInHODL(const QString & output) const {return hodlOutputs.value(getHash("")).contains(output);}
 
     // return empty if not exist
     HodlOutputInfo getHodlOutput(const QString & hash, const QString & output) const {return hodlOutputs.value(getHash(hash)).value(output);}
