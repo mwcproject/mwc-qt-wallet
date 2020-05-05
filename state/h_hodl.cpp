@@ -565,9 +565,11 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                 QString errMsg = jsonRespond["error_message"].toString();
                 QString errorCode = jsonRespond["error_code"].toString();
 
-                QString error = "Unable to reteive HODL reward data. Error Code: " + errorCode + "; "  + errMsg;
-                context->hodlStatus->setError( TAG_GET_HODL_REWARD, error);
-                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, error);
+                if (!errMsg.contains("Not registered", Qt::CaseInsensitive)) {
+                    QString error = "Unable to retrieve HODL reward data. Error Code: " + errorCode + "; " + errMsg;
+                    context->hodlStatus->setError(TAG_GET_HODL_REWARD, error);
+                    notify::appendNotificationMessage(notify::MESSAGE_LEVEL::CRITICAL, error);
+                }
             }
 
             if (success)
