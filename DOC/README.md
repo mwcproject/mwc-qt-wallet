@@ -20,7 +20,7 @@
 
 ### Exchange Examples
 Exchanges may handle Deposits and Withdrawals with different Methods (File/Online).
-To Setup your wallet to Listen please consult below Documentations on how to Receive/Send Funds. 
+To Setup your wallet to Listen please consult below Documents on how to Receive/Send Funds. 
 
 - [HTTP Example: Hotbit](hotbit_withdrawal.md.md)
 
