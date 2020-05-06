@@ -4,7 +4,7 @@ This page will explain how to withdraw MWC from Hotbit into the mwc-qt-wallet. W
 
 This is a Legacy Document and may become out-dated as Exchanges evolve and Implement different Methods to Deposit and Withdraw.
 As of writing this Document Hotbit allows withdrawals and deposits using the Online method and serves as an example for an "HTTP Exchange"
-To Setup your Wallet for Listening please reffer to this [Guides](https://github.com/mwcproject/docs) depending on your Wallet.
+To Setup your Wallet for Listening please reffer to this [Guides](https://github.com/mwcproject/docs) depending on your Setup.
 Futhermore it is recommended that you use Chrome on Hotbit. Other browsers may work but everything in this tutorial has been tested using Chrome.
 
 You will want to make sure that your MWC wallet is:
@@ -20,6 +20,7 @@ When using the Online method the Receiver's wallet *must* be listening for the t
 
 Hotbit usually processes the MWC withdrawals within a few minutes, usually less than 5-10, of the request being made. However, there have been some reports of it taking Hotbit over an hour to broadcast the transaction.
 
+For Detailed Instructions on how to receive using different Methods to Setup everything please reffer to this [Guides](https://github.com/mwcproject/docs) depending on your wanted Setup)
 
 # Go to Withdrawals page.
 
@@ -40,7 +41,7 @@ First click "Withdrawals" under MWC. You will see a section that looks like this
 Click the +Add button you will now see two text areas: "Label" and "Withdraw Address".
 You may put anything you want in the "label" field.
 
-For "Withdraw address" enter your HTTP address, depending on how you Setup your Wallet. (reffer to this [Guides](https://github.com/mwcproject/docs) depending on your Wallet)
+For "Withdraw address" enter your HTTP address, depending on how you Setup your Wallet. 
 
 This is *very important* as if you put ANYTHING other than the address your MWC wallet is listening for then the withdrawal process will fail and you will have to open a support issue with Hotbit to complete your withdrawal.
 
@@ -79,4 +80,4 @@ IMPORTANT: After an hour or so, please make sure to resync with your full node. 
 
 At this point you may want to look into our cold storage project here: https://github.com/mwcproject/coldstorage
 
-This version uses command line. A GUI version for cold storage can be achieved using the QT Wallet, see: https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md
+Above version uses command line. A GUI version for cold storage can be achieved using the QT Wallet, see: https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md
