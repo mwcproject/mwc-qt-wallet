@@ -596,7 +596,7 @@ void wnd::WalletConfig::on_logout_30_clicked()
 
 void wnd::WalletConfig::on_logout_never_clicked()
 {
-    currentLogoutTimeout = -1;
+    currentLogoutTimeout = 1000000000;
     updateButtons();
 }
 
@@ -616,9 +616,7 @@ void WalletConfig::updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartK
 }
 
 void WalletConfig::updateAutoLogoutStateUI(int64_t time) {
-    if (time < 0)
-        ui->logout_never->setChecked(true);
-    else if(time < 4 * 60)
+    if(time < 4 * 60)
         ui->logout_3->setChecked(true);
     else if(time < 7.5 * 60)
         ui->logout_5->setChecked(true);
@@ -626,8 +624,10 @@ void WalletConfig::updateAutoLogoutStateUI(int64_t time) {
         ui->logout_10->setChecked(true);
     else if(time < 25 * 60)
         ui->logout_20->setChecked(true);
-    else
+    else if(time < 35 * 60)
         ui->logout_30->setChecked(true);
+    else
+        ui->logout_never->setChecked(true);
 }
 
 void WalletConfig::on_outputLockingCheck_stateChanged(int check)
