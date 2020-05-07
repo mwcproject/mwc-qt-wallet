@@ -628,7 +628,7 @@ void WalletConfig::updateAutoLogoutStateUI(int64_t time) {
         ui->logout_10->setChecked(true);
     else if(time < 25 * 60)
         ui->logout_20->setChecked(true);
-    else if(time < 35 * 60)
+    else
         ui->logout_30->setChecked(true);
 }
 
