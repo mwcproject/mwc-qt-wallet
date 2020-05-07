@@ -25,6 +25,7 @@ class WalletConfig;
 
 namespace state {
     class WalletConfig;
+    class StateMachine;
 }
 
 namespace wnd {

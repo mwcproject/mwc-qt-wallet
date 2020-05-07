@@ -188,8 +188,6 @@ QPair<bool, QString> readConfig(QApplication & app) {
     int     logoutTimeout = logoutTimeoutStr.toInt(&logoutTimeoutOk);
     if (!logoutTimeoutOk || logoutTimeoutStr.isEmpty() )
         logoutTimeout = 15*60;
-    else if (logoutTimeout < 0)
-        logoutTimeout = 1000000000;
 
     double timeoutMultiplierVal = timeoutMultiplier.isEmpty() ? 2.0 : timeoutMultiplier.toDouble();
     if ( timeoutMultiplierVal < 0.01 )

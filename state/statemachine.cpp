@@ -37,6 +37,7 @@
 #include "u_nodeinfo.h"
 #include "g_Finalize.h"
 #include "y_selectmode.h"
+#include <QDebug>
 
 
 namespace state {
@@ -186,7 +187,11 @@ bool StateMachine::isActionWindowMode() const {
 
 // Reset logout time.
 void StateMachine::resetLogoutLimit() {
-    logoutTime = QDateTime::currentMSecsSinceEpoch() + config::getLogoutTimeMs();
+    if (config::getLogoutTimeMs() < 0)
+        logoutTime = 0;
+    else
+        logoutTime = QDateTime::currentMSecsSinceEpoch() + config::getLogoutTimeMs();
+    qDebug() << "haha" << config::getLogoutTimeMs();
     blockLogoutCounter = 0;
 }
 
@@ -228,7 +233,7 @@ void StateMachine::timerEvent(QTimerEvent *event) {
         return;
 
     // Check if timer expired and we need to logout...
-    if (logoutTime==0)
+    if (logoutTime == 0)
         return;
 
     if (QDateTime::currentMSecsSinceEpoch() > logoutTime ) {
