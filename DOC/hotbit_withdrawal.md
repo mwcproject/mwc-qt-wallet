@@ -3,8 +3,8 @@ This page will explain how to withdraw MWC from Hotbit into the mwc-qt-wallet. W
 # Before you start
 
 This is a Legacy Document and may become out-dated as Exchanges evolve and Implement different Methods to Deposit and Withdraw.
-As of writing this Document Hotbit allows withdrawals and deposits using the Online method and serves as an example for an "HTTP Exchange"
-To Setup your Wallet for Listening please reffer to this [Guides](https://github.com/mwcproject/docs) depending on your Setup.
+As of writing this Document Hotbit allows withdrawals and deposits using the Online method and serves as an example for an "HTTP Exchange" <br>
+To Setup your Wallet for Listening *please reffer to this [Guides](https://github.com/mwcproject/docs)* depending on your Setup.
 Futhermore it is recommended that you use Chrome on Hotbit. Other browsers may work but everything in this tutorial has been tested using Chrome.
 
 You will want to make sure that your MWC wallet is:
