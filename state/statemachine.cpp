@@ -37,7 +37,6 @@
 #include "u_nodeinfo.h"
 #include "g_Finalize.h"
 #include "y_selectmode.h"
-#include <QDebug>
 
 
 namespace state {
@@ -191,7 +190,6 @@ void StateMachine::resetLogoutLimit() {
         logoutTime = 0;
     else
         logoutTime = QDateTime::currentMSecsSinceEpoch() + config::getLogoutTimeMs();
-    qDebug() << "haha" << config::getLogoutTimeMs();
     blockLogoutCounter = 0;
 }
 
