@@ -60,7 +60,6 @@ MWC713::MWC713(QString _mwc713path, QString _mwc713configPath, core::AppContext 
     // Listening for Output Locking changes
     QObject::connect(appContext, &core::AppContext::onOutputLockChanged, this, &MWC713::onOutputLockChanged, Qt::QueuedConnection);
 
-    void    onOutputLockChanged(QString commit);
 }
 
 MWC713::~MWC713() {

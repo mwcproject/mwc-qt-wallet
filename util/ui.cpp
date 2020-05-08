@@ -249,7 +249,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     if ( !hodlStatus->hasAnyOutputsInHODL() && !appContext->isLockOutputEnabled() )
         return true; // Nothing in HODL, let's wallet handle it
 
-    QVector<wallet::WalletOutput>  outputs = wallet->getwalletOutputs().value(accountName);
+    const QVector<wallet::WalletOutput>&  outputs = wallet->getwalletOutputs().value(accountName);
 
     QVector<QPair<wallet::WalletOutput, core::HodlOutputInfo>> hodlOuts;
     QVector<wallet::WalletOutput> freeOuts;
