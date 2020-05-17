@@ -440,8 +440,8 @@ void Mwc713InputParser::initSend() {
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SET_RECEIVE,
                                                 QVector<BaseTrieSection*>{
                                                         new TrieNewLineSection(),
-                                                        new TriePhraseSection("Incoming funds will be received in account: \""),
-                                                        new TrieAnySection(4000, TrieAnySection::NOT_NEW_LINE, "","\"", 1)
+                                                        new TriePhraseSection("Incoming funds will be received in account: "),
+                                                        new TrieAnySection(4000, TrieAnySection::NOT_NEW_LINE, "","", 1)
                                                 }));
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_SENT_TO,
