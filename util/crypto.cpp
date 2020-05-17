@@ -70,15 +70,15 @@ namespace crypto {
     }
 
     // Apply hash to given key and return a string
-    QString getHSA256KeyHash(const QString& key) {
-        QString rootPubKeyHash = "";
+    QString calcHSA256Hash(const QString& key) {
+        QString hash = "";
         if (!key.isEmpty()) {
             QByteArray keyHex = key.toUtf8();
             if (!keyHex.isEmpty()) {
-                rootPubKeyHash = crypto::hex2str( crypto::HSA256( keyHex ) );
+                hash = crypto::hex2str( crypto::HSA256( keyHex ) );
             }
         }
-        return rootPubKeyHash;
+        return hash;
     }
 
     // Verify Public Key.

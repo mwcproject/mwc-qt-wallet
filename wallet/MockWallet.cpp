@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "MockWallet.h"
+#include "../util/crypto.h"
 
 namespace wallet {
 
@@ -57,7 +58,7 @@ MockWallet::~MockWallet() {}
 // Create new wallet and generate a seed for it
 // Check signal: onNewSeed( seed [] )
 void MockWallet::start2init(QString pass) {
-    password = pass;
+    passwordHash = crypto::calcHSA256Hash(pass);
     emit onNewSeed( TEST_SEED);
 }
 
@@ -67,7 +68,7 @@ void MockWallet::start2init(QString pass) {
 // Check Signals: onRecoverResult(bool ok, QString newAddress );
 void MockWallet::start2recover(const QVector<QString> &seed, QString pass) {
     Q_UNUSED(seed)
-    password = pass;
+    passwordHash = crypto::calcHSA256Hash(pass);
 
     emit onRecoverProgress( 2, 10 );
     emit onRecoverProgress( 4, 10 );
@@ -79,13 +80,13 @@ void MockWallet::start2recover(const QVector<QString> &seed, QString pass) {
 
 // Check signal: onLoginResult(bool ok)
 void MockWallet::loginWithPassword(QString pass) {
-    password = pass;
+    passwordHash = crypto::calcHSA256Hash(pass);
     emit onLoginResult(true);
 }
 
 // Current seed for runnign wallet
 // Check Signals: onGetSeed(QVector<QString> seed);
-void MockWallet::getSeed() {
+void MockWallet::getSeed(const QString & walletPassword) {
     emit onGetSeed(TEST_SEED);
 }
 

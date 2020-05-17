@@ -114,13 +114,13 @@ void FileTransaction::on_processButton_clicked()
         }
     }
 
-    QString walletPassword = handler->getContext()->wallet->getPassword();
+    QString walletPasswordHash = handler->getContext()->wallet->getPasswordHash();
     dlg::SendConfirmationDlg::RETURN_CODE retcode = dlg::SendConfirmationDlg::RETURN_CODE::DECLINE;
     bool fluff = false;
-    if (!walletPassword.isEmpty()) {
+    if (!walletPasswordHash.isEmpty()) {
         dlg::SendConfirmationDlg confirmDlg(this, "Confirm Finalize Request",
                                             "You are finalizing transaction for " + ui->mwcLabel->text(),
-                                            1.0, walletPassword,
+                                            1.0, walletPasswordHash,
                                             handler->getContext()->appContext->isFluffSet() );
         connect(&confirmDlg, &dlg::SendConfirmationDlg::saveFluffSetting, this, &FileTransaction::saveFluffSetting);
         if (confirmDlg.exec() == QDialog::Accepted) {
@@ -129,7 +129,7 @@ void FileTransaction::on_processButton_clicked()
         }
 
     }
-    if (walletPassword.isEmpty() || retcode == dlg::SendConfirmationDlg::RETURN_CODE::CONFIRM) {
+    if (walletPasswordHash.isEmpty() || retcode == dlg::SendConfirmationDlg::RETURN_CODE::CONFIRM) {
         ui->progress->show();
         handler->ftContinue( transactionFileName, resTxFN, fluff );
     }

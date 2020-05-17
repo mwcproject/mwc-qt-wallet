@@ -20,15 +20,17 @@
 #include <QTextBlock>
 #include <QScrollBar>
 #include <QThread>
+#include "../util/crypto.h"
 
 namespace control {
 
-MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2, bool default1, bool default2, double widthScale, QString password, RETURN_CODE _passBlockButton ) :
+// Password accepted as a HASH. EMpty String mean that no password is set.
+// After return, passwordHash value will have input raw Password value. So it can be user for wallet
+MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2, bool default1, bool default2, double widthScale, QString & passwordHash, RETURN_CODE _passBlockButton ) :
      MwcDialog(parent),
     ui(new Ui::MessageBox),
-    blockingPassword(password),
+    blockingPasswordHash(passwordHash),
     passBlockButton(_passBlockButton)
-
 {
     ui->setupUi(this);
 
@@ -81,7 +83,7 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
     ui->text3->setMinimumHeight( h );
     ui->text3->adjustSize();
 
-    if (blockingPassword.isEmpty()) {
+    if (blockingPasswordHash.isEmpty()) {
         ui->passwordFrame->hide();
     }
     else {
@@ -123,7 +125,7 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
 
     adjustSize();
 
-    if (!blockingPassword.isEmpty()) {
+    if (!blockingPasswordHash.isEmpty()) {
         ui->passwordEdit->setFocus();
     }
 }
@@ -138,46 +140,61 @@ void MessageBox::on_passwordEdit_textChanged(const QString &str)
 {
     QThread::msleep(200); // Ok for human and will prevent brute force from UI attack (really crasy scenario, better to attack mwc713 if you already get the host).
     control::MwcPushButtonNormal * btn2lock = passBlockButton == RETURN_CODE::BTN1 ? ui->button1 : ui->button2;
-    btn2lock->setEnabled(str == blockingPassword);
+    btn2lock->setEnabled( crypto::calcHSA256Hash(str) == blockingPasswordHash);
 }
 
 void MessageBox::on_button1_clicked()
 {
     retCode = RETURN_CODE::BTN1;
+    blockingPasswordHash = ui->passwordEdit->text();
     accept();
 }
 
 void MessageBox::on_button2_clicked()
 {
     retCode = RETURN_CODE::BTN2;
+    blockingPasswordHash = ui->passwordEdit->text();
     accept();
 }
 
 // One button, OK box
 //static
-void MessageBox::messageText( QWidget *parent, QString title, QString message, double widthScale, QString password ) {
-    MessageBox * msgBox = new MessageBox(parent, title, message, false, "OK", "", true,false, widthScale, password, RETURN_CODE::BTN1 );
+void MessageBox::messageText( QWidget *parent, QString title, QString message, double widthScale ) {
+    QString hash;
+    MessageBox * msgBox = new MessageBox(parent, title, message, false, "OK", "", true,false, widthScale, hash, RETURN_CODE::BTN1 );
     msgBox->exec();
     delete msgBox;
 }
 
-void MessageBox::messageHTML( QWidget *parent, QString title, QString message, double widthScale, QString password ) {
-    MessageBox * msgBox = new MessageBox(parent, title, message, true, "OK", "", true,false, widthScale, password, RETURN_CODE::BTN1 );
+void MessageBox::messageHTML( QWidget *parent, QString title, QString message, double widthScale ) {
+    QString hash;
+    MessageBox * msgBox = new MessageBox(parent, title, message, true, "OK", "", true,false, widthScale, hash, RETURN_CODE::BTN1 );
     msgBox->exec();
     delete msgBox;
 }
 
 // Two button box
 //static
-MessageBox::RETURN_CODE MessageBox::questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, double widthScale, QString password, RETURN_CODE blockButton ) {
-    MessageBox * msgBox = new MessageBox(parent, title, message, false, btn1, btn2, default1, default2, widthScale, password, blockButton);
+MessageBox::RETURN_CODE MessageBox::questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, double widthScale, QString & passwordHash, RETURN_CODE blockButton ) {
+    MessageBox * msgBox = new MessageBox(parent, title, message, false, btn1, btn2, default1, default2, widthScale, passwordHash, blockButton);
     msgBox->exec();
     RETURN_CODE  res = msgBox->getRetCode();
     delete msgBox;
     return res;
 }
-MessageBox::RETURN_CODE MessageBox::questionHTML( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, double widthScale, QString password, RETURN_CODE blockButton  ) {
-    MessageBox * msgBox = new MessageBox(parent, title, message, true, btn1, btn2, default1, default2, widthScale, password, blockButton);
+
+MessageBox::RETURN_CODE MessageBox::questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, double widthScale) {
+    QString hash;
+    MessageBox * msgBox = new MessageBox(parent, title, message, false, btn1, btn2, default1, default2, widthScale, hash, RETURN_CODE::BTN1);
+    msgBox->exec();
+    RETURN_CODE  res = msgBox->getRetCode();
+    delete msgBox;
+    return res;
+}
+
+MessageBox::RETURN_CODE MessageBox::questionHTML( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, double widthScale ) {
+    QString hash;
+    MessageBox * msgBox = new MessageBox(parent, title, message, true, btn1, btn2, default1, default2, widthScale, hash, RETURN_CODE::BTN1);
     msgBox->exec();
     RETURN_CODE  res = msgBox->getRetCode();
     delete msgBox;

@@ -19,10 +19,10 @@
 
 namespace state {
 
-ShowSeed::ShowSeed( StateContext * context) : State(context,  STATE::SHOW_SEED ) {
+ShowSeed::ShowSeed( StateContext * context) : State(context,  STATE::SHOW_SEED )
+{
     QObject::connect(context->wallet, &wallet::Wallet::onGetSeed,
                                    this, &ShowSeed::recoverPassphrase, Qt::QueuedConnection);
-
 }
 
 ShowSeed::~ShowSeed() {}
@@ -32,9 +32,11 @@ NextStateRespond ShowSeed::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     if (wnd==nullptr) {
+        QString walletPassword = context->appContext->pullCookie<QString>("password");
+
         wnd = (wnd::NewSeed*) context->wndManager->switchToWindowEx( mwc::PAGE_X_SHOW_PASSPHRASE,
                 new wnd::NewSeed( context->wndManager->getInWndParent(), this, context, QVector<QString>(), true ) );
-        context->wallet->getSeed();
+        context->wallet->getSeed(walletPassword);
     }
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }

@@ -50,7 +50,7 @@ public:
     virtual STARTED_MODE getStartedMode() override { return STARTED_MODE::NORMAL;}
 
     // ---- Wallet Init Phase
-    virtual void start(bool loginWithLastKnownPassword)  override { Q_UNUSED(loginWithLastKnownPassword); running=true; }
+    virtual void start()  override { running=true; }
 
     // Create new wallet and generate a seed for it
     // Check signal: onNewSeed( seed [] )
@@ -78,10 +78,10 @@ public:
 
     // Current seed for runnign wallet
     // Check Signals: onGetSeed(QVector<QString> seed);
-    virtual void getSeed() override;
+    virtual void getSeed(const QString & walletPassword) override;
 
     // Get last used password. Just don't export from DLL
-    virtual QString getPassword() override {return password;}
+    virtual QString getPasswordHash() override {return passwordHash;}
 
     //--------------- Listening
 
@@ -256,7 +256,7 @@ public:
 private:
     core::AppContext * appContext; // app context to store current account name
 
-    QString password;
+    QString passwordHash;
     bool running = false;
     bool listener_mwcmqs = false;
     bool listener_keybase = false;

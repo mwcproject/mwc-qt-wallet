@@ -165,7 +165,7 @@ void SendOnline::on_sendButton_clicked()
     // Ask for confirmation
     dlg::SendConfirmationDlg confirmDlg(this, "Confirm Send Request",
                                         "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " mwc to address\n" + address,
-                                        1.0, state->getWalletPassword(), state->getContext()->appContext->isFluffSet() );
+                                        1.0, state->getWalletPasswordHash(), state->getContext()->appContext->isFluffSet() );
     connect(&confirmDlg, &dlg::SendConfirmationDlg::saveFluffSetting, this, &SendOnline::saveFluffSetting);
     if (confirmDlg.exec() == QDialog::Accepted) {
         if (dlg::SendConfirmationDlg::RETURN_CODE::CONFIRM != confirmDlg.getRetCode())

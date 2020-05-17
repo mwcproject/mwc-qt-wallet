@@ -39,9 +39,9 @@ class TaskSetReceiveAccount : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*2;
 
-    TaskSetReceiveAccount( MWC713 *wallet713, QString account, QString password ) :
+    TaskSetReceiveAccount( MWC713 *wallet713, QString account ) :
             Mwc713Task("TaskSetReceiveAccount",
-                       QString("set-recv ") + util::toMwc713input(account) + " -p " + util::toMwc713input(password),
+                       QString("set-recv ") + util::toMwc713input(account),
                        wallet713, "set-recv for " + account) {}
 
     virtual ~TaskSetReceiveAccount() override {}

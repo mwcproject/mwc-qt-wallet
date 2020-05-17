@@ -351,7 +351,7 @@ public:
     virtual STARTED_MODE getStartedMode() = 0;
 
     // ---- Wallet Init Phase
-    virtual void start(bool loginWithLastKnownPassword)   = 0;
+    virtual void start()   = 0;
     // Create new wallet and generate a seed for it
     // Check signal: onNewSeed( seed [] )
     virtual void start2init(QString password) = 0;
@@ -378,10 +378,10 @@ public:
 
     // Current seed for runnign wallet
     // Check Signals: onGetSeed(QVector<QString> seed);
-    virtual void getSeed()  = 0;
+    virtual void getSeed(const QString & walletPassword)  = 0;
 
     // Get last used password. Just don't export from DLL
-    virtual QString getPassword() = 0;
+    virtual QString getPasswordHash() = 0;
 
     //--------------- Listening
 

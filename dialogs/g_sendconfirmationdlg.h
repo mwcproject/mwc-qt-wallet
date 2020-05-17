@@ -36,7 +36,7 @@ public:
     enum class RETURN_CODE {DECLINE, CONFIRM};
 
     // widthScale - Horizontal scale for the dialog. Sometimes we need it wider.
-    explicit SendConfirmationDlg(QWidget *parent, QString title, QString message, double widthScale, QString password, bool fluffTxn );
+    explicit SendConfirmationDlg(QWidget *parent, QString title, QString message, double widthScale, QString passwordHash, bool fluffTxn );
     ~SendConfirmationDlg();
 
 public:
@@ -55,7 +55,7 @@ private:
 
     Ui::SendConfirmationDlg *ui;
     RETURN_CODE retCode = RETURN_CODE::DECLINE;
-    QString blockingPassword;
+    QString blockingPasswordHash;
 
     bool origFluffSetting = false;
     bool newFluffSetting = false;

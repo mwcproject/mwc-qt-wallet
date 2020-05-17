@@ -220,7 +220,7 @@ bool InitAccount::finishSeedVerification() {
             context->wallet->logout(true); // Stop the wallet with inti process first
 
             // Now need to start the normall wallet...
-            context->wallet->start(false);
+            context->wallet->start();
             context->wallet->loginWithPassword(pass);
 
             control::MessageBox::messageText(nullptr, "Congratulations!", "Thank you for confirming all words from your passphrase. Your wallet was successfully created");
@@ -329,7 +329,7 @@ void InitAccount::onRecoverResult(bool started, bool finishedWithSuccess, QStrin
 
     if (success) {
         // Now need to start the normall wallet...
-        context->wallet->start(false);
+        context->wallet->start();
         context->wallet->loginWithPassword(pass);
 
         // We are done. Wallet is provisioned and restarted...

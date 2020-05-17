@@ -20,13 +20,14 @@
 #include <QTextBlock>
 #include <QScrollBar>
 #include <QThread>
+#include "../util/crypto.h"
 
 namespace dlg {
 
-SendConfirmationDlg::SendConfirmationDlg( QWidget *parent, QString title, QString message, double widthScale, QString password, bool fluffTxn ) :
+SendConfirmationDlg::SendConfirmationDlg( QWidget *parent, QString title, QString message, double widthScale, QString passwordHash, bool fluffTxn ) :
      MwcDialog(parent),
     ui(new Ui::SendConfirmationDlg),
-    blockingPassword(password),
+    blockingPasswordHash(passwordHash),
     origFluffSetting(fluffTxn),
     newFluffSetting(fluffTxn)
 {
@@ -93,7 +94,7 @@ SendConfirmationDlg::SendConfirmationDlg( QWidget *parent, QString title, QStrin
 
     adjustSize();
 
-    if (!blockingPassword.isEmpty()) {
+    if (!blockingPasswordHash.isEmpty()) {
         ui->passwordEdit->setFocus();
     }
 }
@@ -107,7 +108,7 @@ SendConfirmationDlg::~SendConfirmationDlg()
 void SendConfirmationDlg::on_passwordEdit_textChanged(const QString &str)
 {
     QThread::msleep(200); // Ok for human and will prevent brute force from UI attack (really crasy scenario, better to attack mwc713 if you already get the host).
-    ui->confirmButton->setEnabled(str == blockingPassword);
+    ui->confirmButton->setEnabled( crypto::calcHSA256Hash(str) == blockingPasswordHash);
 }
 
 void SendConfirmationDlg::on_declineButton_clicked()

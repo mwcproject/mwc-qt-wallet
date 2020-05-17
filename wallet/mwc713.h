@@ -62,7 +62,7 @@ public:
     virtual STARTED_MODE getStartedMode() override { if (mwc713process==nullptr) {return STARTED_MODE::OFFLINE;} return startedMode;}
 
     // ---- Wallet Init Phase
-    virtual void start(bool loginWithLastKnownPassword)  override;
+    virtual void start()  override;
     // Create new wallet and generate a seed for it
     // Check signal: onNewSeed( seed [] )
     virtual void start2init(QString password)  override;
@@ -89,10 +89,10 @@ public:
 
     // Current seed for runnign wallet
     // Check Signals: onGetSeed(QVector<QString> seed);
-    virtual void getSeed()  override;
+    virtual void getSeed(const QString & walletPassword)  override;
 
     // Get last used password. Just don't export from DLL
-    virtual QString getPassword() override;
+    virtual QString getPasswordHash() override;
 
     //--------------- Listening
 
@@ -446,7 +446,7 @@ private:
     int64_t lastSyncTime = 0;
 private:
     // Temprary values, local values for states
-    QString walletPassword;
+    QString walletPasswordHash;
 
     QVector<AccountInfo> collectedAccountInfo;
 

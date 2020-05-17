@@ -59,9 +59,9 @@ class TaskAccountSwitch : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*7;
 
-    TaskAccountSwitch( MWC713 * _wallet713, QString accountName, QString password, bool _makeAccountCurrent ) :
-            Mwc713Task("TaskAccountSwitch", "account switch " +  util::toMwc713input(accountName) +
-                       (password.isEmpty() ? "" : " -p " +  util::toMwc713input(password)), _wallet713, "account switch " + accountName ),
+    TaskAccountSwitch( MWC713 * _wallet713, QString accountName,bool _makeAccountCurrent ) :
+            Mwc713Task("TaskAccountSwitch", "account switch " +  util::toMwc713input(accountName)
+                       , _wallet713, "account switch " + accountName ),
             switchAccountName(accountName), makeAccountCurrent(_makeAccountCurrent)
     {
         Q_ASSERT(accountName.length()>0);

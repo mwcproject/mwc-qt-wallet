@@ -432,16 +432,18 @@ void MainWindow::on_actionContacts_triggered()
 
 void MainWindow::on_actionShow_passphrase_triggered()
 {
-    QString password = wallet->getPassword();
+    QString passwordHash = wallet->getPasswordHash();
 
-    if ( !password.isEmpty() ) {
+    if ( !passwordHash.isEmpty() ) {
         if (control::MessageBox::RETURN_CODE::BTN2 !=
             control::MessageBox::questionText(this, "Wallet Password",
                                               "You are going to view wallet mnemonic passphrase.\n\nPlease input your wallet password to continue", "Cancel", "Confirm", false, true, 1.0,
-                                              password, control::MessageBox::RETURN_CODE::BTN2))
+                                              passwordHash, control::MessageBox::RETURN_CODE::BTN2))
             return;
     }
 
+    // passwordHash should contain raw password value form the messgage box
+    appContext->pushCookie<QString>("password", passwordHash);
     stateMachine->setActionWindow( state::STATE::SHOW_SEED );
 }
 

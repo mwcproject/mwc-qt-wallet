@@ -70,7 +70,7 @@ public:
     void sendMwcOffline(  const wallet::AccountInfo & account, int64_t amount, QString message, QString fileName,
             const QStringList & outputs, int changeOutputs );
 
-    QString getWalletPassword();
+    QString getWalletPasswordHash();
 
     bool isNodeHealthy() const {return nodeIsHealthy;}
 protected:

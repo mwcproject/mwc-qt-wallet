@@ -46,7 +46,7 @@ void WalletNotes::onRootPublicKey(bool success, QString errMsg, QString rootPubK
     qDebug("WalletNotes::onRootPublicKey called");
 
     if (success) {
-        walletId = crypto::getHSA256KeyHash(rootPubKey);
+        walletId = crypto::calcHSA256Hash(rootPubKey);
     }
 }
 

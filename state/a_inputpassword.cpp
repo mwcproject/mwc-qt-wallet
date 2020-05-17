@@ -62,7 +62,7 @@ NextStateRespond InputPassword::execute() {
 
         // Starting the wallet normally. The password is needed and it will be provided.
         // It is a first run, just need to login
-        context->wallet->start(false);
+        context->wallet->start();
 
         // As a node we can exit becuase no password is expected
         if (config::isOnlineNode()) {
@@ -100,11 +100,16 @@ void InputPassword::submitPassword(const QString & password) {
     // Check if we need to logout first. It is very valid case if we in lock mode
     if ( inLockMode ) {
         context->wallet->logout(true);
-        context->wallet->start(false);
+        context->wallet->start();
         inLockMode = false;
     }
 
     context->wallet->loginWithPassword( password );
+
+    if ( context->appContext->getActiveWndState() == STATE::SHOW_SEED ) {
+        context->appContext->pushCookie<QString>("password", password);
+    }
+
 }
 
 QPair<bool,bool> InputPassword::getWalletListeningStatus() {
