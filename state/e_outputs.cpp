@@ -53,7 +53,7 @@ Outputs::Outputs(StateContext * context) :
 {
     QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &Outputs::onWalletBalanceUpdated, Qt::QueuedConnection );
 
-    QObject::connect( context->wallet, &wallet::Wallet::onOutputs, this, &Outputs::onOutputs );
+    QObject::connect( context->wallet, &wallet::Wallet::onOutputs, this, &Outputs::onOutputs, Qt::QueuedConnection );
 
     QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
                       this, &Outputs::onNewNotificationMessage, Qt::QueuedConnection );

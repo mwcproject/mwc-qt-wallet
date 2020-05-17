@@ -38,8 +38,9 @@ public:
     QVector<wallet::AccountInfo> getWalletBalance();
 
     // nanoCoins < 0 - all funds
-    void transferFunds(const wallet::AccountInfo & accountFrom,
-                       const wallet::AccountInfo & accountTo,
+    // Note, accountInfo must be passed (or used inside method) by value because event loop can be run inside that method
+    void transferFunds(const wallet::AccountInfo accountFrom,
+                       const wallet::AccountInfo accountTo,
                        int64_t nanoCoins );
 
     void goBack();

@@ -128,6 +128,9 @@ void AccountTransfer::on_transferButton_clicked()
     int fromI = getAccountSelectionComboBoxCurrentIndex( ui->accountFromCB, true );
     int toI   = getAccountSelectionComboBoxCurrentIndex( ui->accountToCB, true );
 
+    if (fromI<0 || toI<0)
+        return; // erro message wwas shown to the user. Just exiting...
+
     if (fromI == toI) {
         control::MessageBox::messageText(this, "Incorrect Input", "Please select pair of different accounts to transfer coins.");
         return;
