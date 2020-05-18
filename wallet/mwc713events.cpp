@@ -151,8 +151,8 @@ void Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout ) {
 bool Mwc713EventManager::addFirstTask( Mwc713Task * task, int64_t timeout) {
     QMutexLocker l( &taskQMutex );
 
-    // timeout multiplier will be applyed to the task because we want apply this value as late as posiible.
-    // User might change it at any moment.
+    // We can push front a new tast only if current one is not running.
+    Q_ASSERT( taskQ.isEmpty() || !taskQ.front().wasStarted );
     taskQ.insert(0,taskInfo(task,timeout));
 
     return true;
@@ -168,12 +168,19 @@ void Mwc713EventManager::processNextTask() {
 
     // Check if we can perform the first task
     taskInfo & task = taskQ.front();
-    if (!task.wasProcessed) {
+    if (!task.wasStarted) {
 
         events.clear();
 
         qDebug() << "Executing the task: " + task.task->toDbgString();
-        task.wasProcessed = true; // reset state first, then process
+        task.wasStarted = true; // reset state first, then process
+        taskExecutionTimeLimit = 0;
+
+        QStringList taskList;
+        for (const auto & t : taskQ) {
+            taskList.push_back(t.task->toDbgString());
+        }
+        logger::logInfo( "Mwc713EventManager", "Task queue: " + taskList.join(", ") );
 
         logger::logTask( "Mwc713EventManager", task.task, "Starting..." );
         task.task->onStarted();
@@ -213,12 +220,12 @@ void Mwc713EventManager::timerEvent(QTimerEvent *event) {
     QString taskName = taskQ.front().task->getTaskName();
 
     if (QDateTime::currentMSecsSinceEpoch() > taskExecutionTimeLimit) {
-
         if (control::MessageBox::questionText(nullptr, "Warning", "mwc713 command execution is taking longer than expected.\nContinue to wait?",
                                           "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
             config::increaseTimeoutMultiplier();
             // Update the waiting time
 
+            // Note, here we might already have another task.
             if (!taskQ.isEmpty())
                 taskExecutionTimeLimit = QDateTime::currentMSecsSinceEpoch() +  (int64_t)(taskQ.front().timeout * config::getTimeoutMultiplier());
             return;
@@ -271,8 +278,11 @@ void Mwc713EventManager::executeTask(taskInfo task) {
 
     logger::logTask("Mwc713EventManager", task.task, "Executing");
 
-    task.task->processTask(events);
+    // Reset before processing because processing might tale some time
+    QVector<WEvent> evts(events);
     events.clear();
+
+    task.task->processTask(evts);
     delete task.task;
 
     processNextTask();

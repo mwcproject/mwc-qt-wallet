@@ -114,7 +114,7 @@ struct WEvent {
 
 struct taskInfo {
     Mwc713Task* task = nullptr; // task
-    bool        wasProcessed = false;
+    bool        wasStarted   = false;
     int         timeout = -1; // timeout for this task
 
     taskInfo() = default;
