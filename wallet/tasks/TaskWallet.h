@@ -219,7 +219,7 @@ public:
     const static int64_t TIMEOUT = 2000;
 
     TaskRootPublicKey( MWC713 * wallet713, const QString & msg) :
-            Mwc713Task("TaskSubmitFile", "getrootpublickey" +
+            Mwc713Task("TaskRootPublicKey", "getrootpublickey" +
                     (msg.isEmpty() ? "" : " --message " + util::toMwc713input(msg)),
                 wallet713, ""),
             message(msg) {}
