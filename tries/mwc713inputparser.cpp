@@ -155,7 +155,7 @@ void Mwc713InputParser::initNeedUnlock() {
 void Mwc713InputParser::initMwcMqAddress() {
         parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_YOUR_MWC_ADDRESS,
               QVector<BaseTrieSection*>{
-                      new TriePhraseSection("Your mwcmq address: "),   // 'Your mwcmq address' cover both mq & mqs cases
+                      new TriePhraseSection("Your mwcmqs address: "),   // 'Your mwcmq address' cover both mq & mqs cases
                   new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE,"","", 1) // mwc MQ address
               }));
 
