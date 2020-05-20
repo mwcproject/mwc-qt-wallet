@@ -147,9 +147,12 @@ void Hodl::registerAccountForHODL() {
 }
 
 void Hodl::claimMWC(const QString & hash) {
+    if (claimId>=0) {
+        control::MessageBox::messageText(nullptr,"HODL Claims", "Another HODL claim is in the progress. Please wait for that HODL claim finish or restart QT wallet.");
+        return;
+    }
 
     // Search for Claim ID...
-
     QVector<core::HodlClaimStatus> claims = context->hodlStatus->getClaimsRequestStatus(hash);
     core::HodlClaimStatus claimNow;
     for (const auto & cl : claims) {
@@ -346,6 +349,7 @@ void Hodl::onGetNextKeyResult( bool success, QString identifier, QString publicK
     else {
         reportMessageToUI("Claim request failed", "Unable to start claim process.\n" +
                                                   errorMessage );
+        resetClaimState();
     }
 }
 
@@ -693,6 +697,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
             }
         }
         else {
+            resetClaimState();
             reportMessageToUI("Claim request failed", "Unable to request a payment challenge." +
                                                       generateMessage(jsonRespond["error_message"].toString(), jsonRespond["error_code"].toInt( INT_MAX )));
         }
