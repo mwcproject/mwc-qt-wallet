@@ -15,7 +15,7 @@
 #ifndef C_PROGRESSWND_H
 #define C_PROGRESSWND_H
 
-#include <QWidget>
+#include "../core/PanelBaseWnd.h"
 
 namespace Ui {
 class ProgressWnd;
@@ -33,7 +33,7 @@ public:
 };
 
 
-class ProgressWnd : public QWidget
+class ProgressWnd : public core::PanelBaseWnd
 {
     Q_OBJECT
 

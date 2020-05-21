@@ -25,7 +25,7 @@
 namespace wnd {
 
 NewSeedTest::NewSeedTest(QWidget *parent, state::InitAccount *_state, int wordNumber) :
-    QWidget(parent),
+    core::PanelBaseWnd(parent),
     ui(new Ui::NewSeedTest),
     state(_state)
 {

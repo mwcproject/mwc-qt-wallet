@@ -15,7 +15,7 @@
 #ifndef INPUTPASSWORDW_H
 #define INPUTPASSWORDW_H
 
-#include <QWidget>
+#include "../core/PanelBaseWnd.h"
 
 namespace Ui {
 class InputPassword;
@@ -28,7 +28,7 @@ namespace state {
 
 namespace wnd {
 
-class InputPassword : public QWidget
+class InputPassword : public core::PanelBaseWnd
 {
     Q_OBJECT
 

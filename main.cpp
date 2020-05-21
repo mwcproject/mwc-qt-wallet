@@ -58,6 +58,7 @@
 #include "misk/DictionaryInit.h"
 #include "util/stringutils.h"
 #include "build_version.h"
+#include "core/WalletApp.h"
 
 #ifdef Q_OS_DARWIN
 namespace Cocoa
@@ -285,7 +286,7 @@ int main(int argc, char *argv[])
         }
     #endif
 
-        QApplication app(argc, argv);
+        core::WalletApp app(argc, argv);
         QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
         QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
@@ -523,6 +524,7 @@ int main(int argc, char *argv[])
 
         state::StateMachine * machine = new state::StateMachine(&context);
         mainWnd->setAppEnvironment( machine, wallet, &appContext);
+        app.setStateMachine(machine);
 
         if (mwc::isAppNonClosed()) {
             machine->start();

@@ -21,7 +21,7 @@
 namespace wnd {
 
 AirdropForBTC::AirdropForBTC(QWidget *parent, state::Airdrop * _state, QString _btcAddress, QString _challenge, QString _identifier) :
-    QWidget(parent),
+    core::PanelBaseWnd(parent),
     ui(new Ui::AirdropForBTC),
     state(_state),
     btcAddress(_btcAddress.trimmed()),

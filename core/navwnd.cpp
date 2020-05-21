@@ -16,6 +16,7 @@
 #include "navbar.h"
 #include <QResizeEvent>
 #include "navmenuaccount.h"
+#include "../state/statemachine.h"
 
 namespace core {
 
@@ -25,7 +26,8 @@ const int TOP_RIGHT_BTNS_CY = 15;
 
 const int NAV_MENU_WIDTH = 190;
 
-NavWnd::NavWnd(QWidget *parent,  state::StateContext * context, bool createNavigationButtons) : QWidget(parent)
+NavWnd::NavWnd(QWidget *parent,  state::StateContext * context, bool createNavigationButtons) :
+        PanelBaseWnd(parent)
 {
     if (createNavigationButtons) {
         topRightButtonWnd = new NavBar(this, context);

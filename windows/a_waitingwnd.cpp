@@ -20,7 +20,7 @@
 namespace wnd {
 
 WaitingWnd::WaitingWnd(QWidget *parent, WaitingWndState * _state, QString title, QString progressMessage) :
-    QWidget(parent),
+    core::PanelBaseWnd(parent),
     ui(new Ui::WaitingWnd),
     state(_state)
 {

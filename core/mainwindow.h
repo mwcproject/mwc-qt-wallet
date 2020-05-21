@@ -34,13 +34,6 @@ namespace core {
     class AppContext;
 }
 
-#ifdef Q_OS_DARWIN
-namespace Cocoa
-{
-    void changeTitleBarColor(WId winId, double red, double green, double blue);
-}
-#endif
-
 class QPushButton;
 
 namespace core {

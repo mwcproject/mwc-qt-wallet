@@ -15,7 +15,7 @@
 #ifndef NEWWALLETW_H
 #define NEWWALLETW_H
 
-#include <QWidget>
+#include "../core/PanelBaseWnd.h"
 
 namespace Ui {
 class NewWallet;
@@ -27,7 +27,7 @@ namespace state {
 
 namespace wnd {
 
-class NewWallet : public QWidget
+class NewWallet : public core::PanelBaseWnd
 {
     Q_OBJECT
 

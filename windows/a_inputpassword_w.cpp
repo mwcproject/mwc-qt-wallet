@@ -30,7 +30,7 @@
 namespace wnd {
 
 InputPassword::InputPassword(QWidget *parent, state::InputPassword * _state, state::WalletConfig * _configState, bool lockMode) :
-    QWidget(parent),
+    core::PanelBaseWnd(parent),
     ui(new Ui::InputPassword),
     state(_state),
     configState(_configState)

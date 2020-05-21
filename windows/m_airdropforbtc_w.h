@@ -15,7 +15,7 @@
 #ifndef AIRDROPFORBTC_H
 #define AIRDROPFORBTC_H
 
-#include <QWidget>
+#include "../core/PanelBaseWnd.h"
 
 namespace Ui {
 class AirdropForBTC;
@@ -27,7 +27,7 @@ namespace state {
 
 namespace wnd {
 
-class AirdropForBTC : public QWidget
+class AirdropForBTC : public core::PanelBaseWnd
 {
     Q_OBJECT
 

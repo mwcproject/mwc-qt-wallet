@@ -18,7 +18,7 @@
 namespace wnd {
 
 ProgressWnd::ProgressWnd(QWidget *parent, IProgressWndState * _state, QString header, QString msgProgress, QString msgPlus, bool cancellable ) :
-    QWidget(parent),
+    core::PanelBaseWnd(parent),
     ui(new Ui::ProgressWnd),
     state(_state)
 {

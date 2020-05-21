@@ -124,7 +124,7 @@ bool InputPassword::getWalletTls() {
     return context->wallet->hasTls();
 }
 
-static bool foreignAPIwasReported = false;
+//static bool foreignAPIwasReported = false;
 
 void InputPassword::onLoginResult(bool ok) {
 

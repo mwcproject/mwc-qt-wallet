@@ -30,7 +30,7 @@
 namespace wnd {
 
 InitAccount::InitAccount(QWidget *parent, state::InitAccount * _state, state::WalletConfig * _configState) :
-    QWidget(parent),
+    core::PanelBaseWnd(parent),
     ui(new Ui::InitAccount),
     state(_state),
     configState(_configState)

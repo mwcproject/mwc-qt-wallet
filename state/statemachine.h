@@ -45,7 +45,7 @@ public:
     bool isActionWindowMode() const;
 
     // Reset logout time.
-    void resetLogoutLimit();
+    void resetLogoutLimit(bool resetBlockLogoutCounter);
 
     // Logout must be blocked for modal dialogs
     void blockLogout();

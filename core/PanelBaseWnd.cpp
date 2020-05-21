@@ -1,4 +1,4 @@
-// Copyright 2019 The MWC Developers
+// Copyright 2020 The MWC Developers
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,34 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NAVWND_H
-#define NAVWND_H
-
 #include "PanelBaseWnd.h"
-
-namespace state {
-struct StateContext;
-}
+#include <QTimer>
 
 namespace core {
 
-class NavBar;
-class NavMenuAccount;
-class AppContext;
-
-// Window with navigation bar
-class NavWnd : public PanelBaseWnd {
-Q_OBJECT
-public:
-    explicit NavWnd(QWidget *parent, state::StateContext * context, bool createNavigationButtons=true);
-
-protected:
-    void resizeEvent(QResizeEvent *event);
-
-private:
-    NavBar * topRightButtonWnd = nullptr;
-};
-
+PanelBaseWnd::PanelBaseWnd( QWidget *parent, Qt::WindowFlags f) :
+    QWidget(parent, f)
+{
+    updateAppTitle();
+    QTimer::singleShot(0, this, SLOT(updateAppTitle()));
 }
 
-#endif // NAVWND_H
+void PanelBaseWnd::updateAppTitle() {
+#ifdef Q_OS_DARWIN
+    Cocoa::changeTitleBarColor(winId(), 0x6F/255.0, 0.0, 0xD6/255.0 ); // Color #6f00d6
+#endif
+}
+
+}

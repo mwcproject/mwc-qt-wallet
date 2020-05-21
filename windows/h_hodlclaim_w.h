@@ -15,7 +15,6 @@
 #ifndef H_HODLCLAIM_W_H
 #define H_HODLCLAIM_W_H
 
-#include <QWidget>
 #include "../core/navwnd.h"
 
 namespace Ui {

@@ -15,7 +15,7 @@
 #ifndef WAITINGWND_H
 #define WAITINGWND_H
 
-#include <QWidget>
+#include "../core/PanelBaseWnd.h"
 
 namespace Ui {
 class WaitingWnd;
@@ -30,8 +30,8 @@ public:
     void virtual deleteWaitingWnd(wnd::WaitingWnd * w) = 0;
 };
 
-// Just a waiting dialog, that can be updated with some info
-class WaitingWnd : public QWidget
+// Just a waiting panel, that can be updated with some info
+class WaitingWnd : public core::PanelBaseWnd
 {
     Q_OBJECT
 

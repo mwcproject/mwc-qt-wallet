@@ -87,6 +87,7 @@ void MockWallet::loginWithPassword(QString pass) {
 // Current seed for runnign wallet
 // Check Signals: onGetSeed(QVector<QString> seed);
 void MockWallet::getSeed(const QString & walletPassword) {
+    Q_UNUSED(walletPassword)
     emit onGetSeed(TEST_SEED);
 }
 

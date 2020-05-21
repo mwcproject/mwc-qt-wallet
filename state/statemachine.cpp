@@ -154,7 +154,7 @@ void StateMachine::executeFrom( STATE nextState ) {
 
     // Resync is blocking logout. We need to respect that.
     if ( !isLogoutOff(currentState) )
-        resetLogoutLimit();
+        resetLogoutLimit(true);
 
     if (currentState == STATE::NONE) {
         // Selecting the send page if nothing found
@@ -185,12 +185,14 @@ bool StateMachine::isActionWindowMode() const {
 }
 
 // Reset logout time.
-void StateMachine::resetLogoutLimit() {
+void StateMachine::resetLogoutLimit(bool resetBlockLogoutCounter ) {
     if (config::getLogoutTimeMs() < 0)
         logoutTime = 0;
     else
         logoutTime = QDateTime::currentMSecsSinceEpoch() + config::getLogoutTimeMs();
-    blockLogoutCounter = 0;
+
+    if (resetBlockLogoutCounter)
+        blockLogoutCounter = 0;
 }
 
 // Logout must be blocked for modal dialogs
@@ -201,7 +203,7 @@ void StateMachine::blockLogout() {
 void StateMachine::unblockLogout() {
     blockLogoutCounter--;
     if (blockLogoutCounter<=0 && logoutTime==0)
-        resetLogoutLimit();
+        resetLogoutLimit(true);
 }
 
 //////////////////////////////////////////////////////////////////////////

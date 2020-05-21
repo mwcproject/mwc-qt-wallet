@@ -17,7 +17,6 @@
 #include <QTime>
 #include <QDebug>
 #include "../state/statemachine.h"
-#include "util/widgetutils.h"
 #include "util/stringutils.h"
 #include "util/execute.h"
 #include "../control/messagebox.h"
@@ -37,12 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-#ifdef Q_OS_DARWIN
-    Cocoa::changeTitleBarColor(winId(), 0x6F/255.0, 0.0, 0xD6/255.0 ); // Color #6f00d6
-#endif
-
     ui->leftTb->hide();
-
 
     ui->statusBar->addPermanentWidget(ui->nodeStatusButton);
     ui->statusBar->addPermanentWidget(ui->listenerStatusButton);

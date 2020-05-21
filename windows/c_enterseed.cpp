@@ -25,7 +25,7 @@
 namespace wnd {
 
 EnterSeed::EnterSeed(QWidget *parent, state::InitAccount * _state) :
-    QWidget(parent),
+    core::PanelBaseWnd(parent),
     ui(new Ui::EnterSeed),
     state(_state)
 {

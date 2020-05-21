@@ -1,4 +1,4 @@
-// Copyright 2019 The MWC Developers
+// Copyright 2020 The MWC Developers
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,41 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NEWSEEDTESTW_H
-#define NEWSEEDTESTW_H
+#ifndef MWC_QT_WALLET_WALLETAPP_H
+#define MWC_QT_WALLET_WALLETAPP_H
 
-#include "../core/PanelBaseWnd.h"
-
-namespace Ui {
-class NewSeedTest;
-}
-
-class QCompleter;
+#include "QApplication"
 
 namespace state {
-    class InitAccount;
+class StateMachine;
 }
 
-namespace wnd {
+namespace core {
 
-class NewSeedTest : public core::PanelBaseWnd
-{
-    Q_OBJECT
-
+class WalletApp : public QApplication {
+Q_OBJECT
 public:
-    explicit NewSeedTest(QWidget *parent, state::InitAccount *state, int wordNumber);
-    ~NewSeedTest();
+    WalletApp(int &argc, char **argv);
 
-private slots:
-    void on_submitButton_clicked();
+    void setStateMachine(state::StateMachine * _stateMachine) {stateMachine = _stateMachine;}
+
+protected:
+    virtual bool notify(QObject *receiver, QEvent *event) override;
 
 private:
-    Ui::NewSeedTest *ui;
-    state::InitAccount *state;
-    QCompleter *completer = nullptr;
+    state::StateMachine * stateMachine = nullptr;
 };
 
 }
 
-
-#endif // NEWSEEDTESTW_H
+#endif //MWC_QT_WALLET_WALLETAPP_H

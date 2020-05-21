@@ -15,7 +15,7 @@
 #ifndef ENTERSEED_H
 #define ENTERSEED_H
 
-#include <QWidget>
+#include "../core/PanelBaseWnd.h"
 
 namespace Ui {
 class EnterSeed;
@@ -27,7 +27,7 @@ namespace state {
 
 namespace wnd {
 
-class EnterSeed : public QWidget
+class EnterSeed : public core::PanelBaseWnd
 {
     Q_OBJECT
 

@@ -22,7 +22,7 @@
 namespace wnd {
 
 NewWallet::NewWallet(QWidget *parent, state::InitAccount * _state) :
-    QWidget(parent),
+    core::PanelBaseWnd(parent),
     ui(new Ui::NewWallet),
     state(_state)
 {

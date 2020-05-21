@@ -15,8 +15,8 @@
 #ifndef InitAccountW_H
 #define InitAccountW_H
 
-#include <QWidget>
 #include "../util/passwordanalyser.h"
+#include "../core/PanelBaseWnd.h"
 
 namespace Ui {
 class InitAccount;
@@ -29,7 +29,7 @@ namespace state {
 
 namespace wnd {
 
-class InitAccount : public QWidget
+class InitAccount : public core::PanelBaseWnd
 {
     Q_OBJECT
 

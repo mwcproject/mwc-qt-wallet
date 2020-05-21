@@ -15,7 +15,6 @@
 #ifndef X_NODECONFIG_W_H
 #define X_NODECONFIG_W_H
 
-#include <QWidget>
 #include "../core/navwnd.h"
 #include "../wallet/wallet.h"
 

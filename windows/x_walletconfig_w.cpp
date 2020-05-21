@@ -485,7 +485,7 @@ bool WalletConfig::applyChanges() {
             } else {
                 logoutTimeout = currentLogoutTimeout;
                 config::setLogoutTimeMs(logoutTimeout * 1000);
-                state->getContext()->stateMachine->resetLogoutLimit();
+                state->getContext()->stateMachine->resetLogoutLimit(true);
             }
         }
 
