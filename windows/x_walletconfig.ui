@@ -6,48 +6,41 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>802</width>
+    <width>855</width>
     <height>656</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_9">
+  <layout class="QVBoxLayout" name="verticalLayout_9" stretch="3,0,0,2">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <item>
     <spacer name="verticalSpacer_5">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeType">
-      <enum>QSizePolicy::Minimum</enum>
+      <enum>QSizePolicy::Expanding</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>50</height>
+       <height>0</height>
       </size>
      </property>
     </spacer>
    </item>
    <item>
-    <widget class="control::MwcLabelLarge" name="label_7">
+    <widget class="QTabWidget" name="tabWidget">
      <property name="maximumSize">
       <size>
-       <width>50000</width>
-       <height>16777215</height>
+       <width>16777215</width>
+       <height>440</height>
       </size>
      </property>
-     <property name="text">
-      <string>mwc713 settings</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QTabWidget" name="tabWidget">
      <property name="font">
       <font>
        <pointsize>13</pointsize>
@@ -75,6 +68,18 @@
        <string>Main</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>20</number>
+       </property>
+       <property name="rightMargin">
+        <number>20</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0">
          <property name="sizeConstraint">
@@ -1003,6 +1008,22 @@ your wallet activity never stored in the logs.</string>
          </property>
         </widget>
        </item>
+       <item>
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>60</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </item>
     </layout>
@@ -1015,7 +1036,7 @@ your wallet activity never stored in the logs.</string>
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>70</height>
+       <height>0</height>
       </size>
      </property>
     </spacer>
@@ -1023,6 +1044,11 @@ your wallet activity never stored in the logs.</string>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control/MwcLabel.h</header>
+  </customwidget>
   <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
@@ -1035,11 +1061,6 @@ your wallet activity never stored in the logs.</string>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control/MwcLabel.h</header>
   </customwidget>
