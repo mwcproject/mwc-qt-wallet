@@ -77,7 +77,7 @@ const QString PAGE_A_RECOVERY_FROM_PASSPHRASE = "Recovery from passphrase";
 
 const QString PAGE_E_TRANSACTION    = "Transactions";
 const QString PAGE_E_RECEIVE        = "Receive coins";
-const QString PAGE_E_LISTENING      = "Listening";
+const QString PAGE_E_LISTENING      = "Listeners";
 const QString PAGE_E_OUTPUTS        = "Outputs";
 
 const QString PAGE_G_SEND           = "Send coins";
