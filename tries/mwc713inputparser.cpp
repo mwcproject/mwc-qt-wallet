@@ -163,7 +163,7 @@ void Mwc713InputParser::initMwcMqAddress() {
                                                 QVector<BaseTrieSection*>{
                                                         new TrieNewLineSection(),
                                                         new TriePhraseSection("Derived with index ["),
-                                                        new TrieAnySection(100, TrieAnySection::NUMBERS,"","", 1), // mwc MQ address
+                                                        new TrieAnySection(100, TrieAnySection::NUMBERS,"","", 1),
                                                         new TriePhraseSection("]"),
                                                 }));
 }
@@ -193,7 +193,7 @@ void Mwc713InputParser::initListening() {
         parser.appendLineParser(new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_ON,
                                                    QVector<BaseTrieSection *>{
                                                            new TriePhraseSection("mwcmqs listener started for ["),
-                                                           new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE, "", "", 1), // mwc MQ address
+                                                           new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE, "@.", "", 1), // mwc MQ address
                                                            new TriePhraseSection("] tid=["),
                                                            new TrieAnySection(100, TrieAnySection::NOT_SPACES, "", "]", 3), // thread ID
                                                            new TriePhraseSection("]")
@@ -211,7 +211,7 @@ void Mwc713InputParser::initListening() {
         parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_ON,
                                                     QVector<BaseTrieSection*>{
                                                             new TriePhraseSection("listener started for ["),
-                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"","", 1), // mwc MQ address
+                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"@.","", 1), // mwc MQ address
                                                             new TriePhraseSection("]")
                                                     }));
     }
@@ -233,7 +233,7 @@ void Mwc713InputParser::initListening() {
         parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_OFF,
                                                     QVector<BaseTrieSection*>{
                                                             new TriePhraseSection("mwcmqs listener ["),
-                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"","", 1), // mwc MQ address
+                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"@.","", 1), // mwc MQ address
                                                             new TriePhraseSection("] stopped. tid=["),
                                                             new TrieAnySection(100, TrieAnySection::NOT_SPACES, "", "]", 3), // thread ID
                                                             new TriePhraseSection("]")
@@ -252,7 +252,7 @@ void Mwc713InputParser::initListening() {
         parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_OFF,
                                                     QVector<BaseTrieSection*>{
                                                             new TriePhraseSection("listener ["),
-                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"","", 1), // mwc MQ address
+                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"@.","", 1), // mwc MQ address
                                                             new TriePhraseSection("] stopped")
                                                     }));
     }
@@ -265,7 +265,7 @@ void Mwc713InputParser::initListening() {
         parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_LOST_CONNECTION,
                                                     QVector<BaseTrieSection*>{
                                                             new TriePhraseSection("WARNING: mwcmqs listener ["),
-                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"","", 1), // mwc MQ address
+                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"@.","", 1), // mwc MQ address
                                                             new TriePhraseSection("] lost connection. Will try to restore in the background. tid=["),
                                                             new TrieAnySection(100, TrieAnySection::NOT_SPACES, "", "]", 3), // thread ID
                                                             new TriePhraseSection("]")
@@ -275,7 +275,7 @@ void Mwc713InputParser::initListening() {
         parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_GET_CONNECTION,
                                                     QVector<BaseTrieSection*>{
                                                             new TriePhraseSection("INFO: mwcmqs listener ["),
-                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"","", 1), // mwc MQ address
+                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"@.","", 1), // mwc MQ address
                                                             new TriePhraseSection("] reestablished connection. tid=["),
                                                             new TrieAnySection(100, TrieAnySection::NOT_SPACES, "", "]", 3), // thread ID
                                                             new TriePhraseSection("]")
@@ -287,7 +287,7 @@ void Mwc713InputParser::initListening() {
         parser.appendLineParser(new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_LOST_CONNECTION,
                                                    QVector<BaseTrieSection *>{
                                                            new TriePhraseSection("WARNING: listener ["),
-                                                           new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE, "", "", 1), // mwc MQ address
+                                                           new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE, "@.", "", 1), // mwc MQ address
                                                            new TriePhraseSection("] lost connection")
                                                    }));
 
@@ -295,7 +295,7 @@ void Mwc713InputParser::initListening() {
         parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_GET_CONNECTION,
                                                     QVector<BaseTrieSection*>{
                                                             new TriePhraseSection("INFO: listener ["),
-                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"","", 1), // mwc MQ address
+                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE,"@.","", 1), // mwc MQ address
                                                             new TriePhraseSection("] reestablished connection.")
                                                     }));
     }
