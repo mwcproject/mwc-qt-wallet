@@ -151,7 +151,9 @@ void WalletConfig::setValues(const QString & mwc713directory,
                              const QString & mwcmqHostNorm,
                              int inputConfirmationNumber,
                              int changeOutputs) {
-    ui->mwc713directoryEdit->setText( mwc713directory );
+    if (!mwc713directory.isEmpty())
+        ui->mwc713directoryEdit->setText( mwc713directory );
+
     ui->keybasePathEdit->setText( keybasePathConfig2InputStr(keyBasePath) );
     ui->mwcmqHost->setText( mwcDomainConfig2InputStr( mwcmqHostNorm ) );
 
@@ -178,7 +180,8 @@ void WalletConfig::updateButtons() {
     bool sameWithDefault =
         getcheckedSizeButton() == scale2Id( state->getInitGuiScale() ) &&
         true == ui->logsEnableBtn->isChecked() &&
-        ui->mwc713directoryEdit->text().trimmed() == defaultWalletConfig.getDataPath() &&
+        // 713 directory is skipped intentionally. We don't want to reset it because user is expected to have many such directories
+        // ui->mwc713directoryEdit->text().trimmed() == defaultWalletConfig.getDataPath() &&
         keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == defaultWalletConfig.keyBasePath &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == defaultWalletConfig.getMwcMqHostNorm() &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(defaultSendParams.inputConfirmationNumber) &&
@@ -399,7 +402,7 @@ void WalletConfig::on_changeOutputsEdit_textEdited(const QString &)
 
 void WalletConfig::on_restoreDefault_clicked()
 {
-    setValues(defaultWalletConfig.getDataPath(), defaultWalletConfig.keyBasePath, defaultWalletConfig.getMwcMqHostNorm(),
+    setValues("", defaultWalletConfig.keyBasePath, defaultWalletConfig.getMwcMqHostNorm(),
               defaultSendParams.inputConfirmationNumber, defaultSendParams.changeOutputs);
 
     checkSizeButton( scale2Id(state->getInitGuiScale()) );
