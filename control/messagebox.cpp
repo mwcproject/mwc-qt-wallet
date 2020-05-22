@@ -102,8 +102,8 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
     }
     else {
         ui->button1->setText(btn1);
-        ui->button1->setDefault(default1);
-        ui->button1->setFocus();
+        if (default1)
+            ui->button1->setFocus();
     }
 
     if (btn2.isEmpty()) {
@@ -116,8 +116,8 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
     }
     else {
         ui->button2->setText(btn2);
-        ui->button2->setDefault(default2);
-        ui->button2->setFocus();
+        if (default2)
+            ui->button2->setFocus();
     }
 
     ui->button2->adjustSize();
@@ -140,7 +140,10 @@ void MessageBox::on_passwordEdit_textChanged(const QString &str)
 {
     QThread::msleep(200); // Ok for human and will prevent brute force from UI attack (really crasy scenario, better to attack mwc713 if you already get the host).
     control::MwcPushButtonNormal * btn2lock = passBlockButton == RETURN_CODE::BTN1 ? ui->button1 : ui->button2;
-    btn2lock->setEnabled( crypto::calcHSA256Hash(str) == blockingPasswordHash);
+    bool ok = crypto::calcHSA256Hash(str) == blockingPasswordHash;
+    btn2lock->setEnabled(ok);
+    if (ok)
+        btn2lock->setFocus();
 }
 
 void MessageBox::on_button1_clicked()

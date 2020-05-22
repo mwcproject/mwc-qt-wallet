@@ -108,7 +108,10 @@ SendConfirmationDlg::~SendConfirmationDlg()
 void SendConfirmationDlg::on_passwordEdit_textChanged(const QString &str)
 {
     QThread::msleep(200); // Ok for human and will prevent brute force from UI attack (really crasy scenario, better to attack mwc713 if you already get the host).
-    ui->confirmButton->setEnabled( crypto::calcHSA256Hash(str) == blockingPasswordHash);
+    bool ok = crypto::calcHSA256Hash(str) == blockingPasswordHash;
+    ui->confirmButton->setEnabled(ok);
+    if (ok)
+        ui->confirmButton->setFocus();
 }
 
 void SendConfirmationDlg::on_declineButton_clicked()

@@ -171,6 +171,9 @@
    <property name="text">
     <string>Cancel</string>
    </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
   </widget>
   <widget class="control::MwcLabelLarge" name="label_8">
    <property name="geometry">
