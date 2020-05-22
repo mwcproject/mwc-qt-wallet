@@ -56,12 +56,13 @@ Receive::~Receive() {
 }
 
 void Receive::updateMwcMqAddress(QString address) {
+    if (!address.contains('@')) {
+        QString mqHost = walletConfig.getMwcMqHostNorm();
+        if (!mqHost.isEmpty())
+            address += "@" + mqHost;
+    }
 
-    QString mqHost = walletConfig.getMwcMqHostNorm();
-    if (!mqHost.isEmpty())
-        mqHost = "@" + mqHost;
-
-    mwcAddress = (config::getUseMwcMqS() ? "mwcmqs://" : "mwcmq://") + address + mqHost;
+    mwcAddress = (config::getUseMwcMqS() ? "mwcmqs://" : "mwcmq://") + address;
     ui->mwcmqAddress->setText( mwcAddress );
 }
 
