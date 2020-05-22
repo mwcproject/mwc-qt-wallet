@@ -34,7 +34,7 @@ SendOffline::SendOffline(QWidget *parent, const wallet::AccountInfo & _selectedA
     ui->progress->initLoader(false);
 
     ui->fromAccount->setText("From account: " + selectedAccount.accountName );
-    ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util::nano2one(amount)) + " mwc" );
+    ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util::nano2one(amount)) + " MWC" );
 }
 
 SendOffline::~SendOffline()
@@ -60,8 +60,8 @@ void SendOffline::on_sendButton_clicked()
     state::TimeoutLockObject to( state );
 
     if ( !state->isNodeHealthy() ) {
-        control::MessageBox::messageText(this, "Unable to send", "Your MWC-Node, that wallet connected to, is not ready.\n"
-                                                                     "MWC-Node need to be connected to few peers and finish blocks synchronization process");
+        control::MessageBox::messageText(this, "Unable to send", "Your MWC-Node, that wallet is connected to, is not ready.\n"
+                                                                     "MWC-Node needs to be connected to a few peers and finish block synchronization process");
         return;
     }
 
@@ -76,22 +76,29 @@ void SendOffline::on_sendButton_clicked()
         }
     }
 
+    wallet::AccountInfo fromAccount = selectedAccount;
     core::SendCoinsParams sendParams = state->getSendCoinsParams();
 
     QStringList outputs;
-    if (! util::getOutputsToSend( selectedAccount.accountName, sendParams.changeOutputs, amount,
+    if (! util::getOutputsToSend( fromAccount.accountName, sendParams.changeOutputs, amount,
                     state->getContext()->wallet, state->getContext()->hodlStatus, state->getContext()->appContext,
                     this, outputs ) )
         return; // User reject something
 
+    QString txnFee = util::getTxnFeeString(this, fromAccount.accountName, amount, state->getContext()->wallet,
+                                           state->getContext()->appContext, outputs, sendParams.changeOutputs);
+    if (txnFee.isEmpty())
+        return;
+
     QString hash = state->getWalletPasswordHash();
-    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this,"Confirm Send request",
-                         "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) +
-                         " mwc offline.\nYour init transaction slate will be stored at the file.", "Decline", "Confirm", false, true, 1.0,
+    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this,"Confirm Send Request",
+                         "You are sending offline " + (amount < 0 ? "all" : util::nano2one(amount)) +
+                         " MWC from account: " + fromAccount.accountName + "\n\nTransaction fee: " + txnFee +
+                         "\n\nYour initial transaction slate will be stored in a file.", "Decline", "Confirm", false, true, 1.0,
                          hash, control::MessageBox::RETURN_CODE::BTN2 ) )
         return;
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Create initial transaction file"),
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Create Initial Transaction Slate File"),
                                                     state->getFileGenerationPath(),
                                                     tr("MWC init transaction (*.tx)"));
 

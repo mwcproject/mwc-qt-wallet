@@ -44,7 +44,7 @@ SendOnline::SendOnline(QWidget *parent,
     ui->apiSecretEdit->hide();
 
     ui->fromAccount->setText("From account: " + selectedAccount.accountName );
-    ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util::nano2one(amount)) + " mwc" );
+    ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util::nano2one(amount)) + " MWC" );
 }
 
 SendOnline::~SendOnline()
@@ -97,11 +97,11 @@ void SendOnline::on_sendButton_clicked()
 
     if ( !state->isNodeHealthy() ) {
         control::MessageBox::messageText(this, "Unable to send", "Your MWC-Node, that wallet connected to, is not ready.\n"
-                                                                     "MWC-Node need to be connected to few peers and finish blocks synchronization process");
+                                                                     "MWC-Node needs to be connected to a few peers and finish block synchronization process");
         return;
     }
 
-
+    wallet::AccountInfo fromAccount = selectedAccount;
     QString sendTo = ui->sendEdit->text().trimmed();
 
     {
@@ -157,14 +157,20 @@ void SendOnline::on_sendButton_clicked()
     core::SendCoinsParams sendParams = state->getSendCoinsParams();
 
     QStringList outputs;
-    if (! util::getOutputsToSend( selectedAccount.accountName, sendParams.changeOutputs, amount,
+    if (! util::getOutputsToSend( fromAccount.accountName, sendParams.changeOutputs, amount,
             state->getContext()->wallet, state->getContext()->hodlStatus, state->getContext()->appContext,
             this, outputs ) )
         return; // User reject something
 
+    QString txnFee = util::getTxnFeeString( this, fromAccount.accountName, amount, state->getContext()->wallet,
+                                           state->getContext()->appContext, outputs, sendParams.changeOutputs );
+    if (txnFee.isEmpty())
+        return; // Error will have already been displayed
+
     // Ask for confirmation
     dlg::SendConfirmationDlg confirmDlg(this, "Confirm Send Request",
-                                        "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " mwc to address\n" + address,
+                                        "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " MWC from account: " + fromAccount.accountName +
+                                        "\nTo address: " + address + "\n\nTransaction fee: " + txnFee,
                                         1.0, state->getWalletPasswordHash(), state->getContext()->appContext->isFluffSet() );
     connect(&confirmDlg, &dlg::SendConfirmationDlg::saveFluffSetting, this, &SendOnline::saveFluffSetting);
     if (confirmDlg.exec() == QDialog::Accepted) {
@@ -173,7 +179,7 @@ void SendOnline::on_sendButton_clicked()
 
         bool fluff = confirmDlg.getFluffSetting();
         ui->progress->show();
-        state->sendMwcOnline( selectedAccount, res.second, address, amount, description, apiSecret, outputs, sendParams.changeOutputs, fluff );
+        state->sendMwcOnline( fromAccount, res.second, address, amount, description, apiSecret, outputs, sendParams.changeOutputs, fluff );
     }
 }
 
@@ -183,7 +189,7 @@ void SendOnline::sendRespond( bool success, const QStringList & errors ) {
     ui->progress->hide();
 
     if (success) {
-        control::MessageBox::messageText(this, "Success", "Your mwc was successfully sent to recipient");
+        control::MessageBox::messageText(this, "Success", "Your MWC was successfully sent to recipient");
         ui->sendEdit->setText("");
         ui->descriptionEdit->setText("");
         return;

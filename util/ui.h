@@ -41,6 +41,30 @@ namespace util {
     // Utility method. Exposed to testing only!!!
     bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> & inputOutputs, QStringList & resultOutputs );
 
+    // calculates the transaction fee (in nanocoins) for the given amount (in nanocoins)
+    // and populates the transaction fee parameter
+    //
+    // if txnOutputList is given, computes the fee based upon those outputs in the wallet
+    // if txnOutputList is not given, computes the fee based upon all spendable outputs in the wallet
+    //
+    // returns true if the fee was able to be calculated and there are enough outputs
+    // to cover the amount + fee
+    // returns false there was an error calculating the fee or if there were not enough
+    // outputs to cover the amount + fee
+    // transactionFee will be populated with 0, if there was an error calculating
+    // the fee. Otherwise transaction fee will contain the actual fee regardless
+    // of the return status.
+    bool getTxnFee(QWidget* parent, const QString& accountName, int64_t amount,
+                   wallet::Wallet* wallet, core::AppContext* appContext,
+                   QStringList& txnOutputList, uint64_t changeOutputs, uint64_t* transactionFee);
+
+    // Returns the transaction fee as a string in the form x.xxx which can be used for
+    // displaying the txn fee. If an error occurs, a message will be displayed on the parent.
+    //
+    // An empty string will be returned if there was an error.
+    QString getTxnFeeString(QWidget* parent, const QString& accountName, int64_t amount,
+                            wallet::Wallet* wallet, core::AppContext* appContext,
+                            QStringList& txnOutputList, uint64_t changeOutputs);
 };
 
 
