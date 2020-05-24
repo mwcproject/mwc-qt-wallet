@@ -146,11 +146,12 @@ bool AppContext::loadData() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x4795)
+    if (id<0x4783 || id>0x4796)
          return false;
 
-    in >> receiveAccount;
-    in >> currentAccountName;
+    QString mockStr;
+    in >> mockStr;
+    in >> mockStr;
 
     int st;
     in >> st;
@@ -221,6 +222,11 @@ bool AppContext::loadData() {
         in >> fluffTransactions;
     }
 
+    if (id>=0x4796) {
+        in >> receiveAccount;
+        in >> currentAccountName;
+    }
+
     return true;
 }
 
@@ -246,9 +252,11 @@ void AppContext::saveData() const {
     QDataStream out(&file);
     out.setVersion(QDataStream::Qt_5_7);
 
-    out << 0x4795;
-    out << receiveAccount;
-    out << currentAccountName;
+    QString mockStr;
+
+    out << 0x4796;
+    out << mockStr;
+    out << mockStr;
     out << int(activeWndState);
     out << pathStates;
     out << intVectorStates;
@@ -283,6 +291,9 @@ void AppContext::saveData() const {
     out << lockedOutputs;
 
     out << fluffTransactions;
+
+    out << receiveAccount;
+    out << currentAccountName;
 }
 
 void AppContext::setLogsEnabled(bool enabled) {

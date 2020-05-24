@@ -149,7 +149,6 @@ public:
     virtual void createAccount( const QString & accountName )  override;
 
     // Switch to different account
-    // Check Signal: onAccountSwitched
     virtual void switchAccount(const QString & accountName)  override;
 
     // Rename account

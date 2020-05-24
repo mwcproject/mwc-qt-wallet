@@ -158,9 +158,8 @@ public:
     virtual void createAccount( const QString & accountName )  override;
     // Check Signal:  onAccountCreated
 
-    // Switch to different account
+    // Switch to different account, no feedback is expected
     virtual void switchAccount(const QString & accountName)  override;
-    // Check Signal: onAccountSwitched
 
     // Rename account
     // Check Signal: onAccountRenamed(bool success, QString errorMessage);
@@ -196,6 +195,7 @@ public:
     // Set account that will receive the funds
     // Check Signal:  onSetReceiveAccount( bool ok, QString AccountOrMessage );
     virtual void setReceiveAccount(QString account)  override;
+    virtual QString getReceiveAccount() override {return recieveAccount;}
 
     // Cancel transaction
     // Check Signal:  onCancelTransacton
@@ -304,9 +304,8 @@ public:
     // Update account feedback
     void updateAccountList( QVector<QString> accounts );
     void updateAccountProgress(int accountIdx, int totalAccounts);
-    void updateAccountFinalize(QString prevCurrentAccount);
+    void updateAccountFinalize();
     void createNewAccount( QString newAccountName );
-    void switchToAccount( QString switchAccountName, bool makeAccountCurrent );
 
     void updateRenameAccount(const QString & oldName, const QString & newName, bool createSimulation,
                              bool success, QString errorMessage);
@@ -440,6 +439,7 @@ private:
     // Accounts with balances info
     QVector<AccountInfo> accountInfoNoLocks;
     QString currentAccount = "default"; // Keep current account by name. It fit better to mwc713 interactions.
+    QString recieveAccount = "default";
 
     QMap<QString, QVector<wallet::WalletOutput> > walletOutputs; // Available outputs from this wallet. Key: account name, value outputs for this account
 

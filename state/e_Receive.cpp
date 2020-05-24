@@ -166,11 +166,10 @@ void Receive::onMwcAddressWithIndex(QString mwcAddress, int idx) {
 }
 
 QString  Receive::getReceiveAccount() {
-    return context->appContext->getReceiveAccount();
+    return context->wallet->getReceiveAccount();
 }
 
 void  Receive::setReceiveAccount(QString accountName ) {
-    context->appContext->setReceiveAccount(accountName);
     context->wallet->setReceiveAccount(accountName);
     // feedback will be ignored. Errors will go to the events naturally
 }

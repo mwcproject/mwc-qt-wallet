@@ -64,6 +64,7 @@ private:
     wnd::AccountTransfer * wnd = nullptr;
     int transferState = -1;
 
+    QString recieveAccount;
     // Single transfer context
     QString myAddress;
     wallet::AccountInfo trAccountFrom;

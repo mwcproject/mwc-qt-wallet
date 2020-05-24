@@ -115,6 +115,7 @@ void AccountTransfer::transferFunds(const wallet::AccountInfo accountFrom,
     outputs2use = outputs;
 
     transferState = 0;
+    recieveAccount = context->wallet->getReceiveAccount();
     context->wallet->setReceiveAccount( trAccountTo.accountName );
 }
 
@@ -177,8 +178,8 @@ void AccountTransfer::onSlateFinalized( QString slate ) {
         // can go forward. Restore the state and update the balance
 
         transferState=2;
-
-        context->wallet->setReceiveAccount( context->appContext->getReceiveAccount() );
+        if (!recieveAccount.isEmpty())
+            context->wallet->setReceiveAccount( recieveAccount );
         context->wallet->updateWalletBalance(true, true);
     }
 }

@@ -42,9 +42,9 @@ public:
 private slots:
 
     void onChecked(int id);
-
     void on_nextButton_clicked();
     void on_allAmountButton_clicked();
+    void on_accountComboBox_currentIndexChanged(int index);
 
 private:
     Ui::SendStarting *ui;

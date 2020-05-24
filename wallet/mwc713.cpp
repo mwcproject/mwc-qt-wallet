@@ -56,8 +56,6 @@ class Mwc713State {
 MWC713::MWC713(QString _mwc713path, QString _mwc713configPath, core::AppContext * _appContext) :
         appContext(_appContext), mwc713Path(_mwc713path),  mwc713configPath(_mwc713configPath) {
 
-    currentAccount = appContext->getCurrentAccountName();
-
     // Listening for Output Locking changes
     QObject::connect(appContext, &core::AppContext::onOutputLockChanged, this, &MWC713::onOutputLockChanged, Qt::QueuedConnection);
 
@@ -183,6 +181,8 @@ void MWC713::resetData(STARTED_MODE _startedMode ) {
     hasHttpTls = false;
     walletPasswordHash = "";
     outputsLines.clear();
+    currentAccount = "default";
+    recieveAccount = "default";
 }
 
 // normal start. will require the password
@@ -580,20 +580,26 @@ void MWC713::createAccount( const QString & accountName )  {
     else {
         eventCollector->addTask( new TaskAccountRename(this, accountInfoNoLocks[delAccIdx].accountName, accountName, true ), TaskAccountRename::TIMEOUT );
     }
-
 }
 
 // Switch to different account
-// Check Signal: onAccountSwitched
 void MWC713::switchAccount(const QString & accountName)  {
     // Expected that account is in the list
-    eventCollector->addTask( new TaskAccountSwitch(this, accountName, true), TaskAccountSwitch::TIMEOUT );
+    // Allways do switch because double processing is fine, it is quick and it can eliminate possible issues
+    currentAccount = accountName;
+    WalletConfig config = getWalletConfig();
+
+    appContext->setCurrentAccountName( config.getDataPath(), accountName);
+    eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
 
 // Rename account
 // Check Signal: onAccountRenamed(bool success, QString errorMessage);
 void MWC713::renameAccount(const QString & oldName, const QString & newName)  {
     eventCollector->addTask( new TaskAccountRename(this, oldName, newName, false), TaskAccountRename::TIMEOUT );
+    if (oldName == currentAccount) {
+        switchAccount("default");
+    }
 }
 
 // Check and repair the wallet. Will take a while
@@ -617,11 +623,10 @@ void MWC713::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const
                      const QString & apiSecret,
                      QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff )  {
     // switch account first
-    eventCollector->addTask( new TaskAccountSwitch(this, account.accountName, true), TaskAccountSwitch::TIMEOUT );
-    // If listening, strting...
-
+    eventCollector->addTask( new TaskAccountSwitch(this, account.accountName), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskSendMwc(this, coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs, outputs, fluff), TaskSendMwc::TIMEOUT );
-    // Set some funds
+    if (account.accountName != currentAccount)
+        eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
 
 
@@ -635,9 +640,10 @@ void MWC713::sendFile( const wallet::AccountInfo &account, int64_t coinNano, QSt
     }
 
     // switch account first
-    eventCollector->addTask( new TaskAccountSwitch(this, account.accountName, true), TaskAccountSwitch::TIMEOUT );
-
+    eventCollector->addTask( new TaskAccountSwitch(this, account.accountName), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskSendFile(this, coinNano, message, fileTx, inputConfirmationNumber, changeOutputs, outputs ), TaskSendFile::TIMEOUT );
+    if (account.accountName != currentAccount)
+        eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
 
 // Receive transaction. Will generate *.response file in the same dir
@@ -673,22 +679,28 @@ void MWC713::submitFile( QString fileTx ) {
 void MWC713::getOutputs(QString account, bool show_spent, bool enforceSync)  {
     sync(true, enforceSync);
     // Need to switch account first
-    eventCollector->addTask( new TaskAccountSwitch(this, account, true), TaskAccountSwitch::TIMEOUT );
+    eventCollector->addTask( new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskOutputs(this, show_spent), TaskOutputs::TIMEOUT );
+    if (account!=currentAccount)
+        eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
 
 void MWC713::getTransactions(QString account, bool enforceSync)  {
     sync(true, enforceSync);
     // Need to switch account first
-    eventCollector->addTask( new TaskAccountSwitch(this, account, true), TaskAccountSwitch::TIMEOUT );
+    eventCollector->addTask( new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskTransactions(this), TaskTransactions::TIMEOUT );
+    if (account!=currentAccount)
+        eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
 
 // get Extended info for specific transaction
 // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
 void MWC713::getTransactionById(QString account, int64_t txIdx ) {
-    eventCollector->addTask( new TaskAccountSwitch(this, account, true), TaskAccountSwitch::TIMEOUT );
+    eventCollector->addTask( new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskTransactionsById(this, txIdx), TaskTransactions::TIMEOUT );
+    if (account != currentAccount)
+        eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
 
 // Read all transactions for all accounts. Might take time...
@@ -707,7 +719,7 @@ void MWC713::getAllTransactions() {
 
     // I f not exist, push the rest with enforcement...
     for (const AccountInfo & acc : accountInfoNoLocks ) {
-            eventCollector->addTask(new TaskAccountSwitch(this, acc.accountName, false), TaskAccountSwitch::TIMEOUT);
+            eventCollector->addTask(new TaskAccountSwitch(this, acc.accountName), TaskAccountSwitch::TIMEOUT);
             eventCollector->addTask(new TaskAllTransactions(this), TaskAllTransactions::TIMEOUT);
     }
     eventCollector->addTask( task, -1 );
@@ -803,6 +815,12 @@ void MWC713::executeMwc713command(QString cmd, QString shadowStr) {
 
 void MWC713::setLoginResult(bool ok) {
     logger::logEmit("MWC713", "onLoginResult", QString::number(ok) );
+    if (ok) {
+        // Setting receive acocunt...
+        WalletConfig config = getWalletConfig();
+        switchAccount(appContext->getCurrentAccountName(config.getDataPath()));
+        setReceiveAccount( appContext->getReceiveAccount(config.getDataPath()) );
+    }
     loggedIn = ok;
     emit onLoginResult(ok);
 
@@ -955,11 +973,11 @@ void MWC713::updateAccountList( QVector<QString> accounts ) {
 
     int idx = 0;
     for (QString acc : accounts) {
-        eventCollector->addTask( new TaskAccountSwitch(this, acc, false), TaskAccountSwitch::TIMEOUT );
+        eventCollector->addTask( new TaskAccountSwitch(this, acc), TaskAccountSwitch::TIMEOUT );
         eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber ), TaskAccountInfo::TIMEOUT );
         eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1 ); // Updating the progress
     }
-    eventCollector->addTask( new TaskAccountListFinal(this, currentAccount), -1 ); // Finalize the task
+    eventCollector->addTask( new TaskAccountListFinal(this), -1 ); // Finalize the task
     // Final will switch back to current account
 }
 
@@ -968,7 +986,7 @@ void MWC713::updateAccountProgress(int accountIdx, int totalAccounts) {
     emit onWalletBalanceProgress( accountIdx, totalAccounts );
 }
 
-void MWC713::updateAccountFinalize(QString prevCurrentAccount) {
+void MWC713::updateAccountFinalize() {
     accountInfoNoLocks = collectedAccountInfo;
     collectedAccountInfo.clear();
 
@@ -987,19 +1005,19 @@ void MWC713::updateAccountFinalize(QString prevCurrentAccount) {
     // Set back the current account
     bool isDefaultFound = false;
     for (auto & acc : accountInfoNoLocks) {
-        if (acc.accountName == prevCurrentAccount) {
+        if (acc.accountName == currentAccount) {
             isDefaultFound = true;
             break;
         }
     }
 
     if (!isDefaultFound && accountInfoNoLocks.size()>0) {
-        prevCurrentAccount = accountInfoNoLocks[0].accountName;
+        currentAccount = accountInfoNoLocks[0].accountName;
     }
 
     // !!!!!! NOTE, 'false' mean that we don't save to that account. It make sence because during such long operation
     //  somebody could change account
-    eventCollector->addFirstTask( new TaskAccountSwitch(this, prevCurrentAccount, false), TaskAccountSwitch::TIMEOUT );
+    eventCollector->addFirstTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
 
 void MWC713::createNewAccount( QString newAccountName ) {
@@ -1015,16 +1033,6 @@ void MWC713::createNewAccount( QString newAccountName ) {
     emit onWalletBalanceUpdated();
 
     appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("New account '" + newAccountName + "' was created" ));
-}
-
-void MWC713::switchToAccount( QString switchAccountName, bool makeAccountCurrent ) {
-    logger::logEmit( "MWC713", "onAccountSwitched",switchAccountName);
-    if (makeAccountCurrent) {
-        currentAccount = switchAccountName;
-        appContext->setCurrentAccountName(currentAccount);
-    }
-
-    emit onAccountSwitched(switchAccountName);
 }
 
 void MWC713::updateRenameAccount(const QString & oldName, const QString & newName, bool createSimulation,
@@ -1217,8 +1225,13 @@ void MWC713::setTransCancelResult( bool success, int64_t transId, QString errMsg
 }
 
 void MWC713::setSetReceiveAccount( bool ok, QString accountOrMessage ) {
-    if (ok)
-        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("Set receive account: '" + accountOrMessage + "'" ));
+    if (ok) {
+        appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                                  QString("Set receive account: '" + accountOrMessage + "'"));
+        recieveAccount = accountOrMessage;
+        WalletConfig config = getWalletConfig();
+        appContext->setReceiveAccount(config.getDataPath(), recieveAccount);
+    }
 
     logger::logEmit( "MWC713", "onSetReceiveAccount", "ok="+QString::number(ok) );
     emit onSetReceiveAccount(ok, accountOrMessage );
@@ -1296,6 +1309,8 @@ void MWC713::processAllTransactionsAppend(const QVector<WalletTransaction> & trV
 void MWC713::processAllTransactionsEnd() {
     emit onAllTransactions(collectedTransactions);
     collectedTransactions.clear();
+    // switching back to current account
+    eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
 
 void MWC713::updateSyncProgress(double progressPercent) {

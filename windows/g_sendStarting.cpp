@@ -167,4 +167,18 @@ void SendStarting::on_allAmountButton_clicked() {
     ui->amountEdit->setText("All");
 }
 
+void SendStarting::on_accountComboBox_currentIndexChanged(int index)
+{
+    auto dt = ui->accountComboBox->currentData();
+    if (!dt.isValid())
+        return;
+
+    int accountIdx = dt.toInt();
+    if (accountIdx>=0 && accountIdx<accountInfo.size()) {
+        wallet::AccountInfo acc = accountInfo[accountIdx];
+        state->switchAccount(acc.accountName);
+    }
 }
+
+}
+

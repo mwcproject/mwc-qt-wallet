@@ -21,6 +21,7 @@
 #include "../wallet/wallet.h"
 #include "../core/HodlStatus.h"
 #include "../core/walletnotes.h"
+#include <QDebug>
 
 class QAction;
 
@@ -30,7 +31,7 @@ struct SendCoinsParams {
     int inputConfirmationNumber;
     int changeOutputs;
 
-    // Expected to be deafult values
+    // Expected to be default values
     SendCoinsParams() :
             inputConfirmationNumber(10), changeOutputs(1) {}
 
@@ -109,11 +110,11 @@ public:
     QVector<int> getIntVectorFor( QString name ) const;
     void updateIntVectorFor( QString name, const QVector<int> & data );
 
-    QString getReceiveAccount() const {return receiveAccount;}
-    void setReceiveAccount(QString account) {receiveAccount = account;}
+    QString getReceiveAccount(const QString & walletDataDir) const { return receiveAccount.value(walletDataDir, "default");}
+    void setReceiveAccount(const QString & walletDataDir, const QString & account) {receiveAccount.insert(walletDataDir, account);}
 
-    QString getCurrentAccountName() const {return currentAccountName;};
-    void setCurrentAccountName(QString currentAccount) {currentAccountName = currentAccount;}
+    QString getCurrentAccountName(const QString & walletDataDir) const {return currentAccountName.value(walletDataDir, "default");};
+    void setCurrentAccountName(const QString & walletDataDir, const QString & currentAccount) {currentAccountName.insert(walletDataDir, currentAccount);}
 
     // AirdropRequests will handle differently
     void saveAirdropRequests( const QVector<state::AirdropRequests> & data );
@@ -201,8 +202,8 @@ private:
     // Don't use many bits because we don't want it be much usable for attacks.
 //    int passHash = -1;
 
-    QString receiveAccount = "default"; // Selected account
-    QString currentAccountName = "default"; // Current account
+    QMap<QString,QString> receiveAccount; // Key: mwc713 data dir; Value: Selected account
+    QMap<QString,QString> currentAccountName; // Key: mwc713 data dir; Value: Current account
 
     // Active window that is visible
     state::STATE activeWndState = state::STATE::LISTENING;

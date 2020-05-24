@@ -443,7 +443,6 @@ public:
     // Request Wallet balance update. It is a multistep operation
     // Check signal: onWalletBalanceUpdated
     //          onWalletBalanceProgress
-    //          onAccountSwitched - multiple calls, please ignore
     virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress, bool skipSync=false)  = 0;
 
 
@@ -452,7 +451,6 @@ public:
     virtual void createAccount( const QString & accountName )  = 0;
 
     // Switch to different account
-    // Check Signal: onAccountSwitched
     virtual void switchAccount(const QString & accountName)  = 0;
 
     // Rename account
@@ -489,6 +487,7 @@ public:
     // Set account that will receive the funds
     // Check Signal:  onSetReceiveAccount( bool ok, QString AccountOrMessage );
     virtual void setReceiveAccount(QString account)  = 0;
+    virtual QString getReceiveAccount() = 0;
 
     // Get wallet balance
     // Cancel transaction
@@ -606,8 +605,7 @@ signals:
     // Progress for balance update
     void onWalletBalanceProgress( int progress, int maxVal );
 
-    // Empty accoount name mean error
-    void onAccountSwitched(QString currentAccountName);
+    // Empty account name mean error
     void onAccountCreated( QString newAccountName);
     void onAccountRenamed(bool success, QString errorMessage);
 

@@ -32,7 +32,7 @@ MockWallet::MockWallet(core::AppContext *_appContext) {
     mwcAddress = MWC_MQS_ADDRESS;
 
     AccountInfo acc1;
-    acc1.setData("deafult",
+    acc1.setData("default",
             5000000000,
             1000000000,
             1000000000,
@@ -185,9 +185,8 @@ void MockWallet::createAccount(const QString &accountName) {
 }
 
 // Switch to different account
-// Check Signal: onAccountSwitched
 void MockWallet::switchAccount(const QString &accountName) {
-    emit onAccountSwitched(accountName);
+    Q_UNUSED(accountName)
 }
 
 // Rename account

@@ -150,9 +150,6 @@ void InputPassword::onLoginResult(bool ok) {
             }
 
             if (! config::isOnlineNode()) {
-                // Set current receive account
-                context->wallet->setReceiveAccount(context->appContext->getReceiveAccount());
-
                 // Updating the wallet balance and a node status
                 context->wallet->updateWalletBalance(true, true);
             }

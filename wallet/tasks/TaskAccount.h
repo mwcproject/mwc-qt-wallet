@@ -59,10 +59,10 @@ class TaskAccountSwitch : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*7;
 
-    TaskAccountSwitch( MWC713 * _wallet713, QString accountName,bool _makeAccountCurrent ) :
+    TaskAccountSwitch( MWC713 * _wallet713, QString accountName ) :
             Mwc713Task("TaskAccountSwitch", "account switch " +  util::toMwc713input(accountName)
                        , _wallet713, "account switch " + accountName ),
-            switchAccountName(accountName), makeAccountCurrent(_makeAccountCurrent)
+            switchAccountName(accountName)
     {
         Q_ASSERT(accountName.length()>0);
     }
@@ -74,7 +74,6 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
     QString switchAccountName;
-    bool makeAccountCurrent;
 };
 
 
@@ -133,14 +132,12 @@ private:
 // Just a callback, not a real task
 class TaskAccountListFinal : public Mwc713Task {
 public:
-    TaskAccountListFinal( MWC713 * _wallet713, QString _accountName2switch ) :
-            Mwc713Task("TaskAccountListFinal", "", _wallet713,""), accountName2switch(_accountName2switch) {}
+    TaskAccountListFinal( MWC713 * _wallet713 ) :
+            Mwc713Task("TaskAccountListFinal", "", _wallet713,"") {}
 
     virtual bool processTask(const QVector<WEvent> &events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>();}
-private:
-    QString accountName2switch;
 };
 
 }

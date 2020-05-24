@@ -72,6 +72,8 @@ public:
 
     QString getWalletPasswordHash();
 
+    void switchAccount(const QString & accountName);
+
     bool isNodeHealthy() const {return nodeIsHealthy;}
 protected:
     virtual NextStateRespond execute() override;

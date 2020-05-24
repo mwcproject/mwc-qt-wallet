@@ -108,11 +108,9 @@ bool TaskAccountCreate::processTask(const QVector<WEvent> &events) {
 
 bool TaskAccountSwitch::processTask(const QVector<WEvent> &events) {
     QVector< WEvent > errors = filterEvents( events, WALLET_EVENTS::S_ERROR );
-    if ( errors.empty() )
-        wallet713->switchToAccount( switchAccountName, makeAccountCurrent );
-    else
-        wallet713->switchToAccount( "", false );
-
+    for ( const auto & e : errors) {
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Account switch error: " + e.message );
+    }
     return true;
 }
 
@@ -261,7 +259,7 @@ bool TaskAccountProgress::processTask(const QVector<WEvent> &events) {
 // ---------------------- TaskAccountListFinal -------------------------
 bool TaskAccountListFinal::processTask(const QVector<WEvent> &events) {
     Q_UNUSED(events);
-    wallet713->updateAccountFinalize(accountName2switch);
+    wallet713->updateAccountFinalize();
     return true;
 }
 

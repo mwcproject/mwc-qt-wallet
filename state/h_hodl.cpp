@@ -760,7 +760,6 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                 // Starting the slate processing transaction...
                 // wallet expected to be offline...
                 Q_ASSERT(config::isOnlineWallet() || config::isColdWallet());
-                context->wallet->setReceiveAccount(context->appContext->getReceiveAccount());
                 context->wallet->receiveFile( slateFn, claimNextTransIdentifier );
 
                 // Continue at onReceiveFile

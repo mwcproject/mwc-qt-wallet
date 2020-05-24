@@ -99,6 +99,13 @@ QString Send::getWalletPasswordHash() {
     return context->wallet->getPasswordHash();
 }
 
+void Send::switchAccount(const QString & accountName) {
+    if (accountName == context->wallet->getCurrentAccountName())
+        return;
+
+    context->wallet->switchAccount(accountName);
+}
+
 // onlineOffline => Next step
 void Send::processSendRequest( bool isOnline, const wallet::AccountInfo & selectedAccount, int64_t amount ) {
     if (isOnline) {
