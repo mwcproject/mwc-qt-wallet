@@ -319,9 +319,8 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     });
 
     Q_ASSERT(nanoCoins>0);
-
-    // Update with possible fee. QT wallet doens't know the fee amount, that is why put 0.02 fee that cover everything possible
-    nanoCoins += 8000000L + std::max(0,outputsNumber-1) * 4000000L;
+    // Applying the maximum possible fees. It is acceptable for output selection
+    nanoCoins += calcTxnFee(1, outputsNumber, 1);
 
     // Calculate what outputs need to be selected...
     if (freeNanoCoins >= nanoCoins) {
@@ -497,8 +496,7 @@ getTransactionInputs(int64_t amountNano, QVector<wallet::WalletOutput> spendable
 //
 // Using more inputs lowers the fee.
 //
-static uint64_t
-calcTxnFee(uint64_t numInputs, uint64_t numOutputs=1, uint64_t numKernels=1) {
+uint64_t calcTxnFee(uint64_t numInputs, uint64_t numOutputs, uint64_t numKernels) {
     uint64_t txnWeight = (4 * numOutputs) + numKernels - numInputs;
     if (1 > txnWeight) {
         // The minimum fee is 1000000 nano coin.

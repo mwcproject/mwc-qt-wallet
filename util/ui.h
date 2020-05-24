@@ -65,6 +65,17 @@ namespace util {
     QString getTxnFeeString(QWidget* parent, const QString& accountName, int64_t amount,
                             wallet::Wallet* wallet, core::AppContext* appContext,
                             QStringList& txnOutputList, uint64_t changeOutputs);
+
+    //
+    // Even though you will find documentation which says the transaction fee is
+    // calculated as 4*(num_outputs + num_kernels) - num_inputs that is not what is actually
+    // in the grin code. The calculation they use is:
+    //     (4*num_outputs) + num_kernels - num_inputs
+    //
+    // Using more inputs lowers the fee.
+    //
+    uint64_t calcTxnFee(uint64_t numInputs, uint64_t numOutputs, uint64_t numKernels);
+
 };
 
 
