@@ -332,15 +332,20 @@ void WalletConfig::on_mwc713directorySelect_clicked()
 {
     state::TimeoutLockObject to( state );
 
-    QString basePath = ioutils::getAppDataPath();
+    QPair<bool,QString> basePath = ioutils::getAppDataPath();
+    if (!basePath.first) {
+        control::MessageBox::messageText(nullptr, "Error", basePath.second);
+        return;
+    }
+
     QString dir = QFileDialog::getExistingDirectory(
             nullptr,
             "Select your wallet folder name",
-            basePath);
+            basePath.second);
     if (dir.isEmpty())
         return;
 
-    QDir baseDir(basePath);
+    QDir baseDir(basePath.second);
     QString walletDir = baseDir.relativeFilePath(dir);
 
     QPair<QString,QString> networkArch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDir); // local path as writen in config

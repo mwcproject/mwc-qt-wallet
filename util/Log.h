@@ -56,7 +56,7 @@ namespace logger {
         void rotateLogFileIfNeeded();
         void openLogFile();
     private:
-        const QString logPath;
+        QString logPath;
         const QString logFileName;
         QFile * logFile = nullptr;
         int counter = 0;

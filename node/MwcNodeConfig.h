@@ -16,6 +16,7 @@
 #define MWC_QT_WALLET_MWCNODECONFIG_H
 
 #include <QString>
+#include <QPair>
 
 namespace node {
 
@@ -28,7 +29,8 @@ struct MwcNodeConfig {
     void setData(QString network, QString host, QString port, QString secret);
 };
 
-QString getMwcNodePath(const QString & nodeDataPath, const QString & network);
+// return: <success, data/error>
+QPair<bool,QString> getMwcNodePath(const QString & nodeDataPath, const QString & network);
 
 // Update first and then get.
 MwcNodeConfig getCurrentMwcNodeConfig(const QString & nodeDataPath, const QString & network );

@@ -57,7 +57,14 @@ MwcNode::~MwcNode() {
 }
 
 QString MwcNode::getLogsLocation() const {
-    return getMwcNodePath(lastDataPath, lastUsedNetwork) + "mwc-server.log";
+    QPair<bool,QString> nodePath = getMwcNodePath(lastDataPath, lastUsedNetwork);
+    if (!nodePath.first) {
+        control::MessageBox::messageText(nullptr, "Error", nodePath.second);
+        QCoreApplication::exit();
+        return "";
+    }
+
+    return nodePath.second + "mwc-server.log";
 }
 
 
@@ -160,15 +167,22 @@ void MwcNode::stop() {
 // paramsPlus - additional parameters for the process
 QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & network ) {
     lastDataPath = dataPath;
-    nodeWorkDir = getMwcNodePath(dataPath, network);
+
+    QPair<bool,QString> nodePath = getMwcNodePath(dataPath, network);
+    if (!nodePath.first) {
+        control::MessageBox::messageText(nullptr, "Error", nodePath.second);
+        QCoreApplication::exit();
+        return nullptr;
+    }
+    nodeWorkDir = nodePath.second;
     MwcNodeConfig nodeConf = getCurrentMwcNodeConfig( dataPath, network );
 
-    QString nodeExecutablePath = QFileInfo(nodePath).canonicalFilePath();
+    QString nodeExecutablePath = QFileInfo(nodePath.second).canonicalFilePath();
     if (nodeExecutablePath.isEmpty()) {
         // file not found. Let's  report it clear way
         logger::logInfo("MWC-NODE", "error. mwc-node canonical path is empty");
 
-        reportNodeFatalError( "mwc-node executable is not found. Expected location at:\n\n" + nodePath );
+        reportNodeFatalError( "mwc-node executable is not found. Expected location at:\n\n" + nodePath.second );
         return nullptr;
     }
 
@@ -205,14 +219,14 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
 
     logger::logInfo( "MWC-NODE", "Starting mwc-node process: " + commandLine + "  at working dir:" + nodeWorkDir );
 
-    process->start(nodePath, params, QProcess::Unbuffered | QProcess::ReadWrite );
+    process->start(nodePath.second, params, QProcess::Unbuffered | QProcess::ReadWrite );
 
     while ( ! process->waitForStarted( (int)( 10000 * config::getTimeoutMultiplier()) ) ) {
         logger::logInfo( "MWC-NODE", "Failed to start mwc-node process" );
         switch (process->error())
         {
             case QProcess::FailedToStart:
-                reportNodeFatalError( "mwc-node failed to start. Mwc node expected location at " + nodePath+ "\n\nCommand line:\n\n" + ">> cd '"+nodeWorkDir+"'\n>> " + commandLine  );
+                reportNodeFatalError( "mwc-node failed to start. Mwc node expected location at " + nodePath.second + "\n\nCommand line:\n\n" + ">> cd '"+nodeWorkDir+"'\n>> " + commandLine  );
                 return nullptr;
             case QProcess::Crashed:
                 reportNodeFatalError( QString("mwc-node crashed during start\n\nCommand line:\n\n") + ">> cd '" + nodeWorkDir+"'\n>> " + commandLine );

@@ -84,15 +84,20 @@ void ChangeNode::on_radioCustomNode_clicked()
 
 void ChangeNode::on_selectNodeDataLocationBtn_clicked()
 {
-    QString basePath = ioutils::getAppDataPath();
+    QPair<bool,QString> basePath = ioutils::getAppDataPath();
+    if (!basePath.first) {
+        control::MessageBox::messageText(nullptr, "Error", basePath.second);
+        return;
+    }
+
     QString dir = QFileDialog::getExistingDirectory(
             nullptr,
             "Select your embedded node data folder",
-            basePath);
+            basePath.second);
     if (dir.isEmpty())
         return;
 
-    QDir baseDir(basePath);
+    QDir baseDir(basePath.second);
     QString nodeDir = baseDir.relativeFilePath(dir);
 
     ui->nodeDataLocation->setText( nodeDir );
@@ -112,12 +117,16 @@ void ChangeNode::on_applyButton_clicked() {
     else if ( ui->radioEmbeddedNode->isChecked() ) {
         QString nodeDataPath = ui->nodeDataLocation->text();
         // Let's create a directory and validate it...
-        QString fullPath = ioutils::getAppDataPath( nodeDataPath );
+        QPair<bool,QString> fullPath = ioutils::getAppDataPath( nodeDataPath );
+        if (!fullPath.first) {
+            control::MessageBox::messageText(nullptr, "Error", fullPath.second);
+            return;
+        }
 
-        QDir d(fullPath);
+        QDir d(fullPath.second);
 
-        if (! ( d.exists() || d.mkdir(fullPath)) ) {
-            control::MessageBox::messageText(this, "Input", "Please specify correct directory for thr node data. Directory\n" + fullPath + "\nis not accessible" );
+        if (! ( d.exists() || d.mkdir(fullPath.second)) ) {
+            control::MessageBox::messageText(this, "Input", "Please specify correct directory for thr node data. Directory\n" + fullPath.second + "\nis not accessible" );
             ui->nodeDataLocation->setFocus();
             return;
         }

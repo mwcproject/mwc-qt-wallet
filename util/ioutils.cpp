@@ -14,17 +14,17 @@
 
 #include "ioutils.h"
 #include <QStandardPaths>
-#include "../core/mwcexception.h"
 #include <QDir>
 
 namespace ioutils {
 
 // init the directory to store app data
-QString getAppDataPath(QString localPath )
+// return: <success, data/error>
+QPair<bool,QString> getAppDataPath(QString localPath )
 {
     QString path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
     if (path.isEmpty())
-        throw core::MwcException("Qt error. Cannot determine home dir location.");
+        return QPair<bool,QString>(false, "Qt error. Cannot determine home dir location.");
     path += "/mwc-qt-wallet/";
 
     // Update the windows we can't just append paths because of the drive.
@@ -45,9 +45,9 @@ QString getAppDataPath(QString localPath )
     QString dataPath = localPathIsRoot ? localPath : (d.absolutePath() + QDir::separator() + localPath);
     dataPath = QDir::cleanPath( dataPath );
     if ( !d.mkpath(dataPath) )
-        throw core::MwcException("Unable create app data directory: " + d.absolutePath());
+        return QPair<bool,QString>(false, "Unable create app data directory: " + d.absolutePath());
 
-    return dataPath;
+    return QPair<bool,QString>(true,dataPath);
 }
 
 

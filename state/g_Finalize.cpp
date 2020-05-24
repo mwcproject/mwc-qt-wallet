@@ -24,6 +24,7 @@
 #include "../windows/g_filetransaction_w.h"
 #include "../core/global.h"
 #include "../core/Config.h"
+#include <QCoreApplication>
 
 namespace state {
 
@@ -144,11 +145,17 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
         }
         else {
             // Cold wallet workflow, let's copy the transaction file
+            QPair<bool,QString> walletPath = ioutils::getAppDataPath( context->wallet->getWalletConfig().getDataPath() );
+            if (!walletPath.first) {
+                control::MessageBox::messageText(nullptr, "Error", walletPath.second);
+                QCoreApplication::exit();
+                return;
+            }
 
-            QString transactionFN = ioutils::getAppDataPath( context->wallet->getWalletConfig().getDataPath() ) + "/saved_txs/" + trInfo.transactionId + ".grintx";
+            QString transactionFN = walletPath.second + "/saved_txs/" + trInfo.transactionId + ".grintx";
             if ( !QFile(transactionFN).exists() ) {
-
                 control::MessageBox::messageText(nullptr, "Internal Error", "Transaction file for id '" + trInfo.transactionId + "' not found. wmc713 didn't create expected file.");
+                return;
             }
 
 

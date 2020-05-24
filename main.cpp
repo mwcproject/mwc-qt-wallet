@@ -69,10 +69,14 @@ bool isRetinaDisplay();
 
 // Very first run - init everything
 bool deployWalletFilesFromResources() {
-    QString confPath = ioutils::getAppDataPath();
+    QPair<bool,QString> confPath = ioutils::getAppDataPath();
+    if (!confPath.first) {
+        QMessageBox::critical(nullptr, "Error", confPath.second);
+        return false;
+    }
 
-    QString mwc713conf = confPath + "/wallet713v2.toml";
-    QString mwcGuiWalletConf = confPath + "/mwc-gui-wallet-v3.conf";
+    QString mwc713conf = confPath.second + "/wallet713v2.toml";
+    QString mwcGuiWalletConf = confPath.second + "/mwc-gui-wallet-v3.conf";
 
     bool ok = true;
 
@@ -245,6 +249,10 @@ int main(int argc, char *argv[])
 
     while (true)
     {
+        // QApplication instance is needed to show possible errors
+        core::WalletApp app(argc, argv);
+        QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+        QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
         Q_ASSERT(argc>=1);
         // Process arglist.
@@ -285,11 +293,6 @@ int main(int argc, char *argv[])
             qputenv("QT_SCALE_FACTOR", "1.001");
         }
     #endif
-
-        core::WalletApp app(argc, argv);
-        QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-        QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-
 
 #ifdef QT_DEBUG
     // Generation of the dictionaries.
@@ -373,15 +376,20 @@ int main(int argc, char *argv[])
 
         {
             // Checking if home path is ascii (Latin1) symbols only
-            QString homePath = ioutils::getAppDataPath();
-            int idx = homePath.indexOf("mwc-qt-wallet");
+            QPair<bool,QString> homePath = ioutils::getAppDataPath();
+            if (!homePath.first) {
+                control::MessageBox::messageText(nullptr, "Error", homePath.second);
+                return 1;
+            }
+
+            int idx = homePath.second.indexOf("mwc-qt-wallet");
             if (idx<0)
-                idx = homePath.length();
+                idx = homePath.second.length();
 
-            homePath = homePath.left(idx-1);
+            homePath.second = homePath.second.left(idx-1);
 
-            if ( !util::validateMwc713Str(homePath, false).first ) {
-                control::MessageBox::messageText(nullptr, "Setup Issue", "Your home directory\n" + homePath + "\ncontains Unicode symbols. Unfortunatelly mwc713 unable to handle that.\n\n"
+            if ( !util::validateMwc713Str(homePath.second, false).first ) {
+                control::MessageBox::messageText(nullptr, "Setup Issue", "Your home directory\n" + homePath.second + "\ncontains Unicode symbols. Unfortunatelly mwc713 unable to handle that.\n\n"
                                          "Please reinstall mwc-qt-wallet under different user name with basic ASCII (Latin1) symbols only.");
                 return 1;
             }
@@ -433,15 +441,20 @@ int main(int argc, char *argv[])
                     return 1;
                 }
 
-                QString basePath = ioutils::getAppDataPath();
+                QPair<bool,QString> basePath = ioutils::getAppDataPath();
+                if (!basePath.first) {
+                    control::MessageBox::messageText(nullptr, "Error", basePath.second);
+                    return 1;
+                }
+
                 QString dir = QFileDialog::getExistingDirectory(
                         nullptr,
                         "Select your wallet folder name",
-                        basePath);
+                        basePath.second);
                 if (dir.isEmpty())
                     return 1; // Exiting
 
-                QDir baseDir(basePath);
+                QDir baseDir(basePath.second);
                 walletDataPath = baseDir.relativeFilePath(dir);
             }
             else {

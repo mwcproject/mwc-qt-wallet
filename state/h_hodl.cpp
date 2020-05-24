@@ -733,7 +733,12 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                     break;
                 }
 
-                QString slateFn = ioutils::getAppDataPath("tmp") + "/" + "slate"+QString::number(requestCounter++)+".tx";
+                QPair<bool,QString> tmpPath = ioutils::getAppDataPath("tmp");
+                if (!tmpPath.first) {
+                    errMsg = tmpPath.second;
+                }
+
+                QString slateFn = tmpPath.second + "/" + "slate"+QString::number(requestCounter++)+".tx";
                 {
                     // Clean up response if exist
                     QString slateRespFn = slateFn + ".response";

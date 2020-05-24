@@ -252,11 +252,15 @@ void NodeInfo::saveBlockchainData(QString fileName) {
     QString network = context->mwcNode->getCurrentNetwork();
 
     Q_ASSERT(currentNodeConnection.isLocalNode());
-    QString nodePath = node::getMwcNodePath( currentNodeConnection.localNodeDataPath, network);
+    QPair<bool,QString> nodePath = node::getMwcNodePath( currentNodeConnection.localNodeDataPath, network);
+    if (!nodePath.first) {
+        control::MessageBox::messageText(nullptr, "Error", nodePath.second);
+        return;
+    }
 
     QCoreApplication::processEvents();
 
-    QPair<bool, QString> res = compress::compressFolder( nodePath + "chain_data/", fileName, network );
+    QPair<bool, QString> res = compress::compressFolder( nodePath.second + "chain_data/", fileName, network );
 
 
     QCoreApplication::processEvents();
@@ -293,11 +297,15 @@ void NodeInfo::loadBlockchainData(QString fileName) {
 
     Q_ASSERT(currentNodeConnection.isLocalNode());
     QString network = context->mwcNode->getCurrentNetwork();
-    QString nodePath = node::getMwcNodePath(currentNodeConnection.localNodeDataPath, network);
+    QPair<bool,QString> nodePath = node::getMwcNodePath(currentNodeConnection.localNodeDataPath, network);
+    if (!nodePath.first) {
+        control::MessageBox::messageText(nullptr, "Error", nodePath.second);
+        return;
+    }
 
     QCoreApplication::processEvents();
 
-    QPair<bool, QString> res = compress::decompressFolder( fileName,  nodePath + "chain_data/", network );
+    QPair<bool, QString> res = compress::decompressFolder( fileName,  nodePath.second + "chain_data/", network );
 
     QCoreApplication::processEvents();
 

@@ -50,10 +50,14 @@ void initLogger( bool logsEnabled) {
 void cleanUpLogs() {
     // Logs expected to be disabled first
     Q_ASSERT(logServer == nullptr );
-    QString logPath = ioutils::getAppDataPath("logs");
+    QPair<bool,QString> logPath = ioutils::getAppDataPath("logs");
+    if (!logPath.first) {
+        control::MessageBox::messageText(nullptr, "Error", logPath.second);
+        return;
+    }
 
-    QFile::remove(logPath + "/" + LOG_FILE_NAME);
-    QFile::remove(logPath + "/prev_" + LOG_FILE_NAME);
+    QFile::remove(logPath.second + "/" + LOG_FILE_NAME);
+    QFile::remove(logPath.second + "/prev_" + LOG_FILE_NAME);
 }
 
 // enable/disable logs
@@ -86,9 +90,17 @@ void LogSender::log(bool addDate, const QString & prefix, const QString & line) 
 
 // Create logger file with some simplest rotation
 LogReceiver::LogReceiver(const QString & filename) :
-        logPath(ioutils::getAppDataPath("logs")),
         logFileName(filename)
 {
+    QPair<bool,QString> path = ioutils::getAppDataPath("logs");
+    if (!path.first) {
+        control::MessageBox::messageText(nullptr, "Error", path.second);
+        QCoreApplication::exit();
+        return;
+    }
+
+    logPath = path.second;
+
     rotateLogFileIfNeeded();
     openLogFile();
 }

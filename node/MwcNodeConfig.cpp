@@ -20,12 +20,17 @@
 #include <QtGlobal>
 #include <QTime>
 #include "../core/global.h"
+#include "../control/messagebox.h"
+#include <QCoreApplication>
 
 namespace node {
 
-QString getMwcNodePath( const QString & nodeDataPath,  const QString & network) {
+QPair<bool,QString> getMwcNodePath( const QString & nodeDataPath,  const QString & network) {
     QString nwPath = network.toLower().contains("main") ? "main" : "floo";
-    return ioutils::getAppDataPath(nodeDataPath) + QDir::separator() + nwPath + QDir::separator();
+    QPair<bool,QString> appPath = ioutils::getAppDataPath(nodeDataPath);
+    if (!appPath.first)
+        return appPath;
+    return QPair<bool,QString>(true, appPath.second + QDir::separator() + nwPath + QDir::separator());
 }
 
 void MwcNodeConfig::setData(QString _network, QString _host, QString _port, QString _secret) {
@@ -36,13 +41,18 @@ void MwcNodeConfig::setData(QString _network, QString _host, QString _port, QStr
 }
 
 static void updateMwcNodeConfig(const QString & nodeDataPath, const QString & network ) {
-    QString walletPath = getMwcNodePath(nodeDataPath, network);
-
-    if ( ! QDir(walletPath).exists() ) {
-        QDir().mkpath(walletPath);
+    QPair<bool,QString> walletPath = getMwcNodePath(nodeDataPath, network);
+    if (!walletPath.first) {
+        control::MessageBox::messageText(nullptr, "Error", walletPath.second);
+        QCoreApplication::exit();
+        return;
     }
 
-    QString apiSecretFN = walletPath + "api_secret";
+    if ( ! QDir(walletPath.second).exists() ) {
+        QDir().mkpath(walletPath.second);
+    }
+
+    QString apiSecretFN = walletPath.second + "api_secret";
     if (!QFile::exists(apiSecretFN) ) {
         QString secret;
         // Since we are targeting 5.9, we can't use QRandomGenerator
@@ -60,7 +70,7 @@ static void updateMwcNodeConfig(const QString & nodeDataPath, const QString & ne
         util::writeTextFile(apiSecretFN, {secret} );
     }
 
-    QString mwcServerTomlFN = walletPath + "mwc-server.toml";
+    QString mwcServerTomlFN = walletPath.second + "mwc-server.toml";
     if (! QFile::exists(mwcServerTomlFN) ) {
         QFile::copy( network.toLower().contains("main") ? mwc::MWC_NODE_CONFIG_MAIN : mwc::MWC_NODE_CONFIG_FLOO, mwcServerTomlFN );
         QFile::setPermissions( mwcServerTomlFN, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup );
@@ -72,11 +82,16 @@ MwcNodeConfig getCurrentMwcNodeConfig(const QString & nodeDataPath, const QStrin
 
     updateMwcNodeConfig( nodeDataPath, network );
 
-    QString walletPath = getMwcNodePath(nodeDataPath, network);
+    QPair<bool,QString> walletPath = getMwcNodePath(nodeDataPath, network);
+    if (!walletPath.first) {
+        control::MessageBox::messageText(nullptr, "Error", walletPath.second);
+        QCoreApplication::exit();
+        return MwcNodeConfig();
+    }
 
     // Note, asserts are disabled because of the first run.
 
-    QStringList lines = util::readTextFile( walletPath + "api_secret" );
+    QStringList lines = util::readTextFile( walletPath.second + "api_secret" );
     //Q_ASSERT( lines.size()>0 && !lines[0].isEmpty() );
 
     QString secret;
@@ -84,7 +99,7 @@ MwcNodeConfig getCurrentMwcNodeConfig(const QString & nodeDataPath, const QStrin
         secret = lines[0];
 
     util::ConfigReader reader;
-    reader.readConfig(walletPath + "mwc-server.toml");
+    reader.readConfig(walletPath.second + "mwc-server.toml");
     //Q_ASSERT( reader.readConfig("chain_type") == network );
 
     MwcNodeConfig result;

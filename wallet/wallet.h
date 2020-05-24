@@ -17,7 +17,6 @@
 
 #include <QVector>
 #include <QString>
-#include "../core/mwcexception.h"
 #include "../util/ioutils.h"
 #include "../util/stringutils.h"
 #include <QDateTime>
@@ -328,7 +327,6 @@ struct WalletUtxoSignature {
 
 
 // Interface to wallet functionality
-// can throw MwcException to signal errors
 class Wallet : public QObject
 {
     Q_OBJECT

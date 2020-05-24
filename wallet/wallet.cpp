@@ -20,6 +20,7 @@
 #include <QDir>
 #include "../util/Files.h"
 #include "../util/Process.h"
+#include "../control/messagebox.h"
 
 namespace wallet {
 
@@ -180,8 +181,13 @@ QPair<QString,QString> WalletConfig::readNetworkArchFromDataPath(QString configP
 {
     QPair<QString,QString> res("", util::getBuildArch() );
 
-    QString path = ioutils::getAppDataPath( configPath );
-    QStringList lns = util::readTextFile(path + "/net.txt" );
+    QPair<bool,QString> path = ioutils::getAppDataPath( configPath );
+    if (!path.first) {
+        control::MessageBox::messageText(nullptr, "Error", path.second);
+        return res;
+    }
+
+    QStringList lns = util::readTextFile(path.second + "/net.txt" );
     if (lns.isEmpty())
         return res;
 
@@ -200,15 +206,23 @@ QPair<QString,QString> WalletConfig::readNetworkArchFromDataPath(QString configP
 
 //static
 bool  WalletConfig::doesSeedExist(QString configPath) {
-    QString path = ioutils::getAppDataPath( configPath );
-    return QFile::exists( path + "/" + "wallet.seed" );
+    QPair<bool,QString> path = ioutils::getAppDataPath( configPath );
+    if (!path.first) {
+        control::MessageBox::messageText(nullptr, "Error", path.second);
+        return false;
+    }
+    return QFile::exists( path.second + "/" + "wallet.seed" );
 }
 
 //static
 void  WalletConfig::saveNetwork2DataPath(QString configPath, QString network, QString arch) // Save the network into the data path
 {
-    QString path = ioutils::getAppDataPath( configPath );
-    util::writeTextFile(path + "/net.txt", {network, arch} );
+    QPair<bool,QString> path = ioutils::getAppDataPath( configPath );
+    if (!path.first) {
+        control::MessageBox::messageText(nullptr, "Error", path.second);
+        return;
+    }
+    util::writeTextFile(path.second + "/net.txt", {network, arch} );
 }
 
 // initialize static csvHeaders

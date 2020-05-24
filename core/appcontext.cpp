@@ -23,6 +23,8 @@
 #include "../core/global.h"
 #include <QtAlgorithms>
 #include "../util/Log.h"
+#include <QMessageBox>
+#include <QCoreApplication>
 
 namespace core {
 
@@ -125,9 +127,14 @@ void AppContext::updateIntVectorFor( QString name, const QVector<int> & data ) {
 
 
 bool AppContext::loadData() {
-    QString dataPath = ioutils::getAppDataPath("context");
+    QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
+    if (!dataPath.first) {
+        QMessageBox::critical(nullptr, "Error", dataPath.second);
+        QCoreApplication::exit();
+        return false;
+    }
 
-    QFile file(dataPath + "/" + settingsFileName);
+    QFile file(dataPath.second + "/" + settingsFileName);
     if ( !file.open(QIODevice::ReadOnly) ) {
         // first run, no file exist
         return false;
@@ -219,9 +226,14 @@ bool AppContext::loadData() {
 
 
 void AppContext::saveData() const {
-    QString dataPath = ioutils::getAppDataPath("context");
+    QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
+    if (!dataPath.first) {
+        control::MessageBox::messageText(nullptr, "Error", dataPath.second);
+        QCoreApplication::exit();
+        return;
+    }
 
-    QString filePath = dataPath + "/" + settingsFileName;
+    QString filePath = dataPath.second + "/" + settingsFileName;
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
         control::MessageBox::messageText(nullptr,
@@ -301,9 +313,14 @@ void AppContext::setShowOutputAll(bool all) {
 
 // AirdropRequests will handle differently
 void AppContext::saveAirdropRequests( const QVector<state::AirdropRequests> & data ) {
-    QString dataPath = ioutils::getAppDataPath("context");
+    QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
+    if (!dataPath.first) {
+        control::MessageBox::messageText(nullptr, "Error", dataPath.second);
+        QCoreApplication::exit();
+        return;
+    }
 
-    QString filePath = dataPath + "/" + airdropRequestsFileName;
+    QString filePath = dataPath.second + "/" + airdropRequestsFileName;
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
         control::MessageBox::messageText(nullptr,
@@ -328,9 +345,14 @@ QVector<state::AirdropRequests> AppContext::loadAirdropRequests() const {
 
     QVector<state::AirdropRequests> res;
 
-    QString dataPath = ioutils::getAppDataPath("context");
+    QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
+    if (!dataPath.first) {
+        control::MessageBox::messageText(nullptr, "Error", dataPath.second);
+        QCoreApplication::exit();
+        return res;
+    }
 
-    QFile file(dataPath + "/" + airdropRequestsFileName);
+    QFile file(dataPath.second + "/" + airdropRequestsFileName);
     if ( !file.open(QIODevice::ReadOnly) ) {
         // first run, no file exist
         return res;
@@ -356,16 +378,6 @@ QVector<state::AirdropRequests> AppContext::loadAirdropRequests() const {
     }
 
     return res;
-}
-
-// First run for a new version flags support...
-bool AppContext::isSetupDone(QString version) {
-    QStringList lns = util::readTextFile(ioutils::getAppDataPath("context") + "/" + airdropRequestsFileName );
-    return lns.size()>0 && lns[0]==version;
-}
-
-void AppContext::updateSetupDone(QString version) {
-    util::writeTextFile(ioutils::getAppDataPath("context") + "/" + airdropRequestsFileName, QStringList{version} );
 }
 
 // -------------- Contacts
@@ -465,8 +477,14 @@ void AppContext::setHodlRegistrationTime(const QString & hash, int64_t time) {
 
 void AppContext::saveHodlOutputs( const QString & rootPubKeyHash, const QMap<QString, core::HodlOutputInfo> & hodlOutputs ) {
     Q_ASSERT(!rootPubKeyHash.isEmpty());
-    QString dataPath = ioutils::getAppDataPath("context");
-    QString filePath = dataPath + "/" + hodlOutputsPrefix+rootPubKeyHash + ".dat";
+    QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
+    if (!dataPath.first) {
+        control::MessageBox::messageText(nullptr, "Error", dataPath.second);
+        QCoreApplication::exit();
+        return;
+    }
+
+    QString filePath = dataPath.second + "/" + hodlOutputsPrefix+rootPubKeyHash + ".dat";
 
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
@@ -491,8 +509,14 @@ void AppContext::saveHodlOutputs( const QString & rootPubKeyHash, const QMap<QSt
 QMap<QString, core::HodlOutputInfo> AppContext::loadHodlOutputs(const QString & rootPubKeyHash ) {
     QMap<QString, core::HodlOutputInfo> res;
 
-    QString dataPath = ioutils::getAppDataPath("context");
-    QString filePath = dataPath + "/" + hodlOutputsPrefix+rootPubKeyHash + ".dat";
+    QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
+    if (!dataPath.first) {
+        control::MessageBox::messageText(nullptr, "Error", dataPath.second);
+        QCoreApplication::exit();
+        return res;
+    }
+
+    QString filePath = dataPath.second + "/" + hodlOutputsPrefix+rootPubKeyHash + ".dat";
 
     QFile file(filePath);
     if ( !file.open(QIODevice::ReadOnly) ) {

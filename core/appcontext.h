@@ -152,10 +152,6 @@ public:
     bool getWallet713DataPathWithNetwork( QString & wallet713DataPath, QString & network);
     void setWallet713DataPathWithNetwork( const QString & wallet713DataPath, const QString & network );
 
-    // First run for a new version flags support...
-    bool isSetupDone(QString version);
-    void updateSetupDone(QString version);
-
     // HODL registration time.
     int64_t getHodlRegistrationTime(const QString & hash) const;
     void    setHodlRegistrationTime(const QString & hash, int64_t time);

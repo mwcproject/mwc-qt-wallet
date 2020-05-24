@@ -27,7 +27,7 @@ namespace test {
 void testLogsRotation() {
 
     // Clean up logs first...
-    QString logPath = ioutils::getAppDataPath("logs");
+    QString logPath = ioutils::getAppDataPath("logs").second;
 
     QDir logDir(logPath);
 
