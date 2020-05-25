@@ -157,20 +157,22 @@ void SendOnline::on_sendButton_clicked()
     core::SendCoinsParams sendParams = state->getSendCoinsParams();
 
     QStringList outputs;
+    uint64_t txnFee = 0;
     if (! util::getOutputsToSend( fromAccount.accountName, sendParams.changeOutputs, amount,
             state->getContext()->wallet, state->getContext()->hodlStatus, state->getContext()->appContext,
-            this, outputs ) )
+            this, outputs, &txnFee ) )
         return; // User reject something
 
-    QString txnFee = util::getTxnFeeString( this, fromAccount.accountName, amount, state->getContext()->wallet,
-                                           state->getContext()->appContext, outputs, sendParams.changeOutputs );
-    if (txnFee.isEmpty())
-        return; // Error will have already been displayed
+    if (txnFee == 0 && outputs.size() == 0) {
+        txnFee = util::getTxnFee( fromAccount.accountName, amount, state->getContext()->wallet,
+                                  state->getContext()->appContext, sendParams.changeOutputs, outputs );
+    }
+    QString txnFeeStr = util::txnFeeToString(txnFee);
 
     // Ask for confirmation
     dlg::SendConfirmationDlg confirmDlg(this, "Confirm Send Request",
                                         "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " MWC from account: " + fromAccount.accountName +
-                                        "\nTo address: " + address + "\n\nTransaction fee: " + txnFee,
+                                        "\nTo address: " + address + "\n\nTransaction fee: " + txnFeeStr,
                                         1.0, state->getWalletPasswordHash(), state->getContext()->appContext->isFluffSet() );
     connect(&confirmDlg, &dlg::SendConfirmationDlg::saveFluffSetting, this, &SendOnline::saveFluffSetting);
     if (confirmDlg.exec() == QDialog::Accepted) {

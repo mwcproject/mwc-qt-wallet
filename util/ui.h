@@ -29,42 +29,33 @@ namespace util {
     // UI related small routines
 
     // in: nanoCoins < 0 - ALL
-    // out: resultOutputs - what we want include into transaction. If
+    // out: resultOutputs - what we want include into transaction.
+    //      txnFee        - txn fee for send using these resultOutputs
     // return false if User cancel this action.
     bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins,
                            wallet::Wallet * wallet,
                            core::HodlStatus * hodlStatus,
                            core::AppContext * appContext,
-                           QWidget * parent, QStringList & resultOutputs );
+                           QWidget * parent, QStringList & resultOutputs, uint64_t* txnFee );
 
 
     // Utility method. Exposed to testing only!!!
     bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> & inputOutputs, QStringList & resultOutputs );
 
-    // calculates the transaction fee (in nanocoins) for the given amount (in nanocoins)
-    // and populates the transaction fee parameter
+    // Calculates the transaction fee (in nanocoins) for the given amount (in nanocoins).
+    // Returns the transaction fee and populates txnOutputList with the outputs used
+    // in calculating the fee and therefore should be sent as the outputs for the
+    // transaction.
     //
-    // if txnOutputList is given, computes the fee based upon those outputs in the wallet
-    // if txnOutputList is not given, computes the fee based upon all spendable outputs in the wallet
+    // The fee is computed based upon all spendable outputs in the wallet.
+    // This method should only be called if there are no HODL outputs or lockedOutputs
+    // is not enabled. Call only if getOutputsToSend() doesn't return resultOutputs and the txnFee
     //
-    // returns true if the fee was able to be calculated and there are enough outputs
-    // to cover the amount + fee
-    // returns false there was an error calculating the fee or if there were not enough
-    // outputs to cover the amount + fee
-    // transactionFee will be populated with 0, if there was an error calculating
-    // the fee. Otherwise transaction fee will contain the actual fee regardless
-    // of the return status.
-    bool getTxnFee(QWidget* parent, const QString& accountName, int64_t amount,
-                   wallet::Wallet* wallet, core::AppContext* appContext,
-                   QStringList& txnOutputList, uint64_t changeOutputs, uint64_t* transactionFee);
-
-    // Returns the transaction fee as a string in the form x.xxx which can be used for
-    // displaying the txn fee. If an error occurs, a message will be displayed on the parent.
+    // returns 0 if the fee could not be calculated and the txnOutputList should not be used.
     //
-    // An empty string will be returned if there was an error.
-    QString getTxnFeeString(QWidget* parent, const QString& accountName, int64_t amount,
-                            wallet::Wallet* wallet, core::AppContext* appContext,
-                            QStringList& txnOutputList, uint64_t changeOutputs);
+    uint64_t getTxnFee(const QString& accountName, int64_t amount, wallet::Wallet* wallet,
+                       core::AppContext* appContext, uint64_t changeOutputs,
+                       QStringList& txnOutputList);
 
     //
     // Even though you will find documentation which says the transaction fee is
@@ -75,6 +66,11 @@ namespace util {
     // Using more inputs lowers the fee.
     //
     uint64_t calcTxnFee(uint64_t numInputs, uint64_t numOutputs, uint64_t numKernels);
+
+    //
+    // Converts the given txn fee in nano coins into a string of the form: x.xxx
+    // If the given transaction fee is 0, "unknown" is returned.
+    QString txnFeeToString(uint64_t nanoTxnFee);
 
 };
 

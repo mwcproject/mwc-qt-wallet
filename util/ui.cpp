@@ -24,6 +24,11 @@
 
 namespace util {
 
+// forward declarations
+static
+uint64_t getTxnFeeFromSpendableOutputs(int64_t amount, const QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs,
+                                       uint64_t changeOutputs, uint64_t totalNanoCoins, QStringList& txnOutputList);
+
 static QString generateMessageHtmlOutputsToSpend( const QVector<core::HodlOutputInfo> & outputs ) {
     /*
   This transaction will include outputs registered for HODL<br>
@@ -239,12 +244,13 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
         wallet::Wallet * wallet,
         core::HodlStatus * hodlStatus,
         core::AppContext * appContext,
-        QWidget * parent, QStringList & resultOutputs ) {
+        QWidget * parent, QStringList & resultOutputs, uint64_t* txnFee ) {
     Q_ASSERT(hodlStatus);
     Q_ASSERT(appContext);
     Q_ASSERT(wallet);
 
     resultOutputs.clear();
+    *txnFee = 0;  // txnFee will only be 0 if it wasn't calculated or there was an error
 
     // mwc713 doesn't know about HODL outputs or locked outputs
     // if we don't have HODL or locked outputs, let mwc713 select the outputs
@@ -254,9 +260,11 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     QVector<wallet::WalletOutput>  outputs = wallet->getwalletOutputs().value(accountName);
 
     QVector<QPair<wallet::WalletOutput, core::HodlOutputInfo>> hodlOuts;
-    QVector<wallet::WalletOutput> freeOuts;
+    //QVector<wallet::WalletOutput> freeOuts;
+    QMultiMap<int64_t, wallet::WalletOutput> freeOuts;
 
     int64_t freeNanoCoins = 0;
+    int64_t totalNanoCoins = 0;
 
     QStringList allOutputs;
 
@@ -274,6 +282,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
             continue;
 
         allOutputs.push_back(o.outputCommitment);
+        totalNanoCoins += o.valueNano;
 
         core::HodlOutputInfo ho = hodlStatus->getHodlOutput("", o.outputCommitment);
 
@@ -283,15 +292,17 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
         }
         else {
             o.weight = 0.01;
-            freeOuts.push_back(o);
+            freeOuts.insert(o.valueNano, o);  // inserts by value
             freeNanoCoins += o.valueNano;
         }
     }
 
     if (hodlOuts.size()==0) {
         // nothing on this account is in HODL
-        if (appContext->isLockOutputEnabled())
+        if (appContext->isLockOutputEnabled()) {
             resultOutputs = allOutputs;
+            *txnFee = getTxnFeeFromSpendableOutputs(nanoCoins, freeOuts, outputsNumber, totalNanoCoins, resultOutputs);
+        }
         return true;
     }
 
@@ -301,12 +312,14 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
         for (const auto & ho : hodlOuts )
             spentOuts.push_back(ho.second);
 
-        // Ask user if he want ot spend all and continue...
+        // Ask user if he wants to spend all and continue...
         if (control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(parent, "HODL Output Spending",
                 generateMessageHtmlOutputsToSpend( spentOuts ),
                 "Cancel", "Continue", true, false, 1.4) ) {
-            if (appContext->isLockOutputEnabled())
+            if (appContext->isLockOutputEnabled()) {
                 resultOutputs = allOutputs;
+                *txnFee = getTxnFeeFromSpendableOutputs(nanoCoins, freeOuts, outputsNumber, totalNanoCoins, resultOutputs);
+            }
             return true;
         }
         else {
@@ -319,38 +332,26 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     });
 
     Q_ASSERT(nanoCoins>0);
-    // Applying the maximum possible fees. It is acceptable for output selection
-    nanoCoins += calcTxnFee(1, outputsNumber, 1);
+    // Applying the maximum possible fees. It is acceptable for output selection.
+    // Add 1 to outputsNumber for output used by txn receiver
+    int64_t maxFee = calcTxnFee(1, outputsNumber+1, 1);
 
     // Calculate what outputs need to be selected...
-    if (freeNanoCoins >= nanoCoins) {
-        // Let's select optimal set of output to spend...
-        bool res = calcOutputsToSpend( nanoCoins, freeOuts, resultOutputs );
-        Q_ASSERT(res); // We have amount, no reasons to fail.
-        if (!res) {
-            QStringList outputs2print;
-            for (const auto & o : freeOuts)
-                outputs2print.push_back(o.toString());
+    if (freeNanoCoins >= nanoCoins + maxFee) {
+        *txnFee = getTxnFeeFromSpendableOutputs(nanoCoins, freeOuts, outputsNumber, freeNanoCoins, resultOutputs);
 
-            control::MessageBox::messageText(parent, "Internal Error", "calcOutputsToSpend internal error for available outputs. nanoCoins=" +
-                QString::number(nanoCoins) + " freeNanoCoins=" + QString::number(freeNanoCoins) + " Number of outputs:" + QString::number(freeOuts.size()) +
-                "\nOutputs:\n" + outputs2print.join("\n")
-            );
-        }
-
-        // 1 - resulting output.  outputsNumber - change outputs
-        // Limit 500 will be checked on the waalet side
-        if (resultOutputs.size() + outputsNumber + 1 > 498 ) {
+        // batch size check done inside of getTxnFeeFromSpendableOutputs is only possible error
+        if (*txnFee == 0 && resultOutputs.size() == 0) {
             control::MessageBox::messageText(parent, "Send Amount", "We can't send such large amount of the coins in a single transaction because your outputs are too small. Please send smaller amount.");
             return false;
         }
-
-        return res;
+        return true;
     }
 
     // Need to spend some HODL outputs
     QStringList hodlResultOutputs;
 
+    nanoCoins += maxFee;
     int64_t hodlCoins = nanoCoins - freeNanoCoins;
     QVector<wallet::WalletOutput> spentOuts;
     double lastW = 0.0;
@@ -369,7 +370,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     bool res = calcOutputsToSpend( nanoCoins - freeNanoCoins, spentOuts, hodlResultOutputs );
     if (!res) {
         // spend all case, very possible because we don't control the balance
-        return getOutputsToSend( accountName, outputsNumber, -1, wallet, hodlStatus, appContext, parent, resultOutputs );
+        return getOutputsToSend( accountName, outputsNumber, -1, wallet, hodlStatus, appContext, parent, resultOutputs, txnFee );
     }
 
     // Let's ask for outptus
@@ -395,40 +396,22 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
 
     // User approve the spending, preparing the list of outputs...
     resultOutputs = hodlResultOutputs;
-    for ( const auto & o : freeOuts )
+    for ( const auto & o : freeOuts.values() )
         resultOutputs.push_back( o.outputCommitment );
+
+    // calculate transaction fee
+    uint64_t numInputs = resultOutputs.size();
+    *txnFee = calcTxnFee(numInputs, outputsNumber + 1, 1);
 
     return true;
 }
 
 //
-// Given a list of output commitments, returns an array of the wallet outputs associated with
-// those commitments. The array is sorted in ascending order by coin value.
+// Populates a multimap with outputs available for spending using the output's value as the key.
 //
-static QVector<wallet::WalletOutput>
-getSortedWalletOutputs(const QString& accountName, const wallet::Wallet* wallet, const QStringList& outputList) {
-    QVector<wallet::WalletOutput> walletOutputs;
-    if (outputList.size() > 0) {
-        QVector<wallet::WalletOutput> outputs = wallet->getwalletOutputs().value(accountName);
-        for (wallet::WalletOutput o : outputs) {
-            if (outputList.contains(o.outputCommitment)) {
-                walletOutputs.push_back(o);
-            }
-        }
-        // ensure the outputs are in ascending order so smaller outputs are spent first
-        // as the fee will be less when more outputs are used
-        std::sort(walletOutputs.begin(), walletOutputs.end(), [](const wallet::WalletOutput &o1, const wallet::WalletOutput &o2) {return o1.valueNano < o2.valueNano;});
-    }
-    return walletOutputs;
-}
-
-//
-// Returns an array of outputs which are available for spending.
-// The array is sorted in ascending order by coin value.
-//
-static QVector<wallet::WalletOutput>
-getSpendableOutputs(const QString& accountName, const wallet::Wallet* wallet, core::AppContext* appContext) {
-    QVector<wallet::WalletOutput> spendableOutputs;
+static void
+findSpendableOutputs(const QString& accountName, const wallet::Wallet* wallet, core::AppContext* appContext,
+                     QMultiMap<int64_t, wallet::WalletOutput>& spendableOutputs) {
 
     QVector<wallet::WalletOutput>  outputs = wallet->getwalletOutputs().value(accountName);
     for ( wallet::WalletOutput o : outputs) {
@@ -439,12 +422,11 @@ getSpendableOutputs(const QString& accountName, const wallet::Wallet* wallet, co
             continue;
         if (!o.coinbase && o.numOfConfirms.toInt() < appContext->getSendCoinsParams().inputConfirmationNumber)
             continue;
-        if (appContext->isLockedOutputs(o.outputCommitment))
+        // ensure outputs locked by Qt Wallet are not used
+        if (appContext->isLockOutputEnabled() && appContext->isLockedOutputs(o.outputCommitment))
             continue;
-        spendableOutputs.push_back(o);
+        spendableOutputs.insert(o.valueNano, o);
     }
-    std::sort(spendableOutputs.begin(), spendableOutputs.end(), [](const wallet::WalletOutput &o1, const wallet::WalletOutput &o2) {return o1.valueNano < o2.valueNano;});
-    return spendableOutputs;
 }
 
 static int64_t
@@ -456,6 +438,15 @@ getTotalCoins(const QVector<wallet::WalletOutput> outputs) {
     return total;
 }
 
+static int64_t
+getTotalCoinsFromMap(const QMultiMap<int64_t, wallet::WalletOutput> outputs) {
+    int64_t total = 0;
+    for ( int64_t valueNano : outputs.keys()) {
+        total += valueNano;
+    }
+    return total;
+}
+
 //
 // Returns an array of the outputs to include, as inputs, in the transaction.
 //
@@ -463,21 +454,25 @@ getTotalCoins(const QVector<wallet::WalletOutput> outputs) {
 //    amountNano - The amount in nano coins to spend. May or may not include the txn fee.
 //    spendableOutputs - Vector of spendable outputs (sorted in the order to be used)
 //
-static QVector<wallet::WalletOutput>
-getTransactionInputs(int64_t amountNano, QVector<wallet::WalletOutput> spendableOutputs)
+static void
+retrieveTransactionInputs(int64_t amountNano, QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs,
+                          uint64_t* totalNanoCoins, QVector<wallet::WalletOutput>& inputs)
 {
-    QVector<wallet::WalletOutput> inputs;
+    inputs.clear();
+    if (*totalNanoCoins == 0) {
+        *totalNanoCoins = getTotalCoinsFromMap(spendableOutputs);
+    }
 
-    int64_t total = getTotalCoins(spendableOutputs);
-    if (total >= amountNano) {
-        if (amountNano < 0) {
-            // send all coins
-            inputs = spendableOutputs;
-        }
-        else {
+    if (amountNano < 0) {
+        // send all coins
+        inputs = spendableOutputs.values().toVector();
+    }
+    else {
+        uint64_t amount = amountNano;
+        if (amount < *totalNanoCoins) {
             int64_t amountToSpend = amountNano;
             int64_t selectedAmount = 0L;
-            for ( wallet::WalletOutput o : spendableOutputs) {
+            for (wallet::WalletOutput o : spendableOutputs.values()) {
                 if (selectedAmount < amountToSpend) {
                     inputs.push_back(o);
                     selectedAmount += o.valueNano;
@@ -485,7 +480,6 @@ getTransactionInputs(int64_t amountNano, QVector<wallet::WalletOutput> spendable
             }
         }
     }
-    return inputs;
 }
 
 //
@@ -506,57 +500,28 @@ uint64_t calcTxnFee(uint64_t numInputs, uint64_t numOutputs, uint64_t numKernels
 }
 
 //
-// Calculates the transaction fee for the amount specified.
-// If txnOutputList is not empty, then those outputs will be used as the
-// spendable outputs in the calculation. If txnOutputList is empty, then
-// the spendable outputs will be retrieved from the wallet.
+// Calculates the transaction fee from the array of spendable outputs.
+// If an error occurs, displays a message on the parent window and returns -1.
 //
-// The transaction fee is calculated based upon the default calculation
-// used in mwc713 where smaller outputs are used first as the fee will
-// be reduced if more spendable outputs are used as transaction inputs.
-//
-// The minimum transaction fee is: 1000000 MWC nanocoin
-//
-// Parameters:
-//     amount        - amount to spend in MWC nanocoins
-//     txnOutputList - list of output commitments to be used in transaction (from getOutputsToSend)
-//     changeOutputs - number of outputs to use for sender change outputs
-//
-bool getTxnFee(QWidget* parent, const QString& accountName, int64_t amount,
-               wallet::Wallet* wallet, core::AppContext* appContext,
-               QStringList& txnOutputList, uint64_t changeOutputs, uint64_t* transactionFee) {
+static
+uint64_t getTxnFeeFromSpendableOutputs(int64_t amount, const QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs,
+                                       uint64_t changeOutputs, uint64_t totalNanoCoins, QStringList& txnOutputList) {
 
-    *transactionFee = 0;
-    bool feeResult = true;
+    uint64_t totalCoins = totalNanoCoins;
+
     uint64_t numKernels = 1;     // always 1 for now
     uint64_t resultOutputs = 1;  // we always have at least 1 result output for the receiver's output
 
-    QVector<wallet::WalletOutput> spendableOutputs;
-    if (txnOutputList.size() > 0) {
-        // the unspent outputs to use were already calculated prior to our being called
-        spendableOutputs = getSortedWalletOutputs(accountName, wallet, txnOutputList);
-    }
-    else {
-        spendableOutputs = getSpendableOutputs(accountName, wallet, appContext);
-        // populate the txnOutputList so that mwc713 uses the same outputs as
-        // we did when calculating the txn fee
-        txnOutputList.clear();
-        for (wallet::WalletOutput o : spendableOutputs) {
-            txnOutputList.push_back(o.outputCommitment);
-        }
-    }
-    QVector<wallet::WalletOutput> txnInputs = getTransactionInputs(amount, spendableOutputs);
+    // retrieval of the transaction inputs from the Map will result
+    // in the inputs being sorted in ascending order by value
+    QVector<wallet::WalletOutput> txnInputs;
+    retrieveTransactionInputs(amount, spendableOutputs, &totalCoins, txnInputs);
+
     uint64_t numInputs = txnInputs.size();
-    if (numInputs == 0) {
-        control::MessageBox::messageText(parent, "Send Amount Error", "Cannot find enough spendable outputs to cover amount.");
-        return false;
-    }
-    if (numInputs + resultOutputs + changeOutputs > mwc::MWC_MAX_OUTPUTS) {
-        control::MessageBox::messageText(parent, "Send Amount Error", "Maximum outputs of 500 exceeded. Amount to send comes from more outputs than allowed. Please send a smaller amount.");
-        return false;
+    if (numInputs == 0 || numInputs + resultOutputs + changeOutputs > mwc::MWC_MAX_OUTPUTS) {
+        return 0;
     }
 
-    uint64_t totalCoins = getTotalCoins(txnInputs);
     uint64_t txnFee = calcTxnFee(numInputs, resultOutputs, numKernels);
 
     uint64_t amountWithFee = 0;
@@ -578,7 +543,7 @@ bool getTxnFee(QWidget* parent, const QString& accountName, int64_t amount,
 
         // check again to ensure we have enough outputs for the amount including the fee
         if (totalCoins < amountWithFee) {
-            txnInputs = getTransactionInputs(amountWithFee, spendableOutputs);
+            retrieveTransactionInputs(amountWithFee, spendableOutputs, &totalCoins, txnInputs);
             numInputs = txnInputs.size();
             // only recalculate txnFee if we had inputs
             // otherwise pass out the latest txnFee so the caller can display
@@ -591,31 +556,61 @@ bool getTxnFee(QWidget* parent, const QString& accountName, int64_t amount,
             }
         }
         if (totalCoins < amountWithFee) {
-            feeResult = false;
+            txnFee = 0;
         }
     }
-    *transactionFee = txnFee;
+    // if we were given an empty txnOutputList, populate it so that mwc713
+    // will use the same outputs as we did when calculating the txn fee
+    // and large number of outputs will not need to be scanned again
+    if (txnFee != 0 && txnOutputList.size() == 0) {
+        for (wallet::WalletOutput o : txnInputs) {
+            txnOutputList.push_back(o.outputCommitment);
+        }
+    }
 
-    return feeResult;
+    return txnFee;
 }
 
 //
-// Returns a string with the transaction fee in the form: x.xxx
+// Calculates the transaction fee for the amount specified.
+// If txnOutputList is not empty, then those outputs will be used as the
+// spendable outputs in the calculation. If txnOutputList is empty, then
+// the spendable outputs will be retrieved from the wallet.
 //
-QString getTxnFeeString(QWidget* parent, const QString& accountName, int64_t amount,
-                        wallet::Wallet* wallet, core::AppContext* appContext,
-                        QStringList& txnOutputList, uint64_t changeOutputs) {
+// The transaction fee is calculated based upon the default calculation
+// used in mwc713 where smaller outputs are used first as the fee will
+// be reduced if more spendable outputs are used as transaction inputs.
+//
+// The minimum transaction fee is: 1000000 MWC nanocoin
+//
+// Parameters:
+//     amount        - amount to spend in MWC nanocoins
+//     txnOutputList - list of output commitments to be used in transaction (from getOutputsToSend)
+//     changeOutputs - number of outputs to use for sender change outputs
+//
+uint64_t getTxnFee(const QString& accountName, int64_t amount, wallet::Wallet* wallet,
+                   core::AppContext* appContext, uint64_t changeOutputs,
+                   QStringList& txnOutputList) {
+    // we should not have been called if the txn outputs have already been found
+    if (txnOutputList.size() > 0)
+        return 0;
 
     uint64_t txnFee = 0;
-    bool txnFeeResult = getTxnFee(parent, accountName, amount, wallet, appContext, txnOutputList, changeOutputs, &txnFee);
-    double dTxnFee = (double)txnFee / (double)mwc::NANO_MWC;
-    QString fee = QString::number(dTxnFee);
-    if (!txnFeeResult && txnFee != 0) {
-       control::MessageBox::messageText(parent, "Send Amount Error", "Cannot find enough outputs available for sending amount plus " + fee + " transaction fee.");
+    QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs;
+    findSpendableOutputs(accountName, wallet, appContext, spendableOutputs);
+
+    if (spendableOutputs.size() > 0) {
+        txnFee = getTxnFeeFromSpendableOutputs(amount, spendableOutputs, changeOutputs, 0, txnOutputList);
     }
-    if (!txnFeeResult) {
-        // reset fee string to be empty
-        fee = "";
+
+    return txnFee;
+}
+
+QString txnFeeToString(uint64_t nanoTxnFee) {
+    double dTxnFee = (double)nanoTxnFee / (double)mwc::NANO_MWC;
+    QString fee = QString::number(dTxnFee);
+    if (nanoTxnFee < mwc::BASE_TRANSACTION_FEE) {
+        fee = "unknown";
     }
     return fee;
 }

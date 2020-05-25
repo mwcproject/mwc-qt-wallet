@@ -80,20 +80,22 @@ void SendOffline::on_sendButton_clicked()
     core::SendCoinsParams sendParams = state->getSendCoinsParams();
 
     QStringList outputs;
+    uint64_t txnFee = 0;
     if (! util::getOutputsToSend( fromAccount.accountName, sendParams.changeOutputs, amount,
                     state->getContext()->wallet, state->getContext()->hodlStatus, state->getContext()->appContext,
-                    this, outputs ) )
+                    this, outputs, &txnFee) )
         return; // User reject something
 
-    QString txnFee = util::getTxnFeeString(this, fromAccount.accountName, amount, state->getContext()->wallet,
-                                           state->getContext()->appContext, outputs, sendParams.changeOutputs);
-    if (txnFee.isEmpty())
-        return;
+    if (txnFee == 0 && outputs.size() == 0) {
+        txnFee = util::getTxnFee(fromAccount.accountName, amount, state->getContext()->wallet,
+                                 state->getContext()->appContext, sendParams.changeOutputs, outputs);
+    }
+    QString txnFeeStr = util::txnFeeToString(txnFee);
 
     QString hash = state->getWalletPasswordHash();
     if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this,"Confirm Send Request",
                          "You are sending offline " + (amount < 0 ? "all" : util::nano2one(amount)) +
-                         " MWC from account: " + fromAccount.accountName + "\n\nTransaction fee: " + txnFee +
+                         " MWC from account: " + fromAccount.accountName + "\n\nTransaction fee: " + txnFeeStr +
                          "\n\nYour initial transaction slate will be stored in a file.", "Decline", "Confirm", false, true, 1.0,
                          hash, control::MessageBox::RETURN_CODE::BTN2 ) )
         return;
