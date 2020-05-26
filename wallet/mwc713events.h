@@ -155,6 +155,9 @@ public:
 
     const QVector<WEvent> & getEvents() const {return events;}
 
+    // Cancelling all tasks except the current one. Return timeout valiue that needed to wait
+    int cancelTasksInQueue();
+
     // clean all tasks, events and all
     void clear();
 public slots:

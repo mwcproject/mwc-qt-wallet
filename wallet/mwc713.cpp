@@ -327,13 +327,27 @@ void MWC713::processStop(bool exitNicely) {
     emit onMwcAddressWithIndex("",1);
 
     if (mwc713process) {
+        // Waitiong for task Q to be empty
+        // Note, event processing can change a lot for us, so we shoudl watch for variables
         if (exitNicely) {
             qDebug() << "start exiting...";
-            executeMwc713command("exit", "");
 
-            if (!util::processWaitForFinished( mwc713process, 5000, "mwc713")) {
+            int taskTimeout = 0;
+            if (eventCollector != nullptr)
+                taskTimeout += eventCollector->cancelTasksInQueue();
+
+            if (taskTimeout <= 10000) {
+                executeMwc713command("exit", "");
+            }
+            else {
+                logger::logInfo("MWC713", QString("mwc713 terminating because running long task that required to stop ") + QString::number(taskTimeout) + "ms");
+                taskTimeout  = 0;
                 mwc713process->terminate();
-                util::processWaitForFinished( mwc713process, 5000, "mwc713");
+            }
+
+            if (!util::processWaitForFinished( mwc713process, 3000 + taskTimeout, "mwc713")) {
+                mwc713process->terminate();
+                util::processWaitForFinished( mwc713process, 3000 + taskTimeout, "mwc713");
             }
             qDebug() << "mwc713 is exited";
         }

@@ -158,6 +158,18 @@ bool Mwc713EventManager::addFirstTask( Mwc713Task * task, int64_t timeout) {
     return true;
 }
 
+// Running and waiting tasks number
+int Mwc713EventManager::cancelTasksInQueue() {
+    QMutexLocker l( &taskQMutex );
+
+    if (taskQ.isEmpty()) {
+        return 0;
+    }
+
+    taskQ.resize(1);
+    return taskQ[0].timeout;
+}
+
 
 // Process next task
 void Mwc713EventManager::processNextTask() {
