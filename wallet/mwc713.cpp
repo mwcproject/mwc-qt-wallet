@@ -249,6 +249,8 @@ void MWC713::start2init(QString password) {
 
     // Init task
     eventCollector->addTask( new TaskInit(this), TaskInit::TIMEOUT );
+
+    walletPasswordHash = crypto::calcHSA256Hash(password);
 }
 
 // Recover the wallet with a mnemonic phrase
@@ -288,6 +290,8 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
     // Adding permanent listeners
     eventCollector->addListener( new TaskErrWrnInfoListener(this) );
     eventCollector->addListener( new TaskRecoverProgressListener(this) );
+
+    walletPasswordHash = crypto::calcHSA256Hash(password);
 }
 
 void MWC713::processStop(bool exitNicely) {
