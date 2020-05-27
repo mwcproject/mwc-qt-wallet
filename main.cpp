@@ -250,7 +250,6 @@ int main(int argc, char *argv[])
     while (true)
     {
         // QApplication instance is needed to show possible errors
-        core::WalletApp app(argc, argv);
         QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
         QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
@@ -344,6 +343,7 @@ int main(int argc, char *argv[])
             }
         }
 
+        core::WalletApp app(argc, argv);
 
         if (!deployWalletFilesFromResources() ) {
             QMessageBox::critical(nullptr, "Error", "Unable to provision or verify resource files during the first run");
