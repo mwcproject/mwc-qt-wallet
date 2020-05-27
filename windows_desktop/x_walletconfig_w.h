@@ -88,7 +88,7 @@ private:
         // Update button state
     void updateButtons();
 
-    void checkSizeButton(int szId); // Id match the control names: 1..4
+    void checkSizeButton(int szId); // Id match the control_desktop names: 1..4
     int getcheckedSizeButton() const;
 
     void updateLogsStateUI(bool enabled);

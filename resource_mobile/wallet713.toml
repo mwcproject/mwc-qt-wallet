@@ -1,0 +1,92 @@
+#########################################
+### WALLET 713 CONFIGURATION          ###
+#########################################
+
+# Blockcahin to use: 'Mainnet' or 'Floonet'
+# chain = "Floonet"
+
+# Path for mwc713 wallet data
+# wallet713_data_path = "wallet713_data"
+
+# Path to the keybase binary
+# keybase_binary = "keybase"
+
+# Legacy Grin Box connection URI. Depricated unsecure method of communication, not recommended for usage
+# If you decided to use it, specify URI.
+# mwcmq_domain = "legacy.grin.box"
+# mwcmq_port   = 443
+
+# Use SSL for Legacy Grin Box connection.
+# grinbox_protocol_unsecure = false
+
+# MWC MQS connection settings. By default mwc713 using thhis method for communication.
+# mwcmqs_domain: mqs.mwc.mw
+# mwcmqs_port: 443
+
+# MWC MQS/GrinBox address defive index. Every new index will give you a new address that will be used for
+# communication with message queue
+# grinbox_address_index = 1
+
+# MWC node connection URI. Please make sure that you are connecting to the node from correct network.
+# mwc_node_uri = "https://mwc713.floonet.mwc.mw"
+
+# MWC node secret
+# mwc_node_secret = "11ne3EAUtOXVKwhxm84U"
+
+# Start Message Queue listener automatically if wallet password was provided at start.
+# grinbox_listener_auto_start = true
+
+# Start KeyBase listener automatically if wallet password was provided at start.
+# keybase_listener_auto_start = true
+
+# Specify maximum amount in nano MWC if you want this wallet automatically accept invoices.
+# Example for 5 MWCs:  max_auto_accept_invoice = 50000000000
+# Note! Change it if you really understand what you are going!
+# max_auto_accept_invoice =
+
+# KetBase TTL period
+# default_keybase_ttl = "24h"
+
+# Enable Owner API for this wallet. See for details: https://github.com/mwcproject/mwc713/blob/master/docs/API_documentation.md
+# owner_api = false
+
+# Owner API listening address. If you want accept connections from
+# the Internet, please make it "0.0.0.0:13415"
+# owner_api_address = "127.0.0.1:13415"
+
+# Owner API secret. REST API call required basic authorization with this secret (user: mwc).
+# owner_api_secret = "my_secret_password"
+
+# Include the foreign API endpoints on the same port as the owner
+# API. Useful for networking environments like AWS ECS that make
+# it difficult to access multiple ports on a single service.
+# owner_api_include_foreign = false
+
+# Enable Foreign API for this wallet. See for details: https://github.com/mwcproject/mwc713/blob/master/docs/API_documentation.md
+# Note! Use this setting if you disable Owner API. Otherwise concider to use 'owner_api_include_foreign' setting
+# foreign_api = false
+
+# Foreign API listening address. If you want accept connections from
+# the Internet, please make it "0.0.0.0:13416"
+# foreign_api_address =  = "127.0.0.1:13416"
+
+# Foreign API secret. REST API call required basic authorization with this secret (user: mwc).
+# foreign_api_secret = "my_secret_password"
+
+# Disable logging history of your mwc713 commands. Recommended for stronger security.
+# Also you can disable history with command line argument '--disable-history'
+# disable_history = false
+
+
+# If enabled both tls_certificate_file and tls_certificate_key, TSL will be applicable to all rest API
+# Paths to TLS certificate files:
+# tls_certificate_file = "path to TLS certificate file"
+# tls_certificate_key = "path to TLS certificate private key file"
+
+# Wallet state update frequency. In none, no updates will be run in the background.
+# If will be set, will run 'sync' command with defined time interval
+# wallet_updater_frequency_sec =
+
+chain = "Mainnet"
+wallet713_data_path = "gui_wallet713_data"
+default_keybase_ttl = "24h"
