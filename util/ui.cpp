@@ -339,12 +339,6 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     // Calculate what outputs need to be selected...
     if (freeNanoCoins >= nanoCoins + maxFee) {
         *txnFee = getTxnFeeFromSpendableOutputs(nanoCoins, freeOuts, outputsNumber, freeNanoCoins, resultOutputs);
-
-        // batch size check done inside of getTxnFeeFromSpendableOutputs is only possible error
-        if (*txnFee == 0 && resultOutputs.size() == 0) {
-            control::MessageBox::messageText(parent, "Send Amount", "We can't send such large amount of the coins in a single transaction because your outputs are too small. Please send smaller amount.");
-            return false;
-        }
         return true;
     }
 
@@ -386,13 +380,6 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
                         generateMessageHtmlOutputsToSpend( hodlOuts2ask ),
                         "Cancel", "Continue", true, false, 1.4) )
         return false;
-
-    // 1 - resulting output.  outputsNumber - change outputs
-    // Limit 500 will be checked on the waalet side
-    if (hodlResultOutputs.size()+freeOuts.size() + outputsNumber + 1 > 498 ) {
-        control::MessageBox::messageText(parent, "Send Amount", "We can't send such large amount of the coins in a single transaction because your outputs are too small. Please send smaller amount.");
-        return false;
-    }
 
     // User approve the spending, preparing the list of outputs...
     resultOutputs = hodlResultOutputs;
@@ -518,7 +505,7 @@ uint64_t getTxnFeeFromSpendableOutputs(int64_t amount, const QMultiMap<int64_t, 
     retrieveTransactionInputs(amount, spendableOutputs, &totalCoins, txnInputs);
 
     uint64_t numInputs = txnInputs.size();
-    if (numInputs == 0 || numInputs + resultOutputs + changeOutputs > mwc::MWC_MAX_OUTPUTS) {
+    if (numInputs == 0) {
         return 0;
     }
 
