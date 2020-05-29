@@ -636,8 +636,12 @@ QCheckBox::indicator:disabled:checked {
     image: url(:/img/disabledCheckOn.svg);
 }
 
-QTabWidget::tab-bar{
+QTabWidget::tab-bar {
 	left: 52px;
+}
+
+QTabWidget::pane {
+    border: none;
 }
 
 QWidget#tab_main {
