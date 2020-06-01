@@ -169,6 +169,8 @@ void SendStarting::on_allAmountButton_clicked() {
 
 void SendStarting::on_accountComboBox_currentIndexChanged(int index)
 {
+    Q_UNUSED(index)
+
     auto dt = ui->accountComboBox->currentData();
     if (!dt.isValid())
         return;

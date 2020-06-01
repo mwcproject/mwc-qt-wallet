@@ -78,37 +78,23 @@ public:
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "send.html";}
-    virtual void timerEvent(QTimerEvent *event) override;
 
 private slots:
     void onWalletBalanceUpdated();
-    void sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate );
-    void onSlateFinalized( QString slate );
-    void onSlateReceivedBack(QString slate, QString mwc, QString fromAddr);
+    void sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc );
 
     void respSendFile( bool success, QStringList errors, QString fileName );
-
-    void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
 
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
 private:
     void switchToStartingWindow();
 
-    // address can be empty - will be ignored
-    // txid  negative - will be ignored
-    void registerSlate( const QString & slate, QString address, int64_t txid, bool send, bool respond );
 
 private:
     wnd::SendStarting  * onlineOfflineWnd = nullptr;
     wnd::SendOnline         * onlineWnd = nullptr;
     wnd::SendOffline  * offlineWnd = nullptr;
-
-    // Here we are keeping not only waiting, but also responded back
-    // Messages order in non guaranteed and we need to handle that
-    // Key: slate
-    QMap<QString, SendEventInfo> slatePool;
-    QSet<int64_t> transactions2cancel;
 
     bool nodeIsHealthy = false;
 };

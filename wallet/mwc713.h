@@ -316,13 +316,8 @@ public:
                       int64_t spendableNano,
                       bool mwcServerBroken );
 
-    void setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate);
-
-    void reportSlateSendTo( QString slate, QString mwc, QString sendAddr );
-    void reportSlateSendBack( QString slate, QString sendAddr );
+    void setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc);
     void reportSlateReceivedFrom( QString slate, QString mwc, QString fromAddr, QString message );
-    void reportSlateReceivedBack( QString slate, QString mwc, QString fromAddr );
-    void reportSlateFinalized( QString slate );
 
     void setSendFileResult( bool success, QStringList errors, QString fileName );
     void setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );

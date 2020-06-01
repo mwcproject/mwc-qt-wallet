@@ -1111,37 +1111,15 @@ void MWC713::infoResults( QString currentAccountName, int64_t height,
     }
 }
 
-void MWC713::setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate) {
-    logger::logEmit( "MWC713", "onSend", "success=" + QString::number(success) );
-    emit onSend( success, errors, address, txid, slate );
-}
-
-void MWC713::reportSlateSendTo( QString slate, QString mwc, QString sendAddr ) {
+void MWC713::setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc) {
     appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("You successfully sent slate " + slate +
-          " with " + mwc + " mwc to " + sendAddr ));
+                                                                    " with " + mwc + " mwc to " + address ));
 
-    logger::logEmit( "MWC713", "onSlateSend", slate + " with " +mwc + " to " + sendAddr );
-    emit onSlateSendTo(slate, mwc, sendAddr);
-}
-
-void MWC713::reportSlateSendBack( QString slate,  QString sendAddr ) {
-    logger::logEmit("MWC713", "onSlateSendBack", slate + " to " + sendAddr);
-
-    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO,
-                                         "Slate " + slate + " sent back to " + sendAddr + " sucessfully" );
-}
-
-void MWC713::reportSlateReceivedBack( QString slate, QString mwc, QString fromAddr ) {
-    logger::logEmit( "MWC713", "reportSlateReceivedBack", slate + " with " +mwc + " from " + fromAddr );
-
-    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO,
-                                         "Slate " + slate + " received back from " + fromAddr + " for " + mwc + " mwc");
-
-    emit onSlateReceivedBack(slate, mwc, fromAddr);
-
-    // Request balace refresh
+    logger::logEmit( "MWC713", "onSend", "success=" + QString::number(success) );
+    emit onSend( success, errors, address, txid, slate, mwc );
     updateWalletBalance(false,true);
 }
+
 
 void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAddr, QString message ) {
     QString msg = "Congratulations! You received " +mwc+ " mwc from " + fromAddr;
@@ -1162,17 +1140,6 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
            "<br>From: " + fromAddr +
            "<br>Slate: " + slate);
 
-}
-
-void MWC713::reportSlateFinalized( QString slate ) {
-
-    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("Slate finalized : "+slate ));
-
-    logger::logEmit( "MWC713", "onSlateFinalized", slate );
-    emit onSlateFinalized(slate);
-
-    // Request balance refresh
-    updateWalletBalance(false,true);
 }
 
 void MWC713::setSendFileResult( bool success, QStringList errors, QString fileName ) {

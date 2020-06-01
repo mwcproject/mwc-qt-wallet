@@ -31,8 +31,6 @@ AccountTransfer::AccountTransfer( StateContext * context) :
 
     connect( context->wallet, &wallet::Wallet::onSetReceiveAccount, this, &AccountTransfer::onSetReceiveAccount, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onSend, this, &AccountTransfer::onSend, Qt::QueuedConnection );
-    connect( context->wallet, &wallet::Wallet::onSlateSendTo, this, &AccountTransfer::onSlateSendTo, Qt::QueuedConnection );
-    connect( context->wallet, &wallet::Wallet::onSlateFinalized, this, &AccountTransfer::onSlateFinalized, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &AccountTransfer::onWalletBalanceUpdated, Qt::QueuedConnection );
 }
 
@@ -112,7 +110,6 @@ void AccountTransfer::transferFunds(const wallet::AccountInfo accountFrom,
     trAccountFrom = accountFrom;
     trAccountTo = accountTo;
     trNanoCoins = nanoCoins;
-    trSlate = "";
     outputs2use = outputs;
 
     transferState = 0;
@@ -144,49 +141,29 @@ void AccountTransfer::onSetReceiveAccount( bool ok, QString AccountOrMessage ) {
 }
 
 
-void AccountTransfer::onSend( bool success, QStringList errors, QString address, int64_t txid, QString slate ) {
+void AccountTransfer::onSend( bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc ) {
     Q_UNUSED(txid);
     Q_UNUSED(slate);
     Q_UNUSED(address);
+    Q_UNUSED(mwc);
 
     if (transferState!=1)
         return;
+
+    if (!recieveAccount.isEmpty())
+        context->wallet->setReceiveAccount( recieveAccount );
+    context->wallet->updateWalletBalance(true, true);
 
     if  (!success) {
         if (wnd)
             wnd->showTransferResults(false, "Failed to send the funds. " + util::formatErrorMessages(errors) );
-        transferState = -1;
         return;
     }
 
-    // Waiting for finalized slate to continue
-}
-
-void AccountTransfer::onSlateSendTo( QString slate, QString mwc, QString sendAddr ) {
-    Q_UNUSED(mwc);
-    Q_UNUSED(sendAddr);
-    if (transferState!=1)
-        return;
-
-    trSlate = slate;
-}
-
-void AccountTransfer::onSlateFinalized( QString slate ) {
-    if (transferState!=1)
-        return;
-
-    if (slate == trSlate) {
-        // can go forward. Restore the state and update the balance
-
-        transferState=2;
-        if (!recieveAccount.isEmpty())
-            context->wallet->setReceiveAccount( recieveAccount );
-        context->wallet->updateWalletBalance(true, true);
-    }
 }
 
 void AccountTransfer::onWalletBalanceUpdated() {
-    if (transferState!=2) {
+    if (transferState!=1) {
         if (wnd)
             wnd->updateAccounts();
         return;

@@ -29,46 +29,12 @@ bool TaskSlatesListener::processTask(const QVector<WEvent> & events) {
     const WEvent & evt = events[0];
 
     switch (evt.event) {
-    case S_SLATE_WAS_SENT_TO:{
-        qDebug() << "TaskSlatesListener::processTask with events: " << printEvents(events);
-        QStringList prms = evt.message.split('|');
-        if (prms.size()==3) {
-            wallet713->reportSlateSendTo( prms[0], util::zeroDbl2Dbl( prms[1] ), prms[2] );
-        }
-        return true;
-    }
-    case S_SLATE_WAS_SENT_BACK:{
-        qDebug() << "TaskSlatesListener::processTask with events: " << printEvents(events);
-        QStringList prms = evt.message.split('|');
-        if (prms.size()==2) {
-            wallet713->reportSlateSendBack( prms[0], prms[1] );
-        }
-        return true;
-    }
-
     case S_SLATE_WAS_RECEIVED_FROM: {
         // We get some moner from somebody!!!
         qDebug() << "TaskSlatesListener::processTask with events: " << printEvents(events);
         QStringList prms = evt.message.split('|');
         if (prms.size()>=3) {
             wallet713->reportSlateReceivedFrom( prms[0], util::zeroDbl2Dbl( prms[2] ), prms[1], prms.size()>3 ? prms[3] : "" );
-        }
-        return true;
-    }
-
-    case S_SLATE_WAS_RECEIVED_BACK: {
-        qDebug() << "TaskSlatesListener::processTask with events: " << printEvents(events);
-        QStringList prms = evt.message.split('|');
-        if (prms.size()==3) {
-            wallet713->reportSlateReceivedBack( prms[0], util::zeroDbl2Dbl( prms[2] ), prms[1] );
-        }
-        return true;
-    }
-    case S_SLATE_WAS_FINALIZED: {
-        qDebug() << "TaskSlatesListener::processTask with events: " << printEvents(events);
-        QStringList prms = evt.message.split('|');
-        if (prms.size()==1) {
-            wallet713->reportSlateFinalized( prms[0] );
         }
         return true;
     }
@@ -104,12 +70,15 @@ bool TaskSetReceiveAccount::processTask(const QVector<WEvent> &events) {
 
 bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
 
-    // txid=60
-    // slate [2fb9c2a7-abac-4370-b6c8-8e10969902ee] for [0.100000000] MWCs sent successfully to [xmgEvZ4MCCGMJnRnNXKHBbHmSGWQchNr9uZpY5J1XXnsCFS45fsU]
+    // slate [59c6f53f-1230-43a2-bed6-2c7c6100f310] received back from [xmgEvZ4MCCGMJnRnNXKHBbHmSGWQchNr9uZpY5J1XXnsCFS45fsU] for [0.321000000] MWCs
+    // txid=34
+    // slate [59c6f53f-1230-43a2-bed6-2c7c6100f310] for [0.321000000] MWCs sent successfully to [xmgEvZ4MCCGMJnRnNXKHBbHmSGWQchNr9uZpY5J1XXnsCFS45fsU]
 
+    // Need to know txid and cuccess phrase that 'MWCs sent successfully to'
     int64_t txId = -1;
     QString address;
     QString slate;
+    QString mwc;
 
     {
         QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
@@ -120,27 +89,31 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
                 txId = ln.message.mid(strlen("txid=")).toLongLong(&ok);
                 if (!ok)
                     txId = -1;
-                else
-                    break;
+            }
+
+            if (ln.message.contains("sent successfully to") ) {
+                int idx1 = ln.message.indexOf('[');
+                int idx2 = ln.message.indexOf(']', idx1+1);
+                if (idx1>0 && idx2>0)
+                    slate = ln.message.mid(idx1+1, idx2-idx1-1);
+
+                idx1 = ln.message.indexOf("for [");
+                idx2 = ln.message.indexOf(']', idx1+1);
+                if (idx1>0 && idx2>0) {
+                    mwc = ln.message.mid(idx1 + 1, idx2 - idx1 - 1);
+                    mwc = util::zeroDbl2Dbl(mwc);
+                }
+
+                idx1 = ln.message.lastIndexOf('[');
+                idx2 = ln.message.indexOf(']', idx1+1);
+                if (idx1>0 && idx2>0)
+                    address = ln.message.mid(idx1+1, idx2-idx1-1);
             }
         }
     }
 
-    {
-        // Let's check for slate
-        QVector< WEvent > sendSlate = filterEvents(events, WALLET_EVENTS::S_SLATE_WAS_SENT_TO);
-
-        if (sendSlate.size()==1) {
-            QStringList prms = sendSlate[0].message.split('|');
-            if (prms.size()==3) {
-                slate = prms[0];
-                address = prms[2];
-            }
-        }
-    }
-
-    if ( txId>0 && !slate.isEmpty() && !address.isEmpty() ) {
-        wallet713->setSendResults(true, QStringList(), address, txId, slate);
+    if ( txId>0 && !slate.isEmpty() && !address.isEmpty() && !mwc.isEmpty() ) {
+        wallet713->setSendResults(true, QStringList(), address, txId, slate, mwc);
         return true;
     }
 
@@ -153,7 +126,7 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
     if (errMsgs.isEmpty())
         errMsgs.push_back("Not found expected output from mwc713");
 
-    wallet713->setSendResults( false, errMsgs, "", -1, "" );
+    wallet713->setSendResults( false, errMsgs, "", -1, "", "" );
     return true;
 }
 

@@ -356,7 +356,7 @@ void MockWallet::sendTo(const wallet::AccountInfo &account, int64_t coinNano, co
     Q_UNUSED(outputs)
     Q_UNUSED(fluff)
 
-    emit onSend( true, {}, address, 4, "0000-1111-2222-3333" );
+    emit onSend( true, {}, address, 4, "0000-1111-2222-3333", util::nano2one(coinNano) );
 }
 
 // Show outputs for the wallet
