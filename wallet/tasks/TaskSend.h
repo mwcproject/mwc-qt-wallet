@@ -57,7 +57,7 @@ public:
 class TaskSendMwc : public QObject, public Mwc713Task {
     Q_OBJECT
 public:
-    const static int64_t TIMEOUT = 1000*60; // 1 minute should be enough
+    const static int64_t TIMEOUT = 1000*150; // Send timeout is 2 minutes, we are making it a little longer to cover start/stop overhead
 
     // coinNano == -1  - mean All
     TaskSendMwc( MWC713 *wallet713, int64_t coinNano, const QString & address, const QString & apiSecret, QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff ) :

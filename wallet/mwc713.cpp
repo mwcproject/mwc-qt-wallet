@@ -1112,8 +1112,10 @@ void MWC713::infoResults( QString currentAccountName, int64_t height,
 }
 
 void MWC713::setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc) {
-    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("You successfully sent slate " + slate +
-                                                                    " with " + mwc + " mwc to " + address ));
+    if (success) {
+        appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, QString("You successfully sent slate " + slate +
+                                                                       " with " + mwc + " mwc to " + address));
+    }
 
     logger::logEmit( "MWC713", "onSend", "success=" + QString::number(success) );
     emit onSend( success, errors, address, txid, slate, mwc );
