@@ -17,8 +17,6 @@
 
 #include "state.h"
 #include "../wallet/wallet.h"
-#include "../windows/a_waitingwnd.h"
-
 
 
 namespace state {

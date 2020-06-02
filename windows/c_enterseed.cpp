@@ -63,14 +63,6 @@ void EnterSeed::on_Enter() {
     }
 }
 
-void EnterSeed::updateProgress(bool show) {
-    if (show)
-        ui->progress->show();
-    else
-        ui->progress->hide();
-}
-
-
 void EnterSeed::on_cancelButton_clicked()
 {
     state->cancel();

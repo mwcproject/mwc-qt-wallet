@@ -249,10 +249,6 @@ int main(int argc, char *argv[])
 
     while (true)
     {
-        // QApplication instance is needed to show possible errors
-        QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-        QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-
         Q_ASSERT(argc>=1);
         // Process arglist.
         // Furst argument has to be the app path
@@ -292,6 +288,10 @@ int main(int argc, char *argv[])
             qputenv("QT_SCALE_FACTOR", "1.001");
         }
     #endif
+
+        core::WalletApp app(argc, argv);
+        QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+        QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
 #ifdef QT_DEBUG
     // Generation of the dictionaries.
@@ -342,8 +342,6 @@ int main(int argc, char *argv[])
                 break;
             }
         }
-
-        core::WalletApp app(argc, argv);
 
         if (!deployWalletFilesFromResources() ) {
             QMessageBox::critical(nullptr, "Error", "Unable to provision or verify resource files during the first run");

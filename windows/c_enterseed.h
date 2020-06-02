@@ -35,8 +35,6 @@ public:
     explicit EnterSeed(QWidget *parent, state::InitAccount * state );
     virtual ~EnterSeed() override;
 
-    void updateProgress(bool show);
-
 private slots:
     void on_Enter();
 
