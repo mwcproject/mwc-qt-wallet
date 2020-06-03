@@ -97,7 +97,8 @@ void Transactions::requestTransactions(QString account, bool enforceSync) {
 
 void Transactions::updateTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> transactions) {
     if (cachedTxs.currentAccount != account) {
-        Q_ASSERT(false); // rarely possible if there are many requests in the Q
+        // if someone changes the account while transactions are updating, just return
+        // the account change will trigger another transaction update
         return;
     }
 
