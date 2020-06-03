@@ -189,54 +189,6 @@ color: #FFFFFF;</string>
       <number>12</number>
      </property>
      <item>
-      <widget class="QToolButton" name="airdropToolButton">
-       <property name="minimumSize">
-        <size>
-         <width>131</width>
-         <height>62</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>131</width>
-         <height>62</height>
-        </size>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
-       </property>
-       <property name="toolTip">
-        <string>Click here to claim your MWC from the Airdrop</string>
-       </property>
-       <property name="text">
-        <string notr="true">Airdrop</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normalon>:/img/Airdrop@2x.svg</normalon>
-        </iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>45</width>
-         <height>18</height>
-        </size>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextUnderIcon</enum>
-       </property>
-       <property name="autoRaise">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QToolButton" name="sendToolButton">
        <property name="minimumSize">
         <size>
@@ -406,6 +358,54 @@ color: #FFFFFF;</string>
        <property name="icon">
         <iconset resource="../resources.qrc">
          <normaloff>:/img/Transactions@2x.svg</normaloff>:/img/Transactions@2x.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>45</width>
+         <height>18</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
+       </property>
+       <property name="autoRaise">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="airdropToolButton">
+       <property name="minimumSize">
+        <size>
+         <width>131</width>
+         <height>62</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>131</width>
+         <height>62</height>
+        </size>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::TabFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Click here to claim your MWC from the Airdrop</string>
+       </property>
+       <property name="text">
+        <string notr="true">Airdrop</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normalon>:/img/Airdrop@2x.svg</normalon>
+        </iconset>
        </property>
        <property name="iconSize">
         <size>
