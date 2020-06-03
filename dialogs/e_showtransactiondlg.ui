@@ -456,7 +456,7 @@
        </size>
       </property>
       <property name="text">
-       <string>Num. outputs</string>
+       <string>Change Outputs</string>
       </property>
      </widget>
     </item>
@@ -1525,17 +1525,6 @@
    <header>control/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLine</class>
-   <extends>QFrame</extends>
-   <header>control/MwcFrameWithBorder.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcComboBox</class>
-   <extends>QComboBox</extends>
-   <header>control/MwcComboBox.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control/MwcLineEdit.h</header>
@@ -1554,6 +1543,17 @@
    <class>control::MwcLineEditDlg</class>
    <extends>QLineEdit</extends>
    <header>control/MwcLineEditDlg.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLine</class>
+   <extends>QFrame</extends>
+   <header>control/MwcFrameWithBorder.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcComboBox</class>
+   <extends>QComboBox</extends>
+   <header>control/MwcComboBox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
