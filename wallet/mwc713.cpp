@@ -73,7 +73,7 @@ bool MWC713::checkWalletInitialized() {
     qDebug() << "checkWalletState with " << mwc713Path << " and " << mwc713configPath;
 
     Q_ASSERT(mwc713process==nullptr);
-    mwc713process = initMwc713process( {}, {"state"}, false );
+    mwc713process = initMwc713process( {"TOR_EXE_NAME", "/usr/local/bin/tor"}, {"state"}, false );
 
     if (mwc713process==nullptr)
         return false;
@@ -202,7 +202,7 @@ void MWC713::start()  {
     qDebug() << "Starting MWC713 at " << mwc713Path << " for config " << mwc713configPath;
 
     // Creating process and starting
-    mwc713process = initMwc713process({}, {} );
+    mwc713process = initMwc713process({"TOR_EXE_NAME", "/usr/local/bin/tor"}, {} );
     if (mwc713process==nullptr)
         return;
 
@@ -234,7 +234,7 @@ void MWC713::start2init(QString password) {
 
     // Creating process and starting
 
-    mwc713process = initMwc713process({"MWC_PASSWORD", password}, {"init"} );
+    mwc713process = initMwc713process({"TOR_EXE_NAME", "/usr/local/bin/tor", "MWC_PASSWORD", password}, {"init"} );
     if (mwc713process==nullptr)
         return;
 
@@ -276,7 +276,7 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
 
     // Creating process and starting
     // Mnemonic will moved into variables
-    mwc713process = initMwc713process({"MWC_PASSWORD", password, "MWC_MNEMONIC", seedStr}, {"recover", "--mnemonic", "env" } );
+    mwc713process = initMwc713process({"TOR_EXE_NAME", "/usr/local/bin/tor", "MWC_PASSWORD", password, "MWC_MNEMONIC", seedStr}, {"recover", "--mnemonic", "env" } );
     if (mwc713process==nullptr)
         return;
 
