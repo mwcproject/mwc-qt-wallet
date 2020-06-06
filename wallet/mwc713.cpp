@@ -73,7 +73,7 @@ bool MWC713::checkWalletInitialized() {
     qDebug() << "checkWalletState with " << mwc713Path << " and " << mwc713configPath;
 
     Q_ASSERT(mwc713process==nullptr);
-    mwc713process = initMwc713process( {}, {"state"}, false );
+    mwc713process = initMwc713process( {"TOR_EXE_NAME", QCoreApplication::applicationDirPath() + "/" + "tor"}, {"state"}, false );
 
     if (mwc713process==nullptr)
         return false;
@@ -106,7 +106,7 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
 
     if (!envVariables.isEmpty()) {
         Q_ASSERT(envVariables.size()%2==0);
-        QProcessEnvironment env;
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 
         for (int t=1; t<envVariables.size(); t+=2 ) {
             env.insert( envVariables[t-1], envVariables[t]);
@@ -202,7 +202,7 @@ void MWC713::start()  {
     qDebug() << "Starting MWC713 at " << mwc713Path << " for config " << mwc713configPath;
 
     // Creating process and starting
-    mwc713process = initMwc713process({}, {} );
+    mwc713process = initMwc713process({"TOR_EXE_NAME", QCoreApplication::applicationDirPath() + "/" + "tor"}, {} );
     if (mwc713process==nullptr)
         return;
 
@@ -234,7 +234,7 @@ void MWC713::start2init(QString password) {
 
     // Creating process and starting
 
-    mwc713process = initMwc713process({"MWC_PASSWORD", password}, {"init"} );
+    mwc713process = initMwc713process({"TOR_EXE_NAME", QCoreApplication::applicationDirPath() + "/" + "tor", "MWC_PASSWORD", password}, {"init"} );
     if (mwc713process==nullptr)
         return;
 
@@ -276,7 +276,7 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
 
     // Creating process and starting
     // Mnemonic will moved into variables
-    mwc713process = initMwc713process({"MWC_PASSWORD", password, "MWC_MNEMONIC", seedStr}, {"recover", "--mnemonic", "env" } );
+    mwc713process = initMwc713process({"TOR_EXE_NAME", QCoreApplication::applicationDirPath() + "/" + "tor", "MWC_PASSWORD", password, "MWC_MNEMONIC", seedStr}, {"recover", "--mnemonic", "env" } );
     if (mwc713process==nullptr)
         return;
 
