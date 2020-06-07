@@ -39,7 +39,7 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
             return true;
         }
         case S_LISTENER_ON: {
-            qCritical() << "TaskListeningListener::processTask with events: " << printEvents(events);
+            qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
 
             QStringList prms = evt.message.split('|');
             if ( prms.size()==0 )
@@ -57,7 +57,6 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
                     wallet713->setMwcAddress(prms[0] );
                 // last case for tor it will be http://something.onion
                 } else if (address.size()>0 && (address[0]=='h')) {
-qCritical() << "got into the loop with " << address;
                     wallet713->setTorAddress(prms[0] );
                 }
             }
