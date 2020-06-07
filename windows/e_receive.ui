@@ -342,6 +342,34 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="control::MwcLineEditNormal" name="torAddress">
+          <property name="minimumSize">
+           <size>
+            <width>600</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="maxLength">
+           <number>1024</number>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>

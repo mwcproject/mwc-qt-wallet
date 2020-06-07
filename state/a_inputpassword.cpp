@@ -144,9 +144,11 @@ void InputPassword::onLoginResult(bool ok) {
             if ( config::isOnlineWallet() && context->wallet->hasPassword() ) {
                 // Start listening, no feedback interested
                 if (context->appContext->isAutoStartMQSEnabled())
-                    context->wallet->listeningStart(true, false, true);
+                    context->wallet->listeningStart(true, false, false, true);
                 if (context->appContext->isAutoStartKeybaseEnabled())
-                    context->wallet->listeningStart(false, true, true);
+                    context->wallet->listeningStart(false, true, false, true);
+                if (context->appContext->isAutoStartTorEnabled())
+                    context->wallet->listeningStart(false, false, true, true);
             }
 
             if (! config::isOnlineNode()) {

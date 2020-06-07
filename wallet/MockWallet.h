@@ -94,11 +94,11 @@ public:
 
     // Start listening through services
     // Check Signal: onStartListening
-    virtual void listeningStart(bool startMq, bool startKb, bool initialStart)  override;
+    virtual void listeningStart(bool startMq, bool startKb, bool startTor, bool initialStart)  override;
 
     // Stop listening through services
     // Check signal: onListeningStopResult
-    virtual void listeningStop(bool stopMq, bool stopKb)  override;
+    virtual void listeningStop(bool stopMq, bool stopKb, bool stopTor)  override;
 
     // Get latest Mwc MQ address that we see
     virtual QString getLastKnownMwcBoxAddress() override;
