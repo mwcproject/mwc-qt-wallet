@@ -315,16 +315,6 @@
          </widget>
         </item>
         <item>
-         <widget class="control::MwcLabelSmall" name="label_3">
-          <property name="text">
-           <string>MWCMQ Address:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="control::MwcLineEditNormal" name="mwcmqAddress">
           <property name="minimumSize">
            <size>
@@ -349,16 +339,6 @@
           </property>
           <property name="readOnly">
            <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="control::MwcLabelSmall" name="label_3">
-          <property name="text">
-           <string>Tor Address:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
