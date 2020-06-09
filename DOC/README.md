@@ -30,14 +30,14 @@ For detailed Instructions on how to send and receive please consult below Docume
 
 ### Receiving Funds
 
-- [Receive over HTTP (NGrok) using the QT Wallet](https://github.com/mwcproject/docs/guides/receive_http_ngrok_qt-wallet.md)
+- [Receive over HTTP (NGrok) using the QT Wallet](https://github.com/mwcproject/docs/wiki/Receive-via-HTTP-with-ngrok-using-a-QT-Wallet)
 
-- [Receive over HTTP (Port Forwarding) using the QT Wallet](https://github.com/mwcproject/docs/guides/receive_http_port_forwarding_qt-wallet.md)
+- [Receive over HTTP (Port Forwarding) using the QT Wallet](https://github.com/mwcproject/docs/wiki/Receive-via-HTTP-with-a-forwarded-Port-using-a-QT-Wallet)
 
-- [Receive over Files using the QT Wallet](https://github.com/mwcproject/docs/guides/receive_file_qt-wallet.md)
+- [Receive over Files using the QT Wallet](https://github.com/mwcproject/docs/wiki/Receive-via-Files-using-a-QT-Wallet)
 
 ### Sending Funds
 
-- [Send over HTTP using the QT Wallet](https://github.com/mwcproject/docs/guides/send_http_qt-wallet.md)
+- [Send over HTTP using the QT Wallet](https://github.com/mwcproject/docs/wiki/Send-via-HTTP-using-the-QT-Wallet)
 
-- [Send over Files using the QT Wallet](https://github.com/mwcproject/docs/guides/send_file_qt-wallet.md)
+- [Send over Files using the QT Wallet](https://github.com/mwcproject/docs/wiki/Send-via-File-using-the-QT-Wallet)
