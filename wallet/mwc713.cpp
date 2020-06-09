@@ -461,7 +461,7 @@ QPair<bool,bool> MWC713::getListenerStartState()  {
 
 // Check Signal: onListeningStartResults
 void MWC713::listeningStart(bool startMq, bool startKb, bool startTor, bool initialStart)  {
-    qDebug() << "listeningStart: mq=" << startMq << ",kb=" << startKb << ",tor=" << startTor;
+    qCritical() << "listeningStart: mq=" << startMq << ",kb=" << startKb << ",tor=" << startTor;
     eventCollector->addTask( new TaskListeningStart(this,startMq,startKb,startTor,initialStart), TaskListeningStart::TIMEOUT );
 
     if (startMq)
