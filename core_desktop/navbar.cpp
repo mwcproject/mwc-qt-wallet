@@ -15,40 +15,39 @@
 #include <state/state.h>
 #include "navbar.h"
 #include "ui_navbar.h"
-#include "../state/statemachine.h"
 #include "navmenuconfig.h"
 #include "navmenuaccount.h"
-#include "../state/x_events.h"
 #include <QFileDialog>
-#include "../state/g_Finalize.h"
 #include "../util/Json.h"
-#include "../control/messagebox.h"
-#include "../dialogs/fileslateinfodlg.h"
-#include "../core/Config.h"
+#include "../bridge/config_b.h"
+#include "../bridge/statemachine_b.h"
+#include "../bridge/wnd/x_events_b.h"
+
+using namespace bridge;
 
 namespace core {
 
-NavBar::NavBar(QWidget *parent, state::StateContext * _context ) :
+NavBar::NavBar(QWidget *parent) :
         QWidget(parent),
         ui(new Ui::NavBar),
-        prntWnd(parent),
-        context(_context)
+        prntWnd(parent)
 {
-    if (config::isOnlineNode()) {
+    config = new Config(this);
+    stateMachine = new StateMachine(this);
+    events = new Events(this);
+
+    if (config->isOnlineNode()) {
         ui->setupUi(this);
 
         ui->accountButton->hide();
     }
     else {
-        state::Events * evtState = (state::Events *)context->stateMachine->getState(state::STATE::EVENTS);
-        Q_ASSERT(evtState);
-
-        QObject::connect( evtState, &state::Events::updateNonShownWarnings,
+        QObject::connect( events, &Events::sgnUpdateNonShownWarnings,
                           this, &NavBar::onUpdateNonShownWarnings, Qt::QueuedConnection );
 
         ui->setupUi(this);
 
-        onUpdateNonShownWarnings( evtState->hasNonShownWarnings() );
+        onUpdateNonShownWarnings( events->hasNonShownWarnings() );
     }
 }
 
@@ -70,21 +69,21 @@ void NavBar::onUpdateNonShownWarnings(bool hasNonShownWarns) {
 void NavBar::on_notificationButton_clicked()
 {
     checkButton(BTN::NOTIFICATION);
-    context->stateMachine->setActionWindow( state::STATE::EVENTS );
+    stateMachine->setActionWindow( state::STATE::EVENTS );
 }
 
 void NavBar::on_settingsButton_clicked()
 {
     checkButton(BTN::SETTINGS);
 
-    showNavMenu( new NavMenuConfig( prntWnd, context ) );
+    showNavMenu( new NavMenuConfig( prntWnd ) );
 }
 
 void NavBar::on_accountButton_clicked()
 {
     checkButton(BTN::ACCOUNTS);
 
-    showNavMenu( new NavMenuAccount( prntWnd, context ) );
+    showNavMenu( new NavMenuAccount( prntWnd ) );
 }
 
 void NavBar::onMenuDestroy() {

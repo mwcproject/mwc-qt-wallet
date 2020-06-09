@@ -15,45 +15,37 @@
 #ifndef C_PROGRESSWND_H
 #define C_PROGRESSWND_H
 
-#include "../core/PanelBaseWnd.h"
+#include "../core_desktop/PanelBaseWnd.h"
 
 namespace Ui {
 class ProgressWnd;
 }
 
-namespace wnd {
-
+namespace bridge {
 class ProgressWnd;
+}
 
-// Cancell callback interface. Because of usage we are fine withinterface, no needs in callback function
-class IProgressWndState {
-public:
-    virtual void cancelProgress() = 0;
-    virtual void destroyProgressWnd(ProgressWnd * w) = 0;
-};
-
+namespace wnd {
 
 class ProgressWnd : public core::PanelBaseWnd
 {
     Q_OBJECT
-
 public:
     // Empty string - hide this item, null - hidden
-    explicit ProgressWnd(QWidget *parent, IProgressWndState * state, QString header, QString msgProgress, QString msgPlus, bool cancellable );
+    explicit ProgressWnd(QWidget *parent, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable );
     virtual ~ProgressWnd() override;
-
-    void setHeader(QString header);
-    void setMsgPlus(QString msgPlus);
-
-    void initProgress(int min, int max);
-    void updateProgress(int pos, QString msgProgress);
 
 private slots:
     void on_cancelButton_clicked();
 
+    void onSgnSetHeader(QString header);
+    void onSgnSetMsgPlus(QString msgPlus);
+    void onSgnInitProgress(int min, int max);
+    void onSgnUpdateProgress(int pos, QString msgProgress);
+
 private:
     Ui::ProgressWnd *ui;
-    IProgressWndState * state;
+    bridge::ProgressWnd * progressWnd = nullptr;
 };
 
 }

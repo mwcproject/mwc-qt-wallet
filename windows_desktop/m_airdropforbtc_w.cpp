@@ -12,23 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "windows/m_airdropforbtc_w.h"
+#include "m_airdropforbtc_w.h"
 #include "ui_m_airdropforbtc.h"
-#include "state/m_airdrop.h"
-#include "../control/messagebox.h"
-#include "../state/timeoutlock.h"
+#include "../control_desktop/messagebox.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../bridge/wnd/m_airdrop_b.h"
 
 namespace wnd {
 
-AirdropForBTC::AirdropForBTC(QWidget *parent, state::Airdrop * _state, QString _btcAddress, QString _challenge, QString _identifier) :
+AirdropForBTC::AirdropForBTC(QWidget *parent, QString _btcAddress, QString _challenge, QString _identifier) :
     core::PanelBaseWnd(parent),
     ui(new Ui::AirdropForBTC),
-    state(_state),
     btcAddress(_btcAddress.trimmed()),
     challenge(_challenge.trimmed()),
     identifier(_identifier)
 {
     ui->setupUi(this);
+
+    airdrop = new bridge::Airdrop(this);
+
+    QObject::connect( airdrop, &bridge::Airdrop::sgnReportMessage,
+                      this, &AirdropForBTC::onSgnReportMessage, Qt::QueuedConnection);
 
     ui->progress->initLoader(false);
 
@@ -40,13 +44,12 @@ AirdropForBTC::AirdropForBTC(QWidget *parent, state::Airdrop * _state, QString _
 
 AirdropForBTC::~AirdropForBTC()
 {
-    state->deleteAirdropForBtcWnd(this);
     delete ui;
 }
 
 void AirdropForBTC::on_claimButton_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to( "AirdropForBTC" );
 
     QString signature = ui->signatureEdit->toPlainText().trimmed();
 
@@ -55,18 +58,18 @@ void AirdropForBTC::on_claimButton_clicked()
         return;
     }
 
-    state->requestClaimMWC( btcAddress, challenge, signature, identifier );
+    airdrop->requestClaimMWC( btcAddress, challenge, signature, identifier );
 
     ui->progress->show();
 }
 
 void AirdropForBTC::on_backButton_clicked()
 {
-    state->backToMainAirDropPage();
+    airdrop->backToMainAirDropPage();
 }
 
-void AirdropForBTC::reportMessage( QString title, QString message ) {
-    state::TimeoutLockObject to( state );
+void AirdropForBTC::onSgnReportMessage(QString title, QString message) {
+    util::TimeoutLockObject to( "AirdropForBTC" );
 
     ui->progress->hide();
     control::MessageBox::messageText(this, title, message);

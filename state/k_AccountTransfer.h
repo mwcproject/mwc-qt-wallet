@@ -16,13 +16,7 @@
 #define MWC_QT_WALLET_ACCOUNTTRANSFER_H
 
 #include "state.h"
-#include "../wallet/wallet.h"
-#include "../core/appcontext.h"
-
-namespace wnd {
-class AccountTransfer;
-}
-
+#include <QObject>
 
 namespace state {
 
@@ -32,21 +26,14 @@ public:
     AccountTransfer( StateContext * context);
     virtual ~AccountTransfer() override;
 
-    void wndDeleted(wnd::AccountTransfer * w) { if(w==wnd) wnd = nullptr; }
-
-    // get balance for current account
-    QVector<wallet::AccountInfo> getWalletBalance();
-
     // nanoCoins < 0 - all funds
     // Note, accountInfo must be passed (or used inside method) by value because event loop can be run inside that method
-    void transferFunds(const wallet::AccountInfo accountFrom,
-                       const wallet::AccountInfo accountTo,
-                       int64_t nanoCoins );
+    // return true if longterm process was started...
+    bool transferFunds(const QString & accountFrom,
+                       const QString & accountTo,
+                       const QString & mwc );
 
     void goBack();
-
-    core::SendCoinsParams getSendCoinsParams();
-    void updateSendCoinsParams(const core::SendCoinsParams &params);
 
 protected:
     virtual NextStateRespond execute() override;
@@ -61,14 +48,13 @@ private slots:
     void onWalletBalanceUpdated();
 
 private:
-    wnd::AccountTransfer * wnd = nullptr;
     int transferState = -1;
 
     QString recieveAccount;
     // Single transfer context
     QString myAddress;
-    wallet::AccountInfo trAccountFrom;
-    wallet::AccountInfo trAccountTo;
+    QString trAccountFrom;
+    QString trAccountTo;
     int64_t trNanoCoins = 0;
     QString trSlate;
     QStringList outputs2use;

@@ -21,28 +21,9 @@
 #include "../util/address.h"
 #include <QSet>
 
-namespace wnd {
-class SendStarting;
-class SendOnline;
-class SendOffline;
-}
-
 namespace state {
 
-struct SendEventInfo {
-    QString address;
-    int64_t txid = -1;
-    QString slate;
-    int64_t timestamp = 0;
-
-    bool send = false;
-    bool respond = false;
-
-    void setData(QString address, int64_t txid,  QString slate, bool send, bool respond);
-
-    // was send and was never respond
-    bool isStaleTransaction() const {return send && !respond;}
-};
+QString generateAmountErrorMsg(int64_t mwcAmount, const wallet::AccountInfo &acc, const core::SendCoinsParams &sendParams);
 
 class Send  : public QObject, public State {
     Q_OBJECT
@@ -50,66 +31,41 @@ public:
     Send( StateContext * context);
     virtual ~Send() override;
 
-    void destroyOnlineOfflineWnd(wnd::SendStarting * w) { if (w==onlineOfflineWnd) onlineOfflineWnd = nullptr;}
-    void destroyOnlineWnd(wnd::SendOnline * w) { if (w==onlineWnd) onlineWnd = nullptr;}
-    void destroyOfflineWnd(wnd::SendOffline * w) { if (w==offlineWnd) offlineWnd = nullptr;}
+    bool isNodeHealthy() const {return nodeIsHealthy;}
 
-    core::SendCoinsParams getSendCoinsParams();
-    void updateSendCoinsParams( const core::SendCoinsParams  & params );
-
-    QString getFileGenerationPath();
-    void updateFileGenerationPath(QString path);
-
-    // onlineOffline => Next step
-    void processSendRequest( bool isOnline, const wallet::AccountInfo & selectedAccount, int64_t amount );
+    // Process sept 1 send request.  sendAmount is a value as user input it
+    // return code:
+    //   0 - ok
+    //   1 - account error
+    //   2 - amount error
+    int initialSendSelection( bool isOnlineSelected, QString account, QString sendAmount );
 
     // Request for MWC to send
     void sendMwcOnline( const wallet::AccountInfo & account, util::ADDRESS_TYPE type, QString address, int64_t mwcNano,
             QString message, QString apiSecret, const QStringList & outputs, int changeOutputs, bool fluff );
 
-    void sendMwcOffline(  const wallet::AccountInfo & account, int64_t amount, QString message, QString fileName,
-            const QStringList & outputs, int changeOutputs );
+    // Handle whole workflow to send offline
+    // return true if some long process was started.
+    bool sendMwcOffline( QString account, int64_t amount, QString message);
 
-    QString getWalletPasswordHash();
+    // Handle whole workflow to send online
+    // return true if some long process was started.
+    bool sendMwcOnline( QString account, int64_t amount, QString address, QString apiSecret, QString message);
 
-    void switchAccount(const QString & accountName);
-
-    bool isNodeHealthy() const {return nodeIsHealthy;}
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "send.html";}
-    virtual void timerEvent(QTimerEvent *event) override;
 
 private slots:
-    void onWalletBalanceUpdated();
     void sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate );
-    void onSlateFinalized( QString slate );
-    void onSlateReceivedBack(QString slate, QString mwc, QString fromAddr);
 
     void respSendFile( bool success, QStringList errors, QString fileName );
-
-    void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
 
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
 private:
     void switchToStartingWindow();
-
-    // address can be empty - will be ignored
-    // txid  negative - will be ignored
-    void registerSlate( const QString & slate, QString address, int64_t txid, bool send, bool respond );
-
 private:
-    wnd::SendStarting  * onlineOfflineWnd = nullptr;
-    wnd::SendOnline         * onlineWnd = nullptr;
-    wnd::SendOffline  * offlineWnd = nullptr;
-
-    // Here we are keeping not only waiting, but also responded back
-    // Messages order in non guaranteed and we need to handle that
-    // Key: slate
-    QMap<QString, SendEventInfo> slatePool;
-    QSet<int64_t> transactions2cancel;
-
     bool nodeIsHealthy = false;
 };
 

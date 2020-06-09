@@ -15,15 +15,15 @@
 #ifndef LISTENINGW_H
 #define LISTENINGW_H
 
-#include "../core/navwnd.h"
-#include "../wallet/wallet.h"
+#include "../core_desktop/navwnd.h"
 
 namespace Ui {
 class Listening;
 }
 
-namespace state {
-    class Listening;
+namespace bridge {
+class Wallet;
+class Config;
 }
 
 namespace wnd {
@@ -33,36 +33,26 @@ class Listening : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit Listening(QWidget *parent, state::Listening * state, const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState,
-                       const QPair<bool, QString> & httpListener,
-                       QString mwcMqAddress, int mwcMqAddrIdx);
+    explicit Listening(QWidget *parent);
     ~Listening();
 
-    void updateStatuses( const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState,
-            const QPair<bool, QString> & httpStatus );
-
-    void updateMwcMqAddress(QString address, int addrIdx);
-
-    void showMessage(QString title, QString message);
-
 private slots:
+    void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline);
+    void onSgnHttpListeningStatus(bool listening, QString additionalInfo);
+    void onSgnMwcAddressWithIndex(QString mwcAddress, int idx);
+
     void on_mwcMqTriggerButton_clicked();
-
     void on_mwcMqNextAddress_clicked();
-
     void on_mwcMqToIndex_clicked();
-
     void on_keybaseTriggerButton_clicked();
-
     void on_httpConfigButton_clicked();
-
 private:
-
-
+    void updateStatuses();
+    void updateMwcMqAddress(QString address, int addrIdx);
 private:
     Ui::Listening *ui;
-    state::Listening * state;
-    wallet::WalletConfig walletConfig;
+    bridge::Wallet * wallet = nullptr;
+    bridge::Config * config = nullptr;
 };
 
 }

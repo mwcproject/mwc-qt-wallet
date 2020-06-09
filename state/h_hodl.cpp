@@ -14,11 +14,6 @@
 
 #include "h_hodl.h"
 #include "../wallet/wallet.h"
-#include "windows/h_hodl_w.h"
-#include "windows/h_hodlcold_w.h"
-#include "windows/h_hodlnode_w.h"
-#include "windows/h_hodlclaim_w.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../core/global.h"
@@ -32,10 +27,11 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonParseError>
-#include <control/messagebox.h>
 #include <QFile>
 #include "../util/crypto.h"
-#include "../dialogs/h_hodlgetsignature.h"
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/h_hodl_b.h"
 
 namespace state {
 
@@ -74,8 +70,7 @@ NextStateRespond Hodl::execute() {
 }
 
 void Hodl::moveToClaimPage(const QString & coldWalletHash) {
-    hodlClaimWnd = (wnd::HodlClaim *)context->wndManager->switchToWindowEx( mwc::PAGE_HODL_CLAIM,
-                        new wnd::HodlClaim( context->wndManager->getInWndParent(), this, coldWalletHash ) );
+    core::getWndManager()->pageHodlClaim(coldWalletHash);
 }
 
 void Hodl::moveToStartHODLPage() {
@@ -83,15 +78,12 @@ void Hodl::moveToStartHODLPage() {
     onLoginResult(true);
 
     if (config::isOnlineWallet()) {
-        hodlNormWnd = (wnd::Hodl *) context->wndManager->switchToWindowEx(mwc::PAGE_HODL,
-                      new wnd::Hodl(context->wndManager->getInWndParent(),this));
+        core::getWndManager()->pageHodl();
     } else if (config::isOnlineNode()) {
-        hodlNodeWnd = (wnd::HodlNode *) context->wndManager->switchToWindowEx(mwc::PAGE_HODL,
-                      new wnd::HodlNode(context->wndManager->getInWndParent(),this));
+        core::getWndManager()->pageHodlNode();
     }
     else if (config::isColdWallet()) {
-        hodlColdWnd = (wnd::HodlCold *) context->wndManager->switchToWindowEx(mwc::PAGE_HODL,
-                      new wnd::HodlCold(context->wndManager->getInWndParent(),this));
+        core::getWndManager()->pageHodlCold();
         context->wallet->getRootPublicKey("");
     }
     else {
@@ -134,7 +126,7 @@ void Hodl::setColdWalletPublicKey(QString pubKey) {
 // Request registration for HODL program
 void Hodl::registerAccountForHODL() {
 
-    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(nullptr, "HODL Registration",
+    if ( core::WndManager::RETURN_CODE::BTN2 != core::getWndManager()->questionTextDlg("HODL Registration",
                                       "Registering for the HODL Program requires the wallet's root public key. This enables outputs and values for the wallet instance to be tracked. Do you wish to continue?",
                                       "Reject", "Accept", false, true) )
     {
@@ -148,7 +140,7 @@ void Hodl::registerAccountForHODL() {
 
 void Hodl::claimMWC(const QString & hash) {
     if (claimId>=0) {
-        control::MessageBox::messageText(nullptr,"HODL Claims", "Another HODL claim is in the progress. Please wait for that HODL claim finish or restart QT wallet.");
+        core::getWndManager()->messageTextDlg("HODL Claims", "Another HODL claim is in the progress. Please wait for that HODL claim finish or restart QT wallet.");
         return;
     }
 
@@ -163,7 +155,7 @@ void Hodl::claimMWC(const QString & hash) {
     }
 
     if (claimNow.claimId<0) {
-        control::MessageBox::messageText(nullptr,"HODL Claims", "We don't see any claims that your can claim.");
+        core::getWndManager()->messageTextDlg("HODL Claims", "We don't see any claims that your can claim.");
         hideWaitingStatus();
         return;
     }
@@ -186,7 +178,7 @@ void Hodl::startChallengeWorkflow(HODL_WORKFLOW workflow ) {
     QString rootPublicKey = context->hodlStatus->getRootPubKey();
     if (rootPublicKey.isEmpty()) {
         Q_ASSERT(false);
-        control::MessageBox::messageText(nullptr, "HODL Registration", "We are not finished collecting data from the mwc713 wallet. Please try register for HODL later.");
+        core::getWndManager()->messageTextDlg("HODL Registration", "We didn't finish data collection from the mwc713 wallet. Please try register for HODL later.");
         return;
     }
 
@@ -252,9 +244,8 @@ void Hodl::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QS
 
     // Cold wallet - just display the signature
     if (config::isColdWallet()) {
-        if ( hodlColdWnd ) {
-            hodlColdWnd->setRootPubKeyWithSignature(rootPubKey, message,  signature);
-        }
+        for (auto b : bridge::getBridgeManager()->getHodl() )
+            b->setRootPubKeyWithSignature(rootPubKey, message,  signature);
         return;
     }
 
@@ -329,7 +320,7 @@ void Hodl::onGetNextKeyResult( bool success, QString identifier, QString publicK
     Q_UNUSED(btcaddress)
     Q_UNUSED(airDropAccPassword)
 
-    if (hodlClaimWnd==nullptr)
+    if (bridge::getBridgeManager()->getHodl().isEmpty())
         return; // Not our case, dropping request...
 
     if (success) {
@@ -605,9 +596,10 @@ void Hodl::replyFinished(QNetworkReply* reply) {
 
             if (config::isOnlineNode() ) {
                 // We can't call wallet, we need to ask user for the Signature...
-                dlg::HodlGetSignature signatureDlg(nullptr, challenge);
-                if ( signatureDlg.exec() == QDialog::Accepted) {
-                    Hodl::onRootPublicKey( true, "",  context->hodlStatus->getRootPubKey(), challenge, signatureDlg.getSignature() );
+                QPair<bool, QString> signature = core::getWndManager()->hodlGetSignatureDlg(challenge);
+
+                if ( signature.first) {
+                    Hodl::onRootPublicKey( true, "",  context->hodlStatus->getRootPubKey(), challenge, signature.second );
                 }
                 else {
                     Hodl::onRootPublicKey( false, "Signature wasn't provided by user", "", "", "" );
@@ -666,9 +658,8 @@ void Hodl::replyFinished(QNetworkReply* reply) {
 
             if (paramClaimId != QString::number(claimId) ) {
                 resetClaimState();
-                if (hodlClaimWnd) {
-                    hodlClaimWnd->reportMessage("Internal Error", "Internal data is not complete. we can't continue claiming. Please retry.");
-                }
+                for (auto b : bridge::getBridgeManager()->getHodl())
+                    b->reportMessage("Internal Error", "Internal data is not complete. we can't continue claiming. Please retry.");
                 return;
             }
 
@@ -681,9 +672,9 @@ void Hodl::replyFinished(QNetworkReply* reply) {
 
             if (!claimHash.isEmpty() ) {
                 // We can't call wallet, we need to ask user for the Signature...
-                dlg::HodlGetSignature signatureDlg(nullptr, challenge);
-                if ( signatureDlg.exec() == QDialog::Accepted) {
-                    Hodl::onRootPublicKey( true, "",  context->hodlStatus->getRootPubKey(), challenge, signatureDlg.getSignature() );
+                QPair<bool, QString> signature = core::getWndManager()->hodlGetSignatureDlg(challenge);
+                if ( signature.first) {
+                    Hodl::onRootPublicKey( true, "",  context->hodlStatus->getRootPubKey(), challenge, signature.second );
                 }
                 else {
                     Hodl::onRootPublicKey( false, "Signature wasn't provided by user", "", "", "" );
@@ -709,9 +700,8 @@ void Hodl::replyFinished(QNetworkReply* reply) {
 
         Q_ASSERT( !claimNextTransIdentifier.isEmpty() && !claimNextTransPubKey.isEmpty() && claimId>=0 );
         if ( claimNextTransIdentifier.isEmpty() || claimNextTransPubKey.isEmpty() || claimId<0 ) {
-            if (hodlClaimWnd) {
-                hodlClaimWnd->reportMessage("Internal Error", "Internal data is not complete. we can't continue claiming. Please retry.");
-            }
+            for (auto b : bridge::getBridgeManager()->getHodl())
+                b->reportMessage("Internal Error", "Internal data is not complete. we can't continue claiming. Please retry.");
             resetClaimState(); // failure case
             return;
         }
@@ -868,44 +858,19 @@ void Hodl::onReceiveFile( bool success, QStringList errors, QString inFileName, 
 
 
 void Hodl::onHodlStatusWasChanged() {
-    if (hodlNormWnd)
-        hodlNormWnd->updateHodlState();
-    else if (hodlNodeWnd)
-        hodlNodeWnd->updateHodlState();
-    else if (hodlClaimWnd)
-        hodlClaimWnd->updateHodlState();
+    for (auto b : bridge::getBridgeManager()->getHodl())
+        b->updateHodlState();
 }
 
 // Respond with error to UI. UI expected to stop waiting
 void Hodl::reportMessageToUI( const QString & title, const QString & message ) {
-    if (hodlNormWnd)
-        hodlNormWnd->reportMessage(title, message);
-    else if (hodlNodeWnd)
-        hodlNodeWnd->reportMessage(title, message);
-    else if (hodlColdWnd)
-        hodlColdWnd->reportMessage(title, message);
-    else if (hodlClaimWnd)
-        hodlClaimWnd->reportMessage(title, message);
+    for (auto b : bridge::getBridgeManager()->getHodl())
+        b->reportMessage(title, message);
 }
 
 void Hodl::hideWaitingStatus() {
-    if (hodlNormWnd)
-        hodlNormWnd->hideWaitingStatus();
-    else if (hodlNodeWnd)
-        hodlNodeWnd->hideWaitingStatus();
-    else if (hodlColdWnd)
-        hodlColdWnd->hideWaitingStatus();
+    for (auto b : bridge::getBridgeManager()->getHodl())
+        b->hideWaitingStatus();
 }
-
-
-QVector<int> Hodl::getColumnsWidhts() {
-    return context->appContext->getIntVectorFor("HodlTblWidth");
-}
-
-void Hodl::updateColumnsWidhts(QVector<int> widths) {
-    context->appContext->updateIntVectorFor("HodlTblWidth", widths);
-}
-
-
 
 }

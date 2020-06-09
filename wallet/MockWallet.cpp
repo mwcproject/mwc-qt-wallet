@@ -211,12 +211,11 @@ void MockWallet::check(bool wait4listeners) {
 }
 
 // Get current configuration of the wallet. will read from wallet713.toml file
-WalletConfig MockWallet::getWalletConfig() {
-    WalletConfig config;
+const WalletConfig & MockWallet::getWalletConfig() {
+    static WalletConfig config;
 
     config.setData("Floonet",
             "mock_wallet_data",
-            "mwcmqDomain",
             "mwcmqsDomain",
             "keyBasePath",
             false,
@@ -228,7 +227,7 @@ WalletConfig MockWallet::getWalletConfig() {
 }
 
 // Get configuration form the resource file.
-WalletConfig MockWallet::getDefaultConfig() {
+const WalletConfig & MockWallet::getDefaultConfig() {
     return getWalletConfig();
 }
 
@@ -263,10 +262,10 @@ void MockWallet::setReceiveAccount(QString account) {
 
 // Cancel transaction
 // Check Signal:  onCancelTransacton
-void MockWallet::cancelTransacton(int64_t transactionID) {
-    Q_UNUSED(transactionID)
+void MockWallet::cancelTransacton(QString account, int64_t txIdx) {
+    Q_UNUSED(txIdx)
 
-    emit onCancelTransacton( true, transactionID, "" );
+    emit onCancelTransacton2( true, account, txIdx, "" );
 }
 
 // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
@@ -289,7 +288,7 @@ void MockWallet::verifyMwcBoxTransactionProof(QString proofFileName) {
 
 // Init send transaction with file output
 // Check signal:  onSendFile
-void MockWallet::sendFile(const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx,
+void MockWallet::sendFile(const QString &account, int64_t coinNano, QString message, QString fileTx,
                           int inputConfirmationNumber, int changeOutputs,
                           const QStringList &outputs) {
     Q_UNUSED(account)
@@ -342,7 +341,7 @@ void MockWallet::getNextKey(int64_t amountNano, QString btcaddress, QString airD
 // Before send, wallet always do the switch to account to make it active
 // Check signal:  onSend
 // coinNano == -1  - mean All
-void MockWallet::sendTo(const wallet::AccountInfo &account, int64_t coinNano, const QString &address,
+void MockWallet::sendTo(const QString &account, int64_t coinNano, const QString &address,
                         const QString &apiSecret,
                         QString message, int inputConfirmationNumber, int changeOutputs,
                         const QStringList &outputs, bool fluff) {
@@ -375,7 +374,7 @@ void MockWallet::getOutputs(QString account, bool show_spent, bool enforceSync) 
             "4",
             1000000000,
             2));
-    emit onOutputs( account, 12345, outputs);
+    emit onOutputs2( account, show_spent, 12345, outputs);
 }
 
 // Show all transactions for current account

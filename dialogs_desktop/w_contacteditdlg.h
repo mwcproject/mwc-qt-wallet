@@ -18,10 +18,14 @@
 #include <QDialog>
 #include "../wallet/wallet.h"
 #include "../core/appcontext.h"
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
 class ContactEditDlg;
+}
+
+namespace bridge {
+class Util;
 }
 
 namespace dlg {
@@ -42,6 +46,7 @@ private slots:
     void on_cancelButton_clicked();
 private:
     Ui::ContactEditDlg *ui;
+    bridge::Util * util = nullptr;
     core::ContactRecord contact;
     const QVector<core::ContactRecord> contactList;
 };

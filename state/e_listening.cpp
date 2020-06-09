@@ -14,15 +14,14 @@
 
 #include "e_listening.h"
 #include "../wallet/wallet.h"
-#include "../windows/e_listening_w.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include <QDebug>
 #include "../util/Log.h"
 #include "../core/global.h"
 #include "../core/Config.h"
-#include "../control/messagebox.h"
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
 
 namespace state {
 
@@ -31,23 +30,11 @@ Listening::Listening(StateContext * context) :
 {
     // Let's establish connectoins at the beginning
 
-    QObject::connect(context->wallet, &wallet::Wallet::onMwcMqListenerStatus,
-                                         this, &Listening::onMwcMqListenerStatus, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onKeybaseListenerStatus,
-                                         this, &Listening::onKeybaseListenerStatus, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onHttpListeningStatus,
-                     this, &Listening::onHttpListeningStatus, Qt::QueuedConnection);
-
     QObject::connect(context->wallet, &wallet::Wallet::onListeningStartResults,
                                          this, &Listening::onListeningStartResults, Qt::QueuedConnection);
 
     QObject::connect(context->wallet, &wallet::Wallet::onListeningStopResult,
                                          this, &Listening::onListeningStopResult, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onMwcAddressWithIndex,
-                                         this, &Listening::onMwcAddressWithIndex, Qt::QueuedConnection);
 
     QObject::connect(context->wallet, &wallet::Wallet::onListenerMqCollision,
                      this, &Listening::onListenerMqCollision, Qt::QueuedConnection);
@@ -64,85 +51,12 @@ NextStateRespond Listening::execute() {
     if ( context->appContext->getActiveWndState() != STATE::LISTENING )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if (wnd==nullptr) {
-        context->wallet->getMwcBoxAddress();
-        // will get result later and will update the window
-
-        wnd = (wnd::Listening*) context->wndManager->switchToWindowEx( mwc::PAGE_E_LISTENING,
-                new wnd::Listening( context->wndManager->getInWndParent(), this,
-                       context->wallet->getListenerStatus(),
-                       context->wallet->getListenerStartState(),
-                       context->wallet->getHttpListeningStatus(),
-                       context->wallet->getLastKnownMwcBoxAddress(), -1));
-    }
+    // will get result later and will update the window
+    core::getWndManager()->pageListening();
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
-void Listening::triggerMwcStartState() {
-    QPair<bool,bool> lsnStatus = context->wallet->getListenerStartState();
-    if ( !lsnStatus.first ) {
-        lastShownErrorMessage = "";
-        context->wallet->listeningStart(true, false, false);
-    }
-    else {
-        context->wallet->listeningStop(true, false);
-    }
-}
-
-void Listening::requestNextMwcMqAddress() {
-    context->wallet->nextBoxAddress();
-}
-
-void Listening::requestNextMwcMqAddressForIndex(int idx) {
-    context->wallet->changeMwcBoxAddress(idx);
-}
-
-void Listening::triggerKeybaseStartState() {
-    QPair<bool,bool> lsnStatus = context->wallet->getListenerStartState();
-    qDebug() << "lsnStatus: " << lsnStatus.first << " " << lsnStatus.second;
-    if ( !lsnStatus.second ) {
-        context->wallet->listeningStart(false, true, false);
-    }
-    else {
-        context->wallet->listeningStop(false, true);
-    }
-}
-
-wallet::WalletConfig Listening::getWalletConfig() {
-    return context->wallet->getWalletConfig();
-}
-
-// require wallet restart
-void Listening::setHttpConfig( const wallet::WalletConfig & config ) {
-    if (context->wallet->setWalletConfig(config, context->appContext, context->mwcNode)) {
-        context->stateMachine->executeFrom( STATE::NONE );
-    }
-}
-
-
-void Listening::onMwcMqListenerStatus(bool online) {
-    Q_UNUSED(online)
-    wndUpdateStatuses();
-}
-void Listening::onKeybaseListenerStatus(bool online) {
-    Q_UNUSED(online)
-    wndUpdateStatuses();
-}
-
-void Listening::onHttpListeningStatus(bool listening, QString additionalInfo) {
-    Q_UNUSED(listening)
-    Q_UNUSED(additionalInfo)
-    wndUpdateStatuses();
-}
-
-void Listening::wndUpdateStatuses() {
-    if (wnd) {
-        wallet::Wallet * wallet = context->wallet;
-        wnd->updateStatuses(wallet->getListenerStatus(), wallet->getListenerStartState(),
-                wallet->getHttpListeningStatus() );
-    }
-}
 
 // Listening, you will not be able to get a results
 void Listening::onListeningStartResults( bool mqTry, bool kbTry, // what we try to start
@@ -150,27 +64,26 @@ void Listening::onListeningStartResults( bool mqTry, bool kbTry, // what we try 
 {
     Q_UNUSED(mqTry)
     Q_UNUSED(kbTry)
-    wndUpdateStatuses();
 
-    if (wnd && !errorMessages.empty() && !initialStart ) {
+    if ( !errorMessages.empty() && !initialStart ) {
         QString msg;
         for (auto & s : errorMessages)
             msg += s + '\n';
 
         if (kbTry) {
 
-            wallet::WalletConfig cfg = context->wallet->getWalletConfig();
+            const wallet::WalletConfig & cfg = context->wallet->getWalletConfig();
             if (!cfg.keyBasePath.isEmpty() ) {
                 msg += "\nYour current keybase path:\n" + cfg.keyBasePath + "\nThe keybase path can be changed at 'Wallet Configuration' page.";
             }
         }
 
         if (msg.contains("mwcmq") && msg.contains("already started") ) {
-            msg = QString("MWC MQ") + (config::getUseMwcMqS() ? "S" : "") + " listener is running, but it lost connection and trying to reconnect in background to " +
+            msg = "MWC MQS listener is running, but it lost connection and trying to reconnect in background to " +
                     context->wallet->getWalletConfig().getMwcMqHostFull() +".\nPlease check your network connection";
         }
 
-        wnd->showMessage("Start listening Error", msg);
+        core::getWndManager()->messageTextDlg("Start listening Error", msg);
     }
 }
 
@@ -178,36 +91,31 @@ void Listening::onListeningStopResult(bool mqTry, bool kbTry, // what we try to 
                             QStringList errorMessages ) {
     Q_UNUSED(mqTry)
     Q_UNUSED(kbTry)
-    wndUpdateStatuses();
 
-    if (wnd && !errorMessages.empty()) {
+    if (!errorMessages.empty()) {
         QString msg;
         for (auto & s : errorMessages)
             msg += s + "/n";
-        wnd->showMessage("Start listening Error", msg);
-    }
-}
 
-void Listening::onMwcAddressWithIndex(QString mwcAddress, int idx) {
-    if (wnd) {
-        wnd->updateMwcMqAddress(mwcAddress, idx);
+        core::getWndManager()->messageTextDlg("Stop listening Error", msg);
     }
 }
 
 void Listening::onListenerMqCollision() {
-    control::MessageBox::messageText(nullptr, "MWC MQS new login detected", "New login to MWC MQS detected. Only one instance of your wallet can be connected to MWC MQS.\nListener is stopped. You can activate listener from 'Listening' page.");
+    core::getWndManager()->messageTextDlg("MWC MQS new login detected",
+            "New login to MWC MQS detected. Only one instance of your wallet can be connected to MWC MQS.\n"
+            "Listener is stopped. You can activate listener from 'Listening' page.");
 }
 
 // Looking for "Failed to start mwcmqs subscriber. Error connecting to mqs.mwc.mw:443"
 void Listening::onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message) {
     Q_UNUSED(level);
     // We are not relying to the window, but checking if it is active
-    if ( wnd!= nullptr && message.contains("Failed to start mwcmqs subscriber") ) {
+    if ( message.contains("Failed to start mwcmqs subscriber") ) {
         if (lastShownErrorMessage!=message) {
-            wnd->showMessage("Start listening Error", message);
+            core::getWndManager()->messageTextDlg("Start listening Error", message);
             lastShownErrorMessage=message;
         }
-
     }
 }
 

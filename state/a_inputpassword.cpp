@@ -13,16 +13,16 @@
 // limitations under the License.
 
 #include "state/a_inputpassword.h"
-#include "windows/a_inputpassword_w.h"
 #include "../wallet/wallet.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../util/Log.h"
 #include "../core/global.h"
 #include "../core/Config.h"
+#include "../core/WndManager.h"
 #include <QCoreApplication>
-#include <control/messagebox.h>
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/a_inputpassword_b.h"
 
 namespace state {
 
@@ -31,18 +31,7 @@ InputPassword::InputPassword( StateContext * _context) :
 {
     // Result of the login
     QObject::connect( context->wallet, &wallet::Wallet::onLoginResult, this, &InputPassword::onLoginResult, Qt::QueuedConnection );
-
-
     QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &InputPassword::onWalletBalanceUpdated, Qt::QueuedConnection );
-
-    QObject::connect(context->wallet, &wallet::Wallet::onMwcMqListenerStatus,
-                                         this, &InputPassword::onMwcMqListenerStatus, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onKeybaseListenerStatus,
-                                         this, &InputPassword::onKeybaseListenerStatus, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onHttpListeningStatus,
-                     this, &InputPassword::onHttpListeningStatus, Qt::QueuedConnection);
 }
 
 InputPassword::~InputPassword() {
@@ -69,21 +58,15 @@ NextStateRespond InputPassword::execute() {
             return NextStateRespond( NextStateRespond::RESULT::DONE );
         }
 
-        wnd = (wnd::InputPassword*)context->wndManager->switchToWindowEx( mwc::PAGE_A_ACCOUNT_LOGIN,
-                new wnd::InputPassword( context->wndManager->getInWndParent(), this,
-                (state::WalletConfig *) context->stateMachine->getState(STATE::WALLET_CONFIG),
-                false ) );
+        core::getWndManager()->pageInputPassword(mwc::PAGE_A_ACCOUNT_LOGIN, false);
 
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
     }
 
     if (!lockStr.isEmpty()) {
         inLockMode = true;
-                // wallet locking mode
-        wnd = (wnd::InputPassword*)context->wndManager->switchToWindowEx( mwc::PAGE_A_ACCOUNT_UNLOCK,
-                       new wnd::InputPassword( context->wndManager->getInWndParent(), this,
-                      (state::WalletConfig *) context->stateMachine->getState(STATE::WALLET_CONFIG),
-                      true ) );
+        // wallet locking mode
+        core::getWndManager()->pageInputPassword(mwc::PAGE_A_ACCOUNT_UNLOCK, true);
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
     }
 
@@ -92,11 +75,6 @@ NextStateRespond InputPassword::execute() {
 }
 
 void InputPassword::submitPassword(const QString & password) {
-    Q_ASSERT(wnd != nullptr);
-    if (wnd) {
-        wnd->startWaiting();
-    }
-
     // Check if we need to logout first. It is very valid case if we in lock mode
     if ( inLockMode ) {
         context->wallet->logout(true);
@@ -128,16 +106,7 @@ bool InputPassword::getWalletTls() {
 
 void InputPassword::onLoginResult(bool ok) {
 
-    if (wnd)
-        wnd->onLoginResult(ok);
-
-    if (!ok) {
-        if (wnd) {
-            wnd->stopWaiting();
-            wnd->reportWrongPassword();
-        }
-    }
-    else {
+    if (ok) {
         // Going forward by initializing the wallet
         if ( context->wallet->getStartedMode() == wallet::Wallet::STARTED_MODE::NORMAL ) { // Normall start of the wallet. Problem that now we have many cases how wallet started
 
@@ -155,39 +124,6 @@ void InputPassword::onLoginResult(bool ok) {
             }
 
             context->wallet->getNodeStatus();
-
-            /*  Users don't want that. It is too much to show that every start
-              if (! config::isOnlineNode()) {
-                if (!foreignAPIwasReported) {
-                    // Check if foregn API is activated and it is not safe
-                    wallet::WalletConfig config = context->wallet->getWalletConfig();
-
-
-                    if (config.hasForeignApi()) {
-                        QString message;
-
-                        if (config.foreignApiSecret.isEmpty())
-                            message += "without any authorization";
-
-                        if (!config.hasTls()) {
-                            if (!message.isEmpty())
-                                message += " and ";
-
-                            message += "with non secure HTTP connection. Please consider to setup TLS certificates for your security.";
-                        }
-
-                        if (!message.isEmpty()) {
-                            message = "Your wallet has activated foreign API " + message;
-                            message += "\n\nIt is reccomended that you use standard security guidelines.";
-
-                            control::MessageBox::messageText(nullptr, "WARNING", message);
-
-                            context->stateMachine->setActionWindow( state::STATE::LISTENING );
-                        }
-                    }
-                    foreignAPIwasReported = true;
-                }
-            }*/
         }
 
     }
@@ -200,27 +136,9 @@ void InputPassword::onWalletBalanceUpdated() {
     if (context->wallet->getWalletBalance().isEmpty() )
         return; // in restart mode
 
-    // Using wnd as a flag that we are active
-    if ( !inLockMode && wnd) {
+    // Using wnd as a flag that we are active.
+    if ( !inLockMode && !bridge::getBridgeManager()->getInputPassword().isEmpty()) {
         context->stateMachine->executeFrom(STATE::INPUT_PASSWORD);
-    }
-}
-
-void InputPassword::onMwcMqListenerStatus(bool online) {
-    if (wnd) {
-        wnd->updateMwcMqState(online);
-    }
-}
-void InputPassword::onKeybaseListenerStatus(bool online) {
-    if (wnd) {
-        wnd->updateKeybaseState(online);
-    }
-}
-
-void InputPassword::onHttpListeningStatus(bool listening, QString additionalInfo) {
-    Q_UNUSED(additionalInfo)
-    if (wnd) {
-        wnd->updateHttpState(listening);
     }
 }
 

@@ -78,7 +78,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../resources.qrc">:/img/HODL_big@2x.svg</pixmap>
+          <pixmap resource="../resources_desktop.qrc">:/img/HODL_big@2x.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -419,36 +419,36 @@ Warning! Wallet public key allows any 3rd party to discover MWC amount that belo
   <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
-   <header>control/MwcPushButton.h</header>
+   <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
+   <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources.qrc"/>
+  <include location="../resources_desktop.qrc"/>
  </resources>
  <connections/>
 </ui>

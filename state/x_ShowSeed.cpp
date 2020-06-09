@@ -13,9 +13,10 @@
 // limitations under the License.
 
 #include "x_ShowSeed.h"
-#include "../windows/c_newseed_w.h"
-#include "../core/windowmanager.h"
 #include "../core/global.h"
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/c_newseed_b.h"
 
 namespace state {
 
@@ -31,20 +32,17 @@ NextStateRespond ShowSeed::execute() {
     if ( context->appContext->getActiveWndState() != STATE::SHOW_SEED )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if (wnd==nullptr) {
+    if ( bridge::getBridgeManager()->getNewSeed().isEmpty()) {
         QString walletPassword = context->appContext->pullCookie<QString>("password");
-
-        wnd = (wnd::NewSeed*) context->wndManager->switchToWindowEx( mwc::PAGE_X_SHOW_PASSPHRASE,
-                new wnd::NewSeed( context->wndManager->getInWndParent(), this, context, QVector<QString>(), true ) );
+        core::getWndManager()->pageNewSeed(mwc::PAGE_X_SHOW_PASSPHRASE, QVector<QString>(), true);
         context->wallet->getSeed(walletPassword);
     }
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
 void ShowSeed::recoverPassphrase( QVector<QString> seed ) {
-    if (wnd) {
-        wnd->showSeedData(seed);
-    }
+    for (auto b : bridge::getBridgeManager()->getNewSeed() )
+        b->showSeedData(seed);
 }
 
 

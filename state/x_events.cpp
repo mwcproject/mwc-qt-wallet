@@ -14,11 +14,12 @@
 
 #include "x_events.h"
 #include "../wallet/wallet.h"
-#include "../windows/x_events_w.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../core/global.h"
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/x_events_b.h"
 
 namespace state {
 
@@ -35,31 +36,19 @@ NextStateRespond Events::execute() {
     if (context->appContext->getActiveWndState() != STATE::EVENTS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    wnd = (wnd::Events*) context->wndManager->switchToWindowEx( mwc::PAGE_X_EVENTS,
-                new wnd::Events( context->wndManager->getInWndParent(), this ) );
+    core::getWndManager()->pageEvents();
 
-    emit updateNonShownWarnings(false);
+    for (auto b : bridge::getBridgeManager()->getEvents())
+        b->updateNonShownWarnings(false);
 
     messageWaterMark = QDateTime::currentMSecsSinceEpoch();
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
-void Events::deleteEventsWnd(wnd::Events * w)
+void Events::eventsWndIsDeleted()
 {
-    if (w==wnd) {
-        wnd=nullptr;
-        messageWaterMark = QDateTime::currentMSecsSinceEpoch();
-    }
-}
-
-QVector<int> Events::getColumnsWidhts() const {
-    return context->appContext->getIntVectorFor("NotifTblColWidth");
-}
-
-void Events::updateColumnsWidhts(const QVector<int> & widths) {
-    context->appContext->updateIntVectorFor("NotifTblColWidth", widths);
-
+    messageWaterMark = QDateTime::currentMSecsSinceEpoch();
 }
 
 // Historical design. UI can call this method now, but not in the past
@@ -70,12 +59,14 @@ QVector<notify::NotificationMessage> Events::getWalletNotificationMessages() {
 void Events::onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString message) {
     Q_UNUSED(message);
 
-    if (wnd!= nullptr) {
-        wnd->updateShowMessages();
-    }
-    else {
-        if ( notify::NotificationMessage::isCritical(level) )
-            emit updateNonShownWarnings(true);
+    for (auto b : bridge::getBridgeManager()->getEvents())
+        b->updateShowMessages();
+
+    if (bridge::getBridgeManager()->getEvents().isEmpty()) {
+        if ( notify::NotificationMessage::isCritical(level) ) {
+            for (auto b : bridge::getBridgeManager()->getEvents())
+                b->updateNonShownWarnings(true);
+        }
     }
 }
 

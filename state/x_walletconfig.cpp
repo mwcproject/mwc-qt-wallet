@@ -14,17 +14,18 @@
 
 #include "x_walletconfig.h"
 #include "../wallet/wallet.h"
-#include "../windows/x_walletconfig_w.h"
-#include "../windows/x_nodeconfig_w.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../core/global.h"
 #include "../core/Config.h"
 #include "../util/execute.h"
 #include "../util/Log.h"
+#include "../util/ConfigReader.h"
 #include <QCoreApplication>
-#include <QFile>
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/x_walletconfig_b.h"
+#include "../bridge/corewindow_b.h"
 
 namespace state {
 
@@ -39,13 +40,10 @@ NextStateRespond WalletConfig::execute() {
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
     if ( config::isOnlineNode() ) {
-        wndNode = (wnd::NodeConfig *) context->wndManager->switchToWindowEx( mwc::PAGE_X_WALLET_CONFIG,
-                new wnd::NodeConfig( context->wndManager->getInWndParent(), this ) );
-
+        core::getWndManager()->pageNodeConfig();
     }
     else {
-        wndWallet = (wnd::WalletConfig *) context->wndManager->switchToWindowEx( mwc::PAGE_X_WALLET_CONFIG,
-                new wnd::WalletConfig( context->wndManager->getInWndParent(), this ) );
+        core::getWndManager()->pageWalletConfig();
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
@@ -53,28 +51,26 @@ NextStateRespond WalletConfig::execute() {
 
 // State can block the state change. Wallet config is the first usage.
 bool WalletConfig::canExitState() {
-    if ( wndWallet != nullptr ) {
-        return wndWallet->askUserForChanges();
-    }
-    if ( wndNode != nullptr ) {
-        return wndNode->askUserForChanges();
+    // first will win. Normally we expecting 0 or 1 bridge
+    if (settingLock) {
+        if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg(
+                "Config changes",
+                "Configuration changes was made for the wallet and not applied. Do you want to drop them?",
+                "Back", "Drop", false, true)) {
+            return true;
+        }
+        return false;
     }
 
     return true;
 }
 
-wallet::WalletConfig WalletConfig::getWalletConfig() const {
-    return context->wallet->getWalletConfig();
-}
-
-wallet::WalletConfig WalletConfig::getDefaultWalletConfig() const {
-    return context->wallet->getDefaultConfig();
-}
-
 bool WalletConfig::setWalletConfig(const wallet::WalletConfig & config, bool guiWalletRestartExpected) {
     if (context->wallet->setWalletConfig(config, context->appContext, context->mwcNode)) {
         // update the window manager with the latest data path
-        context->wndManager->setDataPath(config.getDataPath());
+
+        for (auto b : bridge::getBridgeManager()->getCoreWindow())
+            b->setDataPath(config.getDataPath());
 
         // restarting the wallet...
         if (guiWalletRestartExpected)
@@ -151,6 +147,27 @@ bool WalletConfig::isOutputLockingEnabled() {
 
 void WalletConfig::setOutputLockingEnabled(bool lockingEnabled) {
     context->appContext->setLockOutputEnabled(lockingEnabled);
+}
+
+bool WalletConfig::updateTimeoutValue(int timeout) {
+    util::ConfigReader reader;
+    QString configFN = config::getMwcGuiWalletConf();
+    if ( !reader.readConfig( configFN ) ) {
+        core::getWndManager()->messageTextDlg("Internal Error",
+                                         "Unable to update wallet config file " + configFN );
+        return false;
+    }
+
+    bool updateOk = reader.updateConfig("logoutTimeout", QString::number(timeout));
+
+    if (!updateOk) {
+        core::getWndManager()->messageTextDlg("Error", "Wallet unable to set the selected logout time." );
+        return false;
+    } else {
+        config::setLogoutTimeMs(timeout * 1000);
+        context->stateMachine->resetLogoutLimit(true);
+    }
+    return true;
 }
 
 

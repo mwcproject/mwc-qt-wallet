@@ -15,19 +15,18 @@
 #ifndef E_SHOWOUTPUTDLG_H
 #define E_SHOWOUTPUTDLG_H
 
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
+#include "../wallet/wallet.h"
 
 namespace Ui {
 class ShowOutputDlg;
 }
 
-namespace wallet {
-struct WalletOutput;
-struct WalletConfig;
-}
-
-namespace core {
+namespace bridge {
 class HodlStatus;
+class Config;
+class Wallet;
+class Util;
 }
 
 namespace dlg {
@@ -35,8 +34,7 @@ namespace dlg {
 class ShowOutputDlg : public control::MwcDialog {
 Q_OBJECT
 public:
-    explicit ShowOutputDlg(QWidget *parent, const QString& account, const wallet::WalletOutput &output,
-                           const wallet::WalletConfig &config, core::HodlStatus * hodlStatus,
+    explicit ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output,
                            QString note,
                            bool canBeLocked, bool locked);
 
@@ -44,7 +42,7 @@ public:
 
     bool isLocked() const {return locked;}
 signals:
-    void saveOutputNote(const QString& account, const QString& commitment, const QString& note);
+    void saveOutputNote( QString commitment, QString note);
 
 private slots:
     void on_viewOutput_clicked();
@@ -58,9 +56,13 @@ private:
 private:
     Ui::ShowOutputDlg *ui;
 
+    bridge::HodlStatus * hodl = nullptr;
+    bridge::Config * config = nullptr;
+    bridge::Wallet * wallet = nullptr;
+    bridge::Util * util = nullptr;
+
     QString blockExplorerUrl;
     QString commitment;
-    QString account;
     QString originalOutputNote;
     QString newOutputNote;
     bool    locked;

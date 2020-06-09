@@ -13,9 +13,7 @@
 // limitations under the License.
 
 #include "u_nodeinfo.h"
-#include "../windows/u_nodeinfo_w.h"
 #include "../wallet/wallet.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include <QDebug>
@@ -26,7 +24,9 @@
 #include "../node/MwcNodeConfig.h"
 #include "../util/FolderCompressor.h"
 #include <QCoreApplication>
-#include <control/messagebox.h>
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/u_nodeInfo_b.h"
 
 namespace state {
 
@@ -76,11 +76,10 @@ NextStateRespond NodeInfo::execute() {
     if ( context->appContext->getActiveWndState() != STATE::NODE_INFO )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if (wnd==nullptr) {
-        wnd = (wnd::NodeInfo*) context->wndManager->switchToWindowEx( mwc::PAGE_U_NODE_STATUS,
-                new wnd::NodeInfo( context->wndManager->getInWndParent(), this));
-
-        wnd->setNodeStatus( lastLocalNodeStatus,  lastNodeStatus );
+    if (bridge::getBridgeManager()->getNodeInfo().isEmpty()) {
+        core::getWndManager()->pageNodeInfo();
+        for (auto b : bridge::getBridgeManager()->getNodeInfo())
+            b->setNodeStatus( lastLocalNodeStatus,  lastNodeStatus );
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
@@ -93,7 +92,7 @@ node::MwcNode * NodeInfo::getMwcNode() const {
 // After login - let's check the node status
 void NodeInfo::onLoginResult(bool ok) {
     if (ok) {
-        currentNodeConnection = getNodeConnection().first;
+        currentNodeConnection = getNodeConnection();
         lastLocalNodeStatus = "Waiting";
         requestNodeInfo();
         justLogin = true;
@@ -143,12 +142,12 @@ void NodeInfo::requestNodeInfo() {
     context->wallet->getNodeStatus();
 }
 
-QPair< wallet::MwcNodeConnection, wallet::WalletConfig > NodeInfo::getNodeConnection() const {
-    wallet::WalletConfig wltConfig = context->wallet->getWalletConfig();
-    return QPair< wallet::MwcNodeConnection, wallet::WalletConfig >(  context->appContext->getNodeConnection( wltConfig.getNetwork() )  , wltConfig );
+wallet::MwcNodeConnection NodeInfo::getNodeConnection() const {
+    return context->appContext->getNodeConnection( context->wallet->getWalletConfig().getNetwork() );
 }
 
-void NodeInfo::updateNodeConnection( const wallet::MwcNodeConnection & nodeConnect, const wallet::WalletConfig & walletConfig ) {
+void NodeInfo::updateNodeConnection( const wallet::MwcNodeConnection & nodeConnect) {
+    auto walletConfig = context->wallet->getWalletConfig();
     context->appContext->updateMwcNodeConnection( walletConfig.getNetwork(), nodeConnect );
     context->wallet->setWalletConfig( walletConfig, context->appContext, context->mwcNode );
     // config require to restart
@@ -199,7 +198,7 @@ void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pe
         justLogin = false;
         // Let's consider 5 blocks (5 minutes) unsync be critical issue
         if ( !online || nodeHeight < peerHeight - mwc::NODE_HEIGHT_DIFF_LIMIT || connections==0 ) {
-            if (wnd == nullptr) {
+            if (bridge::getBridgeManager()->getNodeInfo().isEmpty()) {
                 // Switching to this Node Info state. State switch will take care about the rest workflow
                 context->stateMachine->setActionWindow( state::STATE::NODE_INFO );
                 return;
@@ -207,10 +206,8 @@ void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pe
         }
     }
 
-    if (wnd== nullptr)
-        return;
-
-    wnd->setNodeStatus( lastLocalNodeStatus, lastNodeStatus );
+    for (auto b : bridge::getBridgeManager()->getNodeInfo())
+        b->setNodeStatus( lastLocalNodeStatus, lastNodeStatus );
 }
 
 
@@ -218,9 +215,8 @@ void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pe
 void NodeInfo::onMwcStatusUpdate( QString status ) {
     lastLocalNodeStatus = status;
     logger::logInfo("NodeInfo", "embedded mwc-node status: " + status);
-    if (wnd != nullptr) {
-        wnd->updateEmbeddedMwcNodeStatus(getMwcNodeStatus());
-    }
+    for (auto b : bridge::getBridgeManager()->getNodeInfo())
+        b->updateEmbeddedMwcNodeStatus(getMwcNodeStatus());
 }
 
 QString NodeInfo::getBlockchainDataPath() const {
@@ -238,7 +234,7 @@ void    NodeInfo::updatePublishTransactionPath(QString path) {
     context->appContext->updatePathFor("PublishTransaction", path);
 }
 
-void NodeInfo::saveBlockchainData(QString fileName) {
+void NodeInfo::exportBlockchainData(QString fileName) {
     // 1. stop the mwc node
     // 2. Export node data
     // 3. start mwc-node
@@ -254,7 +250,7 @@ void NodeInfo::saveBlockchainData(QString fileName) {
     Q_ASSERT(currentNodeConnection.isLocalNode());
     QPair<bool,QString> nodePath = node::getMwcNodePath( currentNodeConnection.localNodeDataPath, network);
     if (!nodePath.first) {
-        control::MessageBox::messageText(nullptr, "Error", nodePath.second);
+        core::getWndManager()->messageTextDlg("Error", nodePath.second);
         return;
     }
 
@@ -269,22 +265,22 @@ void NodeInfo::saveBlockchainData(QString fileName) {
 
     QCoreApplication::processEvents();
 
-    if (wnd)
-        wnd->hideProgress();
+    for (auto b : bridge::getBridgeManager()->getNodeInfo())
+        b->hideProgress();
 
     QCoreApplication::processEvents();
 
     notify::notificationStateClean( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
     if (res.first) {
-        control::MessageBox::messageText(wnd, "MWC Blockchain data is ready", "MWC blockchain data was successfully exported to the archive " + fileName);
+        core::getWndManager()->messageTextDlg("MWC Blockchain data is ready", "MWC blockchain data was successfully exported to the archive " + fileName);
     }
     else {
-        control::MessageBox::messageText(wnd, "Failed to export MWC Blockchain data", "Unable to export the blockchain data. Error:\n" + res.second);
+        core::getWndManager()->messageTextDlg("Failed to export MWC Blockchain data", "Unable to export the blockchain data. Error:\n" + res.second);
     }
 }
 
-void NodeInfo::loadBlockchainData(QString fileName) {
+void NodeInfo::importBlockchainData(QString fileName) {
     // 1. stop the mwc node
     // 2. Import node data
     // 3. start mwc-node
@@ -299,7 +295,7 @@ void NodeInfo::loadBlockchainData(QString fileName) {
     QString network = context->mwcNode->getCurrentNetwork();
     QPair<bool,QString> nodePath = node::getMwcNodePath(currentNodeConnection.localNodeDataPath, network);
     if (!nodePath.first) {
-        control::MessageBox::messageText(nullptr, "Error", nodePath.second);
+        core::getWndManager()->messageTextDlg("Error", nodePath.second);
         return;
     }
 
@@ -315,16 +311,16 @@ void NodeInfo::loadBlockchainData(QString fileName) {
 
     notify::notificationStateClean( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
-    if (wnd)
-        wnd->hideProgress();
+    for (auto b : bridge::getBridgeManager()->getNodeInfo())
+        b->hideProgress();
 
     QCoreApplication::processEvents();
 
     if (res.first) {
-        control::MessageBox::messageText(wnd, "MWC Blockchain data is ready", "MWC blockchain data was successfully imported from the archive " + fileName);
+        core::getWndManager()->messageTextDlg("MWC Blockchain data is ready", "MWC blockchain data was successfully imported from the archive " + fileName);
     }
     else {
-        control::MessageBox::messageText(wnd, "Failed to import MWC Blockchain data", "Unable to import the blockchain data. Error:\n" + res.second);
+        core::getWndManager()->messageTextDlg("Failed to import MWC Blockchain data", "Unable to import the blockchain data. Error:\n" + res.second);
     }
 }
 
@@ -335,18 +331,18 @@ void NodeInfo::publishTransaction(QString fileName) {
 }
 
 void NodeInfo::onSubmitFile(bool success, QString message, QString fileName) {
-    if (wnd)
-        wnd->hideProgress();
+    for (auto b : bridge::getBridgeManager()->getNodeInfo())
+        b->hideProgress();
 
     if (success) {
-        control::MessageBox::messageText(wnd, "Transaction published", "You transaction at " + fileName +
+        core::getWndManager()->messageTextDlg("Transaction published", "You transaction at " + fileName +
         " was successfully delivered to your local node. Please keep your node running for some time to deliver it to MWC blockchain.\n" + message);
     }
     else {
         if (message.contains("Post TX Error: Request error: Wrong response code: 500 Internal Server Error with data Body(Streaming)"))
             message = "MWC node unable to publish this transaction. Probably this transaction is already published or original output doesn't exist any more";
 
-        control::MessageBox::messageText(wnd, "Transaction failed", "Transaction from " + fileName +
+        core::getWndManager()->messageTextDlg("Transaction failed", "Transaction from " + fileName +
                   " was not delivered to your local node.\n\n" + message);
     }
 }

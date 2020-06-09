@@ -15,23 +15,23 @@
 #include "c_enterseed.h"
 #include "ui_c_enterseed.h"
 #include "../util/stringutils.h"
-#include "../control/messagebox.h"
-#include "../state/a_initaccount.h"
-#include "../util/widgetutils.h"
-#include "util/Bip39.h"
-#include "../state/timeoutlock.h"
-#include "../dialogs/c_addbip39word.h"
+#include "../control_desktop/messagebox.h"
+#include "../util_desktop/widgetutils.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../dialogs_desktop/c_addbip39word.h"
+#include "../bridge/util_b.h"
+#include "../bridge/wnd/a_initaccount_b.h"
 
 namespace wnd {
 
-EnterSeed::EnterSeed(QWidget *parent, state::InitAccount * _state) :
+EnterSeed::EnterSeed(QWidget *parent) :
     core::PanelBaseWnd(parent),
-    ui(new Ui::EnterSeed),
-    state(_state)
+    ui(new Ui::EnterSeed)
 {
-    //state->setWindowTitle("Recover wallet from a Passphrase");
-
     ui->setupUi(this);
+
+    accountInit = new bridge::InitAccount(this);
+    util = new bridge::Util(this);
 
     ui->progress->initLoader(false);
 
@@ -44,7 +44,6 @@ EnterSeed::EnterSeed(QWidget *parent, state::InitAccount * _state) :
 
 EnterSeed::~EnterSeed()
 {
-    state->deleteEnterSeed(this);
     delete ui;
 }
 
@@ -53,7 +52,7 @@ void EnterSeed::on_Enter() {
         return;
 
     QString seedStr = ui->seedText->toPlainText().toLower().trimmed();
-    QVector<QString> seed = util::parsePhrase2Words( seedStr );
+    QVector<QString> seed = util->parsePhrase2Words( seedStr );
 
     if (seed.size()>=24) {
         on_continueButton_clicked();
@@ -63,33 +62,18 @@ void EnterSeed::on_Enter() {
     }
 }
 
-void EnterSeed::updateProgress(bool show) {
-    if (show)
-        ui->progress->show();
-    else
-        ui->progress->hide();
-}
-
-
 void EnterSeed::on_cancelButton_clicked()
 {
-    state->cancel();
+    accountInit->cancelInitAccount();
 }
 
 void EnterSeed::on_continueButton_clicked()
 {
-    state::TimeoutLockObject to(state);
+    util::TimeoutLockObject to("EnterSeed");
 
     QString seedStr = ui->seedText->toPlainText().toLower().trimmed();
 
-    // No need to validate symbols because we better validation is down
-    /*QPair <bool, QString> valRes = util::validateMwc713Str( seedStr );
-    if (!valRes.first) {
-        control::MessageBox::message(this, "Verification error", valRes.second );
-        return;
-    }*/
-
-    QVector<QString> seed = util::parsePhrase2Words( seedStr );
+    QVector<QString> seed = util->parsePhrase2Words( seedStr );
 
     if (seed.size()!=24) {
         control::MessageBox::messageText(this, "Verification error",
@@ -97,7 +81,7 @@ void EnterSeed::on_continueButton_clicked()
         return;
     }
 
-    const QSet<QString> & words = util::getBip39words();
+    QVector<QString> words = util->getBip39words();
     QString nonDictWord;
 
     for ( auto & s : seed ) {
@@ -114,17 +98,17 @@ void EnterSeed::on_continueButton_clicked()
         return;
     }
 
-    state->createWalletWithSeed(seed);
+    accountInit->createWalletWithSeed(seed);
 }
 
 void wnd::EnterSeed::on_addWordButton_clicked()
 {
-    state::TimeoutLockObject to(state);
+    util::TimeoutLockObject to("EnterSeed");
 
     QString seedStrOrig = ui->seedText->toPlainText();
     QString seedStr = seedStrOrig.toLower().trimmed();
 
-    QVector<QString> seed = util::parsePhrase2Words( seedStr );
+    QVector<QString> seed = util->parsePhrase2Words( seedStr );
 
     dlg::AddBip39Word addWordDlg(this, seed.length()+1 );
 

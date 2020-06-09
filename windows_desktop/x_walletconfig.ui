@@ -352,7 +352,7 @@
                      <string>...</string>
                     </property>
                     <property name="icon">
-                     <iconset resource="../resources.qrc">
+                     <iconset resource="../resources_desktop.qrc">
                       <normaloff>:/img/A1@2x.svg</normaloff>:/img/A1@2x.svg</iconset>
                     </property>
                     <property name="iconSize">
@@ -387,7 +387,7 @@
                      <string>...</string>
                     </property>
                     <property name="icon">
-                     <iconset resource="../resources.qrc">
+                     <iconset resource="../resources_desktop.qrc">
                       <normaloff>:/img/A1@2x.svg</normaloff>:/img/A1@2x.svg</iconset>
                     </property>
                     <property name="iconSize">
@@ -422,7 +422,7 @@
                      <string>...</string>
                     </property>
                     <property name="icon">
-                     <iconset resource="../resources.qrc">
+                     <iconset resource="../resources_desktop.qrc">
                       <normaloff>:/img/A1@2x.svg</normaloff>:/img/A1@2x.svg</iconset>
                     </property>
                     <property name="iconSize">
@@ -457,7 +457,7 @@
                      <string>...</string>
                     </property>
                     <property name="icon">
-                     <iconset resource="../resources.qrc">
+                     <iconset resource="../resources_desktop.qrc">
                       <normaloff>:/img/A1@2x.svg</normaloff>:/img/A1@2x.svg</iconset>
                     </property>
                     <property name="iconSize">
@@ -1047,22 +1047,22 @@ your wallet activity never stored in the logs.</string>
   <customwidget>
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
-   <header>control/MwcPushButton.h</header>
+   <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
+   <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -1077,7 +1077,7 @@ your wallet activity never stored in the logs.</string>
   <tabstop>applyButton</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources.qrc"/>
+  <include location="../resources_desktop.qrc"/>
  </resources>
  <connections/>
 </ui>

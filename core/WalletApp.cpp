@@ -18,19 +18,40 @@
 
 namespace core {
 
+static bool appCreated = false;
+static bool appInitialized = false;
+
 WalletApp::WalletApp(int &argc, char **argv) :
     QApplication(argc, argv)
-{}
+{
+    appCreated = true;
+}
 
 bool WalletApp::notify(QObject *receiver, QEvent *event) {
     bool ret = QApplication::notify(receiver, event);
-    if (stateMachine && event) {
+    if (event) {
         if (event->type()==QEvent::KeyPress || event->type()==QEvent::MouseButtonPress) {
             //qDebug() << "Detecting user activity, resetting the locking timer";
-            stateMachine->resetLogoutLimit(false);
+            if (state::getStateMachine()!= nullptr)
+                state::getStateMachine()->resetLogoutLimit(false);
         }
     }
     return ret;
 }
+
+// app is done with init process, basic objects should be good to go
+void WalletApp::reportAppAsInitialized() {
+    appInitialized = true;
+}
+
+bool WalletApp::isAppCreated() {
+    return appCreated;
+}
+
+bool WalletApp::isAppInitialized() {
+    return appInitialized;
+}
+
+
 
 }

@@ -15,15 +15,17 @@
 #ifndef TRANSACTIONSW_H
 #define TRANSACTIONSW_H
 
-#include "../core/navwnd.h"
+#include "../core_desktop/navwnd.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
 class Transactions;
 }
 
-namespace state {
-    class Transactions;
+namespace bridge {
+class Config;
+class Wallet;
+class Transactions;
 }
 
 namespace wnd {
@@ -33,27 +35,8 @@ class Transactions : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit Transactions(QWidget *parent, state::Transactions * state, const wallet::WalletConfig & walletConfig);
+    explicit Transactions(QWidget *parent);
     ~Transactions();
-
-    void setTransactionCount(QString account, int number);
-    // transactions here is a full tx list. Window will copy only needed slice
-    void setTransactionData(QString account, int64_t height, const QVector<wallet::WalletTransaction> & transactions);
-
-    void showExportProofResults(bool success, QString fn, QString msg );
-    void showVerifyProofResults(bool success, QString fn, QString msg );
-
-    void updateCancelTransacton(bool success, int64_t trIdx, QString errMessage);
-    QString updateWalletBalance();
-
-    void triggerRefresh();
-
-    void updateTransactionById(bool success, QString account, int64_t height,
-                          wallet::WalletTransaction transaction,
-                          QVector<wallet::WalletOutput> outputs,
-                          QVector<QString> messages);
-
-    void setConfirmData(int64_t nodeHeight, int confirmNumber);
 
 private slots:
     void on_transactionTable_itemSelectionChanged();
@@ -69,42 +52,44 @@ private slots:
     void on_prevBtn_clicked();
     void on_nextBtn_clicked();
 
-    void saveTransactionNote(const QString& account, int64_t txIdx, const QString& note);
+    void onSgnWalletBalanceUpdated();
+    void onSgnTransactions( QString account, QString height, QVector<QString> transactions);
+    void onSgnCancelTransacton(bool success, QString trIdx, QString errMessage);
 
+    void onSgnTransactionById(bool success, QString account, QString height, QString transaction,
+                              QVector<QString> outputs, QVector<QString> messages);
+
+    void onSgnExportProofResult(bool success, QString fn, QString msg );
+    void onSgnVerifyProofResult(bool success, QString fn, QString msg );
+
+    void onSgnNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, QString totalDifficulty, int connections );
+    void onSgnNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL values
+
+    void saveTransactionNote(QString txUuid, QString note);
 private:
     // return null if nothing was selected
     wallet::WalletTransaction * getSelectedTransaction();
 
-    void requestTransactions(QString account);
-
+    void requestTransactions();
     void updateButtons();
+    void updateData();
 
     void initTableHeaders();
     void saveTableHeaders();
 
-    QString getCsvHeaders();
-
-    wallet::AccountInfo getSelectedAccount() const;
-
-    // return enable state for the buttons
-    QPair<bool,bool> updatePages( int currentPos, int total, int pageSize );
-
-    QString currentSelectedAccount();
-
     int calcPageSize() const;
 private:
     Ui::Transactions *ui;
-    state::Transactions * state;
-    QVector<wallet::AccountInfo> accountInfo;
-    QVector<wallet::WalletTransaction> transactions;
-    wallet::WalletConfig  walletConfig;
+    bridge::Config * config = nullptr;
+    bridge::Wallet * wallet = nullptr;
+    bridge::Transactions * transaction = nullptr; // just a placeholder to signal that this window is online
+
+    QString account;
+    QVector<wallet::WalletTransaction> allTrans;
+    QVector<wallet::WalletTransaction> shownTrans;
 
     int currentPagePosition = 0; // position at the paging...
-    int totalTransactions = 0;
     int64_t nodeHeight    = 0;
-    int     confirmNumber = 0;
-
-    QPair<bool,bool> buttonState = QPair<bool,bool>(false, false);
 };
 
 }

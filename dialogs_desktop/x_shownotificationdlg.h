@@ -17,7 +17,7 @@
 
 #include <QDialog>
 #include "../core/Notification.h"
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
 class ShowNotificationDlg;
@@ -29,7 +29,8 @@ class ShowNotificationDlg : public control::MwcDialog {
 Q_OBJECT
 
 public:
-    explicit ShowNotificationDlg(notify::NotificationMessage msg, QWidget *parent);
+    explicit ShowNotificationDlg(const QString & time, const QString & level,
+            const QString & message, QWidget *parent);
 
     ~ShowNotificationDlg();
 

@@ -36,7 +36,7 @@ namespace util {
                            wallet::Wallet * wallet,
                            core::HodlStatus * hodlStatus,
                            core::AppContext * appContext,
-                           QWidget * parent, QStringList & resultOutputs, uint64_t* txnFee );
+                           QStringList & resultOutputs, uint64_t* txnFee );
 
 
     // Utility method. Exposed to testing only!!!

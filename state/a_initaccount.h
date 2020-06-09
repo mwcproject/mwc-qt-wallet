@@ -20,7 +20,6 @@
 #include <QObject>
 #include <QVector>
 #include "../core/testseedtask.h"
-#include "../windows/z_progresswnd.h"
 
 namespace wnd {
 class NewSeed;
@@ -31,13 +30,9 @@ class NewSeedTest;
 
 namespace state {
 
-class SubmitCaller {
-public:
-    virtual void submit() = 0;
-    virtual void wndDeleted(wnd::NewSeed * w) = 0;
-};
+const QString INIT_ACCOUNT_CALLER_ID = "InitAccount";
 
-class InitAccount : public QObject, public State, public SubmitCaller, public wnd::IProgressWndState
+class InitAccount : public QObject, public State
 {
     Q_OBJECT
 public:
@@ -48,25 +43,21 @@ public:
     void setPassword(const QString & password);
 
     // Step 2
-    enum NEW_WALLET_CHOICE { CREATE_NEW, CREATE_WITH_SEED };
-    enum MWC_NETWORK { MWC_MAIN_NET, MWC_FLOO_NET };
-    void submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice, MWC_NETWORK network);
+    enum NEW_WALLET_CHOICE { CREATE_NEW = 1, CREATE_WITH_SEED = 2 };
+    enum MWC_NETWORK { MWC_MAIN_NET = 1, MWC_FLOO_NET=2 };
+    void submitWalletCreateChoices(NEW_WALLET_CHOICE newWalletChoice, MWC_NETWORK network);
 
     // Step 3  New seed
-    virtual void submit() override;
-    virtual void wndDeleted(wnd::NewSeed * w) override;
+    void doneWithNewSeed();
 
     // Single Word verification
-    void submit(QString word);
+    void submitSeedWord(QString word);
 
     // create form seed
     void createWalletWithSeed( QVector<QString> sd );
 
-
     void cancel();
 
-    virtual void cancelProgress() override {Q_ASSERT(false);}
-    virtual void destroyProgressWnd(wnd::ProgressWnd *) override {progressWnd= nullptr;}
     void deleteEnterSeed(wnd::EnterSeed *) {}
     void deleteNewSeedTestWnd(wnd::NewSeedTest *) {}
 
@@ -86,7 +77,6 @@ protected:
     // return true if done
     bool finishSeedVerification();
 private:
-    wnd::ProgressWnd* progressWnd = nullptr;
     int progressMaxVal = 10;
 
     QString pass;

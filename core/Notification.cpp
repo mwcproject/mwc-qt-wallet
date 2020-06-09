@@ -14,11 +14,11 @@
 
 
 #include "Notification.h"
-#include "../control/messagebox.h"
 #include "../core/global.h"
 #include "../util/Log.h"
 #include <QSet>
 #include <QVector>
+#include "WndManager.h"
 
 namespace notify {
 
@@ -138,7 +138,7 @@ void appendNotificationMessage( MESSAGE_LEVEL level, QString message ) {
 
     if (level == MESSAGE_LEVEL::FATAL_ERROR) {
         // Fatal error. Display message box and exiting. We don't want to continue
-        control::MessageBox::messageText(nullptr, "Wallet Error", "Wallet got a critical error:\n" + message + "\n\nPress OK to exit the wallet" );
+        core::getWndManager()->messageTextDlg("Wallet Error", "Wallet got a critical error:\n" + message + "\n\nPress OK to exit the wallet" );
         mwc::closeApplication();
         return;
     }

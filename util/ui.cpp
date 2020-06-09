@@ -16,7 +16,7 @@
 #include "../core/HodlStatus.h"
 #include "../core/appcontext.h"
 #include "../core/global.h"
-#include "../control/messagebox.h"
+#include "../core/WndManager.h"
 #include "../util/stringutils.h"
 #include <QVector>
 #include <climits>
@@ -244,7 +244,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
         wallet::Wallet * wallet,
         core::HodlStatus * hodlStatus,
         core::AppContext * appContext,
-        QWidget * parent, QStringList & resultOutputs, uint64_t* txnFee ) {
+        QStringList & resultOutputs, uint64_t* txnFee ) {
     Q_ASSERT(hodlStatus);
     Q_ASSERT(appContext);
     Q_ASSERT(wallet);
@@ -313,7 +313,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
             spentOuts.push_back(ho.second);
 
         // Ask user if he wants to spend all and continue...
-        if (control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(parent, "HODL Output Spending",
+        if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionHTMLDlg("HODL Output Spending",
                 generateMessageHtmlOutputsToSpend( spentOuts ),
                 "Cancel", "Continue", true, false, 1.4) ) {
             if (appContext->isLockOutputEnabled()) {
@@ -342,7 +342,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
 
         // batch size check done inside of getTxnFeeFromSpendableOutputs is only possible error
         if (*txnFee == 0 && resultOutputs.size() == 0) {
-            control::MessageBox::messageText(parent, "Send Amount", "We can't send such large amount of the coins in a single transaction because your outputs are too small. Please send smaller amount.");
+            core::getWndManager()->messageTextDlg("Send Amount", "We can't send such large amount of the coins in a single transaction because your outputs are too small. Please send smaller amount.");
             return false;
         }
         return true;
@@ -370,7 +370,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     bool res = calcOutputsToSpend( nanoCoins - freeNanoCoins, spentOuts, hodlResultOutputs );
     if (!res) {
         // spend all case, very possible because we don't control the balance
-        return getOutputsToSend( accountName, outputsNumber, -1, wallet, hodlStatus, appContext, parent, resultOutputs, txnFee );
+        return getOutputsToSend( accountName, outputsNumber, -1, wallet, hodlStatus, appContext, resultOutputs, txnFee );
     }
 
     // Let's ask for outptus
@@ -382,7 +382,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     }
     Q_ASSERT( hodlOuts2ask.size() == hodlResultOutputs.size() );
 
-    if (control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionHTML(parent, "HODL Output Spending",
+    if (core::WndManager::RETURN_CODE::BTN2 != core::getWndManager()->questionHTMLDlg("HODL Output Spending",
                         generateMessageHtmlOutputsToSpend( hodlOuts2ask ),
                         "Cancel", "Continue", true, false, 1.4) )
         return false;
@@ -390,7 +390,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     // 1 - resulting output.  outputsNumber - change outputs
     // Limit 500 will be checked on the waalet side
     if (hodlResultOutputs.size()+freeOuts.size() + outputsNumber + 1 > 498 ) {
-        control::MessageBox::messageText(parent, "Send Amount", "We can't send such large amount of the coins in a single transaction because your outputs are too small. Please send smaller amount.");
+        core::getWndManager()->messageTextDlg("Send Amount", "We can't send such large amount of the coins in a single transaction because your outputs are too small. Please send smaller amount.");
         return false;
     }
 

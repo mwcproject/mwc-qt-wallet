@@ -15,11 +15,15 @@
 #ifndef H_HODLGETSIGNATURE_H
 #define H_HODLGETSIGNATURE_H
 
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
 class HodlGetSignature;
+}
+
+namespace bridge {
+class Util;
 }
 
 namespace dlg {
@@ -40,6 +44,7 @@ private slots:
     void on_signature_textChanged();
 private:
     Ui::HodlGetSignature *ui;
+    bridge::Util * util = nullptr;
     QString signature;
 };
 

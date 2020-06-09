@@ -14,7 +14,7 @@
 
 #ifndef MWC_QT_WALLET_NOTES_H
 #define MWC_QT_WALLET_NOTES_H
-
+/*
 #include <QMap>
 #include <QObject>
 #include "../wallet/wallet.h"
@@ -85,6 +85,6 @@ private:
 };
 
 }
-
+*/
 #endif // MWC_QT_WALLET_NOTES_H
 

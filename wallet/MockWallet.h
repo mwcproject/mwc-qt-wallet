@@ -163,10 +163,10 @@ public:
     virtual void check(bool wait4listeners)  override;
 
     // Get current configuration of the wallet. will read from wallet713.toml file
-    virtual WalletConfig getWalletConfig()  override;
+    virtual const WalletConfig & getWalletConfig() override;
 
     // Get configuration form the resource file.
-    virtual WalletConfig getDefaultConfig()  override;
+    virtual const WalletConfig & getDefaultConfig() override;
 
     // Update wallet config. Will update config and restart the mwc713.
     // Note!!! Caller is fully responsible for input validation. Normally mwc713 will start, but some problems might exist
@@ -188,7 +188,7 @@ public:
 
     // Cancel transaction
     // Check Signal:  onCancelTransacton
-    virtual void cancelTransacton(int64_t transactionID)  override;
+    virtual void cancelTransacton(QString account, int64_t txIdx)  override;
 
     // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
     // Check Signal: onExportProof( bool success, QString fn, QString msg );
@@ -200,7 +200,7 @@ public:
 
     // Init send transaction with file output
     // Check signal:  onSendFile
-    virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx,
+    virtual void sendFile( const QString &account, int64_t coinNano, QString message, QString fileTx,
                            int inputConfirmationNumber, int changeOutputs,
                            const QStringList & outputs )  override;
 
@@ -226,7 +226,7 @@ public:
     // Before send, wallet always do the switch to account to make it active
     // Check signal:  onSend
     // coinNano == -1  - mean All
-    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address,
+    virtual void sendTo( const QString &account, int64_t coinNano, const QString & address,
                          const QString & apiSecret,
                          QString message, int inputConfirmationNumber, int changeOutputs,
                          const QStringList & outputs, bool fluff )  override;

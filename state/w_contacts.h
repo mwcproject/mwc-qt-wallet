@@ -36,9 +36,6 @@ public:
     QPair<bool, QString> deleteContact( const core::ContactRecord & contact );
     QPair<bool, QString> updateContact( const core::ContactRecord & prevValue, const core::ContactRecord & newValue );
 
-    QVector<int> getColumnsWidhts() const;
-    void updateColumnsWidhts(const QVector<int> & width);
-
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "contacts.html";}

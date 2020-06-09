@@ -14,31 +14,34 @@
 
 #include "g_filetransaction_w.h"
 #include "ui_g_filetransaction.h"
-#include "../state/g_Finalize.h"
-#include "../util/stringutils.h"
 #include <QFileDialog>
-#include "../core/appcontext.h"
-#include "../control/messagebox.h"
-#include "../dialogs/g_sendconfirmationdlg.h"
-#include "../state/timeoutlock.h"
-
+#include "../control_desktop/messagebox.h"
+#include "../dialogs_desktop/g_sendconfirmationdlg.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../bridge/wnd/g_filetransaction_b.h"
+#include "../bridge/wallet_b.h"
+#include "../bridge/config_b.h"
 
 namespace wnd {
 
-
-FileTransaction::FileTransaction(QWidget *parent, FileTransactionWndHandler * _handler,
+FileTransaction::FileTransaction(QWidget *parent,
+                                 QString callerId,
                                  const QString & fileName, const util::FileTransactionInfo & transInfo,
-                                 const wallet::WalletTransaction & transaction,
                                  int nodeHeight,
                                  QString transactionType, QString processButtonName) :
-        core::NavWnd(parent, _handler->getContext()),
+        core::NavWnd(parent),
         ui(new Ui::FileTransaction),
-        handler(_handler),
         transactionFileName(fileName)
 {
-    Q_UNUSED(transaction)
-
     ui->setupUi(this);
+
+    fileTransaction = new bridge::FileTransaction(this);
+    fileTransaction->setCallerId(callerId);
+    wallet = new bridge::Wallet(this);
+    config = new bridge::Config(this);
+
+    QObject::connect( fileTransaction, &bridge::FileTransaction::sgnHideProgress,
+                      this, &FileTransaction::onSgnHideProgress, Qt::QueuedConnection);
 
     ui->progress->initLoader(false);
 
@@ -50,7 +53,7 @@ FileTransaction::FileTransaction(QWidget *parent, FileTransactionWndHandler * _h
     ui->lockHeightLabel->setText( transInfo.lock_height>nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-" );
     ui->message->setText( transInfo.message );
 
-    if (!handler->needResultTxFileName()) {
+    if (!fileTransaction->needResultTxFileName()) {
         QSize rc = ui->resultLocationFrame->frameSize();
         ui->resultLocationFrame->hide();
 
@@ -77,20 +80,19 @@ FileTransaction::FileTransaction(QWidget *parent, FileTransactionWndHandler * _h
 }
 
 FileTransaction::~FileTransaction() {
-    handler->deleteFileTransactionWnd(this);
     delete ui;
 }
 
 void FileTransaction::on_cancelButton_clicked() {
-    handler->ftBack();
+    fileTransaction->ftBack();
 }
 
 void FileTransaction::on_processButton_clicked()
 {
-    state::TimeoutLockObject to( handler->getContext()->stateMachine );
+    util::TimeoutLockObject to( "FileTransaction" );
 
     QString resTxFN;
-    if ( handler->needResultTxFileName() ) {
+    if ( fileTransaction->needResultTxFileName() ) {
         resTxFN = ui->resultingTxFileName->text();
         if (resTxFN.isEmpty()) {
             control::MessageBox::messageText( this, "Input value", "Please specify the file name for the resulting transaction." );
@@ -107,35 +109,26 @@ void FileTransaction::on_processButton_clicked()
     }
     else {
         // Check if node healthy first
-        if (!handler->isNodeHealthy()) {
+        if (!fileTransaction->isNodeHealthy()) {
             control::MessageBox::messageText(this, "Unable to finalize", "Your MWC-Node, that wallet connected to, is not ready to finalize transactions.\n"
                                                                          "MWC-Node need to be connected to few peers and finish blocks synchronization process");
             return;
         }
     }
 
-    QString walletPasswordHash = handler->getContext()->wallet->getPasswordHash();
-    dlg::SendConfirmationDlg::RETURN_CODE retcode = dlg::SendConfirmationDlg::RETURN_CODE::DECLINE;
-    bool fluff = false;
+    QString walletPasswordHash = wallet->getPasswordHash();
     if (!walletPasswordHash.isEmpty()) {
         dlg::SendConfirmationDlg confirmDlg(this, "Confirm Finalize Request",
                                             "You are finalizing transaction for " + ui->mwcLabel->text(),
-                                            1.0, walletPasswordHash,
-                                            handler->getContext()->appContext->isFluffSet() );
-        connect(&confirmDlg, &dlg::SendConfirmationDlg::saveFluffSetting, this, &FileTransaction::saveFluffSetting);
-        if (confirmDlg.exec() == QDialog::Accepted) {
-            retcode = confirmDlg.getRetCode();
-            fluff = confirmDlg.getFluffSetting();
-        }
-
+                                            1.0, walletPasswordHash );
+        if (confirmDlg.exec() != QDialog::Accepted)
+            return;
     }
-    if (walletPasswordHash.isEmpty() || retcode == dlg::SendConfirmationDlg::RETURN_CODE::CONFIRM) {
-        ui->progress->show();
-        handler->ftContinue( transactionFileName, resTxFN, fluff );
-    }
+    ui->progress->show();
+    fileTransaction->ftContinue( transactionFileName, resTxFN, config->isFluffSet() );
 }
 
-void FileTransaction::hideProgress() {
+void FileTransaction::onSgnHideProgress() {
     ui->progress->hide();
 }
 
@@ -143,7 +136,7 @@ void FileTransaction::on_resultTransFileNameSelect_clicked()
 {
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Resulting MWC transaction"),
-                                                    handler->getResultTxPath(),
+                                                    config->getPathFor("resultTx"),
                                                     tr("MWC transaction (*.mwctx)"));
 
 
@@ -155,15 +148,10 @@ void FileTransaction::on_resultTransFileNameSelect_clicked()
 
     // Update path
     QFileInfo flInfo(fileName);
-    handler->updateResultTxPath(flInfo.path());
 
+    config->updatePathFor("resultTx", flInfo.path());
     ui->resultingTxFileName->setText(fileName);
 }
-
-void FileTransaction::saveFluffSetting(bool fluffSetting) {
-    handler->getContext()->appContext->setFluff(fluffSetting);
-}
-
 
 }
 

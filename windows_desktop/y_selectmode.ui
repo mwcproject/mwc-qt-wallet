@@ -174,7 +174,7 @@ the Cold Wallet</string>
   <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
-   <header>control/MwcPushButton.h</header>
+   <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

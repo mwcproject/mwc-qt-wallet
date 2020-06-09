@@ -15,16 +15,18 @@
 #ifndef U_NODEINFO_H
 #define U_NODEINFO_H
 
-#include "../core/navwnd.h"
+#include "../core_desktop/navwnd.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
 class NodeInfo;
 }
 
-namespace state {
-struct NodeStatus;
+namespace bridge {
+class Config;
+class Wallet;
 class NodeInfo;
+class Util;
 }
 
 namespace wnd {
@@ -33,36 +35,32 @@ class NodeInfo : public core::NavWnd {
 Q_OBJECT
 
 public:
-    explicit NodeInfo(QWidget *parent, state::NodeInfo * state);
-
+    explicit NodeInfo(QWidget *parent);
     ~NodeInfo();
 
-    void setNodeStatus( const QString & localNodeStatus, const state::NodeStatus & status );
-
-    void updateEmbeddedMwcNodeStatus( const QString & status );
-
-    void hideProgress();
 private:
     // Empty string to hide warning...
     void showWarning(QString warning);
-
     void showNodeLogs();
-
     void updateNodeReadyButtons(bool nodeIsReady);
 
 private slots:
-    void on_refreshButton_clicked();
     void onShowNodeConnectionError(QString errorMessage);
-    void on_changeNodeButton_clicked();
 
+    void on_refreshButton_clicked();
+    void on_changeNodeButton_clicked();
     void on_showLogsButton_clicked();
     void on_showLogsButton_5_clicked();
     void on_showLogsButton_8_clicked();
-
     void on_saveBlockchianData_clicked();
     void on_loadBlockchainData_clicked();
-
     void on_publishTransaction_clicked();
+
+    void onSgnSetNodeStatus( QString localNodeStatus,
+                                     bool online,  QString errMsg, int nodeHeight, int peerHeight,
+                                     QString totalDifficulty2show, int connections);
+    void onSgnUpdateEmbeddedMwcNodeStatus( QString status );
+    void onSgnHideProgress();
 
 private:
 signals:
@@ -70,7 +68,10 @@ signals:
 
 private:
     Ui::NodeInfo *ui;
-    state::NodeInfo * state;
+    bridge::Config * config = nullptr;
+    bridge::Wallet * wallet = nullptr;
+    bridge::NodeInfo * nodeInfo = nullptr;
+    bridge::Util * util = nullptr;
 
     wallet::MwcNodeConnection::NODE_CONNECTION_TYPE connectionType;
     QString currentWarning = "?";

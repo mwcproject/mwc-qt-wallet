@@ -64,7 +64,7 @@
   <customwidget>
    <class>ListWithColumns</class>
    <extends>QTableWidget</extends>
-   <header>control/listwithcolumns.h</header>
+   <header>control_desktop/listwithcolumns.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

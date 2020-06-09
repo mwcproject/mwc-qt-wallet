@@ -15,7 +15,7 @@
 #ifndef FINALIZETRANSACTION_H
 #define FINALIZETRANSACTION_H
 
-#include "../core/navwnd.h"
+#include "../core_desktop/navwnd.h"
 #include "../util/Json.h"
 #include "../wallet/wallet.h"
 
@@ -23,57 +23,38 @@ namespace Ui {
 class FileTransaction;
 }
 
-namespace state {
-class Finalize;
+namespace bridge {
+class FileTransaction;
+class Wallet;
+class Config;
 }
 
 namespace wnd {
-
-class FileTransaction;
-
-class FileTransactionWndHandler {
-public:
-    virtual void ftBack() = 0;
-    virtual void deleteFileTransactionWnd(FileTransaction * wnd) = 0;
-    virtual void ftContinue(QString fileName, QString resultTxFileName, bool fluff) = 0;
-
-    virtual bool needResultTxFileName() = 0;
-
-    virtual QString getResultTxPath() = 0;
-    virtual void updateResultTxPath(QString path) = 0;
-
-    virtual bool isNodeHealthy() const = 0;
-
-    virtual state::StateContext * getContext() = 0;
-};
-
-
 
 class FileTransaction : public core::NavWnd {
 Q_OBJECT
 
 public:
-    explicit FileTransaction(QWidget *parent, FileTransactionWndHandler * handler,
+    explicit FileTransaction(QWidget *parent,
+             QString callerId,
              const QString & fileName, const util::FileTransactionInfo & transInfo,
-             const wallet::WalletTransaction & transaction,
              int nodeHeight,
              QString transactionType, QString processButtonName);
 
     ~FileTransaction();
 
-    void hideProgress();
-
 private slots:
     void on_cancelButton_clicked();
     void on_processButton_clicked();
-
     void on_resultTransFileNameSelect_clicked();
 
-    void saveFluffSetting(bool fluffSetting);
-
+    void onSgnHideProgress();
 private:
     Ui::FileTransaction *ui;
-    FileTransactionWndHandler * handler = nullptr;
+    bridge::FileTransaction * fileTransaction = nullptr;
+    bridge::Wallet * wallet = nullptr;
+    bridge::Config * config = nullptr;
+    QString callerId;
     QString transactionFileName;
 };
 

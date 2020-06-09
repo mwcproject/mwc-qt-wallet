@@ -15,64 +15,81 @@
 #include "e_listening_w.h"
 #include "ui_e_listening.h"
 #include "../state/e_listening.h"
-#include "../control/messagebox.h"
-#include "../control/inputdialog.h"
+#include "../control_desktop/messagebox.h"
+#include "../control_desktop/inputdialog.h"
 #include <QDebug>
-#include "../state/timeoutlock.h"
-#include "../core/Config.h"
-#include "../dialogs/e_httplistenerconfigdlg.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../dialogs_desktop/e_httplistenerconfigdlg.h"
+#include "../bridge/wallet_b.h"
+#include "../bridge/config_b.h"
 
 namespace wnd {
 
-Listening::Listening(QWidget *parent, state::Listening * _state,
-                     const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState,
-                     const QPair<bool, QString> & httpListener,
-                     QString mwcMqAddress, int mwcMqAddrIdx) :
-    core::NavWnd(parent, _state->getContext() ),
-    ui(new Ui::Listening),
-    state(_state)
+Listening::Listening(QWidget *parent) :
+    core::NavWnd(parent),
+    ui(new Ui::Listening)
 {
     ui->setupUi(this);
 
-    walletConfig = state->getWalletConfig();
+    wallet = new bridge::Wallet(this);
+    config = new bridge::Config(this);
 
-    //state->setWindowTitle("Listening");
+    QObject::connect( wallet, &bridge::Wallet::sgnUpdateListenerStatus,
+                      this, &Listening::onSgnUpdateListenerStatus, Qt::QueuedConnection);
+    QObject::connect( wallet, &bridge::Wallet::sgnHttpListeningStatus,
+                      this, &Listening::onSgnHttpListeningStatus, Qt::QueuedConnection);
+    QObject::connect( wallet, &bridge::Wallet::sgnMwcAddressWithIndex,
+                      this, &Listening::onSgnMwcAddressWithIndex, Qt::QueuedConnection);
 
-    updateStatuses( listenerStatus, listenerStartState, httpListener );
+    updateStatuses();
+    wallet->requestMqsAddress();
 
-    updateMwcMqAddress(mwcMqAddress, mwcMqAddrIdx);
-
-    ui->mwcMQlable->setText( QString("mwc MQ") + (config::getUseMwcMqS() ? "S" : "") );
+    ui->mwcMQlable->setText("mwc MQS");
 }
 
 Listening::~Listening()
 {
-    state->wndIsGone(this);
     delete ui;
 }
 
-void Listening::showMessage(QString title, QString message) {
-    state::TimeoutLockObject to( state );
-    control::MessageBox::messageText(this, title, message);
+void Listening::onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline) {
+    Q_UNUSED(mwcOnline);
+    Q_UNUSED(keybaseOnline);
+
+    updateStatuses();
+}
+void Listening::onSgnHttpListeningStatus(bool listening, QString additionalInfo) {
+    Q_UNUSED(listening);
+    Q_UNUSED(additionalInfo);
+
+    updateStatuses();
 }
 
+void Listening::onSgnMwcAddressWithIndex(QString mwcAddress, int idx) {
+    updateMwcMqAddress(mwcAddress, idx);
+}
 
 void Listening::updateMwcMqAddress(QString address, int addrIdx) {
-
     ui->mwcMqAddress->setText( address );
     ui->mwcMqAddressIndexLabel->setText( addrIdx>=0 ? ("Address Index: " + QString::number(addrIdx)) : "" );
 }
 
-void Listening::updateStatuses( const QPair<bool,bool> & listenerStatus, const QPair<bool,bool> & listenerStartState,
-                                const QPair<bool, QString> & httpStatus ) {
-    // MWC MQ
-    ui->mwcMqStatusImg->setPixmap(QPixmap(listenerStatus.first ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
-    ui->mwcMqStatusImg->setToolTip(
-            listenerStatus.first ? "Listener connected to mwcmq" : "Listener diconnected from mwcmq");
-    ui->mwcMqStatusTxt->setText(listenerStatus.first ? "Online" : "Offline");
+void Listening::updateStatuses() {
 
-    if (listenerStartState.first) {
-        if (listenerStatus.first) {
+    bool mqsStatus = wallet->getMqsListenerStatus();
+    bool keybaseStatus = wallet->getKeybaseListenerStatus();
+
+    bool mqsStarted = wallet->isMqsListenerStarted();
+    bool keybaseStarted = wallet->isKeybaseListenerStarted();
+
+    // MWC MQ
+    ui->mwcMqStatusImg->setPixmap(QPixmap(mqsStatus ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
+    ui->mwcMqStatusImg->setToolTip(
+            mqsStatus ? "Listener connected to mwcmqs" : "Listener diconnected from mwcmqs");
+    ui->mwcMqStatusTxt->setText(mqsStatus ? "Online" : "Offline");
+
+    if (mqsStarted) {
+        if (mqsStatus) {
             ui->mwcMqTriggerButton->setText("Stop");
             ui->mwcMqTriggerButton->setToolTip("Stop the MWC MQS Listener");
         } else {
@@ -84,18 +101,18 @@ void Listening::updateStatuses( const QPair<bool,bool> & listenerStatus, const Q
         ui->mwcMqTriggerButton->setText("Start");
         ui->mwcMqTriggerButton->setToolTip("Start the MWC MQS Listener");
     }
-    ui->mwcMqNextAddress->setEnabled(!listenerStartState.first);
-    ui->mwcMqToIndex->setEnabled(!listenerStartState.first);
+    ui->mwcMqNextAddress->setEnabled(!mqsStarted);
+    ui->mwcMqToIndex->setEnabled(!mqsStarted);
 
     ui->keybaseStatusImg->setPixmap(
-            QPixmap(listenerStatus.second ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
+            QPixmap(keybaseStatus ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
     ui->keybaseStatusImg->setToolTip(
-            listenerStatus.second ? "Listener connected to keybase" : "Listener diconnected from keybase");
-    ui->keybaseStatusTxt->setText(listenerStatus.second ? "Online" : "Offline");
+            keybaseStatus ? "Listener connected to keybase" : "Listener diconnected from keybase");
+    ui->keybaseStatusTxt->setText(keybaseStatus ? "Online" : "Offline");
 
     // Keybase
-    if (listenerStartState.second) {
-        if (listenerStatus.second) {
+    if (keybaseStarted) {
+        if (keybaseStatus) {
             ui->keybaseTriggerButton->setText("Stop");
             ui->keybaseTriggerButton->setToolTip("Stop the Keybase Listener");
         } else {
@@ -108,54 +125,56 @@ void Listening::updateStatuses( const QPair<bool,bool> & listenerStatus, const Q
         ui->keybaseTriggerButton->setToolTip("Start the Keybase Listener");
     }
 
-    // -------------   HTTP(S)  ------------------
-    ui->httpStatusImg->setPixmap( QPixmap( httpStatus.first ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg" ) );
-    ui->httpStatusImg->setToolTip(httpStatus.first ? "Wallet http(s) foreign REST API is online" : "Wallet foreign REST API is offline");
-    ui->httpStatusTxt->setText( httpStatus.first ? "Online" : "Offline" );
+    // "true"  - listening
+    // ""  - not listening, no errors
+    // string  - not listening, error message
+    QString httpStatus = wallet->getHttpListeningStatus();
+    bool httpOnline = (httpStatus=="true");
 
-    if (walletConfig.hasTls())
+    // -------------   HTTP(S)  ------------------
+    ui->httpStatusImg->setPixmap( QPixmap( httpOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg" ) );
+    ui->httpStatusImg->setToolTip( httpOnline ? "Wallet http(s) foreign REST API is online" : "Wallet foreign REST API is offline");
+    ui->httpStatusTxt->setText( httpOnline ? "Online" : "Offline" );
+
+    bool hasTls = config->hasTls();
+    if (hasTls)
         ui->label_http->setText("Https");
 
-    if (httpStatus.first) {
+    if (httpOnline) {
         QString warningStr;
 
-        if ( !walletConfig.hasTls() )
+        if ( !hasTls )
             warningStr += "WARNING: You are using non secure http connection.";
-
-        /*  API secret normally is off and it is a vulnarability. non tls/ssl conneciton is the only issue
-        if (walletConfig.foreignApiSecret.isEmpty() ) {
-            if (!warningStr.isEmpty())
-                warningStr+="\n";
-
-            warningStr += "WARNING: Authorization with api secret is disabled.";
-        } */
 
         ui->http_warnings->setText(warningStr);
     } else {
-        ui->http_warnings->setText(httpStatus.second); // String param will an error or nothing if it is disabled. That what we need.
+        ui->http_warnings->setText(httpStatus); // String param will an error or nothing if it is disabled. That what we need.
     }
 }
 
 void Listening::on_mwcMqTriggerButton_clicked()
 {
-    state->triggerMwcStartState();
+    if (wallet->isMqsListenerStarted())
+        wallet->requestStopMqsListener();
+    else
+        wallet->requestStartMqsListener();
 }
 
 void Listening::on_mwcMqNextAddress_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to("Listening");
 
-    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this, tr("Warning"),
+    if ( core::WndManager::RETURN_CODE::BTN2 != control::MessageBox::questionText(this, tr("Warning"),
                                       tr("Please note that your wallet will only listen to one address at a time. You are now setting the wallet to listen to different address.\n\nDo you want to continue?"),
                                       tr("Cancel"), tr("Continue"), false, true ))
         return;
 
-    state->requestNextMwcMqAddress();
+    wallet->requestNextMqsAddress();
 }
 
 void Listening::on_mwcMqToIndex_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to("Listening");
     bool ok = false;
     QString index = control::InputDialog::getText(this, tr("Select MWX box address by index"),
                                             tr("Please specify index of mwc mq address\n\nPlease note that your wallet will only listen to one address at a time. You are now setting the wallet to listen to different address."),
@@ -172,23 +191,24 @@ void Listening::on_mwcMqToIndex_clicked()
         return;
     }
 
-    state->requestNextMwcMqAddressForIndex(idx);
+    wallet->requestChangeMqsAddress(idx);
 }
 
 void Listening::on_keybaseTriggerButton_clicked()
 {
-    state->triggerKeybaseStartState();
+    if (wallet->isKeybaseListenerStarted())
+        wallet->requestStopKeybaseListener();
+    else
+        wallet->requestStartKeybaseListener();
 }
 
-void wnd::Listening::on_httpConfigButton_clicked()
+void Listening::on_httpConfigButton_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to("Listening");
 
-    dlg::HttpListenerConfigDlg optionDlg(this, walletConfig);
-    if ( optionDlg.exec() == QDialog::Accepted ) {
-        // dsdfs
-        state->setHttpConfig(optionDlg.getConfig());
-    }
+    // Just start the config dialog. I will take case about itself
+    dlg::HttpListenerConfigDlg optionDlg(this);
+    optionDlg.exec();
 }
 
 

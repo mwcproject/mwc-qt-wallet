@@ -15,7 +15,7 @@
 #ifndef NEWSEEDTESTW_H
 #define NEWSEEDTESTW_H
 
-#include "../core/PanelBaseWnd.h"
+#include "../core_desktop/PanelBaseWnd.h"
 
 namespace Ui {
 class NewSeedTest;
@@ -23,8 +23,9 @@ class NewSeedTest;
 
 class QCompleter;
 
-namespace state {
-    class InitAccount;
+namespace bridge {
+    class Util;
+    class NewSeed;
 }
 
 namespace wnd {
@@ -32,9 +33,8 @@ namespace wnd {
 class NewSeedTest : public core::PanelBaseWnd
 {
     Q_OBJECT
-
 public:
-    explicit NewSeedTest(QWidget *parent, state::InitAccount *state, int wordNumber);
+    explicit NewSeedTest(QWidget *parent, int wordNumber);
     ~NewSeedTest();
 
 private slots:
@@ -42,7 +42,9 @@ private slots:
 
 private:
     Ui::NewSeedTest *ui;
-    state::InitAccount *state;
+    bridge::Util * util = nullptr;
+    bridge::NewSeed * newSeed = nullptr;
+
     QCompleter *completer = nullptr;
 };
 

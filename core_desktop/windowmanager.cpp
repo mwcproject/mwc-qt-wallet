@@ -16,21 +16,22 @@
 #include "../wallet/wallet.h"
 #include <QDebug>
 #include <QApplication>
-#include "../windows/c_newwallet_w.h"
-#include "../windows/c_newseed_w.h"
-#include "../windows/c_enterseed.h"
-#include "../core/global.h"
-#include "../build_version.h"
+#include "../bridge/wallet_b.h"
+#include "../bridge/config_b.h"
+
+using namespace bridge;
 
 namespace core {
 
-WindowManager::WindowManager(core::MainWindow * _mainWnd, QWidget * _pageHostWnd, QString _walletDataPath) :
+WindowManager::WindowManager(core::MainWindow * _mainWnd, QWidget * _pageHostWnd) :
     mainWnd(_mainWnd),
-    pageHostWnd(_pageHostWnd),
-    walletDataPath(_walletDataPath)
+    pageHostWnd(_pageHostWnd)
 {
     Q_ASSERT(mainWnd);
     Q_ASSERT(pageHostWnd);
+
+    wallet = new bridge::Wallet(this);
+    config = new bridge::Config(this);
 }
 
 QWidget * WindowManager::getInWndParent() const {
@@ -63,20 +64,15 @@ QWidget * WindowManager::switchToWindowEx( const QString & pageName, QWidget * n
 }
 
 QString WindowManager::buildWalletTitle(const QString & pageName) {
-    QString buildNumber = BUILD_VERSION;
+    QString buildNumber = config->getBuildVersion();
 
-    QString title = mwc::get_APP_NAME() + " v" + buildNumber + " [" + walletDataPath + "]";
+    QString title = config->get_APP_NAME() + " v" + buildNumber + " [" + config->getDataPath() + "]";
 
     if (!pageName.isEmpty()) {
         title += " - " + pageName;
     }
     return title;
 }
-
-void WindowManager::setDataPath(const QString& dataPath) {
-    walletDataPath = dataPath;
-}
-
 
 }
 

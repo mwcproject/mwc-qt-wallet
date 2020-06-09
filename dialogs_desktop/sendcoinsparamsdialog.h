@@ -15,7 +15,7 @@
 #ifndef SENDCOINSPARAMSDIALOG_H
 #define SENDCOINSPARAMSDIALOG_H
 
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
 #include "../core/appcontext.h"
 
 namespace Ui {
@@ -29,10 +29,12 @@ class SendCoinsParamsDialog : public control::MwcDialog
     Q_OBJECT
 
 public:
-    explicit SendCoinsParamsDialog(QWidget *parent, const core::SendCoinsParams & params);
+    explicit SendCoinsParamsDialog(QWidget *parent, int inputConfirmationNumber,
+                      int changeOutputs);
     virtual ~SendCoinsParamsDialog() override;
 
-    core::SendCoinsParams getSendCoinsParams() const {return params;}
+    int getInputConfirmationNumber() const {return inputConfirmationNumber;}
+    int getChangeOutputs() const {return changeOutputs;}
 
 private slots:
     void on_okButton_clicked();
@@ -40,7 +42,8 @@ private slots:
 
 private:
     Ui::SendCoinsParamsDialog *ui;
-    core::SendCoinsParams params;
+    int inputConfirmationNumber;
+    int changeOutputs;
 };
 
 }

@@ -19,9 +19,6 @@
 #include "../core/Notification.h"
 #include <QVector>
 
-namespace wnd {
-class Events;
-}
 
 namespace state {
 
@@ -32,19 +29,13 @@ public:
     Events( StateContext * context );
     virtual ~Events() override;
 
-    void deleteEventsWnd(wnd::Events * w);
-
-    QVector<int> getColumnsWidhts() const;
-    void updateColumnsWidhts(const QVector<int> & widths);
+    void eventsWndIsDeleted();
 
     QVector<notify::NotificationMessage> getWalletNotificationMessages();
-    int64_t getWatermarkTime() const {return messageWaterMark;}
 
     // Check if some error/warnings need to be shown
     bool hasNonShownWarnings() const;
 public:
-signals:
-    void updateNonShownWarnings(bool hasNonShownWarns);
 
 private slots:
     void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
@@ -53,7 +44,6 @@ protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "event_log.html";}
 private:
-    wnd::Events *   wnd = nullptr;
     int64_t         messageWaterMark = 0;
 };
 

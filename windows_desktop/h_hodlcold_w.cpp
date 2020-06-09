@@ -14,19 +14,27 @@
 
 #include "h_hodlcold_w.h"
 #include "ui_h_hodlcold_w.h"
-#include "../state/h_hodl.h"
-#include "../control/messagebox.h"
-#include "../state/timeoutlock.h"
-#include "../util/crypto.h"
+#include "../control_desktop/messagebox.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../bridge/wnd/h_hodl_b.h"
 
 namespace wnd {
 
-HodlCold::HodlCold(QWidget *parent, state::Hodl * _state) :
-    core::NavWnd(parent, _state->getContext()),
-    ui(new Ui::HodlCold),
-    state(_state)
+HodlCold::HodlCold(QWidget *parent) :
+    core::NavWnd(parent),
+    ui(new Ui::HodlCold)
 {
     ui->setupUi(this);
+
+    hodl = new bridge::Hodl(this);
+
+    QObject::connect( hodl, &bridge::Hodl::sgnSetRootPubKeyWithSignature,
+                      this, &HodlCold::onSgnSetRootPubKeyWithSignature, Qt::QueuedConnection);
+    QObject::connect( hodl, &bridge::Hodl::sgnReportMessage,
+                      this, &HodlCold::onSgnReportMessage, Qt::QueuedConnection);
+    QObject::connect( hodl, &bridge::Hodl::sgnHideWaitingStatus,
+                      this, &HodlCold::onSgnHideWaitingStatus, Qt::QueuedConnection);
+
     ui->progress->initLoader(false);
 
     ui->sign->setEnabled(false);
@@ -37,22 +45,20 @@ HodlCold::HodlCold(QWidget *parent, state::Hodl * _state) :
 
 HodlCold::~HodlCold()
 {
-    state->deleteHodlColdWnd(this);
     delete ui;
 }
 
-void HodlCold::setRootPubKeyWithSignature(const QString & key, const QString & message, const QString & signature) {
+void HodlCold::onSgnSetRootPubKeyWithSignature(QString key, QString hash, QString message, QString signature) {
     ui->progress->hide();
     ui->publicKey->setText(key);
-    QByteArray keyHex = key.toUtf8();
-    ui->publicKeyHash->setText( crypto::hex2str( crypto::HSA256( keyHex ) ) );
+    ui->publicKeyHash->setText(hash);
     if (ui->message->text()==message) {
         ui->signature->setPlainText(signature);
     }
 }
 
-void HodlCold::reportMessage(const QString & title, const QString & message) {
-    state::TimeoutLockObject to( state );
+void HodlCold::onSgnReportMessage( QString title, QString message) {
+    util::TimeoutLockObject to( "HodlCold" );
     ui->progress->hide();
 
     control::MessageBox::messageText(this, title, message);
@@ -67,10 +73,10 @@ void HodlCold::on_message_textChanged(const QString &str)
 void HodlCold::on_sign_clicked()
 {
     ui->progress->show();
-    state->requestSignMessage(ui->message->text());
+    hodl->requestSignMessage(ui->message->text());
 }
 
-void HodlCold::hideWaitingStatus() {
+void HodlCold::onSgnHideWaitingStatus() {
     ui->progress->hide();
 }
 

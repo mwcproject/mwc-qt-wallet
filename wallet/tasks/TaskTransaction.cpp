@@ -185,7 +185,7 @@ bool TaskOutputs::processTask(const QVector<WEvent> & events) {
     parseOutputs(events, // in
            account, height, outputResult); // out
 
-    wallet713->setOutputs(account, height, outputResult );
+    wallet713->setOutputs(account, showSpent, height, outputResult );
     return true;
 }
 
@@ -526,13 +526,13 @@ bool TaskAllTransactions::processTask(const QVector<WEvent> & events) {
 bool TaskTransCancel::processTask(const QVector<WEvent> & events) {
     QVector< WEvent > errors = filterEvents(events, WALLET_EVENTS::S_ERROR );
     if (errors.isEmpty()) {
-        wallet713->setTransCancelResult( true, transactionId, "" );
+        wallet713->setTransCancelResult( true, account, transactionId, "" );
     }
     else {
         QStringList messages;
         for (auto & e : errors)
             messages.push_back(e.message);
-        wallet713->setTransCancelResult( false, transactionId, util::formatErrorMessages(messages) );
+        wallet713->setTransCancelResult( false, account, transactionId, util::formatErrorMessages(messages) );
     }
     return true;
 }

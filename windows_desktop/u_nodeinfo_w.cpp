@@ -12,17 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/global.h>
 #include "u_nodeinfo_w.h"
 #include "ui_u_nodeinfo_w.h"
-#include "../state/u_nodeinfo.h"
-#include "../control/messagebox.h"
-#include "../dialogs/u_changenode.h"
+#include "../control_desktop/messagebox.h"
+#include "../dialogs_desktop/u_changenode.h"
 #include <QScrollBar>
-#include "../state/timeoutlock.h"
-#include "../dialogs/u_mwcnodelogs.h"
-#include "../core/Config.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../dialogs_desktop/u_mwcnodelogs.h"
 #include <QFileDialog>
+#include "../bridge/config_b.h"
+#include "../bridge/wallet_b.h"
+#include "../bridge/wnd/u_nodeInfo_b.h"
+#include "../core/global.h"
+#include "../bridge/util_b.h"
 
 namespace wnd {
 
@@ -37,34 +39,41 @@ static QString toBoldAndYellow(QString text) {
 }
 
 
-NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
-        core::NavWnd(parent, _state->getContext()),
-        ui(new Ui::NodeInfo),
-        state(_state)
+NodeInfo::NodeInfo(QWidget *parent) :
+        core::NavWnd(parent),
+        ui(new Ui::NodeInfo)
 {
     ui->setupUi(this);
+
+    config = new bridge::Config(this);
+    wallet = new bridge::Wallet(this);
+    nodeInfo = new bridge::NodeInfo(this);
+    util = new bridge::Util(this);
+
+    // Need simulate post message. Using events for that
+    connect(this, &NodeInfo::showNodeConnectionError, this,  &NodeInfo::onShowNodeConnectionError, Qt::QueuedConnection );
+    connect(nodeInfo, &bridge::NodeInfo::sgnSetNodeStatus, this, &NodeInfo::onSgnSetNodeStatus, Qt::QueuedConnection );
+    connect(nodeInfo, &bridge::NodeInfo::sgnUpdateEmbeddedMwcNodeStatus, this, &NodeInfo::onSgnUpdateEmbeddedMwcNodeStatus, Qt::QueuedConnection );
+    connect(nodeInfo, &bridge::NodeInfo::sgnHideProgress, this, &NodeInfo::onSgnHideProgress, Qt::QueuedConnection );
 
     ui->warningLine->hide();
 
     ui->progress->initLoader(false);
 
-    // Need simulate post message. Using events for that
-    connect(this, &NodeInfo::showNodeConnectionError, this,  &NodeInfo::onShowNodeConnectionError, Qt::QueuedConnection );
-
-    connectionType = state->getNodeConnection().first.connectionType;
+    connectionType = wallet::MwcNodeConnection::fromJson(nodeInfo->getNodeConnection()).connectionType;
 
     if (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL)
-        ui->statusInfo->setText( toBoldAndYellow( state->getMwcNodeStatus() ) );
+        ui->statusInfo->setText( toBoldAndYellow( nodeInfo->getMwcNodeStatus() ) );
 
     ui->showLogsButton->setEnabled( connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
 
-    if ( !config::isOnlineWallet() )
+    if ( !config->isOnlineWallet() )
         ui->onlineWalletBtns->hide();
 
-    if ( !config::isOnlineNode() )
+    if ( !config->isOnlineNode() )
         ui->onlineNodeBtns->hide();
 
-    if ( !config::isColdWallet() )
+    if ( !config->isColdWallet() )
         ui->coldWalletBtns->hide();
 
     updateNodeReadyButtons(false);
@@ -73,12 +82,11 @@ NodeInfo::NodeInfo(QWidget *parent, state::NodeInfo * _state) :
 }
 
 NodeInfo::~NodeInfo() {
-    state->wndIsGone(this);
     delete ui;
 }
 
 // logs to show, multi like output
-void NodeInfo::updateEmbeddedMwcNodeStatus( const QString & status ) {
+void NodeInfo::onSgnUpdateEmbeddedMwcNodeStatus( QString status ) {
     if (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL)
         ui->statusInfo->setText( toBoldAndYellow(status) );
 }
@@ -102,12 +110,14 @@ void NodeInfo::showWarning(QString warning) {
 }
 
 
-void NodeInfo::setNodeStatus( const QString & localNodeStatus, const state::NodeStatus & status ) {
+void NodeInfo::onSgnSetNodeStatus( QString localNodeStatus,
+                                 bool online,  QString errMsg, int nodeHeight, int peerHeight,
+                                 QString totalDifficulty2show, int connections) {
     QString warning;
 
     bool nodeIsReady = false;
 
-    if (!status.online) {
+    if (!online) {
         QString statusStr = "Offline";
 
         if (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL && localNodeStatus!="Ready") {
@@ -122,15 +132,15 @@ void NodeInfo::setNodeStatus( const QString & localNodeStatus, const state::Node
         // Don't show message for the local because starting local node might take a while. Error likely will be recoverable
         if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL ) {
             if ( statusStr == "Offline" ) {
-                 if (lastShownErrorMessage != status.errMsg) {
-                     emit showNodeConnectionError(status.errMsg);
-                     lastShownErrorMessage = status.errMsg;
+                 if (lastShownErrorMessage != errMsg) {
+                     emit showNodeConnectionError(errMsg);
+                     lastShownErrorMessage = errMsg;
                  }
             }
         }
     }
     else {
-        if ( status.nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < status.peerHeight ) {
+        if ( nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight ) {
             if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL)
                 ui->statusInfo->setText(toBoldAndYellow("Syncing") );
         }
@@ -141,10 +151,10 @@ void NodeInfo::setNodeStatus( const QString & localNodeStatus, const state::Node
             nodeIsReady = true;
         }
 
-        if (status.connections <= 0) {
+        if (connections <= 0) {
             ui->connectionsInfo->setText( toBoldAndYellow("None") ); // Two offline is confusing and doesn't look good. Let's keep zero and highlight it.
 
-            if (!config::isColdWallet()) {
+            if (!config->isColdWallet()) {
                 if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD) {
                     warning = toBoldAndYellow(
                             "Please note. You can't run two mwc-node with same public IP.<br>That might be a reason why node unable to find any peers.");
@@ -152,14 +162,14 @@ void NodeInfo::setNodeStatus( const QString & localNodeStatus, const state::Node
             }
         }
         else {
-            ui->connectionsInfo->setText( util::longLong2Str(status.connections) );
+            ui->connectionsInfo->setText( QString::number(connections) );
         }
 
-        ui->heightInfo->setText( util::longLong2Str(status.nodeHeight) );
-        ui->difficultyInfo->setText( util::longLong2ShortStr(status.totalDifficulty, 9) );
+        ui->heightInfo->setText( util->longLong2Str(nodeHeight) );
+        ui->difficultyInfo->setText( totalDifficulty2show );
     }
 
-    if (status.peerHeight==0 || status.connections==0)
+    if (peerHeight==0 || connections==0)
         nodeIsReady = false;
 
     updateNodeReadyButtons(nodeIsReady);
@@ -174,15 +184,15 @@ void NodeInfo::onShowNodeConnectionError(QString errorMessage) {
 
 void NodeInfo::on_refreshButton_clicked() {
     if (control::MessageBox::questionText(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
-                       "No", "Yes", true, false) == control::MessageBox::RETURN_CODE::BTN2 ) {
-        state->requestWalletResync();
+                       "No", "Yes", true, false) == core::WndManager::RETURN_CODE::BTN2 ) {
+        nodeInfo->requestWalletResync();
     }
 }
 
 void NodeInfo::showNodeLogs() {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to("NodeInfo");
 
-    dlg::MwcNodeLogs logsDlg(this, state->getMwcNode() );
+    dlg::MwcNodeLogs logsDlg(this);
     logsDlg.exec();
 }
 
@@ -192,26 +202,26 @@ void NodeInfo::on_showLogsButton_8_clicked() { showNodeLogs(); }
 
 void NodeInfo::on_changeNodeButton_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to("NodeInfo");
 
     // call dialog the allow to change the
-    QPair< wallet::MwcNodeConnection, wallet::WalletConfig > conInfo = state->getNodeConnection();
+    wallet::MwcNodeConnection nodeConn = wallet::MwcNodeConnection::fromJson(nodeInfo->getNodeConnection());
 
-    dlg::ChangeNode changeNodeDlg(this, conInfo.first, conInfo.second.getNetwork() );
+    dlg::ChangeNode changeNodeDlg(this, nodeConn, config->getNetwork() );
 
     if ( changeNodeDlg.exec() == QDialog::Accepted ) {
-        state->updateNodeConnection( changeNodeDlg.getNodeConnectionConfig(), conInfo.second );
+        nodeInfo->updateNodeConnection( changeNodeDlg.getNodeConnectionConfig().toJson() );
     }
 }
 
-void NodeInfo::hideProgress() {
+void NodeInfo::onSgnHideProgress() {
     ui->progress->hide();
 }
 
 void NodeInfo::on_saveBlockchianData_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Blockchain Data"),
-                                                       state->getBlockchainDataPath(),
+                                                       config->getPathFor("BlockchainData"),
                                                        tr("MWC Blockchain Data (*.mwcblc)"));
 
     if (fileName.length()==0)
@@ -221,36 +231,36 @@ void NodeInfo::on_saveBlockchianData_clicked()
         fileName += ".mwcblc";
 
     ui->progress->show();
-    state->updateBlockchainDataPath( QFileInfo(fileName).absolutePath() );
-    state->saveBlockchainData(fileName);
+    config->updatePathFor("BlockchainData", QFileInfo(fileName).absolutePath() );
+    nodeInfo->exportBlockchainData(fileName);
 }
 
 void NodeInfo::on_loadBlockchainData_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load Blockchain Data"),
-                                                       state->getBlockchainDataPath(),
-                                                       tr("MWC Blockchain Data (*.mwcblc);;All files (*.*)"));
+                                                    config->getPathFor("BlockchainData"),
+                                                    tr("MWC Blockchain Data (*.mwcblc);;All files (*.*)"));
 
     if (fileName.length()==0)
           return;
 
     ui->progress->show();
-    state->updateBlockchainDataPath( QFileInfo(fileName).absolutePath() );
-    state->loadBlockchainData(fileName);
+    config->updatePathFor("BlockchainData", QFileInfo(fileName).absolutePath() );
+    nodeInfo->importBlockchainData(fileName);
 }
 
 void NodeInfo::on_publishTransaction_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Publish MWC transaction"),
-                                                       state->getPublishTransactionPath(),
-                                                       tr("MWC transaction (*.mwctx)"));
+                                                    config->getPathFor("PublishTransaction"),
+                                                    tr("MWC transaction (*.mwctx)"));
 
     if (fileName.length()==0)
           return;
 
     ui->progress->show();
-    state->updatePublishTransactionPath( QFileInfo(fileName).absolutePath() );
-    state->publishTransaction(fileName);
+    config->updatePathFor("PublishTransaction", QFileInfo(fileName).absolutePath() );
+    nodeInfo->publishTransaction(fileName);
 }
 
 void NodeInfo::updateNodeReadyButtons(bool nodeIsReady) {

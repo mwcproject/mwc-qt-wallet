@@ -69,7 +69,7 @@ struct AccountInfo {
 };
 
 struct MwcNodeConnection {
-    enum class NODE_CONNECTION_TYPE { CLOUD, LOCAL, CUSTOM }; //
+    enum class NODE_CONNECTION_TYPE { CLOUD = 0, LOCAL = 1, CUSTOM = 2 }; //
 
     NODE_CONNECTION_TYPE connectionType = NODE_CONNECTION_TYPE::CLOUD;
 
@@ -95,6 +95,12 @@ struct MwcNodeConnection {
     bool notCustom() const { return connectionType != NODE_CONNECTION_TYPE::CUSTOM; }
     bool isLocalNode() const { return connectionType == NODE_CONNECTION_TYPE::LOCAL; }
     bool isCloudNode() const { return connectionType == NODE_CONNECTION_TYPE::CLOUD; }
+
+    QString toJson();
+    static MwcNodeConnection fromJson(const QString & str);
+private:
+    void setData(NODE_CONNECTION_TYPE connectionType, const QString & localNodeDataPath,
+                    const QString & mwcNodeURI,  const QString & mwcNodeSecret);
 };
 
 // Wallet config
@@ -104,7 +110,6 @@ private:
     QString dataPath;
 
 public:
-    QString mwcmqDomainEx; // empty - default value
     QString mwcmqsDomainEx;// empty - default value
     QString keyBasePath;
 
@@ -126,7 +131,6 @@ public:
 
     WalletConfig & setData(QString network,
                 QString dataPath,
-                QString mwcmqDomain,
                 QString mwcmqsDomain,
                 QString keyBasePath,
                 bool foreignApi,
@@ -135,9 +139,12 @@ public:
                 QString tlsCertificateFile,
                 QString tlsCertificateKey);
 
+    WalletConfig & setForeignApi(bool foreignApi,
+                       QString foreignApiAddress, QString foreignApiSecret,
+                       QString tlsCertificateFile, QString tlsCertificateKey);
+
     WalletConfig & setDataWalletCfg(QString network,
                            QString dataPath,
-                           QString mwcmqDomain,
                            QString mwcmqsDomain,
                            QString keyBasePath);
 
@@ -219,6 +226,9 @@ struct WalletOutput {
     double getWeightedValue() const {return weight*valueNano; }
 
     bool isUnspent() const {return status == "Unspent";}
+
+    QString toJson() const;
+    static WalletOutput fromJson(QString str);
 };
 
 struct WalletTransaction {
@@ -226,7 +236,7 @@ struct WalletTransaction {
 
     int64_t    txIdx = -1;
     uint    transactionType = TRANSACTION_TYPE::NONE;
-    QString txid; // Full tx UUIS
+    QString txid; // Full tx UUID
     QString address;
     QString creationTime;
     int64_t ttlCutoffHeight = -1;
@@ -311,6 +321,9 @@ struct WalletTransaction {
 
     // return transactions values formatted into a CSV string
     QString toStringCSV();
+
+    QString toJson() const;
+    static WalletTransaction fromJson(QString str);
 };
 
 struct WalletUtxoSignature {
@@ -465,10 +478,10 @@ public:
     virtual void check(bool wait4listeners)  = 0;
 
     // Get current configuration of the wallet.
-    virtual WalletConfig getWalletConfig()  = 0;
+    virtual const WalletConfig & getWalletConfig()  = 0;
 
     // Get configuration form the resource file.
-    virtual WalletConfig getDefaultConfig()  = 0;
+    virtual const WalletConfig & getDefaultConfig()  = 0;
 
     // Update wallet config. Will update config and restart the mwc713.
     // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
@@ -482,17 +495,10 @@ public:
     // Check Signal: onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections )
     virtual bool getNodeStatus() = 0;
 
-    // -------------- Transactions
-
     // Set account that will receive the funds
     // Check Signal:  onSetReceiveAccount( bool ok, QString AccountOrMessage );
     virtual void setReceiveAccount(QString account)  = 0;
     virtual QString getReceiveAccount() = 0;
-
-    // Get wallet balance
-    // Cancel transaction
-    // Check Signal:  onCancelTransacton
-    virtual void cancelTransacton(int64_t transactionID)  = 0;
 
     // Proof results
 
@@ -506,7 +512,7 @@ public:
 
     // Init send transaction with file output
     // Check signal:  onSendFile
-    virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx,
+    virtual void sendFile( const QString &account, int64_t coinNano, QString message, QString fileTx,
             int inputConfirmationNumber, int changeOutputs, const QStringList & outputs )  = 0;
 
     // Receive transaction. Will generate *.response file in the same dir
@@ -524,7 +530,7 @@ public:
     // Before send, wallet always do the switch to account to make it active
     // coinNano == -1  - mean All
     // Check signal:  onSend
-    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address, const QString & apiSecret,
+    virtual void sendTo( const QString &account, int64_t coinNano, const QString & address, const QString & apiSecret,
                          QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff )  = 0;
 
     // Airdrop special. Generating the next Public key for transaction
@@ -545,6 +551,11 @@ public:
     // get Extended info for specific transaction
     // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
     virtual void getTransactionById(QString account, int64_t txIdx ) = 0;
+
+    // Get wallet balance
+    // Cancel transaction
+    // Check Signal:  onCancelTransacton
+    virtual void cancelTransacton(QString account, int64_t txIdx)  = 0;
 
     // Read all transactions for all accounts. Might take time...
     // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
@@ -630,13 +641,13 @@ signals:
 
     // Transactions
     void onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
-    void onCancelTransacton( bool success, int64_t trIdx, QString errMessage );
+    void onCancelTransacton2( bool success, QString account, int64_t trIdx, QString errMessage );
 
     void onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages );
 
     void onAllTransactions( QVector<WalletTransaction> Transactions);
 
-    void onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs);
+    void onOutputs2( QString account, bool showSpent, int64_t height, QVector<WalletOutput> outputs);
 
     void onCheckResult(bool ok, QString errors );
 

@@ -14,24 +14,26 @@
 
 #include "c_newseed_w.h"
 #include "ui_c_newseed.h"
-#include "../state/a_initaccount.h"
-#include "../util/widgetutils.h"
-#include "../control/messagebox.h"
-#include "../state/timeoutlock.h"
-#include "../util/stringutils.h"
+#include "../util_desktop/widgetutils.h"
+#include "../control_desktop/messagebox.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../bridge/wnd/c_newseed_b.h"
 
 namespace wnd {
 
 
-NewSeed::NewSeed( QWidget *parent, state::SubmitCaller * _state, state::StateContext * _context,
+NewSeed::NewSeed( QWidget *parent,
                   const QVector<QString> & _seed, bool hideSubmitButton ) :
-    core::NavWnd( parent, _context, hideSubmitButton ),
+    core::NavWnd( parent,  hideSubmitButton ),
     ui(new Ui::NewSeed),
-    state(_state),
-    context(_context),
     seed(_seed)
 {
     ui->setupUi(this);
+
+    newSeed = new bridge::NewSeed(this);
+
+    QObject::connect( newSeed, &bridge::NewSeed::sgnShowSeedData,
+                      this, &NewSeed::onSgnShowSeedData, Qt::QueuedConnection);
 
     if ( hideSubmitButton )
         ui->submitButton->hide();
@@ -46,13 +48,12 @@ NewSeed::NewSeed( QWidget *parent, state::SubmitCaller * _state, state::StateCon
 
 NewSeed::~NewSeed()
 {
-    state->wndDeleted(this);
     delete ui;
 }
 
 // if seed empty or has size 1, it is error message
-void NewSeed::showSeedData(const QVector<QString> & seed) {
-    state::TimeoutLockObject to( context->stateMachine );
+void NewSeed::onSgnShowSeedData(QVector<QString> seed) {
+    util::TimeoutLockObject to("NewSeed");
 
     if (seed.size()<2) {
         control::MessageBox::messageText( this, "Getting Passphrase Failure", "Unable to retrieve a passphrase from mwc713. " + (seed.size()>0 ? seed[0] : "") );
@@ -82,7 +83,7 @@ void NewSeed::updateSeedData( const QString & name, const QVector<QString> & see
 
 void NewSeed::on_submitButton_clicked()
 {
-    state->submit();
+    newSeed->doneWithNewSeed();
 }
 
 }

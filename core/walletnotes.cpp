@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+/*
 #include "walletnotes.h"
 #include <QDataStream>
 #include "Config.h"
@@ -309,4 +309,4 @@ void WalletNotes::recordNotesCleanup(WALLET_NOTE_TYPE noteType, const QString& w
 }
 
 }
-
+*/

@@ -14,52 +14,56 @@
 
 #include "g_sendOffline.h"
 #include "ui_g_sendOffline.h"
-#include "../dialogs/sendcoinsparamsdialog.h"
-#include "state/g_Send.h"
-#include "../control/messagebox.h"
-#include "../state/timeoutlock.h"
-#include <QFileDialog>
-#include "../util/ui.h"
+#include "../dialogs_desktop/sendcoinsparamsdialog.h"
+#include "../control_desktop/messagebox.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../bridge/util_b.h"
+#include "../bridge/config_b.h"
+#include "../bridge/wnd/g_send_b.h"
 
 namespace wnd {
 
-SendOffline::SendOffline(QWidget *parent, const wallet::AccountInfo & _selectedAccount, int64_t _amount, state::Send * _state) :
-    core::NavWnd(parent, _state->getContext() ),
+SendOffline::SendOffline(QWidget *parent, QString _selectedAccount, int64_t _amount) :
+    core::NavWnd(parent),
     ui(new Ui::SendOffline),
-    state(_state),
     selectedAccount(_selectedAccount),
     amount(_amount)
 {
     ui->setupUi(this);
+
+    util = new bridge::Util(this);
+    config = new bridge::Config(this);
+    send = new bridge::Send(this);
+
+    QObject::connect( send, &bridge::Send::sgnShowSendResult,
+                      this, &SendOffline::onSgnShowSendResult, Qt::QueuedConnection);
+
     ui->progress->initLoader(false);
 
-    ui->fromAccount->setText("From account: " + selectedAccount.accountName );
-    ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util::nano2one(amount)) + " MWC" );
+    ui->fromAccount->setText("From account: " + selectedAccount );
+    ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util->nano2one(QString::number(amount))) + " MWC" );
 }
 
 SendOffline::~SendOffline()
 {
-    state->destroyOfflineWnd(this);
     delete ui;
 }
 
-void wnd::SendOffline::on_settingsBtn_clicked()
+void SendOffline::on_settingsBtn_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to("SendOffline");
 
-    core::SendCoinsParams  params = state->getSendCoinsParams();
-
-    SendCoinsParamsDialog dlg(this, params);
+    SendCoinsParamsDialog dlg(this, config->getInputConfirmationNumber(), config->getChangeOutputs());
     if (dlg.exec() == QDialog::Accepted) {
-        state->updateSendCoinsParams( dlg.getSendCoinsParams() );
+        config->updateSendCoinsParams(dlg.getInputConfirmationNumber(), dlg.getChangeOutputs());
     }
 }
 
 void SendOffline::on_sendButton_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to("SendOffline");
 
-    if ( !state->isNodeHealthy() ) {
+    if ( !send->isNodeHealthy() ) {
         control::MessageBox::messageText(this, "Unable to send", "Your MWC-Node, that wallet is connected to, is not ready.\n"
                                                                      "MWC-Node needs to be connected to a few peers and finish block synchronization process");
         return;
@@ -68,60 +72,19 @@ void SendOffline::on_sendButton_clicked()
     QString description = ui->descriptionEdit->toPlainText().trimmed();
 
     {
-        QPair<bool, QString> valRes = util::validateMwc713Str(description);
-        if (!valRes.first) {
-            control::MessageBox::messageText(this, "Incorrect Input", valRes.second);
+        QString valRes = util->validateMwc713Str(description);
+        if (!valRes.isEmpty()) {
+            control::MessageBox::messageText(this, "Incorrect Input", valRes);
             ui->descriptionEdit->setFocus();
             return;
         }
     }
 
-    wallet::AccountInfo fromAccount = selectedAccount;
-    core::SendCoinsParams sendParams = state->getSendCoinsParams();
-
-    QStringList outputs;
-    uint64_t txnFee = 0;
-    if (! util::getOutputsToSend( fromAccount.accountName, sendParams.changeOutputs, amount,
-                    state->getContext()->wallet, state->getContext()->hodlStatus, state->getContext()->appContext,
-                    this, outputs, &txnFee) )
-        return; // User reject something
-
-    if (txnFee == 0 && outputs.size() == 0) {
-        txnFee = util::getTxnFee(fromAccount.accountName, amount, state->getContext()->wallet,
-                                 state->getContext()->appContext, sendParams.changeOutputs, outputs);
-    }
-    QString txnFeeStr = util::txnFeeToString(txnFee);
-
-    QString hash = state->getWalletPasswordHash();
-    if ( control::MessageBox::RETURN_CODE::BTN2 != control::MessageBox::questionText(this,"Confirm Send Request",
-                         "You are sending offline " + (amount < 0 ? "all" : util::nano2one(amount)) +
-                         " MWC from account: " + fromAccount.accountName + "\n\nTransaction fee: " + txnFeeStr +
-                         "\n\nYour initial transaction slate will be stored in a file.", "Decline", "Confirm", false, true, 1.0,
-                         hash, control::MessageBox::RETURN_CODE::BTN2 ) )
-        return;
-
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Create Initial Transaction Slate File"),
-                                                    state->getFileGenerationPath(),
-                                                    tr("MWC init transaction (*.tx)"));
-
-    if (fileName.length()==0)
-        return;
-
-    if (!fileName.endsWith(".tx"))
-        fileName += ".tx";
-
-    // Update path
-    QFileInfo flInfo(fileName);
-    state->updateFileGenerationPath( flInfo.path() );
-
-    ui->progress->show();
-
-    state->sendMwcOffline(  selectedAccount, amount, description, fileName, outputs, sendParams.changeOutputs );
+    if ( send->sendMwcOffline( selectedAccount, QString::number(amount), description) )
+        ui->progress->show();
 }
 
-void SendOffline::showSendMwcOfflineResult( bool success, QString message ) {
-    state::TimeoutLockObject to( state );
-
+void SendOffline::onSgnShowSendResult( bool success, QString message ) {
     ui->progress->hide();
     control::MessageBox::messageText(this, success ? "Success" : "Failure", message );
 }

@@ -14,48 +14,34 @@
 
 #include "g_sendStarting.h"
 #include "ui_g_sendStarting.h"
-#include "../state/g_Send.h"
-#include "../state/timeoutlock.h"
-#include "../control/messagebox.h"
-#include "../core/Config.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../control_desktop/messagebox.h"
+#include "../bridge/wallet_b.h"
+#include "../bridge/config_b.h"
+#include "../bridge/wnd/g_send_b.h"
 
 namespace wnd {
-
-
-QString generateAmountErrorMsg(int64_t mwcAmount, const wallet::AccountInfo &acc, const core::SendCoinsParams &sendParams) {
-    QString msg2print = "You are trying to send " + util::nano2one(mwcAmount) + " mwc, but you only have " +
-                        util::nano2one(acc.currentlySpendable) + " spendable mwc.";
-    if (acc.awaitingConfirmation > 0)
-        msg2print += " " + util::nano2one(acc.awaitingConfirmation) + " coins are awaiting confirmation.";
-
-    if (acc.lockedByPrevTransaction > 0)
-        msg2print += " " + util::nano2one(acc.lockedByPrevTransaction) + " coins are locked.";
-
-    if (acc.awaitingConfirmation > 0 || acc.lockedByPrevTransaction > 0) {
-        if (sendParams.inputConfirmationNumber != 1) {
-            if (sendParams.inputConfirmationNumber < 0)
-                msg2print += " You can modify settings to spend mwc with less than 10 confirmations (wallet default value).";
-            else
-                msg2print += " You can modify settings to spend mwc with less than " +
-                             QString::number(sendParams.inputConfirmationNumber) + " confirmations.";
-        }
-    }
-    return msg2print;
-}
-
 
 enum CHECKED_FR_ID {
     ONLINE_ID = 1, FILE_ID = 2
 };
 
-SendStarting::SendStarting(QWidget *parent, state::Send *_state) :
-        core::NavWnd(parent, _state->getContext() ),
-        ui(new Ui::SendStarting),
-        state(_state) {
+SendStarting::SendStarting(QWidget *parent) :
+        core::NavWnd(parent),
+        ui(new Ui::SendStarting) {
     ui->setupUi(this);
+
+    wallet = new bridge::Wallet(this);
+    config = new bridge::Config(this);
+    send = new bridge::Send(this);
+
+    connect(wallet, &bridge::Wallet::sgnWalletBalanceUpdated, this, &SendStarting::onSgnWalletBalanceUpdated,
+            Qt::QueuedConnection);
 
     // Waiting for account data
     ui->progress->initLoader(true);
+
+    wallet->requestWalletBalanceUpdate();
 
     ui->fileChecked->setId(FILE_ID);
     ui->onlineChecked->setId(ONLINE_ID);
@@ -65,7 +51,7 @@ SendStarting::SendStarting(QWidget *parent, state::Send *_state) :
     connect(ui->onlineChecked, &control::MwcCheckedFrame::onChecked, this, &SendStarting::onChecked,
             Qt::QueuedConnection);
 
-    if (config::isColdWallet()) {
+    if (config->isColdWallet()) {
         // Hide 'online option to send'
         ui->onlineChecked->hide();
         QRect rc = ui->fileChecked->frameGeometry();
@@ -79,19 +65,22 @@ SendStarting::SendStarting(QWidget *parent, state::Send *_state) :
 
 }
 
-void SendStarting::updateAccountBalance( QVector<wallet::AccountInfo> _accountInfo, const QString & selectedAccount ) {
+void SendStarting::onSgnWalletBalanceUpdated() {
     // init accounts
-    accountInfo = _accountInfo;
-
     ui->accountComboBox->clear();
+
+    QString account = wallet->getCurrentAccountName();
+    QVector<QString> accountInfo = wallet->getWalletBalance(true, true,  false);
 
     int selectedAccIdx = 0;
     int idx = 0;
-    for (auto &info : accountInfo) {
-        if (info.accountName == selectedAccount)
+
+    for (int i=1; i<accountInfo.size(); i+=2) {
+        if (accountInfo[i-1] == account)
             selectedAccIdx = idx;
 
-        ui->accountComboBox->addItem(info.getSpendableAccountName(), QVariant(idx++));
+        ui->accountComboBox->addItem( accountInfo[i], QVariant(accountInfo[i-1]));
+        idx++;
     }
     ui->accountComboBox->setCurrentIndex(selectedAccIdx);
 
@@ -114,53 +103,23 @@ void SendStarting::onChecked(int id) {
 
 
 SendStarting::~SendStarting() {
-    state->destroyOnlineOfflineWnd(this);
     delete ui;
 }
 
 void SendStarting::on_nextButton_clicked() {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to( "SendStarting" );
 
-    auto dt = ui->accountComboBox->currentData();
-    if (!dt.isValid())
+    QString account = ui->accountComboBox->currentData().toString();
+    if (account.isEmpty())
         return;
-
-    int accountIdx = dt.toInt();
-    wallet::AccountInfo acc = accountInfo[accountIdx];
-
-    if (acc.currentlySpendable == 0) {
-        control::MessageBox::messageText(this, "Incorrect Input", "Your account doesn't have any spendable MWC to send");
-        ui->accountComboBox->setFocus();
-        return;
-    }
 
     QString sendAmount = ui->amountEdit->text().trimmed();
 
-    QPair<bool, int64_t> mwcAmount;
-    if (sendAmount != "All") {
-        mwcAmount = util::one2nano(ui->amountEdit->text().trimmed());
-        if (!mwcAmount.first || mwcAmount.second<=0) {
-            control::MessageBox::messageText(this, "Incorrect Input", "Please specify the number of MWC to send");
-            ui->amountEdit->setFocus();
-            return;
-        }
-    }
-    else { // All
-        mwcAmount = QPair<bool, int64_t>(true, -1);
-    }
-
-    // init expected to be fixed, so no need to disable the message
-    if ( mwcAmount.second > acc.currentlySpendable ) {
-
-        QString msg2print = generateAmountErrorMsg( mwcAmount.second, acc, state->getSendCoinsParams() );
-
-        control::MessageBox::messageText(this, "Incorrect Input",
-                                     msg2print );
+    int res = send->initialSendSelection( ui->onlineChecked->isChecked(), account, sendAmount );
+    if (res==1)
+        ui->accountComboBox->setFocus();
+    else if (res==2)
         ui->amountEdit->setFocus();
-        return;
-    }
-
-    state->processSendRequest( ui->onlineChecked->isChecked(), acc, mwcAmount.second );
 }
 
 void SendStarting::on_allAmountButton_clicked() {
@@ -169,15 +128,12 @@ void SendStarting::on_allAmountButton_clicked() {
 
 void SendStarting::on_accountComboBox_currentIndexChanged(int index)
 {
-    auto dt = ui->accountComboBox->currentData();
-    if (!dt.isValid())
+    Q_UNUSED(index)
+    QString account = ui->accountComboBox->currentData().toString();
+    if (account.isEmpty())
         return;
 
-    int accountIdx = dt.toInt();
-    if (accountIdx>=0 && accountIdx<accountInfo.size()) {
-        wallet::AccountInfo acc = accountInfo[accountIdx];
-        state->switchAccount(acc.accountName);
-    }
+    wallet->switchAccount(account);
 }
 
 }

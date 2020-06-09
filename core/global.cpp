@@ -19,8 +19,10 @@
 
 namespace mwc {
 
+#ifdef WALLET_DESKTOP
 static QApplication * mwcApp = nullptr;
 static QMainWindow * mwcMainWnd = nullptr;
+#endif
 
 QString get_APP_NAME() {
     if (config::isOnlineWallet())
@@ -33,14 +35,15 @@ QString get_APP_NAME() {
         return "Unknown mode";
 }
 
+static bool nonClosed = true;
+
+bool isAppNonClosed() {return nonClosed;}
+
+#ifdef WALLET_DESKTOP
 void setApplication(QApplication * app, QMainWindow * mainWindow) {
     mwcApp = app;
     mwcMainWnd = mainWindow;
 }
-
-static bool nonClosed = true;
-
-bool isAppNonClosed() {return nonClosed;}
 
 void closeApplication() {
     if (mwcApp == nullptr || mwcMainWnd==nullptr) {
@@ -60,5 +63,19 @@ void closeApplication() {
         QMetaObject::invokeMethod(mwcMainWnd, "close", Qt::QueuedConnection);
     }
 }
+#endif
+
+#ifdef WALLET_MOBILE
+void closeApplication() {
+    if (nonClosed) {
+
+        nonClosed = false;
+
+        // Suppose to close QML application. I am not sure if it will be friendly enough
+        QCoreApplication::quit();
+    }
+}
+#endif
+
 
 }

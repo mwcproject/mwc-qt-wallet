@@ -38,27 +38,27 @@ class State;
 class StateMachine;
 
 enum STATE {
-    NONE,
-    START_WALLET, // Start backed mwc713. Check what it want and then delegate control to the next state
-    STATE_INIT, // first run. Creating the password for a wallet
-    INPUT_PASSWORD, // Input password from the wallet
-    ACCOUNTS,       // Wallet accounts.              Note!!!  Keep accounts first Action page.
-    ACCOUNT_TRANSFER, // Transfer funds from account to account
-    EVENTS,         // Wallet events (logs)
-    HODL,           // Hodl program.
-    SEND,           // Send coins Page
-    RECEIVE_COINS,  // Receive coins
-    LISTENING,      // Listening API setting/status
-    TRANSACTIONS,   // Transactions dialog
-    OUTPUTS,        // Outputs for this wallet
-    CONTACTS,       // Contact page. COntacts supported by wallet713
-    WALLET_CONFIG,  // Wallet config
-    AIRDRDOP_MAIN,  // Starting airdrop page
-    SHOW_SEED,      // Show Seed
-    NODE_INFO,      // Show node info
-    RESYNC,         // Re-sync account with a node
-    FINALIZE,       // Finalize transaction. Windowless state
-    WALLET_RUNNING_MODE  // Running mode as a node, wallet or cold wallet
+    NONE = 0,
+    START_WALLET = 1,    // Start backed mwc713. Check what it want and then delegate control to the next state
+    STATE_INIT = 2,      // first run. Creating the password for a wallet
+    INPUT_PASSWORD = 3,  // Input password from the wallet
+    ACCOUNTS = 4,        // Wallet accounts.              Note!!!  Keep accounts first Action page.
+    ACCOUNT_TRANSFER= 5, // Transfer funds from account to account
+    EVENTS = 6,          // Wallet events (logs)
+    HODL = 7,            // Hodl program.
+    SEND = 8,            // Send coins Page
+    RECEIVE_COINS = 9,   // Receive coins
+    LISTENING = 10,      // Listening API setting/status
+    TRANSACTIONS = 11,   // Transactions dialog
+    OUTPUTS = 12,        // Outputs for this wallet
+    CONTACTS = 13,       // Contact page. COntacts supported by wallet713
+    WALLET_CONFIG = 14,  // Wallet config
+    AIRDRDOP_MAIN = 15,  // Starting airdrop page
+    SHOW_SEED = 16,      // Show Seed
+    NODE_INFO = 17,      // Show node info
+    RESYNC = 18,         // Re-sync account with a node
+    FINALIZE = 19,       // Finalize transaction. Windowless state
+    WALLET_RUNNING_MODE = 20// Running mode as a node, wallet or cold wallet
 };
 
 struct NextStateRespond {
@@ -76,21 +76,21 @@ struct StateContext {
     core::AppContext    * const appContext;
     wallet::Wallet      * const wallet; //wallet caller interface
     node::MwcNode       * const mwcNode;
-    core::WindowManager * const wndManager;
-    core::MainWindow    * const mainWnd;
     StateMachine        * stateMachine = nullptr;
     core::HodlStatus    * hodlStatus = nullptr;
 
     StateContext(core::AppContext * _appContext, wallet::Wallet * _wallet,
-                 node::MwcNode * _mwcNode,
-                 core::WindowManager * _wndManager, core::MainWindow * _mainWnd) :
-        appContext(_appContext), wallet(_wallet), mwcNode(_mwcNode), wndManager(_wndManager),
-        mainWnd(_mainWnd), stateMachine(nullptr) {}
+                 node::MwcNode * _mwcNode) :
+        appContext(_appContext), wallet(_wallet), mwcNode(_mwcNode), stateMachine(nullptr) {}
 
     void setStateMachine(StateMachine * sm) {stateMachine=sm;}
     void setHodlStatus(core::HodlStatus* hs) {hodlStatus=hs;}
 };
 
+void setStateContext(StateContext * context);
+StateContext * getStateContext();
+// Shortcut to state if state_machine. Callir suppose to know the class name
+State * getState(STATE state);
 
 // Single state of the app that is described with Dialog
 class State

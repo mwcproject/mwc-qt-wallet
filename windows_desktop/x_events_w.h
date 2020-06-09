@@ -15,16 +15,15 @@
 #ifndef EVENTSW_H
 #define EVENTSW_H
 
-#include <core/Notification.h>
-#include "../core/navwnd.h"
-#include "../wallet/wallet.h"
+#include "../core_desktop/navwnd.h"
 
 namespace Ui {
 class Events;
 }
 
-namespace state {
-    class Events;
+namespace bridge {
+class Config;
+class Events;
 }
 
 namespace wnd {
@@ -34,7 +33,7 @@ class Events : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit Events(QWidget *parent, state::Events * state);
+    explicit Events(QWidget *parent);
     ~Events();
 
     void updateShowMessages();
@@ -48,9 +47,13 @@ private:
 
 private:
     Ui::Events *ui;
-    state::Events * state;
 
-    QVector<notify::NotificationMessage> messages; // messaged that currently on diplay
+    bridge::Config * config = nullptr;
+    bridge::Events * events = nullptr;
+
+    // messages that currently on diplay
+    // Groups of 5: [time short, time long, level short, level full, message]
+    QVector<QString> messages;
 };
 
 }

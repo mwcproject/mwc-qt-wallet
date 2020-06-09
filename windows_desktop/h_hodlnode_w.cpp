@@ -12,41 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "windows/h_hodlnode_w.h"
+#include "h_hodlnode_w.h"
 #include "ui_h_hodlnode_w.h"
-#include "../state/h_hodl.h"
-#include "../control/messagebox.h"
-#include "../state/timeoutlock.h"
-#include "../util/execute.h"
-#include "../util/crypto.h"
+#include "../control_desktop/messagebox.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../bridge/wnd/h_hodl_b.h"
+#include "../bridge/hodlstatus_b.h"
+#include "../bridge/util_b.h"
 #include "../core/HodlStatus.h"
 
 namespace wnd {
 
-HodlNode::HodlNode(QWidget *parent, state::Hodl * _state) :
-    core::NavWnd(parent, _state->getContext()),
-    ui(new Ui::HodlNode),
-    state(_state)
+HodlNode::HodlNode(QWidget *parent) :
+    core::NavWnd(parent),
+    ui(new Ui::HodlNode)
 {
     ui->setupUi(this);
+
+    hodl = new bridge::Hodl(this);
+    hodlStatus = new bridge::HodlStatus(this);
+    util = new bridge::Util(this);
+
     ui->progress->initLoader(false);
 
     ui->accountStatus->setText("");
 
-    updateHodlState();
+    onSgnUpdateHodlState();
 }
 
 HodlNode::~HodlNode()
 {
-    state->deleteHodlNodeWnd(this);
     delete ui;
 }
 
 // Hodl object changed it's state, need to refresh
-void HodlNode::updateHodlState() {
-    ui->hodlStatus->setText( state->getContext()->hodlStatus->getHodlStatus() );
+void HodlNode::onSgnUpdateHodlState() {
+    ui->hodlStatus->setText( hodlStatus->getHodlStatus() );
 
-    QString pubKey = state->getContext()->hodlStatus->getRootPubKey();
+    QString pubKey = hodlStatus->getRootPubKey();
 
     if (pubKey != ui->publicKey->text()) {
         ui->signInButton->setEnabled(false);
@@ -55,14 +58,14 @@ void HodlNode::updateHodlState() {
         return;
     }
 
-    ui->signInButton->setEnabled( !state->getContext()->hodlStatus->isInHodl("") &&
-               pubKey.length()>0 && crypto::isPublicKeyValid(pubKey) );
-    ui->accountStatus->setText( state->getContext()->hodlStatus->getWalletHodlStatus("").first );
-    ui->viewOutputsButton->setEnabled(state->getContext()->hodlStatus->hasHodlOutputs() && !state->getContext()->hodlStatus->getHodlOutputs("").isEmpty() );
+    ui->signInButton->setEnabled( !hodlStatus->isInHodl("") &&
+               pubKey.length()>0 && util->isPublicKeyValid(pubKey) );
+    ui->accountStatus->setText( hodlStatus->getWalletHodlStatus("")[0] );
+    ui->viewOutputsButton->setEnabled( hodlStatus->hasHodlOutputs() && !hodlStatus->getHodlOutputs("").isEmpty() );
 }
 
-void HodlNode::reportMessage(const QString & title, const QString & message) {
-    state::TimeoutLockObject to( state );
+void HodlNode::onSgnReportMessage( QString title, QString message) {
+    util::TimeoutLockObject to("HodlNode");
     ui->progress->hide();
 
     control::MessageBox::messageText(this, title, message);
@@ -71,12 +74,15 @@ void HodlNode::reportMessage(const QString & title, const QString & message) {
 void HodlNode::on_signInButton_clicked()
 {
     ui->progress->show();
-    state->registerAccountForHODL();
+    hodl->registerAccountForHODL();
 }
 
 void HodlNode::on_viewOutputsButton_clicked()
 {
-    QVector<core::HodlOutputInfo> outputs = state->getContext()->hodlStatus->getHodlOutputs("");
+    QVector<QString> jsons = hodlStatus->getHodlOutputs("");
+    QVector<core::HodlOutputInfo> outputs;
+    for (auto & j : jsons)
+        outputs.push_back( core::HodlOutputInfo::fromJson(j) );
 
  /*
     Outputs that were discovered by HODL server during last scan:<br>
@@ -126,17 +132,17 @@ void HodlNode::on_viewOutputsButton_clicked()
 
 void HodlNode::on_publicKey_textChanged(const QString &pubKey)
 {
-    if ( crypto::isPublicKeyValid(pubKey) ) {
-        state->setColdWalletPublicKey(pubKey);
+    if ( util->isPublicKeyValid(pubKey) ) {
+        hodl->setColdWalletPublicKey(pubKey);
     }
     else {
-        state->setColdWalletPublicKey("");
+        hodl->setColdWalletPublicKey("");
     }
 
-    updateHodlState();
+    onSgnUpdateHodlState();
 }
 
-void HodlNode::hideWaitingStatus() {
+void HodlNode::onSgnHideWaitingStatus() {
     ui->progress->hide();
 }
 

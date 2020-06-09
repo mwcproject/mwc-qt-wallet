@@ -74,7 +74,7 @@ QStringList WordDictionary::detectDictionaryWords( const QString & str, QVector<
         idx0++;
     }
 
-    return QStringList( foundWords.toList() );
+    return QStringList( foundWords.values() );
 }
 
 
@@ -184,7 +184,7 @@ static QString applyStackOp( QString & stack, int & firstChIdx,
 
 QStringList convertToStacked(const QSet<QString> & word) {
 
-    QStringList lines( word.toList() );
+    QStringList lines( word.values() );
 
     lines.sort( Qt::CaseSensitive );
 

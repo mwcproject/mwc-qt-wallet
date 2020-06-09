@@ -18,16 +18,23 @@
 #include <QMap>
 #include "state.h"
 #include <QObject>
+#include <QVector>
 
 namespace state {
+
+// Use  getStateMachine()  to access singletone instance
 
 // State machine that describes wallet application
 class StateMachine : public QObject
 {
     Q_OBJECT
-public:
-    StateMachine(StateContext * context);
+private:
+    StateMachine();
     ~StateMachine();
+
+public:
+    static void initStateMachine();
+    static void destroyStateMachine();
 
     void start();
 
@@ -48,8 +55,8 @@ public:
     void resetLogoutLimit(bool resetBlockLogoutCounter);
 
     // Logout must be blocked for modal dialogs
-    void blockLogout();
-    void unblockLogout();
+    void blockLogout(const QString & id);
+    void unblockLogout(const QString & id);
     // logout now
     void logout();
 
@@ -69,16 +76,16 @@ private:
     bool isLogoutOff( STATE state ) const { return state < STATE::ACCOUNTS || state==STATE::RESYNC; }
 
 private:
-    StateContext * context = nullptr;
-
     // Map is orders by Ids. It naturally define the priority of
     // all states
     QMap< STATE, State* > states;
     STATE currentState = STATE::NONE;
 
     int64_t logoutTime = 0; // 0 mean never logout...
-    int     blockLogoutCounter = 0;
+    QVector<QString> blockLogoutStack;
 };
+
+StateMachine * getStateMachine();
 
 
 }

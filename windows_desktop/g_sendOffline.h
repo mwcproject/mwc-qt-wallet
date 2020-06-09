@@ -15,17 +15,18 @@
 #ifndef SEND3_OFFLINESETTINGS_H
 #define SEND3_OFFLINESETTINGS_H
 
-#include "../core/navwnd.h"
+#include "../core_desktop/navwnd.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
 class SendOffline;
 }
 
-namespace state {
+namespace bridge {
+class Util;
+class Config;
 class Send;
 }
-
 
 namespace wnd {
 
@@ -34,20 +35,21 @@ class SendOffline : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit SendOffline(QWidget *parent, const wallet::AccountInfo & selectedAccount, int64_t amount, state::Send * state);
+    explicit SendOffline(QWidget *parent, QString selectedAccount, int64_t amount);
     virtual ~SendOffline() override;
 
-    void showSendMwcOfflineResult( bool success, QString message );
 private slots:
     void on_sendButton_clicked();
-
     void on_settingsBtn_clicked();
 
+    void onSgnShowSendResult( bool success, QString message );
 private:
     Ui::SendOffline * ui;
-    state::Send * state;
+    bridge::Util * util = nullptr;
+    bridge::Config * config = nullptr;
+    bridge::Send * send = nullptr;
 
-    wallet::AccountInfo selectedAccount;
+    QString selectedAccount;
     int64_t amount;
 };
 

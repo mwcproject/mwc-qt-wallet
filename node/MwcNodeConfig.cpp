@@ -20,8 +20,8 @@
 #include <QtGlobal>
 #include <QTime>
 #include "../core/global.h"
-#include "../control/messagebox.h"
 #include <QCoreApplication>
+#include "../core/WndManager.h"
 
 namespace node {
 
@@ -43,7 +43,7 @@ void MwcNodeConfig::setData(QString _network, QString _host, QString _port, QStr
 static void updateMwcNodeConfig(const QString & nodeDataPath, const QString & network ) {
     QPair<bool,QString> walletPath = getMwcNodePath(nodeDataPath, network);
     if (!walletPath.first) {
-        control::MessageBox::messageText(nullptr, "Error", walletPath.second);
+        core::getWndManager()->messageTextDlg( "Error", walletPath.second);
         QCoreApplication::exit();
         return;
     }
@@ -84,7 +84,7 @@ MwcNodeConfig getCurrentMwcNodeConfig(const QString & nodeDataPath, const QStrin
 
     QPair<bool,QString> walletPath = getMwcNodePath(nodeDataPath, network);
     if (!walletPath.first) {
-        control::MessageBox::messageText(nullptr, "Error", walletPath.second);
+        core::getWndManager()->messageTextDlg("Error", walletPath.second);
         QCoreApplication::exit();
         return MwcNodeConfig();
     }

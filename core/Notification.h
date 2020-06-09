@@ -22,7 +22,7 @@
 namespace notify {
 
 // Report Message to the wallet.
-enum class MESSAGE_LEVEL { FATAL_ERROR, CRITICAL, WARNING, INFO, DEBUG };
+enum class MESSAGE_LEVEL { FATAL_ERROR=1, CRITICAL=2, WARNING=3, INFO=4, DEBUG=5 };
 
 // Enum to string
 QString toString(MESSAGE_LEVEL level);

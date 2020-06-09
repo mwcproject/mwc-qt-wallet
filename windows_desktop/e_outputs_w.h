@@ -15,15 +15,18 @@
 #ifndef OUTPUTSW_H
 #define OUTPUTSW_H
 
-#include "../core/navwnd.h"
+#include "../core_desktop/navwnd.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
 class Outputs;
 }
 
-namespace state {
-    class Outputs;
+namespace bridge {
+class Config;
+class HodlStatus;
+class Wallet;
+class Outputs;
 }
 
 namespace wnd {
@@ -33,16 +36,8 @@ class Outputs : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit Outputs(QWidget *parent, state::Outputs * state);
+    explicit Outputs(QWidget *parent);
     ~Outputs();
-
-    void setOutputCount(QString account, int count);
-    void setOutputsData(QString account, int64_t height, const QVector<wallet::WalletOutput> & outp );
-
-    // return selected account
-    QString updateWalletBalance();
-
-    void triggerRefresh();
 
 private slots:
     void on_accountComboBox_activated(int index);
@@ -52,10 +47,14 @@ private slots:
     void on_showAll_clicked();
     void on_showUnspent_clicked();
     void on_outputsTable_cellDoubleClicked(int row, int column);
-
-    void saveOutputNote(const QString& account, const QString& commitment, const QString& note);
-
     void on_outputsTable_cellClicked(int row, int column);
+
+    void saveOutputNote( QString commitment, QString note);
+
+    void onSgnWalletBalanceUpdated();
+    void onSgnOutputs( QString account, bool showSpent, QString height, QVector<QString> outputs);
+
+    void onSgnNewNotificationMessage(int level, QString message);
 
 private:
     void initTableHeaders();
@@ -66,7 +65,10 @@ private:
     QString currentSelectedAccount();
 
     // return enable state for the buttons
-    QPair<bool,bool> updatePages( int currentPos, int total, int pageSize );
+    void updateShownData();
+
+    // return selected account
+    QString updateAccountsData();
 
     int calcPageSize() const;
 
@@ -80,18 +82,21 @@ private:
     bool showLockMessage();
 private:
     Ui::Outputs *ui;
-    state::Outputs * state;
-    QVector<wallet::AccountInfo> accountInfo;
-    QVector<wallet::WalletOutput> outputs;
+    bridge::Config * config = nullptr;
+    bridge::HodlStatus * hodlStatus = nullptr;
+    bridge::Wallet * wallet = nullptr;
+    bridge::Outputs * outputs = nullptr; // needed as output windows active flag
+
+    QVector<wallet::WalletOutput> allData; // all outputs
+    QVector<wallet::WalletOutput> shownData; // Outputs that we show
 
     int currentPagePosition = INT_MAX; // position at the paging...
-    int totalOutputs = 0;
 
-    QPair<bool,bool> buttonState = QPair<bool,bool>(false, false);
+    //QPair<bool,bool> buttonState = QPair<bool,bool>(false, false);
 
     bool inHodl = false; // If acount enrolled in HODL. Requested once to eliminate race conditions
     bool canLockOutputs = false;
-    QString widthPrefix;
+    QString tableId;
 
     static bool lockMessageWasShown;
 };

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dialogs/helpdlg.h"
+#include "helpdlg.h"
 #include "ui_helpdlg.h"
 
 namespace dlg {

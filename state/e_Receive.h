@@ -17,64 +17,39 @@
 
 #include "state.h"
 #include "../wallet/wallet.h"
-#include "../windows/g_filetransaction_w.h"
-
-namespace wnd {
-class Receive;
-}
 
 namespace state {
 
-class Receive : public QObject, public State, public wnd::FileTransactionWndHandler {
+const QString RECEIVE_CALLER_ID = "Receive";
+
+class Receive : public QObject, public State {
     Q_OBJECT
 public:
     Receive( StateContext * context );
     virtual ~Receive() override;
 
-    QString  getReceiveAccount();
-    void  setReceiveAccount(QString accountName );
-    QVector<wallet::AccountInfo>  getWalletBalance();
-
-    QString getFileGenerationPath();
-    void updateFileGenerationPath(QString path);
-
     void signTransaction( QString fileName );
 
-    void deletedWnd(wnd::Receive * w) { if(w==wnd) wnd = nullptr;}
-
 public:
-    // wnd::FileTransactionWndHandler
+    void ftBack();
+    void ftContinue(QString fileName, QString resultTxFileName, bool fluff);
 
-    virtual void ftBack() override;
-    virtual void deleteFileTransactionWnd(wnd::FileTransaction * wnd) override {  if (wnd==fileTransWnd) fileTransWnd=nullptr; }
-    virtual void ftContinue(QString fileName, QString resultTxFileName, bool fluff) override;
-    virtual state::StateContext * getContext() override;
+    bool needResultTxFileName() {return false;}
 
-    virtual bool needResultTxFileName() override {return false;}
+    QString getResultTxPath() {return "";}
+    virtual void updateResultTxPath(QString path) {Q_UNUSED(path)}
 
-    virtual QString getResultTxPath() override {return "";}
-    virtual void updateResultTxPath(QString path)  override {Q_UNUSED(path)}
-
-    virtual bool isNodeHealthy() const override {return true;}
+    virtual bool isNodeHealthy() const {return true;}
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "receive.html";}
 
     void respReceiveFile( bool success, QStringList errors, QString inFileName );
 
+    bool isActive() const;
 private slots:
-    void onMwcMqListenerStatus(bool online);
-    void onKeybaseListenerStatus(bool online);
-
-    // Http listener
-    void onHttpListeningStatus(bool listening, QString additionalInfo);
-
-    void onMwcAddressWithIndex(QString mwcAddress, int idx);
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
-    void onWalletBalanceUpdated();
 private:
-    wnd::Receive * wnd = nullptr;
-    wnd::FileTransaction * fileTransWnd = nullptr;
     int lastNodeHeight = 0;
 };
 

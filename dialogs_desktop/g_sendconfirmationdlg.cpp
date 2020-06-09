@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dialogs/g_sendconfirmationdlg.h"
+#include "g_sendconfirmationdlg.h"
 #include "ui_g_sendconfirmationdlg.h"
 #include <Qt>
 #include <QTextDocument>
@@ -20,18 +20,19 @@
 #include <QTextBlock>
 #include <QScrollBar>
 #include <QThread>
-#include "../util/crypto.h"
+#include "../bridge/util_b.h"
+#include "../bridge/config_b.h"
 
 namespace dlg {
 
-SendConfirmationDlg::SendConfirmationDlg( QWidget *parent, QString title, QString message, double widthScale, QString passwordHash, bool fluffTxn ) :
+SendConfirmationDlg::SendConfirmationDlg( QWidget *parent, QString title, QString message, double widthScale, QString passwordHash ) :
      MwcDialog(parent),
     ui(new Ui::SendConfirmationDlg),
-    blockingPasswordHash(passwordHash),
-    origFluffSetting(fluffTxn),
-    newFluffSetting(fluffTxn)
+    blockingPasswordHash(passwordHash)
 {
     ui->setupUi(this);
+    util = new bridge::Util(this);
+    config = new bridge::Config(this);
 
     if (widthScale!=1.0) {
         // Let's ujust Width first
@@ -79,10 +80,7 @@ SendConfirmationDlg::SendConfirmationDlg( QWidget *parent, QString title, QStrin
     ui->text3->setMinimumHeight( h );
     ui->text3->adjustSize();
 
-    if (fluffTxn) {
-        ui->fluffCheckBox->setCheckState(Qt::CheckState::Checked);
-    }
-
+    ui->fluffCheckBox->setCheckState( config->isFluffSet() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
 
     ui->confirmButton->setEnabled(false);
 
@@ -108,7 +106,7 @@ SendConfirmationDlg::~SendConfirmationDlg()
 void SendConfirmationDlg::on_passwordEdit_textChanged(const QString &str)
 {
     QThread::msleep(200); // Ok for human and will prevent brute force from UI attack (really crasy scenario, better to attack mwc713 if you already get the host).
-    bool ok = crypto::calcHSA256Hash(str) == blockingPasswordHash;
+    bool ok = util->calcHSA256Hash(str) == blockingPasswordHash;
     ui->confirmButton->setEnabled(ok);
     if (ok)
         ui->confirmButton->setFocus();
@@ -116,18 +114,12 @@ void SendConfirmationDlg::on_passwordEdit_textChanged(const QString &str)
 
 void SendConfirmationDlg::on_declineButton_clicked()
 {
-    newFluffSetting = origFluffSetting;
-    retCode = RETURN_CODE::DECLINE;
-    accept();
+    reject();
 }
 
 void SendConfirmationDlg::on_confirmButton_clicked()
 {
-    newFluffSetting = ui->fluffCheckBox->isChecked();
-    if (origFluffSetting != newFluffSetting) {
-        emit saveFluffSetting(newFluffSetting);
-    }
-    retCode = RETURN_CODE::CONFIRM;
+    config->setFluff(ui->fluffCheckBox->isChecked());
     accept();
 }
 

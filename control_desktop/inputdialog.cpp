@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "control/inputdialog.h"
+#include "inputdialog.h"
 #include "ui_inputdialog.h"
 
 

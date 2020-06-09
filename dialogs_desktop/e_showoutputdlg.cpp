@@ -12,23 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dialogs/e_showoutputdlg.h"
+#include "e_showoutputdlg.h"
 #include "ui_e_showoutputdlg.h"
-#include "../wallet/wallet.h"
-#include "../util/stringutils.h"
-#include "../util/execute.h"
-#include "../core/global.h"
-#include "../core/HodlStatus.h"
+#include "../bridge/hodlstatus_b.h"
+#include "../bridge/config_b.h"
+#include "../bridge/wallet_b.h"
+#include "../bridge/util_b.h"
 
 namespace dlg {
 
-ShowOutputDlg::ShowOutputDlg(QWidget *parent, const QString &account, const wallet::WalletOutput &output,
-                             const wallet::WalletConfig &config, core::HodlStatus * hodlStatus,
+ShowOutputDlg::ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output,
                              QString note,
                              bool canBeLocked, bool _locked) :
         control::MwcDialog(parent),
         ui(new Ui::ShowOutputDlg) {
     ui->setupUi(this);
+
+    hodl = new bridge::HodlStatus(this);
+    config = new bridge::Config(this);
+    wallet = new bridge::Wallet(this);
+    util = new bridge::Util(this);
 
     ui->status->setText(output.status);
     ui->height->setText(output.blockHeight);
@@ -39,19 +42,17 @@ ShowOutputDlg::ShowOutputDlg(QWidget *parent, const QString &account, const wall
     ui->tx->setText(QString::number(output.txIdx + 1));
     ui->commitment->setText(output.outputCommitment);
 
-    blockExplorerUrl = (config.getNetwork() == "Mainnet") ? mwc::BLOCK_EXPLORER_URL_MAINNET
-                                                          : mwc::BLOCK_EXPLORER_URL_FLOONET;
+    blockExplorerUrl = config->getBlockExplorerUrl(config->getNetwork());
 
-    if (hodlStatus==nullptr || !hodlStatus->isInHodl("")) {
+    if (!hodl->isInHodl("")) {
         ui->hodl->setText("N/A");
     }
     else {
-        ui->hodl->setText( hodlStatus->isOutputInHODL(output.outputCommitment) ? "Yes" : "No" );
+        ui->hodl->setText( hodl->isOutputInHODL(output.outputCommitment) ? "Yes" : "No" );
     }
 
     commitment = output.outputCommitment;
 
-    this->account = account;
     originalOutputNote = note;
     newOutputNote = note;
     ui->outputNote->setText(newOutputNote);
@@ -81,12 +82,12 @@ void ShowOutputDlg::updateButtons(bool showOutputEditButtons) {
 }
 
 void ShowOutputDlg::on_viewOutput_clicked() {
-    util::openUrlInBrowser("https://" + blockExplorerUrl + "/#o" + commitment);
+    util->openUrlInBrowser("https://" + blockExplorerUrl + "/#o" + commitment);
 }
 
 void ShowOutputDlg::on_okButton_clicked() {
     if (newOutputNote != originalOutputNote) {
-        emit saveOutputNote(account, commitment, newOutputNote);
+        emit saveOutputNote(commitment, newOutputNote);
     }
     locked = ui->lockOutput->isChecked();
     accept();

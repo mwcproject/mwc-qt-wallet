@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dialogs/u_changenode.h"
+#include "u_changenode.h"
 #include "ui_u_changenode.h"
-#include "../control/messagebox.h"
+#include "../control_desktop/messagebox.h"
 #include <QHostInfo>
 #include <QUrl>
 #include <cstring>
@@ -201,7 +201,7 @@ void ChangeNode::on_applyButton_clicked() {
     }
 
     if (control::MessageBox::questionText(this, "Update mwc node connection", "Update of mwc node connection required relogin into the wallet. Than you will be able to verify if your wallet was able to connect to the mwc node.\nWould you like to continue?",
-                                      "Yes", "No", true, false) != control::MessageBox::RETURN_CODE::BTN1 ) {
+                                      "Yes", "No", true, false) != core::WndManager::RETURN_CODE::BTN1 ) {
         return;
     }
 

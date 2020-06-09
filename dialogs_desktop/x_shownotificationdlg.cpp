@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dialogs/x_shownotificationdlg.h"
+#include "x_shownotificationdlg.h"
 #include "ui_x_shownotificationdlg.h"
 
 namespace dlg {
 
-ShowNotificationDlg::ShowNotificationDlg(notify::NotificationMessage msg, QWidget *parent) :
+ShowNotificationDlg::ShowNotificationDlg(const QString & time, const QString & level, const QString & message, QWidget *parent) :
         MwcDialog(parent),
         ui(new Ui::ShowNotificationDlg) {
     ui->setupUi(this);
 
-    ui->timeText->setText( msg.time.toString("ddd MMMM d yyyy HH:mm:ss") );
-    ui->levelText->setText( msg.getLevelLongStr() );
-    ui->messageText->setPlainText( msg.message );
+    ui->timeText->setText( time );
+    ui->levelText->setText( level );
+    ui->messageText->setPlainText( message );
 }
 
 ShowNotificationDlg::~ShowNotificationDlg() {

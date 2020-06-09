@@ -154,9 +154,7 @@ QString TaskListeningStart::calcCommand(bool startMq, bool startKeybase) const {
     // -m, --mwcmq      mwcmq listener
     // -k, --keybase    keybase listener
     // -s, --mwcmqs     mwcmqs listener
-    static QString mq2start = config::getUseMwcMqS() ? " -s" : " -m";
-
-    return QString("listen") + (startMq ? mq2start : "") + (startKeybase ? " -k" : "");
+    return QString("listen") + (startMq ? " -s" : "") + (startKeybase ? " -k" : "");
 }
 
 // -------------------------------- TaskListeningStop -------------------------------
@@ -188,9 +186,7 @@ QString TaskListeningStop::calcCommand(bool stopMq, bool stopKeybase) const {
     // -m, --mwcmq      mwcmq listener
     // -k, --keybase    keybase listener
     // -s, --mwcmqs     mwcmqs listener
-    static QString mq2stop = config::getUseMwcMqS() ? " -s" : " -m";
-
-    return QString("stop") + (stopMq ? mq2stop : "") + (stopKeybase ? " -k" : "");
+    return QString("stop") + (stopMq ? " -s" : "") + (stopKeybase ? " -k" : "");
 }
 
 

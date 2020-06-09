@@ -183,7 +183,7 @@ QString fullFormalAddress(ADDRESS_TYPE type, QString address) {
             // Updating prefix, depend on active transport
             // protocol, address
             QPair<QString, QString>  protAddr = split2ProtocolAddress(address);
-            return (config::getUseMwcMqS() ? "mwcmqs://" : "mwcmq://") + protAddr.second;
+            return "mwcmqs://" + protAddr.second;
         }
         case ADDRESS_TYPE::KEYBASE:
         case ADDRESS_TYPE::HTTPS:

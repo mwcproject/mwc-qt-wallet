@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "core/mwctoolbar.h"
+#include "mwctoolbar.h"
 #include "ui_mwctoolbar.h"
 #include <QPainter>
 #include <QStyleOption>
-#include "appcontext.h"
-#include "../state/statemachine.h"
-#include "../wallet/wallet.h"
 #include <QDebug>
-#include "../core/Config.h"
+#include "../bridge/config_b.h"
+#include "../bridge/wallet_b.h"
+#include "../bridge/statemachine_b.h"
+#include "../bridge/corewindow_b.h"
+
+using namespace bridge;
 
 namespace core {
 
@@ -30,13 +32,25 @@ MwcToolbar::MwcToolbar(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //setAutoFillBackground(true);
-    //setStyleSheet("background-color: #6F00D6;");
+    config = new Config(this);
+    wallet = new Wallet(this);
+    stateMachine = new StateMachine(this);
+    coreWindow = new CoreWindow(this);
 
-    if (config::isColdWallet()) {
+    if (config->isColdWallet()) {
         //ui->hodlToolButton->hide();
         ui->airdropToolButton->hide();
     }
+
+    QObject::connect( wallet, &Wallet::sgnWalletBalanceUpdated,
+                      this, &MwcToolbar::onWalletBalanceUpdated, Qt::QueuedConnection );
+    QObject::connect( wallet, &Wallet::sgnLoginResult,
+                      this, &MwcToolbar::onLoginResult, Qt::QueuedConnection );
+    QObject::connect( wallet, &Wallet::sgnLogout,
+                      this, &MwcToolbar::onLogout, Qt::QueuedConnection );
+
+    QObject::connect( coreWindow, &CoreWindow::sgnUpdateActionStates,
+                      this, &MwcToolbar::onUpdateButtonsState, Qt::QueuedConnection );
 }
 
 MwcToolbar::~MwcToolbar()
@@ -44,28 +58,14 @@ MwcToolbar::~MwcToolbar()
     delete ui;
 }
 
-void MwcToolbar::setAppEnvironment(state::StateMachine * _stateMachine, wallet::Wallet * _wallet ) {
-    stateMachine = _stateMachine;
-    wallet = _wallet;
-    Q_ASSERT(stateMachine);
-    Q_ASSERT(wallet);
-
-    QObject::connect( wallet, &wallet::Wallet::onWalletBalanceUpdated,
-                      this, &MwcToolbar::onWalletBalanceUpdated, Qt::QueuedConnection );
-    QObject::connect( wallet, &wallet::Wallet::onLoginResult,
-                      this, &MwcToolbar::onLoginResult, Qt::QueuedConnection );
-    QObject::connect( wallet, &wallet::Wallet::onLogout,
-                      this, &MwcToolbar::onLogout, Qt::QueuedConnection );
-}
-
-
-void MwcToolbar::updateButtonsState( state::STATE state ) {
+// state::STATE state
+void MwcToolbar::onUpdateButtonsState( int state ) {
     ui->airdropToolButton->setChecked( state==state::AIRDRDOP_MAIN );
     ui->sendToolButton->setChecked( state==state::SEND );
-    ui->receiveToolButton->setChecked( state==state::RECEIVE_COINS);
-    ui->transactionToolButton->setChecked(state==state::TRANSACTIONS);
-    ui->hodlToolButton->setChecked(state==state::HODL);
-    ui->finalizeToolButton->setChecked(state==state::FINALIZE);
+    ui->receiveToolButton->setChecked( state==state::RECEIVE_COINS );
+    ui->transactionToolButton->setChecked( state==state::TRANSACTIONS );
+    ui->hodlToolButton->setChecked( state==state::HODL );
+    ui->finalizeToolButton->setChecked( state==state::FINALIZE );
 }
 
 void MwcToolbar::paintEvent(QPaintEvent *)
@@ -109,15 +109,7 @@ void MwcToolbar::on_hodlToolButton_clicked()
 // Account info is updated
 void MwcToolbar::onWalletBalanceUpdated() {
     qDebug() << "get onWalletBalanceUpdated. Updating the balance";
-
-    QVector<wallet::AccountInfo> balance = wallet->getWalletBalance();
-
-    int64_t mwcSum = 0;
-    for ( const auto & ai : balance ) {
-        mwcSum += ai.total;
-    }
-
-    ui->totalMwc->setText( util::trimStrAsDouble( util::nano2one(mwcSum), 5) + " mwc" );
+    ui->totalMwc->setText( wallet->getTotalMwcAmount() + " mwc" );
 }
 
 void MwcToolbar::onLoginResult(bool ok) {

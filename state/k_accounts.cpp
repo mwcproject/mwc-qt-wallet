@@ -14,23 +14,20 @@
 
 #include "k_accounts.h"
 #include "../wallet/wallet.h"
-#include "../windows/k_accounts_w.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
+#include "../core/Notification.h"
 #include "../state/statemachine.h"
 #include "../core/global.h"
 #include "../core/Config.h"
-
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/k_accounts_b.h"
 
 namespace state {
-
 
 Accounts::Accounts(StateContext * context) :
     State(context, STATE::ACCOUNTS)
 {
-    connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &Accounts::onWalletBalanceUpdated, Qt::QueuedConnection );
-    connect( context->wallet, &wallet::Wallet::onAccountCreated, this, &Accounts::onAccountCreated, Qt::QueuedConnection );
-    connect( context->wallet, &wallet::Wallet::onAccountRenamed, this, &Accounts::onAccountRenamed, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onLoginResult, this, &Accounts::onLoginResult, Qt::QueuedConnection );
 
     connect(context->wallet, &wallet::Wallet::onNodeStatus,
@@ -47,21 +44,11 @@ NextStateRespond Accounts::execute() {
     if (context->appContext->getActiveWndState() != STATE::ACCOUNTS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if (wnd==nullptr) {
-        wnd  = (wnd::Accounts*)context->wndManager->switchToWindowEx( mwc::PAGE_K_ACCOUNTS,
-                new wnd::Accounts( context->wndManager->getInWndParent(), this ));
+    if ( bridge::getBridgeManager()->getAccounts().isEmpty()) {
+        core::getWndManager()->pageAccounts();
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
-}
-
-// get balance for current account
-QVector<wallet::AccountInfo> Accounts::getWalletBalance() {
-    return context->wallet->getWalletBalance();
-}
-
-void Accounts::updateWalletBalance() {
-    context->wallet->updateWalletBalance(true,true);
 }
 
 void Accounts::doTransferFunds() {
@@ -69,44 +56,7 @@ void Accounts::doTransferFunds() {
     context->stateMachine->setActionWindow( STATE::ACCOUNT_TRANSFER, true );
 }
 
-// add new account
-void Accounts::createAccount(QString account) {
-    context->wallet->createAccount(account);
-}
-
-void Accounts::onAccountCreated( QString newAccountName) {
-    Q_UNUSED(newAccountName);
-    if (wnd) {
-        wnd->refreshWalletBalance();
-    }
-}
-
-void Accounts::onWalletBalanceUpdated() {
-    if (wnd) {
-        wnd->refreshWalletBalance();
-    }
-}
-
-void Accounts::onAccountRenamed(bool success, QString errorMessage) {
-    if (wnd) {
-         wnd->onAccountRenamed(success, errorMessage);
-    }
-}
-
-QVector<int> Accounts::getColumnsWidhts() const {
-    return context->appContext->getIntVectorFor("AccountTblColWidth");
-}
-
-void Accounts::updateColumnsWidhts(const QVector<int> & widths) {
-    context->appContext->updateIntVectorFor("AccountTblColWidth", widths);
-}
-
-// ui caller must be at waiting state
-void Accounts::renameAccount( const wallet::AccountInfo & account, QString newName ) {
-    context->wallet->renameAccount( account.accountName, newName );
-}
-
-void Accounts::deleteAccount( const wallet::AccountInfo & account ) {
+void Accounts::deleteAccount( QString accountName ) {
     // Delete is rename. Checking for names collision
 
     QVector<wallet::AccountInfo> allAccounts = context->wallet->getWalletBalance(false);
@@ -114,7 +64,7 @@ void Accounts::deleteAccount( const wallet::AccountInfo & account ) {
     QString newName;
 
     for (int t=0;t<100;t++) {
-        newName = mwc::DEL_ACCONT_PREFIX + account.accountName + (t==0?"":("_" + QString::number(t)));
+        newName = mwc::DEL_ACCONT_PREFIX + accountName + (t==0?"":("_" + QString::number(t)));
         bool collision = false;
         for ( auto & acc : allAccounts ) {
             if (acc.accountName ==  newName) {
@@ -125,8 +75,7 @@ void Accounts::deleteAccount( const wallet::AccountInfo & account ) {
         if (!collision)
             break;
     }
-
-    renameAccount( account, newName );
+    context->wallet->renameAccount( accountName, newName );
 }
 
 void Accounts::timerEvent(QTimerEvent *event) {

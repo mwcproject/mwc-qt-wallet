@@ -12,32 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "windows/y_selectmode_w.h"
+#include "y_selectmode_w.h"
 #include "ui_y_selectmode.h"
-#include "../state/y_selectmode.h"
-#include "../control/messagebox.h"
+#include "../bridge/wnd/y_selectmode_b.h"
+#include "../core/Config.h"
+#include "../control_desktop/messagebox.h"
 
 namespace wnd {
 
-SelectMode::SelectMode(QWidget *parent, state::SelectMode * _state) :
-        core::NavWnd(parent, _state->getContext() ),
-        ui(new Ui::SelectMode),
-        state(_state)
+SelectMode::SelectMode(QWidget *parent) :
+        core::NavWnd(parent),
+        ui(new Ui::SelectMode)
 {
     ui->setupUi(this);
+    selectMode = new bridge::SelectMode(this);
 
-    runMode = state->getWalletRunMode();
+    runMode = selectMode->getWalletRunMode();
 
     switch (runMode) {
-        case config::WALLET_RUN_MODE::ONLINE_WALLET: {
+        case int(config::WALLET_RUN_MODE::ONLINE_WALLET): {
             ui->radioOnlineWallet->setChecked(true);
             break;
         }
-        case config::WALLET_RUN_MODE::ONLINE_NODE: {
+        case int(config::WALLET_RUN_MODE::ONLINE_NODE): {
             ui->radioOnlineNode->setChecked(true);
             break;
         }
-        case config::WALLET_RUN_MODE::COLD_WALLET: {
+        case int(config::WALLET_RUN_MODE::COLD_WALLET): {
             ui->radioColdWallet->setChecked(true);
             break;
         }
@@ -49,20 +50,19 @@ SelectMode::SelectMode(QWidget *parent, state::SelectMode * _state) :
 }
 
 SelectMode::~SelectMode() {
-    state->deleteWnd(this);
     delete ui;
 }
 
-config::WALLET_RUN_MODE SelectMode::getRunMode() const {
+int SelectMode::getRunMode() const {
     if ( ui->radioOnlineWallet->isChecked() )
-        return config::WALLET_RUN_MODE::ONLINE_WALLET;
+        return int(config::WALLET_RUN_MODE::ONLINE_WALLET);
     if ( ui->radioOnlineNode->isChecked() )
-        return config::WALLET_RUN_MODE::ONLINE_NODE;
+        return int(config::WALLET_RUN_MODE::ONLINE_NODE);
     if ( ui->radioColdWallet->isChecked() )
-        return config::WALLET_RUN_MODE::COLD_WALLET;
+        return int(config::WALLET_RUN_MODE::COLD_WALLET);
 
     Q_ASSERT(false);
-    return config::WALLET_RUN_MODE::ONLINE_WALLET;
+    return int(config::WALLET_RUN_MODE::ONLINE_WALLET);
 }
 
 void SelectMode::updateButtons() {
@@ -70,10 +70,10 @@ void SelectMode::updateButtons() {
 }
 
 void SelectMode::on_applyButton_clicked() {
-    if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(this, "Waller Run Mode",
+    if ( core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionText(this, "Waller Run Mode",
             "Changing running mode required restart.",
                 "Cancel", "Continue", false, true) ) {
-        state->updateWalletRunMode(SelectMode::getRunMode());
+        selectMode->updateWalletRunMode(SelectMode::getRunMode());
     }
 }
 

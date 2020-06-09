@@ -15,10 +15,15 @@
 #ifndef SENDCONFIRMATIONDLG_H
 #define SENDCONFIRMATIONDLG_H
 
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
 class SendConfirmationDlg;
+}
+
+namespace bridge {
+class Util;
+class Config;
 }
 
 namespace dlg {
@@ -33,18 +38,9 @@ class SendConfirmationDlg: public control::MwcDialog
 {
     Q_OBJECT
 public:
-    enum class RETURN_CODE {DECLINE, CONFIRM};
-
     // widthScale - Horizontal scale for the dialog. Sometimes we need it wider.
-    explicit SendConfirmationDlg(QWidget *parent, QString title, QString message, double widthScale, QString passwordHash, bool fluffTxn );
+    explicit SendConfirmationDlg(QWidget *parent, QString title, QString message, double widthScale, QString passwordHash );
     ~SendConfirmationDlg();
-
-public:
-    RETURN_CODE getRetCode() const {return retCode;}
-    bool getFluffSetting() { return newFluffSetting; }
-
-signals:
-    void saveFluffSetting(const bool fluffSetting);
 
 private slots:
     void on_passwordEdit_textChanged(const QString &str);
@@ -52,13 +48,11 @@ private slots:
     void on_confirmButton_clicked();
 
 private:
-
     Ui::SendConfirmationDlg *ui;
-    RETURN_CODE retCode = RETURN_CODE::DECLINE;
-    QString blockingPasswordHash;
+    bridge::Util * util = nullptr;
+    bridge::Config * config = nullptr;
 
-    bool origFluffSetting = false;
-    bool newFluffSetting = false;
+    QString blockingPasswordHash;
 };
 
 }

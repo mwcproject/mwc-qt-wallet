@@ -28,7 +28,6 @@ static QString hodlUrlMainNetUrl;
 static QString hodlUrlTestNetUrl;
 static int64_t logoutTimeMs = 1000*60*15; // 15 minutes is default
 static double  timeoutMultiplier = 1.0;
-static bool    useMwcMqS = true;
 static int     sendTimeoutMs = 60000; // 1 minute
 
 
@@ -71,7 +70,6 @@ void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet71
                    QString _hodlUrlMainNetUrl, QString _hodlUrlTestNetUrl,
                    int64_t  _logoutTimeMs,
                    double _timeoutMultiplier,
-                   bool _useMwcMqS,
                    int _sendTimeoutMs) {
     runMode = _runMode;
     mwcPath = _mwcPath;
@@ -92,7 +90,6 @@ void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet71
     hodlUrlTestNetUrl = _hodlUrlTestNetUrl;
     logoutTimeMs = _logoutTimeMs;
     timeoutMultiplier = _timeoutMultiplier;
-    useMwcMqS = _useMwcMqS;
     sendTimeoutMs = _sendTimeoutMs;
 }
 
@@ -121,8 +118,6 @@ void         setLogoutTimeMs(int64_t timeMs) {logoutTimeMs = timeMs;}
 double          getTimeoutMultiplier() {return timeoutMultiplier;}
 void            increaseTimeoutMultiplier() { timeoutMultiplier *= 1.6; }
 
-bool            getUseMwcMqS() {return useMwcMqS;}
-
 int             getSendTimeoutMs() {return sendTimeoutMs;}
 
 
@@ -145,7 +140,6 @@ QString toString() {
             "mwcGuiWalletConf=" + mwcGuiWalletConf + "\n" +
             "mwcPath=" + mwcPath + "\n" +
             "wallet713path=" + wallet713path + "\n" +
-            "useMwcMqS=" + (useMwcMqS?"true":"false") + "\n" +
             "sendTimeoutMs=" + QString::number(sendTimeoutMs) + "\n" +
             "run_mode=" + runModeStr + "\n" +
             "airdropUrlMainNetUrl=" + airdropUrlMainNetUrl + "\n" +

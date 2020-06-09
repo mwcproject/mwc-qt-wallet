@@ -15,16 +15,15 @@
 #ifndef AIDROPW_H
 #define AIDROPW_H
 
-#include "../core/navwnd.h"
+#include "../core_desktop/navwnd.h"
 
 namespace Ui {
 class Airdrop;
 }
 
-namespace state {
-    class Airdrop;
-    struct AirDropStatus;
-    struct AirdropRequests;
+namespace bridge {
+class Airdrop;
+class Config;
 }
 
 namespace wnd {
@@ -32,27 +31,20 @@ namespace wnd {
 class Airdrop : public core::NavWnd
 {
     Q_OBJECT
-
 public:
-    explicit Airdrop(QWidget *parent, state::Airdrop * state);
+    explicit Airdrop(QWidget *parent);
     ~Airdrop();
 
-    // true if status is active
-    bool updateAirDropStatus( const state::AirDropStatus & status );
-
-    bool updateClaimStatus( int idx, const state::AirdropRequests & request,
-                            QString status, QString message, int64_t amount, int errCode);
-
-    void reportMessage( QString title, QString message );
 private slots:
     void on_nextButton_clicked();
-
     void on_refreshClaimsButton_clicked();
-
     void on_btcAddressEdit_textChanged(const QString &arg1);
-
     void on_claimAirdropBtn_clicked();
 
+    void onSgnUpdateAirDropStatus( bool waiting, bool status, QString message );
+    void onSgnUpdateClaimStatus( int idx, QString requestBtcAddress,
+                                 QString status, QString message, QString mwc, int errCode);
+    void onSgnReportMessage( QString title, QString message );
 private:
     // initiate update status from the state
     void updateClaimStatus();
@@ -64,7 +56,8 @@ private:
     void hideProgress();
 private:
     Ui::Airdrop *ui;
-    state::Airdrop * state;
+    bridge::Airdrop * airdrop = nullptr;
+    bridge::Config * config = nullptr;
 };
 
 }

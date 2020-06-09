@@ -15,7 +15,7 @@
 #ifndef U_CHANGENODE_H
 #define U_CHANGENODE_H
 
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
@@ -37,15 +37,10 @@ private slots:
     void on_resetButton_clicked();
     void on_cancelButton_clicked();
     void on_applyButton_clicked();
-
     void on_radioCloudNode_clicked();
-
     void on_radioEmbeddedNode_clicked();
-
     void on_radioCustomNode_clicked();
-
     void on_selectNodeDataLocationBtn_clicked();
-
 private:
     Ui::ChangeNode *ui;
 

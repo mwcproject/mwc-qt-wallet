@@ -12,31 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dialogs/e_httplistenerconfigdlg.h"
+#include "e_httplistenerconfigdlg.h"
 #include "ui_e_httplistenerconfigdlg.h"
-#include "../util/Generator.h"
 #include <QFileDialog>
-#include "../control/messagebox.h"
+#include "../control_desktop/messagebox.h"
 #include <QFileInfo>
+#include "../bridge/util_b.h"
+#include "../bridge/wallet_b.h"
+#include "../bridge/config_b.h"
 
 namespace dlg {
 
-HttpListenerConfigDlg::HttpListenerConfigDlg(QWidget *parent, const wallet::WalletConfig &_config) :
+HttpListenerConfigDlg::HttpListenerConfigDlg(QWidget *parent) :
     control::MwcDialog(parent),
-    ui(new Ui::HttpListenerConfigDlg),
-    config(_config)
+    ui(new Ui::HttpListenerConfigDlg)
 {
+    util = new bridge::Util(this);
+    wallet = new bridge::Wallet(this);
+    config = new bridge::Config(this);
+
     ui->setupUi(this);
 
-    ui->activateRestApi->setChecked(config.hasForeignApi());
-    ui->listeningAddressEdit->setText(config.foreignApiAddress.isEmpty() ? "0.0.0.0:3415" : config.foreignApiAddress);
+    ui->activateRestApi->setChecked(config->hasForeignApi());
+    QString foreignApiAddress = config->getForeignApiAddress();
+    ui->listeningAddressEdit->setText(foreignApiAddress.isEmpty() ? "0.0.0.0:3415" : foreignApiAddress);
 
-    ui->useBasicAutorization->setChecked( !config.foreignApiSecret.isEmpty() );
-    ui->apiSecretEdit->setText( config.foreignApiSecret.isEmpty() ? util::generateSecret(20)  : config.foreignApiSecret );
+    QString foreignApiSecret = config->getForeignApiSecret();
+    ui->useBasicAutorization->setChecked( !foreignApiSecret.isEmpty() );
+    ui->apiSecretEdit->setText( foreignApiSecret.isEmpty() ? util->generateApiSecret(20)  : foreignApiSecret );
 
-    ui->useTlsCheck->setChecked( config.hasTls() );
-    ui->tlsPrivateKeyEdit->setText( config.tlsCertificateKey );
-    ui->tlsFullchainEdit->setText( config.tlsCertificateFile );
+    ui->useTlsCheck->setChecked( config->hasTls() );
+    ui->tlsPrivateKeyEdit->setText( config->getTlsCertificateKey() );
+    ui->tlsFullchainEdit->setText( config->getTlsCertificateFile() );
 
     updateControlState();
 }
@@ -76,7 +83,7 @@ void HttpListenerConfigDlg::on_resetButton_clicked()
     ui->listeningAddressEdit->setText("0.0.0.0:3415");
 
     ui->useBasicAutorization->setChecked( true );
-    ui->apiSecretEdit->setText(util::generateSecret(20) );
+    ui->apiSecretEdit->setText(util->generateApiSecret(20) );
 
     updateControlState();
 }
@@ -101,7 +108,7 @@ void HttpListenerConfigDlg::on_useTlsCheck_stateChanged(int check)
 
 void HttpListenerConfigDlg::on_generateSecretButton_clicked()
 {
-    ui->apiSecretEdit->setText( util::generateSecret(20) );
+    ui->apiSecretEdit->setText( util->generateApiSecret(20) );
 }
 
 void HttpListenerConfigDlg::updateControlState() {
@@ -134,9 +141,15 @@ void HttpListenerConfigDlg::on_cancelButton_clicked()
 
 void HttpListenerConfigDlg::on_applyButton_clicked()
 {
+    bool foreignApi = false;
+    QString foreignApiAddress = "";
+    QString foreignApiSecret = "";
+    QString tlsCertificateFile = "";
+    QString tlsCertificateKey = "";
+
     // Let's check parameters that we set up so far...
     if (ui->activateRestApi->isChecked()) {
-        config.foreignApi = true;
+        foreignApi = true;
 
         QString listenAddress = ui->listeningAddressEdit->text();
         if (listenAddress.isEmpty()) {
@@ -175,7 +188,7 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
             return;
         }
 
-        config.foreignApiAddress = listenAddress;
+        foreignApiAddress = listenAddress;
 
         if (ui->useBasicAutorization->isChecked() ) {
             QString apiSecret = ui->apiSecretEdit->text();
@@ -193,10 +206,10 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
                 return;
             }
 
-            config.foreignApiSecret = apiSecret;
+            foreignApiSecret = apiSecret;
         }
         else {
-            config.foreignApiSecret = "";
+            foreignApiSecret = "";
         }
 
         if (ui->useTlsCheck->isChecked()) {
@@ -233,29 +246,29 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
                 return;
             }
 
-            config.tlsCertificateFile = chain;
-            config.tlsCertificateKey = privKey;
+            tlsCertificateFile = chain;
+            tlsCertificateKey = privKey;
         }
         else {
-            config.tlsCertificateFile = "";
-            config.tlsCertificateKey = "";
+            tlsCertificateFile = "";
+            tlsCertificateKey = "";
         }
 
     }
     else {
-        config.foreignApi = false;
-        config.foreignApiAddress = "";
-        config.foreignApiSecret = "";
-        config.tlsCertificateFile = "";
-        config.tlsCertificateKey = "";
+        foreignApi = false;
+        foreignApiAddress = "";
+        foreignApiSecret = "";
+        tlsCertificateFile = "";
+        tlsCertificateKey = "";
     }
 
     QString message;
-    if (config.hasForeignApi()) {
-        if (config.foreignApiSecret.isEmpty())
+    if (foreignApi) {
+        if (foreignApiSecret.isEmpty())
             message += "without any authorization";
 
-        if (!config.hasTls()) {
+        if (tlsCertificateFile.isEmpty() || tlsCertificateKey.isEmpty()) {
             if (!message.isEmpty())
                 message += " and ";
 
@@ -267,10 +280,12 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
         }
     }
 
-
-    if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText( this, "Warning",
+    if ( core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionText( this, "Warning",
             message + "Foreign API configuration require to relogin. If mwc713 will not be able to start with those settings, they will be reverted back to default.",
             "Cancel", "Continue", false, true ) ) {
+
+        // apply settings...
+        config->saveForeignApiConfig(foreignApi,foreignApiAddress, foreignApiSecret, tlsCertificateFile, tlsCertificateKey);
         accept();
     }
 }

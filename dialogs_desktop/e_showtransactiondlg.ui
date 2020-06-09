@@ -32,7 +32,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget1">
    <property name="geometry">
     <rect>
      <x>459</x>
@@ -94,7 +94,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget2">
    <property name="geometry">
     <rect>
      <x>370</x>
@@ -156,7 +156,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget3">
    <property name="geometry">
     <rect>
      <x>200</x>
@@ -239,7 +239,7 @@
     <enum>QFrame::Raised</enum>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget4">
    <property name="geometry">
     <rect>
      <x>36</x>
@@ -738,7 +738,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget5">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -800,7 +800,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget6">
    <property name="geometry">
     <rect>
      <x>37</x>
@@ -862,7 +862,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget7">
    <property name="geometry">
     <rect>
      <x>360</x>
@@ -924,7 +924,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget8">
    <property name="geometry">
     <rect>
      <x>500</x>
@@ -986,7 +986,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget9">
    <property name="geometry">
     <rect>
      <x>730</x>
@@ -1048,7 +1048,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget10">
    <property name="geometry">
     <rect>
      <x>620</x>
@@ -1141,7 +1141,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget11">
    <property name="geometry">
     <rect>
      <x>36</x>
@@ -1329,7 +1329,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget12">
    <property name="geometry">
     <rect>
      <x>38</x>
@@ -1403,7 +1403,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget13">
    <property name="geometry">
     <rect>
      <x>38</x>
@@ -1522,38 +1522,38 @@
   <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
-   <header>control/MwcPushButton.h</header>
+   <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLine</class>
    <extends>QFrame</extends>
-   <header>control/MwcFrameWithBorder.h</header>
+   <header>control_desktop/MwcFrameWithBorder.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
-   <header>control/MwcComboBox.h</header>
+   <header>control_desktop/MwcComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
+   <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditDlg</class>
    <extends>QLineEdit</extends>
-   <header>control/MwcLineEditDlg.h</header>
+   <header>control_desktop/MwcLineEditDlg.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

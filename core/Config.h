@@ -25,7 +25,7 @@ namespace config {
 //                         and publish transaction from the cold wallet.
 // "cold_wallet"  - runs wallet in offline mode. Since no online access is expected, only file based
 //                         operations will be available
-enum class WALLET_RUN_MODE { ONLINE_WALLET, ONLINE_NODE, COLD_WALLET };
+enum class WALLET_RUN_MODE { ONLINE_WALLET=1, ONLINE_NODE=2, COLD_WALLET=3 };
 QPair<bool, WALLET_RUN_MODE> runModeFromString(QString str);
 
 WALLET_RUN_MODE getWalletRunMode();
@@ -48,14 +48,12 @@ void setMwcGuiWalletConf( QString conf );
  * @param airdropUrlTestNetUrl  - Airdrop server claims URL for floo net
  * @param logoutTimeMs          - Automatic locking for the wallet
  * @param timeoutMultiplier     - Multiplier for jobs timeouts. Default is 1.0
- * @param useMwcMqS             - true: use mwc mqs for slates exchange.  false: using mwc mq (non secure grin box) for slates exchange
  */
 void setConfigData(WALLET_RUN_MODE runMode, QString mwcPath, QString wallet713path, QString mwczipPath,
                    QString airdropUrlMainNetUrl, QString airdropUrlTestNetUrl,
                    QString hodlUrlMainNetUrl, QString hodlUrlTestNetUrl,
                    int64_t logoutTimeMs,
                    double timeoutMultiplier,
-                   bool useMwcMqS,
                    int sendTimeoutMs);
 
 // For Unit tests only
@@ -79,8 +77,6 @@ void         setLogoutTimeMs(int64_t timeMs);
 
 double          getTimeoutMultiplier();
 void            increaseTimeoutMultiplier();
-
-bool            getUseMwcMqS();
 
 int             getSendTimeoutMs();
 

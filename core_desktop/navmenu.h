@@ -31,7 +31,6 @@ signals:
 
 protected:
     virtual void focusOutEvent(QFocusEvent *event) override;
-
     virtual void leaveEvent(QEvent *event) override;
 };
 

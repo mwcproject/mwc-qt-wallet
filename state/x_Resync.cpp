@@ -14,10 +14,11 @@
 
 #include "x_Resync.h"
 #include "../core/appcontext.h"
-#include "../core/windowmanager.h"
 #include "../state/statemachine.h"
-#include "../control/messagebox.h"
 #include "../core/global.h"
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/z_progresswnd_b.h"
 
 namespace state {
 
@@ -54,8 +55,8 @@ NextStateRespond Resync::execute() {
     if (prevListeningStatus.second)
         context->wallet->listeningStop(false, true);
 
-    wnd = (wnd::ProgressWnd*)context->wndManager->switchToWindowEx( mwc::PAGE_X_RESYNC,
-            new wnd::ProgressWnd( context->wndManager->getInWndParent(), this, "Re-sync with full node", "Preparing to re-sync", "", false) );
+    core::getWndManager()->pageProgressWnd(mwc::PAGE_X_RESYNC, RESYNC_CALLER_ID,
+            "Re-sync with full node", "Preparing to re-sync", "", false);
 
     respondCounter = 0;
     respondZeroLevel = 0;
@@ -63,7 +64,7 @@ NextStateRespond Resync::execute() {
     inSyncProcess = true;
 
     // We can't really be blocked form resync. Result will be looping with locking screen
-    context->stateMachine->blockLogout();
+    context->stateMachine->blockLogout("Resync");
 
     context->wallet->check( prevListeningStatus.first || prevListeningStatus.second );
     // Check does full resync, no needs to 'sync'
@@ -73,7 +74,7 @@ NextStateRespond Resync::execute() {
 }
 
 void Resync::exitingState() {
-    context->stateMachine->unblockLogout();
+    context->stateMachine->unblockLogout("Resync");
 }
 
 bool Resync::canExitState() {
@@ -82,47 +83,50 @@ bool Resync::canExitState() {
 
 
 void Resync::onRecoverProgress( int progress, int maxVal ) {
-    if (wnd) {
+    for (auto b: bridge::getBridgeManager()->getProgressWnd()) {
+        if (b->getCallerId() == RESYNC_CALLER_ID) {
+            if (respondCounter<3) {
+                respondCounter++;
+                respondZeroLevel = progress;
+                progressBase = maxVal / 100 * respondCounter;
 
-        if (respondCounter<3) {
-            respondCounter++;
-            respondZeroLevel = progress;
-            progressBase = maxVal / 100 * respondCounter;
+                progress = respondCounter;
+                maxVal = 100;
+            }
+            else {
+                progress -= respondZeroLevel;
+                maxVal -= respondZeroLevel;
+                progress += progressBase;
+                maxVal += progressBase;
+            }
 
-            progress = respondCounter;
-            maxVal = 100;
+            b->initProgress(RESYNC_CALLER_ID, 0, maxVal);
+
+            maxProgrVal = maxVal;
+            QString msgProgress = "Re-sync in progress..." + QString::number(progress * 100.0 / maxVal, 'f',1) + "%";
+            b->updateProgress(RESYNC_CALLER_ID, progress, msgProgress);
+            b->setMsgPlus(RESYNC_CALLER_ID, "");
         }
-        else {
-            progress -= respondZeroLevel;
-            maxVal -= respondZeroLevel;
-            progress += progressBase;
-            maxVal += progressBase;
-        }
-
-        wnd->initProgress(0, maxVal);
-
-        maxProgrVal = maxVal;
-        QString msgProgress = "Re-sync in progress..." + QString::number(progress * 100.0 / maxVal, 'f',1) + "%";
-        wnd->updateProgress(progress, msgProgress);
-        wnd->setMsgPlus("");
     }
 }
 
 void Resync::onCheckResult(bool ok, QString errors ) {
 
     if (prevListeningStatus.first)
-        context->wallet->listeningStart(true,false, true);
+        context->wallet->listeningStart(true, false, true);
     if (prevListeningStatus.second)
-        context->wallet->listeningStart(false,true, true);
+        context->wallet->listeningStart(false, true, true);
 
-    if (wnd) {
-        wnd->updateProgress(maxProgrVal, ok? "Done" : "Failed" );
+    for (auto b: bridge::getBridgeManager()->getProgressWnd()) {
+        if (b->getCallerId() == RESYNC_CALLER_ID) {
+            b->updateProgress(RESYNC_CALLER_ID, maxProgrVal, ok? "Done" : "Failed");
+        }
     }
 
     if (ok)
-        control::MessageBox::messageText(nullptr, "Success", "Account re-sync finished successfully.");
+        core::getWndManager()->messageTextDlg("Success", "Account re-sync finished successfully.");
     else
-        control::MessageBox::messageText(nullptr, "Failure", "Account re-sync failed.\n" + errors);
+        core::getWndManager()->messageTextDlg("Failure", "Account re-sync failed.\n" + errors);
 
     inSyncProcess = false;
 

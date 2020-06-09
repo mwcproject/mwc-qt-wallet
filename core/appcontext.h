@@ -56,6 +56,10 @@ struct ContactRecord {
     QString name;
     QString address;
 
+    ContactRecord() = default;
+    ContactRecord(const ContactRecord & other) = default;
+    ContactRecord(const QString & n, const QString & a) { name=n; address=a; }
+
     bool operator ==(const ContactRecord & o) {return name == o.name && address == o.address;}
 
     void setData(QString name,
@@ -162,7 +166,7 @@ public:
     QMap<QString, core::HodlOutputInfo> loadHodlOutputs(const QString & rootPubKeyHash );
 
     // setWalletNotes called in main.cpp after StateContext is created
-    void setWalletNotes(core::WalletNotes* _walletNotes);
+/*    void setWalletNotes(core::WalletNotes* _walletNotes);
     // these methods are called by WalletNotes whenever the notes have been updated so the maps will always contain the latest notes
     void setOutputNotesMap(QMap<QString, QMap<QString, QMap<QString, QString>>> _outputNotesMap) { outputNotesMap = _outputNotesMap; }
     void setTxnNotesMap(QMap<QString, QMap<QString, QMap<QString, QString>>> _txnNotesMap) { txnNotesMap = _txnNotesMap; }
@@ -177,7 +181,11 @@ public:
     void initTransactionNotes(const QString & account, const QVector<wallet::WalletTransaction> & transactions);
     QString getNote(const QString& account, int64_t txIdx);
     void updateNote(const QString& account, int64_t txIdx, const QString& newNote) const;
-    void deleteNote(const QString& account, int64_t txIdx) const;
+    void deleteNote(const QString& account, int64_t txIdx) const;*/
+
+    QString getNote(const QString& key);
+    void updateNote(const QString& key, const QString& note);
+    void deleteNote(const QString& key);
 
     // Outputs can be locked from spending.
     bool isLockOutputEnabled() const {return lockOutputEnabled;}
@@ -196,6 +204,9 @@ signals:
 private:
     bool loadData();
     void saveData() const;
+
+    void loadNotesData();
+    void saveNotesData() const;
 
 private:
     // 16 bit hash from the password. Can be used for the password verification
@@ -238,7 +249,7 @@ private:
 
     QMap<QString, qulonglong> hodlRegistrations;
 
-    WalletNotes* walletNotes;
+    //WalletNotes* walletNotes;
     // The app context is created early on in main.cpp and tries to load the app data
     // but the wallet notes object cannot be created until the StateContext has
     // been created later in main.cpp. So we store the output and transaction notes
@@ -246,8 +257,8 @@ private:
     // the wallet notes object. Then each time the wallet notes are updated, they
     // are loaded back into these app context note maps so we don't have to
     // worry about the wallet notes object getting destroyed before the app context.
-    QMap<QString, QMap<QString, QMap<QString, QString>>> outputNotesMap;
-    QMap<QString, QMap<QString, QMap<QString, QString>>> txnNotesMap;
+//    QMap<QString, QMap<QString, QMap<QString, QString>>> outputNotesMap;
+//    QMap<QString, QMap<QString, QMap<QString, QString>>> txnNotesMap;
 
     // Outputs can be locked from spending.
     bool lockOutputEnabled = false; // By default it is false
@@ -256,6 +267,13 @@ private:
     // Allow users to by-pass the stem-phase of the dandelion protocol
     // and directly fluff their transactions.
     bool fluffTransactions = false;     // default to normal dandelion protocol
+
+    // Notes data. Notes can be done for Commits, transactions or may be something else.
+    // By definition tx uuid and commits are unique, that it why we can use them as a key across all wallets
+    // Notes are stored in it's own location, because of data importance and corruption possibility.
+    // For notes we need to do save and move
+    bool notesLoaded = false;
+    QMap<QString, QString> notes;
 };
 
 template <class T>
@@ -281,8 +299,6 @@ template <class T>
 T AppContext::getCookie(QString key) {
     return getCookieMap<T>().value(key);
 }
-
-
 
 }
 

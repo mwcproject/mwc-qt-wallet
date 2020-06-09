@@ -12,22 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "windows/z_progresswnd.h"
+#include "z_progresswnd.h"
 #include "ui_z_progresswnd.h"
+#include "../bridge/wnd/z_progresswnd_b.h"
 
 namespace wnd {
 
-ProgressWnd::ProgressWnd(QWidget *parent, IProgressWndState * _state, QString header, QString msgProgress, QString msgPlus, bool cancellable ) :
+ProgressWnd::ProgressWnd(QWidget *parent, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable ) :
     core::PanelBaseWnd(parent),
-    ui(new Ui::ProgressWnd),
-    state(_state)
+    ui(new Ui::ProgressWnd)
 {
     ui->setupUi(this);
+    progressWnd = new bridge::ProgressWnd(this);
+    progressWnd->setCallerId(callerId);
 
-    setHeader(header);
-    updateProgress(0,msgProgress);
+    connect(progressWnd, &bridge::ProgressWnd::sgnSetHeader, this,  &ProgressWnd::onSgnSetHeader, Qt::QueuedConnection );
+    connect(progressWnd, &bridge::ProgressWnd::sgnSetMsgPlus, this,  &ProgressWnd::onSgnSetMsgPlus, Qt::QueuedConnection );
+    connect(progressWnd, &bridge::ProgressWnd::sgnInitProgress, this,  &ProgressWnd::onSgnInitProgress, Qt::QueuedConnection );
+    connect(progressWnd, &bridge::ProgressWnd::sgnUpdateProgress, this,  &ProgressWnd::onSgnUpdateProgress, Qt::QueuedConnection );
 
-    setMsgPlus(msgPlus);
+    onSgnSetHeader(header);
+    onSgnUpdateProgress(0,msgProgress);
+
+    onSgnSetMsgPlus(msgPlus);
 
     if (!cancellable)
         ui->cancelButton->hide();
@@ -35,16 +42,15 @@ ProgressWnd::ProgressWnd(QWidget *parent, IProgressWndState * _state, QString he
 
 ProgressWnd::~ProgressWnd()
 {
-    state->destroyProgressWnd(this);
     delete ui;
 }
 
 void ProgressWnd::on_cancelButton_clicked()
 {
-    state->cancelProgress();
+    progressWnd->cancelProgress();
 }
 
-void ProgressWnd::setHeader(QString header) {
+void ProgressWnd::onSgnSetHeader(QString header) {
     if (header.length()>0) {
         ui->header->setText(header);
         ui->header->show();
@@ -54,7 +60,7 @@ void ProgressWnd::setHeader(QString header) {
     }
 
 }
-void ProgressWnd::setMsgPlus(QString msgPlus) {
+void ProgressWnd::onSgnSetMsgPlus(QString msgPlus) {
     if (msgPlus.length()>0) {
         ui->messagePlus->setText(msgPlus);
         ui->messagePlus->show();
@@ -64,11 +70,11 @@ void ProgressWnd::setMsgPlus(QString msgPlus) {
     }
 }
 
-void ProgressWnd::initProgress(int min, int max) {
+void ProgressWnd::onSgnInitProgress(int min, int max) {
     ui->progressBar->setRange(min,max);
 }
 
-void ProgressWnd::updateProgress(int pos, QString msgProgress) {
+void ProgressWnd::onSgnUpdateProgress(int pos, QString msgProgress) {
     ui->progressBar->setValue(pos);
 
     if (msgProgress.length()>0) {

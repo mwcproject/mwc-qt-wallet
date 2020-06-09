@@ -32,30 +32,11 @@ public:
     Listening( StateContext * context);
     virtual ~Listening() override;
 
-    void wndIsGone(wnd::Listening * w) { if(w==wnd) wnd = nullptr;} // window is closed
-
-
-    void triggerMwcStartState();
-
-    void requestNextMwcMqAddress();
-
-    void requestNextMwcMqAddressForIndex(int idx);
-
-    void triggerKeybaseStartState();
-
-    wallet::WalletConfig getWalletConfig();
-
-    // Set config require wallet restart
-    void setHttpConfig( const wallet::WalletConfig & config );
-
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "listener.html";}
 
 private slots:
-    void onMwcMqListenerStatus(bool online);
-    void onKeybaseListenerStatus(bool online);
-
     // Listening, you will not be able to get a results
     void onListeningStartResults( bool mqTry, bool kbTry, // what we try to start
                                    QStringList errorMessages, bool initialStart ); // error messages, if get some
@@ -63,22 +44,14 @@ private slots:
     void onListeningStopResult(bool mqTry, bool kbTry, // what we try to stop
                                 QStringList errorMessages );
 
-    void onMwcAddressWithIndex(QString mwcAddress, int idx);
-
     // Login from anotehr wallet happens
     void onListenerMqCollision();
 
-    // Http listener
-    void onHttpListeningStatus(bool listening, QString additionalInfo);
 
     // Looking for "Failed to start mwcmqs subscriber. Error connecting to ..."
     void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
 
 private:
-    void wndUpdateStatuses();
-
-private:
-    wnd::Listening * wnd = nullptr;
     QString lastShownErrorMessage;
 };
 

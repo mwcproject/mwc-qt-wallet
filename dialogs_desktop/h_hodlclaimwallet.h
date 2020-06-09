@@ -15,10 +15,14 @@
 #ifndef H_HODLCLAIMWALLET_H
 #define H_HODLCLAIMWALLET_H
 
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
 class HodlClaimWallet;
+}
+
+namespace bridge {
+class Util;
 }
 
 namespace dlg {
@@ -41,6 +45,7 @@ private slots:
 
 private:
     Ui::HodlClaimWallet *ui;
+    bridge::Util * util = nullptr;
     QString coldWalletPubKeyHash;
 };
 

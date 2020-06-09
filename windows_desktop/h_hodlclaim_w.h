@@ -15,14 +15,16 @@
 #ifndef H_HODLCLAIM_W_H
 #define H_HODLCLAIM_W_H
 
-#include "../core/navwnd.h"
+#include "../core_desktop/navwnd.h"
 
 namespace Ui {
 class HodlClaim;
 }
 
-namespace state {
+namespace bridge {
 class Hodl;
+class HodlStatus;
+class Config;
 }
 
 namespace wnd {
@@ -30,25 +32,26 @@ namespace wnd {
 class HodlClaim : public core::NavWnd {
 Q_OBJECT
 public:
-    explicit HodlClaim( QWidget *parent, state::Hodl * state, const QString & coldWalletHash );
+    explicit HodlClaim( QWidget *parent, const QString & coldWalletHash );
     ~HodlClaim();
 
-    void reportMessage(const QString &title, const QString &message);
-
-    void updateHodlState();
 
 private slots:
     void on_claimMwcButton_clicked();
-
     void on_refreshButton_clicked();
 
+    void onSgnReportMessage(QString title, QString message);
+    void onSgnUpdateHodlState();
 private:
     void initTableHeaders();
     void saveTableHeaders();
 
 private:
     Ui::HodlClaim *ui;
-    state::Hodl * state;
+    bridge::Hodl * hodl = nullptr;
+    bridge::HodlStatus * hodlStatus = nullptr;
+    bridge::Config * config = nullptr;
+
     const QString coldWalletHash;
 };
 

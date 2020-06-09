@@ -15,16 +15,16 @@
 #ifndef InitAccountW_H
 #define InitAccountW_H
 
-#include "../util/passwordanalyser.h"
-#include "../core/PanelBaseWnd.h"
+#include "../core_desktop/PanelBaseWnd.h"
 
 namespace Ui {
 class InitAccount;
 }
 
-namespace state {
-    class InitAccount;
-    class WalletConfig;
+namespace bridge {
+class SelectMode;
+class InitAccount;
+class Util;
 }
 
 namespace wnd {
@@ -34,16 +34,13 @@ class InitAccount : public core::PanelBaseWnd
     Q_OBJECT
 
 public:
-    explicit InitAccount(QWidget *parent, state::InitAccount * state, state::WalletConfig * configState);
+    explicit InitAccount(QWidget *parent);
     virtual ~InitAccount() override;
 
 private slots:
     void on_password1Edit_textChanged(const QString &text);
-
     void on_submitButton_clicked();
-
     void on_instancesButton_clicked();
-
 
     void on_password2Edit_textChanged(const QString &arg1);
     void on_runOnlineNodeButton_clicked();
@@ -53,9 +50,10 @@ private:
 
 private:
     Ui::InitAccount *ui;
-    state::InitAccount * state;
-    state::WalletConfig * configState;
-    util::PasswordAnalyser passwordAnalyser;
+    bridge::SelectMode * selectMode = nullptr;
+    bridge::InitAccount * initAccount = nullptr;
+    bridge::Util * util = nullptr;
+
 };
 
 }

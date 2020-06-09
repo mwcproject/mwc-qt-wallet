@@ -14,19 +14,21 @@
 
 #include "sendcoinsparamsdialog.h"
 #include "ui_sendcoinsparamsdialog.h"
-#include "../control/messagebox.h"
+#include "../control_desktop/messagebox.h"
 
 namespace wnd {
 
-SendCoinsParamsDialog::SendCoinsParamsDialog(QWidget *parent, const core::SendCoinsParams & _params) :
+SendCoinsParamsDialog::SendCoinsParamsDialog(QWidget *parent, int _inputConfirmationNumber,
+                        int _changeOutputs) :
     control::MwcDialog(parent),
     ui(new Ui::SendCoinsParamsDialog),
-    params(_params)
+    inputConfirmationNumber(_inputConfirmationNumber),
+    changeOutputs(_changeOutputs)
 {
     ui->setupUi(this);
 
-    ui->inputsConfEdit->setText( QString::number(params.inputConfirmationNumber ) );
-    ui->changeOutputsEdit->setText( QString::number( params.changeOutputs ) );
+    ui->inputsConfEdit->setText( QString::number(inputConfirmationNumber ) );
+    ui->changeOutputsEdit->setText( QString::number(changeOutputs ) );
 }
 
 SendCoinsParamsDialog::~SendCoinsParamsDialog()
@@ -37,20 +39,18 @@ SendCoinsParamsDialog::~SendCoinsParamsDialog()
 void SendCoinsParamsDialog::on_okButton_clicked()
 {
     bool ok = false;
-    int confNumber = ui->inputsConfEdit->text().trimmed().toInt(&ok);
-    if (!ok || confNumber<=0) {
+    inputConfirmationNumber = ui->inputsConfEdit->text().trimmed().toInt(&ok);
+    if (!ok || inputConfirmationNumber<=0) {
         control::MessageBox::messageText(this, "Need info", "Please input correct value for minimum number of confirmations");
         return;
     }
 
     ok = false;
-    int changeOutputs = ui->changeOutputsEdit->text().trimmed().toInt(&ok);
+    changeOutputs = ui->changeOutputsEdit->text().trimmed().toInt(&ok);
     if (!ok || changeOutputs<=0) {
         control::MessageBox::messageText(this, "Need info", "Please input correct value for change outputs");
         return;
     }
-
-    params.setData( confNumber, changeOutputs );
 
     accept();
 }

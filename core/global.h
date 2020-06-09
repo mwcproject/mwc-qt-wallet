@@ -35,18 +35,17 @@ const QString DATETIME_TEMPLATE_MWC713 = "yyyy-MM-dd hh:mm:ss";
 const QString DATETIME_TEMPLATE_THIS = "hh:mm:ss dd-MM-yyyy";
 
 const QString DEL_ACCONT_PREFIX = "del_";
-const QString HODL_ACCONT_PREFIX = "hodl_"; // hodl not in use yet, just reserving
 
-const QVector<QString> BANNED_ACCOUT_PREFIXES = {DEL_ACCONT_PREFIX, HODL_ACCONT_PREFIX};
+const QVector<QString> BANNED_ACCOUT_PREFIXES = {DEL_ACCONT_PREFIX};
 
 #ifdef Q_OS_DARWIN
-const QString MWC713_DEFAULT_CONFIG = ":/resource/wallet713_mac.toml";
+const QString MWC713_DEFAULT_CONFIG = ":/resource_desktop/wallet713_mac.toml";
 #else
-const QString MWC713_DEFAULT_CONFIG = ":/resource/wallet713_def.toml";
+const QString MWC713_DEFAULT_CONFIG = ":/resource_desktop/wallet713_def.toml";
 #endif
 
-const QString MWC_NODE_CONFIG_MAIN = ":/resource/mwc-server-main.toml";
-const QString MWC_NODE_CONFIG_FLOO = ":/resource/mwc-server-floo.toml";
+const QString MWC_NODE_CONFIG_MAIN = ":/resource_desktop/mwc-server-main.toml";
+const QString MWC_NODE_CONFIG_FLOO = ":/resource_desktop/mwc-server-floo.toml";
 
 const int64_t AIRDROP_TRANS_KEEP_TIME_MS = 1000L*3600L*24L*15; // 15 days should be enough
 
@@ -56,7 +55,6 @@ const int NODE_HEIGHT_DIFF_LIMIT = 5;
 const int COIN_BASE_CONFIRM_NUMBER = 1440;
 
 // Default MQ servers
-const QString DEFAULT_HOST_MWC_MQ  = "mq.mwc.mw";
 const QString DEFAULT_HOST_MWC_MQS = "mqs.mwc.mw";
 
 // Block Explorer URLs
@@ -112,11 +110,13 @@ const QString PAGE_Y_SELECT_RUNNING_MODE = "Select Running Mode";
 const QString PAGE_HODL             = "HODL";
 const QString PAGE_HODL_CLAIM       = "Claim HODL coins";
 
+// Desktop support for App restart
+#ifdef WALLET_DESKTOP
 void setApplication(QApplication * app, QMainWindow * mainWindow);
-
-void closeApplication();
+#endif
 
 bool isAppNonClosed();
+void closeApplication();
 
 }
 

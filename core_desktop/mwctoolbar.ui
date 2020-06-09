@@ -104,7 +104,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../resources.qrc">:/img/TBLogo@2x.svg</pixmap>
+          <pixmap resource="../resources_desktop.qrc">:/img/TBLogo@2x.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -263,7 +263,7 @@ color: #FFFFFF;</string>
         <string notr="true">Send</string>
        </property>
        <property name="icon">
-        <iconset resource="../resources.qrc">
+        <iconset resource="../resources_desktop.qrc">
          <normaloff>:/img/Send@2x.svg</normaloff>:/img/Send@2x.svg</iconset>
        </property>
        <property name="iconSize">
@@ -310,7 +310,7 @@ color: #FFFFFF;</string>
         <string notr="true">Receive</string>
        </property>
        <property name="icon">
-        <iconset resource="../resources.qrc">
+        <iconset resource="../resources_desktop.qrc">
          <normaloff>:/img/Receive@2x.svg</normaloff>:/img/Receive@2x.svg</iconset>
        </property>
        <property name="iconSize">
@@ -357,7 +357,7 @@ color: #FFFFFF;</string>
         <string notr="true">Finalize</string>
        </property>
        <property name="icon">
-        <iconset resource="../resources.qrc">
+        <iconset resource="../resources_desktop.qrc">
          <normaloff>:/img/Finalize@2x.svg</normaloff>:/img/Finalize@2x.svg</iconset>
        </property>
        <property name="iconSize">
@@ -404,7 +404,7 @@ color: #FFFFFF;</string>
         <string notr="true">Transactions</string>
        </property>
        <property name="icon">
-        <iconset resource="../resources.qrc">
+        <iconset resource="../resources_desktop.qrc">
          <normaloff>:/img/Transactions@2x.svg</normaloff>:/img/Transactions@2x.svg</iconset>
        </property>
        <property name="iconSize">
@@ -451,7 +451,7 @@ color: #FFFFFF;</string>
         <string notr="true">HODL</string>
        </property>
        <property name="icon">
-        <iconset resource="../resources.qrc">
+        <iconset resource="../resources_desktop.qrc">
          <normaloff>:/img/HODL@2x.svg</normaloff>:/img/HODL@2x.svg</iconset>
        </property>
        <property name="iconSize">
@@ -489,7 +489,7 @@ color: #FFFFFF;</string>
   </layout>
  </widget>
  <resources>
-  <include location="../resources.qrc"/>
+  <include location="../resources_desktop.qrc"/>
  </resources>
  <connections/>
 </ui>

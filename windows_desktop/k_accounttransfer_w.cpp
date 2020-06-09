@@ -12,49 +12,65 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "windows/k_accounttransfer_w.h"
+#include "k_accounttransfer_w.h"
 #include "ui_k_accounttransfer_w.h"
-#include "../control/messagebox.h"
-#include "../state/k_AccountTransfer.h"
-#include "../dialogs/sendcoinsparamsdialog.h"
-#include "g_sendStarting.h"
-#include "../state/timeoutlock.h"
+#include "../control_desktop/messagebox.h"
+#include "../dialogs_desktop/sendcoinsparamsdialog.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../bridge/wallet_b.h"
+#include "../bridge/config_b.h"
+#include "../bridge/wnd/k_accounttransfer_b.h"
 
 namespace wnd {
 
-AccountTransfer::AccountTransfer(QWidget *parent, state::AccountTransfer * _state) :
-    core::NavWnd(parent, _state->getContext() ),
-    ui(new Ui::AccountTransfer),
-    state(_state)
+AccountTransfer::AccountTransfer(QWidget *parent) :
+    core::NavWnd(parent),
+    ui(new Ui::AccountTransfer)
 {
     ui->setupUi(this);
+
+    wallet = new bridge::Wallet(this);
+    config = new bridge::Config(this);
+    accountTransfer = new bridge::AccountTransfer(this);
+
+    QObject::connect( accountTransfer, &bridge::AccountTransfer::sgnShowTransferResults,
+                      this, &AccountTransfer::onSgnShowTransferResults, Qt::QueuedConnection);
+    QObject::connect( accountTransfer, &bridge::AccountTransfer::sgnUpdateAccounts,
+                      this, &AccountTransfer::onSgnUpdateAccounts, Qt::QueuedConnection);
+    QObject::connect( accountTransfer, &bridge::AccountTransfer::sgnHideProgress,
+                      this, &AccountTransfer::onSgnHideProgress, Qt::QueuedConnection);
+
     ui->progress->initLoader(false);
 
-    updateAccounts();
+    onSgnUpdateAccounts();
 }
 
 AccountTransfer::~AccountTransfer()
 {
-    state->wndDeleted(this);
     delete ui;
 }
 
 
-void AccountTransfer::updateAccounts() {
-    accountInfo = state->getWalletBalance();
+void AccountTransfer::onSgnUpdateAccounts() {
+    QVector<QString> accountInfo = wallet->getWalletBalance(true, false, true);
 
-    int fromI = getAccountSelectionComboBoxCurrentIndex( ui->accountFromCB, false );
-    int toI   = getAccountSelectionComboBoxCurrentIndex( ui->accountToCB, false );
+    QString fromAcc = getSelectedAccount( ui->accountFromCB, false );
+    QString toAcc   = getSelectedAccount( ui->accountToCB, false );
 
     ui->accountFromCB->clear();
     ui->accountToCB->clear();
 
-    int idx = 0;
-    for (auto & info : accountInfo) {
-        QString accountStr = info.getLongAccountName();
-        ui->accountFromCB->addItem(accountStr, QVariant(idx) );
-        ui->accountToCB->addItem(accountStr, QVariant(idx) );
+    int fromI = -1;
+    int toI = -1;
 
+    int idx = 0;
+    for ( int t=1; t<accountInfo.size(); t+=2 ) {
+        ui->accountFromCB->addItem(accountInfo[t], QVariant(accountInfo[t-1]) );
+        ui->accountToCB->addItem(accountInfo[t], QVariant(accountInfo[t-1]) );
+        if (accountInfo[t]==fromAcc)
+            fromI = idx;
+        if (accountInfo[t]==toAcc)
+            toI = idx;
         idx++;
     }
     ui->accountFromCB->setCurrentIndex(fromI);
@@ -62,24 +78,24 @@ void AccountTransfer::updateAccounts() {
 }
 
 
-void AccountTransfer::showTransferResults(bool ok, QString errMsg) {
+void AccountTransfer::onSgnShowTransferResults(bool ok, QString errMsg) {
 
     ui->progress->hide();
 
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to( "AccountTransfer" );
 
     if (ok) {
         control::MessageBox::messageText(this, "Success", "Your funds were successfully transferred");
         // reset state
         ui->amountEdit->setText("");
-        updateAccounts();
+        onSgnUpdateAccounts();
     }
     else {
         control::MessageBox::messageText(this, "Transfer failure", "Funds transfer request has failed.\n" + errMsg);
     }
 }
 
-void AccountTransfer::hideProgress() {
+void AccountTransfer::onSgnHideProgress() {
     ui->progress->hide();
 }
 
@@ -90,86 +106,51 @@ void AccountTransfer::on_allAmountButton_clicked()
 
 void AccountTransfer::on_settingsBtn_clicked()
 {
-    core::SendCoinsParams  params = state->getSendCoinsParams();
+    util::TimeoutLockObject to( "AccountTransfer" );
 
-    state::TimeoutLockObject to( state );
-
-    SendCoinsParamsDialog dlg(this, params);
+    SendCoinsParamsDialog dlg(this, config->getInputConfirmationNumber(), config->getChangeOutputs());
     if (dlg.exec() == QDialog::Accepted) {
-        state->updateSendCoinsParams( dlg.getSendCoinsParams() );
+        config->updateSendCoinsParams( dlg.getInputConfirmationNumber(), dlg.getChangeOutputs() );
     }
 }
 
 // return -1 if not seleted or not valid
-int AccountTransfer::getAccountSelectionComboBoxCurrentIndex( control::MwcComboBox * combo, bool showInputErrMessage ) {
-    auto dt = combo->currentData();
-    if ( !dt.isValid() ) {
-        if (showInputErrMessage)
-            control::MessageBox::messageText(this, "Incorrect Input", "Please select pair of accounts to transfer coins.");
-        return -1;
+QString AccountTransfer::getSelectedAccount( control::MwcComboBox * combo, bool showInputErrMessage ) {
+    auto acc = combo->currentData().toString();
+    if ( acc.isEmpty() ) {
+        if (showInputErrMessage) {
+            control::MessageBox::messageText(this, "Incorrect Input",
+                                             "Please select pair of accounts to transfer coins.");
+            combo->setFocus();
+        }
     }
-
-    int idxVal = dt.toInt();
-
-    if (idxVal<0 || idxVal>accountInfo.size() ) {
-        if (showInputErrMessage)
-            control::MessageBox::messageText(this, "Incorrect Input", "Please select pair of different accounts to transfer coins.");
-        return -1;
-    }
-
-    return idxVal;
+    return acc;
 }
 
 
 void AccountTransfer::on_transferButton_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to( "AccountTransfer" );
 
-    int fromI = getAccountSelectionComboBoxCurrentIndex( ui->accountFromCB, true );
-    int toI   = getAccountSelectionComboBoxCurrentIndex( ui->accountToCB, true );
+    QString fromAcc = getSelectedAccount( ui->accountFromCB, true );
+    QString toAcc   = getSelectedAccount( ui->accountToCB, true );
 
-    if (fromI<0 || toI<0)
+    if (fromAcc.isEmpty() || toAcc.isEmpty() )
         return; // erro message wwas shown to the user. Just exiting...
 
-    if (fromI == toI) {
+    if (fromAcc == toAcc) {
         control::MessageBox::messageText(this, "Incorrect Input", "Please select pair of different accounts to transfer coins.");
         return;
     }
 
-    QString sendAmount = ui->amountEdit->text().trimmed();
-
-    QPair<bool, int64_t> mwcAmount;
-    if (sendAmount != "All") {
-        mwcAmount = util::one2nano(ui->amountEdit->text().trimmed());
-        if (!mwcAmount.first) {
-            control::MessageBox::messageText(this, "Incorrect Input", "Please specify correct number of MWC to send");
-            ui->amountEdit->setFocus();
-            return;
-        }
+    if (accountTransfer->transferFunds(fromAcc, toAcc, ui->amountEdit->text().trimmed())) {
+        ui->progress->show();
     }
-    else { // All
-        mwcAmount = QPair<bool, int64_t>(true, -1);
-    }
-
-    auto & acc = accountInfo[fromI];
-    if ( mwcAmount.second > acc.currentlySpendable ) {
-
-        QString msg2print = generateAmountErrorMsg( mwcAmount.second, acc, state->getSendCoinsParams() );
-
-        control::MessageBox::messageText(this, "Incorrect Input",
-                                     msg2print );
-        ui->amountEdit->setFocus();
-        return;
-    }
-
-
-    ui->progress->show();
-    state->transferFunds( accountInfo[fromI], accountInfo[toI] , mwcAmount.second );
 }
 
 void wnd::AccountTransfer::on_backButton_clicked()
 {
-    state->goBack();
+    accountTransfer->goBack();
 }
 
 }

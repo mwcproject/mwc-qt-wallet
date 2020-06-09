@@ -15,15 +15,16 @@
 #ifndef INPUTPASSWORDW_H
 #define INPUTPASSWORDW_H
 
-#include "../core/PanelBaseWnd.h"
+#include "../core_desktop/PanelBaseWnd.h"
 
 namespace Ui {
 class InputPassword;
 }
 
-namespace state {
-    class InputPassword;
-    class WalletConfig;
+namespace bridge {
+class Config;
+class InputPassword;
+class Wallet;
 }
 
 namespace wnd {
@@ -31,32 +32,28 @@ namespace wnd {
 class InputPassword : public core::PanelBaseWnd
 {
     Q_OBJECT
-
 public:
-    explicit InputPassword(QWidget *parent, state::InputPassword * state, state::WalletConfig * configState, bool lockMode);
+    explicit InputPassword(QWidget *parent, bool lockMode);
     ~InputPassword();
 
-    void startWaiting();
-    void stopWaiting();
+private slots:
+    void onSgnLoginResult(bool ok);
+    void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline);
+    void onSgnHttpListeningStatus(bool listening, QString additionalInfo);
+    void onSgnUpdateSyncProgress(double progressPercent);
 
-    void onLoginResult(bool ok);
-
-    void reportWrongPassword();
-
+    void on_submitButton_clicked();
+    void on_instancesButton_clicked();
+private:
     void updateMwcMqState(bool online);
     void updateKeybaseState(bool online);
     void updateHttpState(bool online);
 
-private slots:
-    void on_submitButton_clicked();
-
-    void on_instancesButton_clicked();
-
-    void onUpdateSyncProgress(double progressPercent);
 private:
     Ui::InputPassword *ui;
-    state::InputPassword * state;
-    state::WalletConfig * configState;
+    bridge::Config * config = nullptr;
+    bridge::InputPassword * inputPassword = nullptr;
+    bridge::Wallet * wallet = nullptr;
 };
 
 }

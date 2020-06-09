@@ -19,10 +19,6 @@
 #include "../wallet/wallet.h"
 #include <QVector>
 
-namespace wnd {
-class Accounts;
-}
-
 namespace state {
 
 
@@ -33,35 +29,14 @@ public:
     Accounts(StateContext * context);
     virtual ~Accounts() override;
 
-    void wndDeleted(wnd::Accounts * w) { if(w==wnd) wnd = nullptr; }
-
-    // get balance for current account
-    QVector<wallet::AccountInfo> getWalletBalance();
-
-    void updateWalletBalance();
-
     void doTransferFunds();
 
-    // add new account
-    void createAccount(QString account);
-
-    QVector<int> getColumnsWidhts() const;
-    void updateColumnsWidhts(const QVector<int> & widths);
-
     // ui caller must be at waiting state
-    void renameAccount( const wallet::AccountInfo & account, QString newName );
-    void deleteAccount( const wallet::AccountInfo & account );
+    void deleteAccount( QString accountName );
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "accounts.html";}
 private slots:
-    // Account info is updated
-    void onWalletBalanceUpdated();
-
-    void onAccountCreated( QString newAccountName);
-
-    void onAccountRenamed(bool success, QString errorMessage);
-
     void onLoginResult(bool ok);
 
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
@@ -71,8 +46,6 @@ private:
 
     bool isNodeHealthy() const {return nodeIsHealthy;}
 private:
-    wnd::Accounts * wnd = nullptr;
-
     bool nodeIsHealthy = false;
 
     bool lastNodeIsHealty = true;

@@ -19,9 +19,9 @@
 #include <QApplication>
 #include <QDateTime>
 #include "../wallet/mwc713task.h"
-#include "../control/messagebox.h"
 #include <QProcess>
 #include "../core/Config.h"
+#include "../core/WndManager.h"
 
 // 10 MB is a reasonable size limit.
 // Compressed will be around 1 MB.
@@ -52,7 +52,7 @@ void cleanUpLogs() {
     Q_ASSERT(logServer == nullptr );
     QPair<bool,QString> logPath = ioutils::getAppDataPath("logs");
     if (!logPath.first) {
-        control::MessageBox::messageText(nullptr, "Error", logPath.second);
+        core::getWndManager()->messageTextDlg("Error", logPath.second);
         return;
     }
 
@@ -94,7 +94,7 @@ LogReceiver::LogReceiver(const QString & filename) :
 {
     QPair<bool,QString> path = ioutils::getAppDataPath("logs");
     if (!path.first) {
-        control::MessageBox::messageText(nullptr, "Error", path.second);
+        core::getWndManager()->messageTextDlg("Error", path.second);
         QCoreApplication::exit();
         return;
     }
@@ -154,7 +154,7 @@ void LogReceiver::rotateLogFileIfNeeded() {
     QDir logDir( logPath );
 
     if (exitCode!=3) {
-        control::MessageBox::messageText(nullptr, "Log files rotation", "Unable to rotate log file at "+ logPath +"\nYour previous file will be swapped with a new log data.");
+        core::getWndManager()->messageTextDlg("Log files rotation", "Unable to rotate log file at "+ logPath +"\nYour previous file will be swapped with a new log data.");
         const QString prevLogFn = "prev_"+logFileName;
         logDir.remove(prevLogFn);
         logDir.rename(logFileName, prevLogFn);
@@ -171,7 +171,7 @@ void LogReceiver::openLogFile() {
     QString logFn = logPath + "/" + logFileName;
     logFile = new QFile(logFn);
     if (!logFile->open(QFile::WriteOnly | QFile::Append)) {
-        control::MessageBox::messageText(nullptr, "Critical Error", "Unable to open the logger file: " + logPath);
+        core::getWndManager()->messageTextDlg("Critical Error", "Unable to open the logger file: " + logPath);
         QApplication::quit();
         return;
     }

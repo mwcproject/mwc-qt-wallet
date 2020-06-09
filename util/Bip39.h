@@ -20,7 +20,7 @@
 
 namespace util {
 
-const QSet<QString> & getBip39words();
+const QVector<QString> & getBip39words();
 
 }
 

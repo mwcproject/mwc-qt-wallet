@@ -475,27 +475,27 @@ p, li { white-space: pre-wrap; }
   <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
-   <header>control/MwcPushButton.h</header>
+   <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
+   <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

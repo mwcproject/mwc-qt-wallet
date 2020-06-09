@@ -16,12 +16,15 @@
 #include "ui_mainwindow.h"
 #include <QTime>
 #include <QDebug>
-#include "../state/statemachine.h"
-#include "util/stringutils.h"
-#include "util/execute.h"
-#include "../control/messagebox.h"
-#include "../dialogs/helpdlg.h"
-#include "../core/Config.h"
+//#include "../state/statemachine.h"
+//#include "util/stringutils.h"
+#include "../control_desktop/messagebox.h"
+#include "../dialogs_desktop/helpdlg.h"
+#include "../bridge/config_b.h"
+#include "../bridge/corewindow_b.h"
+#include "../bridge/wallet_b.h"
+#include "../bridge/statemachine_b.h"
+#include "../bridge/util_b.h"
 #include <QPushButton>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -30,11 +33,44 @@
 
 namespace core {
 
+using namespace bridge;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    config = new bridge::Config(this);
+    coreWindow = new bridge::CoreWindow(this);
+    wallet = new bridge::Wallet(this);
+    stateMachine = new bridge::StateMachine(this);
+    util = new bridge::Util(this);
+
+    QObject::connect( coreWindow, &CoreWindow::sgnUpdateActionStates,
+                      this, &MainWindow::onUpdateActionStates, Qt::QueuedConnection);
+
+    QObject::connect( wallet, &Wallet::sgnNewNotificationMessage,
+                      this, &MainWindow::onNewNotificationMessage, Qt::QueuedConnection);
+    QObject::connect(wallet, &Wallet::sgnConfigUpdate,
+                     this, &MainWindow::onConfigUpdate, Qt::QueuedConnection);
+
+
+    QObject::connect(wallet, &Wallet::sgnUpdateListenerStatus,
+                     this, &MainWindow::updateListenerStatus, Qt::QueuedConnection);
+    QObject::connect(wallet, &Wallet::sgnHttpListeningStatus,
+                     this, &MainWindow::onHttpListeningStatus, Qt::QueuedConnection);
+
+    QObject::connect(wallet, &Wallet::sgnUpdateNodeStatus,
+                     this, &MainWindow::updateNodeStatus, Qt::QueuedConnection);
+
+    QObject::connect(wallet, &Wallet::sgnUpdateSyncProgress,
+                     this, &MainWindow::onUpdateSyncProgress, Qt::QueuedConnection);
+
+    updateListenerBtn();
+    updateNetworkName();
+    updateMenu();
+
 
     ui->leftTb->hide();
 
@@ -44,13 +80,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->statusBar->addPermanentWidget(ui->helpButton);
     ui->statusBar->addPermanentWidget(ui->rightestSpacerLabel);
 
-    if (config::isOnlineNode()) {
+    if (config->isOnlineNode()) {
         ui->helpButton->hide();
         ui->listenerStatusButton->hide();
         ui->btnSpacerLabel1->hide();
     }
 
-    if (config::isColdWallet()) {
+    if (config->isColdWallet()) {
         ui->listenerStatusButton->hide();
     }
 
@@ -90,13 +126,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message) {
+// level: notify::MESSAGE_LEVEL
+void MainWindow::onNewNotificationMessage(int level, QString message) {
 
     using namespace wallet;
 
     QString prefix;
     int timeout = 3000;
-    switch(level) {
+    switch( notify::MESSAGE_LEVEL(level)) {
         case notify::MESSAGE_LEVEL::FATAL_ERROR:
             prefix = "Error: ";
             timeout = 7000;
@@ -119,7 +156,7 @@ void MainWindow::onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString m
             break;
     }
 
-    ui->statusBar->showMessage( prefix + message, (int)(timeout * config::getTimeoutMultiplier()) );
+    ui->statusBar->showMessage( prefix + message, (int)(timeout * config->getTimeoutMultiplier()) );
 }
 
 
@@ -138,61 +175,23 @@ void MainWindow::updateLeftBar(bool show) {
     leftBarShown = show;
 }
 
-void MainWindow::setAppEnvironment(state::StateMachine * _stateMachine, wallet::Wallet * _wallet, core::AppContext * _appContext) {
-    stateMachine = _stateMachine;
-    Q_ASSERT(stateMachine);
-    wallet = _wallet;
-    Q_ASSERT(wallet);
-    appContext = _appContext;
-    Q_ASSERT(appContext);
-
-    ui->leftTb->setAppEnvironment(stateMachine, wallet);
-
-    QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
-                     this, &MainWindow::onNewNotificationMessage, Qt::QueuedConnection);
-    QObject::connect(wallet, &wallet::Wallet::onConfigUpdate,
-                     this, &MainWindow::onConfigUpdate, Qt::QueuedConnection);
-
-
-    QObject::connect(wallet, &wallet::Wallet::onMwcMqListenerStatus,
-                     this, &MainWindow::updateListenerStatus, Qt::QueuedConnection);
-    QObject::connect(wallet, &wallet::Wallet::onKeybaseListenerStatus,
-                     this, &MainWindow::updateListenerStatus, Qt::QueuedConnection);
-    QObject::connect(wallet, &wallet::Wallet::onHttpListeningStatus,
-                     this, &MainWindow::onHttpListeningStatus, Qt::QueuedConnection);
-
-    QObject::connect(wallet, &wallet::Wallet::onNodeStatus,
-                     this, &MainWindow::updateNodeStatus, Qt::QueuedConnection);
-
-    QObject::connect(wallet, &wallet::Wallet::onUpdateSyncProgress,
-                     this, &MainWindow::onUpdateSyncProgress, Qt::QueuedConnection);
-
-    updateListenerBtn();
-    updateNetworkName();
-    updateMenu();
-}
-
 QWidget * MainWindow::getMainWindow() {
     return ui->mainWindowFrame;
 }
 
-void MainWindow::updateActionStates(state::STATE actionState) {
+// actionState:  state::STATE
+void MainWindow::onUpdateActionStates(int actionState) {
 
     bool isLeftBarVisible = (actionState >= state::STATE::ACCOUNTS && actionState != state::STATE::RESYNC );
 
     updateLeftBar( isLeftBarVisible );
 
-    if (isLeftBarVisible) {
-        ui->leftTb->updateButtonsState(actionState);
-    }
-
-//    bool enabled = stateMachine->isActionWindowMode();
     updateMenu();
 }
 
 void core::MainWindow::on_listenerStatusButton_clicked()
 {
-    stateMachine->setActionWindow( state::STATE::LISTENING );
+    stateMachine->setActionWindow( state::STATE::LISTENING);
 }
 
 void core::MainWindow::on_nodeStatusButton_clicked()
@@ -202,22 +201,14 @@ void core::MainWindow::on_nodeStatusButton_clicked()
 
 void MainWindow::on_helpButton_clicked()
 {
-    state::State * state = stateMachine->getCurrentStateObj();
-    QString docName = "";
-    if (state != nullptr) {
-        docName = state->getHelpDocName();
-    }
-
-    if ( docName.isEmpty() ) {
-        docName = "default.html";
-    }
-
+    QString docName = stateMachine->getCurrentHelpDocName();
     dlg::HelpDlg helpDlg(this, docName);
     helpDlg.exec();
 }
 
-void MainWindow::updateListenerStatus(bool online) {
-    Q_UNUSED(online)
+void MainWindow::updateListenerStatus(bool mwcOnline, bool keybaseOnline) {
+    Q_UNUSED(mwcOnline)
+    Q_UNUSED(keybaseOnline)
     updateListenerBtn();
 }
 
@@ -243,7 +234,7 @@ void MainWindow::updateNodeStatus( bool online, QString errMsg, int nodeHeight, 
 }
 
 void MainWindow::onUpdateSyncProgress(double progressPercent) {
-    onNewNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+    onNewNotificationMessage( int(notify::MESSAGE_LEVEL::INFO),
                              "Wallet state update, " + util::trimStrAsDouble( QString::number(progressPercent), 4 ) + "% complete"  );
 }
 
@@ -254,27 +245,29 @@ void MainWindow::onConfigUpdate() {
 
 
 void MainWindow::updateListenerBtn() {
-    QPair<bool,bool> listStatus = wallet->getListenerStatus();
-    qDebug() << "updateListenerBtn: " << listStatus;
+    bool mqsStatus = wallet->getMqsListenerStatus();
+    bool keybaseStatus = wallet->getKeybaseListenerStatus();
+    QString httpListenerStatus = wallet->getHttpListeningStatus();
 
-    bool listening = listStatus.first | listStatus.second;
+    qDebug() << "updateListenerBtn: mqsStatus=" << mqsStatus << " keybaseStatus=" << keybaseStatus << " httpListenerStatus=" << httpListenerStatus;
+
+    bool listening = mqsStatus | keybaseStatus;
     QString listenerNames;
-    if (listStatus.first)
-        listenerNames +=  QString("MWC MQ") + (config::getUseMwcMqS() ? "S" : "");
+    if (mqsStatus)
+        listenerNames +=  QString("MWC MQS");
 
-    if (listStatus.second) {
+    if (keybaseStatus) {
         if (!listenerNames.isEmpty())
             listenerNames += ", ";
         listenerNames += "Keybase";
     }
 
-    QPair<bool,QString> httpListenerStatus = wallet->getHttpListeningStatus();
-    if (httpListenerStatus.first) {
+    if (httpListenerStatus == "true") {
         listening = true;
         if (!listenerNames.isEmpty())
             listenerNames += ", ";
         listenerNames += "Http";
-        if (wallet->hasTls())
+        if (config->hasTls())
             listenerNames += "s";
     }
 
@@ -287,7 +280,7 @@ void MainWindow::updateListenerBtn() {
 
 
 void MainWindow::updateNetworkName() {
-    setStatusButtonState( ui->nodeStatusButton, STATUS::IGNORE, wallet->getWalletConfig().getNetwork() );
+    setStatusButtonState( ui->nodeStatusButton, STATUS::IGNORE, config->getNetwork() );
 }
 
 void MainWindow::setStatusButtonState(  QPushButton * btn, STATUS status, QString text ) {
@@ -318,9 +311,9 @@ void MainWindow::updateMenu() {
         return;
 
     bool canSwitchState = stateMachine->canSwitchState() && stateMachine->getCurrentStateId() >= state::STATE::ACCOUNTS;
-    bool isOnlineWallet = config::isOnlineWallet();
-    bool isColdWallet = config::isColdWallet();
-    bool isOnlineNode = config::isOnlineNode();
+    bool isOnlineWallet = config->isOnlineWallet();
+    bool isColdWallet = config->isColdWallet();
+    bool isOnlineNode = config->isOnlineNode();
 
     ui->actionSend->setEnabled(canSwitchState && !isOnlineNode);
     ui->actionReceive->setEnabled(canSwitchState && !isOnlineNode);
@@ -356,7 +349,7 @@ void MainWindow::on_actionSend_triggered()
 
 void MainWindow::on_actionExchanges_triggered()
 {
-    util::openUrlInBrowser("https://www.mwc.mw/exchanges");
+    util->openUrlInBrowser("https://www.mwc.mw/exchanges");
 }
 
 void MainWindow::on_actionReceive_triggered()
@@ -387,10 +380,9 @@ void MainWindow::on_actionNode_Overview_triggered()
 void MainWindow::on_actionResync_with_full_node_triggered()
 {
     if (control::MessageBox::questionText(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
-                       "No", "Yes", true, false) == control::MessageBox::RETURN_CODE::BTN2 ) {
+                       "No", "Yes", true, false) == WndManager::RETURN_CODE::BTN2 ) {
         // Starting resync
-        appContext->pushCookie("PrevState", (int)appContext->getActiveWndState());
-        stateMachine->setActionWindow( state::STATE::RESYNC );
+        stateMachine->activateResyncState();
     }
 }
 
@@ -429,16 +421,15 @@ void MainWindow::on_actionShow_passphrase_triggered()
     QString passwordHash = wallet->getPasswordHash();
 
     if ( !passwordHash.isEmpty() ) {
-        if (control::MessageBox::RETURN_CODE::BTN2 !=
+        if (WndManager::RETURN_CODE::BTN2 !=
             control::MessageBox::questionText(this, "Wallet Password",
                                               "You are going to view wallet mnemonic passphrase.\n\nPlease input your wallet password to continue", "Cancel", "Confirm", false, true, 1.0,
-                                              passwordHash, control::MessageBox::RETURN_CODE::BTN2))
+                                              passwordHash, WndManager::RETURN_CODE::BTN2))
             return;
     }
 
     // passwordHash should contain raw password value form the messgage box
-    appContext->pushCookie<QString>("password", passwordHash);
-    stateMachine->setActionWindow( state::STATE::SHOW_SEED );
+    stateMachine->activateShowSeed( passwordHash );
 }
 
 void MainWindow::on_actionEvent_log_triggered()
@@ -463,27 +454,27 @@ void MainWindow::on_actionRunning_Mode_Cold_Wallet_triggered()
 
 void MainWindow::on_actionBlock_Explorer_triggered()
 {
-    util::openUrlInBrowser("https://explorer.mwc.mw/");
+    util->openUrlInBrowser("https://explorer.mwc.mw/");
 }
 
 void MainWindow::on_actionWhite_papers_triggered()
 {
-    util::openUrlInBrowser("https://www.mwc.mw/whitepaper");
+    util->openUrlInBrowser("https://www.mwc.mw/whitepaper");
 }
 
 void MainWindow::on_actionGood_Money_triggered()
 {
-    util::openUrlInBrowser("https://www.mwc.mw/good-money");
+    util->openUrlInBrowser("https://www.mwc.mw/good-money");
 }
 
 void MainWindow::on_actionRoadmap_triggered()
 {
-    util::openUrlInBrowser("https://github.com/mwcproject/mwc-node/blob/master/doc/roadmap.md");
+    util->openUrlInBrowser("https://github.com/mwcproject/mwc-node/blob/master/doc/roadmap.md");
 }
 
 void MainWindow::on_actionMWC_website_triggered()
 {
-    util::openUrlInBrowser("https://www.mwc.mw/");
+    util->openUrlInBrowser("https://www.mwc.mw/");
 }
 
 }

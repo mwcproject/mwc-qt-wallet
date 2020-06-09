@@ -14,40 +14,28 @@
 
 #include "e_Receive.h"
 #include "../wallet/wallet.h"
-#include "../windows/e_receive_w.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../util/Log.h"
 #include "../util/Json.h"
-#include "timeoutlock.h"
+//#include "../util_desktop/timeoutlock.h"
 #include "../core/global.h"
-#include "../control/messagebox.h"
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/e_receive_b.h"
+#include "../bridge/wnd/g_filetransaction_b.h"
+#include "../core/WndManager.h"
 
 namespace state {
 
 Receive::Receive( StateContext * _context ) :
         State(_context, STATE::RECEIVE_COINS) {
 
-    QObject::connect(context->wallet, &wallet::Wallet::onMwcMqListenerStatus,
-                     this, &Receive::onMwcMqListenerStatus, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onKeybaseListenerStatus,
-                     this, &Receive::onKeybaseListenerStatus, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onHttpListeningStatus,
-                     this, &Receive::onHttpListeningStatus, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onMwcAddressWithIndex,
-                     this, &Receive::onMwcAddressWithIndex, Qt::QueuedConnection);
-
     QObject::connect(context->wallet, &wallet::Wallet::onReceiveFile,
                                    this, &Receive::respReceiveFile, Qt::QueuedConnection);
 
     QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
                      this, &Receive::onNodeStatus, Qt::QueuedConnection);
-
-    QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &Receive::onWalletBalanceUpdated, Qt::QueuedConnection );
 
 }
 
@@ -57,8 +45,7 @@ NextStateRespond Receive::execute() {
     if ( context->appContext->getActiveWndState() != STATE::RECEIVE_COINS  )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if (wnd==nullptr) {
-        context->wallet->getMwcBoxAddress();
+    if (bridge::getBridgeManager()->getReceive().isEmpty()) {
         ftBack();
     }
 
@@ -66,46 +53,28 @@ NextStateRespond Receive::execute() {
 }
 
 
-QString Receive::getFileGenerationPath() {
-    return context->appContext->getPathFor("fileGen");
-}
-
-void Receive::updateFileGenerationPath(QString path) {
-    context->appContext->updatePathFor("fileGen", path);
-}
-
 void Receive::signTransaction( QString fileName ) {
-    Q_ASSERT(wnd);
 
     // Let's parse transaction first
     util::FileTransactionInfo flTrInfo;
     QPair<bool, QString> perseResult = flTrInfo.parseTransaction( fileName, util::FileTransactionType::RECEIVE );
 
     if (!perseResult.first) {
-        if (wnd) {
-            wnd->onTransactionActionIsFinished( false, perseResult.second );
-        }
+        for (auto p : bridge::getBridgeManager()->getReceive() )
+            p->onTransactionActionIsFinished( false, perseResult.second );
+
         return;
     }
 
     // We don't want to intercept the action from other windows like AirDrop...
-    if (wnd!=nullptr || fileTransWnd!= nullptr) {
-        wallet::WalletTransaction transaction;
-        fileTransWnd = (wnd::FileTransaction*) context->wndManager->switchToWindowEx( mwc::PAGE_G_RECEIVE_TRANS,
-                                                                                      new wnd::FileTransaction( context->wndManager->getInWndParent(), this, fileName, flTrInfo, transaction, lastNodeHeight,
-                                                                                                                "Receive File Transaction", "Generate Response") );
+    if ( isActive() ) {
+        core::getWndManager()->pageFileTransaction(mwc::PAGE_G_RECEIVE_TRANS, RECEIVE_CALLER_ID, fileName, flTrInfo, lastNodeHeight,
+                    "Receive File Transaction", "Generate Response");
     }
 }
 
 void Receive::ftBack() {
-    QPair<bool,bool> lsnStatus = context->wallet->getListenerStatus();
-    QPair<bool, QString> httpStatus = context->wallet->getHttpListeningStatus();
-    wnd = (wnd::Receive*) context->wndManager->switchToWindowEx( mwc::PAGE_E_RECEIVE,
-                          new wnd::Receive( context->wndManager->getInWndParent(), this,
-                                     lsnStatus.first, lsnStatus.second,
-                                     httpStatus.first,
-                                     context->wallet->getLastKnownMwcBoxAddress(),
-                                     context->wallet->getWalletConfig() ) );
+    core::getWndManager()->pageRecieve();
 }
 
 void Receive::ftContinue(QString fileName, QString resultTxFileName, bool fluff) {
@@ -115,67 +84,22 @@ void Receive::ftContinue(QString fileName, QString resultTxFileName, bool fluff)
     context->wallet->receiveFile( fileName );
 }
 
-state::StateContext * Receive::getContext() {
-    return context;
-}
-
-
 void Receive::respReceiveFile( bool success, QStringList errors, QString inFileName ) {
     // Checking if this state is really active on UI level
-    if (wnd!=nullptr || fileTransWnd!= nullptr) {
-
-        if (fileTransWnd)
-            fileTransWnd->hideProgress();
+    if (isActive()) {
+        for (auto p: bridge::getBridgeManager()->getFileTransaction())
+            p->hideProgress();
 
         if (success) {
-            control::MessageBox::messageText(nullptr, "Receive File Transaction",
+            core::getWndManager()->messageTextDlg("Receive File Transaction",
                                          "Transaction file was successfully signed. Resulting transaction located at " +
                                          inFileName + ".response");
             ftBack();
         } else {
-            control::MessageBox::messageText(nullptr, "Failure",
+            core::getWndManager()->messageTextDlg("Failure",
                                          "Unable to sign file transaction.\n" + util::formatErrorMessages(errors));
         }
     }
-}
-
-void Receive::onMwcMqListenerStatus(bool online) {
-    if (wnd) {
-        wnd->updateMwcMqState(online);
-    }
-}
-void Receive::onKeybaseListenerStatus(bool online) {
-    if (wnd) {
-        wnd->updateKeybaseState(online);
-    }
-}
-
-// Http listener
-void Receive::onHttpListeningStatus(bool listening, QString additionalInfo) {
-    Q_UNUSED(additionalInfo)
-    if (wnd) {
-        wnd->updateHttpState(listening);
-    }
-}
-
-void Receive::onMwcAddressWithIndex(QString mwcAddress, int idx) {
-    Q_UNUSED(idx)
-    if (wnd) {
-        wnd->updateMwcMqAddress(mwcAddress);
-    }
-}
-
-QString  Receive::getReceiveAccount() {
-    return context->wallet->getReceiveAccount();
-}
-
-void  Receive::setReceiveAccount(QString accountName ) {
-    context->wallet->setReceiveAccount(accountName);
-    // feedback will be ignored. Errors will go to the events naturally
-}
-
-QVector<wallet::AccountInfo>  Receive::getWalletBalance() {
-    return context->wallet->getWalletBalance();
 }
 
 void Receive::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
@@ -188,11 +112,15 @@ void Receive::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pee
         lastNodeHeight = nodeHeight;
 }
 
+bool Receive::isActive() const {
+    if (!bridge::getBridgeManager()->getReceive().isEmpty())
+        return true;
 
-void Receive::onWalletBalanceUpdated() {
-    if (wnd) {
-        wnd->updateWalletBalance();
+    for (auto p : bridge::getBridgeManager()->getFileTransaction()) {
+        if (p->getCallerId() == RECEIVE_CALLER_ID)
+            return true;
     }
+    return false;
 }
 
 

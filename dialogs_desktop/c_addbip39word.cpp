@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dialogs/c_addbip39word.h"
+#include "c_addbip39word.h"
 #include "ui_c_addbip39word.h"
 #include <QFile>
 #include <QCompleter>
 #include <QStandardItemModel>
-#include "../control/messagebox.h"
+#include "../control_desktop/messagebox.h"
 #include <QListView>
 
 namespace dlg {

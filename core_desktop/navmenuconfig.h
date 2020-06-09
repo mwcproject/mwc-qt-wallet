@@ -24,42 +24,35 @@ class NavMenuConfigNode;
 class NavMenuConfigColdWlt;
 }
 
-
-namespace state {
-struct StateContext;
+namespace bridge {
+class Config;
+class StateMachine;
 }
 
 namespace core {
 
-class AppContext;
-
 class NavMenuConfig : public NavMenu {
 Q_OBJECT
 public:
-    explicit NavMenuConfig(QWidget *parent, state::StateContext * context );
+    explicit NavMenuConfig(QWidget *parent);
 
     ~NavMenuConfig();
 
 private slots:
     void on_walletConfigButton_clicked();
-
     void on_outputsButton_clicked();
-
     void on_mwcmqButton_clicked();
-
     void on_resyncButton_clicked();
-
     void on_nodeOverviewButton_clicked();
-
     void on_selectRunningModeButton_clicked();
-
     void on_hodlButton_clicked();
 
 private:
     Ui::NavMenuConfigWallet *uiWallet = nullptr;
     Ui::NavMenuConfigNode   *uiNode = nullptr;
     Ui::NavMenuConfigColdWlt *uiColdWallet = nullptr;
-    state::StateContext * context = nullptr;
+    bridge::Config * config;
+    bridge::StateMachine * stateMachine;
 };
 
 }

@@ -18,20 +18,19 @@
 #include "state.h"
 #include "../wallet/wallet.h"
 #include "../core/appcontext.h"
-#include "../windows/z_progresswnd.h"
 
 namespace state {
 
+const QString RESYNC_CALLER_ID = "Resync";
+
 // Do resync for account. Expected that caller want us to start 'check' process for mwc713
-class Resync : public QObject, public State, public wnd::IProgressWndState {
+class Resync : public QObject, public State {
     Q_OBJECT
 public:
     Resync( StateContext * context);
     virtual ~Resync() override;
 
 
-    virtual void cancelProgress() override {Q_ASSERT(false);} // progress cancel not expected
-    virtual void destroyProgressWnd(wnd::ProgressWnd * w) override { if (w==wnd) wnd = nullptr;}
 protected:
     virtual NextStateRespond execute() override;
     virtual void exitingState() override;
@@ -42,7 +41,6 @@ private slots:
     void onCheckResult(bool ok, QString errors );
 
 private:
-    wnd::ProgressWnd * wnd = nullptr;
     int prevState = STATE::TRANSACTIONS;
     QPair<bool,bool> prevListeningStatus = QPair<bool,bool>(false,false);
     int maxProgrVal = 100;

@@ -11,11 +11,6 @@
 # Path to the keybase binary
 # keybase_binary = "keybase"
 
-# Legacy Grin Box connection URI. Depricated unsecure method of communication, not recommended for usage
-# If you decided to use it, specify URI.
-# mwcmq_domain = "legacy.grin.box"
-# mwcmq_port   = 443
-
 # Use SSL for Legacy Grin Box connection.
 # grinbox_protocol_unsecure = false
 

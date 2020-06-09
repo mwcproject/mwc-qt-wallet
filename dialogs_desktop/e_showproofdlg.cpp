@@ -14,8 +14,9 @@
 
 #include "e_showproofdlg.h"
 #include "ui_e_showproofdlg.h"
-#include "../util/execute.h"
-#include "../core/global.h"
+#include "../bridge/config_b.h"
+#include "../bridge/util_b.h"
+#include "../bridge/wallet_b.h"
 
 namespace dlg {
 
@@ -68,12 +69,16 @@ bool ProofInfo::parseProofText(const QString & proof) {
 }
 
 
-ShowProofDlg::ShowProofDlg(QWidget *parent, const QString &fileName, const ProofInfo & proofInfo, const wallet::WalletConfig & config ) :
+ShowProofDlg::ShowProofDlg(QWidget *parent, const QString &fileName, const ProofInfo & proofInfo ) :
     control::MwcDialog(parent),
         ui(new Ui::ShowProofDlg),
         proof(proofInfo)
 {
     ui->setupUi(this);
+
+    config = new bridge::Config(this);
+    util = new bridge::Util(this);
+    wallet = new bridge::Wallet(this);
 
     ui->proofLocation->setText(fileName);
 
@@ -86,8 +91,7 @@ ShowProofDlg::ShowProofDlg(QWidget *parent, const QString &fileName, const Proof
     ui->output->setText( proofInfo.output );
     ui->kernel->setText( proofInfo.kernel );
 
-
-    blockExplorerUrl = (config.getNetwork() == "Mainnet") ? mwc::BLOCK_EXPLORER_URL_MAINNET : mwc::BLOCK_EXPLORER_URL_FLOONET;
+    blockExplorerUrl = config->getBlockExplorerUrl(config->getNetwork());
 }
 
 ShowProofDlg::~ShowProofDlg() {
@@ -96,12 +100,12 @@ ShowProofDlg::~ShowProofDlg() {
 
 void ShowProofDlg::on_viewOutput_clicked()
 {
-    util::openUrlInBrowser( "https://"+blockExplorerUrl+"/#o" + proof.output );
+    util->openUrlInBrowser( "https://"+blockExplorerUrl+"/#o" + proof.output );
 }
 
 void ShowProofDlg::on_viewKernel_clicked()
 {
-    util::openUrlInBrowser( "https://"+blockExplorerUrl+"/#k" + proof.kernel );
+    util->openUrlInBrowser( "https://"+blockExplorerUrl+"/#k" + proof.kernel );
 }
 
 void ShowProofDlg::on_pushButton_clicked()

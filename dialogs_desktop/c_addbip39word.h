@@ -15,7 +15,7 @@
 #ifndef C_ADDBIP39WORD_H
 #define C_ADDBIP39WORD_H
 
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
 class AddBip39Word;
@@ -37,11 +37,8 @@ public:
 
 private slots:
     void on_wordEdit_textChanged(const QString &str);
-
     void on_cancelButton_clicked();
-
     void on_submitButton_clicked();
-
 private:
     Ui::AddBip39Word *ui;
     QCompleter * completer = nullptr;

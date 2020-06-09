@@ -13,9 +13,31 @@
 // limitations under the License.
 
 #include "state.h"
-#include  "../core/mainwindow.h"
+#include "statemachine.h"
 
 namespace state {
+
+static StateContext * globalContext = nullptr;
+
+void setStateContext(StateContext * context) {
+    Q_ASSERT(globalContext == nullptr); // set it once
+    globalContext = context;
+
+    Q_ASSERT(globalContext);
+}
+
+StateContext * getStateContext() {
+    Q_ASSERT(globalContext);
+    return globalContext;
+}
+
+// Shortcut to state if state_machine. Callir suppose to know the class name
+State * getState(STATE state) {
+    State * res = getStateContext()->stateMachine->getState(state);
+    Q_ASSERT(res);
+    return res;
+}
+
 
 State::State(StateContext * _context, STATE _stateId) :
     context(_context), stateId(_stateId)

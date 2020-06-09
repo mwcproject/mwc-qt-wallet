@@ -23,13 +23,6 @@
 class QNetworkAccessManager;
 class QNetworkReply;
 
-namespace wnd {
-class Hodl;
-class HodlCold;
-class HodlNode;
-class HodlClaim;
-}
-
 namespace state {
 
 class Hodl : public QObject, public State
@@ -44,11 +37,6 @@ public:
     Hodl(StateContext * context);
     virtual ~Hodl() override;
 
-    void deleteHodlNormWnd(wnd::Hodl * wnd) { if (wnd == hodlNormWnd) {hodlNormWnd = nullptr;} }
-    void deleteHodlColdWnd(wnd::HodlCold * wnd) { if (wnd == hodlColdWnd) {hodlColdWnd = nullptr;} }
-    void deleteHodlNodeWnd(wnd::HodlNode * wnd) { if (wnd == hodlNodeWnd) {hodlNodeWnd = nullptr;} }
-    void deleteHodlClaimWnd(wnd::HodlClaim * wnd) { if (wnd == hodlClaimWnd) {hodlClaimWnd = nullptr;} }
-
     // Set cold wallet public key. That can initiate all status workflow.
     // Epmty String  - reset
     void setColdWalletPublicKey(QString pubKey);
@@ -60,9 +48,6 @@ public:
     void moveToStartHODLPage();
 
     void claimMWC(const QString & hash);
-
-    QVector<int> getColumnsWidhts();
-    void updateColumnsWidhts(QVector<int> widths);
 
     // request message to sign, respond expected to be delivered to the window
     void requestSignMessage(const QString & message);
@@ -102,11 +87,6 @@ private slots:
     void onHodlStatusWasChanged();
 private:
     QNetworkAccessManager *nwManager = nullptr;
-
-    wnd::Hodl * hodlNormWnd = nullptr;
-    wnd::HodlCold * hodlColdWnd = nullptr;
-    wnd::HodlNode * hodlNodeWnd = nullptr;
-    wnd::HodlClaim * hodlClaimWnd = nullptr;
 
     QString hodlUrl; // Url for airdrop requests. Url depend on current network.
 

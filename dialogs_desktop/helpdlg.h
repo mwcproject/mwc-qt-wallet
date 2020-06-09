@@ -16,7 +16,7 @@
 #define HELPDLG_H
 
 #include <QDialog>
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
 class HelpDlg;

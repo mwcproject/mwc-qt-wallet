@@ -14,45 +14,43 @@
 
 #include "m_airdrop_w.h"
 #include "ui_m_airdrop.h"
-#include "state/m_airdrop.h"
-#include "../control/messagebox.h"
-#include "../util/stringutils.h"
-#include "../state/timeoutlock.h"
+#include "../control_desktop/messagebox.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../bridge/config_b.h"
+#include "../bridge/wnd/m_airdrop_b.h"
 
 
 namespace wnd {
 
-Airdrop::Airdrop(QWidget *parent, state::Airdrop * _state) :
-    core::NavWnd(parent, _state->getContext() ),
-    ui(new Ui::Airdrop),
-    state(_state)
+Airdrop::Airdrop(QWidget *parent) :
+    core::NavWnd(parent),
+    ui(new Ui::Airdrop)
 {
     ui->setupUi(this);
+
+    airdrop = new bridge::Airdrop(this);
+    config = new bridge::Config(this);
+
+    QObject::connect( airdrop, &bridge::Airdrop::sgnUpdateAirDropStatus,
+                      this, &Airdrop::onSgnUpdateAirDropStatus, Qt::QueuedConnection);
+    QObject::connect( airdrop, &bridge::Airdrop::sgnUpdateClaimStatus,
+                      this, &Airdrop::onSgnUpdateClaimStatus, Qt::QueuedConnection);
+    QObject::connect( airdrop, &bridge::Airdrop::sgnReportMessage,
+                      this, &Airdrop::onSgnReportMessage, Qt::QueuedConnection);
 
     ui->progress->initLoader(true);
     ui->progressFrame->hide();
     ui->claimFrame->hide();
-    // Static frame is visible
-
-/*    if ( updateAirDropStatus( state->getAirDropStatus() ) ) {
-        initTableHeaders();
-        updateClaimStatus();
-        ui->btcAddressEdit->setFocus();
-        ui->claimAirdropBtn->setEnabled(false);
-        ui->refreshClaimsButton->setEnabled( state->hasAirdropRequests());
-    }*/
 }
 
 Airdrop::~Airdrop()
 {
-    state->deleteAirdropWnd(this);
     saveTableHeaders();
     delete ui;
 }
 
 void Airdrop::on_nextButton_clicked()
 {
-
 }
 
 void Airdrop::showProgress(const QString & message) {
@@ -76,7 +74,7 @@ void Airdrop::initTableHeaders() {
 
     // Disabling to show the grid
     // Creatign columns
-    QVector<int> widths = state->getColumnsWidhts();
+    QVector<int> widths = config->getColumnsWidhts("AirdropTblWidth");
     if ( widths.size() != 4 ) {
         widths = QVector<int>{30,300,100,100};
     }
@@ -85,13 +83,13 @@ void Airdrop::initTableHeaders() {
 }
 
 void Airdrop::saveTableHeaders() {
-    state->updateColumnsWidhts( ui->claimsTable->getColumnWidths() );
+    config->updateColumnsWidhts( "AirdropTblWidth", ui->claimsTable->getColumnWidths() );
 }
 
 void Airdrop::updateClaimStatus() {
     ui->claimsTable->clearData();
 
-    state->refreshAirdropStatusInfo();
+    airdrop->refreshAirdropStatusInfo();
 }
 
 
@@ -103,7 +101,7 @@ void Airdrop::on_btcAddressEdit_textChanged(const QString & text)
 
 void Airdrop::on_claimAirdropBtn_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to("Airdrop");
 
     QString address = ui->btcAddressEdit->text().trimmed().trimmed();
 
@@ -120,49 +118,44 @@ void Airdrop::on_claimAirdropBtn_clicked()
 
     showProgress("Claiming BTC address");
 
-    state->startClaimingProcess( address, password );
+    airdrop->startClaimingProcess( address, password );
 }
 
-void Airdrop::reportMessage( QString title, QString message ) {
-    state::TimeoutLockObject to( state );
-
+void Airdrop::onSgnReportMessage( QString title, QString message ) {
+    util::TimeoutLockObject to("Airdrop");
     hideProgress();
-
     control::MessageBox::messageText(this, title, message);
 }
 
 // true if status is active
-bool Airdrop::updateAirDropStatus( const state::AirDropStatus & status ) {
-    if (status.status) {
+void Airdrop::onSgnUpdateAirDropStatus( bool waiting, bool status, QString message ) {
+    if (status) {
         ui->progressFrame->hide();
         ui->claimFrame->show();
-        return true;
     }
     else {
         ui->progressFrame->show();
         ui->claimFrame->hide();
 
-        if (status.waiting)
+        if (waiting)
             ui->progress->show();
         else
             ui->progress->hide();
 
-        ui->progressMessage->setText(status.message);
-        return false;
+        ui->progressMessage->setText(message);
     }
 }
 
-bool Airdrop::updateClaimStatus( int idx, const state::AirdropRequests & request,
-                        QString status, QString message, int64_t amount, int errCode) {
+void Airdrop::onSgnUpdateClaimStatus( int idx, QString requestBtcAddress,
+                                      QString status, QString message, QString mwc, int errCode) {
     Q_UNUSED(message)
     Q_UNUSED(errCode)
 
     int rows = ui->claimsTable->rowCount();
     if (idx!=rows)
-        return false; // go out of sync. Likely double refresh click. We want to keep only once sequence going
+        return; // go out of sync. Likely double refresh click. We want to keep only once sequence going
 
-    ui->claimsTable->appendRow( QVector<QString>{ QString::number(idx+1), request.btcAddress, amount>0 ? util::nano2one(amount) : "", status } );
-    return true;
+    ui->claimsTable->appendRow( QVector<QString>{ QString::number(idx+1), requestBtcAddress, mwc, status } );
 }
 
 

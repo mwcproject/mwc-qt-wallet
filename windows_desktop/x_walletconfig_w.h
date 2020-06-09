@@ -15,17 +15,15 @@
 #ifndef WALLETCONFIGW_H
 #define WALLETCONFIGW_H
 
-#include "../core/navwnd.h"
-#include "../wallet/wallet.h"
-#include "../core/appcontext.h"
+#include "../core_desktop/navwnd.h"
 
 namespace Ui {
 class WalletConfig;
 }
 
-namespace state {
-    class WalletConfig;
-    class StateMachine;
+namespace bridge {
+class WalletConfig;
+class Util;
 }
 
 namespace wnd {
@@ -35,11 +33,8 @@ class WalletConfig : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit WalletConfig(QWidget *parent, state::WalletConfig * state);
+    explicit WalletConfig(QWidget *parent);
     ~WalletConfig();
-
-    // If data can be apllied, ask user about that. Issue that people expect auto apply by exit
-    bool askUserForChanges();
 
 private slots:
     void on_mwc713directorySelect_clicked();
@@ -77,7 +72,7 @@ private:
                    int inputConfirmationNumber,
                    int changeOutputs);
     // return true if data is fine. In case of error will show message for the user
-    bool readInputValue( wallet::WalletConfig & newWalletConfig, core::SendCoinsParams & newSendParams );
+    //bool readInputValue( wallet::WalletConfig & newWalletConfig, core::SendCoinsParams & newSendParams );
 
     QString mwcDomainConfig2InputStr(QString mwcDomain);
     QString mwcDomainInputStr2Config(QString mwcDomain);
@@ -103,10 +98,10 @@ private:
 
 private:
     Ui::WalletConfig *ui;
-    state::WalletConfig * state;
 
-    wallet::WalletConfig currentWalletConfig;
-    core::SendCoinsParams sendParams;
+    bridge::WalletConfig * walletConfig = nullptr;
+    bridge::Util * util = nullptr;
+
     int uiScale = 2; // in the range [1..4]
 
     bool walletLogsEnabled = false;
@@ -116,8 +111,11 @@ private:
     int64_t logoutTimeout = 20 * 60;
     int64_t currentLogoutTimeout = 20 * 60;
 
-    wallet::WalletConfig defaultWalletConfig;
-    core::SendCoinsParams defaultSendParams;
+    QString dataPath;
+    QString keybasePath;
+    QString mqsHost;
+    int inputConfirmationsNumber = 1;
+    int changeOutputs = 1;
 };
 
 }

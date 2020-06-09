@@ -14,19 +14,16 @@
 
 #include "x_walletconfig_w.h"
 #include "ui_x_walletconfig.h"
-#include "../state/x_walletconfig.h"
-#include "../control/messagebox.h"
+#include "../control_desktop/messagebox.h"
 #include <QFileInfo>
 #include <QHostInfo>
-#include "../util/Waiting.h"
 #include "../util/Process.h"
-#include "../util/ConfigReader.h"
 #include <QFileDialog>
 #include <QStandardPaths>
-#include "../state/timeoutlock.h"
-#include "../dialogs/networkselectiondlg.h"
-#include "../core/Config.h"
-#include "../state/statemachine.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../dialogs_desktop/networkselectiondlg.h"
+#include "../bridge/wnd/x_walletconfig_b.h"
+#include "../bridge/util_b.h"
 
 namespace wnd {
 
@@ -61,7 +58,7 @@ static bool checkKeyBasePath( QWidget * parent, QString keybasePath ) {
         // C:\Users\XXXX\AppData\Local\Keybase\keybase.exe        - ok
         // C:\Users\XXXX\AppData\Local\Keybase\Gui\Keybase.exe    - GUI, will not work
         if (!keybasePath.isEmpty() && (keybasePath.contains("Gui") || keybasePath.contains("gui")) ) {
-            if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::questionText( parent, "Keybase path, Warning",
+            if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText( parent, "Keybase path, Warning",
                                "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
                                "Cancel", "Use this path", true, false ) )
                 return false;
@@ -72,7 +69,7 @@ static bool checkKeyBasePath( QWidget * parent, QString keybasePath ) {
     // /Applications/Keybase.app/Contents/MacOS/Keybase              - GUI, not OK
     // /Applications/Keybase.app/Contents/SharedSupport/bin/keybase  - ok
     if (!keybasePath.isEmpty() && !keybasePath.contains("bin") ) {
-        if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::questionText( parent, "Keybase path, Warning",
+        if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText( parent, "Keybase path, Warning",
                                  "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
                                  "Cancel", "Use this path", true, false ) )
             return false;
@@ -83,36 +80,32 @@ static bool checkKeyBasePath( QWidget * parent, QString keybasePath ) {
 }
 
 static QString calcMWCMW_DOMAIN_DEFAULT_STR() {
-    return QString("default MWC MQ") + (config::getUseMwcMqS() ? "S" : "")  + " Domain";
+    return "default MWC MQS Domain";
 }
 
-WalletConfig::WalletConfig(QWidget *parent, state::WalletConfig * _state) :
-    core::NavWnd(parent, _state->getContext() ),
-    ui(new Ui::WalletConfig),
-    state(_state)
+WalletConfig::WalletConfig(QWidget *parent) :
+    core::NavWnd(parent),
+    ui(new Ui::WalletConfig)
 {
     ui->setupUi(this);
 
-    currentWalletConfig = state->getWalletConfig();
-    sendParams = state->getSendCoinsParams();
+    walletConfig = new bridge::WalletConfig(this);
+    util = new bridge::Util(this);
 
-    defaultWalletConfig = state->getDefaultWalletConfig();
-
-    uiScale = scale2Id( state->getGuiScale() );
+    uiScale = scale2Id( walletConfig->getGuiScale() );
     checkSizeButton(uiScale);
 
-    walletLogsEnabled = state->getWalletLogsEnabled();
+    walletLogsEnabled = walletConfig->getWalletLogsEnabled();
     updateLogsStateUI(walletLogsEnabled);
 
-    autoStartMQSEnabled = state->getAutoStartMQSEnabled();
-    autoStartKeybaseEnabled = state->getAutoStartKeybaseEnabled();
+    autoStartMQSEnabled = walletConfig->getAutoStartMQSEnabled();
+    autoStartKeybaseEnabled = walletConfig->getAutoStartKeybaseEnabled();
     updateAutoStartStateUI(autoStartMQSEnabled, autoStartKeybaseEnabled);
 
-    logoutTimeout = config::getLogoutTimeMs() / 1000;
-    currentLogoutTimeout = logoutTimeout;
-    updateAutoLogoutStateUI(logoutTimeout);
+    currentLogoutTimeout = walletConfig->getLogoutTimeMs() / 1000;
+    updateAutoLogoutStateUI(currentLogoutTimeout);
 
-    outputLockingEnabled = state->isOutputLockingEnabled();
+    outputLockingEnabled = walletConfig->isOutputLockingEnabled();
     ui->outputLockingCheck->setChecked(outputLockingEnabled);
 
 #ifdef Q_OS_DARWIN
@@ -120,31 +113,23 @@ WalletConfig::WalletConfig(QWidget *parent, state::WalletConfig * _state) :
     ui->fontHolder->hide();
 #endif
 
-    setValues(currentWalletConfig.getDataPath(), currentWalletConfig.keyBasePath,
-              currentWalletConfig.getMwcMqHostNorm(),
-              sendParams.inputConfirmationNumber, sendParams.changeOutputs);
+    dataPath = walletConfig->getDataPath();
+    keybasePath = walletConfig->getKeybasePath();
+    mqsHost = walletConfig->getMqsHost();
+    inputConfirmationsNumber = walletConfig->getInputConfirmationsNumber();
+    changeOutputs = walletConfig->getChangeOutputs();
+
+    setValues(dataPath, keybasePath,
+              mqsHost,
+              inputConfirmationsNumber, changeOutputs);
     updateButtons();
 }
 
 WalletConfig::~WalletConfig()
 {
-    state->deleteWndWallet(this);
+    walletConfig->canApplySettings(false);
     delete ui;
 }
-
-// If data can be apllied, ask user about that. Issue that people expect auto apply by exit
-// Return false - if data can't be applied and we have to stay here
-//        true  - no changes or we accept everything
-bool WalletConfig::askUserForChanges() {
-    if ( ui->applyButton->isEnabled() ) {
-        if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(this, "Apply config changes", "Configuration changes was made for the wallet. Do you want to apply them?",
-                "Cancel", "Apply", false, true) ) {
-            return applyChanges();
-        }
-    }
-    return true;
-}
-
 
 void WalletConfig::setValues(const QString & mwc713directory,
                              const QString & keyBasePath,
@@ -167,25 +152,27 @@ void WalletConfig::updateButtons() {
     bool sameWithCurrent =
         getcheckedSizeButton() == uiScale &&
         walletLogsEnabled == ui->logsEnableBtn->isChecked() &&
-        ui->mwc713directoryEdit->text().trimmed() == currentWalletConfig.getDataPath() &&
-        keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == currentWalletConfig.keyBasePath &&
-        mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == currentWalletConfig.getMwcMqHostNorm() &&
-        ui->confirmationNumberEdit->text().trimmed() == QString::number(sendParams.inputConfirmationNumber) &&
-        ui->changeOutputsEdit->text().trimmed() == QString::number(sendParams.changeOutputs) &&
+        ui->mwc713directoryEdit->text().trimmed() == dataPath &&
+        keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == keybasePath &&
+        mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == mqsHost &&
+        ui->confirmationNumberEdit->text().trimmed() == QString::number(inputConfirmationsNumber) &&
+        ui->changeOutputsEdit->text().trimmed() == QString::number(changeOutputs) &&
         autoStartMQSEnabled == ui->start_mqs->isChecked() &&
         autoStartKeybaseEnabled == ui->start_keybase->isChecked() &&
         logoutTimeout == currentLogoutTimeout &&
         outputLockingEnabled == ui->outputLockingCheck->isChecked();
 
+    walletConfig->canApplySettings(!sameWithCurrent);
+
     bool sameWithDefault =
-        getcheckedSizeButton() == scale2Id( state->getInitGuiScale() ) &&
+        getcheckedSizeButton() == scale2Id( walletConfig->getInitGuiScale() ) &&
         true == ui->logsEnableBtn->isChecked() &&
         // 713 directory is skipped intentionally. We don't want to reset it because user is expected to have many such directories
         // ui->mwc713directoryEdit->text().trimmed() == defaultWalletConfig.getDataPath() &&
-        keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == defaultWalletConfig.keyBasePath &&
-        mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == defaultWalletConfig.getMwcMqHostNorm() &&
-        ui->confirmationNumberEdit->text().trimmed() == QString::number(defaultSendParams.inputConfirmationNumber) &&
-        ui->changeOutputsEdit->text().trimmed() == QString::number(defaultSendParams.changeOutputs) &&
+        keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == walletConfig->getDefaultKeybasePath() &&
+        mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == walletConfig->getDefaultMqsHost() &&
+        ui->confirmationNumberEdit->text().trimmed() == QString::number(walletConfig->getDefaultInputConfirmationsNumber()) &&
+        ui->changeOutputsEdit->text().trimmed() == QString::number(walletConfig->getDefaultChangeOutputs()) &&
         ui->start_mqs->isChecked() == true &&
         ui->start_keybase->isChecked() == true &&
         ui->logout_20->isChecked() == true &&
@@ -194,7 +181,6 @@ void WalletConfig::updateButtons() {
     ui->restoreDefault->setEnabled( !sameWithDefault );
     ui->applyButton->setEnabled( !sameWithCurrent );
 }
-
 
 QString WalletConfig::mwcDomainConfig2InputStr(QString mwcDomain) {
     return mwcDomain.isEmpty() ? calcMWCMW_DOMAIN_DEFAULT_STR() : mwcDomain;
@@ -220,117 +206,14 @@ QString WalletConfig::keybasePathInputStr2Config(QString kbpath) {
         return "";
 
     if (kbpath == "Not Found")
-        return currentWalletConfig.keyBasePath;
+        return walletConfig->getKeybasePath();
 
     return kbpath;
 }
 
-
-// return true if data is fine. In case of error will show message for the user
-bool WalletConfig::readInputValue(
-                    wallet::WalletConfig & newWalletConfig, core::SendCoinsParams & newSendParams ) {
-    state::TimeoutLockObject to( state );
-
-    // mwc713 directory
-    QString walletDir = ui->mwc713directoryEdit->text().trimmed();
-    if (walletDir.isEmpty()) {
-        control::MessageBox::messageText(this, "Input", "Please specify non empty wallet folder name");
-        ui->mwc713directoryEdit->setFocus();
-        return false;
-    }
-
-    QPair <bool, QString> res = util::validateMwc713Str(walletDir);
-    if (!res.first) {
-        control::MessageBox::messageText( this, "Input", res.second );
-        ui->mwc713directoryEdit->setFocus();
-        return false;
-    }
-
-    // keybase path
-    QString keybasePath = keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() );
-    res = util::validateMwc713Str(keybasePath);
-    if (!res.first) {
-        control::MessageBox::messageText( this, "Input", res.second );
-        ui->keybasePathEdit->setFocus();
-        return false;
-    }
-
-    if (!checkKeyBasePath(this, keybasePath)) {
-        ui->keybasePathEdit->setFocus();
-        return false;
-    }
-
-    QString mwcmqHost = mwcDomainInputStr2Config(ui->mwcmqHost->text().trimmed());
-    if (!mwcmqHost.isEmpty()) {
-        // Checking the host
-
-        util::Waiting w; // Host verification might tale time, what is why waiting here
-
-        QHostInfo host = QHostInfo::fromName(mwcmqHost);
-        if (host.error() != QHostInfo::NoError) {
-            control::MessageBox::messageText( this, "Input", "Host "+mwcmqHost+" is not reachable.\n" + host.errorString() );
-            ui->mwcmqHost->setFocus();
-            return false;
-        }
-    }
-
-    bool ok = false;
-    int confirmations = ui->confirmationNumberEdit->text().trimmed().toInt(&ok);
-    if (!ok || confirmations<=0 || confirmations>10) {
-        control::MessageBox::messageText( this, "Input", "Please input the number of confirmations in the range from 1 to 10" );
-        ui->confirmationNumberEdit->setFocus();
-        return false;
-    }
-
-    int changeOutputs = ui->changeOutputsEdit->text().trimmed().toInt(&ok);
-    if (!ok || changeOutputs<=0 || confirmations>=100) {
-        control::MessageBox::messageText( this, "Input", "Please input the change output number in the range from 1 to 100" );
-        ui->changeOutputsEdit->setFocus();
-        return false;
-    }
-
-    QPair<QString,QString> networkArch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDir); // local path as writen in config
-    QString runningArc = util::getBuildArch();
-
-    // Just in case. Normally will never be called
-    if ( runningArc != networkArch.second ) {
-        control::MessageBox::messageText(nullptr, "Wallet data architecture mismatch",
-                                     "Your mwc713 seed at '"+ walletDir +"' was created with "+ networkArch.second+" bits version of the wallet. You are using " + runningArc + " bit version.");
-        return false;
-    }
-
-    QString network = networkArch.first; // local path as writen in config
-    if (network.isEmpty()) {
-        // Check if seed file does exist. Import of the data?
-        if ( wallet::WalletConfig::doesSeedExist(walletDir) ) {
-
-            dlg::NetworkSelectionDlg nwDlg(this);
-            if (nwDlg.exec() != QDialog::Accepted)
-                return false;
-
-            network = nwDlg.getNetwork() == state::InitAccount::MWC_NETWORK::MWC_MAIN_NET ? "Mainnet" : "Floonet";
-
-        }
-        else
-            network = "Mainnet"; // will be redefined later in any case...
-    }
-
-    wallet::WalletConfig::saveNetwork2DataPath(walletDir, network, runningArc);
-
-    // So far we are good
-    newWalletConfig.setDataWalletCfg( network,
-            walletDir,
-            config::getUseMwcMqS() ? currentWalletConfig.mwcmqDomainEx : mwcmqHost,
-            config::getUseMwcMqS() ? mwcmqHost : currentWalletConfig.mwcmqsDomainEx,
-            keybasePath);
-    newSendParams.setData( confirmations, changeOutputs );
-    return true;
-}
-
-
 void WalletConfig::on_mwc713directorySelect_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to( "WalletConfig" );
 
     QPair<bool,QString> basePath = ioutils::getAppDataPath();
     if (!basePath.first) {
@@ -379,7 +262,7 @@ void WalletConfig::on_keybasePathEdit_textChanged(const QString &)
 
 void WalletConfig::on_keybasePathSelect_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to( "WalletConfig" );
 
     const QStringList appDirs = QStandardPaths::standardLocations(QStandardPaths::ApplicationsLocation);
 
@@ -407,10 +290,12 @@ void WalletConfig::on_changeOutputsEdit_textEdited(const QString &)
 
 void WalletConfig::on_restoreDefault_clicked()
 {
-    setValues("", defaultWalletConfig.keyBasePath, defaultWalletConfig.getMwcMqHostNorm(),
-              defaultSendParams.inputConfirmationNumber, defaultSendParams.changeOutputs);
+    setValues("", walletConfig->getDefaultKeybasePath(),
+              walletConfig->getMqsHost(),
+              walletConfig->getDefaultInputConfirmationsNumber(),
+              walletConfig->getDefaultChangeOutputs());
 
-    checkSizeButton( scale2Id(state->getInitGuiScale()) );
+    checkSizeButton( scale2Id(walletConfig->getInitGuiScale()) );
 
     updateLogsStateUI(true);
 
@@ -428,92 +313,167 @@ void WalletConfig::on_restoreDefault_clicked()
 // false - need to be made or was made and wallet need to be restarted
 bool WalletConfig::applyChanges() {
 
-    wallet::WalletConfig newWalletConfig;
-    core::SendCoinsParams newSendParams;
+    util::TimeoutLockObject to("WalletConfig");
 
-    if ( readInputValue( newWalletConfig, newSendParams ) ) {
-        if (! (sendParams == newSendParams)) {
-            state->setSendCoinsParams(newSendParams);
-            sendParams = newSendParams;
-        }
-
-        bool need2updateLogEnabled =  ( walletLogsEnabled != ui->logsEnableBtn->isChecked() );
-        if (need2updateLogEnabled) {
-            bool needCleanupLogs = false;
-            if ( !ui->logsEnableBtn->isChecked() ) {
-                needCleanupLogs = (control::MessageBox::questionText(this, "Wallet Logs", "You just disabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
-                                              "Please note, the logs can contain private information about your transactions and accounts.\n"
-                                              "Do you want to clean up existing logs from your wallet?", "Clean up", "Keep the logs", true, false) == control::MessageBox::RETURN_CODE::BTN1);
-            }
-            else {
-                control::MessageBox::messageText(this, "Wallet Logs", "You just enabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
-                                                                      "Please note, the logs can contain private infromation about your transactions and accounts.");
-            }
-            state->updateWalletLogsEnabled(ui->logsEnableBtn->isChecked(), needCleanupLogs);
-        }
-
-        walletLogsEnabled = ui->logsEnableBtn->isChecked();
-
-        bool need2updateGuiSize = ( getcheckedSizeButton() != uiScale );
-
-        if (need2updateGuiSize) {
-            state->updateGuiScale( id2scale( getcheckedSizeButton() ) );
-        }
-
-        bool need2updateAutoStartMQSEnabled = ( autoStartMQSEnabled != ui->start_mqs->isChecked() );
-        if (need2updateAutoStartMQSEnabled) {
-            state->updateAutoStartMQSEnabled(ui->start_mqs->isChecked());
-        }
-        autoStartMQSEnabled = ui->start_mqs->isChecked();
-
-        bool need2updateAutoStartKeybaseEnabled = ( autoStartKeybaseEnabled != ui->start_keybase->isChecked() );
-        if (need2updateAutoStartKeybaseEnabled) {
-            state->updateAutoStartKeybaseEnabled(ui->start_keybase->isChecked());
-        }
-        autoStartKeybaseEnabled = ui->start_keybase->isChecked();
-
-        bool lockingEnabled = ui->outputLockingCheck->isChecked();
-        if (lockingEnabled != outputLockingEnabled) {
-            state->setOutputLockingEnabled(lockingEnabled);
-            outputLockingEnabled = lockingEnabled;
-        }
-
-        if (logoutTimeout != currentLogoutTimeout) {
-            util::ConfigReader reader;
-            QString configFN = config::getMwcGuiWalletConf();
-            if ( !reader.readConfig( configFN ) ) {
-                control::MessageBox::messageText(nullptr, "Internal Error",
-                                             "Unable to update wallet config file " + configFN );
-            }
-
-            bool updateOk = reader.updateConfig("logoutTimeout", QString::number(currentLogoutTimeout));
-
-            if (!updateOk) {
-                control::MessageBox::messageText(nullptr, "Error", "Wallet unable to set the selected logout time." );
-            } else {
-                logoutTimeout = currentLogoutTimeout;
-                config::setLogoutTimeMs(logoutTimeout * 1000);
-                state->getContext()->stateMachine->resetLogoutLimit(true);
-            }
-        }
-
-        if ( ! (currentWalletConfig==newWalletConfig) ) {
-            if (state->setWalletConfig(newWalletConfig, need2updateGuiSize)) { // in case of true, we are already dead, don't touch memory and exit!
-                return false; // need to be restarted. Just want to cancell caller of caller changes state operation
-            }
-        }
-
-        if (need2updateGuiSize) {
-            // Restating the wallet
-            state->restartMwcQtWallet();
-            return false;   // need to be restarted. Just want to cancell caller of caller changes state operation
-        }
-
-        updateButtons();
-        return true; // We are good. Changes was applied
+    // mwc713 directory
+    QString walletDir = ui->mwc713directoryEdit->text().trimmed();
+    if (walletDir.isEmpty()) {
+        control::MessageBox::messageText(this, "Input", "Please specify non empty wallet folder name");
+        ui->mwc713directoryEdit->setFocus();
+        return false;
     }
 
-    return false;
+    QPair<bool, QString> res = util::validateMwc713Str(walletDir);
+    if (!res.first) {
+        control::MessageBox::messageText(this, "Input", res.second);
+        ui->mwc713directoryEdit->setFocus();
+        return false;
+    }
+
+    // keybase path
+    QString keybasePath = keybasePathInputStr2Config(ui->keybasePathEdit->text().trimmed());
+    res = util::validateMwc713Str(keybasePath);
+    if (!res.first) {
+        control::MessageBox::messageText(this, "Input", res.second);
+        ui->keybasePathEdit->setFocus();
+        return false;
+    }
+
+    if (!checkKeyBasePath(this, keybasePath)) {
+        ui->keybasePathEdit->setFocus();
+        return false;
+    }
+
+    QString mwcmqHost = mwcDomainInputStr2Config(ui->mwcmqHost->text().trimmed());
+    if (!mwcmqHost.isEmpty()) {
+        // Checking the host
+        QHostInfo host = QHostInfo::fromName(mwcmqHost);
+        if (host.error() != QHostInfo::NoError) {
+            control::MessageBox::messageText(this, "Input",
+                                             "Host " + mwcmqHost + " is not reachable.\n" + host.errorString());
+            ui->mwcmqHost->setFocus();
+            return false;
+        }
+    }
+
+    bool ok = false;
+    int confirmations = ui->confirmationNumberEdit->text().trimmed().toInt(&ok);
+    if (!ok || confirmations <= 0 || confirmations > 10) {
+        control::MessageBox::messageText(this, "Input",
+                                         "Please input the number of confirmations in the range from 1 to 10");
+        ui->confirmationNumberEdit->setFocus();
+        return false;
+    }
+
+    int changeOutputs = ui->changeOutputsEdit->text().trimmed().toInt(&ok);
+    if (!ok || changeOutputs <= 0 || confirmations >= 100) {
+        control::MessageBox::messageText(this, "Input",
+                                         "Please input the change output number in the range from 1 to 100");
+        ui->changeOutputsEdit->setFocus();
+        return false;
+    }
+
+    QPair<QString, QString> networkArch = wallet::WalletConfig::readNetworkArchFromDataPath(
+            walletDir); // local path as writen in config
+    QString runningArc = util::getBuildArch();
+
+    // Just in case. Normally will never be called
+    if (runningArc != networkArch.second) {
+        control::MessageBox::messageText(nullptr, "Wallet data architecture mismatch",
+                                         "Your mwc713 seed at '" + walletDir + "' was created with " +
+                                         networkArch.second + " bits version of the wallet. You are using " +
+                                         runningArc + " bit version.");
+        return false;
+    }
+
+    QString network = networkArch.first; // local path as writen in config
+    if (network.isEmpty()) {
+        // Check if seed file does exist. Import of the data?
+        if (wallet::WalletConfig::doesSeedExist(walletDir)) {
+
+            dlg::NetworkSelectionDlg nwDlg(this);
+            if (nwDlg.exec() != QDialog::Accepted)
+                return false;
+
+            network = nwDlg.getNetwork() == state::InitAccount::MWC_NETWORK::MWC_MAIN_NET ? "Mainnet" : "Floonet";
+
+        } else
+            network = "Mainnet"; // will be redefined later in any case...
+    }
+
+
+    wallet::WalletConfig::saveNetwork2DataPath(walletDir, network, runningArc);
+
+    if (!(confirmations == inputConfirmationsNumber && changeOutputs == this->changeOutputs)) {
+        walletConfig->setSendCoinsParams(confirmations, changeOutputs);
+        inputConfirmationsNumber = confirmations;
+        this->changeOutputs = changeOutputs;
+    }
+
+    bool need2updateLogEnabled = (walletLogsEnabled != ui->logsEnableBtn->isChecked());
+    if (need2updateLogEnabled) {
+        bool needCleanupLogs = false;
+        if (!ui->logsEnableBtn->isChecked()) {
+            needCleanupLogs = (control::MessageBox::questionText(this, "Wallet Logs",
+                   "You just disabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
+                   "Please note, the logs can contain private information about your transactions and accounts.\n"
+                   "Do you want to clean up existing logs from your wallet?",
+                   "Clean up", "Keep the logs", true, false) ==
+                                    core::WndManager::RETURN_CODE::BTN1);
+        } else {
+            control::MessageBox::messageText(this, "Wallet Logs",
+                    "You just enabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
+                    "Please note, the logs can contain private infromation about your transactions and accounts.");
+        }
+        walletConfig->updateWalletLogsEnabled(ui->logsEnableBtn->isChecked(), needCleanupLogs);
+    }
+
+    walletLogsEnabled = ui->logsEnableBtn->isChecked();
+
+    bool need2updateGuiSize = (getcheckedSizeButton() != uiScale);
+
+    if (need2updateGuiSize) {
+        walletConfig->updateGuiScale(id2scale(getcheckedSizeButton()));
+    }
+
+    bool need2updateAutoStartMQSEnabled = (autoStartMQSEnabled != ui->start_mqs->isChecked());
+    if (need2updateAutoStartMQSEnabled) {
+        walletConfig->updateAutoStartMQSEnabled(ui->start_mqs->isChecked());
+    }
+    autoStartMQSEnabled = ui->start_mqs->isChecked();
+
+    bool need2updateAutoStartKeybaseEnabled = (autoStartKeybaseEnabled != ui->start_keybase->isChecked());
+    if (need2updateAutoStartKeybaseEnabled) {
+        walletConfig->updateAutoStartKeybaseEnabled(ui->start_keybase->isChecked());
+    }
+    autoStartKeybaseEnabled = ui->start_keybase->isChecked();
+
+    bool lockingEnabled = ui->outputLockingCheck->isChecked();
+    if (lockingEnabled != outputLockingEnabled) {
+        walletConfig->setOutputLockingEnabled(lockingEnabled);
+        outputLockingEnabled = lockingEnabled;
+    }
+
+    if (logoutTimeout != currentLogoutTimeout) {
+        if (walletConfig->updateTimeoutValue(logoutTimeout))
+            logoutTimeout = currentLogoutTimeout;
+    }
+
+    if (!(dataPath == walletDir && keybasePath == this->keybasePath &&
+          mwcmqHost == mqsHost)) {
+        if (walletConfig->updateWalletConfig(network, walletDir, mwcmqHost, keybasePath, need2updateGuiSize)) {
+            return false;
+        }
+    }
+
+    if (need2updateGuiSize) {
+        // Restating the wallet
+        walletConfig->restartQtWallet();
+        return false;   // need to be restarted. Just want to cancell caller of caller changes state operation
+    }
+
+    updateButtons();
+    return true; // We are good. Changes was applied
 }
 
 void WalletConfig::on_applyButton_clicked()

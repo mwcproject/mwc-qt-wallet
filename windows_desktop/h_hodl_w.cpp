@@ -15,41 +15,52 @@
 #include "h_hodl_w.h"
 #include "ui_h_hodl.h"
 #include "../state/h_hodl.h"
-#include "../control/messagebox.h"
-#include "../state/timeoutlock.h"
-#include "../util/execute.h"
+#include "../control_desktop/messagebox.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../dialogs_desktop/h_hodlclaimwallet.h"
+#include "../bridge/util_b.h"
+#include "../bridge/hodlstatus_b.h"
+#include "../bridge/wnd/h_hodl_b.h"
 #include "../core/HodlStatus.h"
-#include "../dialogs/h_hodlclaimwallet.h"
 
 namespace wnd {
 
-Hodl::Hodl(QWidget *parent, state::Hodl * _state) :
-    core::NavWnd(parent, _state->getContext()),
-    ui(new Ui::Hodl),
-    state(_state)
+Hodl::Hodl(QWidget *parent) :
+    core::NavWnd(parent),
+    ui(new Ui::Hodl)
 {
     ui->setupUi(this);
 
+    util = new bridge::Util(this);
+    hodl = new bridge::Hodl(this);
+    hodlStatus = new bridge::HodlStatus(this);
+
+    QObject::connect( hodl, &bridge::Hodl::sgnUpdateHodlState,
+                      this, &Hodl::onSgnUpdateHodlState, Qt::QueuedConnection);
+    QObject::connect( hodl, &bridge::Hodl::sgnReportMessage,
+                      this, &Hodl::onSgnReportMessage, Qt::QueuedConnection);
+    QObject::connect( hodl, &bridge::Hodl::sgnHideWaitingStatus,
+                      this, &Hodl::onSgnHideWaitingStatus, Qt::QueuedConnection);
+
     ui->progress->initLoader(false);
 
-    updateHodlState();
+    onSgnUpdateHodlState();
 }
 
 Hodl::~Hodl()
 {
-    state->deleteHodlNormWnd(this);
     delete ui;
 }
 
 void Hodl::on_learnMoreButton_clicked()
 {
-    util::openUrlInBrowser("https://www.mwc.mw/hodl");
+    util->openUrlInBrowser("https://www.mwc.mw/hodl");
 }
 
 void Hodl::on_signInButton_clicked()
 {
     ui->progress->show();
-    state->registerAccountForHODL();
+    hodl->registerAccountForHODL();
 }
 
 void Hodl::on_claimMwcButton_clicked()
@@ -61,68 +72,59 @@ void Hodl::on_claimMwcButton_clicked()
         coldWalletHash = claimWalletHashDlg.getColdWalletPublicKeyHash();
     }
 
-    state->moveToClaimPage(coldWalletHash);
+    hodl->moveToClaimPage(coldWalletHash);
 }
 
-void Hodl::reportMessage(const QString & title, const QString & message) {
-    state::TimeoutLockObject to( state );
+void Hodl::onSgnReportMessage(QString title, QString message) {
+    util::TimeoutLockObject to( "HODL" );
     ui->progress->hide();
-
     control::MessageBox::messageText(this, title, message);
 }
 
 // Hodl object changed it's state, need to refresh
-void Hodl::updateHodlState() {
-    core::HodlStatus * hodlStatus = state->getContext()->hodlStatus;
-    Q_ASSERT(hodlStatus);
-
-    QPair< QString, int64_t> status = state->getContext()->hodlStatus->getWalletHodlStatus("");
+void Hodl::onSgnUpdateHodlState() {
+    QVector<QString> status = hodlStatus->getWalletHodlStatus("");
+    Q_ASSERT(status.size()==2);
 
     ui->signInButton->setEnabled(!hodlStatus->isInHodl(""));
     ui->hodlStatus->setText( hodlStatus->getHodlStatus() );
-    ui->accountStatus->setText( status.first );
+    ui->accountStatus->setText( status[0] );
 
     QString waitingText = "";
-    if (status.second>0) {
-        waitingText = "Your " + util::nano2one(status.second) + " MWC will be available after finalization. "
-                                                                "The finalization process may take a while because finalization is done from an offline wallet and done in batches. "
-                                                                "For details on the finalization schedule go to http://www.mwc.mw/hodl";
+    if (status[1] != "0") {
+        waitingText = "Your " + status[1] + " MWC will be available after finalization. "
+                  "The finalization process may take a while because finalization is done from an offline wallet and done in batches. "
+                  "For details on the finalization schedule go to http://www.mwc.mw/hodl";
     }
     ui->finalizeWaitingText->setText(waitingText);
-
-    // We don't want update Claim button status because it is possibel to claim for
-    // another wallet.
-
-    //QVector<core::HodlClaimStatus> claims = hodlStatus->getClaimsRequestStatus();
-    //ui->claimMwcButton->setEnabled(!claims.isEmpty());
-    //ui->claimMwcButton->setVisible(!claims.isEmpty());
 }
 
-void Hodl::hideWaitingStatus() {
+void Hodl::onSgnHideWaitingStatus() {
     ui->progress->hide();
 }
 
 void Hodl::mouseDoubleClickEvent( QMouseEvent * e ) {
     Q_UNUSED(e)
 
-    core::HodlStatus * hodlStatus = state->getContext()->hodlStatus;
-    Q_ASSERT(hodlStatus);
-
     QString rootPubKey = hodlStatus->getRootPubKey();
     QString rootPubKeyHash =  hodlStatus->getRootPubKeyHash();
     QString isInHodlStr = hodlStatus->isInHodl("") ? "Yes" : "No";
 
-    QVector<core::HodlOutputInfo> hodlOutputs = hodlStatus->getHodlOutputs("");
+    QVector<QString> jsons = hodlStatus->getHodlOutputs("");
+    QVector<core::HodlOutputInfo> hodlOutputs;
+    for (auto & j : jsons)
+        hodlOutputs.push_back( core::HodlOutputInfo::fromJson(j) );
+
     double totalHodlAmount = 0.0;
     for (const auto & ho : hodlOutputs)
         totalHodlAmount += ho.value;
 
-    QMap<QString, QString> requestErrors = hodlStatus->getRequestErrors();
+    QVector<QString> requestErrors = hodlStatus->getRequestErrors();
     QString requestErrorsStr;
-    for ( auto re = requestErrors.begin(); re != requestErrors.end(); re++ ) {
+    for ( int r=1; r<requestErrors.size(); r+=2 ) {
         if (requestErrorsStr.length()>0)
             requestErrorsStr+="\n";
-        requestErrorsStr += re.key() + " : " + re.value();
+        requestErrorsStr += requestErrors[r-1] + " : " + requestErrors[r];
     }
 
     QString reportStr = "rootpubkey: " + rootPubKey + "\n" +

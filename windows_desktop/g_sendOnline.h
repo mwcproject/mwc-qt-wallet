@@ -15,20 +15,16 @@
 #ifndef SEND2_ONLINE_H
 #define SEND2_ONLINE_H
 
-#include "../core/navwnd.h"
-#include "../wallet/wallet.h"
+#include "../core_desktop/navwnd.h"
 
 namespace Ui {
 class SendOnline;
 }
 
-namespace state {
+namespace bridge {
+class Util;
+class Config;
 class Send;
-class Contacts;
-}
-
-namespace core {
-struct SendCoinsParams;
 }
 
 namespace wnd {
@@ -38,28 +34,24 @@ class SendOnline : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit SendOnline(QWidget *parent, const wallet::AccountInfo & selectedAccount, int64_t amount, state::Send * state, state::Contacts * contactsState );
+    explicit SendOnline(QWidget *parent, QString account, int64_t amount );
     virtual ~SendOnline() override;
-
-    void sendRespond( bool success, const QStringList & errors );
 
 private slots:
     void on_contactsButton_clicked();
     void on_sendButton_clicked();
-
     void on_sendEdit_textEdited(const QString &arg1);
     void on_settingsBtn_clicked();
-
     void on_sendEdit_textChanged(const QString &arg1);
 
-    void saveFluffSetting(bool fluffSetting);
-
+    void onSgnShowSendResult( bool success, QString message );
 private:
     Ui::SendOnline *ui;
-    state::Send * state = nullptr;
-    state::Contacts * contactsState = nullptr;
+    bridge::Util * util = nullptr;
+    bridge::Config * config = nullptr;
+    bridge::Send * send = nullptr;
 
-    wallet::AccountInfo selectedAccount;
+    QString account;
     int64_t amount;
 };
 

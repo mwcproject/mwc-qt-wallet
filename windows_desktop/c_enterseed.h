@@ -15,14 +15,16 @@
 #ifndef ENTERSEED_H
 #define ENTERSEED_H
 
-#include "../core/PanelBaseWnd.h"
+#include "../core_desktop/PanelBaseWnd.h"
 
 namespace Ui {
 class EnterSeed;
+class Util;
 }
 
-namespace state {
-    class InitAccount;
+namespace bridge {
+class InitAccount;
+class Util;
 }
 
 namespace wnd {
@@ -32,23 +34,18 @@ class EnterSeed : public core::PanelBaseWnd
     Q_OBJECT
 
 public:
-    explicit EnterSeed(QWidget *parent, state::InitAccount * state );
+    explicit EnterSeed(QWidget *parent);
     virtual ~EnterSeed() override;
-
-    void updateProgress(bool show);
 
 private slots:
     void on_Enter();
-
     void on_cancelButton_clicked();
-
     void on_continueButton_clicked();
-
     void on_addWordButton_clicked();
-
 private:
     Ui::EnterSeed *ui;
-    state::InitAccount * state;
+    bridge::InitAccount * accountInit = nullptr;
+    bridge::Util * util = nullptr;
 };
 
 }

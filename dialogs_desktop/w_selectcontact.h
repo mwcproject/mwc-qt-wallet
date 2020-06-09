@@ -18,14 +18,14 @@
 #include <QDialog>
 #include  "../wallet/wallet.h"
 #include  "../core/appcontext.h"
-#include  "../control/mwcdialog.h"
+#include  "../control_desktop/mwcdialog.h"
 
 namespace Ui {
 class SelectContact;
 }
 
-namespace state {
-class Contacts;
+namespace bridge {
+class Config;
 }
 
 class QTableWidgetItem;
@@ -37,28 +37,20 @@ class SelectContact : public control::MwcDialog
     Q_OBJECT
 
 public:
-    explicit SelectContact(QWidget *parent, state::Contacts * state );
+    explicit SelectContact(QWidget *parent );
     virtual ~SelectContact() override;
 
     core::ContactRecord getSelectedContact() const {return selectedContact;}
 
 private slots:
     void on_cancelButton_clicked();
-
     void on_selectButton_clicked();
-
     void on_contactsTable_itemDoubleClicked(QTableWidgetItem *item);
-
     void on_deleteButton_clicked();
-
     void on_addButton_clicked();
-
     void on_editButton_clicked();
-
     void on_contactsTable_itemSelectionChanged();
-
     void on_searchStr_textEdited(const QString & str);
-
 private:
     void initTableHeaders();
     void saveTableHeaders();
@@ -70,8 +62,9 @@ private:
 
 private:
     Ui::SelectContact *ui;
+    bridge::Config * config = nullptr;
+
     core::ContactRecord selectedContact;
-    state::Contacts * state;
     QVector<core::ContactRecord> contacts; // shown contacts
 };
 

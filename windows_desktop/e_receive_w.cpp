@@ -15,79 +15,77 @@
 #include "e_receive_w.h"
 #include "ui_e_receive.h"
 #include <QFileInfo>
-#include "../state/e_Receive.h"
 #include <QFileDialog>
-#include "../control/messagebox.h"
-#include "../state/timeoutlock.h"
-#include "../core/Config.h"
+#include "../control_desktop/messagebox.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../bridge/config_b.h"
+#include "../bridge/wallet_b.h"
+#include "../bridge/wnd/e_receive_b.h"
 
 namespace wnd {
 
-Receive::Receive(QWidget *parent, state::Receive * _state, bool mwcMqStatus, bool keybaseStatus, bool httpStatus,
-                 QString mwcMqAddress, const wallet::WalletConfig & _walletConfig ) :
-        core::NavWnd(parent, _state->getContext() ),
-        ui(new Ui::Receive),
-        state(_state),
-        walletConfig(_walletConfig)
+Receive::Receive(QWidget *parent) :
+        core::NavWnd(parent),
+        ui(new Ui::Receive)
 {
     ui->setupUi(this);
+
+    config = new bridge::Config(this);
+    wallet = new bridge::Wallet(this);
+    receive = new bridge::Receive(this);
+
+    QObject::connect( receive, &bridge::Receive::sgnTransactionActionIsFinished,
+                      this, &Receive::onSgnTransactionActionIsFinished, Qt::QueuedConnection);
+
+    QObject::connect( wallet, &bridge::Wallet::sgnWalletBalanceUpdated,
+                      this, &Receive::onSgnWalletBalanceUpdated, Qt::QueuedConnection);
 
     ui->progress->initLoader(false);
 
     updateAccountList();
 
-    if (config::isColdWallet()) {
+    if (config->isColdWallet()) {
         ui->frameQs->hide();
         ui->mwcmqAddress->hide();
     }
 
-    if (walletConfig.hasTls())
+    if ( config->hasTls())
         ui->httpLabel->setText("Https");
 
-    updateMwcMqState(mwcMqStatus);
-    updateKeybaseState(keybaseStatus);
-    updateHttpState(httpStatus);
-    updateMwcMqAddress(mwcMqAddress);
+    updateStatus();
 }
 
 Receive::~Receive() {
-    state->deletedWnd(this);
     delete ui;
 }
 
-void Receive::updateMwcMqAddress(QString address) {
-    if (!address.contains('@')) {
-        QString mqHost = walletConfig.getMwcMqHostNorm();
-        if (!mqHost.isEmpty())
-            address += "@" + mqHost;
-    }
+void Receive::updateStatus() {
+    // Recieve is a simple small page, we can update all without problems
+    QString address = wallet->getLastKnownMqsAddress();
 
-    mwcAddress = (config::getUseMwcMqS() ? "mwcmqs://" : "mwcmq://") + address;
+    mwcAddress = "mwcmqs://" + address;
     ui->mwcmqAddress->setText( mwcAddress );
-}
 
-void Receive::updateMwcMqState(bool online) {
-    ui->mwcmqStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
-    ui->mwcmqStatusLabel->setText( online ? "Online" : "Offline" );
-}
+    bool mqsOnline = wallet->getMqsListenerStatus();
+    ui->mwcmqStatusImg->setPixmap( QPixmap(mqsOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
+    ui->mwcmqStatusLabel->setText( mqsOnline ? "Online" : "Offline" );
 
-void Receive::updateKeybaseState(bool online) {
-    ui->keybaseStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
-    ui->keybaseStatusLabel->setText( online ? "Online" : "Offline" );
-}
+    bool keybaseOnline = wallet->getKeybaseListenerStatus();
+    ui->keybaseStatusImg->setPixmap( QPixmap(keybaseOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
+    ui->keybaseStatusLabel->setText( keybaseOnline ? "Online" : "Offline" );
 
-void Receive::updateHttpState(bool online) {
-    ui->httpStatusImg->setPixmap( QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
-    ui->httpStatusLabel->setText( online ? "Online" : "Offline" );
+    bool httpOnline = wallet->getHttpListeningStatus()=="true";
+    ui->httpStatusImg->setPixmap( QPixmap(httpOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
+    ui->httpStatusLabel->setText( httpOnline ? "Online" : "Offline" );
 }
 
 
-void wnd::Receive::on_recieveFileButton_clicked()
+void Receive::on_recieveFileButton_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to( "Receive" );
 
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open initial transaction file"),
-                                                    state->getFileGenerationPath(),
+                                                    config->getPathFor("fileGen"),
                                                     tr("MWC transaction (*.tx *.input);;All files (*.*)"));
 
     if (fileName.length()==0)
@@ -95,51 +93,50 @@ void wnd::Receive::on_recieveFileButton_clicked()
 
     // Update path
     QFileInfo flInfo(fileName);
-    state->updateFileGenerationPath( flInfo.path() );
+    config->updatePathFor("fileGen", flInfo.path());
 
     ui->progress->show();
 
-    state->signTransaction(fileName);
+    receive->signTransaction(fileName);
     // Expected respond from state with result
 }
 
-void Receive::onTransactionActionIsFinished( bool success, QString message ) {
-    state::TimeoutLockObject to( state );
+void Receive::onSgnTransactionActionIsFinished( bool success, QString message ) {
+    util::TimeoutLockObject to( "Receive" );
 
     ui->progress->hide();
     control::MessageBox::messageText(this, success ? "Success" : "Failure", message );
 }
 
-void Receive::stopWaiting() {
-    ui->progress->hide();
-}
-
-
 void Receive::on_accountComboBox_activated(int index)
 {
-    if (index>=0 && index < accountInfo.size() )
-        state->setReceiveAccount( accountInfo[index].accountName );
+    Q_UNUSED(index);
+    auto accountName = ui->accountComboBox->currentData(); // QVariant
+    if (accountName.isValid())
+        wallet->setReceiveAccount(accountName.toString());
 }
 
 void Receive::updateAccountList() {
-    accountInfo = state->getWalletBalance();
-    QString selectedAccount = state->getReceiveAccount();
+    // accountInfo - pairs of [name, longInfo]
+    QVector<QString> accountInfo = wallet->getWalletBalance(true, false, true);
+    QString selectedAccount = wallet->getReceiveAccount();
 
     int selectedAccIdx = 0;
 
     ui->accountComboBox->clear();
 
     int idx=0;
-    for (auto & info : accountInfo) {
-        if (info.accountName == selectedAccount)
+    for (int i=1; i<accountInfo.size(); i+=2) {
+        if (accountInfo[i-1] == selectedAccount)
             selectedAccIdx = idx;
 
-        ui->accountComboBox->addItem( info.getLongAccountName(), QVariant(idx++) );
+        ui->accountComboBox->addItem( accountInfo[i], QVariant(accountInfo[i-1]) );
+        idx++;
     }
     ui->accountComboBox->setCurrentIndex(selectedAccIdx);
 }
 
-void Receive::updateWalletBalance() {
+void Receive::onSgnWalletBalanceUpdated() {
     updateAccountList();
 }
 

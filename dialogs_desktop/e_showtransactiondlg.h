@@ -15,11 +15,17 @@
 #ifndef SHOWTRANSACTIONDLG_H
 #define SHOWTRANSACTIONDLG_H
 
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
 class ShowTransactionDlg;
+}
+
+namespace bridge {
+class Wallet;
+class Config;
+class Util;
 }
 
 namespace dlg {
@@ -31,7 +37,6 @@ class ShowTransactionDlg : public control::MwcDialog
 public:
     explicit ShowTransactionDlg(QWidget *parent,
             const QString& account,
-            const wallet::WalletConfig &config,
             const wallet::WalletTransaction transaction,
             const QVector<wallet::WalletOutput> & outputs,
             const QVector<QString> & messages,
@@ -44,28 +49,26 @@ private:
     void updateButtons(bool showNoteEditButtons);
 
 signals:
-    void saveTransactionNote(const QString& account, int64_t txIdx, const QString& note);
+    void saveTransactionNote(QString txUuid, QString note);
 
 private slots:
     void on_okButton_clicked();
-
     void on_viewKernel_clicked();
-
     void on_viewCommit_clicked();
-
     void on_commitsComboBox_currentIndexChanged(int index);
-
     void on_transactionNote_textEdited(const QString& text);
     void on_saveButton_clicked();
-
 private:
     Ui::ShowTransactionDlg *ui;
+    bridge::Wallet * wallet = nullptr;
+    bridge::Config * config = nullptr;
+    bridge::Util * util = nullptr;
 
     QVector<wallet::WalletOutput> outputs;
     QString blockExplorerUrl;
 
     QString account;
-    int64_t txIdx;
+    QString txUuid;
     QString originalTransactionNote;
     QString newTransactionNote;
 };

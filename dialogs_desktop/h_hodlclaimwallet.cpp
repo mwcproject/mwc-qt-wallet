@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dialogs/h_hodlclaimwallet.h"
+#include "h_hodlclaimwallet.h"
 #include "ui_h_hodlclaimwallet.h"
-#include "../util/crypto.h"
-#include "../control/messagebox.h"
+#include "../control_desktop/messagebox.h"
+#include "../bridge/util_b.h"
 
 namespace dlg {
 
@@ -24,6 +24,9 @@ HodlClaimWallet::HodlClaimWallet(QWidget *parent) :
     ui(new Ui::HodlClaimWallet)
 {
     ui->setupUi(this);
+
+    util = new bridge::Util(this);
+
     ui->claimForThisWalletCheck->setChecked(true);
     ui->coldWalletPublicKeyHash->setEnabled(false);
 }
@@ -53,7 +56,7 @@ void HodlClaimWallet::on_continueButton_clicked()
 {
     if (!ui->claimForThisWalletCheck->isChecked()) {
         QString hash = ui->coldWalletPublicKeyHash->text();
-        if (!crypto::isHashValid(hash)) {
+        if (!util->isHashValid(hash)) {
             control::MessageBox::messageText(this, "Incorrect Hash Value",
                    "Please input correct value for your Cold Wallet Public Key Hash");
             ui->coldWalletPublicKeyHash->setFocus();

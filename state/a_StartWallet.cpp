@@ -14,9 +14,7 @@
 
 #include "a_StartWallet.h"
 #include "../core/appcontext.h"
-#include "../core/windowmanager.h"
 #include "../state/statemachine.h"
-#include "../windows/a_waitingwnd.h"
 #include "../util/Log.h"
 
 namespace state {

@@ -12,9 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "core/mainwindow.h"
+#ifdef WALLET_DESKTOP
+#include "core_desktop/mainwindow.h"
+#include "core_desktop/windowmanager.h"
+#include "core_desktop/DesktopWndManager.h"
+#endif
+#ifdef WALLET_MOBILE
+#include "core_mobile/MobileWndManager.h"
+#endif
+
 #include <QApplication>
-#include "core/windowmanager.h"
 #include "wallet/mwc713.h"
 #include "wallet/MockWallet.h"
 #include "state/state.h"
@@ -35,10 +42,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include "util/address.h"
-#include "dialogs/helpdlg.h"
 #include <QSystemSemaphore>
 #include <QThread>
-#include <control/messagebox.h>
 #include "util/execute.h"
 #include "util/Process.h"
 #include "tests/testStringUtils.h"
@@ -59,6 +64,11 @@
 #include "util/stringutils.h"
 #include "build_version.h"
 #include "core/WalletApp.h"
+#include "core/WndManager.h"
+
+#ifdef WALLET_MOBILE
+#include <QQmlApplicationEngine>
+#endif
 
 #ifdef Q_OS_DARWIN
 namespace Cocoa
@@ -71,7 +81,7 @@ bool isRetinaDisplay();
 bool deployWalletFilesFromResources() {
     QPair<bool,QString> confPath = ioutils::getAppDataPath();
     if (!confPath.first) {
-        QMessageBox::critical(nullptr, "Error", confPath.second);
+        core::getWndManager()->messageTextDlg("Error", confPath.second);
         return false;
     }
 
@@ -82,14 +92,18 @@ bool deployWalletFilesFromResources() {
 
     if ( !QFile::exists(mwc713conf)) {
         ok = ok && QFile::copy(mwc::MWC713_DEFAULT_CONFIG, mwc713conf);
+#ifndef WALLET_MOBILE
         if (ok)
             QFile::setPermissions(mwc713conf, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup);
+#endif
     }
 
     if ( !QFile::exists(mwcGuiWalletConf)) {
-        ok = ok && QFile::copy(":/resource/mwc-gui-wallet.conf", mwcGuiWalletConf);
+        ok = ok && QFile::copy(":/resource_desktop/mwc-gui-wallet.conf", mwcGuiWalletConf);
+#ifndef WALLET_MOBILE
         if (ok)
             QFile::setPermissions(mwcGuiWalletConf, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup);
+#endif
     }
 
     // Set default values
@@ -134,34 +148,6 @@ QPair<bool, QString> readConfig(QApplication & app) {
         return QPair<bool, QString>(false, "Unable to parse config file " + config);
     }
 
-/*  Dialog functionality works, but for UX we move it into the pages
-    if (isFirstRun) {
-        dlg::SelectModeDlg selectModeDlg(nullptr);
-        if(selectModeDlg.exec() == QDialog::Rejected)
-            return QPair<bool, QString>(false, ""); // just exit
-
-        // Accept the setting
-        bool updateOk = true;
-        switch (selectModeDlg.getRunMod()) {
-        case config::WALLET_RUN_MODE::ONLINE_WALLET:
-            updateOk = reader.updateConfig("running_mode", "\"online_wallet\"" );
-            break;
-        case config::WALLET_RUN_MODE::ONLINE_NODE:
-            updateOk = reader.updateConfig("running_mode", "\"online_node\"" );
-            break;
-        case config::WALLET_RUN_MODE::COLD_WALLET:
-            updateOk = reader.updateConfig("running_mode", "\"cold_wallet\"" );
-            break;
-        default:
-            Q_ASSERT(false);
-        }
-
-        if (!updateOk) {
-            control::MessageBox::message(nullptr, "Error", "Wallet unable to switch to the selected mode" );
-            return QPair<bool, QString>(false, ""); // just exit
-        }
-    }*/
-
     QString mwc_path = reader.getString("mwc_path");
     QString wallet713_path = reader.getString("wallet713_path");
     QString mwczip_path = reader.getString("mwczip_path");
@@ -173,7 +159,6 @@ QPair<bool, QString> readConfig(QApplication & app) {
 
     QString logoutTimeoutStr = reader.getString("logoutTimeout");
     QString timeoutMultiplier = reader.getString("timeoutMultiplier");
-    bool useMwcMqS = reader.getString("useMwcMqS") != "false";  // Default expected to be 'true'
     QString sendTimeoutMsStr = reader.getString("send_online_timeout_ms");
 
     QString runningMode = reader.getString("running_mode");
@@ -237,7 +222,8 @@ QPair<bool, QString> readConfig(QApplication & app) {
     }
 
     Q_ASSERT(runMode.first);
-    config::setConfigData( runMode.second, mwc_path, wallet713_path, mwczip_path, airdropUrlMainNet, airdropUrlTestNet, hodlUrlMainnet, hodlUrlTestnet, logoutTimeout*1000L, timeoutMultiplierVal, useMwcMqS, sendTimeoutMs );
+    config::setConfigData( runMode.second, mwc_path, wallet713_path, mwczip_path, airdropUrlMainNet, airdropUrlTestNet, hodlUrlMainnet, hodlUrlTestnet, logoutTimeout*1000L, timeoutMultiplierVal, sendTimeoutMs );
+
     return QPair<bool, QString>(true, "");
 }
 
@@ -246,6 +232,15 @@ int main(int argc, char *argv[])
     int retVal = 0;
 
     double uiScale = 1.0;
+
+#ifdef WALLET_DESKTOP
+    core::DesktopWndManager * wndManager = new core::DesktopWndManager();
+#endif
+#ifdef WALLET_MOBILE
+    core::MobileWndManager * wndManager = new core::MobileWndManager();
+#endif
+
+    core::setWndManager(wndManager);
 
     while (true)
     {
@@ -285,15 +280,17 @@ int main(int argc, char *argv[])
             qputenv( "QT_SCALE_FACTOR", QString::number(scale).toLatin1() );
 
     #else
-        double scale = 1.0; // Mac OS, not applicable, mean 1.0
-        // But scale factor still needed to fix the non retina cases on mac OS
+        #ifdef WALLET_DESKTOP
+            double scale = 1.0; // Mac OS, not applicable, mean 1.0
+            // But scale factor still needed to fix the non retina cases on mac OS
 
-        if (! Cocoa::isRetinaDisplay()) {
-            qputenv("QT_SCALE_FACTOR", "1.001");
-        }
+            if (! Cocoa::isRetinaDisplay()) {
+                qputenv("QT_SCALE_FACTOR", "1.001");
+            }
+        #endif
     #endif
 
-#ifdef QT_DEBUG
+#if defined(QT_DEBUG) && defined(WALLET_DESKTOP)
     // Generation of the dictionaries.
     // Don't uncomment it!
     // misk::provisionDictionary();
@@ -309,6 +306,7 @@ int main(int argc, char *argv[])
 #endif
 
 
+#ifdef WALLET_DESKTOP
         // Update scale if screen resolution is low...
         // Unfortunatelly we can't do that before QApplication inited because Scree res API doesn't work
         // That is why update now is pretty costly, we will need to testart the all because of that.
@@ -342,8 +340,14 @@ int main(int argc, char *argv[])
                 break;
             }
         }
+#endif
 
         core::WalletApp app(argc, argv);
+#ifdef WALLET_MOBILE
+        // Mobile can only imit engine after app instance is created.
+        QQmlApplicationEngine engine;
+        wndManager->init(&engine);
+#endif
 
         if (!deployWalletFilesFromResources() ) {
             QMessageBox::critical(nullptr, "Error", "Unable to provision or verify resource files during the first run");
@@ -363,7 +367,7 @@ int main(int argc, char *argv[])
         qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
 
         { // Apply style sheet
-            QFile file(":/resource/mwcwallet_style.css" );
+            QFile file(":/resource_desktop/mwcwallet_style.css" );
             if (file.open(QFile::ReadOnly | QFile::Text)) {
                    QTextStream ts(&file);
                    app.setStyleSheet(ts.readAll());
@@ -374,11 +378,13 @@ int main(int argc, char *argv[])
             }
         }
 
+        app.reportAppAsInitialized();
+
         {
             // Checking if home path is ascii (Latin1) symbols only
             QPair<bool,QString> homePath = ioutils::getAppDataPath();
             if (!homePath.first) {
-                control::MessageBox::messageText(nullptr, "Error", homePath.second);
+                core::getWndManager()->messageTextDlg("Error", homePath.second);
                 return 1;
             }
 
@@ -389,7 +395,7 @@ int main(int argc, char *argv[])
             homePath.second = homePath.second.left(idx-1);
 
             if ( !util::validateMwc713Str(homePath.second, false).first ) {
-                control::MessageBox::messageText(nullptr, "Setup Issue", "Your home directory\n" + homePath.second + "\ncontains Unicode symbols. Unfortunatelly mwc713 unable to handle that.\n\n"
+                core::getWndManager()->messageTextDlg("Setup Issue", "Your home directory\n" + homePath.second + "\ncontains Unicode symbols. Unfortunatelly mwc713 unable to handle that.\n\n"
                                          "Please reinstall mwc-qt-wallet under different user name with basic ASCII (Latin1) symbols only.");
                 return 1;
             }
@@ -433,7 +439,7 @@ int main(int argc, char *argv[])
             QString arh = network_arch.second;
 
             if (arh != runningArc) {
-                if ( control::MessageBox::RETURN_CODE::BTN1 == control::MessageBox::questionText(nullptr, "Wallet data architecture mismatch",
+                if ( core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg("Wallet data architecture mismatch",
                                              "Your mwc713 seed at '"+ walletDataPath +"' was created with "+arh+" bits version of the wallet. "
                                              "Please exit and use original version of the wallet, or specify another folder for the seed",
                                              "Exit", "Select Folder", false, true) ) {
@@ -443,7 +449,7 @@ int main(int argc, char *argv[])
 
                 QPair<bool,QString> basePath = ioutils::getAppDataPath();
                 if (!basePath.first) {
-                    control::MessageBox::messageText(nullptr, "Error", basePath.second);
+                    core::getWndManager()->messageTextDlg("Error", basePath.second);
                     return 1;
                 }
 
@@ -503,8 +509,8 @@ int main(int argc, char *argv[])
         if (!util::acquireAppGlobalLock() )
         {
             // Seems like we are blocked on global semaphore. It is mean that second instance does exist
-            control::MessageBox::messageText(nullptr, "Second mwc-qt-wallet instance is detected",
-                                         "There is another instance of mwc-qt-wallet is already running. It is impossible to run more than one instance of the wallet at the same time.");
+            core::getWndManager()->messageTextDlg("Second mwc-qt-wallet instance is detected",
+                    "There is another instance of mwc-qt-wallet is already running. It is impossible to run more than one instance of the wallet at the same time.");
             return 1;
         }
 
@@ -513,34 +519,38 @@ int main(int argc, char *argv[])
 
         wallet::MWC713::saveWalletConfig( walletConfig, &appContext, mwcNode );
 
+        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
+        //wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
+
+        state::StateContext context( &appContext, wallet, mwcNode );
+
+        core::HodlStatus hodlStatus(&context);
+        context.setHodlStatus(&hodlStatus);
+        wallet->setHodlStatus(&hodlStatus);
+
+//        core::WalletNotes walletNotes(&context);
+//        appContext.setWalletNotes(&walletNotes);
+
+        state::setStateContext(&context);
+
+        state::StateMachine::initStateMachine();
+
+#ifdef WALLET_DESKTOP
         //main window has delete on close flag. That is why need to
         // create dynamically. Window will be deleted on close
         core::MainWindow * mainWnd = new core::MainWindow(nullptr);
 
         mwc::setApplication(&app, mainWnd);
 
-        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
-        //wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
-
-        core::WindowManager * wndManager = new core::WindowManager( mainWnd, mainWnd->getMainWindow(), walletDataPath );
+        core::WindowManager * windowManager = new core::WindowManager( mainWnd, mainWnd->getMainWindow() );
 
         mainWnd->show();
 
-        state::StateContext context( &appContext, wallet, mwcNode, wndManager, mainWnd );
-
-        core::HodlStatus hodlStatus(&context);
-        context.setHodlStatus(&hodlStatus);
-        wallet->setHodlStatus(&hodlStatus);
-
-        core::WalletNotes walletNotes(&context);
-        appContext.setWalletNotes(&walletNotes);
-
-        state::StateMachine * machine = new state::StateMachine(&context);
-        mainWnd->setAppEnvironment( machine, wallet, &appContext);
-        app.setStateMachine(machine);
+        wndManager->init(windowManager, mainWnd);
+#endif
 
         if (mwc::isAppNonClosed()) {
-            machine->start();
+            state::getStateMachine()->start();
 
             retVal = app.exec();
         }
@@ -548,9 +558,11 @@ int main(int argc, char *argv[])
         // Now we have to stop other object nicely.
         // Note, the order is different from creation.
         // mainWnd expected to be dead here.
-        delete machine; machine=nullptr;
+        state::StateMachine::destroyStateMachine();
         delete wallet;  wallet = nullptr;
-        delete wndManager; wndManager=nullptr;
+#ifdef WALLET_DESKTOP
+        delete windowManager; windowManager=nullptr;
+#endif
 
         if (mwcNode->isRunning()) {
             mwcNode->stop();
@@ -565,6 +577,10 @@ int main(int argc, char *argv[])
 
     // All objets are expected to be released at this point
     util::restartMwcQtWalletIfRequested(uiScale);
+
+#ifdef WALLET_DESKTOP
+    delete wndManager;
+#endif
 
     return retVal;
   }

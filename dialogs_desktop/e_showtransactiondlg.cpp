@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dialogs/e_showtransactiondlg.h"
+#include "e_showtransactiondlg.h"
 #include "ui_e_showtransactiondlg.h"
-#include "../wallet/wallet.h"
-#include "../util/stringutils.h"
-#include "../util/execute.h"
-#include "../core/global.h"
+#include "../bridge/wallet_b.h"
+#include "../bridge/util_b.h"
+#include "../bridge/config_b.h"
 
 namespace dlg {
 
 ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,
                                        const QString& account,
-                                       const wallet::WalletConfig &config,
                                        const wallet::WalletTransaction transaction,
                                        const QVector<wallet::WalletOutput> & _outputs,
                                        const QVector<QString> & messages,
@@ -33,9 +31,11 @@ ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,
     outputs(_outputs)
 {
     ui->setupUi(this);
+    wallet = new bridge::Wallet(this);
+    config = new bridge::Config(this);
+    util = new bridge::Util(this);
 
-    blockExplorerUrl = (config.getNetwork() == "Mainnet") ? mwc::BLOCK_EXPLORER_URL_MAINNET
-                                                          : mwc::BLOCK_EXPLORER_URL_FLOONET;
+    blockExplorerUrl = config->getBlockExplorerUrl(config->getNetwork());
 
     ui->titleLabel->setText("Transaction #" + QString::number(transaction.txIdx+1) ); // Need to show 1 base indexes, instead of 0 based.
     ui->type->setText( transaction.getTypeAsStr() );
@@ -71,7 +71,7 @@ ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,
         updateOutputData();
     }
 
-    txIdx = transaction.txIdx;
+    txUuid = transaction.txid;
     this->account = account;
     originalTransactionNote = note;
     newTransactionNote = note;
@@ -113,7 +113,7 @@ void ShowTransactionDlg::updateButtons(bool showNoteEditButtons) {
 
 void ShowTransactionDlg::on_viewKernel_clicked()
 {
-    util::openUrlInBrowser("https://" + blockExplorerUrl + "/#k" + ui->kernel->text() );
+    util->openUrlInBrowser("https://" + blockExplorerUrl + "/#k" + ui->kernel->text() );
 }
 
 void ShowTransactionDlg::on_viewCommit_clicked()
@@ -122,7 +122,7 @@ void ShowTransactionDlg::on_viewCommit_clicked()
     if (!dt.isValid())
         return;
 
-    util::openUrlInBrowser("https://" + blockExplorerUrl + "/#o" + outputs[ dt.toInt() ].outputCommitment );
+    util->openUrlInBrowser("https://" + blockExplorerUrl + "/#o" + outputs[ dt.toInt() ].outputCommitment );
 }
 
 void ShowTransactionDlg::on_commitsComboBox_currentIndexChanged(int index)
@@ -134,7 +134,7 @@ void ShowTransactionDlg::on_commitsComboBox_currentIndexChanged(int index)
 void ShowTransactionDlg::on_okButton_clicked()
 {
     if (newTransactionNote != originalTransactionNote) {
-        emit saveTransactionNote(account, txIdx, newTransactionNote);
+        emit saveTransactionNote( txUuid, newTransactionNote);
     }
     accept();
 }

@@ -121,7 +121,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resources.qrc">:/img/StatusOk@2x.svg</pixmap>
+         <pixmap resource="../resources_desktop.qrc">:/img/StatusOk@2x.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -237,7 +237,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resources.qrc">:/img/StatusOk@2x.svg</pixmap>
+         <pixmap resource="../resources_desktop.qrc">:/img/StatusOk@2x.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -420,7 +420,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resources.qrc">:/img/StatusOk@2x.svg</pixmap>
+         <pixmap resource="../resources_desktop.qrc">:/img/StatusOk@2x.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -531,37 +531,37 @@
   <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
-   <header>control/MwcPushButton.h</header>
+   <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
-   <header>control/MwcLineEdit.h</header>
+   <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelTiny</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLine</class>
    <extends>QFrame</extends>
-   <header>control/MwcFrameWithBorder.h</header>
+   <header>control_desktop/MwcFrameWithBorder.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources.qrc"/>
+  <include location="../resources_desktop.qrc"/>
  </resources>
  <connections/>
 </ui>

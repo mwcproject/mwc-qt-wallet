@@ -23,11 +23,6 @@
 class QNetworkAccessManager;
 class QNetworkReply;
 
-namespace wnd {
-    class Airdrop;
-    class AirdropForBTC;
-}
-
 namespace state {
 
 struct AirdropRequests {
@@ -57,9 +52,6 @@ public:
     Airdrop( StateContext * context);
     virtual ~Airdrop() override;
 
-    void deleteAirdropForBtcWnd(wnd::AirdropForBTC * w) { if (w==airdropForBtcWnd) airdropForBtcWnd = nullptr;}
-    void deleteAirdropWnd(wnd::Airdrop * w) { if (w==airdropWnd) airdropWnd = nullptr;}
-
     const AirDropStatus & getAirDropStatus() const {return airDropStatus;}
 
     bool hasAirdropRequests() const {return airdropRequests.size()>0;}
@@ -68,9 +60,6 @@ public:
     void requestClaimMWC( const QString & btcAddress, const QString & challendge, const QString & signature, const QString & identifier );
     // Get current status for that
     void refreshAirdropStatusInfo();
-
-    QVector<int> getColumnsWidhts();
-    void updateColumnsWidhts(QVector<int> widths);
 
     void backToMainAirDropPage();
 protected:
@@ -105,9 +94,6 @@ private:
     QNetworkAccessManager *nwManager;
 
     AirDropStatus airDropStatus;
-
-    wnd::Airdrop * airdropWnd = nullptr;
-    wnd::AirdropForBTC * airdropForBtcWnd = nullptr;
 
     QString airDropUrl; // Url for airdrop requests. Url depend on current network.
 

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dialogs/h_hodlgetsignature.h"
+#include "h_hodlgetsignature.h"
 #include "ui_h_hodlgetsignature.h"
-#include "../util/crypto.h"
+#include "../bridge/util_b.h"
 
 namespace dlg {
 
@@ -23,6 +23,7 @@ HodlGetSignature::HodlGetSignature(QWidget *parent, QString message) :
     ui(new Ui::HodlGetSignature)
 {
     ui->setupUi(this);
+    util = new bridge::Util(this);
     ui->message->setPlainText(message);
     ui->continueButton->setEnabled(false);
 }
@@ -45,8 +46,7 @@ void HodlGetSignature::on_continueButton_clicked()
 
 void HodlGetSignature::on_signature_textChanged()
 {
-    ui->continueButton->setEnabled( crypto::isSignatureValid(ui->signature->toPlainText()));
-
+    ui->continueButton->setEnabled( util->isSignatureValid(ui->signature->toPlainText()));
 }
 
 }

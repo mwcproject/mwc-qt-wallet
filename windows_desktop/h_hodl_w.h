@@ -15,15 +15,16 @@
 #ifndef HODLW_H
 #define HODLW_H
 
-#include "../core/navwnd.h"
-#include "../wallet/wallet.h"
+#include "../core_desktop/navwnd.h"
 
 namespace Ui {
 class Hodl;
 }
 
-namespace state {
-    class Hodl;
+namespace bridge {
+class Util;
+class Hodl;
+class HodlStatus;
 }
 
 namespace wnd {
@@ -33,26 +34,25 @@ class Hodl : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit Hodl(QWidget *parent, state::Hodl * state );
+    explicit Hodl(QWidget *parent);
     ~Hodl();
 
-    // Hodl object changed it's state, need to refresh
-    void updateHodlState();
-
-    void reportMessage(const QString & title, const QString & message);
-
-    void hideWaitingStatus();
 private slots:
     void on_learnMoreButton_clicked();
     void on_signInButton_clicked();
     void on_claimMwcButton_clicked();
 
+    void onSgnUpdateHodlState();
+    void onSgnReportMessage(QString  title, QString message);
+    void onSgnHideWaitingStatus();
 protected:
     void mouseDoubleClickEvent( QMouseEvent * e ) override;
 
 private:
     Ui::Hodl *ui;
-    state::Hodl * state;
+    bridge::Util * util = nullptr;
+    bridge::Hodl * hodl = nullptr;
+    bridge::HodlStatus * hodlStatus = nullptr;
 };
 
 }

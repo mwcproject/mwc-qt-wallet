@@ -15,16 +15,15 @@
 #ifndef CONTACTSW_H
 #define CONTACTSW_H
 
-#include "../core/navwnd.h"
-#include "../wallet/wallet.h"
+#include "../core_desktop/navwnd.h"
 #include "../core/appcontext.h"
 
 namespace Ui {
 class Contacts;
 }
 
-namespace state {
-    class Contacts;
+namespace bridge {
+class Config;
 }
 
 namespace wnd {
@@ -34,18 +33,15 @@ class Contacts : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit Contacts(QWidget *parent, state::Contacts * state);
+    explicit Contacts(QWidget *parent);
     ~Contacts();
 
 private slots:
     void on_addButton_clicked();
     void on_editButton_clicked();
     void on_deleteButton_clicked();
-
     void on_contactsTable_cellDoubleClicked(int row, int column);
-
     void on_contactsTable_itemSelectionChanged();
-
 private:
     void updateButtons();
     void initTableHeaders();
@@ -57,8 +53,8 @@ private:
     int  getSelectedContactIndex() const;
 private:
     Ui::Contacts *ui;
-    state::Contacts * state;
-    QVector<core::ContactRecord> contacts;
+    bridge::Config * config = nullptr;
+    QVector<core::ContactRecord> contacts; // Pair of values: [name, address]
 };
 
 }

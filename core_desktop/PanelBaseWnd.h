@@ -17,10 +17,6 @@
 
 #include <QWidget>
 
-namespace state {
-class StateMachine;
-}
-
 #ifdef Q_OS_DARWIN
 namespace Cocoa
 {

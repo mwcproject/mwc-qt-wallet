@@ -17,10 +17,6 @@
 
 #include "QApplication"
 
-namespace state {
-class StateMachine;
-}
-
 namespace core {
 
 class WalletApp : public QApplication {
@@ -28,13 +24,16 @@ Q_OBJECT
 public:
     WalletApp(int &argc, char **argv);
 
-    void setStateMachine(state::StateMachine * _stateMachine) {stateMachine = _stateMachine;}
+    // app is done with init process, basic objects should be good to go
+    void reportAppAsInitialized();
 
+    // true of app object is created, so qt engine is initialized
+    static bool isAppCreated();
+
+    // true if initialized
+    static bool isAppInitialized();
 protected:
     virtual bool notify(QObject *receiver, QEvent *event) override;
-
-private:
-    state::StateMachine * stateMachine = nullptr;
 };
 
 }

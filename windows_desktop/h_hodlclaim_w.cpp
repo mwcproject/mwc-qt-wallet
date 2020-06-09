@@ -14,73 +14,84 @@
 
 #include "h_hodlclaim_w.h"
 #include "ui_h_hodlclaim_w.h"
-#include "../state/h_hodl.h"
-#include "../control/messagebox.h"
-#include "../state/timeoutlock.h"
-#include "../core/HodlStatus.h"
+#include "../control_desktop/messagebox.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../bridge/hodlstatus_b.h"
+#include "../bridge/config_b.h"
+#include "../bridge/wnd/h_hodl_b.h"
 
 namespace wnd {
 
-HodlClaim::HodlClaim(QWidget *parent, state::Hodl * _state, const QString & _coldWalletHash) :
-        core::NavWnd( parent, _state->getContext() ),
+HodlClaim::HodlClaim(QWidget *parent,const QString & _coldWalletHash) :
+        core::NavWnd( parent),
         ui(new Ui::HodlClaim),
-        state(_state),
         coldWalletHash(_coldWalletHash)
 {
     ui->setupUi(this);
 
+    hodl = new bridge::Hodl(this);
+    hodlStatus = new bridge::HodlStatus(this);
+    config = new bridge::Config(this);
+
+    QObject::connect( hodl, &bridge::Hodl::sgnUpdateHodlState,
+                      this, &HodlClaim::onSgnUpdateHodlState, Qt::QueuedConnection);
+    QObject::connect( hodl, &bridge::Hodl::sgnReportMessage,
+                      this, &HodlClaim::onSgnReportMessage, Qt::QueuedConnection);
+
+
     ui->progress->initLoader(false);
 
     initTableHeaders();
-    updateHodlState();
+    onSgnUpdateHodlState();
 
     if (!coldWalletHash.isEmpty())
-        state->requestHodlInfoRefresh(coldWalletHash);
+        hodl->requestHodlInfoRefresh(coldWalletHash);
 }
 
 HodlClaim::~HodlClaim() {
-    state->deleteHodlClaimWnd(this);
     saveTableHeaders();
     delete ui;
 }
 
 
-void HodlClaim::reportMessage(const QString & title, const QString & message) {
-    state::TimeoutLockObject to( state );
+void HodlClaim::onSgnReportMessage(QString title, QString message) {
+    util::TimeoutLockObject to( "HodlClaim" );
     ui->progress->hide();
 
     control::MessageBox::messageText(this, title, message);
 }
 
 // Hodl object changed it's state, need to refresh
-void HodlClaim::updateHodlState() {
-    QPair< QString, int64_t> status = state->getContext()->hodlStatus->getWalletHodlStatus(coldWalletHash);
+void HodlClaim::onSgnUpdateHodlState() {
+    QVector<QString> status = hodlStatus->getWalletHodlStatus(coldWalletHash);
 
-    ui->accountStatus->setText( status.first );
+    ui->accountStatus->setText( status[0] );
 
     QString waitingText = "";
-    if (status.second>0) {
-        waitingText = "Your " + util::nano2one(status.second) + " MWC will be available after finalization. "
+    if (status[1] != "0") {
+        waitingText = "Your " + status[1] + " MWC will be available after finalization. "
                                  "The finalization process may take a while because finalization is done from an offline wallet and done in batches. "
                                  "For details on the finalization schedule go to http://www.mwc.mw/hodl";
     }
     ui->finalizeWaitingText->setText(waitingText);
 
-    QVector<core::HodlClaimStatus> claimStatus = state->getContext()->hodlStatus->getClaimsRequestStatus(coldWalletHash);
+    // Lines for Requested status
+    // Return groups of 4 [ <true/false is has claim>, <mwc>, <claimId>, <status string> ]
+    QVector<QString> claimStatus = hodlStatus->getClaimsRequestStatus(coldWalletHash);
 
     ui->claimsTable->clearData();
 
     bool hasClaims = false;
 
     int idx = 0;
-    for (const auto & st : claimStatus) {
-        if (st.status<3)
+    for ( int i=3; i<claimStatus.size(); i+=4 ) {
+        if (claimStatus[i-3]=="true")
             hasClaims = true;
         ui->claimsTable->appendRow(
                 QVector<QString>{QString::number(++idx),
-                                 util::nano2one(st.amount),
-                                 QString::number(st.claimId),
-                                 st.getStatusAsString()});
+                                 claimStatus[i-2],
+                                 claimStatus[i-1],
+                                 claimStatus[i]});
     }
 
     ui->claimMwcButton->setEnabled(hasClaims);
@@ -89,19 +100,18 @@ void HodlClaim::updateHodlState() {
 void HodlClaim::on_claimMwcButton_clicked()
 {
     ui->progress->show();
-    state->claimMWC(coldWalletHash);
+    hodl->claimMWC(coldWalletHash);
 }
 
-void HodlClaim::on_refreshButton_clicked()
-{
-    state->requestHodlInfoRefresh(coldWalletHash);
+void HodlClaim::on_refreshButton_clicked() {
+    hodl->requestHodlInfoRefresh(coldWalletHash);
 }
 
 void HodlClaim::initTableHeaders() {
 
     // Disabling to show the grid
     // Creatign columns
-    QVector<int> widths = state->getColumnsWidhts();
+    QVector<int> widths = config->getColumnsWidhts("HodlTblWidth");
     if ( widths.size() != 4 ) {
         widths = QVector<int>{30,150,150,300};
     }
@@ -110,7 +120,7 @@ void HodlClaim::initTableHeaders() {
 }
 
 void HodlClaim::saveTableHeaders() {
-    state->updateColumnsWidhts( ui->claimsTable->getColumnWidths() );
+    config->updateColumnsWidhts("HodlTblWidth", ui->claimsTable->getColumnWidths());
 }
 
 

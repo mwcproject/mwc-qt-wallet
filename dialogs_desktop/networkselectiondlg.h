@@ -15,7 +15,7 @@
 #ifndef NETWORKSELECTIONDLG_H
 #define NETWORKSELECTIONDLG_H
 
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
 #include "../state/a_initaccount.h"
 
 namespace Ui {

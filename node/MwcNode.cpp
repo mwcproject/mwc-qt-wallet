@@ -20,8 +20,8 @@
 #include "../core/appcontext.h"
 #include "../core/global.h"
 #include "../core/Config.h"
-#include "../control/messagebox.h"
 #include "../core/Notification.h"
+#include "../core/WndManager.h"
 #include "../core/Config.h"
 #include "../util/Log.h"
 #include <QNetworkAccessManager>
@@ -59,7 +59,7 @@ MwcNode::~MwcNode() {
 QString MwcNode::getLogsLocation() const {
     QPair<bool,QString> nodePath = getMwcNodePath(lastDataPath, lastUsedNetwork);
     if (!nodePath.first) {
-        control::MessageBox::messageText(nullptr, "Error", nodePath.second);
+        core::getWndManager()->messageTextDlg("Error", nodePath.second);
         QCoreApplication::exit();
         return "";
     }
@@ -127,8 +127,8 @@ void MwcNode::stop() {
 
             while( nodeProcess->state() == QProcess::Running ) {
                 if (QDateTime::currentMSecsSinceEpoch() > limitTime) {
-                    if (control::MessageBox::questionText(nullptr, "Warning", "Stopping mwc-node process takes longer than expected.\nContinue to wait?",
-                                                      "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
+                    if ( core::getWndManager()->questionTextDlg(nullptr, "Warning", "Stopping mwc-node process takes longer than expected.\nContinue to wait?",
+                               "Yes", "No", true, false) == core::WndManager::RETURN_CODE::BTN1) {
                         config::increaseTimeoutMultiplier();
                         limitTime = QDateTime::currentMSecsSinceEpoch() + int64_t(1000*20*config::getTimeoutMultiplier());
                     }
@@ -170,7 +170,7 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
 
     QPair<bool,QString> nodePath = getMwcNodePath(dataPath, network);
     if (!nodePath.first) {
-        control::MessageBox::messageText(nullptr, "Error", nodePath.second);
+        core::getWndManager()->messageTextDlg("Error", nodePath.second);
         QCoreApplication::exit();
         return nullptr;
     }
@@ -232,9 +232,9 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
                 reportNodeFatalError( QString("mwc-node crashed during start\n\nCommand line:\n\n") + ">> cd '" + nodeWorkDir+"'\n>> " + commandLine );
                 return nullptr;
             case QProcess::Timedout:
-                if (control::MessageBox::questionText(nullptr, "Warning", "Starting for mwc-node process is taking longer than expected.\nContinue to wait?"
-                                                                      "\n\nCommand line:\n\n" + QString(">> cd '") + nodeWorkDir+"'\n>> " + commandLine,
-                                                  "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
+                if (core::getWndManager()->questionTextDlg(nullptr, "Warning", "Starting for mwc-node process is taking longer than expected.\nContinue to wait?"
+                                "\n\nCommand line:\n\n" + QString(">> cd '") + nodeWorkDir+"'\n>> " + commandLine,
+                                "Yes", "No", true, false) == core::WndManager::RETURN_CODE::BTN1) {
                     config::increaseTimeoutMultiplier();
                     continue; // retry with waiting
                 }
@@ -890,11 +890,11 @@ void MwcNode::replyFinished(QNetworkReply* reply) {
 void MwcNode::reportNodeFatalError( QString message ) {
 
     if ( config::isOnlineNode() ) {
-        control::MessageBox::messageText(nullptr, "Embedded MWC-Node Error", message);
+        core::getWndManager()->messageTextDlg("Embedded MWC-Node Error", message);
     }
     else
     {
-        if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(nullptr, "Embedded MWC-Node Error",
+        if ( core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg("Embedded MWC-Node Error",
                 message + "\n\nIf Embedded mwc-node doesn't work for you, please switch to MWC Cloud node before exit", "Keep Embedded", "Switch to Cloud", false, true ) ) {
 
             // Switching to the cloud node

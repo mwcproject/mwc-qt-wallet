@@ -21,20 +21,21 @@ namespace Ui {
 class NavBar;
 }
 
-namespace state {
-struct StateContext;
+namespace bridge {
+    class Config;
+    class StateMachine;
+    class Events;
 }
 
 namespace core {
 
-class AppContext;
 class NavMenu;
 
 class NavBar : public QWidget {
 Q_OBJECT
 
 public:
-    explicit NavBar( QWidget *parent, state::StateContext * context );
+    explicit NavBar( QWidget *parent );
 
     ~NavBar();
 
@@ -56,8 +57,10 @@ private:
 private:
     Ui::NavBar *ui;
     QWidget *prntWnd; // will be used for popup
-    state::StateContext * context = nullptr;
     QPoint navMenuPos; // Position of navigate menu
+    bridge::Config * config = nullptr;
+    bridge::StateMachine * stateMachine = nullptr;
+    bridge::Events * events = nullptr;
 };
 
 }

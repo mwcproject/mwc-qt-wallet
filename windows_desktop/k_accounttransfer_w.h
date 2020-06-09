@@ -15,19 +15,20 @@
 #ifndef K_ACCOUNTTRANSFER_W_H
 #define K_ACCOUNTTRANSFER_W_H
 
-#include "../core/navwnd.h"
-#include "../wallet/wallet.h"
+#include "../core_desktop/navwnd.h"
 
 namespace Ui {
 class AccountTransfer;
 }
 
-namespace state {
-class AccountTransfer;
-}
-
 namespace control {
 class MwcComboBox;
+}
+
+namespace bridge {
+class Wallet;
+class Config;
+class AccountTransfer;
 }
 
 namespace wnd {
@@ -37,16 +38,12 @@ class AccountTransfer : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit AccountTransfer(QWidget *parent, state::AccountTransfer * state);
+    explicit AccountTransfer(QWidget *parent);
     ~AccountTransfer();
 
-    void showTransferResults(bool ok, QString errMsg);
-    void updateAccounts();
-
-    void hideProgress();
 protected:
-    // return -1 if not seleted or not valid
-    int getAccountSelectionComboBoxCurrentIndex( control::MwcComboBox * combo, bool showInputErrMessage );
+    // return empty String if account not selected
+    QString getSelectedAccount( control::MwcComboBox * combo, bool showInputErrMessage );
 
 private slots:
     void on_allAmountButton_clicked();
@@ -54,10 +51,14 @@ private slots:
     void on_transferButton_clicked();
     void on_backButton_clicked();
 
+    void onSgnShowTransferResults(bool ok, QString errMsg);
+    void onSgnUpdateAccounts();
+    void onSgnHideProgress();
 private:
     Ui::AccountTransfer *ui;
-    state::AccountTransfer * state;
-    QVector<wallet::AccountInfo> accountInfo;
+    bridge::Wallet * wallet = nullptr;
+    bridge::Config * config = nullptr;
+    bridge::AccountTransfer * accountTransfer = nullptr;
 };
 
 }

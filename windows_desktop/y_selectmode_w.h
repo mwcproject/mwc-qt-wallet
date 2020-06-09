@@ -15,16 +15,13 @@
 #ifndef Y_SELECTMODE_W_H
 #define Y_SELECTMODE_W_H
 
-#include "../core/navwnd.h"
-#include "../wallet/wallet.h"
-#include "../core/appcontext.h"
-#include "../core/Config.h"
+#include "../core_desktop/navwnd.h"
 
 namespace Ui {
 class SelectMode;
 }
 
-namespace state {
+namespace bridge {
 class SelectMode;
 }
 
@@ -34,7 +31,7 @@ class SelectMode : public core::NavWnd {
 Q_OBJECT
 
 public:
-    explicit SelectMode(QWidget *parent, state::SelectMode *state);
+    explicit SelectMode(QWidget *parent);
 
     ~SelectMode();
 
@@ -46,12 +43,13 @@ private slots:
     void on_radioColdWallet_clicked();
 
 private:
-    config::WALLET_RUN_MODE getRunMode() const;
+    int getRunMode() const; // return config::WALLET_RUN_MODE
     void updateButtons();
 private:
     Ui::SelectMode *ui;
-    state::SelectMode * state;
-    config::WALLET_RUN_MODE runMode = config::WALLET_RUN_MODE::ONLINE_WALLET;
+    bridge::SelectMode * selectMode = nullptr;
+
+    int runMode = -1; // values from: config::WALLET_RUN_MODE
 };
 
 }

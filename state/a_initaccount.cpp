@@ -14,17 +14,9 @@
 
 #include "a_initaccount.h"
 #include "../wallet/wallet.h"
-#include "../windows/a_initaccount_w.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
-#include "../windows/c_newwallet_w.h"
-#include "../windows/c_newseed_w.h"
-#include "../windows/c_newseedtest_w.h"
-#include "../windows/c_enterseed.h"
-#include "../windows/z_progresswnd.h"
 #include "../util/Log.h"
-#include "../control/messagebox.h"
 #include "x_walletconfig.h"
 #include "../util/ioutils.h"
 #include "../util/Files.h"
@@ -32,6 +24,9 @@
 #include "../core/global.h"
 #include "../core/Notification.h"
 #include "../core/Config.h"
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/z_progresswnd_b.h"
 
 namespace state {
 
@@ -68,12 +63,10 @@ NextStateRespond InitAccount::execute() {
             return NextStateRespond( NextStateRespond::RESULT::DONE );
         }
         else {
-            context->wndManager->switchToWindowEx( mwc::PAGE_A_INIT_ACCOUNT,
-                        new wnd::InitAccount( context->wndManager->getInWndParent(), this,
-                                (state::WalletConfig *) context->stateMachine->getState(STATE::WALLET_CONFIG) ) );
+            core::getWndManager()->pageInitAccount();
 
             // Provosion of new wallet, need to block locking
-            context->stateMachine->blockLogout();
+            context->stateMachine->blockLogout("InitAccount");
 
             return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
         }
@@ -85,18 +78,17 @@ NextStateRespond InitAccount::execute() {
 
 // Executing another state
 void InitAccount::exitingState() {
-    context->stateMachine->unblockLogout();
+    context->stateMachine->unblockLogout("InitAccount");
 }
 
 // Get Password, Choose what to do
 void InitAccount::setPassword(const QString & password) {
     pass = password;
-    context->wndManager->switchToWindowEx( mwc::PAGE_A_NEW_WALLET,
-            new wnd::NewWallet( context->wndManager->getInWndParent(), this ) );
+    core::getWndManager()->pageNewWallet();
 }
 
 // How to provision the wallet
-void InitAccount::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice, MWC_NETWORK network) {
+void InitAccount::submitWalletCreateChoices(NEW_WALLET_CHOICE newWalletChoice, MWC_NETWORK network) {
     // Apply network first
     Q_ASSERT( !context->wallet->isRunning() );
     wallet::WalletConfig walletCfg = context->wallet->getWalletConfig();
@@ -114,7 +106,7 @@ void InitAccount::submitCreateChoice(NEW_WALLET_CHOICE newWalletChoice, MWC_NETW
             context->wallet->start2init(pass);
             break;
         case CREATE_WITH_SEED:
-            context->wndManager->switchToWindowEx( mwc::PAGE_A_ENTER_SEED, new wnd::EnterSeed( context->wndManager->getInWndParent(), this ) );
+            core::getWndManager()->pageEnterSeed();
             break;
         default:
             Q_ASSERT(false);
@@ -136,17 +128,12 @@ void InitAccount::onNewSeed(QVector<QString> sd) {
     tasks.resize(1);
 #endif
 
-    context->wndManager->switchToWindowEx( mwc::PAGE_A_NEW_WALLET_PASSPHRASE,
-        new wnd::NewSeed( context->wndManager->getInWndParent(), this, getContext(),
-                    seed ) );
+    core::getWndManager()->pageNewSeed( mwc::PAGE_A_NEW_WALLET_PASSPHRASE, seed );
 }
 
-void InitAccount::wndDeleted(wnd::NewSeed * )  {}
-
 // New seed was acknoleged...
-void InitAccount::submit() {
+void InitAccount::doneWithNewSeed() {
     // Start next task
-
     if (finishSeedVerification())
         return;
 
@@ -155,23 +142,22 @@ void InitAccount::submit() {
         return;
 
     // Show verify dialog
-    context->wndManager->switchToWindowEx( mwc::PAGE_A_PASSPHRASE_TEST,
-            new wnd::NewSeedTest( context->wndManager->getInWndParent(), this, tasks[0].getWordIndex() ) );
+    core::getWndManager()->pageNewSeedTest( tasks[0].getWordIndex() );
 }
 
 
 // Verify Dialog respond...
-void InitAccount::submit(QString word) {
+void InitAccount::submitSeedWord(QString word) {
     if (tasks.size()==0) {
         Q_ASSERT(false);
         return;
     }
 
-#ifdef QT_DEBUG
+/*#ifdef QT_DEBUG
     // Allways treat as correct answer...
     Q_UNUSED(word);
     tasks.remove(0);
-#else
+#else*/
     // Release, the normal way
     if (tasks[0].applyInputResults(word)) {
         // ok case
@@ -182,7 +168,7 @@ void InitAccount::submit(QString word) {
         seedTestWrongAnswers++;
         bool restart = seedTestWrongAnswers>=3;
 
-        control::MessageBox::messageText(nullptr, "Wrong word",
+        core::getWndManager()->messageTextDlg("Wrong word",
                                      "The word number " + QString::number(tasks[0].getWordIndex()) +
                                      " was typed incorrectly. " +
                                      "Please review your passphrase and we will try again starting " +
@@ -204,28 +190,27 @@ void InitAccount::submit(QString word) {
         }
 
         // switch to 'show seed' window
-        context->wndManager->switchToWindowEx( mwc::PAGE_A_NEW_WALLET_PASSPHRASE,
-            new wnd::NewSeed( context->wndManager->getInWndParent(), this, getContext(),
-                        seed ) );
+        core::getWndManager()->pageNewSeed(mwc::PAGE_A_NEW_WALLET_PASSPHRASE, seed);
         return;
     }
-#endif
-    submit();
+    //#endif
+    doneWithNewSeed();
 }
 
 bool InitAccount::finishSeedVerification() {
     if (tasks.size()==0 && seed.size()>0) {
-            // clean up the state
-            context->wallet->confirmNewSeed();
-            context->wallet->logout(true); // Stop the wallet with inti process first
+        // clean up the state
+        context->wallet->confirmNewSeed();
+        context->wallet->logout(true); // Stop the wallet with inti process first
 
-            // Now need to start the normall wallet...
-            context->wallet->start();
-            context->wallet->loginWithPassword(pass);
+        // Now need to start the normall wallet...
+        context->wallet->start();
+        context->wallet->loginWithPassword(pass);
 
-            control::MessageBox::messageText(nullptr, "Congratulations!", "Thank you for confirming all words from your passphrase. Your wallet was successfully created");
-            // onLoginResult - will be the next step
-            return true;
+        core::getWndManager()->messageTextDlg("Congratulations!",
+                 "Thank you for confirming all words from your passphrase. Your wallet was successfully created");
+        // onLoginResult - will be the next step
+        return true;
     }
     return false;
 }
@@ -255,12 +240,12 @@ void InitAccount::createWalletWithSeed( QVector<QString> sd ) {
 
     if (!config::isColdWallet()) {
         // Check if the node is cloud one. Issue than wallet nned to recover the data and it is problem if wallet will failed..
-        wallet::WalletConfig config = context->wallet->getWalletConfig();
+        const wallet::WalletConfig & config = context->wallet->getWalletConfig();
         wallet::MwcNodeConnection nodeConnection = context->appContext->getNodeConnection(config.getNetwork());
 
         if (!nodeConnection.isCloudNode()) {
-            if ( control::MessageBox::RETURN_CODE::BTN2 !=
-                 control::MessageBox::questionText(nullptr, "Node connection",
+            if ( core::WndManager::RETURN_CODE::BTN2 !=
+                    core::getWndManager()->questionTextDlg(nullptr, "Node connection",
                              "Because restore process requires connection to the running node, we are switching your wallet to the Cloud mwc-node.\n\n"
                                                    "If you prefer different setting, please update your node connection after",
                              "Cancel", "Continue", false, true))
@@ -273,26 +258,25 @@ void InitAccount::createWalletWithSeed( QVector<QString> sd ) {
     }
 
     // switching to a progress Wnd
-    progressWnd = (wnd::ProgressWnd*) context->wndManager->switchToWindowEx( mwc::PAGE_A_RECOVERY_FROM_PASSPHRASE,
-            new wnd::ProgressWnd(context->wndManager->getInWndParent(), this, "Recovering account from the passphrase", "",
-                                                                                                 "", false));
+    core::getWndManager()->pageProgressWnd(mwc::PAGE_A_RECOVERY_FROM_PASSPHRASE, INIT_ACCOUNT_CALLER_ID,
+              "Recovering account from the passphrase", "", "", false);
 
     // Stopping listeners first. Not checking if they are running.
-    progressWnd->setMsgPlus("Preparing for recovery...");
+    for (auto p :  bridge::getBridgeManager()->getProgressWnd())
+        p->setMsgPlus(INIT_ACCOUNT_CALLER_ID, "Preparing for recovery...");
 
     context->wallet->start2recover(seed, pass);
 }
 
 void InitAccount::onRecoverProgress( int progress, int maxVal ) {
-    if ( progressWnd==nullptr ) // active indicator
-        return;
-
     progressMaxVal = maxVal;
-    progressWnd->initProgress(0, maxVal);
 
     QString msgProgress = "Recovering..." + QString::number(progress * 100 / maxVal) + "%";
-    progressWnd->updateProgress(progress, msgProgress);
-    progressWnd->setMsgPlus("");
+    for (auto p :  bridge::getBridgeManager()->getProgressWnd()) {
+        p->initProgress(INIT_ACCOUNT_CALLER_ID, 0, maxVal);
+        p->updateProgress(INIT_ACCOUNT_CALLER_ID, progress, msgProgress);
+        p->setMsgPlus(INIT_ACCOUNT_CALLER_ID, "");
+    }
 }
 
 void InitAccount::onRecoverResult(bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages) {
@@ -300,12 +284,10 @@ void InitAccount::onRecoverResult(bool started, bool finishedWithSuccess, QStrin
 
     context->wallet->logout(true);
 
-    if ( progressWnd==nullptr ) // active indicator
-        return;
-
-
-    if (finishedWithSuccess && progressWnd)
-        progressWnd->updateProgress(progressMaxVal, "Done");
+    if (finishedWithSuccess) {
+        for (auto p :  bridge::getBridgeManager()->getProgressWnd())
+            p->updateProgress(INIT_ACCOUNT_CALLER_ID, progressMaxVal, "Done");
+    }
 
     QString errorMsg;
     if (errorMessages.size()>0) {
@@ -317,14 +299,14 @@ void InitAccount::onRecoverResult(bool started, bool finishedWithSuccess, QStrin
     bool success = false;
 
     if (!started) {
-        control::MessageBox::messageText(nullptr, "Recover failure", "Account recovery failed to start." + errorMsg);
+        core::getWndManager()->messageTextDlg("Recover failure", "Account recovery failed to start." + errorMsg);
     }
     else if (!finishedWithSuccess) {
-        control::MessageBox::messageText(nullptr, "Recover failure", "Account recovery failed to finish." + errorMsg);
+        core::getWndManager()->messageTextDlg("Recover failure", "Account recovery failed to finish." + errorMsg);
     }
     else {
         success = true;
-        control::MessageBox::messageText(nullptr, "Success", "Your account was successfully recovered from the passphrase." + errorMsg);
+        core::getWndManager()->messageTextDlg("Success", "Your account was successfully recovered from the passphrase." + errorMsg);
     }
 
     if (success) {
@@ -338,15 +320,13 @@ void InitAccount::onRecoverResult(bool started, bool finishedWithSuccess, QStrin
     }
     else {
         // switch back to the seed window
-        context->wndManager->switchToWindowEx( mwc::PAGE_A_ENTER_SEED,
-                new wnd::EnterSeed( context->wndManager->getInWndParent(), this ) );
+        core::getWndManager()->pageEnterSeed();
         return;
     }
 }
 
 void InitAccount::cancel() {
-    context->wndManager->switchToWindowEx( mwc::PAGE_A_NEW_WALLET,
-            new wnd::NewWallet( context->wndManager->getInWndParent(), this ) );
+    core::getWndManager()->pageNewWallet();
 }
 
 

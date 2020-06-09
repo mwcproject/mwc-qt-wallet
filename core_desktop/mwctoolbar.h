@@ -22,9 +22,13 @@ namespace Ui {
 class MwcToolbar;
 }
 
-namespace state {
-class StateMachine;
+namespace bridge {
+    class Config;
+    class Wallet;
+    class StateMachine;
+    class CoreWindow;
 }
+
 
 namespace core {
 
@@ -38,34 +42,34 @@ public:
     explicit MwcToolbar(QWidget *parent);
     ~MwcToolbar() override;
 
-    void setAppEnvironment(state::StateMachine * stateMachine, wallet::Wallet * wallet );
-
-    void updateButtonsState( state::STATE state );
-
 protected:
     virtual void paintEvent(QPaintEvent *) override;
 
 private slots:
-    void on_airdropToolButton_clicked();
-
-    void on_sendToolButton_clicked();
-
-    void on_receiveToolButton_clicked();
-
-    void on_transactionToolButton_clicked();
-
-    void on_hodlToolButton_clicked();
 
     void onWalletBalanceUpdated();
     void onLoginResult(bool ok);
     void onLogout();
 
+    // state: state::STATE
+    void onUpdateButtonsState( int state );
+
+    // UI
+    void on_airdropToolButton_clicked();
+    void on_sendToolButton_clicked();
+    void on_receiveToolButton_clicked();
+    void on_transactionToolButton_clicked();
+    void on_hodlToolButton_clicked();
     void on_finalizeToolButton_clicked();
+
+
 
 private:
     Ui::MwcToolbar *ui;
-    wallet::Wallet      * wallet = nullptr;
-    state::StateMachine * stateMachine = nullptr;
+    bridge::Config * config = nullptr;
+    bridge::Wallet * wallet = nullptr;
+    bridge::StateMachine * stateMachine = nullptr;
+    bridge::CoreWindow * coreWindow = nullptr;
 };
 
 }

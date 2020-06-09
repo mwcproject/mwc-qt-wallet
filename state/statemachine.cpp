@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <control/messagebox.h>
 #include "statemachine.h"
 #include "a_initaccount.h"
 #include "a_inputpassword.h"
 #include "../core/appcontext.h"
-#include "../core/mainwindow.h"
 #include "k_accounts.h"
 #include "k_AccountTransfer.h"
 #include "x_events.h"
@@ -37,13 +35,33 @@
 #include "u_nodeinfo.h"
 #include "g_Finalize.h"
 #include "y_selectmode.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/corewindow_b.h"
+#include "../core/WndManager.h"
 
 
 namespace state {
 
-StateMachine::StateMachine(StateContext * _context) :
-        context(_context)
+static StateMachine * stateMachine = nullptr;
+
+void StateMachine::initStateMachine() {
+    Q_ASSERT(stateMachine== nullptr);
+    stateMachine = new StateMachine();
+}
+void StateMachine::destroyStateMachine() {
+    Q_ASSERT(stateMachine);
+    delete stateMachine;
+    stateMachine = nullptr;
+}
+StateMachine * getStateMachine() {
+    return stateMachine;
+}
+
+
+StateMachine::StateMachine()
 {
+    StateContext * context = getStateContext();
+    Q_ASSERT(context);
     context->setStateMachine(this);
 
     // Those states are mandatory because that manage wallet lifecycle
@@ -106,7 +124,9 @@ void StateMachine::start() {
             continue;
 
         currentState = it.key();
-        context->mainWnd->updateActionStates(currentState);
+        for (auto b : bridge::getBridgeManager()->getCoreWindow())
+            b->updateActionStates(currentState);
+
         return;
     }
 
@@ -148,7 +168,8 @@ void StateMachine::executeFrom( STATE nextState ) {
             continue;
 
         currentState = it.key();
-        context->mainWnd->updateActionStates(currentState);
+        for (auto b : bridge::getBridgeManager()->getCoreWindow())
+            b->updateActionStates(currentState);
         break;
     }
 
@@ -158,7 +179,7 @@ void StateMachine::executeFrom( STATE nextState ) {
 
     if (currentState == STATE::NONE) {
         // Selecting the send page if nothing found
-        context->appContext->setActiveWndState( STATE::NODE_INFO );
+        getStateContext()->appContext->setActiveWndState( STATE::NODE_INFO );
         executeFrom(STATE::NONE);
     }
 }
@@ -170,18 +191,18 @@ bool StateMachine::setActionWindow( STATE actionWindowState, bool enforce ) {
     if (!canSwitchState())
         return false;
 
-    context->appContext->setActiveWndState(actionWindowState);
+    getStateContext()->appContext->setActiveWndState(actionWindowState);
     executeFrom(actionWindowState);
     return currentState==actionWindowState;
 }
 
 STATE StateMachine::getActionWindow() const {
-    return context->appContext->getActiveWndState();
+    return getStateContext()->appContext->getActiveWndState();
 }
 
 // return true if action window will applicable
 bool StateMachine::isActionWindowMode() const {
-    return context->appContext->getActiveWndState() == currentState;
+    return getStateContext()->appContext->getActiveWndState() == currentState;
 }
 
 // Reset logout time.
@@ -192,17 +213,28 @@ void StateMachine::resetLogoutLimit(bool resetBlockLogoutCounter ) {
         logoutTime = QDateTime::currentMSecsSinceEpoch() + config::getLogoutTimeMs();
 
     if (resetBlockLogoutCounter)
-        blockLogoutCounter = 0;
+        blockLogoutStack.clear();
 }
 
 // Logout must be blocked for modal dialogs
-void StateMachine::blockLogout() {
-    blockLogoutCounter++;
+void StateMachine::blockLogout(const QString & id) {
+    blockLogoutStack.push_back(id);
     logoutTime = 0;
 }
-void StateMachine::unblockLogout() {
-    blockLogoutCounter--;
-    if (blockLogoutCounter<=0 && logoutTime==0)
+void StateMachine::unblockLogout(const QString & id) {
+    if (id.isEmpty()) {
+        blockLogoutStack.clear();
+    }
+    else {
+        int idx = blockLogoutStack.size()-1;
+        for (; idx>=0; idx--) {
+            if (blockLogoutStack[idx] == id)
+                break;
+        }
+        if (idx>=0)
+            blockLogoutStack.resize(idx);
+    }
+    if (blockLogoutStack.isEmpty() && logoutTime==0)
         resetLogoutLimit(true);
 }
 
@@ -229,7 +261,7 @@ void StateMachine::timerEvent(QTimerEvent *event) {
         return;
 
     // no password - no locks.
-    if(!context->wallet->hasPassword())
+    if(!getStateContext()->wallet->hasPassword())
         return;
 
     // Check if timer expired and we need to logout...
@@ -245,13 +277,13 @@ void StateMachine::timerEvent(QTimerEvent *event) {
 
 // logout now
 void StateMachine::logout() {
-    if(!context->wallet->hasPassword()) {
-        control::MessageBox::messageText(nullptr, "Logout", "Your wallet doesn't protected with a password. Because of that you can't do a logout.");
+    if(!getStateContext()->wallet->hasPassword()) {
+        core::getWndManager()->messageTextDlg("Logout", "Your wallet doesn't protected with a password. Because of that you can't do a logout.");
         return;
     }
 
-    context->appContext->pushCookie<QString>("LockWallet", "lock");
-    context->stateMachine->executeFrom(STATE::NONE);
+    getStateContext()->appContext->pushCookie<QString>("LockWallet", "lock");
+    executeFrom(STATE::NONE);
 }
 
 }

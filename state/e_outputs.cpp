@@ -13,8 +13,6 @@
 // limitations under the License.
 
 #include "e_outputs.h"
-#include "../windows/e_outputs_w.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../core/Config.h"
 #include "../state/statemachine.h"
@@ -22,41 +20,15 @@
 #include "../util/Log.h"
 #include <QDebug>
 #include "../core/global.h"
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/e_outputs_b.h"
 
 namespace state {
-
-void CachedOutputInfo::resetCache(QString account, bool show_spent) {
-    currentAccount = account;
-    showSpent = show_spent;
-    height = -1;
-    unspentOutputs.clear();
-}
-
-void CachedOutputInfo::setCache(QString account, int64_t height, QVector<wallet::WalletOutput> outputs) {
-    Q_UNUSED(account);
-    this->height = height;
-    allAccountOutputs = outputs;
-    // Check if the cache has been reset. If so, we need to regenerate the unspentOutputs.
-    if (showSpent == false && unspentOutputs.isEmpty()) {
-        // create list of any output that isn't spent
-        for (int i=0; i<allAccountOutputs.size(); ++i) {
-            if (allAccountOutputs[i].status != OUTPUT_SPENT_STATUS) {
-                unspentOutputs.append(allAccountOutputs[i]);
-            }
-        }
-    }
-}
-
 
 Outputs::Outputs(StateContext * context) :
     State(context, STATE::OUTPUTS)
 {
-    QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &Outputs::onWalletBalanceUpdated, Qt::QueuedConnection );
-
-    QObject::connect( context->wallet, &wallet::Wallet::onOutputs, this, &Outputs::onOutputs, Qt::QueuedConnection );
-
-    QObject::connect( notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
-                      this, &Outputs::onNewNotificationMessage, Qt::QueuedConnection );
 }
 
 Outputs::~Outputs() {}
@@ -65,96 +37,9 @@ NextStateRespond Outputs::execute() {
     if (context->appContext->getActiveWndState() != STATE::OUTPUTS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if (wnd==nullptr) {
-        wnd = (wnd::Outputs*) context->wndManager->switchToWindowEx( mwc::PAGE_E_OUTPUTS,
-                new wnd::Outputs( context->wndManager->getInWndParent(), this) );
-    }
+    core::getWndManager()->pageOutputs();
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
-}
-
-// request wallet for outputs
-void Outputs::requestOutputs(QString account, bool show_spent, bool enforceSync) {
-    if (cachedOutputs.currentAccount != account) {
-        enforceSync = true;
-    }
-
-    if (enforceSync) {
-        // request all outputs, including spent, so we can cache them
-        // Respond:  onOutputs(...)
-        context->wallet->getOutputs(account, true, enforceSync);
-        // Balance needs to be updated as well to match outputs state
-        context->wallet->updateWalletBalance(false,false);
-        cachedOutputs.resetCache(account, show_spent);
-    }
-    else if (wnd) {
-        wnd->setOutputsData(account, cachedOutputs.height, show_spent ? cachedOutputs.allAccountOutputs : cachedOutputs.unspentOutputs);
-    }
-}
-
-void Outputs::onOutputs( QString account, int64_t height, QVector<wallet::WalletOutput> outputs) {
-    qDebug() << "state onOutputs call for wnd=" << wnd;
-    cachedOutputs.setCache(account, height, outputs);
-    context->appContext->initOutputNotes(account, cachedOutputs.allAccountOutputs);
-    if (wnd) {
-        QVector<wallet::WalletOutput>& wndOutputs = cachedOutputs.showSpent ? cachedOutputs.allAccountOutputs : cachedOutputs.unspentOutputs;
-        wnd->setOutputCount(account, wndOutputs.size());
-        wnd->setOutputsData(account, height, wndOutputs);
-    }
-}
-
-void Outputs::switchCurrentAccount(const wallet::AccountInfo & account) {
-    // Switching without expected feedback.   Possible error will be cought by requestTransactions.
-    context->wallet->switchAccount( account.accountName );
-}
-
-QVector<wallet::AccountInfo> Outputs::getWalletBalance() {
-    return context->wallet->getWalletBalance();
-}
-
-QString Outputs::getCurrentAccountName() const {
-    return context->wallet->getCurrentAccountName();
-}
-
-// IO for columns widhts
-QVector<int> Outputs::getColumnsWidhts(const QString & prefix) const {
-    return context->appContext->getIntVectorFor("OutputsTblColWidth" + prefix);
-}
-
-void Outputs::updateColumnsWidhts(const QString & prefix, const QVector<int> & widths) {
-    context->appContext->updateIntVectorFor("OutputsTblColWidth" + prefix, widths);
-}
-
-void Outputs::onWalletBalanceUpdated() {
-    if (wnd) {
-        wnd->updateWalletBalance();
-    }
-}
-
-void Outputs::onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString message) {
-    Q_UNUSED(level)
-
-    if (wnd && message.contains("Changing status for output")) {
-        wnd->triggerRefresh();
-    }
-}
-
-bool Outputs::isLockOutputEnabled() {
-    return context->appContext->isLockOutputEnabled();
-}
-
-bool Outputs::isLockedOutput(const wallet::WalletOutput & output) {
-    if (!output.isUnspent())
-        return false;
-
-    return context->appContext->isLockedOutputs(output.outputCommitment);
-}
-
-void Outputs::setLockedOutput(bool locked, const wallet::WalletOutput & output) {
-    if (!output.isUnspent())
-        return;
-
-    context->appContext->setLockedOutput(output.outputCommitment, locked);
 }
 
 }

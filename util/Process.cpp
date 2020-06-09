@@ -15,11 +15,10 @@
 #include "Process.h"
 #include <QProcess>
 #include "../core/Config.h"
-#include "../control/messagebox.h"
 #include <QSysInfo>
+#include "../core/WndManager.h"
 
 namespace util {
-
 
 bool processWaitForFinished( QProcess * process, int timeoutMs, const QString & processName ) {
     if (process==nullptr)
@@ -35,9 +34,9 @@ bool processWaitForFinished( QProcess * process, int timeoutMs, const QString & 
 
         QProcess::ProcessError errCode = process->error();
         if (errCode == QProcess::Timedout) {
-            if (control::MessageBox::questionText(nullptr, "Warning", "Stopping process " + processName +
+            if ( core::getWndManager()->questionTextDlg("Warning", "Stopping process " + processName +
                                                                    " is taking longer than expected.\nContinue to wait?",
-                                              "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
+                                              "Yes", "No", true, false) == core::WndManager::RETURN_CODE::BTN1) {
                 config::increaseTimeoutMultiplier();
                 return processWaitForFinished(process, timeoutMs, processName);
             }

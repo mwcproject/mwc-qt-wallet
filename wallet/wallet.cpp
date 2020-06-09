@@ -20,7 +20,9 @@
 #include <QDir>
 #include "../util/Files.h"
 #include "../util/Process.h"
-#include "../control/messagebox.h"
+#include "../core/WndManager.h"
+#include <QJsonObject>
+#include <QJsonDocument>
 
 namespace wallet {
 
@@ -98,9 +100,45 @@ bool MwcNodeConnection::loadData(QDataStream & in) {
     return true;
 }
 
+QString MwcNodeConnection::toJson() {
+    QJsonObject obj;
+    obj.insert("connectionType", int(connectionType) );
+    obj.insert("localNodeDataPath", localNodeDataPath );
+    obj.insert("mwcNodeURI", mwcNodeURI );
+    obj.insert("mwcNodeSecret", mwcNodeSecret );
+
+    return QJsonDocument(obj).toJson();
+
+}
+// static
+MwcNodeConnection MwcNodeConnection::fromJson(const QString & str) {
+    QJsonParseError error;
+    QJsonDocument   jsonDoc = QJsonDocument::fromJson(str.toUtf8(), &error);
+    // Internal data, no error expected
+    Q_ASSERT( error.error == QJsonParseError::NoError );
+    Q_ASSERT(jsonDoc.isObject());
+    QJsonObject obj = jsonDoc.object();
+
+    MwcNodeConnection res;
+    res.setData( NODE_CONNECTION_TYPE(obj.value("connectionType").toInt()),
+                obj.value("localNodeDataPath").toString(),
+                obj.value("mwcNodeURI").toString(),
+                obj.value("mwcNodeSecret").toString() );
+    return res;
+}
+
+void MwcNodeConnection::setData(NODE_CONNECTION_TYPE _connectionType, const QString & _localNodeDataPath,
+             const QString & _mwcNodeURI,  const QString & _mwcNodeSecret) {
+    connectionType = _connectionType;
+    localNodeDataPath = _localNodeDataPath;
+    mwcNodeURI = _mwcNodeURI;
+    mwcNodeSecret = _mwcNodeSecret;
+}
+
+
 bool WalletConfig::operator == (const WalletConfig & other) const {
     bool ok = dataPath==other.dataPath &&
-              mwcmqDomainEx==other.mwcmqDomainEx && mwcmqsDomainEx==other.mwcmqsDomainEx &&
+              mwcmqsDomainEx==other.mwcmqsDomainEx &&
               keyBasePath==other.keyBasePath && foreignApi==other.foreignApi;
 
     if (!ok)
@@ -115,7 +153,6 @@ bool WalletConfig::operator == (const WalletConfig & other) const {
 
 WalletConfig & WalletConfig::setData(QString _network,
                             QString _dataPath,
-                            QString _mwcmqDomain,
                             QString _mwcmqsDomain,
                             QString _keyBasePath,
                             bool    _foreignApi,
@@ -124,8 +161,14 @@ WalletConfig & WalletConfig::setData(QString _network,
                             QString _tlsCertificateFile,
                             QString _tlsCertificateKey) {
 
-    setDataWalletCfg(_network,_dataPath,_mwcmqDomain,_mwcmqsDomain,_keyBasePath);
+    setDataWalletCfg(_network,_dataPath,_mwcmqsDomain,_keyBasePath);
 
+    return setForeignApi(_foreignApi, _foreignApiAddress, _foreignApiSecret, _tlsCertificateFile, _tlsCertificateKey);
+}
+
+WalletConfig & WalletConfig::setForeignApi(bool _foreignApi,
+                             QString _foreignApiAddress, QString _foreignApiSecret,
+                             QString _tlsCertificateFile, QString _tlsCertificateKey) {
     foreignApi = _foreignApi;
     foreignApiAddress = _foreignApiAddress;
     foreignApiSecret = _foreignApiSecret;
@@ -135,15 +178,15 @@ WalletConfig & WalletConfig::setData(QString _network,
     return * this;
 }
 
+
+
 WalletConfig & WalletConfig::setDataWalletCfg(QString _network,
                                 QString _dataPath,
-                                QString _mwcmqDomain,
                                 QString _mwcmqsDomain,
                                 QString _keyBasePath)
 {
     network  = _network;
     dataPath = _dataPath;
-    mwcmqDomainEx = _mwcmqDomain;
     mwcmqsDomainEx = _mwcmqsDomain;
     keyBasePath = _keyBasePath;
 
@@ -154,7 +197,6 @@ WalletConfig & WalletConfig::setDataWalletCfg(QString _network,
 QString WalletConfig::toString() const {
     return "network=" + network + "\n" +
             "dataPath=" + dataPath + "\n" +
-            "mwcmqDomainEx=" + mwcmqDomainEx + "\n" +
             "mwcmqsDomainEx=" + mwcmqsDomainEx + "\n" +
             "keyBasePath=" + keyBasePath;
 }
@@ -162,7 +204,7 @@ QString WalletConfig::toString() const {
 
 // Get MQ/MQS host name. Depend on current config
 QString WalletConfig::getMwcMqHostNorm() const {
-    return config::getUseMwcMqS() ? mwcmqsDomainEx : mwcmqDomainEx;
+    return mwcmqsDomainEx;
 }
 
 // Get MQ/MQS host full name. Depend on current config
@@ -171,7 +213,7 @@ QString WalletConfig::getMwcMqHostFull() const {
     if (!definedHost.isEmpty())
         return definedHost;
 
-    return config::getUseMwcMqS() ? mwc::DEFAULT_HOST_MWC_MQS : mwc::DEFAULT_HOST_MWC_MQ;
+    return mwc::DEFAULT_HOST_MWC_MQS;
 }
 
 
@@ -183,7 +225,7 @@ QPair<QString,QString> WalletConfig::readNetworkArchFromDataPath(QString configP
 
     QPair<bool,QString> path = ioutils::getAppDataPath( configPath );
     if (!path.first) {
-        control::MessageBox::messageText(nullptr, "Error", path.second);
+        core::getWndManager()->messageTextDlg("Error", path.second);
         return res;
     }
 
@@ -208,7 +250,7 @@ QPair<QString,QString> WalletConfig::readNetworkArchFromDataPath(QString configP
 bool  WalletConfig::doesSeedExist(QString configPath) {
     QPair<bool,QString> path = ioutils::getAppDataPath( configPath );
     if (!path.first) {
-        control::MessageBox::messageText(nullptr, "Error", path.second);
+        core::getWndManager()->messageTextDlg("Error", path.second);
         return false;
     }
     return QFile::exists( path.second + "/" + "wallet.seed" );
@@ -219,7 +261,7 @@ void  WalletConfig::saveNetwork2DataPath(QString configPath, QString network, QS
 {
     QPair<bool,QString> path = ioutils::getAppDataPath( configPath );
     if (!path.first) {
-        control::MessageBox::messageText(nullptr, "Error", path.second);
+        core::getWndManager()->messageTextDlg("Error", path.second);
         return;
     }
     util::writeTextFile(path.second + "/net.txt", {network, arch} );
@@ -301,7 +343,60 @@ QString WalletTransaction::toStringCSV() {
     return csvStr;
 }
 
+QString WalletTransaction::toJson() const {
+    QJsonObject obj;
+    obj.insert("txIdx", QString::number(txIdx) );
+    obj.insert("transactionType", int(transactionType) );
+    obj.insert("txid", txid );
+    obj.insert("address", address);
+    obj.insert("creationTime", creationTime);
+    obj.insert("ttlCutoffHeight", QString::number(ttlCutoffHeight) );
+    obj.insert("confirmed", confirmed);
+    obj.insert("height", QString::number(height) );
+    obj.insert("confirmationTime", confirmationTime);
+    obj.insert("numInputs", numInputs);
+    obj.insert("numOutputs", numOutputs);
+    obj.insert("credited", QString::number(credited));
+    obj.insert("debited", QString::number(debited));
+    obj.insert("fee", QString::number(fee));
+    obj.insert("coinNano", QString::number(coinNano) );
+    obj.insert("proof", proof);
+    obj.insert("kernel", kernel);
 
+    return QJsonDocument(obj).toJson();
+}
+//static
+WalletTransaction WalletTransaction::fromJson(QString str) {
+    QJsonParseError error;
+    QJsonDocument   jsonDoc = QJsonDocument::fromJson(str.toUtf8(), &error);
+    // Internal data, no error expected
+    Q_ASSERT( error.error == QJsonParseError::NoError );
+    Q_ASSERT(jsonDoc.isObject());
+    QJsonObject obj = jsonDoc.object();
+
+    WalletTransaction res;
+    res.setData(obj.value("txIdx").toString().toLongLong(),
+            uint(obj.value("transactionType").toInt()),
+            obj.value("txid").toString(),
+            obj.value("address").toString(),
+            obj.value("creationTime").toString(),
+            obj.value("confirmed").toBool(),
+            obj.value("ttlCutoffHeight").toString().toLongLong(),
+            obj.value("height").toString().toLongLong(),
+            obj.value("confirmationTime").toString(),
+            obj.value("numInputs").toInt(),
+            obj.value("numOutputs").toInt(),
+            obj.value("credited").toString().toLongLong(),
+            obj.value("debited").toString().toLongLong(),
+            obj.value("fee").toString().toLongLong(),
+            obj.value("coinNano").toString().toLongLong(),
+            obj.value("proof").toBool(),
+            obj.value("kernel").toString());
+    return res;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  WalletOutput
 
 void WalletOutput::setData(QString _outputCommitment,
         QString     _MMRIndex,
@@ -328,6 +423,45 @@ QString WalletOutput::toString() const {
     return  "Output(" + outputCommitment + ", MMR=" + MMRIndex + ", Height=" + blockHeight + ", Locked=" + lockedUntil + ", status=" +
             status + ", coinbase=" + (coinbase?"true":"false") + ", confirms=" + numOfConfirms, ", value=" + QString::number(valueNano) + ", txIdx=" + txIdx + ")";
 }
+
+QString WalletOutput::toJson() const {
+    QJsonObject obj;
+    obj.insert("outputCommitment", outputCommitment);
+    obj.insert("MMRIndex", MMRIndex);
+    obj.insert("blockHeight", blockHeight);
+    obj.insert("lockedUntil", lockedUntil);
+    obj.insert("status", status);
+    obj.insert("coinbase", coinbase);
+    obj.insert("numOfConfirms", numOfConfirms);
+    obj.insert("valueNano", QString::number(valueNano) );
+    obj.insert("txIdx", QString::number(txIdx) );
+    obj.insert("weight", weight);
+
+    return QJsonDocument(obj).toJson();
+}
+
+//static
+WalletOutput WalletOutput::fromJson(QString str) {
+    QJsonParseError error;
+    QJsonDocument   jsonDoc = QJsonDocument::fromJson(str.toUtf8(), &error);
+    // Internal data, no error expected
+    Q_ASSERT( error.error == QJsonParseError::NoError );
+    Q_ASSERT(jsonDoc.isObject());
+    QJsonObject obj = jsonDoc.object();
+
+    WalletOutput res;
+    res.setData(obj.value("outputCommitment").toString(),
+                obj.value("MMRIndex").toString(),
+                obj.value("blockHeight").toString(),
+                obj.value("lockedUntil").toString(),
+                obj.value("status").toString(),
+                obj.value("coinbase").toBool(),
+                obj.value("numOfConfirms").toString(),
+                obj.value("valueNano").toString().toLongLong(),
+                obj.value("txIdx").toString().toLongLong());
+    return res;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //  WalletUtxoSignature

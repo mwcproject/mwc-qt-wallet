@@ -23,6 +23,11 @@ namespace wallet {
     class Wallet;
 };
 
+namespace bridge {
+class Wallet;
+class config;
+}
+
 namespace core {
 
 // WIndows menager is responsible for connection between UI and the data
@@ -30,14 +35,12 @@ class WindowManager : public QObject
 {
     Q_OBJECT
 public:
-    WindowManager( core::MainWindow * mainWnd, QWidget * pageHostWnd, QString walletDataPath );
+    WindowManager( core::MainWindow * mainWnd, QWidget * pageHostWnd );
 
     // Show new window and return it
     QWidget * switchToWindowEx( const QString & pageName, QWidget * newWindow );
     // Parent for windows it can show.
     QWidget * getInWndParent() const;
-
-    void setDataPath(const QString& dataPath);
 
 private:
     QString buildWalletTitle(const QString & pageName);
@@ -46,7 +49,8 @@ private:
     core::MainWindow * mainWnd;     // App main wnd
     QWidget * pageHostWnd;          // Parent windows for pages.
     QWidget * currentWnd = nullptr; // Current active page. Single page can be active at a time
-    QString   walletDataPath;       // Used in window title
+    bridge::Wallet * wallet = nullptr;
+    bridge::Config * config = nullptr;
 };
 
 }

@@ -15,14 +15,14 @@
 #ifndef NEWWALLETW_H
 #define NEWWALLETW_H
 
-#include "../core/PanelBaseWnd.h"
+#include "../core_desktop/PanelBaseWnd.h"
 
 namespace Ui {
 class NewWallet;
 }
 
-namespace state {
-    class InitAccount;
+namespace bridge {
+class InitAccount;
 }
 
 namespace wnd {
@@ -30,9 +30,8 @@ namespace wnd {
 class NewWallet : public core::PanelBaseWnd
 {
     Q_OBJECT
-
 public:
-    explicit NewWallet(QWidget *parent, state::InitAccount * state);
+    explicit NewWallet(QWidget *parent);
     virtual ~NewWallet() override;
 
 private slots:
@@ -45,7 +44,7 @@ private:
     void updateControls();
 private:
     Ui::NewWallet *ui;
-    state::InitAccount * state = nullptr;
+    bridge::InitAccount * initAccount = nullptr;
 };
 
 }

@@ -19,16 +19,17 @@
 #include <QTextStream>
 #include <QDataStream>
 #include <QDir>
-#include "../control/messagebox.h"
 #include "../core/global.h"
 #include <QtAlgorithms>
 #include "../util/Log.h"
 #include <QMessageBox>
 #include <QCoreApplication>
+#include "../core/WndManager.h"
 
 namespace core {
 
 const static QString settingsFileName("context.dat");
+const static QString notesFileName("notes.dat");
 const static QString airdropRequestsFileName("requests.dat");
 const static QString hodlOutputsPrefix("ho_");
 
@@ -205,12 +206,13 @@ bool AppContext::loadData() {
         in >> autoStartKeybaseEnabled;
     }
 
+    QMap<QString, QMap<QString, QMap<QString, QString>>> mock;
     if (id>=0x4792) {
-        in >> outputNotesMap;
+        in >> mock; //outputNotesMap;
     }
 
     if (id>=0x4793) {
-        in >> txnNotesMap;
+        in >> mock; //txnNotesMap;
     }
 
     if (id>=0x4794) {
@@ -234,7 +236,7 @@ bool AppContext::loadData() {
 void AppContext::saveData() const {
     QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
     if (!dataPath.first) {
-        control::MessageBox::messageText(nullptr, "Error", dataPath.second);
+        core::getWndManager()->messageTextDlg("Error", dataPath.second);
         QCoreApplication::exit();
         return;
     }
@@ -242,7 +244,7 @@ void AppContext::saveData() const {
     QString filePath = dataPath.second + "/" + settingsFileName;
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
-        control::MessageBox::messageText(nullptr,
+        core::getWndManager()->messageTextDlg(
               "ERROR",
               "Unable to save gui-wallet settings to " + filePath +
               "\nError: " + file.errorString());
@@ -284,8 +286,9 @@ void AppContext::saveData() const {
     out << autoStartMQSEnabled;
     out << autoStartKeybaseEnabled;
 
-    out << outputNotesMap;
-    out << txnNotesMap;
+    QMap<QString, QMap<QString, QMap<QString, QString>>> mock;
+    out << mock; //outputNotesMap;
+    out << mock; //txnNotesMap;
 
     out << lockOutputEnabled;
     out << lockedOutputs;
@@ -295,6 +298,73 @@ void AppContext::saveData() const {
     out << receiveAccount;
     out << currentAccountName;
 }
+
+void AppContext::loadNotesData() {
+    QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
+    if (!dataPath.first) {
+        QMessageBox::critical(nullptr, "Error", dataPath.second);
+        QCoreApplication::exit();
+        return;
+    }
+
+    notesLoaded = true;
+
+    QFile file(dataPath.second + "/" + notesFileName);
+    if ( !file.open(QIODevice::ReadOnly) ) {
+        // first run, no file exist
+        return;
+    }
+
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_5_7);
+
+    int id = 0;
+    in >> id;
+
+    if (id!=0x4580)
+        return;
+
+    in >> notes;
+}
+
+void AppContext::saveNotesData() const {
+    QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
+    if (!dataPath.first) {
+        core::getWndManager()->messageTextDlg("Error", dataPath.second);
+        QCoreApplication::exit();
+        return;
+    }
+
+    QString filePath = dataPath.second + "/" + notesFileName + ".bak";
+    {
+        QFile file(filePath);
+        if (!file.open(QIODevice::WriteOnly)) {
+            core::getWndManager()->messageTextDlg(
+                    "ERROR",
+                    "Unable to save Notes data to " + filePath +
+                    "\nError: " + file.errorString());
+            return;
+        }
+
+        QDataStream out(&file);
+        out.setVersion(QDataStream::Qt_5_7);
+
+        out << 0x4580;
+        out << notes;
+
+        if (out.status() != QDataStream::Ok) {
+            core::getWndManager()->messageTextDlg(
+                    "ERROR",
+                    "Unable to save Notes data to " + filePath);
+            return;
+        }
+        file.close();
+    }
+    // Rename suppose to be atomic, no data loss expected
+    QFile::rename(filePath, dataPath.second + "/" + notesFileName);
+
+}
+
 
 void AppContext::setLogsEnabled(bool enabled) {
     if (enabled == logsEnabled)
@@ -326,7 +396,7 @@ void AppContext::setShowOutputAll(bool all) {
 void AppContext::saveAirdropRequests( const QVector<state::AirdropRequests> & data ) {
     QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
     if (!dataPath.first) {
-        control::MessageBox::messageText(nullptr, "Error", dataPath.second);
+        core::getWndManager()->messageTextDlg("Error", dataPath.second);
         QCoreApplication::exit();
         return;
     }
@@ -334,8 +404,7 @@ void AppContext::saveAirdropRequests( const QVector<state::AirdropRequests> & da
     QString filePath = dataPath.second + "/" + airdropRequestsFileName;
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
-        control::MessageBox::messageText(nullptr,
-                                     "ERROR",
+        core::getWndManager()->messageTextDlg("ERROR",
                                      "Unable save to aidrop requests to " + filePath +
                                      "\nError: " + file.errorString());
         return;
@@ -358,7 +427,7 @@ QVector<state::AirdropRequests> AppContext::loadAirdropRequests() const {
 
     QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
     if (!dataPath.first) {
-        control::MessageBox::messageText(nullptr, "Error", dataPath.second);
+        core::getWndManager()->messageTextDlg("Error", dataPath.second);
         QCoreApplication::exit();
         return res;
     }
@@ -490,7 +559,7 @@ void AppContext::saveHodlOutputs( const QString & rootPubKeyHash, const QMap<QSt
     Q_ASSERT(!rootPubKeyHash.isEmpty());
     QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
     if (!dataPath.first) {
-        control::MessageBox::messageText(nullptr, "Error", dataPath.second);
+        core::getWndManager()->messageTextDlg("Error", dataPath.second);
         QCoreApplication::exit();
         return;
     }
@@ -499,8 +568,7 @@ void AppContext::saveHodlOutputs( const QString & rootPubKeyHash, const QMap<QSt
 
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
-        control::MessageBox::messageText(nullptr,
-                                         "ERROR",
+        core::getWndManager()->messageTextDlg("ERROR",
                                          "Unable to store HODL cache to " + filePath +
                                          "\nError: " + file.errorString());
         return;
@@ -522,7 +590,7 @@ QMap<QString, core::HodlOutputInfo> AppContext::loadHodlOutputs(const QString & 
 
     QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
     if (!dataPath.first) {
-        control::MessageBox::messageText(nullptr, "Error", dataPath.second);
+        core::getWndManager()->messageTextDlg("Error", dataPath.second);
         QCoreApplication::exit();
         return res;
     }
@@ -558,7 +626,7 @@ QMap<QString, core::HodlOutputInfo> AppContext::loadHodlOutputs(const QString & 
 
 }
 
-void AppContext::setWalletNotes(core::WalletNotes* _walletNotes) {
+/*void AppContext::setWalletNotes(core::WalletNotes* _walletNotes) {
     walletNotes = _walletNotes;
     walletNotes->loadNotes(WalletNotes::OUTPUT_NOTE, outputNotesMap);
     walletNotes->loadNotes(WalletNotes::TRANSACTION_NOTE, txnNotesMap);
@@ -602,7 +670,7 @@ void AppContext::deleteNote(const QString& account, const QString& outputCommitm
 void AppContext::deleteNote(const QString& account, int64_t txIdx) const {
     walletNotes->deleteNote(account, txIdx);
     saveData();
-}
+}*/
 
 bool AppContext::isLockedOutputs(const QString & output) const {
     if (!lockOutputEnabled)
@@ -644,5 +712,26 @@ void AppContext::setFluff(bool fluffSetting) {
     saveData();
 }
 
+QString AppContext::getNote(const QString& key) {
+    if (!notesLoaded) {
+        loadNotesData();
+    }
+    return notes.value(key);
+}
+
+void AppContext::updateNote(const QString& key, const QString& note) {
+    Q_ASSERT(notesLoaded); // we suppose to load first
+    if (note.isEmpty())
+        notes.remove(key);
+    else
+        notes.insert(key, note);
+    saveNotesData();
+}
+
+void AppContext::deleteNote(const QString& key) {
+    Q_ASSERT(notesLoaded); // we suppose to load first
+    notes.remove(key);
+    saveNotesData();
+}
 
 }

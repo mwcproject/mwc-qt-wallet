@@ -15,11 +15,16 @@
 #ifndef SHOWPROOFDLG_H
 #define SHOWPROOFDLG_H
 
-#include "../control/mwcdialog.h"
-#include "../wallet/wallet.h"
+#include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
 class ShowProofDlg;
+}
+
+namespace bridge {
+class Config;
+class Util;
+class Wallet;
 }
 
 namespace dlg {
@@ -40,19 +45,21 @@ class ShowProofDlg : public control::MwcDialog {
 Q_OBJECT
 
 public:
-    explicit ShowProofDlg(QWidget *parent, const QString &fileName, const ProofInfo & proofInfo, const wallet::WalletConfig & config);
+    explicit ShowProofDlg(QWidget *parent,
+            const QString &fileName, const ProofInfo & proofInfo );
 
     ~ShowProofDlg();
 
 private slots:
     void on_viewOutput_clicked();
-
     void on_viewKernel_clicked();
-
     void on_pushButton_clicked();
-
 private:
     Ui::ShowProofDlg *ui;
+    bridge::Config * config = nullptr;
+    bridge::Util * util = nullptr;
+    bridge::Wallet * wallet = nullptr;
+
     ProofInfo proof;
     QString blockExplorerUrl;
 };

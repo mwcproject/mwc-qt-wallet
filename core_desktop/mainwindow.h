@@ -18,20 +18,18 @@
 #include <QMainWindow>
 #include <QTimer>
 #include "../state/state.h"
-#include "../wallet/wallet.h"
 #include "../core/Notification.h"
-#include "appcontext.h"
 
 namespace Ui {
 class MainWindow;
 }
 
-namespace state {
+namespace bridge {
+    class Config;
+    class CoreWindow;
+    class Wallet;
     class StateMachine;
-}
-
-namespace core {
-    class AppContext;
+    class Util;
 }
 
 class QPushButton;
@@ -48,78 +46,53 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void setAppEnvironment(state::StateMachine * stateMachine, wallet::Wallet * wallet, core::AppContext * appContext);
-
     QWidget * getMainWindow();
 
-    // Update tb & menu actions
-    void updateActionStates(state::STATE actionState);
-
-    void updateLeftBar(bool show);
 
 private slots:
-    void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
+    // Update tb & menu actions
+    void onUpdateActionStates(int actionState); // state::STATE
+
+    void onNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL
     void onConfigUpdate();
 
-    void on_listenerStatusButton_clicked();
-    void on_nodeStatusButton_clicked();
-    void on_helpButton_clicked();
-
-    void updateListenerStatus(bool online);
+    void updateListenerStatus(bool mwcOnline, bool keybaseOnline);
     void onHttpListeningStatus(bool listening, QString additionalInfo);
     void updateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
     void onUpdateSyncProgress(double progressPercent);
 
+    // Internal UI
+    void on_listenerStatusButton_clicked();
+    void on_nodeStatusButton_clicked();
+    void on_helpButton_clicked();
     void on_actionSend_triggered();
-
     void on_actionExchanges_triggered();
-
     void on_actionReceive_triggered();
-
     void on_actionFinalize_triggered();
-
     void on_actionTransactions_triggered();
-
     void on_actionListeners_triggered();
-
     void on_actionNode_Overview_triggered();
-
     void on_actionResync_with_full_node_triggered();
-
     void on_actionOutputs_triggered();
-
     void on_actionAirdrop_triggered();
-
     void on_actionHODL_triggered();
-
     void on_actionWallet_accounts_triggered();
-
     void on_actionAccounts_triggered();
-
     void on_actionContacts_triggered();
-
     void on_actionShow_passphrase_triggered();
-
     void on_actionEvent_log_triggered();
-
     void on_actionLogout_triggered();
-
     void on_actionConfig_triggered();
-
     void on_actionRunning_Mode_Cold_Wallet_triggered();
-
     void on_actionBlock_Explorer_triggered();
-
     void on_actionWhite_papers_triggered();
-
     void on_actionGood_Money_triggered();
-
     void on_actionRoadmap_triggered();
-
     void on_actionMWC_website_triggered();
 
 private:
+    void updateLeftBar(bool show);
     void updateListenerBtn();
     void updateNetworkName();
 
@@ -130,10 +103,11 @@ private:
 
 private:
     Ui::MainWindow *ui;
-    state::StateMachine * stateMachine = nullptr;
-    wallet::Wallet * wallet = nullptr;
-    core::AppContext * appContext = nullptr;
-
+    bridge::Config * config = nullptr;
+    bridge::CoreWindow * coreWindow = nullptr;
+    bridge::Wallet * wallet = nullptr;
+    bridge::StateMachine * stateMachine = nullptr;
+    bridge::Util * util = nullptr;
     bool leftBarShown = true;
 };
 

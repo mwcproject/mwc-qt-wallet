@@ -15,14 +15,15 @@
 #ifndef E_RECEIVE_W_H
 #define E_RECEIVE_W_H
 
-#include "../core/navwnd.h"
-#include "../wallet/wallet.h"
+#include "../core_desktop/navwnd.h"
 
 namespace Ui {
 class Receive;
 }
 
-namespace state {
+namespace bridge {
+class Config;
+class Wallet;
 class Receive;
 }
 
@@ -32,21 +33,21 @@ class Receive : public core::NavWnd {
 Q_OBJECT
 
 public:
-    explicit Receive(QWidget *parent, state::Receive * state, bool mwcMqStatus, bool keybaseStatus, bool httpStatus,
-                     QString mwcMqAddress, const wallet::WalletConfig & walletConfig);
+    explicit Receive(QWidget *parent);
 
     virtual ~Receive() override ;
 
-    void updateMwcMqAddress(QString address);
-    void updateMwcMqState(bool online);
-    void updateKeybaseState(bool online);
-    void updateHttpState(bool online);
+private:
+    void updateStatus();
 
     void onTransactionActionIsFinished( bool success, QString message );
-    void stopWaiting();
 
     void updateWalletBalance();
 private slots:
+    // respond from signTransaction
+    void onSgnTransactionActionIsFinished( bool success, QString message );
+    void onSgnWalletBalanceUpdated();
+
     void on_accountComboBox_activated(int index);
     void on_recieveFileButton_clicked();
 private:
@@ -54,9 +55,10 @@ private:
 
 private:
     Ui::Receive *ui;
-    state::Receive * state;
-    wallet::WalletConfig walletConfig;
-    QVector<wallet::AccountInfo> accountInfo;
+    bridge::Config * config = nullptr;
+    bridge::Wallet * wallet = nullptr;
+    bridge::Receive * receive = nullptr;
+
     QString mwcAddress;
 };
 

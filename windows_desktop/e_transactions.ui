@@ -679,32 +679,32 @@
   <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
-   <header>control/MwcPushButton.h</header>
+   <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabelProgress.h</header>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
-   <header>control/MwcLabel.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>ListWithColumns</class>
    <extends>QTableWidget</extends>
-   <header>control/listwithcolumns.h</header>
+   <header>control_desktop/listwithcolumns.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
-   <header>control/MwcComboBox.h</header>
+   <header>control_desktop/MwcComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcPushButtonRound</class>
    <extends>QPushButton</extends>
-   <header>control/MwcPushButton.h</header>
+   <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

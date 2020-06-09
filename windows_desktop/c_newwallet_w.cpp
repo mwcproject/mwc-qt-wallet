@@ -14,21 +14,22 @@
 
 #include "c_newwallet_w.h"
 #include "ui_c_newwallet.h"
+#include "../control_desktop/messagebox.h"
+#include "../util_desktop/widgetutils.h"
+#include "../bridge/wnd/a_initaccount_b.h"
+
+// Need for enum consts
 #include "../state/a_initaccount.h"
-#include "../control/messagebox.h"
-#include "../util/widgetutils.h"
-#include "../state/timeoutlock.h"
 
 namespace wnd {
 
-NewWallet::NewWallet(QWidget *parent, state::InitAccount * _state) :
+NewWallet::NewWallet(QWidget *parent) :
     core::PanelBaseWnd(parent),
-    ui(new Ui::NewWallet),
-    state(_state)
+    ui(new Ui::NewWallet)
 {
     ui->setupUi(this);
 
-    //state->setWindowTitle("Init your wallet");
+    initAccount = new bridge::InitAccount(this);
 
     ui->radioCreateNew->setChecked(true);
     ui->radioMainNet->setChecked(true);
@@ -52,15 +53,13 @@ void NewWallet::updateControls() {
 
 void NewWallet::on_submitButton_clicked()
 {
-    state::TimeoutLockObject to( state );
-
     Q_ASSERT(ui->radioCreateNew->isChecked() || ui->radioHaveSeed->isChecked());
     Q_ASSERT(ui->radioMainNet->isChecked() || ui->radioFloonet->isChecked());
 
     state::InitAccount::NEW_WALLET_CHOICE newWalletChoice = ui->radioCreateNew->isChecked() ? state::InitAccount::NEW_WALLET_CHOICE::CREATE_NEW : state::InitAccount::NEW_WALLET_CHOICE::CREATE_WITH_SEED;
     state::InitAccount::MWC_NETWORK       mwcNetworkChoice = ui->radioMainNet->isChecked() ? state::InitAccount::MWC_NETWORK::MWC_MAIN_NET      : state::InitAccount::MWC_NETWORK::MWC_FLOO_NET;
 
-    state->submitCreateChoice(newWalletChoice, mwcNetworkChoice);
+    initAccount->submitWalletCreateChoices(newWalletChoice, mwcNetworkChoice);
 }
 
 void NewWallet::on_radioHaveSeed_clicked()

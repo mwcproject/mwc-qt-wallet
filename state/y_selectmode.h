@@ -20,10 +20,6 @@
 #include "../core/appcontext.h"
 #include "../core/Config.h"
 
-namespace wnd {
-class SelectMode;
-}
-
 namespace state {
 
 class SelectMode : public State
@@ -32,21 +28,15 @@ public:
     SelectMode( StateContext * context);
     virtual ~SelectMode() override;
 
-    void deleteWnd(wnd::SelectMode * wnd);
-
-    config::WALLET_RUN_MODE getWalletRunMode() const;
+    static config::WALLET_RUN_MODE getWalletRunMode();
 
     // Will require restart
     // Note, it is used by many parties as a helper method that apply a new mode and restart the wallet
     static void updateWalletRunMode( config::WALLET_RUN_MODE newRunMode );
 
-
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "select_mode.html";}
-
-private:
-    wnd::SelectMode * wnd = nullptr;
 };
 
 }

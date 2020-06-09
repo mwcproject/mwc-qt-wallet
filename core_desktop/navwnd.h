@@ -17,10 +17,6 @@
 
 #include "PanelBaseWnd.h"
 
-namespace state {
-struct StateContext;
-}
-
 namespace core {
 
 class NavBar;
@@ -31,7 +27,7 @@ class AppContext;
 class NavWnd : public PanelBaseWnd {
 Q_OBJECT
 public:
-    explicit NavWnd(QWidget *parent, state::StateContext * context, bool createNavigationButtons=true);
+    explicit NavWnd(QWidget *parent, bool createNavigationButtons=true);
 
 protected:
     void resizeEvent(QResizeEvent *event);

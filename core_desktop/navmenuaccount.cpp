@@ -13,21 +13,21 @@
 // limitations under the License.
 
 #include "navmenuaccount.h"
-#include "../state/state.h"
 #include "ui_navmenuaccount.h"
-#include "../state/statemachine.h"
-#include "../core/appcontext.h"
-#include "../control/messagebox.h"
-
+#include "../control_desktop/messagebox.h"
+#include "../bridge/statemachine_b.h"
+#include "../bridge/wallet_b.h"
+#include "../state/state.h"
 
 namespace core {
 
-NavMenuAccount::NavMenuAccount(QWidget *parent, state::StateContext * _context) :
+NavMenuAccount::NavMenuAccount(QWidget *parent) :
         NavMenu(parent),
-        ui(new Ui::NavMenuAccount),
-        context(_context)
+        ui(new Ui::NavMenuAccount)
 {
     ui->setupUi(this);
+    stateMachine = new bridge::StateMachine(this);
+    wallet = new bridge::Wallet(this);
 }
 
 NavMenuAccount::~NavMenuAccount() {
@@ -36,7 +36,7 @@ NavMenuAccount::~NavMenuAccount() {
 
 void NavMenuAccount::on_accountsButton_clicked()
 {
-    context->stateMachine->setActionWindow( state::STATE::ACCOUNTS );
+    stateMachine->setActionWindow( state::STATE::ACCOUNTS );
     close();
 }
 
@@ -44,34 +44,32 @@ void NavMenuAccount::on_seedButton_clicked()
 {
     // need to logout first, than switch to the seed
 
-    if (context->stateMachine->canSwitchState()) {
+    if (stateMachine->canSwitchState()) {
 
-        QString passwordHash = context->wallet->getPasswordHash();
+        QString passwordHash = wallet->getPasswordHash();
 
         if ( !passwordHash.isEmpty() ) {
-            if (control::MessageBox::RETURN_CODE::BTN2 !=
+            if (WndManager::RETURN_CODE::BTN2 !=
                 control::MessageBox::questionText(this, "Wallet Password",
                                                   "You are going to view wallet mnemonic passphrase.\n\nPlease input your wallet password to continue", "Cancel", "Confirm", false, true, 1.0,
-                                                  passwordHash, control::MessageBox::RETURN_CODE::BTN2))
+                                                  passwordHash, WndManager::RETURN_CODE::BTN2))
                 return;
         }
-
         // passwordHash should contain raw password value form the messgage box
-        context->appContext->pushCookie<QString>("password", passwordHash);
-        context->stateMachine->setActionWindow( state::STATE::SHOW_SEED);
+        stateMachine->activateShowSeed(passwordHash);
     }
     close();
 }
 
 void NavMenuAccount::on_contactsButton_clicked()
 {
-    context->stateMachine->setActionWindow( state::STATE::CONTACTS );
+    stateMachine->setActionWindow( state::STATE::CONTACTS );
     close();
 }
 
 void NavMenuAccount::on_logoutButton_clicked()
 {
-    context->stateMachine->logout();
+    stateMachine->logout();
 }
 
 }

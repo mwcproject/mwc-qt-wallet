@@ -29,7 +29,7 @@
     <string>...</string>
    </property>
    <property name="icon">
-    <iconset resource="../resources.qrc">
+    <iconset resource="../resources_desktop.qrc">
      <normaloff>:/img/NavNotificationNormal@2x.svg</normaloff>:/img/NavNotificationNormal@2x.svg</iconset>
    </property>
    <property name="iconSize">
@@ -64,7 +64,7 @@
     <string>...</string>
    </property>
    <property name="icon">
-    <iconset resource="../resources.qrc">
+    <iconset resource="../resources_desktop.qrc">
      <normaloff>:/img/NavSettings@2x.svg</normaloff>:/img/NavSettings@2x.svg</iconset>
    </property>
    <property name="iconSize">
@@ -99,7 +99,7 @@
     <string>...</string>
    </property>
    <property name="icon">
-    <iconset resource="../resources.qrc">
+    <iconset resource="../resources_desktop.qrc">
      <normaloff>:/img/NavAccount@2x.svg</normaloff>:/img/NavAccount@2x.svg</iconset>
    </property>
    <property name="iconSize">
@@ -123,11 +123,11 @@
   <customwidget>
    <class>control::NavPushButton</class>
    <extends>QToolButton</extends>
-   <header>control/NavControls.h</header>
+   <header>control_desktop/NavControls.h</header>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources.qrc"/>
+  <include location="../resources_desktop.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -15,21 +15,21 @@
 #include "m_airdrop.h"
 
 #include "../wallet/wallet.h"
-#include "windows/m_airdrop_w.h"
-#include "windows/m_airdropforbtc_w.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../core/global.h"
 #include "../core/Config.h"
 #include "../state/statemachine.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <control/messagebox.h>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QUrlQuery>
 #include "../util/Log.h"
 #include <QFile>
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/m_airdrop_b.h"
+#include <QDataStream>
 
 namespace state {
 
@@ -93,9 +93,8 @@ NextStateRespond Airdrop::execute() {
     if (context->appContext->getActiveWndState() != STATE::AIRDRDOP_MAIN)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if (airdropWnd==nullptr) {
-        airdropWnd = (wnd::Airdrop *) context->wndManager->switchToWindowEx( mwc::PAGE_M_AIRDROP,
-                    new wnd::Airdrop( context->wndManager->getInWndParent(), this ) );
+    if (bridge::getBridgeManager()->getAirdrop().isEmpty()) {
+        core::getWndManager()->pageAirdrop();
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
@@ -150,18 +149,8 @@ void Airdrop::requestStatusFor(int idx) {
 }
 
 void Airdrop::backToMainAirDropPage() {
-    airdropWnd = (wnd::Airdrop *) context->wndManager->switchToWindowEx( mwc::PAGE_M_AIRDROP,
-            new wnd::Airdrop( context->wndManager->getInWndParent(), this ) );
+    core::getWndManager()->pageAirdrop();
 }
-
-QVector<int> Airdrop::getColumnsWidhts() {
-    return context->appContext->getIntVectorFor("AirdropTblWidth");
-}
-
-void Airdrop::updateColumnsWidhts(QVector<int> widths) {
-    context->appContext->updateIntVectorFor("AirdropTblWidth", widths);
-}
-
 
 void Airdrop::sendRequest(HTTP_CALL call, const QString & api,
                           const QVector<QString> & params,
@@ -281,9 +270,9 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
                                     ".\nGet communication error: " + requestErrorMessage;
         }
 
-        if (airdropWnd) {
-            airdropWnd->updateAirDropStatus(airDropStatus);
-        }
+        for (auto b : bridge::getBridgeManager()->getAirdrop())
+            b->updateAirDropStatus(airDropStatus.waiting, airDropStatus.status, airDropStatus.message);
+
         return;
     }
 
@@ -321,8 +310,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
 
                 QString challenge = jsonRespond["challenge"].toString();
                 // Switch to the claim window...
-                airdropForBtcWnd = (wnd::AirdropForBTC *) context->wndManager->switchToWindowEx( mwc::PAGE_M_AIRDROP_CLAIM,
-                        new wnd::AirdropForBTC( context->wndManager->getInWndParent(), this, address, challenge, identifier ) );
+                core::getWndManager()->pageAirdropForBTC(address, challenge, identifier);
             }
             else {
                 // error status
@@ -459,14 +447,13 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
             status = message;
 
         Q_ASSERT( idx>=0 && idx<airdropRequests.size() );
-        if ( idx>=0 && idx<airdropRequests.size() && airdropWnd ) {
+        if ( idx>=0 && idx<airdropRequests.size() ) {
             // updating and request next if needed
-            if ( airdropWnd ) {
-                if (airdropWnd->updateClaimStatus( idx, airdropRequests[idx], status, message, amount, errCode)) {
-                    // Request next...
-                    if (idx + 1 < airdropRequests.size())
-                        requestStatusFor(idx + 1);
-                }
+            for (auto b : bridge::getBridgeManager()->getAirdrop()) {
+                b->updateClaimStatus( idx, airdropRequests[idx].btcAddress, status, message, amount, errCode);
+                // Request next...
+                if (idx + 1 < airdropRequests.size())
+                     requestStatusFor(idx + 1);
             }
         }
         return;
@@ -477,7 +464,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
 
 void Airdrop::onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPassword) {
 
-    if (airdropWnd==nullptr && airdropForBtcWnd==nullptr)
+    if (bridge::getBridgeManager()->getAirdrop().isEmpty())
         return; // Not Airdrop workflow
 
     if (success) {
@@ -485,7 +472,6 @@ void Airdrop::onGetNextKeyResult( bool success, QString identifier, QString publ
                               {"btcaddress", btcaddress, "password", airDropAccPassword, "pubkey", publicKey },
                               "",
                               TAG_GET_CHALLENGE, btcaddress, identifier );
-
     }
     else {
         reportMessageToUI("Claim request failed", "Unable to start claim process.\n" +
@@ -544,19 +530,14 @@ void Airdrop::onReceiveFile( bool success, QStringList errors, QString inFileNam
                      stateData,
                      TAG_RESPONCE_SLATE, btcAddress );
     }
-
 }
 
 
 // Respond with error to UI. UI expected to stop waiting
 void Airdrop::reportMessageToUI( QString title, QString message ) {
-    if (airdropWnd)
-        airdropWnd->reportMessage(title, message);
-    else if (airdropForBtcWnd)
-        airdropForBtcWnd->reportMessage(title, message);
+    for (auto b : bridge::getBridgeManager()->getAirdrop())
+        b->reportMessage(title, message);
 }
-
-
 
 
 }

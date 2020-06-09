@@ -22,9 +22,9 @@ namespace Ui {
 class NavMenuAccount;
 }
 
-
-namespace state {
-struct StateContext;
+namespace bridge {
+class StateMachine;
+class Wallet;
 }
 
 namespace core {
@@ -34,21 +34,19 @@ class NavMenuAccount : public NavMenu
     Q_OBJECT
 
 public:
-    explicit NavMenuAccount(QWidget *parent, state::StateContext * context);
+    explicit NavMenuAccount(QWidget *parent);
     ~NavMenuAccount();
 
 private slots:
     void on_accountsButton_clicked();
-
     void on_seedButton_clicked();
-
     void on_contactsButton_clicked();
-
     void on_logoutButton_clicked();
 
 private:
     Ui::NavMenuAccount *ui;
-    state::StateContext * context = nullptr;
+    bridge::StateMachine * stateMachine = nullptr;
+    bridge::Wallet * wallet = nullptr;
 };
 
 }

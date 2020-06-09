@@ -16,33 +16,32 @@
 #include "ui_a_initaccount.h"
 #include "../util/passwordanalyser.h"
 #include "../state/a_initaccount.h"
-#include "../util/widgetutils.h"
-#include "../control/messagebox.h"
+#include "../util_desktop/widgetutils.h"
+#include "../control_desktop/messagebox.h"
 #include <QShortcut>
 #include <QKeyEvent>
-#include "../core/global.h"
-#include "../util/stringutils.h"
-#include "../state/timeoutlock.h"
-#include "../dialogs/x_walletinstances.h"
-#include "../state/y_selectmode.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../dialogs_desktop/x_walletinstances.h"
+#include "../bridge/util_b.h"
+#include "../bridge/wnd/a_initaccount_b.h"
+#include "../bridge/wnd/y_selectmode_b.h"
 #include "../core/Config.h"
 
 namespace wnd {
 
-InitAccount::InitAccount(QWidget *parent, state::InitAccount * _state, state::WalletConfig * _configState) :
+InitAccount::InitAccount(QWidget *parent) :
     core::PanelBaseWnd(parent),
-    ui(new Ui::InitAccount),
-    state(_state),
-    configState(_configState)
+    ui(new Ui::InitAccount)
 {
     ui->setupUi(this);
 
-    QVector<double> weight;
-    QStringList seqWords, dictWords;
-    QPair<QString, bool> paResp = passwordAnalyser.getPasswordQualityReport( ui->password1Edit->text(), weight, seqWords, dictWords );
+    selectMode = new bridge::SelectMode(this);
+    initAccount = new bridge::InitAccount(this);
+    util = new bridge::Util(this);
 
-    ui->strengthLabel->setText( paResp.first );
-    ui->submitButton->setEnabled( paResp.second );
+    util->passwordQualitySet( ui->password1Edit->text() );
+    ui->strengthLabel->setText( util->passwordQualityComment() );
+    ui->submitButton->setEnabled( util->passwordQualityIsAcceptable() );
 
     ui->password1Edit->installEventFilter(this);
 
@@ -52,6 +51,7 @@ InitAccount::InitAccount(QWidget *parent, state::InitAccount * _state, state::Wa
 
 InitAccount::~InitAccount()
 {
+    util->releasePasswordAnalyser();
     delete ui;
 }
 
@@ -63,12 +63,9 @@ void InitAccount::on_password1Edit_textChanged(const QString &text)
         ui->submitButton->setEnabled( false );
     }
 
-    QVector<double> weight;
-    QStringList seqWords, dictWords;
-    QPair<QString, bool> paResp = passwordAnalyser.getPasswordQualityReport( text, weight, seqWords, dictWords );
-
-    ui->strengthLabel->setText(paResp.first);
-    ui->submitButton->setEnabled( paResp.second );
+    util->passwordQualitySet(text);
+    ui->strengthLabel->setText( util->passwordQualityComment() );
+    ui->submitButton->setEnabled( util->passwordQualityIsAcceptable() );
 
     updatePassState();
 }
@@ -96,7 +93,7 @@ void InitAccount::updatePassState() {
 
 void InitAccount::on_submitButton_clicked()
 {
-    state::TimeoutLockObject to(state);
+    util::TimeoutLockObject to("InitAccount");
 
     QString pswd1 = ui->password1Edit->text();
     QString pswd2 = ui->password2Edit->text();
@@ -107,11 +104,9 @@ void InitAccount::on_submitButton_clicked()
         return;
     }
 
-    QVector<double> weight;
-    QStringList seqWords, dictWords;
-    QPair<QString, bool> paResp = passwordAnalyser.getPasswordQualityReport( pswd1, weight, seqWords, dictWords );
+    util->passwordQualitySet(pswd1);
 
-    if (!paResp.second)
+    if (!util->passwordQualityIsAcceptable())
         return;
 
     if (pswd1!=pswd2) {
@@ -119,31 +114,28 @@ void InitAccount::on_submitButton_clicked()
         return;
     }
 
-    if (! paResp.second ) {
-        control::MessageBox::messageText(this, "Password", "Your password is not strong enough. Please input stronger password");
-        return;
-    }
+    util->releasePasswordAnalyser();
 
-    state->setPassword(pswd1);
+    initAccount->setPassword(pswd1);
 }
 
 void InitAccount::on_instancesButton_clicked()
 {
-    state::TimeoutLockObject to(state);
+    util::TimeoutLockObject to("InitAccount");
 
-    dlg::WalletInstances  walletInstances(this, configState);
+    dlg::WalletInstances  walletInstances(this);
     walletInstances.exec();
 }
 
 void wnd::InitAccount::on_runOnlineNodeButton_clicked()
 {
-    state::TimeoutLockObject to(state);
-    if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(this, "Running Mode",
+    util::TimeoutLockObject to("InitAccount");
+    if ( core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionText(this, "Running Mode",
                           "You are switching to 'Online Node'.\nOnline Node can be used as a data provider for the Cold Wallet.",
                                   "Cancel", "Continue", false, true) ) {
         // Restarting wallet in a right mode...
         // First, let's upadte a config
-        state::SelectMode::updateWalletRunMode( config::WALLET_RUN_MODE::ONLINE_NODE );
+        selectMode->updateWalletRunMode( int(config::WALLET_RUN_MODE::ONLINE_NODE) );
     }
 }
 

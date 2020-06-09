@@ -15,14 +15,14 @@
 #ifndef X_NODECONFIG_W_H
 #define X_NODECONFIG_W_H
 
-#include "../core/navwnd.h"
-#include "../wallet/wallet.h"
+#include "../core_desktop/navwnd.h"
 
 namespace Ui {
 class NodeConfig;
 }
 
-namespace state {
+namespace bridge {
+class Config;
 class WalletConfig;
 }
 
@@ -34,7 +34,7 @@ class NodeConfig : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit NodeConfig(QWidget *parent, state::WalletConfig * state );
+    explicit NodeConfig(QWidget *parent);
     virtual ~NodeConfig() override;
 
     bool askUserForChanges();
@@ -50,8 +50,8 @@ private:
     bool applyChanges();
 private:
     Ui::NodeConfig          *ui = nullptr;
-    state::WalletConfig     * state  = nullptr;
-    wallet::WalletConfig    walletCfg;
+    bridge::Config * config = nullptr;
+    bridge::WalletConfig * walletConfig = nullptr;
 };
 
 }

@@ -16,7 +16,6 @@
 #include <QProcess>
 #include <QSystemSemaphore>
 #include "TestSystemSemaphoreThread.h"
-#include "../control/messagebox.h"
 #include "../core/Config.h"
 #include <QDir>
 #include <QtGlobal>
@@ -27,21 +26,9 @@ namespace util {
 
 static QString mwcQtWalletPath;
 
-// By some reasons bool QProcess::startDetached(qint64 *pid = nullptr) is not in 5.9
-// Guessing that something happens and it was removed. But we need it for environemnt varibales
-
-// https://stackoverflow.com/questions/4265946/set-environment-variables-for-startdetached-qprocess
-// https://bugreports.qt.io/browse/QTBUG-2284
-class DetarchedProcess : public QProcess {
-
-};
-
-
-
 void openUrlInBrowser(const QString & url) {
     QDesktopServices::openUrl( QUrl(url) );
 }
-
 
 static QSystemSemaphore * instancesSemaphore = nullptr;
 

@@ -14,23 +14,27 @@
 
 #include "x_walletinstances.h"
 #include "ui_x_walletinstances.h"
-#include "../state/x_walletconfig.h"
-#include "../state/timeoutlock.h"
+#include "../util_desktop/timeoutlock.h"
 #include <QFileDialog>
-#include "../control/messagebox.h"
-#include "../dialogs/networkselectiondlg.h"
-#include "../util/Process.h"
+#include "../control_desktop/messagebox.h"
+#include "../dialogs_desktop/networkselectiondlg.h"
+#include "../bridge/wallet_b.h"
+#include "../bridge/wnd/x_walletconfig_b.h"
+#include "../bridge/config_b.h"
 
 namespace dlg {
 
-WalletInstances::WalletInstances(QWidget *parent, state::WalletConfig * _state) :
+WalletInstances::WalletInstances(QWidget *parent) :
         control::MwcDialog( parent ),
-        ui( new Ui::WalletInstances ),
-        state( _state )
+        ui( new Ui::WalletInstances )
 {
     ui->setupUi(this);
+    wallet = new bridge::Wallet(this);
+    //util = new bridge::Util(this);
+    config = new bridge::Config(this);
+    walletConfig = new bridge::WalletConfig(this);
 
-    ui-> mwc713directoryEdit->setText( state->getWalletConfig().getDataPath() );
+    ui-> mwc713directoryEdit->setText( config->getDataPath() );
 }
 
 WalletInstances::~WalletInstances() {
@@ -38,26 +42,27 @@ WalletInstances::~WalletInstances() {
 }
 
 void WalletInstances::on_mwc713directorySelect_clicked() {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to( "WalletInstances");
 
-    QPair<bool,QString> basePath = ioutils::getAppDataPath();
-    if (!basePath.first) {
-        control::MessageBox::messageText(nullptr, "Error", basePath.second);
+    QString basePath = config->getAppDataPath();
+    if (basePath.startsWith(' ')) {
+        control::MessageBox::messageText(nullptr, "Error", basePath);
         return;
     }
 
     QString dir = QFileDialog::getExistingDirectory(
             nullptr,
             "Select your wallet folder name",
-            basePath.second);
+            basePath);
+
     if (dir.isEmpty())
         return;
 
-    QDir baseDir(basePath.second);
+    QDir baseDir(basePath);
     QString walletDataDir = baseDir.relativeFilePath(dir);
 
-    QString runningArc = util::getBuildArch();
-    QString dataArc    = wallet::WalletConfig::readNetworkArchFromDataPath(walletDataDir).second;
+    QString runningArc = config->getBuildArch();
+    QString dataArc    = config->readNetworkArchFromDataPath(walletDataDir)[1];
     if ( runningArc != dataArc ) {
         control::MessageBox::messageText(nullptr, "Wallet data architecture mismatch",
                     "Your mwc713 seed at '"+ walletDataDir +"' was created with "+ dataArc+" bits version of the wallet. You are using " + runningArc + " bit version.");
@@ -81,45 +86,41 @@ void WalletInstances::on_applyButton_clicked() {
         return;
     }
 
-    wallet::WalletConfig newWalletConfig = state->getWalletConfig();
-    if ( dataPath == newWalletConfig.getDataPath() ) {
+    if ( dataPath == config->getDataPath() ) {
         reject();
         return; // no changes was made
     }
 
     // Data path need to be updated, as well as a network
-    QPair<QString,QString> networkArch = wallet::WalletConfig::readNetworkArchFromDataPath(dataPath); // local path as writen in config
-    QString runningArc = util::getBuildArch();
+    // [<network>, <architecture>]
+    QVector<QString> networkArch = config->readNetworkArchFromDataPath(dataPath); // local path as writen in config
+    QString runningArc = config->getBuildArch();
 
     // Just in case. Normally will never be called
-    if ( runningArc != networkArch.second ) {
+    if ( runningArc != networkArch[1] ) {
         control::MessageBox::messageText(nullptr, "Wallet data architecture mismatch",
-                                     "Your mwc713 seed at '"+ dataPath +"' was created with "+ networkArch.second+" bits version of the wallet. You are using " + runningArc + " bit version.");
+                                     "Your mwc713 seed at '"+ dataPath +"' was created with "+ networkArch[1]+" bits version of the wallet. You are using " + runningArc + " bit version.");
         return;
     }
 
-    if (networkArch.first.isEmpty()) {
+    if (networkArch[0].isEmpty()) {
         // Check if seed file does exist. Import of the data?
-        if ( wallet::WalletConfig::doesSeedExist(dataPath) ) {
-
+        if ( config->doesSeedExist(dataPath) ) {
             dlg::NetworkSelectionDlg nwDlg(this);
             if (nwDlg.exec() != QDialog::Accepted)
                 return;
 
-            networkArch.first = nwDlg.getNetwork() == state::InitAccount::MWC_NETWORK::MWC_MAIN_NET ? "Mainnet" : "Floonet";
-
+            networkArch[0] = nwDlg.getNetwork() == state::InitAccount::MWC_NETWORK::MWC_MAIN_NET ? "Mainnet" : "Floonet";
         }
         else
-            networkArch.first = "Mainnet"; // will be redefined later in any case...
+            networkArch[0] = "Mainnet"; // will be redefined later in any case...
 
-        wallet::WalletConfig::saveNetwork2DataPath(dataPath, networkArch.first, util::getBuildArch() );
+        config->saveNetwork2DataPath(dataPath, networkArch[0], config->getBuildArch() );
     }
 
-    newWalletConfig.setDataPathWithNetwork( dataPath, networkArch.first );
-
-    if (!state->setWalletConfig(newWalletConfig, false) )
+    if (!walletConfig->setDataPathWithNetwork( dataPath, networkArch[0], false ) )
     {
-        control::MessageBox::messageText( this, "Internal error", "Unable to change the folder for your wallet" );
+        control::MessageBox::messageText( this, "Internal error", "Unable to change folder for your wallet" );
         return;
     }
     accept();

@@ -15,14 +15,13 @@
 #ifndef H_HODLCOLD_W_H
 #define H_HODLCOLD_W_H
 
-#include "../core/navwnd.h"
-#include "../wallet/wallet.h"
+#include "../core_desktop/navwnd.h"
 
 namespace Ui {
 class HodlCold;
 }
 
-namespace state {
+namespace bridge {
     class Hodl;
 }
 
@@ -33,22 +32,19 @@ class HodlCold : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit HodlCold(QWidget *parent, state::Hodl * state);
+    explicit HodlCold(QWidget *parent);
     ~HodlCold();
-
-    void setRootPubKeyWithSignature(const QString & key, const QString & message, const QString & signature);
-
-    void reportMessage(const QString & title, const QString & message);
-    void hideWaitingStatus();
 
 private slots:
     void on_sign_clicked();
-
     void on_message_textChanged(const QString &arg1);
 
+    void onSgnSetRootPubKeyWithSignature(QString key, QString hash, QString message, QString signature);
+    void onSgnReportMessage(QString title, QString message);
+    void onSgnHideWaitingStatus();
 private:
     Ui::HodlCold *ui;
-    state::Hodl * state;
+    bridge::Hodl * hodl = nullptr;
 };
 
 }

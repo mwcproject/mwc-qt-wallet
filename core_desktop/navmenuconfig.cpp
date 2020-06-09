@@ -17,22 +17,23 @@
 #include "ui_navmenuconfigwallet.h"
 #include "ui_navmenuconfignode.h"
 #include "ui_navmenuconfigcoldwlt.h"
-#include "../state/statemachine.h"
-#include "../core/appcontext.h"
-#include "../core/Config.h"
-#include "../control/messagebox.h"
+#include "../control_desktop/messagebox.h"
+#include "../bridge/config_b.h"
+#include "../bridge/statemachine_b.h"
 
 namespace core {
 
-NavMenuConfig::NavMenuConfig(QWidget *parent, state::StateContext * _context ) :
-        NavMenu(parent),
-        context(_context) {
+NavMenuConfig::NavMenuConfig(QWidget *parent) :
+        NavMenu(parent) {
 
-    if (config::isOnlineNode()) {
+    config = new bridge::Config(this);
+    stateMachine = new bridge::StateMachine(this);
+
+    if (config->isOnlineNode()) {
         uiNode = new Ui::NavMenuConfigNode;
         uiNode->setupUi(this);
     }
-    else if (config::isColdWallet()) {
+    else if (config->isColdWallet()) {
         uiColdWallet  = new Ui::NavMenuConfigColdWlt;
         uiColdWallet ->setupUi(this);
     }
@@ -53,47 +54,45 @@ NavMenuConfig::~NavMenuConfig() {
 
 void NavMenuConfig::on_walletConfigButton_clicked()
 {
-    context->stateMachine->setActionWindow( state::STATE::WALLET_CONFIG );
+    stateMachine->setActionWindow( state::STATE::WALLET_CONFIG );
     close();
 }
 
 void NavMenuConfig::on_outputsButton_clicked()
 {
-    context->stateMachine->setActionWindow( state::STATE::OUTPUTS );
+    stateMachine->setActionWindow( state::STATE::OUTPUTS );
     close();
 }
 
 void NavMenuConfig::on_mwcmqButton_clicked()
 {
-    context->stateMachine->setActionWindow( state::STATE::LISTENING );
+    stateMachine->setActionWindow( state::STATE::LISTENING );
     close();
 }
 
 void NavMenuConfig::on_nodeOverviewButton_clicked()
 {
-    context->stateMachine->setActionWindow( state::STATE::NODE_INFO );
+    stateMachine->setActionWindow( state::STATE::NODE_INFO );
     close();
 }
 
 void NavMenuConfig::on_selectRunningModeButton_clicked() {
-    context->stateMachine->setActionWindow( state::STATE::WALLET_RUNNING_MODE );
+    stateMachine->setActionWindow( state::STATE::WALLET_RUNNING_MODE );
     close();
 }
 
 void NavMenuConfig::on_resyncButton_clicked()
 {
     if (control::MessageBox::questionText(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
-                       "No", "Yes", true, false) == control::MessageBox::RETURN_CODE::BTN2 ) {
+                       "No", "Yes", true, false) == WndManager::RETURN_CODE::BTN2 ) {
         // Starting resync
-
-        context->appContext->pushCookie("PrevState", (int)context->appContext->getActiveWndState() );
-        context->stateMachine->setActionWindow( state::STATE::RESYNC );
+        stateMachine->activateResyncState();
     }
     close();
 }
 
 void NavMenuConfig::on_hodlButton_clicked() {
-    context->stateMachine->setActionWindow( state::STATE::HODL );
+    stateMachine->setActionWindow( state::STATE::HODL );
     close();
 }
 

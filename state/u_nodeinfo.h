@@ -19,10 +19,6 @@
 #include "../wallet/wallet.h"
 #include "../node/MwcNodeConfig.h"
 
-namespace wnd {
-class NodeInfo;
-}
-
 namespace state {
 
 struct NodeStatus {
@@ -48,15 +44,13 @@ public:
     NodeInfo(StateContext * context);
     virtual ~NodeInfo() override;
 
-    void wndIsGone(wnd::NodeInfo * w) { if(w==wnd) wnd = nullptr;} // window is closed
-
     void requestNodeInfo();
 
     void requestWalletResync();
 
     // Connection with network
-    QPair< wallet::MwcNodeConnection, wallet::WalletConfig > getNodeConnection() const;
-    void updateNodeConnection( const wallet::MwcNodeConnection & nodeConnect, const wallet::WalletConfig & walletConfig );
+    wallet::MwcNodeConnection getNodeConnection() const;
+    void updateNodeConnection( const wallet::MwcNodeConnection & nodeConnect);
 
     QString getMwcNodeStatus();
 
@@ -67,8 +61,8 @@ public:
     QString getPublishTransactionPath() const;
     void    updatePublishTransactionPath(QString path);
 
-    void saveBlockchainData(QString fileName);
-    void loadBlockchainData(QString fileName);
+    void exportBlockchainData(QString fileName);
+    void importBlockchainData(QString fileName);
     void publishTransaction(QString fileName);
 protected:
     virtual NextStateRespond execute() override;
@@ -86,7 +80,6 @@ private slots:
 private:
     virtual void timerEvent(QTimerEvent *event) override;
 private:
-    wnd::NodeInfo * wnd = nullptr;
     bool  justLogin = false;
     NodeStatus lastNodeStatus; // Satus as mwc713 see the node
     QString lastLocalNodeStatus = "Waiting"; // Status from the embedded node

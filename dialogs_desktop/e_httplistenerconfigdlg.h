@@ -15,11 +15,17 @@
 #ifndef E_HTTPLISTENERCONFIGDLG_H
 #define E_HTTPLISTENERCONFIGDLG_H
 
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
 class HttpListenerConfigDlg;
+}
+
+namespace bridge {
+class Util;
+class Wallet;
+class Config;
 }
 
 namespace dlg {
@@ -29,36 +35,33 @@ class HttpListenerConfigDlg : public control::MwcDialog
     Q_OBJECT
 
 public:
-    explicit HttpListenerConfigDlg(QWidget *parent, const wallet::WalletConfig &config);
+    explicit HttpListenerConfigDlg(QWidget *parent);
     ~HttpListenerConfigDlg();
 
-    const wallet::WalletConfig & getConfig() const {return config;}
+signals:
+    // this signal will be sent if user press OK
+    void HttpListenerConfigResult(bool foreignApi,
+        QString foreignApiAddress, QString foreignApiSecret,
+        QString tlsCertificateFile, QString tlsCertificateKey);
 
 private slots:
     void on_selectPrivKeyButton_clicked();
-
     void on_selectFullchainButton_clicked();
-
     void on_resetButton_clicked();
-
     void on_cancelButton_clicked();
-
     void on_applyButton_clicked();
-
     void on_activateRestApi_stateChanged(int check);
-
     void on_useBasicAutorization_stateChanged(int check);
-
     void on_useTlsCheck_stateChanged(int check);
-
     void on_generateSecretButton_clicked();
-
 private:
     void updateControlState();
 
 private:
     Ui::HttpListenerConfigDlg *ui;
-    wallet::WalletConfig config;
+    bridge::Util * util = nullptr;
+    bridge::Wallet * wallet = nullptr;
+    bridge::Config * config = nullptr;
 };
 
 }

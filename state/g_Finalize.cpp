@@ -13,18 +13,17 @@
 // limitations under the License.
 
 #include <QFile>
-#include "../control/messagebox.h"
 #include "g_Finalize.h"
 #include "../wallet/wallet.h"
 #include "../core/appcontext.h"
-#include "../core/windowmanager.h"
 #include "../state/statemachine.h"
 #include "../util/Log.h"
-#include "../windows/g_finalizeupload_w.h"
-#include "../windows/g_filetransaction_w.h"
 #include "../core/global.h"
 #include "../core/Config.h"
 #include <QCoreApplication>
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/g_filetransaction_b.h"
 
 namespace state {
 
@@ -61,23 +60,13 @@ NextStateRespond Finalize::execute() {
 }
 
 void Finalize::ftBack() {
-    uploadWnd = ( wnd::FinalizeUpload* ) context->wndManager->switchToWindowEx( mwc::PAGE_G_FINALIZE_UPLOAD,
-                new wnd::FinalizeUpload( context->wndManager->getInWndParent(), this ) );
+    core::getWndManager()->pageFinalize();
 }
 
-
-QString Finalize::getFileGenerationPath() {
-    return context->appContext->getPathFor("fileGen");
-}
-
-void Finalize::updateFileGenerationPath(QString path) {
-    context->appContext->updatePathFor("fileGen", path);
-}
 
 bool Finalize::needResultTxFileName() {
     return config::isColdWallet();
 }
-
 
 QString Finalize::getResultTxPath() {
     return context->appContext->getPathFor("resultTx");
@@ -87,28 +76,22 @@ void Finalize::updateResultTxPath(QString path) {
 }
 
 
-// Process to the next Step, show transaction details
-void Finalize::fileTransactionUploaded( const QString & fileName, const util::FileTransactionInfo & transInfo ) {
+void Finalize::uploadFileTransaction(QString fileName) {
 
-    wallet::WalletTransaction transaction;
+    util::FileTransactionInfo transInfo;
 
-    /*  No need to get any transaction info
-    if (!transInfo.transactionId.isEmpty()) {
-        for (auto &tr : allTransactions) {
-            if (!tr.txid.isEmpty() && transInfo.transactionId.startsWith(tr.txid) ) {
-                transaction = tr;
-                break;
-            }
-        }
-    }*/
+    QPair<bool, QString> perseResult = transInfo.parseTransaction(fileName, util::FileTransactionType::FINALIZE );
 
-    // Let's try to find the transaction that match that file.
+    if (!perseResult.first) {
+        core::getWndManager()->messageTextDlg("Slate File", perseResult.second );
+        return;
+    }
 
     file2TransactionsInfo.insert(fileName, transInfo);
 
-    fileTransWnd = (wnd::FileTransaction*) context->wndManager->switchToWindowEx( mwc::PAGE_G_FINALIZE_TRANS,
-               new wnd::FileTransaction( context->wndManager->getInWndParent(), this, fileName, transInfo, transaction, lastNodeHeight,
-                                         "Finalize Transaction", "Finalize") );
+    core::getWndManager()->pageFileTransaction(mwc::PAGE_G_FINALIZE_TRANS, FINALIZE_CALLER_ID,
+                                               fileName, transInfo, lastNodeHeight,
+                                               "Finalize Transaction", "Finalize");
 }
 
 
@@ -129,8 +112,8 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
     logger::logInfo("Finalize", "Get file finalize results. success=" + QString::number(success) + " errors=" +
                  errors.join(",") + " fileName=" + fileName );
 
-    if (fileTransWnd!=nullptr)
-        fileTransWnd->hideProgress();
+    for (auto p : bridge::getBridgeManager()->getFileTransaction() )
+        p->hideProgress();
 
     if (success) {
         if (!file2TransactionsInfo.contains(fileName)) {
@@ -141,20 +124,20 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
         const util::FileTransactionInfo & trInfo = file2TransactionsInfo[fileName];
         if (trInfo.resultingFN.isEmpty()) {
             // Online wallet case. The normal workflow
-            control::MessageBox::messageText(nullptr, "Finalize File Transaction", "File Transaction was finalized successfully.");
+            core::getWndManager()->messageTextDlg("Finalize File Transaction", "File Transaction was finalized successfully.");
         }
         else {
             // Cold wallet workflow, let's copy the transaction file
             QPair<bool,QString> walletPath = ioutils::getAppDataPath( context->wallet->getWalletConfig().getDataPath() );
             if (!walletPath.first) {
-                control::MessageBox::messageText(nullptr, "Error", walletPath.second);
+                core::getWndManager()->messageTextDlg("Error", walletPath.second);
                 QCoreApplication::exit();
                 return;
             }
 
             QString transactionFN = walletPath.second + "/saved_txs/" + trInfo.transactionId + ".grintx";
             if ( !QFile(transactionFN).exists() ) {
-                control::MessageBox::messageText(nullptr, "Internal Error", "Transaction file for id '" + trInfo.transactionId + "' not found. wmc713 didn't create expected file.");
+                core::getWndManager()->messageTextDlg("Internal Error", "Transaction file for id '" + trInfo.transactionId + "' not found. wmc713 didn't create expected file.");
                 return;
             }
 
@@ -165,11 +148,11 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
             bool copyOk = QFile::copy(transactionFN, trInfo.resultingFN);
 
             if (copyOk) {
-                control::MessageBox::messageText(nullptr, "Finalize File Transaction", "File Transaction was finalized successfully but it is not published because you are running Cold Wallet.\n"
+                core::getWndManager()->messageTextDlg("Finalize File Transaction", "File Transaction was finalized successfully but it is not published because you are running Cold Wallet.\n"
                                              "Resulting transaction located at " + trInfo.resultingFN+ ". Please publish at with mwc node, so it will be propagated to the blockchain network.");
             }
             else {
-                control::MessageBox::messageText(nullptr, "IO Error", "File Transaction was finalized successfully but we wasn't be able to save file at the requested location. Please note, you need publish this transaction with mwc node, so it will be propagated to the blockchain network."
+                core::getWndManager()->messageTextDlg("IO Error", "File Transaction was finalized successfully but we wasn't be able to save file at the requested location. Please note, you need publish this transaction with mwc node, so it will be propagated to the blockchain network."
                                              "Your transaction location:\n" + transactionFN);
             }
         }
@@ -177,14 +160,9 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
         ftBack();
     }
     else {
-        control::MessageBox::messageText(nullptr, "Failure", "File Transaction failed to finalize.\n" + errors.join("\n") );
+        core::getWndManager()->messageTextDlg("Failure", "File Transaction failed to finalize.\n" + errors.join("\n") );
     }
 }
-
-state::StateContext * Finalize::getContext() {
-    return context;
-}
-
 
 void Finalize::onAllTransactions( QVector<wallet::WalletTransaction> transactions) {
     allTransactions = transactions;

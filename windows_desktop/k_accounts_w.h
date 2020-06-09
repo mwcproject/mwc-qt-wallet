@@ -15,18 +15,20 @@
 #ifndef ACCOUNTS_H
 #define ACCOUNTS_H
 
-#include "../core/navwnd.h"
-#include "../wallet/wallet.h"
+#include "../core_desktop/navwnd.h"
 
 namespace Ui {
 class Accounts;
 }
 
-namespace state {
-    class Accounts;
+namespace bridge {
+class Accounts;
+class HodlStatus;
+class Config;
+class Wallet;
+class Util;
 }
 
-class QListWidgetItem;
 class QTableWidgetItem;
 
 namespace wnd {
@@ -36,25 +38,22 @@ class Accounts : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit Accounts(QWidget *parent, state::Accounts * state);
+    explicit Accounts(QWidget *parent);
     ~Accounts();
-
-    void refreshWalletBalance();
-
-    void onAccountRenamed(bool success, QString errorMessage);
 
 private slots:
     void on_refreshButton_clicked();
     void on_transferButton_clicked();
     void on_addButton_clicked();
-
     void on_deleteButton_clicked();
-
     void on_renameButton_clicked();
-
     void on_accountList_itemSelectionChanged();
-
     void on_accountList_itemDoubleClicked(QTableWidgetItem *item);
+
+    void onSgnWalletBalanceUpdated();
+    void onSgnAccountCreated( QString newAccountName);
+    // Account is renamed, renameAccount
+    void onSgnAccountRenamed(bool success, QString errorMessage);
 
 private:
     void initTableHeaders();
@@ -66,10 +65,14 @@ private:
     void startWaiting();
 private:
     Ui::Accounts *ui;
-    state::Accounts * state;
+    bridge::Config * config = nullptr;
+    bridge::HodlStatus * hodlStatus = nullptr;
+    bridge::Wallet * wallet = nullptr;
+    bridge::Accounts * accState = nullptr; // place holder
+    bridge::Util * util = nullptr;
+
     bool inHodl = false;
-    QString currentAccountName;
-    QVector<wallet::AccountInfo> accounts; // current shown data
+    QVector<QString> accounts; // current shown data
 };
 
 }

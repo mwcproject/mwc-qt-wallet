@@ -24,14 +24,15 @@ find_package(Qt5 COMPONENTS Core Gui Widgets Network REQUIRED)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
+add_definitions( -DWALLET_DESKTOP )
 
 ####################
 #
 # Input files
 #
 
-file(GLOB SOURCE_FILES ./*.cpp control_desktop/*.cpp ./core/*.cpp ./state/*.cpp ./test/*.cpp ./tries/*.cpp ./util/*.cpp ./wallet/*.cpp ./node/*.cpp  ./wallet/tasks/*.cpp windows_desktop/*.cpp dialogs_desktop/*.cpp ./tests/*.cpp ./misk/*.cpp)
-file(GLOB HEADER_FILES control_desktop/*.h ./core/*.h   ./state/*.h   ./test/*.h   ./tries/*.h   ./util/*.h   ./wallet/*.h   ./node/*.h    ./wallet/tasks/*.h windows_desktop/*.h dialogs_desktop/*.h ./tests/*.h   ./misk/*.cpp)
+file(GLOB SOURCE_FILES ./*.cpp control_desktop/*.cpp ./core/*.cpp ./core_desktop/*.cpp ./state/*.cpp ./bridge/*.cpp ./bridge/wnd/*.cpp  ./tries/*.cpp ./util/*.cpp ./util_desktop/*.cpp ./wallet/*.cpp ./node/*.cpp  ./wallet/tasks/*.cpp  windows_desktop/*.cpp  dialogs_desktop/*.cpp ./tests/*.cpp ./misk/*.cpp)
+file(GLOB HEADER_FILES         control_desktop/*.h   ./core/*.h   ./core_desktop/*.h   ./state/*.h   ./bridge/*.h   ./bridge/wnd/*.h    ./tries/*.h   ./util/*.h   ./util_desktop/*.h   ./wallet/*.h   ./node/*.h    ./wallet/tasks/*.h    windows_desktop/*.h    dialogs_desktop/*.h   ./tests/*.h   ./misk/*.h)
 
 # Generate necessary headers from .ui files. (qmake lets `uic` do this job.)
 # hint from [Cross-platform Qt5 project using cmake](http://stackoverflow.com/questions/21174586/)
@@ -65,7 +66,7 @@ ENDIF(APPLE)
 # Outputs
 #
 
-add_executable(mwc-qt-wallet ${SOURCE_FILES} ${HEADER_FILES} ${UI_GENERATED_HEADERS} ${Cocoa_SRCS} resources.qrc)
+add_executable(mwc-qt-wallet ${SOURCE_FILES} ${HEADER_FILES} ${UI_GENERATED_HEADERS} ${Cocoa_SRCS} resources_desktop.qrc)
 target_link_libraries(mwc-qt-wallet Qt5::Widgets Qt5::Gui Qt5::Core Qt5::Network ${AppKit})
 
 # Copy Qt runtime libraries to build directory

@@ -173,10 +173,10 @@ public:
     virtual void check(bool wait4listeners)  override;
 
     // Get current configuration of the wallet. will read from wallet713.toml file
-    virtual WalletConfig getWalletConfig()  override;
+    virtual const WalletConfig & getWalletConfig()  override;
 
     // Get configuration form the resource file.
-    virtual WalletConfig getDefaultConfig()  override;
+    virtual const WalletConfig & getDefaultConfig()  override;
 
     // Update wallet config. Will update config and restart the mwc713.
     // Note!!! Caller is fully responsible for input validation. Normally mwc713 will start, but some problems might exist
@@ -199,7 +199,7 @@ public:
 
     // Cancel transaction
     // Check Signal:  onCancelTransacton
-    virtual void cancelTransacton(int64_t transactionID)  override;
+    virtual void cancelTransacton(QString account, int64_t txIdx)  override;
 
     // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
     // Check Signal: onExportProof( bool success, QString fn, QString msg );
@@ -211,7 +211,7 @@ public:
 
     // Init send transaction with file output
     // Check signal:  onSendFile
-    virtual void sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx,
+    virtual void sendFile( const QString &account, int64_t coinNano, QString message, QString fileTx,
             int inputConfirmationNumber, int changeOutputs,
             const QStringList & outputs )  override;
     // Receive transaction. Will generate *.response file in the same dir
@@ -235,7 +235,7 @@ public:
     // Before send, wallet always do the switch to account to make it active
     // Check signal:  onSend
     // coinNano == -1  - mean All
-    virtual void sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address,
+    virtual void sendTo( const QString &account, int64_t coinNano, const QString & address,
                          const QString & apiSecret,
                          QString message, int inputConfirmationNumber, int changeOutputs,
                          const QStringList & outputs, bool fluff )  override;
@@ -335,14 +335,14 @@ public:
     void setTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages );
 
     // Outputs results
-    void setOutputs( QString account, int64_t height, QVector<WalletOutput> outputs);
+    void setOutputs( QString account, bool show_spent, int64_t height, QVector<WalletOutput> outputs);
 
     void setWalletOutputs( const QString & account, const QVector<WalletOutput> & outputs);
 
     void setExportProofResults( bool success, QString fn, QString msg );
     void setVerifyProofResults( bool success, QString fn, QString msg );
 
-    void setTransCancelResult( bool success, int64_t transId, QString errMsg );
+    void setTransCancelResult( bool success, const QString & account, int64_t transId, QString errMsg );
 
     void setSetReceiveAccount( bool ok, QString accountOrMessage );
 
@@ -444,6 +444,9 @@ private:
     QMap<QString, QVector<wallet::WalletOutput> > walletOutputs; // Available outputs from this wallet. Key: account name, value outputs for this account
 
     int64_t lastSyncTime = 0;
+
+    WalletConfig currentConfig;
+    WalletConfig defaultConfig;
 private:
     // Temprary values, local values for states
     QString walletPasswordHash;

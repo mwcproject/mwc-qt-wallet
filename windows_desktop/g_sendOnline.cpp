@@ -14,28 +14,32 @@
 
 #include "g_sendOnline.h"
 #include "ui_g_sendOnline.h"
-#include "../dialogs/sendcoinsparamsdialog.h"
-#include "../control/messagebox.h"
-#include "../util/address.h"
-#include "../state/g_Send.h"
-#include "../state/timeoutlock.h"
-#include "../dialogs/g_sendconfirmationdlg.h"
-#include "../dialogs/w_selectcontact.h"
-#include "../util/ui.h"
+#include "../dialogs_desktop/sendcoinsparamsdialog.h"
+#include "../control_desktop/messagebox.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../dialogs_desktop/g_sendconfirmationdlg.h"
+#include "../dialogs_desktop/w_selectcontact.h"
+#include "../bridge/util_b.h"
+#include "../bridge/config_b.h"
+#include "../bridge/wnd/g_send_b.h"
 
 namespace wnd {
 
 SendOnline::SendOnline(QWidget *parent,
-        const wallet::AccountInfo & _selectedAccount, int64_t _amount,
-        state::Send * _state, state::Contacts * _contactsState ) :
-    core::NavWnd(parent, _state->getContext() ),
+                       QString _account, int64_t _amount) :
+    core::NavWnd(parent),
     ui(new Ui::SendOnline),
-    state(_state),
-    contactsState(_contactsState ),
-    selectedAccount(_selectedAccount),
+    account(_account),
     amount(_amount)
 {
     ui->setupUi(this);
+
+    util = new bridge::Util(this);
+    config = new bridge::Config(this);
+    send = new bridge::Send(this);
+
+    QObject::connect( send, &bridge::Send::sgnShowSendResult,
+                      this, &SendOnline::onSgnShowSendResult, Qt::QueuedConnection);
 
     ui->progress->initLoader(false);
 
@@ -43,24 +47,23 @@ SendOnline::SendOnline(QWidget *parent,
     ui->contactNameLable->hide();
     ui->apiSecretEdit->hide();
 
-    ui->fromAccount->setText("From account: " + selectedAccount.accountName );
-    ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util::nano2one(amount)) + " MWC" );
+    ui->fromAccount->setText("From account: " + account );
+    ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util->nano2one(QString::number(amount))) + " MWC" );
 }
 
 SendOnline::~SendOnline()
 {
-    state->destroyOnlineWnd(this);
     delete ui;
 }
 
 
 void SendOnline::on_contactsButton_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to("SendOnline");
 
     // Get the contacts
 
-    dlg::SelectContact dlg(this, contactsState);
+    dlg::SelectContact dlg(this);
     if (dlg.exec() == QDialog::Accepted) {
         core::ContactRecord selectedContact = dlg.getSelectedContact();
         ui->sendEdit->setText( selectedContact.address );
@@ -68,7 +71,6 @@ void SendOnline::on_contactsButton_clicked()
         ui->contactNameLable->show();
         ui->formatsLable->hide();
     }
-
 }
 
 
@@ -81,33 +83,31 @@ void SendOnline::on_sendEdit_textEdited(const QString &)
 
 void SendOnline::on_settingsBtn_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to("SendOnline");
 
-    core::SendCoinsParams  params = state->getSendCoinsParams();
-
-    SendCoinsParamsDialog dlg(this, params);
+    SendCoinsParamsDialog dlg(this, config->getInputConfirmationNumber(),
+                config->getChangeOutputs());
     if (dlg.exec() == QDialog::Accepted) {
-        state->updateSendCoinsParams( dlg.getSendCoinsParams() );
+        config->updateSendCoinsParams( dlg.getInputConfirmationNumber(), dlg.getChangeOutputs() );
     }
 }
 
 void SendOnline::on_sendButton_clicked()
 {
-    state::TimeoutLockObject to( state );
+    util::TimeoutLockObject to("SendOnline");
 
-    if ( !state->isNodeHealthy() ) {
+    if ( !send->isNodeHealthy() ) {
         control::MessageBox::messageText(this, "Unable to send", "Your MWC-Node, that wallet connected to, is not ready.\n"
                                                                      "MWC-Node needs to be connected to a few peers and finish block synchronization process");
         return;
     }
 
-    wallet::AccountInfo fromAccount = selectedAccount;
     QString sendTo = ui->sendEdit->text().trimmed();
 
     {
-        QPair<bool, QString> valRes = util::validateMwc713Str(sendTo);
-        if (!valRes.first) {
-            control::MessageBox::messageText(this, "Incorrect Input", valRes.second);
+        QString valRes = util->validateMwc713Str(sendTo);
+        if (!valRes.isEmpty()) {
+            control::MessageBox::messageText(this, "Incorrect Input", valRes);
             ui->sendEdit->setFocus();
             return;
         }
@@ -120,73 +120,33 @@ void SendOnline::on_sendButton_clicked()
         return;
     }
 
-    // Check the address. Try contacts first
-    QString address = sendTo;
-
-    // Let's  verify address first
-    QPair< bool, util::ADDRESS_TYPE > res = util::verifyAddress(address);
-        if ( !res.first ) {
-            control::MessageBox::messageText(this, "Incorrect Input",
-                                         "Please specify correct address to send your MWC" );
-            ui->sendEdit->setFocus();
-            return;
-    }
-
-    QString apiSecret;
-    if (res.second == util::ADDRESS_TYPE::HTTPS) {
-        apiSecret = ui->apiSecretEdit->text();
-        QPair<bool, QString> valRes = util::validateMwc713Str(apiSecret);
-        if (!valRes.first) {
-            control::MessageBox::messageText(this, "Incorrect Input", valRes.second);
-            ui->apiSecretEdit->setFocus();
-            return;
-        }
-    }
-
     QString description = ui->descriptionEdit->toPlainText().trimmed();
 
     {
-        QPair<bool, QString> valRes = util::validateMwc713Str(description);
-        if (!valRes.first) {
-            control::MessageBox::messageText(this, "Incorrect Input", valRes.second);
+        QString valRes = util->validateMwc713Str(description);
+        if (!valRes.isEmpty()) {
+            control::MessageBox::messageText(this, "Incorrect Input", valRes);
             ui->descriptionEdit->setFocus();
             return;
         }
     }
 
-    core::SendCoinsParams sendParams = state->getSendCoinsParams();
-
-    QStringList outputs;
-    uint64_t txnFee = 0;
-    if (! util::getOutputsToSend( fromAccount.accountName, sendParams.changeOutputs, amount,
-            state->getContext()->wallet, state->getContext()->hodlStatus, state->getContext()->appContext,
-            this, outputs, &txnFee ) )
-        return; // User reject something
-
-    if (txnFee == 0 && outputs.size() == 0) {
-        txnFee = util::getTxnFee( fromAccount.accountName, amount, state->getContext()->wallet,
-                                  state->getContext()->appContext, sendParams.changeOutputs, outputs );
-    }
-    QString txnFeeStr = util::txnFeeToString(txnFee);
-
-    // Ask for confirmation
-    dlg::SendConfirmationDlg confirmDlg(this, "Confirm Send Request",
-                                        "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " MWC from account: " + fromAccount.accountName +
-                                        "\nTo address: " + address + "\n\nTransaction fee: " + txnFeeStr,
-                                        1.0, state->getWalletPasswordHash(), state->getContext()->appContext->isFluffSet() );
-    connect(&confirmDlg, &dlg::SendConfirmationDlg::saveFluffSetting, this, &SendOnline::saveFluffSetting);
-    if (confirmDlg.exec() == QDialog::Accepted) {
-        if (dlg::SendConfirmationDlg::RETURN_CODE::CONFIRM != confirmDlg.getRetCode())
+    QString apiSecret = ui->apiSecretEdit->text();
+    {
+        QString valRes = util->validateMwc713Str(apiSecret);
+        if (!valRes.isEmpty()) {
+            control::MessageBox::messageText(this, "Incorrect Input", valRes);
+            ui->apiSecretEdit->setFocus();
             return;
-
-        bool fluff = confirmDlg.getFluffSetting();
-        ui->progress->show();
-        state->sendMwcOnline( fromAccount, res.second, address, amount, description, apiSecret, outputs, sendParams.changeOutputs, fluff );
+        }
     }
+
+    if (send->sendMwcOnline( account, QString::number(amount), sendTo, apiSecret, description))
+        ui->progress->show();
 }
 
-void SendOnline::sendRespond( bool success, const QStringList & errors ) {
-    state::TimeoutLockObject to( state );
+void SendOnline::onSgnShowSendResult( bool success, QString message ) {
+    util::TimeoutLockObject to("SendOnline");
 
     ui->progress->hide();
 
@@ -197,28 +157,15 @@ void SendOnline::sendRespond( bool success, const QStringList & errors ) {
         return;
     }
 
-    QString errMsg = util::formatErrorMessages(errors);
-
-    if (errMsg.isEmpty())
-        errMsg = "Your send request was failed by some reasons";
-    else
-        errMsg = "Your send request was failed:\n" + errMsg;
-
-    control::MessageBox::messageText( this, "Send request failed", errMsg );
+    control::MessageBox::messageText( this, "Send request failed", message );
 }
 
 void SendOnline::on_sendEdit_textChanged(const QString & address)
 {
-    QPair< bool, util::ADDRESS_TYPE > res = util::verifyAddress(address);
-
-    if (res.first && res.second==util::ADDRESS_TYPE::HTTPS)
+    if (util->verifyAddress(address) == "https")
         ui->apiSecretEdit->show();
     else
         ui->apiSecretEdit->hide();
-}
-
-void SendOnline::saveFluffSetting(bool fluffSetting) {
-    state->getContext()->appContext->setFluff(fluffSetting);
 }
 
 

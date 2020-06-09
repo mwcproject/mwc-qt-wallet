@@ -15,14 +15,14 @@
 #ifndef AIRDROPFORBTC_H
 #define AIRDROPFORBTC_H
 
-#include "../core/PanelBaseWnd.h"
+#include "../core_desktop/PanelBaseWnd.h"
 
 namespace Ui {
 class AirdropForBTC;
 }
 
-namespace state {
-    class Airdrop;
+namespace bridge {
+class Airdrop;
 }
 
 namespace wnd {
@@ -32,18 +32,19 @@ class AirdropForBTC : public core::PanelBaseWnd
     Q_OBJECT
 
 public:
-    explicit AirdropForBTC(QWidget *parent, state::Airdrop * state, QString btcAddress, QString challenge, QString identifier );
+    explicit AirdropForBTC(QWidget *parent, QString btcAddress, QString challenge, QString identifier );
     ~AirdropForBTC();
 
-    void reportMessage( QString title, QString message );
 
 private slots:
     void on_claimButton_clicked();
     void on_backButton_clicked();
 
+    void onSgnReportMessage( QString title, QString message );
 private:
     Ui::AirdropForBTC *ui;
-    state::Airdrop * state;
+    bridge::Airdrop * airdrop = nullptr;
+
     QString btcAddress;
     QString challenge;
     QString identifier;

@@ -35,15 +35,14 @@
 #include "../core/global.h"
 #include "../core/appcontext.h"
 #include "../core/Config.h"
-#include "../control/messagebox.h"
 #include "../util/ConfigReader.h"
 #include "../util/Files.h"
-#include "../util/Waiting.h"
 #include "../util/Process.h"
 #include "../node/MwcNodeConfig.h"
 #include "../node/MwcNode.h"
 #include <QCoreApplication>
 #include "../util/crypto.h"
+#include "../core/WndManager.h"
 
 namespace wallet {
 
@@ -59,6 +58,7 @@ MWC713::MWC713(QString _mwc713path, QString _mwc713configPath, core::AppContext 
     // Listening for Output Locking changes
     QObject::connect(appContext, &core::AppContext::onOutputLockChanged, this, &MWC713::onOutputLockChanged, Qt::QueuedConnection);
 
+    defaultConfig = readWalletConfig( mwc::MWC713_DEFAULT_CONFIG );
 }
 
 MWC713::~MWC713() {
@@ -154,9 +154,9 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
                 appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 crashed during start\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
             case QProcess::Timedout:
-                if (control::MessageBox::questionText(nullptr, "Warning", QString("Starting for mwc713 process is taking longer than expected.\nContinue to wait?") +
+                if (core::getWndManager()->questionTextDlg("Warning", QString("Starting for mwc713 process is taking longer than expected.\nContinue to wait?") +
                                                   "\n\nCommand line:\n\n" + commandLine,
-                                                  "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
+                                                  "Yes", "No", true, false) == core::WndManager::RETURN_CODE::BTN1) {
                     config::increaseTimeoutMultiplier();
                     continue; // retry with waiting
                 }
@@ -183,6 +183,7 @@ void MWC713::resetData(STARTED_MODE _startedMode ) {
     outputsLines.clear();
     currentAccount = "default";
     recieveAccount = "default";
+    currentConfig = WalletConfig();
 }
 
 // normal start. will require the password
@@ -192,7 +193,7 @@ void MWC713::start()  {
     resetData(STARTED_MODE::NORMAL);
 
     // Need to check if Tls active
-    WalletConfig config = getWalletConfig();
+    const WalletConfig & config = getWalletConfig();
     hasHttpTls = !config.tlsCertificateKey.isEmpty() && !config.tlsCertificateFile.isEmpty();
 
     // Start the binary
@@ -461,10 +462,6 @@ void MWC713::listeningStart(bool startMq, bool startKb, bool initialStart)  {
 
     if (startMq)
         mwcMqStartRequested = true;
-
-    if ( startMq && !config::getUseMwcMqS() ) {
-        appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "You are using non secure version of the MWC MQ. To switch to secure MWC MQS please specify 'useMwcMqS = true' at mwc-qt-wallet config file." );
-    }
 }
 
 // Check signal: onListeningStopResult
@@ -605,7 +602,7 @@ void MWC713::switchAccount(const QString & accountName)  {
     // Expected that account is in the list
     // Allways do switch because double processing is fine, it is quick and it can eliminate possible issues
     currentAccount = accountName;
-    WalletConfig config = getWalletConfig();
+    const WalletConfig & config = getWalletConfig();
 
     appContext->setCurrentAccountName( config.getDataPath(), accountName);
     eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
@@ -637,20 +634,20 @@ void MWC713::check(bool wait4listeners)  {
 // Send some coins to address.
 // Before send, wallet always do the switch to account to make it active
 // Check signal:  onSend
-void MWC713::sendTo( const wallet::AccountInfo &account, int64_t coinNano, const QString & address,
+void MWC713::sendTo( const QString &account, int64_t coinNano, const QString & address,
                      const QString & apiSecret,
                      QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff )  {
     // switch account first
-    eventCollector->addTask( new TaskAccountSwitch(this, account.accountName), TaskAccountSwitch::TIMEOUT );
+    eventCollector->addTask( new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskSendMwc(this, coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs, outputs, fluff), TaskSendMwc::TIMEOUT );
-    if (account.accountName != currentAccount)
+    if (account != currentAccount)
         eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
 
 
 // Init send transaction with file output
 // Check signal:  onSendFile
-void MWC713::sendFile( const wallet::AccountInfo &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs )  {
+void MWC713::sendFile( const QString &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs )  {
 
     if ( ! util::validateMwc713Str(fileTx, false).first ) {
         setSendFileResult( false, QStringList{"Unable to create file with name '"+fileTx+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."} , fileTx );
@@ -658,9 +655,9 @@ void MWC713::sendFile( const wallet::AccountInfo &account, int64_t coinNano, QSt
     }
 
     // switch account first
-    eventCollector->addTask( new TaskAccountSwitch(this, account.accountName), TaskAccountSwitch::TIMEOUT );
+    eventCollector->addTask( new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskSendFile(this, coinNano, message, fileTx, inputConfirmationNumber, changeOutputs, outputs ), TaskSendFile::TIMEOUT );
-    if (account.accountName != currentAccount)
+    if (account != currentAccount)
         eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
 
@@ -761,8 +758,11 @@ void MWC713::setReceiveAccount(QString account)  {
 
 // Cancel transaction
 // Check Signal:  onCancelTransacton
-void MWC713::cancelTransacton(int64_t transactionID)  {
-    eventCollector->addTask( new TaskTransCancel(this, transactionID), TaskTransCancel::TIMEOUT );
+void MWC713::cancelTransacton(QString account, int64_t txIdx)  {
+    eventCollector->addTask( new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT );
+    eventCollector->addTask( new TaskTransCancel(this, txIdx, account), TaskTransCancel::TIMEOUT );
+    if (account!=currentAccount)
+        eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
 
 
@@ -835,7 +835,7 @@ void MWC713::setLoginResult(bool ok) {
     logger::logEmit("MWC713", "onLoginResult", QString::number(ok) );
     if (ok) {
         // Setting receive acocunt...
-        WalletConfig config = getWalletConfig();
+        const WalletConfig & config = getWalletConfig();
         switchAccount(appContext->getCurrentAccountName(config.getDataPath()));
         setReceiveAccount( appContext->getReceiveAccount(config.getDataPath()) );
     }
@@ -925,7 +925,7 @@ void MWC713::setMwcMqListeningStatus(bool online, QString tid, bool startStopEve
         activeMwcMqsTid = tid;
 
     if (mwcMqOnline != online) {
-        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString("listening on mwc mq") + (config::getUseMwcMqS()?"s":"") );
+        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString("listening on mwc mqs") );
     }
     mwcMqOnline = online;
     logger::logEmit("MWC713", "onMwcMqListenerStatus", QString("online=") + QString::number(online));
@@ -1156,7 +1156,7 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
     updateWalletBalance(false,true);
 
     // Show message box with congrats. Message bot should work from any point. No needs to block locking or what ever we have
-    control::MessageBox::messageHTML(nullptr, "Congratulations!",
+    core::getWndManager()->messageHtmlDlg("Congratulations!",
            "You received <b>" + mwc + "</b> mwc<br>" +
            (message.isEmpty() ? "" : "Description: " + message + "<br>" ) +
            "<br>From: " + fromAddr +
@@ -1221,10 +1221,10 @@ void MWC713::setTransactionById( bool success, QString account, int64_t height, 
 }
 
 
-void MWC713::setOutputs( QString account, int64_t height, QVector<WalletOutput> outputs) {
+void MWC713::setOutputs( QString account, bool show_spent, int64_t height, QVector<WalletOutput> outputs) {
     setWalletOutputs( account, outputs);
     logger::logEmit( "MWC713", "onOutputs", "account="+account );
-    emit onOutputs( account, height, outputs );
+    emit onOutputs2( account, show_spent, height, outputs );
 }
 
 void MWC713::setExportProofResults( bool success, QString fn, QString msg ) {
@@ -1237,9 +1237,9 @@ void MWC713::setVerifyProofResults( bool success, QString fn, QString msg ) {
     emit onVerifyProof(success, fn, msg);
 }
 
-void MWC713::setTransCancelResult( bool success, int64_t transId, QString errMsg ) {
+void MWC713::setTransCancelResult( bool success, const QString & account, int64_t transId, QString errMsg ) {
     logger::logEmit( "MWC713", "onCancelTransacton", "success="+QString::number(success) );
-    emit onCancelTransacton(success, transId, errMsg);
+    emit onCancelTransacton2(success, account, transId, errMsg);
 }
 
 void MWC713::setSetReceiveAccount( bool ok, QString accountOrMessage ) {
@@ -1247,7 +1247,7 @@ void MWC713::setSetReceiveAccount( bool ok, QString accountOrMessage ) {
         appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
                                   QString("Set receive account: '" + accountOrMessage + "'"));
         recieveAccount = accountOrMessage;
-        WalletConfig config = getWalletConfig();
+        const WalletConfig & config = getWalletConfig();
         appContext->setReceiveAccount(config.getDataPath(), recieveAccount);
     }
 
@@ -1515,14 +1515,13 @@ WalletConfig MWC713::readWalletConfig(QString source) {
     util::ConfigReader  mwc713config;
 
     if (!mwc713config.readConfig(source) ) {
-        control::MessageBox::messageText(nullptr, "Read failure", "Unable to read mwc713 configuration from " + source );
+        core::getWndManager()->messageTextDlg("Read failure", "Unable to read mwc713 configuration from " + source );
         return WalletConfig();
     }
 
     QString network = mwc713config.getString("chain");
     QString dataPath = mwc713config.getString("wallet713_data_path");
     QString keyBasePath = mwc713config.getString("keybase_binary");
-    QString mwcmqDomain  = mwc713config.getString("mwcmq_domain");
     QString mwcmqsDomain = mwc713config.getString("mwcmqs_domain");
 
     bool foreignApi = mwc713config.getString("foreign_api") == "true";
@@ -1535,26 +1534,29 @@ WalletConfig MWC713::readWalletConfig(QString source) {
         foreignApi = false;
 
     if (dataPath.isEmpty() ) {
-        control::MessageBox::messageText(nullptr, "Read failure", "Not able to find all expected mwc713 configuration values at " + source );
+        core::getWndManager()->messageTextDlg("Read failure", "Not able to find all expected mwc713 configuration values at " + source );
         return WalletConfig();
     }
 
     QString nodeURI     = mwc713config.getString("mwc_node_uri");
     QString nodeSecret  = mwc713config.getString("mwc_node_secret");
 
-    return WalletConfig().setData( network, dataPath, mwcmqDomain, mwcmqsDomain, keyBasePath,
+    return WalletConfig().setData( network, dataPath, mwcmqsDomain, keyBasePath,
             foreignApi, foreignApiAddress, foreignApiSecret, tlsCertificateFile, tlsCertificateKey );
 }
 
 
 // Get current configuration of the wallet. will read from wallet713.toml file
-WalletConfig MWC713::getWalletConfig()  {
-    return readWalletConfig();
+const WalletConfig & MWC713::getWalletConfig()  {
+    if (!currentConfig.isDefined())
+        currentConfig = readWalletConfig();
+
+    return currentConfig;
 }
 
 // Get configuration form the resource file.
-WalletConfig MWC713::getDefaultConfig()  {
-    return readWalletConfig( mwc::MWC713_DEFAULT_CONFIG );
+const WalletConfig & MWC713::getDefaultConfig()  {
+    return defaultConfig;
 }
 
 
@@ -1573,7 +1575,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
 
     QStringList newConfLines;
 
-    QStringList prefixesToCheck{"wallet713_data_path", "keybase_binary", "mwcmq_domain", "mwcmqs_domain",
+    QStringList prefixesToCheck{"wallet713_data_path", "keybase_binary", "mwcmqs_domain",
                                 "chain", "grinbox_listener_auto_start", "keybase_listener_auto_start",
                                 "foreign_api", "foreign_api_address", "foreign_api_secret",
                                 "tls_certificate_file", "tls_certificate_key"};
@@ -1610,9 +1612,6 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
     newConfLines.append("wallet713_data_path = \"" + config.getDataPath() + "\"");
     if (config.keyBasePath.length() > 0)
         newConfLines.append("keybase_binary = \"" + config.keyBasePath + "\"");
-
-    if (!config.mwcmqDomainEx.isEmpty())
-        newConfLines.append("mwcmq_domain = \"" + config.mwcmqDomainEx + "\"");
 
     if (!config.mwcmqsDomainEx.isEmpty())
         newConfLines.append("mwcmqs_domain = \"" + config.mwcmqsDomainEx + "\"");
@@ -1687,9 +1686,11 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
 bool MWC713::setWalletConfig( const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode ) {
 
     if ( !saveWalletConfig( config, appContext, mwcNode ) ) {
-        control::MessageBox::messageText(nullptr, "Update Config failure", "Not able to update mwc713 configuration at " + config::getMwc713conf() );
+        core::getWndManager()->messageTextDlg("Update Config failure", "Not able to update mwc713 configuration at " + config::getMwc713conf() );
         return false;
     }
+
+    currentConfig = config;
 
     emit onConfigUpdate();
 

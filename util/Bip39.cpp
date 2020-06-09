@@ -14,20 +14,20 @@
 
 #include "Bip39.h"
 #include <QApplication>
-#include "../control/messagebox.h"
 #include <QFile>
 #include <QTextStream>
+#include "../core/WndManager.h"
 
 namespace util {
 
-static QSet<QString>  bip39words;
+static QVector<QString>  bip39words;
 
-const QSet<QString> & getBip39words() {
+const QVector<QString> & getBip39words() {
     if (bip39words.empty()) {
         // load the words
         QFile file(":/txt/bip39_words.txt");
         if (!file.open(QFile::ReadOnly)) {
-            control::MessageBox::messageText(nullptr, "Fatal Error", "Unable to read bip39 dictionary from the resources");
+            core::getWndManager()->messageTextDlg("Fatal Error", "Unable to read bip39 dictionary from the resources");
             QApplication::quit();
             return bip39words;
         }

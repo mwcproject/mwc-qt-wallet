@@ -31,13 +31,15 @@ public:
 
     // Outputs run with no-refresh because wallet responsible to call sync first
     TaskOutputs( MWC713 * wallet713, bool show_spent ) :
-        Mwc713Task("Outputs", QString("outputs") + (show_spent?" --show-spent":"") + " --no-refresh" , wallet713, "") { }
+        Mwc713Task("Outputs", QString("outputs") + (show_spent?" --show-spent":"") + " --no-refresh" , wallet713, "") {showSpent=show_spent;}
 
     virtual ~TaskOutputs() override {}
 
     virtual bool processTask(const QVector<WEvent> & events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+private:
+    bool showSpent;
 };
 
 // Get outputs and deliver them directly to HODL status
@@ -127,8 +129,8 @@ class TaskTransCancel : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*7;
 
-    TaskTransCancel( MWC713 * wallet713, int64_t transId ) :
-            Mwc713Task("TaskTransCancel", "cancel --id " + QString::number(transId) , wallet713, ""), transactionId(transId) {}
+    TaskTransCancel( MWC713 * wallet713, int64_t transId, QString _account ) :
+            Mwc713Task("TaskTransCancel", "cancel --id " + QString::number(transId) , wallet713, ""), transactionId(transId), account(_account) {}
 
     virtual ~TaskTransCancel() override {}
 
@@ -137,7 +139,7 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
 private:
     int64_t transactionId;
-    QString proofFileName;
+    QString account;
 };
 
 

@@ -20,7 +20,7 @@
 #include "../util/Log.h"
 #include "../core/Config.h"
 #include "../core/Notification.h"
-#include "../control/messagebox.h"
+#include "../core/WndManager.h"
 
 namespace wallet {
 
@@ -232,8 +232,8 @@ void Mwc713EventManager::timerEvent(QTimerEvent *event) {
     QString taskName = taskQ.front().task->getTaskName();
 
     if (QDateTime::currentMSecsSinceEpoch() > taskExecutionTimeLimit) {
-        if (control::MessageBox::questionText(nullptr, "Warning", "mwc713 command execution is taking longer than expected.\nContinue to wait?",
-                                          "Yes", "No", true, false) == control::MessageBox::RETURN_CODE::BTN1) {
+        if (core::getWndManager()->questionTextDlg("Warning", "mwc713 command execution is taking longer than expected.\nContinue to wait?",
+                                          "Yes", "No", true, false) == core::WndManager::RETURN_CODE::BTN1) {
             config::increaseTimeoutMultiplier();
             // Update the waiting time
 

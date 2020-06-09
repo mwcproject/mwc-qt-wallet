@@ -13,13 +13,11 @@
 // limitations under the License.
 
 #include "y_selectmode.h"
-#include "../control/messagebox.h"
 #include "../util/ConfigReader.h"
 #include "../util/execute.h"
-#include "../core/windowmanager.h"
 #include "../core/global.h"
-#include "../windows/y_selectmode_w.h"
 #include <QCoreApplication>
+#include "../core/WndManager.h"
 
 namespace state {
 
@@ -30,30 +28,23 @@ SelectMode::SelectMode( StateContext * _context) :
 
 SelectMode::~SelectMode() {}
 
-void SelectMode::deleteWnd(wnd::SelectMode * _wnd) {
-    if (wnd == _wnd)
-        wnd = nullptr;
-}
-
-
 NextStateRespond SelectMode::execute() {
     if (context->appContext->getActiveWndState() != STATE::WALLET_RUNNING_MODE)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    wnd = (wnd::SelectMode *) context->wndManager->switchToWindowEx( mwc::PAGE_Y_SELECT_RUNNING_MODE,
-                                               new wnd::SelectMode( context->wndManager->getInWndParent(), this ) );
+    core::getWndManager()->pageSelectMode();
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
-config::WALLET_RUN_MODE SelectMode::getWalletRunMode() const {
+config::WALLET_RUN_MODE SelectMode::getWalletRunMode() {
     return config::getWalletRunMode();
 }
 
 // Will require restart
 void SelectMode::updateWalletRunMode( config::WALLET_RUN_MODE newRunMode ) {
     if (config::getWalletRunMode() == newRunMode) {
-        control::MessageBox::messageText(nullptr, "Running Mode", "You allready running wallet in selected mode. Nothing need to done." );
+        core::getWndManager()->messageTextDlg("Running Mode", "You allready running wallet in selected mode. Nothing need to done." );
         return;
     }
 
@@ -62,7 +53,7 @@ void SelectMode::updateWalletRunMode( config::WALLET_RUN_MODE newRunMode ) {
     util::ConfigReader reader;
     QString configFN = config::getMwcGuiWalletConf();
     if ( !reader.readConfig( configFN ) ) {
-        control::MessageBox::messageText(nullptr, "Internal Error",
+        core::getWndManager()->messageTextDlg("Internal Error",
                                      "Unable to update wallet config file " + configFN );
     }
 
@@ -82,7 +73,7 @@ void SelectMode::updateWalletRunMode( config::WALLET_RUN_MODE newRunMode ) {
     }
 
     if (!updateOk) {
-        control::MessageBox::messageText(nullptr, "Error", "Wallet unable to switch to the selected mode." );
+        core::getWndManager()->messageTextDlg("Error", "Wallet unable to switch to the selected mode." );
         return;
     }
 

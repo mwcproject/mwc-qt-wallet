@@ -14,13 +14,15 @@
 
 #include "k_AccountTransfer.h"
 #include "../wallet/wallet.h"
-#include "../windows/k_accounttransfer_w.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../core/global.h"
 #include "../util/address.h"
 #include "../util/ui.h"
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/k_accounttransfer_b.h"
+#include "g_Send.h"
 
 namespace state {
 
@@ -44,61 +46,82 @@ NextStateRespond AccountTransfer::execute() {
     if (context->appContext->getActiveWndState() != STATE::ACCOUNT_TRANSFER)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if (wnd==nullptr) {
-        wnd = (wnd::AccountTransfer*) context->wndManager->switchToWindowEx( mwc::PAGE_K_ACCOUNT_TRANSFER,
-                new wnd::AccountTransfer( context->wndManager->getInWndParent(), this ) );
+    if (bridge::getBridgeManager()->getAccountTransfer().isEmpty()) {
+        core::getWndManager()->pageAccountTransfer();
     }
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
 
-// get balance for current account
-QVector<wallet::AccountInfo> AccountTransfer::getWalletBalance() {
-    return context->wallet->getWalletBalance();
-}
-
-core::SendCoinsParams AccountTransfer::getSendCoinsParams() {
-    return context->appContext->getSendCoinsParams();
-}
-
-void AccountTransfer::updateSendCoinsParams(const core::SendCoinsParams &params) {
-    context->appContext->setSendCoinsParams(params);
-    // Need to update the balances because number of confirmations affect the spendable balance.
-    context->wallet->updateWalletBalance(true, true);
-}
-
-
 // nanoCoins < 0 - all funds
-void AccountTransfer::transferFunds(const wallet::AccountInfo accountFrom,
-                        const wallet::AccountInfo accountTo,
-                        int64_t nanoCoins) {
-    Q_ASSERT(wnd);
-    if (!wnd)
-        return;
+bool AccountTransfer::transferFunds(const QString & from,
+                   const QString & to,
+                   const QString & sendAmount ) {
+
+
+    QPair<bool, int64_t> mwcAmount;
+    if (sendAmount != "All") {
+        mwcAmount = util::one2nano(sendAmount);
+        if (!mwcAmount.first) {
+            core::getWndManager()->messageTextDlg("Incorrect Input", "Please specify correct number of MWC to send");
+            return false;
+        }
+    }
+    else { // All
+        mwcAmount = QPair<bool, int64_t>(true, -1);
+    }
+
+    int64_t nanoCoins = mwcAmount.second;
+
+    wallet::AccountInfo accFrom;
+    QVector<wallet::AccountInfo> walletAccounts = context->wallet->getWalletBalance();
+    for (auto & a : walletAccounts) {
+        if (a.accountName == from)
+            accFrom = a;
+    }
+
+    core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
+
+    if ( mwcAmount.second > accFrom.currentlySpendable ) {
+
+        QString msg2print = generateAmountErrorMsg( mwcAmount.second, accFrom, prms );
+
+        core::getWndManager()->messageTextDlg("Incorrect Input",
+                                         msg2print );
+
+        return false;
+    }
+
+
+    if (bridge::getBridgeManager()->getAccountTransfer().isEmpty()) {
+        Q_ASSERT(false);
+        return false;
+    }
 
     if (transferState>=0) {
-        wnd-> showTransferResults(false, "Another funds transfer operation is in the progress. We can't start a new transfer.");
-        return;
+        for (auto b : bridge::getBridgeManager()->getAccountTransfer())
+            b->showTransferResults(false, "Another funds transfer operation is in the progress. We can't start a new transfer.");
+        return false;
     }
 
     myAddress = context->wallet->getLastKnownMwcBoxAddress();
 
     // mwc mq expected to be online, we will use it for slate exchange
     if (myAddress.isEmpty() || !context->wallet->getListenerStatus().first) {
-        wnd->showTransferResults(false, "Please turn on mwc mq listener. We can't transfer funds in offline mode");
-        return;
+        for (auto b : bridge::getBridgeManager()->getAccountTransfer())
+            b->showTransferResults(false, "Please turn on mwc mq listener. We can't transfer funds in offline mode");
+        return false;
     }
-
-    core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
 
     // Check if HODL outputs will be affected
     QStringList outputs; // empty is valid value. Empty - mwc713 will use default algorithm.
     uint64_t txnFee = 0; // not used here yet
     // nanoCoins < 0  - All
-    if (! util::getOutputsToSend( accountFrom.accountName, prms.changeOutputs, nanoCoins, context->wallet, getContext()->hodlStatus, context->appContext, nullptr, outputs, &txnFee) ) {
-        wnd->hideProgress();
-        return; // User cancel transaction
+    if (! util::getOutputsToSend( accFrom.accountName, prms.changeOutputs, nanoCoins, context->wallet, getContext()->hodlStatus, context->appContext, outputs, &txnFee) ) {
+        for (auto b : bridge::getBridgeManager()->getAccountTransfer())
+            b->hideProgress();
+        return false; // User cancel transaction
     }
 
     // Expected that everything is fine, but will do operation step by step
@@ -109,15 +132,17 @@ void AccountTransfer::transferFunds(const wallet::AccountInfo accountFrom,
     // 7. Restore back current account
     // 5. Refresh accounts balance
 
-    trAccountFrom = accountFrom;
-    trAccountTo = accountTo;
+    trAccountFrom = from;
+    trAccountTo = to;
     trNanoCoins = nanoCoins;
     trSlate = "";
     outputs2use = outputs;
 
     transferState = 0;
     recieveAccount = context->wallet->getReceiveAccount();
-    context->wallet->setReceiveAccount( trAccountTo.accountName );
+    context->wallet->setReceiveAccount( trAccountTo );
+
+    return true;
 }
 
 void AccountTransfer::goBack() {
@@ -130,8 +155,8 @@ void AccountTransfer::onSetReceiveAccount( bool ok, QString AccountOrMessage ) {
         return;
 
     if  (!ok) {
-        if (wnd)
-            wnd->showTransferResults(false, "Failed to set receive account. " + AccountOrMessage);
+        for (auto b : bridge::getBridgeManager()->getAccountTransfer())
+            b->showTransferResults(false, "Failed to set receive account. " + AccountOrMessage);
         transferState = -1;
         return;
     }
@@ -153,8 +178,8 @@ void AccountTransfer::onSend( bool success, QStringList errors, QString address,
         return;
 
     if  (!success) {
-        if (wnd)
-            wnd->showTransferResults(false, "Failed to send the funds. " + util::formatErrorMessages(errors) );
+        for (auto b : bridge::getBridgeManager()->getAccountTransfer())
+            b->showTransferResults(false, "Failed to send the funds. " + util::formatErrorMessages(errors) );
         transferState = -1;
         return;
     }
@@ -187,13 +212,13 @@ void AccountTransfer::onSlateFinalized( QString slate ) {
 
 void AccountTransfer::onWalletBalanceUpdated() {
     if (transferState!=2) {
-        if (wnd)
-            wnd->updateAccounts();
+        for (auto b : bridge::getBridgeManager()->getAccountTransfer())
+            b->updateAccounts();
         return;
     }
 
-    if (wnd)
-        wnd->showTransferResults(true, "" );
+    for (auto b : bridge::getBridgeManager()->getAccountTransfer())
+        b->showTransferResults(true, "" );
 
     // Done, finally
     transferState = -1;

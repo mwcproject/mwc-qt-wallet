@@ -22,7 +22,7 @@ namespace util {
 
 // Verify address that mwc wallet can operate
 
-enum class ADDRESS_TYPE { UNKNOWN, MWC_MQ, KEYBASE, HTTPS };
+enum class ADDRESS_TYPE { UNKNOWN=1, MWC_MQ=2, KEYBASE=3, HTTPS=4 };
 
 QPair<bool, ADDRESS_TYPE> verifyAddress(QString address);
 

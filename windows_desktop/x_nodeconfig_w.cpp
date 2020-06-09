@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "windows/x_nodeconfig_w.h"
+#include "x_nodeconfig_w.h"
 #include "ui_x_nodeconfig_w.h"
-#include "../state/x_walletconfig.h"
-#include "../control/messagebox.h"
+#include "../control_desktop/messagebox.h"
+#include "../bridge/config_b.h"
+#include "../bridge/wnd/x_walletconfig_b.h"
 
 namespace wnd {
 
-
-NodeConfig::NodeConfig(QWidget *parent, state::WalletConfig * _state) :
-    core::NavWnd(parent, _state->getContext()),
-    ui(new Ui::NodeConfig),
-    state(_state)
+NodeConfig::NodeConfig(QWidget *parent) :
+    core::NavWnd(parent),
+    ui(new Ui::NodeConfig)
 {
     ui->setupUi(this);
 
-    walletCfg = state->getWalletConfig();
+    config = new bridge::Config(this);
+    walletConfig = new bridge::WalletConfig(this);
 
-    if (walletCfg.getNetwork().toLower().contains("main"))
+    if (config->getNetwork().toLower().contains("main"))
         ui->radioMainNet->setChecked(true);
     else
         ui->radioFloonet->setChecked(true);
@@ -47,7 +47,7 @@ NodeConfig::~NodeConfig()
 //        true  - no changes or we accept everything
 bool NodeConfig::askUserForChanges() {
     if ( ui->applyButton->isEnabled() ) {
-        if ( control::MessageBox::RETURN_CODE::BTN2 == control::MessageBox::questionText(this,
+        if ( core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionText(this,
                 "Apply config changes",
                 "Configuration changes was made for the wallet. Do you want to apply them?",
                 "Cancel", "Apply", false, true) ) {
@@ -59,7 +59,7 @@ bool NodeConfig::askUserForChanges() {
 
 
 void NodeConfig::updateApplyBtn() {
-    ui->applyButton->setEnabled( walletCfg.getNetwork() != getSelectedNetwork() );
+    ui->applyButton->setEnabled( config->getNetwork() != getSelectedNetwork() );
 }
 
 QString NodeConfig::getSelectedNetwork() const {
@@ -87,12 +87,10 @@ void NodeConfig::on_applyButton_clicked()
 
 bool NodeConfig::applyChanges() {
     // data path is expected to be updated on the start.
-    walletCfg.setDataPathWithNetwork( "Fixme", getSelectedNetwork() );
+    walletConfig->setDataPathWithNetwork("Fixme", getSelectedNetwork(), true);
+    walletConfig->restartQtWallet();
 
-    state->setWalletConfig(walletCfg, true);
-    state->restartMwcQtWallet();
-
-    updateApplyBtn();
+    // here we are in restarting mode.
 
     return true;
 }

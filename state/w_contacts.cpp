@@ -13,11 +13,10 @@
 // limitations under the License.
 
 #include "w_contacts.h"
-#include "windows/w_contacts_w.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../core/global.h"
+#include "../core/WndManager.h"
 
 namespace state {
 
@@ -33,8 +32,7 @@ NextStateRespond Contacts::execute() {
     if (context->appContext->getActiveWndState() != STATE::CONTACTS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    context->wndManager->switchToWindowEx( mwc::PAGE_W_CONTACTS,
-                new wnd::Contacts( context->wndManager->getInWndParent(), this ) );
+    core::getWndManager()->pageContacts();
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
@@ -54,15 +52,6 @@ QPair<bool, QString> Contacts::deleteContact( const core::ContactRecord & contac
 QPair<bool, QString> Contacts::updateContact( const core::ContactRecord & prevValue, const core::ContactRecord & newValue ) {
     return context->appContext->updateContact( prevValue, newValue );
 }
-
-QVector<int> Contacts::getColumnsWidhts() const {
-    return context->appContext->getIntVectorFor("ContactsTblWidth");
-}
-
-void Contacts::updateColumnsWidhts(const QVector<int> & width) {
-    context->appContext->updateIntVectorFor("ContactsTblWidth", width);
-}
-
 
 }
 

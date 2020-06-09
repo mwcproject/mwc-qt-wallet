@@ -19,6 +19,8 @@
 #include "../core/appcontext.h"
 #include "../core/Config.h"
 #include <QDataStream>
+#include <QJsonObject>
+#include <QJsonDocument>
 
 namespace core {
 
@@ -54,6 +56,31 @@ bool HodlOutputInfo::loadData(QDataStream & in) {
     in >> cls;
     return true;
 }
+
+QString HodlOutputInfo::toJson() {
+    QJsonObject obj;
+    obj.insert("outputCommitment", outputCommitment);
+    obj.insert("value", value);
+    obj.insert("weight", weight);
+    obj.insert("cls", cls);
+
+    return QJsonDocument(obj).toJson();
+}
+// static
+HodlOutputInfo HodlOutputInfo::fromJson(const QString & jsonStr) {
+    QJsonParseError error;
+    QJsonDocument   jsonDoc = QJsonDocument::fromJson(jsonStr.toUtf8(), &error);
+    // Internal data, no error expected
+    Q_ASSERT( error.error == QJsonParseError::NoError );
+    Q_ASSERT(jsonDoc.isObject());
+    QJsonObject obj = jsonDoc.object();
+
+    HodlOutputInfo res;
+    res.setData( obj.value("outputCommitment").toString(),  obj.value("value").toDouble(),
+                 obj.value("weight").toDouble(), obj.value("cls").toString() );
+    return res;
+}
+
 
 void HodlClaimStatus::setData( int64_t _amount, int _claimId, int _status ) {
     amount = _amount;

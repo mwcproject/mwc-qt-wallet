@@ -14,8 +14,8 @@
 
 #include "w_contacteditdlg.h"
 #include "ui_w_contacteditdlg.h"
-#include "../control/messagebox.h"
-#include "../util/address.h"
+#include "../control_desktop/messagebox.h"
+#include "../bridge/util_b.h"
 
 namespace dlg {
 
@@ -27,6 +27,7 @@ ContactEditDlg::ContactEditDlg(QWidget *parent, const core::ContactRecord & _con
     contactList(contacts)
 {
     ui->setupUi(this);
+    util = new bridge::Util(this);
 
     ui->nameEdit->setText(contact.name);
     ui->addressEdit->setText(contact.address);
@@ -58,14 +59,13 @@ void ContactEditDlg::on_applyButton_clicked()
         return;
     }
 
-    QPair< bool, util::ADDRESS_TYPE > res = util::verifyAddress(contact.address);
-    if ( !res.first ) {
+    if (util->verifyAddress(contact.address) == "unknown")
+    {
         control::MessageBox::messageText(this, "Incorrect Input",
                                      "Please specify correct address for your contact" );
         ui->addressEdit->setFocus();
         return;
     }
-
 
     for ( auto & cnt : contactList ) {
             if (cnt.name == contact.name) {

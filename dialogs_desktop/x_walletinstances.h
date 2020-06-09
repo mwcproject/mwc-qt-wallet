@@ -15,14 +15,16 @@
 #ifndef X_WALLETINSTANCES_H
 #define X_WALLETINSTANCES_H
 
-#include "../control/mwcdialog.h"
+#include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
 class WalletInstances;
 }
 
-namespace state {
+namespace bridge {
+class Wallet;
 class WalletConfig;
+class Config;
 }
 
 namespace dlg {
@@ -30,21 +32,19 @@ namespace dlg {
 class WalletInstances : public control::MwcDialog
 {
     Q_OBJECT
-
 public:
-    explicit WalletInstances(QWidget *parent, state::WalletConfig * state);
+    explicit WalletInstances(QWidget *parent);
     ~WalletInstances();
 
 private slots:
     void on_mwc713directorySelect_clicked();
-
     void on_cancelButton_clicked();
-
     void on_applyButton_clicked();
-
 private:
     Ui::WalletInstances *ui;
-    state::WalletConfig * state;
+    bridge::Wallet * wallet = nullptr;
+    bridge::Config * config = nullptr;
+    bridge::WalletConfig * walletConfig = nullptr;
 };
 
 }

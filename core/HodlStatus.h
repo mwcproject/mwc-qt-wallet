@@ -47,6 +47,9 @@ struct HodlOutputInfo {
 
     void saveData(QDataStream & out) const;
     bool loadData(QDataStream & in);
+
+    QString toJson();
+    static HodlOutputInfo fromJson(const QString & jsonStr);
 };
 
 struct HodlClaimStatus {

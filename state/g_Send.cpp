@@ -12,53 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <control/messagebox.h>
 #include "g_Send.h"
 #include "../wallet/wallet.h"
-#include "windows/g_sendStarting.h"
-#include "windows/g_sendOnline.h"
-#include "windows/g_sendOffline.h"
-#include "../core/windowmanager.h"
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../util/Log.h"
+#include "../util/ui.h"
 #include "../core/global.h"
 #include "../core/Config.h"
+#include "../core/WndManager.h"
+#include "../bridge/BridgeManager.h"
+#include "../bridge/wnd/g_send_b.h"
+#include <QFileInfo>
 
 namespace state {
 
-void SendEventInfo::setData(QString _address, int64_t _txid,  QString _slate, bool _send, bool _respond) {
-    address = _address;
-    txid    = _txid;
-    slate   = _slate;
-    send = _send;
-    respond = _respond;
-    timestamp = QDateTime::currentMSecsSinceEpoch();
+
+QString generateAmountErrorMsg(int64_t mwcAmount, const wallet::AccountInfo &acc, const core::SendCoinsParams &sendParams) {
+    QString msg2print = "You are trying to send " + util::nano2one(mwcAmount) + " mwc, but you only have " +
+                        util::nano2one(acc.currentlySpendable) + " spendable mwc.";
+    if (acc.awaitingConfirmation > 0)
+        msg2print += " " + util::nano2one(acc.awaitingConfirmation) + " coins are awaiting confirmation.";
+
+    if (acc.lockedByPrevTransaction > 0)
+        msg2print += " " + util::nano2one(acc.lockedByPrevTransaction) + " coins are locked.";
+
+    if (acc.awaitingConfirmation > 0 || acc.lockedByPrevTransaction > 0) {
+        if (sendParams.inputConfirmationNumber != 1) {
+            if (sendParams.inputConfirmationNumber < 0)
+                msg2print += " You can modify settings to spend mwc with less than 10 confirmations (wallet default value).";
+            else
+                msg2print += " You can modify settings to spend mwc with less than " +
+                             QString::number(sendParams.inputConfirmationNumber) + " confirmations.";
+        }
+    }
+    return msg2print;
 }
+
 
 Send::Send(StateContext * context) :
         State(context, STATE::SEND) {
 
-    QObject::connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated,
-                      this, &Send::onWalletBalanceUpdated, Qt::QueuedConnection );
     QObject::connect(context->wallet, &wallet::Wallet::onSend,
                      this, &Send::sendRespond, Qt::QueuedConnection);
-    QObject::connect(context->wallet, &wallet::Wallet::onSlateFinalized,
-                     this, &Send::onSlateFinalized, Qt::QueuedConnection);
-    QObject::connect(context->wallet, &wallet::Wallet::onSlateReceivedBack,
-                     this, &Send::onSlateReceivedBack, Qt::QueuedConnection);
 
     QObject::connect(context->wallet, &wallet::Wallet::onSendFile,
                      this, &Send::respSendFile, Qt::QueuedConnection);
 
-    QObject::connect(context->wallet, &wallet::Wallet::onCancelTransacton,
-                     this, &Send::onCancelTransacton, Qt::QueuedConnection);
-
     // Need to update mwc node status because send can fail if node is not healthy.
     QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
                      this, &Send::onNodeStatus, Qt::QueuedConnection);
-
-    startTimer(1000); // Respond from send checking timer
 }
 
 Send::~Send() {}
@@ -73,98 +76,120 @@ NextStateRespond Send::execute() {
 }
 
 void Send::switchToStartingWindow() {
-    onlineOfflineWnd = (wnd::SendStarting*)context->wndManager->switchToWindowEx( mwc::PAGE_G_SEND,
-            new wnd::SendStarting( context->wndManager->getInWndParent(), this ) );
+    core::getWndManager()->pageSendStarting();
     context->wallet->updateWalletBalance(true,true); // request update, respond at onWalletBalanceUpdated
 }
 
-
-core::SendCoinsParams Send::getSendCoinsParams() {
-    return context->appContext->getSendCoinsParams();
-}
-
-void Send::updateSendCoinsParams( const core::SendCoinsParams  & params ) {
-    context->appContext->setSendCoinsParams(params);
-}
-
-QString Send::getFileGenerationPath() {
-    return context->appContext->getPathFor("fileGen");
-}
-
-void Send::updateFileGenerationPath(QString path) {
-    context->appContext->updatePathFor("fileGen", path);
-}
-
-QString Send::getWalletPasswordHash() {
-    return context->wallet->getPasswordHash();
-}
-
-void Send::switchAccount(const QString & accountName) {
-    if (accountName == context->wallet->getCurrentAccountName())
-        return;
-
-    context->wallet->switchAccount(accountName);
-}
-
 // onlineOffline => Next step
-void Send::processSendRequest( bool isOnline, const wallet::AccountInfo & selectedAccount, int64_t amount ) {
-    if (isOnline) {
-        onlineWnd = (wnd::SendOnline*)context->wndManager->switchToWindowEx( mwc::PAGE_G_SEND_ONLINE,
-                new wnd::SendOnline( context->wndManager->getInWndParent(), selectedAccount, amount, this,
-                                     (state::Contacts *)context->stateMachine->getState(STATE::CONTACTS) ) );
+// Process sept 1 send request.  sendAmount is a value as user input it
+// return code:
+//   0 - ok
+//   1 - account error
+//   2 - amount error
+int Send::initialSendSelection( bool isOnlineSelected, QString account, QString sendAmount ) {
+
+    QVector<wallet::AccountInfo> balance = context->wallet->getWalletBalance();
+    wallet::AccountInfo selectedAccount;
+    for (const auto & a : balance) {
+        if (a.accountName == account) {
+            selectedAccount = a;
+            break;
+        }
+    }
+    // Note, if no acount selected, that will be this case. We are fine with that.
+    if (selectedAccount.currentlySpendable == 0) {
+        core::getWndManager()->messageTextDlg("Incorrect Input", "Your account doesn't have any spendable MWC to send");
+        return 1;
+    }
+
+    QPair<bool, int64_t> mwcAmount;
+    if (sendAmount != "All") {
+        mwcAmount = util::one2nano(sendAmount);
+        if (!mwcAmount.first || mwcAmount.second<=0) {
+            core::getWndManager()->messageTextDlg("Incorrect Input", "Please specify the number of MWC to send");
+            return 2;
+        }
+    }
+    else { // All
+        mwcAmount = QPair<bool, int64_t>(true, -1);
+    }
+
+    // init expected to be fixed, so no need to disable the message
+    if ( mwcAmount.second > selectedAccount.currentlySpendable ) {
+
+        QString msg2print = generateAmountErrorMsg( mwcAmount.second, selectedAccount, context->appContext->getSendCoinsParams() );
+
+        core::getWndManager()->messageTextDlg("Incorrect Input", msg2print );
+        return 2;
+    }
+
+    if (isOnlineSelected) {
+        core::getWndManager()->pageSendOnline(selectedAccount.accountName, mwcAmount.second);
     }
     else {
-        offlineWnd = (wnd::SendOffline*)context->wndManager->switchToWindowEx( mwc::PAGE_G_SEND_FILE,
-                new wnd::SendOffline( context->wndManager->getInWndParent(), selectedAccount, amount, this ) );
+        core::getWndManager()->pageSendOffline(selectedAccount.accountName, mwcAmount.second);
     }
+
+    return 0;
 }
 
-// Request for MWC to send
-void Send::sendMwcOnline(const wallet::AccountInfo &account, util::ADDRESS_TYPE type, QString address, int64_t mwcNano,
-        QString message, QString apiSecret, const QStringList & outputs, int changeOutputs, bool fluff ) {
-    core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
-    context->wallet->sendTo( account, mwcNano, util::fullFormalAddress( type, address), apiSecret, message,
-            prms.inputConfirmationNumber, changeOutputs, outputs, fluff );
-}
+// Handle whole workflow to send offline
+bool Send::sendMwcOffline( QString account, int64_t amount, QString message) {
 
-void Send::sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate ) {
+    core::SendCoinsParams sendParams = context->appContext->getSendCoinsParams();
 
-    if (success)
-        registerSlate( slate, address, txid, true, false );
+    // !!!! NOTE.  For mobile HODL not a case, first case can be skipped, Directly can be called util->getTxnFee
+    QStringList outputs;
+    uint64_t txnFee = 0;
+    if (! util::getOutputsToSend( account, sendParams.changeOutputs, amount,
+                                  context->wallet, context->hodlStatus, context->appContext,
+                                  outputs, &txnFee) )
+        return false; // User reject something
 
-    if (onlineWnd) {
-        onlineWnd->sendRespond(success, errors);
-
-        if (success)
-            switchToStartingWindow();
+    if (txnFee == 0 && outputs.size() == 0) {
+        txnFee = util::getTxnFee(account, amount, context->wallet,
+                                 context->appContext, sendParams.changeOutputs, outputs);
     }
-}
+    QString txnFeeStr = util::txnFeeToString(txnFee);
 
-void Send::onSlateFinalized( QString slate ) {
-    registerSlate( slate, "", -1, false, true );
-}
+    QString hash = context->wallet->getPasswordHash();
+    if ( core::WndManager::RETURN_CODE::BTN2 != core::getWndManager()->questionTextDlg("Confirm Send Request",
+                       "You are sending offline " + (amount < 0 ? "all" : util::nano2one(amount)) +
+                       " MWC from account: " + account + "\n\nTransaction fee: " + txnFeeStr +
+                       "\n\nYour initial transaction slate will be stored in a file.", "Decline", "Confirm", false, true, 1.0,
+                       hash, core::WndManager::RETURN_CODE::BTN2 ) )
+        return false;
 
-void Send::onSlateReceivedBack(QString slate, QString mwc, QString fromAddr) {
-    Q_UNUSED(mwc);
-    Q_UNUSED(fromAddr);
-    registerSlate( slate, "", -1, false, true );
-}
+    QString fileName = core::getWndManager()->getSaveFileName( tr("Create Initial Transaction Slate File"),
+                                                    context->appContext->getPathFor("fileGen"),
+                                                    tr("MWC init transaction (*.tx)"));
 
-void Send::sendMwcOffline(  const wallet::AccountInfo & account, int64_t amount, QString message, QString fileName,
-        const QStringList & outputs, int changeOutputs ) {
+    if (fileName.length()==0)
+        return false;
+
+    if (!fileName.endsWith(".tx"))
+        fileName += ".tx";
+
+    // Update path
+    QFileInfo flInfo(fileName);
+    context->appContext->updatePathFor("fileGen", flInfo.path());
+
     core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
-    context->wallet->sendFile( account, amount, message, fileName,prms.inputConfirmationNumber, changeOutputs, outputs );
+
+    context->wallet->sendFile( account, amount, message, fileName,prms.inputConfirmationNumber, prms.changeOutputs, outputs );
+    return true;
 }
 
 void Send::respSendFile( bool success, QStringList errors, QString fileName ) {
-    if (offlineWnd) {
-        QString message;
-        if (success)
-            message = "Transaction file was successfully generated at " + fileName;
-        else
-            message = "Unable to generate transaction file.\n" + util::formatErrorMessages(errors);
+    QString message;
+    if (success)
+        message = "Transaction file was successfully generated at " + fileName;
+    else
+        message = "Unable to generate transaction file.\n" + util::formatErrorMessages(errors);
 
-        offlineWnd->showSendMwcOfflineResult( success, message );
+    if (!bridge::getBridgeManager()->getSend().isEmpty()) {
+        for (auto b : bridge::getBridgeManager()->getSend())
+            b->showSendResult(success, message);
 
         if (success) {
             switchToStartingWindow();
@@ -172,78 +197,68 @@ void Send::respSendFile( bool success, QStringList errors, QString fileName ) {
     }
 }
 
-// Account info is updated
-void Send::onWalletBalanceUpdated() {
-    if (onlineOfflineWnd)
-        onlineOfflineWnd->updateAccountBalance( context->wallet->getWalletBalance(true),
-                context->wallet->getCurrentAccountName() );
+bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QString apiSecret, QString message) {
+    // Let's  verify address first
+    QPair< bool, util::ADDRESS_TYPE > addressRes = util::verifyAddress(address);
+    if ( !addressRes.first ) {
+        core::getWndManager()->messageTextDlg("Incorrect Input",
+                                         "Please specify correct address to send your MWC" );
+        return false;
+    }
+
+    core::SendCoinsParams sendParams = context->appContext->getSendCoinsParams();
+
+    QStringList outputs;
+    uint64_t txnFee = 0;
+    if (! util::getOutputsToSend( account, sendParams.changeOutputs, amount,
+                                  context->wallet, context->hodlStatus, context->appContext,
+                                  outputs, &txnFee ) )
+        return false; // User reject something
+
+    if (txnFee == 0 && outputs.size() == 0) {
+        txnFee = util::getTxnFee( account, amount, context->wallet,
+                                  context->appContext, sendParams.changeOutputs, outputs );
+    }
+    QString txnFeeStr = util::txnFeeToString(txnFee);
+
+    // Ask for confirmation
+    QString hash = context->wallet->getPasswordHash();
+    if ( core::getWndManager()->sendConfirmationDlg("Confirm Send Request",
+                                        "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " MWC from account: " + account +
+                                        "\nTo address: " + address + "\n\nTransaction fee: " + txnFeeStr,
+                                        1.0, hash ) ) {
+
+        context->wallet->sendTo( account, amount, util::fullFormalAddress( addressRes.second, address), apiSecret, message,
+                                 sendParams.inputConfirmationNumber, sendParams.changeOutputs,
+                                 outputs, context->appContext->isFluffSet());
+
+        return true;
+    }
+
+    return false;
 }
 
 
-void Send::timerEvent(QTimerEvent *event)
-{
-    Q_UNUSED(event);
+void Send::sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate ) {
+    Q_UNUSED(address)
+    Q_UNUSED(txid)
+    Q_UNUSED(slate)
 
-    int64_t waitingTimeLimit = QDateTime::currentMSecsSinceEpoch() - config::getSendTimeoutMs();
+    QString errMsg;
 
-    QVector<SendEventInfo> toReview;
-
-    for ( SendEventInfo & evt : slatePool.values() ) {
-        if (evt.timestamp < waitingTimeLimit ) {
-            toReview.push_back(evt);
-        }
+    if (!success) {
+        errMsg = util::formatErrorMessages(errors);
+        if (errMsg.isEmpty())
+            errMsg = "Your send request was failed by some reasons";
+        else
+            errMsg = "Your send request was failed:\n" + errMsg;
     }
 
-    for (auto & evt : toReview) {
-        slatePool.remove(evt.slate);
-    }
+    for (auto b : bridge::getBridgeManager()->getSend())
+        b->showSendResult(success, errMsg);
 
-    // Now let's ask user what to do with cancelled
-    // Expecting that timer calls are single threaded.
-    for (auto & evt : toReview) {
-        if (evt.isStaleTransaction()) {
-            if (control::MessageBox::RETURN_CODE::BTN2 ==
-                control::MessageBox::questionText(nullptr, "Second party didn't respond",
-                                              "We didn't get any response from the address\n" + evt.address +
-                                              "\nThere is a high chance that second party is offline and will never respond back.\n" +
-                                              "Do you want to continue waiting or cancel this transaction?",
-                                              "   Keep Waiting    ", "   Cancel Transaction   ", false, true)) {
-                // let's cancel transaction. Fortunately index is known.
-                // We can just cancel, if error will happen, we will show it
-                context->wallet->cancelTransacton(evt.txid);
-                transactions2cancel += evt.txid;
-            }
-        }
-    }
-}
-
-void Send::onCancelTransacton( bool success, int64_t trIdx, QString errMessage ) {
-    Q_UNUSED(errMessage);
-    if ( !success &&  transactions2cancel.contains(trIdx) ) {
-        // Cancellation was failed, let's display the message about that
-        control::MessageBox::messageText(nullptr, "Unable to cancel transaction",
-                "We unable to cancel the last transaction.\n\nPlease check at transaction page the status of your transactions. At notification page you can check the latest event.");
-    }
-    transactions2cancel.remove(trIdx); // Just, in case, clean up
-}
-
-void Send::registerSlate( const QString & slate, QString address, int64_t txid, bool send, bool respond ) {
-    if (!slatePool.contains( slate ) ) {
-        slatePool[slate].setData( address, txid,  slate, send, respond );
-    }
-    else {
-        SendEventInfo & evtInfo = slatePool[slate];
-        if (send)
-            evtInfo.send = send;
-        if (respond)
-            evtInfo.respond = respond;
-
-        if (!address.isEmpty())
-            evtInfo.address = address;
-
-        if (txid>=0)
-            evtInfo.txid = txid;
-    }
+    if (success && !bridge::getBridgeManager()->getSend().isEmpty())
+        switchToStartingWindow();
 }
 
 void Send::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
