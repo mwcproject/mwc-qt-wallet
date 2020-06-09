@@ -37,6 +37,7 @@ public:
 
     virtual ~Receive() override ;
 
+    void updateTorAddress(QString address);
     void updateMwcMqAddress(QString address);
     void updateMwcMqState(bool online);
     void updateKeybaseState(bool online);

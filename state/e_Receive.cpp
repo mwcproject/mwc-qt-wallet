@@ -41,6 +41,9 @@ Receive::Receive( StateContext * _context ) :
     QObject::connect(context->wallet, &wallet::Wallet::onMwcAddressWithIndex,
                      this, &Receive::onMwcAddressWithIndex, Qt::QueuedConnection);
 
+    QObject::connect(context->wallet, &wallet::Wallet::onTorAddress,
+                     this, &Receive::onTorAddress, Qt::QueuedConnection);
+
     QObject::connect(context->wallet, &wallet::Wallet::onReceiveFile,
                                    this, &Receive::respReceiveFile, Qt::QueuedConnection);
 
@@ -98,6 +101,7 @@ void Receive::signTransaction( QString fileName ) {
 }
 
 void Receive::ftBack() {
+qCritical() << "creating wnd";
     QPair<bool,bool> lsnStatus = context->wallet->getListenerStatus();
     QPair<bool, QString> httpStatus = context->wallet->getHttpListeningStatus();
     wnd = (wnd::Receive*) context->wndManager->switchToWindowEx( mwc::PAGE_E_RECEIVE,
@@ -106,6 +110,8 @@ void Receive::ftBack() {
                                      httpStatus.first,
                                      context->wallet->getLastKnownMwcBoxAddress(),
                                      context->wallet->getWalletConfig() ) );
+    if(torAddress != nullptr)
+        wnd->updateTorAddress(torAddress);
 }
 
 void Receive::ftContinue(QString fileName, QString resultTxFileName, bool fluff) {
@@ -163,6 +169,16 @@ void Receive::onMwcAddressWithIndex(QString mwcAddress, int idx) {
     if (wnd) {
         wnd->updateMwcMqAddress(mwcAddress);
     }
+}
+
+void Receive::onTorAddress(QString _torAddress) {
+   torAddress = _torAddress;
+qCritical() << "in tor: " << torAddress;
+   if(wnd) {
+qCritical() << "inner section!";
+      wnd->updateTorAddress(torAddress);
+   }
+qCritical() << "done";
 }
 
 QString  Receive::getReceiveAccount() {

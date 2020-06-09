@@ -206,6 +206,14 @@ void Mwc713InputParser::initListening() {
                                                             new TriePhraseSection("keybase]", 1) // keybase need go to accumulators, last symbol will be skipped
                                                     }));
 
+        // tor "(i.e. tor listener started for [http://qx4szwqcqtzo4e9krca357hskg53pjh2uxhsdo854updvmr3o4msc3qd.onion])"
+        parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_ON,
+                                                    QVector<BaseTrieSection*>{
+                                                           new TriePhraseSection("tor listener started for ["),
+                                                           new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE, "./:", "", 1), // tor address
+                                                           new TriePhraseSection("]")
+                                                   }));
+
     }
     else {
         parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_ON,

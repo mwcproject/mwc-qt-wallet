@@ -103,11 +103,11 @@ public:
     virtual QPair<bool,bool> getListenerStartState() override;
 
     // Start listening through services
-    virtual void listeningStart(bool startMq, bool startKb, bool initialStart)  override;
+    virtual void listeningStart(bool startMq, bool startKb, bool startTor, bool initialStart)  override;
     // Check Signal: onStartListening
 
     // Stop listening through services
-    virtual void listeningStop(bool stopMq, bool stopKb)  override;
+    virtual void listeningStop(bool stopMq, bool stopKb, bool stopTor)  override;
     // Check signal: onListeningStopResult
 
     // Get latest Mwc MQ address that we see
@@ -278,6 +278,7 @@ public:
    // enum INIT_STATUS {NONE, NEED_PASSWORD, NEED_SEED, WRONG_PASSWORD, READY };
   //  void setInitStatus( INIT_STATUS  initStatus );
 
+    void setTorAddress( QString torAddress ); // Set active tor address.
     void setMwcAddress( QString mwcAddress ); // Set active MWC address. Listener might be offline
     void setMwcAddressWithIndex( QString mwcAddress, int idx );
 
@@ -413,6 +414,7 @@ private:
     //InitWalletStatus initStatus = InitWalletStatus::NONE;
 
     QString mwcAddress; // Address from mwc listener
+    QString torAddress; // Address from tor listener
 
     // listening statuses
     bool mwcMqOnline = false;

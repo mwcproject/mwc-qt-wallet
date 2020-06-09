@@ -39,7 +39,7 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
             return true;
         }
         case S_LISTENER_ON: {
-            qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
+            qCritical() << "TaskListeningListener::processTask with events: " << printEvents(events);
 
             QStringList prms = evt.message.split('|');
             if ( prms.size()==0 )
@@ -49,12 +49,16 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
                 wallet713->setKeybaseListeningStatus(true);
             }
             else {
-                const QString & addrees = prms[0];
+                const QString & address = prms[0];
                 // x prefix is for testnet
                 // q - for mainnet
-                if (addrees.size()>0 && (addrees[0]=='x' || addrees[0]=='q') ) {
+                if (address.size()>0 && (address[0]=='x' || address[0]=='q') ) {
                     wallet713->setMwcMqListeningStatus(true, prms.size()>1 ? prms[1] : "", true);
                     wallet713->setMwcAddress(prms[0] );
+                // last case for tor it will be http://something.onion
+                } else if (address.size()>0 && (address[0]=='h')) {
+qCritical() << "got into the loop with " << address;
+                    wallet713->setTorAddress(prms[0] );
                 }
             }
             return true;
@@ -148,8 +152,12 @@ bool TaskListeningStart::processTask(const QVector<WEvent> &events) {
     return true;
 }
 
-QString TaskListeningStart::calcCommand(bool startMq, bool startKeybase) const {
+QString TaskListeningStart::calcCommand(bool startMq, bool startKeybase, bool startTor) const {
     Q_ASSERT(startMq | startKeybase);
+
+    // if tor, return listen -t
+    if(startTor)
+        return QString("listen -t");
 
     // -m, --mwcmq      mwcmq listener
     // -k, --keybase    keybase listener
@@ -182,8 +190,11 @@ bool TaskListeningStop::processTask(const QVector<WEvent> &events) {
     return true;
 }
 
-QString TaskListeningStop::calcCommand(bool stopMq, bool stopKeybase) const {
+QString TaskListeningStop::calcCommand(bool stopMq, bool stopKeybase, bool stopTor) const {
     Q_ASSERT(stopMq | stopKeybase);
+
+    if(stopTor)
+        return QString("stop -t");
 
     // -m, --mwcmq      mwcmq listener
     // -k, --keybase    keybase listener

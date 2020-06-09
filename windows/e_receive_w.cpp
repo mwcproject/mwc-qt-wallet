@@ -55,6 +55,10 @@ Receive::~Receive() {
     delete ui;
 }
 
+void Receive::updateTorAddress(QString address) {
+    ui->torAddress->setText(address);
+}
+
 void Receive::updateMwcMqAddress(QString address) {
     if (!address.contains('@')) {
         QString mqHost = walletConfig.getMwcMqHostNorm();
