@@ -142,10 +142,6 @@ public:
     bool isAutoStartKeybaseEnabled() const {return autoStartKeybaseEnabled;}
     void setAutoStartKeybaseEnabled(bool enabled);
 
-    // ----- Auto Start Tor ------
-    bool isAutoStartTorEnabled() const {return autoStartTorEnabled;}
-    void setAutoStartTorEnabled(bool enabled);
-
     // ----- Outputs: All/Unspent
     bool isShowOutputAll() const {return showOutputAll;}
     void setShowOutputAll(bool all);
@@ -226,7 +222,6 @@ private:
 
     bool autoStartMQSEnabled = true;
     bool autoStartKeybaseEnabled = true;
-    bool autoStartTorEnabled = true;
 
     // Because of Cursom node logic, we have to track config changes
     wallet::MwcNodeConnection  nodeConnectionMainNet;

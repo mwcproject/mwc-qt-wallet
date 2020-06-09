@@ -93,7 +93,7 @@ void MockWallet::getSeed(const QString & walletPassword) {
 
 // Start listening through services
 // Check Signal: onStartListening
-void MockWallet::listeningStart(bool startMq, bool startKb, bool startTor, bool initialStart) {
+void MockWallet::listeningStart(bool startMq, bool startKb, bool initialStart) {
     if (startMq) {
         listener_mwcmqs = true;
         emit onListeningStartResults(true, false, {}, initialStart);
@@ -106,7 +106,7 @@ void MockWallet::listeningStart(bool startMq, bool startKb, bool startTor, bool 
 
 // Stop listening through services
 // Check signal: onListeningStopResult
-void MockWallet::listeningStop(bool stopMq, bool stopKb, bool stopTor) {
+void MockWallet::listeningStop(bool stopMq, bool stopKb) {
     if (stopMq) {
         listener_mwcmqs = false;
         emit onListeningStopResult(true, false, {});

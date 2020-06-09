@@ -57,9 +57,6 @@ public:
     bool getAutoStartMQSEnabled();
     void updateAutoStartMQSEnabled(bool enabled);
 
-    bool getAutoStartTorEnabled();
-    void updateAutoStartTorEnabled(bool enabled);
-
     bool getAutoStartKeybaseEnabled();
     void updateAutoStartKeybaseEnabled(bool enabled);
 

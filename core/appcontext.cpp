@@ -310,13 +310,6 @@ void AppContext::setAutoStartMQSEnabled(bool enabled) {
     saveData();
 }
 
-void AppContext::setAutoStartTorEnabled(bool enabled) {
-    if (enabled == autoStartTorEnabled)
-        return;
-    autoStartTorEnabled = enabled;
-    saveData();
-}
-
 void AppContext::setAutoStartKeybaseEnabled(bool enabled) {
     if (enabled == autoStartKeybaseEnabled)
         return;

@@ -70,14 +70,12 @@ private slots:
     void onHttpListeningStatus(bool listening, QString additionalInfo);
 
     void onMwcAddressWithIndex(QString mwcAddress, int idx);
-    void onTorAddress(QString torAddress);
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
     void onWalletBalanceUpdated();
 private:
     wnd::Receive * wnd = nullptr;
     wnd::FileTransaction * fileTransWnd = nullptr;
     int lastNodeHeight = 0;
-    QString torAddress = nullptr;
 };
 
 

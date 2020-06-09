@@ -83,10 +83,10 @@ void Listening::triggerMwcStartState() {
     QPair<bool,bool> lsnStatus = context->wallet->getListenerStartState();
     if ( !lsnStatus.first ) {
         lastShownErrorMessage = "";
-        context->wallet->listeningStart(true, false, false, false);
+        context->wallet->listeningStart(true, false, false);
     }
     else {
-        context->wallet->listeningStop(true, false, false);
+        context->wallet->listeningStop(true, false);
     }
 }
 
@@ -102,10 +102,10 @@ void Listening::triggerKeybaseStartState() {
     QPair<bool,bool> lsnStatus = context->wallet->getListenerStartState();
     qDebug() << "lsnStatus: " << lsnStatus.first << " " << lsnStatus.second;
     if ( !lsnStatus.second ) {
-        context->wallet->listeningStart(false, true, false, false);
+        context->wallet->listeningStart(false, true, false);
     }
     else {
-        context->wallet->listeningStop(false, true, false);
+        context->wallet->listeningStop(false, true);
     }
 }
 

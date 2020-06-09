@@ -425,24 +425,19 @@ void MWC713::getSeed(const QString & walletPassword)  {
 
     QPair<bool,bool> lsnState = getListenerStartState();
 
-    if (lsnState.first) {
-        listeningStop(true, false, false);
-        listeningStop(false, false, true);
-    }
+    if (lsnState.first)
+        listeningStop(true, false);
 
     if (lsnState.second)
-        listeningStop(false, true, false);
+        listeningStop(false, true);
 
     eventCollector->addTask(task , TaskRecoverShowMnenonic::TIMEOUT );
 
     if (lsnState.first)
-    {
-        listeningStart(true, false, false, true);
-        listeningStart(false, false, true, true);
-    }
+        listeningStart(true, false, true);
 
     if (lsnState.second)
-        listeningStart(false, true, false, true);
+        listeningStart(false, true, true);
 }
 
 QString MWC713::getPasswordHash() {
@@ -460,9 +455,9 @@ QPair<bool,bool> MWC713::getListenerStartState()  {
 }
 
 // Check Signal: onListeningStartResults
-void MWC713::listeningStart(bool startMq, bool startKb, bool startTor, bool initialStart)  {
-    qCritical() << "listeningStart: mq=" << startMq << ",kb=" << startKb << ",tor=" << startTor;
-    eventCollector->addTask( new TaskListeningStart(this,startMq,startKb,startTor,initialStart), TaskListeningStart::TIMEOUT );
+void MWC713::listeningStart(bool startMq, bool startKb, bool initialStart)  {
+    qDebug() << "listeningStart: mq=" << startMq << ",kb=" << startKb;
+    eventCollector->addTask( new TaskListeningStart(this, startMq,startKb, initialStart), TaskListeningStart::TIMEOUT );
 
     if (startMq)
         mwcMqStartRequested = true;
@@ -473,13 +468,13 @@ void MWC713::listeningStart(bool startMq, bool startKb, bool startTor, bool init
 }
 
 // Check signal: onListeningStopResult
-void MWC713::listeningStop(bool stopMq, bool stopKb, bool stopTor)  {
+void MWC713::listeningStop(bool stopMq, bool stopKb)  {
     qDebug() << "listeningStop: mq=" << stopMq << ",kb=" << stopKb;
 
     if (stopMq)
         mwcMqStartRequested = false;
 
-    eventCollector->addTask( new TaskListeningStop(this, stopMq,stopKb,stopTor), TaskListeningStop::TIMEOUT );
+    eventCollector->addTask( new TaskListeningStop(this, stopMq,stopKb), TaskListeningStop::TIMEOUT );
 }
 
 // Get latest Mwc MQ address that we see
@@ -854,11 +849,6 @@ void MWC713::setGetNextKeyResult( bool success, QString identifier, QString publ
     emit onGetNextKeyResult(success, identifier, publicKey, errorMessage, btcaddress, airDropAccPasswor);
 }
 
-void MWC713::setTorAddress( QString _torAddress) {
-    torAddress = _torAddress;
-    logger::logEmit("MWC713", "onTorAddress", torAddress );
-    emit onTorAddress(torAddress);
-}
 
 void MWC713::setMwcAddress( QString _mwcAddress ) { // Set active MWC address. Listener might be offline
     mwcAddress = _mwcAddress;
@@ -1289,7 +1279,7 @@ void MWC713::notifyMqFailedToStart() {
 void  MWC713::restartMQsListener() {
     if (mwcMqStartRequested && !mwcMqStarted) {
         qDebug() << "Try to restart MQs Listener after failure";
-        eventCollector->addTask( new TaskListeningStart(this,true,false,false,false), TaskListeningStart::TIMEOUT );
+        eventCollector->addTask( new TaskListeningStart(this, true,false, false), TaskListeningStart::TIMEOUT );
 
     }
 }

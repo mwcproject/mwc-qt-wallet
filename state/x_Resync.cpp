@@ -49,12 +49,10 @@ NextStateRespond Resync::execute() {
     // Starting recovery process
     prevListeningStatus = context->wallet->getListenerStartState();
 
-    if (prevListeningStatus.first) {
-        context->wallet->listeningStop(true,false,false);
-        context->wallet->listeningStop(false,false,true);
-    }
+    if (prevListeningStatus.first)
+        context->wallet->listeningStop(true,false);
     if (prevListeningStatus.second)
-        context->wallet->listeningStop(false, true,false);
+        context->wallet->listeningStop(false, true);
 
     wnd = (wnd::ProgressWnd*)context->wndManager->switchToWindowEx( mwc::PAGE_X_RESYNC,
             new wnd::ProgressWnd( context->wndManager->getInWndParent(), this, "Re-sync with full node", "Preparing to re-sync", "", false) );
@@ -113,12 +111,9 @@ void Resync::onRecoverProgress( int progress, int maxVal ) {
 void Resync::onCheckResult(bool ok, QString errors ) {
 
     if (prevListeningStatus.first)
-    {
-        context->wallet->listeningStart(true,false,false,true);
-        context->wallet->listeningStart(false,false,true,true);
-    }
+        context->wallet->listeningStart(true,false, true);
     if (prevListeningStatus.second)
-        context->wallet->listeningStart(false,true,false,true);
+        context->wallet->listeningStart(false,true, true);
 
     if (wnd) {
         wnd->updateProgress(maxProgrVal, ok? "Done" : "Failed" );
