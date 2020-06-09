@@ -528,8 +528,13 @@ uint64_t getTxnFeeFromSpendableOutputs(int64_t amount, const QMultiMap<int64_t, 
         txnFee = calcTxnFee(numInputs, numOutputs, numKernels);
         amountWithFee = amount + txnFee;
 
+        uint64_t transactionTotal = 0;
+        for (wallet::WalletOutput o : txnInputs) {
+            transactionTotal += o.valueNano;
+        }
+
         // check again to ensure we have enough outputs for the amount including the fee
-        if (totalCoins < amountWithFee) {
+        if (transactionTotal < amountWithFee) {
             retrieveTransactionInputs(amountWithFee, spendableOutputs, &totalCoins, txnInputs);
             numInputs = txnInputs.size();
             // only recalculate txnFee if we had inputs
