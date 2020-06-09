@@ -398,6 +398,13 @@ private:
     core::AppContext * appContext; // app context to store current account name
     core::HodlStatus * hodlStatus = nullptr;
 
+    #ifdef Q_OS_WIN
+        const QString TOR_NAME = "tor.exe";
+    #else
+        const QString TOR_NAME = "tor";
+    #endif
+
+
     QString mwc713Path; // path to the backed binary
     QString mwc713configPath; // config file for mwc713
     QProcess * mwc713process = nullptr;
