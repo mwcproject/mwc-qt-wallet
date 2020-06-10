@@ -17,14 +17,12 @@
 #include "../../state/e_Receive.h"
 #include "../../state/g_Finalize.h"
 
-#define CALL_STATE_METHOD( PREF, METHOD )  if (callerId == state::RECEIVE_CALLER_ID) {    \
+#define CALL_STATE_METHOD( PREF, METHOD )  if (callerId == state::RECEIVE_CALLER_ID) {  \
     PREF ((state::Receive*) state::getState(state::STATE::RECEIVE_COINS))->METHOD;     \
 }                                                                                   \
-else if (callerId == state::FINALIZE_CALLER_ID) {                                   \
-    PREF ((state::Finalize*) state::getState(state::STATE::FINALIZE))->METHOD;          \
-}                                                                                   \
-else {                                                                              \
-    Q_ASSERT(false);                                                                \
+else  {                                                                             \
+    Q_ASSERT(callerId == state::FINALIZE_CALLER_ID);                                \
+    PREF ((state::Finalize*) state::getState(state::STATE::FINALIZE))->METHOD;      \
 }
 
 namespace bridge {
