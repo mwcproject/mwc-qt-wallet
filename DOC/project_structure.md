@@ -19,9 +19,9 @@ Both Mobile and Desktop app fit that model.
  
 ![](project_structure_images/High_level_arch.png)
 
-Core and bridges without limitations. Direct functional calls and messages are supported.
+Core and bridges can interact with each other without limitations. Direct functional calls and messages are supported.
 
-UI can talk with Bridges only and only with messages. Q_INVOKE is messages as well. Please note, 
+UI can talk with Bridges only and only with messages (Q_INVOKE calls are messages). Please note, 
 even Desktop code can call derectly any methinds, please don't do, use bridges. That will enforce
 to add some interface to bridge and implement complicated logic on core side that is shared. 
 It is exactly what we need.
@@ -32,6 +32,10 @@ https://doc.qt.io/qt-5/qtqml-cppintegration-data.html
  
 **NOTE: int64 is not in the list.** Also qt doesn't support int64 for Json. That is this we are 
 using String if we want to store int64. 
+
+**NOTE: For messages pass parameters by value.** Let's not make any assumptions about how qt handle the messages. 
+Even it is allowed pass by references and poinres, we better use values only. We don't have much data to transfer,
+so no large performance impact is expected.   
  
 ## Project name conventions
 
@@ -43,11 +47,11 @@ mwc-wallet-desktop.pro  - QT Creator project.
 
 CMakeLists.txt - CMake project
 
-Both thise files include core and desktop sources. 
+Both those files include core and desktop sources. 
 
 #### Mobile project
 
-mwc-wallet-mobile.pro  - QT Creator project.
+mwc-wallet-mobile.pro  - QT Creator project. Include core and mobile files only.
 
 For mobile there is no cmake config. I don't think it is possible.
 
@@ -65,20 +69,22 @@ Mobile defines QML manager at **mwc-qt-wallet/core_mobile/MobileWndManager.h**
 
 # Bridges
 
-Because of the bridges State role was changed. Before 'State' covered business login and provided interface 
-to the mwc713 wallet functionality. Now wallet, config, utils has it's own bridges. 
+Because of the bridges, 'State' role was changed. Before 'States' covered business logic and provided interface 
+to the mwc713 wallet functionality. Now wallet, config, utils has it's own bridges. So States providing only
+business logic functionality when needed.
 
 ## Bridge Manager
 
 Location: /mwc-qt-wallet/bridge/BridgeManager.h
 
 Because bridges provide 'static' interface, at any time new bridge can be created and it should be functioned 
-normally. Bridge to core object call is simple because we can follow static data model easily.
+normally. Bridge to core object call is simple because core follows static data model.
 
-But core to bridge calls are more complicated. By default core doesn't aware about active bridges.
-To solve this problem there a BridgeManager. BridgeManager act as a catalog of active bridges. 
+But core to bridge calls are more complicated. By default core doesn't aware about any active bridges and 
+breadges lifecycle defined by UI.
+To solve this problem there is a BridgeManager. BridgeManager act as a catalog of active bridges. 
 Core can allways iterate through all registered bridges and update all of them.
- 
+Please note, not all bridges participate in BridgeManager.
 
 ## Bridges for core functionality
 
