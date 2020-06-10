@@ -43,6 +43,8 @@ Files and folders can have suffix 'mobile' or 'desktop'. Shared code (core & bri
 
 #### Desktop project
 
+Introduce define  **WALLET_DESKTOP**
+
 mwc-wallet-desktop.pro  - QT Creator project.
 
 CMakeLists.txt - CMake project
@@ -50,6 +52,8 @@ CMakeLists.txt - CMake project
 Both those files include core and desktop sources. 
 
 #### Mobile project
+
+Introduce define  **WALLET_MOBILE**
 
 mwc-wallet-mobile.pro  - QT Creator project. Include core and mobile files only.
 
