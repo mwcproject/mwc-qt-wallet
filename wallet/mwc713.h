@@ -98,20 +98,23 @@ public:
 
     // Checking if wallet is listening through services
     // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
-    virtual QPair<bool,bool> getListenerStatus() override;
+    virtual ListenerStatus getListenerStatus() override;
     // return:  <mwcmq status>, <keybase status>.   true mean was started and need to be stopped, false - never started or was stopped
-    virtual QPair<bool,bool> getListenerStartState() override;
+    virtual ListenerStatus getListenerStartState() override;
 
     // Start listening through services
-    virtual void listeningStart(bool startMq, bool startKb, bool initialStart)  override;
+    virtual void listeningStart(bool startMq, bool startKb, bool startTor, bool initialStart)  override;
     // Check Signal: onStartListening
 
     // Stop listening through services
-    virtual void listeningStop(bool stopMq, bool stopKb)  override;
+    virtual void listeningStop(bool stopMq, bool stopKb, bool stopTor)  override;
     // Check signal: onListeningStopResult
 
     // Get latest Mwc MQ address that we see
-    virtual QString getLastKnownMwcBoxAddress()  override;
+    virtual QString getMqsAddress() override;
+
+    // Get latest Tor address that we see
+    virtual QString getTorAddress()  override;
 
     // Get MWC box <address, index in the chain>
     virtual void getMwcBoxAddress()  override;
@@ -278,6 +281,7 @@ public:
    // enum INIT_STATUS {NONE, NEED_PASSWORD, NEED_SEED, WRONG_PASSWORD, READY };
   //  void setInitStatus( INIT_STATUS  initStatus );
 
+    void setTorAddress( QString torAddress ); // Set active tor address.
     void setMwcAddress( QString mwcAddress ); // Set active MWC address. Listener might be offline
     void setMwcAddressWithIndex( QString mwcAddress, int idx );
 
@@ -285,15 +289,16 @@ public:
 
     void setGettedSeed( QVector<QString> seed );
 
-    void setListeningStartResults( bool mqTry, bool kbTry, // what we try to start
+    void setListeningStartResults( bool mqTry, bool kbTry, bool torTry, // what we try to start
             QStringList errorMessages, bool initialStart );
 
-    void setListeningStopResult(bool mqTry, bool kbTry, // what we try to stop
+    void setListeningStopResult(bool mqTry, bool kbTry, bool torTry, // what we try to stop
                                 QStringList errorMessages );
 
     // tid - thread ID that is responsible for listening. mwc713 can do start/stop async. tid will be used to find who is listening...
     void setMwcMqListeningStatus(bool online, QString tid, bool startStopEvents); // Start stop event are major, they can change active tid
     void setKeybaseListeningStatus(bool online);
+    void setTorListeningStatus(bool online);
 
     // info: if online  - Address, offlone - Error message or empty.
     void setHttpListeningStatus(bool online, QString info);
@@ -316,13 +321,8 @@ public:
                       int64_t spendableNano,
                       bool mwcServerBroken );
 
-    void setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate);
-
-    void reportSlateSendTo( QString slate, QString mwc, QString sendAddr );
-    void reportSlateSendBack( QString slate, QString sendAddr );
+    void setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc);
     void reportSlateReceivedFrom( QString slate, QString mwc, QString fromAddr, QString message );
-    void reportSlateReceivedBack( QString slate, QString mwc, QString fromAddr );
-    void reportSlateFinalized( QString slate );
 
     void setSendFileResult( bool success, QStringList errors, QString fileName );
     void setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
@@ -402,6 +402,12 @@ private:
     core::AppContext * appContext; // app context to store current account name
     core::HodlStatus * hodlStatus = nullptr;
 
+    #ifdef Q_OS_WIN
+        const QString TOR_NAME = "tor.exe";
+    #else
+        const QString TOR_NAME = "tor";
+    #endif
+
     QString mwc713Path; // path to the backed binary
     QString mwc713configPath; // config file for mwc713
     QProcess * mwc713process = nullptr;
@@ -418,12 +424,15 @@ private:
     //InitWalletStatus initStatus = InitWalletStatus::NONE;
 
     QString mwcAddress; // Address from mwc listener
+    QString torAddress; // Address from tor listener
 
     // listening statuses
     bool mwcMqOnline = false;
     bool keybaseOnline = false;
+    bool torOnline = false;
     bool mwcMqStarted = false;
     bool keybaseStarted = false;
+    bool torStarted = false;
     // MWC MQS will try to start forever.
     bool mwcMqStartRequested = false;
 

@@ -31,21 +31,27 @@ public:
     explicit Wallet(QObject * parent);
     ~Wallet();
 
-    // return true is MQS is online
+    // return true if MQS is online
     Q_INVOKABLE bool getMqsListenerStatus();
-    // return true is Keybase is online
+    // return true if Keybase is online
     Q_INVOKABLE bool getKeybaseListenerStatus();
+    // return true if Tor is online
+    Q_INVOKABLE bool getTorListenerStatus();
 
-    // return true is MQS is started
+    // return true if MQS is started
     Q_INVOKABLE bool isMqsListenerStarted();
-    // return true is Keybase is started
+    // return true if Keybase is started
     Q_INVOKABLE bool isKeybaseListenerStarted();
+    // return true if Tor is started
+    Q_INVOKABLE bool isTorListenerStarted();
 
     // Request start/stop listeners. Feedback should come with sgnUpdateListenerStatus
     Q_INVOKABLE void requestStartMqsListener();
     Q_INVOKABLE void requestStopMqsListener();
     Q_INVOKABLE void requestStartKeybaseListener();
     Q_INVOKABLE void requestStopKeybaseListener();
+    Q_INVOKABLE void requestStartTorListener();
+    Q_INVOKABLE void requestStopTorListener();
 
     // return values:
     // "true"  - listening
@@ -69,7 +75,9 @@ public:
     // Return: signal  sgnMwcAddressWithIndex
     Q_INVOKABLE void requestNextMqsAddress();
     // Get last known MQS address. It is good enough for cases when you don't expect address to be changed
-    Q_INVOKABLE QString getLastKnownMqsAddress();
+    Q_INVOKABLE QString getMqsAddress();
+    // Get last known Tor address. It is good enough for cases when you don't expect address to be changed
+    Q_INVOKABLE QString getTorAddress();
 
     // Request accounts info
     // includeAccountName - add Account names
@@ -133,7 +141,7 @@ signals:
     // Updates from the wallet and notification system
     void sgnNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL values
     void sgnConfigUpdate();
-    void sgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline);
+    void sgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
     void sgnHttpListeningStatus(bool listening, QString additionalInfo);
     void sgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, double totalDifficulty, int connections );
     void sgnUpdateSyncProgress(double progressPercent);
@@ -177,7 +185,7 @@ private slots:
     // Signals that comes from wallet & notification system
     void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
     void onConfigUpdate();
-    void onUpdateListenerStatus(bool online);
+    void onUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline);
     void onHttpListeningStatus(bool listening, QString additionalInfo);
     void onUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
     void onUpdateSyncProgress(double progressPercent);

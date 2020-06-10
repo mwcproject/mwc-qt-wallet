@@ -146,6 +146,10 @@ public:
     bool isAutoStartKeybaseEnabled() const {return autoStartKeybaseEnabled;}
     void setAutoStartKeybaseEnabled(bool enabled);
 
+    // ----- Auto Start Tor ------
+    bool isAutoStartTorEnabled() const {return autoStartTorEnabled;}
+    void setAutoStartTorEnabled(bool enabled);
+
     // ----- Outputs: All/Unspent
     bool isShowOutputAll() const {return showOutputAll;}
     void setShowOutputAll(bool all);
@@ -164,24 +168,6 @@ public:
     // HODL outputs data
     void saveHodlOutputs( const QString & rootPubKeyHash, const QMap<QString, core::HodlOutputInfo> & hodlOutputs );
     QMap<QString, core::HodlOutputInfo> loadHodlOutputs(const QString & rootPubKeyHash );
-
-    // setWalletNotes called in main.cpp after StateContext is created
-/*    void setWalletNotes(core::WalletNotes* _walletNotes);
-    // these methods are called by WalletNotes whenever the notes have been updated so the maps will always contain the latest notes
-    void setOutputNotesMap(QMap<QString, QMap<QString, QMap<QString, QString>>> _outputNotesMap) { outputNotesMap = _outputNotesMap; }
-    void setTxnNotesMap(QMap<QString, QMap<QString, QMap<QString, QString>>> _txnNotesMap) { txnNotesMap = _txnNotesMap; }
-
-    // output note
-    void initOutputNotes(const QString & account, const QVector<wallet::WalletOutput> & outputs);
-    QString getNote(const QString& account, const QString& outputCommitment);
-    void updateNote(const QString& account, const QString& outputCommitment, const QString& newNote);
-    void deleteNote(const QString& account, const QString& outputCommitment);
-
-    // transaction note uses transaction txIdx as note id
-    void initTransactionNotes(const QString & account, const QVector<wallet::WalletTransaction> & transactions);
-    QString getNote(const QString& account, int64_t txIdx);
-    void updateNote(const QString& account, int64_t txIdx, const QString& newNote) const;
-    void deleteNote(const QString& account, int64_t txIdx) const;*/
 
     QString getNote(const QString& key);
     void updateNote(const QString& key, const QString& note);
@@ -233,6 +219,7 @@ private:
 
     bool autoStartMQSEnabled = true;
     bool autoStartKeybaseEnabled = true;
+    bool autoStartTorEnabled = true;
 
     // Because of Cursom node logic, we have to track config changes
     wallet::MwcNodeConnection  nodeConnectionMainNet;

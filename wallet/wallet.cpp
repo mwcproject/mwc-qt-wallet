@@ -47,7 +47,7 @@ QString AccountInfo::getLongAccountName() const {
     return accountName + "  Total: " + util::nano2one(total) + "mwc  " +
                 "Spendable: " + util::nano2one(currentlySpendable) + "  Locked: " +
                 util::nano2one(lockedByPrevTransaction) +
-                "  Awaiting Confirmation: " + util::nano2one(awaitingConfirmation);
+                "  Unconfirmed: " + util::nano2one(awaitingConfirmation);
 }
 
 QString AccountInfo::getSpendableAccountName() const {

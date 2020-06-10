@@ -40,11 +40,7 @@ QString toString(WALLET_EVENTS event) {
         case S_LINE:            return "S_LINE";
         case S_NODE_API_ERROR:  return "S_NODE_ERROR";
 
-        case S_LISTENER_MQ_STARTING: return "S_LISTENER_MQ_STARTING";
-        case S_LISTENER_KB_STARTING: return "S_LISTENER_KB_STARTING";
         case S_LISTENER_ON:  return "S_LISTENER_ON";
-        case S_LISTENER_MQ_STOPPING: return "S_LISTENER_MQ_STOPPING";
-        case S_LISTENER_KB_STOPPING: return "S_LISTENER_KB_STOPPING";
         case S_LISTENER_OFF: return "S_LISTENER_OFF";
         case S_RECOVERY_STARTING: return "S_RECOVERY_STARTING";
         case S_RECOVERY_DONE:   return "S_RECOVERY_DONE";
@@ -69,11 +65,7 @@ QString toString(WALLET_EVENTS event) {
 
         case S_ACCOUNTS_INFO_SUM: return "S_ACCOUNTS_INFO_SUM";
 
-        case S_SLATE_WAS_SENT_TO:    return "S_SLATE_WAS_SENT_TO";
-        case S_SLATE_WAS_SENT_BACK: return "S_SLATE_WAS_SENT_BACK";
-        case S_SLATE_WAS_RECEIVED_BACK: return "S_SLATE_WAS_RECEIVED_BACK";
         case S_SLATE_WAS_RECEIVED_FROM: return "S_SLATE_WAS_RECEIVED_FROM";
-        case S_SLATE_WAS_FINALIZED: return "S_SLATE_WAS_FINALIZED";
         case S_SET_RECEIVE:         return "S_SET_RECEIVE";
 
         case S_TRANSACTION_LOG:     return "S_TRANSACTION_LOG";

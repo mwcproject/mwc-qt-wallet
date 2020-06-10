@@ -155,15 +155,22 @@ void InputPassword::updateKeybaseState(bool online) {
     ui->keybaseStatusTxt->setText( online ? "Online" : "Offline" );
 }
 
+void InputPassword::updateTorState(bool online) {
+    ui->torStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg" ) );
+    ui->torStatusImg->setToolTip(online ? "Listener connected to keybase" : "Listener diconnected from keybase");
+    ui->torStatusTxt->setText( online ? "Online" : "Offline" );
+}
+
 void InputPassword::updateHttpState(bool online) {
     ui->httpStatusImg->setPixmap( QPixmap( online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg" ) );
     ui->httpStatusImg->setToolTip(online ? "Wallet http(s) foreign REST API is online" : "Wallet foreign REST API is offline");
     ui->httpStatusTxt->setText( online ? "Online" : "Offline" );
 }
 
-void InputPassword::onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline) {
+void InputPassword::onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor) {
     updateMwcMqState(mwcOnline);
     updateKeybaseState(keybaseOnline);
+    updateTorState(tor);
 }
 
 void InputPassword::onSgnHttpListeningStatus(bool listening, QString additionalInfo) {

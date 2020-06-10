@@ -206,9 +206,10 @@ void MainWindow::on_helpButton_clicked()
     helpDlg.exec();
 }
 
-void MainWindow::updateListenerStatus(bool mwcOnline, bool keybaseOnline) {
+void MainWindow::updateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor) {
     Q_UNUSED(mwcOnline)
     Q_UNUSED(keybaseOnline)
+    Q_UNUSED(tor);
     updateListenerBtn();
 }
 
@@ -247,11 +248,12 @@ void MainWindow::onConfigUpdate() {
 void MainWindow::updateListenerBtn() {
     bool mqsStatus = wallet->getMqsListenerStatus();
     bool keybaseStatus = wallet->getKeybaseListenerStatus();
+    bool torStatus = wallet->getTorListenerStatus();
     QString httpListenerStatus = wallet->getHttpListeningStatus();
 
-    qDebug() << "updateListenerBtn: mqsStatus=" << mqsStatus << " keybaseStatus=" << keybaseStatus << " httpListenerStatus=" << httpListenerStatus;
+    qDebug() << "updateListenerBtn: mqsStatus=" << mqsStatus << " keybaseStatus=" << keybaseStatus << " torStatus=" << torStatus << " httpListenerStatus=" << httpListenerStatus;
 
-    bool listening = mqsStatus | keybaseStatus;
+    bool listening = mqsStatus | keybaseStatus | torStatus;
     QString listenerNames;
     if (mqsStatus)
         listenerNames +=  QString("MWC MQS");
@@ -260,6 +262,12 @@ void MainWindow::updateListenerBtn() {
         if (!listenerNames.isEmpty())
             listenerNames += ", ";
         listenerNames += "Keybase";
+    }
+
+    if (torStatus) {
+        if (!listenerNames.isEmpty())
+            listenerNames += ", ";
+        listenerNames += "TOR";
     }
 
     if (httpListenerStatus == "true") {

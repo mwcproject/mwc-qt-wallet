@@ -147,7 +147,7 @@ bool AppContext::loadData() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x4796)
+    if (id<0x4783 || id>0x4797)
          return false;
 
     QString mockStr;
@@ -229,6 +229,9 @@ bool AppContext::loadData() {
         in >> currentAccountName;
     }
 
+    if (id>0x4797)
+        in >> autoStartTorEnabled;
+
     return true;
 }
 
@@ -256,7 +259,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x4796;
+    out << 0x4797;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -297,6 +300,8 @@ void AppContext::saveData() const {
 
     out << receiveAccount;
     out << currentAccountName;
+
+    out << autoStartTorEnabled;
 }
 
 void AppContext::loadNotesData() {
@@ -377,6 +382,13 @@ void AppContext::setAutoStartMQSEnabled(bool enabled) {
     if (enabled == autoStartMQSEnabled)
         return;
     autoStartMQSEnabled = enabled;
+    saveData();
+}
+
+void AppContext::setAutoStartTorEnabled(bool enabled) {
+    if (enabled == autoStartTorEnabled)
+        return;
+    autoStartTorEnabled = enabled;
     saveData();
 }
 
@@ -625,52 +637,6 @@ QMap<QString, core::HodlOutputInfo> AppContext::loadHodlOutputs(const QString & 
     return res;
 
 }
-
-/*void AppContext::setWalletNotes(core::WalletNotes* _walletNotes) {
-    walletNotes = _walletNotes;
-    walletNotes->loadNotes(WalletNotes::OUTPUT_NOTE, outputNotesMap);
-    walletNotes->loadNotes(WalletNotes::TRANSACTION_NOTE, txnNotesMap);
-}
-
-void AppContext::initOutputNotes(const QString& account, const QVector<wallet::WalletOutput> & outputs) {
-    if (walletNotes->initializeNotes(account, outputs)) {
-        saveData();
-    }
-}
-
-void AppContext::initTransactionNotes(const QString& account, const QVector<wallet::WalletTransaction> & transactions) {
-    if (walletNotes->initializeNotes(account, transactions)) {
-        saveData();
-    }
-}
-
-QString AppContext::getNote(const QString& account, const QString& outputCommitment) {
-    return walletNotes->getNote(account, outputCommitment);
-}
-
-QString AppContext::getNote(const QString& account, int64_t txIdx) {
-    return walletNotes->getNote(account, txIdx);
-}
-
-void AppContext::updateNote(const QString& account, const QString& outputCommitment, const QString& newNote) {
-    walletNotes->updateNote(account, outputCommitment, newNote);
-    saveData();
-}
-
-void AppContext::updateNote(const QString& account, int64_t txIdx, const QString& newNote) const {
-    walletNotes->updateNote(account, txIdx, newNote);
-    saveData();
-}
-
-void AppContext::deleteNote(const QString& account, const QString& outputCommitment) {
-    walletNotes->deleteNote(account, outputCommitment);
-    saveData();
-}
-
-void AppContext::deleteNote(const QString& account, int64_t txIdx) const {
-    walletNotes->deleteNote(account, txIdx);
-    saveData();
-}*/
 
 bool AppContext::isLockedOutputs(const QString & output) const {
     if (!lockOutputEnabled)

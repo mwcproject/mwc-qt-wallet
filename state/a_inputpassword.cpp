@@ -90,18 +90,6 @@ void InputPassword::submitPassword(const QString & password) {
 
 }
 
-QPair<bool,bool> InputPassword::getWalletListeningStatus() {
-    return context->wallet->getListenerStatus();
-}
-
-QPair<bool,QString> InputPassword::getWalletHttpListeningStatus() {
-    return context->wallet->getHttpListeningStatus();
-}
-
-bool InputPassword::getWalletTls() {
-    return context->wallet->hasTls();
-}
-
 //static bool foreignAPIwasReported = false;
 
 void InputPassword::onLoginResult(bool ok) {
@@ -112,10 +100,10 @@ void InputPassword::onLoginResult(bool ok) {
 
             if ( config::isOnlineWallet() && context->wallet->hasPassword() ) {
                 // Start listening, no feedback interested
-                if (context->appContext->isAutoStartMQSEnabled())
-                    context->wallet->listeningStart(true, false, true);
-                if (context->appContext->isAutoStartKeybaseEnabled())
-                    context->wallet->listeningStart(false, true, true);
+                context->wallet->listeningStart(context->appContext->isAutoStartMQSEnabled(),
+                                                context->appContext->isAutoStartKeybaseEnabled(),
+                                                context->appContext->isAutoStartTorEnabled(),
+                                                true);
             }
 
             if (! config::isOnlineNode()) {

@@ -93,35 +93,48 @@ void MockWallet::getSeed(const QString & walletPassword) {
 
 // Start listening through services
 // Check Signal: onStartListening
-void MockWallet::listeningStart(bool startMq, bool startKb, bool initialStart) {
+void MockWallet::listeningStart(bool startMq, bool startKb, bool startTor, bool initialStart) {
     if (startMq) {
         listener_mwcmqs = true;
-        emit onListeningStartResults(true, false, {}, initialStart);
+        emit onListeningStartResults(true, false, false, {}, initialStart);
     }
-    else if (startKb) {
+    if (startKb) {
         listener_keybase = true;
-        emit onListeningStartResults(false, true, {}, initialStart);
+        emit onListeningStartResults(false, true, false, {}, initialStart);
+    }
+    if (startTor) {
+        listener_tor = true;
+        emit onListeningStartResults(false, false, true, {}, initialStart);
     }
 }
 
 // Stop listening through services
 // Check signal: onListeningStopResult
-void MockWallet::listeningStop(bool stopMq, bool stopKb) {
+void MockWallet::listeningStop(bool stopMq, bool stopKb, bool stopTor) {
     if (stopMq) {
         listener_mwcmqs = false;
-        emit onListeningStopResult(true, false, {});
+        emit onListeningStopResult(true, false, false, {});
     }
-    else if (stopKb) {
+    if (stopKb) {
         listener_keybase = false;
-        emit onListeningStopResult(false, true, {});
+        emit onListeningStopResult(false, true, false, {});
+    }
+    if (stopTor) {
+        listener_tor = stopTor;
+        emit onListeningStopResult(false, false, true, {});
     }
 }
 
 // Get latest Mwc MQ address that we see
-QString MockWallet::getLastKnownMwcBoxAddress()
+QString MockWallet::getMqsAddress()
 {
     return mwcAddress;
 }
+QString MockWallet::getTorAddress()
+{
+    return "http://87658976345873482345.onion";
+}
+
 
 // Get MWC box <address, index in the chain>
 // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
@@ -355,7 +368,7 @@ void MockWallet::sendTo(const QString &account, int64_t coinNano, const QString 
     Q_UNUSED(outputs)
     Q_UNUSED(fluff)
 
-    emit onSend( true, {}, address, 4, "0000-1111-2222-3333" );
+    emit onSend( true, {}, address, 4, "0000-1111-2222-3333", util::nano2one(coinNano) );
 }
 
 // Show outputs for the wallet

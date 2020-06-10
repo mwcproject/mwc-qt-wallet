@@ -42,7 +42,7 @@ private slots:
 
 private:
     int prevState = STATE::TRANSACTIONS;
-    QPair<bool,bool> prevListeningStatus = QPair<bool,bool>(false,false);
+    wallet::ListenerStatus  prevListeningStatus;
     int maxProgrVal = 100;
     // Need to recalibrate ther progress..
     // First few respond might be too fast

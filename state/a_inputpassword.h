@@ -31,10 +31,6 @@ public:
     // Async call to submit the password. This state migth get back to UI if password is incorrect
     void submitPassword(const QString & password);
 
-    QPair<bool,bool> getWalletListeningStatus();
-    QPair<bool,QString> getWalletHttpListeningStatus();
-    bool getWalletTls();
-
 protected:
     virtual NextStateRespond execute() override;
 

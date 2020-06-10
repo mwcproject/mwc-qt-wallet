@@ -56,7 +56,7 @@ private slots:
     void onNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL
     void onConfigUpdate();
 
-    void updateListenerStatus(bool mwcOnline, bool keybaseOnline);
+    void updateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
     void onHttpListeningStatus(bool listening, QString additionalInfo);
     void updateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 

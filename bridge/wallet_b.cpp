@@ -35,9 +35,7 @@ Wallet::Wallet(QObject *parent) : QObject(parent) {
                      this, &Wallet::onConfigUpdate, Qt::QueuedConnection);
 
 
-    QObject::connect(wallet, &wallet::Wallet::onMwcMqListenerStatus,
-                     this, &Wallet::onUpdateListenerStatus, Qt::QueuedConnection);
-    QObject::connect(wallet, &wallet::Wallet::onKeybaseListenerStatus,
+    QObject::connect(wallet, &wallet::Wallet::onListenersStatus,
                      this, &Wallet::onUpdateListenerStatus, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onHttpListeningStatus,
                      this, &Wallet::onHttpListeningStatus, Qt::QueuedConnection);
@@ -91,10 +89,8 @@ void Wallet::onConfigUpdate() {
     emit sgnConfigUpdate();
 }
 
-void Wallet::onUpdateListenerStatus(bool online) {
-    Q_UNUSED(online)
-    auto status = getWallet()->getListenerStatus();
-    emit sgnUpdateListenerStatus( status.first, status.second );
+void Wallet::onUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline) {
+    emit sgnUpdateListenerStatus( mqsOnline, keybaseOnline, torOnline );
 }
 
 void Wallet::onHttpListeningStatus(bool listening, QString additionalInfo) {
@@ -174,33 +170,47 @@ void Wallet::onAccountRenamed(bool success, QString errorMessage) {
 
 // return true is MQS is online
 bool Wallet::getMqsListenerStatus() {
-    return getWallet()->getListenerStatus().first;
+    return getWallet()->getListenerStatus().mqs;
 }
 // return true is Keybase is online
 bool Wallet::getKeybaseListenerStatus()  {
-    return getWallet()->getListenerStatus().second;
+    return getWallet()->getListenerStatus().keybase;
+}
+// return true if Tor is online
+bool Wallet::getTorListenerStatus() {
+    return getWallet()->getListenerStatus().tor;
 }
 
 // return true is MQS is started
 bool Wallet::isMqsListenerStarted() {
-    return getWallet()->getListenerStartState().first;
+    return getWallet()->getListenerStartState().mqs;
 }
 // return true is Keybase is started
 bool Wallet::isKeybaseListenerStarted() {
-    return getWallet()->getListenerStartState().second;
+    return getWallet()->getListenerStartState().keybase;
 }
+bool Wallet::isTorListenerStarted() {
+    return getWallet()->getListenerStartState().tor;
+}
+
 // Request start/stop listeners. Feedback should come with sgnUpdateListenerStatus
 void Wallet::requestStartMqsListener() {
-    getWallet()->listeningStart(true, false, false);
+    getWallet()->listeningStart(true, false, false, false);
 }
 void Wallet::requestStopMqsListener() {
-    getWallet()->listeningStop(true, false);
+    getWallet()->listeningStop(true, false, false);
 }
 void Wallet::requestStartKeybaseListener() {
-    getWallet()->listeningStart(false, true, false);
+    getWallet()->listeningStart(false, true, false, false);
 }
 void Wallet::requestStopKeybaseListener() {
-    getWallet()->listeningStop(false, true);
+    getWallet()->listeningStop(false, true, false);
+}
+void Wallet::requestStartTorListener() {
+    getWallet()->listeningStart(false, false, true, false);
+}
+void Wallet::requestStopTorListener() {
+    getWallet()->listeningStop(false, false, true);
 }
 
 // return values:
@@ -250,10 +260,13 @@ void Wallet::requestNextMqsAddress() {
 }
 
 // Get last known MQS address. It is good enough for cases when you don't expect address to be changed
-QString Wallet::getLastKnownMqsAddress() {
-    return getWallet()->getLastKnownMwcBoxAddress();
+QString Wallet::getMqsAddress() {
+    return getWallet()->getMqsAddress();
 }
 
+QString Wallet::getTorAddress() {
+    return getWallet()->getTorAddress();
+}
 
 // Request accounts info
 // includeAccountName - return Account names

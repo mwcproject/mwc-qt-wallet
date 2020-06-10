@@ -61,7 +61,7 @@ Receive::~Receive() {
 
 void Receive::updateStatus() {
     // Recieve is a simple small page, we can update all without problems
-    QString address = wallet->getLastKnownMqsAddress();
+    QString address = wallet->getMqsAddress();
 
     mwcAddress = "mwcmqs://" + address;
     ui->mwcmqAddress->setText( mwcAddress );
@@ -74,9 +74,15 @@ void Receive::updateStatus() {
     ui->keybaseStatusImg->setPixmap( QPixmap(keybaseOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->keybaseStatusLabel->setText( keybaseOnline ? "Online" : "Offline" );
 
+    bool torOnline = wallet->getTorListenerStatus();
+    ui->torStatusImg->setPixmap( QPixmap(torOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
+    ui->torStatusLabel->setText( torOnline ? "Online" : "Offline" );
+
     bool httpOnline = wallet->getHttpListeningStatus()=="true";
     ui->httpStatusImg->setPixmap( QPixmap(httpOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->httpStatusLabel->setText( httpOnline ? "Online" : "Offline" );
+
+    ui->torAddress->setText( wallet->getTorAddress() );
 }
 
 
@@ -139,7 +145,6 @@ void Receive::updateAccountList() {
 void Receive::onSgnWalletBalanceUpdated() {
     updateAccountList();
 }
-
 
 }
 

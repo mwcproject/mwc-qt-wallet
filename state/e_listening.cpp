@@ -59,11 +59,12 @@ NextStateRespond Listening::execute() {
 
 
 // Listening, you will not be able to get a results
-void Listening::onListeningStartResults( bool mqTry, bool kbTry, // what we try to start
+void Listening::onListeningStartResults( bool mqTry, bool kbTry, bool torTry, // what we try to start
                                QStringList errorMessages, bool initialStart ) // error messages, if get some
 {
     Q_UNUSED(mqTry)
     Q_UNUSED(kbTry)
+    Q_UNUSED(torTry)
 
     if ( !errorMessages.empty() && !initialStart ) {
         QString msg;
@@ -87,10 +88,11 @@ void Listening::onListeningStartResults( bool mqTry, bool kbTry, // what we try 
     }
 }
 
-void Listening::onListeningStopResult(bool mqTry, bool kbTry, // what we try to stop
+void Listening::onListeningStopResult(bool mqTry, bool kbTry, bool torTry, // what we try to stop
                             QStringList errorMessages ) {
     Q_UNUSED(mqTry)
     Q_UNUSED(kbTry)
+    Q_UNUSED(torTry)
 
     if (!errorMessages.empty()) {
         QString msg;

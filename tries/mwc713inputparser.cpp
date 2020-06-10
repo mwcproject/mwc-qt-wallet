@@ -177,15 +177,6 @@ void Mwc713InputParser::initInitWalletWorkflow() {
 }
 
 void Mwc713InputParser::initListening() {
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_STARTING,
-                                                QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("starting mwcmqs listener...")
-                                                }));
-
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_KB_STARTING,
-                                                QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("starting keybase listener...")
-                                                }));
 
     // mwc713 emitting messages 'listener started for: ['  and 'listener started for ['
     // mwcmqs listener started for [xmjJGkX9U75Vo8Ro26gTm2i4k4CD39Q24qvQqAPeQVeWuo36YVFh] tid=[xa5ktaMRCEmj151Rfxr7a]
@@ -205,16 +196,13 @@ void Mwc713InputParser::initListening() {
                                                             new TriePhraseSection("keybase]", 1) // keybase need go to accumulators, last symbol will be skipped
                                                     }));
 
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_STOPPING,
-                                                QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("stopping mwcmqs listener...")
-                                                }));
-
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_KB_STOPPING,
-                                                QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("stopping keybase listener...")
-                                                }));
-
+        // tor "(i.e. tor listener started for [http://qx4szwqcqtzo4e9krca357hskg53pjh2uxhsdo854updvmr3o4msc3qd.onion])"
+        parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_ON,
+                                                    QVector<BaseTrieSection*>{
+                                                            new TriePhraseSection("tor listener started for ["),
+                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE, "./:", "", 1), // tor address
+                                                            new TriePhraseSection("]")
+                                                    }));
 
     // mwcmqs listener [xmjJGkX9U75Vo8Ro26gTm2i4k4CD39Q24qvQqAPeQVeWuo36YVFh] stopped. tid=[xa5ktaMRCEmj151Rfxr7a]
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_OFF,
@@ -233,6 +221,12 @@ void Mwc713InputParser::initListening() {
                                                             new TriePhraseSection("keybase]", 1), // keybase need go to accumulators, last symbol will be skipped
                                                             new TriePhraseSection(" stopped")
                                                     }));
+
+    // Stopping TOR listener...
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_OFF,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("Stopping TOR listener")
+                                                }));
 
     /////////////////  Listeners
     // WARNING: mwcmqs listener [xmjJGkX9U75Vo8Ro26gTm2i4k4CD39Q24qvQqAPeQVeWuo36YVFh] lost connection. Will try to restore in the background. tid=[ToMFBchztyUT0OgPTzeK6]
@@ -397,44 +391,6 @@ void Mwc713InputParser::initSend() {
                                                         new TrieAnySection(4000, TrieAnySection::NOT_NEW_LINE, "","", 1)
                                                 }));
 
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_SENT_TO,
-    // slate [dd5a7ca7-a023-4fb3-b8fd-93b35ac45c8b] for [0.100000000] MWCs sent successfully to [xmgEvZ4MCCGMJnRnNXKHBbHmSGWQchNr9uZpY5J1XXnsCFS45fsU]
-                                                QVector<BaseTrieSection*>{
-                                                        new TrieNewLineSection(),
-                                                        new TriePhraseSection("slate ["),
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE|TrieAnySection::NOT_SPACES, "","]", 1),
-                                                        new TriePhraseSection("] for ["),
-                                                        new TrieAnySection(100, TrieAnySection::NUMBERS, ".","]", 2),
-                                                        new TriePhraseSection("] MWCs sent successfully to ["),
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","]", 3),
-                                                        new TriePhraseSection("]"),
-                                                        new TrieNewLineSection()
-                                                }));
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_SENT_BACK,
-            // slate [dd5a7ca7-a023-4fb3-b8fd-93b35ac45c8b] for [0.100000000] MWCs sent successfully to [xmgEvZ4MCCGMJnRnNXKHBbHmSGWQchNr9uZpY5J1XXnsCFS45fsU]
-                                                QVector<BaseTrieSection*>{
-                                                        new TrieNewLineSection(),
-                                                        new TriePhraseSection("slate ["),
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE|TrieAnySection::NOT_SPACES, "","]", 1),
-                                                        new TriePhraseSection("] sent back to ["),
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","]", 2),
-                                                        new TriePhraseSection("] successfully"),
-                                                        new TrieNewLineSection()
-                                                }));
-
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_RECEIVED_BACK,
-                                                QVector<BaseTrieSection*>{
-                                                        new TrieNewLineSection(),
-                                                        new TriePhraseSection("slate ["),
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE|TrieAnySection::NOT_SPACES, "","]", 1),
-                                                        new TriePhraseSection("] received back from ["),
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","]", 2),
-                                                        new TriePhraseSection("] for ["),
-                                                        new TrieAnySection(100, TrieAnySection::NUMBERS, ".","]", 3),
-                                                        new TriePhraseSection("] MWCs"),
-                                                        new TrieNewLineSection()
-                                                }));
-
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_RECEIVED_FROM,
      //slate [5a759d16-f6b1-41d4-8d44-49307a50e09a] received from [xmgcJYZG6eG5ajHdZZGh8gXv5Ne4rdArrKwpSajQGhenUXdJQA5V] for [0.111000000] MWCs. Message: ["L to r 0.111 mwc"]
                                                 QVector<BaseTrieSection*>{
@@ -458,16 +414,6 @@ void Mwc713InputParser::initSend() {
                                                         new TriePhraseSection("] for ["),
                                                         new TrieAnySection(100, TrieAnySection::NUMBERS, ".","]", 3),
                                                         new TriePhraseSection("] MWCs."),
-                                                        new TrieNewLineSection()
-                                                }));
-
-
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SLATE_WAS_FINALIZED,
-                                                QVector<BaseTrieSection*>{
-                                                        new TrieNewLineSection(),
-                                                        new TriePhraseSection("slate ["),
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE|TrieAnySection::NOT_SPACES, "","]", 1),
-                                                        new TriePhraseSection("] finalized successfully"),
                                                         new TrieNewLineSection()
                                                 }));
 }

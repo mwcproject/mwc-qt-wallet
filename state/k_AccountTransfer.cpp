@@ -33,8 +33,6 @@ AccountTransfer::AccountTransfer( StateContext * context) :
 
     connect( context->wallet, &wallet::Wallet::onSetReceiveAccount, this, &AccountTransfer::onSetReceiveAccount, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onSend, this, &AccountTransfer::onSend, Qt::QueuedConnection );
-    connect( context->wallet, &wallet::Wallet::onSlateSendTo, this, &AccountTransfer::onSlateSendTo, Qt::QueuedConnection );
-    connect( context->wallet, &wallet::Wallet::onSlateFinalized, this, &AccountTransfer::onSlateFinalized, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &AccountTransfer::onWalletBalanceUpdated, Qt::QueuedConnection );
 }
 
@@ -105,10 +103,10 @@ bool AccountTransfer::transferFunds(const QString & from,
         return false;
     }
 
-    myAddress = context->wallet->getLastKnownMwcBoxAddress();
+    myAddress = context->wallet->getMqsAddress();
 
     // mwc mq expected to be online, we will use it for slate exchange
-    if (myAddress.isEmpty() || !context->wallet->getListenerStatus().first) {
+    if (myAddress.isEmpty() || !context->wallet->getListenerStatus().mqs) {
         for (auto b : bridge::getBridgeManager()->getAccountTransfer())
             b->showTransferResults(false, "Please turn on mwc mq listener. We can't transfer funds in offline mode");
         return false;
@@ -135,7 +133,6 @@ bool AccountTransfer::transferFunds(const QString & from,
     trAccountFrom = from;
     trAccountTo = to;
     trNanoCoins = nanoCoins;
-    trSlate = "";
     outputs2use = outputs;
 
     transferState = 0;
@@ -169,13 +166,18 @@ void AccountTransfer::onSetReceiveAccount( bool ok, QString AccountOrMessage ) {
 }
 
 
-void AccountTransfer::onSend( bool success, QStringList errors, QString address, int64_t txid, QString slate ) {
+void AccountTransfer::onSend( bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc ) {
     Q_UNUSED(txid);
     Q_UNUSED(slate);
     Q_UNUSED(address);
+    Q_UNUSED(mwc);
 
     if (transferState!=1)
         return;
+
+    if (!recieveAccount.isEmpty())
+        context->wallet->setReceiveAccount( recieveAccount );
+    context->wallet->updateWalletBalance(true, true);
 
     if  (!success) {
         for (auto b : bridge::getBridgeManager()->getAccountTransfer())
@@ -183,35 +185,10 @@ void AccountTransfer::onSend( bool success, QStringList errors, QString address,
         transferState = -1;
         return;
     }
-
-    // Waiting for finalized slate to continue
-}
-
-void AccountTransfer::onSlateSendTo( QString slate, QString mwc, QString sendAddr ) {
-    Q_UNUSED(mwc);
-    Q_UNUSED(sendAddr);
-    if (transferState!=1)
-        return;
-
-    trSlate = slate;
-}
-
-void AccountTransfer::onSlateFinalized( QString slate ) {
-    if (transferState!=1)
-        return;
-
-    if (slate == trSlate) {
-        // can go forward. Restore the state and update the balance
-
-        transferState=2;
-        if (!recieveAccount.isEmpty())
-            context->wallet->setReceiveAccount( recieveAccount );
-        context->wallet->updateWalletBalance(true, true);
-    }
 }
 
 void AccountTransfer::onWalletBalanceUpdated() {
-    if (transferState!=2) {
+    if (transferState!=1) {
         for (auto b : bridge::getBridgeManager()->getAccountTransfer())
             b->updateAccounts();
         return;

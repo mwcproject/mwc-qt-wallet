@@ -295,6 +295,7 @@ control--MwcPushButtonNormal {
 
 control--MwcPushButtonSmall {
     font-size: 12px;
+    border: 1px solid #FFFFFF;
 }
 
 control--MwcPushButtonTiny {
@@ -636,8 +637,12 @@ QCheckBox::indicator:disabled:checked {
     image: url(:/img/disabledCheckOn.svg);
 }
 
-QTabWidget::tab-bar{
+QTabWidget::tab-bar {
 	left: 52px;
+}
+
+QTabWidget::pane {
+    border: none;
 }
 
 QWidget#tab_main {

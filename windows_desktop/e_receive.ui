@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>772</width>
-    <height>528</height>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,14 +49,14 @@
       <widget class="QFrame" name="frameQs">
        <property name="minimumSize">
         <size>
-         <width>259</width>
-         <height>160</height>
+         <width>550</width>
+         <height>130</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>259</width>
-         <height>160</height>
+         <height>130</height>
         </size>
        </property>
        <property name="frameShape">
@@ -69,7 +69,7 @@
         <property name="geometry">
          <rect>
           <x>237</x>
-          <y>9</y>
+          <y>12</y>
           <width>21</width>
           <height>21</height>
          </rect>
@@ -91,7 +91,7 @@
         <property name="geometry">
          <rect>
           <x>39</x>
-          <y>30</y>
+          <y>33</y>
           <width>166</width>
           <height>16</height>
          </rect>
@@ -107,7 +107,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>0</y>
+          <y>3</y>
           <width>229</width>
           <height>35</height>
          </rect>
@@ -123,7 +123,7 @@
         <property name="geometry">
          <rect>
           <x>237</x>
-          <y>63</y>
+          <y>75</y>
           <width>21</width>
           <height>21</height>
          </rect>
@@ -145,7 +145,7 @@
         <property name="geometry">
          <rect>
           <x>39</x>
-          <y>81</y>
+          <y>93</y>
           <width>166</width>
           <height>16</height>
          </rect>
@@ -161,7 +161,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>54</y>
+          <y>66</y>
           <width>229</width>
           <height>35</height>
          </rect>
@@ -176,10 +176,10 @@
        <widget class="control::MwcLabelLarge" name="httpLabel">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>111</y>
-          <width>229</width>
-          <height>35</height>
+          <x>336</x>
+          <y>3</y>
+          <width>181</width>
+          <height>36</height>
          </rect>
         </property>
         <property name="text">
@@ -192,9 +192,9 @@
        <widget class="control::MwcLabelTiny" name="httpStatusLabel">
         <property name="geometry">
          <rect>
-          <x>39</x>
-          <y>138</y>
-          <width>166</width>
+          <x>367</x>
+          <y>30</y>
+          <width>126</width>
           <height>16</height>
          </rect>
         </property>
@@ -208,14 +208,68 @@
        <widget class="QLabel" name="httpStatusImg">
         <property name="geometry">
          <rect>
-          <x>237</x>
-          <y>120</y>
+          <x>525</x>
+          <y>12</y>
           <width>21</width>
           <height>21</height>
          </rect>
         </property>
         <property name="toolTip">
          <string>Keybase listener status</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../resources_desktop.qrc">:/img/StatusOk@2x.svg</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="control::MwcLabelLarge" name="label_7">
+        <property name="geometry">
+         <rect>
+          <x>336</x>
+          <y>66</y>
+          <width>181</width>
+          <height>35</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>TOR</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="control::MwcLabelTiny" name="torStatusLabel">
+        <property name="geometry">
+         <rect>
+          <x>362</x>
+          <y>93</y>
+          <width>131</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Online</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="torStatusImg">
+        <property name="geometry">
+         <rect>
+          <x>525</x>
+          <y>75</y>
+          <width>21</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>TOR listener status</string>
         </property>
         <property name="text">
          <string/>
@@ -284,7 +338,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
-         <number>20</number>
+         <number>10</number>
         </property>
         <property name="leftMargin">
          <number>0</number>
@@ -315,7 +369,55 @@
          </widget>
         </item>
         <item>
+         <widget class="control::MwcLabelSmall" name="label_3">
+          <property name="text">
+           <string>MWCMQ Address:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="control::MwcLineEditNormal" name="mwcmqAddress">
+          <property name="minimumSize">
+           <size>
+            <width>600</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="maxLength">
+           <number>1024</number>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="control::MwcLabelSmall" name="label_31">
+          <property name="text">
+           <string>Tor Address:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="control::MwcLineEditNormal" name="torAddress">
           <property name="minimumSize">
            <size>
             <width>600</width>
@@ -422,7 +524,7 @@
     </layout>
    </item>
    <item>
-    <widget class="control::MwcLabelSmall" name="label_3">
+    <widget class="control::MwcLabelSmall" name="label_32">
      <property name="text">
       <string>Sign transaction</string>
      </property>

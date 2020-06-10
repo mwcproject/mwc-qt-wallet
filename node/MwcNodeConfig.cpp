@@ -82,16 +82,16 @@ MwcNodeConfig getCurrentMwcNodeConfig(const QString & nodeDataPath, const QStrin
 
     updateMwcNodeConfig( nodeDataPath, network );
 
-    QPair<bool,QString> walletPath = getMwcNodePath(nodeDataPath, network);
-    if (!walletPath.first) {
-        core::getWndManager()->messageTextDlg("Error", walletPath.second);
+    QPair<bool,QString> nodeDataFullPath = getMwcNodePath(nodeDataPath, network);
+    if (!nodeDataFullPath.first) {
+        core::getWndManager()->messageTextDlg("Error", nodeDataFullPath.second);
         QCoreApplication::exit();
         return MwcNodeConfig();
     }
 
     // Note, asserts are disabled because of the first run.
 
-    QStringList lines = util::readTextFile( walletPath.second + "api_secret" );
+    QStringList lines = util::readTextFile( nodeDataFullPath.second + "api_secret" );
     //Q_ASSERT( lines.size()>0 && !lines[0].isEmpty() );
 
     QString secret;
@@ -99,7 +99,7 @@ MwcNodeConfig getCurrentMwcNodeConfig(const QString & nodeDataPath, const QStrin
         secret = lines[0];
 
     util::ConfigReader reader;
-    reader.readConfig(walletPath.second + "mwc-server.toml");
+    reader.readConfig(nodeDataFullPath.second + "mwc-server.toml");
     //Q_ASSERT( reader.readConfig("chain_type") == network );
 
     MwcNodeConfig result;

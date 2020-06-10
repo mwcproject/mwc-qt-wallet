@@ -73,7 +73,7 @@ bool MWC713::checkWalletInitialized() {
     qDebug() << "checkWalletState with " << mwc713Path << " and " << mwc713configPath;
 
     Q_ASSERT(mwc713process==nullptr);
-    mwc713process = initMwc713process( {}, {"state"}, false );
+    mwc713process = initMwc713process( {"TOR_EXE_NAME", QCoreApplication::applicationDirPath() + "/" + TOR_NAME}, {"state"}, false );
 
     if (mwc713process==nullptr)
         return false;
@@ -106,7 +106,7 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
 
     if (!envVariables.isEmpty()) {
         Q_ASSERT(envVariables.size()%2==0);
-        QProcessEnvironment env;
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 
         for (int t=1; t<envVariables.size(); t+=2 ) {
             env.insert( envVariables[t-1], envVariables[t]);
@@ -174,8 +174,8 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
 void MWC713::resetData(STARTED_MODE _startedMode ) {
     loggedIn = false;
     startedMode = _startedMode;
-    mwcMqOnline = keybaseOnline = false;
-    mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
+    mwcMqOnline = keybaseOnline = torOnline = false;
+    mwcMqStarted = mwcMqStartRequested = keybaseStarted = torStarted = false;
     httpOnline = false;
     httpInfo = "";
     hasHttpTls = false;
@@ -203,7 +203,7 @@ void MWC713::start()  {
     qDebug() << "Starting MWC713 at " << mwc713Path << " for config " << mwc713configPath;
 
     // Creating process and starting
-    mwc713process = initMwc713process({}, {} );
+    mwc713process = initMwc713process({"TOR_EXE_NAME", QCoreApplication::applicationDirPath() + "/" + TOR_NAME}, {} );
     if (mwc713process==nullptr)
         return;
 
@@ -235,7 +235,7 @@ void MWC713::start2init(QString password) {
 
     // Creating process and starting
 
-    mwc713process = initMwc713process({"MWC_PASSWORD", password}, {"init"} );
+    mwc713process = initMwc713process({"TOR_EXE_NAME", QCoreApplication::applicationDirPath() + "/" + TOR_NAME, "MWC_PASSWORD", password}, {"init"} );
     if (mwc713process==nullptr)
         return;
 
@@ -277,7 +277,7 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
 
     // Creating process and starting
     // Mnemonic will moved into variables
-    mwc713process = initMwc713process({"MWC_PASSWORD", password, "MWC_MNEMONIC", seedStr}, {"recover", "--mnemonic", "env" } );
+    mwc713process = initMwc713process({"TOR_EXE_NAME", QCoreApplication::applicationDirPath() + "/" + TOR_NAME, "MWC_PASSWORD", password, "MWC_MNEMONIC", seedStr}, {"recover", "--mnemonic", "env" } );
     if (mwc713process==nullptr)
         return;
 
@@ -312,11 +312,7 @@ void MWC713::processStop(bool exitNicely) {
     currentAccount = "default"; // Keep current account by name. It fit better to mwc713 interactions.
     collectedAccountInfo.clear();
 
-    if (mwcMqOnline)
-        emit onMwcMqListenerStatus(false);
-
-    if (keybaseOnline)
-        emit onKeybaseListenerStatus(false);
+    emit onListenersStatus(false, false, false);
 
     mwcMqOnline = keybaseOnline = false;
     mwcMqStarted = mwcMqStartRequested = keybaseStarted = false;
@@ -424,21 +420,12 @@ void MWC713::getSeed(const QString & walletPassword)  {
         return;
     }
 
-    QPair<bool,bool> lsnState = getListenerStartState();
-
-    if (lsnState.first)
-        listeningStop(true, false);
-
-    if (lsnState.second)
-        listeningStop(false, true);
+    ListenerStatus lsnState = getListenerStartState();
+    listeningStop(lsnState.mqs, lsnState.keybase, lsnState.tor);
 
     eventCollector->addTask(task , TaskRecoverShowMnenonic::TIMEOUT );
 
-    if (lsnState.first)
-        listeningStart(true, false, true);
-
-    if (lsnState.second)
-        listeningStart(false, true, true);
+    listeningStart(lsnState.mqs, lsnState.keybase, lsnState.tor, true);
 }
 
 QString MWC713::getPasswordHash() {
@@ -447,36 +434,51 @@ QString MWC713::getPasswordHash() {
 
 // Checking if wallet is listening through services
 // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
-QPair<bool,bool> MWC713::getListenerStatus()  {
-    return QPair<bool,bool>(mwcMqOnline, keybaseOnline);
+ListenerStatus MWC713::getListenerStatus()  {
+    return ListenerStatus(mwcMqOnline, keybaseOnline, torOnline);
 }
 
-QPair<bool,bool> MWC713::getListenerStartState()  {
-    return QPair<bool,bool>(mwcMqStarted, keybaseStarted);
+ListenerStatus MWC713::getListenerStartState()  {
+    return ListenerStatus(mwcMqStarted, keybaseStarted, torStarted);
 }
 
 // Check Signal: onListeningStartResults
-void MWC713::listeningStart(bool startMq, bool startKb, bool initialStart)  {
-    qDebug() << "listeningStart: mq=" << startMq << ",kb=" << startKb;
-    eventCollector->addTask( new TaskListeningStart(this, startMq,startKb, initialStart), TaskListeningStart::TIMEOUT );
+void MWC713::listeningStart(bool startMq, bool startKb, bool startTor, bool initialStart)  {
+    qDebug() << "listeningStart: mq=" << startMq << ",kb=" << startKb << ",tor=" << startTor;
+
+    if (startMq)
+        eventCollector->addTask( new TaskListeningStart(this,startMq,false,false,initialStart), TaskListeningStart::TIMEOUT );
+    if ( startKb)
+        eventCollector->addTask( new TaskListeningStart(this,false,startKb,false,initialStart), TaskListeningStart::TIMEOUT );
+    if (startTor)
+        eventCollector->addTask( new TaskListeningStart(this,false,false, startTor,initialStart), TaskListeningStart::TIMEOUT );
 
     if (startMq)
         mwcMqStartRequested = true;
 }
 
 // Check signal: onListeningStopResult
-void MWC713::listeningStop(bool stopMq, bool stopKb)  {
+void MWC713::listeningStop(bool stopMq, bool stopKb, bool stopTor)  {
     qDebug() << "listeningStop: mq=" << stopMq << ",kb=" << stopKb;
 
     if (stopMq)
         mwcMqStartRequested = false;
 
-    eventCollector->addTask( new TaskListeningStop(this, stopMq,stopKb), TaskListeningStop::TIMEOUT );
+    if (stopMq)
+        eventCollector->addTask( new TaskListeningStop(this, stopMq,false,false), TaskListeningStop::TIMEOUT );
+    if (stopKb)
+        eventCollector->addTask( new TaskListeningStop(this, false, stopKb,false), TaskListeningStop::TIMEOUT );
+    if (stopTor)
+        eventCollector->addTask( new TaskListeningStop(this, false,false, stopTor), TaskListeningStop::TIMEOUT );
 }
 
 // Get latest Mwc MQ address that we see
-QString MWC713::getLastKnownMwcBoxAddress()  {
+QString MWC713::getMqsAddress()  {
     return mwcAddress;
+}
+
+QString MWC713::getTorAddress()  {
+    return torAddress;
 }
 
 // Get MWC box <address, index in the chain>
@@ -849,6 +851,11 @@ void MWC713::setGetNextKeyResult( bool success, QString identifier, QString publ
     emit onGetNextKeyResult(success, identifier, publicKey, errorMessage, btcaddress, airDropAccPasswor);
 }
 
+void MWC713::setTorAddress( QString _torAddress) {
+    torAddress = _torAddress;
+    logger::logEmit("MWC713", "onTorAddress", torAddress );
+    emit onTorAddress(torAddress);
+}
 
 void MWC713::setMwcAddress( QString _mwcAddress ) { // Set active MWC address. Listener might be offline
     mwcAddress = _mwcAddress;
@@ -875,7 +882,7 @@ void MWC713::setGettedSeed( QVector<QString> seed ) {
 }
 
 
-void MWC713::setListeningStartResults( bool mqTry, bool kbTry, // what we try to start
+void MWC713::setListeningStartResults( bool mqTry, bool kbTry, bool torTry, // what we try to start
                                QStringList errorMessages, bool initialStart ) {
     logger::logEmit("MWC713", "onListeningStartResults", QString("mqTry=") + QString::number(mqTry) +
                                                          " kbTry=" + QString::number(kbTry) + " errorMessages size " + QString::number(errorMessages.size()) + " initStart=" + (initialStart?"True":"False") );
@@ -884,28 +891,34 @@ void MWC713::setListeningStartResults( bool mqTry, bool kbTry, // what we try to
         mwcMqStarted = true;
     if (kbTry)
         keybaseStarted = true;
+    if (torTry)
+        torStarted = true;
 
-    emit onListeningStartResults(mqTry, kbTry,errorMessages, initialStart );
+    emit onListeningStartResults(mqTry, kbTry, torTry, errorMessages, initialStart );
 }
 
-void MWC713::setListeningStopResult(bool mqTry, bool kbTry, // what we try to stop
+void MWC713::setListeningStopResult(bool mqTry, bool kbTry, bool torTry, // what we try to stop
                             QStringList errorMessages ) {
     logger::logEmit("MWC713", "onListeningStopResult", QString("mqTry=") + QString::number(mqTry) +
-             " kbTry=" + QString::number(kbTry) + " errorMessages size " + QString::number(errorMessages.size()) );
+             " kbTry=" + QString::number(kbTry) + " torTry=" + QString::number(torTry) + " errorMessages size " + QString::number(errorMessages.size()) );
 
     if (mqTry)
         mwcMqStarted = false;
     if (kbTry)
         keybaseStarted = false;
+    if (torTry)
+        torStarted = false;
 
-    emit onListeningStopResult(mqTry, kbTry,errorMessages);
+    emit onListeningStopResult(mqTry, kbTry, torTry, errorMessages);
 
     if (mqTry) {
         setMwcMqListeningStatus(false, activeMwcMqsTid, true );
     }
-
     if (kbTry) {
         setKeybaseListeningStatus(false);
+    }
+    if (torTry) {
+        setTorListeningStatus(false);
     }
 
 
@@ -928,8 +941,8 @@ void MWC713::setMwcMqListeningStatus(bool online, QString tid, bool startStopEve
         appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString("listening on mwc mqs") );
     }
     mwcMqOnline = online;
-    logger::logEmit("MWC713", "onMwcMqListenerStatus", QString("online=") + QString::number(online));
-    emit onMwcMqListenerStatus(online);
+    logger::logEmit("MWC713", "onListenersStatus", QString(mwcMqOnline ? "true" : "false") + " " + QString(keybaseOnline ? "true" : "false") + " " + QString(torOnline ? "true" : "false") );
+    emit onListenersStatus(mwcMqOnline, keybaseOnline, torOnline);
 
 }
 
@@ -938,8 +951,17 @@ void MWC713::setKeybaseListeningStatus(bool online) {
         appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString("listening on keybase"));
     }
     keybaseOnline = online;
-    logger::logEmit("MWC713", "onKeybaseListenerStatus", QString("online=") + QString::number(online));
-    emit onKeybaseListenerStatus(online);
+    logger::logEmit("MWC713", "onListenersStatus", QString(mwcMqOnline ? "true" : "false") + " " + QString(keybaseOnline ? "true" : "false") + " " + QString(torOnline ? "true" : "false") );
+    emit onListenersStatus(mwcMqOnline, keybaseOnline, torOnline);
+}
+
+void MWC713::setTorListeningStatus(bool online) {
+    if (torOnline != online) {
+        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString(" tor listener"));
+    }
+    torOnline = online;
+    logger::logEmit("MWC713", "onListenersStatus", QString(mwcMqOnline ? "true" : "false") + " " + QString(keybaseOnline ? "true" : "false") + " " + QString(torOnline ? "true" : "false") );
+    emit onListenersStatus(mwcMqOnline, keybaseOnline, torOnline);
 }
 
 // info: if online  - Address, offlone - Error message or empty.
@@ -1111,37 +1133,17 @@ void MWC713::infoResults( QString currentAccountName, int64_t height,
     }
 }
 
-void MWC713::setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate) {
+void MWC713::setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc) {
+    if (success) {
+        appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, QString("You successfully sent slate " + slate +
+                                                                       " with " + mwc + " mwc to " + address));
+    }
+
     logger::logEmit( "MWC713", "onSend", "success=" + QString::number(success) );
-    emit onSend( success, errors, address, txid, slate );
-}
-
-void MWC713::reportSlateSendTo( QString slate, QString mwc, QString sendAddr ) {
-    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("You successfully sent slate " + slate +
-          " with " + mwc + " mwc to " + sendAddr ));
-
-    logger::logEmit( "MWC713", "onSlateSend", slate + " with " +mwc + " to " + sendAddr );
-    emit onSlateSendTo(slate, mwc, sendAddr);
-}
-
-void MWC713::reportSlateSendBack( QString slate,  QString sendAddr ) {
-    logger::logEmit("MWC713", "onSlateSendBack", slate + " to " + sendAddr);
-
-    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO,
-                                         "Slate " + slate + " sent back to " + sendAddr + " sucessfully" );
-}
-
-void MWC713::reportSlateReceivedBack( QString slate, QString mwc, QString fromAddr ) {
-    logger::logEmit( "MWC713", "reportSlateReceivedBack", slate + " with " +mwc + " from " + fromAddr );
-
-    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO,
-                                         "Slate " + slate + " received back from " + fromAddr + " for " + mwc + " mwc");
-
-    emit onSlateReceivedBack(slate, mwc, fromAddr);
-
-    // Request balace refresh
+    emit onSend( success, errors, address, txid, slate, mwc );
     updateWalletBalance(false,true);
 }
+
 
 void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAddr, QString message ) {
     QString msg = "Congratulations! You received " +mwc+ " mwc from " + fromAddr;
@@ -1162,17 +1164,6 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
            "<br>From: " + fromAddr +
            "<br>Slate: " + slate);
 
-}
-
-void MWC713::reportSlateFinalized( QString slate ) {
-
-    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("Slate finalized : "+slate ));
-
-    logger::logEmit( "MWC713", "onSlateFinalized", slate );
-    emit onSlateFinalized(slate);
-
-    // Request balance refresh
-    updateWalletBalance(false,true);
 }
 
 void MWC713::setSendFileResult( bool success, QStringList errors, QString fileName ) {
@@ -1290,7 +1281,8 @@ void MWC713::notifyListenerMqCollision() {
 
     if (mwcMqOnline) {
         mwcMqOnline = false;
-        emit onMwcMqListenerStatus(false);
+        logger::logEmit("MWC713", "onListenersStatus", QString(mwcMqOnline ? "true" : "false") + " " + QString(keybaseOnline ? "true" : "false") + " " + QString(torOnline ? "true" : "false") );
+        emit onListenersStatus(mwcMqOnline, keybaseOnline, torOnline);
     }
 }
 
@@ -1298,7 +1290,7 @@ void MWC713::notifyMqFailedToStart() {
     logger::logInfo("MWC713", "notifyMqFailedToStart processed");
     if (mwcMqStarted) {
         mwcMqStarted = false;
-        emit onListeningStopResult(true, false, {} );
+        emit onListeningStopResult(true, false,false, {} );
     }
 
     if (mwcMqStartRequested ) {
@@ -1310,7 +1302,7 @@ void MWC713::notifyMqFailedToStart() {
 void  MWC713::restartMQsListener() {
     if (mwcMqStartRequested && !mwcMqStarted) {
         qDebug() << "Try to restart MQs Listener after failure";
-        eventCollector->addTask( new TaskListeningStart(this, true,false, false), TaskListeningStart::TIMEOUT );
+        eventCollector->addTask( new TaskListeningStart(this,true,false,false,false), TaskListeningStart::TIMEOUT );
 
     }
 }

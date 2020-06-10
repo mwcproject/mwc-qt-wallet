@@ -37,7 +37,7 @@ public:
     ~Listening();
 
 private slots:
-    void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline);
+    void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
     void onSgnHttpListeningStatus(bool listening, QString additionalInfo);
     void onSgnMwcAddressWithIndex(QString mwcAddress, int idx);
 
@@ -46,6 +46,8 @@ private slots:
     void on_mwcMqToIndex_clicked();
     void on_keybaseTriggerButton_clicked();
     void on_httpConfigButton_clicked();
+    void on_torTriggerButton_clicked();
+
 private:
     void updateStatuses();
     void updateMwcMqAddress(QString address, int addrIdx);

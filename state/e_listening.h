@@ -38,10 +38,10 @@ protected:
 
 private slots:
     // Listening, you will not be able to get a results
-    void onListeningStartResults( bool mqTry, bool kbTry, // what we try to start
+    void onListeningStartResults( bool mqTry, bool kbTry, bool torTry, // what we try to start
                                    QStringList errorMessages, bool initialStart ); // error messages, if get some
 
-    void onListeningStopResult(bool mqTry, bool kbTry, // what we try to stop
+    void onListeningStopResult(bool mqTry, bool kbTry, bool torTry, // what we try to stop
                                 QStringList errorMessages );
 
     // Login from anotehr wallet happens

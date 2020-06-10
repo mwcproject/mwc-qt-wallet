@@ -52,9 +52,10 @@ Listening::~Listening()
     delete ui;
 }
 
-void Listening::onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline) {
+void Listening::onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor) {
     Q_UNUSED(mwcOnline);
     Q_UNUSED(keybaseOnline);
+    Q_UNUSED(tor);
 
     updateStatuses();
 }
@@ -78,9 +79,11 @@ void Listening::updateStatuses() {
 
     bool mqsStatus = wallet->getMqsListenerStatus();
     bool keybaseStatus = wallet->getKeybaseListenerStatus();
+    bool torStatus = wallet->getTorListenerStatus();
 
     bool mqsStarted = wallet->isMqsListenerStarted();
     bool keybaseStarted = wallet->isKeybaseListenerStarted();
+    bool torStarted = wallet->isTorListenerStarted();
 
     // MWC MQ
     ui->mwcMqStatusImg->setPixmap(QPixmap(mqsStatus ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
@@ -123,6 +126,27 @@ void Listening::updateStatuses() {
     } else {
         ui->keybaseTriggerButton->setText("Start");
         ui->keybaseTriggerButton->setToolTip("Start the Keybase Listener");
+    }
+
+    ui->torStatusImg->setPixmap(
+            QPixmap(torStatus ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
+    ui->torStatusImg->setToolTip(
+            torStatus ? "Listener connected to Tor" : "Listener diconnected from TOR");
+    ui->torStatusTxt->setText(torStatus ? "Online" : "Offline");
+
+    // TOR
+    if (torStarted) {
+        if (torStatus) {
+            ui->torTriggerButton->setText("Stop");
+            ui->torTriggerButton->setToolTip("Stop the TOR Listener");
+        } else {
+            ui->torTriggerButton->setText("Stop to retry");
+            ui->torTriggerButton->setToolTip(
+                    "TOR Listener is already running and trying to reconnect. Click to restart the TOR Listener");
+        }
+    } else {
+        ui->torTriggerButton->setText("Start");
+        ui->torTriggerButton->setToolTip("Start the TOR Listener");
     }
 
     // "true"  - listening
@@ -201,6 +225,15 @@ void Listening::on_keybaseTriggerButton_clicked()
     else
         wallet->requestStartKeybaseListener();
 }
+
+void Listening::on_torTriggerButton_clicked()
+{
+    if (wallet->isTorListenerStarted())
+        wallet->requestStopTorListener();
+    else
+        wallet->requestStartTorListener();
+}
+
 
 void Listening::on_httpConfigButton_clicked()
 {

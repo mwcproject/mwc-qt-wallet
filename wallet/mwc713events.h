@@ -49,11 +49,7 @@ enum WALLET_EVENTS {
     S_LINE=17,   // Just a line of output data as it is
 
     // Listening
-    S_LISTENER_MQ_STARTING = 20, // starting mwcmq listener...
-    S_LISTENER_KB_STARTING = 21, // starting keybase listener...
     S_LISTENER_ON = 22, // listener started for [XXXXXXX]       Message: address  or 'keybase'.  For MWC MQSs second param is tid
-    S_LISTENER_MQ_STOPPING = 24, // stopping mwcmq listener...
-    S_LISTENER_KB_STOPPING = 25, // stopping keybase listener...
     S_LISTENER_OFF = 26, // listener [XXXXXXX] stopped.     Message address or keybase
 
     S_LISTENER_MQ_LOST_CONNECTION = 28, // WARNING: listener [XXXX] lost connection. it will...
@@ -80,12 +76,7 @@ enum WALLET_EVENTS {
     // Accounts
     S_ACCOUNTS_INFO_SUM = 54, // Account header info. The rest of data will come in lines...
 
-    // Send
-    S_SLATE_WAS_SENT_TO = 65,
-    S_SLATE_WAS_SENT_BACK = 66,
-    S_SLATE_WAS_RECEIVED_BACK = 67,
     S_SLATE_WAS_RECEIVED_FROM = 68,
-    S_SLATE_WAS_FINALIZED = 69,
 
     S_SET_RECEIVE = 75,
 

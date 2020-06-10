@@ -47,7 +47,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="control::MwcPushButtonNormal" name="validateProofButton">
+          <widget class="control::MwcPushButtonSmall" name="validateProofButton">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
              <horstretch>0</horstretch>
@@ -84,7 +84,7 @@
           </widget>
          </item>
          <item>
-          <widget class="control::MwcPushButtonNormal" name="exportButton">
+          <widget class="control::MwcPushButtonSmall" name="exportButton">
            <property name="minimumSize">
             <size>
              <width>160</width>
@@ -682,6 +682,11 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcComboBox</class>
+   <extends>QComboBox</extends>
+   <header>control_desktop/MwcComboBox.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
@@ -697,12 +702,12 @@
    <header>control_desktop/listwithcolumns.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcComboBox</class>
-   <extends>QComboBox</extends>
-   <header>control_desktop/MwcComboBox.h</header>
+   <class>control::MwcPushButtonRound</class>
+   <extends>QPushButton</extends>
+   <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcPushButtonRound</class>
+   <class>control::MwcPushButtonSmall</class>
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>

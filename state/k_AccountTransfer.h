@@ -42,9 +42,7 @@ protected:
 private slots:
     // set receive account name results
     void onSetReceiveAccount( bool ok, QString AccountOrMessage );
-    void onSend( bool success, QStringList errors, QString address, int64_t txid, QString slate );
-    void onSlateSendTo( QString slate, QString mwc, QString sendAddr );
-    void onSlateFinalized( QString slate );
+    void onSend( bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc );
     void onWalletBalanceUpdated();
 
 private:
@@ -56,7 +54,6 @@ private:
     QString trAccountFrom;
     QString trAccountTo;
     int64_t trNanoCoins = 0;
-    QString trSlate;
     QStringList outputs2use;
 };
 

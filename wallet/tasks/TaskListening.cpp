@@ -49,12 +49,17 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
                 wallet713->setKeybaseListeningStatus(true);
             }
             else {
-                const QString & addrees = prms[0];
+                const QString & address = prms[0];
                 // x prefix is for testnet
                 // q - for mainnet
-                if (addrees.size()>0 && (addrees[0]=='x' || addrees[0]=='q') ) {
+                if (address.size()>0 && (address[0]=='x' || address[0]=='q') ) {
                     wallet713->setMwcMqListeningStatus(true, prms.size()>1 ? prms[1] : "", true);
                     wallet713->setMwcAddress(prms[0] );
+                // last case for tor it will be http://something.onion
+                }
+                else if (address.size()>0 && (address[0]=='h') ) {
+                    wallet713->setTorAddress(prms[0] );
+                    wallet713->setTorListeningStatus(true);
                 }
             }
             return true;
@@ -63,9 +68,10 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
 
             QStringList prms = evt.message.split('|');
-            if ( prms.size()==0 )
-                return false;
-
+            if ( prms.size()==0 ) {
+                // It is tor
+                wallet713->setTorListeningStatus(false);
+            }
             if ( prms[0] == "keybase" ) {
                 wallet713->setKeybaseListeningStatus(false);
             }
@@ -131,25 +137,37 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
 bool TaskListeningStart::processTask(const QVector<WEvent> &events) {
     qDebug() << "TaskListeningStart::processTask with events: " << printEvents(events);
 
-    QVector< WEvent > mqStaring = filterEvents(events, WALLET_EVENTS::S_LISTENER_MQ_STARTING );
-    QVector< WEvent > kbStaring = filterEvents(events, WALLET_EVENTS::S_LISTENER_KB_STARTING );
-
     QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_ERROR );
-
     QStringList errorMessages;
     for (auto & evt : error) {
         if (!evt.message.isEmpty())
             errorMessages.append(evt.message);
     }
 
-    wallet713->setListeningStartResults( mqStaring.size()>0, kbStaring.size()>0, // what we try to start
+    bool mqs = false;
+    bool keybase = false;
+    bool tor = false;
+    for (const WEvent & l : filterEvents(events, WALLET_EVENTS::S_LINE ) ) {
+        if (l.message.contains("starting mwcmqs listener"))
+            mqs = true;
+        if (l.message.contains("starting keybase listener"))
+            keybase = true;
+        if (l.message.contains("starting TOR listener"))
+            tor = true;
+    }
+
+    wallet713->setListeningStartResults( mqs, keybase, tor, // what we try to start
                                          errorMessages, initialStart );
 
     return true;
 }
 
-QString TaskListeningStart::calcCommand(bool startMq, bool startKeybase) const {
-    Q_ASSERT(startMq | startKeybase);
+QString TaskListeningStart::calcCommand(bool startMq, bool startKeybase, bool startTor) const {
+    Q_ASSERT(startMq | startKeybase | startTor);
+
+    // if tor, return listen -t
+    if(startTor)
+        return QString("listen -t");
 
     // -m, --mwcmq      mwcmq listener
     // -k, --keybase    keybase listener
@@ -162,26 +180,36 @@ QString TaskListeningStart::calcCommand(bool startMq, bool startKeybase) const {
 bool TaskListeningStop::processTask(const QVector<WEvent> &events) {
     qDebug() << "TaskListeningStop::processTask with events: " << printEvents(events);
 
-    QVector< WEvent > mqStopping = filterEvents(events, WALLET_EVENTS::S_LISTENER_MQ_STOPPING );
-    QVector< WEvent > kbStopping = filterEvents(events, WALLET_EVENTS::S_LISTENER_KB_STOPPING );
-
     QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_ERROR );
-
     QStringList errorMessages;
     for (auto & evt : error) {
         if (!evt.message.isEmpty())
             errorMessages.append(evt.message);
     }
 
-    qDebug() << "results: mq=" << mqStopping.size() << ",kb=" << kbStopping.size();
-    wallet713->setListeningStopResult( mqStopping.size()>0, kbStopping.size()>0,
+    bool mqs = false;
+    bool keybase = false;
+    bool tor = false;
+    for (const WEvent & l : filterEvents(events, WALLET_EVENTS::S_LINE ) ) {
+        if (l.message.contains("stopping mwcmqs listener"))
+            mqs = true;
+        if (l.message.contains("stopping keybase listener"))
+            keybase = true;
+        if (l.message.contains("stopping TOR listener"))
+            tor = true;
+    }
+
+    wallet713->setListeningStopResult( mqs, keybase, tor,
                                        errorMessages );
 
     return true;
 }
 
-QString TaskListeningStop::calcCommand(bool stopMq, bool stopKeybase) const {
+QString TaskListeningStop::calcCommand(bool stopMq, bool stopKeybase, bool stopTor) const {
     Q_ASSERT(stopMq | stopKeybase);
+
+    if(stopTor)
+        return QString("stop -t");
 
     // -m, --mwcmq      mwcmq listener
     // -k, --keybase    keybase listener
