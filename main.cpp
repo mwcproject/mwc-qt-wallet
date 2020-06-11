@@ -65,6 +65,10 @@
 #include "build_version.h"
 #include "core/WalletApp.h"
 #include "core/WndManager.h"
+#include "bridge/wnd/a_inputpassword_b.h"
+#include "bridge/wallet_b.h"
+#include "bridge/util_b.h"
+#include "bridge/corewindow_b.h"
 
 #ifdef WALLET_MOBILE
 #include <QQmlApplicationEngine>
@@ -237,6 +241,15 @@ int main(int argc, char *argv[])
     core::DesktopWndManager * wndManager = new core::DesktopWndManager();
 #endif
 #ifdef WALLET_MOBILE
+    qmlRegisterType<bridge::CoreWindow>("CoreWindowBridge", 1, 0, "CoreWindowBridge");
+    qmlRegisterType<bridge::Wallet>("WalletBridge", 1, 0, "WalletBridge");
+    qmlRegisterType<bridge::Util>("UtilBridge", 1, 0, "UtilBridge");
+    qmlRegisterType<bridge::InputPassword>("InputPasswordBridge", 1, 0, "InputPasswordBridge");
+//    qmlRegisterType<NavbarBridge>("NavbarBridge", 1, 0, "NavbarBridge");
+//    qmlRegisterType<WalletBridge>("WalletBridge", 1, 0, "WalletBridge");
+//    qmlRegisterType<ReceiveBridge>("ReceiveBridge", 1, 0, "ReceiveBridge");
+//    qRegisterMetaType<wallet::WalletConfig>();
+//    qmlRegisterType<ClipboardProxy>("Clipboard", 1, 0, "Clipboard");
     core::MobileWndManager * wndManager = new core::MobileWndManager();
 #endif
 
@@ -343,11 +356,6 @@ int main(int argc, char *argv[])
 #endif
 
         core::WalletApp app(argc, argv);
-#ifdef WALLET_MOBILE
-        // Mobile can only imit engine after app instance is created.
-        QQmlApplicationEngine engine;
-        wndManager->init(&engine);
-#endif
 
         if (!deployWalletFilesFromResources() ) {
             QMessageBox::critical(nullptr, "Error", "Unable to provision or verify resource files during the first run");
@@ -366,6 +374,7 @@ int main(int argc, char *argv[])
         logger::logInfo("mwc-qt-wallet", QString("Starting mwc-gui-wallet version ") + BUILD_VERSION + " with config:\n" + config::toString() );
         qDebug().noquote() << "Starting mwc-gui-wallet with config:\n" << config::toString();
 
+#ifdef WALLET_DESKTOP
         { // Apply style sheet
             QFile file(":/resource_desktop/mwcwallet_style.css" );
             if (file.open(QFile::ReadOnly | QFile::Text)) {
@@ -377,6 +386,7 @@ int main(int argc, char *argv[])
                 return 1;
             }
         }
+#endif
 
         app.reportAppAsInitialized();
 
@@ -519,8 +529,8 @@ int main(int argc, char *argv[])
 
         wallet::MWC713::saveWalletConfig( walletConfig, &appContext, mwcNode );
 
-        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
-        //wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
+//        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
+        wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
 
         state::StateContext context( &appContext, wallet, mwcNode );
 
@@ -547,6 +557,11 @@ int main(int argc, char *argv[])
         mainWnd->show();
 
         wndManager->init(windowManager, mainWnd);
+#endif
+#ifdef WALLET_MOBILE
+        // Mobile can only imit engine after app instance is created.
+        QQmlApplicationEngine engine;
+        wndManager->init(&engine);
 #endif
 
         if (mwc::isAppNonClosed()) {

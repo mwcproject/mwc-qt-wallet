@@ -24,7 +24,7 @@ namespace bridge {
 class CoreWindow : public QObject {
 Q_OBJECT
 public:
-    explicit CoreWindow(QObject * parent);
+    explicit CoreWindow(QObject * parent = nullptr);
     ~CoreWindow();
 
     // Window manager

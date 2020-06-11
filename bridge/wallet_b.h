@@ -28,7 +28,7 @@ namespace bridge {
 class Wallet : public QObject {
     Q_OBJECT
 public:
-    explicit Wallet(QObject * parent);
+    explicit Wallet(QObject * parent = nullptr);
     ~Wallet();
 
     // return true if MQS is online

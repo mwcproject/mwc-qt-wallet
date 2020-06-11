@@ -1,22 +1,22 @@
 import QtQuick 2.0
 import QtQuick.Window 2.0
 import QtQuick.Controls 2.13
-import NavbarBridge 1.0
+//import NavbarBridge 1.0
 
 Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160); }
 
-    NavbarBridge {
-        id: bridge
-    }
+//    NavbarBridge {
+//        id: bridge
+//    }
 
-    Connections {
-        target: bridge
+//    Connections {
+//        target: bridge
 //        onWalletBalanceUpdated: {
 //            balanceText.text = walletBalance
 //        }
-    }
+//    }
 
     Rectangle {
         id: menuRect
@@ -136,17 +136,17 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
-                                switch (index) {
-                                case 0:
-                                    bridge.clickWalletTab()
-                                    break
-                                case 1:
-                                    bridge.clickAccountTab()
-                                    break
-                                case 2:
-                                    bridge.clickSettingsTab()
-                                    break
-                                }
+//                                switch (index) {
+//                                case 0:
+//                                    bridge.clickWalletTab()
+//                                    break
+//                                case 1:
+//                                    bridge.clickAccountTab()
+//                                    break
+//                                case 2:
+//                                    bridge.clickSettingsTab()
+//                                    break
+//                                }
                                 nav.toggle()
                             }
                         }
