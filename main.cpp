@@ -69,6 +69,10 @@
 #include "bridge/wallet_b.h"
 #include "bridge/util_b.h"
 #include "bridge/corewindow_b.h"
+#include "bridge/wnd/e_receive_b.h"
+#include "bridge/config_b.h"
+#include "bridge/clipboard_b.h"
+#include "bridge/statemachine_b.h"
 
 #ifdef WALLET_MOBILE
 #include <QQmlApplicationEngine>
@@ -241,15 +245,15 @@ int main(int argc, char *argv[])
     core::DesktopWndManager * wndManager = new core::DesktopWndManager();
 #endif
 #ifdef WALLET_MOBILE
+    qmlRegisterType<bridge::StateMachine>("StateMachineBridge", 1, 0, "StateMachineBridge");
     qmlRegisterType<bridge::CoreWindow>("CoreWindowBridge", 1, 0, "CoreWindowBridge");
     qmlRegisterType<bridge::Wallet>("WalletBridge", 1, 0, "WalletBridge");
     qmlRegisterType<bridge::Util>("UtilBridge", 1, 0, "UtilBridge");
+    qmlRegisterType<bridge::Config>("ConfigBridge", 1, 0, "ConfigBridge");
     qmlRegisterType<bridge::InputPassword>("InputPasswordBridge", 1, 0, "InputPasswordBridge");
-//    qmlRegisterType<NavbarBridge>("NavbarBridge", 1, 0, "NavbarBridge");
-//    qmlRegisterType<WalletBridge>("WalletBridge", 1, 0, "WalletBridge");
-//    qmlRegisterType<ReceiveBridge>("ReceiveBridge", 1, 0, "ReceiveBridge");
-//    qRegisterMetaType<wallet::WalletConfig>();
-//    qmlRegisterType<ClipboardProxy>("Clipboard", 1, 0, "Clipboard");
+    qmlRegisterType<bridge::Receive>("ReceiveBridge", 1, 0, "ReceiveBridge");
+    qmlRegisterType<ClipboardProxy>("Clipboard", 1, 0, "Clipboard");
+
     core::MobileWndManager * wndManager = new core::MobileWndManager();
 #endif
 

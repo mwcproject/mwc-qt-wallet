@@ -8,10 +8,10 @@
         <file>windows_mobile/main.qml</file>
         <file>windows_mobile/Inputpassword.qml</file>
         <file>img/A1@2x.svg</file>
+        <file>img/Account_big@2x.svg</file>
         <file>img/Add@2x.svg</file>
         <file>img/AddDlg@2x.svg</file>
         <file>img/Airdrop@2x.svg</file>
-        <file>img/Airdrop_big@2x.svg</file>
         <file>img/BigLogo@2x.svg</file>
         <file>img/Blockchain@2x.svg</file>
         <file>img/CheckOff@2x.svg</file>
@@ -34,13 +34,13 @@
         <file>img/FinalizeL@2x.svg</file>
         <file>img/HelpBtn@2x.svg</file>
         <file>img/HODL@2x.svg</file>
-        <file>img/HODL_big@2x.svg</file>
         <file>img/Left@2x.svg</file>
         <file>img/loading.gif</file>
         <file>img/NavAccount@2x.svg</file>
         <file>img/NavNotificationActive@2x.svg</file>
         <file>img/NavNotificationNormal@2x.svg</file>
         <file>img/NavSettings@2x.svg</file>
+        <file>img/Output_big@2x.svg</file>
         <file>img/PassNotMatch@2x.svg</file>
         <file>img/PassOK@2x.svg</file>
         <file>img/purpleCheckOff@2x.svg</file>

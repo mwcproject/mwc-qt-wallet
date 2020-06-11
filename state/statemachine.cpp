@@ -38,6 +38,7 @@
 #include "../bridge/BridgeManager.h"
 #include "../bridge/corewindow_b.h"
 #include "../core/WndManager.h"
+#include "z_wallethome.h"
 
 
 namespace state {
@@ -94,6 +95,9 @@ StateMachine::StateMachine()
     states[ STATE::NODE_INFO ]      = new NodeInfo(context);
 
     states[ WALLET_RUNNING_MODE ]   = new SelectMode(context);
+
+    // Mobile specfic states
+    states[ STATE::WALLET_HOME ] = new WalletHome(context);
 
     startTimer(1000);
 }

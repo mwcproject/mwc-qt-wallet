@@ -7,6 +7,8 @@ Window {
     id: window
     visible: true
     title: qsTr("MWC-Mobile-Wallet")
+    
+    property int currentState
 
     CoreWindowBridge {
         id: coreWindow
@@ -15,7 +17,6 @@ Window {
     Connections {
         target: coreWindow
         onSgnUpdateActionStates: {
-            console.log(111, actionState);
             currentState = actionState;
         }
     }
@@ -37,25 +38,23 @@ Window {
         anchors.fill: parent
     }
 
-    property int currentState
-
     Inputpassword {
         id: inputpassword
         anchors.fill: parent
         visible: currentState === 3
     }
 
-//    Wallet {
-//        id: walletTab
-//        anchors.fill: parent
-//        visible: currentState > 3
-//    }
+    Wallet {
+        id: walletTab
+        anchors.fill: parent
+        visible: currentState === 21
+    }
 
-//    Receive {
-//        id: receiveTab
-//        anchors.fill: parent
-//        visible: currentState === 9
-//    }
+    Receive {
+        id: receiveTab
+        anchors.fill: parent
+        visible: currentState === 9
+    }
 
     Navbar {
         id: navbar

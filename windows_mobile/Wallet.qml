@@ -1,9 +1,14 @@
 import QtQuick 2.0
 import QtQuick.Window 2.0
+import StateMachineBridge 1.0
 
 Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160); }
+
+    StateMachineBridge {
+        id: stateMachine
+    }
 
     Image {
         id: image_send
@@ -11,7 +16,7 @@ Item {
         height: dp(75)
         anchors.bottom: image_finalize.top
         anchors.bottomMargin: dp(80)
-        anchors.horizontalCenterOffset: dp(-60)
+        anchors.horizontalCenterOffset: dp(-90)
         anchors.horizontalCenter: parent.horizontalCenter
         source: "../img/Send_big@2x.svg"
         fillMode: Image.PreserveAspectFit
@@ -39,7 +44,7 @@ Item {
         width: dp(60)
         height: dp(75)
         anchors.verticalCenter: image_send.verticalCenter
-        anchors.horizontalCenterOffset: dp(60)
+        anchors.horizontalCenterOffset: dp(90)
         anchors.horizontalCenter: parent.horizontalCenter
         source: "../img/Receive_big@2x.svg"
         fillMode: Image.PreserveAspectFit
@@ -48,6 +53,7 @@ Item {
             anchors.fill: parent
             onClicked: {
                 console.log("Wallet => Receive")
+                stateMachine.setActionWindow(9)
             }
         }
     }
@@ -66,8 +72,7 @@ Item {
         id: image_finalize
         width: dp(60)
         height: dp(75)
-        anchors.verticalCenterOffset: dp(-20)
-        anchors.horizontalCenterOffset: dp(-60)
+        anchors.horizontalCenterOffset: dp(-90)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         source: "../img/FinalizeL@2x.svg"
@@ -95,7 +100,7 @@ Item {
         id: image_transactions
         width: dp(60)
         height: dp(75)
-        anchors.horizontalCenterOffset: dp(60)
+        anchors.horizontalCenterOffset: dp(90)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: image_finalize.verticalCenter
         source: "../img/Transactions_big@2x.svg"
@@ -119,72 +124,66 @@ Item {
         font.pixelSize: dp(17)
     }
 
-    Rectangle {
-        id: splitter
-        height: 2
-        color: "#ffffff"
-        anchors.right: parent.right
-        anchors.rightMargin: dp(65)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(65)
-        anchors.top: text_finalize.bottom
-        anchors.topMargin: dp(55)
-    }
-
     Image {
-        id: image_hodl
+        id: image_outputs
         width: dp(60)
         height: dp(75)
-        anchors.top: splitter.bottom
+        anchors.top: text_finalize.bottom
         anchors.topMargin: dp(55)
-        anchors.horizontalCenterOffset: dp(-60)
+        anchors.horizontalCenterOffset: dp(-90)
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "../img/HODL_big@2x.svg"
+        source: "../img/Output_big@2x.svg"
         fillMode: Image.PreserveAspectFit
 
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                console.log("Wallet => Hodl")
+                console.log("Wallet => Output")
             }
         }
     }
 
     Text {
-        id: text_hodl
+        id: text_outputs
         color: "white"
-        text: qsTr("HODL")
-        anchors.top: image_hodl.bottom
+        text: qsTr("Outputs")
+        anchors.top: image_outputs.bottom
         anchors.topMargin: dp(9)
-        anchors.horizontalCenter: image_hodl.horizontalCenter
+        anchors.horizontalCenter: image_outputs.horizontalCenter
         font.pixelSize: dp(17)
     }
 
     Image {
-        id: image_airdrop
+        id: image_accounts
         width: dp(60)
         height: dp(75)
-        anchors.verticalCenter: image_hodl.verticalCenter
-        anchors.horizontalCenterOffset: dp(60)
+        anchors.verticalCenter: image_outputs.verticalCenter
+        anchors.horizontalCenterOffset: dp(90)
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "../img/Airdrop_big@2x.svg"
+        source: "../img/Account_big@2x.svg"
         fillMode: Image.PreserveAspectFit
 
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                console.log("Wallet => Airdrop")
+                console.log("Wallet => Accounts")
             }
         }
     }
 
     Text {
-        id: text_airdrop
+        id: text_accounts
         color: "white"
-        text: qsTr("Airdrop")
-        anchors.top: image_airdrop.bottom
+        text: qsTr("Accounts")
+        anchors.top: image_accounts.bottom
         anchors.topMargin: dp(9)
-        anchors.horizontalCenter: image_airdrop.horizontalCenter
+        anchors.horizontalCenter: image_accounts.horizontalCenter
         font.pixelSize: dp(17)
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:640;width:0}
+}
+##^##*/

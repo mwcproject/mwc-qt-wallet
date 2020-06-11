@@ -89,6 +89,9 @@ public:
     virtual void pageWalletConfig() = 0;
     virtual void pageNodeConfig() = 0;
     virtual void pageSelectMode() = 0;
+
+    // Mobile specific pages
+    virtual void pageWalletHome() = 0;
 };
 
 void setWndManager(WndManager * mgr);

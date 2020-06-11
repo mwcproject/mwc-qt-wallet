@@ -279,5 +279,8 @@ void DesktopWndManager::pageSelectMode() {
               new wnd::SelectMode( windowManager->getInWndParent()));
 }
 
+void DesktopWndManager::pageWalletHome() {
+    Q_ASSERT(false);
+}
 
 }
