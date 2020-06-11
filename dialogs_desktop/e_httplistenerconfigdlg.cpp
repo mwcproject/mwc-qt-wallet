@@ -35,7 +35,7 @@ HttpListenerConfigDlg::HttpListenerConfigDlg(QWidget *parent) :
 
     ui->activateRestApi->setChecked(config->hasForeignApi());
     QString foreignApiAddress = config->getForeignApiAddress();
-    ui->listeningAddressEdit->setText(foreignApiAddress.isEmpty() ? "0.0.0.0:3415" : foreignApiAddress);
+    ui->listeningAddressEdit->setText(foreignApiAddress.isEmpty() ? "127.0.0.1:3415" : foreignApiAddress);
 
     QString foreignApiSecret = config->getForeignApiSecret();
     ui->useBasicAutorization->setChecked( !foreignApiSecret.isEmpty() );
@@ -80,7 +80,7 @@ void HttpListenerConfigDlg::on_selectFullchainButton_clicked()
 void HttpListenerConfigDlg::on_resetButton_clicked()
 {
     ui->activateRestApi->setChecked(false);
-    ui->listeningAddressEdit->setText("0.0.0.0:3415");
+    ui->listeningAddressEdit->setText("127.0.0.1:3415");
 
     ui->useBasicAutorization->setChecked( true );
     ui->apiSecretEdit->setText(util->generateApiSecret(20) );
