@@ -188,6 +188,8 @@ public:
     // Check Signal:  onSetReceiveAccount( bool ok, QString AccountOrMessage );
     virtual void setReceiveAccount(QString account)  override;
 
+    virtual QString getReceiveAccount() override;
+
     // Cancel transaction
     // Check Signal:  onCancelTransacton
     virtual void cancelTransacton(QString account, int64_t txIdx)  override;
@@ -267,6 +269,7 @@ private:
 
     QVector<AccountInfo> accountInfo;
     QString currentAccount = "default";
+    QString receiveAccount = "default";
 };
 
 }

@@ -269,8 +269,12 @@ bool MockWallet::getNodeStatus() {
 // Set account that will receive the funds
 // Check Signal:  onSetReceiveAccount( bool ok, QString AccountOrMessage );
 void MockWallet::setReceiveAccount(QString account) {
-    Q_UNUSED(account)
+    receiveAccount = account;
     emit onSetReceiveAccount( true, account );
+}
+
+QString MockWallet::getReceiveAccount() {
+    return receiveAccount;
 }
 
 // Cancel transaction
