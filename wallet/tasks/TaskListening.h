@@ -38,7 +38,7 @@ public:
 
 class TaskListeningStart : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 7000;
+    const static int64_t TIMEOUT = 20000; // Tor can be slow and it is sync now
 
     // Start one listen per request. mwc713 doesn't support both
     TaskListeningStart(MWC713 *wallet713, bool startMq, bool startKeybase, bool startTor, bool _initialStart ) :
@@ -61,7 +61,7 @@ private:
 
 class TaskListeningStop : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 8000;
+    const static int64_t TIMEOUT = 20000; // Tor can be slow and it is sync now
 
     // Start one listen per request. mwc713 doesn't support both
     TaskListeningStop(MWC713 *wallet713, bool stopMq, bool stopKeybase, bool stopTor) :
