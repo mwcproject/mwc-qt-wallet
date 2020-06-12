@@ -22,7 +22,7 @@ namespace bridge {
 class StateMachine : public QObject {
 Q_OBJECT
 public:
-    StateMachine(QObject * parent);
+    StateMachine(QObject * parent = nullptr);
     ~StateMachine();
 
     // Switch to another page

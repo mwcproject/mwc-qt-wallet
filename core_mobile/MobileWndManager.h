@@ -85,6 +85,9 @@ public:
     virtual void pageNodeConfig() override;
     virtual void pageSelectMode() override;
 
+    // Mobile specific pages
+    virtual void pageWalletHome() override;
+
 private:
     QQmlApplicationEngine * engine = nullptr;
     QObject * mainWindow = nullptr;

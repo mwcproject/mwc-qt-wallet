@@ -22,7 +22,7 @@ namespace bridge {
 class Config : public QObject {
 Q_OBJECT
 public:
-    explicit Config(QObject * parent);
+    explicit Config(QObject * parent = nullptr);
     ~Config();
 
     // Build version for the app

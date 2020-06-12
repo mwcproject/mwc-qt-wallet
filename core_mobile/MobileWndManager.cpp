@@ -76,8 +76,6 @@ void MobileWndManager::pageNewWallet() {
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageInputPassword(QString pageTitle, bool lockMode) {
-    Q_ASSERT(false); // implement me
-    // ???
     mainWindow->setProperty("currentState", state::STATE::INPUT_PASSWORD);
 }
 void MobileWndManager::pageInitAccount() {
@@ -171,6 +169,9 @@ void MobileWndManager::pageNodeConfig() {
 }
 void MobileWndManager::pageSelectMode() {
     Q_ASSERT(false); // implement me
+}
+void MobileWndManager::pageWalletHome() {
+    mainWindow->setProperty("currentState", state::STATE::WALLET_HOME);
 }
 
 }

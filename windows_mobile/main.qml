@@ -1,11 +1,25 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.13
+import CoreWindowBridge 1.0
 
 Window {
     id: window
     visible: true
     title: qsTr("MWC-Mobile-Wallet")
+    
+    property int currentState
+
+    CoreWindowBridge {
+        id: coreWindow
+    }
+
+    Connections {
+        target: coreWindow
+        onSgnUpdateActionStates: {
+            currentState = actionState;
+        }
+    }
 
     Rectangle
     {
@@ -24,8 +38,6 @@ Window {
         anchors.fill: parent
     }
 
-    property int currentState
-
     Inputpassword {
         id: inputpassword
         anchors.fill: parent
@@ -35,14 +47,14 @@ Window {
     Wallet {
         id: walletTab
         anchors.fill: parent
-        visible: currentState > 3
+        visible: currentState === 21
     }
 
-//    Receive {
-//        id: receiveTab
-//        anchors.fill: parent
-//        visible: currentState === 9
-//    }
+    Receive {
+        id: receiveTab
+        anchors.fill: parent
+        visible: currentState === 9
+    }
 
     Navbar {
         id: navbar

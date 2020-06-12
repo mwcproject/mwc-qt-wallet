@@ -28,7 +28,7 @@ namespace bridge {
 class Util : public QObject {
 Q_OBJECT
 public:
-    explicit Util(QObject *parent);
+    explicit Util(QObject *parent = nullptr);
 
     ~Util();
 

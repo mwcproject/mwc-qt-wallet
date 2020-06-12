@@ -2,13 +2,31 @@ import QtQuick 2.4
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
 import InputPasswordBridge 1.0
+import WalletBridge 1.0
+import UtilBridge 1.0
 
 Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160); }
 
     InputPasswordBridge {
-        id: bridge
+        id: inputPassword
+    }
+
+    WalletBridge {
+        id: wallet
+    }
+
+    UtilBridge {
+        id: util
+    }
+
+    Connections {
+        target: wallet
+        onSgnLoginResult: {
+            textfield_password.enabled = !ok
+            button_login.enabled = !ok
+        }
     }
 
     MouseArea {
@@ -203,9 +221,9 @@ Item {
                 return
             }
 
-            bridge.validateMwc713Str(textfield_password.text, true)
-            if (!bridge.validation_flag) {
-                messagebox.open(qsTr("Password"), qsTr(bridge.validation_error))
+            const validation = util.validateMwc713Str(textfield_password.text)
+            if (validation) {
+                messagebox.open(qsTr("Password"), qsTr(validation))
                 return
             }
             if (textfield_password.text[0] === "-") {
@@ -214,7 +232,7 @@ Item {
             }
 
             // Submit the password and wait until state will push us.
-            bridge.submitPassword(textfield_password.text)
+            inputPassword.submitPassword(textfield_password.text)
         }
     }
 
@@ -244,14 +262,6 @@ Item {
         id: messagebox
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
-    }
-
-    Connections {
-        target: bridge
-        onDoLogin: {
-            textfield_password.enabled = !result;
-            button_login.enabled = !result;
-        }
     }
 
 }

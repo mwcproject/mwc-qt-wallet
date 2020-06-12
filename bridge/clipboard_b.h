@@ -12,34 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MWC_QT_WALLET_COREWINDOW_B_H
-#define MWC_QT_WALLET_COREWINDOW_B_H
+#ifndef CLIPBOARD_B_H
+#define CLIPBOARD_B_H
 
 #include <QObject>
-#include "../state/statemachine.h"
 
-namespace bridge {
-
-// WindowManager need it's own bridge
-class CoreWindow : public QObject {
-Q_OBJECT
+class ClipboardProxy : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QString text READ dataText WRITE setDataText NOTIFY dataChanged)
+    Q_PROPERTY(QString selectionText READ selectionText WRITE setSelectionText NOTIFY selectionChanged)
 public:
-    explicit CoreWindow(QObject * parent = nullptr);
-    ~CoreWindow();
+    explicit ClipboardProxy(QObject *parent = 0);
 
-    // Window manager
-    void setDataPath(const QString& dataPath);
+    void setDataText(const QString &text);
+    QString dataText() const;
 
-    // Main Window
-    void updateActionStates(state::STATE actionState);
+    void setSelectionText(const QString &text);
+    QString selectionText() const;
 
 signals:
-    // This
-    void sgnSetDataPath(QString dataPath);
-    void sgnUpdateActionStates(int actionState); // state::STATE values
-protected:
+    void dataChanged();
+    void selectionChanged();
 };
 
-}
-
-#endif //MWC_QT_WALLET_COREWINDOW_B_H
+#endif // CLIPBOARD_B_H

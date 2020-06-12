@@ -1,12 +1,27 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.13
-import ReceiveBridge 1.0
-import Clipboard 1.0
 import Qt.labs.platform 1.1
+import QtQuick.Window 2.0
+import ConfigBridge 1.0
+import ReceiveBridge 1.0
+import WalletBridge 1.0
+import Clipboard 1.0
 
 Item {
+    id: element
+    readonly property int dpi: Screen.pixelDensity * 25.4
+    function dp(x){ return (dpi < 120) ? x : x*(dpi/160); }
+
+    ConfigBridge {
+        id: config
+    }
+
     ReceiveBridge {
-        id: bridge
+        id: receive
+    }
+
+    WalletBridge {
+        id: wallet
     }
 
     Clipboard {
@@ -14,51 +29,151 @@ Item {
     }
 
     Connections {
-        target: bridge
-        onDoInit: {
-            accountItems.clear()
+        target: receive
+        onSgnTransactionActionIsFinished: {
+//            util::TimeoutLockObject to( "Receive" );
+//            ui->progress->hide();
+//            control::MessageBox::messageText(this, success ? "Success" : "Failure", message );
+            console.log(success, message)
         }
+    }
 
-        onAddAccountItem: {
-            accountItems.append({text: account})
+    Connections {
+        target: wallet
+        onSgnWalletBalanceUpdated: {
+            updateAccountList()
         }
+    }
 
-        onSelectCurrentAccount: {
-            accountComboBox.currentIndex = index
+    onVisibleChanged: {
+        if (visible) {
+            const mwcMqAddress = wallet.getMqsAddress()
+            text_address.text = mwcMqAddress.slice(0, 9) + " ... " + mwcMqAddress.slice(mwcMqAddress.length - 7, mwcMqAddress.length)
+            image_mwcmq.source = wallet.getMqsListenerStatus() ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
+            image_keybase.source = wallet.getKeybaseListenerStatus() ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
+            image_http.source = wallet.getHttpListeningStatus() ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
+            if (config.hasTls()) {
+                text_http.text = qsTr("Https")
+            }
+            updateAccountList()
         }
+    }
 
-        onDoUpdateMwcMqState: {
-            image_mwcmq.source = online ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
-        }
+    function updateAccountList() {
+        const accountInfo = wallet.getWalletBalance(true, false, true)
+        const selectedAccount = wallet.getReceiveAccount();
+        let selectedAccIdx = 0;
 
-        onDoUpdateKeybaseState: {
-            image_keybase.source = online ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
-        }
+        accountItems.clear()
 
-        onDoUpdateHttpState: {
-            image_http.source = online ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
-        }
+        let idx = 0
+        for (let i = 1; i < accountInfo.length; i += 2) {
+            if (accountInfo[i-1] === selectedAccount)
+                selectedAccIdx = idx
 
-        onDoUpdateMwcMqAddress: {
-            mwcMqAddress.text = mwcAddress
+            accountItems.append({ info: accountInfo[i], account: accountInfo[i-1]})
+            idx++
         }
+        accountComboBox.currentIndex = selectedAccIdx
+    }
 
-        onDoHttpsSupport: {
-            text_http.text = qsTr("Http")
-        }
+    Text {
+        id: text_mwcmq
+        text: qsTr("MWC Message Queue")
+        anchors.right: image_mwcmq.left
+        anchors.rightMargin: dp(16)
+        horizontalAlignment: Text.AlignRight
+        anchors.verticalCenterOffset: dp(-250)
+        anchors.verticalCenter: parent.verticalCenter
+        font.pixelSize: dp(17)
+        color: "white"
+    }
+
+    Image {
+        id: image_mwcmq
+        anchors.horizontalCenterOffset: dp(100)
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: text_mwcmq.verticalCenter
+        width: dp(20)
+        height: dp(20)
+    }
+
+    Text {
+        id: text_keybase
+        text: qsTr("Keybase")
+        anchors.right: image_keybase.left
+        anchors.rightMargin: dp(16)
+        horizontalAlignment: Text.AlignRight
+        anchors.top: text_mwcmq.bottom
+        anchors.topMargin: dp(30)
+        font.pixelSize: dp(17)
+        color: "white"
+    }
+
+    Image {
+        id: image_keybase
+        anchors.horizontalCenterOffset: dp(100)
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: text_keybase.verticalCenter
+        width: dp(20)
+        height: dp(20)
+    }
+
+    Text {
+        id: text_http
+        text: qsTr("Http")
+        anchors.right: image_http.left
+        anchors.rightMargin: dp(16)
+        horizontalAlignment: Text.AlignRight
+        anchors.top: text_keybase.bottom
+        anchors.topMargin: dp(30)
+        font.pixelSize: dp(17)
+        color: "white"
+    }
+
+    Image {
+        id: image_http
+        anchors.verticalCenter: text_http.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: dp(100)
+        width: dp(20)
+        height: dp(20)
+    }
+
+    Text {
+        id: label_combobox
+        color: "#ffffff"
+        text: qsTr("Choose Account")
+        anchors.left: parent.left
+        anchors.leftMargin: dp(30)
+        anchors.bottom: accountComboBox.top
+        anchors.bottomMargin: dp(10)
+        font.pixelSize: dp(13)
     }
 
     ComboBox {
         id: accountComboBox
+        height: dp(72)
+        anchors.right: parent.right
+        anchors.rightMargin: dp(30)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(30)
+        leftPadding: dp(20)
+        rightPadding: dp(40)
+        anchors.verticalCenter: parent.verticalCenter
+        font.pixelSize: dp(14)
 
         onCurrentIndexChanged: {
-            bridge.changeCurrentAccount(accountComboBox.currentIndex)
+            if (accountComboBox.currentIndex >= 0) {
+                const currentAccount = accountItems.get(accountComboBox.currentIndex).account
+                wallet.setReceiveAccount(currentAccount);
+            }
         }
 
         delegate: ItemDelegate {
             width: accountComboBox.width
             contentItem: Text {
-                text: modelData
+                text: info
                 color: "#7579ff"
                 font: accountComboBox.font
                 elide: Text.ElideRight
@@ -71,8 +186,8 @@ Item {
             id: canvas
             x: accountComboBox.width - width - accountComboBox.rightPadding
             y: accountComboBox.topPadding + (accountComboBox.availableHeight - height) / 2
-            width: 12
-            height: 8
+            width: dp(14)
+            height: dp(7)
             contextType: "2d"
 
             Connections {
@@ -83,34 +198,32 @@ Item {
             onPaint: {
                 context.reset();
                 context.moveTo(0, 0);
-                context.lineTo(width, 0);
                 context.lineTo(width / 2, height);
-                context.closePath();
-                context.fillStyle = "white";
-                context.fill();
+                context.lineTo(width, 0);
+                context.strokeStyle = "white"
+                context.stroke();
             }
         }
 
         contentItem: Text {
-            text: accountComboBox.displayText
+            text: accountComboBox.currentIndex >= 0 && accountItems.get(accountComboBox.currentIndex).info
             font: accountComboBox.font
             color: "white"
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
         }
 
         background: Rectangle {
-            border.color: "white"
-            implicitHeight: 40
-            radius: 5
-            color: "#00000000"
+            radius: dp(4)
+            color: "#8633E0"
         }
 
         popup: Popup {
             y: accountComboBox.height - 1
             width: accountComboBox.width
             implicitHeight: contentItem.implicitHeight
-            padding: 1
+            padding: dp(1)
 
             contentItem: ListView {
                 clip: true
@@ -123,134 +236,95 @@ Item {
 
             background: Rectangle {
                 border.color: "white"
-                radius: 5
+                radius: dp(4)
             }
         }
 
         model: ListModel {
             id: accountItems
         }
-        anchors.top: text_http.bottom
-        anchors.topMargin: 50
-        anchors.right: parent.right
-        anchors.rightMargin: 20
-        anchors.left: parent.left
-        anchors.leftMargin: 20
-        leftPadding: 10
-        rightPadding: 5
     }
 
-    TextArea {
-        id: mwcMqAddress
-        font.pointSize: 13
-        color: "white"
-        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignTop
-        anchors.verticalCenterOffset: 75
-        anchors.verticalCenter: accountComboBox.verticalCenter
-        anchors.right: parent.right
-        anchors.rightMargin: 20
+    Text {
+        id: label_address
+        color: "#ffffff"
+        text: qsTr("Online (mwcmqs)")
+        anchors.top: accountComboBox.bottom
+        anchors.topMargin: dp(40)
         anchors.left: parent.left
-        anchors.leftMargin: 20
-        readOnly: true
-        padding: 10
+        anchors.leftMargin: dp(30)
+        font.pixelSize: dp(13)
+    }
+
+    Button {
+        id: button_copyaddress
+        width: dp(180)
+        height: dp(70)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(30)
+        anchors.top: label_address.bottom
+        anchors.topMargin: dp(14)
         background: Rectangle {
-            color: "white"
-            opacity: 0.1
-            radius: 5
-        }
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                clipboard.text = mwcMqAddress.text
-                notification.text = "Address copied to the clipboard"
-                notification.open()
+            color: "#00000000"
+            radius: dp(4)
+            border.color: "white"
+            border.width: dp(1)
+            Text {
+                text: qsTr("Copy Address")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pointSize: dp(18)
+                color: "white"
             }
         }
+        onClicked: {
+            clipboard.text = mwcMqAddress
+            notification.text = "Address copied to the clipboard"
+            notification.open()
+        }
     }
 
     Text {
-        id: text_mwcmq
-        text: qsTr("MWC Message Queue")
-        anchors.verticalCenterOffset: -200
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.horizontalCenterOffset: -50
-        anchors.horizontalCenter: parent.horizontalCenter
-        font.bold: true
-        font.pixelSize: 20
-        color: "white"
-    }
-
-    Image {
-        id: image_mwcmq
-        anchors.horizontalCenterOffset: 100
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: text_mwcmq.verticalCenter
-        width: 20
-        height: 20
+        id: text_address
+        width: dp(160)
+        color: "#BF84FF"
+        text: ""
+        horizontalAlignment: Text.AlignHCenter
+        anchors.horizontalCenter: button_copyaddress.horizontalCenter
+        anchors.top: button_copyaddress.bottom
+        anchors.topMargin: dp(14)
+        font.pixelSize: dp(13)
     }
 
     Text {
-        id: text_keybase
-        text: qsTr("Keybase")
-        anchors.top: text_mwcmq.bottom
-        anchors.topMargin: 50
-        anchors.horizontalCenterOffset: -50
+        id: label_file
+        color: "#ffffff"
+        text: qsTr("Offline (file)")
+        anchors.horizontalCenterOffset: dp(35)
         anchors.horizontalCenter: parent.horizontalCenter
-        font.pixelSize: 20
-        font.bold: true
-        color: "white"
-    }
-
-    Image {
-        id: image_keybase
-        anchors.horizontalCenterOffset: 100
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: text_keybase.verticalCenter
-        width: 20
-        height: 20
-    }
-
-    Text {
-        id: text_http
-        text: qsTr("Http")
-        anchors.top: text_keybase.bottom
-        anchors.topMargin: 50
-        anchors.horizontalCenter: parent.horizontalCenter
-        font.bold: true
-        font.pixelSize: 20
-        anchors.horizontalCenterOffset: -50
-        color: "white"
-    }
-
-    Image {
-        id: image_http
-        anchors.verticalCenterOffset: 0
-        anchors.verticalCenter: text_http.verticalCenter
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: 100
-        width: 20
-        height: 20
+        anchors.top: accountComboBox.bottom
+        anchors.topMargin: dp(40)
+        font.pixelSize: dp(13)
     }
 
     Button {
         id: button_receivebyfile
-        width: 250
-        height: 40
-        anchors.verticalCenterOffset: 100
-        anchors.verticalCenter: mwcMqAddress.verticalCenter
+        width: dp(180)
+        height: dp(70)
+        anchors.horizontalCenterOffset: dp(90)
         anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: label_file.bottom
+        anchors.topMargin: dp(14)
         background: Rectangle {
             color: "#00000000"
-            radius: 10
+            radius: dp(4)
             border.color: "white"
-            border.width: 2
+            border.width: dp(1)
             Text {
-                text: qsTr("Receive MWC by file")
+                text: qsTr("Receive by File")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pointSize: 20
+                font.pointSize: dp(18)
                 color: "white"
             }
         }
@@ -259,24 +333,36 @@ Item {
         }
     }
 
+    Text {
+        id: text_receivebyfile
+        color: "#BF84FF"
+        text: qsTr("(sign transaction)")
+        anchors.horizontalCenter: button_receivebyfile.horizontalCenter
+        anchors.top: button_receivebyfile.bottom
+        anchors.topMargin: dp(14)
+        font.pixelSize: dp(13)
+    }
+
     FileDialog {
         id: fileDialog
         title: qsTr("Open initial transaction file")
-        folder: bridge.getFileGenerationPath()
+        folder: config.getPathFor("fileGen")
         nameFilters: ["MWC transaction (*.tx *.input);;All files (*.*)"]
         onAccepted: {
             console.log("Accepted: " + fileDialog.file)
 //            bridge.updateFileGenerationPath(fileDialog.file)
 //            ui->progress->show();
-            bridge.signTransaction(fileDialog.file);
+//            receive.signTransaction(fileDialog.file);
         }
     }
 
     Rectangle {
-        width: 270
-        anchors.verticalCenterOffset: 50
-        anchors.verticalCenter: button_receivebyfile.verticalCenter
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.right: parent.right
+        anchors.rightMargin: dp(50)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(50)
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: dp(160)
         Notification {
             id: notification
         }
@@ -285,6 +371,6 @@ Item {
 
 /*##^##
 Designer {
-    D{i:0;autoSize:true;height:480;width:640}
+    D{i:0;autoSize:true;height:640;width:320}
 }
 ##^##*/
