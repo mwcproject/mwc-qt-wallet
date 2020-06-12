@@ -450,7 +450,8 @@ Item {
                 }
 
                 onClicked: {
-                    console.log("Change instance")
+                    nav.toggle()
+//                    messagebox.open(qsTr("Change Instance"), qsTr("Changing an instance will log you out of this current wallet instance. Are you sure you want to log out?"))
                 }
             }
 
@@ -472,6 +473,12 @@ Item {
             imagePath: "../img/NavSettings@2x.svg"
         }
     }
+
+//    MessageBox {
+//        id: messagebox
+//        anchors.verticalCenter: parent.verticalCenter
+//        anchors.horizontalCenter: parent.horizontalCenter
+//    }
 }
 
 /*##^##

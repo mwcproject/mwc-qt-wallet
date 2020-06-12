@@ -183,8 +183,17 @@ void MobileWndManager::pageNodeConfig() {
 void MobileWndManager::pageSelectMode() {
     Q_ASSERT(false); // implement me
 }
+
 void MobileWndManager::pageWalletHome() {
     mainWindow->setProperty("currentState", state::STATE::WALLET_HOME);
+}
+
+void MobileWndManager::pageWalletSettings() {
+    mainWindow->setProperty("currentState", state::STATE::WALLET_SETTINGS);
+}
+
+void MobileWndManager::pageAccountOptions() {
+    mainWindow->setProperty("currentState", state::STATE::ACCOUNT_OPTIONS);
 }
 
 }

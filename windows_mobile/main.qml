@@ -46,9 +46,21 @@ Window {
     }
 
     Wallet {
-        id: walletTab
+        id: wallethome
         anchors.fill: parent
         visible: currentState === 21
+    }
+
+    AccountOptions {
+        id: accountoptions
+        anchors.fill: parent
+        visible: currentState === 22
+    }
+
+    Settings {
+        id: walletsettings
+        anchors.fill: parent
+        visible: currentState === 23
     }
 
     Receive {

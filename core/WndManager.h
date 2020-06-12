@@ -98,6 +98,8 @@ public:
 
     // Mobile specific pages
     virtual void pageWalletHome() = 0;
+    virtual void pageWalletSettings() = 0;
+    virtual void pageAccountOptions() = 0;
 };
 
 void setWndManager(WndManager * mgr);

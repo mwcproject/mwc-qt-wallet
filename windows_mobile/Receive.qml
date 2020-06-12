@@ -184,7 +184,7 @@ Item {
 
         indicator: Canvas {
             id: canvas
-            x: accountComboBox.width - width - accountComboBox.rightPadding
+            x: accountComboBox.width - width - accountComboBox.rightPadding / 2
             y: accountComboBox.topPadding + (accountComboBox.availableHeight - height) / 2
             width: dp(14)
             height: dp(7)

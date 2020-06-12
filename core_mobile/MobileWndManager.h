@@ -95,6 +95,8 @@ public:
 
     // Mobile specific pages
     virtual void pageWalletHome() override;
+    virtual void pageWalletSettings() override;
+    virtual void pageAccountOptions() override;
 
 private:
     QQmlApplicationEngine * engine = nullptr;

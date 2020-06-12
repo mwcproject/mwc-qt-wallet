@@ -38,8 +38,11 @@
 #include "../bridge/BridgeManager.h"
 #include "../bridge/corewindow_b.h"
 #include "../core/WndManager.h"
-#include "z_wallethome.h"
 #include "x_migration.h"
+#include "z_wallethome.h"
+#include "z_walletsettings.h"
+#include "z_accountoptions.h"
+>>>>>>> add walletsettings, accoutoptions page, update qml files
 
 
 namespace state {
@@ -99,6 +102,8 @@ StateMachine::StateMachine()
 
     // Mobile specfic states
     states[ STATE::WALLET_HOME ] = new WalletHome(context);
+    states[ STATE::WALLET_SETTINGS ] = new WalletSettings(context);
+    states[ STATE::ACCOUNT_OPTIONS ] = new AccountOptions(context);
 
     // State for handling any data migration between wallet
     // versions that might need to be done

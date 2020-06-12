@@ -7,9 +7,9 @@ Item {
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     Button {
-        id: button_show_passphrase
+        id: button_wallet_configuration
         height: dp(72)
-        anchors.bottom: button_list_contacts.top
+        anchors.bottom: button_listeners.top
         anchors.bottomMargin: dp(23)
         anchors.right: parent.right
         anchors.rightMargin: dp(75)
@@ -21,7 +21,7 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("Show Passphrase")
+                text: qsTr("Wallet Configuration")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
@@ -29,25 +29,26 @@ Item {
             }
         }
         onClicked: {
-            console.log("Show Passphrase")
+            console.log("Wallet Configuration")
         }
     }
 
     Button {
-        id: button_list_contacts
+        id: button_listeners
         height: dp(72)
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: dp(-48)
         anchors.right: parent.right
         anchors.rightMargin: dp(75)
         anchors.left: parent.left
         anchors.leftMargin: dp(75)
-        anchors.verticalCenter: parent.verticalCenter
         background: Rectangle {
             color: "#00000000"
             radius: dp(4)
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("List Contacts")
+                text: qsTr("Listeners")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
@@ -55,14 +56,41 @@ Item {
             }
         }
         onClicked: {
-            console.log("List Contacts")
+            console.log("Listeners")
         }
     }
 
     Button {
-        id: button_log_out
+        id: button_node_overview
         height: dp(72)
-        anchors.top: button_list_contacts.bottom
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: dp(48)
+        anchors.right: parent.right
+        anchors.rightMargin: dp(75)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(75)
+        background: Rectangle {
+            color: "#00000000"
+            radius: dp(4)
+            border.color: "white"
+            border.width: dp(2)
+            Text {
+                text: qsTr("Node Overview")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pixelSize: dp(18)
+                color: "white"
+            }
+        }
+        onClicked: {
+            console.log("Node Overview")
+        }
+    }
+
+    Button {
+        id: button_resync
+        height: dp(72)
+        anchors.top: button_node_overview.bottom
         anchors.topMargin: dp(23)
         anchors.right: parent.right
         anchors.rightMargin: dp(75)
@@ -74,7 +102,7 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("Log Out")
+                text: qsTr("Re-sync with Full Node")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
@@ -82,7 +110,7 @@ Item {
             }
         }
         onClicked: {
-            console.log("Log Out")
+            console.log("Re-sync with Full Node")
         }
     }
 }

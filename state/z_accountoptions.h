@@ -12,26 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "state/z_wallethome.h"
-#include "../core/appcontext.h"
-#include "../core/WndManager.h"
+#ifndef ACCOUNTOPTIONS_H
+#define ACCOUNTOPTIONS_H
+
+#include "state.h"
+#include <QObject>
 
 namespace state {
 
-WalletHome::WalletHome( StateContext * _context) :
-    State(_context, STATE::WALLET_HOME)
+class AccountOptions : public QObject, public State
 {
-}
+    Q_OBJECT
+public:
+    AccountOptions(StateContext * context);
+    virtual ~AccountOptions() override;
 
-WalletHome::~WalletHome() {
-}
-
-NextStateRespond WalletHome::execute() {
-    if (context->appContext->getActiveWndState() != STATE::WALLET_HOME)
-        return NextStateRespond(NextStateRespond::RESULT::DONE);
-
-    core::getWndManager()->pageWalletHome();   // you need to add your page at WndManager
-    return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
-}
+protected:
+    virtual NextStateRespond execute() override;
+};
 
 }
+
+#endif // ACCOUNTOPTIONS_H
