@@ -74,5 +74,6 @@
         <file>windows_mobile/Wallet.qml</file>
         <file>resource_mobile/mwc-gui-wallet.conf</file>
         <file>resource_mobile/wallet713.toml</file>
+        <file>windows_mobile/AccountOptions.qml</file>
     </qresource>
 </RCC>

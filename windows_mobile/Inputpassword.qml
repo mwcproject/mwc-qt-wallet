@@ -7,7 +7,7 @@ import UtilBridge 1.0
 
 Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160); }
+    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     InputPasswordBridge {
         id: inputPassword
@@ -84,16 +84,16 @@ Item {
 
             Connections {
                 target: instanceComboBox
-                function onPressedChanged() { canvas.requestPaint(); }
+                function onPressedChanged() { canvas.requestPaint() }
             }
 
             onPaint: {
-                context.reset();
-                context.moveTo(0, 0);
-                context.lineTo(width / 2, height);
-                context.lineTo(width, 0);
+                context.reset()
+                context.moveTo(0, 0)
+                context.lineTo(width / 2, height)
+                context.lineTo(width, 0)
                 context.strokeStyle = "white"
-                context.stroke();
+                context.stroke()
             }
         }
 

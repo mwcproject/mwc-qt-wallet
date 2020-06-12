@@ -17,7 +17,8 @@ Window {
     Connections {
         target: coreWindow
         onSgnUpdateActionStates: {
-            currentState = actionState;
+            currentState = actionState
+            navbar.updateTitle(currentState)
         }
     }
 
