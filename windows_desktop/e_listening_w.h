@@ -40,6 +40,7 @@ private slots:
     void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
     void onSgnHttpListeningStatus(bool listening, QString additionalInfo);
     void onSgnMwcAddressWithIndex(QString mwcAddress, int idx);
+    void onSgnListenerStartStop();
 
     void on_mwcMqTriggerButton_clicked();
     void on_mwcMqNextAddress_clicked();

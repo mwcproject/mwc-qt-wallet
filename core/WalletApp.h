@@ -32,6 +32,10 @@ public:
 
     // true if initialized
     static bool isAppInitialized();
+
+    static bool isExiting();
+
+    static void startExiting();
 protected:
     virtual bool notify(QObject *receiver, QEvent *event) override;
 };

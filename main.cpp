@@ -577,6 +577,8 @@ int main(int argc, char *argv[])
             retVal = app.exec();
         }
 
+        core::WalletApp::startExiting();
+
         // Now we have to stop other object nicely.
         // Note, the order is different from creation.
         // mainWnd expected to be dead here.

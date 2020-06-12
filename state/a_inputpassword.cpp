@@ -98,17 +98,18 @@ void InputPassword::onLoginResult(bool ok) {
         // Going forward by initializing the wallet
         if ( context->wallet->getStartedMode() == wallet::Wallet::STARTED_MODE::NORMAL ) { // Normall start of the wallet. Problem that now we have many cases how wallet started
 
+            if (! config::isOnlineNode()) {
+                // Updating the wallet balance and a node status
+                context->wallet->updateWalletBalance(true, true);
+            }
+
+            // Starting listeners after balance to speed up the init process
             if ( config::isOnlineWallet() && context->wallet->hasPassword() ) {
                 // Start listening, no feedback interested
                 context->wallet->listeningStart(context->appContext->isAutoStartMQSEnabled(),
                                                 context->appContext->isAutoStartKeybaseEnabled(),
                                                 context->appContext->isAutoStartTorEnabled(),
                                                 true);
-            }
-
-            if (! config::isOnlineNode()) {
-                // Updating the wallet balance and a node status
-                context->wallet->updateWalletBalance(true, true);
             }
 
             context->wallet->getNodeStatus();

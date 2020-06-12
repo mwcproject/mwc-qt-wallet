@@ -40,6 +40,13 @@ Receive::Receive(QWidget *parent) :
     QObject::connect( wallet, &bridge::Wallet::sgnWalletBalanceUpdated,
                       this, &Receive::onSgnWalletBalanceUpdated, Qt::QueuedConnection);
 
+    QObject::connect( wallet, &bridge::Wallet::sgnMwcAddressWithIndex,
+                      this, &Receive::onSgnMwcAddressWithIndex, Qt::QueuedConnection);
+    QObject::connect( wallet, &bridge::Wallet::sgnTorAddress,
+                      this, &Receive::onSgnTorAddress, Qt::QueuedConnection);
+    QObject::connect( wallet, &bridge::Wallet::sgnUpdateListenerStatus,
+                      this, &Receive::onSgnUpdateListenerStatus, Qt::QueuedConnection);
+
     ui->progress->initLoader(false);
 
     updateAccountList();
@@ -145,6 +152,24 @@ void Receive::updateAccountList() {
 void Receive::onSgnWalletBalanceUpdated() {
     updateAccountList();
 }
+
+void Receive::onSgnMwcAddressWithIndex(QString mwcAddress, int idx) {
+    Q_UNUSED(idx);
+    Q_UNUSED(mwcAddress);
+    updateStatus();
+}
+void Receive::onSgnTorAddress(QString tor) {
+    Q_UNUSED(tor);
+    updateStatus();
+}
+
+void Receive::onSgnUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline) {
+    Q_UNUSED(mqsOnline)
+    Q_UNUSED(keybaseOnline)
+    Q_UNUSED(torOnline)
+    updateStatus();
+}
+
 
 }
 

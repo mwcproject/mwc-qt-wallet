@@ -58,6 +58,7 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
         if ( config->isOnlineWallet() ) {
             updateMwcMqState( wallet->getMqsListenerStatus() );
             updateKeybaseState( wallet->getKeybaseListenerStatus());
+            updateTorState( wallet->getTorListenerStatus());
 
             QString httpStatus = wallet->getHttpListeningStatus();
             if ( config->hasTls() ) {

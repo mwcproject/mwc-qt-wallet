@@ -65,9 +65,7 @@ public:
 
     // Start one listen per request. mwc713 doesn't support both
     TaskListeningStop(MWC713 *wallet713, bool stopMq, bool stopKeybase, bool stopTor) :
-            Mwc713Task("TaskListeningStop", calcCommand(stopMq, stopKeybase, stopTor), wallet713,"") {
-        Q_ASSERT(stopMq | stopKeybase); Q_ASSERT( (stopMq && stopKeybase) == false);
-    }
+            Mwc713Task("TaskListeningStop", calcCommand(stopMq, stopKeybase, stopTor), wallet713,"") {}
 
     virtual ~TaskListeningStop() override {}
 

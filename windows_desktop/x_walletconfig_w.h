@@ -24,6 +24,7 @@ class WalletConfig;
 namespace bridge {
 class WalletConfig;
 class Util;
+class Config;
 }
 
 namespace wnd {
@@ -65,6 +66,8 @@ private slots:
     void on_start_keybase_clicked();
     void on_outputLockingCheck_stateChanged(int arg1);
 
+    void on_start_tor_clicked();
+
 private:
     void setValues(const QString & mwc713directory,
                    const QString & keyBasePath,
@@ -88,7 +91,7 @@ private:
 
     void updateLogsStateUI(bool enabled);
 
-    void updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartKeybase);
+    void updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartKeybase, bool isAutoStartTor);
 
     void updateAutoLogoutStateUI(int64_t time);
 
@@ -99,6 +102,7 @@ private:
 private:
     Ui::WalletConfig *ui;
 
+    bridge::Config * config = nullptr;
     bridge::WalletConfig * walletConfig = nullptr;
     bridge::Util * util = nullptr;
 
@@ -107,6 +111,7 @@ private:
     bool walletLogsEnabled = false;
     bool autoStartMQSEnabled = true;
     bool autoStartKeybaseEnabled = true;
+    bool autoStartTorEnabled = true;
     bool outputLockingEnabled = false;
     int64_t logoutTimeout = 20 * 60;
     int64_t currentLogoutTimeout = 20 * 60;

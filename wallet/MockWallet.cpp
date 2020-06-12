@@ -282,7 +282,7 @@ QString MockWallet::getReceiveAccount() {
 void MockWallet::cancelTransacton(QString account, int64_t txIdx) {
     Q_UNUSED(txIdx)
 
-    emit onCancelTransacton2( true, account, txIdx, "" );
+    emit onCancelTransacton( true, account, txIdx, "" );
 }
 
 // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
@@ -391,7 +391,7 @@ void MockWallet::getOutputs(QString account, bool show_spent, bool enforceSync) 
             "4",
             1000000000,
             2));
-    emit onOutputs2( account, show_spent, 12345, outputs);
+    emit onOutputs( account, show_spent, 12345, outputs);
 }
 
 // Show all transactions for current account

@@ -20,6 +20,7 @@ namespace core {
 
 static bool appCreated = false;
 static bool appInitialized = false;
+static bool isAppExiting = false;
 
 WalletApp::WalletApp(int &argc, char **argv) :
     QApplication(argc, argv)
@@ -52,6 +53,13 @@ bool WalletApp::isAppInitialized() {
     return appInitialized;
 }
 
+bool WalletApp::isExiting() {
+    return isAppExiting;
+}
+
+void WalletApp::startExiting() {
+    isAppExiting = true;
+}
 
 
 }

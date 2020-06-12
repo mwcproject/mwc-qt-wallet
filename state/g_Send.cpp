@@ -206,6 +206,52 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
         return false;
     }
 
+    const wallet::ListenerStatus listenerStart = context->wallet->getListenerStartState();
+    const wallet::ListenerStatus listenerStatus = context->wallet->getListenerStatus();
+
+    switch (addressRes.second) {
+        case util::ADDRESS_TYPE::MWC_MQ: {
+            if (!listenerStart.mqs) {
+                core::getWndManager()->messageTextDlg("Listener is Offline",
+                                                      "MQS listener is not started. Please start MQS listener first." );
+                return false;
+            }
+            if (!listenerStatus.mqs) {
+                core::getWndManager()->messageTextDlg("Listener is Offline",
+                                                      "MQS listener is not online even it was started. Please check your network connection and firewall settings." );
+                return false;
+            }
+            break;
+        }
+        case util::ADDRESS_TYPE::KEYBASE: {
+            if (!listenerStart.keybase) {
+                core::getWndManager()->messageTextDlg("Listener is Offline",
+                                                      "Keybase listener is not started. Please start Keybase listener first." );
+                return false;
+            }
+            if (!listenerStatus.keybase) {
+                core::getWndManager()->messageTextDlg("Listener is Offline",
+                                                      "Keybase listener is not online even it was started. Please check your Keybase client setup.");
+                return false;
+            }
+            break;
+        }
+        case util::ADDRESS_TYPE::TOR: {
+            if (!listenerStart.tor) {
+                core::getWndManager()->messageTextDlg("Listener is Offline",
+                                                      "TOR listener is not started. Please start TOR listener first." );
+                return false;
+            }
+            if (!listenerStatus.tor) {
+                core::getWndManager()->messageTextDlg("Listener is Offline",
+                                                      "TOR listener is not online even it was started. Please check your network connection and firewall settings.");
+                return false;
+            }
+        }
+        default: // Http is fine.
+            break;
+    }
+
     core::SendCoinsParams sendParams = context->appContext->getSendCoinsParams();
 
     QStringList outputs;

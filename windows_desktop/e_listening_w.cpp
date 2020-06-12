@@ -40,6 +40,8 @@ Listening::Listening(QWidget *parent) :
                       this, &Listening::onSgnHttpListeningStatus, Qt::QueuedConnection);
     QObject::connect( wallet, &bridge::Wallet::sgnMwcAddressWithIndex,
                       this, &Listening::onSgnMwcAddressWithIndex, Qt::QueuedConnection);
+    QObject::connect( wallet, &bridge::Wallet::sgnListenerStartStop,
+                      this, &Listening::onSgnListenerStartStop, Qt::QueuedConnection);
 
     updateStatuses();
     wallet->requestMqsAddress();
@@ -63,6 +65,10 @@ void Listening::onSgnHttpListeningStatus(bool listening, QString additionalInfo)
     Q_UNUSED(listening);
     Q_UNUSED(additionalInfo);
 
+    updateStatuses();
+}
+
+void Listening::onSgnListenerStartStop() {
     updateStatuses();
 }
 
@@ -160,6 +166,7 @@ void Listening::updateStatuses() {
     ui->httpStatusImg->setToolTip( httpOnline ? "Wallet http(s) foreign REST API is online" : "Wallet foreign REST API is offline");
     ui->httpStatusTxt->setText( httpOnline ? "Online" : "Offline" );
 
+    QString foreignApiAddress = config->getForeignApiAddress();
     bool hasTls = config->hasTls();
     if (hasTls)
         ui->label_http->setText("Https");
@@ -167,8 +174,13 @@ void Listening::updateStatuses() {
     if (httpOnline) {
         QString warningStr;
 
-        if ( !hasTls )
-            warningStr += "WARNING: You are using non secure http connection.";
+        if (foreignApiAddress.startsWith("127.0.0.1:")) {
+            warningStr += "INFO: Accepting TOR and local connections";
+        }
+        else {
+            if (!hasTls)
+                warningStr += "WARNING: You are using non secure http connection.";
+        }
 
         ui->http_warnings->setText(warningStr);
     } else {

@@ -654,13 +654,13 @@ signals:
 
     // Transactions
     void onTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
-    void onCancelTransacton2( bool success, QString account, int64_t trIdx, QString errMessage );
+    void onCancelTransacton( bool success, QString account, int64_t trIdx, QString errMessage );
 
     void onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages );
 
     void onAllTransactions( QVector<WalletTransaction> Transactions);
 
-    void onOutputs2( QString account, bool showSpent, int64_t height, QVector<WalletOutput> outputs);
+    void onOutputs( QString account, bool showSpent, int64_t height, QVector<WalletOutput> outputs);
 
     void onCheckResult(bool ok, QString errors );
 

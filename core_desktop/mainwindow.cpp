@@ -30,6 +30,7 @@
 #include <QDesktopWidget>
 #include <QScrollArea>
 #include <QStyle>
+#include "../core/WalletApp.h"
 
 namespace core {
 
@@ -181,6 +182,8 @@ QWidget * MainWindow::getMainWindow() {
 
 // actionState:  state::STATE
 void MainWindow::onUpdateActionStates(int actionState) {
+    if (core::WalletApp::isExiting())
+        return;
 
     bool isLeftBarVisible = (actionState >= state::STATE::ACCOUNTS && actionState != state::STATE::RESYNC );
 

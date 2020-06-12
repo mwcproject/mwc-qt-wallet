@@ -58,8 +58,8 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
                 // last case for tor it will be http://something.onion
                 }
                 else if (address.size()>0 && (address[0]=='h') ) {
-                    wallet713->setTorAddress(prms[0] );
                     wallet713->setTorListeningStatus(true);
+                    wallet713->setTorAddress(prms[0] );
                 }
             }
             return true;
@@ -100,6 +100,16 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
         case S_LISTENER_KB_GET_CONNECTION: {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
             wallet713->setKeybaseListeningStatus(true);
+            return true;
+        }
+        case S_LISTENER_TOR_LOST_CONNECTION: {
+            qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
+            wallet713->setTorListeningStatus(false);
+            return true;
+        }
+        case S_LISTENER_TOR_GET_CONNECTION: {
+            qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
+            wallet713->setTorListeningStatus(true);
             return true;
         }
         case S_LISTENER_MQ_COLLISION: {
@@ -152,7 +162,7 @@ bool TaskListeningStart::processTask(const QVector<WEvent> &events) {
             mqs = true;
         if (l.message.contains("starting keybase listener"))
             keybase = true;
-        if (l.message.contains("starting TOR listener"))
+        if (l.message.contains("starting tor listener"))
             tor = true;
     }
 
@@ -195,7 +205,7 @@ bool TaskListeningStop::processTask(const QVector<WEvent> &events) {
             mqs = true;
         if (l.message.contains("stopping keybase listener"))
             keybase = true;
-        if (l.message.contains("stopping TOR listener"))
+        if (l.message.contains("stopping TOR listener", Qt::CaseInsensitive))
             tor = true;
     }
 
@@ -206,7 +216,7 @@ bool TaskListeningStop::processTask(const QVector<WEvent> &events) {
 }
 
 QString TaskListeningStop::calcCommand(bool stopMq, bool stopKeybase, bool stopTor) const {
-    Q_ASSERT(stopMq | stopKeybase);
+    Q_ASSERT(stopMq | stopKeybase | stopTor);
 
     if(stopTor)
         return QString("stop -t");

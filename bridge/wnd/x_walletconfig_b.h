@@ -41,6 +41,7 @@ public:
     Q_INVOKABLE bool getWalletLogsEnabled();
     Q_INVOKABLE bool getAutoStartMQSEnabled();
     Q_INVOKABLE bool getAutoStartKeybaseEnabled();
+    Q_INVOKABLE bool getAutoStartTorEnabled();
     Q_INVOKABLE int getLogoutTimeMs();
     Q_INVOKABLE bool isOutputLockingEnabled();
 
@@ -62,6 +63,7 @@ public:
     Q_INVOKABLE void updateGuiScale(double scale);
     Q_INVOKABLE void updateAutoStartMQSEnabled(bool enabled);
     Q_INVOKABLE void updateAutoStartKeybaseEnabled(bool enabled);
+    Q_INVOKABLE void updateAutoStartTorEnabled(bool enabled);
     Q_INVOKABLE void setOutputLockingEnabled(bool enabled);
 
     Q_INVOKABLE bool updateTimeoutValue(int timeout);

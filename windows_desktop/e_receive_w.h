@@ -47,6 +47,9 @@ private slots:
     // respond from signTransaction
     void onSgnTransactionActionIsFinished( bool success, QString message );
     void onSgnWalletBalanceUpdated();
+    void onSgnMwcAddressWithIndex(QString mwcAddress, int idx);
+    void onSgnTorAddress(QString tor);
+    void onSgnUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline);
 
     void on_accountComboBox_activated(int index);
     void on_recieveFileButton_clicked();

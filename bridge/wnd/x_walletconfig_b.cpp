@@ -71,6 +71,10 @@ bool WalletConfig::getAutoStartKeybaseEnabled() {
     return getState()->getAutoStartKeybaseEnabled();
 }
 
+bool WalletConfig::getAutoStartTorEnabled() {
+    return getState()->getAutoStartTorEnabled();
+}
+
 int WalletConfig::getLogoutTimeMs() {
     return config::getLogoutTimeMs();
 }
@@ -127,6 +131,10 @@ void WalletConfig::updateAutoStartMQSEnabled(bool enabled) {
 void WalletConfig::updateAutoStartKeybaseEnabled(bool enabled) {
     getState()->updateAutoStartKeybaseEnabled(enabled);
 }
+void WalletConfig::updateAutoStartTorEnabled(bool enabled) {
+    getState()->updateAutoStartTorEnabled(enabled);
+}
+
 void WalletConfig::setOutputLockingEnabled(bool enabled) {
     getState()->setOutputLockingEnabled(enabled);
 }

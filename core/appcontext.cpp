@@ -229,7 +229,7 @@ bool AppContext::loadData() {
         in >> currentAccountName;
     }
 
-    if (id>0x4797)
+    if (id>=0x4797)
         in >> autoStartTorEnabled;
 
     return true;

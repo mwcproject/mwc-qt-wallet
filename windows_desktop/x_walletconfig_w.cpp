@@ -24,6 +24,7 @@
 #include "../dialogs_desktop/networkselectiondlg.h"
 #include "../bridge/wnd/x_walletconfig_b.h"
 #include "../bridge/util_b.h"
+#include "../bridge/config_b.h"
 
 namespace wnd {
 
@@ -89,6 +90,7 @@ WalletConfig::WalletConfig(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    config = new bridge::Config(this);
     walletConfig = new bridge::WalletConfig(this);
     util = new bridge::Util(this);
 
@@ -100,7 +102,8 @@ WalletConfig::WalletConfig(QWidget *parent) :
 
     autoStartMQSEnabled = walletConfig->getAutoStartMQSEnabled();
     autoStartKeybaseEnabled = walletConfig->getAutoStartKeybaseEnabled();
-    updateAutoStartStateUI(autoStartMQSEnabled, autoStartKeybaseEnabled);
+    autoStartTorEnabled = walletConfig->getAutoStartTorEnabled();
+    updateAutoStartStateUI(autoStartMQSEnabled, autoStartKeybaseEnabled, autoStartTorEnabled);
 
     currentLogoutTimeout = walletConfig->getLogoutTimeMs() / 1000;
     updateAutoLogoutStateUI(currentLogoutTimeout);
@@ -159,6 +162,7 @@ void WalletConfig::updateButtons() {
         ui->changeOutputsEdit->text().trimmed() == QString::number(changeOutputs) &&
         autoStartMQSEnabled == ui->start_mqs->isChecked() &&
         autoStartKeybaseEnabled == ui->start_keybase->isChecked() &&
+        autoStartTorEnabled == ui->start_tor->isChecked() &&
         logoutTimeout == currentLogoutTimeout &&
         outputLockingEnabled == ui->outputLockingCheck->isChecked();
 
@@ -175,6 +179,7 @@ void WalletConfig::updateButtons() {
         ui->changeOutputsEdit->text().trimmed() == QString::number(walletConfig->getDefaultChangeOutputs()) &&
         ui->start_mqs->isChecked() == true &&
         ui->start_keybase->isChecked() == true &&
+        ui->start_tor->isChecked() == true &&
         ui->logout_20->isChecked() == true &&
         ui->outputLockingCheck->isChecked() == false;
 
@@ -299,7 +304,7 @@ void WalletConfig::on_restoreDefault_clicked()
 
     updateLogsStateUI(true);
 
-    updateAutoStartStateUI(true, true);
+    updateAutoStartStateUI(true, true, true);
 
     currentLogoutTimeout = 20 * 60;
     updateAutoLogoutStateUI(20 * 60);
@@ -448,6 +453,59 @@ bool WalletConfig::applyChanges() {
     }
     autoStartKeybaseEnabled = ui->start_keybase->isChecked();
 
+    // Check if Foreign API configured correctly
+    if ( ui->start_tor->isChecked() ) {
+        // Checking how foign API is doing
+        bool foreignIsOk = true;
+        bool resetForeignForTor = false;
+        if ( !config->hasForeignApi() ) {
+            foreignIsOk = false;
+            resetForeignForTor =
+                    core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(this, "TOR Configuration",
+                                "Tor requires Foreign API to be running. "
+                                "Do you want configure Foreign API to match TOR expectations?",
+                                "Disable TOR",
+                                "Configure API",
+                                false, true);
+        }
+        else if ( config->hasTls() ) {
+            foreignIsOk = false;
+            resetForeignForTor =
+                    core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(this, "TOR Configuration",
+                                "Tor requires Foreign API to be running without TLS. "
+                                "Do you want configure Foreign API to match TOR expectations?",
+                                "Disable TOR",
+                                "Configure API",
+                                false, true);
+        }
+        if (!resetForeignForTor && !config->getForeignApiSecret().isEmpty() ) {
+            resetForeignForTor =
+                    core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionHTML(this, "TOR Configuration",
+                                "Tor requires Foreign API to be running. "
+                                "Please note that Foreign API secret is configured. Sender need to be aware about that. "
+                                "Otherwise you will not be able to receive coins.",
+                                "Reset Secret",
+                                "Continue",
+                                false, true);
+        }
+        if (resetForeignForTor) {
+            foreignIsOk = true;
+            need2updateGuiSize = true;
+            config->saveForeignApiConfig(true,
+                    "127.0.0.1:3415", "",
+                    "", "");
+        }
+        if (!foreignIsOk) {
+            ui->start_tor->setCheckState(Qt::Unchecked);
+        }
+    }
+
+    bool need2updateAutoStartTorEnabled = (autoStartTorEnabled != ui->start_tor->isChecked());
+    if (need2updateAutoStartTorEnabled) {
+        walletConfig->updateAutoStartTorEnabled(ui->start_tor->isChecked());
+    }
+    autoStartTorEnabled = ui->start_tor->isChecked();
+
     bool lockingEnabled = ui->outputLockingCheck->isChecked();
     if (lockingEnabled != outputLockingEnabled) {
         walletConfig->setOutputLockingEnabled(lockingEnabled);
@@ -580,9 +638,15 @@ void wnd::WalletConfig::on_start_keybase_clicked()
     updateButtons();
 }
 
-void WalletConfig::updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartKeybase) {
+void WalletConfig::on_start_tor_clicked()
+{
+    updateButtons();
+}
+
+void WalletConfig::updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartKeybase, bool isAutoStartTor) {
     ui->start_mqs->setChecked(isAutoStartMQS);
     ui->start_keybase->setChecked(isAutoStartKeybase);
+    ui->start_tor->setChecked(isAutoStartTor);
 }
 
 void WalletConfig::updateAutoLogoutStateUI(int64_t time) {
@@ -607,3 +671,4 @@ void WalletConfig::on_outputLockingCheck_stateChanged(int check)
 }
 
 }
+

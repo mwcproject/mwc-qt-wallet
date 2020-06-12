@@ -149,8 +149,15 @@ signals:
     void sgnLoginResult(bool ok);
     void sgnLogout();
 
+    // Some of listeners was started, stopped
+    void sgnListenerStartStop();
+
     // Get MWC MQ address with index
     void sgnMwcAddressWithIndex(QString mwcAddress, int idx);
+
+    // Get Tor address. Address will be assigned when tor listener is started.
+    // Empty address will be assigned when tor listener is stopped.
+    void sgnTorAddress(QString tor);
 
     // Outputs requested form the wallet.
     // outputs are in Json format, see wallet::WalletOutput for details
@@ -185,6 +192,10 @@ private slots:
     // Signals that comes from wallet & notification system
     void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
     void onConfigUpdate();
+    void onListeningStartResults( bool mqTry, bool kbTry, bool tor,
+                                  QStringList errorMessages, bool initialStart ); // error messages, if get some
+    void onListeningStopResult(bool mqTry, bool kbTry, bool tor,
+                               QStringList errorMessages );
     void onUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline);
     void onHttpListeningStatus(bool listening, QString additionalInfo);
     void onUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
@@ -193,6 +204,7 @@ private slots:
     void onLoginResult(bool ok);
     void onLogout();
     void onMwcAddressWithIndex(QString mwcAddress, int idx);
+    void onTorAddress(QString tor);
     void onOutputs( QString account, bool showSpent, int64_t height, QVector<wallet::WalletOutput> outputs);
 
     void onTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> Transactions);

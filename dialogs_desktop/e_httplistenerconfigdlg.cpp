@@ -20,6 +20,7 @@
 #include "../bridge/util_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/config_b.h"
+#include "../bridge/wnd/x_walletconfig_b.h"
 
 namespace dlg {
 
@@ -30,6 +31,7 @@ HttpListenerConfigDlg::HttpListenerConfigDlg(QWidget *parent) :
     util = new bridge::Util(this);
     wallet = new bridge::Wallet(this);
     config = new bridge::Config(this);
+    walletConfig = new bridge::WalletConfig(this);
 
     ui->setupUi(this);
 
@@ -268,7 +270,7 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
         if (foreignApiSecret.isEmpty())
             message += "without any authorization";
 
-        if (tlsCertificateFile.isEmpty() || tlsCertificateKey.isEmpty()) {
+        if ((tlsCertificateFile.isEmpty() || tlsCertificateKey.isEmpty()) && !foreignApiAddress.startsWith("127.0.0.1:")  ) {
             if (!message.isEmpty())
                 message += " and ";
 
@@ -277,6 +279,18 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
 
         if (!message.isEmpty()) {
             message = "Warning. Your wallet has activated foreign API " + message + "\n\n";
+        }
+    }
+
+    if (walletConfig->getAutoStartTorEnabled()) {
+        if (!foreignApi || (!tlsCertificateFile.isEmpty() && !tlsCertificateKey.isEmpty()) ) {
+            if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText( this, "TOR Listener",
+                                               "TOR require Foreign API to run (preferably on 127.0.0.1) and not use TSL. You confgiuration is diferent. "
+                                               "Do you want apply it and disable autostart TOR listener?",
+                                               "Cancel", "disable TOR", false, true ) ) {
+                return;
+            }
+            walletConfig->updateAutoStartTorEnabled(false); // disable tor tor starting
         }
     }
 

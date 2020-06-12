@@ -26,6 +26,7 @@ namespace bridge {
 class Util;
 class Wallet;
 class Config;
+class WalletConfig;
 }
 
 namespace dlg {
@@ -62,6 +63,7 @@ private:
     bridge::Util * util = nullptr;
     bridge::Wallet * wallet = nullptr;
     bridge::Config * config = nullptr;
+    bridge::WalletConfig * walletConfig = nullptr;
 };
 
 }

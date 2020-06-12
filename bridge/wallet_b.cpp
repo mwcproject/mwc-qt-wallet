@@ -34,9 +34,12 @@ Wallet::Wallet(QObject *parent) : QObject(parent) {
     QObject::connect(wallet, &wallet::Wallet::onConfigUpdate,
                      this, &Wallet::onConfigUpdate, Qt::QueuedConnection);
 
-
     QObject::connect(wallet, &wallet::Wallet::onListenersStatus,
                      this, &Wallet::onUpdateListenerStatus, Qt::QueuedConnection);
+    QObject::connect(wallet, &wallet::Wallet::onListeningStartResults,
+                     this, &Wallet::onListeningStartResults, Qt::QueuedConnection);
+    QObject::connect(wallet, &wallet::Wallet::onListeningStopResult,
+                     this, &Wallet::onListeningStopResult, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onHttpListeningStatus,
                      this, &Wallet::onHttpListeningStatus, Qt::QueuedConnection);
 
@@ -54,12 +57,14 @@ Wallet::Wallet(QObject *parent) : QObject(parent) {
                      this, &Wallet::onLogout, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onMwcAddressWithIndex,
                      this, &Wallet::onMwcAddressWithIndex, Qt::QueuedConnection);
+    QObject::connect(wallet, &wallet::Wallet::onTorAddress,
+                     this, &Wallet::onTorAddress, Qt::QueuedConnection);
 
-    QObject::connect(wallet, &wallet::Wallet::onOutputs2,
+    QObject::connect(wallet, &wallet::Wallet::onOutputs,
                      this, &Wallet::onOutputs, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onTransactions,
                      this, &Wallet::onTransactions, Qt::QueuedConnection);
-    QObject::connect(wallet, &wallet::Wallet::onCancelTransacton2,
+    QObject::connect(wallet, &wallet::Wallet::onCancelTransacton,
                      this, &Wallet::onCancelTransacton, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onTransactionById,
                      this, &Wallet::onTransactionById, Qt::QueuedConnection);
@@ -88,6 +93,26 @@ void Wallet::onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString messa
 void Wallet::onConfigUpdate() {
     emit sgnConfigUpdate();
 }
+
+void Wallet::onListeningStartResults( bool mqTry, bool kbTry, bool tor,
+                              QStringList errorMessages, bool initialStart ) {
+    Q_UNUSED(mqTry)
+    Q_UNUSED(kbTry)
+    Q_UNUSED(tor)
+    Q_UNUSED(errorMessages)
+    Q_UNUSED(initialStart)
+    emit sgnListenerStartStop();
+}
+
+void Wallet::onListeningStopResult(bool mqTry, bool kbTry, bool tor,
+                           QStringList errorMessages ) {
+    Q_UNUSED(mqTry)
+    Q_UNUSED(kbTry)
+    Q_UNUSED(tor)
+    Q_UNUSED(errorMessages)
+    emit sgnListenerStartStop();
+}
+
 
 void Wallet::onUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline) {
     emit sgnUpdateListenerStatus( mqsOnline, keybaseOnline, torOnline );
@@ -120,6 +145,10 @@ void Wallet::onLogout() {
 
 void Wallet::onMwcAddressWithIndex(QString mwcAddress, int idx) {
     emit sgnMwcAddressWithIndex(mwcAddress, idx);
+}
+
+void Wallet::onTorAddress(QString tor) {
+    emit sgnTorAddress(tor);
 }
 
 void Wallet::onOutputs( QString account, bool showSpent, int64_t height, QVector<wallet::WalletOutput> outputs) {

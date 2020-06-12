@@ -259,6 +259,16 @@ void Mwc713InputParser::initListening() {
                                                         new TriePhraseSection("listener [keybase] reestablished connection.")
                                                 }));
 
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_TOR_LOST_CONNECTION,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("tor is not responding, will try to reconnect")
+                                                }));
+
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_TOR_GET_CONNECTION,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("tor connection reestablished")
+                                                }));
+
     // Need to detect a case when listening collision heppans. Then we will emit message about that
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_MQ_COLLISION,
                           QVector<BaseTrieSection*>{

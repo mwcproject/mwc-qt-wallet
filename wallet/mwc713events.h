@@ -63,6 +63,9 @@ enum WALLET_EVENTS {
     S_LISTENER_HTTP_STARTING = 35, // starting listener for foreign api on [host:port]
     S_LISTENER_HTTP_FAILED   = 36, // thread 'foreign-api-gotham' panicked at XXXXXXXXX
 
+    S_LISTENER_TOR_LOST_CONNECTION = 37, // WARNING: tor is not responding, will try to reconnect
+    S_LISTENER_TOR_GET_CONNECTION = 38, // INFO: tor connection reestablished
+
     // Recovery
     // from init wallet
     S_RECOVERY_STARTING = 45, // recovering... please wait as this could take a few minutes to complete

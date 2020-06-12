@@ -164,8 +164,12 @@ QPair<bool, ADDRESS_TYPE> verifyAddress(QString address) {
     address = protAddr.second;
 
     // both http and https are required
-    if ( protocol == "https" || protocol == "http" )
-        return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::HTTPS);
+    if ( protocol == "https" || protocol == "http" ) {
+        if (address.endsWith(".onion"))
+            return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::TOR);
+        else
+            return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::HTTPS);
+    }
     else if ( protocol == "keybase")
         return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::KEYBASE);
     else if ( protocol == "mwcmq" || protocol == "mwcmqs" )
@@ -187,6 +191,7 @@ QString fullFormalAddress(ADDRESS_TYPE type, QString address) {
         }
         case ADDRESS_TYPE::KEYBASE:
         case ADDRESS_TYPE::HTTPS:
+        case ADDRESS_TYPE::TOR:
         {
             return address;
         }

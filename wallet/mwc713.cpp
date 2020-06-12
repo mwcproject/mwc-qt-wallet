@@ -176,6 +176,8 @@ void MWC713::resetData(STARTED_MODE _startedMode ) {
     startedMode = _startedMode;
     mwcMqOnline = keybaseOnline = torOnline = false;
     mwcMqStarted = mwcMqStartRequested = keybaseStarted = torStarted = false;
+    torAddress = "";
+    mwcAddress = "";
     httpOnline = false;
     httpInfo = "";
     hasHttpTls = false;
@@ -322,6 +324,7 @@ void MWC713::processStop(bool exitNicely) {
 
     emit onMwcAddress("");
     emit onMwcAddressWithIndex("",1);
+    emit onTorAddress("");
 
     if (mwc713process) {
         // Waitiong for task Q to be empty
@@ -906,8 +909,10 @@ void MWC713::setListeningStopResult(bool mqTry, bool kbTry, bool torTry, // what
         mwcMqStarted = false;
     if (kbTry)
         keybaseStarted = false;
-    if (torTry)
+    if (torTry) {
         torStarted = false;
+        setTorAddress("");
+    }
 
     emit onListeningStopResult(mqTry, kbTry, torTry, errorMessages);
 
@@ -1215,7 +1220,7 @@ void MWC713::setTransactionById( bool success, QString account, int64_t height, 
 void MWC713::setOutputs( QString account, bool show_spent, int64_t height, QVector<WalletOutput> outputs) {
     setWalletOutputs( account, outputs);
     logger::logEmit( "MWC713", "onOutputs", "account="+account );
-    emit onOutputs2( account, show_spent, height, outputs );
+    emit onOutputs( account, show_spent, height, outputs );
 }
 
 void MWC713::setExportProofResults( bool success, QString fn, QString msg ) {
@@ -1230,7 +1235,7 @@ void MWC713::setVerifyProofResults( bool success, QString fn, QString msg ) {
 
 void MWC713::setTransCancelResult( bool success, const QString & account, int64_t transId, QString errMsg ) {
     logger::logEmit( "MWC713", "onCancelTransacton", "success="+QString::number(success) );
-    emit onCancelTransacton2(success, account, transId, errMsg);
+    emit onCancelTransacton(success, account, transId, errMsg);
 }
 
 void MWC713::setSetReceiveAccount( bool ok, QString accountOrMessage ) {

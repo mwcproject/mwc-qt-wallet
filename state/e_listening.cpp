@@ -97,7 +97,7 @@ void Listening::onListeningStopResult(bool mqTry, bool kbTry, bool torTry, // wh
     if (!errorMessages.empty()) {
         QString msg;
         for (auto & s : errorMessages)
-            msg += s + "/n";
+            msg += s + "\n";
 
         core::getWndManager()->messageTextDlg("Stop listening Error", msg);
     }
