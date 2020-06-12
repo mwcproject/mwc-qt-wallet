@@ -40,7 +40,7 @@ private slots:
     void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
     void onSgnHttpListeningStatus(bool listening, QString additionalInfo);
     void onSgnMwcAddressWithIndex(QString mwcAddress, int idx);
-    void onSgnListenerStartStop();
+    void onSgnListenerStartStop(bool mqs, bool keybase, bool tor);
 
     void on_mwcMqTriggerButton_clicked();
     void on_mwcMqNextAddress_clicked();
@@ -56,6 +56,10 @@ private:
     Ui::Listening *ui;
     bridge::Wallet * wallet = nullptr;
     bridge::Config * config = nullptr;
+
+    bool mqsInProgress = false;
+    bool keybaseInProgress = false;
+    bool torInProgress = false;
 };
 
 }

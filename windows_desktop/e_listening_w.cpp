@@ -68,7 +68,14 @@ void Listening::onSgnHttpListeningStatus(bool listening, QString additionalInfo)
     updateStatuses();
 }
 
-void Listening::onSgnListenerStartStop() {
+void Listening::onSgnListenerStartStop(bool mqs, bool keybase, bool tor) {
+    if (mqs)
+        mqsInProgress = false;
+    if (keybase)
+        keybaseInProgress = false;
+    if (tor)
+        torInProgress = false;
+
     updateStatuses();
 }
 
@@ -99,7 +106,7 @@ void Listening::updateStatuses() {
 
     if (mqsStarted) {
         if (mqsStatus) {
-            ui->mwcMqTriggerButton->setText("Stop");
+            ui->mwcMqTriggerButton->setText( mqsInProgress ? "Stopping..." : "Stop" );
             ui->mwcMqTriggerButton->setToolTip("Stop the MWC MQS Listener");
         } else {
             ui->mwcMqTriggerButton->setText("Stop to retry");
@@ -107,7 +114,7 @@ void Listening::updateStatuses() {
                     "MWC MQS Listener already running and trying to reconnect. Click to restart the MWC MQS Listener.");
         }
     } else {
-        ui->mwcMqTriggerButton->setText("Start");
+        ui->mwcMqTriggerButton->setText(mqsInProgress ? "Starting..." : "Start");
         ui->mwcMqTriggerButton->setToolTip("Start the MWC MQS Listener");
     }
     ui->mwcMqNextAddress->setEnabled(!mqsStarted);
@@ -122,7 +129,7 @@ void Listening::updateStatuses() {
     // Keybase
     if (keybaseStarted) {
         if (keybaseStatus) {
-            ui->keybaseTriggerButton->setText("Stop");
+            ui->keybaseTriggerButton->setText(keybaseInProgress ? "Stopping..." : "Stop");
             ui->keybaseTriggerButton->setToolTip("Stop the Keybase Listener");
         } else {
             ui->keybaseTriggerButton->setText("Stop to retry");
@@ -130,7 +137,7 @@ void Listening::updateStatuses() {
                     "Keybase Listener already running and trying to reconnect. Click to restart the Keybase Listener");
         }
     } else {
-        ui->keybaseTriggerButton->setText("Start");
+        ui->keybaseTriggerButton->setText(keybaseInProgress ? "Starting..." : "Start");
         ui->keybaseTriggerButton->setToolTip("Start the Keybase Listener");
     }
 
@@ -143,7 +150,7 @@ void Listening::updateStatuses() {
     // TOR
     if (torStarted) {
         if (torStatus) {
-            ui->torTriggerButton->setText("Stop");
+            ui->torTriggerButton->setText(torInProgress ? "Stopping..." : "Stop");
             ui->torTriggerButton->setToolTip("Stop the TOR Listener");
         } else {
             ui->torTriggerButton->setText("Stop to retry");
@@ -151,7 +158,7 @@ void Listening::updateStatuses() {
                     "TOR Listener is already running and trying to reconnect. Click to restart the TOR Listener");
         }
     } else {
-        ui->torTriggerButton->setText("Start");
+        ui->torTriggerButton->setText( torInProgress ? "Starting" : "Start");
         ui->torTriggerButton->setToolTip("Start the TOR Listener");
     }
 
@@ -190,10 +197,18 @@ void Listening::updateStatuses() {
 
 void Listening::on_mwcMqTriggerButton_clicked()
 {
-    if (wallet->isMqsListenerStarted())
+    if (mqsInProgress)
+        return;
+    mqsInProgress = true;
+
+    if (wallet->isMqsListenerStarted()) {
+        ui->mwcMqTriggerButton->setText("Stopping...");
         wallet->requestStopMqsListener();
-    else
+    }
+    else {
+        ui->mwcMqTriggerButton->setText("Starting...");
         wallet->requestStartMqsListener();
+    }
 }
 
 void Listening::on_mwcMqNextAddress_clicked()
@@ -232,18 +247,34 @@ void Listening::on_mwcMqToIndex_clicked()
 
 void Listening::on_keybaseTriggerButton_clicked()
 {
-    if (wallet->isKeybaseListenerStarted())
+    if (keybaseInProgress)
+        return;
+    keybaseInProgress = true;
+
+    if (wallet->isKeybaseListenerStarted()) {
+        ui->keybaseTriggerButton->setText("Stopping...");
         wallet->requestStopKeybaseListener();
-    else
+    }
+    else {
+        ui->keybaseTriggerButton->setText("Starting...");
         wallet->requestStartKeybaseListener();
+    }
 }
 
 void Listening::on_torTriggerButton_clicked()
 {
-    if (wallet->isTorListenerStarted())
+    if (torInProgress)
+        return;
+    torInProgress = true;
+
+    if (wallet->isTorListenerStarted()) {
+        ui->torTriggerButton->setText("Stopping...");
         wallet->requestStopTorListener();
-    else
+    }
+    else {
+        ui->torTriggerButton->setText("Starting...");
         wallet->requestStartTorListener();
+    }
 }
 
 

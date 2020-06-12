@@ -150,7 +150,7 @@ signals:
     void sgnLogout();
 
     // Some of listeners was started, stopped
-    void sgnListenerStartStop();
+    void sgnListenerStartStop(bool mqTry, bool kbTry, bool tor);
 
     // Get MWC MQ address with index
     void sgnMwcAddressWithIndex(QString mwcAddress, int idx);

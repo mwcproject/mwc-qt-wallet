@@ -101,7 +101,7 @@ void Wallet::onListeningStartResults( bool mqTry, bool kbTry, bool tor,
     Q_UNUSED(tor)
     Q_UNUSED(errorMessages)
     Q_UNUSED(initialStart)
-    emit sgnListenerStartStop();
+    emit sgnListenerStartStop(mqTry, kbTry, tor);
 }
 
 void Wallet::onListeningStopResult(bool mqTry, bool kbTry, bool tor,
@@ -110,7 +110,7 @@ void Wallet::onListeningStopResult(bool mqTry, bool kbTry, bool tor,
     Q_UNUSED(kbTry)
     Q_UNUSED(tor)
     Q_UNUSED(errorMessages)
-    emit sgnListenerStartStop();
+    emit sgnListenerStartStop(mqTry, kbTry, tor);
 }
 
 
