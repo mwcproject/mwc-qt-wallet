@@ -286,6 +286,10 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
     return false;
 }
 
+QString Send::getSpendAllAmount(QString account) {
+    return util::getAllSpendableAmount(account, context->wallet, context->appContext);
+}
+
 
 void Send::sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate ) {
     Q_UNUSED(address)

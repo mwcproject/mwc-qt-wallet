@@ -114,7 +114,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../resources.qrc">:/img/SendOnline@2x.svg</pixmap>
+          <pixmap resource="../resources_desktop.qrc">:/img/SendOnline@2x.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -222,7 +222,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../resources.qrc">:/img/File@2x.svg</pixmap>
+          <pixmap resource="../resources_desktop.qrc">:/img/File@2x.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -626,7 +626,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>fileChecked</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources.qrc"/>
+  <include location="../resources_desktop.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -48,6 +48,10 @@ public:
     // return true if some long process was started.
     Q_INVOKABLE bool sendMwcOnline( QString account, QString amountNano, QString address, QString apiSecret, QString message);
 
+    // Return string representing spendable amount for account minus transaction fee
+    // Returns "All" if the amount cannot be calculated
+    Q_INVOKABLE QString getSpendAllAmount( QString account);
+
 signals:
     void sgnShowSendResult( bool success, QString message );
 };

@@ -72,6 +72,12 @@ namespace util {
     // If the given transaction fee is 0, "unknown" is returned.
     QString txnFeeToString(uint64_t nanoTxnFee);
 
+    //
+    // Returns a string representing the account's spendable balance minus the transaction fee.
+    // If an error occurs, "all" is returned.
+    //
+    QString getAllSpendableAmount(const QString& accountName, wallet::Wallet* wallet, core::AppContext* appContext);
+
 };
 
 

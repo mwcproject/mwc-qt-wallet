@@ -123,7 +123,13 @@ void SendStarting::on_nextButton_clicked() {
 }
 
 void SendStarting::on_allAmountButton_clicked() {
-    ui->amountEdit->setText("All");
+    QString account = ui->accountComboBox->currentData().toString();
+    if (account.isEmpty())
+        return;
+    else {
+        QString amount = send->getSpendAllAmount(account);
+        ui->amountEdit->setText(amount);
+    }
 }
 
 void SendStarting::on_accountComboBox_currentIndexChanged(int index)

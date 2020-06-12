@@ -61,5 +61,9 @@ bool Send::sendMwcOnline( QString account, QString amountNano, QString address, 
     return getState()->sendMwcOnline( account, amountNano.toLongLong(), address, apiSecret, message);
 }
 
+QString Send::getSpendAllAmount( QString account) {
+    return getState()->getSpendAllAmount(account);
+}
+
 
 }

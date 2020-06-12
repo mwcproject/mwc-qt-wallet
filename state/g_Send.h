@@ -52,6 +52,9 @@ public:
     // return true if some long process was started.
     bool sendMwcOnline( QString account, int64_t amount, QString address, QString apiSecret, QString message);
 
+    // Returns the amount of coins, minus the transaction fee, which can be spent for this account
+    QString getSpendAllAmount(QString account);
+
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "send.html";}

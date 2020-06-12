@@ -309,17 +309,19 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     if (nanoCoins<0) {
         // handle spending all spendable outputs
         QVector<core::HodlOutputInfo> spentOuts;
-        for (const auto & ho : hodlOuts )
+        for (const auto & ho : hodlOuts ) {
             spentOuts.push_back(ho.second);
+            // combine the HODL outputs by value with the free outputs
+            freeOuts.insert(ho.first.valueNano, ho.first);
+        }
 
         // Ask user if he wants to spend all and continue...
         if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionHTMLDlg("HODL Output Spending",
                 generateMessageHtmlOutputsToSpend( spentOuts ),
                 "Cancel", "Continue", true, false, 1.4) ) {
-            if (appContext->isLockOutputEnabled()) {
-                resultOutputs = allOutputs;
-                *txnFee = getTxnFeeFromSpendableOutputs(nanoCoins, freeOuts, outputsNumber, totalNanoCoins, resultOutputs);
-            }
+            resultOutputs = allOutputs;
+            int changeOutputs = 0;  // we don't expect any change since we are spending all of our outputs
+            *txnFee = getTxnFeeFromSpendableOutputs(nanoCoins, freeOuts, changeOutputs, totalNanoCoins, resultOutputs);
             return true;
         }
         else {
@@ -605,6 +607,22 @@ QString txnFeeToString(uint64_t nanoTxnFee) {
         fee = "unknown";
     }
     return fee;
+}
+
+QString getAllSpendableAmount(const QString& accountName, wallet::Wallet* wallet, core::AppContext* appContext) {
+    QString allSpendableAmount = "All";
+
+    QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs;
+    findSpendableOutputs(accountName, wallet, appContext, spendableOutputs);
+    int64_t numSpendableOutputs = spendableOutputs.size();
+    if (numSpendableOutputs > 0) {
+        int64_t totalSpendableCoins = getTotalCoinsFromMap(spendableOutputs);
+        // we don't expect any change since we are spending all coin
+        uint64_t txnFee = calcTxnFee(numSpendableOutputs, 1, 1);
+        int64_t allAmount = totalSpendableCoins - txnFee;
+        allSpendableAmount = util::nano2one(allAmount);
+    }
+    return allSpendableAmount;
 }
 
 };
