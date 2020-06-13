@@ -64,11 +64,24 @@ ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,
 
     ui->commitsComboBox->clear();
     for (int i=0; i<outputs.size(); i++) {
-        ui->commitsComboBox->addItem( outputs[i].outputCommitment, QVariant(i));
+        QString commitType;
+        if (i<transaction.numInputs) {
+            commitType = "Input " + QString::number(i+1) + ": ";
+        }
+        else {
+            commitType = "Output " + QString::number(i-transaction.numInputs+1) + ": ";
+        }
+
+        ui->commitsComboBox->addItem( commitType + outputs[i].outputCommitment, QVariant(i));
     }
-    if (!outputs.isEmpty()) {
-        ui->commitsComboBox->setCurrentIndex(0);
+
+    // Selecting first output
+    if (transaction.numInputs < outputs.size()) {
+        ui->commitsComboBox->setCurrentIndex(transaction.numInputs);
         updateOutputData();
+    }
+    else {
+        ui->commitsComboBox->setCurrentIndex(-1);
     }
 
     txUuid = transaction.txid;
@@ -86,10 +99,30 @@ ShowTransactionDlg::~ShowTransactionDlg()
 
 void ShowTransactionDlg::updateOutputData() {
     auto dt = ui->commitsComboBox->currentData();
-    if (!dt.isValid())
+    if (!dt.isValid()) {
+        // Need to clean uo the data
+        ui->out_status->setText("");
+        ui->out_mwc->setText("");
+        ui->out_height->setText( "" );
+        ui->out_confirms->setText( "" );
+        ui->out_coinBase->setText("");
+        ui->out_tx->setText("");
+        ui->out_label1->hide();
+        ui->out_label2->hide();
+        ui->out_label3->hide();
+        ui->out_label4->hide();
+        ui->out_label5->hide();
+        ui->out_label6->hide();
         return;
+    }
 
     wallet::WalletOutput & out = outputs[ dt.toInt() ];
+    ui->out_label1->show();
+    ui->out_label2->show();
+    ui->out_label3->show();
+    ui->out_label4->show();
+    ui->out_label5->show();
+    ui->out_label6->show();
     ui->out_status->setText(out.status);
     ui->out_mwc->setText(util::nano2one( out.valueNano) );
     ui->out_height->setText( out.blockHeight );

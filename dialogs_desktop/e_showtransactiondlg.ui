@@ -752,7 +752,7 @@
      <number>5</number>
     </property>
     <item>
-     <widget class="control::MwcLabelSmall" name="label_20">
+     <widget class="control::MwcLabelSmall" name="out_label2">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -814,7 +814,7 @@
      <number>5</number>
     </property>
     <item>
-     <widget class="control::MwcLabelSmall" name="label_23">
+     <widget class="control::MwcLabelSmall" name="out_label1">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -876,7 +876,7 @@
      <number>5</number>
     </property>
     <item>
-     <widget class="control::MwcLabelSmall" name="label_24">
+     <widget class="control::MwcLabelSmall" name="out_label3">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -938,7 +938,7 @@
      <number>5</number>
     </property>
     <item>
-     <widget class="control::MwcLabelSmall" name="label_25">
+     <widget class="control::MwcLabelSmall" name="out_label4">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -1000,7 +1000,7 @@
      <number>5</number>
     </property>
     <item>
-     <widget class="control::MwcLabelSmall" name="label_22">
+     <widget class="control::MwcLabelSmall" name="out_label6">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -1062,7 +1062,7 @@
      <number>5</number>
     </property>
     <item>
-     <widget class="control::MwcLabelSmall" name="label_8">
+     <widget class="control::MwcLabelSmall" name="out_label5">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -1525,12 +1525,6 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLine</class>
-   <extends>QFrame</extends>
-   <header>control_desktop/MwcFrameWithBorder.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
    <header>control_desktop/MwcComboBox.h</header>
@@ -1549,6 +1543,12 @@
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLine</class>
+   <extends>QFrame</extends>
+   <header>control_desktop/MwcFrameWithBorder.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditDlg</class>
