@@ -32,7 +32,7 @@ ContactEditDlg::ContactEditDlg(QWidget *parent, const core::ContactRecord & _con
     ui->nameEdit->setText(contact.name);
     ui->addressEdit->setText(contact.address);
 
-    ui->titleLabel->setText( editMode ? "EDIT CONTACT" : "NEW CONTACT" );
+    ui->titleLabel->setText( editMode ? "Edit Contact" : "New Contact" );
 }
 
 ContactEditDlg::~ContactEditDlg()

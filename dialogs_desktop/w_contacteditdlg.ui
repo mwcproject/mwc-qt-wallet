@@ -63,7 +63,7 @@
       <number>32</number>
      </property>
      <property name="placeholderText">
-      <string>name</string>
+      <string>Name</string>
      </property>
     </widget>
    </item>
@@ -79,7 +79,7 @@
       <number>256</number>
      </property>
      <property name="placeholderText">
-      <string>address</string>
+      <string>Address</string>
      </property>
     </widget>
    </item>
