@@ -11,9 +11,6 @@
 # Path to the keybase binary
 # keybase_binary = "keybase"
 
-# Use SSL for Legacy Grin Box connection.
-# grinbox_protocol_unsecure = false
-
 # MWC MQS connection settings. By default mwc713 using thhis method for communication.
 # mwcmqs_domain: mqs.mwc.mw
 # mwcmqs_port: 443
