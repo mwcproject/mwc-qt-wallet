@@ -30,8 +30,6 @@ Finalize::Finalize(QWidget *parent) :
 
     config = new bridge::Config(this);
     finalize = new bridge::Finalize(this);
-
-
 }
 
 Finalize::~Finalize()

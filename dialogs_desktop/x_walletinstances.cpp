@@ -93,6 +93,13 @@ void WalletInstances::on_applyButton_clicked() {
         return;
     }
 
+    auto res = util::validateMwc713Str(dataPath);
+    if (!res.first) {
+        control::MessageBox::messageText(this, "Wallet data path",
+                                         "Wallet path is invalid.\n\n" + res.second);
+        return;
+    }
+
     if ( dataPath == config->getDataPath() ) {
         reject();
         return; // no changes was made
@@ -105,7 +112,7 @@ void WalletInstances::on_applyButton_clicked() {
 
     // Just in case. Normally will never be called
     if ( runningArc != networkArch[1] ) {
-        control::MessageBox::messageText(nullptr, "Wallet data architecture mismatch",
+        control::MessageBox::messageText(this, "Wallet data architecture mismatch",
                                      "Your mwc713 seed at '"+ dataPath +"' was created with "+ networkArch[1]+" bits version of the wallet. You are using " + runningArc + " bit version.");
         return;
     }

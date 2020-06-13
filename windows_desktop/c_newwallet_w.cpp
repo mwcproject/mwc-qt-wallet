@@ -35,9 +35,11 @@ NewWallet::NewWallet(QWidget *parent) :
     ui->radioMainNet->setChecked(true);
     updateControls();
 
-    ui->radioCreateNew->setFocus();
-
     utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()) );
+}
+
+void NewWallet::panelWndStarted() {
+    ui->radioCreateNew->setFocus();
 }
 
 NewWallet::~NewWallet()

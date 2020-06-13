@@ -37,9 +37,12 @@ EnterSeed::EnterSeed(QWidget *parent) :
 
     ui->seedText->setReadOnly(false);
     ui->seedText->setAcceptRichText(false);
-    ui->seedText->setFocus(Qt::OtherFocusReason);
 
     utils::defineDefaultButtonSlot(this, SLOT(on_Enter()) );
+}
+
+void EnterSeed::panelWndStarted() {
+    ui->seedText->setFocus();
 }
 
 EnterSeed::~EnterSeed()

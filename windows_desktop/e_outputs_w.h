@@ -57,6 +57,8 @@ private slots:
     void onSgnNewNotificationMessage(int level, QString message);
 
 private:
+    virtual void panelWndStarted() override;
+
     void initTableHeaders();
     void saveTableHeaders();
 

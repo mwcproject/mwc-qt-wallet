@@ -50,7 +50,6 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
     ui->progress->initLoader(false);
 
     setFocusPolicy(Qt::StrongFocus);
-    ui->passwordEdit->setFocus(Qt::OtherFocusReason);
 
     utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()) );
 
@@ -79,8 +78,12 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
     ui->mwcMQlable->setText("mwc MQS");
 
     ui->syncStatusMsg->setText("");
-
 }
+
+void InputPassword::panelWndStarted() {
+    ui->passwordEdit->setFocus();
+}
+
 
 InputPassword::~InputPassword()
 {

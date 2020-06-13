@@ -34,6 +34,10 @@ class PanelBaseWnd : public QWidget {
 public:
     PanelBaseWnd(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
+protected:
+    // put focus here
+    virtual void panelWndStarted() {}
+
 private slots:
 
     void updateAppTitle();

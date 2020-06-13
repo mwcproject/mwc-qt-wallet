@@ -48,6 +48,8 @@ private slots:
 private:
     void updatePassState();
 
+    virtual void panelWndStarted() override;
+
 private:
     Ui::InitAccount *ui;
     bridge::SelectMode * selectMode = nullptr;

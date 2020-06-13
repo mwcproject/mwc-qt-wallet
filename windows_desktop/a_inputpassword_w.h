@@ -45,6 +45,8 @@ private slots:
     void on_submitButton_clicked();
     void on_instancesButton_clicked();
 private:
+    virtual void panelWndStarted() override;
+
     void updateMwcMqState(bool online);
     void updateKeybaseState(bool online);
     void updateTorState(bool online);

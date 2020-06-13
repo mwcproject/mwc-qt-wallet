@@ -49,6 +49,11 @@ InitAccount::InitAccount(QWidget *parent) :
     updatePassState();
 }
 
+void InitAccount::panelWndStarted() {
+    ui->password1Edit->setFocus();
+}
+
+
 InitAccount::~InitAccount()
 {
     util->releasePasswordAnalyser();

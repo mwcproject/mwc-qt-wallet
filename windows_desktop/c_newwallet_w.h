@@ -42,6 +42,8 @@ private slots:
 
 private:
     void updateControls();
+
+    virtual void panelWndStarted() override;
 private:
     Ui::NewWallet *ui;
     bridge::InitAccount * initAccount = nullptr;

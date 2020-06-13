@@ -66,10 +66,12 @@ Outputs::Outputs(QWidget *parent) :
     initTableHeaders();
 
     requestOutputs(accName);
-
-    ui->outputsTable->setFocus();
-
 }
+
+void Outputs::panelWndStarted() {
+    ui->outputsTable->setFocus();
+}
+
 
 Outputs::~Outputs() {
     config->setShowOutputAll( isShowUnspent() );

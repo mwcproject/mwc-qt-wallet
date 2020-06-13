@@ -43,8 +43,12 @@ NewSeed::NewSeed( QWidget *parent,
     if (!seed.isEmpty()) {
         updateSeedData("Mnemonic passphrase:",seed); // Seed allways comes from ctor. Mean we are created a new account with a seed.
     }
-
 }
+
+void NewSeed::panelWndStarted() {
+    ui->seedText->setFocus();
+}
+
 
 NewSeed::~NewSeed()
 {

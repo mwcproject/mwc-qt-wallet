@@ -42,6 +42,10 @@ private slots:
     void on_cancelButton_clicked();
     void on_continueButton_clicked();
     void on_addWordButton_clicked();
+
+private:
+    virtual void panelWndStarted() override;
+
 private:
     Ui::EnterSeed *ui;
     bridge::InitAccount * accountInit = nullptr;

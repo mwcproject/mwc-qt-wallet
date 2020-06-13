@@ -56,9 +56,11 @@ NewSeedTest::NewSeedTest(QWidget *parent, int wordNumber) :
         ui->wordEdit->setCompleter(completer);
     }
 
-    ui->wordEdit->setFocus();
-
     utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()) );
+}
+
+void NewSeedTest::panelWndStarted() {
+    ui->wordEdit->setFocus();
 }
 
 NewSeedTest::~NewSeedTest()

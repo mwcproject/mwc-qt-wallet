@@ -125,7 +125,7 @@ void InitAccount::onNewSeed(QVector<QString> sd) {
 
 #ifdef QT_DEBUG
     // We really don't want go trough all words
-    tasks.resize(1);
+//    tasks.resize(1);
 #endif
 
     core::getWndManager()->pageNewSeed( mwc::PAGE_A_NEW_WALLET_PASSPHRASE, seed );

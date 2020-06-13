@@ -41,6 +41,9 @@ private slots:
     void on_submitButton_clicked();
 
 private:
+    virtual void panelWndStarted() override;
+
+private:
     Ui::NewSeedTest *ui;
     bridge::Util * util = nullptr;
     bridge::NewSeed * newSeed = nullptr;
