@@ -1017,12 +1017,13 @@ void MWC713::updateAccountList( QVector<QString> accounts ) {
     QVector<AccountInfo> accountInfo;
 
     int idx = 0;
+    int taskIdx = 0;
     for (QString acc : accounts) {
-        eventCollector->addTask( new TaskAccountSwitch(this, acc), TaskAccountSwitch::TIMEOUT );
-        eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber ), TaskAccountInfo::TIMEOUT );
-        eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1 ); // Updating the progress
+        eventCollector->addTask( new TaskAccountSwitch(this, acc), TaskAccountSwitch::TIMEOUT, taskIdx++ );
+        eventCollector->addTask( new TaskAccountInfo(this, params.inputConfirmationNumber ), TaskAccountInfo::TIMEOUT, taskIdx++ );
+        eventCollector->addTask( new TaskAccountProgress(this, idx++, accounts.size() ), -1, taskIdx++ ); // Updating the progress
     }
-    eventCollector->addTask( new TaskAccountListFinal(this), -1 ); // Finalize the task
+    eventCollector->addTask( new TaskAccountListFinal(this), -1, taskIdx++ ); // Finalize the task
     // Final will switch back to current account
 }
 
@@ -1062,7 +1063,7 @@ void MWC713::updateAccountFinalize() {
 
     // !!!!!! NOTE, 'false' mean that we don't save to that account. It make sence because during such long operation
     //  somebody could change account
-    eventCollector->addFirstTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
+    eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT, 0 );
 }
 
 void MWC713::createNewAccount( QString newAccountName ) {

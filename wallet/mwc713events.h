@@ -135,17 +135,12 @@ public:
     // Add task (single wallet action) to perform.
     // This tale ownership of object
     // Note:  if timeout <= 0, task will be executed immediately
+    //   idx == -1 - push_back, otherwise will insert into the index position
     // Return: true if task was added.  False - was ignored
-    void addTask( Mwc713Task * task, int64_t timeout);
+    void addTask( Mwc713Task * task, int64_t timeout, int idx = -1);
 
     // Check if task already exist
     bool hasTask(Mwc713Task * task);
-
-    bool addFirstTask( Mwc713Task * task, int64_t timeout);
-
-//    void addEvent(WALLET_EVENTS event) { events.push_back(WEvent(event)); }
-  //  void addEvent(WALLET_EVENTS event, QString message) { events.push_back(WEvent(event, message)); }
-//    void reset() { events.clear(); }
 
     const QVector<WEvent> & getEvents() const {return events;}
 

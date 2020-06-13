@@ -128,29 +128,28 @@ bool Mwc713EventManager::hasTask(Mwc713Task * task) {
 // Add task (single wallet action) to perform.
 // This tale ownership of object
 // Note:  if timeout <= 0, task will be executed immediately
+//   idx == -1 - push_back, otherwise will insert into the index position
 // Return: true if task was added.  False - was ignored
-void Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout ) {
-
+void Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout, int idx ) {
     QMutexLocker l( &taskQMutex );
 
     // timeout multiplier will be applyed to the task because we want apply this value as late as posiible.
     // User might change it at any moment.
-    taskQ.push_back(taskInfo(task,timeout));
+    if (idx<0) {
+        taskQ.push_back(taskInfo(task, timeout));
+    }
+    else {
+        if (idx==0) {
+            Q_ASSERT(taskQ.isEmpty() || !taskQ.front().wasStarted);
+        }
+        taskQ.insert(idx, taskInfo(task, timeout));
+    }
+
     processNextTask();
 
     if (taskExecutionTimeLimit==0) {
          taskExecutionTimeLimit = QDateTime::currentMSecsSinceEpoch() + (int64_t)(timeout * config::getTimeoutMultiplier());
     }
-}
-
-bool Mwc713EventManager::addFirstTask( Mwc713Task * task, int64_t timeout) {
-    QMutexLocker l( &taskQMutex );
-
-    // We can push front a new tast only if current one is not running.
-    Q_ASSERT( taskQ.isEmpty() || !taskQ.front().wasStarted );
-    taskQ.insert(0,taskInfo(task,timeout));
-
-    return true;
 }
 
 // Running and waiting tasks number
