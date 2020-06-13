@@ -102,9 +102,17 @@ WndManager::RETURN_CODE DesktopWndManager::questionTextDlg( QString title, QStri
 
 // QFileDialog::getSaveFileName call
 QString DesktopWndManager::getSaveFileName(const QString &caption, const QString &dir, const QString &filter) {
-    return QFileDialog::getSaveFileName(nullptr, caption,
+    QString fileName = QFileDialog::getSaveFileName(nullptr, caption,
                                  dir,
                                  filter);
+
+    auto fileOk = util::validateMwc713Str(fileName);
+    if (!fileOk.first) {
+        core::getWndManager()->messageTextDlg("File Path",
+                                              "This file path is not acceptable.\n" + fileOk.second);
+        return "";
+    }
+    return fileName;
 }
 
 // Ask for confirmation

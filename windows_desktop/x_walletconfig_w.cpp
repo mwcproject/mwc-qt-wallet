@@ -232,6 +232,12 @@ void WalletConfig::on_mwc713directorySelect_clicked()
             basePath.second);
     if (dir.isEmpty())
         return;
+    auto dirOk = util::validateMwc713Str(dir);
+    if (!dirOk.first) {
+        core::getWndManager()->messageTextDlg("Directory Name",
+                                              "This directory name is not acceptable.\n" + dirOk.second);
+        return;
+    }
 
     QDir baseDir(basePath.second);
     QString walletDir = baseDir.relativeFilePath(dir);
@@ -273,6 +279,13 @@ void WalletConfig::on_keybasePathSelect_clicked()
 
     QString keybase = QFileDialog::getOpenFileName(this, tr("Keybase binary location"),
                                                    appDirs.isEmpty() ? "" : appDirs[0]);
+
+    auto fileOk = util::validateMwc713Str(keybase);
+    if (!fileOk.first) {
+        core::getWndManager()->messageTextDlg("File Path",
+                                              "This file path is not acceptable.\n" + fileOk.second);
+        return;
+    }
 
     if ( keybase.isEmpty() || !checkKeyBasePath(this, keybase) ) {
         ui->keybasePathEdit->setFocus();

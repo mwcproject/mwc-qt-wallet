@@ -58,6 +58,13 @@ void WalletInstances::on_mwc713directorySelect_clicked() {
     if (dir.isEmpty())
         return;
 
+    auto dirOk = util::validateMwc713Str(dir);
+    if (!dirOk.first) {
+        core::getWndManager()->messageTextDlg("Directory Name",
+                                              "This directory name is not acceptable.\n" + dirOk.second);
+        return;
+    }
+
     QDir baseDir(basePath);
     QString walletDataDir = baseDir.relativeFilePath(dir);
 

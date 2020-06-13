@@ -143,6 +143,13 @@ void FileTransaction::on_resultTransFileNameSelect_clicked()
     if (fileName.length()==0)
         return;
 
+    auto fileOk = util::validateMwc713Str(fileName);
+    if (!fileOk.first) {
+        core::getWndManager()->messageTextDlg("File Path",
+                                              "This file path is not acceptable.\n" + fileOk.second);
+        return;
+    }
+
     if (!fileName.endsWith(".mwctx"))
            fileName += ".mwctx";
 

@@ -226,6 +226,12 @@ void NodeInfo::on_saveBlockchianData_clicked()
 
     if (fileName.length()==0)
           return;
+    auto fileOk = util::validateMwc713Str(fileName);
+    if (!fileOk.first) {
+        core::getWndManager()->messageTextDlg("File Path",
+                                              "This file path is not acceptable.\n" + fileOk.second);
+        return;
+    }
 
     if (!fileName.endsWith(".mwcblc"))
         fileName += ".mwcblc";
@@ -243,6 +249,12 @@ void NodeInfo::on_loadBlockchainData_clicked()
 
     if (fileName.length()==0)
           return;
+    auto fileOk = util::validateMwc713Str(fileName);
+    if (!fileOk.first) {
+        core::getWndManager()->messageTextDlg("File Path",
+                                              "This file path is not acceptable.\n" + fileOk.second);
+        return;
+    }
 
     ui->progress->show();
     config->updatePathFor("BlockchainData", QFileInfo(fileName).absolutePath() );
@@ -257,6 +269,12 @@ void NodeInfo::on_publishTransaction_clicked()
 
     if (fileName.length()==0)
           return;
+    auto fileOk = util::validateMwc713Str(fileName);
+    if (!fileOk.first) {
+        core::getWndManager()->messageTextDlg("File Path",
+                                              "This file path is not acceptable.\n" + fileOk.second);
+        return;
+    }
 
     ui->progress->show();
     config->updatePathFor("PublishTransaction", QFileInfo(fileName).absolutePath() );

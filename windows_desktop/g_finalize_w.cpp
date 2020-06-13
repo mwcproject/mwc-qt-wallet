@@ -55,7 +55,12 @@ void Finalize::on_uploadFileBtn_clicked() {
                                                     config->getPathFor("fileGen"),
                                                     tr("MWC response transaction (*.tx.response *.response);;All files (*.*)"));
 
-    if (fileName.length() == 0) {
+    if (fileName.length() == 0)
+        return;
+    auto fileOk = util::validateMwc713Str(fileName);
+    if (!fileOk.first) {
+        core::getWndManager()->messageTextDlg("File Path",
+                                              "This file path is not acceptable.\n" + fileOk.second);
         return;
     }
 

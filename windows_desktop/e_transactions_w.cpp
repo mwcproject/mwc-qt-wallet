@@ -310,6 +310,12 @@ void Transactions::on_validateProofButton_clicked()
 
     if (fileName.length()==0)
         return;
+    auto fileOk = util::validateMwc713Str(fileName);
+    if (!fileOk.first) {
+        core::getWndManager()->messageTextDlg("File Path",
+                                              "This file path is not acceptable.\n" + fileOk.second);
+        return;
+    }
 
     // Update path
     QFileInfo flInfo(fileName);
@@ -336,6 +342,12 @@ void Transactions::on_generateProofButton_clicked()
 
     if (fileName.length()==0)
         return;
+    auto fileOk = util::validateMwc713Str(fileName);
+    if (!fileOk.first) {
+        core::getWndManager()->messageTextDlg("File Path",
+                                              "This file path is not acceptable.\n" + fileOk.second);
+        return;
+    }
 
     if (!fileName.endsWith(".proof"))
         fileName += ".proof";

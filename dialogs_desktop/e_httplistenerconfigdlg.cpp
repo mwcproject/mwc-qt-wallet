@@ -64,6 +64,13 @@ void HttpListenerConfigDlg::on_selectPrivKeyButton_clicked()
     if (fileName.length()==0)
         return;
 
+    auto fileOk = util::validateMwc713Str(fileName);
+    if (!fileOk.first) {
+        core::getWndManager()->messageTextDlg("File Path",
+                                              "This file path is not acceptable.\n" + fileOk.second);
+        return;
+    }
+
     ui->tlsPrivateKeyEdit->setText(fileName);
 }
 
@@ -75,6 +82,12 @@ void HttpListenerConfigDlg::on_selectFullchainButton_clicked()
 
     if (fileName.length()==0)
         return;
+    auto fileOk = util::validateMwc713Str(fileName);
+    if (!fileOk.first) {
+        core::getWndManager()->messageTextDlg("File Path",
+                                              "This file path is not acceptable.\n" + fileOk.second);
+        return;
+    }
 
     ui->tlsFullchainEdit->setText(fileName);
 }

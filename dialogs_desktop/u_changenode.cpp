@@ -97,6 +97,13 @@ void ChangeNode::on_selectNodeDataLocationBtn_clicked()
     if (dir.isEmpty())
         return;
 
+    auto dirOk = util::validateMwc713Str(dir);
+    if (!dirOk.first) {
+        core::getWndManager()->messageTextDlg("Directory Name",
+                                              "This directory name is not acceptable.\n" + dirOk.second);
+        return;
+    }
+
     QDir baseDir(basePath.second);
     QString nodeDir = baseDir.relativeFilePath(dir);
 

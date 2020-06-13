@@ -474,6 +474,14 @@ int main(int argc, char *argv[])
                 if (dir.isEmpty())
                     return 1; // Exiting
 
+                auto dirOk = util::validateMwc713Str(dir);
+                if (!dirOk.first) {
+                    core::getWndManager()->messageTextDlg("Directory Name",
+                              "This directory name is not acceptable.\n" + dirOk.second);
+                        // Exit was selected
+                        return 1;
+                }
+
                 QDir baseDir(basePath.second);
                 walletDataPath = baseDir.relativeFilePath(dir);
             }
