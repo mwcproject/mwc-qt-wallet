@@ -61,8 +61,8 @@ bool AccountTransfer::transferFunds(const QString & from,
     QPair<bool, int64_t> mwcAmount;
     if (sendAmount != "All") {
         mwcAmount = util::one2nano(sendAmount);
-        if (!mwcAmount.first) {
-            core::getWndManager()->messageTextDlg("Incorrect Input", "Please specify correct number of MWC to send");
+        if (!mwcAmount.first || mwcAmount.second<=0) {
+            core::getWndManager()->messageTextDlg("Incorrect Input", "Please specify correct number of MWC to transfer");
             return false;
         }
     }
