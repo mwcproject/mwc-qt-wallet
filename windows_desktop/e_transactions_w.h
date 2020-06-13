@@ -54,7 +54,7 @@ private slots:
 
     void onSgnWalletBalanceUpdated();
     void onSgnTransactions( QString account, QString height, QVector<QString> transactions);
-    void onSgnCancelTransacton(bool success, QString trIdx, QString errMessage);
+    void onSgnCancelTransacton(bool success, QString account, QString trIdx, QString errMessage);
 
     void onSgnTransactionById(bool success, QString account, QString height, QString transaction,
                               QVector<QString> outputs, QVector<QString> messages);

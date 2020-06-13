@@ -502,7 +502,8 @@ void Transactions::on_deleteButton_clicked()
     }
 }
 
-void Transactions::onSgnCancelTransacton(bool success, QString trIdxStr, QString errMessage) {
+void Transactions::onSgnCancelTransacton(bool success, QString account, QString trIdxStr, QString errMessage) {
+    Q_UNUSED(account)
     Q_UNUSED(errMessage)
 
     ui->progressFrame->hide();
