@@ -526,7 +526,7 @@ bool WalletConfig::applyChanges() {
     }
 
     if (logoutTimeout != currentLogoutTimeout) {
-        if (walletConfig->updateTimeoutValue(logoutTimeout))
+        if (walletConfig->updateTimeoutValue(currentLogoutTimeout))
             logoutTimeout = currentLogoutTimeout;
     }
 
@@ -605,48 +605,48 @@ void WalletConfig::updateLogsStateUI(bool enabled) {
     ui->logsEnableBtn->setChecked(enabled);
 }
 
-void wnd::WalletConfig::on_logout_3_clicked()
+void WalletConfig::on_logout_3_clicked()
 {
     currentLogoutTimeout = 3 * 60;
     updateButtons();
 }
 
-void wnd::WalletConfig::on_logout_5_clicked()
+void WalletConfig::on_logout_5_clicked()
 {
     currentLogoutTimeout = 5 * 60;
     updateButtons();
 }
 
-void wnd::WalletConfig::on_logout_10_clicked()
+void WalletConfig::on_logout_10_clicked()
 {
     currentLogoutTimeout = 10 * 60;
     updateButtons();
 }
 
-void wnd::WalletConfig::on_logout_20_clicked()
+void WalletConfig::on_logout_20_clicked()
 {
     currentLogoutTimeout = 20 * 60;
     updateButtons();
 }
 
-void wnd::WalletConfig::on_logout_30_clicked()
+void WalletConfig::on_logout_30_clicked()
 {
     currentLogoutTimeout = 30 * 60;
     updateButtons();
 }
 
-void wnd::WalletConfig::on_logout_never_clicked()
+void WalletConfig::on_logout_never_clicked()
 {
     currentLogoutTimeout = -1;
     updateButtons();
 }
 
-void wnd::WalletConfig::on_start_mqs_clicked()
+void WalletConfig::on_start_mqs_clicked()
 {
     updateButtons();
 }
 
-void wnd::WalletConfig::on_start_keybase_clicked()
+void WalletConfig::on_start_keybase_clicked()
 {
     updateButtons();
 }
