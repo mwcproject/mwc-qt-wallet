@@ -207,13 +207,14 @@ bool AppContext::loadData() {
         in >> autoStartKeybaseEnabled;
     }
 
-    QMap<QString, QMap<QString, QMap<QString, QString>>> mock;
+    // the format for saving notes and where they are saved has changed
+    // read in any old notes so they can be migrated when notes are accessed
     if (id>=0x4792) {
-        in >> mock; //outputNotesMap;
+        in >> oldFormatOutputNotes;
     }
 
     if (id>=0x4793) {
-        in >> mock; //txnNotesMap;
+        in >> oldFormatTxnNotes;
     }
 
     if (id>=0x4794) {
@@ -290,9 +291,11 @@ void AppContext::saveData() const {
     out << autoStartMQSEnabled;
     out << autoStartKeybaseEnabled;
 
-    QMap<QString, QMap<QString, QMap<QString, QString>>> mock;
-    out << mock; //outputNotesMap;
-    out << mock; //txnNotesMap;
+    // if dialogs which display notes have not been accessed, the
+    // older format notes will not have been migrated, so we need to
+    // continue to save them
+    out << oldFormatOutputNotes;
+    out << oldFormatTxnNotes;
 
     out << lockOutputEnabled;
     out << lockedOutputs;
@@ -317,7 +320,9 @@ void AppContext::loadNotesData() {
 
     QFile file(dataPath.second + "/" + notesFileName);
     if ( !file.open(QIODevice::ReadOnly) ) {
-        // first run, no file exist
+        // first run, no file exists with notes in new format
+        // migrate any notes in the old format to the new format
+        migrateOutputNotes();
         return;
     }
 
@@ -327,10 +332,16 @@ void AppContext::loadNotesData() {
     int id = 0;
     in >> id;
 
-    if (id!=0x4580)
+    if (id!=0x4580) {
+        // migrate any notes in the old format to the new format
+        migrateOutputNotes();
         return;
+    }
 
     in >> notes;
+    // migrate any notes in the old format to the new format
+    // the old format notes will be added to the notes map
+    migrateOutputNotes();
 }
 
 void AppContext::saveNotesData() const {
@@ -373,6 +384,29 @@ void AppContext::saveNotesData() const {
                 "ERROR",
                 "Unable to save Notes data, file move system error code: " + QString::number(res));
     }
+}
+
+void AppContext::migrateOutputNotes()
+{
+    if (oldFormatOutputNotes.size() <= 0)
+        return;
+
+    // if any older format output notes have been read in, convert them to
+    // the new format where they are stored without wallet and account info
+    for (QString walletId : oldFormatOutputNotes.keys()) {
+        QMap<QString, QMap<QString, QString>>& accountNotes = oldFormatOutputNotes[walletId];
+        for (QString accountId : accountNotes.keys())
+        {
+            QMap<QString, QString>& op_notes = accountNotes[accountId];
+            for (QString commitment : op_notes.keys()) {
+                QString note = op_notes.value(commitment);
+                QString key = "c_" + commitment;
+                notes.insert(key, note);
+            }
+        }
+    }
+    saveNotesData();
+    oldFormatOutputNotes.clear();
 }
 
 

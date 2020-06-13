@@ -193,6 +193,7 @@ private:
 
     void loadNotesData();
     void saveNotesData() const;
+    void migrateOutputNotes();
 
 private:
     // 16 bit hash from the password. Can be used for the password verification
@@ -261,6 +262,11 @@ private:
     // For notes we need to do save and move
     bool notesLoaded = false;
     QMap<QString, QString> notes;
+
+    // Earlier versions of Qt wallet stored notes in a different format by wallet and account
+    // We read these notes in and migrate them to the new format for storing notes
+    QMap<QString, QMap<QString, QMap<QString, QString>>> oldFormatOutputNotes;
+    QMap<QString, QMap<QString, QMap<QString, QString>>> oldFormatTxnNotes;
 };
 
 template <class T>
