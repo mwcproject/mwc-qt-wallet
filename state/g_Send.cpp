@@ -242,11 +242,13 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
                                                       "TOR listener is not started. Please start TOR listener first." );
                 return false;
             }
-            if (!listenerStatus.tor) {
+            /*  Not checking offline because there is a high cnahce that send will work
+             if (!listenerStatus.tor) {
                 core::getWndManager()->messageTextDlg("Listener is Offline",
                                                       "TOR listener is not online even it was started. Please check your network connection and firewall settings.");
                 return false;
-            }
+            }*/
+            break;
         }
         default: // Http is fine.
             break;
