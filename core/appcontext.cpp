@@ -25,6 +25,7 @@
 #include <QMessageBox>
 #include <QCoreApplication>
 #include "../core/WndManager.h"
+#include <stdio.h>
 
 namespace core {
 
@@ -366,8 +367,12 @@ void AppContext::saveNotesData() const {
         file.close();
     }
     // Rename suppose to be atomic, no data loss expected
-    QFile::rename(filePath, dataPath.second + "/" + notesFileName);
-
+    int res = std::rename( filePath.toStdString().c_str(), (dataPath.second + "/" + notesFileName).toStdString().c_str() );
+    if (res!=0) {
+        core::getWndManager()->messageTextDlg(
+                "ERROR",
+                "Unable to save Notes data, file move system error code: " + QString::number(res));
+    }
 }
 
 
