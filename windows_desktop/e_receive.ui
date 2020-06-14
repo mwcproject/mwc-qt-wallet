@@ -366,6 +366,9 @@
             <height>40</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Account that receive incoming MWC coins</string>
+          </property>
          </widget>
         </item>
         <item>
@@ -394,6 +397,9 @@
           </property>
           <property name="focusPolicy">
            <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="toolTip">
+           <string>MWC MQS address of your wallet</string>
           </property>
           <property name="maxLength">
            <number>1024</number>
@@ -432,6 +438,9 @@
           </property>
           <property name="focusPolicy">
            <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="toolTip">
+           <string>TOR (onion) address of your wallet</string>
           </property>
           <property name="maxLength">
            <number>1024</number>
