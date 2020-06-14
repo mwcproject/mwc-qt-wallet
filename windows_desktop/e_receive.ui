@@ -353,6 +353,16 @@
          <number>0</number>
         </property>
         <item>
+         <widget class="control::MwcLabelSmall" name="label_4">
+          <property name="text">
+           <string>Account to receive incoming MWC coins</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="control::MwcComboBox" name="accountComboBox">
           <property name="minimumSize">
            <size>
@@ -367,7 +377,7 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>Account that receive incoming MWC coins</string>
+           <string/>
           </property>
          </widget>
         </item>
