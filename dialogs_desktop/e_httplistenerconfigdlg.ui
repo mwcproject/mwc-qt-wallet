@@ -29,7 +29,7 @@
     </size>
    </property>
    <property name="text">
-    <string>FOREIGN API LISTENER</string>
+    <string>Foreign API Listener</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -58,6 +58,9 @@
       </property>
       <property name="focusPolicy">
        <enum>Qt::StrongFocus</enum>
+      </property>
+      <property name="toolTip">
+       <string>Reset Foreign API settings to default</string>
       </property>
       <property name="text">
        <string>Reset</string>
@@ -88,6 +91,9 @@
       <property name="focusPolicy">
        <enum>Qt::StrongFocus</enum>
       </property>
+      <property name="toolTip">
+       <string>Cancel and drop Foreign API changes</string>
+      </property>
       <property name="text">
        <string>Cancel</string>
       </property>
@@ -103,6 +109,9 @@
       </property>
       <property name="focusPolicy">
        <enum>Qt::StrongFocus</enum>
+      </property>
+      <property name="toolTip">
+       <string>Apply Foreign API changes</string>
       </property>
       <property name="text">
        <string>Apply</string>
@@ -359,6 +368,9 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
    <property name="focusPolicy">
     <enum>Qt::StrongFocus</enum>
    </property>
+   <property name="toolTip">
+    <string>Select private key pem file location</string>
+   </property>
    <property name="text">
     <string>Select File</string>
    </property>
@@ -380,6 +392,9 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
    </property>
    <property name="focusPolicy">
     <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="toolTip">
+    <string>Select fullchain certificate pem file location</string>
    </property>
    <property name="text">
     <string>Select File</string>
@@ -459,6 +474,9 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
    <property name="focusPolicy">
     <enum>Qt::StrongFocus</enum>
    </property>
+   <property name="toolTip">
+    <string>Generate a new api secret for foreign API</string>
+   </property>
    <property name="text">
     <string>Generate</string>
    </property>
@@ -471,17 +489,17 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>

@@ -94,11 +94,13 @@ void HttpListenerConfigDlg::on_selectFullchainButton_clicked()
 
 void HttpListenerConfigDlg::on_resetButton_clicked()
 {
-    ui->activateRestApi->setChecked(false);
+    ui->activateRestApi->setChecked(walletConfig->getAutoStartTorEnabled());
     ui->listeningAddressEdit->setText("127.0.0.1:3415");
 
-    ui->useBasicAutorization->setChecked( true );
+    ui->useBasicAutorization->setChecked( false );
     ui->apiSecretEdit->setText(util->generateApiSecret(20) );
+
+    ui->useTlsCheck->setChecked( false );
 
     updateControlState();
 }
@@ -118,6 +120,12 @@ void HttpListenerConfigDlg::on_useBasicAutorization_stateChanged(int check)
 void HttpListenerConfigDlg::on_useTlsCheck_stateChanged(int check)
 {
     Q_UNUSED(check)
+    updateControlState();
+}
+
+void HttpListenerConfigDlg::on_listeningAddressEdit_textChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1)
     updateControlState();
 }
 
@@ -146,7 +154,14 @@ void HttpListenerConfigDlg::updateControlState() {
     ui->selectPrivKeyButton->setEnabled(api && tls);
     ui->selectFullchainButton->setEnabled(api && tls);
 
-    ui->resetButton->setEnabled(api);
+    if (walletConfig->getAutoStartTorEnabled()) {
+        ui->resetButton->setEnabled(!(api && ui->listeningAddressEdit->text().startsWith("127.0.0.1:") && !auth && !tls));
+    }
+    else {
+        ui->resetButton->setEnabled(api);
+    }
+
+
 }
 
 void HttpListenerConfigDlg::on_cancelButton_clicked()
