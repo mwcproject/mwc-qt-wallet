@@ -128,6 +128,12 @@ the Cold Wallet</string>
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
+        <property name="toolTip">
+         <string>Change application running mode and restart it</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
         <property name="text">
          <string>Apply</string>
         </property>
