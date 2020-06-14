@@ -64,7 +64,7 @@ protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "wallet_configuration.html";}
     // State can block the stare change. Wallet config is the first usage.
-    virtual bool canExitState() override;
+    virtual bool canExitState(STATE nextWindowState) override;
 private:
     bool settingLock = false;
 };

@@ -39,7 +39,7 @@ public:
     void start();
 
     // Check if current state agree to switch the state
-    bool canSwitchState();
+    bool canSwitchState(STATE nextWindowState);
 
     void executeFrom( STATE nextState );
 

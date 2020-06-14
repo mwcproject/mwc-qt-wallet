@@ -138,11 +138,11 @@ void StateMachine::start() {
 }
 
 // Check if current state agree to switch the state
-bool StateMachine::canSwitchState() {
+bool StateMachine::canSwitchState(STATE nextWindowState) {
     State* prevState = states.value(currentState, nullptr);
 
     if (prevState) {
-        return prevState->canExitState();
+        return prevState->canExitState(nextWindowState);
     }
     return true;
 }
@@ -189,10 +189,12 @@ void StateMachine::executeFrom( STATE nextState ) {
 }
 
 bool StateMachine::setActionWindow( STATE actionWindowState, bool enforce ) {
-    if (!enforce && !isActionWindowMode() )
+    if (!enforce ) {
+        if (!isActionWindowMode())
             return false;
+    }
 
-    if (!canSwitchState())
+    if (!canSwitchState(actionWindowState))
         return false;
 
     getStateContext()->appContext->setActiveWndState(actionWindowState);

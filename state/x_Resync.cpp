@@ -74,7 +74,8 @@ void Resync::exitingState() {
     context->stateMachine->unblockLogout("Resync");
 }
 
-bool Resync::canExitState() {
+bool Resync::canExitState(STATE nextWindowState) {
+    Q_UNUSED(nextWindowState)
     return !inSyncProcess;
 }
 

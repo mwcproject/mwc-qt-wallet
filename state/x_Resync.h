@@ -34,7 +34,7 @@ public:
 protected:
     virtual NextStateRespond execute() override;
     virtual void exitingState() override;
-    virtual bool canExitState() override;
+    virtual bool canExitState(STATE nextWindowState) override;
 
 private slots:
     void onRecoverProgress( int progress, int maxVal );

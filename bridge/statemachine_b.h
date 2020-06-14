@@ -35,7 +35,8 @@ public:
 
     // Return true if current state is allow to exit. Note, this call is blocking because
     // it might requre some user input
-    Q_INVOKABLE bool canSwitchState();
+    // nextWindowState type:  State::STATE
+    Q_INVOKABLE bool canSwitchState(int nextWindowState);
 
     // Return current active state. Value from state::STATE
     Q_INVOKABLE int getCurrentStateId();

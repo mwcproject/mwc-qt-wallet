@@ -117,7 +117,7 @@ public:
     virtual NextStateRespond execute() = 0;
 
     // State can block the stare change. Wallet config is the first usage.
-    virtual bool canExitState() {return true;}
+    virtual bool canExitState(STATE nextWindowState) { Q_UNUSED(nextWindowState) return true;}
 
     // Executing another state
     virtual void exitingState() {};

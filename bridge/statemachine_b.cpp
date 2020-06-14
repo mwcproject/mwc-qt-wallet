@@ -51,8 +51,8 @@ QString StateMachine::getCurrentHelpDocName() {
 
 // Return true if current state is allow to exit. Note, this call is blocking because
 // it might requre some user input
-bool StateMachine::canSwitchState() {
-    return getStateMachine()->canSwitchState();
+bool StateMachine::canSwitchState(int nextWindowState) {
+    return getStateMachine()->canSwitchState( state::STATE(nextWindowState) );
 }
 
 // Return current active state. Value from state::STATE

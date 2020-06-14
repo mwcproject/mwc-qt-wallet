@@ -321,7 +321,7 @@ void MainWindow::updateMenu() {
     if (stateMachine==nullptr)
         return;
 
-    bool canSwitchState = stateMachine->canSwitchState() && stateMachine->getCurrentStateId() >= state::STATE::ACCOUNTS;
+    bool canSwitchState = stateMachine->canSwitchState(state::STATE::NONE) && stateMachine->getCurrentStateId() >= state::STATE::ACCOUNTS;
     bool isOnlineWallet = config->isOnlineWallet();
     bool isColdWallet = config->isColdWallet();
     bool isOnlineNode = config->isOnlineNode();

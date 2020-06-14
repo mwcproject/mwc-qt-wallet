@@ -44,7 +44,7 @@ void NavMenuAccount::on_seedButton_clicked()
 {
     // need to logout first, than switch to the seed
 
-    if (stateMachine->canSwitchState()) {
+    if (stateMachine->canSwitchState(state::STATE::SHOW_SEED)) {
 
         QString passwordHash = wallet->getPasswordHash();
 

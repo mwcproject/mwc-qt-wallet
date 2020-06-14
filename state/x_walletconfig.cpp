@@ -50,7 +50,10 @@ NextStateRespond WalletConfig::execute() {
 }
 
 // State can block the state change. Wallet config is the first usage.
-bool WalletConfig::canExitState() {
+bool WalletConfig::canExitState(STATE nextWindowState) {
+    if (nextWindowState == WALLET_CONFIG)
+        return false; // Config is a single page, no reasons to switch
+
     // first will win. Normally we expecting 0 or 1 bridge
     if (settingLock) {
         if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg(
