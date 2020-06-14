@@ -128,6 +128,9 @@
        <property name="focusPolicy">
         <enum>Qt::StrongFocus</enum>
        </property>
+       <property name="toolTip">
+        <string>Cancel and drop the changed</string>
+       </property>
        <property name="text">
         <string>Cancel</string>
        </property>
@@ -146,6 +149,9 @@
        </property>
        <property name="focusPolicy">
         <enum>Qt::StrongFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Apply and process the contact data</string>
        </property>
        <property name="text">
         <string>Apply</string>
