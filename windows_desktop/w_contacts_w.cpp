@@ -75,6 +75,7 @@ void Contacts::updateContactTable() {
         contacts[i/2].setData(pairs[i-1], pairs[i]);
 
     ui->contactsTable->clearData();
+    ui->contactsTable->setTextAlignment( Qt::AlignLeft | Qt::AlignVCenter );
     int idx = 0;
     for ( const core::ContactRecord & cont : contacts ) {
         ui->contactsTable->appendRow( QVector<QString>{

@@ -68,7 +68,7 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
         ui->text3->setPlainText(message);
 
     // size is the wierdest part. We are renderind document to get a size form it.
-    // Document tolk in Pt, so need to convert into px. Conversion is not very accurate
+    // Document talk in Pt, so need to convert into px. Conversion is not very accurate
     ui->text3->document()->adjustSize();
     int h = int(curSz.height());
     ui->text3->adjustSize();
