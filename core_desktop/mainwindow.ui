@@ -200,7 +200,7 @@
               <enum>Qt::NoFocus</enum>
              </property>
              <property name="toolTip">
-              <string>Click here to view mwc node status.</string>
+              <string>Click here to view MWC node status.</string>
              </property>
              <property name="text">
               <string>Floonet</string>
@@ -245,7 +245,7 @@
               <string>Click here to view Listener settings.</string>
              </property>
              <property name="text">
-              <string>Mwc MQ, Keybase</string>
+              <string>MWC MQ, Keybase</string>
              </property>
              <property name="icon">
               <iconset>

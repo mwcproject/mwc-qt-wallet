@@ -28,9 +28,9 @@ QString get_APP_NAME() {
     if (config::isOnlineWallet())
         return "MWC Qt Wallet";
     else if (config::isOnlineNode())
-        return "mwc node";
+        return "MWC Node";
     else if (config::isColdWallet())
-        return "mwc cold wallet";
+        return "MWC Cold Wallet";
     else
         return "Unknown mode";
 }

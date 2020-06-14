@@ -183,7 +183,7 @@
              <enum>Qt::StrongFocus</enum>
             </property>
             <property name="toolTip">
-             <string>Initiate mwc cliam request for your Airdrop BTC address</string>
+             <string>Initiate MWC cliam request for your Airdrop BTC address</string>
             </property>
             <property name="text">
              <string>Request Airdrop</string>

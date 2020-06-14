@@ -44,7 +44,7 @@ void AccountInfo::setData(QString account,
 }
 
 QString AccountInfo::getLongAccountName() const {
-    return accountName + "  Total: " + util::nano2one(total) + "mwc  " +
+    return accountName + "  Total: " + util::nano2one(total) + " MWC  " +
                 "Spendable: " + util::nano2one(currentlySpendable) + "  Locked: " +
                 util::nano2one(lockedByPrevTransaction) +
                 "  Unconfirmed: " + util::nano2one(awaitingConfirmation);
@@ -52,7 +52,7 @@ QString AccountInfo::getLongAccountName() const {
 
 QString AccountInfo::getSpendableAccountName() const {
     return  util::expandStrR(accountName, 15) +
-           "   Available: " + util::nano2one(currentlySpendable) + " mwc";
+           "   Available: " + util::nano2one(currentlySpendable) + " MWC";
 
 }
 

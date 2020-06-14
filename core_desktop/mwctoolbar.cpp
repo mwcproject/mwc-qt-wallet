@@ -109,7 +109,7 @@ void MwcToolbar::on_hodlToolButton_clicked()
 // Account info is updated
 void MwcToolbar::onWalletBalanceUpdated() {
     qDebug() << "get onWalletBalanceUpdated. Updating the balance";
-    ui->totalMwc->setText( wallet->getTotalMwcAmount() + " mwc" );
+    ui->totalMwc->setText( wallet->getTotalMwcAmount() + " MWC" );
 }
 
 void MwcToolbar::onLoginResult(bool ok) {

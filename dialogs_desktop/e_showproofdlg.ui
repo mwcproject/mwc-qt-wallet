@@ -280,7 +280,7 @@ p, li { white-space: pre-wrap; }
    <item>
     <widget class="control::MwcLabelLarge" name="label_4">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;WARNING: &lt;br/&gt;this proof should only be considered valid if the kernel is actually on-chain with sufficient confirmations. Please use a mwc block explorer to verify this is the case by pressing &amp;quot;View&amp;quot; buttons.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;WARNING: &lt;br/&gt;this proof should only be considered valid if the kernel is actually on-chain with sufficient confirmations. Please use a MWC block explorer to verify this is the case by pressing &amp;quot;View&amp;quot; buttons.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

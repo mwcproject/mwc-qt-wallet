@@ -227,7 +227,7 @@
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Transfer mwc between accounts</string>
+            <string>Transfer MWC between accounts</string>
            </property>
            <property name="styleSheet">
             <string notr="true">border:none</string>

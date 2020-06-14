@@ -93,7 +93,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Send mwc online with mwc MQ, Keybase or HTTPS</string>
+         <string>Send MWC online with MWC MQS, Keybase, HTTP(S) or TOR</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -321,7 +321,7 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Account to send mwc from</string>
+         <string>Account to send MWC from</string>
         </property>
        </widget>
        <widget class="control::MwcLineEditNormal" name="amountEdit">
@@ -414,7 +414,7 @@
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="toolTip">
-         <string>Send mwc. Continue with a next step.</string>
+         <string>Send MWC. Continue with a next step.</string>
         </property>
         <property name="text">
          <string>Next</string>

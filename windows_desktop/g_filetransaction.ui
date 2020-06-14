@@ -128,7 +128,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>2355 mwc</string>
+         <string>2355 MWC</string>
         </property>
        </widget>
        <widget class="control::MwcLabelLarge" name="transactionType">

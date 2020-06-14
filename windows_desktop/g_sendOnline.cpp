@@ -97,8 +97,8 @@ void SendOnline::on_sendButton_clicked()
     util::TimeoutLockObject to("SendOnline");
 
     if ( !send->isNodeHealthy() ) {
-        control::MessageBox::messageText(this, "Unable to send", "Your MWC-Node, that wallet connected to, is not ready.\n"
-                                                                     "MWC-Node needs to be connected to a few peers and finish block synchronization process");
+        control::MessageBox::messageText(this, "Unable to send", "Your MWC Node, that wallet connected to, is not ready.\n"
+                                                                     "MWC Node needs to be connected to a few peers and finish block synchronization process");
         return;
     }
 

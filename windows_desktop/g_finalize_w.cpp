@@ -42,8 +42,8 @@ void Finalize::on_uploadFileBtn_clicked() {
     util::TimeoutLockObject to("FinalizeUpload");
 
     if ( !finalize->isNodeHealthy() ) {
-        control::MessageBox::messageText(this, "Unable to finalize", "Your MWC-Node, that wallet connected to, is not ready to finalize transactions.\n"
-                                                                     "MWC-Node need to be connected to few peers and finish blocks synchronization process");
+        control::MessageBox::messageText(this, "Unable to finalize", "Your MWC Node, that wallet connected to, is not ready to finalize transactions.\n"
+                                                                     "MWC Node need to be connected to few peers and finish blocks synchronization process");
         return;
     }
 

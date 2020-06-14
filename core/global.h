@@ -96,14 +96,14 @@ const QString PAGE_K_ACCOUNT_TRANSFER = "Transfer coins between accounts";
 const QString PAGE_M_AIRDROP        = "Airdrop";
 const QString PAGE_M_AIRDROP_CLAIM  = "Claim coins for BTC address";
 
-const QString PAGE_U_NODE_STATUS    = "mwc node status";
+const QString PAGE_U_NODE_STATUS    = "MWC Node Status";
 
 const QString PAGE_W_CONTACTS       = "Contacts";
 
 const QString PAGE_X_EVENTS         = "Event log";
 const QString PAGE_X_SHOW_PASSPHRASE= "Wallet mnemonic passphrase";
 const QString PAGE_X_WALLET_CONFIG  = "Wallet Config";
-const QString PAGE_X_RESYNC         = "Re-sync wallet with mwc node";
+const QString PAGE_X_RESYNC         = "Re-sync wallet with MWC Node";
 
 const QString PAGE_Y_SELECT_RUNNING_MODE = "Select Running Mode";
 

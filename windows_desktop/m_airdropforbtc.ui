@@ -340,7 +340,7 @@ p, li { white-space: pre-wrap; }
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Claim mwc for this BTC address</string>
+            <string>Claim MWC for this BTC address</string>
            </property>
            <property name="text">
             <string>Claim</string>

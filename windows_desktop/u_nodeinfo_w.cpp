@@ -157,7 +157,7 @@ void NodeInfo::onSgnSetNodeStatus( QString localNodeStatus,
             if (!config->isColdWallet()) {
                 if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD) {
                     warning = toBoldAndYellow(
-                            "Please note. You can't run two mwc-node with same public IP.<br>That might be a reason why node unable to find any peers.");
+                            "Please note. You can't run two MWC Nodes with same public IP.<br>That might be a reason why node unable to find any peers.");
                 }
             }
         }
@@ -178,8 +178,8 @@ void NodeInfo::onSgnSetNodeStatus( QString localNodeStatus,
 }
 
 void NodeInfo::onShowNodeConnectionError(QString errorMessage) {
-    control::MessageBox::messageText(this, "mwc node connection error",
-        "Unable to retrieve mwc node status.\n" + errorMessage);
+    control::MessageBox::messageText(this, "MWC Node connection error",
+        "Unable to retrieve MWC Node status.\n" + errorMessage);
 }
 
 void NodeInfo::on_refreshButton_clicked() {

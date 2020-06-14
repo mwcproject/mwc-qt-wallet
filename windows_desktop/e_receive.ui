@@ -75,7 +75,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>mwc MQ listener status</string>
+         <string>MWC MQS listener status</string>
         </property>
         <property name="text">
          <string/>
@@ -113,7 +113,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>mwc Message Queue</string>
+         <string>MWC Message Queue</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -504,7 +504,7 @@
         <string>Sign income File Transaction</string>
        </property>
        <property name="text">
-        <string>Receive mwc by file</string>
+        <string>Receive MWC by file</string>
        </property>
       </widget>
      </item>

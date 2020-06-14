@@ -129,8 +129,8 @@ void MwcNode::stop() {
                 if (QDateTime::currentMSecsSinceEpoch() > limitTime) {
                     if ( core::getWndManager()->questionTextDlg(nullptr, "Warning", "Stopping mwc-node process takes longer than expected.\nContinue to wait?",
                                "Yes", "No",
-                               "Continue to wait and let MWC node more time to start",
-                               "Don't wait and kill MWC node process even it can corrupt the node data",
+                               "Continue to wait and let MWC Node more time to start",
+                               "Don't wait and kill MWC Node process even it can corrupt the node data",
                                true, false) == core::WndManager::RETURN_CODE::BTN1) {
                         config::increaseTimeoutMultiplier();
                         limitTime = QDateTime::currentMSecsSinceEpoch() + int64_t(1000*20*config::getTimeoutMultiplier());
@@ -238,8 +238,8 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
                 if (core::getWndManager()->questionTextDlg(nullptr, "Warning", "Starting for mwc-node process is taking longer than expected.\nContinue to wait?"
                                 "\n\nCommand line:\n\n" + QString(">> cd '") + nodeWorkDir+"'\n>> " + commandLine,
                                 "Yes", "No",
-                                "Wait more and give MWC node more time to start",
-                                "Don't wait and kill MWC node process even it can corrupt the node data",
+                                "Wait more and give MWC Node more time to start",
+                                "Don't wait and kill MWC Node process even it can corrupt the node data",
                                 true, false) == core::WndManager::RETURN_CODE::BTN1) {
                     config::increaseTimeoutMultiplier();
                     continue; // retry with waiting
@@ -884,7 +884,7 @@ void MwcNode::replyFinished(QNetworkReply* reply) {
 
         int connections =   jsonRespond["connections"].toInt(0);
         nodeHeight =        jsonRespond["tip"].toObject()["height"].toInt(0);
-        logger::logInfo("MwcNode", "mwc node status: connections=" + QString::number(connections) +
+        logger::logInfo("MwcNode", "MWC Node status: connections=" + QString::number(connections) +
                 " height="+QString::number(nodeHeight));
 
         if (connections == 0)
@@ -901,9 +901,9 @@ void MwcNode::reportNodeFatalError( QString message ) {
     else
     {
         if ( core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg("Embedded MWC-Node Error",
-                message + "\n\nIf Embedded mwc-node doesn't work for you, please switch to MWC Cloud node before exit",
+                message + "\n\nIf Embedded mwc-node doesn't work for you, please switch to MWC Cloud Node before exit",
                 "Keep Embedded", "Switch to Cloud",
-                "I understand what is the problem and I want to keep connection to local embedded MWC node",
+                "I understand what is the problem and I want to keep connection to local embedded MWC Node",
                 "Embedded node doesn't work for me, I prefer to switch to the public MWC node",
                 false, true ) ) {
 

@@ -946,7 +946,7 @@ void MWC713::setMwcMqListeningStatus(bool online, QString tid, bool startStopEve
         activeMwcMqsTid = tid;
 
     if (mwcMqOnline != online) {
-        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString("listening on mwc mqs") );
+        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString("listening on MWC MQS") );
     }
     mwcMqOnline = online;
     logger::logEmit("MWC713", "onListenersStatus", QString(mwcMqOnline ? "true" : "false") + " " + QString(keybaseOnline ? "true" : "false") + " " + QString(torOnline ? "true" : "false") );
@@ -998,7 +998,7 @@ void MWC713::setRecoveryResults( bool started, bool finishedWithSuccess, QString
     }
 
     if (finishedWithSuccess) {
-        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("MWC wallet was successfully recovered from the mnemonic"));
+        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("MWC Wallet was successfully recovered from the mnemonic"));
     }
     else {
         appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, QString("Failed to recover from the mnemonic"));
@@ -1145,7 +1145,7 @@ void MWC713::infoResults( QString currentAccountName, int64_t height,
 void MWC713::setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc) {
     if (success) {
         appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, QString("You successfully sent slate " + slate +
-                                                                       " with " + mwc + " mwc to " + address));
+                                                                       " with " + mwc + " MWC to " + address));
     }
 
     logger::logEmit( "MWC713", "onSend", "success=" + QString::number(success) );
@@ -1155,7 +1155,7 @@ void MWC713::setSendResults(bool success, QStringList errors, QString address, i
 
 
 void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAddr, QString message ) {
-    QString msg = "Congratulations! You received " +mwc+ " mwc from " + fromAddr;
+    QString msg = "Congratulations! You received " +mwc+ " MWC from " + fromAddr;
     if (!message.isEmpty()) {
         msg += " with message " + message + ".";
     }
@@ -1168,7 +1168,7 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
 
     // Show message box with congrats. Message bot should work from any point. No needs to block locking or what ever we have
     core::getWndManager()->messageHtmlDlg("Congratulations!",
-           "You received <b>" + mwc + "</b> mwc<br>" +
+           "You received <b>" + mwc + "</b> MWC<br>" +
            (message.isEmpty() ? "" : "Description: " + message + "<br>" ) +
            "<br>From: " + fromAddr +
            "<br>Slate: " + slate);

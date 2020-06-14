@@ -162,32 +162,32 @@ void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pe
         if (online != lastNodeStatus.online) {
             if (online) {
                 notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
-                        "Wallet restore connection to mwc node");
+                        "Wallet restore connection to MWC Node");
             }
             else {
                 if ( ! notify::notificationStateCheck( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA) )
                     notify::appendNotificationMessage(notify::MESSAGE_LEVEL::CRITICAL,
-                                                           "Wallet lost connection to mwc node");
+                                                           "Wallet lost connection to MWC Node");
             }
         }
         else if ( (connections==0) ^ (lastNodeStatus.connections==0) ) {
                 if (connections>0) {
                     notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
-                                                               "mwc node restored connection to mwc network");
+                                                               "MWC Node restored connection to MWC network");
                 }
                 else {
                     notify::appendNotificationMessage(notify::MESSAGE_LEVEL::CRITICAL,
-                                                               "mwc node lost connection to mwc network");
+                                                               "MWC Node lost connection to MWC network");
                 }
         }
         else if ( (nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight) ^ (lastNodeStatus.nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < lastNodeStatus.peerHeight) ) {
             if (nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight) {
                 notify::appendNotificationMessage(notify::MESSAGE_LEVEL::CRITICAL,
-                                                           "mwc node out of sync from mwc network");
+                                                           "MWC Node out of sync from mwc network");
             }
             else {
                 notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
-                                                           "mwc node finish syncing and runs well now");
+                                                           "MWC Node finish syncing and runs well now");
             }
         }
     }
@@ -340,7 +340,7 @@ void NodeInfo::onSubmitFile(bool success, QString message, QString fileName) {
     }
     else {
         if (message.contains("Post TX Error: Request error: Wrong response code: 500 Internal Server Error with data Body(Streaming)"))
-            message = "MWC node unable to publish this transaction. Probably this transaction is already published or original output doesn't exist any more";
+            message = "MWC Node unable to publish this transaction. Probably this transaction is already published or original output doesn't exist any more";
 
         core::getWndManager()->messageTextDlg("Transaction failed", "Transaction from " + fileName +
                   " was not delivered to your local node.\n\n" + message);

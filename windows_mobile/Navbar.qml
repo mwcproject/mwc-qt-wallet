@@ -19,7 +19,7 @@ Item {
     Connections {
         target: wallet
         onSgnWalletBalanceUpdated: {
-            text_balance.text = wallet.getTotalMwcAmount() + " mwc";
+            text_balance.text = wallet.getTotalMwcAmount() + " MWC";
         }
     }
 

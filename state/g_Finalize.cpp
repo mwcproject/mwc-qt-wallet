@@ -149,10 +149,10 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
 
             if (copyOk) {
                 core::getWndManager()->messageTextDlg("Finalize File Transaction", "File Transaction was finalized successfully but it is not published because you are running Cold Wallet.\n"
-                                             "Resulting transaction located at " + trInfo.resultingFN+ ". Please publish at with mwc node, so it will be propagated to the blockchain network.");
+                                             "Resulting transaction located at " + trInfo.resultingFN+ ". Please publish at with MWC Node, so it will be propagated to the blockchain network.");
             }
             else {
-                core::getWndManager()->messageTextDlg("IO Error", "File Transaction was finalized successfully but we wasn't be able to save file at the requested location. Please note, you need publish this transaction with mwc node, so it will be propagated to the blockchain network."
+                core::getWndManager()->messageTextDlg("IO Error", "File Transaction was finalized successfully but we wasn't be able to save file at the requested location. Please note, you need publish this transaction with MWC Node, so it will be propagated to the blockchain network."
                                              "Your transaction location:\n" + transactionFN);
             }
         }

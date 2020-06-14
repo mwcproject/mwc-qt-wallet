@@ -48,7 +48,7 @@ FileTransaction::FileTransaction(QWidget *parent,
     ui->transactionType->setText(transactionType);
     ui->processButton->setText(processButtonName);
 
-    ui->mwcLabel->setText( util::nano2one( transInfo.amount ) + " mwc" );
+    ui->mwcLabel->setText( util::nano2one( transInfo.amount ) + " MWC" );
     ui->transactionIdLabel->setText(transInfo.transactionId);
     ui->lockHeightLabel->setText( transInfo.lock_height>nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-" );
     ui->message->setText( transInfo.message );
@@ -110,8 +110,8 @@ void FileTransaction::on_processButton_clicked()
     else {
         // Check if node healthy first
         if (!fileTransaction->isNodeHealthy()) {
-            control::MessageBox::messageText(this, "Unable to finalize", "Your MWC-Node, that wallet connected to, is not ready to finalize transactions.\n"
-                                                                         "MWC-Node need to be connected to few peers and finish blocks synchronization process");
+            control::MessageBox::messageText(this, "Unable to finalize", "Your MWC Node, that wallet connected to, is not ready to finalize transactions.\n"
+                                                                         "MWC Node need to be connected to few peers and finish blocks synchronization process");
             return;
         }
     }

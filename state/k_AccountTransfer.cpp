@@ -108,7 +108,7 @@ bool AccountTransfer::transferFunds(const QString & from,
     // mwc mq expected to be online, we will use it for slate exchange
     if (myAddress.isEmpty() || !context->wallet->getListenerStatus().mqs) {
         for (auto b : bridge::getBridgeManager()->getAccountTransfer())
-            b->showTransferResults(false, "Please turn on mwc mq listener. We can't transfer funds in offline mode");
+            b->showTransferResults(false, "Please turn on MWC MQS listener. We can't transfer funds in offline mode");
         return false;
     }
 

@@ -115,7 +115,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>mwc MQ listener status</string>
+         <string>MWC MQS listener status</string>
         </property>
         <property name="text">
          <string/>
@@ -155,7 +155,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Start/Stop listening for messages at mwc MQ</string>
+         <string>Start/Stop listening for messages at MWC MQS</string>
         </property>
         <property name="text">
          <string>Start</string>
@@ -199,7 +199,7 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>You mwc MQ address</string>
+         <string>You MWC MQS address</string>
         </property>
         <property name="maxLength">
          <number>1024</number>
@@ -218,7 +218,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>mwc MQ</string>
+         <string>MWC MQS</string>
         </property>
        </widget>
        <widget class="QLabel" name="keybaseStatusImg">
@@ -300,7 +300,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Select a specific index for your MWC MQ address</string>
+         <string>Select a specific index for your MWC MQS address</string>
         </property>
         <property name="text">
          <string>To index</string>
@@ -334,7 +334,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Use the next addess for listening to MWC MQ messages</string>
+         <string>Use the next address for listening to MWC MQS messages</string>
         </property>
         <property name="text">
          <string>Next Address</string>

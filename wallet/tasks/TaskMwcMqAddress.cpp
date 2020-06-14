@@ -28,7 +28,7 @@ bool TaskMwcMqAddress::processTask(const QVector<WEvent> & events) {
 
     if (mwcMqAddr.empty()) {
         notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL,
-                                             "Unable to get the mwc mq address");
+                                             "Unable to get the MWC MQS address");
         return true;
     }
 
@@ -43,7 +43,7 @@ bool TaskMwcMqAddress::processTask(const QVector<WEvent> & events) {
             idx=-1;
     }
 
-    qDebug() << "Get mwc MQ address " << address << " for index " << idx;
+    qDebug() << "Get MWC MQS address " << address << " for index " << idx;
 
     if (idx>=0)
         wallet713->setMwcAddressWithIndex( address, idx );

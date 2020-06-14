@@ -506,7 +506,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>mwc wallet Logs</string>
+                  <string>MWC Wallet Logs</string>
                  </property>
                 </widget>
                </item>
@@ -583,14 +583,14 @@ your wallet activity never stored in the logs.</string>
               </size>
              </property>
              <property name="text">
-              <string>MWC MQ domain</string>
+              <string>MWC MQS domain</string>
              </property>
             </widget>
            </item>
            <item row="14" column="0" colspan="2">
             <widget class="control::MwcLabelLarge" name="label_8">
              <property name="text">
-              <string>Send mwc parameters</string>
+              <string>Send MWC parameters</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -758,7 +758,7 @@ your wallet activity never stored in the logs.</string>
             <item>
              <widget class="QCheckBox" name="start_mqs">
               <property name="text">
-               <string>mwc MQS</string>
+               <string>MWC MQS</string>
               </property>
               <property name="checked">
                <bool>true</bool>

@@ -185,7 +185,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Send mwc parameters</string>
+    <string>Send MWC parameters</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>

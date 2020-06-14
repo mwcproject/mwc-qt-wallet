@@ -75,7 +75,7 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
         ui->listeningStatusFrame->hide();
     }
 
-    ui->mwcMQlable->setText("mwc MQS");
+    ui->mwcMQlable->setText("MWC MQS");
 
     ui->syncStatusMsg->setText("");
 }

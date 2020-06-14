@@ -193,7 +193,7 @@ void ChangeNode::on_applyButton_clicked() {
             if (host.error() != QHostInfo::NoError) {
 
                 control::MessageBox::messageText(this, "Input",
-                                             "mwc node host " + hostName + " is not reachable.\n" + host.errorString());
+                                             "MWC Node host " + hostName + " is not reachable.\n" + host.errorString());
                 ui->mwcNodeUriEdit->setFocus();
                 return;
             }
@@ -207,7 +207,7 @@ void ChangeNode::on_applyButton_clicked() {
         return;
     }
 
-    if (control::MessageBox::questionText(this, "Update mwc node connection", "Update of mwc node connection required relogin into the wallet. Than you will be able to verify if your wallet was able to connect to the mwc node.\nWould you like to continue?",
+    if (control::MessageBox::questionText(this, "Update MWC Node connection", "Update of mwc node connection required relogin into the wallet. Than you will be able to verify if your wallet was able to connect to the mwc node.\nWould you like to continue?",
                                       "Yes", "No",
                                       "Apply node connection settings and relogin",
                                       "Cancel this operation",

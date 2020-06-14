@@ -80,7 +80,7 @@ QPair<bool, QString> FileTransactionInfo::parseTransaction( QString fn, FileTran
     QJsonObject json = jsonFromString(jsonStr);
 
     if (json.length()==0 ) {
-        return QPair<bool, QString>(false, "Content of the file " + fn + " has wrong format. It is not a mwc slate.");
+        return QPair<bool, QString>(false, "Content of the file " + fn + " has wrong format. It is not a MWC slate.");
     }
 
     bool ok1 = true, ok2 = true, ok3 = true, ok4 = true;
@@ -117,11 +117,11 @@ QPair<bool, QString> FileTransactionInfo::parseTransaction( QString fn, FileTran
             break;
         default:
             qDebug() << "Transaction file has unknown version " << version;
-            return QPair<bool, QString>(false, "Content of the file " + fn + " has unknown version. We unable to process this mwc slate.");
+            return QPair<bool, QString>(false, "Content of the file " + fn + " has unknown version. We unable to process this MWC slate.");
     }
 
     if (! (ok1 && ok2 && ok3 && ok4 && !transactionId.isEmpty() && amount>0 && fee>0 && height>0 && lock_height>=0) )
-        return  QPair<bool, QString>(false, "Content of the file " + fn + " is non complete mwc slate. Transaction details are not found.");
+        return  QPair<bool, QString>(false, "Content of the file " + fn + " is non complete MWC slate. Transaction details are not found.");
 
     // Same for v0, v1 & v2
     QJsonArray participant_data = readValueFromJson( json, "participant_data" ).toArray();
@@ -140,7 +140,7 @@ QPair<bool, QString> FileTransactionInfo::parseTransaction( QString fn, FileTran
     //  Finalize mast have part_sig
     // participant_data with part_sig exist for all slate versions...
     if ( pdSz==0 ) {
-        return QPair<bool, QString>(false, "Content of the file " + fn + " is non complete mwc slate, 'participant_data' not found.");
+        return QPair<bool, QString>(false, "Content of the file " + fn + " is non complete MWC slate, 'participant_data' not found.");
     }
 
     bool hasPartSig = false;

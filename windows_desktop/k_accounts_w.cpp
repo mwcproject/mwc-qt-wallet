@@ -218,7 +218,7 @@ void Accounts::renameAccount(int idx) {
     util::TimeoutLockObject to( "Accounts" );
 
     bool ok = false;
-    QString name = control::InputDialog::getText(this, "Rename mwc account",
+    QString name = control::InputDialog::getText(this, "Rename MWC Account",
                                         QString("Input a new name for your account '") + accounts[idx] + "'", "",
                                         accounts[idx], 32, &ok);
     if (!ok || name.isEmpty() || name==accounts[idx] )
