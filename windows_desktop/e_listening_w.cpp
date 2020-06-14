@@ -217,7 +217,10 @@ void Listening::on_mwcMqNextAddress_clicked()
 
     if ( core::WndManager::RETURN_CODE::BTN2 != control::MessageBox::questionText(this, tr("Warning"),
                                       tr("Please note that your wallet will only listen to one address at a time. You are now setting the wallet to listen to different address.\n\nDo you want to continue?"),
-                                      tr("Cancel"), tr("Continue"), false, true ))
+                                      tr("Cancel"), tr("Continue"),
+                                      tr("Cancel and keep current wallet address"),
+                                      tr("Continue and change my wallet address"),
+                                      false, true ))
         return;
 
     wallet->requestNextMqsAddress();

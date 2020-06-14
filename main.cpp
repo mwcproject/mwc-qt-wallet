@@ -456,7 +456,10 @@ int main(int argc, char *argv[])
                 if ( core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg("Wallet data architecture mismatch",
                                              "Your mwc713 seed at '"+ walletDataPath +"' was created with "+arh+" bits version of the wallet. "
                                              "Please exit and use original version of the wallet, or specify another folder for the seed",
-                                             "Exit", "Select Folder", false, true) ) {
+                                             "Exit", "Select Folder",
+                                             "Exit QT Wallet, I have another version to open this wallet",
+                                             "Select another wallet with compatible architecture",
+                                             false, true) ) {
                     // Exit was selected
                     return 1;
                 }

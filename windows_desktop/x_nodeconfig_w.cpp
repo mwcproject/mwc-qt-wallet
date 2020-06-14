@@ -50,7 +50,10 @@ bool NodeConfig::askUserForChanges() {
         if ( core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionText(this,
                 "Apply config changes",
                 "Configuration changes was made for the wallet. Do you want to apply them?",
-                "Cancel", "Apply", false, true) ) {
+                "Cancel", "Apply",
+                "Drop those config changes",
+                "Continue and apply the changes",
+                false, true) ) {
             return applyChanges();
         }
     }

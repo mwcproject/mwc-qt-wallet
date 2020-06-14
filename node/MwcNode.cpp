@@ -128,7 +128,10 @@ void MwcNode::stop() {
             while( nodeProcess->state() == QProcess::Running ) {
                 if (QDateTime::currentMSecsSinceEpoch() > limitTime) {
                     if ( core::getWndManager()->questionTextDlg(nullptr, "Warning", "Stopping mwc-node process takes longer than expected.\nContinue to wait?",
-                               "Yes", "No", true, false) == core::WndManager::RETURN_CODE::BTN1) {
+                               "Yes", "No",
+                               "Continue to wait and let MWC node more time to start",
+                               "Don't wait and kill MWC node process even it can corrupt the node data",
+                               true, false) == core::WndManager::RETURN_CODE::BTN1) {
                         config::increaseTimeoutMultiplier();
                         limitTime = QDateTime::currentMSecsSinceEpoch() + int64_t(1000*20*config::getTimeoutMultiplier());
                     }
@@ -234,7 +237,10 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
             case QProcess::Timedout:
                 if (core::getWndManager()->questionTextDlg(nullptr, "Warning", "Starting for mwc-node process is taking longer than expected.\nContinue to wait?"
                                 "\n\nCommand line:\n\n" + QString(">> cd '") + nodeWorkDir+"'\n>> " + commandLine,
-                                "Yes", "No", true, false) == core::WndManager::RETURN_CODE::BTN1) {
+                                "Yes", "No",
+                                "Wait more and give MWC node more time to start",
+                                "Don't wait and kill MWC node process even it can corrupt the node data",
+                                true, false) == core::WndManager::RETURN_CODE::BTN1) {
                     config::increaseTimeoutMultiplier();
                     continue; // retry with waiting
                 }
@@ -895,7 +901,11 @@ void MwcNode::reportNodeFatalError( QString message ) {
     else
     {
         if ( core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg("Embedded MWC-Node Error",
-                message + "\n\nIf Embedded mwc-node doesn't work for you, please switch to MWC Cloud node before exit", "Keep Embedded", "Switch to Cloud", false, true ) ) {
+                message + "\n\nIf Embedded mwc-node doesn't work for you, please switch to MWC Cloud node before exit",
+                "Keep Embedded", "Switch to Cloud",
+                "I understand what is the problem and I want to keep connection to local embedded MWC node",
+                "Embedded node doesn't work for me, I prefer to switch to the public MWC node",
+                false, true ) ) {
 
             // Switching to the cloud node
             wallet::MwcNodeConnection mwcNodeConnection = appContext->getNodeConnection( lastUsedNetwork );

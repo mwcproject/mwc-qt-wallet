@@ -313,9 +313,12 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
     if (walletConfig->getAutoStartTorEnabled()) {
         if (!foreignApi || (!tlsCertificateFile.isEmpty() && !tlsCertificateKey.isEmpty()) ) {
             if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText( this, "TOR Listener",
-                                               "TOR require Foreign API to run (preferably on 127.0.0.1) and not use TSL. You confgiuration is diferent. "
+                                               "TOR require Foreign API to run (preferably on 127.0.0.1) and not use TSL. You configuration is different. "
                                                "Do you want apply it and disable autostart TOR listener?",
-                                               "Cancel", "disable TOR", false, true ) ) {
+                                               "Cancel", "disable TOR",
+                                               "Drop my Foreign API changes in order to keep TOR",
+                                               "Disable autostart for TOR listener and continue",
+                                               false, true ) ) {
                 return;
             }
             walletConfig->updateAutoStartTorEnabled(false); // disable tor tor starting
@@ -324,7 +327,10 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
 
     if ( core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionText( this, "Warning",
             message + "Foreign API configuration require to relogin. If mwc713 will not be able to start with those settings, they will be reverted back to default.",
-            "Cancel", "Continue", false, true ) ) {
+            "Cancel", "Continue",
+            "Drop my Foreign API changes",
+            "Aplly changes and relogin into this wallet",
+            false, true ) ) {
 
         // apply settings...
         config->saveForeignApiConfig(foreignApi,foreignApiAddress, foreignApiSecret, tlsCertificateFile, tlsCertificateKey);

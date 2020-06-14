@@ -56,7 +56,10 @@ bool WalletConfig::canExitState() {
         if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg(
                 "Config changes",
                 "Configuration changes was made for the wallet and not applied. Do you want to drop them?",
-                "Back", "Drop", false, true)) {
+                "Back", "Drop",
+                "Stay at config page",
+                "Drop my changes and continue",
+                false, true)) {
             return true;
         }
         return false;

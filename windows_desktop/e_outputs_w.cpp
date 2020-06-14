@@ -387,7 +387,10 @@ bool Outputs::showLockMessage() {
 
     if ( core::WndManager::RETURN_CODE::BTN2 != control::MessageBox::questionText(this, "Locking Output",
             "By manually locking output you are preventing it from spending by QT wallet.\nLocked outputs amount will be shown as Locked balance until you change this.",
-            "Cancel", "Continue", false, true) ) {
+            "Cancel", "Continue",
+            "Cancel, I don't want to change lock status my output",
+            "Continue and change lock status",
+            false, true) ) {
         return false;
     }
 

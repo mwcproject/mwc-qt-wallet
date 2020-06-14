@@ -128,7 +128,10 @@ void Hodl::registerAccountForHODL() {
 
     if ( core::WndManager::RETURN_CODE::BTN2 != core::getWndManager()->questionTextDlg("HODL Registration",
                                       "Registering for the HODL Program requires the wallet's root public key. This enables outputs and values for the wallet instance to be tracked. Do you wish to continue?",
-                                      "Reject", "Accept", false, true) )
+                                      "Reject", "Accept",
+                                      "I don't want to share my root public key for this wallet, don't enroll me in the HODL",
+                                      "I am agree to share my root public key for this wallet, please enroll me in HODL",
+                                      false, true) )
     {
         hideWaitingStatus();
         return;

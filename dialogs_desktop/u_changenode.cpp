@@ -208,7 +208,10 @@ void ChangeNode::on_applyButton_clicked() {
     }
 
     if (control::MessageBox::questionText(this, "Update mwc node connection", "Update of mwc node connection required relogin into the wallet. Than you will be able to verify if your wallet was able to connect to the mwc node.\nWould you like to continue?",
-                                      "Yes", "No", true, false) != core::WndManager::RETURN_CODE::BTN1 ) {
+                                      "Yes", "No",
+                                      "Apply node connection settings and relogin",
+                                      "Cancel this operation",
+                                      true, false) != core::WndManager::RETURN_CODE::BTN1 ) {
         return;
     }
 

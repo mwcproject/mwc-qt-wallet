@@ -26,7 +26,9 @@ namespace control {
 
 // Password accepted as a HASH. EMpty String mean that no password is set.
 // After return, passwordHash value will have input raw Password value. So it can be user for wallet
-MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2, bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE _passBlockButton ) :
+MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2,
+        QString btn1Tooltip, QString btn2Tooltip,
+        bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE _passBlockButton ) :
      MwcDialog(parent),
     ui(new Ui::MessageBox),
     blockingPasswordHash(passwordHash),
@@ -123,6 +125,12 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
     ui->button2->adjustSize();
     ui->button1->adjustSize();
 
+    if (!btn1Tooltip.isEmpty())
+        ui->button1->setToolTip(btn1Tooltip);
+
+    if (!btn2Tooltip.isEmpty())
+        ui->button2->setToolTip(btn2Tooltip);
+
     adjustSize();
 
     if (!blockingPasswordHash.isEmpty()) {
@@ -164,40 +172,46 @@ void MessageBox::on_button2_clicked()
 //static
 void MessageBox::messageText( QWidget *parent, QString title, QString message, double widthScale ) {
     QString hash;
-    MessageBox * msgBox = new MessageBox(parent, title, message, false, "OK", "", true,false, widthScale, hash, core::WndManager::RETURN_CODE::BTN1 );
+    MessageBox * msgBox = new MessageBox(parent, title, message, false, "OK", "", "","", true,false, widthScale, hash, core::WndManager::RETURN_CODE::BTN1 );
     msgBox->exec();
     delete msgBox;
 }
 
 void MessageBox::messageHTML( QWidget *parent, QString title, QString message, double widthScale ) {
     QString hash;
-    MessageBox * msgBox = new MessageBox(parent, title, message, true, "OK", "", true,false, widthScale, hash, core::WndManager::RETURN_CODE::BTN1 );
+    MessageBox * msgBox = new MessageBox(parent, title, message, true, "OK", "", "","", true,false, widthScale, hash, core::WndManager::RETURN_CODE::BTN1 );
     msgBox->exec();
     delete msgBox;
 }
 
 // Two button box
 //static
-core::WndManager::RETURN_CODE MessageBox::questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE blockButton ) {
-    MessageBox * msgBox = new MessageBox(parent, title, message, false, btn1, btn2, default1, default2, widthScale, passwordHash, blockButton);
+core::WndManager::RETURN_CODE MessageBox::questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2,
+                   QString btn1Tooltip, QString btn2Tooltip,
+                   bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE blockButton ) {
+    MessageBox * msgBox = new MessageBox(parent, title, message, false, btn1, btn2, btn1Tooltip, btn2Tooltip, default1, default2, widthScale, passwordHash, blockButton);
     msgBox->exec();
     core::WndManager::RETURN_CODE  res = msgBox->getRetCode();
     delete msgBox;
     return res;
 }
 
-core::WndManager::RETURN_CODE MessageBox::questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, double widthScale) {
+core::WndManager::RETURN_CODE MessageBox::questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2,
+        QString btn1Tooltip, QString btn2Tooltip,
+        bool default1, bool default2, double widthScale) {
     QString hash;
-    MessageBox * msgBox = new MessageBox(parent, title, message, false, btn1, btn2, default1, default2, widthScale, hash, core::WndManager::RETURN_CODE::BTN1);
+    MessageBox * msgBox = new MessageBox(parent, title, message, false, btn1, btn2, btn1Tooltip, btn2Tooltip, default1, default2, widthScale, hash, core::WndManager::RETURN_CODE::BTN1);
     msgBox->exec();
     core::WndManager::RETURN_CODE  res = msgBox->getRetCode();
     delete msgBox;
     return res;
 }
 
-core::WndManager::RETURN_CODE MessageBox::questionHTML( QWidget *parent, QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, double widthScale ) {
+core::WndManager::RETURN_CODE MessageBox::questionHTML( QWidget *parent, QString title, QString message, QString btn1, QString btn2,
+            QString btn1Tooltip, QString btn2Tooltip,
+            bool default1, bool default2, double widthScale ) {
     QString hash;
-    MessageBox * msgBox = new MessageBox(parent, title, message, true, btn1, btn2, default1, default2, widthScale, hash, core::WndManager::RETURN_CODE::BTN1);
+    MessageBox * msgBox = new MessageBox(parent, title, message, true, btn1, btn2, btn1Tooltip, btn2Tooltip, default1, default2, widthScale, hash, core::WndManager::RETURN_CODE::BTN1);
     msgBox->exec();
     core::WndManager::RETURN_CODE  res = msgBox->getRetCode();
     delete msgBox;

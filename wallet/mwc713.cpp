@@ -155,8 +155,11 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
                 return nullptr;
             case QProcess::Timedout:
                 if (core::getWndManager()->questionTextDlg("Warning", QString("Starting for mwc713 process is taking longer than expected.\nContinue to wait?") +
-                                                  "\n\nCommand line:\n\n" + commandLine,
-                                                  "Yes", "No", true, false) == core::WndManager::RETURN_CODE::BTN1) {
+                                  "\n\nCommand line:\n\n" + commandLine,
+                                  "Yes", "No",
+                                  "Wait more time and let mwc713 to start",
+                                  "Stop waiting and kill mwc713 even it can corrupt its data",
+                                  true, false) == core::WndManager::RETURN_CODE::BTN1) {
                     config::increaseTimeoutMultiplier();
                     continue; // retry with waiting
                 }

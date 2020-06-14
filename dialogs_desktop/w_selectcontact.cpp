@@ -139,7 +139,11 @@ void SelectContact::on_deleteButton_clicked()
     core::ContactRecord contact2del = contacts[idx];
 
     if (control::MessageBox::questionText(this, "Remove a contact", "Remove the selected contact for " + contact2del.name +
-                              "? Press 'Yes' to delete.", "Yes", "No", false,true) == core::WndManager::RETURN_CODE::BTN1 ) {
+                              "? Press 'Yes' to delete.",
+                              "Yes", "No",
+                              "Continue and delete the contact",
+                              "Cancel and keep my contact",
+                              false,true) == core::WndManager::RETURN_CODE::BTN1 ) {
         QString err = config->deleteContact(contact2del.name, contact2del.address);
         if (!err.isEmpty())
             control::MessageBox::messageText(this, "Error", "Unable to remove the contact '"+ contact2del.name +"'.\nError: " + err);

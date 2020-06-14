@@ -318,7 +318,10 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
         // Ask user if he wants to spend all and continue...
         if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionHTMLDlg("HODL Output Spending",
                 generateMessageHtmlOutputsToSpend( spentOuts ),
-                "Cancel", "Continue", true, false, 1.4) ) {
+                "Cancel", "Continue",
+                "Cancel operation, keep outputs in HODL",
+                "Continue and spend those outputs, they will be excluded form the HODL",
+                true, false, 1.4) ) {
             resultOutputs = allOutputs;
             int changeOutputs = 0;  // we don't expect any change since we are spending all of our outputs
             *txnFee = getTxnFeeFromSpendableOutputs(nanoCoins, freeOuts, changeOutputs, totalNanoCoins, resultOutputs);
@@ -380,7 +383,10 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
 
     if (core::WndManager::RETURN_CODE::BTN2 != core::getWndManager()->questionHTMLDlg("HODL Output Spending",
                         generateMessageHtmlOutputsToSpend( hodlOuts2ask ),
-                        "Cancel", "Continue", true, false, 1.4) )
+                        "Cancel", "Continue",
+                        "Cancel operation, keep outputs in HODL",
+                        "Continue and spend those outputs, they will be excluded form the HODL",
+                        true, false, 1.4) )
         return false;
 
     // User approve the spending, preparing the list of outputs...

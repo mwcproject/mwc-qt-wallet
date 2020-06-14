@@ -84,7 +84,9 @@ void NavMenuConfig::on_selectRunningModeButton_clicked() {
 void NavMenuConfig::on_resyncButton_clicked()
 {
     if (control::MessageBox::questionText(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
-                       "No", "Yes", true, false) == WndManager::RETURN_CODE::BTN2 ) {
+                       "No", "Yes",
+                       "Cancel re-sync operation", "Continue and re-sync account with a node",
+                       true, false) == WndManager::RETURN_CODE::BTN2 ) {
         // Starting resync
         stateMachine->activateResyncState();
     }

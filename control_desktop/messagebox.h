@@ -33,6 +33,7 @@ protected:
     // Password accepted as a HASH. EMpty String mean that no password is set.
     // After return, passwordHash value will have input raw Password value. So it can be user for wallet
     explicit MessageBox(QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2,
+            QString btn1Tooltip, QString btn2Tooltip,
             bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE passBlockButton );
     virtual ~MessageBox() override;
 
@@ -43,13 +44,18 @@ public:
     static void messageHTML( QWidget *parent, QString title, QString message, double widthScale = 1.0);
     // Two button box
     static core::WndManager::RETURN_CODE questionText( QWidget *parent, QString title, QString message,
-            QString btn1, QString btn2, bool default1=false, bool default2=true, double widthScale = 1.0 );
+            QString btn1, QString btn2,
+            QString btn1Tooltip, QString btn2Tooltip,
+            bool default1=false, bool default2=true, double widthScale = 1.0 );
     static core::WndManager::RETURN_CODE questionHTML( QWidget *parent, QString title, QString message,
-            QString btn1, QString btn2, bool default1=false, bool default2=true, double widthScale = 1.0 );
+            QString btn1, QString btn2,
+            QString btn1Tooltip, QString btn2Tooltip,
+            bool default1=false, bool default2=true, double widthScale = 1.0 );
 
     // Password accepted as a HASH. EMpty String mean that no password is set.
     // After return, passwordHash value will have input raw Password value. So it can be user for wallet
     static core::WndManager::RETURN_CODE questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2,
+            QString btn1Tooltip, QString btn2Tooltip,
             bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE blockButton );
 
 private slots:

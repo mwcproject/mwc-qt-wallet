@@ -71,8 +71,11 @@ static bool checkKeyBasePath( QWidget * parent, QString keybasePath ) {
     // /Applications/Keybase.app/Contents/SharedSupport/bin/keybase  - ok
     if (!keybasePath.isEmpty() && !keybasePath.contains("bin") ) {
         if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText( parent, "Keybase path, Warning",
-                                 "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
-                                 "Cancel", "Use this path", true, false ) )
+                     "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
+                     "Cancel", "Use this path",
+                     "Drop my selection, I will select correct keybase client",
+                     "Apply my selection, I have non standard keybase installation, am sure that client is correct",
+                     true, false ) )
             return false;
     }
 #endif
@@ -436,7 +439,10 @@ bool WalletConfig::applyChanges() {
                    "You just disabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n"
                    "Please note, the logs can contain private information about your transactions and accounts.\n"
                    "Do you want to clean up existing logs from your wallet?",
-                   "Clean up", "Keep the logs", true, false) ==
+                   "Clean up", "Keep the logs",
+                   "Delete my logs data that I have",
+                   "Let's keep the logs that I already have even they has information about my past operation and wallet balance",
+                   true, false) ==
                                     core::WndManager::RETURN_CODE::BTN1);
         } else {
             control::MessageBox::messageText(this, "Wallet Logs",
@@ -479,6 +485,8 @@ bool WalletConfig::applyChanges() {
                                 "Do you want configure Foreign API to match TOR expectations?",
                                 "Disable TOR",
                                 "Configure API",
+                                "Don't change foreign API settings and disable the TOR",
+                                "Continue and change foreign API settings, I want TOR to run",
                                 false, true);
         }
         else if ( config->hasTls() ) {
@@ -489,6 +497,8 @@ bool WalletConfig::applyChanges() {
                                 "Do you want configure Foreign API to match TOR expectations?",
                                 "Disable TOR",
                                 "Configure API",
+                                "Don't change foreign API settings and disable the TOR",
+                                "Continue and change foreign API settings, I want TOR to run",
                                 false, true);
         }
         if (!resetForeignForTor && !config->getForeignApiSecret().isEmpty() ) {
@@ -499,6 +509,8 @@ bool WalletConfig::applyChanges() {
                                 "Otherwise you will not be able to receive coins.",
                                 "Reset Secret",
                                 "Continue",
+                                "Don't use foreign API secret, so I could acccept payments form anybody",
+                                "Continue with foreign API secret, I am accepting coins only form people who knows the secret",
                                 false, true);
         }
         if (resetForeignForTor) {

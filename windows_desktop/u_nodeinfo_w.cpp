@@ -183,8 +183,12 @@ void NodeInfo::onShowNodeConnectionError(QString errorMessage) {
 }
 
 void NodeInfo::on_refreshButton_clicked() {
-    if (control::MessageBox::questionText(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
-                       "No", "Yes", true, false) == core::WndManager::RETURN_CODE::BTN2 ) {
+    if (control::MessageBox::questionText(this, "Re-sync account with a node",
+            "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
+            "No", "Yes",
+            "Cancel resync operation",
+            "Continue with resync, I will wait for a while",
+            true, false) == core::WndManager::RETURN_CODE::BTN2 ) {
         nodeInfo->requestWalletResync();
     }
 }

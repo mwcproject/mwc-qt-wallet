@@ -508,7 +508,11 @@ void Transactions::on_deleteButton_clicked()
 
     if ( control::MessageBox::questionText(this, "Transaction cancellation",
             "Are you sure you want to cancel transaction #" + QString::number(tx2del.txIdx+1) +
-                               ", TXID " + tx2del.txid, "No", "Yes", true, false) == core::WndManager::RETURN_CODE::BTN2 ) {
+                               ", TXID " + tx2del.txid,
+                               "No", "Yes",
+                               "Keep my transaction, I am expecting it to be finalized",
+                               "Continue and cancel the transaction, I am not expecting it to be finalized",
+                               true, false) == core::WndManager::RETURN_CODE::BTN2 ) {
 
         wallet->requestCancelTransacton( account, QString::number(tx2del.txIdx));
     }

@@ -156,7 +156,11 @@ bool Send::sendMwcOffline( QString account, int64_t amount, QString message) {
     if ( core::WndManager::RETURN_CODE::BTN2 != core::getWndManager()->questionTextDlg("Confirm Send Request",
                        "You are sending offline " + (amount < 0 ? "all" : util::nano2one(amount)) +
                        " MWC from account: " + account + "\n\nTransaction fee: " + txnFeeStr +
-                       "\n\nYour initial transaction slate will be stored in a file.", "Decline", "Confirm", false, true, 1.0,
+                       "\n\nYour initial transaction slate will be stored in a file.",
+                       "Decline", "Confirm",
+                       "Don't send, cancel this operation",
+                       "Everything is good, continue and send",
+                       false, true, 1.0,
                        hash, core::WndManager::RETURN_CODE::BTN2 ) )
         return false;
 

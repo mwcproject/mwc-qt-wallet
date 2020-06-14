@@ -35,8 +35,11 @@ bool processWaitForFinished( QProcess * process, int timeoutMs, const QString & 
         QProcess::ProcessError errCode = process->error();
         if (errCode == QProcess::Timedout) {
             if ( core::getWndManager()->questionTextDlg("Warning", "Stopping process " + processName +
-                                                                   " is taking longer than expected.\nContinue to wait?",
-                                              "Yes", "No", true, false) == core::WndManager::RETURN_CODE::BTN1) {
+                                " is taking longer than expected.\nContinue to wait?",
+                                "Yes", "No",
+                                "Give this process more time to stop, I believe it will make it",
+                                "Probably somrthing wrong, let's kill this process even it can corrupt its data",
+                                true, false) == core::WndManager::RETURN_CODE::BTN1) {
                 config::increaseTimeoutMultiplier();
                 return processWaitForFinished(process, timeoutMs, processName);
             }

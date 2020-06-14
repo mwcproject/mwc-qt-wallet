@@ -390,8 +390,12 @@ void MainWindow::on_actionNode_Overview_triggered()
 
 void MainWindow::on_actionResync_with_full_node_triggered()
 {
-    if (control::MessageBox::questionText(this, "Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
-                       "No", "Yes", true, false) == WndManager::RETURN_CODE::BTN2 ) {
+    if (control::MessageBox::questionText(this, "Re-sync account with a node",
+            "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue",
+                       "No", "Yes",
+                       "Cancel resync operation",
+                       "I am agree to wait some time, lets go forward and resync",
+                       true, false) == WndManager::RETURN_CODE::BTN2 ) {
         // Starting resync
         stateMachine->activateResyncState();
     }
@@ -434,7 +438,11 @@ void MainWindow::on_actionShow_passphrase_triggered()
     if ( !passwordHash.isEmpty() ) {
         if (WndManager::RETURN_CODE::BTN2 !=
             control::MessageBox::questionText(this, "Wallet Password",
-                                              "You are going to view wallet mnemonic passphrase.\n\nPlease input your wallet password to continue", "Cancel", "Confirm", false, true, 1.0,
+                                              "You are going to view wallet mnemonic passphrase.\n\nPlease input your wallet password to continue",
+                                              "Cancel", "Confirm",
+                                              "Cancel show mnemonic passphrase",
+                                              "Verify the password and show the passphrase",
+                                              false, true, 1.0,
                                               passwordHash, WndManager::RETURN_CODE::BTN2))
             return;
     }
