@@ -348,6 +348,9 @@
           <height>40</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Amount of MWC coins to send</string>
+        </property>
         <property name="maxLength">
          <number>32</number>
         </property>
