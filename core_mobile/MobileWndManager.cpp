@@ -42,19 +42,32 @@ void MobileWndManager::messageHtmlDlg( QString title, QString message, double wi
 }
 
 // Two button box
-WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, double widthScale) {
+WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2,
+                                                           QString btn1Tooltip, QString btn2Tooltip,
+                                                           bool default1, bool default2, double widthScale) {
+    Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
+    Q_UNUSED(btn2Tooltip)
+
     Q_ASSERT(false); // implement me
     return WndManager::RETURN_CODE::BTN1;
 }
 
-WndManager::RETURN_CODE MobileWndManager::questionHTMLDlg( QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, double widthScale )  {
+WndManager::RETURN_CODE MobileWndManager::questionHTMLDlg( QString title, QString message, QString btn1, QString btn2,
+                                                           QString btn1Tooltip, QString btn2Tooltip,
+                                                           bool default1, bool default2, double widthScale )  {
+    Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
+    Q_UNUSED(btn2Tooltip)
     Q_ASSERT(false); // implement me
     return WndManager::RETURN_CODE::BTN1;
 }
 
 // Password accepted as a HASH. EMpty String mean that no password is set.
 // After return, passwordHash value will have input raw Password value. So it can be user for wallet
-WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2, bool default1, bool default2, double widthScale, QString & passwordHash, WndManager::RETURN_CODE blockButton )  {
+WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2,
+                                                           QString btn1Tooltip, QString btn2Tooltip,
+                                                           bool default1, bool default2, double widthScale, QString & passwordHash, WndManager::RETURN_CODE blockButton )  {
+    Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
+    Q_UNUSED(btn2Tooltip)
     Q_ASSERT(false); // implement me
     return WndManager::RETURN_CODE::BTN1;
 }
