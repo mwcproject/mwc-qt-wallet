@@ -64,7 +64,7 @@ QString HodlOutputInfo::toJson() {
     obj.insert("weight", weight);
     obj.insert("cls", cls);
 
-    return QJsonDocument(obj).toJson();
+    return QJsonDocument(obj).toJson(QJsonDocument::JsonFormat::Compact);
 }
 // static
 HodlOutputInfo HodlOutputInfo::fromJson(const QString & jsonStr) {

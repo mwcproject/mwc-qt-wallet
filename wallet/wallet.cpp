@@ -107,7 +107,7 @@ QString MwcNodeConnection::toJson() {
     obj.insert("mwcNodeURI", mwcNodeURI );
     obj.insert("mwcNodeSecret", mwcNodeSecret );
 
-    return QJsonDocument(obj).toJson();
+    return QJsonDocument(obj).toJson(QJsonDocument::JsonFormat::Compact);
 
 }
 // static
@@ -363,7 +363,7 @@ QString WalletTransaction::toJson() const {
     obj.insert("proof", proof);
     obj.insert("kernel", kernel);
 
-    return QJsonDocument(obj).toJson();
+    return QJsonDocument(obj).toJson(QJsonDocument::JsonFormat::Compact);
 }
 //static
 WalletTransaction WalletTransaction::fromJson(QString str) {
@@ -437,7 +437,7 @@ QString WalletOutput::toJson() const {
     obj.insert("txIdx", QString::number(txIdx) );
     obj.insert("weight", weight);
 
-    return QJsonDocument(obj).toJson();
+    return QJsonDocument(obj).toJson(QJsonDocument::JsonFormat::Compact);
 }
 
 //static

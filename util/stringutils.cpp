@@ -221,6 +221,11 @@ QString mwc713time2ThisTime(QString mwc713TimeStr) {
     time = time.addSecs(offsetFromUTC);
 
     QString res = time.toString( mwc::DATETIME_TEMPLATE_THIS);
+
+    // Return original string if time wan't converted. It is a usecase for Json data conversion
+    if (res.isEmpty() && !mwc713TimeStr.isEmpty())
+        return mwc713TimeStr;
+
     return res;
 }
 
