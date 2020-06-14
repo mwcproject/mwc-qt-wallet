@@ -215,7 +215,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Keybase listener status</string>
+         <string>Foreign API listener status</string>
         </property>
         <property name="text">
          <string/>
@@ -646,14 +646,14 @@
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelTiny</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcComboBox</class>
