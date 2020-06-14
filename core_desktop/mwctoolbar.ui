@@ -445,7 +445,7 @@ color: #FFFFFF;</string>
         <enum>Qt::TabFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Click to register your coins for the HODL program</string>
+        <string>Click here to Register/Claim your coins from the HODL program</string>
        </property>
        <property name="text">
         <string notr="true">HODL</string>
