@@ -44,7 +44,7 @@
     </size>
    </property>
    <property name="text">
-    <string>MWC NODE CONNECTION</string>
+    <string>MWC Node Connection</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -276,6 +276,9 @@ by MWC Project Developers</string>
       <property name="focusPolicy">
        <enum>Qt::StrongFocus</enum>
       </property>
+      <property name="toolTip">
+       <string>Reset to default values</string>
+      </property>
       <property name="text">
        <string>Reset</string>
       </property>
@@ -305,6 +308,9 @@ by MWC Project Developers</string>
       <property name="focusPolicy">
        <enum>Qt::StrongFocus</enum>
       </property>
+      <property name="toolTip">
+       <string>Cancel and drop the changes</string>
+      </property>
       <property name="text">
        <string>Cancel</string>
       </property>
@@ -320,6 +326,9 @@ by MWC Project Developers</string>
       </property>
       <property name="focusPolicy">
        <enum>Qt::StrongFocus</enum>
+      </property>
+      <property name="toolTip">
+       <string>Apply MWC node connection settings</string>
       </property>
       <property name="text">
        <string>Apply</string>
@@ -408,6 +417,9 @@ by MWC Project Developers</string>
     <property name="focusPolicy">
      <enum>Qt::StrongFocus</enum>
     </property>
+    <property name="toolTip">
+     <string>Specify location of the MWC node data</string>
+    </property>
     <property name="text">
      <string>Select</string>
     </property>
@@ -419,12 +431,6 @@ by MWC Project Developers</string>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLine</class>
-   <extends>QFrame</extends>
-   <header>control_desktop/MwcFrameWithBorder.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>
@@ -440,6 +446,12 @@ by MWC Project Developers</string>
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLine</class>
+   <extends>QFrame</extends>
+   <header>control_desktop/MwcFrameWithBorder.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
