@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
     while (true)
     {
         // QApplication instance is needed to show possible errors
-        QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+   //     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
         QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
         Q_ASSERT(argc>=1);

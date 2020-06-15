@@ -39,6 +39,7 @@ NextStateRespond WalletConfig::execute() {
     if (context->appContext->getActiveWndState() != STATE::WALLET_CONFIG)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
+    settingLock = false;
     if ( config::isOnlineNode() ) {
         core::getWndManager()->pageNodeConfig();
     }
@@ -56,6 +57,9 @@ bool WalletConfig::canExitState(STATE nextWindowState) {
 
     // first will win. Normally we expecting 0 or 1 bridge
     if (settingLock) {
+        if (nextWindowState == NONE)
+            return false;
+
         if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg(
                 "Config changes",
                 "Configuration changes was made for the wallet and not applied. Do you want to drop them?",
@@ -68,6 +72,7 @@ bool WalletConfig::canExitState(STATE nextWindowState) {
         return false;
     }
 
+    settingLock = false;
     return true;
 }
 
