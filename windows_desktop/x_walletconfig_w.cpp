@@ -61,7 +61,10 @@ static bool checkKeyBasePath( QWidget * parent, QString keybasePath ) {
         if (!keybasePath.isEmpty() && (keybasePath.contains("Gui") || keybasePath.contains("gui")) ) {
             if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText( parent, "Keybase path, Warning",
                                "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
-                               "Cancel", "Use this path", true, false ) )
+                               "Cancel", "Use this path",
+                               "Drop my selection, I will select correct keybase client",
+                               "Apply my selection, I have non standard keybase installation, am sure that client is correct",
+                               true, false ) )
                 return false;
         }
 #endif
