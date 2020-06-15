@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
     while (true)
     {
         // QApplication instance is needed to show possible errors
-   //     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+   //     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);  Disabled because it looks badly on 4k Linux and Windows with Scale 200% (default for 4k)
         QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
         Q_ASSERT(argc>=1);

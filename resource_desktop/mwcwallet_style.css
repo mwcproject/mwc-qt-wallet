@@ -679,6 +679,7 @@ QTabBar::tab:selected{
 
 QGroupBox {
     color: white;
+    font-size: 13px;
     font: bold;
     border: 1px solid silver;
     border-radius: 6px;

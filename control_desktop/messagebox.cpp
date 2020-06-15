@@ -79,7 +79,7 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
     int page = vSb->pageStep();
 
     if (scrollDiff >0) {
-        h = int( h * double(scrollDiff + page)/page + 1);
+        h = int( h * double(scrollDiff + page)/page * 1.2 + 1); // Under the Windows we are having 1 line to scroll, lets compensate it
     }
     ui->text3->setMaximumHeight( h );
     ui->text3->setMinimumHeight( h );
