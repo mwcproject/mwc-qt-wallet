@@ -73,7 +73,7 @@ LineResult TrieSectionContext::calcResult() const {
 
 
 // Context from the whole line
-TrieLineContext::TrieLineContext() {}
+TrieLineContext::TrieLineContext(bool _isSingleActiveContext) : isSingleActiveContext(_isSingleActiveContext) {}
 
 TrieLineContext::~TrieLineContext() {
     releaseData();
@@ -115,6 +115,9 @@ void TrieLineContext::processChar( BaseTrieSection * headSection, QChar ch ) {
     }
 
     // Every iteration try to start a new parser
+    if (isSingleActiveContext && !contexts.isEmpty())
+        return;
+
     startNewSectionAndProcess( headSection, LineResult(), ch );
 }
 

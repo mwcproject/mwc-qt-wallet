@@ -107,7 +107,7 @@ bool TaskAccountCreate::processTask(const QVector<WEvent> &events) {
 // ---------------------------- TaskAccountSwitch -------------------------
 
 bool TaskAccountSwitch::processTask(const QVector<WEvent> &events) {
-    QVector< WEvent > errors = filterEvents( events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > errors = filterEvents( events, WALLET_EVENTS::S_GENERIC_ERROR );
     for ( const auto & e : errors) {
         notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Account switch error: " + e.message );
     }
@@ -118,7 +118,7 @@ bool TaskAccountSwitch::processTask(const QVector<WEvent> &events) {
 
 bool TaskAccountRename::processTask(const QVector<WEvent> &events) {
     QVector< WEvent > lns = filterEvents( events, WALLET_EVENTS::S_LINE );
-    QVector< WEvent > errors = filterEvents( events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > errors = filterEvents( events, WALLET_EVENTS::S_GENERIC_ERROR );
 
     // Check for success...
     // rename acct from 'second' to 'forth'

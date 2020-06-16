@@ -524,7 +524,7 @@ bool TaskAllTransactions::processTask(const QVector<WEvent> & events) {
 // ------------------------- TaskTransCancel ---------------------------
 
 bool TaskTransCancel::processTask(const QVector<WEvent> & events) {
-    QVector< WEvent > errors = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > errors = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     if (errors.isEmpty()) {
         wallet713->setTransCancelResult( true, account, transactionId, "" );
     }
@@ -540,7 +540,7 @@ bool TaskTransCancel::processTask(const QVector<WEvent> & events) {
 // ------------------------------------ TaskTransExportProof -------------------------------------------
 
 bool TaskTransExportProof::processTask(const QVector<WEvent> & events) {
-    QVector< WEvent > errors = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > errors = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     if (!errors.isEmpty()) {
         QStringList messages;
         for (auto & e : errors)
@@ -596,7 +596,7 @@ bool TaskTransExportProof::processTask(const QVector<WEvent> & events) {
 
 
 bool TaskTransVerifyProof::processTask(const QVector<WEvent> & events) {
-    QVector< WEvent > errors = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > errors = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     if (!errors.isEmpty()) {
         QStringList messages;
         for (auto & e : errors)

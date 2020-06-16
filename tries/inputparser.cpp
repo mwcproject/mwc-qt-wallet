@@ -42,8 +42,8 @@ InputParser::~InputParser() {
 
 // append a new line parser.
 // parser must be on the heap and pnership will be transferred to this
-void InputParser::appendLineParser( TrieLineParser* parser ) {
-    lines.push_back( LineInfo( parser, new TrieLineContext() ) );
+void InputParser::appendLineParser( TrieLineParser* parser, bool hasSingleActiveContext ) {
+    lines.push_back( LineInfo( parser, new TrieLineContext(hasSingleActiveContext) ) );
 }
 
 bool InputParser::deleteLineParser(int parserId) {

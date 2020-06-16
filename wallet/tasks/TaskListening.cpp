@@ -147,7 +147,7 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
 bool TaskListeningStart::processTask(const QVector<WEvent> &events) {
     qDebug() << "TaskListeningStart::processTask with events: " << printEvents(events);
 
-    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     QStringList errorMessages;
     for (auto & evt : error) {
         if (!evt.message.isEmpty())
@@ -190,7 +190,7 @@ QString TaskListeningStart::calcCommand(bool startMq, bool startKeybase, bool st
 bool TaskListeningStop::processTask(const QVector<WEvent> &events) {
     qDebug() << "TaskListeningStop::processTask with events: " << printEvents(events);
 
-    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     QStringList errorMessages;
     for (auto & evt : error) {
         if (!evt.message.isEmpty())

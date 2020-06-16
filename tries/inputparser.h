@@ -59,7 +59,7 @@ public:
 
     // append a new line parser.
     // parser must be on the heap and pnership will be transferred to this
-    void appendLineParser( TrieLineParser* parser );
+    void appendLineParser( TrieLineParser* parser, bool hasSingleActiveContext = false );
 
     // return true if anything was deleted
     bool deleteLineParser(int parserId);

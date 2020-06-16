@@ -55,7 +55,7 @@ bool TaskSetReceiveAccount::processTask(const QVector<WEvent> &events) {
         return true;
     }
 
-    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     if (errs.size()>0) {
         wallet713->setSetReceiveAccount( false, okresp[0].message );
     }
@@ -118,7 +118,7 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
     }
 
     QStringList errMsgs;
-    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
 
     for (WEvent & evt : errs)
         errMsgs.push_back( evt.message );
@@ -214,7 +214,7 @@ bool TaskSendFile::processTask(const QVector<WEvent> &events) {
         }
     }
 
-    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     QStringList errMsg;
     for (auto & er:errs)
         errMsg.push_back(er.message);
@@ -262,7 +262,7 @@ bool TaskReceiveFile::processTask(const QVector<WEvent> &events) {
         return true;
     }
 
-    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     QStringList errMsg;
     for (auto & er:errs)
         errMsg.push_back(er.message);
@@ -296,7 +296,7 @@ bool TaskFinalizeFile::processTask(const QVector<WEvent> &events) {
     }
 
     QVector< WEvent > apiErrs = filterEvents(events, WALLET_EVENTS::S_NODE_API_ERROR);
-    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     QStringList errMsg;
     // We prefer API messages from the node. Wallet doesn't provide details
     for (auto & er:apiErrs) {

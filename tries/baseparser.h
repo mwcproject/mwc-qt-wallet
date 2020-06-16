@@ -113,7 +113,7 @@ protected:
 // Context from the whole line
 class TrieLineContext {
 public:
-    TrieLineContext();
+    TrieLineContext(bool hasSingleActiveContext);
     ~TrieLineContext();
 
     TrieLineContext(const TrieLineContext&) = delete;
@@ -133,6 +133,7 @@ private:
     void processContext(TrieSectionContext* context, bool done, bool startNext, QChar ch);
     void startNewSectionAndProcess( BaseTrieSection * newSection, LineResult && prevResult, QChar ch );
 protected:
+    bool isSingleActiveContext;
     QVector< TrieSectionContext* > contexts; // owners those objects
     QVector<LineResult> readyResult;
 };

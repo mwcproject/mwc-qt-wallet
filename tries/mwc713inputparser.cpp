@@ -105,32 +105,27 @@ void Mwc713InputParser::initPasswordError()  // notification about the wrong pas
 }
 
 void Mwc713InputParser::initGenericError() {
+    // Keeping single context because we want to parce once something like this: 'error: another error: API error: not able to connect'
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_GENERIC_ERROR,
           QVector<BaseTrieSection*>{
                 new TrieNewLineSection(),
-                new TriePhraseSection("ERROR: "),
+                new TriePhraseSection("ERROR: ", true),
                 new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE,"","", 1)
-                } ));
+                } ), true);
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_GENERIC_WARNING,
                                                 QVector<BaseTrieSection*>{
                                                         new TrieNewLineSection(),
                                                         new TriePhraseSection("WARNING: ", true),
                                                         new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","", 1)
-                                                        } ));
+                                                        } ), true);
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_GENERIC_INFO,
                                                 QVector<BaseTrieSection*>{
                                                         new TrieNewLineSection(),
                                                         new TriePhraseSection("INFO: ", true),
                                                         new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","", 1)
-                                                        } ));
-
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_ERROR,
-                                                QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("error: ", true),
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","", 1)
-                                                } ));
+                                                        } ), true);
 
     // Post TX Error: Request error: Error code: 500 Internal Server Error; Description: failed: Internal error: Failed to update pool
     // API errors:  Request error: Error code: 500 Internal Server Error; Description: failed: Internal error: Failed to update pool
@@ -290,6 +285,11 @@ void Mwc713InputParser::initListening() {
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_HTTP_FAILED,
                                                 QVector<BaseTrieSection*>{
                                                         new TriePhraseSection("thread 'foreign-api-gotham' panicked at '"),
+                                                        new TrieAnySection(500, TrieAnySection::NOT_NEW_LINE,"","'", 1), // Error message, not user friendly (rust way)
+                                                }));
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_HTTP_FAILED,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("Foreign API Listener failed, "),
                                                         new TrieAnySection(500, TrieAnySection::NOT_NEW_LINE,"","'", 1), // Error message, not user friendly (rust way)
                                                 }));
 }

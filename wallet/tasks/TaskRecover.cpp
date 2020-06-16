@@ -28,7 +28,7 @@ static bool ProcessRecoverTask(const QVector<WEvent> &events,MWC713 *wallet713) 
     QVector< WEvent > staring = filterEvents(events, WALLET_EVENTS::S_RECOVERY_STARTING );
     QVector< WEvent > done = filterEvents(events, WALLET_EVENTS::S_RECOVERY_DONE );
     QVector< WEvent > mqAddr = filterEvents(events, WALLET_EVENTS::S_YOUR_MWC_ADDRESS );
-    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
 
     QStringList errorMessages;
     for (auto & evt : error) {
@@ -108,7 +108,7 @@ bool TaskRecoverShowMnenonic::processTask(const QVector<WEvent> &events) {
     }
 
     // Check for error
-    QVector< WEvent > err = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > err = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     if (err.size()>0) {
         wallet713->setGettedSeed( QVector<QString>{err[0].message} );
     }
@@ -136,7 +136,7 @@ bool TaskCheck::processTask(const QVector<WEvent> &events) {
     }
 
     QStringList messages;
-    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_ERROR );
+    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     for (auto & e : errs)
         messages.push_back(e.message);
 

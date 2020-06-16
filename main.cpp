@@ -539,6 +539,23 @@ int main(int argc, char *argv[])
             return 1;
         }
 
+        // Checking if TOR is active. Then we will activate Foreign API.  Or if Foreign API active wrong way, we will disable the TOR
+        if (appContext.isAutoStartTorEnabled()) {
+            if (!walletConfig.hasForeignApi()) {
+                // Expected to do that silently. It is a migration case
+                walletConfig.setForeignApi(true,"127.0.0.1:3415","", "","");
+            }
+            else {
+                // Check if foreign API has HTTPs. TOR doesn't support it
+                if (walletConfig.hasTls()) {
+                    core::getWndManager()->messageTextDlg("Unable to start TOR",
+                                                          "Your Foreign API is configured to use TLS certificated. TOR doesn't support https connection.\n\n"
+                                                          "Because of that TOR will not be started. You can review your configuration at Wallet Settings page.");
+                    appContext.setAutoStartTorEnabled(false);
+                }
+            }
+        }
+
         // Update Node
         node::MwcNode * mwcNode = new node::MwcNode( config::getMwcPath(), &appContext );
 

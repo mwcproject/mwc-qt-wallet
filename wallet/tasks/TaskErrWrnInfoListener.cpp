@@ -31,7 +31,6 @@ bool TaskErrWrnInfoListener::processTask(const QVector<WEvent> &events) {
                 qDebug() << "TaskErrWrnInfoListener::processTask switch to ready state";
             walletIsReady = true;
             return false;
-        case S_ERROR:
         case S_GENERIC_ERROR: {
             if (walletIsReady) {
                 qDebug() << "TaskErrWrnInfoListener::processTask with events: " << printEvents(events);
