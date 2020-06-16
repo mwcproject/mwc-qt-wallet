@@ -70,9 +70,8 @@ void Hodl::on_claimMwcButton_clicked()
     QString coldWalletHash;
     if (claimWalletHashDlg.exec() == QDialog::Accepted) {
         coldWalletHash = claimWalletHashDlg.getColdWalletPublicKeyHash();
+        hodl->moveToClaimPage(coldWalletHash);
     }
-
-    hodl->moveToClaimPage(coldWalletHash);
 }
 
 void Hodl::onSgnReportMessage(QString title, QString message) {
