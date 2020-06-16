@@ -42,7 +42,6 @@
 #include "z_wallethome.h"
 #include "z_walletsettings.h"
 #include "z_accountoptions.h"
->>>>>>> add walletsettings, accoutoptions page, update qml files
 
 
 namespace state {
