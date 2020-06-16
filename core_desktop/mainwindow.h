@@ -51,16 +51,17 @@ public:
 
 private slots:
     // Update tb & menu actions
-    void onUpdateActionStates(int actionState); // state::STATE
+    void onSgnUpdateActionStates(int actionState); // state::STATE
 
-    void onNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL
-    void onConfigUpdate();
+    void onSgnNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL
+    void onSgnConfigUpdate();
+    void onSgnLoginResult(bool ok);
 
-    void updateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
-    void onHttpListeningStatus(bool listening, QString additionalInfo);
-    void updateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
+    void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
+    void onSgnHttpListeningStatus(bool listening, QString additionalInfo);
+    void onSgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
-    void onUpdateSyncProgress(double progressPercent);
+    void onSgnUpdateSyncProgress(double progressPercent);
 
     // Internal UI
     void on_listenerStatusButton_clicked();

@@ -49,24 +49,25 @@ MainWindow::MainWindow(QWidget *parent) :
     util = new bridge::Util(this);
 
     QObject::connect( coreWindow, &CoreWindow::sgnUpdateActionStates,
-                      this, &MainWindow::onUpdateActionStates, Qt::QueuedConnection);
+                      this, &MainWindow::onSgnUpdateActionStates, Qt::QueuedConnection);
 
     QObject::connect( wallet, &Wallet::sgnNewNotificationMessage,
-                      this, &MainWindow::onNewNotificationMessage, Qt::QueuedConnection);
+                      this, &MainWindow::onSgnNewNotificationMessage, Qt::QueuedConnection);
     QObject::connect(wallet, &Wallet::sgnConfigUpdate,
-                     this, &MainWindow::onConfigUpdate, Qt::QueuedConnection);
-
+                     this, &MainWindow::onSgnConfigUpdate, Qt::QueuedConnection);
+    QObject::connect(wallet, &Wallet::sgnLoginResult,
+                     this, &MainWindow::onSgnLoginResult, Qt::QueuedConnection);
 
     QObject::connect(wallet, &Wallet::sgnUpdateListenerStatus,
-                     this, &MainWindow::updateListenerStatus, Qt::QueuedConnection);
+                     this, &MainWindow::onSgnUpdateListenerStatus, Qt::QueuedConnection);
     QObject::connect(wallet, &Wallet::sgnHttpListeningStatus,
-                     this, &MainWindow::onHttpListeningStatus, Qt::QueuedConnection);
+                     this, &MainWindow::onSgnHttpListeningStatus, Qt::QueuedConnection);
 
     QObject::connect(wallet, &Wallet::sgnUpdateNodeStatus,
-                     this, &MainWindow::updateNodeStatus, Qt::QueuedConnection);
+                     this, &MainWindow::onSgnUpdateNodeStatus, Qt::QueuedConnection);
 
     QObject::connect(wallet, &Wallet::sgnUpdateSyncProgress,
-                     this, &MainWindow::onUpdateSyncProgress, Qt::QueuedConnection);
+                     this, &MainWindow::onSgnUpdateSyncProgress, Qt::QueuedConnection);
 
     updateListenerBtn();
     updateNetworkName();
@@ -128,7 +129,7 @@ MainWindow::~MainWindow()
 }
 
 // level: notify::MESSAGE_LEVEL
-void MainWindow::onNewNotificationMessage(int level, QString message) {
+void MainWindow::onSgnNewNotificationMessage(int level, QString message) {
 
     using namespace wallet;
 
@@ -181,7 +182,7 @@ QWidget * MainWindow::getMainWindow() {
 }
 
 // actionState:  state::STATE
-void MainWindow::onUpdateActionStates(int actionState) {
+void MainWindow::onSgnUpdateActionStates(int actionState) {
     if (core::WalletApp::isExiting())
         return;
 
@@ -209,21 +210,21 @@ void MainWindow::on_helpButton_clicked()
     helpDlg.exec();
 }
 
-void MainWindow::updateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor) {
+void MainWindow::onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor) {
     Q_UNUSED(mwcOnline)
     Q_UNUSED(keybaseOnline)
     Q_UNUSED(tor);
     updateListenerBtn();
 }
 
-void MainWindow::onHttpListeningStatus(bool listening, QString additionalInfo) {
+void MainWindow::onSgnHttpListeningStatus(bool listening, QString additionalInfo) {
     Q_UNUSED(listening)
     Q_UNUSED(additionalInfo)
     updateListenerBtn();
 }
 
 // Node info
-void MainWindow::updateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
+void MainWindow::onSgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
     Q_UNUSED(errMsg)
     Q_UNUSED(totalDifficulty)
     if ( !online ) {
@@ -237,13 +238,17 @@ void MainWindow::updateNodeStatus( bool online, QString errMsg, int nodeHeight, 
     }
 }
 
-void MainWindow::onUpdateSyncProgress(double progressPercent) {
-    onNewNotificationMessage( int(notify::MESSAGE_LEVEL::INFO),
+void MainWindow::onSgnUpdateSyncProgress(double progressPercent) {
+    onSgnNewNotificationMessage( int(notify::MESSAGE_LEVEL::INFO),
                              "Wallet state update, " + util::trimStrAsDouble( QString::number(progressPercent), 4 ) + "% complete"  );
 }
 
+void MainWindow::onSgnConfigUpdate() {
+    updateNetworkName();
+}
 
-void MainWindow::onConfigUpdate() {
+void MainWindow::onSgnLoginResult(bool ok) {
+    Q_UNUSED(ok)
     updateNetworkName();
 }
 
