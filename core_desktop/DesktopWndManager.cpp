@@ -294,4 +294,12 @@ void DesktopWndManager::pageWalletHome() {
     Q_ASSERT(false);
 }
 
+void DesktopWndManager::pageWalletSettings() {
+    Q_ASSERT(false);
+}
+
+void DesktopWndManager::pageAccountOptions() {
+    Q_ASSERT(false);
+}
+
 }

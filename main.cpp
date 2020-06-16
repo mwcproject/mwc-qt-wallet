@@ -73,6 +73,7 @@
 #include "bridge/config_b.h"
 #include "bridge/clipboard_b.h"
 #include "bridge/statemachine_b.h"
+#include "bridge/wnd/g_send_b.h"
 
 #ifdef WALLET_MOBILE
 #include <QQmlApplicationEngine>
@@ -253,6 +254,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<bridge::InputPassword>("InputPasswordBridge", 1, 0, "InputPasswordBridge");
     qmlRegisterType<bridge::Receive>("ReceiveBridge", 1, 0, "ReceiveBridge");
     qmlRegisterType<ClipboardProxy>("Clipboard", 1, 0, "Clipboard");
+    qmlRegisterType<bridge::Send>("SendBridge", 1, 0, "SendBridge");
 
     core::MobileWndManager * wndManager = new core::MobileWndManager();
 #endif

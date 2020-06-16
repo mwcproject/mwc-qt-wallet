@@ -4,7 +4,7 @@ import StateMachineBridge 1.0
 
 Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160); }
+    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     StateMachineBridge {
         id: stateMachine
@@ -24,7 +24,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                console.log("Wallet => Send")
+                stateMachine.setActionWindow(8)
             }
         }
     }
@@ -52,7 +52,6 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                console.log("Wallet => Receive")
                 stateMachine.setActionWindow(9)
             }
         }

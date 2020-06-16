@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "state/z_wallethome.h"
+#include "state/z_walletsettings.h"
 #include "../core/appcontext.h"
 #include "../core/WndManager.h"
 
 namespace state {
 
-WalletHome::WalletHome( StateContext * _context) :
-    State(_context, STATE::WALLET_HOME)
+WalletSettings::WalletSettings( StateContext * _context) :
+    State(_context, STATE::WALLET_SETTINGS)
 {
 }
 
-WalletHome::~WalletHome() {
+WalletSettings::~WalletSettings() {
 }
 
-NextStateRespond WalletHome::execute() {
-    if (context->appContext->getActiveWndState() != STATE::WALLET_HOME)
+NextStateRespond WalletSettings::execute() {
+    if (context->appContext->getActiveWndState() != STATE::WALLET_SETTINGS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    core::getWndManager()->pageWalletHome();   // you need to add your page at WndManager
+    core::getWndManager()->pageWalletSettings();   // you need to add your page at WndManager
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 

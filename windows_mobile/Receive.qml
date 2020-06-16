@@ -10,7 +10,7 @@ import Clipboard 1.0
 Item {
     id: element
     readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160); }
+    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     ConfigBridge {
         id: config
@@ -31,9 +31,9 @@ Item {
     Connections {
         target: receive
         onSgnTransactionActionIsFinished: {
-//            util::TimeoutLockObject to( "Receive" );
-//            ui->progress->hide();
-//            control::MessageBox::messageText(this, success ? "Success" : "Failure", message );
+//            util::TimeoutLockObject to( "Receive" )
+//            ui->progress->hide()
+//            control::MessageBox::messageText(this, success ? "Success" : "Failure", message )
             console.log(success, message)
         }
     }
@@ -61,8 +61,8 @@ Item {
 
     function updateAccountList() {
         const accountInfo = wallet.getWalletBalance(true, false, true)
-        const selectedAccount = wallet.getReceiveAccount();
-        let selectedAccIdx = 0;
+        const selectedAccount = wallet.getReceiveAccount()
+        let selectedAccIdx = 0
 
         accountItems.clear()
 
@@ -166,12 +166,13 @@ Item {
         onCurrentIndexChanged: {
             if (accountComboBox.currentIndex >= 0) {
                 const currentAccount = accountItems.get(accountComboBox.currentIndex).account
-                wallet.setReceiveAccount(currentAccount);
+                wallet.setReceiveAccount(currentAccount)
             }
         }
 
         delegate: ItemDelegate {
             width: accountComboBox.width
+            height: dp(40)
             contentItem: Text {
                 text: info
                 color: "#7579ff"
@@ -184,7 +185,7 @@ Item {
 
         indicator: Canvas {
             id: canvas
-            x: accountComboBox.width - width - accountComboBox.rightPadding
+            x: accountComboBox.width - width - accountComboBox.rightPadding / 2
             y: accountComboBox.topPadding + (accountComboBox.availableHeight - height) / 2
             width: dp(14)
             height: dp(7)
@@ -192,16 +193,16 @@ Item {
 
             Connections {
                 target: accountComboBox
-                function onPressedChanged() { canvas.requestPaint(); }
+                function onPressedChanged() { canvas.requestPaint() }
             }
 
             onPaint: {
-                context.reset();
-                context.moveTo(0, 0);
-                context.lineTo(width / 2, height);
-                context.lineTo(width, 0);
+                context.reset()
+                context.moveTo(0, 0)
+                context.lineTo(width / 2, height)
+                context.lineTo(width, 0)
                 context.strokeStyle = "white"
-                context.stroke();
+                context.stroke()
             }
         }
 
@@ -258,7 +259,7 @@ Item {
 
     Button {
         id: button_copyaddress
-        width: dp(180)
+        width: parent.width / 2 - dp(40)
         height: dp(70)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
@@ -273,12 +274,12 @@ Item {
                 text: qsTr("Copy Address")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pointSize: dp(18)
+                font.pixelSize: dp(18)
                 color: "white"
             }
         }
         onClicked: {
-            clipboard.text = mwcMqAddress
+            clipboard.text = "mwcmqs://" + wallet.getMqsAddress()
             notification.text = "Address copied to the clipboard"
             notification.open()
         }
@@ -300,8 +301,8 @@ Item {
         id: label_file
         color: "#ffffff"
         text: qsTr("Offline (file)")
-        anchors.horizontalCenterOffset: dp(35)
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.left: parent.left
+        anchors.leftMargin: parent.width / 2 + dp(10)
         anchors.top: accountComboBox.bottom
         anchors.topMargin: dp(40)
         font.pixelSize: dp(13)
@@ -309,10 +310,10 @@ Item {
 
     Button {
         id: button_receivebyfile
-        width: dp(180)
+        width: parent.width / 2 - dp(40)
         height: dp(70)
-        anchors.horizontalCenterOffset: dp(90)
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.right: parent.right
+        anchors.rightMargin: dp(30)
         anchors.top: label_file.bottom
         anchors.topMargin: dp(14)
         background: Rectangle {
@@ -324,12 +325,12 @@ Item {
                 text: qsTr("Receive by File")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pointSize: dp(18)
+                font.pixelSize: dp(18)
                 color: "white"
             }
         }
         onClicked: {
-            fileDialog.open();
+            fileDialog.open()
         }
     }
 
@@ -351,8 +352,8 @@ Item {
         onAccepted: {
             console.log("Accepted: " + fileDialog.file)
 //            bridge.updateFileGenerationPath(fileDialog.file)
-//            ui->progress->show();
-//            receive.signTransaction(fileDialog.file);
+//            ui->progress->show()
+//            receive.signTransaction(fileDialog.file)
         }
     }
 

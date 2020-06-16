@@ -5,14 +5,14 @@ Rectangle {
     id: panel
 
     readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160); }
+    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     property bool open: false
     property int position: Qt.LeftEdge
 
-    function show() { open = true; }
-    function hide() { open = false; }
-    function toggle() { open = open ? false : true; }
+    function show() { open = true }
+    function hide() { open = false }
+    function toggle() { open = open ? false : true }
 
     readonly property bool _rightEdge: position === Qt.RightEdge
     readonly property int _closeX: _rightEdge ? _rootItem.width : - panel.width - 5
@@ -37,33 +37,33 @@ Rectangle {
     z: 10
 
     function _setupAnchors() {
-        _rootItem = parent;
+        _rootItem = parent
 
-        shadow.anchors.right = undefined;
-        shadow.anchors.left = undefined;
+        shadow.anchors.right = undefined
+        shadow.anchors.left = undefined
 
-        mouse.anchors.left = undefined;
-        mouse.anchors.right = undefined;
+        mouse.anchors.left = undefined
+        mouse.anchors.right = undefined
 
         if (_rightEdge) {
-            mouse.anchors.right = mouse.parent.right;
-            shadow.anchors.right = panel.left;
+            mouse.anchors.right = mouse.parent.right
+            shadow.anchors.right = panel.left
         } else {
-            mouse.anchors.left = mouse.parent.left;
-            shadow.anchors.left = panel.right;
+            mouse.anchors.left = mouse.parent.left
+            shadow.anchors.left = panel.right
         }
 
-        slideAnimation.enabled = false;
-        panel.x = _rightEdge ? _rootItem.width :  - panel.width;
-        slideAnimation.enabled = true;
+        slideAnimation.enabled = false
+        panel.x = _rightEdge ? _rootItem.width :  - panel.width
+        slideAnimation.enabled = true
     }
 
     function completeSlideDirection() {
         if (open) {
-            panel.x = _openX;
+            panel.x = _openX
         } else {
-            panel.x = _closeX;
-            Qt.inputMethod.hide();
+            panel.x = _closeX
+            Qt.inputMethod.hide()
         }
     }
 
@@ -71,25 +71,25 @@ Rectangle {
         var velocityThreshold = dp(5)
         if ((_rightEdge && _velocity > velocityThreshold) ||
                 (!_rightEdge && _velocity < -velocityThreshold)) {
-            panel.open = false;
+            panel.open = false
             completeSlideDirection()
         } else if ((_rightEdge && _velocity < -velocityThreshold) ||
                    (!_rightEdge && _velocity > velocityThreshold)) {
-            panel.open = true;
+            panel.open = true
             completeSlideDirection()
         } else if ((_rightEdge && panel.x < _openX + _pullThreshold) ||
                    (!_rightEdge && panel.x > _openX - _pullThreshold) ) {
-            panel.open = true;
-            panel.x = _openX;
+            panel.open = true
+            panel.x = _openX
         } else {
-            panel.open = false;
-            panel.x = _closeX;
+            panel.open = false
+            panel.x = _closeX
         }
     }
 
     function handleClick(mouse) {
         if ((_rightEdge && mouse.x < panel.x ) || mouse.x > panel.width) {
-            open = false;
+            open = false
         }
     }
 
@@ -123,7 +123,7 @@ Rectangle {
         y: _rootItem.y
         width: open ? _rootItem.width : _openMarginSize
         height: _rootItem.height
-        onPressed:  if (!open) holdAnimation.restart();
+        onPressed:  if (!open) holdAnimation.restart()
         onClicked: handleClick(mouse)
         drag.target: panel
         drag.minimumX: _minimumX
@@ -133,8 +133,8 @@ Rectangle {
         onReleased: handleRelease()
         z: open ? 1 : 0
         onMouseXChanged: {
-            _velocity = (mouse.x - _oldMouseX);
-            _oldMouseX = mouse.x;
+            _velocity = (mouse.x - _oldMouseX)
+            _oldMouseX = mouse.x
         }
     }
 

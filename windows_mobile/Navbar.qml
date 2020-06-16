@@ -6,7 +6,27 @@ import StateMachineBridge 1.0
 
 Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160); }
+    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
+
+    function updateTitle(state) {
+        switch (state) {
+        case 8:
+            text_title.text = qsTr("Wallet  >   Send")
+            break
+        case 9:
+            text_title.text = qsTr("Wallet  >   Receive")
+            break
+        case 21:
+            text_title.text = qsTr("Wallet")
+            break
+        case 22:
+            text_title.text = qsTr("Account Options")
+            break
+        case 23:
+            text_title.text = qsTr("Wallet Settings")
+            break
+        }
+    }
 
     WalletBridge {
         id: wallet
@@ -19,7 +39,7 @@ Item {
     Connections {
         target: wallet
         onSgnWalletBalanceUpdated: {
-            text_balance.text = wallet.getTotalMwcAmount() + " MWC";
+            text_balance.text = wallet.getTotalMwcAmount() + " mwc"
         }
     }
 
@@ -28,7 +48,7 @@ Item {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: dp(70)
+        height: dp(60)
         color: "#00000000"
 
         Rectangle {
@@ -73,29 +93,61 @@ Item {
             }
         }
 
-        Image {
-            id: image_logo1
-            width: dp(58)
-            height: dp(29)
-            anchors.horizontalCenterOffset: dp(-30)
-            anchors.verticalCenter: parent.verticalCenter
+        Text {
+            id: text_title
+            color: "#ffffff"
+            text: "Wallet"
             anchors.horizontalCenter: parent.horizontalCenter
-            fillMode: Image.PreserveAspectFit
-            source: "../img/TBLogo@2x.svg"
+            font.bold: true
+            anchors.verticalCenter: parent.verticalCenter
+            font.pixelSize: dp(17)
         }
+
+
+    }
+
+    Rectangle {
+        id: rect_splitter
+        width: dp(250)
+        height: dp(1)
+        color: "#ffffff"
+        anchors.top: menuRect.bottom
+        anchors.topMargin: 0
+        anchors.horizontalCenter: parent.horizontalCenter
+    }
+
+    Rectangle {
+        id: rect_balance
+        height: dp(60)
+        color: "#00000000"
+        anchors.top: menuRect.bottom
+        anchors.topMargin: 0
+        anchors.right: parent.right
+        anchors.rightMargin: 0
+        anchors.left: parent.left
+        anchors.leftMargin: 0
 
         Text {
             id: text_balance
             text: ""
             anchors.left: image_logo1.right
             anchors.leftMargin: dp(14)
-            font.bold: true
             font.pixelSize: dp(20)
+            font.bold: true
             color: "white"
             anchors.verticalCenter: image_logo1.verticalCenter
         }
 
-
+        Image {
+            id: image_logo1
+            width: dp(58)
+            height: dp(29)
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenterOffset: dp(-30)
+            anchors.horizontalCenter: parent.horizontalCenter
+            fillMode: Image.PreserveAspectFit
+            source: "../img/TBLogo@2x.svg"
+        }
     }
 
     Image {
@@ -311,16 +363,16 @@ Item {
 
                     Connections {
                         target: accountComboBox
-                        function onPressedChanged() { canvas.requestPaint(); }
+                        function onPressedChanged() { canvas.requestPaint() }
                     }
 
                     onPaint: {
-                        context.reset();
-                        context.moveTo(0, 0);
-                        context.lineTo(width / 2, height);
-                        context.lineTo(width, 0);
+                        context.reset()
+                        context.moveTo(0, 0)
+                        context.lineTo(width / 2, height)
+                        context.lineTo(width, 0)
                         context.strokeStyle = "white"
-                        context.stroke();
+                        context.stroke()
                     }
                 }
 
@@ -401,7 +453,8 @@ Item {
                 }
 
                 onClicked: {
-                    console.log("Change instance")
+                    nav.toggle()
+//                    messagebox.open(qsTr("Change Instance"), qsTr("Changing an instance will log you out of this current wallet instance. Are you sure you want to log out?"))
                 }
             }
 
@@ -423,6 +476,12 @@ Item {
             imagePath: "../img/NavSettings@2x.svg"
         }
     }
+
+//    MessageBox {
+//        id: messagebox
+//        anchors.verticalCenter: parent.verticalCenter
+//        anchors.horizontalCenter: parent.horizontalCenter
+//    }
 }
 
 /*##^##

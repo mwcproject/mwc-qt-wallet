@@ -1,9 +1,13 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.13
+import QtQuick.Window 2.0
 
 Item {
-    width: 280
-    height: 200
+    readonly property int dpi: Screen.pixelDensity * 25.4
+    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
+
+    width: dp(280)
+    height: dp(200)
     id: messagebox
     visible: false
 
@@ -16,11 +20,11 @@ Item {
     Rectangle {
         id: rectangle
         color: "#ffffff"
-        anchors.rightMargin: 1
-        anchors.leftMargin: 1
-        anchors.bottomMargin: 1
-        anchors.topMargin: 1
-        border.width: 1
+        anchors.rightMargin: dp(1)
+        anchors.leftMargin: dp(1)
+        anchors.bottomMargin: dp(1)
+        anchors.topMargin: dp(1)
+        border.width: dp(1)
         anchors.fill: parent
 
         Text {
@@ -28,42 +32,42 @@ Item {
             text: qsTr("Title")
             font.bold: true
             anchors.top: parent.top
-            anchors.topMargin: 25
+            anchors.topMargin: dp(25)
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: 20
+            font.pixelSize: dp(20)
             color: "#3600c9"
         }
 
         Text {
             id: content
-            width: 200
-            height: 80
+            width: dp(200)
+            height: dp(80)
             text: qsTr("Content")
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: 15
+            font.pixelSize: dp(15)
             color: "#3600c9"
         }
 
         Button {
             id: button_ok
-            width: 150
-            height: 30
+            width: dp(150)
+            height: dp(30)
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 20
+            anchors.bottomMargin: dp(20)
             anchors.horizontalCenter: parent.horizontalCenter
 
             background: Rectangle {
                 color: "#9e00e7"
-                radius: 10
+                radius: dp(10)
                 Text {
                     text: qsTr("OK")
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
-                    font.pointSize: 15
+                    font.pointSize: dp(15)
                     color: "white"
                 }
             }
