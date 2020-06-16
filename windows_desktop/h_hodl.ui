@@ -93,7 +93,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="../resources.qrc">:/img/HODL_big@2x.svg</pixmap>
+          <pixmap resource="../resources_desktop.qrc">:/img/HODL_big@2x.svg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -470,6 +470,11 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
@@ -484,14 +489,9 @@
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources.qrc"/>
+  <include location="../resources_desktop.qrc"/>
  </resources>
  <connections/>
 </ui>

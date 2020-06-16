@@ -127,7 +127,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../resources.qrc">
+        <iconset resource="../resources_desktop.qrc">
          <normaloff>:/img/DeleteDlg@2x.svg</normaloff>:/img/DeleteDlg@2x.svg</iconset>
        </property>
        <property name="iconSize">
@@ -174,7 +174,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../resources.qrc">
+        <iconset resource="../resources_desktop.qrc">
          <normaloff>:/img/AddDlg@2x.svg</normaloff>:/img/AddDlg@2x.svg</iconset>
        </property>
        <property name="iconSize">
@@ -221,7 +221,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../resources.qrc">
+        <iconset resource="../resources_desktop.qrc">
          <normaloff>:/img/EditDlg@2x.svg</normaloff>:/img/EditDlg@2x.svg</iconset>
        </property>
        <property name="iconSize">
@@ -334,7 +334,7 @@
   <tabstop>selectButton</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources.qrc"/>
+  <include location="../resources_desktop.qrc"/>
  </resources>
  <connections/>
 </ui>

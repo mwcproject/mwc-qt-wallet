@@ -215,7 +215,7 @@ color: #FFFFFF;</string>
         <string notr="true">Send</string>
        </property>
        <property name="icon">
-        <iconset resource="../resources.qrc">
+        <iconset resource="../resources_desktop.qrc">
          <normaloff>:/img/Send@2x.svg</normaloff>:/img/Send@2x.svg</iconset>
        </property>
        <property name="iconSize">
