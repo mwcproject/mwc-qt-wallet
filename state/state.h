@@ -43,28 +43,29 @@ enum STATE {
     STATE_INIT = 2,             // first run. Creating the password for a wallet
     INPUT_PASSWORD = 3,         // Input password from the wallet
     ACCOUNTS = 4,               // Wallet accounts.              Note!!!  Keep accounts first Action page.
-    MIGRATION = 5,              // Data migration between wallet versions. Note!! Needs to be before Transaction page.
-    ACCOUNT_TRANSFER= 6,        // Transfer funds from account to account
-    EVENTS = 7,                 // Wallet events (logs)
-    HODL = 8,                   // Hodl program.
-    SEND = 9,                   // Send coins Page
-    RECEIVE_COINS = 10,         // Receive coins
-    LISTENING = 11,             // Listening API setting/status
-    TRANSACTIONS = 12,          // Transactions dialog
-    OUTPUTS = 13,               // Outputs for this wallet
-    CONTACTS = 14,              // Contact page. COntacts supported by wallet713
-    WALLET_CONFIG = 15,         // Wallet config
-    AIRDRDOP_MAIN = 16,         // Starting airdrop page
-    SHOW_SEED = 17,             // Show Seed
-    NODE_INFO = 18,             // Show node info
-    RESYNC = 19,                // Re-sync account with a node
-    FINALIZE = 20,              // Finalize transaction. Windowless state
-    WALLET_RUNNING_MODE = 21,   // Running mode as a node, wallet or cold wallet
+    ACCOUNT_TRANSFER= 5,        // Transfer funds from account to account
+    EVENTS = 6,                 // Wallet events (logs)
+    HODL = 7,                   // Hodl program.
+    SEND = 8,                   // Send coins Page
+    RECEIVE_COINS = 9,          // Receive coins
+    LISTENING = 10,             // Listening API setting/status
+    TRANSACTIONS = 11,          // Transactions dialog
+    OUTPUTS = 12,               // Outputs for this wallet
+    CONTACTS = 13,              // Contact page. COntacts supported by wallet713
+    WALLET_CONFIG = 14,         // Wallet config
+    AIRDRDOP_MAIN = 15,         // Starting airdrop page
+    SHOW_SEED = 16,             // Show Seed
+    NODE_INFO = 17,             // Show node info
+    RESYNC = 18,                // Re-sync account with a node
+    FINALIZE = 19,              // Finalize transaction. Windowless state
+    WALLET_RUNNING_MODE = 20,   // Running mode as a node, wallet or cold wallet
 
     // Mobile Specific Pages
-    WALLET_HOME = 22,           // Wallet home page
-    ACCOUNT_OPTIONS = 23,       // Account options page
-    WALLET_SETTINGS = 24        // Settings page
+    WALLET_HOME = 21,           // Wallet home page
+    ACCOUNT_OPTIONS = 22,       // Account options page
+    WALLET_SETTINGS = 23,       // Settings page
+
+    MIGRATION = 24              // Data migration between wallet versions.
 };
 
 struct NextStateRespond {
