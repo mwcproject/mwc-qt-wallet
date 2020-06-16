@@ -172,6 +172,7 @@ Item {
 
         delegate: ItemDelegate {
             width: accountComboBox.width
+            height: dp(40)
             contentItem: Text {
                 text: info
                 color: "#7579ff"
@@ -273,7 +274,7 @@ Item {
                 text: qsTr("Copy Address")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pointSize: dp(18)
+                font.pixelSize: dp(18)
                 color: "white"
             }
         }
@@ -324,7 +325,7 @@ Item {
                 text: qsTr("Receive by File")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pointSize: dp(18)
+                font.pixelSize: dp(18)
                 color: "white"
             }
         }

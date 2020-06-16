@@ -76,5 +76,6 @@
         <file>resource_mobile/wallet713.toml</file>
         <file>windows_mobile/AccountOptions.qml</file>
         <file>windows_mobile/Settings.qml</file>
+        <file>windows_mobile/Send.qml</file>
     </qresource>
 </RCC>

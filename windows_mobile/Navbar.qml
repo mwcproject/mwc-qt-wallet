@@ -10,6 +10,9 @@ Item {
 
     function updateTitle(state) {
         switch (state) {
+        case 8:
+            text_title.text = qsTr("Wallet  >   Send")
+            break
         case 9:
             text_title.text = qsTr("Wallet  >   Receive")
             break

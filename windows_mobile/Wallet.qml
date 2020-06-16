@@ -24,7 +24,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                console.log("Wallet => Send")
+                stateMachine.setActionWindow(8)
             }
         }
     }
@@ -52,7 +52,6 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                console.log("Wallet => Receive")
                 stateMachine.setActionWindow(9)
             }
         }

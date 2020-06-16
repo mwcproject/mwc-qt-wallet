@@ -10,6 +10,9 @@ Window {
     
     property int currentState
 
+    readonly property int dpi: Screen.pixelDensity * 25.4
+    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
+
     CoreWindowBridge {
         id: coreWindow
     }
@@ -45,28 +48,46 @@ Window {
         visible: currentState === 3
     }
 
-    Wallet {
-        id: wallethome
-        anchors.fill: parent
-        visible: currentState === 21
-    }
+    Rectangle {
+        color: "#00000000"
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: dp(60)
+        anchors.right: parent.right
+        anchors.rightMargin: 0
+        anchors.left: parent.left
+        anchors.leftMargin: 0
+        anchors.top: parent.top
+        anchors.topMargin: dp(120)
 
-    AccountOptions {
-        id: accountoptions
-        anchors.fill: parent
-        visible: currentState === 22
-    }
+        Wallet {
+            id: wallethome
+            anchors.fill: parent
+            visible: currentState === 21
+        }
 
-    Settings {
-        id: walletsettings
-        anchors.fill: parent
-        visible: currentState === 23
-    }
+        AccountOptions {
+            id: accountoptions
+            anchors.fill: parent
+            visible: currentState === 22
+        }
 
-    Receive {
-        id: receiveTab
-        anchors.fill: parent
-        visible: currentState === 9
+        Settings {
+            id: walletsettings
+            anchors.fill: parent
+            visible: currentState === 23
+        }
+
+        Send {
+            id: sendTab
+            anchors.fill: parent
+            visible: currentState === 8
+        }
+
+        Receive {
+            id: receiveTab
+            anchors.fill: parent
+            visible: currentState === 9
+        }
     }
 
     Navbar {
