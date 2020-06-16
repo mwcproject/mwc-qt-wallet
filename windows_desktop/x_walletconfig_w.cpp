@@ -113,6 +113,7 @@ WalletConfig::WalletConfig(QWidget *parent) :
 
     currentLogoutTimeout = walletConfig->getLogoutTimeMs() / 1000;
     updateAutoLogoutStateUI(currentLogoutTimeout);
+    logoutTimeout = currentLogoutTimeout;
 
     outputLockingEnabled = walletConfig->isOutputLockingEnabled();
     ui->outputLockingCheck->setChecked(outputLockingEnabled);
