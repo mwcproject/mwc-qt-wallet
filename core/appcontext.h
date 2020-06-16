@@ -183,6 +183,11 @@ public:
     bool isFluffSet() const { return fluffTransactions; }
     void setFluff(bool fluffSetting);
 
+    // Transaction note migration
+    bool hasTxnNotesToMigrate();
+    QStringList getTxnNotesToMigrate(QString walletId, QString accountId);
+    void migrateTxnNote(QString walletId, QString accountId, QString txIdx, QString txUuid);
+
 private:
 signals:
     void onOutputLockChanged(QString commit);

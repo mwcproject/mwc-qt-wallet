@@ -39,6 +39,7 @@
 #include "../bridge/corewindow_b.h"
 #include "../core/WndManager.h"
 #include "z_wallethome.h"
+#include "x_migration.h"
 
 
 namespace state {
@@ -98,6 +99,10 @@ StateMachine::StateMachine()
 
     // Mobile specfic states
     states[ STATE::WALLET_HOME ] = new WalletHome(context);
+
+    // State for handling any data migration between wallet
+    // versions that might need to be done
+    states[ STATE::MIGRATION ] = new Migration(context);
 
     startTimer(1000);
 }

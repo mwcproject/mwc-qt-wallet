@@ -409,6 +409,54 @@ void AppContext::migrateOutputNotes()
     oldFormatOutputNotes.clear();
 }
 
+bool AppContext::hasTxnNotesToMigrate() {
+    return oldFormatTxnNotes.size() > 0;
+}
+
+QStringList AppContext::getTxnNotesToMigrate(QString walletId, QString accountId) {
+    QStringList txIdxList;
+
+    if (oldFormatTxnNotes.size() <= 0)
+        return txIdxList;
+
+    if (oldFormatTxnNotes.contains(walletId)) {
+        QMap<QString, QMap<QString, QString>> accountNotes = oldFormatTxnNotes[walletId];
+        if (accountNotes.contains(accountId)) {
+           QMap<QString, QString> txnNotes = accountNotes[accountId];
+           for (QString txIdx : txnNotes.keys()) {
+               txIdxList.append(txIdx);
+           }
+        }
+    }
+    return txIdxList;
+}
+
+void AppContext::migrateTxnNote(QString walletId, QString accountId, QString txIdx, QString txUuid) {
+    if (oldFormatTxnNotes.size() <= 0)
+        return;
+
+    if (oldFormatTxnNotes.contains(walletId)) {
+        QMap<QString, QMap<QString, QString>>& accountNotes = oldFormatTxnNotes[walletId];
+        if (accountNotes.contains(accountId)) {
+            QMap<QString, QString>& txnNotes = accountNotes[accountId];
+            if (txnNotes.contains(txIdx)) {
+                QString note = txnNotes.value(txIdx);
+                QString key = "tx_" + txUuid;
+                updateNote(key, note);
+                txnNotes.remove(txIdx);
+            }
+            if (txnNotes.size() <= 0) {
+                // this account doesn't have any more notes, so remove it
+                accountNotes.remove(accountId);
+            }
+        }
+        if (accountNotes.size() <= 0) {
+            // this wallet doesn't have any more notes
+            oldFormatTxnNotes.remove(walletId);
+        }
+    }
+}
+
 
 void AppContext::setLogsEnabled(bool enabled) {
     if (enabled == logsEnabled)
