@@ -100,7 +100,8 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
                 idx1 = ln.message.indexOf("for [");
                 idx2 = ln.message.indexOf(']', idx1+1);
                 if (idx1>0 && idx2>0) {
-                    mwc = ln.message.mid(idx1 + 1, idx2 - idx1 - 1);
+                    idx1 += int(strlen("for ["));
+                    mwc = ln.message.mid(idx1, idx2 - idx1);
                     mwc = util::zeroDbl2Dbl(mwc);
                 }
 
