@@ -44,7 +44,7 @@ NextStateRespond AccountTransfer::execute() {
     if (context->appContext->getActiveWndState() != STATE::ACCOUNT_TRANSFER)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if (bridge::getBridgeManager()->getAccountTransfer().isEmpty()) {
+    if ( state::getStateMachine()->getCurrentStateId() != STATE::ACCOUNT_TRANSFER ) {
         core::getWndManager()->pageAccountTransfer();
     }
 
@@ -92,7 +92,7 @@ bool AccountTransfer::transferFunds(const QString & from,
     }
 
 
-    if (bridge::getBridgeManager()->getAccountTransfer().isEmpty()) {
+    if ( state::getStateMachine()->getCurrentStateId() != STATE::ACCOUNT_TRANSFER ) {
         Q_ASSERT(false);
         return false;
     }

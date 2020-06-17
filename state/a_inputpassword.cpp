@@ -126,7 +126,7 @@ void InputPassword::onWalletBalanceUpdated() {
         return; // in restart mode
 
     // Using wnd as a flag that we are active.
-    if ( !inLockMode && !bridge::getBridgeManager()->getInputPassword().isEmpty()) {
+    if ( !inLockMode && state::getStateMachine()->getCurrentStateId() == STATE::INPUT_PASSWORD) {
         context->stateMachine->executeFrom(STATE::INPUT_PASSWORD);
     }
 }

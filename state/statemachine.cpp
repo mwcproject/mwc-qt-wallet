@@ -174,16 +174,19 @@ void StateMachine::executeFrom( STATE nextState ) {
 
     Q_ASSERT( states.contains(nextState) );
 
-    currentState = STATE::NONE;
-    for ( auto it = states.find(nextState); it!=states.end(); it++)
     {
-        if ( processState( it.value() ) )
-            continue;
+        STATE newState = STATE::NONE;
+        for ( auto it = states.find(nextState); it!=states.end(); it++)
+        {
+            if ( processState( it.value() ) )
+                continue;
 
-        currentState = it.key();
-        for (auto b : bridge::getBridgeManager()->getCoreWindow())
-            b->updateActionStates(currentState);
-        break;
+            newState = it.key();
+            for (auto b : bridge::getBridgeManager()->getCoreWindow())
+                b->updateActionStates(newState);
+            break;
+        }
+        currentState = newState;
     }
 
     // Resync is blocking logout. We need to respect that.

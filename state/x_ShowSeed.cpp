@@ -17,6 +17,7 @@
 #include "../core/WndManager.h"
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/c_newseed_b.h"
+#include "statemachine.h"
 
 namespace state {
 
@@ -32,7 +33,7 @@ NextStateRespond ShowSeed::execute() {
     if ( context->appContext->getActiveWndState() != STATE::SHOW_SEED )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if ( bridge::getBridgeManager()->getNewSeed().isEmpty()) {
+    if ( state::getStateMachine()->getCurrentStateId() != STATE::SHOW_SEED) {
         QString walletPassword = context->appContext->pullCookie<QString>("password");
         core::getWndManager()->pageNewSeed(mwc::PAGE_X_SHOW_PASSPHRASE, QVector<QString>(), true);
         context->wallet->getSeed(walletPassword);

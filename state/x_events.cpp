@@ -62,7 +62,7 @@ void Events::onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString mess
     for (auto b : bridge::getBridgeManager()->getEvents())
         b->updateShowMessages();
 
-    if (bridge::getBridgeManager()->getEvents().isEmpty()) {
+    if ( state::getStateMachine()->getCurrentStateId() != STATE::EVENTS ) {
         if ( notify::NotificationMessage::isCritical(level) ) {
             for (auto b : bridge::getBridgeManager()->getEvents())
                 b->updateNonShownWarnings(true);

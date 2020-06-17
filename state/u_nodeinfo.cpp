@@ -76,7 +76,7 @@ NextStateRespond NodeInfo::execute() {
     if ( context->appContext->getActiveWndState() != STATE::NODE_INFO )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if (bridge::getBridgeManager()->getNodeInfo().isEmpty()) {
+    if ( state::getStateMachine()->getCurrentStateId() != STATE::NODE_INFO ) {
         core::getWndManager()->pageNodeInfo();
         for (auto b : bridge::getBridgeManager()->getNodeInfo())
             b->setNodeStatus( lastLocalNodeStatus,  lastNodeStatus );
@@ -198,7 +198,7 @@ void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pe
         justLogin = false;
         // Let's consider 5 blocks (5 minutes) unsync be critical issue
         if ( !online || nodeHeight < peerHeight - mwc::NODE_HEIGHT_DIFF_LIMIT || connections==0 ) {
-            if (bridge::getBridgeManager()->getNodeInfo().isEmpty()) {
+            if ( state::getStateMachine()->getCurrentStateId() != STATE::NODE_INFO) {
                 // Switching to this Node Info state. State switch will take care about the rest workflow
                 context->stateMachine->setActionWindow( state::STATE::NODE_INFO );
                 return;

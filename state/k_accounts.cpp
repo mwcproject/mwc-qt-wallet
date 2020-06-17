@@ -44,7 +44,7 @@ NextStateRespond Accounts::execute() {
     if (context->appContext->getActiveWndState() != STATE::ACCOUNTS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if ( bridge::getBridgeManager()->getAccounts().isEmpty()) {
+    if ( state::getStateMachine()->getCurrentStateId() != STATE::ACCOUNTS ) {
         core::getWndManager()->pageAccounts();
     }
 

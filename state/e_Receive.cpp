@@ -45,7 +45,7 @@ NextStateRespond Receive::execute() {
     if ( context->appContext->getActiveWndState() != STATE::RECEIVE_COINS  )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if (bridge::getBridgeManager()->getReceive().isEmpty()) {
+    if ( state::getStateMachine()->getCurrentStateId() != STATE::RECEIVE_COINS ) {
         ftBack();
     }
 
@@ -113,14 +113,7 @@ void Receive::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pee
 }
 
 bool Receive::isActive() const {
-    if (!bridge::getBridgeManager()->getReceive().isEmpty())
-        return true;
-
-    for (auto p : bridge::getBridgeManager()->getFileTransaction()) {
-        if (p->getCallerId() == RECEIVE_CALLER_ID)
-            return true;
-    }
-    return false;
+    return state::getStateMachine()->getCurrentStateId() == STATE::RECEIVE_COINS;
 }
 
 

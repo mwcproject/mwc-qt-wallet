@@ -323,7 +323,7 @@ void Hodl::onGetNextKeyResult( bool success, QString identifier, QString publicK
     Q_UNUSED(btcaddress)
     Q_UNUSED(airDropAccPassword)
 
-    if (bridge::getBridgeManager()->getHodl().isEmpty())
+    if ( state::getStateMachine()->getCurrentStateId() != STATE::HODL )
         return; // Not our case, dropping request...
 
     if (success) {

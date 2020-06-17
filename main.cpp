@@ -101,18 +101,14 @@ bool deployWalletFilesFromResources() {
 
     if ( !QFile::exists(mwc713conf)) {
         ok = ok && QFile::copy(mwc::MWC713_DEFAULT_CONFIG, mwc713conf);
-#ifndef WALLET_MOBILE
         if (ok)
             QFile::setPermissions(mwc713conf, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup);
-#endif
     }
 
     if ( !QFile::exists(mwcGuiWalletConf)) {
-        ok = ok && QFile::copy(":/resource_desktop/mwc-gui-wallet.conf", mwcGuiWalletConf);
-#ifndef WALLET_MOBILE
+        ok = ok && QFile::copy(mwc::QT_WALLET_DEFAULT_CONFIG, mwcGuiWalletConf);
         if (ok)
             QFile::setPermissions(mwcGuiWalletConf, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup);
-#endif
     }
 
     // Set default values

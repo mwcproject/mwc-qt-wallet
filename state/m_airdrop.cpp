@@ -93,7 +93,7 @@ NextStateRespond Airdrop::execute() {
     if (context->appContext->getActiveWndState() != STATE::AIRDRDOP_MAIN)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if (bridge::getBridgeManager()->getAirdrop().isEmpty()) {
+    if ( state::getStateMachine()->getCurrentStateId() != STATE::AIRDRDOP_MAIN ) {
         core::getWndManager()->pageAirdrop();
     }
 
@@ -464,7 +464,7 @@ void Airdrop::replyFinished(QNetworkReply* reply) {
 
 void Airdrop::onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPassword) {
 
-    if (bridge::getBridgeManager()->getAirdrop().isEmpty())
+    if ( state::getStateMachine()->getCurrentStateId() != STATE::AIRDRDOP_MAIN )
         return; // Not Airdrop workflow
 
     if (success) {

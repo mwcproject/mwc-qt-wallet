@@ -191,7 +191,7 @@ void Send::respSendFile( bool success, QStringList errors, QString fileName ) {
     else
         message = "Unable to generate transaction file.\n" + util::formatErrorMessages(errors);
 
-    if (!bridge::getBridgeManager()->getSend().isEmpty()) {
+    if ( state::getStateMachine()->getCurrentStateId() == STATE::SEND ) {
         for (auto b : bridge::getBridgeManager()->getSend())
             b->showSendResult(success, message);
 
@@ -313,7 +313,7 @@ void Send::sendRespond( bool success, QStringList errors, QString address, int64
     for (auto b : bridge::getBridgeManager()->getSend())
         b->showSendResult(success, errMsg);
 
-    if (success && !bridge::getBridgeManager()->getSend().isEmpty())
+    if (success && state::getStateMachine()->getCurrentStateId() == STATE::SEND)
         switchToStartingWindow();
 }
 

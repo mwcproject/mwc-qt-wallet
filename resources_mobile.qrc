@@ -77,5 +77,7 @@
         <file>windows_mobile/AccountOptions.qml</file>
         <file>windows_mobile/Settings.qml</file>
         <file>windows_mobile/Send.qml</file>
+        <file>resource_mobile/mwc-server-floo.toml</file>
+        <file>resource_mobile/mwc-server-main.toml</file>
     </qresource>
 </RCC>

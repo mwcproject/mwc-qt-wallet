@@ -38,14 +38,26 @@ const QString DEL_ACCONT_PREFIX = "del_";
 
 const QVector<QString> BANNED_ACCOUT_PREFIXES = {DEL_ACCONT_PREFIX};
 
+#ifdef WALLET_DESKTOP
+
+const QString QT_WALLET_DEFAULT_CONFIG  = ":/resource_desktop/mwc-gui-wallet.conf";
+
 #ifdef Q_OS_DARWIN
-const QString MWC713_DEFAULT_CONFIG = ":/resource_desktop/wallet713_mac.toml";
+const QString MWC713_DEFAULT_CONFIG     = ":/resource_desktop/wallet713_mac.toml";
 #else
-const QString MWC713_DEFAULT_CONFIG = ":/resource_desktop/wallet713_def.toml";
+const QString MWC713_DEFAULT_CONFIG     = ":/resource_desktop/wallet713_def.toml";
 #endif
 
-const QString MWC_NODE_CONFIG_MAIN = ":/resource_desktop/mwc-server-main.toml";
-const QString MWC_NODE_CONFIG_FLOO = ":/resource_desktop/mwc-server-floo.toml";
+const QString MWC_NODE_CONFIG_MAIN      = ":/resource_desktop/mwc-server-main.toml";
+const QString MWC_NODE_CONFIG_FLOO      = ":/resource_desktop/mwc-server-floo.toml";
+#endif
+
+#ifdef WALLET_MOBILE
+const QString QT_WALLET_DEFAULT_CONFIG  = ":/resource_mobile/mwc-gui-wallet.conf";
+const QString MWC713_DEFAULT_CONFIG     = ":/resource_mobile/wallet713.toml";
+const QString MWC_NODE_CONFIG_MAIN      = ":/resource_mobile/mwc-server-main.toml";
+const QString MWC_NODE_CONFIG_FLOO      = ":/resource_mobile/mwc-server-floo.toml";
+#endif
 
 const int64_t AIRDROP_TRANS_KEEP_TIME_MS = 1000L*3600L*24L*15; // 15 days should be enough
 
