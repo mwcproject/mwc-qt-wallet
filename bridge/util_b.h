@@ -49,7 +49,7 @@ public:
     Q_INVOKABLE bool isPublicKeyValid(QString str);
 
     // Verify address and return the address type.
-    // Return values: "Unknown", "https", "keybase", "mwcmqs"
+    // Return values: "Unknown", "https", "tor","keybase", "mwcmqs"
     Q_INVOKABLE QString verifyAddress(QString address);
 
     // Password analyzer routine, simplifyed version for GUI.

@@ -162,7 +162,8 @@ void SendOnline::onSgnShowSendResult( bool success, QString message ) {
 
 void SendOnline::on_sendEdit_textChanged(const QString & address)
 {
-    if (util->verifyAddress(address) == "https")
+    QString addrType = util->verifyAddress(address);
+    if ( addrType == "https" || addrType=="tor" )
         ui->apiSecretEdit->show();
     else
         ui->apiSecretEdit->hide();
