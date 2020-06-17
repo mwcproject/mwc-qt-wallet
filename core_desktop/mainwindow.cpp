@@ -92,7 +92,7 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->listenerStatusButton->hide();
     }
 
-    setStatusButtonState(ui->nodeStatusButton, STATUS::RED, "Waiting");
+    setStatusButtonState(ui->nodeStatusButton, STATUS::GREEN, "Waiting");
     setStatusButtonState(ui->listenerStatusButton, STATUS::RED, "Listeners");
 
     //ui->statusBar->showMessage("Can show any message here", 2000);
