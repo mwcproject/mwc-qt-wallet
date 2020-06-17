@@ -307,7 +307,7 @@ void Send::sendRespond( bool success, QStringList errors, QString address, int64
         if (errMsg.isEmpty())
             errMsg = "Your send request was failed by some reasons";
         else
-            errMsg = "Your send request was failed:\n" + errMsg;
+            errMsg = "Your send request was failed:\n\n" + errMsg;
     }
 
     for (auto b : bridge::getBridgeManager()->getSend())

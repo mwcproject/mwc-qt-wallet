@@ -121,8 +121,12 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
     QStringList errMsgs;
     QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
 
-    for (WEvent & evt : errs)
-        errMsgs.push_back( evt.message );
+    for (WEvent & evt : errs) {
+        if (evt.message.contains("is recipient listening"))
+            errMsgs.push_back("Recipient wallet is offline. Please retry to send when recipient wallet will be online.");
+
+        errMsgs.push_back(evt.message);
+    }
 
     if (errMsgs.isEmpty())
         errMsgs.push_back("Not found expected output from mwc713");

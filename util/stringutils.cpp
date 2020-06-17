@@ -189,7 +189,7 @@ QString formatErrorMessages(QStringList messages) {
     QString errMsg;
     for (auto & err : messages) {
         if (errMsg.size()>0)
-            errMsg += "\n";
+            errMsg += "\n\n";
 
         errMsg += util::trimErrorMessage(err);
     }
