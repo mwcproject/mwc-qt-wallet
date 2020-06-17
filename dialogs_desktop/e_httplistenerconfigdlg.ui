@@ -29,7 +29,7 @@
     </size>
    </property>
    <property name="text">
-    <string>Foreign API Listener</string>
+    <string>HTTP Foreign API Listener</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -183,7 +183,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Use basic authorization</string>
+    <string>Foreign API Secret</string>
    </property>
   </widget>
   <widget class="QWidget" name="layoutWidget1_5">
@@ -214,7 +214,7 @@
        </size>
       </property>
       <property name="text">
-       <string>Password for user 'mwc'</string>
+       <string>Basic authorization for user 'mwc'</string>
       </property>
      </widget>
     </item>
@@ -494,17 +494,17 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>

@@ -363,7 +363,7 @@
             <number>1024</number>
            </property>
            <property name="placeholderText">
-            <string>Recipient wallet foreign api secret (optional)</string>
+            <string>Recipient HTTP Foreign API secret (optional)</string>
            </property>
           </widget>
          </item>
@@ -558,9 +558,9 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>
@@ -573,9 +573,9 @@
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
+   <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelTiny</class>
