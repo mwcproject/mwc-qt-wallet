@@ -19,6 +19,7 @@
 #endif
 #ifdef WALLET_MOBILE
 #include "core_mobile/MobileWndManager.h"
+#include <QSysInfo>
 #endif
 
 #include <QApplication>
@@ -118,6 +119,46 @@ bool deployWalletFilesFromResources() {
     return ok;
 }
 
+#ifdef WALLET_MOBILE
+// Let's deploy mwc713 wallet
+bool deployMwc713FromResources() {
+    QPair<bool,QString> confPath = ioutils::getAppDataPath();
+    if (!confPath.first) {
+        core::getWndManager()->messageTextDlg("Error", confPath.second);
+        return false;
+    }
+    QString mwc713path = confPath.second + "/mwc713";
+    bool ok = true;
+
+    // We can use currentCpuArchitecture()  but I think build makes more sense.
+    // App can be run on compatible CPU that we don't aware about
+    QString buildAbi = QSysInfo::buildCpuArchitecture();
+    QString mwc713resourcePath;
+    if (buildAbi == "arm")
+        mwc713resourcePath = ":/android_bin/arm/mwc713_arm";
+    else if (buildAbi == "arm64")
+        mwc713resourcePath = ":/android_bin/arm64/mwc713_arm64";
+    else if (buildAbi == "i386")
+        mwc713resourcePath = ":/android_bin/x86/mwc713_x86";
+    else if (buildAbi == "x86_64")
+        mwc713resourcePath = ":/android_bin/x86_64/mwc713_x86_64";
+
+    if (mwc713resourcePath.isEmpty()) {
+        core::getWndManager()->messageTextDlg("Error", "Your Android device has unsupported CPU Architecture " + buildAbi );
+        return false;
+    }
+
+    if ( !QFile::exists(mwc713path)) {
+        ok = ok && QFile::copy(mwc713resourcePath, mwc713path);
+        if (ok)
+            QFile::setPermissions(mwc713path, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner |
+                        QFileDevice::ReadGroup | QFileDevice::ExeGroup);
+    }
+    return ok;
+}
+#endif
+
+
 // Read configs
 // first - success flag
 // second - error message
@@ -205,6 +246,7 @@ QPair<bool, QString> readConfig(QApplication & app) {
         return QPair<bool, QString>(false, "Not found all expected fields at config file " + config);
     }
 
+#ifdef WALLET_DESKTOP
     if (wallet713_path == "build in") {
         wallet713_path = QCoreApplication::applicationDirPath() + "/" + "mwc713";
 #ifdef Q_OS_WIN
@@ -225,6 +267,29 @@ QPair<bool, QString> readConfig(QApplication & app) {
         mwc_path += ".exe";
 #endif
     }
+#endif
+
+#ifdef WALLET_MOBILE
+    // At Binary our binary are part of the data.
+    QPair<bool,QString> confPath = ioutils::getAppDataPath();
+    if (!confPath.first) {
+        core::getWndManager()->messageTextDlg("Error", confPath.second);
+        return QPair<bool, QString>(false, confPath.second);
+    }
+
+    if (wallet713_path == "build in") {
+        wallet713_path = confPath.second + "/mwc713";
+    }
+
+    if (mwc_path == "build in") {
+        mwc_path = confPath.second + "/mwc";
+    }
+
+    if (mwczip_path == "build in") {
+        mwczip_path = confPath.second + "/mwczip";
+    }
+#endif
+
 
     Q_ASSERT(runMode.first);
     config::setConfigData( runMode.second, mwc_path, wallet713_path, mwczip_path, airdropUrlMainNet, airdropUrlTestNet, hodlUrlMainnet, hodlUrlTestnet, logoutTimeout*1000L, timeoutMultiplierVal, sendTimeoutMs );
@@ -387,6 +452,14 @@ int main(int argc, char *argv[])
                 QMessageBox::critical(nullptr, "Error", "MWC GUI Wallet unable to read the stylesheet.");
                 return 1;
             }
+        }
+#endif
+
+#ifdef WALLET_MOBILE
+        // Let's deploy mwc713 wallet
+        if (!deployMwc713FromResources() ) {
+            QMessageBox::critical(nullptr, "Error", "Unable to provision mwc713 binary during the first run");
+            return 1;
         }
 #endif
 
@@ -563,6 +636,7 @@ int main(int argc, char *argv[])
         wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
 #else
         wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
+//        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
 #endif
 
         state::StateContext context( &appContext, wallet, mwcNode );
