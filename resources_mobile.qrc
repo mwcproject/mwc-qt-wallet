@@ -79,9 +79,5 @@
         <file>windows_mobile/Send.qml</file>
         <file>resource_mobile/mwc-server-floo.toml</file>
         <file>resource_mobile/mwc-server-main.toml</file>
-        <file>android_bin/arm64/mwc713_arm64</file>
-        <file>android_bin/armv7/mwc713_arm</file>
-        <file>android_bin/x86/mwc713_x86</file>
-        <file>android_bin/x86_64/mwc713_x86_64</file>
     </qresource>
 </RCC>

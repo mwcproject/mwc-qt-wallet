@@ -15,6 +15,7 @@
 #include "MobileWndManager.h"
 #include <QQmlApplicationEngine>
 #include "../state/state.h"
+#include <QMessageBox>
 
 namespace core {
 
@@ -34,7 +35,9 @@ void MobileWndManager::messageTextDlg( QString title, QString message, double wi
         Q_ASSERT(false); // early crash, not much what we can do. May be do some logs (message is an error description)?
         return;
     }
-    Q_ASSERT(false); // implement me
+
+    Q_UNUSED(widthScale)
+    QMessageBox::critical(nullptr, title,message);
 }
 
 void MobileWndManager::messageHtmlDlg( QString title, QString message, double widthScale)  {
@@ -48,8 +51,10 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
     Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
     Q_UNUSED(btn2Tooltip)
 
-    Q_ASSERT(false); // implement me
-    return WndManager::RETURN_CODE::BTN1;
+    if ( QMessageBox::Yes == QMessageBox::question(nullptr, title, message) )
+        return WndManager::RETURN_CODE::BTN2;
+    else
+        return WndManager::RETURN_CODE::BTN1;
 }
 
 WndManager::RETURN_CODE MobileWndManager::questionHTMLDlg( QString title, QString message, QString btn1, QString btn2,

@@ -89,6 +89,7 @@ bool MWC713::checkWalletInitialized() {
 
     bool uninit = output.contains("Uninitialized");
 
+    logger::logInfo("MWC713", QString("Output result: ") + output );
     logger::logInfo("MWC713", QString("Wallet initialization checking status: ") + (uninit ? "Uninitialized" : "Initialized") );
 
     return !uninit;
