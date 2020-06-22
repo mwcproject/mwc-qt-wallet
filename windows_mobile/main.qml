@@ -9,6 +9,7 @@ Window {
     title: qsTr("MWC-Mobile-Wallet")
     
     property int currentState
+    property int subWindow
 
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
@@ -80,7 +81,13 @@ Window {
         Send {
             id: sendTab
             anchors.fill: parent
-            visible: currentState === 8
+            visible: currentState === 8 && subWindow === 0
+        }
+
+        SendOnline {
+            id: sendonline
+            anchors.fill: parent
+            visible: currentState === 8 && subWindow === 1
         }
 
         Receive {

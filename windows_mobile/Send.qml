@@ -16,37 +16,42 @@ Item {
         id: send
     }
 
-    property bool isInitialized: false
-
     Connections {
         target: wallet
         onSgnWalletBalanceUpdated: {
-            if (!isInitialized) {
-                isInitialized = true
-                const accountInfo = wallet.getWalletBalance(true, true, false)
-                const selectedAccount = wallet.getReceiveAccount()
-                let selectedAccIdx = 0
+            const accountInfo = wallet.getWalletBalance(true, true, false)
+            const selectedAccount = wallet.getReceiveAccount()
+            let selectedAccIdx = 0
 
-                accountItems.clear()
+            accountItems.clear()
 
-                let idx = 0
-                for (let i = 1; i < accountInfo.length; i += 2) {
-                    if (accountInfo[i-1] === selectedAccount)
-                        selectedAccIdx = idx
+            let idx = 0
+            for (let i = 1; i < accountInfo.length; i += 2) {
+                if (accountInfo[i-1] === selectedAccount)
+                    selectedAccIdx = idx
 
-                    accountItems.append({ info: accountInfo[i], account: accountInfo[i-1]})
-                    idx++
-                }
-                accountComboBox.currentIndex = selectedAccIdx
+                accountItems.append({ info: accountInfo[i], account: accountInfo[i-1]})
+                idx++
             }
+            accountComboBox.currentIndex = selectedAccIdx
         }
     }
 
     onVisibleChanged: {
-        if(visible) {
+        if (visible) {
             wallet.requestWalletBalanceUpdate()
             rect_online.color = "#8633E0"
             text_online_selected.visible = true
+            rect_file.color = "#00000000"
+            text_file_selected.visible = false
+            textfield_amount.text = ""
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            textfield_amount.focus = false
         }
     }
 
@@ -273,7 +278,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-//                textfield_amount.focus = true
+                textfield_amount.focus = true
             }
         }
     }

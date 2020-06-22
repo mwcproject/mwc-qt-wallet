@@ -14,6 +14,7 @@
 
 #include "MobileWndManager.h"
 #include <QQmlApplicationEngine>
+#include <QMessageBox>
 #include "../state/state.h"
 #include <QMessageBox>
 
@@ -27,6 +28,7 @@ void MobileWndManager::init(QQmlApplicationEngine * _engine) {
     engine->load(QUrl(QStringLiteral("qrc:/windows_mobile/main.qml")));
     mainWindow = engine->rootObjects().first();
     mainWindow->setProperty("currentState", 0);
+    mainWindow->setProperty("subWindow", 0);
 }
 
 
@@ -130,13 +132,14 @@ void MobileWndManager::pageFinalize() {
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageSendStarting() {
-    Q_ASSERT(false); // implement me
+    mainWindow->setProperty("currentState", state::STATE::SEND);
+    mainWindow->setProperty("subWindow", 0);
 }
 void MobileWndManager::pageSendOnline( QString selectedAccount, int64_t amount ) {
-    Q_ASSERT(false); // implement me
+    mainWindow->setProperty("subWindow", 1);
 }
 void MobileWndManager::pageSendOffline( QString selectedAccount, int64_t amount ) {
-    Q_ASSERT(false); // implement me
+    mainWindow->setProperty("subWindow", 2);
 }
 void MobileWndManager::pageTransactions() {
     Q_ASSERT(false); // implement me

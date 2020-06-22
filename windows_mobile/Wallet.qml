@@ -73,6 +73,7 @@ Item {
         height: dp(75)
         anchors.horizontalCenterOffset: dp(-90)
         anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenterOffset: dp(-35)
         anchors.verticalCenter: parent.verticalCenter
         source: "../img/FinalizeL@2x.svg"
         fillMode: Image.PreserveAspectFit
