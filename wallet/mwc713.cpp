@@ -79,7 +79,7 @@ bool MWC713::checkWalletInitialized() {
         return false;
 
     if (!util::processWaitForFinished( mwc713process, 3000, "mwc713")) {
-        mwc713process->terminate();
+        mwc713process->kill();
         util::processWaitForFinished( mwc713process, 3000, "mwc713");
     }
 
@@ -346,11 +346,11 @@ void MWC713::processStop(bool exitNicely) {
             else {
                 logger::logInfo("MWC713", QString("mwc713 terminating because running long task that required to stop ") + QString::number(taskTimeout) + "ms");
                 taskTimeout  = 0;
-                mwc713process->terminate();
+                mwc713process->kill();
             }
 
             if (!util::processWaitForFinished( mwc713process, 8000 + taskTimeout, "mwc713")) {
-                mwc713process->terminate();
+                mwc713process->kill();
                 util::processWaitForFinished( mwc713process, 8000 + taskTimeout, "mwc713");
             }
             qDebug() << "mwc713 is exited";

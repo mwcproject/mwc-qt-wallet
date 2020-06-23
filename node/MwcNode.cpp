@@ -147,7 +147,7 @@ void MwcNode::stop() {
             QCoreApplication::processEvents();
 
             while( nodeProcess->state() == QProcess::Running ) {
-                nodeProcess->terminate();
+                nodeProcess->kill();
             }
         }
         qDebug() << "mwc-node is exited";
