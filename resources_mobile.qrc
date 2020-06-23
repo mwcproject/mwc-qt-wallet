@@ -80,5 +80,6 @@
         <file>resource_mobile/mwc-server-floo.toml</file>
         <file>resource_mobile/mwc-server-main.toml</file>
         <file>windows_mobile/SendOnline.qml</file>
+        <file>windows_mobile/SendOffline.qml</file>
     </qresource>
 </RCC>

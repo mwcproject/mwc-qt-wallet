@@ -20,3 +20,7 @@ ui_*.h
 CMakeSettings.json
 mwc-qt-wallet.pro.user
 mwc-qt-mobile.pro.user
+
+.gradle
+android.iml
+local.properties

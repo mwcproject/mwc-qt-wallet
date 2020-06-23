@@ -63,8 +63,8 @@ Item {
         radius: dp(10)
         anchors.left: parent.left
         anchors.leftMargin: (parent.width / 2 - rect_online.width) / 1.5
-        anchors.top: parent.top
-        anchors.topMargin: dp(30)
+        anchors.bottom: text_description1 .top
+        anchors.bottomMargin: dp(30)
         border.color: "#ffffff"
         border.width: dp(2)
 
@@ -216,8 +216,8 @@ Item {
         id: text_description1
         color: "#ffffff"
         text: qsTr("- Transaction will not be finalized if the destination wallet is offline and not listening for the destination address.")
-        anchors.top: rect_online.bottom
-        anchors.topMargin: dp(30)
+        anchors.bottom: text_description2.top
+        anchors.bottomMargin: dp(5)
         anchors.right: parent.right
         anchors.rightMargin: dp(30)
         anchors.left: parent.left
@@ -230,28 +230,27 @@ Item {
         id: text_description2
         color: "#ffffff"
         text: qsTr("- Your funds at that output will be blocked until your transaction is finalized")
-        anchors.topMargin: dp(5)
-        anchors.rightMargin: dp(30)
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         font.pixelSize: dp(15)
-        anchors.leftMargin: dp(30)
         anchors.right: parent.right
-        anchors.top: text_description1.bottom
+        anchors.rightMargin: dp(30)
         anchors.left: parent.left
+        anchors.leftMargin: dp(30)
+        anchors.verticalCenter: parent.verticalCenter
     }
 
     Text {
         id: text_description3
         color: "#ffffff"
         text: qsTr("- You can cancel any non finalized transaction to unblock your funds at 'Transactions'")
-        anchors.topMargin: dp(5)
-        anchors.rightMargin: dp(30)
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        anchors.leftMargin: dp(30)
         font.pixelSize: dp(15)
         anchors.right: parent.right
-        anchors.top: text_description2.bottom
+        anchors.rightMargin: dp(30)
         anchors.left: parent.left
+        anchors.leftMargin: dp(30)
+        anchors.top: text_description2.bottom
+        anchors.topMargin: dp(5)
     }
 
     TextField {
@@ -317,8 +316,8 @@ Item {
         id: button_next
         width: dp(150)
         height: dp(50)
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(50)
+        anchors.top: button_all.bottom
+        anchors.topMargin: dp(50)
         anchors.horizontalCenter: parent.horizontalCenter
         background: Rectangle {
             color: "#00000000"

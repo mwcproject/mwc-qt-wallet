@@ -90,6 +90,12 @@ Window {
             visible: currentState === 8 && subWindow === 1
         }
 
+        SendOffline {
+            id: sendoffline
+            anchors.fill: parent
+            visible: currentState === 8 && subWindow === 2
+        }
+
         Receive {
             id: receiveTab
             anchors.fill: parent
