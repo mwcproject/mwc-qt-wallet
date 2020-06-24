@@ -8,6 +8,16 @@ Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
+    property string selectedAccount
+    property double amount
+
+    function init(initParams) {
+        selectedAccount = initParams.selectedAccount
+        amount = initParams.amount
+        text_from_account.text = qsTr("From account: " + selectedAccount)
+        text_amount_to_send.text = qsTr("Amount to send: " + ( amount < 0 ? "All" : util.nano2one(Number(amount).toString())) + " MWC" )
+    }
+
     UtilBridge {
         id: util
     }
@@ -22,16 +32,6 @@ Item {
 //            ui->progress->hide();
 //            control::MessageBox::messageText(this, success ? "Success" : "Failure", message );
             console.log(success ? "Success" : "Failure", message)
-        }
-    }
-
-    property string selectedAccount: "Default"
-    property double amount: -1
-
-    onVisibleChanged: {
-        if (visible) {
-            text_from_account.text = qsTr("From account: " + selectedAccount)
-            text_amount_to_send.text = qsTr("Amount to send: " + ( amount < 0 ? "All" : util.nano2one(Number(amount).toString())) + " MWC" )
         }
     }
 

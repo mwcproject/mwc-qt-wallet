@@ -17,6 +17,7 @@
 #include <QMessageBox>
 #include "../state/state.h"
 #include <QMessageBox>
+#include <QJsonDocument>
 
 namespace core {
 
@@ -133,13 +134,21 @@ void MobileWndManager::pageFinalize() {
 }
 void MobileWndManager::pageSendStarting() {
     mainWindow->setProperty("currentState", state::STATE::SEND);
-    mainWindow->setProperty("subWindow", 0);
+     mainWindow->setProperty("initParams", "");
 }
 void MobileWndManager::pageSendOnline( QString selectedAccount, int64_t amount ) {
-    mainWindow->setProperty("subWindow", 1);
+    QJsonObject obj;
+    obj["isSendOnline"] = true;
+    obj["selectedAccount"] = selectedAccount;
+    obj["amount"] = amount;
+    mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 void MobileWndManager::pageSendOffline( QString selectedAccount, int64_t amount ) {
-    mainWindow->setProperty("subWindow", 2);
+    QJsonObject obj;
+    obj["isSendOnline"] = false;
+    obj["selectedAccount"] = selectedAccount;
+    obj["amount"] = amount;
+    mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 void MobileWndManager::pageTransactions() {
     Q_ASSERT(false); // implement me

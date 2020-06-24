@@ -9,7 +9,7 @@ Window {
     title: qsTr("MWC-Mobile-Wallet")
     
     property int currentState
-    property int subWindow
+    property string initParams
 
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
@@ -17,6 +17,15 @@ Window {
     CoreWindowBridge {
         id: coreWindow
     }
+
+/*
+      CurrentState      Page
+      21                Wallet
+      22                AccountOptions
+      23                Settings
+      8                 Send
+      9                 Receive
+*/
 
     Connections {
         target: coreWindow
@@ -81,19 +90,29 @@ Window {
         Send {
             id: sendTab
             anchors.fill: parent
-            visible: currentState === 8 && subWindow === 0
+            visible: currentState === 8 && initParams.length === 0
         }
 
         SendOnline {
             id: sendonline
             anchors.fill: parent
-            visible: currentState === 8 && subWindow === 1
+            visible: currentState === 8 && initParams.length !== 0 && JSON.parse(initParams).isSendOnline
+            onVisibleChanged: {
+                if (visible) {
+                    sendonline.init(JSON.parse(initParams))
+                }
+            }
         }
 
         SendOffline {
             id: sendoffline
             anchors.fill: parent
-            visible: currentState === 8 && subWindow === 2
+            visible: currentState === 8 && initParams.length !== 0 && !JSON.parse(initParams).isSendOnline
+            onVisibleChanged: {
+                if (visible) {
+                    sendoffline.init(JSON.parse(initParams))
+                }
+            }
         }
 
         Receive {
