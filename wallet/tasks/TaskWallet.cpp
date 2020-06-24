@@ -428,5 +428,24 @@ bool TaskRootPublicKey::processTask(const QVector<WEvent> & events) {
 }
 
 
+bool TaskRepost::processTask(const QVector<WEvent> & events) {
+    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_INIT_WANT_ENTER );
+
+    logger::blockLogMwc713out(false);
+
+    if (!error.isEmpty()) {
+        QString errMsg;
+        for ( WEvent & e : error ) {
+            if (errMsg.isEmpty()>0)
+                errMsg += "; ";
+            errMsg += e.message;
+        }
+
+    }
+
+    return true;
+}
+
+
 }
 

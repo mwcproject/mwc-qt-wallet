@@ -52,7 +52,9 @@ public:
 private slots:
     // Update tb & menu actions
     void onSgnUpdateActionStates(int actionState); // state::STATE
-
+    #ifndef QT_NO_CONTEXTMENU
+    void contextMenuEvent(QContextMenuEvent *event) override;
+    #endif /* QT_NO_CONTEXTMENU */
     void onSgnNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL
     void onSgnConfigUpdate();
     void onSgnLoginResult(bool ok);
@@ -92,6 +94,9 @@ private slots:
     void on_actionRoadmap_triggered();
     void on_actionMWC_website_triggered();
 
+public slots:
+    void repost();
+    void repost_as_fluff();
 private:
     void updateLeftBar(bool show);
     void updateListenerBtn();

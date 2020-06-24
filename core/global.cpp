@@ -77,5 +77,14 @@ void closeApplication() {
 }
 #endif
 
+static int repostId = -1;
+
+int getRepostId() {
+    return repostId;
+}
+
+void setRepostId(int id) {
+    repostId = id;
+}
 
 }

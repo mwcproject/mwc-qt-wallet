@@ -16,6 +16,7 @@
 #include "ui_mainwindow.h"
 #include <QTime>
 #include <QDebug>
+#include <QContextMenuEvent>
 //#include "../state/statemachine.h"
 //#include "util/stringutils.h"
 #include "../control_desktop/messagebox.h"
@@ -30,6 +31,7 @@
 #include <QDesktopWidget>
 #include <QScrollArea>
 #include <QStyle>
+#include "../core/global.h"
 #include "../core/WalletApp.h"
 
 namespace core {
@@ -122,6 +124,38 @@ MainWindow::MainWindow(QWidget *parent) :
                      newSz.width(), newSz.height() );
     }
 }
+
+void MainWindow::repost() {
+    int id = mwc::getRepostId();
+    wallet->repost(id, false);
+}
+
+void MainWindow::repost_as_fluff() {
+    int id = mwc::getRepostId();
+    wallet->repost(id, true);
+}
+
+
+#ifndef QT_NO_CONTEXTMENU
+void MainWindow::contextMenuEvent(QContextMenuEvent *event)
+{
+    if(mwc::getRepostId() >= 0) {
+        QMenu contextMenu(tr("Context menu"), this);
+        QAction action1("Repost", coreWindow);
+        QAction action2("Repost as a fluff transaction", coreWindow);
+
+        QObject::connect( &action1, SIGNAL(triggered()),
+                      SLOT(repost()), Qt::QueuedConnection);
+        QObject::connect( &action2, SIGNAL(triggered()),
+                      SLOT(repost_as_fluff()), Qt::QueuedConnection);
+
+        contextMenu.addAction(&action1);
+        contextMenu.addAction(&action2);
+
+        contextMenu.exec(event->globalPos());
+    }
+}
+#endif /* QT_NO_CONTEXTMENU */
 
 MainWindow::~MainWindow()
 {

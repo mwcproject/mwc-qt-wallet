@@ -235,6 +235,23 @@ private:
     QString message;
 };
 
+class TaskRepost: public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 2000;
+
+    TaskRepost( MWC713 * wallet713, int index, bool fluff) :
+            Mwc713Task("TaskRepost", "repost -i " + QString::number(index) +
+                       (fluff ? " --fluff" : ""),
+                       wallet713, "")
+            {}
+
+    virtual ~TaskRepost() override {}
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+};
+
+
 
 }
 

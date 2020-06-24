@@ -130,6 +130,9 @@ void setApplication(QApplication * app, QMainWindow * mainWindow);
 bool isAppNonClosed();
 void closeApplication();
 
+int getRepostId();
+void setRepostId(int id);
+
 }
 
 

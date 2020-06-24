@@ -75,6 +75,7 @@ Transactions::Transactions(QWidget *parent) :
 
 Transactions::~Transactions()
 {
+    mwc::setRepostId(-1);
     saveTableHeaders();
     delete ui;
 }
@@ -423,6 +424,16 @@ void Transactions::on_exportButton_clicked()
 
 void Transactions::on_transactionTable_itemSelectionChanged()
 {
+    wallet::WalletTransaction * selected = getSelectedTransaction();
+    if(selected!=nullptr) {
+
+        if(selected->transactionType == wallet::WalletTransaction::TRANSACTION_TYPE::SEND &&
+           !selected->confirmed)
+            mwc::setRepostId(selected->txIdx);
+        else
+            mwc::setRepostId(-1);
+    }
+
     updateButtons();
 }
 

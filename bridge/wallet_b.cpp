@@ -242,6 +242,10 @@ void Wallet::requestStopTorListener() {
     getWallet()->listeningStop(false, false, true);
 }
 
+void Wallet::repost(int id, bool fluff) {
+    getWallet()->repost(id, fluff);
+}
+
 // return values:
 // "true"  - listening
 // ""  - not listening, no errors
