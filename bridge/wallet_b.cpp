@@ -242,8 +242,8 @@ void Wallet::requestStopTorListener() {
     getWallet()->listeningStop(false, false, true);
 }
 
-void Wallet::repost(int id, bool fluff) {
-    getWallet()->repost(id, fluff);
+void Wallet::repost(QString account, int id, bool fluff) {
+    getWallet()->repost(account, id, fluff);
 }
 
 // return values:

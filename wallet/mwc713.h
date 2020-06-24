@@ -264,7 +264,7 @@ public:
     virtual void getRootPublicKey( QString message2sign ) override;
 
     // Repost a transaction. Optionally fluff the transaction. index is the tx_index in the tx_log.
-    virtual void repost(int index, bool fluff) override;
+    virtual void repost(QString account, int index, bool fluff) override;
 
 public:
     // Feed the command to mwc713 process

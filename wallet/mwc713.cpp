@@ -755,8 +755,11 @@ void MWC713::getRootPublicKey( QString message2sign ) {
     eventCollector->addTask( new TaskRootPublicKey(this, message2sign ), TaskRootPublicKey::TIMEOUT );
 }
 
-void MWC713::repost(int index, bool fluff) {
+void MWC713::repost(QString account, int index, bool fluff) {
+    eventCollector->addTask( new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT );
     eventCollector->addTask( new TaskRepost(this, index, fluff), TaskRepost::TIMEOUT );
+    if (account!=currentAccount)
+        eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
 
 

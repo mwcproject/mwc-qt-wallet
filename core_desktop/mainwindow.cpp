@@ -127,12 +127,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::repost() {
     int id = mwc::getRepostId();
-    wallet->repost(id, false);
+    QString account = mwc::getRepostAccount();
+    wallet->repost(account, id, false);
 }
 
 void MainWindow::repost_as_fluff() {
     int id = mwc::getRepostId();
-    wallet->repost(id, true);
+    QString account = mwc::getRepostAccount();
+    wallet->repost(account, id, true);
 }
 
 

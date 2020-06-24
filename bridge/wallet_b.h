@@ -53,7 +53,7 @@ public:
     Q_INVOKABLE void requestStartTorListener();
     Q_INVOKABLE void requestStopTorListener();
 
-    Q_INVOKABLE void repost(int id, bool fluff);
+    Q_INVOKABLE void repost(QString account, int id, bool fluff);
 
     // return values:
     // "true"  - listening

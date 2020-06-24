@@ -428,8 +428,10 @@ void Transactions::on_transactionTable_itemSelectionChanged()
     if(selected!=nullptr) {
 
         if(selected->transactionType == wallet::WalletTransaction::TRANSACTION_TYPE::SEND &&
-           !selected->confirmed)
+           !selected->confirmed) {
             mwc::setRepostId(selected->txIdx);
+            mwc::setRepostAccount(ui->accountComboBox->currentData().toString());
+        }
         else
             mwc::setRepostId(-1);
     }

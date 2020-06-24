@@ -78,6 +78,7 @@ void closeApplication() {
 #endif
 
 static int repostId = -1;
+static QString repostAccount;
 
 int getRepostId() {
     return repostId;
@@ -85,6 +86,14 @@ int getRepostId() {
 
 void setRepostId(int id) {
     repostId = id;
+}
+
+QString getRepostAccount() {
+    return repostAccount;
+}
+
+void setRepostAccount(QString account) {
+    repostAccount = account;
 }
 
 }

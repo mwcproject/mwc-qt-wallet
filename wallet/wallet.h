@@ -589,7 +589,7 @@ public:
 
     // Repost the transaction. Optionally fluff.
     // index is the tx_index in the tx_log.
-    virtual void repost(int index, bool fluff) = 0;
+    virtual void repost(QString account, int index, bool fluff) = 0;
 
 
 private:
