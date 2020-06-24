@@ -81,7 +81,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                console.log("Wallet => Finalize")
+                stateMachine.setActionWindow(19)
             }
         }
     }
@@ -109,7 +109,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                console.log("Wallet => Transactions")
+                stateMachine.setActionWindow(11)
             }
         }
     }
@@ -138,7 +138,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                console.log("Wallet => Output")
+                stateMachine.setActionWindow(12)
             }
         }
     }
@@ -166,7 +166,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                console.log("Wallet => Accounts")
+                stateMachine.setActionWindow(4)
             }
         }
     }

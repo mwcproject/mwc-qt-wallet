@@ -5,11 +5,11 @@ import SendBridge 1.0
 import UtilBridge 1.0
 
 Item {
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     property string account
     property double amount
+
+    readonly property int dpi: Screen.pixelDensity * 25.4
+    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     function init(initParams) {
         account = initParams.selectedAccount

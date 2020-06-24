@@ -19,12 +19,34 @@ Window {
     }
 
 /*
-      CurrentState      Page
-      21                Wallet
-      22                AccountOptions
-      23                Settings
-      8                 Send
-      9                 Receive
+    NONE = 0,
+    START_WALLET = 1,           // Start backed mwc713. Check what it want and then delegate control to the next state
+    STATE_INIT = 2,             // first run. Creating the password for a wallet
+    INPUT_PASSWORD = 3,         // Input password from the wallet
+    ACCOUNTS = 4,               // Wallet accounts.              Note!!!  Keep accounts first Action page.
+    ACCOUNT_TRANSFER= 5,        // Transfer funds from account to account
+    EVENTS = 6,                 // Wallet events (logs)
+    HODL = 7,                   // Hodl program.
+    SEND = 8,                   // Send coins Page
+    RECEIVE_COINS = 9,          // Receive coins
+    LISTENING = 10,             // Listening API setting/status
+    TRANSACTIONS = 11,          // Transactions dialog
+    OUTPUTS = 12,               // Outputs for this wallet
+    CONTACTS = 13,              // Contact page. COntacts supported by wallet713
+    WALLET_CONFIG = 14,         // Wallet config
+    AIRDRDOP_MAIN = 15,         // Starting airdrop page
+    SHOW_SEED = 16,             // Show Seed
+    NODE_INFO = 17,             // Show node info
+    RESYNC = 18,                // Re-sync account with a node
+    FINALIZE = 19,              // Finalize transaction. Windowless state
+    WALLET_RUNNING_MODE = 20,   // Running mode as a node, wallet or cold wallet
+
+    // Mobile Specific Pages
+    WALLET_HOME = 21,           // Wallet home page
+    ACCOUNT_OPTIONS = 22,       // Account options page
+    WALLET_SETTINGS = 23,       // Settings page
+
+    MIGRATION = 24              // Data migration between wallet versions.
 */
 
     Connections {
@@ -119,6 +141,12 @@ Window {
             id: receiveTab
             anchors.fill: parent
             visible: currentState === 9
+        }
+
+        Finalize {
+            id: finalizeTab
+            anchors.fill: parent
+            visible: currentState === 19
         }
     }
 

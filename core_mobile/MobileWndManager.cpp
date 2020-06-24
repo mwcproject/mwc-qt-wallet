@@ -124,17 +124,17 @@ void MobileWndManager::pageFileTransaction(QString pageTitle, QString callerId,
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageRecieve() {
-    Q_ASSERT(false); // implement me
+    mainWindow->setProperty("currentState", state::STATE::RECEIVE_COINS);
 }
 void MobileWndManager::pageListening() {
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageFinalize() {
-    Q_ASSERT(false); // implement me
+    mainWindow->setProperty("currentState", state::STATE::FINALIZE);
 }
 void MobileWndManager::pageSendStarting() {
     mainWindow->setProperty("currentState", state::STATE::SEND);
-     mainWindow->setProperty("initParams", "");
+    mainWindow->setProperty("initParams", "");
 }
 void MobileWndManager::pageSendOnline( QString selectedAccount, int64_t amount ) {
     QJsonObject obj;
