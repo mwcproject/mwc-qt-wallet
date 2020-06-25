@@ -53,7 +53,7 @@ Window {
         target: coreWindow
         onSgnUpdateActionStates: {
             currentState = actionState
-            navbar.updateTitle(currentState)
+            navbarItem.updateTitle(currentState)
         }
     }
 
@@ -75,7 +75,7 @@ Window {
     }
 
     Inputpassword {
-        id: inputpassword
+        id: inputPasswordItem
         anchors.fill: parent
         visible: currentState === 3
     }
@@ -83,75 +83,81 @@ Window {
     Rectangle {
         color: "#00000000"
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(60)
+        anchors.bottomMargin: dp(90)
         anchors.right: parent.right
         anchors.rightMargin: 0
         anchors.left: parent.left
         anchors.leftMargin: 0
         anchors.top: parent.top
-        anchors.topMargin: dp(120)
+        anchors.topMargin: dp(140)
 
         Wallet {
-            id: wallethome
+            id: walletItem
             anchors.fill: parent
             visible: currentState === 21
         }
 
         AccountOptions {
-            id: accountoptions
+            id: accountOptionsItem
             anchors.fill: parent
             visible: currentState === 22
         }
 
         Settings {
-            id: walletsettings
+            id: settingsItem
             anchors.fill: parent
             visible: currentState === 23
         }
 
         Send {
-            id: sendTab
+            id: sendItem
             anchors.fill: parent
             visible: currentState === 8 && initParams.length === 0
         }
 
         SendOnline {
-            id: sendonline
+            id: sendOnlineItem
             anchors.fill: parent
             visible: currentState === 8 && initParams.length !== 0 && JSON.parse(initParams).isSendOnline
             onVisibleChanged: {
                 if (visible) {
-                    sendonline.init(JSON.parse(initParams))
+                    sendOnlineItem.init(JSON.parse(initParams))
                 }
             }
         }
 
         SendOffline {
-            id: sendoffline
+            id: sendOfflineItem
             anchors.fill: parent
             visible: currentState === 8 && initParams.length !== 0 && !JSON.parse(initParams).isSendOnline
             onVisibleChanged: {
                 if (visible) {
-                    sendoffline.init(JSON.parse(initParams))
+                    sendOfflineItem.init(JSON.parse(initParams))
                 }
             }
         }
 
         Receive {
-            id: receiveTab
+            id: receiveItem
             anchors.fill: parent
             visible: currentState === 9
         }
 
         Finalize {
-            id: finalizeTab
+            id: finalizeItem
             anchors.fill: parent
             visible: currentState === 19
+        }
+
+        Transactions {
+            id: transactionsItem
+            anchors.fill: parent
+            visible: currentState === 11
         }
     }
 
     Navbar {
-        id: navbar
+        id: navbarItem
         anchors.fill: parent
         visible: currentState > 3
     }

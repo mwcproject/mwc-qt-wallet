@@ -151,7 +151,7 @@ void MobileWndManager::pageSendOffline( QString selectedAccount, int64_t amount 
     mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 void MobileWndManager::pageTransactions() {
-    Q_ASSERT(false); // implement me
+    mainWindow->setProperty("currentState", state::STATE::TRANSACTIONS);
 }
 
 void MobileWndManager::pageHodl() {
