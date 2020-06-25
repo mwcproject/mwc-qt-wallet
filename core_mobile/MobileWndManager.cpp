@@ -29,7 +29,6 @@ void MobileWndManager::init(QQmlApplicationEngine * _engine) {
     engine->load(QUrl(QStringLiteral("qrc:/windows_mobile/main.qml")));
     mainWindow = engine->rootObjects().first();
     mainWindow->setProperty("currentState", 0);
-    mainWindow->setProperty("subWindow", 0);
 }
 
 
