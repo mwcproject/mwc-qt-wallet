@@ -527,7 +527,7 @@ public:
     // Init send transaction with file output
     // Check signal:  onSendFile
     virtual void sendFile( const QString &account, int64_t coinNano, QString message, QString fileTx,
-            int inputConfirmationNumber, int changeOutputs, const QStringList & outputs )  = 0;
+            int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, int ttl_blocks )  = 0;
 
     // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
@@ -545,7 +545,7 @@ public:
     // coinNano == -1  - mean All
     // Check signal:  onSend
     virtual void sendTo( const QString &account, int64_t coinNano, const QString & address, const QString & apiSecret,
-                         QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff )  = 0;
+                         QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff, int ttl_blocks )  = 0;
 
     // Airdrop special. Generating the next Public key for transaction
     // wallet713> getnextkey --amount 1000000

@@ -645,10 +645,10 @@ void MWC713::check(bool wait4listeners)  {
 // Check signal:  onSend
 void MWC713::sendTo( const QString &account, int64_t coinNano, const QString & address,
                      const QString & apiSecret,
-                     QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff )  {
+                     QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff, int ttl_blocks )  {
     // switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT );
-    eventCollector->addTask( new TaskSendMwc(this, coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs, outputs, fluff), TaskSendMwc::TIMEOUT );
+    eventCollector->addTask( new TaskSendMwc(this, coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs, outputs, fluff, ttl_blocks), TaskSendMwc::TIMEOUT );
     if (account != currentAccount)
         eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
@@ -656,7 +656,7 @@ void MWC713::sendTo( const QString &account, int64_t coinNano, const QString & a
 
 // Init send transaction with file output
 // Check signal:  onSendFile
-void MWC713::sendFile( const QString &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs )  {
+void MWC713::sendFile( const QString &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, int ttl_blocks )  {
 
     if ( ! util::validateMwc713Str(fileTx, false).first ) {
         setSendFileResult( false, QStringList{"Unable to create file with name '"+fileTx+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."} , fileTx );
@@ -665,7 +665,7 @@ void MWC713::sendFile( const QString &account, int64_t coinNano, QString message
 
     // switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT );
-    eventCollector->addTask( new TaskSendFile(this, coinNano, message, fileTx, inputConfirmationNumber, changeOutputs, outputs ), TaskSendFile::TIMEOUT );
+    eventCollector->addTask( new TaskSendFile(this, coinNano, message, fileTx, inputConfirmationNumber, changeOutputs, outputs, ttl_blocks ), TaskSendFile::TIMEOUT );
     if (account != currentAccount)
         eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }

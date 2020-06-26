@@ -162,7 +162,7 @@ void AccountTransfer::onSetReceiveAccount( bool ok, QString AccountOrMessage ) {
 
     core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
     bool fluff = context->appContext->isFluffSet();
-    context->wallet->sendTo( trAccountFrom, trNanoCoins, util::fullFormalAddress( util::ADDRESS_TYPE::MWC_MQ, myAddress), "", "", prms.inputConfirmationNumber, prms.changeOutputs, outputs2use, fluff );
+    context->wallet->sendTo( trAccountFrom, trNanoCoins, util::fullFormalAddress( util::ADDRESS_TYPE::MWC_MQ, myAddress), "", "", prms.inputConfirmationNumber, prms.changeOutputs, outputs2use, fluff, -1 );
 }
 
 

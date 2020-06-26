@@ -153,6 +153,7 @@ bool Send::sendMwcOffline( QString account, int64_t amount, QString message) {
     QString txnFeeStr = util::txnFeeToString(txnFee);
 
     QString hash = context->wallet->getPasswordHash();
+    int ttl_blocks = -1;
     if ( core::WndManager::RETURN_CODE::BTN2 != core::getWndManager()->questionTextDlg("Confirm Send Request",
                        "You are sending offline " + (amount < 0 ? "all" : util::nano2one(amount)) +
                        " MWC from account: " + account + "\n\nTransaction fee: " + txnFeeStr +
@@ -161,7 +162,7 @@ bool Send::sendMwcOffline( QString account, int64_t amount, QString message) {
                        "Don't send, cancel this operation",
                        "Everything is good, continue and send",
                        false, true, 1.0,
-                       hash, core::WndManager::RETURN_CODE::BTN2 ) )
+                       hash, core::WndManager::RETURN_CODE::BTN2, &ttl_blocks) )
         return false;
 
     QString fileName = core::getWndManager()->getSaveFileName( tr("Create Initial Transaction Slate File"),
@@ -180,7 +181,7 @@ bool Send::sendMwcOffline( QString account, int64_t amount, QString message) {
 
     core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
 
-    context->wallet->sendFile( account, amount, message, fileName,prms.inputConfirmationNumber, prms.changeOutputs, outputs );
+    context->wallet->sendFile( account, amount, message, fileName,prms.inputConfirmationNumber, prms.changeOutputs, outputs, ttl_blocks );
     return true;
 }
 
@@ -282,7 +283,7 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
 
         context->wallet->sendTo( account, amount, util::fullFormalAddress( addressRes.second, address), apiSecret, message,
                                  sendParams.inputConfirmationNumber, sendParams.changeOutputs,
-                                 outputs, context->appContext->isFluffSet());
+                                 outputs, context->appContext->isFluffSet(), -1 /* Not used for online sends */);
 
         return true;
     }

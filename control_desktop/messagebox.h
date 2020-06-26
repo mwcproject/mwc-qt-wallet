@@ -34,7 +34,8 @@ protected:
     // After return, passwordHash value will have input raw Password value. So it can be user for wallet
     explicit MessageBox(QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2,
             QString btn1Tooltip, QString btn2Tooltip,
-            bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE passBlockButton );
+            bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE passBlockButton,
+            int *ttl_blocks );
     virtual ~MessageBox() override;
 
 public:
@@ -47,6 +48,11 @@ public:
             QString btn1, QString btn2,
             QString btn1Tooltip, QString btn2Tooltip,
             bool default1=false, bool default2=true, double widthScale = 1.0 );
+    static core::WndManager::RETURN_CODE questionTextWithTTL( QWidget *parent, QString title, QString message,
+            QString btn1, QString btn2,
+            QString btn1Tooltip, QString btn2Tooltip,
+            bool default1=false, bool default2=true, double widthScale = 1.0, int *ttl_blocks = 0 );
+
     static core::WndManager::RETURN_CODE questionHTML( QWidget *parent, QString title, QString message,
             QString btn1, QString btn2,
             QString btn1Tooltip, QString btn2Tooltip,
@@ -57,6 +63,10 @@ public:
     static core::WndManager::RETURN_CODE questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2,
             QString btn1Tooltip, QString btn2Tooltip,
             bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE blockButton );
+    static core::WndManager::RETURN_CODE questionTextWithTTL( QWidget *parent, QString title, QString message, QString btn1, QString btn2,
+            QString btn1Tooltip, QString btn2Tooltip,
+            bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE blockButton, int *ttl_blocks );
+    int ttl_blocks = -1;
 
 private slots:
     void on_passwordEdit_textChanged(const QString &str);
