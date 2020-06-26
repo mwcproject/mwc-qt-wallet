@@ -14,8 +14,10 @@
 
 #include "MobileWndManager.h"
 #include <QQmlApplicationEngine>
+#include <QMessageBox>
 #include "../state/state.h"
 #include <QMessageBox>
+#include <QJsonDocument>
 
 namespace core {
 
@@ -121,25 +123,34 @@ void MobileWndManager::pageFileTransaction(QString pageTitle, QString callerId,
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageRecieve() {
-    Q_ASSERT(false); // implement me
+    mainWindow->setProperty("currentState", state::STATE::RECEIVE_COINS);
 }
 void MobileWndManager::pageListening() {
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageFinalize() {
-    Q_ASSERT(false); // implement me
+    mainWindow->setProperty("currentState", state::STATE::FINALIZE);
 }
 void MobileWndManager::pageSendStarting() {
-    Q_ASSERT(false); // implement me
+    mainWindow->setProperty("currentState", state::STATE::SEND);
+    mainWindow->setProperty("initParams", "");
 }
 void MobileWndManager::pageSendOnline( QString selectedAccount, int64_t amount ) {
-    Q_ASSERT(false); // implement me
+    QJsonObject obj;
+    obj["isSendOnline"] = true;
+    obj["selectedAccount"] = selectedAccount;
+    obj["amount"] = amount;
+    mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 void MobileWndManager::pageSendOffline( QString selectedAccount, int64_t amount ) {
-    Q_ASSERT(false); // implement me
+    QJsonObject obj;
+    obj["isSendOnline"] = false;
+    obj["selectedAccount"] = selectedAccount;
+    obj["amount"] = amount;
+    mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 void MobileWndManager::pageTransactions() {
-    Q_ASSERT(false); // implement me
+    mainWindow->setProperty("currentState", state::STATE::TRANSACTIONS);
 }
 
 void MobileWndManager::pageHodl() {

@@ -385,7 +385,7 @@ void TaskRootPublicKey::onStarted() {
 }
 
 bool TaskRootPublicKey::processTask(const QVector<WEvent> & events) {
-    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_INIT_WANT_ENTER );
+    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
 
     logger::blockLogMwc713out(false);
 
@@ -429,9 +429,7 @@ bool TaskRootPublicKey::processTask(const QVector<WEvent> & events) {
 
 
 bool TaskRepost::processTask(const QVector<WEvent> & events) {
-    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_INIT_WANT_ENTER );
-
-    logger::blockLogMwc713out(false);
+    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
 
     if (!error.isEmpty()) {
         QString errMsg;
@@ -440,7 +438,7 @@ bool TaskRepost::processTask(const QVector<WEvent> & events) {
                 errMsg += "; ";
             errMsg += e.message;
         }
-
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to report transaction. " + errMsg );
     }
 
     return true;

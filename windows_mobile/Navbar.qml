@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.12
 import QtQuick.Window 2.0
 import QtQuick.Controls 2.13
 import WalletBridge 1.0
@@ -39,216 +39,255 @@ Item {
     Connections {
         target: wallet
         onSgnWalletBalanceUpdated: {
-            text_balance.text = wallet.getTotalMwcAmount() + " mwc"
+            text_balance.text = wallet.getTotalMwcAmount() + " MWC"
         }
     }
 
     Rectangle {
-        id: menuRect
-        anchors.top: parent.top
+        id: navbarTop
+        height: dp(140)
         anchors.left: parent.left
         anchors.right: parent.right
-        height: dp(60)
-        color: "#00000000"
+        anchors.top: parent.top
+        gradient: Gradient {
+            orientation: Gradient.Horizontal
+            GradientStop {
+                position: 0
+                color: "#9E00E7"
+            }
+
+            GradientStop {
+                position: 1
+                color: "#3600C9"
+            }
+        }
 
         Rectangle {
+            id: menuRect
             anchors.top: parent.top
-            anchors.bottom: parent.bottom
             anchors.left: parent.left
-            width: dp(70)
+            anchors.right: parent.right
+            height: dp(60)
             color: "#00000000"
 
             Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
                 anchors.left: parent.left
-                anchors.leftMargin: dp(28)
-                width: dp(6)
-                height: dp(6)
-                radius: dp(3)
-            }
+                width: dp(70)
+                color: "#00000000"
 
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.leftMargin: dp(39)
-                width: dp(6)
-                height: dp(6)
-                radius: dp(3)
-            }
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: dp(28)
+                    width: dp(6)
+                    height: dp(6)
+                    radius: dp(3)
+                }
 
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.leftMargin: dp(49)
-                width: dp(6)
-                height: dp(6)
-                radius: dp(3)
-            }
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: dp(39)
+                    width: dp(6)
+                    height: dp(6)
+                    radius: dp(3)
+                }
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    nav.toggle()
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: dp(49)
+                    width: dp(6)
+                    height: dp(6)
+                    radius: dp(3)
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        nav.toggle()
+                    }
                 }
             }
+
+            Text {
+                id: text_title
+                color: "#ffffff"
+                text: "Wallet"
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.bold: true
+                anchors.verticalCenter: parent.verticalCenter
+                font.pixelSize: dp(17)
+            }
         }
 
-        Text {
-            id: text_title
+        Rectangle {
+            id: rect_splitter
+            width: dp(250)
+            height: dp(1)
             color: "#ffffff"
-            text: "Wallet"
+            anchors.top: menuRect.bottom
+            anchors.topMargin: 0
             anchors.horizontalCenter: parent.horizontalCenter
-            font.bold: true
-            anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: dp(17)
         }
 
-
-    }
-
-    Rectangle {
-        id: rect_splitter
-        width: dp(250)
-        height: dp(1)
-        color: "#ffffff"
-        anchors.top: menuRect.bottom
-        anchors.topMargin: 0
-        anchors.horizontalCenter: parent.horizontalCenter
-    }
-
-    Rectangle {
-        id: rect_balance
-        height: dp(60)
-        color: "#00000000"
-        anchors.top: menuRect.bottom
-        anchors.topMargin: 0
-        anchors.right: parent.right
-        anchors.rightMargin: 0
-        anchors.left: parent.left
-        anchors.leftMargin: 0
-
-        Text {
-            id: text_balance
-            text: ""
-            anchors.left: image_logo1.right
-            anchors.leftMargin: dp(14)
-            font.pixelSize: dp(20)
-            font.bold: true
-            color: "white"
-            anchors.verticalCenter: image_logo1.verticalCenter
-        }
-
-        Image {
-            id: image_logo1
-            width: dp(58)
-            height: dp(29)
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenterOffset: dp(-30)
-            anchors.horizontalCenter: parent.horizontalCenter
-            fillMode: Image.PreserveAspectFit
-            source: "../img/TBLogo@2x.svg"
-        }
-    }
-
-    Image {
-        id: image_notifications
-        width: dp(28)
-        height: dp(28)
-        anchors.bottom: text_instance_account.top
-        anchors.bottomMargin: dp(13)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(28)
-        fillMode: Image.PreserveAspectFit
-        source: "../img/NavNotificationNormal@2x.svg"
-    }
-
-    Image {
-        id: image_help
-        width: dp(28)
-        height: dp(28)
-        anchors.left: image_notifications.right
-        anchors.leftMargin: dp(17)
-        anchors.verticalCenter: image_notifications.verticalCenter
-        fillMode: Image.PreserveAspectFit
-        source: "../img/HelpBtn@2x.svg"
-    }
-
-    Rectangle {
-        id: rect_listener
-        width: dp(95)
-        height: dp(25)
-        color: "#00000000"
-        radius: dp(12.5)
-        border.width: dp(1)
-        border.color: "#ffffff"
-        anchors.right: parent.right
-        anchors.rightMargin: dp(28)
-        anchors.verticalCenter: image_help.verticalCenter
-
-        Image {
-            id: image_listener
-            width: dp(12)
-            height: dp(12)
+        Rectangle {
+            id: rect_balance
+            height: dp(60)
+            color: "#00000000"
+            anchors.top: menuRect.bottom
+            anchors.topMargin: 0
+            anchors.right: parent.right
+            anchors.rightMargin: 0
             anchors.left: parent.left
-            anchors.leftMargin: dp(10)
-            anchors.verticalCenter: parent.verticalCenter
-            fillMode: Image.PreserveAspectFit
-            source: "../img/CircGreen@2x.svg"
-        }
+            anchors.leftMargin: 0
 
-        Text {
-            id: text_listener
-            color: "#ffffff"
-            text: qsTr("MWC MQS")
-            anchors.left: image_listener.right
-            anchors.leftMargin: dp(8)
-            anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: dp(11)
-        }
-    }
+            Text {
+                id: text_balance
+                text: ""
+                anchors.left: image_logo1.right
+                anchors.leftMargin: dp(14)
+                font.pixelSize: dp(20)
+                font.bold: true
+                color: "white"
+                anchors.verticalCenter: image_logo1.verticalCenter
+            }
 
-    Rectangle {
-        id: rect_network
-        width: dp(84)
-        height: dp(25)
-        color: "#00000000"
-        radius: dp(12.5)
-        anchors.rightMargin: dp(12)
-        anchors.verticalCenter: image_help.verticalCenter
-        border.width: dp(1)
-        border.color: "#ffffff"
-        anchors.right: rect_listener.left
-
-        Image {
-            id: image_network
-            width: dp(12)
-            height: dp(12)
-            anchors.left: parent.left
-            anchors.leftMargin: dp(10)
-            anchors.verticalCenter: parent.verticalCenter
-            fillMode: Image.PreserveAspectFit
-            source: "../img/CircGreen@2x.svg"
-        }
-
-        Text {
-            id: text_network
-            text: qsTr("Floonet")
-            anchors.left: image_network.right
-            anchors.leftMargin: dp(8)
-            anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: dp(11)
-            color: "white"
+            Image {
+                id: image_logo1
+                width: dp(58)
+                height: dp(29)
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenterOffset: dp(-30)
+                anchors.horizontalCenter: parent.horizontalCenter
+                fillMode: Image.PreserveAspectFit
+                source: "../img/TBLogo@2x.svg"
+            }
         }
     }
 
-    Text {
-        id: text_instance_account
-        color: "white"
-        text: qsTr("INSTANCE:  Default  //  ACCOUNT:  SatoshisDream")
+    Rectangle
+    {
+        id: navbarBottom
+        height: dp(90)
+        anchors.left: parent.left
+        anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(14)
-        anchors.horizontalCenter: parent.horizontalCenter
-        font.pixelSize: dp(13)
+        gradient: Gradient {
+            orientation: Gradient.Horizontal
+            GradientStop {
+                position: 0
+                color: "#9E00E7"
+            }
+
+            GradientStop {
+                position: 1
+                color: "#3600C9"
+            }
+        }
+
+        Image {
+            id: image_notifications
+            width: dp(28)
+            height: dp(28)
+            anchors.bottom: text_instance_account.top
+            anchors.bottomMargin: dp(13)
+            anchors.left: parent.left
+            anchors.leftMargin: dp(28)
+            fillMode: Image.PreserveAspectFit
+            source: "../img/NavNotificationNormal@2x.svg"
+        }
+
+        Image {
+            id: image_help
+            width: dp(28)
+            height: dp(28)
+            anchors.left: image_notifications.right
+            anchors.leftMargin: dp(17)
+            anchors.verticalCenter: image_notifications.verticalCenter
+            fillMode: Image.PreserveAspectFit
+            source: "../img/HelpBtn@2x.svg"
+        }
+
+        Rectangle {
+            id: rect_listener
+            width: dp(95)
+            height: dp(25)
+            color: "#00000000"
+            radius: dp(12.5)
+            border.width: dp(1)
+            border.color: "#ffffff"
+            anchors.right: parent.right
+            anchors.rightMargin: dp(28)
+            anchors.verticalCenter: image_help.verticalCenter
+
+            Image {
+                id: image_listener
+                width: dp(12)
+                height: dp(12)
+                anchors.left: parent.left
+                anchors.leftMargin: dp(10)
+                anchors.verticalCenter: parent.verticalCenter
+                fillMode: Image.PreserveAspectFit
+                source: "../img/CircGreen@2x.svg"
+            }
+
+            Text {
+                id: text_listener
+                color: "#ffffff"
+                text: qsTr("MWC MQS")
+                anchors.left: image_listener.right
+                anchors.leftMargin: dp(8)
+                anchors.verticalCenter: parent.verticalCenter
+                font.pixelSize: dp(11)
+            }
+        }
+
+        Rectangle {
+            id: rect_network
+            width: dp(84)
+            height: dp(25)
+            color: "#00000000"
+            radius: dp(12.5)
+            anchors.rightMargin: dp(12)
+            anchors.verticalCenter: image_help.verticalCenter
+            border.width: dp(1)
+            border.color: "#ffffff"
+            anchors.right: rect_listener.left
+
+            Image {
+                id: image_network
+                width: dp(12)
+                height: dp(12)
+                anchors.left: parent.left
+                anchors.leftMargin: dp(10)
+                anchors.verticalCenter: parent.verticalCenter
+                fillMode: Image.PreserveAspectFit
+                source: "../img/CircGreen@2x.svg"
+            }
+
+            Text {
+                id: text_network
+                text: qsTr("Floonet")
+                anchors.left: image_network.right
+                anchors.leftMargin: dp(8)
+                anchors.verticalCenter: parent.verticalCenter
+                font.pixelSize: dp(11)
+                color: "white"
+            }
+        }
+
+        Text {
+            id: text_instance_account
+            color: "white"
+            text: qsTr("INSTANCE:  Default  //  ACCOUNT:  SatoshisDream")
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: dp(14)
+            anchors.horizontalCenter: parent.horizontalCenter
+            font.pixelSize: dp(13)
+        }
     }
 
     NavigationDrawer {
