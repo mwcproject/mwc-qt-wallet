@@ -21,6 +21,8 @@
 #include <core/HodlStatus.h>
 #include "../core/global.h"
 
+#define INITIALIZED_WALLET
+
 namespace core {
 class AppContext;
 }
@@ -45,9 +47,21 @@ public:
 
 
     // Check if walled need to be initialized or not. Will run statndalone app, wait for exit and return the result
-    virtual bool checkWalletInitialized() override {return true;}
+    virtual bool checkWalletInitialized() override {
+#ifdef INITIALIZED_WALLET
+        return true;
+#else
+        return false;
+#endif
+    }
 
-    virtual STARTED_MODE getStartedMode() override { return STARTED_MODE::NORMAL;}
+    virtual STARTED_MODE getStartedMode() override {
+#ifdef INITIALIZED_WALLET
+        return STARTED_MODE::NORMAL;
+#else
+        return STARTED_MODE::INIT;
+#endif
+    }
 
     // ---- Wallet Init Phase
     virtual void start()  override { running=true; }
@@ -255,6 +269,9 @@ public:
     // Check Signal: onRootPublicKey( QString rootPubKey, QString message, QString signature )
     virtual void getRootPublicKey( QString message2sign ) override;
 
+    // Repost the transaction. Optionally fluff.
+    // index is the tx_index in the tx_log.
+    virtual void repost(QString account, int index, bool fluff) override;
 
 private:
     core::AppContext * appContext; // app context to store current account name
