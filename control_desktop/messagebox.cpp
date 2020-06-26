@@ -170,8 +170,6 @@ void MessageBox::on_button1_clicked()
     retCode = core::WndManager::RETURN_CODE::BTN1;
     blockingPasswordHash = ui->passwordEdit->text();
     ttl_blocks = ui->TTLEdit->text().toInt();
-qCritical() << "xttl blocks = " << ttl_blocks;
-qCritical() << "qString val = " << ui->TTLEdit->text();
     accept();
 }
 
@@ -180,8 +178,6 @@ void MessageBox::on_button2_clicked()
     retCode = core::WndManager::RETURN_CODE::BTN2;
     blockingPasswordHash = ui->passwordEdit->text();
     ttl_blocks = ui->TTLEdit->text().toInt();
-qCritical() << "2xttl blocks = " << ttl_blocks;
-qCritical() << "2qString val = " << ui->TTLEdit->text();
     accept();
 }
 
