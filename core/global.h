@@ -135,6 +135,8 @@ void setRepostId(int id);
 
 QString getRepostAccount();
 void setRepostAccount(QString account);
+void setFinalize(bool finalize);
+bool isFinalize();
 
 }
 

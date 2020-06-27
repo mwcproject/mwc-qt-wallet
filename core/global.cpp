@@ -79,6 +79,7 @@ void closeApplication() {
 
 static int repostId = -1;
 static QString repostAccount;
+static bool finalize = false;
 
 int getRepostId() {
     return repostId;
@@ -94,6 +95,14 @@ QString getRepostAccount() {
 
 void setRepostAccount(QString account) {
     repostAccount = account;
+}
+
+bool isFinalize() {
+    return finalize;
+}
+
+void setFinalize(bool finalizeValue) {
+    finalize = finalizeValue;
 }
 
 }

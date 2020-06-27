@@ -21,6 +21,7 @@
 #include "../bridge/config_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/wnd/e_receive_b.h"
+#include "../core/global.h"
 
 namespace wnd {
 
@@ -28,6 +29,7 @@ Receive::Receive(QWidget *parent) :
         core::NavWnd(parent),
         ui(new Ui::Receive)
 {
+    mwc::setFinalize(false);
     ui->setupUi(this);
 
     config = new bridge::Config(this);

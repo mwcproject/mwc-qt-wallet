@@ -21,6 +21,7 @@
 #include "../bridge/wnd/g_filetransaction_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/config_b.h"
+#include "../core/global.h"
 
 namespace wnd {
 
@@ -115,14 +116,15 @@ void FileTransaction::on_processButton_clicked()
             return;
         }
     }
-
     QString walletPasswordHash = wallet->getPasswordHash();
     if (!walletPasswordHash.isEmpty()) {
-        dlg::SendConfirmationDlg confirmDlg(this, "Confirm Finalize Request",
+        if (mwc::isFinalize()) {
+            dlg::SendConfirmationDlg confirmDlg(this, "Confirm Finalize Request",
                                             "You are finalizing transaction for " + ui->mwcLabel->text(),
                                             1.0, walletPasswordHash );
-        if (confirmDlg.exec() != QDialog::Accepted)
-            return;
+            if (confirmDlg.exec() != QDialog::Accepted)
+                return;
+        }
     }
     ui->progress->show();
     fileTransaction->ftContinue( transactionFileName, resTxFN, config->isFluffSet() );

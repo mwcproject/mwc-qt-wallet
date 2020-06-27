@@ -19,6 +19,7 @@
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/config_b.h"
 #include "../bridge/wnd/g_finalize_b.h"
+#include "../core/global.h"
 
 namespace wnd {
 
@@ -26,6 +27,7 @@ Finalize::Finalize(QWidget *parent) :
     core::NavWnd(parent),
     ui(new Ui::FinalizeUpload)
 {
+    mwc::setFinalize(true);
     ui->setupUi(this);
 
     config = new bridge::Config(this);
