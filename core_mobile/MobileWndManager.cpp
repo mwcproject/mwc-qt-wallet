@@ -53,7 +53,7 @@ void MobileWndManager::messageHtmlDlg( QString title, QString message, double wi
 // Two button box
 WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2,
                                                            QString btn1Tooltip, QString btn2Tooltip,
-                                                           bool default1, bool default2, double widthScale) {
+                                                           bool default1, bool default2, double widthScale, int *ttl_blocks) {
     Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
     Q_UNUSED(btn2Tooltip)
     Q_UNUSED(widthScale)
@@ -61,6 +61,7 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
     Q_UNUSED(default2)
     Q_UNUSED(btn1)
     Q_UNUSED(btn2)
+    Q_UNUSED(ttl_blocks)
 
     if ( QMessageBox::Yes == QMessageBox::question(nullptr, title, message) )
         return WndManager::RETURN_CODE::BTN2;
@@ -89,7 +90,7 @@ WndManager::RETURN_CODE MobileWndManager::questionHTMLDlg( QString title, QStrin
 // After return, passwordHash value will have input raw Password value. So it can be user for wallet
 WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2,
                                                            QString btn1Tooltip, QString btn2Tooltip,
-                                                           bool default1, bool default2, double widthScale, QString & passwordHash, WndManager::RETURN_CODE blockButton )  {
+                                                           bool default1, bool default2, double widthScale, QString & passwordHash, WndManager::RETURN_CODE blockButton, int *ttl_blocks)  {
     Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
     Q_UNUSED(btn2Tooltip)
     Q_UNUSED(title)
@@ -101,6 +102,7 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
     Q_UNUSED(widthScale)
     Q_UNUSED(passwordHash)
     Q_UNUSED(blockButton)
+    Q_UNUSED(ttl_blocks)
 
     Q_ASSERT(false); // implement me
     return WndManager::RETURN_CODE::BTN1;
