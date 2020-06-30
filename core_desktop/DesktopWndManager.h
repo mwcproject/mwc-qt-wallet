@@ -36,7 +36,7 @@ public:
     // Two button box
     virtual RETURN_CODE questionTextDlg( QString title, QString message, QString btn1, QString btn2,
                    QString btn1Tooltip, QString btn2Tooltip,
-                   bool default1=false, bool default2=true, double widthScale = 1.0, int *ttl_blocks = 0 ) override;
+                   bool default1=false, bool default2=true, double widthScale = 1.0, int *ttl_blocks = nullptr ) override;
     virtual RETURN_CODE questionHTMLDlg( QString title, QString message, QString btn1, QString btn2,
                    QString btn1Tooltip, QString btn2Tooltip,
                    bool default1=false, bool default2=true, double widthScale = 1.0 ) override;
