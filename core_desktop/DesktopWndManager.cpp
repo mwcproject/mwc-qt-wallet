@@ -89,8 +89,6 @@ void DesktopWndManager::messageHtmlDlg( QString title, QString message, double w
 WndManager::RETURN_CODE DesktopWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2,
         QString btn1Tooltip, QString btn2Tooltip,
         bool default1, bool default2, double widthScale, int *ttl_blocks ) {
-    if( ttl_blocks != nullptr)
-    	*ttl_blocks = 1440;
     WndManager::RETURN_CODE ret = MessageBox::questionTextWithTTL(nullptr, title, message, btn1, btn2, btn1Tooltip, btn2Tooltip, default1, default2, widthScale, ttl_blocks);
     return ret;
 }
@@ -103,8 +101,6 @@ WndManager::RETURN_CODE DesktopWndManager::questionHTMLDlg( QString title, QStri
 WndManager::RETURN_CODE DesktopWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2,
         QString btn1Tooltip, QString btn2Tooltip,
         bool default1, bool default2, double widthScale, QString & passwordHash, RETURN_CODE blockButton, int *ttl_blocks ) {
-    if( ttl_blocks != nullptr)
-        *ttl_blocks = 1440;
     WndManager::RETURN_CODE ret = MessageBox::questionTextWithTTL(nullptr, title, message, btn1, btn2, btn1Tooltip, btn2Tooltip, default1, default2, widthScale, passwordHash, blockButton, ttl_blocks);
     return ret;
 }

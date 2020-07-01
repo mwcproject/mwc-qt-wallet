@@ -153,7 +153,7 @@ bool Send::sendMwcOffline( QString account, int64_t amount, QString message) {
     QString txnFeeStr = util::txnFeeToString(txnFee);
 
     QString hash = context->wallet->getPasswordHash();
-    int ttl_blocks = -1;
+    int ttl_blocks = 1440;
     if ( core::WndManager::RETURN_CODE::BTN2 != core::getWndManager()->questionTextDlg("Confirm Send Request",
                        "You are sending offline " + (amount < 0 ? "all" : util::nano2one(amount)) +
                        " MWC from account: " + account + "\n\nTransaction fee: " + txnFeeStr +
