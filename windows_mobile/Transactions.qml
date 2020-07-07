@@ -3,15 +3,19 @@ import QtQuick.Window 2.12
 import WalletBridge 1.0
 import TransactionsBridge 1.0
 import ConfigBridge 1.0
+import UtilBridge 1.0
 
 Item {
     id: transactionsItem
 
-    var allTrans = []
-    var nodeHeight = 0
-    var TRANSACTION_CANCELLED = 0x8000
-    var TRANSACTION_COIN_BASE = 4
-    var COIN_BASE_CONFIRM_NUMBER = 1440
+    property var allTrans: []
+    property var node_height: 0
+    property var type_TRANSACTION_CANCELLED: 0x8000
+    property var type_TRANSACTION_COIN_BASE: 4
+    property var type_TRANSACTION_RECEIVE: 2
+    property var type_TRANSACTION_SEND: 1
+    property var number_COIN_BASE_CONFIRM: 1440
+    property var locale: Qt.locale()
 
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
@@ -28,10 +32,49 @@ Item {
         id: config
     }
 
+    UtilBridge {
+        id: util
+    }
+
     Connections {
         target: wallet
-        onSgnWalletBalanceUpdated: {
+        onSgnNodeStatus: {
+            if (online) {
+                node_height = nodeHeight
+            }
+        }
 
+        onSgnTransactions: {
+            if (account !== wallet.getCurrentAccountName() )
+                return;
+//            ui->progressFrame->hide();
+            allTrans = []
+            transactions.forEach(tx => allTrans.push(tx))
+            updateData();
+        }
+
+        onSgnTransactionById: {
+//            ui->progressFrame->hide();
+            if (!success) {
+//                control::MessageBox::messageText(this, "Transaction details",
+//                                                 "Internal error. Transaction details are not found.");
+                return;
+            }
+            const txinfo = JSON.parse(transaction)
+            const outputsInfo = []
+            outputs.forEach(json => {
+                outputsInfo.push(json)
+            })
+            const txnNote = config.getTxNote(txinfo.txid);
+            transactionDetail.init(account, txinfo, outputsInfo, messages, txnNote)
+            transactionDetail.visible = true
+//            connect(&showTransDlg, &dlg::ShowTransactionDlg::saveTransactionNote, this, &Transactions::saveTransactionNote);
+        }
+
+        onSgnNewNotificationMessage: {
+            if (message.includes("Changing transaction")) {
+                requestTransactions()
+            }
         }
     }
 
@@ -56,24 +99,23 @@ Item {
     function updateData() {
         const expectedConfirmNumber = config.getInputConfirmationNumber()
         for ( let idx = allTrans.length - 1; idx >= 0; idx--) {
-            const trans = allTrans[idx]
-
+            const trans = JSON.parse(allTrans[idx])
             const selection = 0.0
 
-            if ( canBeCancelled(trans) ) {
-                const age = calculateTransactionAge(trans)
+            if (canBeCancelled(trans.transactionType, trans.confirmed)) {
+                const age = calculateTransactionAge(trans.creationTime)
                 // 1 hours is a 1.0
                 selection = age > 60 * 60 ?
                             1.0 : (Number(age) / Number(60 * 60))
             }
 
-            const transConfirmedStr = trans.confirmed ? "YES" : "NO"
+            let transConfirmedStr = trans.confirmed ? "YES" : "NO"
             // if the node is online and in sync, display the number of confirmations instead
-            // nodeHeight will be 0 if the node is offline or out of sync
-            if (nodeHeight > 0 && trans.height > 0) {
-                const needConfirms = isCoinBase(trans) ? COIN_BASE_CONFIRM_NUMBER : expectedConfirmNumber
+            // node_height will be 0 if the node is offline or out of sync
+            if (node_height > 0 && trans.height > 0) {
+                const needConfirms = isCoinBase(trans.transactionType) ? number_COIN_BASE_CONFIRM : expectedConfirmNumber
                 // confirmations are 1 more than the difference between the node and transaction heights
-                const confirmations = nodeHeight - trans.height + 1
+                const confirmations = node_height - trans.height + 1
                 transConfirmedStr = Number(confirmations).toString()
                 if (needConfirms >= confirmations) {
                     transConfirmedStr += "/" + Number(needConfirms).toString()
@@ -82,40 +124,73 @@ Item {
 
             transactionModel.append({
                 txNum: Number(trans.txIdx+1).toString(),
-                txType: getTypeAsStr(trans),
-                txId: trans.txid,
-                txAddress: trans.address,
-                txTime: trans.creationTime,
-                txCoinNano: trans.coinNano,
+                txType: getTypeAsStr(trans.transactionType),
+                txId: "ID: " + trans.txid,
+                txAddress: trans.address === "file" ? "File Transfer" : trans.address,
+                txTime: getTxTime(trans.creationTime),
+                txCoinNano: util.nano2one(trans.coinNano) + " MWC",
                 txConfirmedStr: transConfirmedStr,
-                txHeight: trans.height <= 0 ? "" : Number(trans.height).toString()
+                txHeight: trans.height <= 0 ? "" : Number(trans.height).toString(),
+                selection: selection
             })
         }
     }
 
-    function canBeCancelled(trans) {
-        return (trans.transactionType & TRANSACTION_CANCELLED) === 0 && !trans.confirmed
+    function canBeCancelled(transactionType, confirmed) {
+        return (transactionType & type_TRANSACTION_CANCELLED) === 0 && !confirmed
     }
 
-    function calculateTransactionAge(trans) {
+    function calculateTransactionAge(creationTime) {
         const now = new Date()
-        const creationTime = new Date(trans.creationTime)
-        return (now.getTime() - creationTime.getTime()) / 1000
+        const txCreationTime = new Date(creationTime)
+        return (now.getTime() - txCreationTime.getTime()) / 1000
     }
 
-    function isCoinBase(trans) {
-        return trans.transactionType === TRANSACTION_COIN_BASE
+    function isCoinBase(transactionType) {
+        return transactionType === type_TRANSACTION_COIN_BASE
+    }
+
+    function getTypeAsStr(transactionType) {
+        let res = ""
+        if ( transactionType & type_TRANSACTION_SEND )
+            res += "Sent";
+        if ( transactionType & type_TRANSACTION_RECEIVE )
+            res += "Received";
+        if ( transactionType & type_TRANSACTION_COIN_BASE )
+            res += "CoinBase";
+
+        if ( transactionType & type_TRANSACTION_CANCELLED ) {
+            if (res.length !== 0)
+                res += ", ";
+            res += "Cancelled";
+        }
+
+        return res;
+    }
+
+    function getTxTime(creationTime) {
+//        const date = Date.fromLocaleString(locale, creationTime, "hh:mm:ss dd-MM-yyyy")
+        const date = Date.fromLocaleString(locale, creationTime, "dd-MM-yyyy hh:mm")
+        return date.toLocaleString(locale, "MMM dd, yyyy / hh:mm ap")
+    }
+
+    function getTxTypeIcon(txType) {
+        if (txType.includes("Cancelled")) {
+            return "../img/Transactions_Cancelled@2x.svg"
+        }
+        if (txType.includes("Sent")) {
+            return "../img/Transactions_Sent@2x.svg"
+        }
+        if (txType.includes("Received")) {
+            return "../img/Transactions_Received@2x.svg"
+        }
+        if (txType.includes("CoinBase")) {
+            return "../img/Transactions_CoinBase@2x.svg"
+        }
     }
 
     ListModel {
         id: transactionModel
-        ListElement {
-            txType: "Sent"
-            txTime: "Jun 25, 2020  /  12:57pm"
-            txBalance: "-90 MWC"
-            txId: "ID: 49570294750498750249875049875"
-            txUrl: "https://tokok.co/coin/mwc/7295hghhgh4bdfb654"
-        }
     }
 
     ListView {
@@ -144,6 +219,18 @@ Item {
                 anchors.left: parent.left
                 anchors.leftMargin: dp(20)
 
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        const account = wallet.getCurrentAccountName()
+                        if (account === "" || index < 0 || index >= allTrans.length)
+                            return
+                        // respond will come at updateTransactionById
+                        wallet.requestTransactionById(account, Number(allTrans[index].txIdx));
+//                        ui->progressFrame->show();
+                    }
+                }
+
                 Image {
                     width: dp(17)
                     height: dp(17)
@@ -152,7 +239,7 @@ Item {
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
                     fillMode: Image.PreserveAspectFit
-                    source: txType === "Sent" ? "../img/Transactions_Sent@2x.svg" : "../img/Transactions_Received@2x.svg"
+                    source: getTxTypeIcon(txType)
                 }
 
                 Text {
@@ -192,7 +279,7 @@ Item {
 
                 Text {
                     color: "#ffffff"
-                    text: txBalance
+                    text: txCoinNano
                     font.bold: true
                     anchors.top: parent.top
                     anchors.topMargin: dp(90)
@@ -213,7 +300,7 @@ Item {
 
                 Text {
                     color: "#ffffff"
-                    text: txUrl
+                    text: txAddress
                     anchors.top: parent.top
                     anchors.topMargin: dp(150)
                     anchors.left: parent.left
@@ -222,5 +309,13 @@ Item {
                 }
             }
         }
+    }
+
+    TransactionDetail {
+        id: transactionDetail
+        visible: false
+        anchors.fill: parent
+        anchors.leftMargin: dp(30)
+        anchors.rightMargin: dp(30)
     }
 }
