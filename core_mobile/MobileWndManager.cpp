@@ -43,15 +43,25 @@ void MobileWndManager::messageTextDlg( QString title, QString message, double wi
 }
 
 void MobileWndManager::messageHtmlDlg( QString title, QString message, double widthScale)  {
+    Q_UNUSED(title)
+    Q_UNUSED(message)
+    Q_UNUSED(widthScale)
+
     Q_ASSERT(false); // implement me
 }
 
 // Two button box
 WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2,
                                                            QString btn1Tooltip, QString btn2Tooltip,
-                                                           bool default1, bool default2, double widthScale) {
+                                                           bool default1, bool default2, double widthScale, int *ttl_blocks) {
     Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
     Q_UNUSED(btn2Tooltip)
+    Q_UNUSED(widthScale)
+    Q_UNUSED(default1)
+    Q_UNUSED(default2)
+    Q_UNUSED(btn1)
+    Q_UNUSED(btn2)
+    Q_UNUSED(ttl_blocks)
 
     if ( QMessageBox::Yes == QMessageBox::question(nullptr, title, message) )
         return WndManager::RETURN_CODE::BTN2;
@@ -64,6 +74,14 @@ WndManager::RETURN_CODE MobileWndManager::questionHTMLDlg( QString title, QStrin
                                                            bool default1, bool default2, double widthScale )  {
     Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
     Q_UNUSED(btn2Tooltip)
+    Q_UNUSED(title)
+    Q_UNUSED(message)
+    Q_UNUSED(widthScale)
+    Q_UNUSED(default1)
+    Q_UNUSED(default2)
+    Q_UNUSED(btn1)
+    Q_UNUSED(btn2)
+
     Q_ASSERT(false); // implement me
     return WndManager::RETURN_CODE::BTN1;
 }
@@ -72,21 +90,41 @@ WndManager::RETURN_CODE MobileWndManager::questionHTMLDlg( QString title, QStrin
 // After return, passwordHash value will have input raw Password value. So it can be user for wallet
 WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2,
                                                            QString btn1Tooltip, QString btn2Tooltip,
-                                                           bool default1, bool default2, double widthScale, QString & passwordHash, WndManager::RETURN_CODE blockButton )  {
+                                                           bool default1, bool default2, double widthScale, QString & passwordHash, WndManager::RETURN_CODE blockButton, int *ttl_blocks)  {
     Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
     Q_UNUSED(btn2Tooltip)
+    Q_UNUSED(title)
+    Q_UNUSED(message)
+    Q_UNUSED(btn1)
+    Q_UNUSED(btn2)
+    Q_UNUSED(default1)
+    Q_UNUSED(default2)
+    Q_UNUSED(widthScale)
+    Q_UNUSED(passwordHash)
+    Q_UNUSED(blockButton)
+    Q_UNUSED(ttl_blocks)
+
     Q_ASSERT(false); // implement me
     return WndManager::RETURN_CODE::BTN1;
 }
 
 // QFileDialog::getSaveFileName call
 QString MobileWndManager::getSaveFileName(const QString &caption, const QString &dir, const QString &filter) {
+    Q_UNUSED(caption)
+    Q_UNUSED(dir)
+    Q_UNUSED(filter)
+
     Q_ASSERT(false); // implement me
     return "";
 }
 
 // Ask for confirmation
 bool MobileWndManager::sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) {
+    Q_UNUSED(title)
+    Q_UNUSED(message)
+    Q_UNUSED(widthScale)
+    Q_UNUSED(passwordHash)
+
     Q_ASSERT(false); // implement me
     return false;
 }
@@ -96,6 +134,9 @@ void MobileWndManager::pageNewWallet() {
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageInputPassword(QString pageTitle, bool lockMode) {
+    Q_UNUSED(pageTitle)
+    Q_UNUSED(lockMode)
+
     mainWindow->setProperty("currentState", state::STATE::INPUT_PASSWORD);
 }
 void MobileWndManager::pageInitAccount() {
@@ -105,12 +146,25 @@ void MobileWndManager::pageEnterSeed() {
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageNewSeed(QString pageTitle, QVector<QString> seed, bool hideSubmitButton) {
+    Q_UNUSED(pageTitle)
+    Q_UNUSED(seed)
+    Q_UNUSED(hideSubmitButton)
+
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageNewSeedTest(int wordIndex) {
+    Q_UNUSED(wordIndex)
+
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageProgressWnd(QString pageTitle, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable ) {
+    Q_UNUSED(pageTitle)
+    Q_UNUSED(callerId)
+    Q_UNUSED(header)
+    Q_UNUSED(msgProgress)
+    Q_UNUSED(msgPlus)
+    Q_UNUSED(cancellable)
+
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageOutputs() {
@@ -120,6 +174,14 @@ void MobileWndManager::pageFileTransaction(QString pageTitle, QString callerId,
                                      const QString & fileName, const util::FileTransactionInfo & transInfo,
                                      int nodeHeight,
                                      QString transactionType, QString processButtonName) {
+    Q_UNUSED(pageTitle)
+    Q_UNUSED(callerId)
+    Q_UNUSED(fileName)
+    Q_UNUSED(transInfo)
+    Q_UNUSED(nodeHeight)
+    Q_UNUSED(transactionType)
+    Q_UNUSED(processButtonName)
+
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageRecieve() {
@@ -139,14 +201,14 @@ void MobileWndManager::pageSendOnline( QString selectedAccount, int64_t amount )
     QJsonObject obj;
     obj["isSendOnline"] = true;
     obj["selectedAccount"] = selectedAccount;
-    obj["amount"] = amount;
+    obj["amount"] = QString::number(amount);
     mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 void MobileWndManager::pageSendOffline( QString selectedAccount, int64_t amount ) {
     QJsonObject obj;
     obj["isSendOnline"] = false;
     obj["selectedAccount"] = selectedAccount;
-    obj["amount"] = amount;
+    obj["amount"] = QString::number(amount);
     mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 void MobileWndManager::pageTransactions() {
@@ -163,10 +225,13 @@ void MobileWndManager::pageHodlCold() {
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageHodlClaim(QString walletHash) {
+    Q_UNUSED(walletHash)
+
     Q_ASSERT(false); // implement me
 }
     // return true(first) if press OK and input signature value(second)
 QPair<bool, QString> MobileWndManager::hodlGetSignatureDlg(QString challenge) {
+    Q_UNUSED(challenge)
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageAccounts() {
@@ -179,6 +244,10 @@ void MobileWndManager::pageAirdrop() {
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageAirdropForBTC(QString btcAddress, QString challenge, QString identifier) {
+    Q_UNUSED(btcAddress)
+    Q_UNUSED(challenge)
+    Q_UNUSED(identifier)
+
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageNodeInfo() {

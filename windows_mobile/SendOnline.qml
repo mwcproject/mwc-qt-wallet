@@ -13,7 +13,7 @@ Item {
 
     function init(initParams) {
         account = initParams.selectedAccount
-        amount = initParams.amount
+        amount = parseInt(initParams.amount)
         text_from_account.text = qsTr("From account: " + account)
         text_amount_to_send.text = qsTr("Amount to send: " + ( amount < 0 ? "All" : util.nano2one(Number(amount).toString())) + " MWC" )
     }
