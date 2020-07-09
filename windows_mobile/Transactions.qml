@@ -56,8 +56,7 @@ Item {
         onSgnTransactionById: {
 //            ui->progressFrame->hide();
             if (!success) {
-//                control::MessageBox::messageText(this, "Transaction details",
-//                                                 "Internal error. Transaction details are not found.");
+                messagebox.open(qsTr("Transaction details"), qsTr("Internal error. Transaction details are not found."))
                 return
             }
             const txinfo = JSON.parse(transaction)
@@ -328,5 +327,11 @@ Item {
         anchors.fill: parent
         anchors.leftMargin: dp(30)
         anchors.rightMargin: dp(30)
+    }
+
+    MessageBox {
+        id: messagebox
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
     }
 }

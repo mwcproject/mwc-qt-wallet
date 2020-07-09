@@ -31,7 +31,6 @@ Item {
     Connections {
         target: receive
         onSgnTransactionActionIsFinished: {
-//            util::TimeoutLockObject to( "Receive" )
 //            ui->progress->hide()
 //            control::MessageBox::messageText(this, success ? "Success" : "Failure", message )
             console.log(success, message)
