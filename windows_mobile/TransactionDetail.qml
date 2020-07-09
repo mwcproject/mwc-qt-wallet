@@ -165,6 +165,12 @@ Item {
         text_txnum.text = out.txIdx < 0 ? "None" : Number(out.txIdx+1).toString()
     }
 
+    onVisibleChanged: {
+        if (visible) {
+            view_txinfo.contentItem.contentY = 0
+        }
+    }
+
     Rectangle {
         anchors.fill: parent
         color: "white"
