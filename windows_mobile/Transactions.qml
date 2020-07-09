@@ -68,7 +68,6 @@ Item {
             const txnNote = config.getTxNote(txinfo.txid);
             transactionDetail.init(account, txinfo, outputsInfo, messages, txnNote)
             transactionDetail.visible = true
-//            connect(&showTransDlg, &dlg::ShowTransactionDlg::saveTransactionNote, this, &Transactions::saveTransactionNote);
         }
 
         onSgnNewNotificationMessage: {
@@ -124,7 +123,7 @@ Item {
 
             transactionModel.append({
                 txNum: Number(trans.txIdx+1).toString(),
-                txType: getTypeAsStr(trans.transactionType),
+                txType: getTypeAsStr(trans.transactionType, trans.confirmed),
                 txId: "ID: " + trans.txid,
                 txAddress: trans.address === "file" ? "File Transfer" : trans.address,
                 txTime: getTxTime(trans.creationTime),
@@ -150,22 +149,21 @@ Item {
         return transactionType === type_TRANSACTION_COIN_BASE
     }
 
-    function getTypeAsStr(transactionType) {
-        let res = ""
+    function getTypeAsStr(transactionType, confirmed) {
+        if ( transactionType & type_TRANSACTION_CANCELLED )
+            return "Cancelled";
+
+        if (!confirmed)
+            return "Unconfirmed"
+
         if ( transactionType & type_TRANSACTION_SEND )
-            res += "Sent";
+            return "Sent"
+
         if ( transactionType & type_TRANSACTION_RECEIVE )
-            res += "Received";
+            return "Received"
+
         if ( transactionType & type_TRANSACTION_COIN_BASE )
-            res += "CoinBase";
-
-        if ( transactionType & type_TRANSACTION_CANCELLED ) {
-            if (res.length !== 0)
-                res += ", ";
-            res += "Cancelled";
-        }
-
-        return res;
+            return "CoinBase"
     }
 
     function getTxTime(creationTime) {
@@ -175,18 +173,20 @@ Item {
     }
 
     function getTxTypeIcon(txType) {
-        if (txType.includes("Cancelled")) {
+        if (txType === "Cancelled")
             return "../img/Transactions_Cancelled@2x.svg"
-        }
-        if (txType.includes("Sent")) {
+
+        if (txType === "Unconfirmed")
+            return "../img/Transactions_Unconfirmed@2x.svg"
+
+        if (txType === "Sent")
             return "../img/Transactions_Sent@2x.svg"
-        }
-        if (txType.includes("Received")) {
+
+        if (txType === "Received")
             return "../img/Transactions_Received@2x.svg"
-        }
-        if (txType.includes("CoinBase")) {
+
+        if (txType === "CoinBase")
             return "../img/Transactions_CoinBase@2x.svg"
-        }
     }
 
     ListModel {

@@ -1,6 +1,9 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
+import WalletBridge 1.0
+import ConfigBridge 1.0
+import UtilBridge 1.0
 
 Item {
     id: transactionDetail
@@ -9,9 +12,25 @@ Item {
     property var outputs
     property var messages
     property var txnNote
+    property string blockExplorerUrl
+    property string originalTransactionNote
+    property string txUuid
+    property var type_TRANSACTION_CANCELLED: 0x8000
+    property var type_TRANSACTION_COIN_BASE: 4
+    property var type_TRANSACTION_RECEIVE: 2
+    property var type_TRANSACTION_SEND: 1
+    property var locale: Qt.locale()
 
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
+
+    ConfigBridge {
+        id: config
+    }
+
+    UtilBridge {
+        id: util
+    }
 
     function init(_account, _txinfo, _outputsInfo, _messages, _txnNote) {
         account = _account
@@ -19,11 +38,97 @@ Item {
         outputs = _outputsInfo
         messages = _messages
         txnNote = _txnNote
+        txUuid = txinfo.txid
+        blockExplorerUrl = config.getBlockExplorerUrl(config.getNetwork());
+        image_txtype.source = getTxTypeIcon(txinfo.transactionType, txinfo.confirmed)
+        text_txtype_amount.text = getTypeAsStr(txinfo.transactionType) + " " + util.nano2one(txinfo.coinNano) + " MWC"
+        text_txdate.text = getTxTime(txinfo.creationTime)
+        text_confirmed.text = txinfo.confirmed ? "Yes" : "No"
+        text_txid.text = txinfo.txid
+        text_address.text = txinfo.address
+
+        let strMessage = "None";
+        if (messages.length) {
+            strMessage = messages[0]
+            for (let t = 1; t < messages.length; t++) {
+                strMessage += "; "
+                strMessage += messages[t]
+            }
+        }
+        text_message.text = strMessage
+
+        textfield_note.text = txnNote
+        originalTransactionNote = txnNote
+        text_kernel.text = txinfo.kernel
+        text_inputs.text = Number(txinfo.numInputs).toString()
+        text_debited.text = util.nano2one(txinfo.debited)
+        text_outputs.text = Number(txinfo.numOutputs).toString()
+        text_credited.text = util.nano2one(txinfo.credited)
+        text_txfee.text = util.nano2one(txinfo.fee)
+
+        list_commitments.clear()
+        for (let i = 0; i < outputs.length; i++) {
+            let commitType = ""
+            if (i < txinfo.numInputs) {
+                commitType = "Input " + Number(i+1).toString() + ": ";
+            }
+            else {
+                commitType = "Output " + Number(i-txinfo.numInputs+1) + ": ";
+            }
+
+            list_commitments.append({ text: commitType + outputs[i].outputCommitment });
+        }
+
+        // Selecting first output
+        if (txinfo.numInputs < outputs.length) {
+            combobox_commitments.currentIndex = txinfo.numInputs
+        } else {
+            combobox_commitments.currentIndex = -1
+        }
     }
 
-    onVisibleChanged: {
-        if (visible) {
+    function getTxTypeIcon(transactionType, confirmed) {
+        if ( transactionType & type_TRANSACTION_CANCELLED )
+            return "../img/Transactions_Cancelled_Blue@2x.svg"
 
+        if ( !confirmed )
+            return "../img/Transactions_Unconfirmed_Blue@2x.svg"
+
+        if ( transactionType & type_TRANSACTION_SEND )
+            return "../img/Transactions_Sent_Blue@2x.svg"
+
+        if ( transactionType & type_TRANSACTION_RECEIVE )
+            return "../img/Transactions_Received_Blue@2x.svg"
+
+        if ( transactionType & type_TRANSACTION_COIN_BASE )
+            return "../img/Transactions_CoinBase_Blue@2x.svg"
+    }
+
+    function getTypeAsStr(transactionType) {
+        if ( transactionType & type_TRANSACTION_SEND )
+            return "Sent"
+
+        if ( transactionType & type_TRANSACTION_RECEIVE )
+            return "Received"
+
+        if ( transactionType & type_TRANSACTION_COIN_BASE )
+            return "CoinBase"
+    }
+
+    function getTxTime(creationTime) {
+//        const date = Date.fromLocaleString(locale, creationTime, "hh:mm:ss dd-MM-yyyy")
+        const date = Date.fromLocaleString(locale, creationTime, "dd-MM-yyyy hh:mm")
+        return date.toLocaleString(locale, "MMM dd, yyyy")
+    }
+
+    function saveTransactionNote(newNote) {
+        if (originalTransactionNote !== newNote) {
+            originalTransactionNote = newNote
+            if (newNote === "") {
+                config.deleteTxNote(txUuid)
+            } else {
+                config.updateTxNote(txUuid, newNote)
+            }
         }
     }
 
@@ -46,6 +151,7 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     textfield_note.focus = false
+                    saveTransactionNote(textfield_note.text)
                 }
             }
 
@@ -96,6 +202,7 @@ Item {
                     anchors.fill: parent
                     onClicked: {
                         transactionDetail.visible = false
+                        saveTransactionNote(textfield_note.text)
                     }
                 }
             }
@@ -115,6 +222,7 @@ Item {
                 anchors.fill: parent
                 onClicked: {
                     textfield_note.focus = false
+                    saveTransactionNote(textfield_note.text)
                 }
             }
 
@@ -316,7 +424,7 @@ Item {
                 }
 
                 onClicked: {
-                    console.log("kernel view clicked")
+                    Qt.openUrlExternally("https://" + blockExplorerUrl + "/#k" + text_kernel.text)
                 }
             }
 
