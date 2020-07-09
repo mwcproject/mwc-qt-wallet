@@ -105,4 +105,14 @@ void setFinalize(bool finalizeValue) {
     finalize = finalizeValue;
 }
 
+static bool walletLocked = false;
+
+void setWalletLocked(bool locked) {
+    walletLocked = locked;
+}
+
+bool isWalletLocked() {
+    return walletLocked;
+}
+
 }

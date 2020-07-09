@@ -37,6 +37,8 @@ class QPushButton;
 namespace core {
 
 class WindowManager;
+class StatusWnd;
+class StatusWndMgr;
 
 class MainWindow : public QMainWindow
 {
@@ -47,7 +49,9 @@ public:
     ~MainWindow();
 
     QWidget * getMainWindow();
-
+    void restore();
+    void statusHide(const QSharedPointer<StatusWnd> swnd);
+    void statusDone(const QSharedPointer<StatusWnd> swnd);
 
 private slots:
     // Update tb & menu actions
@@ -107,6 +111,10 @@ private:
     enum class STATUS { IGNORE, RED, YELLOW, GREEN };
     void setStatusButtonState( QPushButton * btn, STATUS status, QString text );
 
+    void moveEvent(QMoveEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
+    bool event(QEvent* event) override;
+
 private:
     Ui::MainWindow *ui;
     bridge::Config * config = nullptr;
@@ -115,6 +123,7 @@ private:
     bridge::StateMachine * stateMachine = nullptr;
     bridge::Util * util = nullptr;
     bool leftBarShown = true;
+    core::StatusWndMgr* statusMgr = nullptr;
 };
 
 }

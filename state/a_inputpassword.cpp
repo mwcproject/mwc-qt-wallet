@@ -65,6 +65,7 @@ NextStateRespond InputPassword::execute() {
 
     if (!lockStr.isEmpty()) {
         inLockMode = true;
+        mwc::setWalletLocked(inLockMode);
         // wallet locking mode
         core::getWndManager()->pageInputPassword(mwc::PAGE_A_ACCOUNT_UNLOCK, true);
         return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
@@ -80,6 +81,7 @@ void InputPassword::submitPassword(const QString & password) {
         context->wallet->logout(true);
         context->wallet->start();
         inLockMode = false;
+        mwc::setWalletLocked(inLockMode);
     }
 
     context->wallet->loginWithPassword( password );

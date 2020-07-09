@@ -23,6 +23,15 @@ QStatusBar {
     font-size: 13px;
 }
 
+core--StatusWnd {
+    background-color: #9000FF;
+    border-radius: 6px;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 15px;
+}
+
 /* Needed for Windows */
 QWidget {
     border: none;
@@ -335,6 +344,28 @@ QPushButton:disabled {
 
 QPushButton:pressed {
     background: rgba(255, 255, 255, 0.3);
+}
+
+control--MwcStatusLine {
+    border-radius: 6px;
+    border: none;
+    background-color: #9000FF;
+}
+
+control--MwcStatusLine:!enabled {
+    border: none;
+}
+
+control--MwcStatusLine:disabled {
+    border: none;
+}
+
+control--MwcStatusLine:enabled:!focus::hover {
+    border: none;
+}
+
+control--MwcStatusLine:enabled:focus {
+    border: none;
 }
 
 /* ------------------ Scroll bars ------------------------ */

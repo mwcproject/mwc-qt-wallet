@@ -33,6 +33,7 @@
 #include <QStyle>
 #include "../core/global.h"
 #include "../core/WalletApp.h"
+#include "../core_desktop/statuswndmgr.h"
 
 namespace core {
 
@@ -49,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent) :
     wallet = new bridge::Wallet(this);
     stateMachine = new bridge::StateMachine(this);
     util = new bridge::Util(this);
+
+    statusMgr = new core::StatusWndMgr(this);
 
     QObject::connect( coreWindow, &CoreWindow::sgnUpdateActionStates,
                       this, &MainWindow::onSgnUpdateActionStates, Qt::QueuedConnection);
@@ -162,6 +165,19 @@ void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete statusMgr;
+}
+
+void MainWindow::restore() {
+    statusMgr->restore();
+}
+
+void MainWindow::statusHide(const QSharedPointer<StatusWnd> _swnd) {
+    statusMgr->statusHide(_swnd);
+}
+
+void MainWindow::statusDone(const QSharedPointer<StatusWnd> _swnd) {
+    statusMgr->statusDone(_swnd);
 }
 
 // level: notify::MESSAGE_LEVEL
@@ -194,6 +210,7 @@ void MainWindow::onSgnNewNotificationMessage(int level, QString message) {
             break;
     }
 
+    statusMgr->handleStatusMessage(prefix, message);
     ui->statusBar->showMessage( prefix + message, (int)(timeout * config->getTimeoutMultiplier()) );
 }
 
@@ -352,6 +369,23 @@ void MainWindow::setStatusButtonState(  QPushButton * btn, STATUS status, QStrin
 
     if (!text.isEmpty())
         btn->setText(" " + text + " ");
+}
+
+void MainWindow::moveEvent(QMoveEvent* event) {
+    statusMgr->moveEvent(event);
+    QMainWindow::moveEvent(event);
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event) {
+    statusMgr->resizeEvent(event);
+    QMainWindow::resizeEvent(event);
+}
+
+bool MainWindow::event(QEvent* event) {
+    if (statusMgr->event(event)) {
+        return true;
+    }
+    return QMainWindow::event(event);
 }
 
 //////////////////////////////////////////////////////////////////////////////////

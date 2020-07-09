@@ -138,6 +138,9 @@ void setRepostAccount(QString account);
 void setFinalize(bool finalize);
 bool isFinalize();
 
+void setWalletLocked(bool locked);
+bool isWalletLocked();
+
 }
 
 

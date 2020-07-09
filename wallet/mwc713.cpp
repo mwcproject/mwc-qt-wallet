@@ -1174,12 +1174,14 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
 
     updateWalletBalance(false,true);
 
-    // Show message box with congrats. Message bot should work from any point. No needs to block locking or what ever we have
-    core::getWndManager()->messageHtmlDlg("Congratulations!",
+    // We no longer display a message box with the receive message
+    // It is now displayed in a status window off of the main window.
+    /* core::getWndManager()->messageHtmlDlg("Congratulations!",
            "You received <b>" + mwc + "</b> MWC<br>" +
            (message.isEmpty() ? "" : "Description: " + message + "<br>" ) +
            "<br>From: " + fromAddr +
            "<br>Slate: " + slate);
+    */
 
 }
 

@@ -256,7 +256,7 @@ void Mwc713InputParser::initListening() {
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_TOR_LOST_CONNECTION,
                                                 QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("tor is not responding, will try to reconnect")
+                                                        new TriePhraseSection("Tor is not responding. Will try to reconnect")
                                                 }));
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_TOR_GET_CONNECTION,
@@ -289,7 +289,7 @@ void Mwc713InputParser::initListening() {
                                                 }));
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_HTTP_FAILED,
                                                 QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("Foreign API Listener failed, "),
+                                                        new TriePhraseSection("Foreign API Listener failed. "),
                                                         new TrieAnySection(500, TrieAnySection::NOT_NEW_LINE,"","'", 1), // Error message, not user friendly (rust way)
                                                 }));
 }
