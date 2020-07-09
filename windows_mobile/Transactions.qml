@@ -46,11 +46,11 @@ Item {
 
         onSgnTransactions: {
             if (account !== wallet.getCurrentAccountName() )
-                return;
+                return
 //            ui->progressFrame->hide();
             allTrans = []
             transactions.forEach(tx => allTrans.push(tx))
-            updateData();
+            updateData()
         }
 
         onSgnTransactionById: {
@@ -58,7 +58,7 @@ Item {
             if (!success) {
 //                control::MessageBox::messageText(this, "Transaction details",
 //                                                 "Internal error. Transaction details are not found.");
-                return;
+                return
             }
             const txinfo = JSON.parse(transaction)
             const outputsInfo = []
@@ -86,8 +86,9 @@ Item {
 
     function requestTransactions() {
         transactionModel.clear()
+        allTrans = []
         const account = wallet.getCurrentAccountName()
-        if (account.length === 0) {
+        if (account === "") {
             return
         }
         wallet.requestNodeStatus()
@@ -96,6 +97,7 @@ Item {
     }
 
     function updateData() {
+        transactionModel.clear()
         const expectedConfirmNumber = config.getInputConfirmationNumber()
         for ( let idx = allTrans.length - 1; idx >= 0; idx--) {
             const trans = JSON.parse(allTrans[idx])
@@ -122,7 +124,7 @@ Item {
             }
 
             transactionModel.append({
-                txNum: Number(trans.txIdx+1).toString(),
+                txIdx: trans.txIdx,
                 txType: getTypeAsStr(trans.transactionType, trans.confirmed),
                 txId: "ID: " + trans.txid,
                 txAddress: trans.address === "file" ? "File Transfer" : trans.address,
@@ -226,9 +228,18 @@ Item {
                         if (account === "" || index < 0 || index >= allTrans.length)
                             return
                         // respond will come at updateTransactionById
-                        wallet.requestTransactionById(account, Number(allTrans[index].txIdx));
+                        wallet.requestTransactionById(account, Number(txIdx).toString());
 //                        ui->progressFrame->show();
                     }
+                }
+
+                Rectangle {
+                    width: dp(10)
+                    height: parent.height
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    color: "#BCF317"
+                    visible: txType === "Unconfirmed"
                 }
 
                 Image {
