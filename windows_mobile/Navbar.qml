@@ -16,6 +16,12 @@ Item {
         case 9:
             text_title.text = qsTr("Wallet  >   Receive")
             break
+        case 11:
+            text_title.text = qsTr("Wallet  >   Transactions")
+            break
+        case 19:
+            text_title.text = qsTr("Wallet  >   Finalize")
+            break
         case 21:
             text_title.text = qsTr("Wallet")
             break
