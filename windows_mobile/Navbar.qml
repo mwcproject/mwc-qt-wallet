@@ -510,7 +510,7 @@ Item {
         id: navModel
         ListElement {
             pageName: "Wallet"
-            imagePath: "../img/NavAccount@2x.svg"
+            imagePath: "../img/NavWallet@2x.svg"
         }
         ListElement {
             pageName: "Account Options"
