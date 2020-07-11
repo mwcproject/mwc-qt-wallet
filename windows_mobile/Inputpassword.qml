@@ -65,7 +65,7 @@ Item {
         delegate: ItemDelegate {
             width: instanceComboBox.width
             contentItem: Text {
-                text: modelData
+                text: value
                 color: "#7579ff"
                 font: instanceComboBox.font
                 elide: Text.ElideRight
@@ -135,7 +135,7 @@ Item {
 
         model: ListModel {
             id: accountItems
-            ListElement { text: "Default" }
+            ListElement { value: "Default" }
         }
         anchors.bottom: text_login.top
         anchors.bottomMargin: dp(15)

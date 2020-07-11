@@ -41,6 +41,7 @@
         <file>img/NavNotificationActive@2x.svg</file>
         <file>img/NavNotificationNormal@2x.svg</file>
         <file>img/NavSettings@2x.svg</file>
+        <file>img/NavWallet@2x.svg</file>
         <file>img/Output_big@2x.svg</file>
         <file>img/PassNotMatch@2x.svg</file>
         <file>img/PassOK@2x.svg</file>
@@ -67,10 +68,15 @@
         <file>img/Transactions@2x.svg</file>
         <file>img/Transactions_big@2x.svg</file>
         <file>img/Transactions_Cancelled@2x.svg</file>
+        <file>img/Transactions_Cancelled_Blue@2x.svg</file>
         <file>img/Transactions_CoinBase@2x.svg</file>
+        <file>img/Transactions_CoinBase_Blue@2x.svg</file>
         <file>img/Transactions_Received@2x.svg</file>
+        <file>img/Transactions_Received_Blue@2x.svg</file>
         <file>img/Transactions_Sent@2x.svg</file>
         <file>img/Transactions_Sent_Blue@2x.svg</file>
+        <file>img/Transactions_Unconfirmed@2x.svg</file>
+        <file>img/Transactions_Unconfirmed_Blue@2x.svg</file>
         <file>img/Transfer@2x.svg</file>
         <file>windows_mobile/NavigationDrawer.qml</file>
         <file>windows_mobile/Navbar.qml</file>

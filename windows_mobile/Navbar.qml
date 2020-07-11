@@ -16,6 +16,12 @@ Item {
         case 9:
             text_title.text = qsTr("Wallet  >   Receive")
             break
+        case 11:
+            text_title.text = qsTr("Wallet  >   Transactions")
+            break
+        case 19:
+            text_title.text = qsTr("Wallet  >   Finalize")
+            break
         case 21:
             text_title.text = qsTr("Wallet")
             break
@@ -504,7 +510,7 @@ Item {
         id: navModel
         ListElement {
             pageName: "Wallet"
-            imagePath: "../img/NavAccount@2x.svg"
+            imagePath: "../img/NavWallet@2x.svg"
         }
         ListElement {
             pageName: "Account Options"
