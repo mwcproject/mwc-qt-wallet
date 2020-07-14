@@ -97,6 +97,5 @@
         <file>windows_mobile/Finalize.qml</file>
         <file>windows_mobile/Transactions.qml</file>
         <file>windows_mobile/TransactionDetail.qml</file>
-        <file>windows_mobile/InitAccount.qml</file>
     </qresource>
 </RCC>

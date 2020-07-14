@@ -77,6 +77,7 @@
 #include "bridge/wnd/g_send_b.h"
 #include "bridge/wnd/g_finalize_b.h"
 #include "bridge/wnd/e_transactions_b.h"
+#include "bridge/wnd/a_initaccount_b.h"
 
 #ifdef WALLET_MOBILE
 #include <QQmlApplicationEngine>
@@ -274,6 +275,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<bridge::Send>("SendBridge", 1, 0, "SendBridge");
     qmlRegisterType<bridge::Finalize>("FinalizeBridge", 1, 0, "FinalizeBridge");
     qmlRegisterType<bridge::Transactions>("TransactionsBridge", 1, 0, "TransactionsBridge");
+    qmlRegisterType<bridge::InitAccount>("InitAccountBridge", 1, 0, "InitAccountBridge");
 
     core::MobileWndManager * wndManager = new core::MobileWndManager();
 #endif

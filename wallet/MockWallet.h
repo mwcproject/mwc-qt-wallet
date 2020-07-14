@@ -21,7 +21,7 @@
 #include <core/HodlStatus.h>
 #include "../core/global.h"
 
-#define INITIALIZED_WALLET
+// #define INITIALIZED_WALLET
 
 namespace core {
 class AppContext;

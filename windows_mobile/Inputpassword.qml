@@ -4,10 +4,17 @@ import QtQuick.Window 2.0
 import InputPasswordBridge 1.0
 import WalletBridge 1.0
 import UtilBridge 1.0
+import InitAccountBridge 1.0
 
 Item {
+    property int currentState
+
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
+
+    function setCurrentState(state) {
+        currentState = state
+    }
 
     InputPasswordBridge {
         id: inputPassword
@@ -21,11 +28,24 @@ Item {
         id: util
     }
 
+    InitAccountBridge {
+        id: initAccount
+    }
+
     Connections {
         target: wallet
         onSgnLoginResult: {
             textfield_password.enabled = !ok
             button_login.enabled = !ok
+        }
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            if (currentState === 2) {
+                textfield_password.text = ""
+                textfield_confirm.text = ""
+            }
         }
     }
 
@@ -38,6 +58,7 @@ Item {
         anchors.fill: parent
         onClicked: {
             textfield_password.focus = false
+            textfield_confirm.focus = false
         }
     }
 
@@ -167,7 +188,7 @@ Item {
 
     Text {
         id: text_login
-        text: qsTr("Login")
+        text: currentState === 3 ? qsTr("Login") : qsTr("Password")
         color: "white"
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
@@ -181,19 +202,102 @@ Item {
         height: dp(50)
         padding: dp(10)
         leftPadding: dp(20)
-        anchors.verticalCenter: parent.verticalCenter
         font.pixelSize: dp(18)
         placeholderText: qsTr("Type your password")
         echoMode: "Password"
         color: "white"
         text: ""
-        anchors.verticalCenterOffset: dp(-10)
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: currentState === 3 ? dp(-10) : dp(-50)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        horizontalAlignment: Text.AlignHCenter
+        horizontalAlignment: Text.AlignLeft
+        background: Rectangle {
+            color: "#8633E0"
+            radius: dp(5)
+        }
 
+        onTextChanged: {
+            if (currentState === 2) {
+                const validation = util.validateMwc713Str(textfield_password.text)
+                if (validation) {
+                    text_pwdcomment.text = validation
+                }
+                util.passwordQualitySet(textfield_password.text)
+                text_pwdcomment.text = util.passwordQualityComment()
+                button_login.enabled = util.passwordQualityIsAcceptable()
+                if (button_login.enabled) {
+                    rect_pwdcomment.color = "#00000000"
+                    text_pwdcomment.color = "white"
+                }
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                textfield_password.focus = true
+            }
+        }
+    }
+
+    Rectangle {
+        id: rect_pwdcomment
+        height: text_pwdcomment.height + dp(24)
+        color: "#CCFF33"
+        anchors.right: parent.right
+        anchors.rightMargin: dp(45)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(45)
+        anchors.top: textfield_password.bottom
+        anchors.topMargin: dp(5)
+        visible: currentState === 2 && text_pwdcomment.text
+
+        Text {
+            id: text_pwdcomment
+            color: "#3600C9"
+            text: ""
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            font.pixelSize: dp(14)
+        }
+    }
+
+    Text {
+        id: text_confirm
+        text: qsTr("Confirm Password")
+        color: "white"
+        anchors.left: parent.left
+        anchors.leftMargin: dp(45)
+        anchors.top: rect_pwdcomment.visible ? rect_pwdcomment.bottom : textfield_password.bottom
+        anchors.topMargin: dp(15)
+        font.pixelSize: dp(14)
+        visible: currentState === 2
+    }
+
+    TextField {
+        id: textfield_confirm
+        height: dp(50)
+        padding: dp(10)
+        leftPadding: dp(20)
+        font.pixelSize: dp(18)
+        placeholderText: qsTr("Confirm your password")
+        echoMode: "Password"
+        color: "white"
+        text: ""
+        anchors.top: text_confirm.bottom
+        anchors.topMargin: dp(10)
+        anchors.right: parent.right
+        anchors.rightMargin: dp(45)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(45)
+        horizontalAlignment: Text.AlignLeft
+        visible: currentState === 2
 
         background: Rectangle {
             color: "#8633E0"
@@ -202,7 +306,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                textfield_password.focus = true
+                textfield_confirm.focus = true
             }
         }
     }
@@ -214,21 +318,22 @@ Item {
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        anchors.top: textfield_password.bottom
+        anchors.top: currentState === 3 ? textfield_password.bottom : textfield_confirm.bottom
         anchors.topMargin: dp(40)
+        enabled: currentState === 3 ? true : false
         background: Rectangle {
             id: rectangle
             color: "#00000000"
             radius: dp(5)
-            border.color: "white"
+            border.color: button_login.enabled ? "white" : "#9e62e0"
             border.width: dp(2)
             Text {
                 id: loginText
-                text: qsTr("Open Wallet")
+                text: currentState === 3 ? qsTr("Open Wallet") : qsTr("Create")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
-                color: "white"
+                color: button_login.enabled ? "white" : "#9e62e0"
             }
         }
 
@@ -243,13 +348,26 @@ Item {
                 messagebox.open(qsTr("Password"), qsTr(validation))
                 return
             }
-            if (textfield_password.text[0] === "-") {
-                messagebox.open(qsTr("Password"), qsTr("You can't start your password from '-' symbol."))
-                return
-            }
 
-            // Submit the password and wait until state will push us.
-            inputPassword.submitPassword(textfield_password.text)
+            if (currentState === 3) {
+                // Submit the password and wait until state will push us.
+                inputPassword.submitPassword(textfield_password.text)
+            } else {
+                util.passwordQualitySet(textfield_password.text)
+
+                if (!util.passwordQualityIsAcceptable()) {
+                    return
+                }
+
+                if (textfield_password.text !== textfield_confirm.text) {
+                    messagebox.open(qsTr("Password"), qsTr("Password doesn't match confirm string. Please retype the password correctly"))
+                    return
+                }
+
+                util.releasePasswordAnalyser()
+
+                initAccount.setPassword(textfield_password.text)
+            }
         }
     }
 
@@ -263,6 +381,7 @@ Item {
         source: "../img/NewInstanceBtn@2x.svg"
         anchors.bottom: image_help.top
         anchors.horizontalCenter: parent.horizontalCenter
+        visible: currentState === 3
         MouseArea {
             anchors.fill: parent
             onClicked: {
@@ -279,6 +398,7 @@ Item {
         anchors.left: image_newinstance.right
         anchors.verticalCenter: image_newinstance.verticalCenter
         font.pixelSize: dp(18)
+        visible: currentState === 3
         MouseArea {
             anchors.fill: parent
             onClicked: {
@@ -286,8 +406,6 @@ Item {
             }
         }
     }
-
-
 
     Image {
         id: image_help

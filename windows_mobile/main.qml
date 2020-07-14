@@ -53,7 +53,13 @@ Window {
         target: coreWindow
         onSgnUpdateActionStates: {
             currentState = actionState
-            navbarItem.updateTitle(currentState)
+            if (currentState > 1 && currentState < 4) {
+                inputPasswordItem.visible = true
+                inputPasswordItem.setCurrentState(currentState)
+            } else {
+                inputPasswordItem.visible = false
+                navbarItem.updateTitle(currentState)
+            }
         }
     }
 
@@ -77,7 +83,7 @@ Window {
     Inputpassword {
         id: inputPasswordItem
         anchors.fill: parent
-        visible: currentState === 3
+        visible: false
     }
 
     Rectangle {
