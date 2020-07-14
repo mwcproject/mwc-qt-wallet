@@ -35,10 +35,10 @@ _Please note_ those version numbers will change, we use QT V1.0.22 here as an ex
 ```3.2.2```<br>
 
 
-4.) Now we can build the binaries 
+4.) Now we can build the binaries <br>
 ```sudo sh build-qt-wallet-linux.sh```
 
-5.) Link the platforms folder of the QT subfolder._ Make sure the Version number is correct as this might change over time_.
+5.) Link the platforms folder of the QT subfolder. _Make sure the Version number is correct as this might change over time_.
 
 ```ln -s ../Qt/5.9.9/gcc_64/plugins/platforms platforms```
 
