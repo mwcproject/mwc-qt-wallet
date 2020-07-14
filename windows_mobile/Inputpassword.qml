@@ -29,6 +29,10 @@ Item {
         }
     }
 
+    function createNewInstance() {
+
+    }
+
     MouseArea {
         id: mouseArea
         anchors.fill: parent
@@ -53,7 +57,7 @@ Item {
         text: qsTr("Instances")
         color: "white"
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.leftMargin: dp(45)
         anchors.bottom: instanceComboBox.top
         anchors.bottomMargin: dp(10)
         font.pixelSize: dp(14)
@@ -66,12 +70,14 @@ Item {
             width: instanceComboBox.width
             contentItem: Text {
                 text: value
-                color: "#7579ff"
+                color: instanceComboBox.highlightedIndex === index ? "#8633E0" : "white"
                 font: instanceComboBox.font
                 elide: Text.ElideRight
                 verticalAlignment: Text.AlignVCenter
             }
             highlighted: instanceComboBox.highlightedIndex === index
+            topPadding: dp(10)
+            bottomPadding: dp(10)
         }
 
         indicator: Canvas {
@@ -89,10 +95,17 @@ Item {
 
             onPaint: {
                 context.reset()
-                context.moveTo(0, 0)
-                context.lineTo(width / 2, height)
-                context.lineTo(width, 0)
+                if (instanceComboBox.popup.visible) {
+                    context.moveTo(0, height)
+                    context.lineTo(width / 2, 0)
+                    context.lineTo(width, height)
+                } else {
+                    context.moveTo(0, 0)
+                    context.lineTo(width / 2, height)
+                    context.lineTo(width, 0)
+                }
                 context.strokeStyle = "white"
+                context.lineWidth = 2
                 context.stroke()
             }
         }
@@ -113,10 +126,10 @@ Item {
         }
 
         popup: Popup {
-            y: instanceComboBox.height - 1
+            y: instanceComboBox.height + dp(3)
             width: instanceComboBox.width
-            implicitHeight: contentItem.implicitHeight
-            padding: dp(1)
+            implicitHeight: contentItem.implicitHeight + dp(40)
+            padding: dp(20)
 
             contentItem: ListView {
                 clip: true
@@ -128,23 +141,27 @@ Item {
             }
 
             background: Rectangle {
-                border.color: "white"
-                radius: dp(3)
+                color: "#8633E0"
+                radius: dp(5)
             }
         }
 
         model: ListModel {
             id: accountItems
             ListElement { value: "Default" }
+            ListElement { value: "Name of instance 2" }
+            ListElement { value: "Another instance name" }
+            ListElement { value: "another instance" }
+            ListElement { value: "Long instance name long name" }
         }
         anchors.bottom: text_login.top
         anchors.bottomMargin: dp(15)
         anchors.right: parent.right
-        anchors.rightMargin: dp(30)
+        anchors.rightMargin: dp(45)
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
-        leftPadding: dp(10)
-        rightPadding: dp(10)
+        anchors.leftMargin: dp(45)
+        leftPadding: dp(20)
+        rightPadding: dp(20)
         font.pixelSize: dp(18)
     }
 
@@ -153,7 +170,7 @@ Item {
         text: qsTr("Login")
         color: "white"
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.leftMargin: dp(45)
         anchors.bottom: textfield_password.top
         anchors.bottomMargin: dp(10)
         font.pixelSize: dp(14)
@@ -162,8 +179,8 @@ Item {
     TextField {
         id: textfield_password
         height: dp(50)
-        padding: dp(5)
-        leftPadding: dp(10)
+        padding: dp(10)
+        leftPadding: dp(20)
         anchors.verticalCenter: parent.verticalCenter
         font.pixelSize: dp(18)
         placeholderText: qsTr("Type your password")
@@ -172,9 +189,9 @@ Item {
         text: ""
         anchors.verticalCenterOffset: dp(-10)
         anchors.right: parent.right
-        anchors.rightMargin: dp(30)
+        anchors.rightMargin: dp(45)
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.leftMargin: dp(45)
         horizontalAlignment: Text.AlignHCenter
 
 
@@ -192,17 +209,17 @@ Item {
 
     Button {
         id: button_login
-        height: dp(50)
+        height: dp(70)
         anchors.right: parent.right
-        anchors.rightMargin: dp(30)
+        anchors.rightMargin: dp(45)
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.leftMargin: dp(45)
         anchors.top: textfield_password.bottom
-        anchors.topMargin: dp(50)
+        anchors.topMargin: dp(40)
         background: Rectangle {
             id: rectangle
             color: "#00000000"
-            radius: dp(4)
+            radius: dp(5)
             border.color: "white"
             border.width: dp(2)
             Text {
@@ -237,11 +254,47 @@ Item {
     }
 
     Image {
+        id: image_newinstance
+        width: dp(30)
+        height: dp(30)
+        anchors.horizontalCenterOffset: dp(-40)
+        anchors.bottomMargin: dp(30)
+        fillMode: Image.PreserveAspectFit
+        source: "../img/NewInstanceBtn@2x.svg"
+        anchors.bottom: image_help.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                createNewInstance()
+            }
+        }
+    }
+
+    Text {
+        id: text_newinstance
+        text: qsTr("New Instance")
+        anchors.leftMargin: dp(20)
+        color: "white"
+        anchors.left: image_newinstance.right
+        anchors.verticalCenter: image_newinstance.verticalCenter
+        font.pixelSize: dp(18)
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                createNewInstance()
+            }
+        }
+    }
+
+
+
+    Image {
         id: image_help
         width: dp(30)
         height: dp(30)
-        anchors.horizontalCenterOffset: dp(-20)
-        anchors.bottomMargin: dp(100)
+        anchors.horizontalCenterOffset: dp(-40)
+        anchors.bottomMargin: dp(90)
         fillMode: Image.PreserveAspectFit
         source: "../img/HelpBtn@2x.svg"
         anchors.bottom: parent.bottom
