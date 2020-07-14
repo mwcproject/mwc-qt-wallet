@@ -1,5 +1,5 @@
 To build the MWC QT Wallet we can use some scripts of the mwcbuildpipeline Repository in order to automate some steps of our build. <br>
-> Please note that this process is tested on Ubuntu (Server) 18.04, other Distributions may vary and need some manual troubleshooting.<br>
+> Please note that this process is tested on Ubuntu 18.04, other Distributions may vary and need some manual troubleshooting.<br>
 > On Ubuntu 16.04 you might need to install SSL, see https://github.com/mwcproject/mwc-wallet/blob/master/doc/installing_openssl.md<br>
 
 ## Build process
