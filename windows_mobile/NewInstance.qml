@@ -12,7 +12,10 @@ Item {
     function updateCurrentStep() {
         const params = JSON.parse(initParams)
         currentStep = params.currentStep
-        seed = params.seed
+        if (currentStep === 1) {
+            seed = params.seed
+            newSeedItem.init(seed)
+        }
     }
 
     Image {
@@ -52,7 +55,11 @@ Item {
             visible: currentStep === 0
         }
 
-
+        NewSeed {
+            id: newSeedItem
+            anchors.fill: parent
+            visible: currentStep === 1
+        }
     }
 
     Image {

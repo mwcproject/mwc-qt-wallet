@@ -58,6 +58,7 @@
         <file>img/Ready@2x.svg</file>
         <file>img/Receive@2x.svg</file>
         <file>img/Receive_big@2x.svg</file>
+        <file>img/RecoveryPhrase@2x.svg</file>
         <file>img/Refresh@2x.svg</file>
         <file>img/Right@2x.svg</file>
         <file>img/RestoreBtn_big@2x.svg</file>
@@ -102,5 +103,6 @@
         <file>windows_mobile/NewInstance.qml</file>
         <file>windows_mobile/InitAccount.qml</file>
         <file>windows_mobile/InitWallet.qml</file>
+        <file>windows_mobile/NewSeed.qml</file>
     </qresource>
 </RCC>
