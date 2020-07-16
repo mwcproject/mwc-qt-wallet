@@ -53,13 +53,14 @@ Window {
         target: coreWindow
         onSgnUpdateActionStates: {
             currentState = actionState
-            if (currentState > 1 && currentState < 4) {
-                inputPasswordItem.visible = true
-                inputPasswordItem.setCurrentState(currentState)
-            } else {
-                inputPasswordItem.visible = false
-                navbarItem.updateTitle(currentState)
-            }
+            navbarItem.updateTitle(currentState)
+        }
+    }
+
+    function updateInitParams(newParams) {
+        initParams = newParams
+        if (currentState === 2) {
+            newInstanceItem.updateCurrentStep()
         }
     }
 
@@ -80,10 +81,22 @@ Window {
         anchors.fill: parent
     }
 
+//    InitWallet {
+//        id: initAccountItem
+//        anchors.fill: parent
+//        visible: currentState === 2
+//    }
+
+    NewInstance {
+        id: newInstanceItem
+        anchors.fill: parent
+        visible: currentState === 2
+    }
+
     Inputpassword {
         id: inputPasswordItem
         anchors.fill: parent
-        visible: false
+        visible: currentState === 3
     }
 
     Rectangle {

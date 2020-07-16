@@ -43,6 +43,7 @@
         <file>img/NavSettings@2x.svg</file>
         <file>img/NavWallet@2x.svg</file>
         <file>img/NewInstanceBtn@2x.svg</file>
+        <file>img/NewInstanceBtn_big@2x.svg</file>
         <file>img/Output_big@2x.svg</file>
         <file>img/PassNotMatch@2x.svg</file>
         <file>img/PassOK@2x.svg</file>
@@ -59,6 +60,7 @@
         <file>img/Receive_big@2x.svg</file>
         <file>img/Refresh@2x.svg</file>
         <file>img/Right@2x.svg</file>
+        <file>img/RestoreBtn_big@2x.svg</file>
         <file>img/Send@2x.svg</file>
         <file>img/Send_big@2x.svg</file>
         <file>img/SendOnline@2x.svg</file>
@@ -97,5 +99,8 @@
         <file>windows_mobile/Finalize.qml</file>
         <file>windows_mobile/Transactions.qml</file>
         <file>windows_mobile/TransactionDetail.qml</file>
+        <file>windows_mobile/NewInstance.qml</file>
+        <file>windows_mobile/InitAccount.qml</file>
+        <file>windows_mobile/InitWallet.qml</file>
     </qresource>
 </RCC>
