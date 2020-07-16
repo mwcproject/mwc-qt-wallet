@@ -104,5 +104,6 @@
         <file>windows_mobile/InitAccount.qml</file>
         <file>windows_mobile/InitWallet.qml</file>
         <file>windows_mobile/NewSeed.qml</file>
+        <file>windows_mobile/NewSeedTest.qml</file>
     </qresource>
 </RCC>

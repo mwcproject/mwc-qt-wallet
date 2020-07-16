@@ -4,7 +4,6 @@ import QtQuick.Window 2.0
 
 Item {
     property int currentStep: 0
-    property string seed
 
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
@@ -13,8 +12,9 @@ Item {
         const params = JSON.parse(initParams)
         currentStep = params.currentStep
         if (currentStep === 1) {
-            seed = params.seed
-            newSeedItem.init(seed)
+            newSeedItem.init(params.seed, params.hideSubmitButton)
+        } else if (currentStep === 2) {
+            newSeedTestItem.init(params.wordIndex)
         }
     }
 
@@ -59,6 +59,12 @@ Item {
             id: newSeedItem
             anchors.fill: parent
             visible: currentStep === 1
+        }
+
+        NewSeedTest {
+            id: newSeedTestItem
+            anchors.fill: parent
+            visible: currentStep === 2
         }
     }
 

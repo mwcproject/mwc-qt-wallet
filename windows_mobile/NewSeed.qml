@@ -1,16 +1,32 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
+import NewSeedBridge 1.0
 
 Item {
-    id: element
-
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
-    function init(seed) {
+    function init(seed, hideSubmitButton) {
         text_seed.text = seed
         text_seed.text = text_seed.text.replace(/\s/g, '    ')
+        button_next.visible = !hideSubmitButton
+    }
+
+    NewSeedBridge {
+        id: newSeed
+    }
+
+    Connections {
+        target: newSeed
+        onSgnShowSeedData: {
+            console.log("Retrieving seeds from mwc713: ", seed)
+//            if (seed.size()<2) {
+//                control::MessageBox::messageText( this, "Getting Passphrase Failure", "Unable to retrieve a passphrase from mwc713. " + (seed.size()>0 ? seed[0] : "") );
+//                return;
+//            }
+//            updateSeedData("Mnemonic passphrase:", seed);
+        }
     }
 
     Rectangle {
@@ -112,6 +128,7 @@ Item {
         }
 
         onClicked: {
+            newSeed.doneWithNewSeed()
         }
     }
 }

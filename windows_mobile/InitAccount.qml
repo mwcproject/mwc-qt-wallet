@@ -27,7 +27,6 @@ Item {
     }
 
     MouseArea {
-        id: mouseArea
         anchors.fill: parent
         onClicked: {
             textfield_instancename.focus = false
