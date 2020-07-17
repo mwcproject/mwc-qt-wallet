@@ -486,7 +486,7 @@ retrieveTransactionInputs(int64_t amountNano, QMultiMap<int64_t, wallet::WalletO
 // Using more inputs lowers the fee.
 //
 uint64_t calcTxnFee(uint64_t numInputs, uint64_t numOutputs, uint64_t numKernels) {
-    uint64_t txnWeight = (4 * numOutputs) + numKernels - numInputs;
+    int64_t txnWeight = (4 * numOutputs) + numKernels - numInputs;
     if (1 > txnWeight) {
         // The minimum fee is 1000000 nano coin.
         txnWeight = 1;
