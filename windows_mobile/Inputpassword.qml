@@ -4,17 +4,11 @@ import QtQuick.Window 2.0
 import InputPasswordBridge 1.0
 import WalletBridge 1.0
 import UtilBridge 1.0
-import InitAccountBridge 1.0
+import StateMachineBridge 1.0
 
 Item {
-    property int currentState
-
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
-    function setCurrentState(state) {
-        currentState = state
-    }
 
     InputPasswordBridge {
         id: inputPassword
@@ -28,8 +22,8 @@ Item {
         id: util
     }
 
-    InitAccountBridge {
-        id: initAccount
+    StateMachineBridge {
+        id: stateMachine
     }
 
     Connections {
@@ -38,19 +32,6 @@ Item {
             textfield_password.enabled = !ok
             button_login.enabled = !ok
         }
-    }
-
-    onVisibleChanged: {
-        if (visible) {
-            if (currentState === 2) {
-                textfield_password.text = ""
-                textfield_confirm.text = ""
-            }
-        }
-    }
-
-    function createNewInstance() {
-
     }
 
     MouseArea {
@@ -188,7 +169,7 @@ Item {
 
     Text {
         id: text_login
-        text: currentState === 3 ? qsTr("Login") : qsTr("Password")
+        text: qsTr("Login")
         color: "white"
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
@@ -208,7 +189,7 @@ Item {
         color: "white"
         text: ""
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: currentState === 3 ? dp(-10) : dp(-50)
+        anchors.verticalCenterOffset: dp(-10)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
@@ -217,96 +198,12 @@ Item {
         background: Rectangle {
             color: "#8633E0"
             radius: dp(5)
-        }
-
-        onTextChanged: {
-            if (currentState === 2) {
-                const validation = util.validateMwc713Str(textfield_password.text)
-                if (validation) {
-                    text_pwdcomment.text = validation
-                }
-                util.passwordQualitySet(textfield_password.text)
-                text_pwdcomment.text = util.passwordQualityComment()
-                button_login.enabled = util.passwordQualityIsAcceptable()
-                if (button_login.enabled) {
-                    rect_pwdcomment.color = "#00000000"
-                    text_pwdcomment.color = "white"
-                }
-            }
         }
 
         MouseArea {
             anchors.fill: parent
             onClicked: {
                 textfield_password.focus = true
-            }
-        }
-    }
-
-    Rectangle {
-        id: rect_pwdcomment
-        height: text_pwdcomment.height + dp(24)
-        color: "#CCFF33"
-        anchors.right: parent.right
-        anchors.rightMargin: dp(45)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.top: textfield_password.bottom
-        anchors.topMargin: dp(5)
-        visible: currentState === 2 && text_pwdcomment.text
-
-        Text {
-            id: text_pwdcomment
-            color: "#3600C9"
-            text: ""
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            font.pixelSize: dp(14)
-        }
-    }
-
-    Text {
-        id: text_confirm
-        text: qsTr("Confirm Password")
-        color: "white"
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.top: rect_pwdcomment.visible ? rect_pwdcomment.bottom : textfield_password.bottom
-        anchors.topMargin: dp(15)
-        font.pixelSize: dp(14)
-        visible: currentState === 2
-    }
-
-    TextField {
-        id: textfield_confirm
-        height: dp(50)
-        padding: dp(10)
-        leftPadding: dp(20)
-        font.pixelSize: dp(18)
-        placeholderText: qsTr("Confirm your password")
-        echoMode: "Password"
-        color: "white"
-        text: ""
-        anchors.top: text_confirm.bottom
-        anchors.topMargin: dp(10)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(45)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        horizontalAlignment: Text.AlignLeft
-        visible: currentState === 2
-
-        background: Rectangle {
-            color: "#8633E0"
-            radius: dp(5)
-        }
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                textfield_confirm.focus = true
             }
         }
     }
@@ -318,22 +215,21 @@ Item {
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        anchors.top: currentState === 3 ? textfield_password.bottom : textfield_confirm.bottom
+        anchors.top: textfield_password.bottom
         anchors.topMargin: dp(40)
-        enabled: currentState === 3 ? true : false
         background: Rectangle {
             id: rectangle
             color: "#00000000"
             radius: dp(5)
-            border.color: button_login.enabled ? "white" : "#9e62e0"
+            border.color: "white"
             border.width: dp(2)
             Text {
                 id: loginText
-                text: currentState === 3 ? qsTr("Open Wallet") : qsTr("Create")
+                text: qsTr("Open Wallet")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
-                color: button_login.enabled ? "white" : "#9e62e0"
+                color: "white"
             }
         }
 
@@ -349,25 +245,8 @@ Item {
                 return
             }
 
-            if (currentState === 3) {
-                // Submit the password and wait until state will push us.
-                inputPassword.submitPassword(textfield_password.text)
-            } else {
-                util.passwordQualitySet(textfield_password.text)
-
-                if (!util.passwordQualityIsAcceptable()) {
-                    return
-                }
-
-                if (textfield_password.text !== textfield_confirm.text) {
-                    messagebox.open(qsTr("Password"), qsTr("Password doesn't match confirm string. Please retype the password correctly"))
-                    return
-                }
-
-                util.releasePasswordAnalyser()
-
-                initAccount.setPassword(textfield_password.text)
-            }
+            // Submit the password and wait until state will push us.
+            inputPassword.submitPassword(textfield_password.text)
         }
     }
 
@@ -381,13 +260,6 @@ Item {
         source: "../img/NewInstanceBtn@2x.svg"
         anchors.bottom: image_help.top
         anchors.horizontalCenter: parent.horizontalCenter
-        visible: currentState === 3
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                createNewInstance()
-            }
-        }
     }
 
     Text {
@@ -398,12 +270,15 @@ Item {
         anchors.left: image_newinstance.right
         anchors.verticalCenter: image_newinstance.verticalCenter
         font.pixelSize: dp(18)
-        visible: currentState === 3
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                createNewInstance()
-            }
+    }
+
+    MouseArea {
+        anchors.left: image_newinstance.left
+        anchors.top: image_newinstance.top
+        anchors.right: text_instances.right
+        anchors.bottom: image_newinstance.bottom
+        onClicked: {
+            stateMachine.setActionWindow(2)
         }
     }
 
