@@ -86,92 +86,142 @@ Item {
     }
 
     function updateStatus() {
-        image_mwcmq.source = wallet.getMqsListenerStatus() ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
-        image_keybase.source = wallet.getKeybaseListenerStatus() ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
-        image_http.source = wallet.getHttpListeningStatus() ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
-        image_tor.source = wallet.getTorListenerStatus() ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
+        image_mwcmq.source = wallet.getMqsListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
+        image_keybase.source = wallet.getKeybaseListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
+        image_http.source = wallet.getHttpListeningStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
+        image_tor.source = wallet.getTorListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
     }
 
-    Text {
-        id: text_mwcmq
-        text: qsTr("MWCMQ")
-        anchors.left: parent.left
-        anchors.leftMargin: dp(50)
-        horizontalAlignment: Text.AlignRight
-        anchors.verticalCenterOffset: dp(-250)
+    Rectangle {
+        id: rect_mwcmq
+        width: dp(150)
+        height: dp(40)
         anchors.verticalCenter: parent.verticalCenter
-        font.pixelSize: dp(17)
-        color: "white"
-    }
-
-    Image {
-        id: image_mwcmq
-        anchors.left: text_mwcmq.right
-        anchors.leftMargin: dp(16)
-        anchors.verticalCenter: text_mwcmq.verticalCenter
-        width: dp(20)
-        height: dp(20)
-    }
-
-    Text {
-        id: text_keybase
-        text: qsTr("Keybase")
-        anchors.verticalCenter: text_mwcmq.verticalCenter
+        anchors.verticalCenterOffset: dp(-250)
         anchors.horizontalCenter: parent.horizontalCenter
-        horizontalAlignment: Text.AlignRight
-        font.pixelSize: dp(17)
-        color: "white"
+        anchors.horizontalCenterOffset: dp(-100)
+        border.color: "white"
+        border.width: dp(2)
+        radius: dp(50)
+        color: "#00000000"
+
+        Image {
+            id: image_mwcmq
+            anchors.left: parent.left
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            width: dp(20)
+            height: dp(20)
+        }
+
+        Text {
+            id: text_mwcmq
+            text: qsTr("MWCMQ")
+            anchors.left: image_mwcmq.right
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            font.pixelSize: dp(17)
+            color: "white"
+        }
     }
 
-    Image {
-        id: image_keybase
-        anchors.left: text_keybase.right
-        anchors.leftMargin: dp(16)
-        anchors.verticalCenter: text_keybase.verticalCenter
-        width: dp(20)
-        height: dp(20)
+    Rectangle {
+        id: rect_keybase
+        width: dp(150)
+        height: dp(40)
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: dp(-250)
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: dp(100)
+        border.color: "white"
+        border.width: dp(2)
+        radius: dp(50)
+        color: "#00000000"
+
+        Image {
+            id: image_keybase
+            anchors.left: parent.left
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            width: dp(20)
+            height: dp(20)
+        }
+
+        Text {
+            id: text_keybase
+            text: qsTr("Keybase")
+            anchors.left: image_keybase.right
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            font.pixelSize: dp(17)
+            color: "white"
+        }
     }
 
-    Text {
-        id: text_http
-        text: qsTr("Http")
-        anchors.verticalCenter: text_mwcmq.verticalCenter
-        anchors.right: image_http.left
-        anchors.rightMargin: dp(16)
-        horizontalAlignment: Text.AlignRight
-        font.pixelSize: dp(17)
-        color: "white"
+    Rectangle {
+        id: rect_tor
+        width: dp(150)
+        height: dp(40)
+        anchors.top: rect_mwcmq.bottom
+        anchors.topMargin: dp(20)
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: dp(-100)
+        border.color: "white"
+        border.width: dp(2)
+        radius: dp(50)
+        color: "#00000000"
+
+        Image {
+            id: image_tor
+            anchors.left: parent.left
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            width: dp(20)
+            height: dp(20)
+        }
+
+        Text {
+            id: text_tor
+            text: qsTr("TOR")
+            anchors.left: image_tor.right
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            font.pixelSize: dp(17)
+            color: "white"
+        }
     }
 
-    Image {
-        id: image_http
-        anchors.verticalCenter: text_http.verticalCenter
-        anchors.right: parent.right
-        anchors.rightMargin: dp(50)
-        width: dp(20)
-        height: dp(20)
-    }
+    Rectangle {
+        id: rect_http
+        width: dp(150)
+        height: dp(40)
+        anchors.top: rect_mwcmq.bottom
+        anchors.topMargin: dp(20)
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: dp(100)
+        border.color: "white"
+        border.width: dp(2)
+        radius: dp(50)
+        color: "#00000000"
 
-    Text {
-        id: text_tor
-        text: qsTr("TOR")
-        anchors.left: parent.left
-        anchors.leftMargin: dp(50)
-        horizontalAlignment: Text.AlignRight
-        anchors.top: text_mwcmq.bottom
-        anchors.topMargin: dp(30)
-        anchors.right: text_mwcmq.right
-        font.pixelSize: dp(17)
-        color: "white"
-    }
+        Image {
+            id: image_http
+            anchors.left: parent.left
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            width: dp(20)
+            height: dp(20)
+        }
 
-    Image {
-        id: image_tor
-        anchors.left: text_tor.right
-        anchors.leftMargin: dp(16)
-        anchors.verticalCenter: text_tor.verticalCenter
-        width: dp(20)
-        height: dp(20)
+        Text {
+            id: text_http
+            text: qsTr("HTTP")
+            anchors.left: image_http.right
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            font.pixelSize: dp(17)
+            color: "white"
+        }
     }
 
     Text {
@@ -180,7 +230,7 @@ Item {
         text: qsTr("Account to receive incoming MWC coins")
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
-        anchors.top: text_tor.bottom
+        anchors.top: rect_tor.bottom
         anchors.topMargin: dp(45)
         font.pixelSize: dp(14)
     }

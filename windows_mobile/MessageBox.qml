@@ -6,8 +6,8 @@ Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
-    width: dp(280)
-    height: dp(200)
+    width: dp(400)
+    height: dp(400)
     id: messagebox
     visible: false
 
@@ -32,7 +32,7 @@ Item {
             text: qsTr("Title")
             font.bold: true
             anchors.top: parent.top
-            anchors.topMargin: dp(25)
+            anchors.topMargin: dp(30)
             anchors.horizontalCenter: parent.horizontalCenter
             font.pixelSize: dp(20)
             color: "#3600c9"
@@ -40,34 +40,34 @@ Item {
 
         Text {
             id: content
-            width: dp(200)
-            height: dp(80)
+            width: dp(320)
+            height: dp(280)
             text: qsTr("Content")
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(15)
-            color: "#3600c9"
+            font.pixelSize: dp(21)
+            color: "#3600C9"
         }
 
         Button {
             id: button_ok
-            width: dp(150)
-            height: dp(30)
+            width: dp(135)
+            height: dp(50)
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: dp(20)
+            anchors.bottomMargin: dp(25)
             anchors.horizontalCenter: parent.horizontalCenter
 
             background: Rectangle {
-                color: "#9e00e7"
-                radius: dp(10)
+                color: "#6F00D6"
+                radius: dp(5)
                 Text {
                     text: qsTr("OK")
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
-                    font.pointSize: dp(15)
+                    font.pixelSize: dp(18)
                     color: "white"
                 }
             }

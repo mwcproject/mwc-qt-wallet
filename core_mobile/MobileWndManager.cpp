@@ -18,6 +18,7 @@
 #include "../state/state.h"
 #include <QMessageBox>
 #include <QJsonDocument>
+#include <QDebug>
 
 namespace core {
 
@@ -147,15 +148,24 @@ void MobileWndManager::pageEnterSeed() {
 }
 void MobileWndManager::pageNewSeed(QString pageTitle, QVector<QString> seed, bool hideSubmitButton) {
     Q_UNUSED(pageTitle)
-    Q_UNUSED(seed)
-    Q_UNUSED(hideSubmitButton)
 
-    Q_ASSERT(false); // implement me
+    QJsonObject obj;
+    QString strSeed = "";
+    for (int i = 0; i < seed.length() ; i++) {
+        strSeed += seed.at(i) + " ";
+    }
+    obj["currentStep"] = 1;
+    obj["seed"] = strSeed;
+    obj["hideSubmitButton"] = hideSubmitButton;
+    QVariant retValue;
+    QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
 void MobileWndManager::pageNewSeedTest(int wordIndex) {
-    Q_UNUSED(wordIndex)
-
-    Q_ASSERT(false); // implement me
+    QJsonObject obj;
+    obj["currentStep"] = 2;
+    obj["wordIndex"] = wordIndex;
+    QVariant retValue;
+    QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
 void MobileWndManager::pageProgressWnd(QString pageTitle, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable ) {
     Q_UNUSED(pageTitle)

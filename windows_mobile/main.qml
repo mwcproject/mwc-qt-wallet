@@ -53,7 +53,15 @@ Window {
         target: coreWindow
         onSgnUpdateActionStates: {
             currentState = actionState
+            console.log("current state: ", currentState)
             navbarItem.updateTitle(currentState)
+        }
+    }
+
+    function updateInitParams(newParams) {
+        initParams = newParams
+        if (currentState === 2) {
+            newInstanceItem.updateCurrentStep()
         }
     }
 
@@ -72,6 +80,18 @@ Window {
             }
         }
         anchors.fill: parent
+    }
+
+//    InitWallet {
+//        id: initAccountItem
+//        anchors.fill: parent
+//        visible: currentState === 2
+//    }
+
+    NewInstance {
+        id: newInstanceItem
+        anchors.fill: parent
+        visible: currentState === 2
     }
 
     Inputpassword {
