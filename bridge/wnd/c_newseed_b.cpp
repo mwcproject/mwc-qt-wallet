@@ -44,5 +44,9 @@ Q_INVOKABLE void NewSeed::submitSeedWord(QString word) {
     getState()->submitSeedWord(word);
 }
 
+// Restart seed verification
+Q_INVOKABLE void NewSeed::restartSeedVerification() {
+    getState()->restartSeedVerification();
+}
 
 }

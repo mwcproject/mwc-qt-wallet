@@ -32,6 +32,9 @@ public:
 
     // Submit a new word from the user input
     Q_INVOKABLE void submitSeedWord(QString word);
+
+    // Restart seed verification
+    Q_INVOKABLE void restartSeedVerification();
 private:
 signals:
     void sgnShowSeedData(QVector<QString> seed);

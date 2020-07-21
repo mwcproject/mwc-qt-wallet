@@ -34,6 +34,12 @@ Item {
         }
     }
 
+    function changeInstanceCallback(ret) {
+        if (ret) {
+            console.log("change instance => True")
+        }
+    }
+
     WalletBridge {
         id: wallet
     }
@@ -499,10 +505,9 @@ Item {
 
                 onClicked: {
                     nav.toggle()
-//                    messagebox.open(qsTr("Change Instance"), qsTr("Changing an instance will log you out of this current wallet instance. Are you sure you want to log out?"))
+                    messagebox.open(qsTr("Change Instance"), qsTr("Changing an instance will log you out of this current wallet instance. Are you sure you want to log out?"), true, "No", "Yes", changeInstanceCallback)
                 }
             }
-
         }
     }
 
@@ -522,11 +527,10 @@ Item {
         }
     }
 
-//    MessageBox {
-//        id: messagebox
-//        anchors.verticalCenter: parent.verticalCenter
-//        anchors.horizontalCenter: parent.horizontalCenter
-//    }
+    MessageBox {
+        id: messagebox
+        anchors.verticalCenter: parent.verticalCenter
+    }
 }
 
 /*##^##
