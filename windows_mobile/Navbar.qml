@@ -3,8 +3,14 @@ import QtQuick.Window 2.0
 import QtQuick.Controls 2.13
 import WalletBridge 1.0
 import StateMachineBridge 1.0
+import ConfigBridge 1.0
 
 Item {
+    readonly property int status_ignore: 0
+    readonly property int status_red: 1
+    readonly property int status_yellow: 2
+    readonly property int status_green: 3
+
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
@@ -48,10 +54,129 @@ Item {
         id: stateMachine
     }
 
+    ConfigBridge {
+        id: config
+    }
+
     Connections {
         target: wallet
+
         onSgnWalletBalanceUpdated: {
             text_balance.text = wallet.getTotalMwcAmount() + " MWC"
+        }
+
+        onSgnUpdateNodeStatus: (online, errMsg, nodeHeight, peerHeight, totalDifficulty, connections) => {
+           if ( !online ) {
+               setStatusButtonState(true, status_red, "")
+           }
+           else if (connections === 0 || nodeHeight === 0 || ( peerHeight > 0 && peerHeight - nodeHeight > 5 )) {
+               setStatusButtonState(true, status_yellow, "")
+           }
+           else {
+               setStatusButtonState(true, status_green, "")
+           }
+        }
+
+        onSgnConfigUpdate: {
+            updateNetworkName()
+        }
+
+        onSgnLoginResult: {
+            updateNetworkName()
+        }
+
+        onSgnUpdateListenerStatus: {
+            updateListenerBtn()
+        }
+
+        onSgnHttpListeningStatus: {
+            updateListenerBtn()
+        }
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            updateListenerBtn()
+            updateNetworkName()
+        }
+    }
+
+    function updateNetworkName() {
+        setStatusButtonState(true, status_ignore, config.getNetwork())
+    }
+
+    function updateListenerBtn() {
+        const mqsStatus = wallet.getMqsListenerStatus()
+        const keybaseStatus = wallet.getKeybaseListenerStatus()
+        const torStatus = wallet.getTorListenerStatus()
+        const httpListenerStatus = wallet.getHttpListeningStatus()
+
+        console.log("updateListenerBtn: mqsStatus =", mqsStatus, "keybaseStatus =", keybaseStatus, "torStatus =", torStatus, "httpListenerStatus =", httpListenerStatus)
+
+        let listening = mqsStatus | keybaseStatus | torStatus
+        let listenerNames = ""
+        if (mqsStatus)
+            listenerNames +=  "MWC MQS"
+
+        if (keybaseStatus) {
+            if (listenerNames !== "")
+                listenerNames += ", "
+            listenerNames += "Keybase"
+        }
+
+        if (torStatus) {
+            if (listenerNames !== "")
+                listenerNames += ", "
+            listenerNames += "TOR"
+        }
+
+        if (httpListenerStatus === "true") {
+            listening = true
+            if (listenerNames !== "")
+                listenerNames += ", "
+            listenerNames += "Http"
+            if (config.hasTls())
+                listenerNames += "s"
+        }
+
+        setStatusButtonState(false, listening ? status_green : status_red, listening ? listenerNames : "Listeners")
+    }
+
+    function setStatusButtonState(isNetwork, status, text) {
+        if (isNetwork) {
+            switch (status) {
+                case status_green:
+                    image_network.source = "../img/CircGreen@2x.svg"
+                    break;
+                case status_red:
+                    image_network.source = "../img/CircRed@2x.svg"
+                    break;
+                case status_yellow:
+                    image_network.source = "../img/CircYellow@2x.svg"
+                    break;
+                default: // Ingnore suppose to be here
+                    break;
+            }
+
+            if (text !== "")
+                text_network.text = text
+        } else {
+            switch (status) {
+                case status_green:
+                    image_listener.source = "../img/CircGreen@2x.svg"
+                    break;
+                case status_red:
+                    image_listener.source = "../img/CircRed@2x.svg"
+                    break;
+                case status_yellow:
+                    image_listener.source = "../img/CircYellow@2x.svg"
+                    break;
+                default: // Ingnore suppose to be here
+                    break;
+            }
+
+            if (text !== "")
+                text_listener.text = text
         }
     }
 
@@ -225,7 +350,7 @@ Item {
 
         Rectangle {
             id: rect_listener
-            width: dp(95)
+            width: text_listener.width + dp(40)
             height: dp(25)
             color: "#00000000"
             radius: dp(12.5)
@@ -259,7 +384,7 @@ Item {
 
         Rectangle {
             id: rect_network
-            width: dp(84)
+            width: text_network.width + dp(40)
             height: dp(25)
             color: "#00000000"
             radius: dp(12.5)

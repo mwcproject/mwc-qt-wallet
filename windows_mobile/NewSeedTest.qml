@@ -10,13 +10,13 @@ Item {
     function init(wordIndex) {
         textfield_word.placeholderText = "Please enter word number " + Number(wordIndex).toString()
         textfield_word.clear()
-        const words = ["angry","animal","ankle","announce",
-                       "actress", "actual", "adapt", "add",
-                       "addict", "address", "adjust", "admit",
-                       "adult", "advance", "advice", "aerobic",
-                       "affair", "afford", "afraid", "again",
-                       "age", "agent", "agree", "ahead"]
-        newSeed.submitSeedWord(words[wordIndex-1])
+//        const words = ["angry","animal","ankle","announce",
+//                       "actress", "actual", "adapt", "add",
+//                       "addict", "address", "adjust", "admit",
+//                       "adult", "advance", "advice", "aerobic",
+//                       "affair", "afford", "afraid", "again",
+//                       "age", "agent", "agree", "ahead"]
+//        newSeed.submitSeedWord(words[wordIndex-1])
     }
 
     NewSeedBridge {

@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include "MobileWndManager.h"
+#include <QCoreApplication>
+#include <QThread>
 #include <QQmlApplicationEngine>
 #include <QMessageBox>
 #include "../state/state.h"
@@ -65,16 +67,14 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
     Q_UNUSED(default2)
     Q_UNUSED(ttl_blocks)
 
-    if (mainWindow) {
+    if(mainWindow) {
         mainWindow->setProperty("questionTextDlgResponse", -1);
         QVariant retValue;
         QMetaObject::invokeMethod(mainWindow, "openQuestionTextDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, btn1), Q_ARG(QVariant, btn2));
-    //    , Q_ARG(QVariant, message), Q_ARG(QVariant, btn1), Q_ARG(QVariant, btn2)
-        qDebug() << "start loop";
-        while (mainWindow->property("questionTextDlgResponse") == -1) {
-            continue;
+        while(mainWindow->property("questionTextDlgResponse") == -1) {
+            QCoreApplication::processEvents();
+            QThread::usleep(50);
         }
-        qDebug() << "exit loop";
         if (mainWindow->property("questionTextDlgResponse") == 1)
             return WndManager::RETURN_CODE::BTN2;
         else
@@ -111,10 +111,6 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
                                                            bool default1, bool default2, double widthScale, QString & passwordHash, WndManager::RETURN_CODE blockButton, int *ttl_blocks)  {
     Q_UNUSED(btn1Tooltip) // Mobile doesn't have any tooltips
     Q_UNUSED(btn2Tooltip)
-    Q_UNUSED(title)
-    Q_UNUSED(message)
-    Q_UNUSED(btn1)
-    Q_UNUSED(btn2)
     Q_UNUSED(default1)
     Q_UNUSED(default2)
     Q_UNUSED(widthScale)
@@ -122,7 +118,13 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
     Q_UNUSED(blockButton)
     Q_UNUSED(ttl_blocks)
 
-    Q_ASSERT(false); // implement me
+    mainWindow->setProperty("questionTextDlgResponse", -1);
+    QVariant retValue;
+    QMetaObject::invokeMethod(mainWindow, "openQuestionTextDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, btn1), Q_ARG(QVariant, btn2));
+    while(mainWindow->property("questionTextDlgResponse") == -1) {
+        QCoreApplication::processEvents();
+        QThread::usleep(50);
+    }
     return WndManager::RETURN_CODE::BTN1;
 }
 
