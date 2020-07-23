@@ -321,6 +321,7 @@ Item {
 
             util.releasePasswordAnalyser()
 
+            currentInstanceName = textfield_instancename.text
             initAccount.setPassword(textfield_password.text)
             initAccount.submitWalletCreateChoices(1, isMainNet ? 1 : 2) // first param: NEW_WALLET_CHOICE, second param: MWC_NETWORK
         }

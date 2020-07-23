@@ -28,9 +28,20 @@ Item {
 
     Connections {
         target: wallet
-        onSgnLoginResult: {
+        onSgnLoginResult: (ok) => {
             textfield_password.enabled = !ok
             button_login.enabled = !ok
+            if (ok) {
+                currentInstanceName = instanceComboBox.displayText
+            }
+        }
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            textfield_password.text = ""
+            textfield_password.enabled = true
+            button_login.enabled = true
         }
     }
 

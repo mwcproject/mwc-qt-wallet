@@ -15,7 +15,7 @@ Item {
     anchors.right: parent.right
     anchors.rightMargin: dp(25)
 
-    function open(title, message, isTwoButtons, noBtnText, yesBtnText, _callback) {
+    function open(title, message, isTwoButtons, noBtnText, yesBtnText, passwordHash, blockButton, _ttl_blocks, _callback) {
         text_title.text = title
         text_message.text = message
         if (isTwoButtons) {

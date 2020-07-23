@@ -42,7 +42,7 @@ Item {
 
     function changeInstanceCallback(ret) {
         if (ret) {
-            console.log("change instance => True")
+            stateMachine.logout()
         }
     }
 
@@ -79,6 +79,7 @@ Item {
 
         onSgnConfigUpdate: {
             updateNetworkName()
+            updateInstanceAccountText()
         }
 
         onSgnLoginResult: {
@@ -98,6 +99,8 @@ Item {
         if (visible) {
             updateListenerBtn()
             updateNetworkName()
+            updateInstanceAccountText()
+            updateAccountList()
         }
     }
 
@@ -178,6 +181,28 @@ Item {
             if (text !== "")
                 text_listener.text = text
         }
+    }
+
+    function updateInstanceAccountText() {
+        text_instance_account.text = "INSTANCE:  " + currentInstanceName + "  //  ACCOUNT:  " + wallet.getCurrentAccountName()
+    }
+
+    function updateAccountList() {
+        const accountInfo = wallet.getWalletBalance(true, true, false)
+        const selectedAccount = wallet.getCurrentAccountName()
+        let selectedAccIdx = 0
+
+        accountItems.clear()
+
+        let idx = 0
+        for (let i = 1; i < accountInfo.length; i += 2) {
+            if (accountInfo[i-1] === selectedAccount)
+                selectedAccIdx = idx
+
+            accountItems.append({ info: accountInfo[i-1] + accountInfo[i].substring(27), account: accountInfo[i-1]})
+            idx++
+        }
+        accountComboBox.currentIndex = selectedAccIdx
     }
 
     Rectangle {
@@ -517,16 +542,25 @@ Item {
             ComboBox {
                 id: accountComboBox
 
+                onCurrentIndexChanged: {
+                    if (accountComboBox.currentIndex >= 0) {
+                        const selectedAccount = accountItems.get(accountComboBox.currentIndex).account
+                        wallet.switchAccount(selectedAccount)
+                    }
+                }
+
                 delegate: ItemDelegate {
                     width: accountComboBox.width
                     contentItem: Text {
-                        text: modelData
-                        color: "#7579ff"
+                        text: info
+                        color: accountComboBox.highlightedIndex === index ? "#8633E0" : "white"
                         font: accountComboBox.font
                         elide: Text.ElideRight
                         verticalAlignment: Text.AlignVCenter
                     }
                     highlighted: accountComboBox.highlightedIndex === index
+                    topPadding: dp(10)
+                    bottomPadding: dp(10)
                 }
 
                 indicator: Canvas {
@@ -544,16 +578,23 @@ Item {
 
                     onPaint: {
                         context.reset()
-                        context.moveTo(0, 0)
-                        context.lineTo(width / 2, height)
-                        context.lineTo(width, 0)
+                        if (accountComboBox.popup.visible) {
+                            context.moveTo(0, height)
+                            context.lineTo(width / 2, 0)
+                            context.lineTo(width, height)
+                        } else {
+                            context.moveTo(0, 0)
+                            context.lineTo(width / 2, height)
+                            context.lineTo(width, 0)
+                        }
                         context.strokeStyle = "white"
+                        context.lineWidth = 2
                         context.stroke()
                     }
                 }
 
                 contentItem: Text {
-                    text: accountComboBox.displayText
+                    text: accountComboBox.currentIndex >= 0 && accountItems.get(accountComboBox.currentIndex).info
                     font: accountComboBox.font
                     color: "white"
                     verticalAlignment: Text.AlignVCenter
@@ -568,10 +609,10 @@ Item {
                 }
 
                 popup: Popup {
-                    y: accountComboBox.height - 1
+                    y: accountComboBox.height + dp(3)
                     width: accountComboBox.width
-                    implicitHeight: contentItem.implicitHeight
-                    padding: dp(1)
+                    implicitHeight: contentItem.implicitHeight + dp(40)
+                    padding: dp(20)
 
                     contentItem: ListView {
                         clip: true
@@ -583,14 +624,19 @@ Item {
                     }
 
                     background: Rectangle {
-                        border.color: "white"
-                        radius: dp(3)
+                        color: "#8633E0"
+                        radius: dp(5)
+                    }
+
+                    onVisibleChanged: {
+                        if (!accountComboBox.popup.visible) {
+                            canvas.requestPaint()
+                        }
                     }
                 }
 
                 model: ListModel {
                     id: accountItems
-                    ListElement { text: "Default" }
                 }
                 anchors.bottom: button_changeinstance.top
                 anchors.bottomMargin: dp(55)
@@ -598,8 +644,8 @@ Item {
                 anchors.rightMargin: dp(35)
                 anchors.left: parent.left
                 anchors.leftMargin: dp(35)
-                leftPadding: dp(10)
-                rightPadding: dp(10)
+                leftPadding: dp(20)
+                rightPadding: dp(20)
                 font.pixelSize: dp(18)
             }
 

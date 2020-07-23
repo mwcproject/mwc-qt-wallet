@@ -65,19 +65,21 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
     Q_UNUSED(widthScale)
     Q_UNUSED(default1)
     Q_UNUSED(default2)
-    Q_UNUSED(ttl_blocks)
 
     if(mainWindow) {
         mainWindow->setProperty("questionTextDlgResponse", -1);
         QVariant retValue;
-        QMetaObject::invokeMethod(mainWindow, "openQuestionTextDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, btn1), Q_ARG(QVariant, btn2));
+        QMetaObject::invokeMethod(mainWindow, "openQuestionTextDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, btn1), Q_ARG(QVariant, btn2), Q_ARG(QVariant, ""), Q_ARG(QVariant, 0), Q_ARG(QVariant, *ttl_blocks));
         while(mainWindow->property("questionTextDlgResponse") == -1) {
             QCoreApplication::processEvents();
             QThread::usleep(50);
         }
-        if (mainWindow->property("questionTextDlgResponse") == 1)
+        if (mainWindow->property("questionTextDlgResponse") == 1) {
+//            if (ttl_blocks != nullptr) {
+//                *ttl_blocks = mainWindow->property("ttl_blocks").toInt();
+//            }
             return WndManager::RETURN_CODE::BTN2;
-        else
+        } else
             return WndManager::RETURN_CODE::BTN1;
     } else {
         if ( QMessageBox::Yes == QMessageBox::question(nullptr, title, message) )
@@ -114,18 +116,21 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
     Q_UNUSED(default1)
     Q_UNUSED(default2)
     Q_UNUSED(widthScale)
-    Q_UNUSED(passwordHash)
-    Q_UNUSED(blockButton)
-    Q_UNUSED(ttl_blocks)
 
     mainWindow->setProperty("questionTextDlgResponse", -1);
     QVariant retValue;
-    QMetaObject::invokeMethod(mainWindow, "openQuestionTextDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, btn1), Q_ARG(QVariant, btn2));
+    QMetaObject::invokeMethod(mainWindow, "openQuestionTextDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, btn1), Q_ARG(QVariant, btn2), Q_ARG(QVariant, passwordHash), Q_ARG(QVariant, blockButton == WndManager::RETURN_CODE::BTN1 ? 0 : 1), Q_ARG(QVariant, *ttl_blocks));
     while(mainWindow->property("questionTextDlgResponse") == -1) {
         QCoreApplication::processEvents();
         QThread::usleep(50);
     }
-    return WndManager::RETURN_CODE::BTN1;
+    if (mainWindow->property("questionTextDlgResponse") == 1) {
+//        if (ttl_blocks != nullptr) {
+//            *ttl_blocks = mainWindow->property("ttl_blocks").toInt();
+//        }
+        return WndManager::RETURN_CODE::BTN2;
+    } else
+        return WndManager::RETURN_CODE::BTN1;
 }
 
 // QFileDialog::getSaveFileName call
