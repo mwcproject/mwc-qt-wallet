@@ -197,6 +197,16 @@ void InitAccount::submitSeedWord(QString word) {
     doneWithNewSeed();
 }
 
+// Restart seed verification
+void InitAccount::restartSeedVerification() {
+    // generate a new tasks for a wallet
+    tasks = core::generateSeedTasks(seed);
+    seedTestWrongAnswers = 0;
+
+    // switch to 'show seed' window
+    core::getWndManager()->pageNewSeed(mwc::PAGE_A_NEW_WALLET_PASSPHRASE, seed);
+}
+
 bool InitAccount::finishSeedVerification() {
     if (tasks.size()==0 && seed.size()>0) {
         // clean up the state

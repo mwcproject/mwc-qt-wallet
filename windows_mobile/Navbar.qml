@@ -3,8 +3,14 @@ import QtQuick.Window 2.0
 import QtQuick.Controls 2.13
 import WalletBridge 1.0
 import StateMachineBridge 1.0
+import ConfigBridge 1.0
 
 Item {
+    readonly property int status_ignore: 0
+    readonly property int status_red: 1
+    readonly property int status_yellow: 2
+    readonly property int status_green: 3
+
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
@@ -34,6 +40,12 @@ Item {
         }
     }
 
+    function changeInstanceCallback(ret) {
+        if (ret) {
+            stateMachine.logout()
+        }
+    }
+
     WalletBridge {
         id: wallet
     }
@@ -42,11 +54,155 @@ Item {
         id: stateMachine
     }
 
+    ConfigBridge {
+        id: config
+    }
+
     Connections {
         target: wallet
+
         onSgnWalletBalanceUpdated: {
             text_balance.text = wallet.getTotalMwcAmount() + " MWC"
         }
+
+        onSgnUpdateNodeStatus: (online, errMsg, nodeHeight, peerHeight, totalDifficulty, connections) => {
+           if ( !online ) {
+               setStatusButtonState(true, status_red, "")
+           }
+           else if (connections === 0 || nodeHeight === 0 || ( peerHeight > 0 && peerHeight - nodeHeight > 5 )) {
+               setStatusButtonState(true, status_yellow, "")
+           }
+           else {
+               setStatusButtonState(true, status_green, "")
+           }
+        }
+
+        onSgnConfigUpdate: {
+            updateNetworkName()
+            updateInstanceAccountText()
+        }
+
+        onSgnLoginResult: {
+            updateNetworkName()
+        }
+
+        onSgnUpdateListenerStatus: {
+            updateListenerBtn()
+        }
+
+        onSgnHttpListeningStatus: {
+            updateListenerBtn()
+        }
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            updateListenerBtn()
+            updateNetworkName()
+            updateInstanceAccountText()
+            updateAccountList()
+        }
+    }
+
+    function updateNetworkName() {
+        setStatusButtonState(true, status_ignore, config.getNetwork())
+    }
+
+    function updateListenerBtn() {
+        const mqsStatus = wallet.getMqsListenerStatus()
+        const keybaseStatus = wallet.getKeybaseListenerStatus()
+        const torStatus = wallet.getTorListenerStatus()
+        const httpListenerStatus = wallet.getHttpListeningStatus()
+
+        console.log("updateListenerBtn: mqsStatus =", mqsStatus, "keybaseStatus =", keybaseStatus, "torStatus =", torStatus, "httpListenerStatus =", httpListenerStatus)
+
+        let listening = mqsStatus | keybaseStatus | torStatus
+        let listenerNames = ""
+        if (mqsStatus)
+            listenerNames +=  "MWC MQS"
+
+        if (keybaseStatus) {
+            if (listenerNames !== "")
+                listenerNames += ", "
+            listenerNames += "Keybase"
+        }
+
+        if (torStatus) {
+            if (listenerNames !== "")
+                listenerNames += ", "
+            listenerNames += "TOR"
+        }
+
+        if (httpListenerStatus === "true") {
+            listening = true
+            if (listenerNames !== "")
+                listenerNames += ", "
+            listenerNames += "Http"
+            if (config.hasTls())
+                listenerNames += "s"
+        }
+
+        setStatusButtonState(false, listening ? status_green : status_red, listening ? listenerNames : "Listeners")
+    }
+
+    function setStatusButtonState(isNetwork, status, text) {
+        if (isNetwork) {
+            switch (status) {
+                case status_green:
+                    image_network.source = "../img/CircGreen@2x.svg"
+                    break;
+                case status_red:
+                    image_network.source = "../img/CircRed@2x.svg"
+                    break;
+                case status_yellow:
+                    image_network.source = "../img/CircYellow@2x.svg"
+                    break;
+                default: // Ingnore suppose to be here
+                    break;
+            }
+
+            if (text !== "")
+                text_network.text = text
+        } else {
+            switch (status) {
+                case status_green:
+                    image_listener.source = "../img/CircGreen@2x.svg"
+                    break;
+                case status_red:
+                    image_listener.source = "../img/CircRed@2x.svg"
+                    break;
+                case status_yellow:
+                    image_listener.source = "../img/CircYellow@2x.svg"
+                    break;
+                default: // Ingnore suppose to be here
+                    break;
+            }
+
+            if (text !== "")
+                text_listener.text = text
+        }
+    }
+
+    function updateInstanceAccountText() {
+        text_instance_account.text = "INSTANCE:  " + currentInstanceName + "  //  ACCOUNT:  " + wallet.getCurrentAccountName()
+    }
+
+    function updateAccountList() {
+        const accountInfo = wallet.getWalletBalance(true, true, false)
+        const selectedAccount = wallet.getCurrentAccountName()
+        let selectedAccIdx = 0
+
+        accountItems.clear()
+
+        let idx = 0
+        for (let i = 1; i < accountInfo.length; i += 2) {
+            if (accountInfo[i-1] === selectedAccount)
+                selectedAccIdx = idx
+
+            accountItems.append({ info: accountInfo[i-1] + accountInfo[i].substring(27), account: accountInfo[i-1]})
+            idx++
+        }
+        accountComboBox.currentIndex = selectedAccIdx
     }
 
     Rectangle {
@@ -219,7 +375,7 @@ Item {
 
         Rectangle {
             id: rect_listener
-            width: dp(95)
+            width: text_listener.width + dp(40)
             height: dp(25)
             color: "#00000000"
             radius: dp(12.5)
@@ -253,7 +409,7 @@ Item {
 
         Rectangle {
             id: rect_network
-            width: dp(84)
+            width: text_network.width + dp(40)
             height: dp(25)
             color: "#00000000"
             radius: dp(12.5)
@@ -386,16 +542,25 @@ Item {
             ComboBox {
                 id: accountComboBox
 
+                onCurrentIndexChanged: {
+                    if (accountComboBox.currentIndex >= 0) {
+                        const selectedAccount = accountItems.get(accountComboBox.currentIndex).account
+                        wallet.switchAccount(selectedAccount)
+                    }
+                }
+
                 delegate: ItemDelegate {
                     width: accountComboBox.width
                     contentItem: Text {
-                        text: modelData
-                        color: "#7579ff"
+                        text: info
+                        color: accountComboBox.highlightedIndex === index ? "#8633E0" : "white"
                         font: accountComboBox.font
                         elide: Text.ElideRight
                         verticalAlignment: Text.AlignVCenter
                     }
                     highlighted: accountComboBox.highlightedIndex === index
+                    topPadding: dp(10)
+                    bottomPadding: dp(10)
                 }
 
                 indicator: Canvas {
@@ -413,16 +578,23 @@ Item {
 
                     onPaint: {
                         context.reset()
-                        context.moveTo(0, 0)
-                        context.lineTo(width / 2, height)
-                        context.lineTo(width, 0)
+                        if (accountComboBox.popup.visible) {
+                            context.moveTo(0, height)
+                            context.lineTo(width / 2, 0)
+                            context.lineTo(width, height)
+                        } else {
+                            context.moveTo(0, 0)
+                            context.lineTo(width / 2, height)
+                            context.lineTo(width, 0)
+                        }
                         context.strokeStyle = "white"
+                        context.lineWidth = 2
                         context.stroke()
                     }
                 }
 
                 contentItem: Text {
-                    text: accountComboBox.displayText
+                    text: accountComboBox.currentIndex >= 0 && accountItems.get(accountComboBox.currentIndex).info
                     font: accountComboBox.font
                     color: "white"
                     verticalAlignment: Text.AlignVCenter
@@ -437,10 +609,10 @@ Item {
                 }
 
                 popup: Popup {
-                    y: accountComboBox.height - 1
+                    y: accountComboBox.height + dp(3)
                     width: accountComboBox.width
-                    implicitHeight: contentItem.implicitHeight
-                    padding: dp(1)
+                    implicitHeight: contentItem.implicitHeight + dp(40)
+                    padding: dp(20)
 
                     contentItem: ListView {
                         clip: true
@@ -452,14 +624,19 @@ Item {
                     }
 
                     background: Rectangle {
-                        border.color: "white"
-                        radius: dp(3)
+                        color: "#8633E0"
+                        radius: dp(5)
+                    }
+
+                    onVisibleChanged: {
+                        if (!accountComboBox.popup.visible) {
+                            canvas.requestPaint()
+                        }
                     }
                 }
 
                 model: ListModel {
                     id: accountItems
-                    ListElement { text: "Default" }
                 }
                 anchors.bottom: button_changeinstance.top
                 anchors.bottomMargin: dp(55)
@@ -467,8 +644,8 @@ Item {
                 anchors.rightMargin: dp(35)
                 anchors.left: parent.left
                 anchors.leftMargin: dp(35)
-                leftPadding: dp(10)
-                rightPadding: dp(10)
+                leftPadding: dp(20)
+                rightPadding: dp(20)
                 font.pixelSize: dp(18)
             }
 
@@ -499,10 +676,9 @@ Item {
 
                 onClicked: {
                     nav.toggle()
-//                    messagebox.open(qsTr("Change Instance"), qsTr("Changing an instance will log you out of this current wallet instance. Are you sure you want to log out?"))
+                    messagebox.open(qsTr("Change Instance"), qsTr("Changing an instance will log you out of this current wallet instance. Are you sure you want to log out?"), true, "No", "Yes", changeInstanceCallback)
                 }
             }
-
         }
     }
 
@@ -522,11 +698,10 @@ Item {
         }
     }
 
-//    MessageBox {
-//        id: messagebox
-//        anchors.verticalCenter: parent.verticalCenter
-//        anchors.horizontalCenter: parent.horizontalCenter
-//    }
+    MessageBox {
+        id: messagebox
+        anchors.verticalCenter: parent.verticalCenter
+    }
 }
 
 /*##^##

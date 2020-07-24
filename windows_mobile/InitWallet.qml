@@ -1,10 +1,15 @@
 import QtQuick 2.0
 import QtQuick.Window 2.0
+import StateMachineBridge 1.0
 
 Item {
     id: element
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
+
+    StateMachineBridge {
+        id: stateMachine
+    }
 
     Image {
         id: image_logo
@@ -56,6 +61,7 @@ Item {
         height: label_new.height + dp(75)
         onClicked: {
             console.log("new instance clicked")
+            stateMachine.setActionWindow(2)
         }
     }
 

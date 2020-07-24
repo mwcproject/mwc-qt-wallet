@@ -28,9 +28,20 @@ Item {
 
     Connections {
         target: wallet
-        onSgnLoginResult: {
+        onSgnLoginResult: (ok) => {
             textfield_password.enabled = !ok
             button_login.enabled = !ok
+            if (ok) {
+                currentInstanceName = instanceComboBox.displayText
+            }
+        }
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            textfield_password.text = ""
+            textfield_password.enabled = true
+            button_login.enabled = true
         }
     }
 
@@ -39,7 +50,6 @@ Item {
         anchors.fill: parent
         onClicked: {
             textfield_password.focus = false
-            textfield_confirm.focus = false
         }
     }
 
@@ -251,6 +261,38 @@ Item {
     }
 
     Image {
+        id: image_restore
+        width: dp(30)
+        height: dp(30)
+        anchors.horizontalCenterOffset: dp(-40)
+        anchors.bottomMargin: dp(30)
+        fillMode: Image.PreserveAspectFit
+        source: "../img/RestoreBtn@2x.svg"
+        anchors.bottom: image_newinstance.top
+        anchors.horizontalCenter: parent.horizontalCenter
+    }
+
+    Text {
+        id: text_restore
+        text: qsTr("Restore")
+        anchors.leftMargin: dp(20)
+        color: "white"
+        anchors.left: image_restore.right
+        anchors.verticalCenter: image_restore.verticalCenter
+        font.pixelSize: dp(18)
+    }
+
+    MouseArea {
+        anchors.left: image_restore.left
+        anchors.top: image_restore.top
+        anchors.right: text_restore.right
+        anchors.bottom: image_restore.bottom
+        onClicked: {
+            console.log("Restore Instance Clicked")
+        }
+    }
+
+    Image {
         id: image_newinstance
         width: dp(30)
         height: dp(30)
@@ -307,7 +349,6 @@ Item {
     MessageBox {
         id: messagebox
         anchors.verticalCenter: parent.verticalCenter
-        anchors.horizontalCenter: parent.horizontalCenter
     }
 
 }

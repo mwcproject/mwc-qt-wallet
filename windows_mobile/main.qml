@@ -8,8 +8,11 @@ Window {
     visible: true
     title: qsTr("MWC-Mobile-Wallet")
     
+    property string currentInstanceName
     property int currentState
     property string initParams
+    property int questionTextDlgResponse
+    property int ttl_blocks
 
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
@@ -63,6 +66,22 @@ Window {
         if (currentState === 2) {
             newInstanceItem.updateCurrentStep()
         }
+    }
+
+    function openQuestionTextDlg(title, message, noBtnText, yesBtnText, passwordHash, blockButton, _ttl_blocks) {
+        messagebox.open(title, message, true, noBtnText, yesBtnText, passwordHash, blockButton, _ttl_blocks, questionTextDlgCallback)
+    }
+
+    function questionTextDlgCallback(ret) {
+        if (ret) {
+            questionTextDlgResponse = 1
+        } else {
+            questionTextDlgResponse = 0
+        }
+    }
+
+    function openMessageTextDlg(title, message) {
+        messagebox.open(title, message)
     }
 
     Rectangle
@@ -180,6 +199,11 @@ Window {
         id: navbarItem
         anchors.fill: parent
         visible: currentState > 3
+    }
+
+    MessageBox {
+        id: messagebox
+        anchors.verticalCenter: parent.verticalCenter
     }
 }
 

@@ -108,7 +108,7 @@ Item {
         }
 
         onClicked: {
-            currentStep = 1
+            newSeed.restartSeedVerification()
         }
     }
 

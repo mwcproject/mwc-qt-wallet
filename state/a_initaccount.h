@@ -53,6 +53,9 @@ public:
     // Single Word verification
     void submitSeedWord(QString word);
 
+    // Restart seed verification
+    void restartSeedVerification();
+
     // create form seed
     void createWalletWithSeed( QVector<QString> sd );
 
