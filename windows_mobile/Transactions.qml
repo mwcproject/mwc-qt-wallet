@@ -105,8 +105,8 @@ Item {
             if (canBeCancelled(trans.transactionType, trans.confirmed)) {
                 const age = calculateTransactionAge(trans.creationTime)
                 // 1 hours is a 1.0
-                selection = age > 60 * 60 ?
-                            1.0 : (Number(age) / Number(60 * 60))
+//                selection = age > 60 * 60 ?
+//                            1.0 : (Number(age) / Number(60 * 60))
             }
 
             let transConfirmedStr = trans.confirmed ? "YES" : "NO"
