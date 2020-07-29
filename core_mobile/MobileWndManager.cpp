@@ -31,6 +31,7 @@ void MobileWndManager::init(QQmlApplicationEngine * _engine) {
     engine->load(QUrl(QStringLiteral("qrc:/windows_mobile/main.qml")));
     mainWindow = engine->rootObjects().first();
     mainWindow->setProperty("currentState", 0);
+//    engine.rootContext()->setContextProperty(QLatin1String("qtAndroidService"), qtAndroidService);
 }
 
 

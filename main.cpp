@@ -79,6 +79,7 @@
 #include "bridge/wnd/e_transactions_b.h"
 #include "bridge/wnd/a_initaccount_b.h"
 #include "bridge/wnd/c_newseed_b.h"
+#include "qtandroidservice.h"
 
 #ifdef WALLET_MOBILE
 #include <QQmlApplicationEngine>
@@ -589,8 +590,10 @@ int main(int argc, char *argv[])
 #ifdef WALLET_DESKTOP
         wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
 #else
-//        wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
-        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
+        wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
+//        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
+        // QtAndroidService *qtAndroidService = new QtAndroidService(&app);
+        // qtAndroidService->sendToService("Hello Buddy");
 #endif
 
         state::StateContext context( &appContext, wallet, mwcNode );
