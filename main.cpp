@@ -20,6 +20,8 @@
 #ifdef WALLET_MOBILE
 #include "core_mobile/MobileWndManager.h"
 #include <QSysInfo>
+#include "core_mobile/qtandroidservice.h"
+#include <QAndroidService>
 #endif
 
 #include <QApplication>
@@ -79,8 +81,6 @@
 #include "bridge/wnd/e_transactions_b.h"
 #include "bridge/wnd/a_initaccount_b.h"
 #include "bridge/wnd/c_newseed_b.h"
-#include "qtandroidservice.h"
-#include <QAndroidService>
 
 #ifdef WALLET_MOBILE
 #include <QQmlApplicationEngine>
@@ -259,13 +259,14 @@ QPair<bool, QString> readConfig(QApplication & app) {
 
 int main(int argc, char *argv[])
 {
+#ifdef WALLET_MOBILE
     if (argc > 1 && strcmp(argv[1], "-service") == 0) {
         qWarning() << "Service starting with BroadcastReceiver from same .so file";
         QAndroidService app(argc, argv);
 
         return app.exec();
-
     }
+#endif
     int retVal = 0;
 
     double uiScale = 1.0;
