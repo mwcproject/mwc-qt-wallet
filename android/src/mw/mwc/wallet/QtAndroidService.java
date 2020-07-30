@@ -1,4 +1,4 @@
-package com.mwc.mobile;
+package mw.mwc.wallet;
 
 import android.content.Context;
 import android.content.Intent;

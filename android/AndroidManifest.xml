@@ -82,8 +82,12 @@
 
     <!-- For adding service(s) please check: https://wiki.qt.io/AndroidServices -->
     <service android:process=":qt_service" android:name=".QtAndroidService">
+        <!-- Application arguments -->
+        <meta-data android:name="android.app.arguments" android:value="-service"/>
+        <!-- Application arguments -->
+
         <!-- Ministro -->
-        <meta-data android:name="android.app.lib_name" android:value="mwc-qt-mobile-service"/>
+        <meta-data android:name="android.app.lib_name" android:value="mwc-qt-mobile"/>
         <meta-data android:name="android.app.qt_sources_resource_id" android:resource="@array/qt_sources"/>
         <meta-data android:name="android.app.repository" android:value="default"/>
         <meta-data android:name="android.app.qt_libs_resource_id" android:resource="@array/qt_libs"/>

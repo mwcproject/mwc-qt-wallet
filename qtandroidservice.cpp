@@ -23,7 +23,7 @@ QtAndroidService::QtAndroidService(QObject *parent) : QObject(parent)
 void QtAndroidService::sendToService(const QString &message)
 {
     QAndroidIntent serviceIntent(QtAndroid::androidActivity().object(),
-                                "com/mwc/mobile/QtAndroidService");
+                                "mw/mwc/wallet/QtAndroidService");
     serviceIntent.putExtra("message", message.toUtf8());
     QAndroidJniObject result = QtAndroid::androidActivity().callObjectMethod(
                 "startService",
@@ -35,7 +35,7 @@ void QtAndroidService::registerNatives()
 {
     JNINativeMethod methods[] {
         {"sendToQt", "(Ljava/lang/String;)V", reinterpret_cast<void *>(receivedFromAndroidService)}};
-    QAndroidJniObject javaClass("com/mwc/mobile/ActivityUtils");
+    QAndroidJniObject javaClass("mw/mwc/wallet/ActivityUtils");
 
     QAndroidJniEnvironment env;
     jclass objectClass = env->GetObjectClass(javaClass.object<jobject>());
@@ -48,7 +48,7 @@ void QtAndroidService::registerNatives()
 void QtAndroidService::registerBroadcastReceiver()
 {
     QAndroidJniEnvironment env;
-    jclass javaClass = env.findClass("com/mwc/mobile/ActivityUtils");
+    jclass javaClass = env.findClass("mw/mwc/wallet/ActivityUtils");
     QAndroidJniObject classObject(javaClass);
 
     classObject.callMethod<void>("registerServiceBroadcastReceiver",
