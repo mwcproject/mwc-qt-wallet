@@ -79,6 +79,8 @@
 #include "bridge/wnd/e_transactions_b.h"
 #include "bridge/wnd/a_initaccount_b.h"
 #include "bridge/wnd/c_newseed_b.h"
+#include "qtandroidservice.h"
+#include <QAndroidService>
 
 #ifdef WALLET_MOBILE
 #include <QQmlApplicationEngine>
@@ -257,6 +259,13 @@ QPair<bool, QString> readConfig(QApplication & app) {
 
 int main(int argc, char *argv[])
 {
+    if (argc > 1 && strcmp(argv[1], "-service") == 0) {
+        qWarning() << "Service starting with BroadcastReceiver from same .so file";
+        QAndroidService app(argc, argv);
+
+        return app.exec();
+
+    }
     int retVal = 0;
 
     double uiScale = 1.0;
@@ -589,8 +598,10 @@ int main(int argc, char *argv[])
 #ifdef WALLET_DESKTOP
         wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
 #else
-        wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
-//        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
+        //  wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
+        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
+        QtAndroidService *qtAndroidService = new QtAndroidService(&app);
+        qtAndroidService->sendToService("Start Service");
 #endif
 
         state::StateContext context( &appContext, wallet, mwcNode );
