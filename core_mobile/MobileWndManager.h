@@ -37,7 +37,7 @@ public:
     virtual RETURN_CODE questionTextDlg( QString title, QString message,
                                          QString btn1, QString btn2,
                                          QString btn1Tooltip, QString btn2Tooltip,
-                                         bool default1=false, bool default2=true, double widthScale = 1.0 ) override;
+                                         bool default1=false, bool default2=true, double widthScale = 1.0, int *ttl_blocks = nullptr ) override;
     virtual RETURN_CODE questionHTMLDlg( QString title, QString message,
                                          QString btn1, QString btn2,
                                          QString btn1Tooltip, QString btn2Tooltip,
@@ -47,7 +47,7 @@ public:
     // After return, passwordHash value will have input raw Password value. So it can be user for wallet
     virtual RETURN_CODE questionTextDlg( QString title, QString message, QString btn1, QString btn2,
                                          QString btn1Tooltip, QString btn2Tooltip,
-                                         bool default1, bool default2, double widthScale, QString & passwordHash, RETURN_CODE blockButton ) override;
+                                         bool default1, bool default2, double widthScale, QString & passwordHash, RETURN_CODE blockButton, int *ttl_blocks ) override;
 
     // QFileDialog::getSaveFileName call
     virtual QString getSaveFileName(const QString &caption, const QString &dir, const QString &filter) override;

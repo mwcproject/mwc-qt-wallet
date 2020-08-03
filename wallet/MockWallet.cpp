@@ -495,8 +495,9 @@ void MockWallet::getRootPublicKey(QString message2sign) {
 // Repost the transaction. Optionally fluff.
 // index is the tx_index in the tx_log.
 void MockWallet::repost(QString account, int index, bool fluff) {
+    Q_UNUSED(account)
+    Q_UNUSED(index)
+    Q_UNUSED(fluff)
 }
-
-
 
 }

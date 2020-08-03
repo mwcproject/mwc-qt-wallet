@@ -31,9 +31,9 @@ Item {
     Connections {
         target: receive
         onSgnTransactionActionIsFinished: {
-//            util::TimeoutLockObject to( "Receive" )
 //            ui->progress->hide()
-//            control::MessageBox::messageText(this, success ? "Success" : "Failure", message )
+            const title = success ? "Success" : "Failure"
+            messagebox.open(qsTr(title), qsTr(message))
             console.log(success, message)
         }
     }
@@ -43,19 +43,27 @@ Item {
         onSgnWalletBalanceUpdated: {
             updateAccountList()
         }
+
+        onSgnMwcAddressWithIndex: {
+            updateStatus()
+        }
+
+        onSgnTorAddress: {
+            updateStatus()
+        }
+
+        onSgnUpdateListenerStatus: {
+            updateStatus()
+        }
     }
 
     onVisibleChanged: {
         if (visible) {
-            const mwcMqAddress = wallet.getMqsAddress()
-            text_address.text = mwcMqAddress.slice(0, 9) + " ... " + mwcMqAddress.slice(mwcMqAddress.length - 7, mwcMqAddress.length)
-            image_mwcmq.source = wallet.getMqsListenerStatus() ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
-            image_keybase.source = wallet.getKeybaseListenerStatus() ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
-            image_http.source = wallet.getHttpListeningStatus() ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
             if (config.hasTls()) {
                 text_http.text = qsTr("Https")
             }
             updateAccountList()
+            updateStatus()
         }
     }
 
@@ -77,78 +85,154 @@ Item {
         accountComboBox.currentIndex = selectedAccIdx
     }
 
-    Text {
-        id: text_mwcmq
-        text: qsTr("MWC Message Queue")
-        anchors.right: image_mwcmq.left
-        anchors.rightMargin: dp(16)
-        horizontalAlignment: Text.AlignRight
-        anchors.verticalCenterOffset: dp(-250)
+    function updateStatus() {
+        image_mwcmq.source = wallet.getMqsListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
+        image_keybase.source = wallet.getKeybaseListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
+        image_http.source = wallet.getHttpListeningStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
+        image_tor.source = wallet.getTorListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
+    }
+
+    Rectangle {
+        id: rect_mwcmq
+        width: dp(150)
+        height: dp(40)
         anchors.verticalCenter: parent.verticalCenter
-        font.pixelSize: dp(17)
-        color: "white"
-    }
-
-    Image {
-        id: image_mwcmq
-        anchors.horizontalCenterOffset: dp(100)
+        anchors.verticalCenterOffset: dp(-250)
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: text_mwcmq.verticalCenter
-        width: dp(20)
-        height: dp(20)
+        anchors.horizontalCenterOffset: dp(-100)
+        border.color: "white"
+        border.width: dp(2)
+        radius: dp(50)
+        color: "#00000000"
+
+        Image {
+            id: image_mwcmq
+            anchors.left: parent.left
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            width: dp(20)
+            height: dp(20)
+        }
+
+        Text {
+            id: text_mwcmq
+            text: qsTr("MWCMQ")
+            anchors.left: image_mwcmq.right
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            font.pixelSize: dp(17)
+            color: "white"
+        }
     }
 
-    Text {
-        id: text_keybase
-        text: qsTr("Keybase")
-        anchors.right: image_keybase.left
-        anchors.rightMargin: dp(16)
-        horizontalAlignment: Text.AlignRight
-        anchors.top: text_mwcmq.bottom
-        anchors.topMargin: dp(30)
-        font.pixelSize: dp(17)
-        color: "white"
-    }
-
-    Image {
-        id: image_keybase
-        anchors.horizontalCenterOffset: dp(100)
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: text_keybase.verticalCenter
-        width: dp(20)
-        height: dp(20)
-    }
-
-    Text {
-        id: text_http
-        text: qsTr("Http")
-        anchors.right: image_http.left
-        anchors.rightMargin: dp(16)
-        horizontalAlignment: Text.AlignRight
-        anchors.top: text_keybase.bottom
-        anchors.topMargin: dp(30)
-        font.pixelSize: dp(17)
-        color: "white"
-    }
-
-    Image {
-        id: image_http
-        anchors.verticalCenter: text_http.verticalCenter
+    Rectangle {
+        id: rect_keybase
+        width: dp(150)
+        height: dp(40)
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: dp(-250)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: dp(100)
-        width: dp(20)
-        height: dp(20)
+        border.color: "white"
+        border.width: dp(2)
+        radius: dp(50)
+        color: "#00000000"
+
+        Image {
+            id: image_keybase
+            anchors.left: parent.left
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            width: dp(20)
+            height: dp(20)
+        }
+
+        Text {
+            id: text_keybase
+            text: qsTr("Keybase")
+            anchors.left: image_keybase.right
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            font.pixelSize: dp(17)
+            color: "white"
+        }
+    }
+
+    Rectangle {
+        id: rect_tor
+        width: dp(150)
+        height: dp(40)
+        anchors.top: rect_mwcmq.bottom
+        anchors.topMargin: dp(20)
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: dp(-100)
+        border.color: "white"
+        border.width: dp(2)
+        radius: dp(50)
+        color: "#00000000"
+
+        Image {
+            id: image_tor
+            anchors.left: parent.left
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            width: dp(20)
+            height: dp(20)
+        }
+
+        Text {
+            id: text_tor
+            text: qsTr("TOR")
+            anchors.left: image_tor.right
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            font.pixelSize: dp(17)
+            color: "white"
+        }
+    }
+
+    Rectangle {
+        id: rect_http
+        width: dp(150)
+        height: dp(40)
+        anchors.top: rect_mwcmq.bottom
+        anchors.topMargin: dp(20)
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: dp(100)
+        border.color: "white"
+        border.width: dp(2)
+        radius: dp(50)
+        color: "#00000000"
+
+        Image {
+            id: image_http
+            anchors.left: parent.left
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            width: dp(20)
+            height: dp(20)
+        }
+
+        Text {
+            id: text_http
+            text: qsTr("HTTP")
+            anchors.left: image_http.right
+            anchors.leftMargin: dp(10)
+            anchors.verticalCenter: parent.verticalCenter
+            font.pixelSize: dp(17)
+            color: "white"
+        }
     }
 
     Text {
         id: label_combobox
         color: "#ffffff"
-        text: qsTr("Choose Account")
+        text: qsTr("Account to receive incoming MWC coins")
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
-        anchors.bottom: accountComboBox.top
-        anchors.bottomMargin: dp(10)
-        font.pixelSize: dp(13)
+        anchors.top: rect_tor.bottom
+        anchors.topMargin: dp(45)
+        font.pixelSize: dp(14)
     }
 
     ComboBox {
@@ -158,15 +242,16 @@ Item {
         anchors.rightMargin: dp(30)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
+        anchors.top: label_combobox.bottom
+        anchors.topMargin: dp(10)
         leftPadding: dp(20)
-        rightPadding: dp(40)
-        anchors.verticalCenter: parent.verticalCenter
+        rightPadding: dp(50)
         font.pixelSize: dp(14)
 
         onCurrentIndexChanged: {
             if (accountComboBox.currentIndex >= 0) {
-                const currentAccount = accountItems.get(accountComboBox.currentIndex).account
-                wallet.setReceiveAccount(currentAccount)
+                const selectedAccount = accountItems.get(accountComboBox.currentIndex).account
+                wallet.setReceiveAccount(selectedAccount)
             }
         }
 
@@ -247,29 +332,28 @@ Item {
     }
 
     Text {
-        id: label_address
+        id: label_online_methods
         color: "#ffffff"
-        text: qsTr("Online (mwcmqs)")
-        anchors.top: accountComboBox.bottom
-        anchors.topMargin: dp(40)
+        text: qsTr("Online Methods")
+        anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
-        font.pixelSize: dp(13)
+        anchors.leftMargin: dp(36)
+        font.pixelSize: dp(14)
     }
 
     Button {
-        id: button_copyaddress
+        id: button_mwcmq
         width: parent.width / 2 - dp(40)
-        height: dp(70)
+        height: dp(72)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
-        anchors.top: label_address.bottom
-        anchors.topMargin: dp(14)
+        anchors.top: label_online_methods.bottom
+        anchors.topMargin: dp(17)
         background: Rectangle {
             color: "#00000000"
-            radius: dp(4)
+            radius: dp(5)
             border.color: "white"
-            border.width: dp(1)
+            border.width: dp(2)
             Text {
                 text: qsTr("Copy Address")
                 anchors.verticalCenter: parent.verticalCenter
@@ -285,42 +369,68 @@ Item {
         }
     }
 
+    Button {
+        id: button_tor
+        width: parent.width / 2 - dp(40)
+        height: dp(72)
+        anchors.right: parent.right
+        anchors.rightMargin: dp(30)
+        anchors.verticalCenter: button_mwcmq.verticalCenter
+        background: Rectangle {
+            color: "#00000000"
+            radius: dp(5)
+            border.color: "white"
+            border.width: dp(2)
+            Text {
+                text: qsTr("TOR")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pixelSize: dp(18)
+                color: "white"
+            }
+        }
+        onClicked: {
+            clipboard.text = wallet.getTorAddress()
+            notification.text = "Address copied to the clipboard"
+            notification.open()
+        }
+    }
+
     Text {
-        id: text_address
-        width: dp(160)
+        id: label_copy_clipboard
         color: "#BF84FF"
-        text: ""
+        text: "(Copies address to clipboard)"
         horizontalAlignment: Text.AlignHCenter
-        anchors.horizontalCenter: button_copyaddress.horizontalCenter
-        anchors.top: button_copyaddress.bottom
-        anchors.topMargin: dp(14)
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: button_mwcmq.bottom
+        anchors.topMargin: dp(12)
         font.pixelSize: dp(13)
     }
 
     Text {
-        id: label_file
+        id: label_offline_methods
         color: "#ffffff"
-        text: qsTr("Offline (file)")
+        text: qsTr("Offline Method")
         anchors.left: parent.left
-        anchors.leftMargin: parent.width / 2 + dp(10)
-        anchors.top: accountComboBox.bottom
-        anchors.topMargin: dp(40)
-        font.pixelSize: dp(13)
+        anchors.leftMargin: dp(36)
+        anchors.top: label_copy_clipboard.bottom
+        anchors.topMargin: dp(35)
+        font.pixelSize: dp(14)
     }
 
     Button {
-        id: button_receivebyfile
-        width: parent.width / 2 - dp(40)
-        height: dp(70)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(30)
-        anchors.top: label_file.bottom
-        anchors.topMargin: dp(14)
+        id: button_file
+        width: button_mwcmq.width
+        height: dp(72)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(30)
+        anchors.top: label_offline_methods.bottom
+        anchors.topMargin: dp(17)
         background: Rectangle {
             color: "#00000000"
-            radius: dp(4)
+            radius: dp(5)
             border.color: "white"
-            border.width: dp(1)
+            border.width: dp(2)
             Text {
                 text: qsTr("Receive by File")
                 anchors.verticalCenter: parent.verticalCenter
@@ -335,12 +445,12 @@ Item {
     }
 
     Text {
-        id: text_receivebyfile
+        id: text_file
         color: "#BF84FF"
         text: qsTr("(sign transaction)")
-        anchors.horizontalCenter: button_receivebyfile.horizontalCenter
-        anchors.top: button_receivebyfile.bottom
-        anchors.topMargin: dp(14)
+        anchors.horizontalCenter: button_file.horizontalCenter
+        anchors.top: button_file.bottom
+        anchors.topMargin: dp(12)
         font.pixelSize: dp(13)
     }
 
@@ -358,15 +468,18 @@ Item {
     }
 
     Rectangle {
-        anchors.right: parent.right
-        anchors.rightMargin: dp(50)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(50)
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: -notification.width / 2
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(160)
+        anchors.bottomMargin: dp(50)
         Notification {
             id: notification
         }
+    }
+
+    MessageBox {
+        id: messagebox
+        anchors.verticalCenter: parent.verticalCenter
     }
 }
 

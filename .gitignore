@@ -18,8 +18,7 @@ ui_*.h
 
 .qmake.stash
 CMakeSettings.json
-mwc-qt-wallet.pro.user
-mwc-qt-mobile.pro.user
+*.pro.user
 
 .gradle
 android.iml

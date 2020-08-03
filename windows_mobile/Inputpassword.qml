@@ -4,6 +4,7 @@ import QtQuick.Window 2.0
 import InputPasswordBridge 1.0
 import WalletBridge 1.0
 import UtilBridge 1.0
+import StateMachineBridge 1.0
 
 Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
@@ -21,11 +22,26 @@ Item {
         id: util
     }
 
+    StateMachineBridge {
+        id: stateMachine
+    }
+
     Connections {
         target: wallet
-        onSgnLoginResult: {
+        onSgnLoginResult: (ok) => {
             textfield_password.enabled = !ok
             button_login.enabled = !ok
+            if (ok) {
+                currentInstanceName = instanceComboBox.displayText
+            }
+        }
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            textfield_password.text = ""
+            textfield_password.enabled = true
+            button_login.enabled = true
         }
     }
 
@@ -53,7 +69,7 @@ Item {
         text: qsTr("Instances")
         color: "white"
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.leftMargin: dp(45)
         anchors.bottom: instanceComboBox.top
         anchors.bottomMargin: dp(10)
         font.pixelSize: dp(14)
@@ -65,13 +81,15 @@ Item {
         delegate: ItemDelegate {
             width: instanceComboBox.width
             contentItem: Text {
-                text: modelData
-                color: "#7579ff"
+                text: value
+                color: instanceComboBox.highlightedIndex === index ? "#8633E0" : "white"
                 font: instanceComboBox.font
                 elide: Text.ElideRight
                 verticalAlignment: Text.AlignVCenter
             }
             highlighted: instanceComboBox.highlightedIndex === index
+            topPadding: dp(10)
+            bottomPadding: dp(10)
         }
 
         indicator: Canvas {
@@ -89,10 +107,17 @@ Item {
 
             onPaint: {
                 context.reset()
-                context.moveTo(0, 0)
-                context.lineTo(width / 2, height)
-                context.lineTo(width, 0)
+                if (instanceComboBox.popup.visible) {
+                    context.moveTo(0, height)
+                    context.lineTo(width / 2, 0)
+                    context.lineTo(width, height)
+                } else {
+                    context.moveTo(0, 0)
+                    context.lineTo(width / 2, height)
+                    context.lineTo(width, 0)
+                }
                 context.strokeStyle = "white"
+                context.lineWidth = 2
                 context.stroke()
             }
         }
@@ -113,10 +138,10 @@ Item {
         }
 
         popup: Popup {
-            y: instanceComboBox.height - 1
+            y: instanceComboBox.height + dp(3)
             width: instanceComboBox.width
-            implicitHeight: contentItem.implicitHeight
-            padding: dp(1)
+            implicitHeight: contentItem.implicitHeight + dp(40)
+            padding: dp(20)
 
             contentItem: ListView {
                 clip: true
@@ -128,23 +153,27 @@ Item {
             }
 
             background: Rectangle {
-                border.color: "white"
-                radius: dp(3)
+                color: "#8633E0"
+                radius: dp(5)
             }
         }
 
         model: ListModel {
             id: accountItems
-            ListElement { text: "Default" }
+            ListElement { value: "Default" }
+            ListElement { value: "Name of instance 2" }
+            ListElement { value: "Another instance name" }
+            ListElement { value: "another instance" }
+            ListElement { value: "Long instance name long name" }
         }
         anchors.bottom: text_login.top
         anchors.bottomMargin: dp(15)
         anchors.right: parent.right
-        anchors.rightMargin: dp(30)
+        anchors.rightMargin: dp(45)
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
-        leftPadding: dp(10)
-        rightPadding: dp(10)
+        anchors.leftMargin: dp(45)
+        leftPadding: dp(20)
+        rightPadding: dp(20)
         font.pixelSize: dp(18)
     }
 
@@ -153,7 +182,7 @@ Item {
         text: qsTr("Login")
         color: "white"
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.leftMargin: dp(45)
         anchors.bottom: textfield_password.top
         anchors.bottomMargin: dp(10)
         font.pixelSize: dp(14)
@@ -162,26 +191,25 @@ Item {
     TextField {
         id: textfield_password
         height: dp(50)
-        padding: dp(5)
-        leftPadding: dp(10)
-        anchors.verticalCenter: parent.verticalCenter
+        padding: dp(10)
+        leftPadding: dp(20)
         font.pixelSize: dp(18)
         placeholderText: qsTr("Type your password")
         echoMode: "Password"
         color: "white"
         text: ""
+        anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: dp(-10)
         anchors.right: parent.right
-        anchors.rightMargin: dp(30)
+        anchors.rightMargin: dp(45)
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
-        horizontalAlignment: Text.AlignHCenter
-
-
+        anchors.leftMargin: dp(45)
+        horizontalAlignment: Text.AlignLeft
         background: Rectangle {
             color: "#8633E0"
             radius: dp(5)
         }
+
         MouseArea {
             anchors.fill: parent
             onClicked: {
@@ -192,17 +220,17 @@ Item {
 
     Button {
         id: button_login
-        height: dp(50)
+        height: dp(70)
         anchors.right: parent.right
-        anchors.rightMargin: dp(30)
+        anchors.rightMargin: dp(45)
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.leftMargin: dp(45)
         anchors.top: textfield_password.bottom
-        anchors.topMargin: dp(50)
+        anchors.topMargin: dp(40)
         background: Rectangle {
             id: rectangle
             color: "#00000000"
-            radius: dp(4)
+            radius: dp(5)
             border.color: "white"
             border.width: dp(2)
             Text {
@@ -226,10 +254,6 @@ Item {
                 messagebox.open(qsTr("Password"), qsTr(validation))
                 return
             }
-            if (textfield_password.text[0] === "-") {
-                messagebox.open(qsTr("Password"), qsTr("You can't start your password from '-' symbol."))
-                return
-            }
 
             // Submit the password and wait until state will push us.
             inputPassword.submitPassword(textfield_password.text)
@@ -237,11 +261,75 @@ Item {
     }
 
     Image {
+        id: image_restore
+        width: dp(30)
+        height: dp(30)
+        anchors.horizontalCenterOffset: dp(-40)
+        anchors.bottomMargin: dp(30)
+        fillMode: Image.PreserveAspectFit
+        source: "../img/RestoreBtn@2x.svg"
+        anchors.bottom: image_newinstance.top
+        anchors.horizontalCenter: parent.horizontalCenter
+    }
+
+    Text {
+        id: text_restore
+        text: qsTr("Restore")
+        anchors.leftMargin: dp(20)
+        color: "white"
+        anchors.left: image_restore.right
+        anchors.verticalCenter: image_restore.verticalCenter
+        font.pixelSize: dp(18)
+    }
+
+    MouseArea {
+        anchors.left: image_restore.left
+        anchors.top: image_restore.top
+        anchors.right: text_restore.right
+        anchors.bottom: image_restore.bottom
+        onClicked: {
+            console.log("Restore Instance Clicked")
+        }
+    }
+
+    Image {
+        id: image_newinstance
+        width: dp(30)
+        height: dp(30)
+        anchors.horizontalCenterOffset: dp(-40)
+        anchors.bottomMargin: dp(30)
+        fillMode: Image.PreserveAspectFit
+        source: "../img/NewInstanceBtn@2x.svg"
+        anchors.bottom: image_help.top
+        anchors.horizontalCenter: parent.horizontalCenter
+    }
+
+    Text {
+        id: text_newinstance
+        text: qsTr("New Instance")
+        anchors.leftMargin: dp(20)
+        color: "white"
+        anchors.left: image_newinstance.right
+        anchors.verticalCenter: image_newinstance.verticalCenter
+        font.pixelSize: dp(18)
+    }
+
+    MouseArea {
+        anchors.left: image_newinstance.left
+        anchors.top: image_newinstance.top
+        anchors.right: text_instances.right
+        anchors.bottom: image_newinstance.bottom
+        onClicked: {
+            stateMachine.setActionWindow(2)
+        }
+    }
+
+    Image {
         id: image_help
         width: dp(30)
         height: dp(30)
-        anchors.horizontalCenterOffset: dp(-20)
-        anchors.bottomMargin: dp(100)
+        anchors.horizontalCenterOffset: dp(-40)
+        anchors.bottomMargin: dp(90)
         fillMode: Image.PreserveAspectFit
         source: "../img/HelpBtn@2x.svg"
         anchors.bottom: parent.bottom
@@ -261,7 +349,6 @@ Item {
     MessageBox {
         id: messagebox
         anchors.verticalCenter: parent.verticalCenter
-        anchors.horizontalCenter: parent.horizontalCenter
     }
 
 }

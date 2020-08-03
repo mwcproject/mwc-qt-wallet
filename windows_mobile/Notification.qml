@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.0
+import QtQuick.Window 2.0
 
 Popup {
     id: popup
@@ -9,9 +10,12 @@ Popup {
 
     closePolicy: Popup.NoAutoClose // To close click the notification or wait 3 seconds
 
+    readonly property int dpi: Screen.pixelDensity * 25.4
+    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
+
     Timer {
         id: timer
-        interval: 3000 // milliseconds
+        interval: 2000 // milliseconds
         running: true
         repeat: false
         onTriggered: {
@@ -43,6 +47,7 @@ Popup {
         Text {
             id: txt
             color: "white"
+            font.pixelSize: dp(20)
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
         }

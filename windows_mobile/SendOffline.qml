@@ -13,7 +13,7 @@ Item {
 
     function init(initParams) {
         selectedAccount = initParams.selectedAccount
-        amount = initParams.amount
+        amount = parseInt(initParams.amount)
         text_from_account.text = qsTr("From account: " + selectedAccount)
         text_amount_to_send.text = qsTr("Amount to send: " + ( amount < 0 ? "All" : util.nano2one(Number(amount).toString())) + " MWC" )
     }
@@ -30,8 +30,7 @@ Item {
         target: send
         onSgnShowSendResult: {
 //            ui->progress->hide();
-//            control::MessageBox::messageText(this, success ? "Success" : "Failure", message );
-            console.log(success ? "Success" : "Failure", message)
+            messagebox.open(success ? "Success" : "Failure", message)
         }
     }
 
@@ -163,9 +162,7 @@ Item {
 
         onClicked: {
             if ( !send.isNodeHealthy() ) {
-//                control::MessageBox::messageText(this, "Unable to send", "Your MWC Node, that wallet connected to, is not ready.\n"
-//                                                                             "MWC Node needs to be connected to a few peers and finish block synchronization process");
-                console.log("Unable to send", "Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process")
+                messagebox.open("Unable to send", "Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process")
                 return
             }
 
@@ -173,8 +170,7 @@ Item {
 
             const valRes = util.validateMwc713Str(description);
             if (valRes !== "") {
-//                control::MessageBox::messageText(this, "Incorrect Input", valRes);
-                console.log("Incorrect Input", valRes)
+                messagebox.open("Incorrect Input", valRes)
                 textarea_description.focus = true
                 return;
             }
@@ -184,5 +180,10 @@ Item {
                 console.log("Sending is in progress")
             }
         }
+    }
+
+    MessageBox {
+        id: messagebox
+        anchors.verticalCenter: parent.verticalCenter
     }
 }

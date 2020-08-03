@@ -20,6 +20,8 @@
 #ifdef WALLET_MOBILE
 #include "core_mobile/MobileWndManager.h"
 #include <QSysInfo>
+#include "core_mobile/qtandroidservice.h"
+#include <QAndroidService>
 #endif
 
 #include <QApplication>
@@ -76,6 +78,9 @@
 #include "bridge/statemachine_b.h"
 #include "bridge/wnd/g_send_b.h"
 #include "bridge/wnd/g_finalize_b.h"
+#include "bridge/wnd/e_transactions_b.h"
+#include "bridge/wnd/a_initaccount_b.h"
+#include "bridge/wnd/c_newseed_b.h"
 
 #ifdef WALLET_MOBILE
 #include <QQmlApplicationEngine>
@@ -254,6 +259,14 @@ QPair<bool, QString> readConfig(QApplication & app) {
 
 int main(int argc, char *argv[])
 {
+#ifdef WALLET_MOBILE
+    if (argc > 1 && strcmp(argv[1], "-service") == 0) {
+        qWarning() << "Service starting with BroadcastReceiver from same .so file";
+        QAndroidService app(argc, argv);
+
+        return app.exec();
+    }
+#endif
     int retVal = 0;
 
     double uiScale = 1.0;
@@ -272,6 +285,9 @@ int main(int argc, char *argv[])
     qmlRegisterType<ClipboardProxy>("Clipboard", 1, 0, "Clipboard");
     qmlRegisterType<bridge::Send>("SendBridge", 1, 0, "SendBridge");
     qmlRegisterType<bridge::Finalize>("FinalizeBridge", 1, 0, "FinalizeBridge");
+    qmlRegisterType<bridge::Transactions>("TransactionsBridge", 1, 0, "TransactionsBridge");
+    qmlRegisterType<bridge::InitAccount>("InitAccountBridge", 1, 0, "InitAccountBridge");
+    qmlRegisterType<bridge::NewSeed>("NewSeedBridge", 1, 0, "NewSeedBridge");
 
     core::MobileWndManager * wndManager = new core::MobileWndManager();
 #endif
@@ -583,8 +599,10 @@ int main(int argc, char *argv[])
 #ifdef WALLET_DESKTOP
         wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
 #else
-        wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
-//        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
+        //  wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
+        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
+        QtAndroidService *qtAndroidService = new QtAndroidService(&app);
+        qtAndroidService->sendToService("Start Service");
 #endif
 
         state::StateContext context( &appContext, wallet, mwcNode );
