@@ -110,6 +110,7 @@ QPair<bool, QString> FileTransactionInfo::parseTransaction( QString fn, FileTran
             lock_height = readValueFromJson( json, "lock_height" ).toInt(-1);
             break;
         case 2:
+        case 3:
             amount  = readStringFromJson( json, "amount" ).toLongLong(&ok1);
             fee     = readStringFromJson( json, "fee" ).toLongLong(&ok2);
             height  = readStringFromJson( json, "height" ).toInt(&ok3);
