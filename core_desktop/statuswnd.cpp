@@ -29,8 +29,7 @@ namespace core {
 
 // StatusWnd objects are controlled by MainWindow so that they can always be displayed
 // on top of whatever windows might be visible at the time. If the MainWindow is destroyed,
-// all StatusWnd objects will also be destroyed. If the MainWindow is iconified, StatusWnd
-// objects will still appear on whichever screen the dock appears on.
+// all StatusWnd objects will also be destroyed.
 StatusWnd::StatusWnd(MainWindow* _mainWindow, QString _statusMessage, int windowPosition, bool _clickable) :
     QWidget(_mainWindow),
     ui(new Ui::StatusWnd),
