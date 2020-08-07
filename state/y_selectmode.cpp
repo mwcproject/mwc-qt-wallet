@@ -44,7 +44,7 @@ config::WALLET_RUN_MODE SelectMode::getWalletRunMode() {
 // Will require restart
 void SelectMode::updateWalletRunMode( config::WALLET_RUN_MODE newRunMode ) {
     if (config::getWalletRunMode() == newRunMode) {
-        core::getWndManager()->messageTextDlg("Running Mode", "You allready running wallet in selected mode. Nothing need to done." );
+        core::getWndManager()->messageTextDlg("Running Mode", "You are already running wallet in selected mode. Nothing need to done." );
         return;
     }
 

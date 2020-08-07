@@ -70,8 +70,8 @@ void SelectMode::updateButtons() {
 }
 
 void SelectMode::on_applyButton_clicked() {
-    if ( core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionText(this, "Waller Run Mode",
-            "Changing running mode required restart.",
+    if ( core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionText(this, "Wallet Run Mode",
+            "Changing running mode requires restart.",
             "Cancel", "Continue",
             "Drop my request and don't change running mode",
             "Continue, change the running mode and restart this app",
