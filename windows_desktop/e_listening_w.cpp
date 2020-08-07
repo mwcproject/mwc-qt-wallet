@@ -151,15 +151,15 @@ void Listening::updateStatuses() {
     if (torStarted) {
         if (torStatus) {
             ui->torTriggerButton->setText(torInProgress ? "Stopping..." : "Stop");
-            ui->torTriggerButton->setToolTip("Stop the TOR Listener");
+            ui->torTriggerButton->setToolTip("Stop the Tor Listener");
         } else {
             ui->torTriggerButton->setText("Stop to retry");
             ui->torTriggerButton->setToolTip(
-                    "TOR Listener is already running and trying to reconnect. Click to restart the TOR Listener");
+                    "Tor Listener is already running and trying to reconnect. Click to restart the Tor Listener");
         }
     } else {
         ui->torTriggerButton->setText( torInProgress ? "Starting" : "Start");
-        ui->torTriggerButton->setToolTip("Start the TOR Listener");
+        ui->torTriggerButton->setToolTip("Start the Tor Listener");
     }
 
     // "true"  - listening
@@ -182,11 +182,11 @@ void Listening::updateStatuses() {
         QString warningStr;
 
         if (foreignApiAddress.startsWith("127.0.0.1:")) {
-            warningStr += "INFO: Accepting TOR and local connections";
+            warningStr += "INFO: Accepting Tor and local connections";
         }
         else {
             if (!hasTls)
-                warningStr += "WARNING: You are using non secure http connection.";
+                warningStr += "WARNING: You are using non-secure HTTP connection.";
         }
 
         ui->http_warnings->setText(warningStr);

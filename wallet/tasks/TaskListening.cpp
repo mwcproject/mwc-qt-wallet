@@ -55,7 +55,7 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
                 if (address.size()>0 && (address[0]=='x' || address[0]=='q') ) {
                     wallet713->setMwcMqListeningStatus(true, prms.size()>1 ? prms[1] : "", true);
                     wallet713->setMwcAddress(prms[0] );
-                // last case for tor it will be http://something.onion
+                // last case for Tor it will be http://something.onion
                 }
                 else if (address.size()>0 && (address[0]=='h') ) {
                     wallet713->setTorListeningStatus(true);
@@ -158,11 +158,11 @@ bool TaskListeningStart::processTask(const QVector<WEvent> &events) {
     bool keybase = false;
     bool tor = false;
     for (const WEvent & l : filterEvents(events, WALLET_EVENTS::S_LINE ) ) {
-        if (l.message.contains("starting mwcmqs listener"))
+        if (l.message.contains("Starting mwcmqs listener"))
             mqs = true;
-        if (l.message.contains("starting keybase listener"))
+        if (l.message.contains("Starting keybase listener"))
             keybase = true;
-        if (l.message.contains("starting tor listener"))
+        if (l.message.contains("Starting Tor listener"))
             tor = true;
     }
 
@@ -201,11 +201,11 @@ bool TaskListeningStop::processTask(const QVector<WEvent> &events) {
     bool keybase = false;
     bool tor = false;
     for (const WEvent & l : filterEvents(events, WALLET_EVENTS::S_LINE ) ) {
-        if (l.message.contains("stopping mwcmqs listener"))
+        if (l.message.contains("Stopping mwcmqs listener"))
             mqs = true;
-        if (l.message.contains("stopping keybase listener"))
+        if (l.message.contains("Stopping keybase listener"))
             keybase = true;
-        if (l.message.contains("stopping TOR listener", Qt::CaseInsensitive))
+        if (l.message.contains("Stopping Tor listener", Qt::CaseInsensitive))
             tor = true;
     }
 

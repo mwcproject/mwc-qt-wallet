@@ -237,7 +237,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>TOR</string>
+         <string>Tor</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -269,7 +269,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>TOR listener status</string>
+         <string>Tor listener status</string>
         </property>
         <property name="text">
          <string/>
@@ -450,7 +450,7 @@
            <enum>Qt::StrongFocus</enum>
           </property>
           <property name="toolTip">
-           <string>TOR (onion) address of your wallet</string>
+           <string>Tor (onion) address of your wallet</string>
           </property>
           <property name="maxLength">
            <number>1024</number>
@@ -670,6 +670,11 @@
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
@@ -678,11 +683,6 @@
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
    <header>control_desktop/MwcComboBox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources>

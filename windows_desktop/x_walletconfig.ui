@@ -778,7 +778,7 @@ your wallet activity never stored in the logs.</string>
             <item>
              <widget class="QCheckBox" name="start_tor">
               <property name="text">
-               <string>TOR</string>
+               <string>Tor</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1055,11 +1055,6 @@ your wallet activity never stored in the logs.</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
@@ -1071,6 +1066,11 @@ your wallet activity never stored in the logs.</string>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>

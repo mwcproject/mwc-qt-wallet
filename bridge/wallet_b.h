@@ -157,8 +157,8 @@ signals:
     // Get MWC MQ address with index
     void sgnMwcAddressWithIndex(QString mwcAddress, int idx);
 
-    // Get Tor address. Address will be assigned when tor listener is started.
-    // Empty address will be assigned when tor listener is stopped.
+    // Get Tor address. Address will be assigned when Tor listener is started.
+    // Empty address will be assigned when Tor listener is stopped.
     void sgnTorAddress(QString tor);
 
     // Outputs requested form the wallet.

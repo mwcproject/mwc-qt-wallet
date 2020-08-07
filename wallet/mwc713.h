@@ -284,7 +284,7 @@ public:
    // enum INIT_STATUS {NONE, NEED_PASSWORD, NEED_SEED, WRONG_PASSWORD, READY };
   //  void setInitStatus( INIT_STATUS  initStatus );
 
-    void setTorAddress( QString torAddress ); // Set active tor address.
+    void setTorAddress( QString torAddress ); // Set active Tor address.
     void setMwcAddress( QString mwcAddress ); // Set active MWC address. Listener might be offline
     void setMwcAddressWithIndex( QString mwcAddress, int idx );
 
@@ -427,7 +427,7 @@ private:
     //InitWalletStatus initStatus = InitWalletStatus::NONE;
 
     QString mwcAddress; // Address from mwc listener
-    QString torAddress; // Address from tor listener
+    QString torAddress; // Address from Tor listener
 
     // listening statuses
     bool mwcMqOnline = false;

@@ -484,37 +484,37 @@ bool WalletConfig::applyChanges() {
         if ( !config->hasForeignApi() ) {
             foreignIsOk = false;
             resetForeignForTor =
-                    core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(this, "TOR Configuration",
+                    core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(this, "Tor Configuration",
                                 "Tor requires Foreign API to be running. "
-                                "Do you want configure Foreign API to match TOR expectations?",
-                                "Disable TOR",
+                                "Do you want configure Foreign API to match Tor expectations?",
+                                "Disable Tor",
                                 "Configure API",
-                                "Don't change foreign API settings and disable the TOR",
-                                "Continue and change foreign API settings, I want TOR to run",
+                                "Don't change foreign API settings and disable the Tor",
+                                "Continue and change Foreign API settings, I want Tor to run",
                                 false, true);
         }
         else if ( config->hasTls() ) {
             foreignIsOk = false;
             resetForeignForTor =
-                    core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(this, "TOR Configuration",
+                    core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(this, "Tor Configuration",
                                 "Tor requires Foreign API to be running without TLS. "
-                                "Do you want configure Foreign API to match TOR expectations?",
-                                "Disable TOR",
+                                "Do you want configure Foreign API to match Tor expectations?",
+                                "Disable Tor",
                                 "Configure API",
-                                "Don't change foreign API settings and disable the TOR",
-                                "Continue and change foreign API settings, I want TOR to run",
+                                "Don't change Foreign API settings and disable Tor",
+                                "Continue and change Foreign API settings. I want Tor to run",
                                 false, true);
         }
         if (!resetForeignForTor && !config->getForeignApiSecret().isEmpty() ) {
             resetForeignForTor =
-                    core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionHTML(this, "TOR Configuration",
+                    core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionHTML(this, "Tor Configuration",
                                 "Tor requires Foreign API to be running. "
-                                "Please note that Foreign API secret is configured. Sender need to be aware about that. "
+                                "Please note that Foreign API secret is configured. Sender needs to be aware about that. "
                                 "Otherwise you will not be able to receive coins.",
                                 "Reset Secret",
                                 "Continue",
-                                "Don't use foreign API secret, so I could acccept payments form anybody",
-                                "Continue with foreign API secret, I am accepting coins only form people who knows the secret",
+                                "Don't use Foreign API secret, so I can acccept payments from anybody",
+                                "Continue with Foreign API secret. I am accepting coins only from people who know the secret",
                                 false, true);
         }
         if (resetForeignForTor) {

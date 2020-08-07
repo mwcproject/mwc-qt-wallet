@@ -521,7 +521,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>TOR listener status</string>
+         <string>Tor listener status</string>
         </property>
         <property name="text">
          <string/>
@@ -543,7 +543,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>TOR</string>
+         <string>Tor</string>
         </property>
        </widget>
        <widget class="control::MwcPushButtonNormal" name="torTriggerButton">
@@ -574,7 +574,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Start/Stop TOR listener</string>
+         <string>Start/Stop Tor listener</string>
         </property>
         <property name="text">
          <string>Start</string>

@@ -59,11 +59,11 @@ enum WALLET_EVENTS {
     S_LISTENER_KB_LOST_CONNECTION = 32, // WARNING: listener [keybase] lost connection. it will keep trying to restore connection in the background.
     S_LISTENER_KB_GET_CONNECTION = 33, // INFO: listener [keybase] reestablished connection.
 
-    S_LISTENER_HTTP_STARTING = 35, // starting listener for foreign api on [host:port]
+    S_LISTENER_HTTP_STARTING = 35, // Starting listener for Foreign API on [host:port]
     S_LISTENER_HTTP_FAILED   = 36, // thread 'foreign-api-gotham' panicked at XXXXXXXXX
 
-    S_LISTENER_TOR_LOST_CONNECTION = 37, // WARNING: tor is not responding, will try to reconnect
-    S_LISTENER_TOR_GET_CONNECTION = 38, // INFO: tor connection reestablished
+    S_LISTENER_TOR_LOST_CONNECTION = 37, // WARNING: Tor is not responding. Will try to reconnect
+    S_LISTENER_TOR_GET_CONNECTION = 38, // INFO: Tor connection reestablished
 
     // Recovery
     // from init wallet

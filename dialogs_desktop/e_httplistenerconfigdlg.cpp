@@ -312,16 +312,16 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
 
     if (walletConfig->getAutoStartTorEnabled()) {
         if (!foreignApi || (!tlsCertificateFile.isEmpty() && !tlsCertificateKey.isEmpty()) ) {
-            if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText( this, "TOR Listener",
-                                               "TOR require Foreign API to run (preferably on 127.0.0.1) and not use TSL. You configuration is different. "
-                                               "Do you want apply it and disable autostart TOR listener?",
-                                               "Cancel", "disable TOR",
-                                               "Drop my Foreign API changes in order to keep TOR",
-                                               "Disable autostart for TOR listener and continue",
+            if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText( this, "Tor Listener",
+                                               "Tor requires Foreign API to run (preferably on 127.0.0.1) and not use TLS. Your configuration is different. "
+                                               "Do you want to apply your configuration and disable autostart Tor listener?",
+                                               "Cancel", "Disable Tor)",
+                                               "Drop my Foreign API changes in order to keep Tor",
+                                               "Disable autostart for Tor listener and continue",
                                                false, true ) ) {
                 return;
             }
-            walletConfig->updateAutoStartTorEnabled(false); // disable tor tor starting
+            walletConfig->updateAutoStartTorEnabled(false); // disable Tor starting
         }
     }
 

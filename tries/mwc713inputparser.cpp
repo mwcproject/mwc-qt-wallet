@@ -191,11 +191,11 @@ void Mwc713InputParser::initListening() {
                                                             new TriePhraseSection("keybase]", 1) // keybase need go to accumulators, last symbol will be skipped
                                                     }));
 
-        // tor "(i.e. tor listener started for [http://qx4szwqcqtzo4e9krca357hskg53pjh2uxhsdo854updvmr3o4msc3qd.onion])"
-        parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_ON,
+    // Tor "(i.e. Tor listener started for [http://qx4szwqcqtzo4e9krca357hskg53pjh2uxhsdo854updvmr3o4msc3qd.onion])"
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_ON,
                                                     QVector<BaseTrieSection*>{
-                                                            new TriePhraseSection("tor listener started for ["),
-                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE, "./:", "", 1), // tor address
+                                                            new TriePhraseSection("Tor listener started for ["),
+                                                            new TrieAnySection(100, TrieAnySection::NUMBERS | TrieAnySection::LOW_CASE, "./:", "", 1), // Tor address
                                                             new TriePhraseSection("]")
                                                     }));
 
@@ -217,11 +217,11 @@ void Mwc713InputParser::initListening() {
                                                             new TriePhraseSection(" stopped")
                                                     }));
 
-    // Stopping TOR listener...
+    // Stopping Tor listener...
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_OFF,
-                                                QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("Stopping TOR listener")
-                                                }));
+                                                    QVector<BaseTrieSection*>{
+                                                            new TriePhraseSection("Stopping Tor listener")
+                                                    }));
 
     /////////////////  Listeners
     // WARNING: mwcmqs listener [xmjJGkX9U75Vo8Ro26gTm2i4k4CD39Q24qvQqAPeQVeWuo36YVFh] lost connection. Will try to restore in the background. tid=[ToMFBchztyUT0OgPTzeK6]
@@ -261,7 +261,7 @@ void Mwc713InputParser::initListening() {
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_TOR_GET_CONNECTION,
                                                 QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("tor connection reestablished")
+                                                        new TriePhraseSection("Tor connection reestablished")
                                                 }));
 
     // Need to detect a case when listening collision heppans. Then we will emit message about that
@@ -278,7 +278,7 @@ void Mwc713InputParser::initListening() {
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_HTTP_STARTING,
                                                 QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("starting listener for foreign api on ["),
+                                                        new TriePhraseSection("Starting listener for Foreign API on ["),
                                                         new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE,"","]", 1), // addrees that is listening on...
                                                 }));
 

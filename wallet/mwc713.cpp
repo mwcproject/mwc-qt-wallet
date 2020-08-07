@@ -973,7 +973,7 @@ void MWC713::setKeybaseListeningStatus(bool online) {
 
 void MWC713::setTorListeningStatus(bool online) {
     if (torOnline != online) {
-        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString(" tor listener"));
+        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString(" Tor listener"));
     }
     torOnline = online;
     logger::logEmit("MWC713", "onListenersStatus", QString(mwcMqOnline ? "true" : "false") + " " + QString(keybaseOnline ? "true" : "false") + " " + QString(torOnline ? "true" : "false") );
