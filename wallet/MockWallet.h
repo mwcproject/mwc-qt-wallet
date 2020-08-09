@@ -47,7 +47,8 @@ public:
 
 
     // Check if walled need to be initialized or not. Will run statndalone app, wait for exit and return the result
-    virtual bool checkWalletInitialized() override {
+    virtual bool checkWalletInitialized(bool hasSeed) override {
+        Q_UNUSED(hasSeed)
 #ifdef INITIALIZED_WALLET
         return true;
 #else
@@ -189,7 +190,7 @@ public:
     //          and caller suppose listen for them
     // If return true, expected that wallet will need to have password input.
     // Check signal: onConfigUpdate()
-    virtual bool setWalletConfig( const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode )  override;
+    virtual bool setWalletConfig( const WalletConfig & config, bool canStartNode )  override;
 
     // Status of the node
     // return true if task was scheduled

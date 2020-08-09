@@ -77,7 +77,7 @@ bool WalletConfig::canExitState(STATE nextWindowState) {
 }
 
 bool WalletConfig::setWalletConfig(const wallet::WalletConfig & config, bool guiWalletRestartExpected) {
-    if (context->wallet->setWalletConfig(config, context->appContext, context->mwcNode)) {
+    if (context->wallet->setWalletConfig(config, false)) {
         // update the window manager with the latest data path
 
         for (auto b : bridge::getBridgeManager()->getCoreWindow())

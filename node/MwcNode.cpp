@@ -48,6 +48,7 @@ MwcNode::MwcNode(const QString & _nodePath, core::AppContext * _appContext) :
 
     nwManager = new QNetworkAccessManager();
     connect( nwManager, &QNetworkAccessManager::finished, this, &MwcNode::replyFinished, Qt::QueuedConnection );
+    restartCounter = 0;
 }
 
 MwcNode::~MwcNode() {
@@ -152,7 +153,7 @@ void MwcNode::stop() {
         }
         qDebug() << "mwc-node is exited";
 
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node is stopped" + (restartCounter>0 ? ". Attempt " + QString::number(restartCounter+1) : "") );
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node is stopped." );
 
         nodeProcess->deleteLater();
         nodeProcess = nullptr;
@@ -324,35 +325,27 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
     stop();
 
-    if (restartCounter<3) {
+    if ( !isFinalRun() ) {
         // First try to stop another instamse if it is there
-        if (restartCounter<2) {
-            MwcNodeConfig mainnetConfig = getCurrentMwcNodeConfig(lastDataPath, "Mainnet");
-            MwcNodeConfig floonetConfig = getCurrentMwcNodeConfig(lastDataPath, "Floonet");
+        restartCounter++;
+        MwcNodeConfig mainnetConfig = getCurrentMwcNodeConfig(lastDataPath, "Mainnet");
+        MwcNodeConfig floonetConfig = getCurrentMwcNodeConfig(lastDataPath, "Floonet");
 
-            // Let's request other embedded local node to stop. There is a high chance that it is running and take the port.
-            if (!mainnetConfig.secret.isEmpty())
-                sendRequest("StopMainNet", mainnetConfig.secret, "/v1/status?action=stop_node", REQUEST_TYPE::POST);
+        // Let's request other embedded local node to stop. There is a high chance that it is running and take the port.
+        if (!mainnetConfig.secret.isEmpty())
+            sendRequest("StopMainNet", mainnetConfig.secret, "/v1/status?action=stop_node", REQUEST_TYPE::POST);
 
-            if (!floonetConfig.secret.isEmpty())
-                sendRequest("StopFlooNet", floonetConfig.secret, "/v1/status?action=stop_node", REQUEST_TYPE::POST);
+        if (!floonetConfig.secret.isEmpty())
+            sendRequest("StopFlooNet", floonetConfig.secret, "/v1/status?action=stop_node", REQUEST_TYPE::POST);
 
-            restartCounter++;
-
-            // restart the node in 4 seconds
-            QTimer::singleShot(1000 * 4, this, &MwcNode::onRestartNode);
-        }
-        else {
-            Q_ASSERT(restartCounter==2);
-            restartCounter++;
-
+        if ( isFinalRun() ) {
             // Last try. Let's clean the data
             QDir dir(nodeWorkDir);
             dir.removeRecursively();
             notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Embedded mwc-node data was cleaned, probably it was corrupted");
-            // restart the node in 1 second
-            QTimer::singleShot(1000 * 1, this, &MwcNode::onRestartNode);
         }
+        // restart the node in 20 seconds. Stopping takes time
+        QTimer::singleShot(1000 * 20, this, &MwcNode::onRestartNode);
     }
     else {
         reportNodeFatalError( "mwc-node process exited due some unexpected error. The exit code: " + QString::number(exitCode) + "\n\n"
@@ -365,7 +358,10 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
 // One short timer to restart the node. Usinng instead of sleep
 void MwcNode::onRestartNode() {
-    start( lastDataPath, lastUsedNetwork );
+    // Because starting process is long, user might go forward, so in the progress might be another instance.
+    // It is fine, this task is already executed
+    if (!isRunning())
+        start( lastDataPath, lastUsedNetwork );
 }
 
 
@@ -704,11 +700,13 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
 
             break;
         case tries::NODE_OUTPUT_EVENT::ADDRESS_ALREADY_IN_USE:
-            reportNodeFatalError("Unable to start local mwc-node because of error:\n"
+            if (isFinalRun()) {
+                reportNodeFatalError("Unable to start local mwc-node because of error:\n"
                                      "'Address already in use'\n"
                                      "It is likely that another mwc-node instance is still running, "
                                      "or there is another app active "
                                      "and using the same ports.");
+            }
             break;
         default:
             Q_ASSERT(false);
@@ -793,7 +791,13 @@ void MwcNode::sendRequest( const QString & tag, QString secret,
     request.setHeader(QNetworkRequest::ServerHeader, "application/json");
 
     // HTTP Basic authentication header value: base64(username:password)
-    QString concatenated = (lastUsedNetwork.toLower().contains("floo") ? QString("mwcfloo") : QString("mwcmain")) + ":" + secret;
+    QString user = lastUsedNetwork.toLower().contains("floo") ? QString("mwcfloo") : QString("mwcmain");
+    if (tag == "StopMainNet")
+        user = "mwcmain";
+    if (tag == "StopFlooNet")
+        user = "mwcfloo";
+
+    QString concatenated = user + ":" + secret;
     QByteArray data = concatenated.toLocal8Bit().toBase64();
     QString headerData = "Basic " + data;
     request.setRawHeader("Authorization", headerData.toLocal8Bit());

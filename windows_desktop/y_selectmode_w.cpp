@@ -46,6 +46,8 @@ SelectMode::SelectMode(QWidget *parent) :
             Q_ASSERT(false);
     }
 
+    ui->progress->initLoader(false);
+
     updateButtons();
 }
 
@@ -76,6 +78,7 @@ void SelectMode::on_applyButton_clicked() {
             "Drop my request and don't change running mode",
             "Continue, change the running mode and restart this app",
             false, true) ) {
+        ui->progress->show();
         selectMode->updateWalletRunMode(SelectMode::getRunMode());
     }
 }

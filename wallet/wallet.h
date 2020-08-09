@@ -143,10 +143,7 @@ public:
                        QString foreignApiAddress, QString foreignApiSecret,
                        QString tlsCertificateFile, QString tlsCertificateKey);
 
-    WalletConfig & setDataWalletCfg(QString network,
-                           QString dataPath,
-                           QString mwcmqsDomain,
-                           QString keyBasePath);
+    WalletConfig & setDataWalletCfg(QString mwcmqsDomain, QString keyBasePath);
 
     void updateDataPath(const QString & path) {dataPath=path;}
     void updateNetwork(const QString & mw) { Q_ASSERT(!mw.isEmpty()); network=mw; }
@@ -165,12 +162,9 @@ public:
     // Get MQ/MQS host full name. Depend on current config
     QString getMwcMqHostFull() const;
 
-    // caller is responsible to call saveNetwork2DataPath if needed
-    void setDataPathWithNetwork( QString _dataPath, QString _network ) { dataPath=_dataPath; network = _network;  }
-
-    // First Nerwork, Second is Arch
-    static QPair<QString,QString> readNetworkArchFromDataPath(QString configPath); // local path as writen in config
-    static void    saveNetwork2DataPath(QString configPath, QString network, QString arch); // Save the network into the data path
+    // First [Network, Arch, InstanceName]
+    static QVector<QString> readNetworkArchInstanceFromDataPath(QString configPath); // local path as writen in config
+    static void saveNetwork2DataPath(QString configPath, QString network, QString arch, QString instanceName); // Save the network into the data path
 
     static bool    doesSeedExist(QString configPath);
 
@@ -368,7 +362,7 @@ public:
 
     // Check if wallet need to be initialized or not. Will run standalone app, wait for exit and return the result
     // Call might take few seconds
-    virtual bool checkWalletInitialized() = 0;
+    virtual bool checkWalletInitialized(bool hasSeed) = 0;
 
     enum STARTED_MODE { OFFLINE, NORMAL, INIT, RECOVER, GET_NEXTKEY, RECEIVE_SLATE };
     virtual STARTED_MODE getStartedMode() = 0;
@@ -502,7 +496,7 @@ public:
     //          and caller suppose listen for them
     // If returns true, expected that wallet will need to have password input.
     // Check signal: onConfigUpdate()
-    virtual bool setWalletConfig(const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode  )  = 0;
+    virtual bool setWalletConfig(const WalletConfig & config, bool canStartNode )  = 0;
 
     // Status of the node
     // return true if task was scheduled

@@ -160,8 +160,9 @@ WalletConfig & WalletConfig::setData(QString _network,
                             QString _foreignApiSecret,
                             QString _tlsCertificateFile,
                             QString _tlsCertificateKey) {
-
-    setDataWalletCfg(_network,_dataPath,_mwcmqsDomain,_keyBasePath);
+    updateNetwork(_network);
+    updateDataPath(_dataPath);
+    setDataWalletCfg(_mwcmqsDomain,_keyBasePath);
 
     return setForeignApi(_foreignApi, _foreignApiAddress, _foreignApiSecret, _tlsCertificateFile, _tlsCertificateKey);
 }
@@ -180,19 +181,11 @@ WalletConfig & WalletConfig::setForeignApi(bool _foreignApi,
 
 
 
-WalletConfig & WalletConfig::setDataWalletCfg(QString _network,
-                                QString _dataPath,
-                                QString _mwcmqsDomain,
-                                QString _keyBasePath)
-{
-    network  = _network;
-    dataPath = _dataPath;
+WalletConfig & WalletConfig::setDataWalletCfg( QString _mwcmqsDomain, QString _keyBasePath) {
     mwcmqsDomainEx = _mwcmqsDomain;
     keyBasePath = _keyBasePath;
-
     return *this;
 }
-
 
 QString WalletConfig::toString() const {
     return "network=" + network + "\n" +
@@ -200,7 +193,6 @@ QString WalletConfig::toString() const {
             "mwcmqsDomainEx=" + mwcmqsDomainEx + "\n" +
             "keyBasePath=" + keyBasePath;
 }
-
 
 // Get MQ/MQS host name. Depend on current config
 QString WalletConfig::getMwcMqHostNorm() const {
@@ -216,12 +208,11 @@ QString WalletConfig::getMwcMqHostFull() const {
     return mwc::DEFAULT_HOST_MWC_MQS;
 }
 
-
 // Return empty if not found
 //static
-QPair<QString,QString> WalletConfig::readNetworkArchFromDataPath(QString configPath) // local path as writen in config
+QVector<QString>  WalletConfig::readNetworkArchInstanceFromDataPath(QString configPath) // local path as writen in config
 {
-    QPair<QString,QString> res("", util::getBuildArch() );
+    QVector<QString> res{"Mainnet", util::getBuildArch(), configPath};
 
     QPair<bool,QString> path = ioutils::getAppDataPath( configPath );
     if (!path.first) {
@@ -229,7 +220,7 @@ QPair<QString,QString> WalletConfig::readNetworkArchFromDataPath(QString configP
         return res;
     }
 
-    QStringList lns = util::readTextFile(path.second + "/net.txt" );
+    QStringList lns = util::readTextFile(path.second + QDir::separator() + "net.txt" );
     if (lns.isEmpty())
         return res;
 
@@ -238,33 +229,38 @@ QPair<QString,QString> WalletConfig::readNetworkArchFromDataPath(QString configP
     if (!nw.contains("net"))
         return res;
 
-    res.first = nw;
+    res[0] = nw;
 
+    // Architecture
     if (lns.size()>1)
-        res.second = lns[1];
+        res[1] = lns[1];
+
+    // Instance name
+    if (lns.size()>2)
+        res[2] = lns[2];
 
     return res;
 }
 
 //static
 bool  WalletConfig::doesSeedExist(QString configPath) {
-    QPair<bool,QString> path = ioutils::getAppDataPath( configPath );
+    QPair<bool,QString> path = ioutils::getAppDataPath( configPath, false );
     if (!path.first) {
         core::getWndManager()->messageTextDlg("Error", path.second);
         return false;
     }
-    return QFile::exists( path.second + "/" + "wallet.seed" );
+    return QFile::exists( path.second + QDir::separator() + "wallet.seed" );
 }
 
 //static
-void  WalletConfig::saveNetwork2DataPath(QString configPath, QString network, QString arch) // Save the network into the data path
+void  WalletConfig::saveNetwork2DataPath(QString configPath, QString network, QString arch, QString instanceName) // Save the network into the data path
 {
     QPair<bool,QString> path = ioutils::getAppDataPath( configPath );
     if (!path.first) {
         core::getWndManager()->messageTextDlg("Error", path.second);
         return;
     }
-    util::writeTextFile(path.second + "/net.txt", {network, arch} );
+    util::writeTextFile(path.second + "/net.txt", {network, arch, instanceName} );
 }
 
 // initialize static csvHeaders

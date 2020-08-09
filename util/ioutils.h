@@ -21,8 +21,9 @@
 namespace ioutils {
 
 // init the directory to store app data
+// prepareDir - will create if doesn't exist
 // return: <success, data/error>
-QPair<bool,QString> getAppDataPath(QString localPath = "");
+QPair<bool,QString> getAppDataPath(QString localPath = "", bool prepareDir = true);
 
 QByteArray FilterEscSymbols( const QByteArray & data );
 

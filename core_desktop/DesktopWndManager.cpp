@@ -17,9 +17,9 @@
 #include "windowmanager.h"
 #include "mainwindow.h"
 #include "../core/global.h"
+#include "../windows_desktop/a_initfirsttime_w.h"
 #include "../windows_desktop/a_initaccount_w.h"
 #include "../windows_desktop/a_inputpassword_w.h"
-#include "../windows_desktop/c_newwallet_w.h"
 #include "../windows_desktop/c_newseed_w.h"
 #include "../windows_desktop/c_newseedtest_w.h"
 #include "../windows_desktop/c_enterseed.h"
@@ -53,6 +53,8 @@
 #include <QFileDialog>
 #include "../core/WalletApp.h"
 #include <QMessageBox>
+#include "../util_desktop/timeoutlock.h"
+#include "../util/Process.h"
 
 namespace core {
 
@@ -126,10 +128,9 @@ bool DesktopWndManager::sendConfirmationDlg( QString title, QString message, dou
     return confirmDlg.exec() == QDialog::Accepted;
 }
 
-
-void DesktopWndManager::pageNewWallet() {
-    windowManager->switchToWindowEx( mwc::PAGE_A_NEW_WALLET,
-                new wnd::NewWallet( windowManager->getInWndParent() ) );
+void DesktopWndManager::pageInitFirstTime() {
+    windowManager->switchToWindowEx( mwc::PAGE_A_FIRST_TIME,
+                                     new wnd::InitFirstTime( windowManager->getInWndParent() ) );
 }
 
 void DesktopWndManager::pageInputPassword(QString pageTitle, bool lockMode) {
@@ -303,5 +304,48 @@ void DesktopWndManager::pageWalletSettings() {
 void DesktopWndManager::pageAccountOptions() {
     Q_ASSERT(false);
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Select a directory that has a wallet data
+QString selectWalletDirectory() {
+    util::TimeoutLockObject to( "WalletConfig" );
+
+    QPair<bool,QString> basePath = ioutils::getAppDataPath();
+    if (!basePath.first) {
+        control::MessageBox::messageText(nullptr, "Error", basePath.second);
+        return "";
+    }
+
+    QString dir = QFileDialog::getExistingDirectory(
+            nullptr,
+            "Select your wallet folder name",
+            basePath.second);
+    if (dir.isEmpty())
+        return "";
+    auto dirOk = util::validateMwc713Str(dir);
+    if (!dirOk.first) {
+        core::getWndManager()->messageTextDlg("Directory Name",
+                                              "This directory name is not acceptable.\n" + dirOk.second);
+        return "";
+    }
+
+    QDir baseDir(basePath.second);
+    QString walletDir = baseDir.relativeFilePath(dir);
+
+    QVector<QString>  networkArch = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletDir); // local path as writen in config
+    QString runningArc = util::getBuildArch();
+
+    // Just in case. Normally will never be called
+    if ( runningArc != networkArch[1] ) {
+        control::MessageBox::messageText(nullptr, "Wallet data architecture mismatch",
+                                         "Your mwc713 seed at '"+ walletDir +"' was created with "+ networkArch[1] +" bits version of the wallet. You are using " + runningArc + " bit version.");
+        return "";
+    }
+
+    return walletDir;
+}
+
+
 
 }

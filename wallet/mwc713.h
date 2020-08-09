@@ -42,10 +42,10 @@ public:
     static WalletConfig readWalletConfig(QString source = "");
     // Save config into config::getMwc713conf()
     // !!! Note !!!! Also it start/stop local mwcNode if it is needed by setting. Stop can take for a while
-    static bool saveWalletConfig(const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode);
+    static bool saveWalletConfig(const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode, bool canStartNode);
 
 public:
-    MWC713(QString mwc713path, QString mwc713configPath, core::AppContext * appContext);
+    MWC713(QString mwc713path, QString mwc713configPath, core::AppContext * appContext, node::MwcNode * mwcNode);
     virtual ~MWC713() override;
 
     void setHodlStatus(core::HodlStatus * _hodlStatus) {hodlStatus = _hodlStatus; Q_ASSERT(hodlStatus);}
@@ -57,7 +57,7 @@ public:
 
     // Check if walled need to be initialized or not. Will run statndalone app, wait for exit and return the result
     // Call might take few seconds
-    virtual bool checkWalletInitialized() override;
+    virtual bool checkWalletInitialized(bool hasSeed) override;
 
     virtual STARTED_MODE getStartedMode() override { if (mwc713process==nullptr) {return STARTED_MODE::OFFLINE;} return startedMode;}
 
@@ -186,7 +186,7 @@ public:
     //          and caller suppose listen for them
     // If return true, expected that wallet will need to have password input.
     // Check signal: onConfigUpdate()
-    virtual bool setWalletConfig( const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode )  override;
+    virtual bool setWalletConfig( const WalletConfig & config, bool canStartNode )  override;
 
     // Status of the node
     // return true if task was scheduled
@@ -386,6 +386,9 @@ private:
     // Reset data as wallet not started yet
     void resetData(STARTED_MODE startedMode);
 
+    // Updating config according to what is stored at the path
+    bool updateWalletConfig(const QString & path, bool canStartNode);
+
 private slots:
     // mwc713 Process IOs
     void	mwc713errorOccurred(QProcess::ProcessError error);
@@ -402,7 +405,8 @@ private:
     QVector<AccountInfo> applyOutputLocksToBalance() const;
 
 private:
-    core::AppContext * appContext; // app context to store current account name
+    core::AppContext * appContext = nullptr; // app context to store current account name
+    node::MwcNode * mwcNode = nullptr;
     core::HodlStatus * hodlStatus = nullptr;
 
     #ifdef Q_OS_WIN

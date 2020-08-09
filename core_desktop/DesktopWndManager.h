@@ -54,7 +54,7 @@ public:
     virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) override;
 
     //---------------- Pages ------------------------
-    virtual void pageNewWallet() override;
+    virtual void pageInitFirstTime() override;
     virtual void pageInputPassword(QString pageTitle, bool lockMode) override;
     virtual void pageInitAccount() override;
     virtual void pageEnterSeed() override;
@@ -100,6 +100,9 @@ private:
     WindowManager * windowManager = nullptr;
     MainWindow    * mainWindow = nullptr;
 };
+
+// Select a directory that has a wallet data. Returns a 'wallet dir' as Intance manager expect it
+QString selectWalletDirectory();
 
 }
 

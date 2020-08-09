@@ -82,5 +82,8 @@
         <file>img/purpleCheckOn@2x.svg</file>
         <file>img/disabledCheckOff@2x.svg</file>
         <file>img/disabledCheckOn@2x.svg</file>
+        <file>img/AddLarge@2x.svg</file>
+        <file>img/RestoreBtn_big@2x.svg</file>
+        <file>img/RestoreBtn@2x.svg</file>
     </qresource>
 </RCC>

@@ -6,17 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>517</width>
-    <height>427</height>
+    <width>660</width>
+    <height>584</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="4,0,2,0,5,0,1,0,0,0,0">
-   <property name="spacing">
-    <number>0</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,2,0,0,0,3">
    <item>
     <spacer name="verticalSpacer_3">
      <property name="orientation">
@@ -127,13 +124,13 @@
        <property name="minimumSize">
         <size>
          <width>400</width>
-         <height>107</height>
+         <height>240</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>400</width>
-         <height>107</height>
+         <height>240</height>
         </size>
        </property>
        <property name="frameShape">
@@ -146,7 +143,7 @@
         <property name="geometry">
          <rect>
           <x>48</x>
-          <y>3</y>
+          <y>81</y>
           <width>300</width>
           <height>40</height>
          </rect>
@@ -201,7 +198,7 @@
         <property name="geometry">
          <rect>
           <x>48</x>
-          <y>63</y>
+          <y>139</y>
           <width>300</width>
           <height>40</height>
          </rect>
@@ -232,7 +229,7 @@
         <property name="geometry">
          <rect>
           <x>363</x>
-          <y>69</y>
+          <y>145</y>
           <width>30</width>
           <height>30</height>
          </rect>
@@ -245,6 +242,102 @@
         </property>
         <property name="scaledContents">
          <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="control::MwcLineEditNormal" name="instanceNameEdit">
+        <property name="geometry">
+         <rect>
+          <x>48</x>
+          <y>0</y>
+          <width>300</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>30000</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="mouseTracking">
+         <bool>true</bool>
+        </property>
+        <property name="tabletTracking">
+         <bool>false</bool>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Name of your new wallet instance</string>
+        </property>
+        <property name="inputMask">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string notr="true"/>
+        </property>
+        <property name="maxLength">
+         <number>64</number>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Normal</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Name your instance</string>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radioMainNet">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>215</y>
+          <width>96</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="text">
+         <string>MainNet </string>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="radioFloonet">
+        <property name="geometry">
+         <rect>
+          <x>225</x>
+          <y>215</y>
+          <width>101</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="text">
+         <string>TestNet</string>
         </property>
        </widget>
       </widget>
@@ -334,7 +427,7 @@
         <string>Continue with creation of a new wallet</string>
        </property>
        <property name="text">
-        <string>Create</string>
+        <string>Next</string>
        </property>
        <property name="autoDefault">
         <bool>true</bool>
@@ -353,161 +446,6 @@
         <size>
          <width>40</width>
          <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <spacer name="verticalSpacer_4">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <spacer name="horizontalSpacer_7">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="control::MwcPushButtonTinyUnderline" name="instancesButton">
-       <property name="minimumSize">
-        <size>
-         <width>140</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>140</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <underline>false</underline>
-        </font>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
-       </property>
-       <property name="toolTip">
-        <string>Change wallet instance</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string>Wallet instances</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_31">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Expanding</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <spacer name="verticalSpacer_41">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>82</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_21">
-     <item>
-      <spacer name="horizontalSpacer1">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>4</width>
-         <height>4</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="control::MwcPushButtonTinyUnderline" name="runOnlineNodeButton">
-       <property name="minimumSize">
-        <size>
-         <width>180</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>180</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <underline>false</underline>
-        </font>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
-       </property>
-       <property name="toolTip">
-        <string>Run as online MWC Node</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string>Run as MWC Node</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_21">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>4</width>
-         <height>4</height>
         </size>
        </property>
       </spacer>
@@ -545,12 +483,15 @@
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcPushButtonTinyUnderline</class>
-   <extends>QPushButton</extends>
-   <header>control_desktop/MwcPushButton.h</header>
-  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>instanceNameEdit</tabstop>
+  <tabstop>password1Edit</tabstop>
+  <tabstop>password2Edit</tabstop>
+  <tabstop>radioMainNet</tabstop>
+  <tabstop>radioFloonet</tabstop>
+  <tabstop>submitButton</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources_desktop.qrc"/>
  </resources>

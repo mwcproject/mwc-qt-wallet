@@ -57,7 +57,6 @@ NextStateRespond InitAccount::execute() {
     if ( !running && context->appContext->pullCookie<QString>("checkWalletInitialized")=="FAILED" ) {
         if (config::isOnlineNode()) {
             // Very first run. Need to create the wallet without any passwords
-            // Let's not wait for anyhting
             context->wallet->start2init("");
             context->wallet->confirmNewSeed();
             return NextStateRespond( NextStateRespond::RESULT::DONE );
@@ -82,35 +81,33 @@ void InitAccount::exitingState() {
 }
 
 // Get Password, Choose what to do
-void InitAccount::setPassword(const QString & password) {
+void InitAccount::setPassword(const QString & password ) {
     pass = password;
-    core::getWndManager()->pageNewWallet();
 }
 
 // How to provision the wallet
-void InitAccount::submitWalletCreateChoices(NEW_WALLET_CHOICE newWalletChoice, MWC_NETWORK network) {
+void InitAccount::submitWalletCreateChoices( MWC_NETWORK network, QString instanceName) {
     // Apply network first
     Q_ASSERT( !context->wallet->isRunning() );
+    QString path = context->appContext->getCurrentWalletInstance(false);
+
     wallet::WalletConfig walletCfg = context->wallet->getWalletConfig();
     QString nwName = network == MWC_NETWORK::MWC_MAIN_NET ? "Mainnet" : "Floonet";
-    walletCfg.setDataPathWithNetwork( walletCfg.getDataPath(), nwName );
+    walletCfg.updateNetwork(nwName);
+    walletCfg.updateDataPath(path);
 
     // Store the nw name with architecture at the data folder.
-    walletCfg.saveNetwork2DataPath(walletCfg.getDataPath(), nwName, util::getBuildArch() );
+    walletCfg.saveNetwork2DataPath(walletCfg.getDataPath(), nwName, util::getBuildArch(), instanceName );
 
-    context->wallet->setWalletConfig( walletCfg, context->appContext, context->mwcNode );
+    context->wallet->setWalletConfig(walletCfg, false );
 
-    switch (newWalletChoice) {
-        case CREATE_NEW:
-            // generate a new seed for a new wallet
-            context->wallet->start2init(pass);
-            break;
-        case CREATE_WITH_SEED:
-            core::getWndManager()->pageEnterSeed();
-            break;
-        default:
-            Q_ASSERT(false);
-            break;
+    if (context->appContext->getCookie<bool>("restoreWalletFromSeed")) {
+        // Enter seed to restore
+        core::getWndManager()->pageEnterSeed();
+    }
+    else {
+        // generate a new seed for a new wallet
+        context->wallet->start2init(pass);
     }
 }
 
@@ -153,11 +150,12 @@ void InitAccount::submitSeedWord(QString word) {
         return;
     }
 
-/*#ifdef QT_DEBUG
-    // Allways treat as correct answer...
+#ifdef QT_DEBUG
+    // Allways treat as correct answer and don't ask more...
     Q_UNUSED(word);
-    tasks.remove(0);
-#else*/
+//    tasks.remove(0);
+    tasks.clear();
+#else
     // Release, the normal way
     if (tasks[0].applyInputResults(word)) {
         // ok case
@@ -193,7 +191,7 @@ void InitAccount::submitSeedWord(QString word) {
         core::getWndManager()->pageNewSeed(mwc::PAGE_A_NEW_WALLET_PASSPHRASE, seed);
         return;
     }
-    //#endif
+#endif
     doneWithNewSeed();
 }
 
@@ -266,7 +264,7 @@ void InitAccount::createWalletWithSeed( QVector<QString> sd ) {
 
             nodeConnection.setAsCloud();
             context->appContext->updateMwcNodeConnection( config.getNetwork(), nodeConnection );
-            context->wallet->setWalletConfig( config, context->appContext, context->mwcNode );
+            context->wallet->setWalletConfig( config, false );
         }
     }
 
@@ -336,10 +334,6 @@ void InitAccount::onRecoverResult(bool started, bool finishedWithSuccess, QStrin
         core::getWndManager()->pageEnterSeed();
         return;
     }
-}
-
-void InitAccount::cancel() {
-    core::getWndManager()->pageNewWallet();
 }
 
 

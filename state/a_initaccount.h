@@ -41,11 +41,9 @@ public:
 
     // Step 1
     void setPassword(const QString & password);
-
     // Step 2
-    enum NEW_WALLET_CHOICE { CREATE_NEW = 1, CREATE_WITH_SEED = 2 };
     enum MWC_NETWORK { MWC_MAIN_NET = 1, MWC_FLOO_NET=2 };
-    void submitWalletCreateChoices(NEW_WALLET_CHOICE newWalletChoice, MWC_NETWORK network);
+    void submitWalletCreateChoices(MWC_NETWORK network, QString instanceName);
 
     // Step 3  New seed
     void doneWithNewSeed();
@@ -58,12 +56,6 @@ public:
 
     // create form seed
     void createWalletWithSeed( QVector<QString> sd );
-
-    void cancel();
-
-    void deleteEnterSeed(wnd::EnterSeed *) {}
-    void deleteNewSeedTestWnd(wnd::NewSeedTest *) {}
-
 private slots:
     void onNewSeed(QVector<QString> seed);
 

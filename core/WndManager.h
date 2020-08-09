@@ -59,7 +59,7 @@ public:
     virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) = 0;
 
     //---------------- Pages ------------------------
-    virtual void pageNewWallet() = 0;
+    virtual void pageInitFirstTime() = 0;
     virtual void pageInputPassword(QString pageTitle, bool lockMode) = 0;
     virtual void pageInitAccount() = 0;
     virtual void pageEnterSeed() = 0;

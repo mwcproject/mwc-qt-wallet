@@ -323,7 +323,7 @@ Item {
 
             currentInstanceName = textfield_instancename.text
             initAccount.setPassword(textfield_password.text)
-            initAccount.submitWalletCreateChoices(1, isMainNet ? 1 : 2) // first param: NEW_WALLET_CHOICE, second param: MWC_NETWORK
+            initAccount.submitWalletCreateChoices(isMainNet ? 1 : 2, textfield_instancename.text) // first param: MWC_NETWORK, second param: New Instance Name
         }
     }
 

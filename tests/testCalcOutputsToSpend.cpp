@@ -179,7 +179,7 @@ static void dotest_getOutputsToSend() {
     logger::initLogger(false);
 
     AppContext appContext;
-    wallet::MWC713 mwc713( "", "", &appContext);
+    wallet::MWC713 mwc713( "", "", &appContext, nullptr);
     core::HodlStatus hodl(nullptr);
 
     const int64_t nano = 1000000000L;

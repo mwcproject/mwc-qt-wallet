@@ -96,6 +96,8 @@ private:
     void reportNodeFatalError( QString message );
 
     void updateRunningStatus();
+
+    bool isFinalRun() {return restartCounter>2;}
 private:
     virtual void timerEvent(QTimerEvent *event) override;
 

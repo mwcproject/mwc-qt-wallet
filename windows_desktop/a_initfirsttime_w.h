@@ -1,4 +1,4 @@
-// Copyright 2019 The MWC Developers
+// Copyright 2020 The MWC Developers
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,43 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NEWWALLETW_H
-#define NEWWALLETW_H
+
+#ifndef A_INITFIRSTTIME_W_H
+#define A_INITFIRSTTIME_W_H
 
 #include "../core_desktop/PanelBaseWnd.h"
 
 namespace Ui {
-class NewWallet;
+class InitFirstTime;
 }
 
 namespace bridge {
-class InitAccount;
+class StartWallet;
 }
 
 namespace wnd {
 
-class NewWallet : public core::PanelBaseWnd
+class InitFirstTime : public core::PanelBaseWnd
 {
     Q_OBJECT
+
 public:
-    explicit NewWallet(QWidget *parent);
-    virtual ~NewWallet() override;
+    explicit InitFirstTime(QWidget *parent = nullptr);
+    ~InitFirstTime();
 
 private slots:
-    void on_submitButton_clicked();
+    void on_newInstanceButton_clicked();
 
-    void on_radioHaveSeed_clicked();
-    void on_radioCreateNew_clicked();
+    void on_restoreInstanceButton_clicked();
+
+    void on_runOnlineNodeButton_clicked();
 
 private:
-    void updateControls();
-
-    virtual void panelWndStarted() override;
-private:
-    Ui::NewWallet *ui;
-    bridge::InitAccount * initAccount = nullptr;
+    Ui::InitFirstTime *ui;
+    bridge::StartWallet * startWallet = nullptr;
 };
 
 }
 
-#endif // NEWWALLET_H
+#endif // A_INITFIRSTTIME_W_H

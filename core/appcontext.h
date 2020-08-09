@@ -21,6 +21,7 @@
 #include "../wallet/wallet.h"
 #include "../core/HodlStatus.h"
 #include "../core/walletnotes.h"
+#include "../core/Config.h"
 #include <QDebug>
 
 class QAction;
@@ -97,7 +98,6 @@ public:
     double getGuiScale() const;
     void setGuiScale(double scale) { guiScale = scale; }
 
-
     state::STATE getActiveWndState() const {return activeWndState;}
     void setActiveWndState(state::STATE  state) {activeWndState=state;}
 
@@ -154,12 +154,8 @@ public:
     bool isShowOutputAll() const {return showOutputAll;}
     void setShowOutputAll(bool all);
 
-    wallet::MwcNodeConnection getNodeConnection(const QString network) const;
-    void updateMwcNodeConnection(const QString network, const wallet::MwcNodeConnection & connection );
-
-    // return false if value not set
-    bool getWallet713DataPathWithNetwork( QString & wallet713DataPath, QString & network);
-    void setWallet713DataPathWithNetwork( const QString & wallet713DataPath, const QString & network );
+    wallet::MwcNodeConnection getNodeConnection( const QString & network );
+    void updateMwcNodeConnection( const QString & network, const wallet::MwcNodeConnection & connection );
 
     // HODL registration time.
     int64_t getHodlRegistrationTime(const QString & hash) const;
@@ -188,6 +184,17 @@ public:
     QStringList getTxnNotesToMigrate(QString walletId, QString accountId);
     void migrateTxnNote(QString walletId, QString accountId, QString txIdx, QString txUuid);
 
+    // Wallet instances. Return instances paths that are valid and current selected index
+    QPair<QVector<QString>, int> getWalletInstances(bool hasSeed) const;
+    // Return path to current wallet instance. Expected that at least 1 instance does exist
+    QString getCurrentWalletInstance(bool hasSeed) const;
+    void setCurrentWalletInstance(const QString & path);
+    // Add new instance and make it active
+    void addNewInstance(const QString & instance);
+
+    // Check if inline node running the main network
+    bool isOnlineNodeRunsMainNetwork() const;
+    void setOnlineNodeRunsMainNetwork(bool isMainNet);
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -227,16 +234,16 @@ private:
     bool autoStartKeybaseEnabled = true;
     bool autoStartTorEnabled = true;
 
-    // Because of Cursom node logic, we have to track config changes
-    wallet::MwcNodeConnection  nodeConnectionMainNet;
-    wallet::MwcNodeConnection  nodeConnectionFlooNet;
+    // Because of Custom node logic, we have to track config changes
+    QMap<QString, wallet::MwcNodeConnection> nodeConnection;
 
     // Contact list
     QVector<ContactRecord> contactList;
 
-    // wallet 713 path need to be duplicated because of the running mode.
-    QString wallet713DataPath;
-    QString network;
+    QVector<QString> walletInstancePaths; // We never remove from this list. We want to support mount/unmount paths
+    int currentWalletInstanceIdx = -1;
+
+    bool isOnlineNodeMainNetwork = true;
 
     bool showOutputAll = false; // Show all or Unspent outputs
 

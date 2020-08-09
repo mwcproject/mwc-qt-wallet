@@ -249,10 +249,9 @@ const WalletConfig & MockWallet::getDefaultConfig() {
 //          and caller suppose listen for them
 // If return true, expected that wallet will need to have password input.
 // Check signal: onConfigUpdate()
-bool MockWallet::setWalletConfig(const WalletConfig &config, core::AppContext *appContext, node::MwcNode *mwcNode) {
+bool MockWallet::setWalletConfig(const WalletConfig &config, bool canStartNode) {
     Q_UNUSED(config)
-    Q_UNUSED(appContext)
-    Q_UNUSED(mwcNode)
+    Q_UNUSED(canStartNode)
 
     emit onConfigUpdate();
     return false;

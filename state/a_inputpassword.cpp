@@ -23,6 +23,7 @@
 #include <QCoreApplication>
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/a_inputpassword_b.h"
+#include <QDir>
 
 namespace state {
 
@@ -49,12 +50,10 @@ NextStateRespond InputPassword::execute() {
         // Processing all pending to clean up the processes
         QCoreApplication::processEvents();
 
-        // Starting the wallet normally. The password is needed and it will be provided.
-        // It is a first run, just need to login
-        context->wallet->start();
-
         // As a node we can exit becuase no password is expected
         if (config::isOnlineNode()) {
+            // Starting the wallet normally for the node
+            context->wallet->start();
             return NextStateRespond( NextStateRespond::RESULT::DONE );
         }
 
@@ -77,13 +76,15 @@ NextStateRespond InputPassword::execute() {
 
 void InputPassword::submitPassword(const QString & password) {
     // Check if we need to logout first. It is very valid case if we in lock mode
-    if ( inLockMode ) {
+    if ( context->wallet->isRunning() )
         context->wallet->logout(true);
-        context->wallet->start();
+
+    if (inLockMode) {
         inLockMode = false;
         mwc::setWalletLocked(inLockMode);
     }
 
+    context->wallet->start();
     context->wallet->loginWithPassword( password );
 
     if ( context->appContext->getActiveWndState() == STATE::SHOW_SEED ) {

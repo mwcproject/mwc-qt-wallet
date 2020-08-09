@@ -38,9 +38,6 @@ public:
     ~WalletConfig();
 
 private slots:
-    void on_mwc713directorySelect_clicked();
-    void on_mwc713directoryEdit_textEdited(const QString &arg1);
-
     void on_keybasePathEdit_textChanged(const QString &arg1);
     void on_keybasePathSelect_clicked();
 
@@ -65,12 +62,11 @@ private slots:
     void on_start_mqs_clicked();
     void on_start_keybase_clicked();
     void on_outputLockingCheck_stateChanged(int arg1);
-
     void on_start_tor_clicked();
+    void on_walletInstanceNameEdit_textChanged(const QString &arg1);
 
 private:
-    void setValues(const QString & mwc713directory,
-                   const QString & keyBasePath,
+    void setValues(const QString & keyBasePath,
                    const QString & mwcmqHost,
                    int inputConfirmationNumber,
                    int changeOutputs);
@@ -116,11 +112,11 @@ private:
     int64_t logoutTimeout = 20 * 60;
     int64_t currentLogoutTimeout = 20 * 60;
 
-    QString dataPath;
     QString keybasePath;
     QString mqsHost;
     int inputConfirmationsNumber = 1;
     int changeOutputs = 1;
+    QString walletInstanceName;
 };
 
 }

@@ -149,7 +149,7 @@ wallet::MwcNodeConnection NodeInfo::getNodeConnection() const {
 void NodeInfo::updateNodeConnection( const wallet::MwcNodeConnection & nodeConnect) {
     auto walletConfig = context->wallet->getWalletConfig();
     context->appContext->updateMwcNodeConnection( walletConfig.getNetwork(), nodeConnect );
-    context->wallet->setWalletConfig( walletConfig, context->appContext, context->mwcNode );
+    context->wallet->setWalletConfig( walletConfig, false );
     // config require to restart
     currentNodeConnection = nodeConnect;
     context->stateMachine->executeFrom( STATE::NONE );

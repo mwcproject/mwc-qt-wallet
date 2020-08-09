@@ -90,7 +90,7 @@ void NodeConfig::on_applyButton_clicked()
 
 bool NodeConfig::applyChanges() {
     // data path is expected to be updated on the start.
-    walletConfig->setDataPathWithNetwork("Fixme", getSelectedNetwork(), true);
+    walletConfig->setOnlineNodeRunsMainNetwork( getSelectedNetwork() == "Mainnet" );
     walletConfig->restartQtWallet();
 
     // here we are in restarting mode.

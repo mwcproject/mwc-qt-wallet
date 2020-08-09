@@ -18,6 +18,7 @@
 #include "../core_desktop/statuswndmgr.h"
 #include <QWidget>
 #include <QDebug>
+#include <QEvent>
 
 namespace core {
 
