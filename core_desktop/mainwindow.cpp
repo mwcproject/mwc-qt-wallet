@@ -372,18 +372,26 @@ void MainWindow::setStatusButtonState(  QPushButton * btn, STATUS status, QStrin
 }
 
 void MainWindow::moveEvent(QMoveEvent* event) {
-    statusMgr->moveEvent(event);
+    // yes, it can be possible
+    if (statusMgr!=nullptr)
+        statusMgr->moveEvent(event);
     QMainWindow::moveEvent(event);
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event) {
-    statusMgr->resizeEvent(event);
+    // yes, it can be possible
+    if (statusMgr!=nullptr)
+        statusMgr->resizeEvent(event);
+
     QMainWindow::resizeEvent(event);
 }
 
 bool MainWindow::event(QEvent* event) {
-    if (statusMgr->event(event)) {
-        return true;
+    // yes, it can be possible
+    if (statusMgr!=nullptr) {
+        if (statusMgr->event(event)) {
+            return true;
+        }
     }
     return QMainWindow::event(event);
 }
