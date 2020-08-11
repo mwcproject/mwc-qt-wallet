@@ -29,7 +29,7 @@ core--StatusWnd {
     font-family: Open Sans;
     font-style: normal;
     font-weight: normal;
-    font-size: 15px;
+    font-size: 13px;
 }
 
 /* Needed for Windows */
@@ -350,6 +350,10 @@ control--MwcStatusLine {
     border-radius: 6px;
     border: none;
     background-color: #9000FF;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
 }
 
 control--MwcStatusLine:!enabled {
@@ -725,6 +729,10 @@ QGroupBox::title {
 
 QMenuBar {
     color: white;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 15px;
 }
 QMenuBar::item:selected { /* when selected using mouse or keyboard */
     background: #9759d0;
@@ -733,6 +741,10 @@ QMenuBar::item:selected { /* when selected using mouse or keyboard */
 QMenu {
     background-color: #9759d0;
     color: white;
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 15px;
 }
 
 QMenu::item:disabled {
@@ -742,4 +754,11 @@ QMenu::item:disabled {
 QMenu::item:selected {
     background: #E2CCF7;
     color: #3600C9;
+}
+
+QAction {
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 15px;
 }
