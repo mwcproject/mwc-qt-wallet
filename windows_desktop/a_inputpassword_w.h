@@ -25,6 +25,7 @@ namespace bridge {
 class Config;
 class InputPassword;
 class Wallet;
+class StartWallet;
 }
 
 namespace wnd {
@@ -43,7 +44,8 @@ private slots:
     void onSgnUpdateSyncProgress(double progressPercent);
 
     void on_submitButton_clicked();
-    void on_instancesButton_clicked();
+    void on_restoreInstanceButton_clicked();
+    void on_newInstanceButton_clicked();
 private:
     virtual void panelWndStarted() override;
 
@@ -56,6 +58,7 @@ private:
     Ui::InputPassword *ui;
     bridge::Config * config = nullptr;
     bridge::InputPassword * inputPassword = nullptr;
+    bridge::StartWallet * startWallet = nullptr;
     bridge::Wallet * wallet = nullptr;
 };
 

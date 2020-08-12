@@ -155,8 +155,8 @@ bool MobileWndManager::sendConfirmationDlg( QString title, QString message, doub
     return false;
 }
 
-    //---------------- Pages ------------------------
-void MobileWndManager::pageNewWallet() {
+//---------------- Pages ------------------------
+void MobileWndManager::pageInitFirstTime() {
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageInputPassword(QString pageTitle, bool lockMode) {
@@ -268,6 +268,7 @@ void MobileWndManager::pageHodlClaim(QString walletHash) {
 QPair<bool, QString> MobileWndManager::hodlGetSignatureDlg(QString challenge) {
     Q_UNUSED(challenge)
     Q_ASSERT(false); // implement me
+    return QPair<bool, QString>(false, "");
 }
 void MobileWndManager::pageAccounts() {
     Q_ASSERT(false); // implement me

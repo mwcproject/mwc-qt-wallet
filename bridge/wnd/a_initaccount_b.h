@@ -34,9 +34,9 @@ public:
     // Create a wallet form the seed
     Q_INVOKABLE void createWalletWithSeed(QVector<QString> seed);
 
-    // newWalletChoice: see values at state::InitAccount::NEW_WALLET_CHOICE
     // network: see values at state::InitAccount::MWC_NETWORK
-    Q_INVOKABLE void submitWalletCreateChoices(int newWalletChoice, int network);
+    // newInstanceName: Name of the new wallet instance
+    Q_INVOKABLE void submitWalletCreateChoices(int network, QString newInstanceName);
 
 };
 

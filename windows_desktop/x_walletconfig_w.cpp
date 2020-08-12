@@ -17,7 +17,6 @@
 #include "../control_desktop/messagebox.h"
 #include <QFileInfo>
 #include <QHostInfo>
-#include "../util/Process.h"
 #include <QFileDialog>
 #include <QStandardPaths>
 #include "../util_desktop/timeoutlock.h"
@@ -118,18 +117,23 @@ WalletConfig::WalletConfig(QWidget *parent) :
     outputLockingEnabled = walletConfig->isOutputLockingEnabled();
     ui->outputLockingCheck->setChecked(outputLockingEnabled);
 
+    QVector<QString> instanceInfo = config->getCurrentWalletInstance();
+    QString fullPath = instanceInfo[1];
+    walletInstanceName = instanceInfo[2];
+    ui->walletInstanceNameEdit->setText(walletInstanceName);
+    ui->walletDataPath->setText(fullPath);
+
 #ifdef Q_OS_DARWIN
     // MacOS doesn't support font scale. Need to hide all the buttons
     ui->fontHolder->hide();
 #endif
 
-    dataPath = walletConfig->getDataPath();
     keybasePath = walletConfig->getKeybasePath();
     mqsHost = walletConfig->getMqsHost();
     inputConfirmationsNumber = walletConfig->getInputConfirmationsNumber();
     changeOutputs = walletConfig->getChangeOutputs();
 
-    setValues(dataPath, keybasePath,
+    setValues(keybasePath,
               mqsHost,
               inputConfirmationsNumber, changeOutputs);
     updateButtons();
@@ -141,14 +145,10 @@ WalletConfig::~WalletConfig()
     delete ui;
 }
 
-void WalletConfig::setValues(const QString & mwc713directory,
-                             const QString & keyBasePath,
+void WalletConfig::setValues(const QString & keyBasePath,
                              const QString & mwcmqHostNorm,
                              int inputConfirmationNumber,
                              int changeOutputs) {
-    if (!mwc713directory.isEmpty())
-        ui->mwc713directoryEdit->setText( mwc713directory );
-
     ui->keybasePathEdit->setText( keybasePathConfig2InputStr(keyBasePath) );
     ui->mwcmqHost->setText( mwcDomainConfig2InputStr( mwcmqHostNorm ) );
 
@@ -160,9 +160,9 @@ void WalletConfig::setValues(const QString & mwc713directory,
 
 void WalletConfig::updateButtons() {
     bool sameWithCurrent =
+        ui->walletInstanceNameEdit->text().trimmed() == walletInstanceName &&
         getcheckedSizeButton() == uiScale &&
         walletLogsEnabled == ui->logsEnableBtn->isChecked() &&
-        ui->mwc713directoryEdit->text().trimmed() == dataPath &&
         keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == keybasePath &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == mqsHost &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(inputConfirmationsNumber) &&
@@ -223,51 +223,6 @@ QString WalletConfig::keybasePathInputStr2Config(QString kbpath) {
     return kbpath;
 }
 
-void WalletConfig::on_mwc713directorySelect_clicked()
-{
-    util::TimeoutLockObject to( "WalletConfig" );
-
-    QPair<bool,QString> basePath = ioutils::getAppDataPath();
-    if (!basePath.first) {
-        control::MessageBox::messageText(nullptr, "Error", basePath.second);
-        return;
-    }
-
-    QString dir = QFileDialog::getExistingDirectory(
-            nullptr,
-            "Select your wallet folder name",
-            basePath.second);
-    if (dir.isEmpty())
-        return;
-    auto dirOk = util::validateMwc713Str(dir);
-    if (!dirOk.first) {
-        core::getWndManager()->messageTextDlg("Directory Name",
-                                              "This directory name is not acceptable.\n" + dirOk.second);
-        return;
-    }
-
-    QDir baseDir(basePath.second);
-    QString walletDir = baseDir.relativeFilePath(dir);
-
-    QPair<QString,QString> networkArch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDir); // local path as writen in config
-    QString runningArc = util::getBuildArch();
-
-    // Just in case. Normally will never be called
-    if ( runningArc != networkArch.second ) {
-        control::MessageBox::messageText(nullptr, "Wallet data architecture mismatch",
-                                     "Your mwc713 seed at '"+ walletDir +"' was created with "+ networkArch.second+" bits version of the wallet. You are using " + runningArc + " bit version.");
-        return;
-    }
-
-    ui->mwc713directoryEdit->setText( walletDir );
-    updateButtons();
-}
-
-void WalletConfig::on_mwc713directoryEdit_textEdited(const QString &)
-{
-    updateButtons();
-}
-
 void WalletConfig::on_mwcmqHost_textEdited(const QString &)
 {
     updateButtons();
@@ -315,7 +270,7 @@ void WalletConfig::on_changeOutputsEdit_textEdited(const QString &)
 
 void WalletConfig::on_restoreDefault_clicked()
 {
-    setValues("", walletConfig->getDefaultKeybasePath(),
+    setValues(walletConfig->getDefaultKeybasePath(),
               walletConfig->getMqsHost(),
               walletConfig->getDefaultInputConfirmationsNumber(),
               walletConfig->getDefaultChangeOutputs());
@@ -340,24 +295,16 @@ bool WalletConfig::applyChanges() {
 
     util::TimeoutLockObject to("WalletConfig");
 
-    // mwc713 directory
-    QString walletDir = ui->mwc713directoryEdit->text().trimmed();
-    if (walletDir.isEmpty()) {
-        control::MessageBox::messageText(this, "Input", "Please specify non empty wallet folder name");
-        ui->mwc713directoryEdit->setFocus();
-        return false;
-    }
-
-    QPair<bool, QString> res = util::validateMwc713Str(walletDir);
-    if (!res.first) {
-        control::MessageBox::messageText(this, "Input", res.second);
-        ui->mwc713directoryEdit->setFocus();
+    QString newWalletInstanceName = ui->walletInstanceNameEdit->text().trimmed();
+    if (newWalletInstanceName.isEmpty()) {
+        control::MessageBox::messageText(this, "Input", "Please specify non empty wallet insatance name");
+        ui->walletInstanceNameEdit->setFocus();
         return false;
     }
 
     // keybase path
     QString keybasePath = keybasePathInputStr2Config(ui->keybasePathEdit->text().trimmed());
-    res = util::validateMwc713Str(keybasePath);
+    QPair <bool, QString> res = util::validateMwc713Str(keybasePath);
     if (!res.first) {
         control::MessageBox::messageText(this, "Input", res.second);
         ui->keybasePathEdit->setFocus();
@@ -397,37 +344,6 @@ bool WalletConfig::applyChanges() {
         ui->changeOutputsEdit->setFocus();
         return false;
     }
-
-    QPair<QString, QString> networkArch = wallet::WalletConfig::readNetworkArchFromDataPath(
-            walletDir); // local path as writen in config
-    QString runningArc = util::getBuildArch();
-
-    // Just in case. Normally will never be called
-    if (runningArc != networkArch.second) {
-        control::MessageBox::messageText(nullptr, "Wallet data architecture mismatch",
-                                         "Your mwc713 seed at '" + walletDir + "' was created with " +
-                                         networkArch.second + " bits version of the wallet. You are using " +
-                                         runningArc + " bit version.");
-        return false;
-    }
-
-    QString network = networkArch.first; // local path as writen in config
-    if (network.isEmpty()) {
-        // Check if seed file does exist. Import of the data?
-        if (wallet::WalletConfig::doesSeedExist(walletDir)) {
-
-            dlg::NetworkSelectionDlg nwDlg(this);
-            if (nwDlg.exec() != QDialog::Accepted)
-                return false;
-
-            network = nwDlg.getNetwork() == state::InitAccount::MWC_NETWORK::MWC_MAIN_NET ? "Mainnet" : "Floonet";
-
-        } else
-            network = "Mainnet"; // will be redefined later in any case...
-    }
-
-
-    wallet::WalletConfig::saveNetwork2DataPath(walletDir, network, runningArc);
 
     if (!(confirmations == inputConfirmationsNumber && changeOutputs == this->changeOutputs)) {
         walletConfig->setSendCoinsParams(confirmations, changeOutputs);
@@ -546,9 +462,14 @@ bool WalletConfig::applyChanges() {
             logoutTimeout = currentLogoutTimeout;
     }
 
-    if (!(dataPath == walletDir && keybasePath == this->keybasePath &&
+    if (newWalletInstanceName != walletInstanceName) {
+        config->updateActiveInstanceName(newWalletInstanceName);
+        walletInstanceName = newWalletInstanceName;
+    }
+
+    if (!(keybasePath == this->keybasePath &&
           mwcmqHost == mqsHost)) {
-        if (walletConfig->updateWalletConfig(network, walletDir, mwcmqHost, keybasePath, need2updateGuiSize)) {
+        if (walletConfig->updateWalletConfig( mwcmqHost, keybasePath, need2updateGuiSize )) {
             return false;
         }
     }
@@ -668,6 +589,11 @@ void WalletConfig::on_start_keybase_clicked()
 }
 
 void WalletConfig::on_start_tor_clicked()
+{
+    updateButtons();
+}
+
+void WalletConfig::on_walletInstanceNameEdit_textChanged(const QString &)
 {
     updateButtons();
 }

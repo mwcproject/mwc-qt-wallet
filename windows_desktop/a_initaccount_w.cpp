@@ -21,7 +21,6 @@
 #include <QShortcut>
 #include <QKeyEvent>
 #include "../util_desktop/timeoutlock.h"
-#include "../dialogs_desktop/x_walletinstances.h"
 #include "../bridge/util_b.h"
 #include "../bridge/wnd/a_initaccount_b.h"
 #include "../bridge/wnd/y_selectmode_b.h"
@@ -44,6 +43,9 @@ InitAccount::InitAccount(QWidget *parent) :
     ui->submitButton->setEnabled( util->passwordQualityIsAcceptable() );
 
     ui->password1Edit->installEventFilter(this);
+
+    // Default is allways a mainnet
+    ui->radioMainNet->setChecked(true);
 
     utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()) );
     updatePassState();
@@ -100,6 +102,13 @@ void InitAccount::on_submitButton_clicked()
 {
     util::TimeoutLockObject to("InitAccount");
 
+    QString instanceName = ui->instanceNameEdit->text();
+    if (instanceName.isEmpty()) {
+        control::MessageBox::messageText(this, "Instance name", "Please define your wallet instance name.");
+        ui->instanceNameEdit->setFocus();
+        return;
+    }
+
     QString pswd1 = ui->password1Edit->text();
     QString pswd2 = ui->password2Edit->text();
 
@@ -122,14 +131,9 @@ void InitAccount::on_submitButton_clicked()
     util->releasePasswordAnalyser();
 
     initAccount->setPassword(pswd1);
-}
-
-void InitAccount::on_instancesButton_clicked()
-{
-    util::TimeoutLockObject to("InitAccount");
-
-    dlg::WalletInstances  walletInstances(this);
-    walletInstances.exec();
+    initAccount->submitWalletCreateChoices(
+                ui->radioMainNet->isChecked() ? state::InitAccount::MWC_NETWORK::MWC_MAIN_NET : state::InitAccount::MWC_NETWORK::MWC_FLOO_NET,
+                instanceName);
 }
 
 void wnd::InitAccount::on_runOnlineNodeButton_clicked()

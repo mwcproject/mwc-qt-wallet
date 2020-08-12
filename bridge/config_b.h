@@ -38,18 +38,25 @@ public:
     // Error message will be started with ' ' - space
     Q_INVOKABLE QString getAppDataPath(QString localPath = "");
 
-    // Read from wallet directory architecture and the network. If not found - caller shoudl assume any
-    // Return array of size 2  [<network>, <architecture>]
-    Q_INVOKABLE QVector<QString> readNetworkArchFromDataPath(QString walletDataDir);
-    // Save info about network and architecture at that dir
-    Q_INVOKABLE void saveNetwork2DataPath(QString walletDataDir, QString network, QString architecture );
     // Update config with foreign API settings.
     Q_INVOKABLE void saveForeignApiConfig(bool foreignApi,
                                           QString foreignApiAddress, QString foreignApiSecret,
                                           QString tlsCertificateFile, QString tlsCertificateKey);
-    // Check if seed for that wallet exist.
-    Q_INVOKABLE bool doesSeedExist(QString dataPath);
 
+    // Request wallet instances.
+    // hasSeed - true if needed initialized wallet instances.
+    // Returns the data as:
+    // <selected path_id>, < <path_id>, <instance name>, <network> >, ...  >
+    Q_INVOKABLE QVector<QString> getWalletInstances(bool hasSeed);
+    // Request current wallet instance details.
+    // Returns the data as 4 items tuple:
+    // < <path_id>, <full_path>, <instance name>, <network> >
+    Q_INVOKABLE QVector<QString> getCurrentWalletInstance();
+
+    // Set this instance as active
+    Q_INVOKABLE void setActiveInstance(QString instancePathId);
+    // Update instance name
+    Q_INVOKABLE void updateActiveInstanceName(QString newInstanceName);
 
     // Wallet running mode. Mobile can support OnlineWallet only.
     Q_INVOKABLE bool isOnlineWallet();

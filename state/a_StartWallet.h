@@ -27,6 +27,8 @@ public:
     StartWallet(StateContext * context);
     virtual ~StartWallet() override;
 
+    void createNewWalletInstance(QString path, bool restoreWallet);
+
 protected:
     virtual NextStateRespond execute() override;
 

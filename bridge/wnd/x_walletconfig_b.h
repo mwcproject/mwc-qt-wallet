@@ -25,11 +25,8 @@ public:
     explicit WalletConfig(QObject * parent = nullptr);
     ~WalletConfig();
 
-    // Update data path and nwtwork for the current wallet.
-    // dataPath & network - new settign for the config
-    // guiWalletRestartExpected shoudl be true if GUI will restart the wallet now.
-    // Return: true on success.
-    Q_INVOKABLE bool setDataPathWithNetwork(QString dataPath, QString network, bool guiWalletRestartExpected);
+    // Specify if the Online Node will run as a mainnet.
+    Q_INVOKABLE void setOnlineNodeRunsMainNetwork(bool isMainNet);
 
     // Request restart for qt wallet
     Q_INVOKABLE void restartQtWallet();
@@ -68,8 +65,7 @@ public:
 
     Q_INVOKABLE bool updateTimeoutValue(int timeout);
 
-    Q_INVOKABLE bool updateWalletConfig(QString network, QString dataPath,
-                    QString mwcmqsDomain, QString keyBasePath, bool need2updateGuiSize);
+    Q_INVOKABLE bool updateWalletConfig( QString mwcmqsDomain, QString keyBasePath, bool need2updateGuiSize );
 
 };
 

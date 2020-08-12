@@ -22,10 +22,12 @@
 #include "../core/global.h"
 #include <QtAlgorithms>
 #include "../util/Log.h"
+#include "../util/Process.h"
 #include <QMessageBox>
 #include <QCoreApplication>
 #include "../core/WndManager.h"
 #include <stdio.h>
+#include <QDebug>
 
 namespace core {
 
@@ -148,7 +150,7 @@ bool AppContext::loadData() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x4797)
+    if (id<0x4783 || id>0x4798)
          return false;
 
     QString mockStr;
@@ -181,14 +183,18 @@ bool AppContext::loadData() {
     if (id>=0x4785)
         in >> logsEnabled;
 
+    wallet::MwcNodeConnection nodeConnectionMainNet;
+    wallet::MwcNodeConnection nodeConnectionFlooNet;
+
     if (id>=0x4786) {
         nodeConnectionMainNet.loadData(in);
         nodeConnectionFlooNet.loadData(in);
     }
 
     if (id>=0x4787) {
-        in >> wallet713DataPath;
-        in >> network;
+        QString s;
+        in >> s;
+        in >> s;
     }
 
     if (id>=0x4788) {
@@ -234,6 +240,47 @@ bool AppContext::loadData() {
     if (id>=0x4797)
         in >> autoStartTorEnabled;
 
+    if (id>=0x4798) {
+        int sz = 0;
+        in >> sz;
+        for (int r=0; r<sz; r++) {
+            QString key;
+            in >> key;
+            wallet::MwcNodeConnection val;
+            val.loadData(in);
+            nodeConnection.insert(key,val);
+        }
+
+        in >> walletInstancePaths;
+        in >> currentWalletInstanceIdx;
+    }
+    else {
+        // Migration case
+        nodeConnection.insert( "OnlineWallet_Mainnet", nodeConnectionMainNet );
+        nodeConnection.insert( "OnlineWallet_Floonet", nodeConnectionFlooNet );
+
+        // Let's scan for the wallets.
+        QPair<bool,QString> path = ioutils::getAppDataPath("");
+        if (path.first) {
+            QDir qt_wallet_dir(path.second);
+            QFileInfoList files = qt_wallet_dir.entryInfoList();
+            for (const QFileInfo & fl : files) {
+                if (fl.isDir()) {
+                    QString walletDataDir = fl.fileName(); // The last dir name, for QT developers it is a file.
+                    if (walletDataDir.startsWith('.'))
+                        continue; // Self and parent - not interested
+                    if (wallet::WalletConfig::doesSeedExist(walletDataDir)) {
+                        QString arch = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletDataDir)[1];
+                        if (arch == util::getBuildArch() ) {
+                            walletInstancePaths.push_back(walletDataDir);
+                            currentWalletInstanceIdx = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     return true;
 }
 
@@ -261,7 +308,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x4797;
+    out << 0x4798;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -278,11 +325,13 @@ void AppContext::saveData() const {
     out << guiScale;
     out << logsEnabled;
 
-    nodeConnectionMainNet.saveData(out);
-    nodeConnectionFlooNet.saveData(out);
+    wallet::MwcNodeConnection nc;
+    nc.saveData(out);
+    nc.saveData(out);
 
-    out << wallet713DataPath;
-    out << network;
+    QString s;
+    out << s;
+    out << s;
 
     out << showOutputAll;
 
@@ -306,6 +355,15 @@ void AppContext::saveData() const {
     out << currentAccountName;
 
     out << autoStartTorEnabled;
+
+    int sz = nodeConnection.size();
+    out << sz;
+    for (QMap<QString, wallet::MwcNodeConnection>::const_iterator i = nodeConnection.constBegin(); i != nodeConnection.constEnd(); ++i) {
+        out << i.key();
+        i.value().saveData(out);
+    }
+    out << walletInstancePaths;
+    out << currentWalletInstanceIdx;
 }
 
 void AppContext::loadNotesData() {
@@ -607,41 +665,123 @@ double AppContext::getGuiScale() const
     return guiScale<0.0 ? initScaleValue : guiScale;
 }
 
-wallet::MwcNodeConnection AppContext::getNodeConnection(const QString network) const {
-    return network.toLower().contains("main") ? nodeConnectionMainNet : nodeConnectionFlooNet;
+wallet::MwcNodeConnection AppContext::getNodeConnection(const QString & network) {
+    switch (config::getWalletRunMode()) {
+        case config::WALLET_RUN_MODE::ONLINE_WALLET: {
+            wallet::MwcNodeConnection mwcNodeConnection = nodeConnection.value( "OnlineWallet_" + network );
+            return mwcNodeConnection;
+        }
+        case config::WALLET_RUN_MODE::COLD_WALLET: {
+            wallet::MwcNodeConnection mwcNodeConnection = nodeConnection.value( "ColdWallet_" + network );
+            if ( !mwcNodeConnection.isLocalNode() ) {
+                mwcNodeConnection.setAsLocal( "mwc-node" );
+                updateMwcNodeConnection(network, mwcNodeConnection );
+            }
+            return mwcNodeConnection;
+        }
+        case config::WALLET_RUN_MODE::ONLINE_NODE: {
+            wallet::MwcNodeConnection mwcNodeConnection = nodeConnection.value( "Node_" + network );
+            if ( !mwcNodeConnection.isLocalNode() ) {
+                mwcNodeConnection.setAsLocal( "mwc-node" );
+                updateMwcNodeConnection(network, mwcNodeConnection );
+            }
+            return mwcNodeConnection;
+        }
+        default: {
+            Q_ASSERT(false);
+            return wallet::MwcNodeConnection();
+        }
+    }
 }
 
-void AppContext::updateMwcNodeConnection(const QString network, const wallet::MwcNodeConnection & connection ) {
-    if (network.toLower().contains("main")) {
-        nodeConnectionMainNet = connection;
-        if (nodeConnectionFlooNet.notCustom() && connection.notCustom() )
-            nodeConnectionFlooNet = connection;
+void AppContext::updateMwcNodeConnection(const QString & network, const wallet::MwcNodeConnection & connection ) {
+    switch (config::getWalletRunMode()) {
+        case config::WALLET_RUN_MODE::ONLINE_WALLET: {
+            nodeConnection.insert( "OnlineWallet_" + network, connection );
+            break;
+        }
+        case config::WALLET_RUN_MODE::COLD_WALLET: {
+            nodeConnection.insert( "ColdWallet_" + network, connection );
+            break;
+        }
+        case config::WALLET_RUN_MODE::ONLINE_NODE: {
+            nodeConnection.insert( "Node_" + network, connection );
+            break;
+        }
+        default: {
+            Q_ASSERT(false);
+        }
     }
-    else {
-        nodeConnectionFlooNet = connection;
-        if (nodeConnectionMainNet.notCustom() && connection.notCustom() )
-            nodeConnectionMainNet = connection;
-
-    }
-    // save because it must be in sync with configs that saved now as well
     saveData();
 }
 
-bool AppContext::getWallet713DataPathWithNetwork( QString & _wallet713DataPath, QString & _network) {
-    if ( wallet713DataPath.isEmpty() || network.isEmpty() )
-        return false;
 
-    _wallet713DataPath = wallet713DataPath;
-    _network = network;
-    return true;
+// Wallet instances. Return instances paths that are valid and current selected index
+QPair<QVector<QString>, int> AppContext::getWalletInstances(bool hasSeed) const {
+    switch (config::getWalletRunMode()) {
+        case config::WALLET_RUN_MODE::COLD_WALLET:
+        case config::WALLET_RUN_MODE::ONLINE_WALLET: {
+            QVector<QString> paths(walletInstancePaths);
+
+            if (hasSeed) {
+                for ( int r=paths.size()-1; r>=0; r-- ) {
+                    if (!wallet::WalletConfig::doesSeedExist(paths[r])) {
+                        paths.remove(r);
+                    }
+                }
+            }
+
+            int selectedIdx = -1;
+            if (!paths.isEmpty()) {
+                selectedIdx = std::max(0, paths.indexOf(walletInstancePaths.value(currentWalletInstanceIdx, "")));
+            }
+
+            return QPair<QVector<QString>, int> (paths, selectedIdx);
+        }
+        case config::WALLET_RUN_MODE::ONLINE_NODE: {
+            // For network the wallet instance is predefined.
+            QString network = isOnlineNodeRunsMainNetwork() ? "Mainnet" : "Floonet";
+            QString walletPath = QString("tmp") + QDir::separator() + "online_node_wallet"  + QDir::separator() + network;
+
+            QVector<QString> paths{walletPath};
+            return QPair<QVector<QString>, int> (paths,0);
+        }
+    }
+}
+// Return path to current wallet instance. Expected that at least 1 instance does exist
+QString AppContext::getCurrentWalletInstance(bool hasSeed) const {
+    auto res = getWalletInstances(hasSeed);
+    Q_ASSERT(!res.first.isEmpty());
+    return res.first[res.second];
 }
 
-void AppContext::setWallet713DataPathWithNetwork( const QString & _wallet713DataPath, const QString & _network ) {
-    if ( wallet713DataPath == _wallet713DataPath && network == _network )
-        return;
+void AppContext::setCurrentWalletInstance(const QString & path) {
+    int idx = walletInstancePaths.indexOf(path);
+    if (idx>=0) {
+        currentWalletInstanceIdx = idx;
+    }
+}
 
-    wallet713DataPath = _wallet713DataPath;
-    network = _network;
+
+// Add new instance and make it active
+void AppContext::addNewInstance(const QString & instance) {
+    currentWalletInstanceIdx = walletInstancePaths.indexOf(instance);
+    if (currentWalletInstanceIdx < 0) {
+        currentWalletInstanceIdx = walletInstancePaths.size();
+        walletInstancePaths.push_back(instance);
+    }
+    saveData();
+}
+
+// Check if inline node running the main network
+bool AppContext::isOnlineNodeRunsMainNetwork() const {
+    return isOnlineNodeMainNetwork;
+}
+
+void AppContext::setOnlineNodeRunsMainNetwork(bool isMainNet) {
+    if (isOnlineNodeMainNetwork==isMainNet)
+        return;
+    isOnlineNodeMainNetwork = isMainNet;
     saveData();
 }
 

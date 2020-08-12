@@ -34,7 +34,9 @@ void InitAccount::setPassword(QString password) {
 
 // Cancel whatever init account you have and return to the starting page
 void InitAccount::cancelInitAccount() {
-    getState()->cancel();
+    // Not needed for now and implementaiton need to be done.
+    // keeping the bridge method in case UI will need cancellation workflow
+    //getState()->cancel();
 }
 
 // Create a wallet form the seed
@@ -44,8 +46,8 @@ void InitAccount::createWalletWithSeed(QVector<QString> seed) {
 
 // newWalletChoice: see values at state::InitAccount::NEW_WALLET_CHOICE
 // network: see values at state::InitAccount::MWC_NETWORK
-void InitAccount::submitWalletCreateChoices(int newWalletChoice, int network) {
-    getState()->submitWalletCreateChoices( state::InitAccount::NEW_WALLET_CHOICE(newWalletChoice), state::InitAccount::MWC_NETWORK(network));
+void InitAccount::submitWalletCreateChoices(int network, QString newInstanceName) {
+    getState()->submitWalletCreateChoices( state::InitAccount::MWC_NETWORK(network), newInstanceName);
 }
 
 

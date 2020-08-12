@@ -52,8 +52,8 @@ class Mwc713State {
     virtual ~Mwc713State();
 };
 
-MWC713::MWC713(QString _mwc713path, QString _mwc713configPath, core::AppContext * _appContext) :
-        appContext(_appContext), mwc713Path(_mwc713path),  mwc713configPath(_mwc713configPath) {
+MWC713::MWC713(QString _mwc713path, QString _mwc713configPath, core::AppContext * _appContext, node::MwcNode * _mwcNode) :
+        appContext(_appContext), mwcNode(_mwcNode), mwc713Path(_mwc713path),  mwc713configPath(_mwc713configPath) {
 
     // Listening for Output Locking changes
     QObject::connect(appContext, &core::AppContext::onOutputLockChanged, this, &MWC713::onOutputLockChanged, Qt::QueuedConnection);
@@ -68,9 +68,11 @@ MWC713::~MWC713() {
 
 // Check if waaled need to be initialized or not. Will run statndalone app, wait for exit and return the result
 // Check signal: onWalletState(bool initialized)
-bool MWC713::checkWalletInitialized() {
-
-    qDebug() << "checkWalletState with " << mwc713Path << " and " << mwc713configPath;
+bool MWC713::checkWalletInitialized(bool hasSeed) {
+    QString path = appContext->getCurrentWalletInstance(hasSeed);
+    qDebug() << "checkWalletState with " << mwc713Path << " and " << mwc713configPath << "  Data Path: " << path;
+    if (!updateWalletConfig(path, false))
+        return false;
 
     Q_ASSERT(mwc713process==nullptr);
     mwc713process = initMwc713process( {"TOR_EXE_NAME", QCoreApplication::applicationDirPath() + "/" + TOR_NAME}, {"state"}, false );
@@ -192,11 +194,42 @@ void MWC713::resetData(STARTED_MODE _startedMode ) {
     currentConfig = WalletConfig();
 }
 
+// Updating config according to what is stored at the path
+bool MWC713::updateWalletConfig(const QString & path, bool canStartNode) {
+    WalletConfig config = getWalletConfig();
+
+    if (config.getDataPath() != path) {
+        // Path for the wallet need to be updated
+        QVector<QString> network_arch_name = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(path);
+        Q_ASSERT(network_arch_name.size() == 3);
+
+        QString arh = network_arch_name[1];
+        if (arh != util::getBuildArch()) {
+            core::getWndManager()->messageTextDlg("Error", "Wallet data at directory " + path +
+                                                           " was belong to different architecture. Expecting " + util::getBuildArch() + " but get " + arh);
+            return false;
+        }
+
+        // Config need to be updated with a path and a Network
+        config.updateDataPath(path);
+        if (!network_arch_name[0].isEmpty() )
+            config.updateNetwork(network_arch_name[0]);
+    }
+
+    // Need to call setWalletConfig in order to update tor params, embedded node state, e.t.c
+    setWalletConfig(config, canStartNode);
+
+    return true;
+}
+
 // normal start. will require the password
 void MWC713::start()  {
-    qDebug() << "MWC713::start";
-
     resetData(STARTED_MODE::NORMAL);
+
+    QString path = appContext->getCurrentWalletInstance(true);
+    qDebug() << "MWC713::start for path " << path;
+    if (!updateWalletConfig(path, true))
+        return;
 
     // Need to check if Tls active
     const WalletConfig & config = getWalletConfig();
@@ -235,6 +268,10 @@ void MWC713::start2init(QString password) {
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
 
+    QString path = appContext->getCurrentWalletInstance(false);
+    if (!updateWalletConfig(path, false))
+        return;
+
     resetData(STARTED_MODE::INIT);
 
     qDebug() << "Starting MWC713 as init at " << mwc713Path << " for config " << mwc713configPath;
@@ -271,6 +308,10 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
+
+    QString path = appContext->getCurrentWalletInstance(false);
+    if (!updateWalletConfig(path, true))
+        return;
 
     qDebug() << "Starting MWC713 as init at " << mwc713Path << " for config " << mwc713configPath;
 
@@ -1431,7 +1472,7 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
     if (config.hasForeignApi()) {
         errorMessage += "\n\nYou have activated foreign API and it might be a reason for this issue. Foreign API is deactivated, please try to restart the wallet";
         config.foreignApi = false;
-        saveWalletConfig(config, nullptr, nullptr );
+        saveWalletConfig(config, nullptr, nullptr, false );
     }
     else {
         if (QDateTime::currentMSecsSinceEpoch() - walletStartTime < 1000L * 15) {
@@ -1572,7 +1613,7 @@ const WalletConfig & MWC713::getDefaultConfig()  {
 
 
 //static
-bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode ) {
+bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode, bool canStartNode ) {
     if (!config.isDefined()) {
         Q_ASSERT(false);
         logger::logInfo("MWC713", "Failed to update the config, because it is invalid:\n" + config.toString());
@@ -1612,11 +1653,6 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
             // keep whatever we have here
             newConfLines.append(ln);
         }
-    }
-
-    if (!config::isOnlineNode() && appContext != nullptr) {
-        // point of that setting to restore for switch from online node to wallet
-        appContext->setWallet713DataPathWithNetwork(config.getDataPath(), config.getNetwork());
     }
 
     newConfLines.append("chain = \"" + config.getNetwork() + "\"");
@@ -1669,13 +1705,21 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
                 Q_ASSERT(false);
         }
 
-        // allways stop because config migth change
-        if (mwcNode->isRunning()) {
-            mwcNode->stop();
+        // Update node by demand
+        if ( ! needLocalMwcNode ) {
+            // stopping because we don't need it...
+            if (mwcNode->isRunning()) {
+                mwcNode->stop();
+            }
         }
+        else {
+            if (mwcNode->isRunning()) {
+                if (mwcNode->getCurrentNetwork() != config.getNetwork()) {
+                    mwcNode->stop();
+                }
+            }
 
-        if (needLocalMwcNode) {
-            if (!mwcNode->isRunning()) {
+            if (!mwcNode->isRunning() && canStartNode) {
                 mwcNode->start(connection.localNodeDataPath, config.getNetwork());
             }
         }
@@ -1694,9 +1738,27 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
 // Update wallet config. Will update config and restart the mwc713.
 // Note!!! Caller is fully responsible for input validation. Normally mwc713 will sart, but some problems might exist
 //          and caller suppose listen for them
-bool MWC713::setWalletConfig( const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode ) {
+bool MWC713::setWalletConfig( const WalletConfig & _config, bool canStartNode ) {
+    WalletConfig config = _config;
 
-    if ( !saveWalletConfig( config, appContext, mwcNode ) ) {
+    // Checking if Tor is active. Then we will activate Foreign API.  Or if Foreign API active wrong way, we will disable Tor
+    if (appContext->isAutoStartTorEnabled()) {
+        if (!config.hasForeignApi()) {
+            // Expected to do that silently. It is a migration case
+            config.setForeignApi(true,"127.0.0.1:3415","", "","");
+        }
+        else {
+            // Check if Foreign API has HTTPS. Tor doesn't support it
+            if (config.hasTls()) {
+                core::getWndManager()->messageTextDlg("Unable to start Tor",
+                                                      "Your Foreign API is configured to use TLS certificated. Tor doesn't support HTTPS connection.\n\n"
+                                                      "Because of that Tor will not be started. You can review your configuration at Wallet Settings page.");
+                appContext->setAutoStartTorEnabled(false);
+            }
+        }
+    }
+
+    if ( !saveWalletConfig( config, appContext, mwcNode, canStartNode ) ) {
         core::getWndManager()->messageTextDlg("Update Config failure", "Not able to update mwc713 configuration at " + config::getMwc713conf() );
         return false;
     }

@@ -20,7 +20,7 @@ namespace ioutils {
 
 // init the directory to store app data
 // return: <success, data/error>
-QPair<bool,QString> getAppDataPath(QString localPath )
+QPair<bool,QString> getAppDataPath(QString localPath, bool prepareDir )
 {
     QString path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
     if (path.isEmpty())
@@ -44,8 +44,10 @@ QPair<bool,QString> getAppDataPath(QString localPath )
     QDir d(path);
     QString dataPath = localPathIsRoot ? localPath : (d.absolutePath() + QDir::separator() + localPath);
     dataPath = QDir::cleanPath( dataPath );
-    if ( !d.mkpath(dataPath) )
-        return QPair<bool,QString>(false, "Unable create app data directory: " + d.absolutePath());
+    if (prepareDir) {
+        if ( !d.mkpath(dataPath) )
+            return QPair<bool,QString>(false, "Unable create app data directory: " + d.absolutePath());
+    }
 
     return QPair<bool,QString>(true,dataPath);
 }

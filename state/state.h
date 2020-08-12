@@ -80,9 +80,9 @@ struct NextStateRespond {
 
 
 struct StateContext {
-    core::AppContext    * const appContext;
-    wallet::Wallet      * const wallet; //wallet caller interface
-    node::MwcNode       * const mwcNode;
+    core::AppContext    * const appContext = nullptr;
+    wallet::Wallet      * const wallet = nullptr; //wallet caller interface
+    node::MwcNode       * const mwcNode = nullptr;
     StateMachine        * stateMachine = nullptr;
     core::HodlStatus    * hodlStatus = nullptr;
 

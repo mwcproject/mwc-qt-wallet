@@ -37,11 +37,9 @@ WalletConfig::~WalletConfig() {
     getBridgeManager()->removeWalletConfig(this);
 }
 
-// Update data path and nwtwork for the current wallet.
-bool WalletConfig::setDataPathWithNetwork(QString dataPath, QString network, bool guiWalletRestartExpected) {
-    auto walletConfig = getStateContext()->wallet->getWalletConfig();
-    walletConfig.setDataPathWithNetwork( dataPath, network );
-    return getState()->setWalletConfig(walletConfig, guiWalletRestartExpected);
+// Specify if the Online Node will run as a mainnet.
+void WalletConfig::setOnlineNodeRunsMainNetwork(bool isMainNet) {
+    getStateContext()->appContext->setOnlineNodeRunsMainNetwork(isMainNet);
 }
 
 // Change network and restart qt wallet. Used by Online Node
@@ -143,10 +141,9 @@ bool WalletConfig::updateTimeoutValue(int timeout) {
     return getState()->updateTimeoutValue(timeout);
 }
 
-bool WalletConfig::updateWalletConfig(QString network, QString dataPath,
-                                    QString mwcmqsDomain, QString keyBasePath, bool need2updateGuiSize) {
+bool WalletConfig::updateWalletConfig( QString mwcmqsDomain, QString keyBasePath, bool need2updateGuiSize) {
     auto config = getWallet()->getWalletConfig();
-    config.setDataWalletCfg(network, dataPath, mwcmqsDomain, keyBasePath);
+    config.setDataWalletCfg(mwcmqsDomain, keyBasePath);
     return getState()->setWalletConfig(config, need2updateGuiSize);
 }
 

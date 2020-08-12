@@ -458,114 +458,6 @@ int main(int argc, char *argv[])
         wallet::WalletConfig walletConfig = wallet::MWC713::readWalletConfig();
         QString walletDataPath = walletConfig.getDataPath();
 
-        if (!config::isOnlineNode())
-        {
-            // Check if wallet point to the right location
-            if ( walletDataPath.contains("tmp") && walletDataPath.contains("online_node_wallet") ) {
-                // need to switch to the normal wallet path
-
-                // Try to restore the last valid wallet path and a network...
-                QString network;
-                if (!appContext.getWallet713DataPathWithNetwork(walletDataPath, network) )
-                {
-                    walletDataPath = "gui_wallet713_data";
-                    network = walletConfig.getNetwork();
-                }
-                wallet::MwcNodeConnection mwcNodeConnection = appContext.getNodeConnection( network );
-                if ( !mwcNodeConnection.isCloudNode() ) {
-                    mwcNodeConnection.setAsCloud();
-                    appContext.updateMwcNodeConnection(network, mwcNodeConnection );
-                }
-            }
-        }
-
-        while (true) {
-            QPair<QString,QString> network_arch = wallet::WalletConfig::readNetworkArchFromDataPath(walletDataPath);
-
-            if (!network_arch.first.isEmpty())
-                walletConfig.updateNetwork(network_arch.first);
-
-            QString arh = network_arch.second;
-
-            if (arh != runningArc) {
-                if ( core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg("Wallet data architecture mismatch",
-                                             "Your mwc713 seed at '"+ walletDataPath +"' was created with "+arh+" bits version of the wallet. "
-                                             "Please exit and use original version of the wallet, or specify another folder for the seed",
-                                             "Exit", "Select Folder",
-                                             "Exit QT Wallet, I have another version to open this wallet",
-                                             "Select another wallet with compatible architecture",
-                                             false, true) ) {
-                    // Exit was selected
-                    return 1;
-                }
-
-                QPair<bool,QString> basePath = ioutils::getAppDataPath();
-                if (!basePath.first) {
-                    core::getWndManager()->messageTextDlg("Error", basePath.second);
-                    return 1;
-                }
-
-                QString dir = QFileDialog::getExistingDirectory(
-                        nullptr,
-                        "Select your wallet folder name",
-                        basePath.second);
-                if (dir.isEmpty())
-                    return 1; // Exiting
-
-                auto dirOk = util::validateMwc713Str(dir);
-                if (!dirOk.first) {
-                    core::getWndManager()->messageTextDlg("Directory Name",
-                              "This directory name is not acceptable.\n" + dirOk.second);
-                        // Exit was selected
-                        return 1;
-                }
-
-                QDir baseDir(basePath.second);
-                walletDataPath = baseDir.relativeFilePath(dir);
-            }
-            else {
-                break; // good to go
-            }
-        }
-
-        // Prepare wallet to run as online Node
-        if (config::isOnlineNode())
-        {
-            QString network = walletConfig.getNetwork();
-            // mwc713 should run without any password with some account.
-            // Account not expected for use, so no protection is needed. Instead will use the special directory for that
-            walletDataPath = QString("tmp") + QDir::separator() + "online_node_wallet"  + QDir::separator() + network;
-
-            // Node must be embedded local.
-            wallet::MwcNodeConnection mwcNodeConnection = appContext.getNodeConnection( network );
-            if ( !mwcNodeConnection.isLocalNode() ) {
-                mwcNodeConnection.setAsLocal( "mwc-node" );
-                appContext.updateMwcNodeConnection(network, mwcNodeConnection );
-            }
-
-            // Start page will be always the node status
-            appContext.setActiveWndState( state::STATE::NODE_INFO );
-        }
-
-
-        if (config::isColdWallet()) {
-            // Node must be local
-            QString network = walletConfig.getNetwork();
-            wallet::MwcNodeConnection mwcNodeConnection = appContext.getNodeConnection( network );
-            if ( !mwcNodeConnection.isLocalNode() ) {
-                mwcNodeConnection.setAsLocal( "mwc-node" );
-                appContext.updateMwcNodeConnection(network, mwcNodeConnection );
-            }
-
-            // Start page will be always the node status
-            appContext.setActiveWndState( state::STATE::NODE_INFO );
-        }
-
-
-        if (walletDataPath != walletConfig.getDataPath()) {
-            walletConfig.updateDataPath(walletDataPath);
-        }
-
         if (!util::acquireAppGlobalLock() )
         {
             // Seems like we are blocked on global semaphore. It is mean that second instance does exist
@@ -574,18 +466,18 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        // Checking if Tor is active. Then we will activate Foreign API.  Or if Foreign API active wrong way, we will disable Tor
+        // Checking if TOR is active. Then we will activate Foreign API.  Or if Foreign API active wrong way, we will disable the TOR
         if (appContext.isAutoStartTorEnabled()) {
             if (!walletConfig.hasForeignApi()) {
                 // Expected to do that silently. It is a migration case
                 walletConfig.setForeignApi(true,"127.0.0.1:3415","", "","");
             }
             else {
-                // Check if Foreign API has HTTPS. Tor doesn't support it
+                // Check if foreign API has HTTPs. TOR doesn't support it
                 if (walletConfig.hasTls()) {
-                    core::getWndManager()->messageTextDlg("Unable to start Tor",
-                                                          "Your Foreign API is configured to use TLS certificated. Tor doesn't support HTTPS connection.\n\n"
-                                                          "Because of that Tor will not be started. You can review your configuration at Wallet Settings page.");
+                    core::getWndManager()->messageTextDlg("Unable to start TOR",
+                                                          "Your Foreign API is configured to use TLS certificated. TOR doesn't support https connection.\n\n"
+                                                          "Because of that TOR will not be started. You can review your configuration at Wallet Settings page.");
                     appContext.setAutoStartTorEnabled(false);
                 }
             }
@@ -594,13 +486,11 @@ int main(int argc, char *argv[])
         // Update Node
         node::MwcNode * mwcNode = new node::MwcNode( config::getMwcPath(), &appContext );
 
-        wallet::MWC713::saveWalletConfig( walletConfig, &appContext, mwcNode );
-
 #ifdef WALLET_DESKTOP
-        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
+        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext, mwcNode );
 #else
         //  wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
-        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext );
+        wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext, mwcNode );
         QtAndroidService *qtAndroidService = new QtAndroidService(&app);
         qtAndroidService->sendToService("Start Service");
 #endif
@@ -645,6 +535,11 @@ int main(int argc, char *argv[])
 
         core::WalletApp::startExiting();
 
+        // Stopping embedded node first
+        if (mwcNode->isRunning()) {
+            mwcNode->stop();
+        }
+
         // Now we have to stop other object nicely.
         // Note, the order is different from creation.
         // mainWnd expected to be dead here.
@@ -653,10 +548,6 @@ int main(int argc, char *argv[])
 #ifdef WALLET_DESKTOP
         delete windowManager; windowManager=nullptr;
 #endif
-
-        if (mwcNode->isRunning()) {
-            mwcNode->stop();
-        }
 
         delete mwcNode; mwcNode = nullptr;
 

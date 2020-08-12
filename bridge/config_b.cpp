@@ -55,18 +55,6 @@ QString Config::getAppDataPath(QString localPath) {
     return " " + res.second;
 }
 
-// Read from wallet directory architecture and the network. If not found - caller shoudl assume any
-// Return array of size 2  [<network>, <architecture>]
-QVector<QString> Config::readNetworkArchFromDataPath(QString walletDataDir) {
-    auto res = wallet::WalletConfig::readNetworkArchFromDataPath(walletDataDir);
-    return { res.first,res.second};
-}
-
-// Save info about network and architecture at that dir
-void Config::saveNetwork2DataPath(QString walletDataDir, QString network, QString architecture ){
-    wallet::WalletConfig::saveNetwork2DataPath(walletDataDir, network, architecture );
-}
-
 // Update config with foreign API settings.
 void Config::saveForeignApiConfig(bool foreignApi,
                                       QString foreignApiAddress, QString foreignApiSecret,
@@ -78,15 +66,63 @@ void Config::saveForeignApiConfig(bool foreignApi,
             tlsCertificateFile, tlsCertificateKey);
 
 
-    if (getWallet()->setWalletConfig(config, getAppContext(), state::getStateContext()->mwcNode)) {
+    if (getWallet()->setWalletConfig(config, false)) {
         state::getStateContext()->stateMachine->executeFrom( state::STATE::NONE );
     }
 }
 
+// Request wallet instances. Returns the data as:
+// <selected path_id>, < <path_id>, <instance name>, <network> >, ...  >
+QVector<QString> Config::getWalletInstances(bool hasSeed) {
+    QPair<QVector<QString>, int> instances = getAppContext()->getWalletInstances(hasSeed);
+    // Expected that data is available
+    Q_ASSERT(!instances.first.isEmpty());
+    QVector<QString> result;
+    result.push_back(instances.first[instances.second]);
 
-bool Config::doesSeedExist(QString dataPath) {
-    return wallet::WalletConfig::doesSeedExist(dataPath);
+    for ( const QString & wallet_local_path : instances.first ) {
+        QVector<QString> nai = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(wallet_local_path);
+        result.push_back(wallet_local_path);
+        result.push_back(nai[2]);
+        result.push_back(nai[0]);
+    }
+    return result;
 }
+
+// Request current wallet instance details.
+// Returns the data as 4 items tuple:
+// < <path_id>, <full_path>, <instance name>, <network> >
+QVector<QString> Config::getCurrentWalletInstance() {
+    QPair<QVector<QString>, int> instances = getAppContext()->getWalletInstances(false);
+    QVector<QString> result;
+
+    if (instances.first.isEmpty()) {
+        result.resize(4); // wallet is not open yet
+        return result;
+    }
+
+
+    QString walletLocalPath = instances.first[instances.second];
+    result.push_back(walletLocalPath);
+    result.push_back( ioutils::getAppDataPath(walletLocalPath).second);
+    QVector<QString> nai = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletLocalPath);
+    result.push_back(nai[2]);
+    result.push_back(nai[0]);
+    return result;
+}
+
+// Set this instance as active
+void Config::setActiveInstance(QString instancePathId) {
+    getAppContext()->setCurrentWalletInstance(instancePathId);
+}
+
+// Update instance name
+void Config::updateActiveInstanceName(QString newInstanceName) {
+    QString walletLocalPath = getAppContext()->getCurrentWalletInstance(true);
+    QVector<QString> nai = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletLocalPath);
+    wallet::WalletConfig::saveNetwork2DataPath(walletLocalPath, nai[0], nai[1], newInstanceName);
+}
+
 
 bool Config::isOnlineWallet() {
     return config::isOnlineWallet();
