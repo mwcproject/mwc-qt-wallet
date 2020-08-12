@@ -4,9 +4,7 @@
 
 Status Windows
 
-**Author: Sharon Casaletto**
-
-**Date: ****July 30, 2020				Last Updated: August 5, 2020**
+Last Updated: August 5, 2020
 
 # OVERVIEW
 
