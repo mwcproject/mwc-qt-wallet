@@ -412,7 +412,12 @@ private:
     #ifdef Q_OS_WIN
         const QString TOR_NAME = "tor.exe";
     #else
-        const QString TOR_NAME = "tor";
+        #ifdef WALLET_DESKTOP
+            const QString TOR_NAME = "tor";
+        #endif
+        #ifdef MOBILE_DESKTOP
+            const QString TOR_NAME = "tor.so";
+        #endif
     #endif
 
     QString mwc713Path; // path to the backed binary
