@@ -250,7 +250,12 @@ void Outputs::requestOutputs(QString account) {
 
 void Outputs::on_accountComboBox_activated(int index) {
     Q_UNUSED(index)
-    requestOutputs(currentSelectedAccount());
+    // Selecting the active account
+    QString selectedAccount = currentSelectedAccount();
+    if (!selectedAccount.isEmpty()) {
+        wallet->switchAccount(selectedAccount);
+        requestOutputs(selectedAccount);
+    }
 }
 
 void Outputs::onSgnWalletBalanceUpdated() {
