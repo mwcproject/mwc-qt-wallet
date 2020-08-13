@@ -193,6 +193,12 @@ Window {
             anchors.fill: parent
             visible: currentState === 11
         }
+
+        Notifications {
+            id: notificationsItem
+            anchors.fill: parent
+            visible: currentState === 6
+        }
     }
 
     Navbar {

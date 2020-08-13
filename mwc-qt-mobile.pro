@@ -33,7 +33,6 @@ SOURCES += $$files(wallet/tasks/*.cpp)
 SOURCES -= $$files(out/*.cpp, true)
 SOURCES -= $$files(VS/*.cpp, true)
 
-HEADERS += qtandroidservice.h
 HEADERS += $$files(core/*.h)
 HEADERS += $$files(core_mobile/*.h)
 HEADERS += $$files(state/*.h)
