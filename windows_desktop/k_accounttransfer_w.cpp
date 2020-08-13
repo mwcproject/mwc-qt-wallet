@@ -67,9 +67,9 @@ void AccountTransfer::onSgnUpdateAccounts() {
     for ( int t=1; t<accountInfo.size(); t+=2 ) {
         ui->accountFromCB->addItem(accountInfo[t], QVariant(accountInfo[t-1]) );
         ui->accountToCB->addItem(accountInfo[t], QVariant(accountInfo[t-1]) );
-        if (accountInfo[t]==fromAcc)
+        if (accountInfo[t-1]==fromAcc)
             fromI = idx;
-        if (accountInfo[t]==toAcc)
+        if (accountInfo[t-1]==toAcc)
             toI = idx;
         idx++;
     }
