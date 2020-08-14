@@ -4,7 +4,8 @@ import QtQuick.Window 2.0
 import InputPasswordBridge 1.0
 import WalletBridge 1.0
 import UtilBridge 1.0
-import StateMachineBridge 1.0
+import StartWalletBridge 1.0
+import ConfigBridge 1.0
 
 Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
@@ -22,8 +23,12 @@ Item {
         id: util
     }
 
-    StateMachineBridge {
-        id: stateMachine
+    ConfigBridge {
+        id: config
+    }
+
+    StartWalletBridge {
+        id: startWallet
     }
 
     Connections {
@@ -31,9 +36,13 @@ Item {
         onSgnLoginResult: (ok) => {
             textfield_password.enabled = !ok
             button_login.enabled = !ok
-            if (ok) {
-                currentInstanceName = instanceComboBox.displayText
-            }
+            mousearea_newinstance.enabled = !ok
+            mousearea_restore.enabled = !ok
+        }
+
+        onSgnUpdateSyncProgress: (progressPercent) => {
+            console.log("Wallet state update, " + progressPercent + "% complete")
+//            ui->syncStatusMsg->setText("Wallet state update, " + util::trimStrAsDouble(QString::number(progressPercent), 4) + "% complete");
         }
     }
 
@@ -42,6 +51,34 @@ Item {
             textfield_password.text = ""
             textfield_password.enabled = true
             button_login.enabled = true
+//            ui->syncStatusMsg->setText("");
+
+            instanceItems.clear()
+            // <selected path_id>, < <path_id>, <instance name>, <network> >, ...  >
+            const instanceData = config.getWalletInstances(true)
+            // expecting at least 1 instance value
+            if (instanceData.length >= 4) {
+                // scanning for networks first
+                const networkSet = [];
+                for (let i = 1; i<=instanceData.length - 3; i += 3) {
+                    networkSet.push(instanceData[i+2])
+                }
+                let selectedIdx = 0;
+                for (let j = 1; j <= instanceData.length - 3; j += 3) {
+                    const pathId = instanceData[j]
+                    const name = instanceData[j+1]
+                    const nw = instanceData[j+2]
+
+                    if (pathId === instanceData[0]) {
+                        selectedIdx = j/3
+                    }
+                    instanceItems.append({
+                        instanceName: networkSet.lengh > 1 ? name + "; " + nw : name,
+                        pathId
+                    })
+                }
+                instanceComboBox.currentIndex = selectedIdx
+            }
         }
     }
 
@@ -81,7 +118,7 @@ Item {
         delegate: ItemDelegate {
             width: instanceComboBox.width
             contentItem: Text {
-                text: value
+                text: instanceName
                 color: instanceComboBox.highlightedIndex === index ? "#8633E0" : "white"
                 font: instanceComboBox.font
                 elide: Text.ElideRight
@@ -123,7 +160,7 @@ Item {
         }
 
         contentItem: Text {
-            text: instanceComboBox.displayText
+            text: instanceComboBox.currentIndex >= 0 && instanceItems.get(instanceComboBox.currentIndex).instanceName
             font: instanceComboBox.font
             color: "white"
             verticalAlignment: Text.AlignVCenter
@@ -156,15 +193,16 @@ Item {
                 color: "#8633E0"
                 radius: dp(5)
             }
+
+            onVisibleChanged: {
+                if (!instanceComboBox.popup.visible) {
+                    canvas.requestPaint()
+                }
+            }
         }
 
         model: ListModel {
-            id: accountItems
-            ListElement { value: "Default" }
-            ListElement { value: "Name of instance 2" }
-            ListElement { value: "Another instance name" }
-            ListElement { value: "another instance" }
-            ListElement { value: "Long instance name long name" }
+            id: instanceItems
         }
         anchors.bottom: text_login.top
         anchors.bottomMargin: dp(15)
@@ -255,6 +293,10 @@ Item {
                 return
             }
 
+            const selectedPath = instanceItems.get(instanceComboBox.currentIndex).instanceName
+            console.log(selectedPath)
+            config.setActiveInstance(selectedPath)
+
             // Submit the password and wait until state will push us.
             inputPassword.submitPassword(textfield_password.text)
         }
@@ -283,12 +325,13 @@ Item {
     }
 
     MouseArea {
+        id: mousearea_restore
         anchors.left: image_restore.left
         anchors.top: image_restore.top
         anchors.right: text_restore.right
         anchors.bottom: image_restore.bottom
         onClicked: {
-            console.log("Restore Instance Clicked")
+            startWallet.createNewWalletInstance("", true);
         }
     }
 
@@ -315,12 +358,13 @@ Item {
     }
 
     MouseArea {
+        id: mousearea_newinstance
         anchors.left: image_newinstance.left
         anchors.top: image_newinstance.top
-        anchors.right: text_instances.right
+        anchors.right: text_newinstance.right
         anchors.bottom: image_newinstance.bottom
         onClicked: {
-            stateMachine.setActionWindow(2)
+            startWallet.createNewWalletInstance("", false);
         }
     }
 

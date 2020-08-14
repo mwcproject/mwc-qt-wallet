@@ -1,14 +1,14 @@
 import QtQuick 2.0
 import QtQuick.Window 2.0
-import StateMachineBridge 1.0
+import StartWalletBridge 1.0
 
 Item {
     id: element
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
-    StateMachineBridge {
-        id: stateMachine
+    StartWalletBridge {
+        id: startWallet
     }
 
     Image {
@@ -60,8 +60,7 @@ Item {
         width: label_new.width
         height: label_new.height + dp(75)
         onClicked: {
-            console.log("new instance clicked")
-            stateMachine.setActionWindow(2)
+            startWallet.createNewWalletInstance("", false);
         }
     }
 
@@ -92,7 +91,7 @@ Item {
         width: label_restore.width
         height: label_restore.height + dp(75)
         onClicked: {
-            console.log("restore instance clicked")
+            startWallet.createNewWalletInstance("", true);
         }
     }
 

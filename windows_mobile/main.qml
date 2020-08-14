@@ -101,11 +101,11 @@ Window {
         anchors.fill: parent
     }
 
-//    InitWallet {
-//        id: initAccountItem
-//        anchors.fill: parent
-//        visible: currentState === 2
-//    }
+    InitWallet {
+        id: initWalletItem
+        anchors.fill: parent
+        visible: currentState === 1
+    }
 
     NewInstance {
         id: newInstanceItem
