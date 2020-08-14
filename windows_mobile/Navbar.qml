@@ -11,6 +11,8 @@ Item {
     readonly property int status_yellow: 2
     readonly property int status_green: 3
 
+    property string docName
+
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
@@ -360,6 +362,13 @@ Item {
             anchors.leftMargin: dp(28)
             fillMode: Image.PreserveAspectFit
             source: "../img/NavNotificationNormal@2x.svg"
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    stateMachine.setActionWindow(6)
+                }
+            }
         }
 
         Image {
@@ -371,6 +380,22 @@ Item {
             anchors.verticalCenter: image_notifications.verticalCenter
             fillMode: Image.PreserveAspectFit
             source: "../img/HelpBtn@2x.svg"
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    docName = stateMachine.getCurrentHelpDocName()
+                    var xhr = new XMLHttpRequest
+                    xhr.open('GET', "qrc:/help/" + docName)
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === XMLHttpRequest.DONE) {
+                            var response = xhr.responseText
+                            helpDlg.open(response)
+                        }
+                    }
+                    xhr.send()
+                }
+            }
         }
 
         Rectangle {
@@ -701,6 +726,16 @@ Item {
     MessageBox {
         id: messagebox
         anchors.verticalCenter: parent.verticalCenter
+    }
+
+    HelpDlg {
+        id: helpDlg
+        visible: false
+        anchors.fill: parent
+        anchors.leftMargin: dp(30)
+        anchors.rightMargin: dp(30)
+        anchors.topMargin: dp(30)
+        anchors.bottomMargin: dp(40)
     }
 }
 

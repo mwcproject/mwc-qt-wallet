@@ -81,6 +81,8 @@
 #include "bridge/wnd/e_transactions_b.h"
 #include "bridge/wnd/a_initaccount_b.h"
 #include "bridge/wnd/c_newseed_b.h"
+#include "bridge/wnd/x_events_b.h"
+#include "bridge/wnd/a_startwallet_b.h"
 
 #ifdef WALLET_MOBILE
 #include <QQmlApplicationEngine>
@@ -288,6 +290,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<bridge::Transactions>("TransactionsBridge", 1, 0, "TransactionsBridge");
     qmlRegisterType<bridge::InitAccount>("InitAccountBridge", 1, 0, "InitAccountBridge");
     qmlRegisterType<bridge::NewSeed>("NewSeedBridge", 1, 0, "NewSeedBridge");
+    qmlRegisterType<bridge::Events>("EventsBridge", 1, 0, "EventsBridge");
+    qmlRegisterType<bridge::StartWallet>("StartWalletBridge", 1, 0, "StartWalletBridge");
 
     core::MobileWndManager * wndManager = new core::MobileWndManager();
 #endif
@@ -489,7 +493,7 @@ int main(int argc, char *argv[])
 #ifdef WALLET_DESKTOP
         wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext, mwcNode );
 #else
-        //  wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
+        // wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
         wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext, mwcNode );
         QtAndroidService *qtAndroidService = new QtAndroidService(&app);
         qtAndroidService->sendToService("Start Service");

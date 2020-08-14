@@ -102,12 +102,11 @@ Item {
             const trans = JSON.parse(allTrans[idx])
             const selection = 0.0
 
-            if (canBeCancelled(trans.transactionType, trans.confirmed)) {
-                const age = calculateTransactionAge(trans.creationTime)
-                // 1 hours is a 1.0
-//                selection = age > 60 * 60 ?
-//                            1.0 : (Number(age) / Number(60 * 60))
-            }
+//            if (canBeCancelled(trans.transactionType, trans.confirmed)) {
+//                const age = calculateTransactionAge(trans.creationTime)
+//                // 1 hours is a 1.0
+//                selection = age > 60 * 60 ? 1.0 : (Number(age) / Number(60 * 60))
+//            }
 
             let transConfirmedStr = trans.confirmed ? "YES" : "NO"
             // if the node is online and in sync, display the number of confirmations instead
@@ -131,7 +130,7 @@ Item {
                 txCoinNano: util.nano2one(trans.coinNano) + " MWC",
                 txConfirmedStr: transConfirmedStr,
                 txHeight: trans.height <= 0 ? "" : Number(trans.height).toString(),
-                selection: selection
+//                selection: selection
             })
         }
     }

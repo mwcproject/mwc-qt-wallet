@@ -101,11 +101,11 @@ Window {
         anchors.fill: parent
     }
 
-//    InitWallet {
-//        id: initAccountItem
-//        anchors.fill: parent
-//        visible: currentState === 2
-//    }
+    InitWallet {
+        id: initWalletItem
+        anchors.fill: parent
+        visible: currentState === 1
+    }
 
     NewInstance {
         id: newInstanceItem
@@ -192,6 +192,12 @@ Window {
             id: transactionsItem
             anchors.fill: parent
             visible: currentState === 11
+        }
+
+        Notifications {
+            id: notificationsItem
+            anchors.fill: parent
+            visible: currentState === 6
         }
     }
 

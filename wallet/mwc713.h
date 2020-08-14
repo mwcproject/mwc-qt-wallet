@@ -415,7 +415,7 @@ private:
         #ifdef WALLET_DESKTOP
             const QString TOR_NAME = "tor";
         #endif
-        #ifdef MOBILE_DESKTOP
+        #ifdef WALLET_MOBILE
             const QString TOR_NAME = "tor.so";
         #endif
     #endif
