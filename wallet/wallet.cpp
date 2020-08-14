@@ -21,6 +21,7 @@
 #include "../util/Files.h"
 #include "../util/Process.h"
 #include "../core/WndManager.h"
+#include "../core/appcontext.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 
@@ -210,9 +211,17 @@ QString WalletConfig::getMwcMqHostFull() const {
 
 // Return empty if not found
 //static
-QVector<QString>  WalletConfig::readNetworkArchInstanceFromDataPath(QString configPath) // local path as writen in config
+QVector<QString>  WalletConfig::readNetworkArchInstanceFromDataPath(QString configPath, core::AppContext * context) // local path as writen in config
 {
-    QVector<QString> res{"Mainnet", util::getBuildArch(), configPath};
+    QString defaultNetwork = "Mainnet";
+    if (config::isOnlineNode()) {
+        if ( context->isOnlineNodeRunsMainNetwork() )
+            defaultNetwork = "Mainnet";
+        else
+            defaultNetwork = "Floonet";
+    }
+
+    QVector<QString> res{defaultNetwork, util::getBuildArch(), configPath};
 
     QPair<bool,QString> path = ioutils::getAppDataPath( configPath );
     if (!path.first) {

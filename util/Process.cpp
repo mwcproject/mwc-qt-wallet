@@ -17,6 +17,7 @@
 #include "../core/Config.h"
 #include <QSysInfo>
 #include "../core/WndManager.h"
+#include <QCoreApplication>
 
 namespace util {
 
@@ -27,25 +28,38 @@ bool processWaitForFinished( QProcess * process, int timeoutMs, const QString & 
     if (process->state() != QProcess::Running)
         return true;
 
-    if (!process->waitForFinished((int) (timeoutMs * config::getTimeoutMultiplier())) ) {
+    int64_t timeLimit = QDateTime::currentMSecsSinceEpoch() + (timeoutMs * config::getTimeoutMultiplier());
 
-        if (process->state() == QProcess::NotRunning)
-            return true;
 
-        QProcess::ProcessError errCode = process->error();
-        if (errCode == QProcess::Timedout) {
-            if ( core::getWndManager()->questionTextDlg("Warning", "Stopping process " + processName +
-                                " is taking longer than expected.\nContinue to wait?",
-                                "Yes", "No",
-                                "Give this process more time to stop, I believe it will make it",
-                                "Probably somrthing wrong, let's kill this process even it can corrupt its data",
-                                true, false) == core::WndManager::RETURN_CODE::BTN1) {
-                config::increaseTimeoutMultiplier();
-                return processWaitForFinished(process, timeoutMs, processName);
+    while(true) {
+        bool waiting = QDateTime::currentMSecsSinceEpoch() < timeLimit;
+        if (!process->waitForFinished(50)) {
+            if (process->state() == QProcess::NotRunning)
+                return true;
+
+            QProcess::ProcessError errCode = process->error();
+            if (errCode == QProcess::Timedout) {
+                if (!waiting) {
+                    if (core::getWndManager()->questionTextDlg("Warning", "Stopping process " + processName +
+                                                                          " is taking longer than expected.\nContinue to wait?",
+                                                               "Yes", "No",
+                                                               "Give this process more time to stop, I believe it will make it",
+                                                               "Probably somrthing wrong, let's kill this process even it can corrupt its data",
+                                                               true, false) == core::WndManager::RETURN_CODE::BTN1) {
+                        config::increaseTimeoutMultiplier();
+                        return processWaitForFinished(process, timeoutMs, processName);
+                    }
+                }
+
             }
+            else {
+                return false;
+            }
+            QCoreApplication::processEvents();
         }
-
-        return false;
+        else {
+            break; // Process exited
+        }
     }
 
     return true;

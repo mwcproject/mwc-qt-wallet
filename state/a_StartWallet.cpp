@@ -89,7 +89,7 @@ void StartWallet::createNewWalletInstance(QString path, bool restoreWallet) {
         context->appContext->addNewInstance(emptyWalletDir);
     }
     else {
-        QVector<QString> network_arch_name = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(path);
+        QVector<QString> network_arch_name = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(path, context->appContext);
         Q_ASSERT(network_arch_name.size() ==3);
 
         QString arh = network_arch_name[1];

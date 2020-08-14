@@ -333,7 +333,7 @@ QString selectWalletDirectory() {
     QDir baseDir(basePath.second);
     QString walletDir = baseDir.relativeFilePath(dir);
 
-    QVector<QString>  networkArch = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletDir); // local path as writen in config
+    QVector<QString>  networkArch = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletDir, state::getStateContext()->appContext ); // local path as writen in config
     QString runningArc = util::getBuildArch();
 
     // Just in case. Normally will never be called

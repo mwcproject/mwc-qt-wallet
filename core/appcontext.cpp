@@ -150,7 +150,7 @@ bool AppContext::loadData() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x4798)
+    if (id<0x4783 || id>0x4799)
          return false;
 
     QString mockStr;
@@ -270,7 +270,7 @@ bool AppContext::loadData() {
                     if (walletDataDir.startsWith('.'))
                         continue; // Self and parent - not interested
                     if (wallet::WalletConfig::doesSeedExist(walletDataDir)) {
-                        QString arch = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletDataDir)[1];
+                        QString arch = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletDataDir,this)[1];
                         if (arch == util::getBuildArch() ) {
                             walletInstancePaths.push_back(walletDataDir);
                             currentWalletInstanceIdx = 0;
@@ -279,6 +279,10 @@ bool AppContext::loadData() {
                 }
             }
         }
+    }
+
+    if (id>=0x4799) {
+        in >> isOnlineNodeMainNetwork;
     }
 
     return true;
@@ -308,7 +312,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x4798;
+    out << 0x4799;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -364,6 +368,8 @@ void AppContext::saveData() const {
     }
     out << walletInstancePaths;
     out << currentWalletInstanceIdx;
+
+    out << isOnlineNodeMainNetwork;
 }
 
 void AppContext::loadNotesData() {

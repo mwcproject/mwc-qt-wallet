@@ -140,7 +140,7 @@ void MwcNode::stop() {
                         break;
                     }
                 }
-                if (nodeProcess->waitForFinished( 500 ))
+                if (nodeProcess->waitForFinished( 50 ))
                     break;
                 QCoreApplication::processEvents();
             }

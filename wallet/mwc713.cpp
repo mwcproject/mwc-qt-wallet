@@ -200,7 +200,7 @@ bool MWC713::updateWalletConfig(const QString & path, bool canStartNode) {
 
     if (config.getDataPath() != path) {
         // Path for the wallet need to be updated
-        QVector<QString> network_arch_name = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(path);
+        QVector<QString> network_arch_name = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(path, appContext);
         Q_ASSERT(network_arch_name.size() == 3);
 
         QString arh = network_arch_name[1];

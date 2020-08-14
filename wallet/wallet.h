@@ -163,7 +163,7 @@ public:
     QString getMwcMqHostFull() const;
 
     // First [Network, Arch, InstanceName]
-    static QVector<QString> readNetworkArchInstanceFromDataPath(QString configPath); // local path as writen in config
+    static QVector<QString> readNetworkArchInstanceFromDataPath(QString configPath, core::AppContext * context); // local path as writen in config
     static void saveNetwork2DataPath(QString configPath, QString network, QString arch, QString instanceName); // Save the network into the data path
 
     static bool    doesSeedExist(QString configPath);

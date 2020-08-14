@@ -25,6 +25,7 @@ NodeConfig::NodeConfig(QWidget *parent) :
     ui(new Ui::NodeConfig)
 {
     ui->setupUi(this);
+    ui->progress->initLoader(false);
 
     config = new bridge::Config(this);
     walletConfig = new bridge::WalletConfig(this);
@@ -89,6 +90,8 @@ void NodeConfig::on_applyButton_clicked()
 }
 
 bool NodeConfig::applyChanges() {
+    ui->progress->show();
+
     // data path is expected to be updated on the start.
     walletConfig->setOnlineNodeRunsMainNetwork( getSelectedNetwork() == "Mainnet" );
     walletConfig->restartQtWallet();

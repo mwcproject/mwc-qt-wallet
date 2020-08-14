@@ -81,7 +81,7 @@ QVector<QString> Config::getWalletInstances(bool hasSeed) {
     result.push_back(instances.first[instances.second]);
 
     for ( const QString & wallet_local_path : instances.first ) {
-        QVector<QString> nai = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(wallet_local_path);
+        QVector<QString> nai = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(wallet_local_path, getAppContext());
         result.push_back(wallet_local_path);
         result.push_back(nai[2]);
         result.push_back(nai[0]);
@@ -105,7 +105,7 @@ QVector<QString> Config::getCurrentWalletInstance() {
     QString walletLocalPath = instances.first[instances.second];
     result.push_back(walletLocalPath);
     result.push_back( ioutils::getAppDataPath(walletLocalPath).second);
-    QVector<QString> nai = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletLocalPath);
+    QVector<QString> nai = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletLocalPath, getAppContext());
     result.push_back(nai[2]);
     result.push_back(nai[0]);
     return result;
@@ -119,7 +119,7 @@ void Config::setActiveInstance(QString instancePathId) {
 // Update instance name
 void Config::updateActiveInstanceName(QString newInstanceName) {
     QString walletLocalPath = getAppContext()->getCurrentWalletInstance(true);
-    QVector<QString> nai = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletLocalPath);
+    QVector<QString> nai = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletLocalPath, getAppContext());
     wallet::WalletConfig::saveNetwork2DataPath(walletLocalPath, nai[0], nai[1], newInstanceName);
 }
 
