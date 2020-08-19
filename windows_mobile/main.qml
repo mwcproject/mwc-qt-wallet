@@ -8,7 +8,6 @@ Window {
     visible: true
     title: qsTr("MWC-Mobile-Wallet")
     
-    property string currentInstanceName
     property int currentState
     property string initParams
     property int questionTextDlgResponse

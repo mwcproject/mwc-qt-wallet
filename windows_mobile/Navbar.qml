@@ -186,7 +186,7 @@ Item {
     }
 
     function updateInstanceAccountText() {
-        text_instance_account.text = "INSTANCE:  " + currentInstanceName + "  //  ACCOUNT:  " + wallet.getCurrentAccountName()
+        text_instance_account.text = "INSTANCE:  " + config.getCurrentWalletInstance()[2] + "  //  ACCOUNT:  " + wallet.getCurrentAccountName()
     }
 
     function updateAccountList() {
@@ -299,14 +299,20 @@ Item {
 
         Rectangle {
             id: rect_balance
+            width: dp(72) + text_balance.width
             height: dp(60)
             color: "#00000000"
             anchors.top: menuRect.bottom
-            anchors.topMargin: 0
-            anchors.right: parent.right
-            anchors.rightMargin: 0
-            anchors.left: parent.left
-            anchors.leftMargin: 0
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            Image {
+                id: image_logo1
+                width: dp(58)
+                height: dp(29)
+                anchors.verticalCenter: parent.verticalCenter
+                fillMode: Image.PreserveAspectFit
+                source: "../img/TBLogo@2x.svg"
+            }
 
             Text {
                 id: text_balance
@@ -317,17 +323,6 @@ Item {
                 font.bold: true
                 color: "white"
                 anchors.verticalCenter: image_logo1.verticalCenter
-            }
-
-            Image {
-                id: image_logo1
-                width: dp(58)
-                height: dp(29)
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenterOffset: dp(-30)
-                anchors.horizontalCenter: parent.horizontalCenter
-                fillMode: Image.PreserveAspectFit
-                source: "../img/TBLogo@2x.svg"
             }
         }
     }
@@ -578,14 +573,18 @@ Item {
                     width: accountComboBox.width
                     contentItem: Text {
                         text: info
-                        color: accountComboBox.highlightedIndex === index ? "#8633E0" : "white"
+                        color: "white"
                         font: accountComboBox.font
                         elide: Text.ElideRight
                         verticalAlignment: Text.AlignVCenter
                     }
-                    highlighted: accountComboBox.highlightedIndex === index
+                    background: Rectangle {
+                        color: accountComboBox.highlightedIndex === index ? "#955BDD" : "#8633E0"
+                    }
                     topPadding: dp(10)
                     bottomPadding: dp(10)
+                    leftPadding: dp(20)
+                    rightPadding: dp(20)
                 }
 
                 indicator: Canvas {
@@ -637,7 +636,10 @@ Item {
                     y: accountComboBox.height + dp(3)
                     width: accountComboBox.width
                     implicitHeight: contentItem.implicitHeight + dp(40)
-                    padding: dp(20)
+                    topPadding: dp(20)
+                    bottomPadding: dp(20)
+                    leftPadding: dp(0)
+                    rightPadding: dp(0)
 
                     contentItem: ListView {
                         clip: true

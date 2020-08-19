@@ -31,7 +31,7 @@ Item {
     Connections {
         target: receive
         onSgnTransactionActionIsFinished: {
-//            ui->progress->hide()
+            rect_progress.visible = false
             const title = success ? "Success" : "Failure"
             messagebox.open(qsTr(title), qsTr(message))
             console.log(success, message)
@@ -59,6 +59,7 @@ Item {
 
     onVisibleChanged: {
         if (visible) {
+            rect_progress.visible = false
             if (config.hasTls()) {
                 text_http.text = qsTr("Https")
             }
@@ -245,7 +246,7 @@ Item {
         anchors.top: label_combobox.bottom
         anchors.topMargin: dp(10)
         leftPadding: dp(20)
-        rightPadding: dp(50)
+        rightPadding: dp(40)
         font.pixelSize: dp(14)
 
         onCurrentIndexChanged: {
@@ -257,15 +258,22 @@ Item {
 
         delegate: ItemDelegate {
             width: accountComboBox.width
-            height: dp(40)
+            height: dp(72)
             contentItem: Text {
                 text: info
-                color: "#7579ff"
+                color: "white"
                 font: accountComboBox.font
                 elide: Text.ElideRight
                 verticalAlignment: Text.AlignVCenter
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
-            highlighted: accountComboBox.highlightedIndex === index
+            background: Rectangle {
+                color: accountComboBox.highlightedIndex === index ? "#955BDD" : "#8633E0"
+            }
+            topPadding: dp(10)
+            bottomPadding: dp(10)
+            leftPadding: dp(20)
+            rightPadding: dp(20)
         }
 
         indicator: Canvas {
@@ -283,10 +291,17 @@ Item {
 
             onPaint: {
                 context.reset()
-                context.moveTo(0, 0)
-                context.lineTo(width / 2, height)
-                context.lineTo(width, 0)
+                if (accountComboBox.popup.visible) {
+                    context.moveTo(0, height)
+                    context.lineTo(width / 2, 0)
+                    context.lineTo(width, height)
+                } else {
+                    context.moveTo(0, 0)
+                    context.lineTo(width / 2, height)
+                    context.lineTo(width, 0)
+                }
                 context.strokeStyle = "white"
+                context.lineWidth = 2
                 context.stroke()
             }
         }
@@ -301,15 +316,19 @@ Item {
         }
 
         background: Rectangle {
+            implicitHeight: dp(72)
             radius: dp(4)
             color: "#8633E0"
         }
 
         popup: Popup {
-            y: accountComboBox.height - 1
+            y: accountComboBox.height + dp(3)
             width: accountComboBox.width
-            implicitHeight: contentItem.implicitHeight
-            padding: dp(1)
+            implicitHeight: contentItem.implicitHeight + dp(40)
+            topPadding: dp(20)
+            bottomPadding: dp(20)
+            leftPadding: dp(0)
+            rightPadding: dp(0)
 
             contentItem: ListView {
                 clip: true
@@ -321,8 +340,14 @@ Item {
             }
 
             background: Rectangle {
-                border.color: "white"
-                radius: dp(4)
+                color: "#8633E0"
+                radius: dp(5)
+            }
+
+            onVisibleChanged: {
+                if (!accountComboBox.popup.visible) {
+                    canvas.requestPaint()
+                }
             }
         }
 
@@ -444,6 +469,20 @@ Item {
         }
     }
 
+    Rectangle {
+        id: rect_progress
+        width: dp(60)
+        height: dp(30)
+        anchors.verticalCenter: button_file.verticalCenter
+        anchors.horizontalCenter: button_tor.horizontalCenter
+        color: "#00000000"
+        visible: false
+        AnimatedImage {
+            id: animation
+            source: "../img/loading.gif"
+        }
+    }
+
     Text {
         id: text_file
         color: "#BF84FF"
@@ -462,7 +501,7 @@ Item {
         onAccepted: {
             console.log("Accepted: " + fileDialog.file)
 //            bridge.updateFileGenerationPath(fileDialog.file)
-//            ui->progress->show()
+//              rect_progress.visible = true
 //            receive.signTransaction(fileDialog.file)
         }
     }
