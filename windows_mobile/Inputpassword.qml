@@ -34,6 +34,12 @@ Item {
     Connections {
         target: wallet
         onSgnLoginResult: (ok) => {
+            if (!ok) {
+                rect_progress.visible = false
+                messagebox.open(qsTr("Password"), qsTr("Password supplied was incorrect. Please input correct password."))
+                textfield_password.text = ""
+            }
+
             textfield_password.enabled = !ok
             button_login.enabled = !ok
             mousearea_newinstance.enabled = !ok
@@ -41,17 +47,17 @@ Item {
         }
 
         onSgnUpdateSyncProgress: (progressPercent) => {
-            console.log("Wallet state update, " + progressPercent + "% complete")
-//            ui->syncStatusMsg->setText("Wallet state update, " + util::trimStrAsDouble(QString::number(progressPercent), 4) + "% complete");
+            text_syncStatusMsg.text = "Wallet state update, " + util.trimStrAsDouble(Number(progressPercent).toString(), 4) + "% complete"
         }
     }
 
     onVisibleChanged: {
         if (visible) {
+            rect_progress.visible = false
             textfield_password.text = ""
             textfield_password.enabled = true
             button_login.enabled = true
-//            ui->syncStatusMsg->setText("");
+            text_syncStatusMsg.text = ""
 
             instanceItems.clear()
             // <selected path_id>, < <path_id>, <instance name>, <network> >, ...  >
@@ -63,6 +69,7 @@ Item {
                 for (let i = 1; i<=instanceData.length - 3; i += 3) {
                     networkSet.push(instanceData[i+2])
                 }
+
                 let selectedIdx = 0;
                 for (let j = 1; j <= instanceData.length - 3; j += 3) {
                     const pathId = instanceData[j]
@@ -73,7 +80,8 @@ Item {
                         selectedIdx = j/3
                     }
                     instanceItems.append({
-                        instanceName: networkSet.lengh > 1 ? name + "; " + nw : name,
+                        instanceName: networkSet.length > 1 ? name + "; " + nw : name,
+                        name,
                         pathId
                     })
                 }
@@ -102,6 +110,17 @@ Item {
     }
 
     Text {
+        id: text_logo
+        text: qsTr("mwc")
+        color: "white"
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: image_logo.bottom
+        anchors.topMargin: dp(14)
+        font.bold: true
+        font.pixelSize: dp(18)
+    }
+
+    Text {
         id: text_instances
         text: qsTr("Instances")
         color: "white"
@@ -119,14 +138,18 @@ Item {
             width: instanceComboBox.width
             contentItem: Text {
                 text: instanceName
-                color: instanceComboBox.highlightedIndex === index ? "#8633E0" : "white"
+                color: "white"
                 font: instanceComboBox.font
                 elide: Text.ElideRight
                 verticalAlignment: Text.AlignVCenter
             }
-            highlighted: instanceComboBox.highlightedIndex === index
+            background: Rectangle {
+                color: instanceComboBox.highlightedIndex === index ? "#955BDD" : "#8633E0"
+            }
             topPadding: dp(10)
             bottomPadding: dp(10)
+            leftPadding: dp(20)
+            rightPadding: dp(20)
         }
 
         indicator: Canvas {
@@ -164,7 +187,7 @@ Item {
             font: instanceComboBox.font
             color: "white"
             verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
+            horizontalAlignment: Text.AlignLeft
             elide: Text.ElideRight
         }
 
@@ -178,7 +201,10 @@ Item {
             y: instanceComboBox.height + dp(3)
             width: instanceComboBox.width
             implicitHeight: contentItem.implicitHeight + dp(40)
-            padding: dp(20)
+            topPadding: dp(20)
+            bottomPadding: dp(20)
+            leftPadding: dp(0)
+            rightPadding: dp(0)
 
             contentItem: ListView {
                 clip: true
@@ -236,8 +262,8 @@ Item {
         echoMode: "Password"
         color: "white"
         text: ""
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: dp(-10)
+        anchors.bottom: button_login.top
+        anchors.bottomMargin: dp(40)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
@@ -263,8 +289,7 @@ Item {
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        anchors.top: textfield_password.bottom
-        anchors.topMargin: dp(40)
+        anchors.verticalCenter: parent.verticalCenter
         background: Rectangle {
             id: rectangle
             color: "#00000000"
@@ -293,13 +318,38 @@ Item {
                 return
             }
 
-            const selectedPath = instanceItems.get(instanceComboBox.currentIndex).instanceName
-            console.log(selectedPath)
+            const selectedPath = instanceItems.get(instanceComboBox.currentIndex).name
             config.setActiveInstance(selectedPath)
+
+            rect_progress.visible = true
 
             // Submit the password and wait until state will push us.
             inputPassword.submitPassword(textfield_password.text)
         }
+    }
+
+    Rectangle {
+        id: rect_progress
+        width: dp(60)
+        height: dp(30)
+        anchors.top: button_login.bottom
+        anchors.topMargin: dp(40)
+        anchors.horizontalCenter: parent.horizontalCenter
+        color: "#00000000"
+        visible: false
+        AnimatedImage {
+            id: animation
+            source: "../img/loading.gif"
+        }
+    }
+
+    Text {
+        id: text_syncStatusMsg
+        anchors.top: rect_progress.bottom
+        anchors.topMargin: dp(15)
+        anchors.horizontalCenter: parent.horizontalCenter
+        font.pixelSize: dp(17)
+        color: "white"
     }
 
     Image {

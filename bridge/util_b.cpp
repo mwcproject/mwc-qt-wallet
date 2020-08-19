@@ -143,5 +143,10 @@ QString Util::longLong2Str(int n) {
     return util::longLong2Str(n);
 }
 
+// Trim string that represent double. 23434.32345, len 7 => 23434.32; 23434.32345, len 5 => 23434
+QString Util::trimStrAsDouble(const QString & dblStr, int maxLen) {
+    return util::trimStrAsDouble(dblStr, maxLen);
+}
+
 
 }

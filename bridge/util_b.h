@@ -78,6 +78,9 @@ public:
     // Print nicely the number
     Q_INVOKABLE QString longLong2Str(int n);
 
+    // Trim string that represent double. 23434.32345, len 7 => 23434.32; 23434.32345, len 5 => 23434
+    Q_INVOKABLE QString trimStrAsDouble(const QString & dblStr, int maxLen);
+
 private:
     util::PasswordAnalyser * pa = nullptr;
     // PasswordAnalyser last respond values

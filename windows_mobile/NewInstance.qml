@@ -37,7 +37,7 @@ Item {
         anchors.top: image_logo.bottom
         anchors.topMargin: dp(14)
         anchors.horizontalCenter: image_logo.horizontalCenter
-        font.pixelSize: dp(16)
+        font.pixelSize: dp(18)
     }
 
     Rectangle {
