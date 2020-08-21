@@ -33,7 +33,9 @@ on a USB stick. The downside of this option is you will need to recover from pas
 Please note, by running Ubuntu on a USB stick you might run into the following issues:
  - UEFI Bios might not handle the removable boot drive well.
  - USB stick will wear relatively fast.
- - You will need to install needed packages offline. For example qt libraries need to be installed. 
+ - You will need to install needed packages offline. The following packages are needed:
+   1. qt5-default
+   2. libncursesw5
 
 Full explanation is out of scope for this document.
 

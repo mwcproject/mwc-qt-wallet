@@ -202,6 +202,10 @@ Now update the Ubuntu repository and install Qt5 which is needed by MWC Qt Walle
 
 * sudo apt-get install qt5-default
 
+Load other required packages:
+
+* sudo apt-get install libncursesw5
+
  
 
 Next: 
