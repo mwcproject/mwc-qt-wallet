@@ -1,20 +1,36 @@
-Creating a Cold Wallet on a USB Drive With Persistent Storage
+Creating a USB Drive With Persistent Storage For MWC Cold Wallet
 
-Last Updated: Aug. 11, 2020
+Last Updated: Aug. 23, 2020
 
 # Overview
 
-Our previous instructions for creating or running an MWC Cold Wallet using USB sticks required the use of a bootable live Ubuntu USB drive and a second USB drive for your MWC Cold Wallet. The live Ubuntu USB drive could not store files, hence the reason for the second USB drive to hold your wallet.
+A cold wallet is intended to keep your MWC safe by storing your MWC in offline storage. Once set up, your cold wallet should never be connected to the internet. This will prevent hackers from being able to access your wallet and steal your funds.
 
-With Ubuntu it is possible to create a live USB drive with persistent storage. Therefore you can create a USB drive which can be booted and also contains your cold wallet. Persistence doesn’t work with every Linux distribution but it is known to work with versions of Ubuntu 18.04 LTS or later. I’ve tested the following procedure using the latest version of Ubuntu available at the time of this writing (20.04.1).
+Our previous instructions for creating or running an MWC Cold Wallet using USB drives required the use of a bootable live Ubuntu USB drive and a second USB drive for your MWC Cold Wallet. The live Ubuntu USB drive could not store files, hence the reason for the second USB drive to hold your wallet.
 
-This document describes a procedure where you can create an MWC Cold Wallet where the USB drive containing the wallet will also contain Ubuntu. It will no longer be necessary to boot from a separate live Ubuntu USB stick in order to access your cold wallet.
+With Ubuntu it is now possible to create a live USB drive with persistent storage. Therefore you can create a USB drive which can be booted and also contains your cold wallet. Persistence doesn’t work with every Linux distribution but it is known to work with versions of Ubuntu 18.04 LTS or later. I’ve tested the following procedure using the latest version of Ubuntu available at the time of this writing (20.04.1).
 
-Once you create a USB drive running Ubuntu and mwc-qt-wallet you can then follow the procedures in  [https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md) which describes the full procedure for setting up and using an MWC Cold Wallet.
+This document describes the procedure where you can create a USB drive running Ubuntu and which supports persistent storage. This USB drive can then be used to install and set up an MWC cold wallet. Your MWC cold wallet will then run on a single USB drive which you boot to whenever you want to access your cold wallet. 
+
+The procedure to install the software needed to run an MWC cold wallet can be found at:
+
+* [MWC Cold Wallet Software Installation Guide](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet_software_installation_guide.md)
+
+The procedure to set up an MWC cold wallet, after the software has been installed on your USB stick, can be found at:
+
+* [Create/Manage Cold Wallet](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md)
+
+Once you have your MWC cold wallet set up on a USB stick you’ve created following this procedure, it will no longer be necessary to boot from a separate live Ubuntu USB stick in order to access your cold wallet.
+
+# Prerequisites
+
+* A USB drive with at least 64GB of memory. 
+
+You will have the best cold wallet experience with a faster USB drive. At the time of this writing, you can get a USB 3.1 stick with 128GB of memory and a data transfer rate of 300mb/s for around $20.
 
 # Run Ubuntu
 
-In order to make a live Ubuntu USB drive with persistent storage, you need a computer already running Ubuntu. If you do not have such a system, you can create a bootable Ubuntu USB drive to use for this procedure only. This drive will not have persistent storage and is meant only to allow you to boot up Ubuntu so that you can create a USB drive with Ubuntu that has persistent storage and so can also contain your cold wallet. So do not use a drive with a lot of storage for this temporary live Ubuntu USB drive.
+In order to make a live Ubuntu USB drive with persistent storage, you need a computer already running Ubuntu. If you do not have such a system, you can create a bootable Ubuntu USB drive to use for this procedure only. This USB drive will not have persistent storage and is meant only to allow you to boot up Ubuntu so that you can create a USB drive with Ubuntu that has persistent storage and so can also contain your cold wallet.
 
 The following links contain procedures for creating this type of bootable Ubuntu USB drive depending upon your computer OS. This procedure is using Ubuntu Desktop so the size requirements for the USB drive are larger than what is documented in the article in the link.
 
@@ -152,7 +168,7 @@ Ensure option 1 (default) is selected in the next dialog that appears.
 
 * Click ‘OK’
 
-Now select the percentage of the storage space on the USB drive you want to use for persistence vs data. Since you won’t be using the USB drive for anything other than your cold wallet, you won’t need that much space for persistence. But you will need to download and install some software such as mwc-qt-wallet and Qt5 which is required by the wallet. If uncertain, just keep the default setting of 50%.
+Now select the percentage of the storage space on the USB drive you want to use for persistence vs data. Since you won’t be using the USB drive for anything other than your cold wallet, you won’t need that much space for persistence. But you will need to download and install some software such as mwc-qt-wallet and Qt5 which is required to run a cold wallet. If uncertain, just keep the default setting of 50%.
 
 * Select persistence percentage
 
@@ -174,69 +190,33 @@ At the terminal window which appeared when mkusb was launched, you will be promp
 
 * Press ‘Enter’
 
-You can now eject your new bootable live Ubuntu USB with persistent storage.
+You can now eject your new bootable live Ubuntu USB with persistent storage and label it.
 
-Then power off your computer and remove the USB drive that you had previously booted it with. Place this drive somewhere so you don’t mix it up with your new persistent USB drive.
+Then power off your computer and remove the USB drive, without persistent storage, that you had previously booted with. Place this drive somewhere so you don’t mix it up with your new persistent USB drive.
 
-### Install mwc-qt-wallet onto New USB Drive
+# MWC Cold Wallet Software Installation
 
-To run a cold wallet on your new USB drive, you first need to:
+You are now ready to install the software needed to create and run an MWC cold wallet onto your new bootable live Ubuntu USB drive with persistent storage. See the installation instructions at the following link:
 
-* Boot with the new drive and connect to your network
-
-We are now connected to the internet so that we can download and install the files necessary to run an MWC Cold Wallet. This will be the only time you ever connect to the internet with this USB drive. Once your cold wallet is set up, you should never run it while connected to a network.
-
-Open the Software & Updates application and under Downloadable from the Internet:
-
-* check Source Code
-
-* Click ‘Apply’
-
-* Click ‘Reload’
-
-Now update the Ubuntu repository and install Qt5 which is needed by MWC Qt Wallet:
-
-* sudo add-apt-repository universe
-
-* sudo apt-get update
-
-* sudo apt-get install qt5-default
-
-Load other required packages:
-
-* sudo apt-get install libncursesw5
-
- 
-
-Next: 
-
-* Open a browser and download the mwc-qt-wallet from [https://www.mwc.mw/downloads](https://www.mwc.mw/downloads)
-
-* Double click on the downloaded file icon to cause the installer to open and installation to occur.
-
-### Shutdown Computer
-
-Now that mwc-qt-wallet has been installed on your USB drive:
-
-* Shutdown your computer
-
-* Remove USB drive with mwc-qt-wallet installed on it
-
-* Label the drive
+* [MWC Cold Wallet Software Installation Guide](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet_software_installation_guide.md)
 
 # Cold Wallet Setup
 
-You are now ready to setup your cold wallet following the instructions in:
+One you have installed the software necessary to create and run an MWC cold wallet, you then need to setup your cold wallet following the instructions in:
 
-* [https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md)
+* [Create/Manage Cold Wallet](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md)
 
-However, you will not now need 2 USB drives to startup your wallet. You now only need to use the one we just created with mwc-qt-wallet on it. However, you will still need a second USB drive to transfer files between your online node and cold wallet.
+Since you have created a live Ubuntu USB drive with persistent storage and installed the software necessary to run a cold wallet, you will not need 2 USB drives to startup your wallet as described in the first part of the instructions. You now only need to use the one we just created with mwc-qt-wallet on it. However, you will still need a second USB drive to transfer files between your online node and cold wallet.
 
-Start with the section "Online Node Host".
+To set up your MWC cold wallet, start with the section in the instructions titled "Online Node Host".
 
 When you come to the section "Cold Wallet Setup" you can skip steps 1 thru 5. Instead do the following:
 
 * Boot from your USB drive but *DO NOT CONNECT TO YOUR NETWORK*
+
+* Once you have booted from your USB drive, verify that you are *not* connected to your network. See the section in the installation guide *Verify Network Connection* for information on how to see if your computer has any network connections. From this point on and whenever you use your cold wallet, you do not want any network connections.
+
+Note: Some versions of Ubuntu (e.g. 18.04.5) will automatically reconnect to the network they have previously been connected to, even though you do not connect to a network during initial boot up.
 
 Then continue to follow the directions in "Cold Wallet Setup" starting with step 6.
 
