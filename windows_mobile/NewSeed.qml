@@ -8,8 +8,8 @@ Item {
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     function init(seed, hideSubmitButton) {
-        text_seed.text = seed
-        text_seed.text = text_seed.text.replace(/\s/g, '    ')
+        text_seed.text = seed.replace(/\s/g, '    ')
+//        testSeed = seed.split(" ")
         button_next.visible = !hideSubmitButton
     }
 

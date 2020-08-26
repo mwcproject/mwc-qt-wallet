@@ -69,7 +69,7 @@ Item {
                 commitType = "Output " + Number(i-txinfo.numInputs+1) + ": ";
             }
 
-            list_commitments.append({ value: commitType + outputs[i].outputCommitment });
+            list_commitments.append({ value: commitType + JSON.parse(outputs[i]).outputCommitment });
         }
 
         // Selecting first output
@@ -79,7 +79,6 @@ Item {
         } else {
             combobox_commitments.currentIndex = -1
         }
-//        combobox_commitments.currentIndex = 0;
     }
 
     function getTxTypeIcon(transactionType, confirmed) {
@@ -111,8 +110,7 @@ Item {
     }
 
     function getTxTime(creationTime) {
-//        const date = Date.fromLocaleString(locale, creationTime, "hh:mm:ss dd-MM-yyyy")
-        const date = Date.fromLocaleString(locale, creationTime, "dd-MM-yyyy hh:mm")
+        const date = Date.fromLocaleString(locale, creationTime, "hh:mm:ss dd-MM-yyyy")
         return date.toLocaleString(locale, "MMM dd, yyyy")
     }
 
@@ -144,7 +142,7 @@ Item {
             return
         }
 
-        const out = outputs[combobox_commitments.currentIndex]
+        const out = JSON.parse(outputs[combobox_commitments.currentIndex])
         label_status.visible = true
         text_status.visible = true
         text_status.text = out.status
@@ -324,10 +322,13 @@ Item {
                 id: text_address
                 color: "#3600c9"
                 text: qsTr("https://tokok.co/coin/mwc/7295hghhgh4bdfb65")
+                elide: Text.ElideMiddle
                 anchors.left: parent.left
                 anchors.topMargin: dp(3)
                 anchors.top: label_address.bottom
                 anchors.leftMargin: dp(20)
+                anchors.right: parent.right
+                anchors.rightMargin: dp(20)
                 font.pixelSize: dp(15)
             }
 
@@ -618,11 +619,15 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                     }
                     highlighted: combobox_commitments.highlightedIndex === index
+                    topPadding: dp(10)
+                    bottomPadding: dp(10)
+                    leftPadding: dp(20)
+                    rightPadding: dp(30)
                 }
 
                 indicator: Canvas {
                     id: canvas
-                    x: combobox_commitments.width - width - combobox_commitments.rightPadding
+                    x: combobox_commitments.width - width - dp(10)
                     y: combobox_commitments.topPadding + (combobox_commitments.availableHeight - height) / 2
                     width: dp(14)
                     height: dp(7)
@@ -635,16 +640,22 @@ Item {
 
                     onPaint: {
                         context.reset()
-                        context.moveTo(0, 0)
-                        context.lineTo(width / 2, height)
-                        context.lineTo(width, 0)
+                        if (combobox_commitments.popup.visible) {
+                            context.moveTo(0, height)
+                            context.lineTo(width / 2, 0)
+                            context.lineTo(width, height)
+                        } else {
+                            context.moveTo(0, 0)
+                            context.lineTo(width / 2, height)
+                            context.lineTo(width, 0)
+                        }
                         context.fillStyle = "#3600C9"
                         context.fill()
                     }
                 }
 
                 contentItem: Text {
-                    text: combobox_commitments.displayText
+                    text: combobox_commitments.currentIndex >= 0 && list_commitments.get(combobox_commitments.currentIndex).value
                     font: combobox_commitments.font
                     color: "#3600C9"
                     verticalAlignment: Text.AlignVCenter
@@ -652,7 +663,7 @@ Item {
                 }
 
                 background: Rectangle {
-                    implicitHeight: dp(44)
+                    implicitHeight: dp(40)
                     radius: dp(4)
                     border.color: "#E2CCF7"
                     border.width: dp(2)
@@ -675,16 +686,20 @@ Item {
                     }
 
                     background: Rectangle {
-                        border.color: "white"
-                        radius: dp(3)
+                        color: "white"
+                        border.color: "#3600C9"
+                        border.width: dp(2)
+                    }
+
+                    onVisibleChanged: {
+                        if (!combobox_commitments.popup.visible) {
+                            canvas.requestPaint()
+                        }
                     }
                 }
 
                 model: ListModel {
                     id: list_commitments
-                    ListElement { value: "odifjowo4384938hfjk3fjijifji3nfeunf..." }
-                    ListElement { value: "odifjowo4384938hfjk3fjijifji3nfeunf..." }
-                    ListElement { value: "odifjowo4384938hfjk3fjijifji3nfeunf..." }
                 }
                 anchors.top: label_commitments.bottom
                 anchors.topMargin: dp(10)
@@ -720,7 +735,7 @@ Item {
 
                 onClicked: {
                     if (combobox_commitments.currentIndex >= 0) {
-                        Qt.openUrlExternally("https://" + blockExplorerUrl + "/#o" + outputs[combobox_commitments.currentIndex].outputCommitment )
+                        Qt.openUrlExternally("https://" + blockExplorerUrl + "/#o" + JSON.parse(outputs[combobox_commitments.currentIndex]).outputCommitment )
                     }
                 }
             }
