@@ -65,7 +65,8 @@ enum STATE {
     ACCOUNT_OPTIONS = 22,       // Account options page
     WALLET_SETTINGS = 23,       // Settings page
 
-    MIGRATION = 24              // Data migration between wallet versions.
+    MIGRATION = 24,             // Data migration between wallet versions.
+    SWAP = 25,                  // Atomic swaps
 };
 
 struct NextStateRespond {

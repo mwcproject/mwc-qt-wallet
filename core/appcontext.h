@@ -20,7 +20,6 @@
 #include "../state/m_airdrop.h"
 #include "../wallet/wallet.h"
 #include "../core/HodlStatus.h"
-#include "../core/walletnotes.h"
 #include "../core/Config.h"
 #include <QDebug>
 

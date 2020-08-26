@@ -50,6 +50,10 @@
 #include "../windows_desktop/x_walletconfig_w.h"
 #include "../windows_desktop/x_nodeconfig_w.h"
 #include "../windows_desktop/y_selectmode_w.h"
+#include "../windows_desktop/s_swaplist_w.h"
+#include "../windows_desktop/s_editswap_w.h"
+#include "../windows_desktop/s_newswap_w.h"
+#include "../windows_desktop/s_tradedetails_w.h"
 #include <QFileDialog>
 #include "../core/WalletApp.h"
 #include <QMessageBox>
@@ -304,6 +308,25 @@ void DesktopWndManager::pageWalletSettings() {
 void DesktopWndManager::pageAccountOptions() {
     Q_ASSERT(false);
 }
+
+void DesktopWndManager::pageSwapList() {
+    windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_LIST,
+        new wnd::SwapList( windowManager->getInWndParent()));
+}
+void DesktopWndManager::pageSwapNew() {
+    windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_NEW,
+        new wnd::NewSwap( windowManager->getInWndParent()));
+}
+
+void DesktopWndManager::pageSwapEdit(QString swapId) {
+    windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_EDIT,
+         new wnd::EditSwap( windowManager->getInWndParent(), swapId));
+}
+void DesktopWndManager::pageSwapTradeDetails(QString swapId) {
+    windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_DETAILS,
+         new wnd::TradeDetails( windowManager->getInWndParent(), swapId));
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

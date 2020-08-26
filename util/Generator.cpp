@@ -19,7 +19,7 @@ namespace util {
 
 static const QString Base58Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-// Genrate a secret. Note, random number generator is not cryptography secure because of QT version
+// Generate a secret. Note, random number generator is not cryptography secure because of QT version
 QString generateSecret(int length) {
     qsrand( static_cast<quint64>( QTime::currentTime().msecsSinceStartOfDay() ) );
     QString result;

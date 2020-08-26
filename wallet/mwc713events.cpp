@@ -72,6 +72,7 @@ QString toString(WALLET_EVENTS event) {
 
         case S_TRANSACTION_LOG:     return "S_TRANSACTION_LOG";
         case S_OUTPUT_LOG:          return "S_OUTPUT_LOG";
+        case S_SWAP_GET_OFFER:      return "S_SWAP_GET_OFFER";
 
         default: Q_ASSERT(false); return "Unknown";
     }

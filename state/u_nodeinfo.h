@@ -48,6 +48,8 @@ public:
 
     void requestWalletResync();
 
+    int getCurrentNodeHeight() {return lastNodeStatus.nodeHeight;}
+
     // Connection with network
     wallet::MwcNodeConnection getNodeConnection() const;
     void updateNodeConnection( const wallet::MwcNodeConnection & nodeConnect);

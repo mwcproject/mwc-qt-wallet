@@ -56,6 +56,7 @@ private:
     void initAccount();
     void initSend();
     void initTransactions();
+    void initSwaps();
 
     void initSyncProgress(); // Special listeners that don't emit simple events, instead update the progress at the status line
 

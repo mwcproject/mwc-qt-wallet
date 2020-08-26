@@ -96,6 +96,12 @@ public:
     virtual void pageWalletSettings() override;
     virtual void pageAccountOptions() override;
 
+    // Swap pages
+    virtual void pageSwapList() override;
+    virtual void pageSwapNew() override;
+    virtual void pageSwapEdit(QString swapId) override;
+    virtual void pageSwapTradeDetails(QString swapId) override;
+
 private:
     WindowManager * windowManager = nullptr;
     MainWindow    * mainWindow = nullptr;

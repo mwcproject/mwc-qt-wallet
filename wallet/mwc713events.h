@@ -85,6 +85,8 @@ enum WALLET_EVENTS {
     S_TRANSACTION_LOG = 80,
     S_OUTPUT_LOG = 81,
 
+    // Swaps
+    S_SWAP_GET_OFFER = 90,
 
 };
 QString toString(WALLET_EVENTS event);

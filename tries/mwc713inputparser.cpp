@@ -34,11 +34,10 @@ Mwc713InputParser::Mwc713InputParser() {
     initAccount();
     initSend();
     initTransactions();
-
     initListening();
     initRecovery();
-
     initSyncProgress();
+    initSwaps();
 }
 
 Mwc713InputParser::~Mwc713InputParser() {}
@@ -456,6 +455,19 @@ void Mwc713InputParser::initTransactions() {
                                                         new TrieNewLineSection(),
                                                         new TrieAnySection(512, TrieAnySection::NOT_NEW_LINE, "", "", 1),
                                                         new TrieNewLineSection()
+                                                }));
+}
+
+
+void Mwc713InputParser::initSwaps() {
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SWAP_GET_OFFER,
+                                                QVector<BaseTrieSection*>{
+                                                        new TrieNewLineSection(),
+                                                        new TriePhraseSection("You get an offer to swap "),
+                                                        // Account name have extra character!
+                                                        new TrieAnySection(10, TrieAnySection::NOT_SPACES | TrieAnySection::START_NEXT_EVERY_TRY, "","", 1),
+                                                        new TriePhraseSection(" to MWC. SwapID is "),
+                                                        new TrieAnySection(50, TrieAnySection::NOT_NEW_LINE, "","", 2),
                                                 }));
 }
 

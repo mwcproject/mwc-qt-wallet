@@ -266,6 +266,53 @@ public:
     // Repost a transaction. Optionally fluff the transaction. index is the tx_index in the tx_log.
     virtual void repost(QString account, int index, bool fluff) override;
 
+    // ---------------- Swaps -------------
+
+    // Request all running swap trades.
+    // Check Signal: void onRequestSwapTrades(QVector<SwapInfo> swapTrades);
+    virtual void requestSwapTrades() override;
+
+    // Delete the swap trade
+    // Check Signal: void onDeleteSwapTrade(QString swapId, QString errMsg)
+    virtual void deleteSwapTrade(QString swapId) override;
+
+    // Create a new Swap trade deal.
+    // Check Signal: void onCreateNewSwapTrade(QString swapId);
+    virtual void createNewSwapTrade(
+                                    int min_confirmations, // minimum number of confimations
+                                    double mwc, double btc, QString secondary,
+                                    QString redeemAddress,
+                                    bool sellerLockFirst,
+                                    int messageExchangeTimeMinutes,
+                                    int redeemTimeMinutes,
+                                    int mwcConfirmationNumber,
+                                    int secondaryConfirmationNumber,
+                                    QString communicationMethod,
+                                    QString communicationAddress ) override;
+
+    // Cancel the trade
+    // Check Signal: void onCancelSwapTrade(QString swapId, QString error);
+    virtual void cancelSwapTrade(QString swapId) override;
+
+    // Request details about this trade.
+    // Check Signal: void onRequestTradeDetails( SwapTradeInfo swap,
+    //                            QVector<SwapExecutionPlanRecord> executionPlan,
+    //                            QString currentAction,
+    //                            QVector<SwapJournalMessage> tradeJournal,
+    //                            QString error );
+    virtual void requestTradeDetails(QString swapId) override;
+
+    // Adjust swap stade values. params are optional
+    // Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
+    virtual void adjustSwapData( QString swapId, QString adjustCmd, QString param1 = "", QString param2 = "" ) override;
+
+    // Perform a auto swap step for this trade.
+    // Check Signal: void onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+    //                       QVector<SwapExecutionPlanRecord> executionPlan,
+    //                       QVector<SwapJournalMessage> tradeJournal,
+    //                       QString error );
+    virtual void performAutoSwapStep( QString swapId ) override;
+
 public:
     // Feed the command to mwc713 process
     void executeMwc713command( QString cmd, QString shadowStr);
@@ -371,6 +418,26 @@ public:
 
     Mwc713EventManager * getEventCollector() {return eventCollector;}
     core::HodlStatus *   getHodlStatus() {return hodlStatus;}
+
+
+    void setRequestSwapTrades(QVector<SwapInfo> swapTrades, QString error);
+    void setDeleteSwapTrade(QString swapId, QString errMsg);
+    void setCreateNewSwapTrade(QString swapId, QString errMsg);
+    void setCancelSwapTrade(QString swapId, QString errMsg);
+    void setRequestTradeDetails( SwapTradeInfo swap,
+                                QVector<SwapExecutionPlanRecord> executionPlan,
+                                QString currentAction,
+                                QVector<SwapJournalMessage> tradeJournal,
+                                QString error );
+    void setAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
+
+    void setPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+                               QVector<SwapExecutionPlanRecord> executionPlan,
+                               QVector<SwapJournalMessage> tradeJournal,
+                               QString error );
+
+    // Notificaiton that nee Swap trade offer was recieved.
+    void notifyAboutNewSwapTrade(QString currency, QString swapId);
 
 private:
 

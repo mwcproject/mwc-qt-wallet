@@ -332,6 +332,68 @@ struct WalletUtxoSignature {
             QString _messageSignature);
 };
 
+struct SwapInfo {
+    QString info;
+    QString swapId;
+    int64_t startTime = 0;
+    QString state;
+    QString action;
+    int64_t expiration = 0;
+    bool    done = false;
+    bool    isSeller;
+    QString secondaryAddress;
+
+    void setData( QString info, QString swapId, int64_t startTime, QString state, QString action,
+                  int64_t expiration, bool isSeller, QString secondaryAddress );
+};
+
+struct SwapTradeInfo {
+    QString swapId;
+    bool isSeller;
+    double mwcAmount;
+    double secondaryAmount;
+    QString secondaryCurrency;
+    QString secondaryAddress; // redeem/refund address
+
+    double secondaryFee;
+    QString secondaryFeeUnits;
+
+    int mwcConfirmations;
+    int secondaryConfirmations;
+    int messageExchangeTimeLimit;
+    int redeemTimeLimit;
+    bool sellerLockingFirst;
+    int mwcLockHeight;
+    int64_t mwcLockTime;
+    int64_t secondaryLockTime;
+
+    QString communicationMethod;
+    QString communicationAddress;
+
+
+    void setData( QString swapId, bool isSeller,  double mwcAmount, double secondaryAmount,
+                QString secondaryCurrency,  QString secondaryAddress, double secondaryFee,
+                QString secondaryFeeUnits, int mwcConfirmations, int secondaryConfirmations,
+                int messageExchangeTimeLimit, int redeemTimeLimit, bool sellerLockingFirst,
+                int mwcLockHeight, int64_t mwcLockTime, int64_t secondaryLockTime,
+                QString communicationMethod, QString communicationAddress );
+};
+
+struct SwapExecutionPlanRecord {
+    bool active = false;
+    int64_t end_time = 0;
+    QString name;
+
+    void setData( bool active, int64_t end_time, QString name );
+};
+
+struct SwapJournalMessage {
+    QString message;
+    int64_t time = 0;
+
+    void setData( QString message, int64_t time );
+};
+
 // Some startus booleans for 3 listeners
 struct ListenerStatus {
     bool mqs = false;
@@ -585,6 +647,53 @@ public:
     // index is the tx_index in the tx_log.
     virtual void repost(QString account, int index, bool fluff) = 0;
 
+    // ---------------- Swaps -------------
+
+    // Request all running swap trades.
+    // Check Signal: void onRequestSwapTrades(QVector<SwapInfo> swapTrades, QString error);
+    virtual void requestSwapTrades() = 0;
+
+    // Delete the swap trade
+    // Check Signal: void onDeleteSwapTrade(QString swapId, QString errMsg)
+    virtual void deleteSwapTrade(QString swapId) = 0;
+
+    // Create a new Swap trade deal.
+    // Check Signal: void onCreateNewSwapTrade(QString swapId);
+    virtual void createNewSwapTrade(
+                                    int min_confirmations, // minimum number of confimations
+                                    double mwc, double btc, QString secondary,
+                                    QString redeemAddress,
+                                    bool sellerLockFirst,
+                                    int messageExchangeTimeMinutes,
+                                    int redeemTimeMinutes,
+                                    int mwcConfirmationNumber,
+                                    int secondaryConfirmationNumber,
+                                    QString communicationMethod,
+                                    QString communicationAddress ) = 0;
+
+    // Cancel the trade
+    // Check Signal: void onCancelSwapTrade(QString swapId, QString error);
+    virtual void cancelSwapTrade(QString swapId) = 0;
+
+
+    // Request details about this trade.
+    // Check Signal: void onRequestTradeDetails( SwapTradeInfo swap,
+    //                            QVector<SwapExecutionPlanRecord> executionPlan,
+    //                            QString currentAction,
+    //                            QVector<SwapJournalMessage> tradeJournal,
+    //                            QString error );
+    virtual void requestTradeDetails(QString swapId ) = 0;
+
+    // Adjust swap stade values. params are optional
+    // Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
+    virtual void adjustSwapData( QString swapId, QString adjustCmd, QString param1 = "", QString param2 = "" ) = 0;
+
+    // Perform a auto swap step for this trade.
+    // Check Signal: void onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+    //                       QVector<SwapExecutionPlanRecord> executionPlan,
+    //                       QVector<SwapJournalMessage> tradeJournal,
+    //                       QString error );
+    virtual void performAutoSwapStep( QString swapId ) = 0;
 
 private:
 signals:
@@ -684,11 +793,46 @@ signals:
 
     // Progress update regarding Sync progress. NOTE, THIS SUGNAL doesn't have caller, it can be emitted background.
     void onUpdateSyncProgress(double progressPercent);
+
+    // Response from requestSwapTrades
+    void onRequestSwapTrades(QVector<SwapInfo> swapTrades, QString error);
+
+    // Response form deleteSwapTrade. OK - errMsg will be empty
+    void onDeleteSwapTrade(QString swapId, QString errMsg);
+
+    // Response from createNewSwapTrade, SwapId on OK,  errMsg on failure
+    void onCreateNewSwapTrade(QString swapId, QString errMsg);
+
+    // Response from cancelSwapTrade
+    void onCancelSwapTrade(QString swapId, QString error);
+
+    // Response from requestTradeDetails
+    void onRequestTradeDetails( SwapTradeInfo swap,
+                                QVector<SwapExecutionPlanRecord> executionPlan,
+                                QString currentAction,
+                                QVector<SwapJournalMessage> tradeJournal,
+                                QString error );
+
+    // Response from adjustSwapData
+    void onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
+
+    // Response from performAutoSwapStep
+    void onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+                           QVector<SwapExecutionPlanRecord> executionPlan,
+                           QVector<SwapJournalMessage> tradeJournal,
+                           QString error );
+
+    // Notificaiton that nee Swap trade offer was recieved.
+    void onNewSwapTrade(QString currency, QString swapId);
 };
 
 }
 
 Q_DECLARE_METATYPE(wallet::WalletTransaction);
 Q_DECLARE_METATYPE(wallet::WalletOutput);
+Q_DECLARE_METATYPE(wallet::SwapInfo);
+Q_DECLARE_METATYPE(wallet::SwapTradeInfo);
+Q_DECLARE_METATYPE(wallet::SwapExecutionPlanRecord);
+Q_DECLARE_METATYPE(wallet::SwapJournalMessage);
 
 #endif // MWCWALLET_H
