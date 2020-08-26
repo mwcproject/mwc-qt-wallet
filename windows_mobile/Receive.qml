@@ -8,7 +8,6 @@ import WalletBridge 1.0
 import Clipboard 1.0
 
 Item {
-    id: element
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
