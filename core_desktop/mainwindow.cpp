@@ -491,7 +491,12 @@ void MainWindow::on_actionOutputs_triggered()
 
 void MainWindow::on_actionAirdrop_triggered()
 {
-    stateMachine->setActionWindow( state::STATE::AIRDRDOP_MAIN );
+   if ( QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier ) {
+       stateMachine->setActionWindow(state::STATE::SWAP);
+   }
+   else {
+       stateMachine->setActionWindow(state::STATE::AIRDRDOP_MAIN);
+   }
 }
 
 void MainWindow::on_actionHODL_triggered()

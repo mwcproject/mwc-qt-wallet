@@ -31,6 +31,7 @@
 #include "tasks/TaskAccount.h"
 #include "tasks/TaskSend.h"
 #include "tasks/TaskTransaction.h"
+#include "tasks/TaskSwap.h"
 #include "../util/Log.h"
 #include "../core/global.h"
 #include "../core/appcontext.h"
@@ -259,6 +260,7 @@ void MWC713::start()  {
     eventCollector->addListener( new TaskListeningListener(this) );
     eventCollector->addListener( new TaskSlatesListener(this) );
     eventCollector->addListener( new TaskSyncProgressListener(this) );
+    eventCollector->addListener( new TaskSwapNewTradeArrive(this) );
 }
 
 // start to init. Expected that we will exit pretty quckly
@@ -801,6 +803,71 @@ void MWC713::repost(QString account, int index, bool fluff) {
     eventCollector->addTask( new TaskRepost(this, index, fluff), TaskRepost::TIMEOUT );
     if (account!=currentAccount)
         eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
+}
+
+// Request all running swap trades.
+// Check Signal: void onRequestSwapTrades(QVector<SwapInfo> swapTrades);
+void MWC713::requestSwapTrades() {
+    eventCollector->addTask( new TaskGetSwapTrades(this), TaskGetSwapTrades::TIMEOUT );
+}
+
+// Delete the swap trade
+// Check Signal: void onDeleteSwapTrade(QString swapId, QString errMsg)
+void MWC713::deleteSwapTrade(QString swapId) {
+    eventCollector->addTask( new TaskDeleteSwapTrade(this, swapId), TaskDeleteSwapTrade::TIMEOUT );
+}
+
+// Create a new Swap trade deal.
+// Check Signal: void onCreateNewSwapTrade(QString swapId);
+void MWC713::createNewSwapTrade(
+                                int min_confirmations, // minimum number of confimations
+                                double mwc, double btc, QString secondary,
+                                QString redeemAddress,
+                                bool sellerLockFirst,
+                                int messageExchangeTimeMinutes,
+                                int redeemTimeMinutes,
+                                int mwcConfirmationNumber,
+                                int secondaryConfirmationNumber,
+                                QString communicationMethod,
+                                QString communicationAddress ) {
+
+    eventCollector->addTask(new TaskCreateNewSwapTrade(this, min_confirmations, // minimum number of confimations
+                                                       mwc, btc, secondary,
+                                                       redeemAddress,
+                                                       sellerLockFirst,
+                                                       messageExchangeTimeMinutes,
+                                                       redeemTimeMinutes,
+                                                       mwcConfirmationNumber,
+                                                       secondaryConfirmationNumber,
+                                                       communicationMethod,
+                                                       communicationAddress), TaskCreateNewSwapTrade::TIMEOUT);
+}
+
+// Cancel the trade
+// Check Signal: void onCancelSwapTrade(QString swapId, QString error);
+void MWC713::cancelSwapTrade(QString swapId) {
+    eventCollector->addTask( new TaskCancelSwapTrade(this, swapId), TaskCancelSwapTrade::TIMEOUT );
+}
+
+// Request details about this trade.
+// Check Signal: void onRequestTradeDetails( SwapTradeInfo swap )
+void MWC713::requestTradeDetails(QString swapId) {
+    eventCollector->addTask( new TaskTradeDetails(this, swapId), TaskTradeDetails::TIMEOUT );
+}
+
+// Adjust swap stade values. params are optional
+// Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
+void MWC713::adjustSwapData( QString swapId, QString adjustCmd, QString param1, QString param2 ) {
+    eventCollector->addTask( new TaskAdjustTrade(this, swapId, adjustCmd, param1, param2), TaskAdjustTrade::TIMEOUT );
+}
+
+// Perform a auto swap step for this trade.
+// Check Signal: void onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+//                       QVector<SwapExecutionPlanRecord> executionPlan,
+//                       QVector<SwapJournalMessage> tradeJournal,
+//                       QString error );
+void MWC713::performAutoSwapStep( QString swapId ) {
+    eventCollector->addTask( new TaskPerformAutoSwapStep(this, swapId), TaskPerformAutoSwapStep::TIMEOUT );
 }
 
 
@@ -1393,6 +1460,58 @@ void MWC713::updateSyncAsDone() {
     lastSyncTime = QDateTime::currentMSecsSinceEpoch();
 }
 
+void MWC713::setRequestSwapTrades( QVector<SwapInfo> swapTrades, QString error ) {
+    logger::logEmit("MWC713", "onRequestSwapTrades", "Trades: " + QString::number(swapTrades.size()) + ", Error: " + error );
+    emit onRequestSwapTrades( swapTrades, error );
+}
+
+void MWC713::setDeleteSwapTrade(QString swapId, QString errMsg) {
+    logger::logEmit("MWC713", "onDeleteSwapTrade", swapId + ", " + errMsg );
+    emit onDeleteSwapTrade( swapId, errMsg );
+}
+
+void MWC713::setCreateNewSwapTrade(QString swapId, QString errMsg) {
+    logger::logEmit("MWC713", "onCreateNewSwapTrade", swapId + ", " + errMsg );
+    emit onCreateNewSwapTrade( swapId, errMsg );
+
+}
+
+void MWC713::setCancelSwapTrade(QString swapId, QString errMsg) {
+    logger::logEmit("MWC713", "onCancelSwapTrade", swapId + ", " + errMsg );
+    emit onCancelSwapTrade(swapId, errMsg );
+}
+
+void MWC713::setRequestTradeDetails( SwapTradeInfo swap,
+                                     QVector<SwapExecutionPlanRecord> executionPlan,
+                                     QString currentAction,
+                                     QVector<SwapJournalMessage> tradeJournal,
+                                     QString error ) {
+    logger::logEmit("MWC713", "onRequestSwapDetails", swap.swapId + ", " + error );
+    emit onRequestTradeDetails( swap, executionPlan, currentAction, tradeJournal, error );
+}
+
+void MWC713::setAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg) {
+    logger::logEmit("MWC713", "onAdjustSwapData", swapId + ", " + adjustCmd + ", " + errMsg );
+    emit onAdjustSwapData( swapId, adjustCmd, errMsg );
+}
+
+void MWC713::setPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+                            QVector<SwapExecutionPlanRecord> executionPlan,
+                            QVector<SwapJournalMessage> tradeJournal,
+                            QString error ) {
+    logger::logEmit( "MWC713", "onPerformAutoSwapStep", swapId + ", " + currentAction + ", " + currentState + ", " + error );
+
+    emit onPerformAutoSwapStep(swapId, swapIsDone, currentAction, currentState,
+                               executionPlan,
+                               tradeJournal,
+                               error );
+}
+
+// Notificaiton that nee Swap trade offer was recieved.
+void MWC713::notifyAboutNewSwapTrade(QString currency, QString swapId) {
+    logger::logEmit( "MWC713", "onNewSwapTrade", currency + ", " + swapId );
+    emit onNewSwapTrade(currency, swapId);
+}
 
 
 /////////////////////////////////////////////////////////////////////////////////

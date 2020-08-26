@@ -229,6 +229,16 @@ QString mwc713time2ThisTime(QString mwc713TimeStr) {
     return res;
 }
 
+// Convert timestamp to this wallet time.
+QString timestamp2ThisTime(int64_t timestamp) {
+    if (timestamp==0)
+        return "";
+    QDateTime time = QDateTime::fromSecsSinceEpoch(timestamp);
+    QString res = time.toString( mwc::DATETIME_TEMPLATE_THIS);
+    return res;
+}
+
+
 QPair <bool, QString> validateMwc713Str(QString str, bool secureStr) {
     QString nonAsciiChars;
 

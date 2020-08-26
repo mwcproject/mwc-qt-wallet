@@ -482,7 +482,65 @@ void WalletUtxoSignature::setData(int64_t _coinNano, // Output amount
     messageSignature = _messageSignature;
 }
 
+/////////////////////////////////////////////////////////////////////////////////
+// SwapInfo
 
+void SwapInfo::setData( QString _info, QString _swapId, int64_t _startTime, QString _state, QString _action, int64_t _expiration, bool _isSeller, QString _secondaryAddress ) {
+    info = _info;
+    swapId = _swapId;
+    startTime = _startTime;
+    state = _state;
+    action = _action;
+    expiration = _expiration;
+    isSeller = _isSeller;
+    secondaryAddress = _secondaryAddress;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+// SwapTradeInfo
+
+void SwapTradeInfo::setData( QString _swapId, bool _isSeller, double _mwcAmount, double _secondaryAmount,
+              QString _secondaryCurrency,  QString _secondaryAddress, double _secondaryFee,
+              QString _secondaryFeeUnits, int _mwcConfirmations, int _secondaryConfirmations,
+              int _messageExchangeTimeLimit, int _redeemTimeLimit, bool _sellerLockingFirst,
+              int _mwcLockHeight, int64_t _mwcLockTime, int64_t _secondaryLockTime,
+              QString _communicationMethod, QString _communicationAddress ) {
+
+    swapId = _swapId;
+    isSeller = _isSeller;
+    mwcAmount = _mwcAmount;
+    secondaryAmount = _secondaryAmount;
+    secondaryCurrency = _secondaryCurrency;
+    secondaryAddress = _secondaryAddress;
+    secondaryFee = _secondaryFee;
+    secondaryFeeUnits = _secondaryFeeUnits;
+    mwcConfirmations = _mwcConfirmations;
+    secondaryConfirmations = _secondaryConfirmations;
+    messageExchangeTimeLimit = _messageExchangeTimeLimit;
+    redeemTimeLimit = _redeemTimeLimit;
+    sellerLockingFirst = _sellerLockingFirst;
+    mwcLockHeight = _mwcLockHeight;
+    mwcLockTime = _mwcLockTime;
+    secondaryLockTime = _secondaryLockTime;
+    communicationMethod = _communicationMethod;
+    communicationAddress = _communicationAddress;
+}
+
+////////////////////////////////////////////////////////////////////
+
+void SwapExecutionPlanRecord::setData( bool _active, int64_t _end_time, QString _name ) {
+    active = _active;
+    end_time = _end_time;
+    name = _name;
+}
+
+///////////////////////////////////////////////////////////////////
+void SwapJournalMessage::setData( QString _message, int64_t _time ) {
+    message = _message;
+    time = _time;
+}
+
+//////////////////////////////////////////////////////////////////
 Wallet::Wallet()
 {
 }

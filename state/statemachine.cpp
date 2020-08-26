@@ -42,7 +42,7 @@
 #include "z_wallethome.h"
 #include "z_walletsettings.h"
 #include "z_accountoptions.h"
-
+#include "s_swap.h"
 
 namespace state {
 
@@ -107,6 +107,7 @@ StateMachine::StateMachine()
     // State for handling any data migration between wallet
     // versions that might need to be done
     states[ STATE::MIGRATION ] = new Migration(context);
+    states[ STATE::SWAP ] = new Swap(context);
 
     startTimer(1000);
 }

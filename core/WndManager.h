@@ -100,6 +100,12 @@ public:
     virtual void pageWalletHome() = 0;
     virtual void pageWalletSettings() = 0;
     virtual void pageAccountOptions() = 0;
+
+    // Swap pages
+    virtual void pageSwapList() = 0;
+    virtual void pageSwapNew() = 0;
+    virtual void pageSwapEdit(QString swapId) = 0;
+    virtual void pageSwapTradeDetails(QString swapId) = 0;
 };
 
 void setWndManager(WndManager * mgr);
