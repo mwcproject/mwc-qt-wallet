@@ -15,6 +15,8 @@ Item {
             newSeedItem.init(params.seed, params.hideSubmitButton)
         } else if (currentStep === 2) {
             newSeedTestItem.init(params.wordIndex)
+        } else if (currentStep === 4) {
+            progressWndItem.init(params.callerId,params.msgProgress)
         }
     }
 
@@ -65,6 +67,18 @@ Item {
             id: newSeedTestItem
             anchors.fill: parent
             visible: currentStep === 2
+        }
+
+        EnterSeed {
+            id: enterSeedItem
+            anchors.fill: parent
+            visible: currentStep === 3
+        }
+
+        ProgressWnd {
+            id: progressWndItem
+            anchors.fill: parent
+            visible: currentStep === 4
         }
     }
 

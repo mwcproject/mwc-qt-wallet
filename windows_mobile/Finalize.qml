@@ -84,7 +84,7 @@ Item {
 //                                                            config->getPathFor("fileGen"),
 //                                                            tr("MWC response transaction (*.tx.response *.response);;All files (*.*)"));
 
-//            if (fileName.length() == 0)
+//            if (fileName.length == 0)
 //                return;
 //            auto fileOk = util::validateMwc713Str(fileName);
 //            if (!fileOk.first) {

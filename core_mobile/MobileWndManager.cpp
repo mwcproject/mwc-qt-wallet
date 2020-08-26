@@ -31,7 +31,6 @@ void MobileWndManager::init(QQmlApplicationEngine * _engine) {
     engine->load(QUrl(QStringLiteral("qrc:/windows_mobile/main.qml")));
     mainWindow = engine->rootObjects().first();
     mainWindow->setProperty("currentState", 0);
-//    engine.rootContext()->setContextProperty(QLatin1String("qtAndroidService"), qtAndroidService);
 }
 
 
@@ -171,7 +170,10 @@ void MobileWndManager::pageInitAccount(QString path, bool restoredFromSeed) {
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageEnterSeed() {
-    Q_ASSERT(false); // implement me
+    QJsonObject obj;
+    obj["currentStep"] = 3;
+    QVariant retValue;
+    QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
 void MobileWndManager::pageNewSeed(QString pageTitle, QVector<QString> seed, bool hideSubmitButton) {
     Q_UNUSED(pageTitle)
@@ -196,13 +198,16 @@ void MobileWndManager::pageNewSeedTest(int wordIndex) {
 }
 void MobileWndManager::pageProgressWnd(QString pageTitle, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable ) {
     Q_UNUSED(pageTitle)
-    Q_UNUSED(callerId)
     Q_UNUSED(header)
-    Q_UNUSED(msgProgress)
     Q_UNUSED(msgPlus)
     Q_UNUSED(cancellable)
 
-    Q_ASSERT(false); // implement me
+    QJsonObject obj;
+    obj["currentStep"] = 4;
+    obj["callerId"] = callerId;
+    obj["msgProgress"] = msgProgress;
+    QVariant retValue;
+    QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
 void MobileWndManager::pageOutputs() {
     Q_ASSERT(false); // implement me
