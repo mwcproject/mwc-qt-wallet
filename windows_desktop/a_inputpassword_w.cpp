@@ -67,12 +67,12 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
             }
             updateHttpState(httpStatus == "true");
         } else {
-            ui->listeningStatusFrame->hide();
+            ui->listeningStatusFrameHolder->hide();
         }
 
         ui->newInstancaHolder->hide();
     } else {
-        ui->listeningStatusFrame->hide();
+        ui->listeningStatusFrameHolder->hide();
     }
 
     ui->mwcMQlable->setText("MWC MQS");
@@ -209,23 +209,20 @@ void InputPassword::onSgnUpdateSyncProgress(double progressPercent) {
 }
 
 void InputPassword::on_restoreInstanceButton_clicked() {
-    QString wallet_dir;
-    if ( QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier ) {
-        wallet_dir = core::selectWalletDirectory();
-        if (wallet_dir.isEmpty())
-            return;
-    }
-    startWallet->createNewWalletInstance(wallet_dir, true);
+    startWallet->createNewWalletInstance("", true);
 }
 
 void InputPassword::on_newInstanceButton_clicked() {
-    QString wallet_dir;
-    if ( QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier ) {
-        wallet_dir = core::selectWalletDirectory();
-        if (wallet_dir.isEmpty())
-            return;
-    }
+    startWallet->createNewWalletInstance("", false);
+}
+
+void wnd::InputPassword::on_openWalletButton_clicked()
+{
+    QString wallet_dir = core::selectWalletDirectory();
+    if (wallet_dir.isEmpty())
+         return;
     startWallet->createNewWalletInstance(wallet_dir, false);
 }
 
 }
+

@@ -85,5 +85,8 @@
         <file>img/AddLarge@2x.svg</file>
         <file>img/RestoreBtn_big@2x.svg</file>
         <file>img/RestoreBtn@2x.svg</file>
+        <file>img/OpenFile@2x.svg</file>
+        <file>img/Node@2x.svg</file>
+        <file>img/WarningTriangle@2x.svg</file>
     </qresource>
 </RCC>

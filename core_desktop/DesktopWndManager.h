@@ -56,7 +56,7 @@ public:
     //---------------- Pages ------------------------
     virtual void pageInitFirstTime() override;
     virtual void pageInputPassword(QString pageTitle, bool lockMode) override;
-    virtual void pageInitAccount() override;
+    virtual void pageInitAccount(QString path, bool restoredFromSeed) override;
     virtual void pageEnterSeed() override;
     virtual void pageNewSeed(QString pageTitle, QVector<QString> seed, bool hideSubmitButton = false) override;
     virtual void pageNewSeedTest(int wordIndex) override;

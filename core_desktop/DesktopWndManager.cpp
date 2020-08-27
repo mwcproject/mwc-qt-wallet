@@ -142,9 +142,9 @@ void DesktopWndManager::pageInputPassword(QString pageTitle, bool lockMode) {
                 new wnd::InputPassword( windowManager->getInWndParent(), lockMode ) );
 }
 
-void DesktopWndManager::pageInitAccount() {
+void DesktopWndManager::pageInitAccount(QString path, bool restoredFromSeed) {
     windowManager->switchToWindowEx( mwc::PAGE_A_INIT_ACCOUNT,
-                new wnd::InitAccount( windowManager->getInWndParent()));
+                new wnd::InitAccount( windowManager->getInWndParent(), path, restoredFromSeed ));
 }
 
 void DesktopWndManager::pageEnterSeed() {

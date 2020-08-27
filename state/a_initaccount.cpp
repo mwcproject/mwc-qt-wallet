@@ -27,6 +27,7 @@
 #include "../core/WndManager.h"
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/z_progresswnd_b.h"
+#include <QDir>
 
 namespace state {
 
@@ -63,9 +64,20 @@ NextStateRespond InitAccount::execute() {
             return NextStateRespond( NextStateRespond::RESULT::DONE );
         }
         else {
-            core::getWndManager()->pageInitAccount();
+            QString walletPath = context->appContext->getCurrentWalletInstance(false);
 
-            // Provosion of new wallet, need to block locking
+            QPair<bool,QString> res = ioutils::getAppDataPath("");
+
+            if (res.first) {
+                QDir baseDir(res.second);
+                walletPath = baseDir.absoluteFilePath(walletPath);
+                QDir wpath(walletPath);
+                walletPath = wpath.absolutePath();
+            }
+
+            core::getWndManager()->pageInitAccount(walletPath, context->appContext->getCookie<bool>("restoreWalletFromSeed") );
+
+            // Provision of new wallet, need to block locking
             context->stateMachine->blockLogout("InitAccount");
 
             return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );

@@ -165,7 +165,9 @@ void MobileWndManager::pageInputPassword(QString pageTitle, bool lockMode) {
 
     mainWindow->setProperty("currentState", state::STATE::INPUT_PASSWORD);
 }
-void MobileWndManager::pageInitAccount() {
+void MobileWndManager::pageInitAccount(QString path, bool restoredFromSeed) {
+    Q_UNUSED(path) // mobile doesn't need it
+    Q_UNUSED(restoredFromSeed)  // mobile doesn't need it
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageEnterSeed() {

@@ -43,6 +43,10 @@ private slots:
 
     void on_runOnlineNodeButton_clicked();
 
+    void on_openWalletButton_clicked();
+
+    void on_helpButton_clicked();
+
 private:
     Ui::InitFirstTime *ui;
     bridge::StartWallet * startWallet = nullptr;

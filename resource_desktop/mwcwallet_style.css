@@ -308,7 +308,9 @@ control--MwcPushButtonSmall {
 }
 
 control--MwcPushButtonTiny {
+    border-radius: 3px;
     font-size: 10px;
+    border: none;
 }
 
 control--MwcPushButtonTinyUnderline {

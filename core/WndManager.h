@@ -61,7 +61,7 @@ public:
     //---------------- Pages ------------------------
     virtual void pageInitFirstTime() = 0;
     virtual void pageInputPassword(QString pageTitle, bool lockMode) = 0;
-    virtual void pageInitAccount() = 0;
+    virtual void pageInitAccount(QString path, bool restoredFromSeed) = 0;
     virtual void pageEnterSeed() = 0;
     virtual void pageNewSeed(QString pageTitle, QVector<QString> seed, bool hideSubmitButton = false) = 0;
     virtual void pageNewSeedTest(int wordIndex) = 0;

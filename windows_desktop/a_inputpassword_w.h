@@ -46,6 +46,8 @@ private slots:
     void on_submitButton_clicked();
     void on_restoreInstanceButton_clicked();
     void on_newInstanceButton_clicked();
+    void on_openWalletButton_clicked();
+
 private:
     virtual void panelWndStarted() override;
 

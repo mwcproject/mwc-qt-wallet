@@ -84,7 +84,7 @@ QString Util::verifyAddress(QString address) {
 // Set word for analysys
 void Util::passwordQualitySet(QString password) {
     if (pa == nullptr) {
-        pa = new util::PasswordAnalyser();
+        pa = new util::PasswordAnalyser( "#3600C9", "#CCCCCC");
     }
 
     passwordAnalyserWeight.clear();

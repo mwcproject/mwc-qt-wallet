@@ -42,24 +42,20 @@ InitFirstTime::~InitFirstTime()
 
 void InitFirstTime::on_newInstanceButton_clicked()
 {
-    QString wallet_dir;
-    if ( QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier ) {
-        wallet_dir = core::selectWalletDirectory();
-        if (wallet_dir.isEmpty())
-            return;
-    }
-    startWallet->createNewWalletInstance(wallet_dir, false);
+    startWallet->createNewWalletInstance("", false);
 }
 
 void InitFirstTime::on_restoreInstanceButton_clicked()
 {
-    QString wallet_dir;
-    if ( QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier ) {
-        wallet_dir = core::selectWalletDirectory();
-        if (wallet_dir.isEmpty())
-            return;
-    }
-    startWallet->createNewWalletInstance(wallet_dir, true);
+    startWallet->createNewWalletInstance("", true);
+}
+
+void InitFirstTime::on_openWalletButton_clicked()
+{
+    QString wallet_dir = core::selectWalletDirectory();
+    if (wallet_dir.isEmpty())
+         return;
+    startWallet->createNewWalletInstance(wallet_dir, false);
 }
 
 void InitFirstTime::on_runOnlineNodeButton_clicked()
@@ -79,5 +75,13 @@ void InitFirstTime::on_runOnlineNodeButton_clicked()
     }
 }
 
+void InitFirstTime::on_helpButton_clicked()
+{
+    control::MessageBox::messageText(this, "Help", "'Open Wallet' - Open the wallet form external location like USB stick or another drive.\n\n"
+                                                   "'New Instance' - Create a new wallet instance.\n\n"
+                                                   "'Restore Instance' - Restore a new wallet instance from the mnemonic passphrase.\n\n"
+                                                   "'Cold Wallet Node' - This configuraiton is needed if you are using the cold wallet. Online Node needed for exportign the blockchina data to the Cold Wallet and for publishing finalized transacitons.");
+}
 
 }
+

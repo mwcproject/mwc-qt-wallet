@@ -92,4 +92,6 @@ Note: Mobile will need to adopt them for instance management.
 
 
 
+# August 26, 2020 #
 
+Add a new bridge: Swap

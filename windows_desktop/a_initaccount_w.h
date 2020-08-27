@@ -25,6 +25,7 @@ namespace bridge {
 class SelectMode;
 class InitAccount;
 class Util;
+class StartWallet;
 }
 
 namespace wnd {
@@ -34,7 +35,7 @@ class InitAccount : public core::PanelBaseWnd
     Q_OBJECT
 
 public:
-    explicit InitAccount(QWidget *parent);
+    explicit InitAccount(QWidget *parent, QString path, bool restoredFromSeed);
     virtual ~InitAccount() override;
 
 private slots:
@@ -43,6 +44,7 @@ private slots:
 
     void on_password2Edit_textChanged(const QString &arg1);
     void on_runOnlineNodeButton_clicked();
+    void on_changeDirButton_clicked();
 
 private:
     void updatePassState();
@@ -54,7 +56,9 @@ private:
     bridge::SelectMode * selectMode = nullptr;
     bridge::InitAccount * initAccount = nullptr;
     bridge::Util * util = nullptr;
+    bridge::StartWallet * startWallet = nullptr;
 
+    bool restoredFromSeed = false;
 };
 
 }
