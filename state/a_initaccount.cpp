@@ -59,6 +59,7 @@ NextStateRespond InitAccount::execute() {
             // Very first run. Need to create the wallet without any passwords
             context->wallet->start2init("");
             context->wallet->confirmNewSeed();
+            context->wallet->logout(true); // Stop will wait enough time
             return NextStateRespond( NextStateRespond::RESULT::DONE );
         }
         else {
