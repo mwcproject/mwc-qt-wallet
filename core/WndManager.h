@@ -58,6 +58,10 @@ public:
     // Ask for confirmation
     virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) = 0;
 
+    // Stopping wallet message
+    virtual void showWalletStoppingMessage(int taskTimeout) = 0;
+    virtual void hideWalletStoppingMessage() = 0;
+
     //---------------- Pages ------------------------
     virtual void pageInitFirstTime() = 0;
     virtual void pageInputPassword(QString pageTitle, bool lockMode) = 0;
@@ -96,6 +100,7 @@ public:
     virtual void pageNodeConfig() = 0;
     virtual void pageSelectMode() = 0;
 
+
     // Mobile specific pages
     virtual void pageWalletHome() = 0;
     virtual void pageWalletSettings() = 0;
@@ -106,6 +111,7 @@ public:
     virtual void pageSwapNew() = 0;
     virtual void pageSwapEdit(QString swapId) = 0;
     virtual void pageSwapTradeDetails(QString swapId) = 0;
+
 };
 
 void setWndManager(WndManager * mgr);

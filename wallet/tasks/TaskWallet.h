@@ -126,6 +126,22 @@ virtual bool processTask(const QVector<WEvent> & events) override;
 virtual QSet<WALLET_EVENTS> getReadyEvents() override {return {};}
 };
 
+// Logout from the wallet. Close that app
+class TaskExit: public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = -1;
+
+    TaskExit( MWC713 * wallet713) :
+            Mwc713Task("Exit", "", wallet713, "") {} // press enter to trigger ready.
+
+    virtual ~TaskExit() override {}
+
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return {};}
+};
+
+
 // get next key is end the wallet life. It is similar to logout
 class TaskGetNextKey: public Mwc713Task {
 public:

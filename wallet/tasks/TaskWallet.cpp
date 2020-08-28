@@ -144,6 +144,15 @@ bool TaskLogout::processTask(const QVector<WEvent> & events) {
     return true;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+// TaskExit
+
+bool TaskExit::processTask(const QVector<WEvent> & events) {
+    Q_UNUSED(events)
+    wallet713->launchExitCommand();
+    return true;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // TaskGetNextKey
 

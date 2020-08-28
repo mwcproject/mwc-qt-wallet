@@ -101,7 +101,7 @@ void Resync::onRecoverProgress( int progress, int maxVal ) {
             b->initProgress(RESYNC_CALLER_ID, 0, maxVal);
 
             maxProgrVal = maxVal;
-            QString msgProgress = "Re-sync in progress..." + QString::number(progress * 100.0 / maxVal, 'f',1) + "%";
+            QString msgProgress = "Re-sync in progress...  " + QString::number(progress * 100.0 / maxVal, 'f',1) + "%";
             b->updateProgress(RESYNC_CALLER_ID, progress, msgProgress);
             b->setMsgPlus(RESYNC_CALLER_ID, "");
         }

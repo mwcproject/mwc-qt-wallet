@@ -344,10 +344,52 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
     walletPasswordHash = crypto::calcHSA256Hash(password);
 }
 
+void MWC713::launchExitCommand() {
+    mwc713disconnect();
+    executeMwc713command("exit", "");
+}
+
 void MWC713::processStop(bool exitNicely) {
     qDebug() << "MWC713::processStop exitNicely=" << exitNicely;
 
     logger::logInfo("MWC713", QString("mwc713 process exiting ") + (exitNicely? "nicely" : "by killing") );
+
+    if (mwc713process) {
+        // Waitiong for task Q to be empty
+        // Note, event processing can change a lot for us, so we shoudl watch for variables
+        if (exitNicely) {
+            qDebug() << "start exiting...";
+
+            int taskTimeout = 0;
+            if (eventCollector != nullptr)
+                taskTimeout += eventCollector->cancelTasksInQueue();
+
+            // We neevr want to kill the wallet. Even there is a long precess, we want to wait. Other wise we might hit for a data corruption.
+            eventCollector->addTask( new TaskExit(this), TaskExit::TIMEOUT );
+
+            if (taskTimeout > 10000) {
+                core::getWndManager()->showWalletStoppingMessage(taskTimeout);
+            }
+
+            if (!util::processWaitForFinished(mwc713process, 8000 + taskTimeout, "mwc713")) {
+               mwc713process->kill();
+               util::processWaitForFinished(mwc713process, 8000 + taskTimeout, "mwc713");
+            }
+
+            core::getWndManager()->hideWalletStoppingMessage();
+
+            qDebug() << "mwc713 is exited";
+        }
+        else {
+            mwc713disconnect();
+            // init state have to be killed. Otherwise it will create a
+            // seed without verification. We don't want that
+            mwc713process->kill();
+        }
+
+        mwc713process->deleteLater();
+        mwc713process = nullptr;
+    }
 
     loggedIn = false;
 
@@ -372,41 +414,6 @@ void MWC713::processStop(bool exitNicely) {
     emit onMwcAddress("");
     emit onMwcAddressWithIndex("",1);
     emit onTorAddress("");
-
-    if (mwc713process) {
-        // Waitiong for task Q to be empty
-        // Note, event processing can change a lot for us, so we shoudl watch for variables
-        if (exitNicely) {
-            qDebug() << "start exiting...";
-
-            int taskTimeout = 0;
-            if (eventCollector != nullptr)
-                taskTimeout += eventCollector->cancelTasksInQueue();
-
-            if (taskTimeout <= 10000) {
-                executeMwc713command("exit", "");
-            }
-            else {
-                logger::logInfo("MWC713", QString("mwc713 terminating because running long task that required to stop ") + QString::number(taskTimeout) + "ms");
-                taskTimeout  = 0;
-                mwc713process->kill();
-            }
-
-            if (!util::processWaitForFinished( mwc713process, 8000 + taskTimeout, "mwc713")) {
-                mwc713process->kill();
-                util::processWaitForFinished( mwc713process, 8000 + taskTimeout, "mwc713");
-            }
-            qDebug() << "mwc713 is exited";
-        }
-        else {
-            // init state have to be killed. Otherwise it will create a
-            // seed without verification. We don't want that
-            mwc713process->kill();
-        }
-
-        mwc713process->deleteLater();
-        mwc713process = nullptr;
-    }
 
     if (inputParser) {
         inputParser->deleteLater();

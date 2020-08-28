@@ -161,6 +161,11 @@ bool AppContext::loadData() {
     in >> st;
     activeWndState = (state::STATE)st;
 
+    if (activeWndState == state::STATE::RESYNC || state::STATE::MIGRATION ) {
+        // Invalid states, let's regirect to Node info
+        activeWndState = state::STATE::NODE_INFO;
+    }
+
     in >> pathStates;
     in >> intVectorStates;
 

@@ -213,9 +213,8 @@ void Mwc713EventManager::timerEvent(QTimerEvent *event) {
         return;
 
     if (taskQ.empty()) {
-        qDebug() << "INTERNAL ERROR Found timeout without a task. Ignoring the timeout";
+        // Fine for exiting.
         taskExecutionTimeLimit = 0;
-        Q_ASSERT(false);
         return;
     }
 

@@ -314,6 +314,9 @@ public:
     virtual void performAutoSwapStep( QString swapId ) override;
 
 public:
+    // launch exit command.
+    void launchExitCommand();
+
     // Feed the command to mwc713 process
     void executeMwc713command( QString cmd, QString shadowStr);
 

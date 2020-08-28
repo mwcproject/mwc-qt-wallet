@@ -59,6 +59,7 @@
 #include <QMessageBox>
 #include "../util_desktop/timeoutlock.h"
 #include "../util/Process.h"
+#include "../dialogs_desktop/showwalletstoppingmessagedlg.h"
 
 namespace core {
 
@@ -131,6 +132,25 @@ bool DesktopWndManager::sendConfirmationDlg( QString title, QString message, dou
     dlg::SendConfirmationDlg confirmDlg(nullptr, title, message, widthScale, passwordHash );
     return confirmDlg.exec() == QDialog::Accepted;
 }
+
+static dlg::ShowWalletStoppingMessageDlg * showWalletMessageDlg = nullptr;
+
+// Stopping wallet message
+void DesktopWndManager::showWalletStoppingMessage(int taskTimeout) {
+    if (showWalletMessageDlg == nullptr) {
+        showWalletMessageDlg = new dlg::ShowWalletStoppingMessageDlg(nullptr, taskTimeout);
+    }
+    showWalletMessageDlg->show();
+}
+
+void DesktopWndManager::hideWalletStoppingMessage() {
+    if (showWalletMessageDlg != nullptr) {
+        showWalletMessageDlg->hide();
+        showWalletMessageDlg->deleteLater();
+        showWalletMessageDlg = nullptr;
+    }
+}
+
 
 void DesktopWndManager::pageInitFirstTime() {
     windowManager->switchToWindowEx( mwc::PAGE_A_FIRST_TIME,

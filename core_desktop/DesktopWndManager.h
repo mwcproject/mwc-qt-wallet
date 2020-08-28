@@ -53,6 +53,10 @@ public:
     // Ask for confirmation
     virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) override;
 
+    // Stopping wallet message
+    virtual void showWalletStoppingMessage(int taskTimeout) override;
+    virtual void hideWalletStoppingMessage() override;
+
     //---------------- Pages ------------------------
     virtual void pageInitFirstTime() override;
     virtual void pageInputPassword(QString pageTitle, bool lockMode) override;
