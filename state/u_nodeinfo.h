@@ -66,6 +66,7 @@ public:
     void exportBlockchainData(QString fileName);
     void importBlockchainData(QString fileName);
     void publishTransaction(QString fileName);
+    void resetEmbeddedNodeData();
 protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "node_overview.html";}

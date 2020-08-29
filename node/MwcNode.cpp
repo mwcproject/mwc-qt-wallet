@@ -128,7 +128,7 @@ void MwcNode::stop() {
 
             while( nodeProcess->state() == QProcess::Running ) {
                 if (QDateTime::currentMSecsSinceEpoch() > limitTime) {
-                    if ( core::getWndManager()->questionTextDlg(nullptr, "Warning", "Stopping mwc-node process takes longer than expected.\nContinue to wait?",
+                    if ( core::getWndManager()->questionTextDlg("Warning", "Stopping mwc-node process takes longer than expected.\nContinue to wait?",
                                "Yes", "No",
                                "Continue to wait and let MWC Node more time to start",
                                "Don't wait and kill MWC Node process even it can corrupt the node data",

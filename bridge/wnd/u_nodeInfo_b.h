@@ -48,6 +48,9 @@ public:
     Q_INVOKABLE void importBlockchainData(QString fileName);
     // publish transaction from the file
     Q_INVOKABLE void publishTransaction(QString fileName);
+
+    // Reset embedded node data
+    Q_INVOKABLE void resetEmbeddedNodeData();
 signals:
     void sgnSetNodeStatus( QString localNodeStatus,
                              bool online,  QString errMsg, int nodeHeight, int peerHeight,

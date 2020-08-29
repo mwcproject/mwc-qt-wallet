@@ -27,6 +27,7 @@
 #include "../core/WndManager.h"
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/u_nodeInfo_b.h"
+#include <QDir>
 
 namespace state {
 
@@ -348,7 +349,39 @@ void NodeInfo::onSubmitFile(bool success, QString message, QString fileName) {
 }
 
 
+void NodeInfo::resetEmbeddedNodeData() {
+    notify::notificationStateSet( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
+    Q_ASSERT(currentNodeConnection.isLocalNode());
+    QString network = context->mwcNode->getCurrentNetwork();
+    QPair<bool,QString> nodePath = node::getMwcNodePath(currentNodeConnection.localNodeDataPath, network);
+    if (!nodePath.first) {
+        core::getWndManager()->messageTextDlg("Error", nodePath.second);
+        return;
+    }
+
+    context->mwcNode->stop();
+
+    QCoreApplication::processEvents();
+
+    // Cleaning up the folder
+    QString nodeDataPath = nodePath.second + "chain_data/";
+    QDir dir(nodeDataPath);
+    if (!dir.removeRecursively()) {
+        core::getWndManager()->messageTextDlg("Error", "Unable to clean up the node data at " + nodeDataPath);
+    }
+
+    QCoreApplication::processEvents();
+
+    context->mwcNode->start(currentNodeConnection.localNodeDataPath, network);
+
+    notify::notificationStateClean( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
+
+    for (auto b : bridge::getBridgeManager()->getNodeInfo())
+        b->hideProgress();
+
+    QCoreApplication::processEvents();
+}
 
 
 }

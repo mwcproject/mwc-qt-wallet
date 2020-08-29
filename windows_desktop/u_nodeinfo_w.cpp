@@ -202,7 +202,7 @@ void NodeInfo::showNodeLogs() {
 
 void NodeInfo::on_showLogsButton_clicked() { showNodeLogs(); }
 void NodeInfo::on_showLogsButton_5_clicked() { showNodeLogs(); }
-void NodeInfo::on_showLogsButton_8_clicked() { showNodeLogs(); }
+void NodeInfo::on_showLogsButton_9_clicked() { showNodeLogs(); }
 
 void NodeInfo::on_changeNodeButton_clicked()
 {
@@ -245,7 +245,7 @@ void NodeInfo::on_saveBlockchianData_clicked()
     nodeInfo->exportBlockchainData(fileName);
 }
 
-void NodeInfo::on_loadBlockchainData_clicked()
+void NodeInfo::on_loadBlockchainData_2_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load Blockchain Data"),
                                                     config->getPathFor("BlockchainData"),
@@ -291,4 +291,19 @@ void NodeInfo::updateNodeReadyButtons(bool nodeIsReady) {
     ui->refreshButton->setEnabled(nodeIsReady);
 }
 
+void NodeInfo::on_resyncNodeData_clicked()
+{
+    if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText(this, "Resync Node", "Please note, Node resync process might take a long time. Please try resync if you believe that your node is stuck and not able to sync by some reasons.\n\n"
+                                                           "Are you sure you want to clean up the node data and perform the full resync?",
+                                      "No", "Yes",
+                                      "Cancel resync process, let's keep node running as it is.", "Clean up Node data and resync from the scratch,",
+                                      true, false) )
+        return;
+
+    // User choose to clean up.
+    ui->progress->show();
+    nodeInfo->resetEmbeddedNodeData();
 }
+
+}
+

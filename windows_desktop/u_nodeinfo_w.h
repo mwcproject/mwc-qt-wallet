@@ -51,9 +51,9 @@ private slots:
     void on_changeNodeButton_clicked();
     void on_showLogsButton_clicked();
     void on_showLogsButton_5_clicked();
-    void on_showLogsButton_8_clicked();
+    void on_showLogsButton_9_clicked();
     void on_saveBlockchianData_clicked();
-    void on_loadBlockchainData_clicked();
+    void on_loadBlockchainData_2_clicked();
     void on_publishTransaction_clicked();
 
     void onSgnSetNodeStatus( QString localNodeStatus,
@@ -61,6 +61,8 @@ private slots:
                                      QString totalDifficulty2show, int connections);
     void onSgnUpdateEmbeddedMwcNodeStatus( QString status );
     void onSgnHideProgress();
+
+    void on_resyncNodeData_clicked();
 
 private:
 signals:

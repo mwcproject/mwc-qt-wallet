@@ -75,5 +75,10 @@ void NodeInfo::publishTransaction(QString fileName) {
     getState()->publishTransaction(fileName);
 }
 
+// Reset embedded node data
+void NodeInfo::resetEmbeddedNodeData() {
+    getState()->resetEmbeddedNodeData();
+}
+
 
 }

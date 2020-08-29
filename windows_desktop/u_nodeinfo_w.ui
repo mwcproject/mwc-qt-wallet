@@ -548,7 +548,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Re-sync your wallet with a full node. Please note, resync process will take time.</string>
+          <string>View this local MWC node Logs</string>
          </property>
          <property name="text">
           <string>Status Details</string>
@@ -559,7 +559,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>294</y>
+          <y>295</y>
           <width>766</width>
           <height>44</height>
          </rect>
@@ -573,7 +573,7 @@
         <widget class="control::MwcPushButtonNormal" name="showLogsButton_5">
          <property name="geometry">
           <rect>
-           <x>6</x>
+           <x>0</x>
            <y>2</y>
            <width>166</width>
            <height>40</height>
@@ -592,7 +592,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Re-sync your wallet with a full node. Please note, resync process will take time.</string>
+          <string>View this local MWC node Logs</string>
          </property>
          <property name="text">
           <string>Status Details</string>
@@ -601,9 +601,9 @@
         <widget class="control::MwcPushButtonNormal" name="saveBlockchianData">
          <property name="geometry">
           <rect>
-           <x>282</x>
+           <x>405</x>
            <y>2</y>
-           <width>223</width>
+           <width>166</width>
            <height>40</height>
           </rect>
          </property>
@@ -620,18 +620,18 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Re-sync your wallet with a full node. Please note, resync process will take time.</string>
+          <string>Export Blockchain data for Cold Wallet</string>
          </property>
          <property name="text">
-          <string>Save Blockchain Data</string>
+          <string>Export Blockchain</string>
          </property>
         </widget>
         <widget class="control::MwcPushButtonNormal" name="publishTransaction">
          <property name="geometry">
           <rect>
-           <x>534</x>
+           <x>580</x>
            <y>2</y>
-           <width>223</width>
+           <width>186</width>
            <height>40</height>
           </rect>
          </property>
@@ -648,10 +648,38 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Re-sync your wallet with a full node. Please note, resync process will take time.</string>
+          <string>Publish Transaction from Cold Wallet</string>
          </property>
          <property name="text">
           <string>Publish Transaction</string>
+         </property>
+        </widget>
+        <widget class="control::MwcPushButtonNormal" name="resyncNodeData">
+         <property name="geometry">
+          <rect>
+           <x>220</x>
+           <y>2</y>
+           <width>166</width>
+           <height>40</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Resync Node data from the scratch. </string>
+         </property>
+         <property name="text">
+          <string>Resync Node</string>
          </property>
         </widget>
        </widget>
@@ -659,7 +687,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>294</y>
+          <y>295</y>
           <width>766</width>
           <height>44</height>
          </rect>
@@ -670,7 +698,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <widget class="control::MwcPushButtonNormal" name="showLogsButton_8">
+        <widget class="control::MwcPushButtonNormal" name="showLogsButton_9">
          <property name="geometry">
           <rect>
            <x>135</x>
@@ -692,13 +720,13 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Re-sync your wallet with a full node. Please note, resync process will take time.</string>
+          <string>View this local MWC node Logs</string>
          </property>
          <property name="text">
           <string>Status Details</string>
          </property>
         </widget>
-        <widget class="control::MwcPushButtonNormal" name="loadBlockchainData">
+        <widget class="control::MwcPushButtonNormal" name="loadBlockchainData_2">
          <property name="geometry">
           <rect>
            <x>405</x>
@@ -720,10 +748,10 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Re-sync your wallet with a full node. Please note, resync process will take time.</string>
+          <string>Import blockchain data from Online Node</string>
          </property>
          <property name="text">
-          <string>Load Blockchain Data</string>
+          <string>Inport Blockchain Data</string>
          </property>
         </widget>
        </widget>
@@ -891,6 +919,10 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>showLogsButton_5</tabstop>
+  <tabstop>resyncNodeData</tabstop>
+  <tabstop>saveBlockchianData</tabstop>
+  <tabstop>publishTransaction</tabstop>
   <tabstop>showLogsButton</tabstop>
   <tabstop>changeNodeButton</tabstop>
   <tabstop>refreshButton</tabstop>
