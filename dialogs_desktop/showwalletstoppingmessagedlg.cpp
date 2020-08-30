@@ -32,7 +32,7 @@ ShowWalletStoppingMessageDlg::ShowWalletStoppingMessageDlg(QWidget *parent, int 
     }
 
     ui->stoppingLabel->setText("mwc713 stopping might take up to <b>" + waitingTime + "</b> because it need to finish current running task.\n\n"
-                               "Please wait until mwc713 will finish it's task and exit.");
+                               "Please wait until mwc713 will finish the task and exit.");
 }
 
 ShowWalletStoppingMessageDlg::~ShowWalletStoppingMessageDlg()
