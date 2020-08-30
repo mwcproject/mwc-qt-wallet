@@ -266,7 +266,7 @@ void InitAccount::createWalletWithSeed( QVector<QString> sd ) {
 
         if (!nodeConnection.isCloudNode()) {
             if ( core::WndManager::RETURN_CODE::BTN2 !=
-                    core::getWndManager()->questionTextDlg(nullptr, "Node connection",
+                    core::getWndManager()->questionTextDlg("Node connection",
                              "Because restore process requires connection to the running node, we are switching your wallet to the Cloud MWC Node.\n\n"
                                                    "If you prefer different setting, please update your MWC Node connection after",
                              "Cancel", "Continue",

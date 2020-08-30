@@ -664,19 +664,13 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>changeDirButton</tabstop>
   <tabstop>instanceNameEdit</tabstop>
   <tabstop>password1Edit</tabstop>
   <tabstop>password2Edit</tabstop>
   <tabstop>radioMainNet</tabstop>
   <tabstop>radioFloonet</tabstop>
   <tabstop>submitButton</tabstop>
-  <tabstop>radioMainNet_2</tabstop>
-  <tabstop>radioFloonet_2</tabstop>
-  <tabstop>changeDirButton_2</tabstop>
-  <tabstop>instanceNameEdit_2</tabstop>
-  <tabstop>password1Edit_2</tabstop>
-  <tabstop>password2Edit_2</tabstop>
+  <tabstop>changeDirButton</tabstop>
  </tabstops>
  <resources>
   <include location="../resources_desktop.qrc"/>

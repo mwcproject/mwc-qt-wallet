@@ -176,9 +176,8 @@ QVector<int> Swap::getConfirmationLimitForSecondary(QString secondaryName) {
     if (secondaryName == "BCH") {
         return QVector<int>{1, 1000};
     }
-
     Q_ASSERT(false);
-    QVector<int>{1, 1000};
+    return QVector<int>{1, 1000};
 }
 
 // Create a new trade. Responce will be send back with a signal
