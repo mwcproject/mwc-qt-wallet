@@ -16,8 +16,9 @@
 #define STATUSWND_H
 
 #include "mainwindow.h"
+#include <QApplication>
 #include <QWidget>
-#include <QWidget>
+#include <QPropertyAnimation>
 
 namespace Ui {
 class StatusWnd;
@@ -31,12 +32,17 @@ class MainWindow;
 class StatusWnd : public QWidget {
     Q_OBJECT
 public:
-    StatusWnd(core::MainWindow* mainWindow, QString statusMessage, int windowPosition, bool clickable = true);
+    StatusWnd(core::MainWindow* mainWindow, int position, bool mainWindowDisplay = true);
     ~StatusWnd();
-    void display(int windowPosition);
+    void display(int position);
+    void displayMessage(QString message, int position);
+    void stopDisplay();
+    int windowPosition() { return statusWindowNumber; }
+    void resetWindowPosition() { statusWindowNumber = -1; }
 
 private slots:
     void on_statusMessage_clicked();
+    void onApplicationStateChange(Qt::ApplicationState state);
 
 protected:
     void startTimer();
@@ -44,6 +50,7 @@ protected:
     void fadeOut();
     void fadeDone();
     void findStatusSummary();
+    void checkWindowFlags(bool displayOnTop);
     void displayOnMainWindow(int windowPosition);
     void displayOnMainScreen(int windowPosition);
 
@@ -52,16 +59,28 @@ private:
     core::MainWindow*     mainWindow = nullptr;
     Qt::WindowFlags       flags;
 
+    QApplication*         mwcApp = nullptr;
+    Qt::ApplicationState  currentState = Qt::ApplicationActive;
+
+    int                   statusWindowNumber = -1;
+    bool                  mainWindowDisplay = true;  // display on wallet main window vs system main screen
+    bool                  clickable = true;
+
+    QString               statusMessage;
+    QString               statusSummary;
+
     int                   statusSummaryLimit = 50;
     bool                  extractSummary     = true;
     bool                  clearSummary       = false;
-    QString               statusSummary;
-    QString               statusMessage;
 
-    bool                  clickable = true;
-    int                   fadeInTime  = 2000;
     int                   displayTime = 6000;
-    int                   fadeOutTime = 2000;
+    int                   fadeInTime  = 2000;
+    int                   fadeOutTime = 1000;
+
+    QTimer*               displayTimer;
+    QPropertyAnimation*   fadeInAnimation;
+    QPropertyAnimation*   fadeOutAnimation;
+
     int                   yScaleFactor = 2;
 };
 

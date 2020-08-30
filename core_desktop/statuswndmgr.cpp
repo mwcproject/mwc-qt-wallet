@@ -17,8 +17,8 @@
 #include "../core_desktop/statuswnd.h"
 #include "../core_desktop/statuswndmgr.h"
 #include <QWidget>
-#include <QDebug>
 #include <QEvent>
+#include <QDebug>
 
 namespace core {
 
@@ -29,8 +29,38 @@ StatusWndMgr::StatusWndMgr(core::MainWindow* mainwindow) :
 }
 
 StatusWndMgr::~StatusWndMgr() {
-    statusWindowList.clear();  // deletes any remaining smart pointers
-    pendingStatusMessages.clear();
+    removeWindows();
+}
+
+void StatusWndMgr::initWindows() {
+    // create windows for notifications once and reuse as needed
+    for (int i=0; i<maxStatusDisplay; i++) {
+        StatusWnd* swnd = new StatusWnd(mainWindow, i);
+        statusWindowList.append(swnd);
+    }
+
+    // window 0 displays the number of pending messages when the wallet is iconified
+    // displays on screen above task bar
+    StatusWnd* pwnd = new StatusWnd(mainWindow, pendingMsgScreenWindow, false);
+    pendingWindowList.append(pwnd);
+    // window 1 displays the number of pending messages when the wallet is locked
+    // displays on wallet
+    pwnd = new StatusWnd(mainWindow, pendingMsgWalletWindow, true);
+    pendingWindowList.append(pwnd);
+}
+
+void StatusWndMgr::removeWindows() {
+    for (int i=0; i<maxStatusDisplay; i++) {
+        StatusWnd* swnd = statusWindowList.takeFirst();
+        swnd->stopDisplay();
+        delete swnd;
+    }
+
+    for (int j=0; j<numPendingMsgWindows; j++) {
+        StatusWnd* pwnd = pendingWindowList.takeFirst();
+        pwnd->stopDisplay();
+        delete pwnd;
+    }
 }
 
 void StatusWndMgr::restore() {
@@ -49,6 +79,14 @@ void StatusWndMgr::handleStatusMessage(QString prefix, QString message) {
     // only display messages that would also go into the event log
     if (message.contains("Wallet state update, "))
         return;
+
+    // perform one-time initialization of the status windows
+    // can't do this in CTOR as entire system isn't set up yet and
+    // StatusWnd needs access to wallet applicatian (QApplication)
+    if (statusWindowList.size() == 0) {
+        initWindows();
+    }
+
     // skip any duplicates
     if (pendingStatusMessages.size() > 0 && pendingStatusMessages.last() == message)
         return;
@@ -69,15 +107,11 @@ void StatusWndMgr::displayPendingStatusMessages() {
         prevPendingMsgCount = 0;  // used when the wallet is locked or minimized, reset when not
 
         // display pending status messages as room allows
-        while (!pendingStatusMessages.isEmpty() && statusWindowList.size() < maxStatusDisplay) {
+        while (!pendingStatusMessages.isEmpty() && visibleMsgCount < maxStatusDisplay) {
             QString statusMsg = pendingStatusMessages.takeFirst();
-            // because StatusWnd uses a timer, we always want to use deleteLater for object destruction
-            // deleteLater won't let the object be destroyed until control returns to the event loop so we
-            // don't have to worry about the timer firing and causing a crash because the object has already
-            // been deleted
-            QSharedPointer<StatusWnd> swnd = QSharedPointer<StatusWnd>(new StatusWnd(mainWindow, statusMsg, statusWindowList.size()), &StatusWnd::deleteLater);
-            statusWindowList.append(swnd);
-            swnd->show();
+            StatusWnd* swnd = statusWindowList.value(visibleMsgCount);
+            swnd->displayMessage(statusMsg, visibleMsgCount);
+            visibleMsgCount++;
         }
     }
 }
@@ -90,46 +124,61 @@ void StatusWndMgr::displayNumberPendingMessages() {
             if (pendingMsgCount >= pendingMsgLimit) {
                 statusMsg = "Notifications Waiting To Be Read At Limit: " + QString::number(pendingMsgLimit);
             }
-            // Hide any previous pending msg count messages
-            // Sometimes messages come in quickly, so usually the last message count is only displayed
-            if (statusWindowList.size() > 0) {
-                statusHideAll();
+            // Hide any normal status messages
+            if (visibleMsgCount > 0) {
+                hideStatusWindows();
             }
-            QSharedPointer<StatusWnd> swnd = QSharedPointer<StatusWnd>(new StatusWnd(mainWindow, statusMsg, 0, false), &StatusWnd::deleteLater);
-            statusWindowList.append(swnd);
-            swnd->show();
+
+            // Sometimes messages come in quickly, so usually the last message count is only displayed
+            StatusWnd* pwnd = pendingWindowList.first();
+            pwnd->stopDisplay();
+            pwnd->displayMessage(statusMsg, 0);
             prevPendingMsgCount = pendingMsgCount;
         }
     }
 }
 
-void StatusWndMgr::statusHideAll() {
-    while (statusWindowList.size() > 0) {
-        QSharedPointer<StatusWnd> swnd = statusWindowList.last();
-        swnd->hide();
-        statusWindowList.removeLast();
+void StatusWndMgr::hideStatusWindows() {
+    for (int i=0; i<statusWindowList.size(); i++) {
+        StatusWnd* swnd = statusWindowList.value(i);
+        swnd->stopDisplay();
+        swnd->resetWindowPosition();
     }
+    visibleMsgCount = 0;
 }
 
-void StatusWndMgr::statusHide(const QSharedPointer<StatusWnd> _swnd) {
-    _swnd->hide();
-    int idx = statusWindowList.indexOf(_swnd);
-    if (idx >= 0 && idx < statusWindowList.size()) {
-        // because we are using shared pointers, we can just remove
-        // the status window from our list, we don't have to explicitly
-        // delete it
+void StatusWndMgr::hidePendingWindow() {
+    StatusWnd* pwnd = pendingWindowList.first();
+    pwnd->stopDisplay();
+}
+
+void StatusWndMgr::hideWindow(StatusWnd* swnd) {
+    swnd->stopDisplay();
+    if (visibleMsgCount > 0) {
+        // reposition any visible status windows
+        int idx = statusWindowList.indexOf(swnd);
         statusWindowList.removeAt(idx);
-    }
-    for (int i = 0; i < statusWindowList.size(); i++) {
-        // reposition all of the remaining status messages
-        QSharedPointer<StatusWnd> swnd = statusWindowList.value(i);
-        swnd->display(i);
+
+        int newPosition = 0;
+        // reposition all of the remain status messages
+        for (int i=0; i<statusWindowList.size(); i++) {
+            StatusWnd* rwnd = statusWindowList.value(i);
+            if (rwnd->windowPosition() == -1) {
+                continue;
+            }
+            qDebug() << "moving window[" << QString::number(i) << "] to position: " << QString::number(newPosition);
+            rwnd->display(newPosition++);
+        }
+        visibleMsgCount = newPosition;
+        // reset and append the status window to the back of the list
+        swnd->resetWindowPosition();
+        statusWindowList.append(swnd);
     }
 }
 
-void StatusWndMgr::statusDone(const QSharedPointer<StatusWnd> _swnd) {
+void StatusWndMgr::statusDone(StatusWnd* swnd) {
     // hide and reposition any statuses still visible
-    statusHide(_swnd);
+    hideWindow(swnd);
     // display any pending messages if there is room
     displayPendingStatusMessages();
 }
@@ -137,11 +186,11 @@ void StatusWndMgr::statusDone(const QSharedPointer<StatusWnd> _swnd) {
 void StatusWndMgr::moveEvent(QMoveEvent* event) {
     Q_UNUSED(event);
 
-    if (statusWindowList.size() > 0) {
-        for (int i = 0; i < statusWindowList.size(); i++) {
-            // reposition all of the remaining status messages
-            QSharedPointer<StatusWnd> statusWin = statusWindowList.value(i);
-            statusWin->display(i);
+    if (visibleMsgCount > 0) {
+        for (int i=0; i<visibleMsgCount; i++) {
+            // reposition all of the visible status messages
+            StatusWnd* swnd = statusWindowList.value(i);
+            swnd->display(i);
         }
     }
     else if (pendingStatusMessages.size() > 0) {
@@ -152,10 +201,12 @@ void StatusWndMgr::moveEvent(QMoveEvent* event) {
 void StatusWndMgr::resizeEvent(QResizeEvent* event) {
     Q_UNUSED(event);
 
-    for (int i = 0; i < statusWindowList.size(); i++) {
-        // reposition all of the remaining status messages
-        QSharedPointer<StatusWnd> statusWin = statusWindowList.value(i);
-        statusWin->display(i);
+    // redisplay all of the visible messages
+    if (visibleMsgCount > 0) {
+        for (int i=0; i<visibleMsgCount; i++) {
+            StatusWnd* swnd = statusWindowList.value(i);
+            swnd->display(i);
+        }
     }
 }
 
@@ -165,13 +216,13 @@ bool StatusWndMgr::event(QEvent* event) {
         if (mainWindow->isMinimized()) {
             eventConsumed = true;
             previouslyMinimized = true;
-            statusHideAll();
+            hideStatusWindows();
             displayNumberPendingMessages();
         }
         else if (mainWindow->isVisible() && previouslyMinimized) {
             // we just changed from being minimized to visible
             // hide any previously shown windows
-            statusHideAll();
+            hideStatusWindows();
             // reset the main window and any state
             restore();
             eventConsumed = true;

@@ -14,12 +14,12 @@
 
 #include "statuswnd.h"
 #include "ui_statuswnd.h"
+#include "../core/global.h"
 #include "../control_desktop/messagebox.h"
 #include <QApplication>
 #include <QPropertyAnimation>
 #include <QResizeEvent>
 #include <QScreen>
-#include <QSharedPointer>
 #include <QStatusBar>
 #include <QTimer>
 #include <QFrame>
@@ -30,33 +30,46 @@ namespace core {
 // StatusWnd objects are controlled by MainWindow so that they can always be displayed
 // on top of whatever windows might be visible at the time. If the MainWindow is destroyed,
 // all StatusWnd objects will also be destroyed.
-StatusWnd::StatusWnd(MainWindow* _mainWindow, QString _statusMessage, int windowPosition, bool _clickable) :
+StatusWnd::StatusWnd(MainWindow* _mainWindow, int position, bool _mainWindowDisplay) :
     QWidget(_mainWindow),
     ui(new Ui::StatusWnd),
     mainWindow(_mainWindow),
-    statusMessage(_statusMessage),
-    clickable(_clickable)
+    statusWindowNumber(position),
+    mainWindowDisplay(_mainWindowDisplay)
 {
-    Qt::WindowFlags flags = Qt::Window;
-    if (clickable) {
+    flags = Qt::Window | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint | Qt::WindowStaysOnTopHint;
+    if (mainWindowDisplay) {
+        this->setParent(mainWindow);
         // note on flags, Qt::Tool seems to pause when wallet loses focus
         // Qt::SubWindow seems to keep running and stays with wallet and
         // doesn't appear in other screen where you are working
         // so can keep wallet up on one screen and work on another while
         // keeping an eye on the wallet notifications
         flags |= Qt::SubWindow;  // should always be kept on top of parent
-        flags |= Qt::WindowStaysOnTopHint;
+
+        // settings which don't display when WindowStaysOnTopHint turned off and focus somewhere else
+        //flags |= Qt::Tool;
+        // setting which displays on top even when WindowStaysOnTopHint turned off
+        //flags |= Qt::ToolTip;
+        //flags |= Qt::Popup;
+        //flags |= Qt::Widget;
+        //flags |= Qt::Dialog;
+        //flags |= Qt::Window;
     }
     else {
         // Qt::Dialog will end up being displayed on whichever screen you
         // are currently working on. So we only use it for the notifications
         // when the wallet is minimized or iconified
         flags |= Qt::Dialog;
-        flags |= Qt::WindowStaysOnTopHint;
     }
-    flags |= Qt::FramelessWindowHint;
-    flags |= Qt::NoDropShadowWindowHint;
     QWidget::setWindowFlags(flags);
+
+    // we hook up to the main application here as it can't be done in StatusWndMgr as it's
+    // saved as a global too late
+    mwcApp = mwc::getApplication();
+    if (mwcApp) {
+        QObject::connect(mwcApp, &QGuiApplication::applicationStateChanged, this, &StatusWnd::onApplicationStateChange, Qt::QueuedConnection);
+    }
 
     // if we don't initialize ourself with the main window
     // we end up with crashes in the other windows off of the main
@@ -64,19 +77,53 @@ StatusWnd::StatusWnd(MainWindow* _mainWindow, QString _statusMessage, int window
     // sure to initialize with the main window as our parent.
 
     ui->setupUi(this);
-    if (!clickable)
-        ui->statusMessage->setFocusPolicy(Qt::NoFocus);
-    findStatusSummary();
-    ui->statusMessage->setText(statusSummary);
+
+    displayTimer = new QTimer(this);
+    fadeInAnimation = new QPropertyAnimation(this, "windowOpacity", this);
+    fadeOutAnimation = new QPropertyAnimation(this, "windowOpacity", this);
+
+    // set up animation properties
+    // set the start and end values so the status will fade in
+    fadeInAnimation->setStartValue(0.0);
+    fadeInAnimation->setEndValue(1.0);
+    fadeInAnimation->setDuration(fadeInTime);
+    fadeInAnimation->setEasingCurve(QEasingCurve::InQuad);
+    // reverse the start and end values so the status will fade out
+    fadeOutAnimation->setStartValue(1.0);
+    fadeOutAnimation->setEndValue(0.0);
+    fadeOutAnimation->setDuration(fadeOutTime);
+    fadeOutAnimation->setEasingCurve(QEasingCurve::Linear);
+
+    QObject::connect(displayTimer, &QTimer::timeout, this, &StatusWnd::fadeOut);
+    QObject::connect(fadeInAnimation, &QPropertyAnimation::finished, this, &StatusWnd::startTimer);
+    QObject::connect(fadeOutAnimation, &QPropertyAnimation::finished, this, &StatusWnd::fadeDone);
+
     ui->statusMessage->setAttribute(Qt::WA_TranslucentBackground);
 
-    display(windowPosition);
-    this->show();
-    fadeIn();
+    if (mainWindowDisplay) {
+        ui->statusMessage->setFocusPolicy(Qt::ClickFocus);
+    }
+    else {
+        ui->statusMessage->setFocusPolicy(Qt::NoFocus);
+    }
+
+    this->hide();
 }
 
 StatusWnd::~StatusWnd() {
     delete ui;
+    delete displayTimer;
+    delete fadeInAnimation;
+    delete fadeOutAnimation;
+}
+
+void StatusWnd::displayMessage(QString message, int position) {
+    hide();
+    statusMessage = message;
+    findStatusSummary();
+    ui->statusMessage->setText(statusSummary);
+    display(position);
+    fadeIn();
 }
 
 void StatusWnd::findStatusSummary() {
@@ -114,46 +161,45 @@ void StatusWnd::findStatusSummary() {
 }
 
 void StatusWnd::startTimer() {
-    QTimer::singleShot(displayTime, this, &StatusWnd::fadeOut);
+    displayTimer->start(displayTime);
 }
 
 void StatusWnd::fadeIn() {
-    QPropertyAnimation* animation = new QPropertyAnimation(this, "windowOpacity", this);
-    connect(animation, &QPropertyAnimation::finished, this, &StatusWnd::startTimer);
-
-    // reversing the start and end values will cause the status to fade out vs fade in
-    animation->setStartValue(0.0);
-    animation->setEndValue(1.0);
-    animation->setDuration(fadeInTime);
-    animation->setEasingCurve(QEasingCurve::InQuad);
-    animation->start(QAbstractAnimation::DeleteWhenStopped);
+    fadeInAnimation->start(QAbstractAnimation::KeepWhenStopped);
 }
 
 void StatusWnd::fadeOut() {
-    QPropertyAnimation* animation = new QPropertyAnimation(this, "windowOpacity", this);
-    connect(animation, &QPropertyAnimation::finished, this, &StatusWnd::fadeDone);
-
-    // reversing the start and end values will cause the status to fade in vs fade out
-    animation->setStartValue(1.0);
-    animation->setEndValue(0.0);
-    animation->setDuration(fadeOutTime);
-    animation->setEasingCurve(QEasingCurve::Linear);
-    animation->start(QAbstractAnimation::DeleteWhenStopped);
+    displayTimer->stop();
+    fadeOutAnimation->start(QAbstractAnimation::KeepWhenStopped);
 }
 
 void StatusWnd::fadeDone() {
     hide();
-    mainWindow->statusDone(QSharedPointer<StatusWnd>(this));
+    mainWindow->statusDone(this);
 }
 
-void StatusWnd::display(int windowPosition) {
-    if (!clickable) {
-        // we are displaying the number of pending status messages
-        displayOnMainScreen(windowPosition);
+void StatusWnd::stopDisplay() {
+    hide();
+    if (displayTimer->isActive()) {
+        displayTimer->stop();
+    }
+    fadeInAnimation->stop();
+    fadeOutAnimation->stop();
+    statusMessage.clear();
+    statusSummary.clear();
+    statusWindowNumber = -1;
+}
+
+void StatusWnd::display(int position) {
+    statusWindowNumber = position;
+    if (mainWindowDisplay) {
+        displayOnMainWindow(statusWindowNumber);
     }
     else {
-        displayOnMainWindow(windowPosition);
+        // we are displaying the number of pending status messages
+        displayOnMainScreen(statusWindowNumber);
     }
+    this->show();
 }
 
 void StatusWnd::displayOnMainWindow(int windowPosition) {
@@ -162,15 +208,10 @@ void StatusWnd::displayOnMainWindow(int windowPosition) {
     QSize  swnSize = this->frameSize();
     QSize  mwnSize = mainWindow->size();
     const QStatusBar* sbar = mainWindow->statusBar();
-    QPoint sbarPos = sbar->pos();
     int sbarHeight = sbar->height() + 23; // height is always 27 as configured in .ui file, 23 is padding
     if (mainWindow->isFullScreen()) {
         sbarHeight = sbar->height() + (yScaleFactor * 23);
     }
-    qDebug() << "mainWindow pos - x: " << QString::number(mwnPos.x()) << " y: " << QString::number(mwnPos.y());
-    qDebug() << "mainWindow size - width: " << QString::number(mwnSize.width()) << " height: " << QString::number(mwnSize.height());
-    qDebug() << "statusbar pos - x: " << QString::number(sbarPos.x()) << " y: " << QString::number(sbarPos.y());
-    qDebug() << "statusbar height: " << QString::number(sbarHeight) << "statusSummary: " << statusSummary;
 
     // position window relative to the right hand edge of the main window
     // and above the status bar
@@ -191,9 +232,9 @@ void StatusWnd::displayOnMainScreen(int windowPosition) {
 }
 
 void StatusWnd::on_statusMessage_clicked() {
-    if (!clickable) {
+    if (!mainWindowDisplay) {
         // hide this window
-        mainWindow->statusHide(QSharedPointer<StatusWnd>(this));
+        mainWindow->hideWindow(this);
         // restore the main window
         mainWindow->restore();
         return;
@@ -215,6 +256,26 @@ void StatusWnd::on_statusMessage_clicked() {
         }
     }
     control::MessageBox::messageText(this, messageTitle, messageText);
+}
+
+void StatusWnd::onApplicationStateChange(Qt::ApplicationState state) {
+    // for status messages displayed in the wallet app, don't display the notification windows
+    // on top if the wallet is not the active application
+    if (mainWindowDisplay && state != currentState) {
+        currentState = state;
+        hide();
+        if (state == Qt::ApplicationActive) {
+            qDebug() << "Turning on WindowStaysOnTopHint";
+            flags |= Qt::WindowStaysOnTopHint;
+            QWidget::setWindowFlags(flags);
+        }
+        else {
+            qDebug() << "Turning off WindowStaysOnTopHint";
+            flags &= ~Qt::WindowStaysOnTopHint;
+            QWidget::setWindowFlags(flags);
+        }
+        display(statusWindowNumber);
+    }
 }
 
 }

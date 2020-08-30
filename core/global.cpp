@@ -45,6 +45,10 @@ void setApplication(QApplication * app, QMainWindow * mainWindow) {
     mwcMainWnd = mainWindow;
 }
 
+QApplication* getApplication() {
+    return mwcApp;
+}
+
 void closeApplication() {
     if (mwcApp == nullptr || mwcMainWnd==nullptr) {
         nonClosed = false;

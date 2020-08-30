@@ -51,8 +51,6 @@ MainWindow::MainWindow(QWidget *parent) :
     stateMachine = new bridge::StateMachine(this);
     util = new bridge::Util(this);
 
-    statusMgr = new core::StatusWndMgr(this);
-
     QObject::connect( coreWindow, &CoreWindow::sgnUpdateActionStates,
                       this, &MainWindow::onSgnUpdateActionStates, Qt::QueuedConnection);
 
@@ -126,6 +124,10 @@ MainWindow::MainWindow(QWidget *parent) :
                      (screenRc.height() - newSize.height())/2,
                      newSz.width(), newSz.height() );
     }
+
+    // wait until all settings for the main window have been updated before creating the StatusWndMgr
+    // as it read the main window's dimensions
+    statusMgr = new core::StatusWndMgr(this);
 }
 
 void MainWindow::repost() {
@@ -172,12 +174,12 @@ void MainWindow::restore() {
     statusMgr->restore();
 }
 
-void MainWindow::statusHide(const QSharedPointer<StatusWnd> _swnd) {
-    statusMgr->statusHide(_swnd);
+void MainWindow::hideWindow(StatusWnd* swnd) {
+    statusMgr->hideWindow(swnd);
 }
 
-void MainWindow::statusDone(const QSharedPointer<StatusWnd> _swnd) {
-    statusMgr->statusDone(_swnd);
+void MainWindow::statusDone(StatusWnd* swnd) {
+    statusMgr->statusDone(swnd);
 }
 
 // level: notify::MESSAGE_LEVEL

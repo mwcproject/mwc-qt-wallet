@@ -50,8 +50,8 @@ public:
 
     QWidget * getMainWindow();
     void restore();
-    void statusHide(const QSharedPointer<StatusWnd> swnd);
-    void statusDone(const QSharedPointer<StatusWnd> swnd);
+    void hideWindow(StatusWnd* swnd);
+    void statusDone(StatusWnd* swnd);
 
 private slots:
     // Update tb & menu actions

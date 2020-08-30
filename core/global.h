@@ -131,6 +131,7 @@ const QString PAGE_HODL_CLAIM       = "Claim HODL coins";
 // Desktop support for App restart
 #ifdef WALLET_DESKTOP
 void setApplication(QApplication * app, QMainWindow * mainWindow);
+QApplication* getApplication();
 #endif
 
 bool isAppNonClosed();

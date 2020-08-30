@@ -24,6 +24,7 @@ class StatusWnd;
 
 // Non-widget class used to control the status windows from the main window
 class StatusWndMgr {
+
 public:
     StatusWndMgr(core::MainWindow* mainwindow);
     ~StatusWndMgr();
@@ -31,25 +32,35 @@ public:
     void restore();  // restore after being iconified
 
     void handleStatusMessage(QString prefix, QString message);
-    void statusHide(const QSharedPointer<StatusWnd> _swnd);
-    void statusDone(const QSharedPointer<StatusWnd> _swnd);
+    void hideWindow(StatusWnd* swnd);
+    void statusDone(StatusWnd* swnd);
     void moveEvent(QMoveEvent* event);
     void resizeEvent(QResizeEvent* event);
     bool event(QEvent* event);
 
 protected:
+    void initWindows();
+    void removeWindows();
     void displayPendingStatusMessages();
     void displayNumberPendingMessages();
-    void statusHideAll();
+    void hideStatusWindows();
+    void hidePendingWindow();
 
 private:
-    core::MainWindow*                mainWindow;
+    core::MainWindow*                mainWindow = nullptr;
 
     bool                             previouslyMinimized = false;
     int                              maxStatusDisplay = 5;
+    int                              visibleMsgCount = 0;
+
+    int                              numPendingMsgWindows = 1;
+    int                              pendingMsgScreenWindow = 0;
+    int                              pendingMsgWalletWindow = 1;
     int                              prevPendingMsgCount = 0;
     int                              pendingMsgLimit = 25;
-    QList<QSharedPointer<StatusWnd>> statusWindowList;
+
+    QList<StatusWnd*>                statusWindowList;
+    QList<StatusWnd*>                pendingWindowList;
     QList<QString>                   pendingStatusMessages;
 };
 
