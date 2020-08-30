@@ -24,7 +24,7 @@ ShowWalletStoppingMessageDlg::ShowWalletStoppingMessageDlg(QWidget *parent, int 
     ui->setupUi(this);
 
     QString waitingTime;
-    if (taskTimeout < 120 ) {
+    if (taskTimeout < 120*1000 ) {
         waitingTime = QString::number(taskTimeout/1000) + " seconds";
     }
     else {
