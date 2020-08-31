@@ -38,11 +38,10 @@ public:
     void displayMessage(QString message, int position);
     void stopDisplay();
     int windowPosition() { return statusWindowNumber; }
-    void resetWindowPosition() { statusWindowNumber = -1; }
+    void checkWindowFlags(bool displayOnTop);
 
 private slots:
     void on_statusMessage_clicked();
-    void onApplicationStateChange(Qt::ApplicationState state);
 
 protected:
     void startTimer();
@@ -50,7 +49,6 @@ protected:
     void fadeOut();
     void fadeDone();
     void findStatusSummary();
-    void checkWindowFlags(bool displayOnTop);
     void displayOnMainWindow(int windowPosition);
     void displayOnMainScreen(int windowPosition);
 
@@ -58,9 +56,6 @@ private:
     Ui::StatusWnd*        ui = nullptr;
     core::MainWindow*     mainWindow = nullptr;
     Qt::WindowFlags       flags;
-
-    QApplication*         mwcApp = nullptr;
-    Qt::ApplicationState  currentState = Qt::ApplicationActive;
 
     int                   statusWindowNumber = -1;
     bool                  mainWindowDisplay = true;  // display on wallet main window vs system main screen

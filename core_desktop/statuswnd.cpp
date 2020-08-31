@@ -64,13 +64,6 @@ StatusWnd::StatusWnd(MainWindow* _mainWindow, int position, bool _mainWindowDisp
     }
     QWidget::setWindowFlags(flags);
 
-    // we hook up to the main application here as it can't be done in StatusWndMgr as it's
-    // saved as a global too late
-    mwcApp = mwc::getApplication();
-    if (mwcApp) {
-        QObject::connect(mwcApp, &QGuiApplication::applicationStateChanged, this, &StatusWnd::onApplicationStateChange, Qt::QueuedConnection);
-    }
-
     // if we don't initialize ourself with the main window
     // we end up with crashes in the other windows off of the main
     // window (e.g. PanelBaseWnd, NavWnd). Not sure why, but make
@@ -190,16 +183,41 @@ void StatusWnd::stopDisplay() {
     statusWindowNumber = -1;
 }
 
-void StatusWnd::display(int position) {
-    statusWindowNumber = position;
-    if (mainWindowDisplay) {
-        displayOnMainWindow(statusWindowNumber);
+void StatusWnd::checkWindowFlags(bool displayOnTop) {
+    if (!mainWindowDisplay)
+        return;
+
+    hide();
+    if (displayOnTop) {
+        qDebug() << "Turning on WindowStaysOnTopHint";
+        flags |= Qt::WindowStaysOnTopHint;
     }
     else {
-        // we are displaying the number of pending status messages
-        displayOnMainScreen(statusWindowNumber);
+        qDebug() << "Turning off WindowStaysOnTopHint";
+        flags &= ~Qt::WindowStaysOnTopHint;
     }
-    this->show();
+    if (statusWindowNumber >= 0) {
+        display(statusWindowNumber);
+    }
+}
+
+void StatusWnd::display(int position) {
+    if (!statusMessage.isEmpty()) {
+        statusWindowNumber = position;
+        if (mainWindowDisplay) {
+            // For some reason need to set the window flags before anything
+            // is displayed on the main window. Otherwise when the notification
+            // window is not supposed to be on top, it will still appear on
+            // top when you switch to working on a different screen.
+            QWidget::setWindowFlags(flags);
+            displayOnMainWindow(statusWindowNumber);
+        }
+        else {
+            // we are displaying the number of pending status messages
+            displayOnMainScreen(statusWindowNumber);
+        }
+        this->show();
+    }
 }
 
 void StatusWnd::displayOnMainWindow(int windowPosition) {
@@ -256,26 +274,6 @@ void StatusWnd::on_statusMessage_clicked() {
         }
     }
     control::MessageBox::messageText(this, messageTitle, messageText);
-}
-
-void StatusWnd::onApplicationStateChange(Qt::ApplicationState state) {
-    // for status messages displayed in the wallet app, don't display the notification windows
-    // on top if the wallet is not the active application
-    if (mainWindowDisplay && state != currentState) {
-        currentState = state;
-        hide();
-        if (state == Qt::ApplicationActive) {
-            qDebug() << "Turning on WindowStaysOnTopHint";
-            flags |= Qt::WindowStaysOnTopHint;
-            QWidget::setWindowFlags(flags);
-        }
-        else {
-            qDebug() << "Turning off WindowStaysOnTopHint";
-            flags &= ~Qt::WindowStaysOnTopHint;
-            QWidget::setWindowFlags(flags);
-        }
-        display(statusWindowNumber);
-    }
 }
 
 }

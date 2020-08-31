@@ -124,10 +124,6 @@ MainWindow::MainWindow(QWidget *parent) :
                      (screenRc.height() - newSize.height())/2,
                      newSz.width(), newSz.height() );
     }
-
-    // wait until all settings for the main window have been updated before creating the StatusWndMgr
-    // as it read the main window's dimensions
-    statusMgr = new core::StatusWndMgr(this);
 }
 
 void MainWindow::repost() {
@@ -212,7 +208,10 @@ void MainWindow::onSgnNewNotificationMessage(int level, QString message) {
             break;
     }
 
-    statusMgr->handleStatusMessage(prefix, message);
+    if (statusMgr != nullptr) {
+        // status manager doesn't get created until first login
+        statusMgr->handleStatusMessage(prefix, message);
+    }
     ui->statusBar->showMessage( prefix + message, (int)(timeout * config->getTimeoutMultiplier()) );
 }
 
@@ -305,6 +304,27 @@ void MainWindow::onSgnConfigUpdate() {
 void MainWindow::onSgnLoginResult(bool ok) {
     Q_UNUSED(ok)
     updateNetworkName();
+    if (ok && statusMgr == nullptr) {
+        // wait until first successful login to create the status window manager
+        statusMgr = new core::StatusWndMgr(this);
+        // In order to detect when notification windows should no longer be displayed on top of other windows
+        // we need to detect application state changes of the WalletApp. But when the MainWindow is first
+        // created, there isn't access to the WalletApp yet. So when the user first logs in, we finally
+        // set up this connection.
+        QApplication* mwcApp = mwc::getApplication();
+        if (mwcApp) {
+            QObject::connect(mwcApp, &QGuiApplication::applicationStateChanged, this, &MainWindow::onApplicationStateChange, Qt::QueuedConnection);
+        }
+    }
+    if (statusMgr != nullptr) {
+        statusMgr->onLoginResult(ok);
+    }
+}
+
+void MainWindow::onApplicationStateChange(Qt::ApplicationState state) {
+    if (statusMgr) {
+        statusMgr->onApplicationStateChange(state);
+    }
 }
 
 

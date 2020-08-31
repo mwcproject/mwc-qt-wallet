@@ -16,6 +16,10 @@
 #include "../core_desktop/mainwindow.h"
 #include "../core_desktop/statuswnd.h"
 #include "../core_desktop/statuswndmgr.h"
+
+#include "../state/state.h"
+#include "../wallet/wallet.h"
+
 #include <QWidget>
 #include <QEvent>
 #include <QDebug>
@@ -99,8 +103,9 @@ void StatusWndMgr::handleStatusMessage(QString prefix, QString message) {
 }
 
 void StatusWndMgr::displayPendingStatusMessages() {
-    if (mwc::isWalletLocked() || mainWindow->isMinimized()) {
+    if (mwc::isWalletLocked() || mainWindow->isMinimized() || !loginOk) {
         // display pending messages if the wallet is locked or minimized
+        // or the wallet is no longer in the locked state but the login did not succeed
         displayNumberPendingMessages();
     }
     else {
@@ -109,9 +114,11 @@ void StatusWndMgr::displayPendingStatusMessages() {
         // display pending status messages as room allows
         while (!pendingStatusMessages.isEmpty() && visibleMsgCount < maxStatusDisplay) {
             QString statusMsg = pendingStatusMessages.takeFirst();
-            StatusWnd* swnd = statusWindowList.value(visibleMsgCount);
-            swnd->displayMessage(statusMsg, visibleMsgCount);
-            visibleMsgCount++;
+            if (!statusMsg.isEmpty()) {
+                StatusWnd* swnd = statusWindowList.value(visibleMsgCount);
+                swnd->displayMessage(statusMsg, visibleMsgCount);
+                visibleMsgCount++;
+            }
         }
     }
 }
@@ -129,9 +136,16 @@ void StatusWndMgr::displayNumberPendingMessages() {
                 hideStatusWindows();
             }
 
+            // Hide any num pending status windows
+            hidePendingWindows();
             // Sometimes messages come in quickly, so usually the last message count is only displayed
-            StatusWnd* pwnd = pendingWindowList.first();
-            pwnd->stopDisplay();
+            StatusWnd* pwnd = nullptr;
+            if (mainWindow->isMinimized()) {
+                pwnd = pendingWindowList.value(pendingMsgScreenWindow);
+            }
+            else {
+                pwnd = pendingWindowList.value(pendingMsgWalletWindow);
+            }
             pwnd->displayMessage(statusMsg, 0);
             prevPendingMsgCount = pendingMsgCount;
         }
@@ -142,14 +156,15 @@ void StatusWndMgr::hideStatusWindows() {
     for (int i=0; i<statusWindowList.size(); i++) {
         StatusWnd* swnd = statusWindowList.value(i);
         swnd->stopDisplay();
-        swnd->resetWindowPosition();
     }
     visibleMsgCount = 0;
 }
 
-void StatusWndMgr::hidePendingWindow() {
-    StatusWnd* pwnd = pendingWindowList.first();
-    pwnd->stopDisplay();
+void StatusWndMgr::hidePendingWindows() {
+    for (int i=0; i<numPendingMsgWindows; i++) {
+        StatusWnd* pwnd = pendingWindowList.value(i);
+        pwnd->stopDisplay();
+    }
 }
 
 void StatusWndMgr::hideWindow(StatusWnd* swnd) {
@@ -160,18 +175,18 @@ void StatusWndMgr::hideWindow(StatusWnd* swnd) {
         statusWindowList.removeAt(idx);
 
         int newPosition = 0;
-        // reposition all of the remain status messages
+        // reposition all of the remaining status messages
         for (int i=0; i<statusWindowList.size(); i++) {
             StatusWnd* rwnd = statusWindowList.value(i);
             if (rwnd->windowPosition() == -1) {
                 continue;
             }
             qDebug() << "moving window[" << QString::number(i) << "] to position: " << QString::number(newPosition);
+            rwnd->hide();
             rwnd->display(newPosition++);
         }
         visibleMsgCount = newPosition;
-        // reset and append the status window to the back of the list
-        swnd->resetWindowPosition();
+        // append the status window to the back of the list
         statusWindowList.append(swnd);
     }
 }
@@ -213,6 +228,7 @@ void StatusWndMgr::resizeEvent(QResizeEvent* event) {
 bool StatusWndMgr::event(QEvent* event) {
     bool eventConsumed = false;
     if (event->type() == QEvent::WindowStateChange) {
+        qDebug() << "QEvent::WindowStateChange";
         if (mainWindow->isMinimized()) {
             eventConsumed = true;
             previouslyMinimized = true;
@@ -222,13 +238,40 @@ bool StatusWndMgr::event(QEvent* event) {
         else if (mainWindow->isVisible() && previouslyMinimized) {
             // we just changed from being minimized to visible
             // hide any previously shown windows
-            hideStatusWindows();
+            hidePendingWindows();
             // reset the main window and any state
             restore();
             eventConsumed = true;
         }
     }
     return eventConsumed;
+}
+
+void StatusWndMgr::onLoginResult(bool ok) {
+    loginOk = ok;
+}
+
+void StatusWndMgr::onApplicationStateChange(Qt::ApplicationState state) {
+    // for status messages displayed in the wallet app, don't display the notification windows
+    // on top if the wallet is not the active application
+    if (state != currentState) {
+        currentState = state;
+        bool windowOnTop = false;
+        if (state == Qt::ApplicationActive) {
+            windowOnTop = true;
+        }
+        // inform status windows of new state
+        for (int i=0; i<statusWindowList.size(); i++) {
+            StatusWnd* swnd = statusWindowList.value(i);
+            swnd->checkWindowFlags(windowOnTop);
+        }
+        // inform num messages pending window for wallet
+        StatusWnd* pwnd = pendingWindowList.value(pendingMsgWalletWindow);
+        pwnd->checkWindowFlags(windowOnTop);
+        if (visibleMsgCount == 0) {
+            displayNumberPendingMessages();
+        }
+    }
 }
 
 

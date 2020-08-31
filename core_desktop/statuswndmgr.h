@@ -37,6 +37,8 @@ public:
     void moveEvent(QMoveEvent* event);
     void resizeEvent(QResizeEvent* event);
     bool event(QEvent* event);
+    void onLoginResult(bool ok);
+    void onApplicationStateChange(Qt::ApplicationState state);
 
 protected:
     void initWindows();
@@ -44,12 +46,15 @@ protected:
     void displayPendingStatusMessages();
     void displayNumberPendingMessages();
     void hideStatusWindows();
-    void hidePendingWindow();
+    void hidePendingWindows();
 
 private:
     core::MainWindow*                mainWindow = nullptr;
+    Qt::ApplicationState             currentState = Qt::ApplicationActive;
 
+    bool                             loginOk = true;
     bool                             previouslyMinimized = false;
+
     int                              maxStatusDisplay = 5;
     int                              visibleMsgCount = 0;
 

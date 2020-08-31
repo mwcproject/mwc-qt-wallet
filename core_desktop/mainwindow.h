@@ -62,6 +62,7 @@ private slots:
     void onSgnNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL
     void onSgnConfigUpdate();
     void onSgnLoginResult(bool ok);
+    void onApplicationStateChange(Qt::ApplicationState state);
 
     void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
     void onSgnHttpListeningStatus(bool listening, QString additionalInfo);
