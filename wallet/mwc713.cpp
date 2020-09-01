@@ -1595,7 +1595,10 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
     WalletConfig config = getWalletConfig();
     QString errorMessage = "mwc713 process exited due some unexpected error.\nmwc713 exit code: " + QString::number(exitCode);
 
-    if (config.hasForeignApi()) {
+    // Checking if foreign API enable but it is not default fro the TOR
+    if (config.hasForeignApi() && !(appContext->isAutoStartTorEnabled() && config.hasForeignApi() &&
+       config.foreignApiAddress == "127.0.0.1:3415" && config.foreignApiSecret.isEmpty() && !config.hasTls()))
+    {
         errorMessage += "\n\nYou have activated foreign API and it might be a reason for this issue. Foreign API is deactivated, please try to restart the wallet";
         config.foreignApi = false;
         saveWalletConfig(config, nullptr, nullptr, false );
@@ -1629,8 +1632,16 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
         }
     }
 
-    appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
-                               errorMessage );
+    if (startedMode == STARTED_MODE::RECOVER) {
+        // We are good, just a wrong passphrase. We need to report it correctly.
+        // let's feed outputsLines to the parser
+        inputParser->processInput(outputsLines.join("\n") );
+        inputParser->processInput("\n" + mwc::PROMPTS_MWC713 + "\n");
+    }
+    else {
+        appendNotificationMessage(notify::MESSAGE_LEVEL::FATAL_ERROR,
+                                  errorMessage);
+    }
 }
 
 void MWC713::mwc713readyReadStandardError() {

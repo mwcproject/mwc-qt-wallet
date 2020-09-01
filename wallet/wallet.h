@@ -426,7 +426,7 @@ public:
     // Call might take few seconds
     virtual bool checkWalletInitialized(bool hasSeed) = 0;
 
-    enum STARTED_MODE { OFFLINE, NORMAL, INIT, RECOVER, GET_NEXTKEY, RECEIVE_SLATE };
+    enum STARTED_MODE { OFFLINE, NORMAL, INIT, RECOVER };
     virtual STARTED_MODE getStartedMode() = 0;
 
     // ---- Wallet Init Phase
