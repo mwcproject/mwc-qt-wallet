@@ -73,7 +73,7 @@ void StatusWndMgr::restore() {
         prevPendingMsgCount = 0;
 
         // restore the main window from being minimized
-        mainWindow->setWindowState(mainWindow->windowState() & !Qt::WindowMinimized | Qt::WindowActive);
+        mainWindow->setWindowState(Qt::WindowActive);
 
         displayPendingStatusMessages();
     }
