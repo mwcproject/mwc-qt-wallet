@@ -352,9 +352,6 @@ bool TaskSyncProgressListener::processTask(const QVector<WEvent> &events) {
 
     qDebug() << "TaskSyncProgressListener::processTask with events: " << printEvents(events) << " TaskSyncShowProgress=" << TaskSyncShowProgress;
 
-    if (!TaskSyncShowProgress)
-        return true;
-
     // See Mwc713InputParser::initSyncProgress()  for details
     QStringList lst = evt.message.split('|');
     Q_ASSERT(lst.size()==1);
@@ -362,6 +359,8 @@ bool TaskSyncProgressListener::processTask(const QVector<WEvent> &events) {
         return false;
 
     const QString & msg = lst[0];
+
+    double progressPercentage = -1.0;
 
     if (msg.contains("Scanning Complet")) {
         wallet713->updateSyncProgress(100.0);
@@ -380,6 +379,17 @@ bool TaskSyncProgressListener::processTask(const QVector<WEvent> &events) {
             Q_ASSERT(ok);
             if (ok)
                 wallet713->updateSyncProgress(prc);
+        }
+    }
+
+    if (!TaskSyncShowProgress) {
+        if (progressPercentage >= 0.0) {
+            notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, "Wallet synchronization is in progress: " + QString::number( progressPercentage ) + "%" );
+        }
+    }
+    else {
+        if (progressPercentage >= 0.0) {
+            wallet713->updateSyncProgress(progressPercentage);
         }
     }
 
