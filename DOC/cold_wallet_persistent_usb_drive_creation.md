@@ -2,7 +2,7 @@
 
 # Creating a USB Drive With Persistent Storage For MWC Cold Wallet
 
-Last Updated: September 1, 2020
+Last Updated: September 3, 2020
 
 
 # Overview
@@ -31,10 +31,7 @@ Once you have your MWC cold wallet set up on a USB stick you’ve created follow
 
 
 # Prerequisites
-
-
-
-*   A USB drive with at least 64GB of memory. 
+*   A USB drive with at least 64GB of memory. 128GB is probably better.
 
 You will have the best cold wallet experience with a faster USB drive. At the time of this writing, you can get a USB 3.1 stick with 128GB of memory and a data transfer rate of 300mb/s for around $20.
 
@@ -156,11 +153,11 @@ When the _Run mkusb dus _dialog appears and asks: _Run mkusb version dus?_
 <img src="cold_wallet_persistent_usb_images/image4.png" max-width="300" height="300"/>
 
 
-When the warning dialog about overwriting the USB device appears:
+When the Do USB Stuff Dialog appears:
+* Click 'OK'
 
-*   Click ‘Yes’
+<img src="cold_wallet_persistent_usb_images/overwrite.png" max-width="300" height="300"/>
 
-<img src="cold_wallet_persistent_usb_images/image5.png" max-width="300" height="200"/>
 
 
 In the next window select:
@@ -198,6 +195,12 @@ The _Select Target Device_ window allows you to select the USB drive to use.
 *   Click ‘OK’
 
 <img src="cold_wallet_persistent_usb_images/image9.png" max-width="300" height="250"/>
+
+When the warning dialog _Please check again_ appears asking you to verify that you want to overwriting the USB device appears:
+
+*   Click ‘Yes’
+
+<img src="cold_wallet_persistent_usb_images/image5.png" max-width="300" height="200"/>
 
 
 In the next window select:
