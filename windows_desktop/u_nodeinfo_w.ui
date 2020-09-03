@@ -751,7 +751,7 @@
           <string>Import blockchain data from Online Node</string>
          </property>
          <property name="text">
-          <string>Inport Blockchain Data</string>
+          <string>Import Blockchain Data</string>
          </property>
         </widget>
        </widget>
