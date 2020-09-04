@@ -143,7 +143,7 @@
          <string>Create a new wallet instance</string>
         </property>
         <property name="styleSheet">
-         <string notr="true">QToolButton{ border-radius: 12px; background: transparent; font-size: 13px;} QToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
+         <string notr="true">QToolButton{ padding-top: 18px; border-radius: 12px; background: transparent; font-size: 13px;} QToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
         </property>
         <property name="text">
          <string>New Instance</string>
@@ -175,7 +175,7 @@
          <string>Restore wallet from the mnemonic passphrase</string>
         </property>
         <property name="styleSheet">
-         <string notr="true">QToolButton{ border-radius: 12px; background: transparent; font-size: 13px;} QToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
+         <string notr="true">QToolButton{ padding-top: 18px; border-radius: 12px; background: transparent; font-size: 13px;} QToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
         </property>
         <property name="text">
          <string>Restore Instance</string>
@@ -207,7 +207,7 @@
          <string>Open a wallet from not default location like USB stick or another drive</string>
         </property>
         <property name="styleSheet">
-         <string notr="true">QToolButton{ border-radius: 12px; background: transparent; font-size: 13px;} QToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
+         <string notr="true">QToolButton{ padding-top: 18px; border-radius: 12px; background: transparent; font-size: 13px;} QToolButton:enabled:!checked::hover {  background-color: rgba(255, 255, 255, 0.1); }</string>
         </property>
         <property name="text">
          <string>Open Wallet</string>
@@ -278,13 +278,13 @@
       <widget class="QToolButton" name="runOnlineNodeButton">
        <property name="minimumSize">
         <size>
-         <width>190</width>
+         <width>170</width>
          <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>190</width>
+         <width>170</width>
          <height>40</height>
         </size>
        </property>
@@ -316,13 +316,13 @@
       <widget class="QToolButton" name="helpButton">
        <property name="minimumSize">
         <size>
-         <width>120</width>
+         <width>100</width>
          <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>120</width>
+         <width>100</width>
          <height>40</height>
         </size>
        </property>

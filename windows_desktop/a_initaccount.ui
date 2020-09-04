@@ -320,15 +320,21 @@
             <rect>
              <x>105</x>
              <y>45</y>
-             <width>246</width>
+             <width>126</width>
              <height>19</height>
             </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>126</width>
+             <height>0</height>
+            </size>
            </property>
            <property name="layoutDirection">
             <enum>Qt::LeftToRight</enum>
            </property>
            <property name="text">
-            <string>[ change data directory ]                   </string>
+            <string>[ change data directory ]</string>
            </property>
           </widget>
          </widget>

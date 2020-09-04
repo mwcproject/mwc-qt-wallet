@@ -42,11 +42,7 @@ InitAccount::InitAccount(QWidget *parent, QString path, bool _restoredFromSeed) 
     startWallet = new bridge::StartWallet(this);
 
     util->passwordQualitySet(ui->password1Edit->text());
-    ui->strengthLabel->setText(util->passwordQualityComment());
-    if (!util->passwordQualityIsAcceptable())
-        ui->strengthLabel->setStyleSheet("background-color: #CCFF33");
-    else
-        ui->strengthLabel->setStyleSheet("");
+    ui->strengthLabel->setText("");
     ui->submitButton->setEnabled(util->passwordQualityIsAcceptable());
 
     ui->password1Edit->installEventFilter(this);
@@ -59,12 +55,11 @@ InitAccount::InitAccount(QWidget *parent, QString path, bool _restoredFromSeed) 
     utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()));
     updatePassState();
 
-    if (ui->strengthLabel->text().isEmpty())
-        ui->straighHolder->hide();
-    else
-        ui->straighHolder->show();
+    ui->straighHolder->hide();
 
     ui->passwordWndHolder->adjustSize();
+
+    startTimer(200); // 1 second timer is fine. Timer is for try.
 }
 
 void InitAccount::panelWndStarted() {
@@ -80,7 +75,7 @@ InitAccount::~InitAccount() {
 void InitAccount::on_password1Edit_textChanged(const QString &text) {
     QPair<bool, QString> valRes = util::validateMwc713Str(text, true);
     if (!valRes.first) {
-        ui->strengthLabel->setText(valRes.second);
+        ui->strengthLabel->setText( text.isEmpty() ? "" : valRes.second);
         ui->strengthLabel->setStyleSheet("background-color: #CCFF33; color: #3600C9");
         ui->submitButton->setEnabled(false);
         ui->submitButton->setEnabled(util->passwordQualityIsAcceptable());
@@ -98,13 +93,42 @@ void InitAccount::on_password1Edit_textChanged(const QString &text) {
     }
     updatePassState();
 
-    if (ui->strengthLabel->text().isEmpty())
+    // Hiding only. Show will be on the timer...
+    if (ui->strengthLabel->text().isEmpty()) {
         ui->straighHolder->hide();
-    else
-        ui->straighHolder->show();
+        warningCounters = 0;
+    }
 
     ui->passwordWndHolder->adjustSize();
 }
+
+void InitAccount::timerEvent(QTimerEvent *event) {
+    Q_UNUSED(event)
+
+    QString passWarnText = ui->strengthLabel->text();
+    if (passWarnText.isEmpty())
+        return;
+
+     passWarnText += "|" + ui->password1Edit->text();
+
+    if (!ui->straighHolder->isHidden()) {
+        return;
+    }
+
+    if (passWarnText == lastWarningStr) {
+        warningCounters++;
+    }
+    else {
+        lastWarningStr = passWarnText;
+        warningCounters = 0;
+    }
+
+    if (warningCounters==5) {
+        ui->straighHolder->show();
+        ui->passwordWndHolder->adjustSize();
+    }
+}
+
 
 void InitAccount::on_password2Edit_textChanged(const QString &text) {
     Q_UNUSED(text)

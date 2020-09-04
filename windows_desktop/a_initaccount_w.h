@@ -52,6 +52,9 @@ private:
     virtual void panelWndStarted() override;
 
 private:
+    virtual void timerEvent(QTimerEvent *event) override;
+
+private:
     Ui::InitAccount *ui;
     bridge::SelectMode * selectMode = nullptr;
     bridge::InitAccount * initAccount = nullptr;
@@ -59,6 +62,8 @@ private:
     bridge::StartWallet * startWallet = nullptr;
 
     bool restoredFromSeed = false;
+    QString lastWarningStr;
+    int  warningCounters = 0;
 };
 
 }
