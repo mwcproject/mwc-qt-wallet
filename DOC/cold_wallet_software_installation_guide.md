@@ -114,21 +114,21 @@ If you are booting from a USB device without persistent storage:
 
 At the end of the boot process the Ubuntu Desktop will appear.
 
-<img src="cold_wallet_installation_images/image1.png" max-width="300" height="300"/>
+<img src="cold_wallet_software_installation_images/image1.png" max-width="300" height="300"/>
 
 ## Disable All Network Connections
 Every time you boot up Ubuntu from your USB device, you should first verify that you do not have any network connections. To verify that you are not connected to your network, click the down arrow in the top right of the desktop menu bar.
 
-<img src="cold_wallet_installation_images/image2.png" max-width="100" height="100"/>
+<img src="cold_wallet_software_installation_images/image2.png" max-width="100" height="100"/>
 
 *   Select Settings->Wi-Fi
 *   Enable Airplane Mode
 *   Select Settings->Network
 *   Ensure that there is not a network profile. If there is, remove it by clicking on the _Settings_ icon and then clicking on _Remove Connection Profile._
 
-<img src="cold_wallet_installation_images/image3.png" max-width="300" height="300"/>
+<img src="cold_wallet_software_installation_images/image3.png" max-width="300" height="300"/>
 
-<img src="cold_wallet_installation_images/image4.png" max-width="300" height="300"/>
+<img src="cold_wallet_software_installation_images/image4.png" max-width="300" height="300"/>
 
 ## Copy Files From File Transfer USB Device
 Now that we have booted from our Ubuntu USB device and ensured that we are not connected to the network, we can prepare to install MWC Qt Wallet and its dependent software.
