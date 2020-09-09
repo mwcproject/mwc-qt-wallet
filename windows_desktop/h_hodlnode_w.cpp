@@ -33,6 +33,13 @@ HodlNode::HodlNode(QWidget *parent) :
     hodlStatus = new bridge::HodlStatus(this);
     util = new bridge::Util(this);
 
+    QObject::connect( hodl, &bridge::Hodl::sgnUpdateHodlState,
+                      this, &HodlNode::onSgnUpdateHodlState, Qt::QueuedConnection);
+    QObject::connect( hodl, &bridge::Hodl::sgnReportMessage,
+                      this, &HodlNode::onSgnReportMessage, Qt::QueuedConnection);
+    QObject::connect( hodl, &bridge::Hodl::sgnHideWaitingStatus,
+                      this, &HodlNode::onSgnHideWaitingStatus, Qt::QueuedConnection);
+
     ui->progress->initLoader(false);
 
     ui->accountStatus->setText("");
