@@ -355,9 +355,9 @@ QPushButton:pressed {
 }
 
 control--MwcStatusLine {
-    border-radius: 6px;
     border: none;
-    background-color: #9000FF;
+    border-radius: 0px;
+    background-color: #9401E4;
     font-family: Open Sans;
     font-style: normal;
     font-weight: normal;
@@ -373,6 +373,8 @@ control--MwcStatusLine:disabled {
 }
 
 control--MwcStatusLine:enabled:!focus::hover {
+    color: #9401E4;
+    background: white;
     border: none;
 }
 
