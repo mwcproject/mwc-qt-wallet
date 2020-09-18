@@ -221,14 +221,16 @@ void StatusWnd::display(int position) {
 }
 
 void StatusWnd::displayOnMainWindow(int windowPosition) {
+    // we need to ensure that color changes due to having the focus as reset, if the window is moved
+    ui->statusMessage->setAttribute(Qt::WA_UnderMouse, false);
+
     // we want to position the status window in the bottom right corner of the main window
     QPoint mwnPos = mainWindow->pos();
     QSize  swnSize = this->frameSize();
     QSize  mwnSize = mainWindow->size();
-    const QStatusBar* sbar = mainWindow->statusBar();
-    int sbarHeight = sbar->height() + 23; // height is always 27 as configured in .ui file, 23 is padding
+    int sbarHeight = mwnStatusBarHeight + 23; // height is always 27 as configured in .ui file, 23 is padding
     if (mainWindow->isFullScreen()) {
-        sbarHeight = sbar->height() + (yScaleFactor * 23);
+        sbarHeight = mwnStatusBarHeight + (yScaleFactor * 23);
     }
 
     // position window relative to the right hand edge of the main window

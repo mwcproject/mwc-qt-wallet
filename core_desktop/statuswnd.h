@@ -76,6 +76,11 @@ private:
     QPropertyAnimation*   fadeInAnimation;
     QPropertyAnimation*   fadeOutAnimation;
 
+    // the main window status bar height is hard-coded to 27 in the .ui file
+    // but some screens change the height of the status bar
+    // to consistently display the status windows at the same location relative
+    // to the main window, we use a constant status bar height of 27
+    int                   mwnStatusBarHeight = 27;
     int                   yScaleFactor = 2;
 };
 
