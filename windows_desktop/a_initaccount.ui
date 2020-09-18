@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>633</width>
+    <width>800</width>
     <height>698</height>
    </rect>
   </property>
@@ -295,12 +295,12 @@
             <bool>true</bool>
            </property>
           </widget>
-          <widget class="control::MwcLabelSmall" name="createdDirLabel">
+          <widget class="control::MwcLabelMini" name="createdDirLabel">
            <property name="geometry">
             <rect>
              <x>105</x>
              <y>0</y>
-             <width>306</width>
+             <width>481</width>
              <height>46</height>
             </rect>
            </property>
@@ -667,6 +667,11 @@
    <class>control::MwcPushButtonTiny</class>
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelMini</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

@@ -27,6 +27,17 @@ MwcLabelTiny::MwcLabelTiny(const QString &text, QWidget *parent, Qt::WindowFlags
 MwcLabelTiny::~MwcLabelTiny() {}
 
 
+MwcLabelMini::MwcLabelMini(QWidget *parent, Qt::WindowFlags f) :
+   QLabel(parent,f)
+{}
+
+MwcLabelMini::MwcLabelMini(const QString &text, QWidget *parent, Qt::WindowFlags f) :
+    QLabel(text,parent, f)
+{}
+
+MwcLabelMini::~MwcLabelMini() {}
+
+
 MwcLabelSmall::MwcLabelSmall(QWidget *parent, Qt::WindowFlags f) :
     QLabel(parent,f)
 {}

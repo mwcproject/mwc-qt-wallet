@@ -27,6 +27,14 @@ public:
     virtual ~MwcLabelTiny() override;
 };
 
+class MwcLabelMini : public QLabel {
+    Q_OBJECT
+public:
+    explicit MwcLabelMini(QWidget *parent=Q_NULLPTR, Qt::WindowFlags f=Qt::WindowFlags());
+    explicit MwcLabelMini(const QString &text, QWidget *parent=Q_NULLPTR, Qt::WindowFlags f=Qt::WindowFlags());
+    virtual ~MwcLabelMini() override;
+};
+
 class MwcLabelSmall : public QLabel {
     Q_OBJECT
 public:

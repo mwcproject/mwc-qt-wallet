@@ -102,6 +102,12 @@ QLabel::disabled {
 control--MwcLabelTiny {
     font-size: 9px;
 }
+/* use MwcLabelTiny10px when the font size needs to match
+   the font size with MwcPushButtonTiny
+*/
+control--MwcLabelMini {
+    font-size: 10px;
+}
 control--MwcLabelSmall {
     font-size: 12px;
 }

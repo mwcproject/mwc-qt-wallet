@@ -207,6 +207,7 @@ void InitAccount::on_changeDirButton_clicked() {
     if (wallet_dir.isEmpty())
         return;
     startWallet->createNewWalletInstance(wallet_dir, restoredFromSeed);
+    ui->createdDirLabel->setText("You are saving your data to:\n" + wallet_dir);
 }
 
 }
