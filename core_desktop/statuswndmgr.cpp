@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "../bridge/config_b.h"
+
 #include "../core/global.h"
 #include "../core_desktop/mainwindow.h"
 #include "../core_desktop/statuswnd.h"
@@ -79,9 +81,25 @@ void StatusWndMgr::restore() {
     }
 }
 
+bool StatusWndMgr::filterOutMessage(QString message) {
+    bool filterOut = false;
+    if (message.contains("Wallet state update, ")) {
+        // only display messages that would also go into the event log
+        filterOut = true;
+    }
+    else if (mainWindow->config->isColdWallet()) {
+        if (message.contains("listener") || message.contains("sync")) {
+            // the cold wallet is expected to be offline
+            // don't display messages about the listeners
+            filterOut = true;
+        }
+    }
+    return filterOut;
+}
+
 void StatusWndMgr::handleStatusMessage(QString prefix, QString message) {
     // only display messages that would also go into the event log
-    if (message.contains("Wallet state update, "))
+    if (filterOutMessage(message))
         return;
 
     // perform one-time initialization of the status windows

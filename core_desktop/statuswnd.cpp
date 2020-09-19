@@ -223,6 +223,7 @@ void StatusWnd::display(int position) {
 void StatusWnd::displayOnMainWindow(int windowPosition) {
     // we need to ensure that color changes due to having the focus as reset, if the window is moved
     ui->statusMessage->setAttribute(Qt::WA_UnderMouse, false);
+    ui->statusMessage->setAttribute(Qt::WA_TranslucentBackground);
 
     // we want to position the status window in the bottom right corner of the main window
     QPoint mwnPos = mainWindow->pos();

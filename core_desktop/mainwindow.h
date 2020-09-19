@@ -43,6 +43,7 @@ class StatusWndMgr;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+    friend class StatusWndMgr;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);

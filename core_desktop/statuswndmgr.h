@@ -43,6 +43,7 @@ public:
 protected:
     void initWindows();
     void removeWindows();
+    bool filterOutMessage(QString message);
     void displayPendingStatusMessages();
     void displayNumberPendingMessages();
     void hideStatusWindows();
