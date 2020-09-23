@@ -24,7 +24,7 @@
 
 #include <QWidget>
 #include <QEvent>
-#include <QDebug>
+//#include <QDebug>
 
 namespace core {
 
@@ -199,9 +199,10 @@ void StatusWndMgr::hideWindow(StatusWnd* swnd) {
             if (rwnd->windowPosition() == -1) {
                 continue;
             }
-            qDebug() << "moving window[" << QString::number(i) << "] to position: " << QString::number(newPosition);
+            //qDebug() << "moving window[" << QString::number(i) << "] to position: " << QString::number(newPosition);
             rwnd->hide();
-            rwnd->display(newPosition++);
+            rwnd->display(newPosition);
+            newPosition++;
         }
         visibleMsgCount = newPosition;
         // append the status window to the back of the list
@@ -246,7 +247,7 @@ void StatusWndMgr::resizeEvent(QResizeEvent* event) {
 bool StatusWndMgr::event(QEvent* event) {
     bool eventConsumed = false;
     if (event->type() == QEvent::WindowStateChange) {
-        qDebug() << "QEvent::WindowStateChange";
+        //qDebug() << "QEvent::WindowStateChange";
         if (mainWindow->isMinimized()) {
             eventConsumed = true;
             previouslyMinimized = true;
@@ -267,6 +268,7 @@ bool StatusWndMgr::event(QEvent* event) {
 
 void StatusWndMgr::onLoginResult(bool ok) {
     loginOk = ok;
+    visibleMsgCount = 0;
 }
 
 void StatusWndMgr::onApplicationStateChange(Qt::ApplicationState state) {

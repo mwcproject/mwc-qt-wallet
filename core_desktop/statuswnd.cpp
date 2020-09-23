@@ -23,7 +23,7 @@
 #include <QStatusBar>
 #include <QTimer>
 #include <QFrame>
-#include <QDebug>
+//#include <QDebug>
 
 namespace core {
 
@@ -189,11 +189,11 @@ void StatusWnd::checkWindowFlags(bool displayOnTop) {
 
     hide();
     if (displayOnTop) {
-        qDebug() << "Turning on WindowStaysOnTopHint";
+        //qDebug() << "Turning on WindowStaysOnTopHint";
         flags |= Qt::WindowStaysOnTopHint;
     }
     else {
-        qDebug() << "Turning off WindowStaysOnTopHint";
+        //qDebug() << "Turning off WindowStaysOnTopHint";
         flags &= ~Qt::WindowStaysOnTopHint;
     }
     if (statusWindowNumber >= 0) {
@@ -221,7 +221,7 @@ void StatusWnd::display(int position) {
 }
 
 void StatusWnd::displayOnMainWindow(int windowPosition) {
-    // we need to ensure that color changes due to having the focus as reset, if the window is moved
+    // we need to ensure that color changes due to having the focus is reset, if the window is moved
     ui->statusMessage->setAttribute(Qt::WA_UnderMouse, false);
     ui->statusMessage->setAttribute(Qt::WA_TranslucentBackground);
 
