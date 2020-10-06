@@ -45,7 +45,11 @@ StatusWnd::StatusWnd(MainWindow* _mainWindow, int position, bool _mainWindowDisp
         // doesn't appear in other screen where you are working
         // so can keep wallet up on one screen and work on another while
         // keeping an eye on the wallet notifications
+#ifdef Q_OS_MAC
         flags |= Qt::SubWindow;  // should always be kept on top of parent
+#else
+        flags |= Qt::Tool;
+#endif
 
         // settings which don't display when WindowStaysOnTopHint turned off and focus somewhere else
         //flags |= Qt::Tool;
