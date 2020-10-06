@@ -154,6 +154,17 @@ bool MobileWndManager::sendConfirmationDlg( QString title, QString message, doub
     return false;
 }
 
+// Stopping wallet message
+void MobileWndManager::showWalletStoppingMessage(int taskTimeout) {
+    Q_UNUSED(taskTimeout)
+
+    Q_ASSERT(false); // implement me
+}
+
+void MobileWndManager::hideWalletStoppingMessage() {
+    Q_ASSERT(false); // implement me
+}
+
 //---------------- Pages ------------------------
 void MobileWndManager::pageInitFirstTime() {
     Q_ASSERT(false); // implement me
@@ -322,6 +333,24 @@ void MobileWndManager::pageWalletSettings() {
 
 void MobileWndManager::pageAccountOptions() {
     mainWindow->setProperty("currentState", state::STATE::ACCOUNT_OPTIONS);
+}
+
+void MobileWndManager::pageSwapList() {
+    Q_ASSERT(false); // implement me
+}
+void MobileWndManager::pageSwapNew() {
+    Q_ASSERT(false); // implement me
+}
+
+void MobileWndManager::pageSwapEdit(QString swapId) {
+    Q_UNUSED(swapId)
+
+    Q_ASSERT(false); // implement me
+}
+void MobileWndManager::pageSwapTradeDetails(QString swapId) {
+    Q_UNUSED(swapId)
+
+    Q_ASSERT(false); // implement me
 }
 
 }
