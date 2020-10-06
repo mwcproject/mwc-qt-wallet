@@ -79,7 +79,7 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            color: white
+            color: "white"
 
             WebView {
                 id: webview

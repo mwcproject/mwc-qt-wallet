@@ -200,9 +200,9 @@ Item {
         popup: Popup {
             y: instanceComboBox.height + dp(3)
             width: instanceComboBox.width
-            implicitHeight: contentItem.implicitHeight + dp(40)
-            topPadding: dp(20)
-            bottomPadding: dp(20)
+            implicitHeight: contentItem.implicitHeight + dp(20)
+            topPadding: dp(10)
+            bottomPadding: dp(10)
             leftPadding: dp(0)
             rightPadding: dp(0)
 
