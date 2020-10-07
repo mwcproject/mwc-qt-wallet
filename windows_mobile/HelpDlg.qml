@@ -77,9 +77,16 @@ Item {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: dp(180)
 
-        WebView {
-            id: webview
+        Rectangle {
             anchors.fill: parent
+            color: "white"
+
+            WebView {
+                id: webview
+                anchors.fill: parent
+                anchors.leftMargin: dp(20)
+                anchors.rightMargin: dp(30)
+            }
         }
     }
 

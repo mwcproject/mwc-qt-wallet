@@ -55,6 +55,10 @@ public:
     // Ask for confirmation
     virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) override;
 
+    // Stopping wallet message
+    virtual void showWalletStoppingMessage(int taskTimeout) override;
+    virtual void hideWalletStoppingMessage() override;
+
     //---------------- Pages ------------------------
     virtual void pageInitFirstTime() override;
     virtual void pageInputPassword(QString pageTitle, bool lockMode) override;
@@ -97,6 +101,12 @@ public:
     virtual void pageWalletHome() override;
     virtual void pageWalletSettings() override;
     virtual void pageAccountOptions() override;
+
+    // Swap pages
+    virtual void pageSwapList() override;
+    virtual void pageSwapNew() override;
+    virtual void pageSwapEdit(QString swapId) override;
+    virtual void pageSwapTradeDetails(QString swapId) override;
 
 private:
     QQmlApplicationEngine * engine = nullptr;

@@ -34,11 +34,13 @@ Item {
                 idx++
             }
             accountComboBox.currentIndex = selectedAccIdx
+            rect_progress.visible = false
         }
     }
 
     onVisibleChanged: {
         if (visible) {
+            rect_progress.visible = true
             wallet.requestWalletBalanceUpdate()
             rect_online.color = "#8633E0"
             text_online_selected.visible = true
@@ -312,6 +314,21 @@ Item {
         }
     }
 
+    Rectangle {
+        id: rect_progress
+        width: dp(60)
+        height: dp(30)
+        anchors.top: button_all.bottom
+        anchors.topMargin: dp(50)
+        anchors.horizontalCenter: parent.horizontalCenter
+        color: "#00000000"
+        visible: false
+        AnimatedImage {
+            id: animation
+            source: "../img/loading.gif"
+        }
+    }
+
     Button {
         id: button_next
         width: dp(150)
@@ -319,6 +336,7 @@ Item {
         anchors.top: button_all.bottom
         anchors.topMargin: dp(50)
         anchors.horizontalCenter: parent.horizontalCenter
+        visible: !rect_progress.visible
         background: Rectangle {
             color: "#00000000"
             radius: dp(4)
@@ -348,7 +366,6 @@ Item {
 
     ComboBox {
         id: accountComboBox
-        height: dp(50)
         anchors.top: text_description3.bottom
         anchors.topMargin: dp(30)
         anchors.right: parent.right
@@ -356,7 +373,7 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         leftPadding: dp(20)
-        rightPadding: dp(40)
+        rightPadding: dp(20)
         font.pixelSize: dp(18)
 
         onCurrentIndexChanged: {
@@ -371,17 +388,23 @@ Item {
             height: dp(40)
             contentItem: Text {
                 text: info
-                color: "#7579ff"
+                color: "white"
                 font: accountComboBox.font
                 elide: Text.ElideRight
                 verticalAlignment: Text.AlignVCenter
             }
-            highlighted: accountComboBox.highlightedIndex === index
+            background: Rectangle {
+                color: accountComboBox.highlightedIndex === index ? "#955BDD" : "#8633E0"
+            }
+            topPadding: dp(10)
+            bottomPadding: dp(10)
+            leftPadding: dp(20)
+            rightPadding: dp(20)
         }
 
         indicator: Canvas {
             id: canvas
-            x: accountComboBox.width - width - accountComboBox.rightPadding / 2
+            x: accountComboBox.width - width - accountComboBox.rightPadding
             y: accountComboBox.topPadding + (accountComboBox.availableHeight - height) / 2
             width: dp(14)
             height: dp(7)
@@ -394,10 +417,17 @@ Item {
 
             onPaint: {
                 context.reset()
-                context.moveTo(0, 0)
-                context.lineTo(width / 2, height)
-                context.lineTo(width, 0)
+                if (accountComboBox.popup.visible) {
+                    context.moveTo(0, height)
+                    context.lineTo(width / 2, 0)
+                    context.lineTo(width, height)
+                } else {
+                    context.moveTo(0, 0)
+                    context.lineTo(width / 2, height)
+                    context.lineTo(width, 0)
+                }
                 context.strokeStyle = "white"
+                context.lineWidth = 2
                 context.stroke()
             }
         }
@@ -407,19 +437,24 @@ Item {
             font: accountComboBox.font
             color: "white"
             verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignLeft
             elide: Text.ElideRight
         }
 
         background: Rectangle {
+            implicitHeight: dp(50)
             radius: dp(4)
             color: "#8633E0"
         }
 
         popup: Popup {
-            y: accountComboBox.height - 1
+            y: accountComboBox.height + dp(3)
             width: accountComboBox.width
-            implicitHeight: contentItem.implicitHeight
-            padding: dp(1)
+            implicitHeight: contentItem.implicitHeight + dp(20)
+            topPadding: dp(10)
+            bottomPadding: dp(10)
+            leftPadding: dp(0)
+            rightPadding: dp(0)
 
             contentItem: ListView {
                 clip: true
@@ -431,8 +466,14 @@ Item {
             }
 
             background: Rectangle {
-                border.color: "white"
+                color: "#8633E0"
                 radius: dp(4)
+            }
+
+            onVisibleChanged: {
+                if (!accountComboBox.popup.visible) {
+                    canvas.requestPaint()
+                }
             }
         }
 

@@ -83,6 +83,7 @@
 #include "bridge/wnd/c_newseed_b.h"
 #include "bridge/wnd/x_events_b.h"
 #include "bridge/wnd/a_startwallet_b.h"
+#include "bridge/wnd/z_progresswnd_b.h"
 
 #ifdef WALLET_MOBILE
 #include <QQmlApplicationEngine>
@@ -292,6 +293,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<bridge::NewSeed>("NewSeedBridge", 1, 0, "NewSeedBridge");
     qmlRegisterType<bridge::Events>("EventsBridge", 1, 0, "EventsBridge");
     qmlRegisterType<bridge::StartWallet>("StartWalletBridge", 1, 0, "StartWalletBridge");
+    qmlRegisterType<bridge::ProgressWnd>("ProgressWndBridge", 1, 0, "ProgressWndBridge");
 
     core::MobileWndManager * wndManager = new core::MobileWndManager();
 #endif

@@ -4,6 +4,7 @@ import QtQuick.Window 2.0
 
 Item {
     property int currentStep: 0
+//    property var testSeed: []
 
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
@@ -15,6 +16,8 @@ Item {
             newSeedItem.init(params.seed, params.hideSubmitButton)
         } else if (currentStep === 2) {
             newSeedTestItem.init(params.wordIndex)
+        } else if (currentStep === 4) {
+            progressWndItem.init(params.callerId,params.msgProgress)
         }
     }
 
@@ -37,7 +40,7 @@ Item {
         anchors.top: image_logo.bottom
         anchors.topMargin: dp(14)
         anchors.horizontalCenter: image_logo.horizontalCenter
-        font.pixelSize: dp(16)
+        font.pixelSize: dp(18)
     }
 
     Rectangle {
@@ -65,6 +68,18 @@ Item {
             id: newSeedTestItem
             anchors.fill: parent
             visible: currentStep === 2
+        }
+
+        EnterSeed {
+            id: enterSeedItem
+            anchors.fill: parent
+            visible: currentStep === 3
+        }
+
+        ProgressWnd {
+            id: progressWndItem
+            anchors.fill: parent
+            visible: currentStep === 4
         }
     }
 

@@ -123,5 +123,7 @@
         <file>windows_mobile/NewSeedTest.qml</file>
         <file>windows_mobile/HelpDlg.qml</file>
         <file>windows_mobile/Notifications.qml</file>
+        <file>windows_mobile/EnterSeed.qml</file>
+        <file>windows_mobile/ProgressWnd.qml</file>
     </qresource>
 </RCC>

@@ -171,7 +171,7 @@ Item {
         padding: dp(10)
         leftPadding: dp(20)
         font.pixelSize: dp(18)
-        placeholderText: qsTr("Confirm your password")
+        placeholderText: qsTr("Re-type your password")
         echoMode: "Password"
         color: "white"
         text: ""

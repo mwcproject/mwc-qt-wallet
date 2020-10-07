@@ -47,14 +47,19 @@ Item {
         onSgnTransactions: {
             if (account !== wallet.getCurrentAccountName() )
                 return
-//            ui->progressFrame->hide();
+
+            rect_progress.visible = false
+            transactionList.visible = true
+
             allTrans = []
             transactions.forEach(tx => allTrans.push(tx))
             updateData()
         }
 
         onSgnTransactionById: {
-//            ui->progressFrame->hide();
+            rect_progress.visible = false
+            transactionList.visible = true
+
             if (!success) {
                 messagebox.open(qsTr("Transaction details"), qsTr("Internal error. Transaction details are not found."))
                 return
@@ -78,6 +83,7 @@ Item {
 
     onVisibleChanged: {
         if (visible) {
+            rect_progress.visible = true
            requestTransactions()
            updateData()
         }
@@ -90,6 +96,8 @@ Item {
         if (account === "") {
             return
         }
+        rect_progress.visible = true
+        transactionList.visible = false
         wallet.requestNodeStatus()
         wallet.requestTransactions(account, true)
         updateData()
@@ -167,8 +175,7 @@ Item {
     }
 
     function getTxTime(creationTime) {
-//        const date = Date.fromLocaleString(locale, creationTime, "hh:mm:ss dd-MM-yyyy")
-        const date = Date.fromLocaleString(locale, creationTime, "dd-MM-yyyy hh:mm")
+        const date = Date.fromLocaleString(locale, creationTime, "hh:mm:ss dd-MM-yyyy")
         return date.toLocaleString(locale, "MMM dd, yyyy / hh:mm ap")
     }
 
@@ -194,6 +201,7 @@ Item {
     }
 
     ListView {
+        id: transactionList
         anchors.fill: parent
         anchors.top: parent.top
         model: transactionModel
@@ -227,7 +235,8 @@ Item {
                             return
                         // respond will come at updateTransactionById
                         wallet.requestTransactionById(account, Number(txIdx).toString());
-//                        ui->progressFrame->show();
+                        rect_progress.visible = true
+                        transactionList.visible = false
                     }
                 }
 
@@ -310,10 +319,13 @@ Item {
                 Text {
                     color: "#ffffff"
                     text: txAddress
+                    elide: Text.ElideMiddle
                     anchors.top: parent.top
                     anchors.topMargin: dp(150)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
+                    anchors.right: parent.right
+                    anchors.rightMargin: dp(35)
                     font.pixelSize: dp(15)
                 }
             }
@@ -331,5 +343,19 @@ Item {
     MessageBox {
         id: messagebox
         anchors.verticalCenter: parent.verticalCenter
+    }
+
+    Rectangle {
+        id: rect_progress
+        width: dp(60)
+        height: dp(30)
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        color: "#00000000"
+        visible: false
+        AnimatedImage {
+            id: animation
+            source: "../img/loading.gif"
+        }
     }
 }
