@@ -114,6 +114,11 @@ StatusWnd::~StatusWnd() {
     delete fadeOutAnimation;
 }
 
+void StatusWnd::disableClickable() {
+    clickable = false;
+    ui->statusMessage->setStyleSheet("control--MwcStatusLine:enabled:!focus::hover { color: white; background: #9401E4; border: none; }");
+}
+
 void StatusWnd::displayMessage(QString message, int position) {
     hide();
     statusMessage = message;

@@ -34,7 +34,7 @@ class StatusWnd : public QWidget {
 public:
     StatusWnd(core::MainWindow* mainWindow, int position, bool mainWindowDisplay = true);
     ~StatusWnd();
-    void disableClickable() { clickable = false; }
+    void disableClickable();
     void display(int position);
     void displayMessage(QString message, int position);
     void stopDisplay();
