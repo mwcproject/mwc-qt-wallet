@@ -52,6 +52,7 @@ void StatusWndMgr::initWindows() {
     // window 1 displays the number of pending messages when the wallet is locked
     // displays on wallet
     pwnd = new StatusWnd(mainWindow, pendingMsgWalletWindow, true);
+    pwnd->disableClickable();
     pendingWindowList.append(pwnd);
 }
 

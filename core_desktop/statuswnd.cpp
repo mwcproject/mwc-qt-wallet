@@ -264,23 +264,25 @@ void StatusWnd::on_statusMessage_clicked() {
         mainWindow->restore();
         return;
     }
-    QString messageTitle = "";
-    QString messageText = statusMessage;
-    if (statusSummary != statusMessage) {
-        if (!clearSummary) {
-            messageTitle = statusSummary;
-        }
-        if (extractSummary) {
-            int startPos = statusMessage.indexOf('!');
-            if (startPos == -1) {
-                startPos = statusMessage.indexOf('.');
+    if (clickable) {
+        QString messageTitle = "";
+        QString messageText = statusMessage;
+        if (statusSummary != statusMessage) {
+            if (!clearSummary) {
+                messageTitle = statusSummary;
             }
-            if (startPos != -1) {
-                messageText = statusMessage.remove(0, startPos+2);  // include removal of punctuation plus space
+            if (extractSummary) {
+                int startPos = statusMessage.indexOf('!');
+                if (startPos == -1) {
+                    startPos = statusMessage.indexOf('.');
+                }
+                if (startPos != -1) {
+                    messageText = statusMessage.remove(0, startPos+2);  // include removal of punctuation plus space
+                }
             }
         }
+        control::MessageBox::messageText(this, messageTitle, messageText);
     }
-    control::MessageBox::messageText(this, messageTitle, messageText);
 }
 
 }
