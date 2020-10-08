@@ -29,13 +29,14 @@ Item {
     Connections {
         target: send
         onSgnShowSendResult: {
+            rect_progress.visible = false
             if (success) {
                 messagebox.open(qsTr("Success"), qsTr("Your MWC was successfully sent to recipient"))
                 textfield_send_to.text = ""
                 textarea_description.text = ""
-                return;
+            } else {
+                messagebox.open(qsTr("Send request failed"), qsTr(message))
             }
-            messagebox.open(qsTr("Send request failed"), qsTr(message))
         }
     }
 
@@ -321,7 +322,6 @@ Item {
 
             if (send.sendMwcOnline(account, Number(amount).toString(), sendTo, apiSecret, description)) {
                 rect_progress.visible = true
-                console.log("Sending is in progress")
             }
         }
     }

@@ -12,6 +12,7 @@ Window {
     property string initParams
     property int questionTextDlgResponse
     property int ttl_blocks
+    property int sendConformationDlgResponse
 
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
@@ -81,6 +82,18 @@ Window {
 
     function openMessageTextDlg(title, message) {
         messagebox.open(title, message)
+    }
+
+    function sendConfirmationDlgCallback(ret) {
+        if (ret) {
+            sendConformationDlgResponse = 1
+        } else {
+            sendConformationDlgResponse = 0
+        }
+    }
+
+    function openSendConfirmationDlg(title, message, passwordHash) {
+        sendConfirmationItem.open(title, message, passwordHash, sendConfirmationDlgCallback)
     }
 
     Rectangle
@@ -197,6 +210,11 @@ Window {
             id: notificationsItem
             anchors.fill: parent
             visible: currentState === 6
+        }
+
+        SendConfirmation {
+            id: sendConfirmationItem
+            anchors.verticalCenter: parent.verticalCenter
         }
     }
 

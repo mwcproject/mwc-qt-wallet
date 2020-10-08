@@ -145,13 +145,18 @@ QString MobileWndManager::getSaveFileName(const QString &caption, const QString 
 
 // Ask for confirmation
 bool MobileWndManager::sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) {
-    Q_UNUSED(title)
-    Q_UNUSED(message)
     Q_UNUSED(widthScale)
-    Q_UNUSED(passwordHash)
 
-    Q_ASSERT(false); // implement me
-    return false;
+    if(mainWindow) {
+        mainWindow->setProperty("sendConformationDlgResponse", -1);
+        QVariant retValue;
+        QMetaObject::invokeMethod(mainWindow, "openSendConfirmationDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, passwordHash));
+        while(mainWindow->property("sendConformationDlgResponse") == -1) {
+            QCoreApplication::processEvents();
+            QThread::usleep(50);
+        }
+        return mainWindow->property("sendConformationDlgResponse") == 1;
+    }
 }
 
 // Stopping wallet message
