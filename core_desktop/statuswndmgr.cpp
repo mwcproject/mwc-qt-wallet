@@ -41,17 +41,17 @@ StatusWndMgr::~StatusWndMgr() {
 void StatusWndMgr::initWindows() {
     // create windows for notifications once and reuse as needed
     for (int i=0; i<maxStatusDisplay; i++) {
-        StatusWnd* swnd = new StatusWnd(mainWindow, i);
+        StatusWnd* swnd = new StatusWnd(mainWindow);
         statusWindowList.append(swnd);
     }
 
     // window 0 displays the number of pending messages when the wallet is iconified
     // displays on screen above task bar
-    StatusWnd* pwnd = new StatusWnd(mainWindow, pendingMsgScreenWindow, false);
+    StatusWnd* pwnd = new StatusWnd(mainWindow, false);
     pendingWindowList.append(pwnd);
     // window 1 displays the number of pending messages when the wallet is locked
     // displays on wallet
-    pwnd = new StatusWnd(mainWindow, pendingMsgWalletWindow, true);
+    pwnd = new StatusWnd(mainWindow, true);
     pwnd->disableClickable();
     pendingWindowList.append(pwnd);
 }
@@ -110,13 +110,15 @@ void StatusWndMgr::handleStatusMessage(QString prefix, QString message) {
         initWindows();
     }
 
-    // skip any duplicates
+    // skip any duplicate messages
     if (pendingStatusMessages.size() > 0 && pendingStatusMessages.last() == message)
         return;
-    pendingStatusMessages.append(prefix + message);
-    // limit the messages stored for later display
-    if (pendingStatusMessages.size() > pendingMsgLimit) {
-        pendingStatusMessages.removeLast();
+
+    // only append the message if there is room in the queue
+    // the call to displayPendingStatusMessages() will then check
+    // if we can take and display any more messages from the queue
+    if (pendingStatusMessages.size() < pendingMsgLimit) {
+        pendingStatusMessages.append(prefix + message);
     }
     displayPendingStatusMessages();
 }
@@ -143,31 +145,57 @@ void StatusWndMgr::displayPendingStatusMessages() {
 }
 
 void StatusWndMgr::displayNumberPendingMessages() {
-    if (!pendingStatusMessages.isEmpty()) {
-        int pendingMsgCount = pendingStatusMessages.size();
-        if (pendingMsgCount != prevPendingMsgCount || pendingMsgCount >= pendingMsgLimit) {
-            QString statusMsg = "Notifications Waiting To Be Read: " + QString::number(pendingMsgCount);
-            if (pendingMsgCount >= pendingMsgLimit) {
-                statusMsg = "Notifications Waiting To Be Read At Limit: " + QString::number(pendingMsgLimit);
-            }
-            // Hide any normal status messages
-            if (visibleMsgCount > 0) {
-                hideStatusWindows();
-            }
+    int atLimitCounter = 0;
 
-            // Hide any num pending status windows
-            hidePendingWindows();
-            // Sometimes messages come in quickly, so usually the last message count is only displayed
-            StatusWnd* pwnd = nullptr;
-            if (mainWindow->isMinimized()) {
-                pwnd = pendingWindowList.value(pendingMsgScreenWindow);
-            }
-            else {
-                pwnd = pendingWindowList.value(pendingMsgWalletWindow);
-            }
-            pwnd->displayMessage(statusMsg, 0);
-            prevPendingMsgCount = pendingMsgCount;
+    // Hide any normal status messages
+    if (visibleMsgCount > 0) {
+        hideStatusWindows();
+        // ensure counter is reset as we were previously displaying normal notifications
+        atLimitCounter = 0;
+    }
+    // Hide any num pending status windows
+    hidePendingWindows();
+
+    int pendingMsgCount = pendingStatusMessages.size();
+    if (pendingMsgCount == 0) {
+        atLimitCounter = 0;
+        return;
+    }
+
+    // if we are at the limit, only display the at limit message once every time the
+    // limit counter is zero
+    // otherwise the mining wallet is constantly displaying the limit notfications
+    if (pendingMsgCount == pendingMsgLimit && prevPendingMsgCount == pendingMsgCount) {
+        // we've displayed the at limit message previously
+        if (atLimitCounter == pendingMsgLimit) {
+            // allow another at limit message to be displayed
+            atLimitCounter = 0;
         }
+        else {
+            atLimitCounter++;
+        }
+    }
+    else {
+        atLimitCounter = 0;
+    }
+
+    //qDebug() << "atLimitCounter: " << QString::number(atLimitCounter);
+    if (atLimitCounter == 0 && prevPendingMsgCount != pendingMsgCount) {
+        QString statusMsg = "Notifications Waiting To Be Read: " + QString::number(pendingMsgCount);
+        if (pendingMsgCount >= pendingMsgLimit) {
+            statusMsg = "Notifications Waiting To Be Read At Limit: " + QString::number(pendingMsgLimit);
+        }
+
+        // Sometimes messages come in quickly, so usually the last message count is only displayed
+        StatusWnd* pwnd = nullptr;
+        if (mainWindow->isMinimized()) {
+            pwnd = pendingWindowList.value(pendingMsgScreenWindow);
+        }
+        else {
+            pwnd = pendingWindowList.value(pendingMsgWalletWindow);
+        }
+        pwnd->displayMessage(statusMsg, 0);
+        prevPendingMsgCount = pendingMsgCount;
     }
 }
 
@@ -200,7 +228,6 @@ void StatusWndMgr::hideWindow(StatusWnd* swnd) {
             if (rwnd->windowPosition() == -1) {
                 continue;
             }
-            //qDebug() << "moving window[" << QString::number(i) << "] to position: " << QString::number(newPosition);
             rwnd->hide();
             rwnd->display(newPosition);
             newPosition++;

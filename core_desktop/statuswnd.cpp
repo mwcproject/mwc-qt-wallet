@@ -30,30 +30,28 @@ namespace core {
 // StatusWnd objects are controlled by MainWindow so that they can always be displayed
 // on top of whatever windows might be visible at the time. If the MainWindow is destroyed,
 // all StatusWnd objects will also be destroyed.
-StatusWnd::StatusWnd(MainWindow* _mainWindow, int position, bool _mainWindowDisplay) :
+StatusWnd::StatusWnd(MainWindow* _mainWindow, bool _mainWindowDisplay) :
     QWidget(_mainWindow),
     ui(new Ui::StatusWnd),
     mainWindow(_mainWindow),
-    statusWindowNumber(position),
     mainWindowDisplay(_mainWindowDisplay)
 {
     flags = Qt::Window | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint | Qt::WindowStaysOnTopHint;
     if (mainWindowDisplay) {
         this->setParent(mainWindow);
-        // note on flags, Qt::Tool seems to pause when wallet loses focus
+
+#ifdef Q_OS_MAC
+        // Qt::Tool seems to pause when wallet loses focus on Mac
         // Qt::SubWindow seems to keep running and stays with wallet and
         // doesn't appear in other screen where you are working
         // so can keep wallet up on one screen and work on another while
         // keeping an eye on the wallet notifications
-#ifdef Q_OS_MAC
         flags |= Qt::SubWindow;  // should always be kept on top of parent
 #else
         flags |= Qt::Tool;
 #endif
-
-        // settings which don't display when WindowStaysOnTopHint turned off and focus somewhere else
-        //flags |= Qt::Tool;
-        // setting which displays on top even when WindowStaysOnTopHint turned off
+        // some info to know about flags learned while testing
+        // settings which display on top even when WindowStaysOnTopHint turned off
         //flags |= Qt::ToolTip;
         //flags |= Qt::Popup;
         //flags |= Qt::Widget;
@@ -130,7 +128,7 @@ void StatusWnd::displayMessage(QString message, int position) {
 
 void StatusWnd::findStatusSummary() {
     if (statusMessage.contains("MWCs sent successfully")) {
-        // some message contain what we'd like to display as a status
+        // some messages contain what we'd like to display as a status
         // embedded deep inside the message
         statusSummary = "MWCs sent successfully";
         extractSummary = false;
@@ -176,20 +174,26 @@ void StatusWnd::fadeOut() {
 }
 
 void StatusWnd::fadeDone() {
-    hide();
+    stopDisplay();
     mainWindow->statusDone(this);
 }
 
 void StatusWnd::stopDisplay() {
     hide();
-    if (displayTimer->isActive()) {
-        displayTimer->stop();
+    if (statusWindowNumber >= 0) {
+        statusWindowNumber = -1;
+        statusMessage.clear();
+        statusSummary.clear();
+        if (displayTimer->isActive()) {
+            displayTimer->stop();
+        }
+        if (fadeInAnimation->state() == QAbstractAnimation::Running) {
+            fadeInAnimation->stop();
+        }
+        if (fadeOutAnimation->state() == QAbstractAnimation::Running) {
+            fadeOutAnimation->stop();
+        }
     }
-    fadeInAnimation->stop();
-    fadeOutAnimation->stop();
-    statusMessage.clear();
-    statusSummary.clear();
-    statusWindowNumber = -1;
 }
 
 void StatusWnd::checkWindowFlags(bool displayOnTop) {

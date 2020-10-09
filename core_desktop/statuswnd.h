@@ -32,7 +32,7 @@ class MainWindow;
 class StatusWnd : public QWidget {
     Q_OBJECT
 public:
-    StatusWnd(core::MainWindow* mainWindow, int position, bool mainWindowDisplay = true);
+    StatusWnd(core::MainWindow* mainWindow, bool mainWindowDisplay = true);
     ~StatusWnd();
     void disableClickable();
     void display(int position);
