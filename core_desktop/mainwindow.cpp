@@ -350,7 +350,7 @@ void MainWindow::updateListenerBtn() {
     if (torStatus) {
         if (!listenerNames.isEmpty())
             listenerNames += ", ";
-        listenerNames += "TOR";
+        listenerNames += "Tor";
     }
 
     if (httpListenerStatus == "true") {
