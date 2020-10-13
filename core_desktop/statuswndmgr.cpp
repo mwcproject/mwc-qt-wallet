@@ -245,15 +245,22 @@ void StatusWndMgr::statusDone(StatusWnd* swnd) {
     displayPendingStatusMessages();
 }
 
+void StatusWndMgr::redisplayStatusWindows() {
+    // redisplay all of the visible messages
+    if (visibleMsgCount > 0) {
+        for (int i=0; i<visibleMsgCount; i++) {
+            StatusWnd* swnd = statusWindowList.value(i);
+            swnd->display(i);
+        }
+    }
+}
+
 void StatusWndMgr::moveEvent(QMoveEvent* event) {
     Q_UNUSED(event);
 
     if (visibleMsgCount > 0) {
-        for (int i=0; i<visibleMsgCount; i++) {
-            // reposition all of the visible status messages
-            StatusWnd* swnd = statusWindowList.value(i);
-            swnd->display(i);
-        }
+        // reposition all of the visible status messages
+        redisplayStatusWindows();
     }
     else if (pendingStatusMessages.size() > 0) {
         displayPendingStatusMessages();
@@ -264,12 +271,7 @@ void StatusWndMgr::resizeEvent(QResizeEvent* event) {
     Q_UNUSED(event);
 
     // redisplay all of the visible messages
-    if (visibleMsgCount > 0) {
-        for (int i=0; i<visibleMsgCount; i++) {
-            StatusWnd* swnd = statusWindowList.value(i);
-            swnd->display(i);
-        }
-    }
+    redisplayStatusWindows();
 }
 
 bool StatusWndMgr::event(QEvent* event) {
@@ -289,6 +291,13 @@ bool StatusWndMgr::event(QEvent* event) {
             // reset the main window and any state
             restore();
             eventConsumed = true;
+        }
+        else if ((mainWindow->isFullScreen() && !previouslyFullScreen) ||
+                 (!mainWindow->isFullScreen() && previouslyFullScreen))
+        {
+            previouslyFullScreen = mainWindow->isFullScreen();
+            // redisplay all of the status windows
+            redisplayStatusWindows();
         }
     }
     return eventConsumed;

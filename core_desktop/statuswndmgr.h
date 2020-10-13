@@ -48,6 +48,7 @@ protected:
     void displayNumberPendingMessages();
     void hideStatusWindows();
     void hidePendingWindows();
+    void redisplayStatusWindows();
 
 private:
     core::MainWindow*                mainWindow = nullptr;
@@ -55,6 +56,7 @@ private:
 
     bool                             loginOk = true;
     bool                             previouslyMinimized = false;
+    bool                             previouslyFullScreen = false;
 
     int                              maxStatusDisplay = 5;
     int                              visibleMsgCount = 0;

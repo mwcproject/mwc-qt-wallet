@@ -82,6 +82,13 @@ private:
     // to consistently display the status windows at the same location relative
     // to the main window, we use a constant status bar height of 27
     int                   mwnStatusBarHeight = 27;
+    // padding above the status bar for placing first status window
+    int                   mwnStatusBarPadding = 20;
+    // window spacing is the distance between each status window
+    int                   windowSpacing = 3;
+    // x offset is the indent from the right hand side of the main window
+    int                   xoffset = 4;
+    // when the window is in full screen mode, we need to scale placement by yScaleFactor
     int                   yScaleFactor = 2;
 };
 

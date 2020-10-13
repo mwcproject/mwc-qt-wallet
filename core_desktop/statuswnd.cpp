@@ -242,15 +242,15 @@ void StatusWnd::displayOnMainWindow(int windowPosition) {
     QPoint mwnPos = mainWindow->pos();
     QSize  swnSize = this->frameSize();
     QSize  mwnSize = mainWindow->size();
-    int sbarHeight = mwnStatusBarHeight + 23; // height is always 27 as configured in .ui file, 23 is padding
+    int sbarHeight = mwnStatusBarHeight + mwnStatusBarPadding; // height is always 27 as configured in .ui file
     if (mainWindow->isFullScreen()) {
-        sbarHeight = mwnStatusBarHeight + (yScaleFactor * 23);
+        sbarHeight = mwnStatusBarHeight + (yScaleFactor * mwnStatusBarPadding);
     }
 
-    // position window relative to the right hand edge of the main window
+    // position each status window relative to the right hand edge of the main window
     // and above the status bar
-    int newX = mwnPos.x() + mwnSize.width() - swnSize.width() - 4;
-    int newY = mwnPos.y() + mwnSize.height() - sbarHeight - ((swnSize.height() + 5) * windowPosition);
+    int newX = mwnPos.x() + mwnSize.width() - swnSize.width() - xoffset;
+    int newY = mwnPos.y() + mwnSize.height() - sbarHeight - ((swnSize.height() + windowSpacing) * windowPosition);
     move(newX, newY);
 }
 
