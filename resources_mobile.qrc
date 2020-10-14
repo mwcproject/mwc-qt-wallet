@@ -126,5 +126,6 @@
         <file>windows_mobile/EnterSeed.qml</file>
         <file>windows_mobile/ProgressWnd.qml</file>
         <file>windows_mobile/SendConfirmation.qml</file>
+        <file>windows_mobile/SendSettings.qml</file>
     </qresource>
 </RCC>

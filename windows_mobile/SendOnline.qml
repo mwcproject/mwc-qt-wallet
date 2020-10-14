@@ -258,6 +258,7 @@ Item {
         }
 
         onClicked: {
+            settingsItem.visible = true
         }
     }
 
@@ -339,6 +340,12 @@ Item {
             id: animation
             source: "../img/loading.gif"
         }
+    }
+
+    SendSettings {
+        id: settingsItem
+        anchors.verticalCenter: parent.verticalCenter
+        visible: false
     }
 
     MessageBox {

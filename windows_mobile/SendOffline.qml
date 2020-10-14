@@ -29,7 +29,7 @@ Item {
     Connections {
         target: send
         onSgnShowSendResult: {
-//            ui->progress->hide();
+            rect_progress.visible = false
             messagebox.open(success ? "Success" : "Failure", message)
         }
     }
@@ -136,6 +136,7 @@ Item {
         }
 
         onClicked: {
+            settingsItem.visible = true
         }
     }
 
@@ -176,11 +177,33 @@ Item {
             }
 
             if (send.sendMwcOffline(selectedAccount, Number(amount).toString(), description)) {
-//                ui->progress->show();
+                rect_progress.visible = true
                 console.log("Sending is in progress")
             }
         }
     }
+
+    Rectangle {
+        id: rect_progress
+        width: dp(60)
+        height: dp(30)
+        anchors.top: button_send.bottom
+        anchors.topMargin: dp(50)
+        anchors.horizontalCenter: parent.horizontalCenter
+        color: "#00000000"
+        visible: false
+        AnimatedImage {
+            id: animation
+            source: "../img/loading.gif"
+        }
+    }
+
+    SendSettings {
+        id: settingsItem
+        anchors.verticalCenter: parent.verticalCenter
+        visible: false
+    }
+
 
     MessageBox {
         id: messagebox
