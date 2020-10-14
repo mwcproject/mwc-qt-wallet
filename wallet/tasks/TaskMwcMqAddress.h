@@ -41,6 +41,25 @@ private:
     QString calcCommandLine( bool genNext, int idx ) const;
 };
 
+class TaskFileProofAddress : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 2000;
+
+    // genNext:true - generate next address, address by index
+    // idx     - index for generated address (genNext is true)
+    // genNext:false - get current address with associated index
+    TaskFileProofAddress( MWC713 * wallet713) :
+            Mwc713Task("FileProofAddress", "address --provable-address" , wallet713,"") {}
+
+    virtual ~TaskFileProofAddress() override {}
+
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+};
+
+
+
 }
 
 

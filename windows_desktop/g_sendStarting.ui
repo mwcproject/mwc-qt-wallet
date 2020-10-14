@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>717</width>
-    <height>625</height>
+    <height>660</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -65,13 +65,13 @@
        <property name="minimumSize">
         <size>
          <width>600</width>
-         <height>500</height>
+         <height>540</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>600</width>
-         <height>500</height>
+         <height>540</height>
         </size>
        </property>
        <property name="frameShape">
@@ -393,7 +393,7 @@
         <property name="geometry">
          <rect>
           <x>225</x>
-          <y>456</y>
+          <y>500</y>
           <width>148</width>
           <height>40</height>
          </rect>
@@ -441,6 +441,22 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="wordWrap">
          <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="generatePoof">
+        <property name="geometry">
+         <rect>
+          <x>105</x>
+          <y>460</y>
+          <width>391</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Generate Transaction Proof</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
         </property>
        </widget>
       </widget>
@@ -589,15 +605,9 @@ p, li { white-space: pre-wrap; }
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLine</class>
-   <extends>QFrame</extends>
-   <header>control_desktop/MwcFrameWithBorder.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelProgress</class>
@@ -610,9 +620,15 @@ p, li { white-space: pre-wrap; }
    <header>control_desktop/MwcComboBox.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
+   <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLine</class>
+   <extends>QFrame</extends>
+   <header>control_desktop/MwcFrameWithBorder.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>control::MwcCheckedFrame</class>
@@ -624,6 +640,11 @@ p, li { white-space: pre-wrap; }
  <tabstops>
   <tabstop>onlineChecked</tabstop>
   <tabstop>fileChecked</tabstop>
+  <tabstop>accountComboBox</tabstop>
+  <tabstop>amountEdit</tabstop>
+  <tabstop>allAmountButton</tabstop>
+  <tabstop>generatePoof</tabstop>
+  <tabstop>nextButton</tabstop>
  </tabstops>
  <resources>
   <include location="../resources_desktop.qrc"/>

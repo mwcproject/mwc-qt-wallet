@@ -116,6 +116,9 @@ public:
     // Get latest Tor address that we see
     virtual QString getTorAddress()  override;
 
+    // Request proof address for files
+    virtual void requestFileProofAddress() override;
+
     // Get MWC box <address, index in the chain>
     virtual void getMwcBoxAddress()  override;
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
@@ -216,7 +219,7 @@ public:
     // Check signal:  onSendFile
     virtual void sendFile( const QString &account, int64_t coinNano, QString message, QString fileTx,
             int inputConfirmationNumber, int changeOutputs,
-            const QStringList & outputs, int ttl_blocks )  override;
+            const QStringList & outputs, int ttl_blocks, bool generateProof )  override;
     // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
     virtual void receiveFile( QString fileTx, QString identifier = "")  override;
@@ -241,7 +244,7 @@ public:
     virtual void sendTo( const QString &account, int64_t coinNano, const QString & address,
                          const QString & apiSecret,
                          QString message, int inputConfirmationNumber, int changeOutputs,
-                         const QStringList & outputs, bool fluff, int ttl_blocks )  override;
+                         const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof )  override;
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
@@ -337,6 +340,7 @@ public:
     void setTorAddress( QString torAddress ); // Set active Tor address.
     void setMwcAddress( QString mwcAddress ); // Set active MWC address. Listener might be offline
     void setMwcAddressWithIndex( QString mwcAddress, int idx );
+    void setFileProofAddress( QString address );
 
     void setNewSeed( QVector<QString> seed );
 

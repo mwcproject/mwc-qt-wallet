@@ -221,7 +221,7 @@ public:
     // Check signal:  onSendFile
     virtual void sendFile( const QString &account, int64_t coinNano, QString message, QString fileTx,
                            int inputConfirmationNumber, int changeOutputs,
-                           const QStringList & outputs, int ttl_blocks )  override;
+                           const QStringList & outputs, int ttl_blocks, bool generateProof )  override;
 
     // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
@@ -248,7 +248,7 @@ public:
     virtual void sendTo( const QString &account, int64_t coinNano, const QString & address,
                          const QString & apiSecret,
                          QString message, int inputConfirmationNumber, int changeOutputs,
-                         const QStringList & outputs, bool fluff, int ttl_blocks )  override;
+                         const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof )  override;
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)

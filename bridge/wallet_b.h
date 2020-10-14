@@ -81,6 +81,10 @@ public:
     // Get last known Tor address. It is good enough for cases when you don't expect address to be changed
     Q_INVOKABLE QString getTorAddress();
 
+    // Request a wallet address for file/http transactions
+    // Return: signal  sgnFileProofAddress
+    Q_INVOKABLE void requestFileProofAddress();
+
     // Request accounts info
     // includeAccountName - add Account names
     // includeSpendableInfo - add String about Spendables
@@ -161,6 +165,10 @@ signals:
     // Empty address will be assigned when Tor listener is stopped.
     void sgnTorAddress(QString tor);
 
+    // Get wallet provable address. Please note, address will be changed
+    // When address index will be changed. Normally it is the same as a tor address
+    void sgnFileProofAddress(QString proofAddress);
+
     // Outputs requested form the wallet.
     // outputs are in Json format, see wallet::WalletOutput for details
     void sgnOutputs( QString account, bool showSpent, QString height, QVector<QString> outputs);
@@ -207,6 +215,7 @@ private slots:
     void onLogout();
     void onMwcAddressWithIndex(QString mwcAddress, int idx);
     void onTorAddress(QString tor);
+    void onFileProofAddress(QString address);
     void onOutputs( QString account, bool showSpent, int64_t height, QVector<wallet::WalletOutput> outputs);
 
     void onTransactions( QString account, int64_t height, QVector<wallet::WalletTransaction> Transactions);

@@ -138,6 +138,10 @@ public:
     // Update fluff flag value
     Q_INVOKABLE void setFluff(bool fluffSetting);
 
+    // Get 'generate proof' flag value
+    Q_INVOKABLE bool getGenerateProof();
+    // Update 'generate proof' flag value
+    Q_INVOKABLE void setGenerateProof(bool generate);
 };
 
 }

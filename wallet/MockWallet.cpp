@@ -306,7 +306,7 @@ void MockWallet::verifyMwcBoxTransactionProof(QString proofFileName) {
 // Check signal:  onSendFile
 void MockWallet::sendFile(const QString &account, int64_t coinNano, QString message, QString fileTx,
                           int inputConfirmationNumber, int changeOutputs,
-                          const QStringList &outputs, int ttl_blocks) {
+                          const QStringList &outputs, int ttl_blocks, bool generateProof) {
     Q_UNUSED(account)
     Q_UNUSED(coinNano)
     Q_UNUSED(message)
@@ -315,6 +315,7 @@ void MockWallet::sendFile(const QString &account, int64_t coinNano, QString mess
     Q_UNUSED(changeOutputs)
     Q_UNUSED(outputs)
     Q_UNUSED(ttl_blocks)
+    Q_UNUSED(generateProof)
 
     emit onSendFile( true, {}, fileTx );
 }
@@ -361,7 +362,7 @@ void MockWallet::getNextKey(int64_t amountNano, QString btcaddress, QString airD
 void MockWallet::sendTo(const QString &account, int64_t coinNano, const QString &address,
                         const QString &apiSecret,
                         QString message, int inputConfirmationNumber, int changeOutputs,
-                        const QStringList &outputs, bool fluff, int ttl_blocks) {
+                        const QStringList &outputs, bool fluff, int ttl_blocks, bool generateProof) {
     Q_UNUSED(account)
     Q_UNUSED(coinNano)
     Q_UNUSED(address)
@@ -372,6 +373,7 @@ void MockWallet::sendTo(const QString &account, int64_t coinNano, const QString 
     Q_UNUSED(outputs)
     Q_UNUSED(fluff)
     Q_UNUSED(ttl_blocks)
+    Q_UNUSED(generateProof)
 
     emit onSend( true, {}, address, 4, "0000-1111-2222-3333", util::nano2one(coinNano) );
 }

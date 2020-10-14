@@ -90,8 +90,37 @@ Q_INVOKABLE void updateActiveInstanceName(QString newInstanceName);
 ```
 Note: Mobile will need to adopt them for instance management.
 
-
-
 # August 26, 2020 #
 
 Add a new bridge: Swap
+
+# October 13, 2020 #
+
+Add support for proofs.
+
+### Change at Bridge:  Config
+
+Add GenerateProof flag getter and setter
+```
+    // Get 'generate proof' flag value
+    Q_INVOKABLE bool getGenerateProof();
+    // Update 'generate proof' flag value
+    Q_INVOKABLE void setGenerateProof(bool generate);
+
+```
+
+### Change at Bridge:  Wallet
+
+Method to Request proof address
+```
+    // Request a wallet address for file/http transactions
+    // Return: signal  sgnFileProofAddress
+    Q_INVOKABLE void requestFileProofAddress();
+```
+Signal that returned that address
+```
+    // Get wallet provable address. Please note, address will be changed
+    // When address index will be changed. Normally it is the same as a tor address
+    void sgnFileProofAddress(QString proofAddress);
+```
+

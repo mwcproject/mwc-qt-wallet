@@ -194,6 +194,10 @@ public:
     // Check if inline node running the main network
     bool isOnlineNodeRunsMainNetwork() const;
     void setOnlineNodeRunsMainNetwork(bool isMainNet);
+
+    // Generate proof for all send transactions.
+    bool getGenerateProof() const {return generateProof;}
+    void setGenerateProof(bool proof);
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -278,6 +282,10 @@ private:
     // We read these notes in and migrate them to the new format for storing notes
     QMap<QString, QMap<QString, QMap<QString, QString>>> oldFormatOutputNotes;
     QMap<QString, QMap<QString, QMap<QString, QString>>> oldFormatTxnNotes;
+
+    // Genrate proof for all send transactions. By default it is false because
+    // receiver wallet need to be upgraded in order to support it.
+    bool generateProof = false;
 };
 
 template <class T>

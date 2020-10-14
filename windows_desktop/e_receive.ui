@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>772</width>
-    <height>544</height>
+    <width>844</width>
+    <height>711</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -337,21 +337,6 @@
         <enum>QFrame::Raised</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="spacing">
-         <number>10</number>
-        </property>
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
         <item>
          <widget class="control::MwcLabelSmall" name="label_4">
           <property name="text">
@@ -434,6 +419,47 @@
         </item>
         <item>
          <widget class="control::MwcLineEditNormal" name="torAddress">
+          <property name="minimumSize">
+           <size>
+            <width>600</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="toolTip">
+           <string>Tor (onion) address of your wallet</string>
+          </property>
+          <property name="maxLength">
+           <number>1024</number>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="control::MwcLabelSmall" name="label_33">
+          <property name="text">
+           <string>Files/HTTP payments proof address:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="control::MwcLineEditNormal" name="fileAddress">
           <property name="minimumSize">
            <size>
             <width>600</width>

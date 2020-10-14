@@ -59,6 +59,8 @@ Wallet::Wallet(QObject *parent) : QObject(parent) {
                      this, &Wallet::onMwcAddressWithIndex, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onTorAddress,
                      this, &Wallet::onTorAddress, Qt::QueuedConnection);
+    QObject::connect(wallet, &wallet::Wallet::onFileProofAddress,
+                     this, &Wallet::onFileProofAddress, Qt::QueuedConnection);
 
     QObject::connect(wallet, &wallet::Wallet::onOutputs,
                      this, &Wallet::onOutputs, Qt::QueuedConnection);
@@ -149,6 +151,10 @@ void Wallet::onMwcAddressWithIndex(QString mwcAddress, int idx) {
 
 void Wallet::onTorAddress(QString tor) {
     emit sgnTorAddress(tor);
+}
+
+void Wallet::onFileProofAddress(QString address) {
+    emit sgnFileProofAddress(address);
 }
 
 void Wallet::onOutputs( QString account, bool showSpent, int64_t height, QVector<wallet::WalletOutput> outputs) {
@@ -300,6 +306,13 @@ QString Wallet::getMqsAddress() {
 QString Wallet::getTorAddress() {
     return getWallet()->getTorAddress();
 }
+
+// Request a wallet address for file/http transactions
+// Return: signal  sgnFileProofAddress
+void Wallet::requestFileProofAddress() {
+    getWallet()->requestFileProofAddress();
+}
+
 
 // Request accounts info
 // includeAccountName - return Account names

@@ -137,7 +137,7 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
 
 QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, const QString & apiSecret,
         QString message, int inputConfirmationNumber, int changeOutputs,
-        const QStringList & outputs, bool fluff, int ttl_blocks ) const {
+        const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof ) const {
 
     QString cmd = "send ";// + util::nano2one(coinNano);
     if (coinNano>0)
@@ -171,6 +171,9 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, co
     if (ttl_blocks > 0)
         cmd += " --ttl-blocks " + QString::number(ttl_blocks);
 
+    if (generateProof)
+        cmd += " --proof";
+
     if (coinNano<0)
         cmd += " ALL";
 
@@ -181,7 +184,7 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, co
 
 // ----------------------- TaskSendFile --------------------------
 
-QString TaskSendFile::buildCommand( int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, int ttl_blocks) const {
+QString TaskSendFile::buildCommand( int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, int ttl_blocks, bool generateProof) const {
     QString cmd = "send ";// + util::nano2one(coinNano);
     if (coinNano > 0)
         cmd += util::nano2one(coinNano);
@@ -204,6 +207,9 @@ QString TaskSendFile::buildCommand( int64_t coinNano, QString message, QString f
 
     if (ttl_blocks > 0)
         cmd += " --ttl-blocks " + QString::number(ttl_blocks);
+
+    if (generateProof)
+        cmd += " --proof";
 
     if (coinNano < 0)
         cmd += " ALL";

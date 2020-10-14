@@ -150,7 +150,7 @@ bool AppContext::loadData() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x4799)
+    if (id<0x4783 || id>0x479A)
          return false;
 
     QString mockStr;
@@ -290,6 +290,10 @@ bool AppContext::loadData() {
         in >> isOnlineNodeMainNetwork;
     }
 
+    if (id>=0x479A) {
+        in >> generateProof;
+    }
+
     return true;
 }
 
@@ -317,7 +321,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x4799;
+    out << 0x479A;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -375,6 +379,8 @@ void AppContext::saveData() const {
     out << currentWalletInstanceIdx;
 
     out << isOnlineNodeMainNetwork;
+
+    out << generateProof;
 }
 
 void AppContext::loadNotesData() {
@@ -795,6 +801,13 @@ void AppContext::setOnlineNodeRunsMainNetwork(bool isMainNet) {
     isOnlineNodeMainNetwork = isMainNet;
     saveData();
 }
+
+// Generate proof for all send transactions.
+void AppContext::setGenerateProof(bool proof) {
+    generateProof = proof;
+    // flag not critical, save on exit
+}
+
 
 // HODL registration time.
 int64_t AppContext::getHodlRegistrationTime(const QString & hash) const {

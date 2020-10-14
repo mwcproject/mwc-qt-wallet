@@ -62,6 +62,41 @@ QString TaskMwcMqAddress::calcCommandLine( bool genNext, int idx ) const {
         return "address";
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
+// -------------------------------------
+
+bool TaskFileProofAddress::processTask(const QVector<WEvent> & events) {
+    qDebug() << "FileProofAddress::processTask: " << printEvents(events);
+
+    QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
+
+    QString address;
+
+    for (const auto & ln : lns) {
+        const QString & msg = ln.message;
+        if (msg.contains("file/http wallet address")) {
+            int idx = msg.indexOf(':');
+            if (idx>0) {
+                address = msg.mid(idx + 1).trimmed();
+                break;
+            }
+        }
+    }
+
+    if (address.isEmpty()) {
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL,
+                                           "Unable to get the proof address from mwc713 wallet");
+        return true;
+    }
+
+    qDebug() << "Get proof address " << address;
+    wallet713->setFileProofAddress( address );
+
+    return true;
+
+}
+
+
 
 }
 

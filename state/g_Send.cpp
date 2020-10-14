@@ -181,7 +181,7 @@ bool Send::sendMwcOffline( QString account, int64_t amount, QString message) {
 
     core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
 
-    context->wallet->sendFile( account, amount, message, fileName,prms.inputConfirmationNumber, prms.changeOutputs, outputs, ttl_blocks );
+    context->wallet->sendFile( account, amount, message, fileName,prms.inputConfirmationNumber, prms.changeOutputs, outputs, ttl_blocks, context->appContext->getGenerateProof() );
     return true;
 }
 
@@ -283,7 +283,8 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
 
         context->wallet->sendTo( account, amount, util::fullFormalAddress( addressRes.second, address), apiSecret, message,
                                  sendParams.inputConfirmationNumber, sendParams.changeOutputs,
-                                 outputs, context->appContext->isFluffSet(), -1 /* Not used for online sends */);
+                                 outputs, context->appContext->isFluffSet(), -1 /* Not used for online sends */,
+                                 context->appContext->getGenerateProof());
 
         return true;
     }

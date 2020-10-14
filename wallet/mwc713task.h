@@ -63,7 +63,7 @@ protected:
     // wallet to call back regarding the state change
     MWC713 * wallet713;
     QString inputStr; // string (command) to feed to a wallet
-    QString shadowStr; // If difined, will represend this task into the logs
+    QString shadowStr; // If defined, will print this string into the logs instead of the task output
 };
 
 // Some event utils

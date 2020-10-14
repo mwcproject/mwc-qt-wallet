@@ -63,6 +63,7 @@ SendStarting::SendStarting(QWidget *parent) :
         onChecked(ONLINE_ID);
     }
 
+    ui->generatePoof->setCheckState( config->getGenerateProof() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
 }
 
 void SendStarting::onSgnWalletBalanceUpdated() {
@@ -142,5 +143,26 @@ void SendStarting::on_accountComboBox_currentIndexChanged(int index)
     wallet->switchAccount(account);
 }
 
+static bool showGenProofWarning = false;
+
+void wnd::SendStarting::on_generatePoof_clicked(bool checked)
+{
+    if ( checked && !showGenProofWarning ) {
+        if ( core::WndManager::RETURN_CODE::BTN2 !=  control::MessageBox::questionText(this, "Warning", "Transaction proof generation requires receiver wallet version 1.0.23 or higher.\n\n"
+                                          "Do you want to generate proofs for all your send transactions?",
+                                          "Cancel", "Generate proofs",
+                                          "No, I don't want to generate proofs for my send transaction", "Yes, I am sure that receiver wallet is upgraded and I can generate proofs",
+                                          false, true))
+        {
+            ui->generatePoof->setCheckState(Qt::CheckState::Unchecked);
+            return;
+        }
+
+        showGenProofWarning  = true;
+    }
+    config->setGenerateProof(checked);
 }
+
+}
+
 

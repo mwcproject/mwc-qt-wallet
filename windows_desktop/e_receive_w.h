@@ -49,6 +49,7 @@ private slots:
     void onSgnWalletBalanceUpdated();
     void onSgnMwcAddressWithIndex(QString mwcAddress, int idx);
     void onSgnTorAddress(QString tor);
+    void onSgnFileProofAddress(QString proofAddress);
     void onSgnUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline);
 
     void on_accountComboBox_activated(int index);

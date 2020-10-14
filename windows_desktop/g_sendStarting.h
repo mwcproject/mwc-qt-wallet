@@ -46,6 +46,8 @@ private slots:
     void on_accountComboBox_currentIndexChanged(int index);
 
     void onSgnWalletBalanceUpdated();
+    void on_generatePoof_clicked(bool checked);
+
 private:
     Ui::SendStarting *ui;
     bridge::Wallet * wallet = nullptr;

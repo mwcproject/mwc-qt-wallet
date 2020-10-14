@@ -296,5 +296,15 @@ void Config::setFluff(bool fluffSetting) {
     getAppContext()->setFluff(fluffSetting);
 }
 
+// Get 'generate proof' flag value
+bool Config::getGenerateProof() {
+    return getAppContext()->getGenerateProof();
+}
+
+// Update 'generate proof' flag value
+void Config::setGenerateProof(bool generate) {
+    getAppContext()->setGenerateProof(generate);
+}
+
 
 }

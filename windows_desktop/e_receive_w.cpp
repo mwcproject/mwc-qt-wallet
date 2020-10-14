@@ -46,6 +46,8 @@ Receive::Receive(QWidget *parent) :
                       this, &Receive::onSgnMwcAddressWithIndex, Qt::QueuedConnection);
     QObject::connect( wallet, &bridge::Wallet::sgnTorAddress,
                       this, &Receive::onSgnTorAddress, Qt::QueuedConnection);
+    QObject::connect( wallet, &bridge::Wallet::sgnFileProofAddress,
+                      this, &Receive::onSgnFileProofAddress, Qt::QueuedConnection);
     QObject::connect( wallet, &bridge::Wallet::sgnUpdateListenerStatus,
                       this, &Receive::onSgnUpdateListenerStatus, Qt::QueuedConnection);
 
@@ -60,6 +62,8 @@ Receive::Receive(QWidget *parent) :
 
     if ( config->hasTls())
         ui->httpLabel->setText("Https");
+
+    wallet->requestFileProofAddress();
 
     updateStatus();
 }
@@ -169,6 +173,10 @@ void Receive::onSgnMwcAddressWithIndex(QString mwcAddress, int idx) {
 void Receive::onSgnTorAddress(QString tor) {
     Q_UNUSED(tor);
     updateStatus();
+}
+
+void Receive::onSgnFileProofAddress(QString proofAddress) {
+    ui->fileAddress->setText(proofAddress);
 }
 
 void Receive::onSgnUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline) {
