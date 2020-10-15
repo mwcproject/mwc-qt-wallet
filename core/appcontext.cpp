@@ -150,7 +150,7 @@ bool AppContext::loadData() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x479A)
+    if (id<0x4783 || id>0x479B)
          return false;
 
     QString mockStr;
@@ -294,6 +294,10 @@ bool AppContext::loadData() {
         in >> generateProof;
     }
 
+    if (id>=0x479B) {
+        in >> notificationWindowsEnabled;
+    }
+
     return true;
 }
 
@@ -321,7 +325,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x479A;
+    out << 0x479B;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -381,6 +385,8 @@ void AppContext::saveData() const {
     out << isOnlineNodeMainNetwork;
 
     out << generateProof;
+
+    out << notificationWindowsEnabled;
 }
 
 void AppContext::loadNotesData() {
@@ -949,6 +955,13 @@ void AppContext::deleteNote(const QString& key) {
     Q_ASSERT(notesLoaded); // we suppose to load first
     notes.remove(key);
     saveNotesData();
+}
+
+void AppContext::setNotficationWindowsEnabled(bool enable) {
+    if (notificationWindowsEnabled == enable)
+        return;
+    notificationWindowsEnabled = enable;
+    saveData();
 }
 
 }

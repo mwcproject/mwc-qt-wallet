@@ -64,6 +64,7 @@ private slots:
     void on_outputLockingCheck_stateChanged(int arg1);
     void on_start_tor_clicked();
     void on_walletInstanceNameEdit_textChanged(const QString &arg1);
+    void on_notificationsEnabled_clicked();
 
 private:
     void setValues(const QString & keyBasePath,
@@ -109,6 +110,7 @@ private:
     bool autoStartKeybaseEnabled = true;
     bool autoStartTorEnabled = true;
     bool outputLockingEnabled = false;
+    bool notificationWindowsEnabled = true;
     int64_t logoutTimeout = 20 * 60;
     int64_t currentLogoutTimeout = 20 * 60;
 

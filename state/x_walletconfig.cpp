@@ -168,6 +168,14 @@ void WalletConfig::setOutputLockingEnabled(bool lockingEnabled) {
     context->appContext->setLockOutputEnabled(lockingEnabled);
 }
 
+bool WalletConfig::getNotificationWindowsEnabled() {
+    return context->appContext->getNotificationWindowsEnabled();
+}
+
+void WalletConfig::setNotificationWindowsEnabled(bool enabled) {
+    context->appContext->setNotficationWindowsEnabled(enabled);
+}
+
 bool WalletConfig::updateTimeoutValue(int timeout) {
     util::ConfigReader reader;
     QString configFN = config::getMwcGuiWalletConf();

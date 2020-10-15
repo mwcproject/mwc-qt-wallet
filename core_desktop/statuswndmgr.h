@@ -43,6 +43,7 @@ public:
 protected:
     void initWindows();
     void removeWindows();
+    bool checkEnabled();
     bool filterOutMessage(QString message);
     void displayPendingStatusMessages();
     void displayNumberPendingMessages();
@@ -54,6 +55,7 @@ private:
     core::MainWindow*                mainWindow = nullptr;
     Qt::ApplicationState             currentState = Qt::ApplicationActive;
 
+    bool                             enabled = true;
     bool                             loginOk = true;
     bool                             previouslyMinimized = false;
     bool                             previouslyFullScreen = false;
@@ -61,7 +63,7 @@ private:
     int                              maxStatusDisplay = 5;
     int                              visibleMsgCount = 0;
 
-    int                              numPendingMsgWindows = 1;
+    int                              numPendingMsgWindows = 2;
     int                              pendingMsgScreenWindow = 0;
     int                              pendingMsgWalletWindow = 1;
     int                              prevPendingMsgCount = 0;

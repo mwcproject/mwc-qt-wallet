@@ -41,6 +41,7 @@ public:
     Q_INVOKABLE bool getAutoStartTorEnabled();
     Q_INVOKABLE int getLogoutTimeMs();
     Q_INVOKABLE bool isOutputLockingEnabled();
+    Q_INVOKABLE bool getNotificationWindowsEnabled();
 
     Q_INVOKABLE QString getDataPath();
     Q_INVOKABLE QString getKeybasePath();
@@ -62,6 +63,7 @@ public:
     Q_INVOKABLE void updateAutoStartKeybaseEnabled(bool enabled);
     Q_INVOKABLE void updateAutoStartTorEnabled(bool enabled);
     Q_INVOKABLE void setOutputLockingEnabled(bool enabled);
+    Q_INVOKABLE void setNotificationWindowsEnabled(bool enabled);
 
     Q_INVOKABLE bool updateTimeoutValue(int timeout);
 

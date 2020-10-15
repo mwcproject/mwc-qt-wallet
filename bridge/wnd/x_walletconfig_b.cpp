@@ -81,6 +81,10 @@ bool WalletConfig::isOutputLockingEnabled() {
     return getState()->isOutputLockingEnabled();
 }
 
+bool WalletConfig::getNotificationWindowsEnabled() {
+    return getState()->getNotificationWindowsEnabled();
+}
+
 QString WalletConfig::getDataPath() {
     return getWallet()->getWalletConfig().getDataPath();
 }
@@ -135,6 +139,10 @@ void WalletConfig::updateAutoStartTorEnabled(bool enabled) {
 
 void WalletConfig::setOutputLockingEnabled(bool enabled) {
     getState()->setOutputLockingEnabled(enabled);
+}
+
+void WalletConfig::setNotificationWindowsEnabled(bool enabled) {
+    getState()->setNotificationWindowsEnabled(enabled);
 }
 
 bool WalletConfig::updateTimeoutValue(int timeout) {

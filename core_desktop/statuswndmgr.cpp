@@ -57,17 +57,40 @@ void StatusWndMgr::initWindows() {
 }
 
 void StatusWndMgr::removeWindows() {
-    for (int i=0; i<maxStatusDisplay; i++) {
-        StatusWnd* swnd = statusWindowList.takeFirst();
-        swnd->stopDisplay();
-        delete swnd;
+    // there's always the possibility that the status windows have
+    // not been initialized since we might not be enabled
+    // so check the sizes of the lists first
+    if (statusWindowList.size() > 0) {
+        for (int i=0; i<maxStatusDisplay; i++) {
+            StatusWnd* swnd = statusWindowList.takeFirst();
+            swnd->stopDisplay();
+            delete swnd;
+        }
     }
 
-    for (int j=0; j<numPendingMsgWindows; j++) {
-        StatusWnd* pwnd = pendingWindowList.takeFirst();
-        pwnd->stopDisplay();
-        delete pwnd;
+    if (pendingWindowList.size() > 0) {
+        for (int j=0; j<numPendingMsgWindows; j++) {
+            StatusWnd* pwnd = pendingWindowList.takeFirst();
+            pwnd->stopDisplay();
+            delete pwnd;
+        }
     }
+}
+
+bool StatusWndMgr::checkEnabled() {
+    bool windowsEnabled = mainWindow->config->getNotificationWindowsEnabled();
+    if (enabled != windowsEnabled) {
+        enabled = windowsEnabled;
+        if (!enabled) {
+            // we were enabled but have been disabled
+            // hide all status windows and clear the pending status messages
+            hideStatusWindows();
+            hidePendingWindows();
+            pendingStatusMessages.clear();
+            prevPendingMsgCount = 0;
+        }
+    }
+    return enabled;
 }
 
 void StatusWndMgr::restore() {
@@ -100,7 +123,7 @@ bool StatusWndMgr::filterOutMessage(QString message) {
 
 void StatusWndMgr::handleStatusMessage(QString prefix, QString message) {
     // only display messages that would also go into the event log
-    if (filterOutMessage(message))
+    if (!checkEnabled() || filterOutMessage(message))
         return;
 
     // perform one-time initialization of the status windows
@@ -124,6 +147,9 @@ void StatusWndMgr::handleStatusMessage(QString prefix, QString message) {
 }
 
 void StatusWndMgr::displayPendingStatusMessages() {
+    if (!checkEnabled())
+        return;
+
     if (mwc::isWalletLocked() || mainWindow->isMinimized() || !loginOk) {
         // display pending messages if the wallet is locked or minimized
         // or the wallet is no longer in the locked state but the login did not succeed
@@ -145,7 +171,13 @@ void StatusWndMgr::displayPendingStatusMessages() {
 }
 
 void StatusWndMgr::displayNumberPendingMessages() {
-    int atLimitCounter = 0;
+    static int atLimitCounter = 0;
+
+    if (!checkEnabled() || pendingWindowList.size() == 0) {
+        // we're either not enabled or not initialized yet
+        atLimitCounter = 0;
+        return;
+    }
 
     // Hide any normal status messages
     if (visibleMsgCount > 0) {
@@ -208,7 +240,7 @@ void StatusWndMgr::hideStatusWindows() {
 }
 
 void StatusWndMgr::hidePendingWindows() {
-    for (int i=0; i<numPendingMsgWindows; i++) {
+    for (int i=0; i<pendingWindowList.size(); i++) {
         StatusWnd* pwnd = pendingWindowList.value(i);
         pwnd->stopDisplay();
     }
@@ -247,7 +279,7 @@ void StatusWndMgr::statusDone(StatusWnd* swnd) {
 
 void StatusWndMgr::redisplayStatusWindows() {
     // redisplay all of the visible messages
-    if (visibleMsgCount > 0) {
+    if (checkEnabled() && visibleMsgCount > 0) {
         for (int i=0; i<visibleMsgCount; i++) {
             StatusWnd* swnd = statusWindowList.value(i);
             swnd->display(i);
@@ -323,15 +355,15 @@ void StatusWndMgr::onApplicationStateChange(Qt::ApplicationState state) {
             swnd->checkWindowFlags(windowOnTop);
         }
         // inform num messages pending window for wallet
-        StatusWnd* pwnd = pendingWindowList.value(pendingMsgWalletWindow);
-        pwnd->checkWindowFlags(windowOnTop);
-        if (visibleMsgCount == 0) {
-            displayNumberPendingMessages();
+        if (pendingWindowList.size() > 0) {
+            StatusWnd* pwnd = pendingWindowList.value(pendingMsgWalletWindow);
+            pwnd->checkWindowFlags(windowOnTop);
+            if (visibleMsgCount == 0) {
+                displayNumberPendingMessages();
+            }
         }
     }
 }
 
 
 }
-
-

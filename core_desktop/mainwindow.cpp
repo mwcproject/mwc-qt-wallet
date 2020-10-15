@@ -167,14 +167,18 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::restore() {
+    // called from the pending messages window when it has
+    // been clicked while the wallet is iconified
     statusMgr->restore();
 }
 
 void MainWindow::hideWindow(StatusWnd* swnd) {
+    // called by StatusWnd so we know statusMgr exists
     statusMgr->hideWindow(swnd);
 }
 
 void MainWindow::statusDone(StatusWnd* swnd) {
+    // called by StatusWnd so we know statusMgr exists
     statusMgr->statusDone(swnd);
 }
 
@@ -306,6 +310,8 @@ void MainWindow::onSgnLoginResult(bool ok) {
     updateNetworkName();
     if (ok && statusMgr == nullptr) {
         // wait until first successful login to create the status window manager
+        // we create the status window manager regardless of whether notification windows are enabled
+        // as if they are disabled, they could later be enabled
         statusMgr = new core::StatusWndMgr(this);
         // In order to detect when notification windows should no longer be displayed on top of other windows
         // we need to detect application state changes of the WalletApp. But when the MainWindow is first

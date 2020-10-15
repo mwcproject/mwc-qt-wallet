@@ -306,5 +306,9 @@ void Config::setGenerateProof(bool generate) {
     getAppContext()->setGenerateProof(generate);
 }
 
+// Check if notification windows are enabled
+bool Config::getNotificationWindowsEnabled() {
+    return getAppContext()->getNotificationWindowsEnabled();
+}
 
 }

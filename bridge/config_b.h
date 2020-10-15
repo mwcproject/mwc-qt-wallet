@@ -142,6 +142,10 @@ public:
     Q_INVOKABLE bool getGenerateProof();
     // Update 'generate proof' flag value
     Q_INVOKABLE void setGenerateProof(bool generate);
+
+    // Check if notification windows are enabled
+    Q_INVOKABLE bool getNotificationWindowsEnabled();
+
 };
 
 }

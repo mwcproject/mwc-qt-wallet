@@ -1298,15 +1298,14 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
 
     updateWalletBalance(false,true);
 
-    // We no longer display a message box with the receive message
-    // It is now displayed in a status window off of the main window.
-    /* core::getWndManager()->messageHtmlDlg("Congratulations!",
+    if (!appContext->getNotificationWindowsEnabled()) {
+        // only display the message dialog if notification windows are not enabled
+        core::getWndManager()->messageHtmlDlg("Congratulations!",
            "You received <b>" + mwc + "</b> MWC<br>" +
            (message.isEmpty() ? "" : "Description: " + message + "<br>" ) +
            "<br>From: " + fromAddr +
            "<br>Slate: " + slate);
-    */
-
+    }
 }
 
 void MWC713::setSendFileResult( bool success, QStringList errors, QString fileName ) {

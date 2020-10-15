@@ -198,6 +198,11 @@ public:
     // Generate proof for all send transactions.
     bool getGenerateProof() const {return generateProof;}
     void setGenerateProof(bool proof);
+
+    // Display of status messages using notification windows
+    bool getNotificationWindowsEnabled() { return notificationWindowsEnabled; }
+    void setNotficationWindowsEnabled(bool enable);
+
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -286,6 +291,11 @@ private:
     // Genrate proof for all send transactions. By default it is false because
     // receiver wallet need to be upgraded in order to support it.
     bool generateProof = false;
+
+    // The display of status messages using notification windows in the lower
+    // right hand corner of the wallet is enabled by default
+    bool notificationWindowsEnabled = true;
+
 };
 
 template <class T>

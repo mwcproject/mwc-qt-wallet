@@ -55,6 +55,9 @@ public:
     bool isOutputLockingEnabled();
     void setOutputLockingEnabled(bool lockingEnabled);
 
+    bool getNotificationWindowsEnabled();
+    void setNotificationWindowsEnabled(bool enabled);
+
     bool updateTimeoutValue(int timeout);
 
     // Locked if currently some settigns are waiting for applying
