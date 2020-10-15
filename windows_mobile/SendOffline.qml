@@ -16,6 +16,7 @@ Item {
         amount = parseInt(initParams.amount)
         text_from_account.text = qsTr("From account: " + selectedAccount)
         text_amount_to_send.text = qsTr("Amount to send: " + ( amount < 0 ? "All" : util.nano2one(Number(amount).toString())) + " MWC" )
+        rect_progress.visible = false
     }
 
     UtilBridge {
@@ -163,7 +164,7 @@ Item {
 
         onClicked: {
             if ( !send.isNodeHealthy() ) {
-                messagebox.open("Unable to send", "Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process")
+                messagebox.open(qsTr("Unable to send"), qsTr("Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process"))
                 return
             }
 
@@ -173,12 +174,11 @@ Item {
             if (valRes !== "") {
                 messagebox.open("Incorrect Input", valRes)
                 textarea_description.focus = true
-                return;
+                return
             }
 
             if (send.sendMwcOffline(selectedAccount, Number(amount).toString(), description)) {
                 rect_progress.visible = true
-                console.log("Sending is in progress")
             }
         }
     }

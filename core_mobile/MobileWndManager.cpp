@@ -119,7 +119,7 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
 
     mainWindow->setProperty("questionTextDlgResponse", -1);
     QVariant retValue;
-    QMetaObject::invokeMethod(mainWindow, "openQuestionTextDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, btn1), Q_ARG(QVariant, btn2), Q_ARG(QVariant, passwordHash), Q_ARG(QVariant, blockButton == WndManager::RETURN_CODE::BTN1 ? 0 : 1), Q_ARG(QVariant, *ttl_blocks));
+    QMetaObject::invokeMethod(mainWindow, "openQuestionTextDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, btn1), Q_ARG(QVariant, btn2), Q_ARG(QVariant, blockButton == WndManager::RETURN_CODE::BTN1 ? 0 : 1), Q_ARG(QVariant, *ttl_blocks), Q_ARG(QVariant, passwordHash));
     while(mainWindow->property("questionTextDlgResponse") == -1) {
         QCoreApplication::processEvents();
         QThread::usleep(50);
@@ -136,11 +136,12 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
 // QFileDialog::getSaveFileName call
 QString MobileWndManager::getSaveFileName(const QString &caption, const QString &dir, const QString &filter) {
     Q_UNUSED(caption)
-    Q_UNUSED(dir)
     Q_UNUSED(filter)
 
-    Q_ASSERT(false); // implement me
-    return "";
+    QDateTime now;
+    QString fileName = dir + "/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm");
+    this->messageTextDlg("Tx file Saved!", "File Path: " + fileName + ".tx");
+    return fileName;
 }
 
 // Ask for confirmation

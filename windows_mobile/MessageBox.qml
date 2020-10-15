@@ -1,9 +1,11 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
+import UtilBridge 1.0
 
 Item {
     property var callback
+    property string blockingPasswordHash
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
@@ -25,12 +27,33 @@ Item {
             button_yes.visible = true
             button_no.visible = true
             callback = _callback
+            blockingPasswordHash = ""
+            label_password.visible = false
+            textfield_password.visible = false
+            textfield_password.text = ""
+
+            if (passwordHash !== "") {
+                messagebox.height = text_message.height + dp(350)
+                text_message.anchors.verticalCenterOffset = dp(-50)
+                label_password.visible = true
+                textfield_password.visible = true
+                if (blockButton === 0) {
+                    button_no.enabled = false
+                } else {
+                    button_yes.enabled = false
+                }
+                blockingPasswordHash = passwordHash
+            }
         } else {
             button_ok.visible = true
             button_yes.visible = false
             button_no.visible = false
         }
         messagebox.visible = true
+    }
+
+    UtilBridge {
+        id: util
     }
 
     Rectangle {
@@ -87,6 +110,62 @@ Item {
             color: "#3600C9"
         }
 
+        Text {
+            id: label_password
+            visible: false
+            anchors.left: parent.left
+            anchors.leftMargin: dp(40)
+            anchors.right: parent.right
+            anchors.rightMargin: dp(40)
+            anchors.top: text_message.bottom
+            anchors.topMargin: dp(30)
+            text: qsTr("Input your password to continue:")
+            verticalAlignment: Text.AlignVCenter
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            font.pixelSize: dp(20)
+            color: "#3600C9"
+        }
+
+        TextField {
+            id: textfield_password
+            visible: false
+            height: dp(50)
+            padding: dp(10)
+            leftPadding: dp(20)
+            font.pixelSize: dp(18)
+            placeholderText: qsTr("Password")
+            echoMode: "Password"
+            color: "#3600C9"
+            text: ""
+            anchors.top: label_password.bottom
+            anchors.topMargin: dp(10)
+            anchors.right: parent.right
+            anchors.rightMargin: dp(40)
+            anchors.left: parent.left
+            anchors.leftMargin: dp(40)
+            horizontalAlignment: Text.AlignLeft
+            background: Rectangle {
+                border.width: dp(1)
+                border.color: "#8633E0"
+                color: "white"
+                radius: dp(5)
+            }
+
+            onTextChanged: {
+                const ok = util.calcHSA256Hash(textfield_password.text) === blockingPasswordHash
+                button_yes.enabled = ok
+                if (ok)
+                    button_yes.focus = true
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    textfield_password.focus = true
+                }
+            }
+        }
+
         Button {
             id: button_ok
             width: dp(135)
@@ -122,15 +201,17 @@ Item {
             anchors.rightMargin: parent.width / 2 - dp(150)
 
             background: Rectangle {
-                color: "#6F00D6"
+                color: button_yes.enabled ? "#6F00D6" : "white"
                 radius: dp(5)
+                border.width: dp(2)
+                border.color: button_yes.enabled ? "#6F00D6" : "gray"
                 Text {
                     id: text_yesbutton
                     text: qsTr("Yes")
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.pixelSize: dp(18)
-                    color: "white"
+                    color: button_yes.enabled ? "white" : "gray"
                 }
             }
 

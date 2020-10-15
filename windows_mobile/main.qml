@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.13
+import Qt.labs.platform 1.1
 import CoreWindowBridge 1.0
 
 Window {
@@ -10,8 +11,8 @@ Window {
     
     property int currentState
     property string initParams
-    property int questionTextDlgResponse
     property int ttl_blocks
+    property int questionTextDlgResponse
     property int sendConformationDlgResponse
 
     readonly property int dpi: Screen.pixelDensity * 25.4
@@ -68,7 +69,7 @@ Window {
         }
     }
 
-    function openQuestionTextDlg(title, message, noBtnText, yesBtnText, passwordHash, blockButton, _ttl_blocks) {
+    function openQuestionTextDlg(title, message, noBtnText, yesBtnText, blockButton, _ttl_blocks, passwordHash = "") {
         messagebox.open(title, message, true, noBtnText, yesBtnText, passwordHash, blockButton, _ttl_blocks, questionTextDlgCallback)
     }
 
