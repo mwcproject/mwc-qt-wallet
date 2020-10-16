@@ -39,11 +39,7 @@ public:
     void updateShowMessages();
 
 private slots:
-    void on_notificationList_cellActivated(int row, int column);
-
-private:
-    void initTableHeaders();
-    void saveTableHeaders();
+    void onItemActivated(QString itemId);
 
 private:
     Ui::Events *ui;

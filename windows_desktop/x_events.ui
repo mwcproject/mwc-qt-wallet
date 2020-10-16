@@ -40,31 +40,16 @@
     </widget>
    </item>
    <item>
-    <widget class="ListWithColumns" name="notificationList">
-     <column>
-      <property name="text">
-       <string>Time</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Level</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Message</string>
-      </property>
-     </column>
-    </widget>
+    <widget class="control::RichVBox" name="eventsList" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ListWithColumns</class>
-   <extends>QTableWidget</extends>
-   <header>control_desktop/listwithcolumns.h</header>
+   <class>control::RichVBox</class>
+   <extends>QWidget</extends>
+   <header>control_desktop/richvbox.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

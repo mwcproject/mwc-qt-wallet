@@ -18,6 +18,9 @@
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/config_b.h"
 #include "../bridge/wnd/x_events_b.h"
+#include "../control_desktop/richvbox.h"
+#include "../control_desktop/richitem.h"
+#include <QLabel>
 
 const int MSG_GROUP_SIZE = 5;
 
@@ -32,71 +35,64 @@ Events::Events(QWidget *parent) :
     config = new bridge::Config(this);
     events = new bridge::Events(this);
 
-    initTableHeaders();
+    ui->eventsList->setFocus();
 
-    ui->notificationList->setTextAlignment( Qt::AlignLeft | Qt::AlignVCenter );
-    ui->notificationList->setFocus();
+    QObject::connect(ui->eventsList, &control::RichVBox::onItemActivated,
+                     this, &Events::onItemActivated, Qt::QueuedConnection);
 
     updateShowMessages();
 }
 
 Events::~Events()
 {
-    saveTableHeaders();
-
     events->eventsWndIsDeleted();
     delete ui;
-}
-
-void Events::initTableHeaders() {
-
-    // Disabling to show the grid
-    // Creatign columns
-    QVector<int> widths = config->getColumnsWidhts("NotifTblColWidth");
-    if ( widths.size() != 3 ) {
-        widths = QVector<int>{80, 50, 550 };
-    }
-    Q_ASSERT( widths.size() == 3 );
-
-    ui->notificationList->setColumnWidths( widths );
-}
-
-void Events::saveTableHeaders() {
-    config->updateColumnsWidhts("NotifTblColWidth", ui->notificationList->getColumnWidths());
 }
 
 void Events::updateShowMessages() {
 
     messages = events->getWalletNotificationMessages();
 
-    ui->notificationList->clearData();
+  //  ui->eventsList->clearAll();
 
-    for (int i=messages.size()/MSG_GROUP_SIZE-1; i>=0; i-- ) {
+    // Current implementaiton of the list with bunch of controls can't have too many items.
+    // That is why we printing only first 200 elements.
+    int msgNumber = 0;
+    for (int i=messages.size()/MSG_GROUP_SIZE-1; i>=0 && msgNumber < 200; i--, msgNumber++ ) {
         QString timeShort = messages[i*MSG_GROUP_SIZE];
+        QString timeLong = messages[i*MSG_GROUP_SIZE+1];
         QString levelShort = messages[i*MSG_GROUP_SIZE+2];
+        QString levelFull = messages[i*MSG_GROUP_SIZE+3];
         QString message = messages[i*MSG_GROUP_SIZE+4];
 
 #ifndef QT_DEBUG
         if ( levelShort.contains("dbg") )
-            continue; // Don't want ot show debug messaged in the release.
+            continue; // Don't want to show debug messaged in the release.
 #endif
-        ui->notificationList->appendRow( QVector<QString>{ timeShort, levelShort, message }, 0.0);
+
+        control::RichItem * itm = control::createMarkedItem(QString::number(i*MSG_GROUP_SIZE), ui->eventsList, !(levelShort == "info" || levelShort == "dgb") );
+        itm->addWidget( control::crateLable(itm, true, true, timeLong + " / " + levelFull ) )
+            .addWidget( control::crateLable(itm, true, false, message ) );
+        itm->apply();
+
+        ui->eventsList->addItem(itm);
     }
+    ui->eventsList->apply();
 }
 
-void Events::on_notificationList_cellActivated(int row, int column)
-{
+void Events::onItemActivated(QString itemId) {
     util::TimeoutLockObject to("Events");
 
-    Q_UNUSED(column);
+    int idx = itemId.toInt();
+
     // Show message details for that row
-    if (row>=0 && row<messages.size()/MSG_GROUP_SIZE) {
-        int groupIdx = (messages.size()/MSG_GROUP_SIZE-1-row) * MSG_GROUP_SIZE;
-        dlg::ShowNotificationDlg * showDlg = new dlg::ShowNotificationDlg( messages[groupIdx+1],
-                messages[groupIdx+3], messages[groupIdx+4], this );
+    if (idx>=0 && idx<=messages.size() - MSG_GROUP_SIZE) {
+        dlg::ShowNotificationDlg * showDlg = new dlg::ShowNotificationDlg( messages[idx+1],
+                                                                           messages[idx+3], messages[idx+4], this );
         showDlg->exec();
         delete(showDlg);
     }
+
 }
 
 }
