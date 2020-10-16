@@ -140,7 +140,7 @@ QString MobileWndManager::getSaveFileName(const QString &caption, const QString 
 
     QDateTime now;
     QString fileName = dir + "/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm");
-    this->messageTextDlg("Tx file Saved!", "File Path: " + fileName + ".tx");
+//    this->messageTextDlg("Tx file Saved!", "File Path: " + fileName + ".tx");
     return fileName;
 }
 
@@ -234,17 +234,23 @@ void MobileWndManager::pageFileTransaction(QString pageTitle, QString callerId,
                                      int nodeHeight,
                                      QString transactionType, QString processButtonName) {
     Q_UNUSED(pageTitle)
-    Q_UNUSED(callerId)
-    Q_UNUSED(fileName)
-    Q_UNUSED(transInfo)
-    Q_UNUSED(nodeHeight)
-    Q_UNUSED(transactionType)
-    Q_UNUSED(processButtonName)
 
-    Q_ASSERT(false); // implement me
+    QJsonObject obj;
+    obj["callerId"] = callerId;
+    obj["fileName"] = fileName;
+    obj["transactionType"] = transactionType;
+    obj["processButtonName"] = processButtonName;
+    obj["amount"] = util::nano2one(transInfo.amount);
+    obj["transactionId"] = transInfo.transactionId;
+    obj["lockHeight"] = transInfo.lock_height > nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-";
+    obj["message"] = transInfo.message;
+
+    QVariant retValue;
+    QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
 void MobileWndManager::pageRecieve() {
     mainWindow->setProperty("currentState", state::STATE::RECEIVE_COINS);
+    mainWindow->setProperty("initParams", "");
 }
 void MobileWndManager::pageListening() {
     Q_ASSERT(false); // implement me

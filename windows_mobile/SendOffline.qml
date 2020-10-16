@@ -29,7 +29,7 @@ Item {
 
     Connections {
         target: send
-        onSgnShowSendResult: {
+        onSgnShowSendResult: (success, message) => {
             rect_progress.visible = false
             messagebox.open(success ? "Success" : "Failure", message)
         }

@@ -28,7 +28,7 @@ Item {
 
     Connections {
         target: send
-        onSgnShowSendResult: {
+        onSgnShowSendResult: (success, message) => {
             rect_progress.visible = false
             if (success) {
                 messagebox.open(qsTr("Success"), qsTr("Your MWC was successfully sent to recipient"))

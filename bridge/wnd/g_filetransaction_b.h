@@ -43,6 +43,9 @@ public:
 
     Q_INVOKABLE bool isNodeHealthy();
 
+    // This method is only for the mobile since it's difficult to call global isFinalize method in qml
+    Q_INVOKABLE bool isFinalize();
+
 signals:
     void sgnHideProgress();
 

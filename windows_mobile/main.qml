@@ -192,7 +192,13 @@ Window {
         Receive {
             id: receiveItem
             anchors.fill: parent
-            visible: currentState === 9
+            visible: currentState === 9 && initParams.length === 0
+        }
+
+        FileTransaction {
+            id: fileTransactionItem
+            anchors.fill: parent
+            visible: currentState === 9 && initParams.length !== 0
         }
 
         Finalize {
