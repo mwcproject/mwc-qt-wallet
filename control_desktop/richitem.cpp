@@ -89,6 +89,12 @@ RichItem & RichItem::addSpacer() {
     return *this;
 }
 
+RichItem & RichItem::addFixedHSpacer(int cx) {
+    Q_ASSERT(!layoutStack.isEmpty());
+    layoutStack.back()->addItem( new QSpacerItem(cx,1, QSizePolicy::Fixed, QSizePolicy::Expanding) );
+    return *this;
+}
+
 
 RichItem & RichItem::apply() { // last step, first item form activeLayoutStack will be applyed
     Q_ASSERT(!layoutStack.isEmpty());
@@ -142,20 +148,37 @@ RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked ) {
             .setWidgetStyleSheet(marked ? control::LEFT_MARK_ON : control::LEFT_MARK_OFF);
 
     itm->vbox().setSpacing(VBOX_SPACING)
-            .setContentsMargins(0, VBOX_SPACING, 0, VBOX_SPACING);
+            .setContentsMargins(0, VBOX_SPACING * 3/2, 0, VBOX_SPACING * 3/2);
 
     return itm;
 }
 
-QLabel * crateLable( control::RichItem * parent, bool wordwrap, bool lowLight, QString text ) {
+QLabel * crateLabel( control::RichItem * parent, bool wordwrap, bool lowLight, QString text, int fontSize ) {
     QLabel * l = new QLabel(parent);
-//        l1->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
     l->setWordWrap(wordwrap);
-    l->setStyleSheet( (lowLight ? ("color: " + control::LOW_LIGHT_COLOR + "; ") : "") + "border: transparent; background: transparent");
+    l->setStyleSheet( (lowLight ? ("color: " + control::LOW_LIGHT_COLOR + "; ") : "") + "border: transparent; background: transparent; font-size: " + QString::number(fontSize) + "px;");
     l->setText(text);
     return l;
 }
 
+// Create a lable with an icon
+QLabel *  createIcon( control::RichItem * parent, QString pixmapPath, int cx, int cy ) {
+    QLabel * l = new QLabel(parent);
+    l->setStyleSheet("background: transparent; border: transparent");
+    l->setScaledContents(true);
+    l->setPixmap( QPixmap(pixmapPath) );
+    l->setMinimumSize(cx,cy);
+    l->setMaximumSize(cx,cy);
+    return l;
+}
+
+QLabel * createHorzLine(control::RichItem * parent) {
+    QLabel * l = new QLabel(parent);
+    l->setMinimumHeight(1);
+    l->setMaximumHeight(1);
+    l->setStyleSheet(HORZ_LINE);
+    return l;
+}
 
 
 }

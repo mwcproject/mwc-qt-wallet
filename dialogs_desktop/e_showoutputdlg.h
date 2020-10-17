@@ -41,14 +41,12 @@ public:
     ~ShowOutputDlg();
 
     bool isLocked() const {return locked;}
-signals:
-    void saveOutputNote( QString commitment, QString note);
+    QString getResultOutputNote() const {return newOutputNote;}
 
 private slots:
     void on_viewOutput_clicked();
     void on_okButton_clicked();
-    void on_outputNote_textEdited(const QString& text);
-    void on_pushButton_Save_clicked();
+    void on_cancelButton_clicked();
 
 private:
     void updateButtons(bool showOutputEditButtons);

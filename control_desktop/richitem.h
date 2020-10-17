@@ -10,10 +10,16 @@ class RichVBox;
 
 const QString LEFT_MARK_ON = "background: #BCF317; border: transparent;";
 const QString LEFT_MARK_OFF = "background: transparent; border: transparent;";
+const QString HORZ_LINE = "background: rgba(255, 255, 255, 0.5); border: transparent;";  // Same as Resorces has
 const int     LEFT_MARK_SIZE = 3;
 const int     LEFT_MARK_SPACING = 10;
 const QString LOW_LIGHT_COLOR = "#BF84FF";
-const int     VBOX_SPACING = 10;
+const int     VBOX_SPACING = 5;
+const int     ROW_HEIGHT = 16; // use it for non text elements like icons
+
+const int     FONT_NORMAL = 14;
+const int     FONT_LARGE  = 16;
+const int     FONT_SMALL  = 12;
 
 // Rich Item should provide ability to dynamically construct complex list items that allow to show information better then traditional lists
 // with columns
@@ -38,6 +44,7 @@ public:
     RichItem & setFixedHeight(int cy);
     RichItem & setText(const QString & text);
     RichItem & addSpacer();
+    RichItem & addFixedHSpacer(int cx);
 
     QWidget * getCurrentWidget() const {return curWidget;}
     QLayout * getCurrentLayout() const { Q_ASSERT(!layoutStack.isEmpty()); return layoutStack.last(); }
@@ -68,7 +75,13 @@ private:
 // Create Mark + v layout that ready to accept the rows
 RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked );
 
-QLabel *  crateLable( control::RichItem * parent, bool wordwrap, bool lowLight, QString text );
+// Create a lable with a text
+QLabel *  crateLabel( control::RichItem * parent, bool wordwrap, bool lowLight, QString text, int fontSize = FONT_NORMAL );
+
+// Create a lable with an icon
+QLabel *  createIcon( control::RichItem * parent, QString pixmapPath, int cx, int cy );
+
+QLabel * createHorzLine(control::RichItem * parent);
 
 }
 

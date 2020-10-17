@@ -15,20 +15,35 @@
 #include "e_outputs_w.h"
 #include "ui_e_outputs.h"
 #include <QDebug>
-#include <control_desktop/messagebox.h>
+#include "../control_desktop/messagebox.h"
 #include "../dialogs_desktop/e_showoutputdlg.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/config_b.h"
 #include "../bridge/hodlstatus_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/wnd/e_outputs_b.h"
+#include "../control_desktop/richbutton.h"
 
 namespace wnd {
 
-const int LOCK_OUTPUT_COLUMN_IDX = 3;
-
 // static
 bool Outputs::lockMessageWasShown = false;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void OutputData::setBtns(control::RichItem * _ritem,
+                         QWidget * _markWnd,
+                         control::RichButton * _lockBtn,
+                         QLabel * _lockLabel,
+                         QLabel * _comment) {
+    ritem = _ritem;
+    markWnd = _markWnd;
+    lockBtn = _lockBtn;
+    lockLabel = _lockLabel;
+    comment = _comment;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Outputs::Outputs(QWidget *parent) :
         core::NavWnd(parent),
@@ -47,23 +62,19 @@ Outputs::Outputs(QWidget *parent) :
     QObject::connect( wallet, &bridge::Wallet::sgnNewNotificationMessage,
                       this, &Outputs::onSgnNewNotificationMessage, Qt::QueuedConnection);
 
-    ui->outputsTable->setHightlightColors(QColor(255, 255, 255, 51), QColor(255, 255, 255, 153)); // Alpha: 0.2  - 0.6
-    // Alpha delta for row stripe coloring. Range 0-255
-    ui->outputsTable->setStripeAlfaDelta(5); // very small number
+    QObject::connect(ui->outputsTable, &control::RichVBox::onItemActivated,
+                     this, &Outputs::onItemActivated, Qt::QueuedConnection);
 
     ui->progress->initLoader(true);
     ui->progressFrame->hide();
 
     bool showAll = config->isShowOutputAll();
-    ui->showAll->setEnabled(!showAll); // inverse state, enabled is a switch
-    ui->showUnspent->setEnabled(showAll);
+    ui->showUnspent->setText( QString("Show Spent: ") + (showAll ? "Yes" : "No") );
 
     QString accName = updateAccountsData();
 
     inHodl = hodlStatus->isInHodl();
     canLockOutputs = config->isLockOutputEnabled();
-
-    initTableHeaders();
 
     requestOutputs(accName);
 }
@@ -74,134 +85,169 @@ void Outputs::panelWndStarted() {
 
 
 Outputs::~Outputs() {
-    config->setShowOutputAll( isShowUnspent() );
-    saveTableHeaders();
     delete ui;
 }
 
-void Outputs::initTableHeaders() {
-
-    tableId = "Outputs_N";
-    QVector<QString> columns{"TX #", "MWC", "STATUS", "CONF", "COMMITMENT", "CB", "HEIGHT", "LOCK H" };
-    QVector<int> widths{40, 90, 100, 70, 240, 50, 70, 70};
-
-    if (canLockOutputs) {
-        columns.insert(LOCK_OUTPUT_COLUMN_IDX, "LOCKED");
-        widths.insert(LOCK_OUTPUT_COLUMN_IDX, 60);
-        tableId += "L";
-
-        ui->outputsTable->addHighlightedColumn(LOCK_OUTPUT_COLUMN_IDX);
-    }
-
-    if (inHodl) {
-        columns.push_back("HODL");
-        widths.push_back(60);
-        tableId += "H";
-    }
-
-    QVector<int> ww = config->getColumnsWidhts( tableId );
-    if (ww.size() == widths.size()) {
-        widths = ww;
-    }
-
-    ui->outputsTable->setColumnCount(widths.size());
-    for (int t=0; t<widths.size(); t++) {
-        ui->outputsTable->setColumnWidth(t, widths[t]);
-        QTableWidgetItem * itm = new QTableWidgetItem( columns[t]) ;
-        ui->outputsTable->setHorizontalHeaderItem( t, itm );
-    }
-}
-
-void Outputs::saveTableHeaders() {
-    QVector<int>  width = ui->outputsTable->getColumnWidths();
-    config->updateColumnsWidhts( tableId, width );
-}
-
-int Outputs::calcPageSize() const {
-    QSize sz1 = ui->outputsTable->size();
-    QSize sz2 = ui->progressFrame->size();
-
-    return ListWithColumns::getNumberOfVisibleRows(std::max(sz1.height(), std::max(0, sz2.height() - 50)));
-}
-
-
-void Outputs::on_prevBtn_clicked() {
-    if (currentPagePosition > 0) {
-        int pageSize = calcPageSize();
-        currentPagePosition = std::max( 0, currentPagePosition-pageSize );
-        updateShownData();
-    }
-}
-
-void Outputs::on_nextBtn_clicked() {
-    if (currentPagePosition + shownData.size() < allData.size()) {
-        int pageSize = calcPageSize();
-        currentPagePosition = std::min( allData.size()-pageSize, currentPagePosition+pageSize );
-        updateShownData();
-    }
+bool Outputs::calcMarkFlag(const wallet::WalletOutput & out) {
+    QString lockState = calcLockedState(out);
+    return out.status == "Unconfirmed" || out.status == "Locked" || lockState == "YES";
 }
 
 void Outputs::updateShownData() {
-    int pageSize = calcPageSize();
-    shownData.clear();
-    ui->outputsTable->clearData();
-    if (currentPagePosition < 0 || allData.isEmpty() || pageSize <= 0) {
-        ui->nextBtn->setEnabled(false);
-        ui->prevBtn->setEnabled(false);
-        ui->pageLabel->setText("");
-        return;
-    } else {
-        int total = allData.size();
+    ui->outputsTable->clearAll();
 
-        ui->nextBtn->setEnabled(currentPagePosition < total - pageSize);
-        ui->prevBtn->setEnabled(currentPagePosition > 0);
+    int total = allData.size();
 
+    qDebug() << "updating output table for " << total << " outputs";
+    // Printing first 200 outputs. For normal usage 200 is enough. The re
+    for (int i = allData.size()-1; i >= std::max(0, allData.size()-200); i--) {
+        auto &out = allData[i].output;
 
-        if (total <= 1) {
-            ui->pageLabel->setText(QString::number(total) +
-                                   " of " + QString::number(total));
-        } else {
-            ui->pageLabel->setText(QString::number(currentPagePosition + 1) + "-" +
-                                   QString::number(std::min(currentPagePosition + pageSize - 1 + 1, total)) +
-                                   " of " + QString::number(total));
-        }
+        // Data filtering was done on outputs request level. No need to filter out anything
 
-        for (int i=currentPagePosition; i<total && pageSize>0; i++, pageSize--) {
-            shownData.push_back(allData[i]);
-        }
+        // return "N/A, Yes, "No"
+        QString lockState = calcLockedState(out);
+        bool mark = calcMarkFlag(out);
 
-        ui->outputsTable->clearData();
+        control::RichItem * itm = control::createMarkedItem(QString::number(i), ui->outputsTable, mark );
 
-        qDebug() << "updating output table for " << shownData.size() << " rows";
-        int row = 0;
-        for (int i = shownData.size()-1; i >= 0; i--) {
-            auto &out = shownData[i];
+        QWidget * markWnd = (QWidget *) itm->getCurrentWidget();
 
-            QVector<QString> rowData{
-                    QString::number(out.txIdx + 1),
-                    // out.status, // Status allways 'unspent', so no reasons to print it.
-                    util::nano2one(out.valueNano),
-                    out.status,
-                    out.numOfConfirms,
-                    out.outputCommitment,
-                    out.coinbase ? "Yes" : "No",
-                    out.blockHeight,
-                    out.lockedUntil
-            };
-
-            if (canLockOutputs) {
-                rowData.insert(LOCK_OUTPUT_COLUMN_IDX, "" );
+        // First row with Info about the commit
+        {
+            itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
+            // Adding Icon and a text
+            if (out.status == "Unconfirmed") {
+                itm->addWidget(control::createIcon(itm, ":/img/iconUnconfirmed@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+            } else if (out.status == "Unspent") {
+                if (out.coinbase)
+                    itm->addWidget(control::createIcon(itm, ":/img/iconCoinbase@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+                else
+                    itm->addWidget(control::createIcon(itm, ":/img/iconReceived@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+            } else if (out.status == "Locked") {
+                itm->addWidget( control::createIcon(itm, ":/img/iconLock@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+            } else if (out.status == "Spent") {
+                itm->addWidget( control::createIcon(itm, ":/img/iconSent@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+            } else {
+                Q_ASSERT(false);
             }
 
-            if (inHodl) {
-                rowData.push_back( hodlStatus->getOutputHodlStatus(out.outputCommitment) );
+            itm->addWidget(control::crateLabel(itm, false, false, out.status));
+            itm->addSpacer();
+
+            bool hok = false;
+            int height = out.blockHeight.toInt(&hok);
+            bool lok = false;
+            int lockH = out.lockedUntil.toInt(&lok);
+
+            if (hok) {
+                itm->addWidget(control::crateLabel(itm, false, true, "Block: " + out.blockHeight));
+            }
+            if (lok && hok && lockH > height) {
+                itm->addFixedHSpacer(control::LEFT_MARK_SPACING).addWidget(
+                        control::crateLabel(itm, false, true, "Lock Height: " + out.lockedUntil));
+            }
+            itm->pop();
+        } // First line
+
+        itm->addWidget( control::createHorzLine(itm) );
+
+        QLabel * lockL = nullptr;
+        control::RichButton * lockBtn = nullptr;
+
+        { // Line with amount
+            itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
+
+            itm->addWidget(control::createIcon(itm, ":/img/iconLock@2x", control::ROW_HEIGHT, control::ROW_HEIGHT));
+            lockL = (QLabel*)itm->getCurrentWidget();
+
+            if (lockState != "YES") {
+                lockL->hide();
             }
 
-            ui->outputsTable->appendRow( rowData );
+            itm->addWidget( control::crateLabel(itm, false, false, util::nano2one(out.valueNano) + " MWC", control::FONT_LARGE));
+            itm->addSpacer();
 
-            showLockedState(row++, out);
+            // Add lock button if it is applicable
+            if ( lockState == "YES" ) {
+                itm->addWidget(new control::RichButton(itm, "Unlock", 60, control::ROW_HEIGHT));
+                lockBtn = (control::RichButton*) itm->getCurrentWidget();
+            }
+            else if (lockState == "NO") {
+                itm->addWidget(new control::RichButton(itm, "Lock", 60, control::ROW_HEIGHT));
+                lockBtn = (control::RichButton*) itm->getCurrentWidget();
+            }
+
+            if (lockBtn) {
+                lockBtn->setCallback(this, QString::number(i) );
+                itm->addFixedHSpacer(control::ROW_HEIGHT);
+            }
+
+            itm->addWidget( control::crateLabel(itm, false, true, "Conf: " + out.numOfConfirms));
+
+
+            itm->pop();
         }
+
+        // line with commit
+        itm->addWidget( control::crateLabel(itm, false, true, out.outputCommitment, control::FONT_SMALL) );
+
+        // And the last optional line is comment
+        QString outputNote = config->getOutputNote(out.outputCommitment);
+        itm->addWidget( control::crateLabel(itm, true, false,outputNote));
+        QLabel * noteL = (QLabel *) itm->getCurrentWidget();
+        if (outputNote.isEmpty())
+            noteL->hide();
+
+        itm->apply();
+
+        allData[i].setBtns(itm, markWnd, lockBtn, lockL, noteL);
+        ui->outputsTable->addItem(itm);
     }
+
+    ui->outputsTable->apply();
+}
+
+void Outputs::richButtonPressed(control::RichButton * button, QString coockie) {
+    // cookie is index.
+    int idx = coockie.toInt();
+
+    if (idx>=0 && idx<allData.size()) {
+        wallet::WalletOutput & selected = allData[idx].output;
+        bool locked = !config->isLockedOutput(selected.outputCommitment);
+        config->setLockedOutput(locked, selected.outputCommitment);
+
+        updateOutputState( idx, locked );
+    }
+}
+
+bool Outputs::updateOutputState(int idx, bool lock) {
+    if ( idx>=0 && idx<allData.size() && showLockMessage() ) {
+
+        wallet::WalletOutput & selected = allData[idx].output;
+        QLabel * lockL = allData[idx].lockLabel;
+        control::RichButton * lockBtn = allData[idx].lockBtn;
+
+        config->setLockedOutput(lock, selected.outputCommitment);
+        if (lock) {
+            if (lockBtn)
+                lockBtn->setText("Unlock");
+            if (lockL)
+                lockL->show();
+        }
+        else {
+            if (lockBtn)
+                lockBtn->setText("Lock");
+            if (lockL)
+                lockL->hide();
+        }
+
+        bool mark = calcMarkFlag(selected);
+        allData[idx].markWnd->setStyleSheet( mark ? control::LEFT_MARK_ON : control::LEFT_MARK_OFF );
+
+        return true;
+    }
+    return false;
 }
 
 QString Outputs::currentSelectedAccount() {
@@ -211,21 +257,19 @@ QString Outputs::currentSelectedAccount() {
 void Outputs::onSgnOutputs( QString account, bool showSpent, QString height, QVector<QString> outputs) {
     Q_UNUSED(height);
 
-    if (account != currentSelectedAccount() || showSpent != isShowUnspent())
+    if (account != currentSelectedAccount() || showSpent != config->isShowOutputAll() )
         return;
 
     ui->progressFrame->hide();
     ui->tableFrame->show();
 
     allData.clear();
-    shownData.clear();
 
     for (const QString & s : outputs) {
-        allData.push_back( wallet::WalletOutput::fromJson(s) );
+        OutputData out;
+        out.output = wallet::WalletOutput::fromJson(s);
+        allData.push_back( out );
     }
-
-    int pageSize = calcPageSize();
-    currentPagePosition = std::max(0, allData.size() - pageSize);
 
     updateShownData();
 }
@@ -236,16 +280,14 @@ void Outputs::on_refreshButton_clicked() {
 
 // Request and reset page counter
 void Outputs::requestOutputs(QString account) {
-    currentPagePosition = INT_MAX; // Reset Paging
     allData.clear();
-    shownData.clear();
 
     ui->progressFrame->show();
     ui->tableFrame->hide();
 
     updateShownData();
 
-    wallet->requestOutputs(account, isShowUnspent(), true);
+    wallet->requestOutputs(account, config->isShowOutputAll(), true);
 }
 
 void Outputs::on_accountComboBox_activated(int index) {
@@ -284,105 +326,24 @@ QString Outputs::updateAccountsData() {
 }
 
 
-void Outputs::on_showAll_clicked() {
-    ui->showAll->setEnabled(false);
-    ui->showUnspent->setEnabled(true);
-    on_refreshButton_clicked();
-}
-
 void Outputs::on_showUnspent_clicked() {
-    ui->showAll->setEnabled(true);
-    ui->showUnspent->setEnabled(false);
+    bool showAll = ! config->isShowOutputAll();
+    config->setShowOutputAll( showAll );
+    ui->showUnspent->setText( QString("Show Spent: ") + (showAll ? "Yes" : "No") );
+
     on_refreshButton_clicked();
 }
 
-bool Outputs::isShowUnspent() const {
-    return !ui->showAll->isEnabled();
-}
-
-// return null if nothing was selected
-wallet::WalletOutput * Outputs::getSelectedOutput() {
-    int row = ui->outputsTable->getSelectedRow();
-    if (row<0 || row>=shownData.size())
-        return nullptr;
-
-    return &shownData[shownData.size()-1-row];
-}
-
-void Outputs::on_outputsTable_cellDoubleClicked(int row, int column)
-{
-    Q_UNUSED(row);
-    Q_UNUSED(column);
-    util::TimeoutLockObject to( "Outputs");
-    wallet::WalletOutput * selected = getSelectedOutput();
-
-    if (selected==nullptr)
-        return;
-
-    wallet::WalletOutput out = *selected;
-
-    bool locked = config->isLockedOutput(out.outputCommitment);
-
-    QString account = currentSelectedAccount();
-    QString outputNote = config->getOutputNote( out.outputCommitment);
-    dlg::ShowOutputDlg showOutputDlg(this, out,
-                                     outputNote,
-                                     config->isLockOutputEnabled(), locked );
-    connect(&showOutputDlg, &dlg::ShowOutputDlg::saveOutputNote, this, &Outputs::saveOutputNote);
-    if (showOutputDlg.exec() == QDialog::Accepted) {
-        if (locked != showOutputDlg.isLocked()) {
-            if (showLockMessage()) {
-                // Updating the state
-                config->setLockedOutput(showOutputDlg.isLocked(), out.outputCommitment);
-                showLockedState(row, out);
-            }
-        }
-    }
-}
-
-void Outputs::on_outputsTable_cellClicked(int row, int column)
-{
+// return "N/A, YES, "NO"
+QString Outputs::calcLockedState(const wallet::WalletOutput & output) {
     if (!canLockOutputs)
-        return;
-
-    // We can change the lock flag
-    if (column == LOCK_OUTPUT_COLUMN_IDX) {
-        wallet::WalletOutput * selected = getSelectedOutput();
-        if (selected==nullptr)
-            return;
-
-        if (!selected->isUnspent())
-            return;
-
-        wallet::WalletOutput out = *selected;
-
-        if (showLockMessage()) {
-            bool locked = !config->isLockedOutput(out.outputCommitment);
-            config->setLockedOutput(locked, out.outputCommitment);
-            showLockedState(row, out);
-        }
-    }
-}
-
-void Outputs::showLockedState(int row, const wallet::WalletOutput & output) {
-    if (!canLockOutputs)
-        return;
+        return "N/A";
 
     QString lockState = "N/A";
     if (output.isUnspent()) {
             lockState = config->isLockedOutput(output.outputCommitment) ? "YES" : "NO";
     }
-    ui->outputsTable->setItemText(row,LOCK_OUTPUT_COLUMN_IDX, lockState);
-}
-
-void Outputs::saveOutputNote( QString commitment, QString note) {
-    if (note.isEmpty()) {
-        config->deleteOutputNote(commitment);
-    }
-    else {
-        // add new note or update existing note for this commitment
-        config->updateOutputNote(commitment, note);
-    }
+    return lockState;
 }
 
 // return true if user fine with lock changes
@@ -407,6 +368,46 @@ void Outputs::onSgnNewNotificationMessage(int level, QString message) {
     Q_UNUSED(level)
     if (message.contains("Changing status for output")) {
         on_refreshButton_clicked();
+    }
+}
+
+void Outputs::onItemActivated(QString itemId) {
+    util::TimeoutLockObject to("Events");
+
+    int idx = itemId.toInt();
+    if (idx>=0 && idx<allData.size()) {
+        wallet::WalletOutput out = allData[idx].output;
+        util::TimeoutLockObject to("Outputs");
+
+        bool locked = config->isLockedOutput(out.outputCommitment);
+
+        QString account = currentSelectedAccount();
+        QString outputNote = config->getOutputNote(out.outputCommitment);
+        dlg::ShowOutputDlg showOutputDlg(this, out,
+                                         outputNote,
+                                         config->isLockOutputEnabled(), locked);
+
+        if (showOutputDlg.exec() == QDialog::Accepted) {
+            if (locked != showOutputDlg.isLocked()) {
+                if (updateOutputState(idx, showOutputDlg.isLocked())) {
+                    config->setLockedOutput(showOutputDlg.isLocked(), out.outputCommitment);
+                }
+            }
+
+            QString resNote = showOutputDlg.getResultOutputNote();
+            if (resNote != outputNote ) {
+                if (resNote.isEmpty()) {
+                    config->deleteOutputNote( out.outputCommitment );
+                    allData[idx].comment->hide();
+                }
+                else {
+                    // add new note or update existing note for this commitment
+                    config->updateOutputNote(out.outputCommitment, resNote);
+                    allData[idx].comment->setText(resNote);
+                    allData[idx].comment->show();
+                }
+            }
+        }
     }
 }
 

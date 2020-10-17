@@ -88,5 +88,12 @@
         <file>img/OpenFile@2x.svg</file>
         <file>img/Node@2x.svg</file>
         <file>img/WarningTriangle@2x.svg</file>
+        <file>img/iconUnlock@2x.svg</file>
+        <file>img/iconLock@2x.svg</file>
+        <file>img/iconReceived@2x.svg</file>
+        <file>img/iconSent@2x.svg</file>
+        <file>img/iconUnconfirmed@2x.svg</file>
+        <file>img/iconCoinbase@2x.svg</file>
+        <file>img/iconClose@2x.svg</file>
     </qresource>
 </RCC>

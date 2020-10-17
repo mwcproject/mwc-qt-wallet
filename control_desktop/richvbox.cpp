@@ -14,6 +14,7 @@ RichVBox::RichVBox(QWidget *parent) : QScrollArea(parent)
 
     vlist = new QWidget (this);
     layout = new QVBoxLayout(vlist);
+    layout->setContentsMargins(0,0,3,0); // Have 3 on the right because of the scroll bar.
     vlist->setLayout( layout );
 
 //    vlist->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
@@ -29,7 +30,7 @@ void RichVBox::clearAll() {
     int count = layout->count();
     focusItem = nullptr;
 
-    for (int t=count-1; t>=0; t++) {
+    for (int t=count-1; t>=0; t--) {
         QLayoutItem *child = layout->takeAt(t);
         if (child!= nullptr) {
             delete child->widget();
@@ -47,8 +48,9 @@ RichVBox & RichVBox::addItem(RichItem * item) {
 }
 
 RichVBox & RichVBox::apply() {
-
-    layout->addItem( new QSpacerItem(1,1, QSizePolicy::Expanding, QSizePolicy::Expanding) );
+    // It is a spacer that works as we need. Regular spacer works as regular Widget and it doesn't work for few items.
+    // In order to make work, we need something with stretch non 0.
+    layout->addStretch(1);
     return *this;
 }
 

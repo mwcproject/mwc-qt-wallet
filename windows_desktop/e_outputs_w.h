@@ -17,6 +17,9 @@
 
 #include "../core_desktop/navwnd.h"
 #include "../wallet/wallet.h"
+#include "../control_desktop/richbutton.h"
+
+class QLabel;
 
 namespace Ui {
 class Outputs;
@@ -29,9 +32,24 @@ class Wallet;
 class Outputs;
 }
 
+namespace control {
+class RichItem;
+}
+
 namespace wnd {
 
-class Outputs : public core::NavWnd
+struct OutputData {
+    wallet::WalletOutput output;
+    control::RichItem * ritem = nullptr;
+    QWidget * markWnd = nullptr;
+    control::RichButton * lockBtn = nullptr;
+    QLabel * lockLabel = nullptr;
+    QLabel * comment = nullptr;
+
+    void setBtns(control::RichItem * ritem, QWidget * markWnd, control::RichButton * lockBtn, QLabel * lockLabel, QLabel * comment);
+};
+
+class Outputs : public core::NavWnd,  control::RichButtonPressCallback
 {
     Q_OBJECT
 
@@ -41,26 +59,25 @@ public:
 
 private slots:
     void on_accountComboBox_activated(int index);
-    void on_prevBtn_clicked();
-    void on_nextBtn_clicked();
     void on_refreshButton_clicked();
-    void on_showAll_clicked();
     void on_showUnspent_clicked();
-    void on_outputsTable_cellDoubleClicked(int row, int column);
-    void on_outputsTable_cellClicked(int row, int column);
-
-    void saveOutputNote( QString commitment, QString note);
 
     void onSgnWalletBalanceUpdated();
     void onSgnOutputs( QString account, bool showSpent, QString height, QVector<QString> outputs);
 
     void onSgnNewNotificationMessage(int level, QString message);
 
+    void onItemActivated(QString itemId);
+
+protected:
+    virtual void richButtonPressed(control::RichButton * button, QString coockie) override;
+
 private:
     virtual void panelWndStarted() override;
 
-    void initTableHeaders();
-    void saveTableHeaders();
+    bool calcMarkFlag(const wallet::WalletOutput & out);
+
+    bool updateOutputState(int idx, bool lock);
 
     void requestOutputs(QString account);
 
@@ -72,13 +89,8 @@ private:
     // return selected account
     QString updateAccountsData();
 
-    int calcPageSize() const;
-
-    bool isShowUnspent() const;
-
-    wallet::WalletOutput * getSelectedOutput();
-
-    void showLockedState(int row, const wallet::WalletOutput & output);
+    // return "N/A, YES, "NO"
+    QString calcLockedState(const wallet::WalletOutput & output);
 
     // return true if user fine with lock changes
     bool showLockMessage();
@@ -89,16 +101,10 @@ private:
     bridge::Wallet * wallet = nullptr;
     bridge::Outputs * outputs = nullptr; // needed as output windows active flag
 
-    QVector<wallet::WalletOutput> allData; // all outputs
-    QVector<wallet::WalletOutput> shownData; // Outputs that we show
-
-    int currentPagePosition = INT_MAX; // position at the paging...
-
-    //QPair<bool,bool> buttonState = QPair<bool,bool>(false, false);
+    QVector<OutputData> allData; // all outputs
 
     bool inHodl = false; // If acount enrolled in HODL. Requested once to eliminate race conditions
     bool canLockOutputs = false;
-    QString tableId;
 
     static bool lockMessageWasShown;
 };

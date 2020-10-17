@@ -60,25 +60,10 @@ ShowOutputDlg::ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output
     locked = _locked;
     ui->lockOutput->setChecked(locked);
     ui->lockOutput->setVisible(canBeLocked && output.isUnspent());
-
-    updateButtons(false);
 }
 
 ShowOutputDlg::~ShowOutputDlg() {
     delete ui;
-}
-
-void ShowOutputDlg::updateButtons(bool showOutputEditButtons) {
-    ui->pushButton_Save->setEnabled(showOutputEditButtons);
-
-    // disable OK button if save is enabled
-    // forces the user to save any active changes to the note
-    if (showOutputEditButtons) {
-        ui->okButton->setEnabled(false);
-    }
-    else {
-        ui->okButton->setEnabled(true);
-    }
 }
 
 void ShowOutputDlg::on_viewOutput_clicked() {
@@ -86,24 +71,15 @@ void ShowOutputDlg::on_viewOutput_clicked() {
 }
 
 void ShowOutputDlg::on_okButton_clicked() {
-    if (newOutputNote != originalOutputNote) {
-        emit saveOutputNote(commitment, newOutputNote);
-    }
+    newOutputNote = ui->outputNote->text();
     locked = ui->lockOutput->isChecked();
     accept();
 }
 
-void ShowOutputDlg::on_outputNote_textEdited(const QString& text) {
-    Q_UNUSED(text);
-    updateButtons(true);
-}
-
-void ShowOutputDlg::on_pushButton_Save_clicked() {
-    QString newNote = ui->outputNote->text();
-    if (newNote != newOutputNote) {
-        newOutputNote = newNote;
-    }
-    updateButtons(false);
+void dlg::ShowOutputDlg::on_cancelButton_clicked()
+{
+    reject();
 }
 
 }
+
