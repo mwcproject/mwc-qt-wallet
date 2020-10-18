@@ -742,6 +742,9 @@
        <property name="text">
         <string>Cancel</string>
        </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
        <property name="default">
         <bool>false</bool>
        </property>
@@ -819,7 +822,7 @@
  <tabstops>
   <tabstop>viewOutput</tabstop>
   <tabstop>outputNote</tabstop>
-  <tabstop>lockOutput</tabstop>
+  <tabstop>cancelButton</tabstop>
   <tabstop>okButton</tabstop>
  </tabstops>
  <resources/>

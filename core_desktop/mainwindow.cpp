@@ -126,40 +126,6 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 }
 
-void MainWindow::repost() {
-    int id = mwc::getRepostId();
-    QString account = mwc::getRepostAccount();
-    wallet->repost(account, id, false);
-}
-
-void MainWindow::repost_as_fluff() {
-    int id = mwc::getRepostId();
-    QString account = mwc::getRepostAccount();
-    wallet->repost(account, id, true);
-}
-
-
-#ifndef QT_NO_CONTEXTMENU
-void MainWindow::contextMenuEvent(QContextMenuEvent *event)
-{
-    if(mwc::getRepostId() >= 0) {
-        QMenu contextMenu(tr("Context menu"), this);
-        QAction action1("Repost", coreWindow);
-        QAction action2("Repost as a fluff transaction", coreWindow);
-
-        QObject::connect( &action1, SIGNAL(triggered()),
-                      SLOT(repost()), Qt::QueuedConnection);
-        QObject::connect( &action2, SIGNAL(triggered()),
-                      SLOT(repost_as_fluff()), Qt::QueuedConnection);
-
-        contextMenu.addAction(&action1);
-        contextMenu.addAction(&action2);
-
-        contextMenu.exec(event->globalPos());
-    }
-}
-#endif /* QT_NO_CONTEXTMENU */
-
 MainWindow::~MainWindow()
 {
     delete ui;

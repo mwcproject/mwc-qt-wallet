@@ -61,7 +61,6 @@ private:
 
     QString blockExplorerUrl;
     QString commitment;
-    QString originalOutputNote;
     QString newOutputNote;
     bool    locked;
 };

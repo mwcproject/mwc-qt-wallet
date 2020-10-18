@@ -17,6 +17,7 @@
 
 #include "../core_desktop/navwnd.h"
 #include "../wallet/wallet.h"
+#include "../control_desktop/richbutton.h"
 
 namespace Ui {
 class Transactions;
@@ -28,9 +29,30 @@ class Wallet;
 class Transactions;
 }
 
+namespace control {
+class RichItem;
+class RichButton;
+}
+
+class QLabel;
+
 namespace wnd {
 
-class Transactions : public core::NavWnd
+struct TransactionData {
+    wallet::WalletTransaction trans;
+
+    control::RichItem * ritem = nullptr;
+    control::RichButton * cancelBtn = nullptr;
+    control::RichButton * repostBtn = nullptr;
+    control::RichButton * proofBtn = nullptr;
+    QLabel * noteL = nullptr;
+
+    void setBtns(control::RichItem * ritem, control::RichButton * cancelBtn,
+                 control::RichButton * repostBtn, control::RichButton * proofBtn,
+                 QLabel * noteL);
+};
+
+class Transactions : public core::NavWnd,  control::RichButtonPressCallback
 {
     Q_OBJECT
 
@@ -39,18 +61,11 @@ public:
     ~Transactions();
 
 private slots:
-    void on_transactionTable_itemSelectionChanged();
-    void on_transactionTable_cellDoubleClicked(int row, int column);
-
     void on_accountComboBox_activated(int index);
 
     void on_refreshButton_clicked();
     void on_validateProofButton_clicked();
-    void on_generateProofButton_clicked();
     void on_exportButton_clicked();
-    void on_deleteButton_clicked();
-    void on_prevBtn_clicked();
-    void on_nextBtn_clicked();
 
     void onSgnWalletBalanceUpdated();
     void onSgnTransactions( QString account, QString height, QVector<QString> transactions);
@@ -65,19 +80,15 @@ private slots:
     void onSgnNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, QString totalDifficulty, int connections );
     void onSgnNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL values
 
-    void saveTransactionNote(QString txUuid, QString note);
-private:
-    // return null if nothing was selected
-    wallet::WalletTransaction * getSelectedTransaction();
+    void onItemActivated(QString itemId);
 
+protected:
+    virtual void richButtonPressed(control::RichButton * button, QString coockie) override;
+
+private:
     void requestTransactions();
-    void updateButtons();
     void updateData();
 
-    void initTableHeaders();
-    void saveTableHeaders();
-
-    int calcPageSize() const;
 private:
     Ui::Transactions *ui;
     bridge::Config * config = nullptr;
@@ -85,10 +96,8 @@ private:
     bridge::Transactions * transaction = nullptr; // just a placeholder to signal that this window is online
 
     QString account;
-    QVector<wallet::WalletTransaction> allTrans;
-    QVector<wallet::WalletTransaction> shownTrans;
+    QVector<TransactionData> allTrans;
 
-    int currentPagePosition = 0; // position at the paging...
     int64_t nodeHeight    = 0;
 };
 

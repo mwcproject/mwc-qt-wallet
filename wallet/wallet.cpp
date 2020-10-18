@@ -324,7 +324,7 @@ int64_t WalletTransaction::calculateTransactionAge( const QDateTime & current ) 
     return setTime.secsTo(current);
 }
 
-QString WalletTransaction::toStringCSV() {
+QString WalletTransaction::toStringCSV() const {
     QString separator = ",";
     // always enclose the type string in quotes as it could contain a comma
     QString txTypeStr = "\"" + getTypeAsStr() + "\"";

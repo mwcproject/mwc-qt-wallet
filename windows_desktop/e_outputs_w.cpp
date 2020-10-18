@@ -170,11 +170,11 @@ void Outputs::updateShownData() {
 
             // Add lock button if it is applicable
             if ( lockState == "YES" ) {
-                itm->addWidget(new control::RichButton(itm, "Unlock", 60, control::ROW_HEIGHT));
+                itm->addWidget(new control::RichButton(itm, "Unlock", 60, control::ROW_HEIGHT, "Unlock this output and make it spendable"));
                 lockBtn = (control::RichButton*) itm->getCurrentWidget();
             }
             else if (lockState == "NO") {
-                itm->addWidget(new control::RichButton(itm, "Lock", 60, control::ROW_HEIGHT));
+                itm->addWidget(new control::RichButton(itm, "Lock", 60, control::ROW_HEIGHT, "Lock this output and make it non spendable"));
                 lockBtn = (control::RichButton*) itm->getCurrentWidget();
             }
 
@@ -184,7 +184,6 @@ void Outputs::updateShownData() {
             }
 
             itm->addWidget( control::crateLabel(itm, false, true, "Conf: " + out.numOfConfirms));
-
 
             itm->pop();
         }

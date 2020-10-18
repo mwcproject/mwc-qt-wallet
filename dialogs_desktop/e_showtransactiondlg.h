@@ -44,20 +44,18 @@ public:
 
     ~ShowTransactionDlg();
 
+    QString getTransactionNote() const {return newTransactionNote;}
+
 private:
     void updateOutputData();
-    void updateButtons(bool showNoteEditButtons);
-
-signals:
-    void saveTransactionNote(QString txUuid, QString note);
 
 private slots:
     void on_okButton_clicked();
     void on_viewKernel_clicked();
     void on_viewCommit_clicked();
     void on_commitsComboBox_currentIndexChanged(int index);
-    void on_transactionNote_textEdited(const QString& text);
-    void on_saveButton_clicked();
+    void on_cancelButton_clicked();
+
 private:
     Ui::ShowTransactionDlg *ui;
     bridge::Wallet * wallet = nullptr;
@@ -69,7 +67,6 @@ private:
 
     QString account;
     QString txUuid;
-    QString originalTransactionNote;
     QString newTransactionNote;
 };
 

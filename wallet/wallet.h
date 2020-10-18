@@ -314,7 +314,7 @@ struct WalletTransaction {
     }
 
     // return transactions values formatted into a CSV string
-    QString toStringCSV();
+    QString toStringCSV() const;
 
     QString toJson() const;
     static WalletTransaction fromJson(QString str);

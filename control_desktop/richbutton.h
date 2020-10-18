@@ -30,7 +30,7 @@ public:
 class RichButton : public QPushButton {
 Q_OBJECT
 public:
-    RichButton(QWidget * parent, QString text, int cx, int cy);
+    RichButton(QWidget * parent, QString text, int cx, int cy, QString tooltip);
 
     void setCallback(RichButtonPressCallback * pressCallback, const QString & cookie);
 

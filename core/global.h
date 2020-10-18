@@ -137,11 +137,6 @@ QApplication* getApplication();
 bool isAppNonClosed();
 void closeApplication();
 
-int getRepostId();
-void setRepostId(int id);
-
-QString getRepostAccount();
-void setRepostAccount(QString account);
 void setFinalize(bool finalize);
 bool isFinalize();
 

@@ -30,6 +30,18 @@
 
 namespace wnd {
 
+void TransactionData::setBtns(control::RichItem * _ritem, control::RichButton * _cancelBtn,
+             control::RichButton * _repostBtn, control::RichButton * _proofBtn,
+             QLabel * _noteL) {
+    ritem = _ritem;
+    cancelBtn = _cancelBtn;
+    repostBtn = _repostBtn;
+    proofBtn = _proofBtn;
+    noteL = _noteL;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 Transactions::Transactions(QWidget *parent) :
     core::NavWnd(parent),
     ui(new Ui::Transactions)
@@ -56,15 +68,11 @@ Transactions::Transactions(QWidget *parent) :
                       this, &Transactions::onSgnNodeStatus, Qt::QueuedConnection);
     QObject::connect( wallet, &bridge::Wallet::sgnNewNotificationMessage,
                       this, &Transactions::onSgnNewNotificationMessage, Qt::QueuedConnection);
-
-    ui->transactionTable->setHightlightColors(QColor(255,255,255,51), QColor(255,255,255,153) ); // Alpha: 0.2  - 0.6
-    // Alpha delta for row stripe coloring. Range 0-255
-    ui->transactionTable->setStripeAlfaDelta( 5 ); // very small number
+    QObject::connect(ui->transactionTable, &control::RichVBox::onItemActivated,
+                     this, &Transactions::onItemActivated, Qt::QueuedConnection);
 
     ui->progress->initLoader(true);
     ui->progressFrame->hide();
-
-    initTableHeaders();
 
     onSgnWalletBalanceUpdated();
     requestTransactions();
@@ -75,131 +83,234 @@ Transactions::Transactions(QWidget *parent) :
 
 Transactions::~Transactions()
 {
-    mwc::setRepostId(-1);
-    saveTableHeaders();
     delete ui;
 }
 
-void Transactions::initTableHeaders() {
-
-    // Disabling to show the grid
-    // Creatign columns
-    QVector<int> widths = config->getColumnsWidhts("TransTblColWidth");
-    if ( widths.size() != 8 ) {
-        widths = QVector<int>{30,90,100,200,160,90,70,90};
-    }
-    Q_ASSERT( widths.size() == 8 );
-
-    ui->transactionTable->setColumnWidths( widths );
-}
-
-void Transactions::saveTableHeaders() {
-    config->updateColumnsWidhts("TransTblColWidth", ui->transactionTable->getColumnWidths());
-}
-
-int Transactions::calcPageSize() const {
-    QSize sz1 = ui->transactionTable->size();
-    QSize sz2 = ui->progressFrame->size();
-
-    return ListWithColumns::getNumberOfVisibleRows( std::max(sz1.height(), sz2.height()) );
-}
-
-void Transactions::on_prevBtn_clicked()
-{
-    if (currentPagePosition > 0) {
-        int pageSize = calcPageSize();
-        currentPagePosition = std::max( 0, currentPagePosition-pageSize );
-        updateData();
-    }
-}
-
-void Transactions::on_nextBtn_clicked()
-{
-    if (currentPagePosition + shownTrans.size() < allTrans.size()) {
-        int pageSize = calcPageSize();
-        currentPagePosition = std::min( allTrans.size()-pageSize, currentPagePosition+pageSize );
-        updateData();
-    }
-}
-
 void Transactions::updateData() {
-    ui->nextBtn->setEnabled(false);
-    ui->prevBtn->setEnabled(false);
-    shownTrans.clear();
-    ui->transactionTable->clearData();
-    int pageSize = calcPageSize();
+    ui->transactionTable->clearAll();
 
-    updateButtons();
+    QDateTime current = QDateTime::currentDateTime();
+    int expectedConfirmNumber = config->getInputConfirmationNumber();
+    QString currentAccount = ui->accountComboBox->currentData().toString();
 
-    if (currentPagePosition <0 || allTrans.size()<=0 || pageSize<=0) {
-        ui->pageLabel->setText("");
+    int txCnt = 0;
+
+    for ( int idx = allTrans.size()-1; idx>=0 && txCnt<200; idx--, txCnt++) {
+        TransactionData &tr = allTrans[idx];
+        const wallet::WalletTransaction &trans = tr.trans;
+
+        // if the node is online and in sync, display the number of confirmations instead of time
+        // trans.confirmationTime format: 2020-10-13 04:36:54
+        // Expected: Jan 2, 2020 / 2:07am
+        QString txTimeStr = trans.confirmationTime;
+        if (txTimeStr.isEmpty() || txTimeStr == "None")
+            txTimeStr = trans.creationTime;
+
+        QDateTime txTime = QDateTime::fromString(txTimeStr, "HH:mm:ss dd-MM-yyyy");
+        txTimeStr = txTime.toString("MMM d, yyyy / H:mmap");
+        bool blocksPrinted = false;
+        if (trans.confirmed && nodeHeight > 0 && trans.height > 0) {
+            int needConfirms = trans.isCoinbase() ? mwc::COIN_BASE_CONFIRM_NUMBER : expectedConfirmNumber;
+            // confirmations are 1 more than the difference between the node and transaction heights
+            int64_t confirmations = nodeHeight - trans.height + 1;
+            if (needConfirms >= confirmations) {
+                txTimeStr = "(" + QString::number(confirmations) + "/" + QString::number(needConfirms) + " blocks)";
+                blocksPrinted = true;
+            }
+        }
+
+        control::RichItem *itm = control::createMarkedItem(QString::number(idx), ui->transactionTable,
+                                                           trans.canBeCancelled());
+
+        { // First line
+            itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
+            // Adding Icon and a text
+            itm->addWidget( control::crateLabel(itm, false, false, "#" + QString::number(trans.txIdx + 1)) ).addFixedHSpacer(10);
+
+            if (trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::CANCELLED) {
+                itm->addWidget(control::createIcon(itm, ":/img/iconClose@2x.svg", control::ROW_HEIGHT,
+                                                   control::ROW_HEIGHT))
+                        .addWidget(control::crateLabel(itm, false, false, "Cancelled"));
+            } else if (!trans.confirmed) {
+                itm->addWidget(control::createIcon(itm, ":/img/iconUnconfirmed@2x.svg", control::ROW_HEIGHT,
+                                                   control::ROW_HEIGHT))
+                        .addWidget(control::crateLabel(itm, false, false, "Unconfirmed"));
+            } else if (trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::SEND) {
+                itm->addWidget(control::createIcon(itm, ":/img/iconSent@2x.svg", control::ROW_HEIGHT,
+                                                   control::ROW_HEIGHT))
+                        .addWidget(control::crateLabel(itm, false, false, "Sent"));
+            } else if (trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::RECEIVE) {
+                itm->addWidget(control::createIcon(itm, ":/img/iconReceived@2x.svg", control::ROW_HEIGHT,
+                                                   control::ROW_HEIGHT))
+                        .addWidget(control::crateLabel(itm, false, false, "Received"));
+            } else if (trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::COIN_BASE) {
+                itm->addWidget(control::createIcon(itm, ":/img/iconCoinbase@2x.svg", control::ROW_HEIGHT,
+                                                   control::ROW_HEIGHT))
+                        .addWidget(control::crateLabel(itm, false, false, "CoinBase"));
+            } else {
+                Q_ASSERT(false);
+            }
+
+            // Update with time or blocks
+            itm->addSpacer().addWidget(control::crateLabel(itm, false, true, txTimeStr));
+
+            itm->pop();
+        } // First line
+
+        itm->addWidget(control::createHorzLine(itm));
+
+        control::RichButton *cancelBtn = nullptr;
+        control::RichButton *repostBtn = nullptr;
+
+        // Line with amount
+        {
+            QString amount = util::nano2one(trans.coinNano);
+
+            itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
+            itm->addWidget(control::crateLabel(itm, false, false, amount + " MWC", control::FONT_LARGE));
+
+            itm->addSpacer();
+
+            if (!blocksPrinted && nodeHeight > 0 && trans.height > 0) {
+                itm->addWidget(control::crateLabel(itm, false, true,
+                                                   "Conf: " + QString::number(nodeHeight - trans.height + 1)));
+            }
+            if (trans.canBeCancelled()) {
+                itm->addWidget(new control::RichButton(itm, "Cancel", 60, control::ROW_HEIGHT, "Cancel this transaction and unlock coins"));
+                cancelBtn = (control::RichButton *) itm->getCurrentWidget();
+                cancelBtn->setCallback(this, "Cancel:" + QString::number(idx));
+            }
+            // Can be reposted
+            if (trans.transactionType == wallet::WalletTransaction::TRANSACTION_TYPE::SEND && !trans.confirmed) {
+                itm->addWidget(new control::RichButton(itm, "Repost", 60, control::ROW_HEIGHT, "Report this transaction to the network"));
+                repostBtn = (control::RichButton *) itm->getCurrentWidget();
+                repostBtn->setCallback(this,
+                                       "Repost:" + QString::number(idx) + ":" + currentAccount);
+            }
+            itm->pop();
+        }
+
+        control::RichButton *proofBtn = nullptr;
+
+        // Line with ID
+        {
+            itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
+            itm->addWidget(control::crateLabel(itm, false, true, trans.txid, control::FONT_SMALL));
+            itm->addSpacer();
+            if (trans.proof) {
+                itm->addWidget(new control::RichButton(itm, "Proof", 60, control::ROW_HEIGHT,
+                                                       "Generate proof file for this transaction. Proof file can be validated by public at MWC Block Explorer"));
+                proofBtn = (control::RichButton *) itm->getCurrentWidget();
+                proofBtn->setCallback(this, "Proof:" + QString::number(idx));
+            }
+            itm->pop();
+        }
+
+
+        // Address field...
+        if (!trans.address.isEmpty()) {
+            itm->addWidget(control::crateLabel(itm, false, true, trans.address, control::FONT_SMALL));
+        }
+
+        // And the last optional line is comment
+        QString txnNote = config->getTxNote(trans.txid);
+
+        itm->addWidget(control::crateLabel(itm, true, false, txnNote));
+        QLabel *noteL = (QLabel *) itm->getCurrentWidget();
+        if (txnNote.isEmpty())
+            noteL->hide();
+
+        itm->apply();
+
+        tr.setBtns(itm, cancelBtn, repostBtn, proofBtn, noteL);
+
+        ui->transactionTable->addItem(itm);
+    }
+    ui->transactionTable->apply();
+}
+
+void Transactions::richButtonPressed(control::RichButton * button, QString coockie) {
+    Q_UNUSED(button);
+
+    QStringList res = coockie.split(':');
+    if (res.size()<2) {
+        Q_ASSERT(false);
         return;
     }
-    else {
-        int total = allTrans.size();
-        // Updating page status
-        if (total <= 1) {
-            ui->pageLabel->setText( QString::number(total) +
-                                    " of " + QString::number( total) );
-        }
-        else {
-            ui->pageLabel->setText( QString::number(currentPagePosition+1) + "-" + QString::number( std::min(currentPagePosition+pageSize-1+1, total) ) +
-                                " of " + QString::number( total) );
-        }
-        ui->nextBtn->setEnabled(currentPagePosition < total-pageSize);
-        ui->prevBtn->setEnabled(currentPagePosition>0);
 
-        // Updating tx table data
-        shownTrans.clear();
-        for (int i=currentPagePosition; i<allTrans.size() && pageSize>0; i++, pageSize-- ) {
-            shownTrans.push_back(allTrans[i]);
-        }
+    QString id = res[0];
+    int idx = res[1].toInt();
 
-        QDateTime current = QDateTime::currentDateTime();
-
-        ui->transactionTable->clearData();
-
-        int expectedConfirmNumber = config->getInputConfirmationNumber();
-
-        for ( int idx = shownTrans.size()-1; idx>=0; idx--) {
-            const wallet::WalletTransaction trans = shownTrans[idx];
-
-            double selection = 0.0;
-
-            if ( trans.canBeCancelled() ) {
-                int64_t age = trans.calculateTransactionAge(current);
-                // 1 hours is a 1.0
-                selection = age > 60 * 60 ?
-                            1.0 : (double(age) / double(60 * 60));
-            }
-
-            QString transConfirmedStr = trans.confirmed ? "YES" : "NO";
-            // if the node is online and in sync, display the number of confirmations instead
-            // nodeHeight will be 0 if the node is offline or out of sync
-            if (nodeHeight > 0 && trans.height > 0) {
-                int needConfirms = trans.isCoinbase() ? mwc::COIN_BASE_CONFIRM_NUMBER : expectedConfirmNumber;
-                // confirmations are 1 more than the difference between the node and transaction heights
-                int64_t confirmations = nodeHeight - trans.height + 1;
-                transConfirmedStr = QString::number(confirmations);
-                if (needConfirms >= confirmations) {
-                    transConfirmedStr += "/" + QString::number(needConfirms);
-                }
-            }
-
-            ui->transactionTable->appendRow( QVector<QString>{
-                    QString::number(  trans.txIdx+1 ),
-                    trans.getTypeAsStr(),
-                    trans.txid,
-                    trans.address,
-                    trans.creationTime,
-                    util::nano2one(trans.coinNano),
-                    transConfirmedStr,
-                    trans.height<=0 ? "" : QString::number(trans.height)
-            }, selection );
-        }
-
+    if (idx<0 || idx>=allTrans.size()) {
+        Q_ASSERT(false); // might happen during refresh.
+        return;
     }
+
+    wallet::WalletTransaction tx2process = allTrans[idx].trans;
+
+    if (id=="Cancel") {
+        util::TimeoutLockObject to("Transactions");
+
+        if (control::MessageBox::questionText(this, "Transaction cancellation",
+                                              "Are you sure you want to cancel transaction #" +
+                                              QString::number(tx2process.txIdx + 1) +
+                                              ", TXID " + tx2process.txid,
+                                              "No", "Yes",
+                                              "Keep my transaction, I am expecting it to be finalized",
+                                              "Continue and cancel the transaction, I am not expecting it to be finalized",
+                                              true, false) == core::WndManager::RETURN_CODE::BTN2) {
+
+            wallet->requestCancelTransacton(account, QString::number(tx2process.txIdx));
+        }
+    }
+    else if (id=="Repost") {
+        if (res.size()<3) {
+            Q_ASSERT(false);
+            return;
+        }
+        QString currentAccount = res[2];
+        wallet->repost( currentAccount, tx2process.txIdx, config->isFluffSet() );
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Processing repost for transaction #" + QString::number(tx2process.txIdx+1) );
+    }
+    else if ( id == "Proof" ) {
+        util::TimeoutLockObject to("Transactions");
+
+        if (!tx2process.proof) {
+            Q_ASSERT(false);
+            control::MessageBox::messageText(this, "Need info",
+                                             "Please select qualify transaction to generate a proof.");
+            return;
+        }
+
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Create transaction proof file"),
+                                                        config->getPathFor("Transactions"),
+                                                        tr("transaction proof (*.proof)"));
+
+        if (fileName.length() == 0)
+            return;
+        auto fileOk = util::validateMwc713Str(fileName);
+        if (!fileOk.first) {
+            core::getWndManager()->messageTextDlg("File Path",
+                                                  "This file path is not acceptable.\n" + fileOk.second);
+            return;
+        }
+
+        if (!fileName.endsWith(".proof"))
+            fileName += ".proof";
+
+        // Update path
+        QFileInfo flInfo(fileName);
+        config->updatePathFor("Transactions", flInfo.path());
+
+        wallet->generateTransactionProof(QString::number(tx2process.txIdx), fileName);
+    }
+    else {
+        // Unexpected id
+        Q_ASSERT(false);
+    }
+
 }
+
 
 void Transactions::onSgnTransactions( QString acc, QString height, QVector<QString> transactions) {
     Q_UNUSED(height)
@@ -211,15 +322,13 @@ void Transactions::onSgnTransactions( QString acc, QString height, QVector<QStri
     ui->transactionTable->show();
 
     account = acc;
-    shownTrans.clear();
     allTrans.clear();
 
     for (QString & t : transactions ) {
-        allTrans.push_back( wallet::WalletTransaction::fromJson(t) );
+        TransactionData dt;
+        dt.trans = wallet::WalletTransaction::fromJson(t);
+        allTrans.push_back( dt );
     }
-
-    int pageSize = calcPageSize();
-    currentPagePosition = std::max(0, allTrans.size() - pageSize);
 
     updateData();
 }
@@ -262,9 +371,7 @@ void Transactions::onSgnVerifyProofResult(bool success, QString fn, QString msg 
 
 void Transactions::requestTransactions() {
     allTrans.clear();
-    shownTrans.clear();
     nodeHeight = -1;
-    currentPagePosition = 0;
 
     QString account = ui->accountComboBox->currentData().toString();
     if (account.isEmpty())
@@ -272,28 +379,12 @@ void Transactions::requestTransactions() {
 
     ui->progressFrame->show();
     ui->transactionTable->hide();
-    ui->transactionTable->clearData();
+    ui->transactionTable->clearAll();
 
     // !!! Note, order is important even it is async. We want node status be processed first..
     wallet->requestNodeStatus(); // Need to know th height.
     wallet->requestTransactions(account, true);
     updateData();
-}
-
-// return null if nothing was selected
-wallet::WalletTransaction * Transactions::getSelectedTransaction() {
-    int row = ui->transactionTable->getSelectedRow();
-    if (row<0 || row>=shownTrans.size())
-        return nullptr;
-
-    return &shownTrans[ shownTrans.size()-1-row ];
-}
-
-void Transactions::updateButtons() {
-    wallet::WalletTransaction * selected = getSelectedTransaction();
-
-    ui->generateProofButton->setEnabled( selected!=nullptr && selected->proof );
-    ui->deleteButton->setEnabled( selected!=nullptr && selected->canBeCancelled() );
 }
 
 void Transactions::on_refreshButton_clicked()
@@ -323,41 +414,6 @@ void Transactions::on_validateProofButton_clicked()
     config->updatePathFor( "Transactions", flInfo.path());
 
     wallet->verifyTransactionProof(fileName);
-}
-
-void Transactions::on_generateProofButton_clicked()
-{
-    util::TimeoutLockObject to( "Transactions" );
-
-    wallet::WalletTransaction * selected = getSelectedTransaction();
-
-    if (! ( selected!=nullptr && selected->proof ) ) {
-        control::MessageBox::messageText(this, "Need info",
-                              "Please select qualify transaction to generate a proof.");
-        return;
-    }
-
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Create transaction proof file"),
-                            config->getPathFor("Transactions"),
-                            tr("transaction proof (*.proof)"));
-
-    if (fileName.length()==0)
-        return;
-    auto fileOk = util::validateMwc713Str(fileName);
-    if (!fileOk.first) {
-        core::getWndManager()->messageTextDlg("File Path",
-                                              "This file path is not acceptable.\n" + fileOk.second);
-        return;
-    }
-
-    if (!fileName.endsWith(".proof"))
-        fileName += ".proof";
-
-    // Update path
-    QFileInfo flInfo(fileName);
-    config->updatePathFor("Transactions", flInfo.path());
-
-    wallet->generateTransactionProof( QString::number(selected->txIdx), fileName );
 }
 
 void Transactions::on_exportButton_clicked()
@@ -392,7 +448,7 @@ void Transactions::on_exportButton_clicked()
     QStringList exportRecords;
 
     // retrieve the first transaction and get the CSV headers
-    wallet::WalletTransaction trans = allTrans[0];
+    const wallet::WalletTransaction & trans = allTrans[0].trans;
     QString csvHeaders = trans.getCSVHeaders();
     exportRecords << csvHeaders;
     QString csvValues = trans.toStringCSV();
@@ -400,7 +456,7 @@ void Transactions::on_exportButton_clicked()
 
     // now retrieve the remaining transactions and add them to our list
     for ( int idx=1; idx < allTrans.size(); idx++) {
-        wallet::WalletTransaction trans = allTrans[idx];
+        const wallet::WalletTransaction & trans = allTrans[idx].trans;
         QString csvValues = trans.toStringCSV();
         exportRecords << csvValues;
     }
@@ -422,36 +478,18 @@ void Transactions::on_exportButton_clicked()
     return;
 }
 
-void Transactions::on_transactionTable_itemSelectionChanged()
-{
-    wallet::WalletTransaction * selected = getSelectedTransaction();
-    if(selected!=nullptr) {
-
-        if(selected->transactionType == wallet::WalletTransaction::TRANSACTION_TYPE::SEND &&
-           !selected->confirmed) {
-            mwc::setRepostId(selected->txIdx);
-            mwc::setRepostAccount(ui->accountComboBox->currentData().toString());
-        }
-        else
-            mwc::setRepostId(-1);
+void Transactions::onItemActivated(QString itemId) {
+    int idx = itemId.toInt();
+    if (idx<0 || idx>=allTrans.size()) {
+        Q_ASSERT(false);
+        return;
     }
 
-    updateButtons();
-}
-
-void Transactions::on_transactionTable_cellDoubleClicked(int row, int column)
-{
-    Q_UNUSED(row);
-    Q_UNUSED(column);
-
-    wallet::WalletTransaction * selected = getSelectedTransaction();
     QString account = ui->accountComboBox->currentData().toString();
-
-    if (account.isEmpty() || selected==nullptr)
-        return;
+    const wallet::WalletTransaction & selected = allTrans[idx].trans;
 
     // respond will come at updateTransactionById
-    wallet->requestTransactionById(account, QString::number(selected->txIdx) );
+    wallet->requestTransactionById(account, QString::number(selected.txIdx) );
 
     ui->progressFrame->show();
     ui->transactionTable->hide();
@@ -493,8 +531,29 @@ void Transactions::onSgnTransactionById(bool success, QString account, QString h
 
     QString txnNote = config->getTxNote(transaction.txid);
     dlg::ShowTransactionDlg showTransDlg(this, account,  transaction, outputs, messages, txnNote);
-    connect(&showTransDlg, &dlg::ShowTransactionDlg::saveTransactionNote, this, &Transactions::saveTransactionNote);
-    showTransDlg.exec();
+    if (  showTransDlg.exec() == QDialog::Accepted ) {
+        if (txnNote != showTransDlg.getTransactionNote() ) {
+            txnNote = showTransDlg.getTransactionNote();
+            if (txnNote.isEmpty()) {
+                config->deleteTxNote(transaction.txid);
+            } else {
+                // add new note or update existing note for this commitment
+                config->updateTxNote(transaction.txid, txnNote);
+            }
+
+            // Updating the UI
+            for (const auto & tx : allTrans) {
+                if (tx.trans.txid == transaction.txid) {
+                    tx.noteL->setText(txnNote);
+                    if (txnNote.isEmpty())
+                        tx.noteL->hide();
+                    else
+                        tx.noteL->show();
+                }
+            }
+        }
+    }
+
 }
 
 void Transactions::on_accountComboBox_activated(int index)
@@ -504,31 +563,6 @@ void Transactions::on_accountComboBox_activated(int index)
     if (!account.isEmpty())
         wallet->switchAccount(account);
     requestTransactions();
-}
-
-void Transactions::on_deleteButton_clicked()
-{
-    util::TimeoutLockObject to( "Transactions" );
-    wallet::WalletTransaction * selected = getSelectedTransaction();
-
-    if (! ( selected!=nullptr && !selected->confirmed ) ) {
-        control::MessageBox::messageText(this, "Need info",
-                              "Please select qualify transaction to cancel.");
-        return;
-    }
-
-    wallet::WalletTransaction tx2del = *selected;
-
-    if ( control::MessageBox::questionText(this, "Transaction cancellation",
-            "Are you sure you want to cancel transaction #" + QString::number(tx2del.txIdx+1) +
-                               ", TXID " + tx2del.txid,
-                               "No", "Yes",
-                               "Keep my transaction, I am expecting it to be finalized",
-                               "Continue and cancel the transaction, I am not expecting it to be finalized",
-                               true, false) == core::WndManager::RETURN_CODE::BTN2 ) {
-
-        wallet->requestCancelTransacton( account, QString::number(tx2del.txIdx));
-    }
 }
 
 void Transactions::onSgnCancelTransacton(bool success, QString account, QString trIdxStr, QString errMessage) {
@@ -575,16 +609,6 @@ void Transactions::onSgnNewNotificationMessage(int level, QString message) // le
     Q_UNUSED(level)
     if (message.contains("Changing transaction")) {
         on_refreshButton_clicked();
-    }
-}
-
-void Transactions::saveTransactionNote(QString txUuid, QString note) {
-    if (note.isEmpty()) {
-        config->deleteTxNote(txUuid);
-    }
-    else {
-        // add new note or update existing note for this commitment
-        config->updateTxNote(txUuid, note);
     }
 }
 

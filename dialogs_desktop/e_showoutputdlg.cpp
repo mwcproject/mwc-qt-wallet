@@ -53,7 +53,6 @@ ShowOutputDlg::ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output
 
     commitment = output.outputCommitment;
 
-    originalOutputNote = note;
     newOutputNote = note;
     ui->outputNote->setText(newOutputNote);
 

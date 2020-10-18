@@ -86,10 +86,8 @@ ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,
 
     txUuid = transaction.txid;
     this->account = account;
-    originalTransactionNote = note;
     newTransactionNote = note;
     ui->transactionNote->setText(newTransactionNote);
-    updateButtons(false);
 }
 
 ShowTransactionDlg::~ShowTransactionDlg()
@@ -131,19 +129,6 @@ void ShowTransactionDlg::updateOutputData() {
     ui->out_tx->setText(out.txIdx<0 ? "None" : QString::number(out.txIdx+1) );
 }
 
-void ShowTransactionDlg::updateButtons(bool showNoteEditButtons) {
-    ui->saveButton->setEnabled(showNoteEditButtons);
-
-    // disable OK button if save is enabled
-    // forces the user to save any active changes to the note
-    if (showNoteEditButtons) {
-        ui->okButton->setEnabled(false);
-    }
-    else {
-        ui->okButton->setEnabled(true);
-    }
-}
-
 void ShowTransactionDlg::on_viewKernel_clicked()
 {
     util->openUrlInBrowser("https://" + blockExplorerUrl + "/#k" + ui->kernel->text() );
@@ -166,23 +151,13 @@ void ShowTransactionDlg::on_commitsComboBox_currentIndexChanged(int index)
 
 void ShowTransactionDlg::on_okButton_clicked()
 {
-    if (newTransactionNote != originalTransactionNote) {
-        emit saveTransactionNote( txUuid, newTransactionNote);
-    }
+    newTransactionNote = ui->transactionNote->text();
     accept();
 }
 
-void ShowTransactionDlg::on_transactionNote_textEdited(const QString& text) {
-    Q_UNUSED(text);
-    updateButtons(true);
-}
-
-void ShowTransactionDlg::on_saveButton_clicked() {
-    QString newNote = ui->transactionNote->text();
-    if (newNote != newTransactionNote) {
-        newTransactionNote = newNote;
-    }
-    updateButtons(false);
+void ShowTransactionDlg::on_cancelButton_clicked()
+{
+    reject();
 }
 
 }

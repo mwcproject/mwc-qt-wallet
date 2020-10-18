@@ -16,7 +16,7 @@
 
 namespace control {
 
-RichButton::RichButton(QWidget * parent, QString text, int cx, int cy) :
+RichButton::RichButton(QWidget * parent, QString text, int cx, int cy, QString tooltip) :
     QPushButton(parent)
 {
     // Lock the size...
@@ -24,6 +24,8 @@ RichButton::RichButton(QWidget * parent, QString text, int cx, int cy) :
     setMinimumSize( cx,cy );
 
     setText(text);
+
+    setToolTip(tooltip);
 
     QString style = "QPushButton"
                     " {"
