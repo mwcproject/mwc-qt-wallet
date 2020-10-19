@@ -58,7 +58,7 @@ void Events::updateShowMessages() {
     // Current implementaiton of the list with bunch of controls can't have too many items.
     // That is why we printing only first 200 elements.
     int msgNumber = 0;
-    for (int i=messages.size()/MSG_GROUP_SIZE-1; i>=0 && msgNumber < 200; i--, msgNumber++ ) {
+    for (int i=messages.size()/MSG_GROUP_SIZE-1; i>=0 && msgNumber < 5000; i--, msgNumber++ ) {
         QString timeShort = messages[i*MSG_GROUP_SIZE];
         QString timeLong = messages[i*MSG_GROUP_SIZE+1];
         QString levelShort = messages[i*MSG_GROUP_SIZE+2];

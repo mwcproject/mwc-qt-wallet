@@ -100,7 +100,7 @@ void Outputs::updateShownData() {
 
     qDebug() << "updating output table for " << total << " outputs";
     // Printing first 200 outputs. For normal usage 200 is enough. The re
-    for (int i = allData.size()-1; i >= std::max(0, allData.size()-200); i--) {
+    for (int i = allData.size()-1; i >= std::max(0, allData.size()-5000); i--) {
         auto &out = allData[i].output;
 
         // Data filtering was done on outputs request level. No need to filter out anything

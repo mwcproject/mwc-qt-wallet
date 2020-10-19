@@ -95,7 +95,7 @@ void Transactions::updateData() {
 
     int txCnt = 0;
 
-    for ( int idx = allTrans.size()-1; idx>=0 && txCnt<200; idx--, txCnt++) {
+    for ( int idx = allTrans.size()-1; idx>=0 && txCnt<5000; idx--, txCnt++) {
         TransactionData &tr = allTrans[idx];
         const wallet::WalletTransaction &trans = tr.trans;
 
