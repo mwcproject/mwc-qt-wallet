@@ -503,7 +503,6 @@ Item {
         nameFilters: ["MWC transaction (*.tx *.input);;All files (*.*)"]
         onAccepted: {
             var path = fileDialog.file.toString()
-            console.log("Accepted: " + path)
 
             const validation = util.validateMwc713Str(path)
             if (validation) {

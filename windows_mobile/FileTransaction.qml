@@ -205,7 +205,8 @@ Item {
                 }
             }
             rect_progress.visible = true
-            fileTransaction.ftContinue( transactionFileName, resTxFN, config.isFluffSet() )
+//            fileTransaction.ftContinue( transactionFileName, resTxFN, config.isFluffSet() )
+//            fileTransaction.ftContinue( "/mnt/user/0/primary/October-15-2020-19-52.tx", resTxFN, config.isFluffSet() )
         }
     }
 
