@@ -8,6 +8,7 @@ import WalletBridge 1.0
 Item {
     property string transactionFileName
     property string resTxFN
+    property bool isFinalize
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
@@ -30,9 +31,13 @@ Item {
         }
     }
 
-    function confirmationCallback() {
-        rect_progress.visible = true
-        fileTransaction.ftContinue( transactionFileName, resTxFN, config.isFluffSet() )
+    function confirmationCallback(ret) {
+        if (ret) {
+            rect_progress.visible = true
+            const filepath = decodeURIComponent(transactionFileName)
+            const path = "/mnt/user/0/primary/" + filepath.substring(filepath.search("primary:") + 8, filepath.length)
+            fileTransaction.ftContinue( path, resTxFN, config.isFluffSet() )
+        }
     }
 
     onVisibleChanged: {
@@ -46,7 +51,8 @@ Item {
             text_amount.text = params.amount + " MWC"
             text_txid.text = params.transactionId
             text_lockheight.text = params.lockHeight
-            text_message.text = message
+            text_message.text = params.message
+            isFinalize = params.isFinalize
         }
     }
 
@@ -197,16 +203,14 @@ Item {
                 messagebox.open(qsTr("Unable to finalize"), qsTr("Your MWC Node, that wallet connected to, is not ready to finalize transactions.\nMWC Node need to be connected to few peers and finish blocks synchronization process"))
                 return
             }
-            const walletPasswordHash = wallet.getPasswordHash();
+            const walletPasswordHash = wallet.getPasswordHash()
             if (walletPasswordHash !== "") {
-                if (fileTransaction.isFinalize()) {
+                if (isFinalize) {
                     sendConfirmationItem.open(qsTr("Confirm Finalize Request"), qsTr("You are finalizing transaction for " + text_amount.text), walletPasswordHash, confirmationCallback)
-                    return;
+                    return
                 }
             }
-            rect_progress.visible = true
-//            fileTransaction.ftContinue( transactionFileName, resTxFN, config.isFluffSet() )
-//            fileTransaction.ftContinue( "/mnt/user/0/primary/October-15-2020-19-52.tx", resTxFN, config.isFluffSet() )
+            confirmationCallback(true)
         }
     }
 

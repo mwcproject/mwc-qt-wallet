@@ -136,11 +136,11 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
 // QFileDialog::getSaveFileName call
 QString MobileWndManager::getSaveFileName(const QString &caption, const QString &dir, const QString &filter) {
     Q_UNUSED(caption)
+    Q_UNUSED(dir)
     Q_UNUSED(filter)
 
     QDateTime now;
-    QString fileName = dir + "/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm");
-//    this->messageTextDlg("Tx file Saved!", "File Path: " + fileName + ".tx");
+    QString fileName = "/mnt/user/0/primary/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm");
     return fileName;
 }
 
@@ -158,6 +158,7 @@ bool MobileWndManager::sendConfirmationDlg( QString title, QString message, doub
         }
         return mainWindow->property("sendConformationDlgResponse") == 1;
     }
+    return false;
 }
 
 // Stopping wallet message
@@ -244,6 +245,7 @@ void MobileWndManager::pageFileTransaction(QString pageTitle, QString callerId,
     obj["transactionId"] = transInfo.transactionId;
     obj["lockHeight"] = transInfo.lock_height > nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-";
     obj["message"] = transInfo.message;
+    obj["isFinalize"] = processButtonName == "Finalize";
 
     QVariant retValue;
     QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
@@ -257,6 +259,7 @@ void MobileWndManager::pageListening() {
 }
 void MobileWndManager::pageFinalize() {
     mainWindow->setProperty("currentState", state::STATE::FINALIZE);
+    mainWindow->setProperty("initParams", "");
 }
 void MobileWndManager::pageSendStarting() {
     mainWindow->setProperty("currentState", state::STATE::SEND);

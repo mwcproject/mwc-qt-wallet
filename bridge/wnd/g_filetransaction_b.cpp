@@ -16,7 +16,6 @@
 #include "../BridgeManager.h"
 #include "../../state/e_Receive.h"
 #include "../../state/g_Finalize.h"
-#include "../../core/global.h"
 
 #define CALL_STATE_METHOD( PREF, METHOD )  if (callerId == state::RECEIVE_CALLER_ID) {  \
     PREF ((state::Receive*) state::getState(state::STATE::RECEIVE_COINS))->METHOD;     \
@@ -62,10 +61,6 @@ void FileTransaction::updateResultTxPath(QString path){
 
 bool FileTransaction::isNodeHealthy() {
     CALL_STATE_METHOD( return ,isNodeHealthy())
-}
-
-bool FileTransaction::isFinalize() {
-    return mwc::isFinalize();
 }
 
 }

@@ -195,16 +195,16 @@ Window {
             visible: currentState === 9 && initParams.length === 0
         }
 
-        FileTransaction {
-            id: fileTransactionItem
-            anchors.fill: parent
-            visible: currentState === 9 && initParams.length !== 0
-        }
-
         Finalize {
             id: finalizeItem
             anchors.fill: parent
-            visible: currentState === 19
+            visible: currentState === 19 && initParams.length === 0
+        }
+
+        FileTransaction {
+            id: fileTransactionItem
+            anchors.fill: parent
+            visible: (currentState === 9 || currentState === 19) && initParams.length !== 0
         }
 
         Transactions {

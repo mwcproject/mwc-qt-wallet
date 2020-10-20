@@ -513,7 +513,6 @@ Item {
             path= path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/,"")
             // unescape html codes like '%23' for '#'
             const cleanPath = decodeURIComponent(path);
-            console.log("cleanPath: " + cleanPath)
             config.updatePathFor("fileGen", cleanPath)
             rect_progress.visible = true
             receive.signTransaction(fileDialog.file.toString())

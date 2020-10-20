@@ -4,6 +4,7 @@ import Qt.labs.platform 1.1
 import QtQuick.Window 2.0
 import FinalizeBridge 1.0
 import ConfigBridge 1.0
+import UtilBridge 1.0
 
 Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
@@ -15,6 +16,10 @@ Item {
 
     ConfigBridge {
         id: config
+    }
+
+    UtilBridge {
+        id: util
     }
 
     Image {
@@ -61,12 +66,9 @@ Item {
 
         onClicked: {
             if (!finalize.isNodeHealthy()) {
-//                control::MessageBox::messageText(this, "Unable to finalize", "Your MWC Node, that wallet connected to, is not ready to finalize transactions.\n"
-//                                                                             "MWC Node need to be connected to few peers and finish blocks synchronization process");
-                console.log("Unable to finalize", "Your MWC Node, that wallet connected to, is not ready to finalize transactions.\nMWC Node need to be connected to few peers and finish blocks synchronization process")
+                messagebox.open(qsTr("Unable to finalize"), qsTr("Your MWC Node, that wallet connected to, is not ready to finalize transactions.\nMWC Node need to be connected to few peers and finish blocks synchronization process"))
                 return
             }
-
             fileDialog.open()
         }
     }
@@ -77,27 +79,24 @@ Item {
         folder: config.getPathFor("fileGen")
         nameFilters: ["MWC response transaction (*.tx.response *.response);;All files (*.*)"]
         onAccepted: {
-            console.log("Accepted: " + fileDialog.file)
-            // Logic is implemented into This Window
-            // It is really wrong, but also we don't want to have special state for that.
-//            const fileName = QFileDialog::getOpenFileName(this, tr("Finalize transaction file"),
-//                                                            config->getPathFor("fileGen"),
-//                                                            tr("MWC response transaction (*.tx.response *.response);;All files (*.*)"));
+            var path = fileDialog.file.toString()
 
-//            if (fileName.length == 0)
-//                return;
-//            auto fileOk = util::validateMwc713Str(fileName);
-//            if (!fileOk.first) {
-//                core::getWndManager()->messageTextDlg("File Path",
-//                                                      "This file path is not acceptable.\n" + fileOk.second);
-//                return;
-//            }
-
-//            // Update path
-//            QFileInfo flInfo(fileName);
-//            config->updatePathFor("fileGen", flInfo.path());
-
-//            finalize->uploadFileTransaction(fileName);
+            const validation = util.validateMwc713Str(path)
+            if (validation) {
+                messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
+                return
+            }
+            // remove prefixed "file:///"
+            path= path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/,"")
+            // unescape html codes like '%23' for '#'
+            const cleanPath = decodeURIComponent(path);
+            config.updatePathFor("fileGen", cleanPath)
+            finalize.uploadFileTransaction(fileDialog.file.toString());
         }
+    }
+
+    MessageBox {
+        id: messagebox
+        anchors.verticalCenter: parent.verticalCenter
     }
 }

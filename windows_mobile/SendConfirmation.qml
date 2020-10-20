@@ -10,7 +10,7 @@ Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
-    height: dp(600)
+    height: text_message.height + dp(450)
     id: messagebox
     visible: false
     anchors.left: parent.left
