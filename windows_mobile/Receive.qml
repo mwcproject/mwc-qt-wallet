@@ -5,6 +5,7 @@ import QtQuick.Window 2.0
 import ConfigBridge 1.0
 import ReceiveBridge 1.0
 import WalletBridge 1.0
+import UtilBridge 1.0
 import Clipboard 1.0
 
 Item {
@@ -23,17 +24,20 @@ Item {
         id: wallet
     }
 
+    UtilBridge {
+        id: util
+    }
+
     Clipboard {
         id: clipboard
     }
 
     Connections {
         target: receive
-        onSgnTransactionActionIsFinished: {
+        onSgnTransactionActionIsFinished: (success, message) => {
             rect_progress.visible = false
             const title = success ? "Success" : "Failure"
             messagebox.open(qsTr(title), qsTr(message))
-            console.log(success, message)
         }
     }
 
@@ -498,10 +502,20 @@ Item {
         folder: config.getPathFor("fileGen")
         nameFilters: ["MWC transaction (*.tx *.input);;All files (*.*)"]
         onAccepted: {
-            console.log("Accepted: " + fileDialog.file)
-//            bridge.updateFileGenerationPath(fileDialog.file)
-//              rect_progress.visible = true
-//            receive.signTransaction(fileDialog.file)
+            var path = fileDialog.file.toString()
+
+            const validation = util.validateMwc713Str(path)
+            if (validation) {
+                messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
+                return
+            }
+            // remove prefixed "file:///"
+            path= path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/,"")
+            // unescape html codes like '%23' for '#'
+            const cleanPath = decodeURIComponent(path);
+            config.updatePathFor("fileGen", cleanPath)
+            rect_progress.visible = true
+            receive.signTransaction(fileDialog.file.toString())
         }
     }
 

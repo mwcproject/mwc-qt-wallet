@@ -119,7 +119,7 @@ WndManager::RETURN_CODE MobileWndManager::questionTextDlg( QString title, QStrin
 
     mainWindow->setProperty("questionTextDlgResponse", -1);
     QVariant retValue;
-    QMetaObject::invokeMethod(mainWindow, "openQuestionTextDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, btn1), Q_ARG(QVariant, btn2), Q_ARG(QVariant, passwordHash), Q_ARG(QVariant, blockButton == WndManager::RETURN_CODE::BTN1 ? 0 : 1), Q_ARG(QVariant, *ttl_blocks));
+    QMetaObject::invokeMethod(mainWindow, "openQuestionTextDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, btn1), Q_ARG(QVariant, btn2), Q_ARG(QVariant, blockButton == WndManager::RETURN_CODE::BTN1 ? 0 : 1), Q_ARG(QVariant, *ttl_blocks), Q_ARG(QVariant, passwordHash));
     while(mainWindow->property("questionTextDlgResponse") == -1) {
         QCoreApplication::processEvents();
         QThread::usleep(50);
@@ -139,18 +139,25 @@ QString MobileWndManager::getSaveFileName(const QString &caption, const QString 
     Q_UNUSED(dir)
     Q_UNUSED(filter)
 
-    Q_ASSERT(false); // implement me
-    return "";
+    QDateTime now;
+    QString fileName = "/mnt/user/0/primary/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm");
+    return fileName;
 }
 
 // Ask for confirmation
 bool MobileWndManager::sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) {
-    Q_UNUSED(title)
-    Q_UNUSED(message)
     Q_UNUSED(widthScale)
-    Q_UNUSED(passwordHash)
 
-    Q_ASSERT(false); // implement me
+    if(mainWindow) {
+        mainWindow->setProperty("sendConformationDlgResponse", -1);
+        QVariant retValue;
+        QMetaObject::invokeMethod(mainWindow, "openSendConfirmationDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, passwordHash));
+        while(mainWindow->property("sendConformationDlgResponse") == -1) {
+            QCoreApplication::processEvents();
+            QThread::usleep(50);
+        }
+        return mainWindow->property("sendConformationDlgResponse") == 1;
+    }
     return false;
 }
 
@@ -228,23 +235,31 @@ void MobileWndManager::pageFileTransaction(QString pageTitle, QString callerId,
                                      int nodeHeight,
                                      QString transactionType, QString processButtonName) {
     Q_UNUSED(pageTitle)
-    Q_UNUSED(callerId)
-    Q_UNUSED(fileName)
-    Q_UNUSED(transInfo)
-    Q_UNUSED(nodeHeight)
-    Q_UNUSED(transactionType)
-    Q_UNUSED(processButtonName)
 
-    Q_ASSERT(false); // implement me
+    QJsonObject obj;
+    obj["callerId"] = callerId;
+    obj["fileName"] = fileName;
+    obj["transactionType"] = transactionType;
+    obj["processButtonName"] = processButtonName;
+    obj["amount"] = util::nano2one(transInfo.amount);
+    obj["transactionId"] = transInfo.transactionId;
+    obj["lockHeight"] = transInfo.lock_height > nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-";
+    obj["message"] = transInfo.message;
+    obj["isFinalize"] = processButtonName == "Finalize";
+
+    QVariant retValue;
+    QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
 void MobileWndManager::pageRecieve() {
     mainWindow->setProperty("currentState", state::STATE::RECEIVE_COINS);
+    mainWindow->setProperty("initParams", "");
 }
 void MobileWndManager::pageListening() {
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageFinalize() {
     mainWindow->setProperty("currentState", state::STATE::FINALIZE);
+    mainWindow->setProperty("initParams", "");
 }
 void MobileWndManager::pageSendStarting() {
     mainWindow->setProperty("currentState", state::STATE::SEND);

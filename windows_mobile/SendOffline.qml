@@ -16,6 +16,7 @@ Item {
         amount = parseInt(initParams.amount)
         text_from_account.text = qsTr("From account: " + selectedAccount)
         text_amount_to_send.text = qsTr("Amount to send: " + ( amount < 0 ? "All" : util.nano2one(Number(amount).toString())) + " MWC" )
+        rect_progress.visible = false
     }
 
     UtilBridge {
@@ -28,8 +29,8 @@ Item {
 
     Connections {
         target: send
-        onSgnShowSendResult: {
-//            ui->progress->hide();
+        onSgnShowSendResult: (success, message) => {
+            rect_progress.visible = false
             messagebox.open(success ? "Success" : "Failure", message)
         }
     }
@@ -136,6 +137,7 @@ Item {
         }
 
         onClicked: {
+            settingsItem.visible = true
         }
     }
 
@@ -162,7 +164,7 @@ Item {
 
         onClicked: {
             if ( !send.isNodeHealthy() ) {
-                messagebox.open("Unable to send", "Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process")
+                messagebox.open(qsTr("Unable to send"), qsTr("Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process"))
                 return
             }
 
@@ -172,15 +174,36 @@ Item {
             if (valRes !== "") {
                 messagebox.open("Incorrect Input", valRes)
                 textarea_description.focus = true
-                return;
+                return
             }
 
             if (send.sendMwcOffline(selectedAccount, Number(amount).toString(), description)) {
-//                ui->progress->show();
-                console.log("Sending is in progress")
+                rect_progress.visible = true
             }
         }
     }
+
+    Rectangle {
+        id: rect_progress
+        width: dp(60)
+        height: dp(30)
+        anchors.top: button_send.bottom
+        anchors.topMargin: dp(50)
+        anchors.horizontalCenter: parent.horizontalCenter
+        color: "#00000000"
+        visible: false
+        AnimatedImage {
+            id: animation
+            source: "../img/loading.gif"
+        }
+    }
+
+    SendSettings {
+        id: settingsItem
+        anchors.verticalCenter: parent.verticalCenter
+        visible: false
+    }
+
 
     MessageBox {
         id: messagebox

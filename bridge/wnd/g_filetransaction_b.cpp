@@ -63,5 +63,4 @@ bool FileTransaction::isNodeHealthy() {
     CALL_STATE_METHOD( return ,isNodeHealthy())
 }
 
-
 }

@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
+import ConfigBridge 1.0
 import UtilBridge 1.0
 
 Item {
@@ -9,7 +10,7 @@ Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
-    height: text_message.height + dp(250)
+    height: text_message.height + dp(450)
     id: messagebox
     visible: false
     anchors.left: parent.left
@@ -17,43 +18,28 @@ Item {
     anchors.right: parent.right
     anchors.rightMargin: dp(25)
 
-    function open(title, message, isTwoButtons, noBtnText, yesBtnText, passwordHash, blockButton, _ttl_blocks, _callback) {
+    function open(title, message, passwordHash, _callback) {
         text_title.text = title
         text_message.text = message
-        if (isTwoButtons) {
-            text_yesbutton.text = yesBtnText
-            text_nobutton.text = noBtnText
-            button_ok.visible = false
-            button_yes.visible = true
-            button_no.visible = true
-            callback = _callback
-            blockingPasswordHash = ""
-            label_password.visible = false
-            textfield_password.visible = false
-            textfield_password.text = ""
-
-            if (passwordHash !== "") {
-                messagebox.height = text_message.height + dp(350)
-                text_message.anchors.verticalCenterOffset = dp(-50)
-                label_password.visible = true
-                textfield_password.visible = true
-                if (blockButton === 0) {
-                    button_no.enabled = false
-                } else {
-                    button_yes.enabled = false
-                }
-                blockingPasswordHash = passwordHash
-            }
-        } else {
-            button_ok.visible = true
-            button_yes.visible = false
-            button_no.visible = false
-        }
+        blockingPasswordHash = passwordHash
+        callback = _callback
         messagebox.visible = true
     }
 
     UtilBridge {
         id: util
+    }
+
+    ConfigBridge {
+        id: config
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            checkbox_fluff.checked = config.isFluffSet()
+            button_confirm.enabled = false
+            textfield_password.text = ""
+        }
     }
 
     Rectangle {
@@ -65,6 +51,13 @@ Item {
         anchors.topMargin: dp(1)
         border.width: dp(1)
         anchors.fill: parent
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                textfield_password.focus = false
+            }
+        }
 
         Image {
             id: image_close
@@ -88,10 +81,10 @@ Item {
             id: text_title
             text: qsTr("Title")
             font.bold: true
-            anchors.bottom: text_message.top
-            anchors.bottomMargin: dp(30)
+            anchors.top: parent.top
+            anchors.topMargin: dp(30)
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(20)
+            font.pixelSize: dp(24)
             color: "#3600c9"
         }
 
@@ -101,24 +94,76 @@ Item {
             anchors.leftMargin: dp(40)
             anchors.right: parent.right
             anchors.rightMargin: dp(40)
+            anchors.top: text_title.bottom
+            anchors.topMargin: dp(50)
             text: qsTr("Content")
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: dp(21)
+            font.pixelSize: dp(18)
             color: "#3600C9"
         }
 
-        Text {
-            id: label_password
-            visible: false
+        CheckBox {
+            id: checkbox_fluff
+            text: qsTr("Fluff the transaction")
+            font.pixelSize: dp(20)
             anchors.left: parent.left
             anchors.leftMargin: dp(40)
             anchors.right: parent.right
             anchors.rightMargin: dp(40)
             anchors.top: text_message.bottom
-            anchors.topMargin: dp(30)
+            anchors.topMargin: dp(50)
+
+            indicator: Rectangle {
+                implicitWidth: dp(20)
+                implicitHeight: dp(20)
+                x: checkbox_fluff.leftPadding
+                y: parent.height / 2 - height / 2
+
+                Image {
+                    width: dp(20)
+                    height: dp(20)
+                    anchors.fill: parent
+                    fillMode: Image.PreserveAspectFit
+                    source: checkbox_fluff.checked ? "../img/purpleCheckOn@2x.svg" : "../img/purpleCheckOff@2x.svg"
+                }
+            }
+
+            contentItem: Text {
+                text: checkbox_fluff.text
+                font: checkbox_fluff.font
+                color: "#3600C9"
+                verticalAlignment: Text.AlignVCenter
+                anchors.left: checkbox_fluff.indicator.right
+                anchors.leftMargin: checkbox_fluff.spacing
+            }
+
+        }
+
+        Text {
+            id: checkbox_note
+            anchors.left: parent.left
+            anchors.leftMargin: dp(40)
+            anchors.right: parent.right
+            anchors.rightMargin: dp(40)
+            anchors.top: checkbox_fluff.bottom
+            anchors.topMargin: dp(5)
+            text: qsTr("Note: Ignores Dandelion relay protocol and reduces anonymity of transactions")
+            verticalAlignment: Text.AlignVCenter
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            font.pixelSize: dp(16)
+            color: "#3600C9"
+        }
+
+        Text {
+            id: label_password
+            anchors.left: parent.left
+            anchors.leftMargin: dp(40)
+            anchors.right: parent.right
+            anchors.rightMargin: dp(40)
+            anchors.top: checkbox_note.bottom
+            anchors.topMargin: dp(20)
             text: qsTr("Input your password to continue:")
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -128,7 +173,6 @@ Item {
 
         TextField {
             id: textfield_password
-            visible: false
             height: dp(50)
             padding: dp(10)
             leftPadding: dp(20)
@@ -153,9 +197,9 @@ Item {
 
             onTextChanged: {
                 const ok = util.calcHSA256Hash(textfield_password.text) === blockingPasswordHash
-                button_yes.enabled = ok
+                button_confirm.enabled = ok
                 if (ok)
-                    button_yes.focus = true
+                    button_confirm.focus = true
             }
 
             MouseArea {
@@ -167,68 +211,43 @@ Item {
         }
 
         Button {
-            id: button_ok
-            width: dp(135)
-            height: dp(50)
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: dp(30)
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            background: Rectangle {
-                color: "#6F00D6"
-                radius: dp(5)
-                Text {
-                    text: qsTr("OK")
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: dp(18)
-                    color: "white"
-                }
-            }
-
-            onClicked: {
-                messagebox.visible = false
-            }
-        }
-
-        Button {
-            id: button_yes
+            id: button_confirm
             width: dp(135)
             height: dp(50)
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.right: parent.right
-            anchors.rightMargin: parent.width / 2 - dp(150)
+            anchors.rightMargin: parent.width / 2 - dp(200)
 
             background: Rectangle {
-                color: button_yes.enabled ? "#6F00D6" : "white"
+                color: button_confirm.enabled ? "#6F00D6" : "white"
                 radius: dp(5)
                 border.width: dp(2)
-                border.color: button_yes.enabled ? "#6F00D6" : "gray"
+                border.color: button_confirm.enabled ? "#6F00D6" : "gray"
                 Text {
-                    id: text_yesbutton
-                    text: qsTr("Yes")
+                    text: qsTr("Confirm")
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.pixelSize: dp(18)
-                    color: button_yes.enabled ? "white" : "gray"
+                    color: button_confirm.enabled ? "white" : "gray"
                 }
             }
 
             onClicked: {
+                config.setFluff(checkbox_fluff.checked)
                 messagebox.visible = false
                 callback(true)
             }
         }
 
         Button {
-            id: button_no
+            id: button_decline
             width: dp(135)
             height: dp(50)
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.left: parent.left
-            anchors.leftMargin: parent.width / 2 - dp(150)
+            anchors.leftMargin: parent.width / 2 - dp(200)
 
             background: Rectangle {
                 color: "#ffffff"
@@ -236,8 +255,7 @@ Item {
                 border.width: dp(2)
                 border.color: "#3600C9"
                 Text {
-                    id: text_nobutton
-                    text: qsTr("No")
+                    text: qsTr("Decline")
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.pixelSize: dp(18)

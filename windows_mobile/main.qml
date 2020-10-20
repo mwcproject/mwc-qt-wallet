@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.13
+import Qt.labs.platform 1.1
 import CoreWindowBridge 1.0
 
 Window {
@@ -10,8 +11,9 @@ Window {
     
     property int currentState
     property string initParams
-    property int questionTextDlgResponse
     property int ttl_blocks
+    property int questionTextDlgResponse
+    property int sendConformationDlgResponse
 
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
@@ -67,7 +69,7 @@ Window {
         }
     }
 
-    function openQuestionTextDlg(title, message, noBtnText, yesBtnText, passwordHash, blockButton, _ttl_blocks) {
+    function openQuestionTextDlg(title, message, noBtnText, yesBtnText, blockButton, _ttl_blocks, passwordHash = "") {
         messagebox.open(title, message, true, noBtnText, yesBtnText, passwordHash, blockButton, _ttl_blocks, questionTextDlgCallback)
     }
 
@@ -81,6 +83,18 @@ Window {
 
     function openMessageTextDlg(title, message) {
         messagebox.open(title, message)
+    }
+
+    function sendConfirmationDlgCallback(ret) {
+        if (ret) {
+            sendConformationDlgResponse = 1
+        } else {
+            sendConformationDlgResponse = 0
+        }
+    }
+
+    function openSendConfirmationDlg(title, message, passwordHash) {
+        sendConfirmationItem.open(title, message, passwordHash, sendConfirmationDlgCallback)
     }
 
     Rectangle
@@ -178,13 +192,19 @@ Window {
         Receive {
             id: receiveItem
             anchors.fill: parent
-            visible: currentState === 9
+            visible: currentState === 9 && initParams.length === 0
         }
 
         Finalize {
             id: finalizeItem
             anchors.fill: parent
-            visible: currentState === 19
+            visible: currentState === 19 && initParams.length === 0
+        }
+
+        FileTransaction {
+            id: fileTransactionItem
+            anchors.fill: parent
+            visible: (currentState === 9 || currentState === 19) && initParams.length !== 0
         }
 
         Transactions {
@@ -197,6 +217,11 @@ Window {
             id: notificationsItem
             anchors.fill: parent
             visible: currentState === 6
+        }
+
+        SendConfirmation {
+            id: sendConfirmationItem
+            anchors.verticalCenter: parent.verticalCenter
         }
     }
 

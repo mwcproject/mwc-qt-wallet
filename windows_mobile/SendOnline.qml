@@ -28,21 +28,21 @@ Item {
 
     Connections {
         target: send
-        onSgnShowSendResult: {
+        onSgnShowSendResult: (success, message) => {
+            rect_progress.visible = false
             if (success) {
-//                control::MessageBox::messageText(this, "Success", "Your MWC was successfully sent to recipient");
-                console.log("Success", "Your MWC was successfully sent to recipient")
+                messagebox.open(qsTr("Success"), qsTr("Your MWC was successfully sent to recipient"))
                 textfield_send_to.text = ""
                 textarea_description.text = ""
-                return;
+            } else {
+                messagebox.open(qsTr("Send request failed"), qsTr(message))
             }
-//            control::MessageBox::messageText( this, "Send request failed", message );
-            console.log("Send request failed", message)
         }
     }
 
     onVisibleChanged: {
         if (visible) {
+            rect_progress.visible = false
             textfield_api_secret.visible = false
         }
     }
@@ -258,6 +258,7 @@ Item {
         }
 
         onClicked: {
+            settingsItem.visible = true
         }
     }
 
@@ -284,9 +285,7 @@ Item {
 
         onClicked: {
             if ( !send.isNodeHealthy() ) {
-//                control::MessageBox::messageText(this, "Unable to send", "Your MWC Node, that wallet connected to, is not ready.\n"
-//                                                                             "MWC Node needs to be connected to a few peers and finish block synchronization process");
-                console.log("Unable to send", "Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process")
+                messagebox.open(qsTr("Unable to send"), qsTr("Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process"))
                 return
             }
 
@@ -294,16 +293,13 @@ Item {
 
             let valRes = util.validateMwc713Str(sendTo)
             if (valRes !== "") {
-//                control::MessageBox::messageText(this, "Incorrect Input", valRes);
-                console.log("Incorrect Input", valRes)
+                messagebox.open(qsTr("Incorrect Input"), qsTr(valRes))
                 textfield_send_to.focus = true
                 return
             }
 
             if (sendTo.length === 0 ) {
-//                control::MessageBox::messageText(this, "Incorrect Input",
-//                                             "Please specify a valid address." );
-                console.log("Incorrect Input", "Please specify a valid address.")
+                messagebox.open(qsTr("Incorrect Input"), qsTr("Please specify a valid address."))
                 textfield_send_to.focus = true
                 return
             }
@@ -312,8 +308,7 @@ Item {
 
             valRes = util.validateMwc713Str(description);
             if (valRes !== "") {
-//                control::MessageBox::messageText(this, "Incorrect Input", valRes);
-                console.log("Incorrect Input", valRes)
+                messagebox.open(qsTr("Incorrect Input"), qsTr(valRes))
                 textarea_description.focus = true
                 return;
             }
@@ -321,16 +316,40 @@ Item {
             const apiSecret = textfield_api_secret.text;
             valRes = util.validateMwc713Str(apiSecret);
             if (valRes !== "") {
-//                control::MessageBox::messageText(this, "Incorrect Input", valRes);
-                console.log("Incorrect Input", valRes)
+                messagebox.open(qsTr("Incorrect Input"), qsTr(valRes))
                 textfield_api_secret.focus = true
                 return
             }
 
             if (send.sendMwcOnline(account, Number(amount).toString(), sendTo, apiSecret, description)) {
-//                ui->progress->show();
-                console.log("Sending is in progress")
+                rect_progress.visible = true
             }
         }
+    }
+
+    Rectangle {
+        id: rect_progress
+        width: dp(60)
+        height: dp(30)
+        anchors.top: button_send.bottom
+        anchors.topMargin: dp(50)
+        anchors.horizontalCenter: parent.horizontalCenter
+        color: "#00000000"
+        visible: false
+        AnimatedImage {
+            id: animation
+            source: "../img/loading.gif"
+        }
+    }
+
+    SendSettings {
+        id: settingsItem
+        anchors.verticalCenter: parent.verticalCenter
+        visible: false
+    }
+
+    MessageBox {
+        id: messagebox
+        anchors.verticalCenter: parent.verticalCenter
     }
 }

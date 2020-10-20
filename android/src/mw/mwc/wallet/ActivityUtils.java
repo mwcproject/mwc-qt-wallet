@@ -1,5 +1,7 @@
 package mw.mwc.wallet;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -8,7 +10,9 @@ import android.content.IntentFilter;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.net.Uri;
-
+import android.support.v4.content.ContextCompat; 
+import android.widget.Toast; 
+import android.content.pm.PackageManager;
 // import java.util.Timer;
 // import java.util.TimerTask;
 
@@ -39,8 +43,19 @@ public class ActivityUtils {
         }
         context.startActivity(intent);
 
+        checkPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, 100);
+
         Log.i(TAG, "ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS permissions are requested");
     }
+    
+    // Function to check and request permission. 
+    public void checkPermission(Context context, String permission, int requestCode) 
+    {
+        if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_DENIED) { 
+            // Requesting the permission 
+            ((Activity)context).requestPermissions(new String[] { permission }, requestCode); 
+        } 
+    } 
 
     private BroadcastReceiver serviceMessageReceiver = new BroadcastReceiver() {
         @Override
