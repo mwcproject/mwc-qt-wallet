@@ -83,7 +83,7 @@ void SelectContact::updateContactTable(const QString & searchStr) {
         QString address = contactPairs[k];
         if ( searchStr.isEmpty() || name.contains( searchStr ) ) {
             ui->contactsTable->appendRow(QVector<QString>{
-                    QString::number( contacts.size()),
+                    QString::number( contacts.size()+1),
                     name,
                     address
             });
@@ -138,11 +138,10 @@ void SelectContact::on_deleteButton_clicked()
 
     core::ContactRecord contact2del = contacts[idx];
 
-    if (control::MessageBox::questionText(this, "Remove a contact", "Remove the selected contact for " + contact2del.name +
-                              "? Press 'Yes' to delete.",
+    if (control::MessageBox::questionText(this, "Remove a contact", "Are you sure, you want to remove the contact " + contact2del.name + "?",
                               "Yes", "No",
-                              "Continue and delete the contact",
-                              "Cancel and keep my contact",
+                              "Delete the contact",
+                              "Keep the contact",
                               false,true) == core::WndManager::RETURN_CODE::BTN1 ) {
         QString err = config->deleteContact(contact2del.name, contact2del.address);
         if (!err.isEmpty())
