@@ -52,6 +52,7 @@ FileTransaction::FileTransaction(QWidget *parent,
     ui->mwcLabel->setText( util::nano2one( transInfo.amount ) + " MWC" );
     ui->transactionIdLabel->setText(transInfo.transactionId);
     ui->lockHeightLabel->setText( transInfo.lock_height>nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-" );
+    ui->receiverAddressLabel->setText(transInfo.receiverAddress.isEmpty() ? "-" : transInfo.receiverAddress);
     ui->message->setText( transInfo.message );
 
     if (!fileTransaction->needResultTxFileName()) {

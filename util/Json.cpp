@@ -124,6 +124,9 @@ QPair<bool, QString> FileTransactionInfo::parseTransaction( QString fn, FileTran
     if (! (ok1 && ok2 && ok3 && ok4 && !transactionId.isEmpty() && amount>0 && fee>0 && height>0 && lock_height>=0) )
         return  QPair<bool, QString>(false, "Content of the file " + fn + " is non complete MWC slate. Transaction details are not found.");
 
+    // Looking for the receiver address
+    receiverAddress = readValueFromJson( json, "payment_proof.receiver_address" ).toString();
+
     // Same for v0, v1 & v2
     QJsonArray participant_data = readValueFromJson( json, "participant_data" ).toArray();
     int pdSz = participant_data.size();

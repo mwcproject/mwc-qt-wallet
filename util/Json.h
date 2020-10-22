@@ -38,6 +38,7 @@ struct FileTransactionInfo {
     QString transactionId;
     int64_t amount; // nanos
     int64_t fee;    // nanos
+    QString receiverAddress;
     QString message;
     int     height;
     int     lock_height;
