@@ -440,9 +440,9 @@ p, li { white-space: pre-wrap; }
        <widget class="control::MwcLabelNormal" name="label_9">
         <property name="geometry">
          <rect>
-          <x>104</x>
+          <x>84</x>
           <y>200</y>
-          <width>131</width>
+          <width>151</width>
           <height>20</height>
          </rect>
         </property>
