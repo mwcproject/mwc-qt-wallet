@@ -316,6 +316,13 @@ public:
     //                       QString error );
     virtual void performAutoSwapStep( QString swapId ) override;
 
+    // Backup/export swap trade data file
+    // Check Signal: onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage)
+    virtual void backupSwapTradeData(QString swapId, QString backupFileName) override;
+
+    // Restore/import swap trade from the file
+    // Check Signal: onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
+    virtual void restoreSwapTradeData(QString filename) override;
 public:
     // launch exit command.
     void launchExitCommand();
@@ -446,6 +453,9 @@ public:
     // Notificaiton that nee Swap trade offer was recieved.
     void notifyAboutNewSwapTrade(QString currency, QString swapId);
 
+    void setBackupSwapTradeData(QString swapId, QString backupFileName, QString errorMessage);
+
+    void setRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
 private:
 
 

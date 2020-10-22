@@ -203,6 +203,9 @@ public:
     bool getNotificationWindowsEnabled() { return notificationWindowsEnabled; }
     void setNotficationWindowsEnabled(bool enable);
 
+    // Index of the open tab at the swap page.
+    int getSwapTabSelection() const {return swapTabSselection;}
+    void setSwapTabSelection(int sel) {swapTabSselection=sel;}
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -296,6 +299,8 @@ private:
     // right hand corner of the wallet is enabled by default
     bool notificationWindowsEnabled = true;
 
+    // Selected tab at the swap list page
+    int swapTabSselection = 0;
 };
 
 template <class T>

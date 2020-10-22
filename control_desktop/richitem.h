@@ -42,6 +42,7 @@ public:
     RichItem & setWidgetStyleSheet(QString styleSheet);
     RichItem & setFixedWidth(int cx);
     RichItem & setFixedHeight(int cy);
+    RichItem & setMinWidth(int cx);
     RichItem & setText(const QString & text);
     RichItem & addSpacer();
     RichItem & addFixedHSpacer(int cx);
@@ -76,7 +77,7 @@ private:
 RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked );
 
 // Create a lable with a text
-QLabel *  crateLabel( control::RichItem * parent, bool wordwrap, bool lowLight, QString text, int fontSize = FONT_NORMAL );
+QLabel *  createLabel( control::RichItem * parent, bool wordwrap, bool lowLight, QString text, int fontSize = FONT_NORMAL );
 
 // Create a lable with an icon
 QLabel *  createIcon( control::RichItem * parent, QString pixmapPath, int cx, int cy );

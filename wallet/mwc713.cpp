@@ -882,6 +882,18 @@ void MWC713::performAutoSwapStep( QString swapId ) {
     eventCollector->addTask( new TaskPerformAutoSwapStep(this, swapId), TaskPerformAutoSwapStep::TIMEOUT );
 }
 
+// Backup/export swap trade data file
+// Check Signal: onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage)
+void MWC713::backupSwapTradeData(QString swapId, QString backupFileName) {
+    eventCollector->addTask( new TaskBackupSwapTradeData(this, swapId, backupFileName), TaskBackupSwapTradeData::TIMEOUT );
+}
+
+// Restore/import swap trade from the file
+// Check Signal: onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
+void MWC713::restoreSwapTradeData(QString filename) {
+    eventCollector->addTask( new TaskRestoreSwapTradeData(this, filename), TaskRestoreSwapTradeData::TIMEOUT );
+}
+
 
 // -------------- Transactions
 
@@ -1528,6 +1540,15 @@ void MWC713::notifyAboutNewSwapTrade(QString currency, QString swapId) {
     emit onNewSwapTrade(currency, swapId);
 }
 
+void MWC713::setBackupSwapTradeData(QString swapId, QString backupFileName, QString errorMessage) {
+    logger::logEmit( "MWC713", "onBackupSwapTradeData", swapId + ", " + backupFileName + ", " + errorMessage );
+    emit onBackupSwapTradeData(swapId, backupFileName, errorMessage);
+}
+
+void MWC713::setRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage) {
+    logger::logEmit( "MWC713", "onRestoreSwapTradeData", swapId + ", " + importedFilename + ", " + errorMessage );
+    emit onRestoreSwapTradeData( swapId, importedFilename, errorMessage );
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 //      mwc713  IOs

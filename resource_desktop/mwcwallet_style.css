@@ -65,7 +65,7 @@ QToolButton:pressed {
 }
 
 QToolButton:checked {
-    background-color: #5800dd;
+    background: rgba(255, 255, 255, 0.3);
 }
 
 QToolButton::disabled {
@@ -75,6 +75,29 @@ QToolButton::disabled {
 QToolButton:enabled:!checked::hover
 {
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* --------------------------------- */
+control--MwcToolButtonUnderscore {
+    background-color: transparent;
+    border-radius: 0px;
+    border: none;
+    font-size: 15px;
+    font-weight: 400;
+    color: white;
+}
+
+control--MwcToolButtonUnderscore:checked {
+    font-weight: 700;
+    background-color: transparent;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+control--MwcToolButtonUnderscore:enabled:!checked::hover
+{
+    background-color: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    border-top: 1px solid rgba(255, 255, 255, 0.0); /* need top to balance the text */
 }
 
 
@@ -598,12 +621,6 @@ control--NavPushButton:focus {
 control--NavPushButton:pressed {
     background: rgba(255, 255, 255, 0.35);
 }
-
-QToolButton:checked {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-
 
 control--NavMenuButton {
 

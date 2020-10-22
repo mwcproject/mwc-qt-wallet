@@ -61,6 +61,9 @@ QString mwc713time2ThisTime(QString mwc713TimeStr);
 // Convert timestamp to this wallet time.
 QString timestamp2ThisTime(int64_t timestamp);
 
+// Convert time interval in seconds into 2 sevel word description.
+QString interval2String(int64_t intervalSec, bool shortUnits, int tiers);
+
 // Validate string for acceptable symbols. mwc713 understand low ASCII synblos only. Need to verify that.
 QPair <bool, QString> validateMwc713Str(QString str, bool secureStr = false);
 

@@ -30,9 +30,9 @@ public:
 class RichButton : public QPushButton {
 Q_OBJECT
 public:
-    RichButton(QWidget * parent, QString text, int cx, int cy, QString tooltip);
+    RichButton(QWidget * parent, QString text, int cx, int cy, QString tooltip, int fontSize=10);
 
-    void setCallback(RichButtonPressCallback * pressCallback, const QString & cookie);
+    RichButton * setCallback(RichButtonPressCallback * pressCallback, const QString & cookie);
 
 private slots:
     void onClicked(bool checked);

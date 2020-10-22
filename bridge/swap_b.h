@@ -93,6 +93,14 @@ public:
 
     // Stop swap processing
     Q_INVOKABLE void stopAutoSwapTrade(QString swapId);
+
+    // Backup/export swap trade data into the file
+    // Respond with sgnBackupSwapTradeData
+    Q_INVOKABLE void backupSwapTradeData(QString swapId, QString backupFileName);
+
+    // Import/restore swap trade data from the file
+    // Respond with sgnRestoreSwapTradeData
+    Q_INVOKABLE void restoreSwapTradeData(QString filename);
 signals:
     // Result of deleteSwapTrade call.
     void sgnDeleteSwapTrade(QString swapId, QString error);
@@ -100,8 +108,8 @@ signals:
     // Result of cancelTrade. Ok - empty error.
     void sgnCancelTrade(QString swapId, QString error);
 
-    // Result comes in series of 6 item tuples:
-    // < <Info>, <Trade Id>, <State>, <Status>, <Date>, <secondary_address> >, ....
+    // Result comes in series of 9 item tuples:
+    // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <State>, <initiate_time_interval>, <expire_time_interval>  <secondary_address> >, ....
     void sgnSwapTradesResult( QVector<QString> trades );
 
     // Response from createNewSwapTrade, SwapId on OK,  errMsg on failure
@@ -147,6 +155,13 @@ signals:
     // needed action on the page level
     void sgnNewSwapTrade(QString currency, QString swapId);
 
+    // Respond from backupSwapTradeData
+    // On OK will get exportedFileName
+    void sgnBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage);
+
+    // Import/restore swap trade data from the file
+    // Respond from restoreSwapTradeData
+    void sgnRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
 private slots:
     void onRequestSwapTrades(QVector<wallet::SwapInfo> swapTrades);
     void onDeleteSwapTrade(QString swapId, QString errMsg);
@@ -164,6 +179,9 @@ private slots:
                                   QVector<wallet::SwapJournalMessage> tradeJournal);
 
     void onNewSwapTrade(QString currency, QString swapId);
+
+    void onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage);
+    void onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
 
 };
 

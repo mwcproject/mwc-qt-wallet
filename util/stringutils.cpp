@@ -238,6 +238,55 @@ QString timestamp2ThisTime(int64_t timestamp) {
     return res;
 }
 
+// Convert time interval in seconds into 2 sevel word description.
+QString interval2String(int64_t intervalSec, bool shortUnits, int tiers) {
+    if (tiers<=0 || intervalSec<=0)
+        return "";
+
+    int64_t days = intervalSec / (3600*24);
+    int64_t hrs = intervalSec / 3600;
+    int64_t min = intervalSec / 60;
+    QString res;
+    if (days>0) {
+        res = QString::number(days);
+         if (shortUnits) {
+             res += "d";
+         }
+         else {
+             res += " day";
+             if (days > 1)
+                 res += "s";
+         }
+
+        intervalSec %= (3600*24);
+    }
+    else if (hrs>0) {
+        res = QString::number(hrs);
+        if (shortUnits) {
+            res += "h";
+        }
+        else {
+            res += " hr";
+            if (hrs > 1)
+                res += "s";
+        }
+        intervalSec %= 3600;
+    }
+    else if (min>0) {
+        res = QString::number(hrs) + (shortUnits ? "m" : " min");
+        intervalSec %= 60;
+    }
+    else {
+        res = QString::number(intervalSec) + (shortUnits ? "s" : " sec");
+        intervalSec = 0;
+    }
+
+    QString nextS = interval2String(intervalSec, shortUnits, tiers-1);
+    if (nextS.isEmpty())
+        return res;
+    else
+        return res + " " + nextS;
+}
 
 QPair <bool, QString> validateMwc713Str(QString str, bool secureStr) {
     QString nonAsciiChars;

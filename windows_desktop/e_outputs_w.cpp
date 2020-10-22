@@ -132,7 +132,7 @@ void Outputs::updateShownData() {
                 Q_ASSERT(false);
             }
 
-            itm->addWidget(control::crateLabel(itm, false, false, out.status));
+            itm->addWidget(control::createLabel(itm, false, false, out.status));
             itm->addSpacer();
 
             bool hok = false;
@@ -141,11 +141,11 @@ void Outputs::updateShownData() {
             int lockH = out.lockedUntil.toInt(&lok);
 
             if (hok) {
-                itm->addWidget(control::crateLabel(itm, false, true, "Block: " + out.blockHeight));
+                itm->addWidget(control::createLabel(itm, false, true, "Block: " + out.blockHeight));
             }
             if (lok && hok && lockH > height) {
                 itm->addFixedHSpacer(control::LEFT_MARK_SPACING).addWidget(
-                        control::crateLabel(itm, false, true, "Lock Height: " + out.lockedUntil));
+                        control::createLabel(itm, false, true, "Lock Height: " + out.lockedUntil));
             }
             itm->pop();
         } // First line
@@ -165,7 +165,7 @@ void Outputs::updateShownData() {
                 lockL->hide();
             }
 
-            itm->addWidget( control::crateLabel(itm, false, false, util::nano2one(out.valueNano) + " MWC", control::FONT_LARGE));
+            itm->addWidget( control::createLabel(itm, false, false, util::nano2one(out.valueNano) + " MWC", control::FONT_LARGE));
             itm->addSpacer();
 
             // Add lock button if it is applicable
@@ -183,17 +183,17 @@ void Outputs::updateShownData() {
                 itm->addFixedHSpacer(control::ROW_HEIGHT);
             }
 
-            itm->addWidget( control::crateLabel(itm, false, true, "Conf: " + out.numOfConfirms));
+            itm->addWidget( control::createLabel(itm, false, true, "Conf: " + out.numOfConfirms));
 
             itm->pop();
         }
 
         // line with commit
-        itm->addWidget( control::crateLabel(itm, false, true, out.outputCommitment, control::FONT_SMALL) );
+        itm->addWidget( control::createLabel(itm, false, true, out.outputCommitment, control::FONT_SMALL) );
 
         // And the last optional line is comment
         QString outputNote = config->getOutputNote(out.outputCommitment);
-        itm->addWidget( control::crateLabel(itm, true, false,outputNote));
+        itm->addWidget( control::createLabel(itm, true, false,outputNote));
         QLabel * noteL = (QLabel *) itm->getCurrentWidget();
         if (outputNote.isEmpty())
             noteL->hide();
@@ -208,6 +208,7 @@ void Outputs::updateShownData() {
 }
 
 void Outputs::richButtonPressed(control::RichButton * button, QString coockie) {
+    Q_UNUSED(button)
     // cookie is index.
     int idx = coockie.toInt();
 

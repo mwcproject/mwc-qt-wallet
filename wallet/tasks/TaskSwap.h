@@ -195,6 +195,46 @@ private:
     QString swapId;
 };
 
+class TaskBackupSwapTradeData : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*2;
+
+    TaskBackupSwapTradeData( MWC713 *wallet713, const QString & _swapId, const QString & backupFileName ) :
+            Mwc713Task("TaskBackupSwapTradeData",
+                    "swap --trade_export \"" + backupFileName + "\"  -i " + _swapId,
+                    wallet713, ""),
+    swapId(_swapId) {}
+
+    virtual ~TaskBackupSwapTradeData() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    QString swapId;
+};
+
+class TaskRestoreSwapTradeData : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*3;
+
+    TaskRestoreSwapTradeData( MWC713 *wallet713, const QString & _fileName ) :
+            Mwc713Task("TaskBackupSwapTradeData",
+                       "swap --trade_import \"" + _fileName + "\"",
+                       wallet713, ""),
+            fileName(_fileName) {}
+
+    virtual ~TaskRestoreSwapTradeData() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    QString fileName;
+};
+
+
+
 }
 
 #endif //MWC_QT_WALLET_TASKSWAP_H

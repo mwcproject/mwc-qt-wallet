@@ -77,6 +77,12 @@ RichItem & RichItem::setFixedHeight(int cy) {
     return *this;
 }
 
+RichItem & RichItem::setMinWidth(int cx) {
+    Q_ASSERT(curWidget!=nullptr);
+    curWidget->setMinimumWidth(cx);
+    return *this;
+}
+
 RichItem & RichItem::setText(const QString & text) {
     Q_ASSERT(curWidget!=nullptr);
     ((QLabel *)curWidget)->setText(text);
@@ -153,7 +159,7 @@ RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked ) {
     return itm;
 }
 
-QLabel * crateLabel( control::RichItem * parent, bool wordwrap, bool lowLight, QString text, int fontSize ) {
+QLabel * createLabel( control::RichItem * parent, bool wordwrap, bool lowLight, QString text, int fontSize ) {
     QLabel * l = new QLabel(parent);
     l->setWordWrap(wordwrap);
     l->setStyleSheet( (lowLight ? ("color: " + control::LOW_LIGHT_COLOR + "; ") : "") + "border: transparent; background: transparent; font-size: " + QString::number(fontSize) + "px;");

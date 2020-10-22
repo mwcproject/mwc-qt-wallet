@@ -55,7 +55,7 @@ QVector<QString> Events::getWalletNotificationMessages() {
     QVector<QString> res;
     for (auto & msg : messages) {
         res.push_back(msg.time.toString("HH:mm:ss"));
-        res.push_back(msg.time.toString("ddd MMMM d yyyy HH:mm:ss"));
+        res.push_back(msg.time.toString("MMM d, yyyy / H:mm:ss ap"));
         res.push_back(msg.getLevelStr());
         res.push_back(msg.getLevelLongStr());
         res.push_back(msg.message);

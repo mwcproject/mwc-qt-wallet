@@ -25,8 +25,6 @@ class NavPushButton : public QToolButton {
     Q_OBJECT
 public:
     explicit NavPushButton(QWidget *parent = Q_NULLPTR);
-    explicit NavPushButton(const QString &text, QWidget *parent = Q_NULLPTR);
-    NavPushButton(const QIcon &icon, const QString &text, QWidget *parent = Q_NULLPTR);
     virtual ~NavPushButton() override;
 };
 

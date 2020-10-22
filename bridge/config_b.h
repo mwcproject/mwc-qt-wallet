@@ -146,6 +146,11 @@ public:
     // Check if notification windows are enabled
     Q_INVOKABLE bool getNotificationWindowsEnabled();
 
+    // Check if 'fluff' flag is set
+    Q_INVOKABLE int getSwapTabSelection();
+    // Update fluff flag value
+    Q_INVOKABLE void setSwapTabSelection(int selection);
+
 };
 
 }

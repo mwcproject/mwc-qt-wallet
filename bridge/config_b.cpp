@@ -311,4 +311,15 @@ bool Config::getNotificationWindowsEnabled() {
     return getAppContext()->getNotificationWindowsEnabled();
 }
 
+// Check if 'fluff' flag is set
+int Config::getSwapTabSelection() {
+    return getAppContext()->getSwapTabSelection();
+}
+
+// Update fluff flag value
+void Config::setSwapTabSelection(int selection) {
+    getAppContext()->setSwapTabSelection(selection);
+}
+
+
 }

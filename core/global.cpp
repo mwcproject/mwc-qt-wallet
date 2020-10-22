@@ -81,8 +81,6 @@ void closeApplication() {
 }
 #endif
 
-static int repostId = -1;
-static QString repostAccount;
 static bool finalize = false;
 
 bool isFinalize() {

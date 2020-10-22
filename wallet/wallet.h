@@ -333,7 +333,9 @@ struct WalletUtxoSignature {
 };
 
 struct SwapInfo {
-    QString info;
+    QString mwcAmount;
+    QString secondaryAmount;
+    QString secondaryCurrency;
     QString swapId;
     int64_t startTime = 0;
     QString state;
@@ -343,7 +345,8 @@ struct SwapInfo {
     bool    isSeller;
     QString secondaryAddress;
 
-    void setData( QString info, QString swapId, int64_t startTime, QString state, QString action,
+    void setData( QString mwcAmount, QString secondaryAmount, QString secondaryCurrency,
+                  QString swapId, int64_t startTime, QString state, QString action,
                   int64_t expiration, bool isSeller, QString secondaryAddress );
 };
 
@@ -698,6 +701,13 @@ public:
     //                       QString error );
     virtual void performAutoSwapStep( QString swapId ) = 0;
 
+    // Backup/export swap trade data file
+    // Check Signal: onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage)
+    virtual void backupSwapTradeData(QString swapId, QString backupFileName) = 0;
+
+    // Restore/import swap trade from the file
+    // Check Signal: onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
+    virtual void restoreSwapTradeData(QString filename) = 0;
 private:
 signals:
 
@@ -830,6 +840,12 @@ signals:
 
     // Notificaiton that nee Swap trade offer was recieved.
     void onNewSwapTrade(QString currency, QString swapId);
+
+    // Response from backupSwapTradeData
+    void onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage);
+
+    // Response from restoreSwapTradeData
+    void onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
 };
 
 }

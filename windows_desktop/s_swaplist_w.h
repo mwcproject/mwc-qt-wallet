@@ -16,6 +16,7 @@
 #define S_SWAPLIST_W_H
 
 #include "../core_desktop/navwnd.h"
+#include "../control_desktop/richbutton.h"
 
 namespace Ui {
 class SwapList;
@@ -23,45 +24,62 @@ class SwapList;
 
 namespace bridge {
 class Swap;
+class Config;
+}
+
+namespace control {
+class RichItem;
 }
 
 namespace wnd {
 
 struct SwapTradeInfo {
-    QString info;
+    bool    isSeller;
+    QString mwcAmount;
+    QString secondaryAmount;
+    QString secondaryCurrency;
     QString tradeId;
     QString state;
-    QString status;
-    QString date;
+    QString initiatedTimeInterval; // String format as Brent defines it. It has special format
+    QString expirationTimeInterval;
     QString secondary_address;
 
     SwapTradeInfo() = default;
     SwapTradeInfo(const SwapTradeInfo & obj) = default;
     SwapTradeInfo & operator = (const SwapTradeInfo & obj) = default;
 
-    SwapTradeInfo(const QString & _info, const QString & _tradeId,
-                  const QString & _state,
-                  const QString & _status,
-                  const QString & _date,
-                  const QString & _secondary_address) :
-                  info(_info), tradeId(_tradeId), state(_state), status(_status), date(_date), secondary_address(_secondary_address) {}
+    SwapTradeInfo( bool _isSeller,
+                   const QString & _mwcAmount,
+                   const QString & _secondaryAmount,
+                   const QString & _secondaryCurrency,
+                   const QString & _tradeId,
+                   const QString & _state,
+                   const QString & _initiatedTimeInterval,
+                   const QString & _expirationTimeInterval,
+                   const QString & _secondary_address) :
+            isSeller(_isSeller), mwcAmount(_mwcAmount), secondaryAmount(_secondaryAmount), secondaryCurrency(_secondaryCurrency),
+            tradeId(_tradeId), state(_state), initiatedTimeInterval(_initiatedTimeInterval), expirationTimeInterval(_expirationTimeInterval), secondary_address(_secondary_address) {}
 
     bool isValid() const {return !tradeId.isEmpty();}
     bool isDeletable() const;
-    bool isRunnable() const;
-    bool isStoppable() const;
+    // Everything that can expire can be cancelled. No return steps doesn't have expiraiton time.
+    bool isCancellable() const { return !expirationTimeInterval.isEmpty();}
 };
 
-class SwapList : public core::NavWnd {
+class SwapList : public core::NavWnd, control::RichButtonPressCallback {
 Q_OBJECT
 public:
     explicit SwapList(QWidget *parent);
     ~SwapList();
 
 private:
-    void updateButtons();
     void requestSwapList();
-    SwapTradeInfo getSelectedTrade();
+    void selectSwapTab(int selection);
+    void updateTradeListData();
+
+protected:
+    virtual void richButtonPressed(control::RichButton * button, QString coockie);
+
 private slots:
     void sgnSwapTradesResult( QVector<QString> trades );
     void sgnDeleteSwapTrade(QString swapId, QString error);
@@ -69,24 +87,29 @@ private slots:
                                    QVector<QString> executionPlan,
                                    QVector<QString> tradeJournal);
     void sgnNewSwapTrade(QString currency, QString swapId);
+    void sgnCancelTrade(QString swapId, QString error);
 
-    void on_tradeList_cellActivated(int row, int column);
-    void on_tradeList_itemSelectionChanged();
-    void on_newTradeBtn_clicked();
-    void on_deleteBtn_clicked();
-    void on_veiwTradeBtn_clicked();
-    void on_refreshBtn_clicked();
-    void on_showActiveBtn_clicked();
-    void on_startButton_clicked();
+    void sgnBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage);
+    void sgnRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
 
-    void on_stopButton_clicked();
+    void onItemActivated(QString id);
+
+    void on_outgoingSwaps_clicked();
+    void on_incomingSwaps_clicked();
+    void on_completedSwaps_clicked();
+    void on_newTradeButton_clicked();
+    void on_refreshButton_clicked();
+
+
+    void on_restoreTrade_clicked();
 
 private:
     Ui::SwapList *ui;
     bridge::Swap * swap = nullptr;
-    bool isShowActiveOnly = false;
+    bridge::Config * config = nullptr;
 
     QVector<SwapTradeInfo> swapList;
+    int swapTabSelection = 0; // 0 - 2 as shown in UI: incoming, outgoing, complete
 };
 
 }

@@ -125,34 +125,34 @@ void Transactions::updateData() {
         { // First line
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
             // Adding Icon and a text
-            itm->addWidget( control::crateLabel(itm, false, false, "#" + QString::number(trans.txIdx + 1)) ).addFixedHSpacer(10);
+            itm->addWidget( control::createLabel(itm, false, false, "#" + QString::number(trans.txIdx + 1)) ).addFixedHSpacer(10);
 
             if (trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::CANCELLED) {
                 itm->addWidget(control::createIcon(itm, ":/img/iconClose@2x.svg", control::ROW_HEIGHT,
                                                    control::ROW_HEIGHT))
-                        .addWidget(control::crateLabel(itm, false, false, "Cancelled"));
+                        .addWidget(control::createLabel(itm, false, false, "Cancelled"));
             } else if (!trans.confirmed) {
                 itm->addWidget(control::createIcon(itm, ":/img/iconUnconfirmed@2x.svg", control::ROW_HEIGHT,
                                                    control::ROW_HEIGHT))
-                        .addWidget(control::crateLabel(itm, false, false, "Unconfirmed"));
+                        .addWidget(control::createLabel(itm, false, false, "Unconfirmed"));
             } else if (trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::SEND) {
                 itm->addWidget(control::createIcon(itm, ":/img/iconSent@2x.svg", control::ROW_HEIGHT,
                                                    control::ROW_HEIGHT))
-                        .addWidget(control::crateLabel(itm, false, false, "Sent"));
+                        .addWidget(control::createLabel(itm, false, false, "Sent"));
             } else if (trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::RECEIVE) {
                 itm->addWidget(control::createIcon(itm, ":/img/iconReceived@2x.svg", control::ROW_HEIGHT,
                                                    control::ROW_HEIGHT))
-                        .addWidget(control::crateLabel(itm, false, false, "Received"));
+                        .addWidget(control::createLabel(itm, false, false, "Received"));
             } else if (trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::COIN_BASE) {
                 itm->addWidget(control::createIcon(itm, ":/img/iconCoinbase@2x.svg", control::ROW_HEIGHT,
                                                    control::ROW_HEIGHT))
-                        .addWidget(control::crateLabel(itm, false, false, "CoinBase"));
+                        .addWidget(control::createLabel(itm, false, false, "CoinBase"));
             } else {
                 Q_ASSERT(false);
             }
 
             // Update with time or blocks
-            itm->addSpacer().addWidget(control::crateLabel(itm, false, true, txTimeStr));
+            itm->addSpacer().addWidget(control::createLabel(itm, false, true, txTimeStr));
 
             itm->pop();
         } // First line
@@ -167,12 +167,12 @@ void Transactions::updateData() {
             QString amount = util::nano2one(trans.coinNano);
 
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
-            itm->addWidget(control::crateLabel(itm, false, false, amount + " MWC", control::FONT_LARGE));
+            itm->addWidget(control::createLabel(itm, false, false, amount + " MWC", control::FONT_LARGE));
 
             itm->addSpacer();
 
             if (!blocksPrinted && nodeHeight > 0 && trans.height > 0) {
-                itm->addWidget(control::crateLabel(itm, false, true,
+                itm->addWidget(control::createLabel(itm, false, true,
                                                    "Conf: " + QString::number(nodeHeight - trans.height + 1)));
             }
             if (trans.canBeCancelled()) {
@@ -195,7 +195,7 @@ void Transactions::updateData() {
         // Line with ID
         {
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
-            itm->addWidget(control::crateLabel(itm, false, true, trans.txid, control::FONT_SMALL));
+            itm->addWidget(control::createLabel(itm, false, true, trans.txid, control::FONT_SMALL));
             itm->addSpacer();
             if (trans.proof) {
                 itm->addWidget(new control::RichButton(itm, "Proof", 60, control::ROW_HEIGHT,
@@ -209,13 +209,13 @@ void Transactions::updateData() {
 
         // Address field...
         if (!trans.address.isEmpty()) {
-            itm->addWidget(control::crateLabel(itm, false, true, trans.address, control::FONT_SMALL));
+            itm->addWidget(control::createLabel(itm, false, true, trans.address, control::FONT_SMALL));
         }
 
         // And the last optional line is comment
         QString txnNote = config->getTxNote(trans.txid);
 
-        itm->addWidget(control::crateLabel(itm, true, false, txnNote));
+        itm->addWidget(control::createLabel(itm, true, false, txnNote));
         QLabel *noteL = (QLabel *) itm->getCurrentWidget();
         if (txnNote.isEmpty())
             noteL->hide();

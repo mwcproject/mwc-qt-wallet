@@ -16,7 +16,7 @@
 
 namespace control {
 
-RichButton::RichButton(QWidget * parent, QString text, int cx, int cy, QString tooltip) :
+RichButton::RichButton(QWidget * parent, QString text, int cx, int cy, QString tooltip, int fontSize) :
     QPushButton(parent)
 {
     // Lock the size...
@@ -35,7 +35,7 @@ RichButton::RichButton(QWidget * parent, QString text, int cx, int cy, QString t
                     " font-weight: normal;"
                     " border: 1px solid #FFFFFF;"
                     " border-radius: 3px;"
-                    " font-size: 10px;"
+                    " font-size: "+QString::number(fontSize)+"px;"
                     " background: transparent;"
                     " }"
                     " QPushButton:enabled:!focus::hover"
@@ -56,9 +56,10 @@ RichButton::RichButton(QWidget * parent, QString text, int cx, int cy, QString t
                      this, &RichButton::onClicked, Qt::QueuedConnection);
 }
 
-void RichButton::setCallback( RichButtonPressCallback * _pressCallback, const QString & _cookie ) {
+RichButton * RichButton::setCallback( RichButtonPressCallback * _pressCallback, const QString & _cookie ) {
     pressCallback = _pressCallback;
     cookie = _cookie;
+    return this;
 }
 
 void RichButton::onClicked(bool checked) {

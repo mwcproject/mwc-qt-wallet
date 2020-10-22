@@ -51,6 +51,11 @@ Swap::Swap(QObject *parent) : QObject(parent) {
     QObject::connect(wallet, &wallet::Wallet::onNewSwapTrade,
                      this, &Swap::onNewSwapTrade, Qt::QueuedConnection);
 
+    QObject::connect(wallet, &wallet::Wallet::onBackupSwapTradeData,
+                     this, &Swap::onBackupSwapTradeData, Qt::QueuedConnection);
+    QObject::connect(wallet, &wallet::Wallet::onRestoreSwapTradeData,
+                     this, &Swap::onRestoreSwapTradeData, Qt::QueuedConnection);
+
     state::Swap * swap = getSwap();
     QObject::connect(swap, &state::Swap::onSwapTradeStatusUpdated,
                      this, &Swap::onSwapTradeStatusUpdated, Qt::QueuedConnection);
@@ -69,19 +74,31 @@ void Swap::requestSwapTrades() {
 }
 
 void Swap::onRequestSwapTrades(QVector<wallet::SwapInfo> swapTrades) {
-    // Result comes in series of 5 item tuples:
-    // < <Info>, <Trade Id>, <State>, <Status>, <Date>, <secondary_address> >, ....
+    // Result comes in series of 9 item tuples:
+    // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <State>, <initiate_time_interval>, <expire_time_interval>  <secondary_address> >, ....
     QVector<QString> trades;
+    int64_t timestampSec = QDateTime::currentSecsSinceEpoch();
     for (const auto & st : swapTrades) {
-        trades.push_back(st.info);
+        trades.push_back( st.isSeller ? "true" : "false" );
+        trades.push_back( st.mwcAmount );
+        trades.push_back( st.secondaryAmount );
+        trades.push_back( st.secondaryCurrency );
         trades.push_back(st.swapId);
-        trades.push_back(st.state);
-        trades.push_back(getSwap()->isTradeRunning(st.swapId) ? "Running" : ( st.done ? "Done" : "Not running" ));
-        QDateTime startTime;
-        startTime.setTime_t(st.startTime);
-        trades.push_back(startTime.toString("MMMM d yyyy hh:mm"));
+        if (st.action.isEmpty() || st.action=="None")
+            trades.push_back(st.state);
+        else
+            trades.push_back(st.action);
+
+        trades.push_back( util::interval2String( timestampSec - st.startTime, false, 2 ));
+        if (st.expiration>0) {
+            trades.push_back( util::interval2String( st.expiration - timestampSec, true, 2 ));
+        }
+        else {
+            trades.push_back("");
+        }
         trades.push_back(st.secondaryAddress);
     }
+
     emit sgnSwapTradesResult( trades );
 }
 
@@ -371,6 +388,25 @@ void Swap::onNewSwapTrade(QString currency, QString swapId) {
     emit sgnNewSwapTrade(currency, swapId);
 }
 
+// Backup/export swap trade data into the file
+// Respond with sgnBackupSwapTradeData
+void Swap::backupSwapTradeData(QString swapId, QString backupFileName) {
+    getWallet()->backupSwapTradeData(swapId, backupFileName);
+}
+
+// Import/restore swap trade data from the file
+// Respond with sgnRestoreSwapTradeData
+void Swap::restoreSwapTradeData(QString filename) {
+    getWallet()->restoreSwapTradeData(filename);
+}
+
+void Swap::onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage) {
+    emit sgnBackupSwapTradeData(swapId, exportedFileName, errorMessage);
+}
+
+void Swap::onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage) {
+    emit sgnRestoreSwapTradeData(swapId, importedFilename, errorMessage);
+}
 
 }
 

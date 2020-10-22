@@ -150,7 +150,7 @@ bool AppContext::loadData() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x479B)
+    if (id<0x4783 || id>0x479C)
          return false;
 
     QString mockStr;
@@ -298,6 +298,10 @@ bool AppContext::loadData() {
         in >> notificationWindowsEnabled;
     }
 
+    if (id>=0x479C) {
+        in >> swapTabSselection;
+    }
+
     return true;
 }
 
@@ -325,7 +329,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x479B;
+    out << 0x479C;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -387,6 +391,8 @@ void AppContext::saveData() const {
     out << generateProof;
 
     out << notificationWindowsEnabled;
+
+    out << swapTabSselection;
 }
 
 void AppContext::loadNotesData() {
