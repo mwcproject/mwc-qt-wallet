@@ -167,7 +167,7 @@ void SwapList::updateTradeListData() {
             itm->addWidget(control::createLabel(itm, false, true, sw.initiatedTimeInterval.isEmpty() ? "" :
                                                                   "initiated " + sw.initiatedTimeInterval +
                                                                   " ago")).setMinWidth(120);
-            itm->addSpacer();
+            itm->addHSpacer();
 
             if (!sw.expirationTimeInterval.isEmpty())
                 itm->addWidget(control::createLabel(itm, false, true, "expires " + sw.initiatedTimeInterval + " ago")).setMinWidth(120);
@@ -177,14 +177,12 @@ void SwapList::updateTradeListData() {
 
         // Second Line
         {
+            itm->addFixedVSpacer(control::VBOX_SPACING); // add extra spacing
             itm->hbox();
             itm->addWidget(control::createLabel(itm, false, true, "Trade ID: " + sw.tradeId, control::FONT_SMALL)).setMinWidth(350);
-            if (!sw.secondary_address.isEmpty())
-                itm->addWidget(control::createLabel(itm, false, true, sw.secondary_address, control::FONT_SMALL));
-            itm->addSpacer();
             itm->pop();
         }
-        itm->addWidget(control::createLabel(itm, true, false, sw.state));
+        itm->addWidget(control::createLabel(itm, true, false, "Status: " + sw.state, control::FONT_SMALL));
 
         // Buttons need to go in full size.
         // So we need to finish the main vertical layout
@@ -192,21 +190,18 @@ void SwapList::updateTradeListData() {
 
         // Currently root Horz layout is current one.
         // Adding another vertical layout with a single horiz line & spacer at the bottom.
-        itm->vbox().hbox();
+        itm->vbox().setContentsMargins( 0, control::VBOX_MARGIN, 0, 0).setSpacing(control::VBOX_SPACING);
 
         const int BTN_FONT_SIZE = 13;
         const int BTN_WIDTH = 80;
-        const int BTN_SPACING = 10;
 
         if (sw.isCancellable()) {
-            itm->addFixedHSpacer(BTN_SPACING);
             itm->addWidget(
                     (new control::RichButton(itm, "Cancel", BTN_WIDTH, control::ROW_HEIGHT * 3/2, "Cancel this swap Trade", BTN_FONT_SIZE))->
                             setCallback(this, "Cancel:" + sw.tradeId));
         }
 
         if (sw.isDeletable()) {
-            itm->addFixedHSpacer(BTN_SPACING);
             itm->addWidget(
                     (new control::RichButton(itm, "Delete", BTN_WIDTH, control::ROW_HEIGHT * 3/2, "Cancel this swap Trade", BTN_FONT_SIZE))->
                             setCallback(this, "Delete:" + sw.tradeId));
@@ -214,7 +209,6 @@ void SwapList::updateTradeListData() {
 
         if (!sw.isSeller) {
             // Buyer can backup immediatelly.
-            itm->addFixedHSpacer(BTN_SPACING);
             itm->addWidget((new control::RichButton(itm, "Backup", BTN_WIDTH, control::ROW_HEIGHT * 3/2,
                                                     "Backup your trade data, so you will be able to get a refund in case of the hardware failure", BTN_FONT_SIZE))->
                     setCallback(this, "Backup:" + sw.tradeId));
@@ -222,11 +216,13 @@ void SwapList::updateTradeListData() {
 
         // Check if this Trade is not running, it is mean it need to be accepted to start
         if (!sw.isDeletable() && !swap->isRunning(sw.tradeId)) {
-            itm->addFixedHSpacer(BTN_SPACING);
             itm->addWidget((new control::RichButton(itm, "Accept", BTN_WIDTH, control::ROW_HEIGHT * 3/2,
                                                     "Review and accept this swap Trade", BTN_FONT_SIZE))->
                     setCallback(this, "Accept:" + sw.tradeId));
         }
+
+        itm->addVSpacer();
+
         ui->swapsTable->addItem(itm);
     }
     ui->swapsTable->apply();

@@ -152,7 +152,7 @@ void Transactions::updateData() {
             }
 
             // Update with time or blocks
-            itm->addSpacer().addWidget(control::createLabel(itm, false, true, txTimeStr));
+            itm->addHSpacer().addWidget(control::createLabel(itm, false, true, txTimeStr));
 
             itm->pop();
         } // First line
@@ -169,7 +169,7 @@ void Transactions::updateData() {
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
             itm->addWidget(control::createLabel(itm, false, false, amount + " MWC", control::FONT_LARGE));
 
-            itm->addSpacer();
+            itm->addHSpacer();
 
             if (!blocksPrinted && nodeHeight > 0 && trans.height > 0) {
                 itm->addWidget(control::createLabel(itm, false, true,
@@ -196,7 +196,7 @@ void Transactions::updateData() {
         {
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
             itm->addWidget(control::createLabel(itm, false, true, trans.txid, control::FONT_SMALL));
-            itm->addSpacer();
+            itm->addHSpacer();
             if (trans.proof) {
                 itm->addWidget(new control::RichButton(itm, "Proof", 60, control::ROW_HEIGHT,
                                                        "Generate proof file for this transaction. Proof file can be validated by public at MWC Block Explorer"));

@@ -89,15 +89,27 @@ RichItem & RichItem::setText(const QString & text) {
     return *this;
 }
 
-RichItem & RichItem::addSpacer() {
+RichItem & RichItem::addHSpacer() {
     Q_ASSERT(!layoutStack.isEmpty());
-    layoutStack.back()->addItem( new QSpacerItem(1,1, QSizePolicy::Expanding, QSizePolicy::Expanding) );
+    layoutStack.back()->addItem( new QSpacerItem(1,1, QSizePolicy::Expanding, QSizePolicy::Fixed) );
+    return *this;
+}
+
+RichItem & RichItem::addVSpacer() {
+    Q_ASSERT(!layoutStack.isEmpty());
+    layoutStack.back()->addItem( new QSpacerItem(1,1, QSizePolicy::Fixed, QSizePolicy::Expanding) );
     return *this;
 }
 
 RichItem & RichItem::addFixedHSpacer(int cx) {
     Q_ASSERT(!layoutStack.isEmpty());
     layoutStack.back()->addItem( new QSpacerItem(cx,1, QSizePolicy::Fixed, QSizePolicy::Expanding) );
+    return *this;
+}
+
+RichItem & RichItem::addFixedVSpacer(int cy) {
+    Q_ASSERT(!layoutStack.isEmpty());
+    layoutStack.back()->addItem( new QSpacerItem(1,cy, QSizePolicy::Expanding, QSizePolicy::Fixed) );
     return *this;
 }
 
@@ -154,7 +166,7 @@ RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked ) {
             .setWidgetStyleSheet(marked ? control::LEFT_MARK_ON : control::LEFT_MARK_OFF);
 
     itm->vbox().setSpacing(VBOX_SPACING)
-            .setContentsMargins(0, VBOX_SPACING * 3/2, 0, VBOX_SPACING * 3/2);
+            .setContentsMargins(0, VBOX_MARGIN, 0, VBOX_MARGIN);
 
     return itm;
 }
@@ -162,7 +174,7 @@ RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked ) {
 QLabel * createLabel( control::RichItem * parent, bool wordwrap, bool lowLight, QString text, int fontSize ) {
     QLabel * l = new QLabel(parent);
     l->setWordWrap(wordwrap);
-    l->setStyleSheet( (lowLight ? ("color: " + control::LOW_LIGHT_COLOR + "; ") : "") + "border: transparent; background: transparent; font-size: " + QString::number(fontSize) + "px;");
+    l->setStyleSheet( (lowLight ? ("color: " + control::LOW_LIGHT_COLOR + "; ") : "") + "border: transparent; background: transparent; font-weight: 400; font-size: " + QString::number(fontSize) + "px;");
     l->setText(text);
     return l;
 }

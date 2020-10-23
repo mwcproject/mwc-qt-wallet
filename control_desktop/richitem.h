@@ -12,8 +12,9 @@ const QString LEFT_MARK_ON = "background: #BCF317; border: transparent;";
 const QString LEFT_MARK_OFF = "background: transparent; border: transparent;";
 const QString HORZ_LINE = "background: rgba(255, 255, 255, 0.5); border: transparent;";  // Same as Resorces has
 const int     LEFT_MARK_SIZE = 3;
-const int     LEFT_MARK_SPACING = 10;
+const int     LEFT_MARK_SPACING = 20;
 const QString LOW_LIGHT_COLOR = "#BF84FF";
+const int     VBOX_MARGIN = 20;
 const int     VBOX_SPACING = 5;
 const int     ROW_HEIGHT = 16; // use it for non text elements like icons
 
@@ -44,8 +45,10 @@ public:
     RichItem & setFixedHeight(int cy);
     RichItem & setMinWidth(int cx);
     RichItem & setText(const QString & text);
-    RichItem & addSpacer();
+    RichItem & addHSpacer();
+    RichItem & addVSpacer();
     RichItem & addFixedHSpacer(int cx);
+    RichItem & addFixedVSpacer(int cy);
 
     QWidget * getCurrentWidget() const {return curWidget;}
     QLayout * getCurrentLayout() const { Q_ASSERT(!layoutStack.isEmpty()); return layoutStack.last(); }

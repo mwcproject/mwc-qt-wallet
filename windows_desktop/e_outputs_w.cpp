@@ -133,7 +133,7 @@ void Outputs::updateShownData() {
             }
 
             itm->addWidget(control::createLabel(itm, false, false, out.status));
-            itm->addSpacer();
+            itm->addHSpacer();
 
             bool hok = false;
             int height = out.blockHeight.toInt(&hok);
@@ -166,7 +166,7 @@ void Outputs::updateShownData() {
             }
 
             itm->addWidget( control::createLabel(itm, false, false, util::nano2one(out.valueNano) + " MWC", control::FONT_LARGE));
-            itm->addSpacer();
+            itm->addHSpacer();
 
             // Add lock button if it is applicable
             if ( lockState == "YES" ) {
