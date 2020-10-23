@@ -150,7 +150,7 @@ bool AppContext::loadData() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x479C)
+    if (id<0x4783 || id>0x479D)
          return false;
 
     QString mockStr;
@@ -302,6 +302,10 @@ bool AppContext::loadData() {
         in >> swapTabSselection;
     }
 
+    if (id>=0x479D) {
+        in >> swapEnforceBackup;
+    }
+
     return true;
 }
 
@@ -329,7 +333,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x479C;
+    out << 0x479D;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -393,6 +397,8 @@ void AppContext::saveData() const {
     out << notificationWindowsEnabled;
 
     out << swapTabSselection;
+
+    out << swapEnforceBackup;
 }
 
 void AppContext::loadNotesData() {
@@ -969,5 +975,14 @@ void AppContext::setNotficationWindowsEnabled(bool enable) {
     notificationWindowsEnabled = enable;
     saveData();
 }
+
+void AppContext::setSwapEnforceBackup(bool doBackup) {
+    if (swapEnforceBackup == doBackup)
+        return;
+
+    swapEnforceBackup = doBackup;
+    saveData();
+}
+
 
 }

@@ -151,6 +151,8 @@ public:
     // Update fluff flag value
     Q_INVOKABLE void setSwapTabSelection(int selection);
 
+    Q_INVOKABLE void setSwapEnforceBackup(bool doBackup);
+    Q_INVOKABLE bool getSwapEnforceBackup();
 };
 
 }

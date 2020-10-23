@@ -101,7 +101,11 @@ private slots:
     void on_refreshButton_clicked();
 
 
-    void on_restoreTrade_clicked();
+    void on_restoreTradesTab_clicked();
+
+    void on_restoreTradeBtn_clicked();
+
+    void on_checkEnforceBackup_clicked();
 
 private:
     Ui::SwapList *ui;

@@ -206,6 +206,10 @@ public:
     // Index of the open tab at the swap page.
     int getSwapTabSelection() const {return swapTabSselection;}
     void setSwapTabSelection(int sel) {swapTabSselection=sel;}
+
+    bool getSwapEnforceBackup() const {return swapEnforceBackup;}
+    void setSwapEnforceBackup(bool doBackup);
+
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -301,6 +305,9 @@ private:
 
     // Selected tab at the swap list page
     int swapTabSselection = 0;
+
+    // Enforce a backup for the swaps. Before lock stage user will be asked to save the trade file somewhere
+    bool swapEnforceBackup = true;
 };
 
 template <class T>

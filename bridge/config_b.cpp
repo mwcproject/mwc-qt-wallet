@@ -321,5 +321,13 @@ void Config::setSwapTabSelection(int selection) {
     getAppContext()->setSwapTabSelection(selection);
 }
 
+void Config::setSwapEnforceBackup(bool doBackup) {
+    getAppContext()->setSwapEnforceBackup(doBackup);
+}
+
+bool Config::getSwapEnforceBackup() {
+    return getAppContext()->getSwapEnforceBackup();
+}
+
 
 }
