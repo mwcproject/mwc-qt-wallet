@@ -34,6 +34,7 @@
         <file>img/FinalizeL@2x.svg</file>
         <file>img/HelpBtn@2x.svg</file>
         <file>img/HODL@2x.svg</file>
+        <file>img/iconLock@2x.svg</file>
         <file>img/Left@2x.svg</file>
         <file>img/loading.gif</file>
         <file>img/MessageBox_Close@2x.svg</file>
@@ -45,6 +46,8 @@
         <file>img/NewInstanceBtn@2x.svg</file>
         <file>img/NewInstanceBtn_big@2x.svg</file>
         <file>img/Output_big@2x.svg</file>
+        <file>img/Outputs_Spent@2x.svg</file>
+        <file>img/Outputs_Unspent@2x.svg</file>
         <file>img/PassNotMatch@2x.svg</file>
         <file>img/PassOK@2x.svg</file>
         <file>img/purpleCheckOff@2x.svg</file>
@@ -128,5 +131,6 @@
         <file>windows_mobile/SendConfirmation.qml</file>
         <file>windows_mobile/SendSettings.qml</file>
         <file>windows_mobile/FileTransaction.qml</file>
+        <file>windows_mobile/Outputs.qml</file>
     </qresource>
 </RCC>

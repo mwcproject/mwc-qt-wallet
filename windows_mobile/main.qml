@@ -213,6 +213,12 @@ Window {
             visible: currentState === 11
         }
 
+        Outputs {
+            id: outputsItem
+            anchors.fill: parent
+            visible: currentState === 12
+        }
+
         Notifications {
             id: notificationsItem
             anchors.fill: parent
