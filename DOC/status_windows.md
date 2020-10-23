@@ -4,7 +4,7 @@
 
 Status Windows
 
-Last Updated: August 5, 2020
+Last Updated: October 23, 2020
 
 # OVERVIEW
 
@@ -32,11 +32,11 @@ The following describes the general behavior of the status windows:
 
 6. Status messages which come in but cannot be displayed because 5 windows are already being displayed, will be stored until there is room for them to be displayed.
 
-7. A limit of 25 messages will be queued waiting to be displayed. If more than 25 messages are waiting to be displayed, the oldest messages will be removed from the queue and will not be displayed as a status message.
+7. A limit of 25 messages will be queued waiting to be displayed. Once the queue is filled, additional messages will not be appended until space in the queue becomes available.
 
-![image alt text](status_windows_images/image_1.png)
+<img src="status_windows_images/image_1.png" max-width="300" height="300"/>
 
-![image alt text](status_windows_images/image_2.png)
+<img src="status_windows_images/image_2.png" max-width="300" height="300"/>
 
 # Status Window Content
 
@@ -48,7 +48,8 @@ The status windows display the notification messages which are stored in the Eve
 
 3. Event log
 
-![image alt text](status_windows_images/image_3.png)
+<img src="status_windows_images/image_7.png" max-width="300" height="300"/>
+
 
 For displaying in the status window, each notification message is parsed looking for a summary message to display for the notification. When the notification message is less than 50 characters, the summary message will be the same as the notification message. If the notification message is greater than 50 characters, the first sentence of the notification message is used as the summary. For example, if you look at the previous image, line 3 of the Event Log says: "Unable to start Tor listener. Tor Process Error: …" and the status window displays the first sentence “Unable to start Tor listener”. When a notification message is just one long string, the first 50 characters of the message are displayed followed by “...”. For some specific long messages, a hard-coded summary is used as what the message is really about is deeply embedded into the message.
 
@@ -60,11 +61,11 @@ To see the entire content of a notification message, you can click on the status
 
 In most cases the summary and the notification message, with the summary extracted from it, will be displayed in the modal.
 
-![image alt text](status_windows_images/image_4.png)
+<img src="status_windows_images/image_4.png" max-width="300" height="300"/>
 
 The following is an example where the notification message was one long string so the summary contained the first 50 characters of the message. For notification messages of this type, the summary is not displayed along with the message. For this type of message only the original notification message is displayed. For long notification messages, extracting the summary as is done for other notifications sometimes leads to incomplete sentences which might not make sense.
 
-![image alt text](status_windows_images/image_5.png)
+<img src="status_windows_images/image_5.png" max-width="300" height="300"/>
 
 Status windows will continue to appear on top of this modal as notifications arrive in the wallet. If the OK button is covered by the status windows, you can wait until the windows disappear or move the main window on the screen as dialog windows do not move with the main window. 
 
@@ -72,7 +73,7 @@ Status windows will continue to appear on top of this modal as notifications arr
 
 When Qt Wallet is locked, individual status messages are not displayed. Instead a single status message indicating how many messages are waiting to be read is displayed. As new notification messages come into Qt Wallet, the single window is displayed with the current count of pending messages to be read.
 
-![image alt text](status_windows_images/image_6.png)
+<img src="status_windows_images/image_6.png" max-width="300" height="300"/>
 
 When the wallet is locked, you must unlock the wallet to see the notifications appear in the status windows. Clicking on the "Notifications Waiting To Be Read" status window makes the “Notifications Waiting” message disappear.
 
