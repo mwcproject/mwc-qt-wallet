@@ -24,6 +24,8 @@
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/g_send_b.h"
 #include <QFileInfo>
+#include <QCoreApplication>
+#include <QThread>
 
 namespace state {
 
@@ -62,6 +64,10 @@ Send::Send(StateContext * context) :
     // Need to update mwc node status because send can fail if node is not healthy.
     QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
                      this, &Send::onNodeStatus, Qt::QueuedConnection);
+
+    QObject::connect(context->wallet, &wallet::Wallet::onRequestRecieverWalletAddress,
+                     this, &Send::onRequestRecieverWalletAddress, Qt::QueuedConnection);
+
 }
 
 Send::~Send() {}
@@ -214,8 +220,11 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
     const wallet::ListenerStatus listenerStart = context->wallet->getListenerStartState();
     const wallet::ListenerStatus listenerStatus = context->wallet->getListenerStatus();
 
+    bool genProof = context->appContext->getGenerateProof();
+
     switch (addressRes.second) {
         case util::ADDRESS_TYPE::MWC_MQ: {
+            genProof = false; // for MQS we are getting proof legacy way. It will help with backward compability
             if (!listenerStart.mqs) {
                 core::getWndManager()->messageTextDlg("Listener is Offline",
                                                       "MQS listener is not started. Please start MQS listener first." );
@@ -229,6 +238,7 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
             break;
         }
         case util::ADDRESS_TYPE::KEYBASE: {
+            genProof = false; // For Keybase proof doesn't work in any case
             if (!listenerStart.keybase) {
                 core::getWndManager()->messageTextDlg("Listener is Offline",
                                                       "Keybase listener is not started. Please start Keybase listener first." );
@@ -274,23 +284,52 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
     }
     QString txnFeeStr = util::txnFeeToString(txnFee);
 
+    respProofAddress = "";
+    restProofError = "";
+
+    if (genProof && addressRes.second == util::ADDRESS_TYPE::HTTPS ) {
+        // Requesting proof address
+        context->wallet->requestRecieverWalletAddress(address, apiSecret);
+
+        // waiting for the respose in sync mode...
+        // It is not good, but other solutions are more wierd.
+        while(respProofAddress.isEmpty() && restProofError.isEmpty()) {
+            QCoreApplication::processEvents();
+            QThread::usleep(50);
+        }
+
+        if (!restProofError.isEmpty()) {
+            core::getWndManager()->messageTextDlg("Error", "Unable to get a wallet proof address for the " + address);
+            return false;
+        }
+        Q_ASSERT(!respProofAddress.isEmpty());
+    }
+
     // Ask for confirmation
     QString hash = context->wallet->getPasswordHash();
     if ( core::getWndManager()->sendConfirmationDlg("Confirm Send Request",
                                         "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " MWC from account: " + account +
-                                        "\nTo address: " + address + "\n\nTransaction fee: " + txnFeeStr,
+                                        "\nTo: " + address +
+                                        (respProofAddress.isEmpty() ? "" : "\n\nReceiver wallet proof address:\n" + respProofAddress) +
+                                        "\n\nTransaction fee: " + txnFeeStr,
                                         1.0, hash ) ) {
 
         context->wallet->sendTo( account, amount, util::fullFormalAddress( addressRes.second, address), apiSecret, message,
                                  sendParams.inputConfirmationNumber, sendParams.changeOutputs,
                                  outputs, context->appContext->isFluffSet(), -1 /* Not used for online sends */,
-                                 context->appContext->getGenerateProof());
+                                 context->appContext->getGenerateProof(), respProofAddress);
 
         return true;
     }
-
     return false;
 }
+
+// Response from requestRecieverWalletAddress(url)
+void Send::onRequestRecieverWalletAddress(QString url, QString proofAddress, QString error) {
+    respProofAddress = proofAddress;
+    restProofError = error;
+}
+
 
 QString Send::getSpendAllAmount(QString account) {
     return util::getAllSpendableAmount(account, context->wallet, context->appContext);

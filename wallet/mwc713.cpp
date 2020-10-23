@@ -700,10 +700,11 @@ void MWC713::check(bool wait4listeners)  {
 // Check signal:  onSend
 void MWC713::sendTo( const QString &account, int64_t coinNano, const QString & address,
                      const QString & apiSecret,
-                     QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof )  {
+                     QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs,
+                     bool fluff, int ttl_blocks, bool generateProof, QString expectedproofAddress )  {
     // switch account first
     eventCollector->addTask( new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT );
-    eventCollector->addTask( new TaskSendMwc(this, coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs, outputs, fluff, ttl_blocks, generateProof), TaskSendMwc::TIMEOUT );
+    eventCollector->addTask( new TaskSendMwc(this, coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs, outputs, fluff, ttl_blocks, generateProof, expectedproofAddress), TaskSendMwc::TIMEOUT );
     if (account != currentAccount)
         eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
@@ -894,6 +895,9 @@ void MWC713::restoreSwapTradeData(QString filename) {
     eventCollector->addTask( new TaskRestoreSwapTradeData(this, filename), TaskRestoreSwapTradeData::TIMEOUT );
 }
 
+void MWC713::requestRecieverWalletAddress(QString url, QString apiSecret) {
+    eventCollector->addTask( new TaskRequestRecieverWalletAddress(this, url, apiSecret), TaskRequestRecieverWalletAddress::TIMEOUT );
+}
 
 // -------------- Transactions
 
@@ -1549,6 +1553,12 @@ void MWC713::setRestoreSwapTradeData(QString swapId, QString importedFilename, Q
     logger::logEmit( "MWC713", "onRestoreSwapTradeData", swapId + ", " + importedFilename + ", " + errorMessage );
     emit onRestoreSwapTradeData( swapId, importedFilename, errorMessage );
 }
+
+void MWC713::setRequestRecieverWalletAddress(QString url, QString address, QString error) {
+    logger::logEmit( "MWC713", "onRequestRecieverWalletAddress", url + ", " + address + ", " + error );
+    emit onRequestRecieverWalletAddress(url, address, error);
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////
 //      mwc713  IOs

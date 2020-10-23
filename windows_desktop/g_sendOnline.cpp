@@ -141,8 +141,9 @@ void SendOnline::on_sendButton_clicked()
         }
     }
 
-    if (send->sendMwcOnline( account, QString::number(amount), sendTo, apiSecret, description))
-        ui->progress->show();
+    ui->progress->show();
+    if (!send->sendMwcOnline( account, QString::number(amount), sendTo, apiSecret, description))
+        ui->progress->hide();
 }
 
 void SendOnline::onSgnShowSendResult( bool success, QString message ) {

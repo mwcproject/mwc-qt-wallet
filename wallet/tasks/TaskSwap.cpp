@@ -18,22 +18,9 @@
 #include <QJsonArray>
 #include <QJsonValue>
 #include "../mwc713.h"
+#include "utils.h"
 
 namespace wallet {
-
-static QString getErrorMessage(const QVector<WEvent> &events, QString defaultMessage) {
-    QString errors;
-    QVector<WEvent> errs = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR);
-    for (auto &e : errs) {
-        if (errors.length() > 0)
-            errors += "; ";
-        errors += e.message;
-    }
-    if (errors.isEmpty()) {
-        errors = defaultMessage;
-    }
-    return errors;
-}
 
 // ---------------- TaskSwapNewTradeArrive ----------------
 

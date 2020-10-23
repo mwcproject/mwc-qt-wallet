@@ -487,6 +487,7 @@ public:
     virtual QString getTorAddress()  = 0;
 
     // Request proof address for files
+    // Check signal onFileProofAddress(QString address);
     virtual void requestFileProofAddress() = 0;
 
     // Get MWC box <address, index in the chain>
@@ -607,7 +608,7 @@ public:
     // coinNano == -1  - mean All
     // Check signal:  onSend
     virtual void sendTo( const QString &account, int64_t coinNano, const QString & address, const QString & apiSecret,
-                         QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof )  = 0;
+                         QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof, QString expectedproofAddress )  = 0;
 
     // Airdrop special. Generating the next Public key for transaction
     // wallet713> getnextkey --amount 1000000
@@ -708,6 +709,11 @@ public:
     // Restore/import swap trade from the file
     // Check Signal: onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
     virtual void restoreSwapTradeData(QString filename) = 0;
+
+    // Request proff address from http transaction
+    // apiSecret - if foreign API secret, optional. Normally it is empty
+    // Chack signal: onRequestRecieverWalletAddress(QString url, QString address, QString error)
+    virtual void requestRecieverWalletAddress(QString url, QString apiSecret) = 0;
 private:
 signals:
 
@@ -846,6 +852,9 @@ signals:
 
     // Response from restoreSwapTradeData
     void onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
+
+    // Response from requestRecieverWalletAddress(url)
+    void onRequestRecieverWalletAddress(QString url, QString address, QString error);
 };
 
 }

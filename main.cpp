@@ -495,6 +495,7 @@ int main(int argc, char *argv[])
         node::MwcNode * mwcNode = new node::MwcNode( config::getMwcPath(), &appContext );
 
 #ifdef WALLET_DESKTOP
+        //wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
         wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext, mwcNode );
 #else
         // wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);

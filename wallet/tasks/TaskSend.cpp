@@ -16,7 +16,7 @@
 #include <QDebug>
 #include "../mwc713.h"
 #include "../../util/address.h"
-#include "../../util/stringutils.h"
+#include "utils.h"
 
 namespace wallet {
 
@@ -137,7 +137,8 @@ bool TaskSendMwc::processTask(const QVector<WEvent> &events) {
 
 QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, const QString & apiSecret,
         QString message, int inputConfirmationNumber, int changeOutputs,
-        const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof ) const {
+        const QStringList & outputs, bool fluff, int ttl_blocks,
+        bool generateProof, const QString & expectedproofAddress ) const {
 
     QString cmd = "send ";// + util::nano2one(coinNano);
     if (coinNano>0)
@@ -173,6 +174,10 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, co
 
     if (generateProof)
         cmd += " --proof";
+
+    if (!expectedproofAddress.isEmpty()) {
+        cmd += " --expectedproof " + expectedproofAddress;
+    }
 
     if (coinNano<0)
         cmd += " ALL";
@@ -331,6 +336,24 @@ bool TaskFinalizeFile::processTask(const QVector<WEvent> &events) {
 
 }
 
+// --------------------------- TaskRequestRecieverWalletAddress ---------------------------
+
+bool TaskRequestRecieverWalletAddress::processTask(const QVector<WEvent> &events) {
+    QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
+
+    for (const auto & ln : lns) {
+        const QString msg = ln.message;
+        if (msg.startsWith("Proof pub key of the listening wallet:")) {
+            QString addr = msg.mid( strlen("Proof pub key of the listening wallet:") ).trimmed();
+            wallet713->setRequestRecieverWalletAddress(url, addr, "");
+            return true;
+        }
+    }
+
+    // reporting error
+    wallet713->setRequestRecieverWalletAddress(url, "", getErrorMessage(events, "Unable to get a receiver wallet address for " + url));
+    return true;
+}
 
 
 }

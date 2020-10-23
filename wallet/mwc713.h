@@ -244,7 +244,7 @@ public:
     virtual void sendTo( const QString &account, int64_t coinNano, const QString & address,
                          const QString & apiSecret,
                          QString message, int inputConfirmationNumber, int changeOutputs,
-                         const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof )  override;
+                         const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof, QString expectedproofAddress )  override;
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
@@ -323,6 +323,10 @@ public:
     // Restore/import swap trade from the file
     // Check Signal: onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
     virtual void restoreSwapTradeData(QString filename) override;
+
+    // Request proof address for http transaction
+    // Check signal: onRequestRecieverWalletAddress(QString url, QString address, QString error)
+    virtual void requestRecieverWalletAddress(QString url, QString apiSecret) override;
 public:
     // launch exit command.
     void launchExitCommand();
@@ -456,6 +460,8 @@ public:
     void setBackupSwapTradeData(QString swapId, QString backupFileName, QString errorMessage);
 
     void setRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
+
+    void setRequestRecieverWalletAddress(QString url, QString address, QString error);
 private:
 
 

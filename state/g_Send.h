@@ -66,10 +66,15 @@ private slots:
 
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
+    // Response from requestRecieverWalletAddress(url)
+    void onRequestRecieverWalletAddress(QString url, QString proofAddress, QString error);
 private:
     void switchToStartingWindow();
 private:
     bool nodeIsHealthy = false;
+
+    QString respProofAddress;
+    QString restProofError;
 };
 
 }

@@ -362,7 +362,7 @@ void MockWallet::getNextKey(int64_t amountNano, QString btcaddress, QString airD
 void MockWallet::sendTo(const QString &account, int64_t coinNano, const QString &address,
                         const QString &apiSecret,
                         QString message, int inputConfirmationNumber, int changeOutputs,
-                        const QStringList &outputs, bool fluff, int ttl_blocks, bool generateProof) {
+                        const QStringList &outputs, bool fluff, int ttl_blocks, bool generateProof, QString expectedproofAddress) {
     Q_UNUSED(account)
     Q_UNUSED(coinNano)
     Q_UNUSED(address)
@@ -374,6 +374,7 @@ void MockWallet::sendTo(const QString &account, int64_t coinNano, const QString 
     Q_UNUSED(fluff)
     Q_UNUSED(ttl_blocks)
     Q_UNUSED(generateProof)
+    Q_UNUSED(expectedproofAddress)
 
     emit onSend( true, {}, address, 4, "0000-1111-2222-3333", util::nano2one(coinNano) );
 }
@@ -500,5 +501,111 @@ void MockWallet::repost(QString account, int index, bool fluff) {
     Q_UNUSED(index)
     Q_UNUSED(fluff)
 }
+
+// Request proof address for files
+// Check signal onFileProofAddress(QString address);
+void MockWallet::requestFileProofAddress() {
+    emit onFileProofAddress("lw7wfvw4f5gfboqvwwafbrqeryngxps4ygnskm7tdvy2e7bmmrgmecyd");
+}
+
+// Request all running swap trades.
+// Check Signal: void onRequestSwapTrades(QVector<SwapInfo> swapTrades, QString error);
+void MockWallet::requestSwapTrades() {
+    SwapInfo sw;
+    sw.setData( "123.456", "0.00123", "BCH",
+                         "XXXXX-XXXXXXXXXX-XXXXXX", 1603424302, "State for this trade", "Action fro this trade",
+                          1603454302, true, "mmmGZgkyaVvYnvkp6b4EXgsgN2UubNNZ1s" );
+
+    emit onRequestSwapTrades( {sw}, "");
+}
+
+// Delete the swap trade
+// Check Signal: void onDeleteSwapTrade(QString swapId, QString errMsg)
+void MockWallet::deleteSwapTrade(QString swapId) {
+    emit onDeleteSwapTrade(swapId, "");
+}
+
+// Create a new Swap trade deal.
+// Check Signal: void onCreateNewSwapTrade(QString swapId, QString err);
+void MockWallet::createNewSwapTrade(
+        int min_confirmations, // minimum number of confimations
+        double mwc, double btc, QString secondary,
+        QString redeemAddress,
+        bool sellerLockFirst,
+        int messageExchangeTimeMinutes,
+        int redeemTimeMinutes,
+        int mwcConfirmationNumber,
+        int secondaryConfirmationNumber,
+        QString communicationMethod,
+        QString communicationAddress ) {
+
+    Q_UNUSED(min_confirmations)
+    Q_UNUSED(mwc)
+    Q_UNUSED(btc)
+    Q_UNUSED(secondary)
+    Q_UNUSED(redeemAddress)
+    Q_UNUSED(sellerLockFirst)
+    Q_UNUSED(messageExchangeTimeMinutes)
+    Q_UNUSED(redeemTimeMinutes)
+    Q_UNUSED(mwcConfirmationNumber)
+    Q_UNUSED(secondaryConfirmationNumber)
+    Q_UNUSED(communicationMethod)
+    Q_UNUSED(communicationAddress)
+
+    emit onCreateNewSwapTrade("XXXXX-new-trade-id-XXXXX", "");
+}
+
+// Cancel the trade
+// Check Signal: void onCancelSwapTrade(QString swapId, QString error);
+void MockWallet::cancelSwapTrade(QString swapId) {
+    emit onCancelSwapTrade(swapId, "");
+}
+
+
+// Request details about this trade.
+// Check Signal: void onRequestTradeDetails( SwapTradeInfo swap,
+//                            QVector<SwapExecutionPlanRecord> executionPlan,
+//                            QString currentAction,
+//                            QVector<SwapJournalMessage> tradeJournal,
+//                            QString error );
+void MockWallet::requestTradeDetails(QString swapId ) {
+    SwapTradeInfo sw;
+    emit onRequestTradeDetails( sw, {}, "current action", {}, "");
+}
+
+// Adjust swap stade values. params are optional
+// Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
+void MockWallet::adjustSwapData( QString swapId, QString adjustCmd, QString param1, QString param2 ) {
+    emit onAdjustSwapData(swapId, "adjust command", "");
+}
+
+// Perform a auto swap step for this trade.
+// Check Signal: void onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+//                       QVector<SwapExecutionPlanRecord> executionPlan,
+//                       QVector<SwapJournalMessage> tradeJournal,
+//                       QString error );
+void MockWallet::performAutoSwapStep( QString swapId ) {
+    emit onPerformAutoSwapStep(swapId, false, "current Action", "current State", {}, {}, "");
+}
+
+// Backup/export swap trade data file
+// Check Signal: onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage)
+void MockWallet::backupSwapTradeData(QString swapId, QString backupFileName) {
+    emit onBackupSwapTradeData(swapId, backupFileName, "");
+}
+
+// Restore/import swap trade from the file
+// Check Signal: onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
+void MockWallet::restoreSwapTradeData(QString filename) {
+    onRestoreSwapTradeData("XXXX-swap-id-XXXXXXX", filename, "");
+}
+
+// Request proff address from http transaction
+// apiSecret - if foreign API secret, optional. Normally it is empty
+// Chack signal: onRequestRecieverWalletAddress(QString url, QString address, QString error)
+void MockWallet::requestRecieverWalletAddress(QString url, QString apiSecret) {
+    emit onRequestRecieverWalletAddress(url, "dhfkldgsfjfdkljhfdkjhkfdghgkfdhgkjh", "");
+}
+
 
 }

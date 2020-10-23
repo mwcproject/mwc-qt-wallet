@@ -248,7 +248,7 @@ public:
     virtual void sendTo( const QString &account, int64_t coinNano, const QString & address,
                          const QString & apiSecret,
                          QString message, int inputConfirmationNumber, int changeOutputs,
-                         const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof )  override;
+                         const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof, QString expectedproofAddress )  override;
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
@@ -273,6 +273,69 @@ public:
     // Repost the transaction. Optionally fluff.
     // index is the tx_index in the tx_log.
     virtual void repost(QString account, int index, bool fluff) override;
+
+    // Request proof address for files
+    // Check signal onFileProofAddress(QString address);
+    virtual void requestFileProofAddress() override;
+
+    // Request all running swap trades.
+    // Check Signal: void onRequestSwapTrades(QVector<SwapInfo> swapTrades, QString error);
+    virtual void requestSwapTrades() override;
+
+    // Delete the swap trade
+    // Check Signal: void onDeleteSwapTrade(QString swapId, QString errMsg)
+    virtual void deleteSwapTrade(QString swapId) override;
+
+    // Create a new Swap trade deal.
+    // Check Signal: void onCreateNewSwapTrade(QString swapId);
+    virtual void createNewSwapTrade(
+            int min_confirmations, // minimum number of confimations
+            double mwc, double btc, QString secondary,
+            QString redeemAddress,
+            bool sellerLockFirst,
+            int messageExchangeTimeMinutes,
+            int redeemTimeMinutes,
+            int mwcConfirmationNumber,
+            int secondaryConfirmationNumber,
+            QString communicationMethod,
+            QString communicationAddress ) override;
+
+    // Cancel the trade
+    // Check Signal: void onCancelSwapTrade(QString swapId, QString error);
+    virtual void cancelSwapTrade(QString swapId) override;
+
+
+    // Request details about this trade.
+    // Check Signal: void onRequestTradeDetails( SwapTradeInfo swap,
+    //                            QVector<SwapExecutionPlanRecord> executionPlan,
+    //                            QString currentAction,
+    //                            QVector<SwapJournalMessage> tradeJournal,
+    //                            QString error );
+    virtual void requestTradeDetails(QString swapId ) override;
+
+    // Adjust swap stade values. params are optional
+    // Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
+    virtual void adjustSwapData( QString swapId, QString adjustCmd, QString param1 = "", QString param2 = "" ) override;
+
+    // Perform a auto swap step for this trade.
+    // Check Signal: void onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+    //                       QVector<SwapExecutionPlanRecord> executionPlan,
+    //                       QVector<SwapJournalMessage> tradeJournal,
+    //                       QString error );
+    virtual void performAutoSwapStep( QString swapId ) override;
+
+    // Backup/export swap trade data file
+    // Check Signal: onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage)
+    virtual void backupSwapTradeData(QString swapId, QString backupFileName) override;
+
+    // Restore/import swap trade from the file
+    // Check Signal: onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
+    virtual void restoreSwapTradeData(QString filename) override;
+
+    // Request proff address from http transaction
+    // apiSecret - if foreign API secret, optional. Normally it is empty
+    // Chack signal: onRequestRecieverWalletAddress(QString url, QString address, QString error)
+    virtual void requestRecieverWalletAddress(QString url, QString apiSecret) override;
 
 private:
     core::AppContext * appContext; // app context to store current account name

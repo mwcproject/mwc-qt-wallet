@@ -84,7 +84,7 @@ ShowProofDlg::ShowProofDlg(QWidget *parent, const QString &fileName, const Proof
 
     ui->textEdit->setText("<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">"
             "p, li { white-space: pre-wrap; }"
-            "</style></head><body style=\"line-height:130%;margin-left:20px;margin-right:20px;margin-top:15px\">"
+            "</style></head><body style=\"font-size:16px;line-height:130%;margin-left:20px;margin-right:20px;margin-top:15px\">"
             "<p align=\"center\">this file proves that <b>" + proofInfo.mwc + " MWCs</b> was sent to<br /><b>" + proofInfo.toAdress +
             "</b> <br/>from<br/><b>" + proofInfo.fromAdress + "</br></p></body></html>");
 

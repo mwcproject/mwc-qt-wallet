@@ -60,9 +60,11 @@ public:
     const static int64_t TIMEOUT = 1000*150; // Send timeout is 2 minutes, we are making it a little longer to cover start/stop overhead
 
     // coinNano == -1  - mean All
-    TaskSendMwc( MWC713 *wallet713, int64_t coinNano, const QString & address, const QString & apiSecret, QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof ) :
+    TaskSendMwc( MWC713 *wallet713, int64_t coinNano, const QString & address, const QString & apiSecret, QString message,
+                 int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff, int ttl_blocks,
+                 bool generateProof, const QString & expectedproofAddress ) :
             Mwc713Task("TaskSendMwc",
-                    buildCommand( coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs, outputs, fluff, ttl_blocks, generateProof),
+                    buildCommand( coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs, outputs, fluff, ttl_blocks, generateProof, expectedproofAddress),
                     wallet713, ""), sendMwcNano(coinNano) {}
 
     virtual ~TaskSendMwc() override {}
@@ -72,7 +74,7 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
     // coinNano == -1  - mean All
-    QString buildCommand(int64_t coinNano, const QString & address, const QString & apiSecret, QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof) const;
+    QString buildCommand(int64_t coinNano, const QString & address, const QString & apiSecret, QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof, const QString & expectedproofAddress) const;
 
     int64_t sendMwcNano;
 };
@@ -129,6 +131,25 @@ public:
 private:
     QString buildCommand(QString filename, bool fluff) const;
 };
+
+class TaskRequestRecieverWalletAddress : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*40; // up to 30 seconds in case of network issues. We have retry logic there and it takes time
+
+    TaskRequestRecieverWalletAddress( MWC713 *wallet713, QString _url, QString apiSecret ) :
+        Mwc713Task("TaskRequestRecieverWalletAddress", "check-proof --to " + _url +
+                (apiSecret.isEmpty()? "" : " --apisecret \"" + apiSecret + "\"" ), wallet713, ""),
+            url(_url) {}
+
+    virtual ~TaskRequestRecieverWalletAddress() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    QString url;
+};
+
 
 }
 
