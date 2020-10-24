@@ -163,11 +163,13 @@ void SendOnline::onSgnShowSendResult( bool success, QString message ) {
 
 void SendOnline::on_sendEdit_textChanged(const QString & address)
 {
-    QString addrType = util->verifyAddress(address);
+    // NOTE!!!!  Foeign API can be protected with a secret. But because that secret is shared with owner API,
+    // it is impossible to share it. Becasue of that there is no reason for QT wallet to support that case. It adds confusion.
+/*    QString addrType = util->verifyAddress(address);
     if ( addrType == "https" || addrType=="tor" )
         ui->apiSecretEdit->show();
     else
-        ui->apiSecretEdit->hide();
+        ui->apiSecretEdit->hide();*/
 }
 
 

@@ -234,16 +234,19 @@
       <item>
        <widget class="control::MwcLabelNormal" name="label">
         <property name="text">
-         <string>Trades data contains refund slates and private keys for the redeem operation. In case of the hardware failure you might lost this data and as a result you might loose your funds. That is why we strongly recommend to keep the copy of your trade file on the separate drive like USB stick.
+         <string>
+
+Trades data contains refund slates and private keys for the redeem operation. In case of the hardware failure you might lost this data and as a result you might loose your funds. That is why we strongly recommend to keep the copy of your trade file on the separate drive like USB stick.
 
 If you have your backup, in worst case scenario you will be able to restore your MWC wallet from the mnemonic phrase, restore your swap trades, and finish the swap process.
 
 The best opportunity to backup the trade data is before the initial funds lock.
 
-Please note, swap trade files are encrypted, so you can only restore it to the same wallet only.</string>
+Please note, swap trade files are encrypted, so you can only restore it to the same wallet only.
+</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
