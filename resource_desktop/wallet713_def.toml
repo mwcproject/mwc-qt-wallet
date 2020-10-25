@@ -98,7 +98,7 @@
 # btc_test_2 = "btc.test1.swap.mwc.mw:8000"
 
 chain = "Mainnet"
-wallet713_data_path = "gui_wallet713_data"
+wallet713_data_path = "xxxxx"
 default_keybase_ttl = "24h"
 
 [swap_electrumx_addr]
