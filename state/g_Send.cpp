@@ -317,7 +317,7 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
         context->wallet->sendTo( account, amount, util::fullFormalAddress( addressRes.second, address), apiSecret, message,
                                  sendParams.inputConfirmationNumber, sendParams.changeOutputs,
                                  outputs, context->appContext->isFluffSet(), -1 /* Not used for online sends */,
-                                 context->appContext->getGenerateProof(), respProofAddress);
+                                 genProof, respProofAddress);
 
         return true;
     }
