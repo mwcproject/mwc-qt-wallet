@@ -105,7 +105,7 @@ bool deployWalletFilesFromResources() {
         return false;
     }
 
-    QString mwc713conf = confPath.second + "/wallet713v2.toml";
+    QString mwc713conf = confPath.second + "/wallet713v3.toml";
     QString mwcGuiWalletConf = confPath.second + "/mwc-gui-wallet-v3.conf";
 
     bool ok = true;

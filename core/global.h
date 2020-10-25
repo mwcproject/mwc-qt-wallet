@@ -42,11 +42,7 @@ const QVector<QString> BANNED_ACCOUT_PREFIXES = {DEL_ACCONT_PREFIX};
 
 const QString QT_WALLET_DEFAULT_CONFIG  = ":/resource_desktop/mwc-gui-wallet.conf";
 
-#ifdef Q_OS_DARWIN
-const QString MWC713_DEFAULT_CONFIG     = ":/resource_desktop/wallet713_mac.toml";
-#else
 const QString MWC713_DEFAULT_CONFIG     = ":/resource_desktop/wallet713_def.toml";
-#endif
 
 const QString MWC_NODE_CONFIG_MAIN      = ":/resource_desktop/mwc-server-main.toml";
 const QString MWC_NODE_CONFIG_FLOO      = ":/resource_desktop/mwc-server-floo.toml";

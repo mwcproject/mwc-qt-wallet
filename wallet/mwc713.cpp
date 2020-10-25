@@ -1831,30 +1831,39 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
         }
     }
 
-    newConfLines.append("chain = \"" + config.getNetwork() + "\"");
-    newConfLines.append("wallet713_data_path = \"" + config.getDataPath() + "\"");
+    // toml format doesn't allow to end section and return to the main one. So we need to keep the structure
+    int appentIdx = newConfLines.size();
+    for (int j=0; j<appentIdx; j++) {
+        if (newConfLines[j].trimmed().startsWith('[')) {
+            appentIdx = j;
+            break;
+        }
+    }
+
+    newConfLines.insert(appentIdx, "chain = \"" + config.getNetwork() + "\"");
+    newConfLines.insert(appentIdx, "wallet713_data_path = \"" + config.getDataPath() + "\"");
     if (config.keyBasePath.length() > 0)
-        newConfLines.append("keybase_binary = \"" + config.keyBasePath + "\"");
+        newConfLines.insert(appentIdx, "keybase_binary = \"" + config.keyBasePath + "\"");
 
     if (!config.mwcmqsDomainEx.isEmpty())
-        newConfLines.append("mwcmqs_domain = \"" + config.mwcmqsDomainEx + "\"");
+        newConfLines.insert(appentIdx, "mwcmqs_domain = \"" + config.mwcmqsDomainEx + "\"");
 
     if (config.hasForeignApi() && !config.foreignApiAddress.isEmpty()) {
-        newConfLines.append("foreign_api = true");
-        newConfLines.append("foreign_api_address = \"" + config.foreignApiAddress + "\"");
+        newConfLines.insert(appentIdx,"foreign_api = true");
+        newConfLines.insert(appentIdx,"foreign_api_address = \"" + config.foreignApiAddress + "\"");
 
         if (!config.foreignApiSecret.isEmpty())
-            newConfLines.append("foreign_api_secret = \"" + config.foreignApiSecret + "\"");
+            newConfLines.insert(appentIdx,"foreign_api_secret = \"" + config.foreignApiSecret + "\"");
 
         if (!config.tlsCertificateFile.isEmpty() && !config.tlsCertificateKey.isEmpty()) {
-            newConfLines.append("tls_certificate_file = \"" + config.tlsCertificateFile + "\"");
-            newConfLines.append("tls_certificate_key = \"" + config.tlsCertificateKey + "\"");
+            newConfLines.insert(appentIdx,"tls_certificate_file = \"" + config.tlsCertificateFile + "\"");
+            newConfLines.insert(appentIdx,"tls_certificate_key = \"" + config.tlsCertificateKey + "\"");
         }
     }
 
     if ( !config::isOnlineWallet()) {
-        newConfLines.append("grinbox_listener_auto_start = false");
-        newConfLines.append("keybase_listener_auto_start = false");
+        newConfLines.insert(appentIdx,"grinbox_listener_auto_start = false");
+        newConfLines.insert(appentIdx,"keybase_listener_auto_start = false");
     }
 
     // Update connection node...
@@ -1868,14 +1877,14 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
             case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL: {
                 node::MwcNodeConfig nodeConfig = node::getCurrentMwcNodeConfig(connection.localNodeDataPath,
                                                                                config.getNetwork());
-                newConfLines.append("mwc_node_uri = \"http://127.0.0.1:13413\"");
-                newConfLines.append("mwc_node_secret = \"" + nodeConfig.secret + "\"");
+                newConfLines.insert(appentIdx,"mwc_node_uri = \"http://127.0.0.1:13413\"");
+                newConfLines.insert(appentIdx,"mwc_node_secret = \"" + nodeConfig.secret + "\"");
                 needLocalMwcNode = true;
                 break;
             }
             case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CUSTOM:
-                newConfLines.append("mwc_node_uri = \"" + connection.mwcNodeURI + "\"");
-                newConfLines.append("mwc_node_secret = \"" + connection.mwcNodeSecret + "\"");
+                newConfLines.insert(appentIdx,"mwc_node_uri = \"" + connection.mwcNodeURI + "\"");
+                newConfLines.insert(appentIdx,"mwc_node_secret = \"" + connection.mwcNodeSecret + "\"");
                 break;
             default:
                 Q_ASSERT(false);
