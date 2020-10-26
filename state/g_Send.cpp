@@ -326,6 +326,7 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
 
 // Response from requestRecieverWalletAddress(url)
 void Send::onRequestRecieverWalletAddress(QString url, QString proofAddress, QString error) {
+    Q_UNUSED(url)
     respProofAddress = proofAddress;
     restProofError = error;
 }

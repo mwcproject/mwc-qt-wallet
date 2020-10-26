@@ -131,6 +131,36 @@ void AppContext::updateIntVectorFor( QString name, const QVector<int> & data ) {
 
 
 bool AppContext::loadData() {
+    bool res = loadDataImpl();
+
+    if (walletInstancePaths.isEmpty()) {
+        // Need to do default initialization
+        // Let's scan for the wallets.
+        QPair<bool,QString> path = ioutils::getAppDataPath("");
+        if (path.first) {
+            QDir qt_wallet_dir(path.second);
+            QFileInfoList files = qt_wallet_dir.entryInfoList();
+            for (const QFileInfo & fl : files) {
+                if (fl.isDir()) {
+                    QString walletDataDir = fl.fileName(); // The last dir name, for QT developers it is a file.
+                    if (walletDataDir.startsWith('.'))
+                        continue; // Self and parent - not interested
+                    if (wallet::WalletConfig::doesSeedExist(walletDataDir)) {
+                        QString arch = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletDataDir,this)[1];
+                        if (arch == util::getBuildArch() ) {
+                            walletInstancePaths.push_back(walletDataDir);
+                            currentWalletInstanceIdx = 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return res;
+}
+
+bool AppContext::loadDataImpl() {
     QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
     if (!dataPath.first) {
         QMessageBox::critical(nullptr, "Error", dataPath.second);
@@ -264,26 +294,7 @@ bool AppContext::loadData() {
         nodeConnection.insert( "OnlineWallet_Mainnet", nodeConnectionMainNet );
         nodeConnection.insert( "OnlineWallet_Floonet", nodeConnectionFlooNet );
 
-        // Let's scan for the wallets.
-        QPair<bool,QString> path = ioutils::getAppDataPath("");
-        if (path.first) {
-            QDir qt_wallet_dir(path.second);
-            QFileInfoList files = qt_wallet_dir.entryInfoList();
-            for (const QFileInfo & fl : files) {
-                if (fl.isDir()) {
-                    QString walletDataDir = fl.fileName(); // The last dir name, for QT developers it is a file.
-                    if (walletDataDir.startsWith('.'))
-                        continue; // Self and parent - not interested
-                    if (wallet::WalletConfig::doesSeedExist(walletDataDir)) {
-                        QString arch = wallet::WalletConfig::readNetworkArchInstanceFromDataPath(walletDataDir,this)[1];
-                        if (arch == util::getBuildArch() ) {
-                            walletInstancePaths.push_back(walletDataDir);
-                            currentWalletInstanceIdx = 0;
-                        }
-                    }
-                }
-            }
-        }
+        // walletInstancePaths  discovery is skipped because we handle that in the caller function
     }
 
     if (id>=0x4799) {

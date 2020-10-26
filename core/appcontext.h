@@ -216,6 +216,8 @@ signals:
 
 private:
     bool loadData();
+    bool loadDataImpl();
+
     void saveData() const;
 
     void loadNotesData();
