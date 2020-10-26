@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>778</width>
-    <height>580</height>
+    <height>584</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -648,6 +648,15 @@
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>mwcMqTriggerButton</tabstop>
+  <tabstop>mwcMqAddress</tabstop>
+  <tabstop>mwcMqNextAddress</tabstop>
+  <tabstop>mwcMqToIndex</tabstop>
+  <tabstop>keybaseTriggerButton</tabstop>
+  <tabstop>torTriggerButton</tabstop>
+  <tabstop>httpConfigButton</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources_desktop.qrc"/>
  </resources>
