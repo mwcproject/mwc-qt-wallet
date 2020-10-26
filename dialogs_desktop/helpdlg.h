@@ -34,13 +34,7 @@ public:
     ~HelpDlg();
 
 private slots:
-    void on_backwardBtn_clicked();
-    void on_forwardBtn_clicked();
     void on_doneButton_clicked();
-
-    void on_backwardAvailable(bool available);
-    void on_forwardAvailable(bool available);
-
 private:
     Ui::HelpDlg *ui;
 };
