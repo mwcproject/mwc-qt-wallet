@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1055</width>
-    <height>826</height>
+    <height>716</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <number>20</number>
    </property>
    <property name="topMargin">
-    <number>80</number>
+    <number>90</number>
    </property>
    <property name="rightMargin">
     <number>30</number>
@@ -603,14 +603,24 @@ Please note, swap trade files are encrypted, so you can only restore it to the s
  </widget>
  <customwidgets>
   <customwidget>
+   <class>control::MwcPushButtonNormal</class>
+   <extends>QPushButton</extends>
+   <header>control_desktop/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcToolButtonUnderscore</class>
-   <extends>QToolButton</extends>
-   <header>control_desktop/MwcToolButton.h</header>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcPushButtonRound</class>
+   <extends>QPushButton</extends>
+   <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::RichVBox</class>
@@ -619,19 +629,9 @@ Please note, swap trade files are encrypted, so you can only restore it to the s
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>control::MwcPushButtonRound</class>
-   <extends>QPushButton</extends>
-   <header>control_desktop/MwcPushButton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcPushButtonNormal</class>
-   <extends>QPushButton</extends>
-   <header>control_desktop/MwcPushButton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelNormal</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
+   <class>control::MwcToolButtonUnderscore</class>
+   <extends>QToolButton</extends>
+   <header>control_desktop/MwcToolButton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

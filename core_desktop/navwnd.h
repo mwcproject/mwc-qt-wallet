@@ -22,6 +22,7 @@ namespace core {
 class NavBar;
 class NavMenuAccount;
 class AppContext;
+class PanelTitle;
 
 // Window with navigation bar
 class NavWnd : public PanelBaseWnd {
@@ -34,6 +35,7 @@ protected:
 
 private:
     NavBar * topRightButtonWnd = nullptr;
+    PanelTitle * panelTitle = nullptr;
 };
 
 }

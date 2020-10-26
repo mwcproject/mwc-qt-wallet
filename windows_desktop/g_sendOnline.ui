@@ -23,6 +23,9 @@
    <property name="spacing">
     <number>0</number>
    </property>
+   <property name="topMargin">
+    <number>60</number>
+   </property>
    <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -553,14 +556,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcPushButtonNormal</class>
-   <extends>QPushButton</extends>
-   <header>control_desktop/MwcPushButton.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcPushButtonNormal</class>
+   <extends>QPushButton</extends>
+   <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>

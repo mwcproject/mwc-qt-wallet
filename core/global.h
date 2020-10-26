@@ -117,6 +117,7 @@ const QString PAGE_W_CONTACTS       = "Contacts";
 const QString PAGE_X_EVENTS         = "Event log";
 const QString PAGE_X_SHOW_PASSPHRASE= "Wallet mnemonic passphrase";
 const QString PAGE_X_WALLET_CONFIG  = "Wallet Config";
+const QString PAGE_X_NODE_CONFIG    = "Node Config";
 const QString PAGE_X_RESYNC         = "Re-sync wallet with MWC Node";
 
 const QString PAGE_Y_SELECT_RUNNING_MODE = "Select Running Mode";

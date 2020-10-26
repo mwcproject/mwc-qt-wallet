@@ -308,7 +308,7 @@ void DesktopWndManager::pageWalletConfig() {
 }
 
 void DesktopWndManager::pageNodeConfig() {
-    windowManager->switchToWindowEx( mwc::PAGE_X_WALLET_CONFIG,
+    windowManager->switchToWindowEx( mwc::PAGE_X_NODE_CONFIG,
              new wnd::NodeConfig( windowManager->getInWndParent()));
 }
 

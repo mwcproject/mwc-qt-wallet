@@ -16,6 +16,7 @@
 #include "navbar.h"
 #include <QResizeEvent>
 #include "navmenuaccount.h"
+#include "paneltitle.h"
 
 namespace core {
 
@@ -30,6 +31,7 @@ NavWnd::NavWnd(QWidget *parent, bool createNavigationButtons) :
 {
     if (createNavigationButtons) {
         topRightButtonWnd = new NavBar(this);
+        panelTitle = new PanelTitle(this);
     }
 }
 
@@ -39,11 +41,16 @@ void NavWnd::resizeEvent(QResizeEvent *event) {
         QSize sz = event->size();
 
         QSize trwndSz = topRightButtonWnd->size();
-        int x0 = sz.width() - trwndSz.width() - TOP_RIGHT_BTNS_CX;
+        int dx = trwndSz.width() + TOP_RIGHT_BTNS_CX;
+        int x0 = sz.width() - dx;
         topRightButtonWnd->move(x0, TOP_RIGHT_BTNS_CY);
 
         topRightButtonWnd->setNavMenuPosition(QPoint(std::min(x0, sz.width() - NAV_MENU_WIDTH - TOP_RIGHT_BTNS_CY),
                                                      TOP_RIGHT_BTNS_CY + trwndSz.height() + trwndSz.height() / 3));
+
+        Q_ASSERT(panelTitle);
+        panelTitle->resize(sz.width()-dx*2, trwndSz.height());
+        panelTitle->move(dx, TOP_RIGHT_BTNS_CY);
     }
 }
 

@@ -13,20 +13,13 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2,14,1">
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>66</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="14">
+   <property name="topMargin">
+    <number>90</number>
+   </property>
+   <property name="bottomMargin">
+    <number>30</number>
+   </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,10,1">
      <item>
@@ -429,19 +422,6 @@
      </item>
     </layout>
    </item>
-   <item>
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>66</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -451,14 +431,14 @@
    <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
-   <class>ListWithColumns</class>
-   <extends>QTableWidget</extends>
-   <header>control_desktop/listwithcolumns.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonRound</class>
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ListWithColumns</class>
+   <extends>QTableWidget</extends>
+   <header>control_desktop/listwithcolumns.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -18,6 +18,7 @@
 #include <QApplication>
 #include "../bridge/wallet_b.h"
 #include "../bridge/config_b.h"
+#include "paneltitle.h"
 
 using namespace bridge;
 
@@ -59,6 +60,7 @@ QWidget * WindowManager::switchToWindowEx( const QString & pageName, QWidget * n
     currentWnd->repaint();
 
     mainWnd->setWindowTitle(buildWalletTitle(pageName));
+    setCurrentTitle(pageName);
 
     return newWindow;
 }
@@ -69,9 +71,10 @@ QString WindowManager::buildWalletTitle(const QString & pageName) {
 
     QString title = config->get_APP_NAME() + " v" + buildNumber + " [" + ppin[2] + "]";
 
+    /* we are printing page name on the page now...
     if (!pageName.isEmpty()) {
         title += " - " + pageName;
-    }
+    }*/
     return title;
 }
 
