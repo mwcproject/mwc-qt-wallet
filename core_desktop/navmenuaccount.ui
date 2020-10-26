@@ -110,7 +110,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Logout</string>
+    <string>Logout / Change Wallet</string>
    </property>
   </widget>
  </widget>
