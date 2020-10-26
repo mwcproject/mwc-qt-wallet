@@ -158,15 +158,11 @@ MessageBox::~MessageBox()
 
 void MessageBox::on_passwordEdit_textChanged(const QString &str)
 {
-    QThread::msleep(200); // Ok for human and will prevent brute force from UI attack (really crasy scenario, better to attack mwc713 if you already get the host).
     control::MwcPushButtonNormal * btn2lock = passBlockButton == core::WndManager::RETURN_CODE::BTN1 ? ui->button1 : ui->button2;
     bool ok = crypto::calcHSA256Hash(str) == blockingPasswordHash;
     btn2lock->setEnabled(ok);
     if (ok)
         btn2lock->setFocus();
-
-    // Sometimes button is not repaint under the Linux. Let's enforce it
-    btn2lock->update();
 }
 
 void MessageBox::on_button1_clicked()

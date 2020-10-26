@@ -97,7 +97,7 @@ void Receive::respReceiveFile( bool success, QStringList errors, QString inFileN
             ftBack();
         } else {
             core::getWndManager()->messageTextDlg("Failure",
-                                         "Unable to sign file transaction.\n" + util::formatErrorMessages(errors));
+                                         "Unable to receive file transaction.\n\n" + util::formatErrorMessages(errors));
         }
     }
 }

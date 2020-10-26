@@ -34,13 +34,13 @@ MwcPushButtonNormal::~MwcPushButtonNormal()
 {}
 
 void MwcPushButtonNormal::focusInEvent(QFocusEvent * event) {
-    Q_UNUSED(event)
-    update();
+    QPushButton::focusInEvent(event);
+    repaint(); // update by some reasons doesn't work. Seems like qt bug
 }
 
 void MwcPushButtonNormal::focusOutEvent(QFocusEvent * event) {
-    Q_UNUSED(event)
-    update();
+    QPushButton::focusOutEvent(event);
+    repaint(); // update by some reasons doesn't work. Seems like qt bug
 }
 
 // -----------------   MwcPushButtonSmall  -----------------------

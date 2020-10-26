@@ -66,6 +66,8 @@ QWidget * WindowManager::switchToWindowEx( const QString & pageName, QWidget * n
 }
 
 QString WindowManager::buildWalletTitle(const QString & pageName) {
+    Q_UNUSED(pageName)
+
     QString buildNumber = config->getBuildVersion();
     QVector<QString> ppin = config->getCurrentWalletInstance();
 

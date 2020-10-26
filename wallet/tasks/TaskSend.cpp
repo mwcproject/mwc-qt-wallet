@@ -289,6 +289,13 @@ bool TaskReceiveFile::processTask(const QVector<WEvent> &events) {
     for (auto & er:errs)
         errMsg.push_back(er.message);
 
+    // Update possibe error meesage
+    for ( QString & s : errMsg ) {
+        if (s.contains("Transaction Expired", Qt::CaseInsensitive)) {
+            s = "This transaction has expired TTL. It already cancelled by sender wallet.";
+        }
+    }
+
     wallet713->setReceiveFile(false, errMsg, inFileName,"");
     return true;
 }

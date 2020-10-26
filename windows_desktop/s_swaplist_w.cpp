@@ -367,6 +367,9 @@ void SwapList::sgnDeleteSwapTrade(QString swapId, QString error) {
 void SwapList::sgnSwapTradeStatusUpdated(QString swapId, QString currentAction, QString currentState,
                                          QVector<QString> executionPlan,
                                          QVector<QString> tradeJournal) {
+    Q_UNUSED(swapId)
+    Q_UNUSED(currentAction)
+    Q_UNUSED(currentState)
     Q_UNUSED(executionPlan);
     Q_UNUSED(tradeJournal);
 

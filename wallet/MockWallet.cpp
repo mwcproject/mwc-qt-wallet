@@ -569,6 +569,7 @@ void MockWallet::cancelSwapTrade(QString swapId) {
 //                            QVector<SwapJournalMessage> tradeJournal,
 //                            QString error );
 void MockWallet::requestTradeDetails(QString swapId ) {
+    Q_UNUSED(swapId)
     SwapTradeInfo sw;
     emit onRequestTradeDetails( sw, {}, "current action", {}, "");
 }
@@ -576,6 +577,10 @@ void MockWallet::requestTradeDetails(QString swapId ) {
 // Adjust swap stade values. params are optional
 // Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
 void MockWallet::adjustSwapData( QString swapId, QString adjustCmd, QString param1, QString param2 ) {
+    Q_UNUSED(swapId)
+    Q_UNUSED(adjustCmd)
+    Q_UNUSED(param1)
+    Q_UNUSED(param2)
     emit onAdjustSwapData(swapId, "adjust command", "");
 }
 
@@ -604,6 +609,8 @@ void MockWallet::restoreSwapTradeData(QString filename) {
 // apiSecret - if foreign API secret, optional. Normally it is empty
 // Chack signal: onRequestRecieverWalletAddress(QString url, QString address, QString error)
 void MockWallet::requestRecieverWalletAddress(QString url, QString apiSecret) {
+    Q_UNUSED(url)
+    Q_UNUSED(apiSecret)
     emit onRequestRecieverWalletAddress(url, "dhfkldgsfjfdkljhfdkjhkfdghgkfdhgkjh", "");
 }
 

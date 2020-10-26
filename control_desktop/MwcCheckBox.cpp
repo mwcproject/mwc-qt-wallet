@@ -25,7 +25,7 @@ MwcCheckBox::~MwcCheckBox() {}
 
 // to handle hoover
 void MwcCheckBox::enterEvent(QEvent * event) {
-    Q_UNUSED(event)
+    QCheckBox::enterEvent(event);
     if (isEnabled() && !hasFocus()) {
         QFont f = font();
         f.setUnderline(true);
@@ -34,7 +34,7 @@ void MwcCheckBox::enterEvent(QEvent * event) {
 }
 
 void MwcCheckBox::leaveEvent(QEvent * event) {
-    Q_UNUSED(event)
+    QCheckBox::leaveEvent(event);
     if (!hasFocus()) {
         QFont f = font();
         f.setUnderline(false);
@@ -45,6 +45,7 @@ void MwcCheckBox::leaveEvent(QEvent * event) {
 
 // to handle focus
 void MwcCheckBox::focusInEvent(QFocusEvent * event) {
+    QCheckBox::focusInEvent(event);
     Q_UNUSED(event)
     if (isEnabled()) {
         QFont f = font();
@@ -54,7 +55,7 @@ void MwcCheckBox::focusInEvent(QFocusEvent * event) {
 }
 
 void MwcCheckBox::focusOutEvent(QFocusEvent * event) {
-    Q_UNUSED(event)
+    QCheckBox::focusOutEvent(event);
     QFont f = font();
     f.setUnderline(false);
     setFont(f);
