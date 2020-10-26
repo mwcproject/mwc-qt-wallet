@@ -18,11 +18,10 @@
 
 namespace util {
 
-QStringList readTextFile( QString fileName, bool cleanEMptyLines, std::function<void()> openOpenErrorCallback ) {
+QStringList readTextFile( QString fileName, bool trimmed, bool cleanEMptyLines, std::function<void()> openOpenErrorCallback ) {
     QFile file(fileName);
     QStringList res;
     if (!file.open(QFile::ReadOnly)) {
-
         openOpenErrorCallback();
         return res;
     }
@@ -30,7 +29,9 @@ QStringList readTextFile( QString fileName, bool cleanEMptyLines, std::function<
     QTextStream in(&file);
 
     while(!in.atEnd()) {
-        QString line = in.readLine().trimmed();
+        QString line = in.readLine();
+        if (trimmed)
+            line = line.trimmed();
         if (cleanEMptyLines && line.isEmpty())
             continue;
 

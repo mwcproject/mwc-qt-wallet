@@ -1798,7 +1798,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
 
     QString mwc713confFN = config::getMwc713conf();
 
-    QStringList confLines = util::readTextFile(mwc713confFN, false);
+    QStringList confLines = util::readTextFile(mwc713confFN, true, false);
     // Updating the config with new values
 
     QStringList newConfLines;

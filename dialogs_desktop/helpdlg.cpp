@@ -24,7 +24,7 @@ HelpDlg::HelpDlg( QWidget *parent, QString documentName ) :
     ui(new Ui::HelpDlg)
 {
     ui->setupUi(this);
-    QStringList lines = util::readTextFile(":/help/" + documentName);
+    QStringList lines = util::readTextFile(":/help/" + documentName, false);
     QString htmlStr = lines.join("");
     ui->browser->setHtml(htmlStr);
 }
