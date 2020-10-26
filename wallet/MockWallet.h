@@ -272,6 +272,7 @@ public:
 
     // Repost the transaction. Optionally fluff.
     // index is the tx_index in the tx_log.
+    // Check Signal: onRepost(QString error)
     virtual void repost(QString account, int index, bool fluff) override;
 
     // Request proof address for files

@@ -53,6 +53,7 @@ public:
     Q_INVOKABLE void requestStartTorListener();
     Q_INVOKABLE void requestStopTorListener();
 
+    // Return: signal  sgnRepost(int id, QString err)
     Q_INVOKABLE void repost(QString account, int id, bool fluff);
 
     // return values:
@@ -198,6 +199,8 @@ signals:
     // Account is renamed, renameAccount
     void sgnAccountRenamed(bool success, QString errorMessage);
 
+    // respobd from repost.  OK is err is empty
+    void sgnRepost(int txIdx, QString err);
 private slots:
     // Signals that comes from wallet & notification system
     void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
@@ -229,6 +232,8 @@ private slots:
 
     void onAccountCreated( QString newAccountName);
     void onAccountRenamed(bool success, QString errorMessage);
+
+    void onRepost(int txIdx, QString err);
 };
 
 }

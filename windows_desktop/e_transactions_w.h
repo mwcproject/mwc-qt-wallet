@@ -80,6 +80,8 @@ private slots:
     void onSgnNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, QString totalDifficulty, int connections );
     void onSgnNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL values
 
+    void onSgnRepost( int idx, QString err );
+
     void onItemActivated(QString itemId);
 
 protected:

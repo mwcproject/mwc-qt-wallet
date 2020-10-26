@@ -267,6 +267,7 @@ public:
     virtual void getRootPublicKey( QString message2sign ) override;
 
     // Repost a transaction. Optionally fluff the transaction. index is the tx_index in the tx_log.
+    // Check Signal: onRepost(QString error)
     virtual void repost(QString account, int index, bool fluff) override;
 
     // ---------------- Swaps -------------
@@ -462,6 +463,8 @@ public:
     void setRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
 
     void setRequestRecieverWalletAddress(QString url, QString address, QString error);
+
+    void setRepost(int txIdx, QString err);
 private:
 
 

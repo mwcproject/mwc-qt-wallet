@@ -68,6 +68,9 @@ Transactions::Transactions(QWidget *parent) :
                       this, &Transactions::onSgnNodeStatus, Qt::QueuedConnection);
     QObject::connect( wallet, &bridge::Wallet::sgnNewNotificationMessage,
                       this, &Transactions::onSgnNewNotificationMessage, Qt::QueuedConnection);
+    QObject::connect( wallet, &bridge::Wallet::sgnRepost,
+                      this, &Transactions::onSgnRepost, Qt::QueuedConnection);
+
     QObject::connect(ui->transactionTable, &control::RichVBox::onItemActivated,
                      this, &Transactions::onItemActivated, Qt::QueuedConnection);
 
@@ -230,8 +233,6 @@ void Transactions::updateData() {
 }
 
 void Transactions::richButtonPressed(control::RichButton * button, QString coockie) {
-    Q_UNUSED(button);
-
     QStringList res = coockie.split(':');
     if (res.size()<2) {
         Q_ASSERT(false);
@@ -270,7 +271,9 @@ void Transactions::richButtonPressed(control::RichButton * button, QString coock
         }
         QString currentAccount = res[2];
         wallet->repost( currentAccount, tx2process.txIdx, config->isFluffSet() );
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Processing repost for transaction #" + QString::number(tx2process.txIdx+1) );
+        // response by the signal...
+        ui->progressFrame->show();
+        ui->transactionTable->hide();
     }
     else if ( id == "Proof" ) {
         util::TimeoutLockObject to("Transactions");
@@ -309,6 +312,20 @@ void Transactions::richButtonPressed(control::RichButton * button, QString coock
         Q_ASSERT(false);
     }
 
+}
+
+void Transactions::onSgnRepost( int idx, QString err ) {
+    ui->progressFrame->hide();
+    ui->transactionTable->show();
+
+    if (err.isEmpty()) {
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Transaction #" + QString::number(idx+1) + " was successfully reposted." );
+        core::getWndManager()->messageTextDlg("Repost", "Transaction #" + QString::number(idx+1) + " was successfully reposted." );
+    }
+    else {
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Failed to repost transaction #" + QString::number(idx+1) + ". " + err );
+        core::getWndManager()->messageTextDlg("Repost", "Failed to repost transaction #" + QString::number(idx+1) + ".\n\n" + err );
+    }
 }
 
 

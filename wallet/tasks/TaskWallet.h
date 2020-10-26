@@ -253,18 +253,21 @@ private:
 
 class TaskRepost: public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 2000;
+    const static int64_t TIMEOUT = 1000 * 30; // in case of error retry takes time
 
     TaskRepost( MWC713 * wallet713, int index, bool fluff) :
             Mwc713Task("TaskRepost", "repost -i " + QString::number(index) +
                        (fluff ? " --fluff" : ""),
-                       wallet713, "")
+                       wallet713, ""),
+                       idx(index)
             {}
 
     virtual ~TaskRepost() override {}
     virtual bool processTask(const QVector<WEvent> & events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+private:
+    int idx = -1;
 };
 
 

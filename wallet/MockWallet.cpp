@@ -500,6 +500,7 @@ void MockWallet::repost(QString account, int index, bool fluff) {
     Q_UNUSED(account)
     Q_UNUSED(index)
     Q_UNUSED(fluff)
+    emit onRepost(index, "");
 }
 
 // Request proof address for files

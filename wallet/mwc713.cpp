@@ -1560,6 +1560,12 @@ void MWC713::setRequestRecieverWalletAddress(QString url, QString address, QStri
 }
 
 
+void MWC713::setRepost(int txIdx, QString err) {
+    logger::logEmit( "MWC713", "onRepost", err );
+    emit onRepost(txIdx, err);
+}
+
+
 /////////////////////////////////////////////////////////////////////////////////
 //      mwc713  IOs
 

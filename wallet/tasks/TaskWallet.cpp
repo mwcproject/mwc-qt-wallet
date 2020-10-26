@@ -17,6 +17,7 @@
 #include "../mwc713.h"
 #include "../../util/Log.h"
 #include "../../core/Notification.h"
+#include "utils.h"
 
 namespace wallet {
 
@@ -446,20 +447,8 @@ bool TaskRootPublicKey::processTask(const QVector<WEvent> & events) {
     return true;
 }
 
-
 bool TaskRepost::processTask(const QVector<WEvent> & events) {
-    QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
-
-    if (!error.isEmpty()) {
-        QString errMsg;
-        for ( WEvent & e : error ) {
-            if (errMsg.isEmpty()>0)
-                errMsg += "; ";
-            errMsg += e.message;
-        }
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to report transaction. " + errMsg );
-    }
-
+    wallet713->setRepost(idx, getErrorMessage(events, ""));
     return true;
 }
 

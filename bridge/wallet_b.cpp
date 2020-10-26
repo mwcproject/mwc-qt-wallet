@@ -84,6 +84,8 @@ Wallet::Wallet(QObject *parent) : QObject(parent) {
                      this, &Wallet::onAccountCreated, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onAccountRenamed,
                      this, &Wallet::onAccountRenamed, Qt::QueuedConnection);
+    QObject::connect(wallet, &wallet::Wallet::onRepost,
+                     this, &Wallet::onRepost, Qt::QueuedConnection);
 }
 
 Wallet::~Wallet() {}
@@ -202,6 +204,9 @@ void Wallet::onAccountRenamed(bool success, QString errorMessage) {
     emit sgnAccountRenamed(success, errorMessage);
 }
 
+void Wallet::onRepost(int txIdx, QString err) {
+    emit sgnRepost(txIdx, err);
+}
 
 // return true is MQS is online
 bool Wallet::getMqsListenerStatus() {

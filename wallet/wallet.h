@@ -652,6 +652,7 @@ public:
 
     // Repost the transaction. Optionally fluff.
     // index is the tx_index in the tx_log.
+    // Check Signal: onRepost(QString error)
     virtual void repost(QString account, int index, bool fluff) = 0;
 
     // ---------------- Swaps -------------
@@ -855,6 +856,9 @@ signals:
 
     // Response from requestRecieverWalletAddress(url)
     void onRequestRecieverWalletAddress(QString url, QString address, QString error);
+
+    // Response to the post command. Empty message - mean we are good, no errors.
+    void onRepost(int txIdx, QString error);
 };
 
 }
