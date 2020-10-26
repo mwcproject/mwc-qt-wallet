@@ -26,6 +26,10 @@ public:
     explicit MwcPushButtonNormal(const QString &text, QWidget *parent = Q_NULLPTR);
     MwcPushButtonNormal(const QIcon &icon, const QString &text, QWidget *parent = Q_NULLPTR);
     virtual ~MwcPushButtonNormal() override;
+protected:
+    // to handle focus
+    virtual void focusInEvent(QFocusEvent * event) override;
+    virtual void focusOutEvent(QFocusEvent * event) override;
 };
 
 class MwcPushButtonSmall : public QPushButton {

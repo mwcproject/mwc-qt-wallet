@@ -327,6 +327,22 @@ QPushButton:enabled:!focus::hover
     background-color: rgba(255, 255, 255, 0.15);
 }
 
+QPushButton:focus {
+    background: #FFFFFF;
+    color: #6F00D6;
+}
+
+QPushButton:disabled {
+    /*    border: 2px solid gray;
+        color: gray;*/
+    color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+QPushButton:pressed {
+    background: rgba(255, 255, 255, 0.3);
+}
+
 control--MwcPushButtonNormal {
     font-size: 15px;
 }
@@ -359,22 +375,6 @@ control--MwcPushButtonStatusLine {
     border-radius: 10px;
     font-size: 12px;
     padding: 4px;
-}
-
-QPushButton:focus {
-    background: #FFFFFF;
-    color: #6F00D6;
-}
-
-QPushButton:disabled {
-/*    border: 2px solid gray;
-    color: gray;*/
-    color: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-QPushButton:pressed {
-    background: rgba(255, 255, 255, 0.3);
 }
 
 control--MwcStatusLine {
@@ -676,7 +676,6 @@ QCheckBox {
 QCheckBox::disabled {
     color: #E2CCF7;
 }
-
 
 QCheckBox::indicator {
     width: 18px;

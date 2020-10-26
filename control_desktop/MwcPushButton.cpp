@@ -33,6 +33,16 @@ MwcPushButtonNormal::MwcPushButtonNormal(const QIcon &icon, const QString &text,
 MwcPushButtonNormal::~MwcPushButtonNormal()
 {}
 
+void MwcPushButtonNormal::focusInEvent(QFocusEvent * event) {
+    Q_UNUSED(event)
+    update();
+}
+
+void MwcPushButtonNormal::focusOutEvent(QFocusEvent * event) {
+    Q_UNUSED(event)
+    update();
+}
+
 // -----------------   MwcPushButtonSmall  -----------------------
 
 MwcPushButtonSmall::MwcPushButtonSmall(QWidget *parent) :

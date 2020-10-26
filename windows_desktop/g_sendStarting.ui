@@ -382,6 +382,9 @@
         <property name="cursor">
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
         <property name="toolTip">
          <string>Send all MWC in this account</string>
         </property>
@@ -413,6 +416,9 @@
         <property name="cursor">
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
         <property name="toolTip">
          <string>Send MWC. Continue with a next step.</string>
         </property>
@@ -443,14 +449,23 @@ p, li { white-space: pre-wrap; }
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QCheckBox" name="generatePoof">
+       <widget class="control::MwcCheckBox" name="generatePoof">
         <property name="geometry">
          <rect>
           <x>105</x>
           <y>460</y>
           <width>391</width>
-          <height>20</height>
+          <height>25</height>
          </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
         <property name="text">
          <string>Generate Transaction Proof</string>
@@ -635,6 +650,11 @@ p, li { white-space: pre-wrap; }
    <extends>QFrame</extends>
    <header>control_desktop/MwcCheckedFrame.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>control_desktop/MwcCheckBox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
