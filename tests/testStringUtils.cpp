@@ -56,6 +56,14 @@ void testUtils() {
     Q_ASSERT( util::urlEncode("abc") == "abc");
     Q_ASSERT( util::urlEncode("а") == "%D0%B0");
     Q_ASSERT( util::urlEncode("%abcа") == "%25abc%D0%B0");
+
+    QString s1 = util::nano2one(1000000000);
+    Q_ASSERT( s1 == "1");
+    Q_ASSERT( util::trimStrAsDouble( s1, 5) == "1");
+
+    QString s2 = util::nano2one(6200000023);
+    Q_ASSERT( s2 == "6.200000023");
+    Q_ASSERT( util::trimStrAsDouble( s2, 5) == "6.2");
 }
 
 }

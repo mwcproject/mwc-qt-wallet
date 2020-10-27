@@ -122,6 +122,11 @@ QString trimStrAsDouble(const QString & dblStr, int maxLen) {
         return res;
 
     res = res.left( std::max(ptIdx, maxLen) );
+
+    // removing ending 0s. Example: 6.200
+    while(res.size() > ptIdx && res[res.size()-1] == '0')
+        res = res.left( res.size()-1 );
+
     if ( res[res.size()-1] == '.' ) {
         res = res.left( res.size()-1 );
     }
