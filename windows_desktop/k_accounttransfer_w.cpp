@@ -153,4 +153,28 @@ void wnd::AccountTransfer::on_backButton_clicked()
     accountTransfer->goBack();
 }
 
+void AccountTransfer::on_accountFromCB_currentIndexChanged(int index)
+{
+    Q_UNUSED(index)
+
+    QString fromAcc = getSelectedAccount( ui->accountFromCB, false );
+    QString toAcc   = getSelectedAccount( ui->accountToCB, false );
+
+    if (fromAcc==toAcc && !fromAcc.isEmpty()) {
+        ui->accountToCB->setCurrentIndex(-1);
+    }
+}
+
+void AccountTransfer::on_accountToCB_currentIndexChanged(int index)
+{
+    Q_UNUSED(index)
+
+    QString fromAcc = getSelectedAccount( ui->accountFromCB, false );
+    QString toAcc   = getSelectedAccount( ui->accountToCB, false );
+
+    if (fromAcc==toAcc && !fromAcc.isEmpty()) {
+        ui->accountFromCB->setCurrentIndex(-1);
+    }
+}
+
 }

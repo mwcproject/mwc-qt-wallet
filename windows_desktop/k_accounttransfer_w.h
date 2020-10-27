@@ -54,6 +54,10 @@ private slots:
     void onSgnShowTransferResults(bool ok, QString errMsg);
     void onSgnUpdateAccounts();
     void onSgnHideProgress();
+    void on_accountFromCB_currentIndexChanged(int index);
+
+    void on_accountToCB_currentIndexChanged(int index);
+
 private:
     Ui::AccountTransfer *ui;
     bridge::Wallet * wallet = nullptr;
