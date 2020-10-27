@@ -129,7 +129,7 @@ bool AccountTransfer::transferFunds(const QString & from,
     QString txnFeeStr = util::txnFeeToString(txnFee);
 
     QString hash = context->wallet->getPasswordHash();
-    if ( !core::getWndManager()->sendConfirmationDlg("Confirm Send Request",
+    if ( !core::getWndManager()->sendConfirmationDlg("Confirm Transfer Request",
                                                     "You are transferring " + (nanoCoins < 0 ? "all" : util::nano2one(nanoCoins)) +
                                                     " MWC\nfrom account '" + from + "' to account '" + to + "'" +
                                                     "\n\nTransaction fee: " + txnFeeStr,
