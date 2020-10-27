@@ -112,7 +112,6 @@ bool AccountTransfer::transferFunds(const QString & from,
         return false;
     }
 
-    // Check if HODL outputs will be affected
     QStringList outputs; // empty is valid value. Empty - mwc713 will use default algorithm.
     uint64_t txnFee = 0; // not used here yet
     // nanoCoins < 0  - All
@@ -120,6 +119,22 @@ bool AccountTransfer::transferFunds(const QString & from,
         for (auto b : bridge::getBridgeManager()->getAccountTransfer())
             b->hideProgress();
         return false; // User cancel transaction
+    }
+
+    // Need to show confirmation dialog similar to what send has. Point to show the fees
+    if (txnFee == 0 && outputs.size() == 0) {
+        txnFee = util::getTxnFee( accFrom.accountName, nanoCoins, context->wallet,
+                                  context->appContext, prms.changeOutputs, outputs );
+    }
+    QString txnFeeStr = util::txnFeeToString(txnFee);
+
+    QString hash = context->wallet->getPasswordHash();
+    if ( !core::getWndManager()->sendConfirmationDlg("Confirm Send Request",
+                                                    "You are transferring " + (nanoCoins < 0 ? "all" : util::nano2one(nanoCoins)) +
+                                                    " MWC\nfrom account '" + from + "' to account '" + to + "'" +
+                                                    "\n\nTransaction fee: " + txnFeeStr,
+                                                    1.0, hash ) ) {
+        return false;
     }
 
     // Expected that everything is fine, but will do operation step by step
