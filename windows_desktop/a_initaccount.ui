@@ -144,7 +144,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QFrame" name="frame">
+         <widget class="QWidget" name="passwordFrame" native="true">
           <property name="minimumSize">
            <size>
             <width>400</width>
@@ -156,12 +156,6 @@
             <width>400</width>
             <height>185</height>
            </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
           </property>
           <widget class="control::MwcLineEditNormal" name="password1Edit">
            <property name="geometry">
@@ -195,6 +189,9 @@
            </property>
            <property name="tabletTracking">
             <bool>false</bool>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
            </property>
            <property name="acceptDrops">
             <bool>false</bool>

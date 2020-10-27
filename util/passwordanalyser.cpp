@@ -139,7 +139,7 @@ QPair<QString, bool> PasswordAnalyser::getPasswordQualityReport(const QString & 
         if ( seqWords.isEmpty() && dictWords.isEmpty() )
             return QPair<QString, bool>("",true); // Great password
 
-        QString respondStr = "<font color="+happyColor+">Your password is acceptable. But please note that it has:";
+        QString respondStr = "<font color="+happyColor+">Your password is acceptable. But note, it has:";
         if (seqWords.size()>0)
             respondStr += "<br>Sequences: " + seqWords.join(", ");
         if (dictWords.size()>0)

@@ -63,7 +63,7 @@ InitAccount::InitAccount(QWidget *parent, QString path, bool _restoredFromSeed) 
 }
 
 void InitAccount::panelWndStarted() {
-    ui->password1Edit->setFocus();
+    ui->instanceNameEdit->setFocus();
 }
 
 
