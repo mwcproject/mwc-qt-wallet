@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/*
 #ifndef MWC_QT_WALLET_STATUS_H
 #define MWC_QT_WALLET_STATUS_H
 
@@ -160,3 +161,4 @@ private:
 }
 
 #endif //MWC_QT_WALLET_STATUS_H
+*/

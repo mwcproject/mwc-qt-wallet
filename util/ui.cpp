@@ -29,63 +29,6 @@ static
 uint64_t getTxnFeeFromSpendableOutputs(int64_t amount, const QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs,
                                        uint64_t changeOutputs, uint64_t totalNanoCoins, QStringList& txnOutputList);
 
-static QString generateMessageHtmlOutputsToSpend( const QVector<core::HodlOutputInfo> & outputs ) {
-    /*
-  This transaction will include outputs registered for HODL<br>
-<table>
-  <tr>
-    <th>Commitment</th>
-    <th></th>
-    <th>MWC</th>
-    <th>&nbsp;&nbsp;&nbsp;</th>
-  </tr>
-  <tr>
-    <td>089e22b5084906e5da629272d487eaeb67138366faf28865fcde7599d5ed5410af</td>
-    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>0.154</td>
-    <th></th>
-  </tr>
-  <tr>
-    <td>0932084ef0b3cf60c62cb65d054beafba5ae0e5cf8a7890208d714bf20b36d257d</td>
-    <td></td>
-    <td>0.154</td>
-    <th></th>
-  </tr>
-</table>
-<br><br>
-<br>Please press 'Continue' if you want to withdraw those outputs from HODL and spend them now.
-*/
-    QString result = "This transaction will include outputs registered for HODL<br>"
-                     "<table>"
-                     "  <tr>"
-                     "    <th>Commitment</th>"
-                     "    <th></th>"
-                     "    <th>Class</th>"
-                     "    <th></th>"
-                     "    <th>MWC</th>"
-                     "    <th>&nbsp;&nbsp;&nbsp;</th>"
-                     "  </tr>"
-                     "  <tr>";
-
-    int limit = 7;
-    for (const core::HodlOutputInfo & outpt : outputs) {
-        limit--;
-        if (limit==0) {
-            result += "<tr><td> .......... </td><td></td><td></td><td></td><td> ... </td></tr>";
-            break;
-        }
-        else {
-            result += "<tr><td>" + outpt.outputCommitment + "</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>" +
-                    outpt.cls + "</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>" +
-                    util::trimStrAsDouble( QString::number(outpt.value), 7) +
-                      "</td><td></td></tr>";
-        }
-
-    }
-    result += "</table><br><br><br>Please press 'Continue' if you want to withdraw those outputs from HODL and spend them now.";
-    return result;
-}
-
 static int calcSubstituteIndex( QVector<wallet::WalletOutput> & resultBucket, const wallet::WalletOutput & testOutput, int64_t change ) {
     double bestWeightedGain = 0.0;
     int bestIndex = -1;
@@ -242,10 +185,8 @@ bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> 
 // return false if User cancel this action.
 bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins,
         wallet::Wallet * wallet,
-        core::HodlStatus * hodlStatus,
         core::AppContext * appContext,
         QStringList & resultOutputs, uint64_t* txnFee ) {
-    Q_ASSERT(hodlStatus);
     Q_ASSERT(appContext);
     Q_ASSERT(wallet);
 
@@ -254,12 +195,11 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
 
     // mwc713 doesn't know about HODL outputs or locked outputs
     // if we don't have HODL or locked outputs, let mwc713 select the outputs
-    if ( !hodlStatus->hasAnyOutputsInHODL() && !appContext->isLockOutputEnabled() )
+    if (!appContext->isLockOutputEnabled())
         return true; // let mwc713 wallet handle it
 
-    QVector<wallet::WalletOutput>  outputs = wallet->getwalletOutputs().value(accountName);
+    QVector<wallet::WalletOutput> outputs = wallet->getwalletOutputs().value(accountName);
 
-    QVector<QPair<wallet::WalletOutput, core::HodlOutputInfo>> hodlOuts;
     //QVector<wallet::WalletOutput> freeOuts;
     QMultiMap<int64_t, wallet::WalletOutput> freeOuts;
 
@@ -268,12 +208,12 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
 
     QStringList allOutputs;
 
-    for ( wallet::WalletOutput o : outputs) {
+    for (wallet::WalletOutput o : outputs) {
         // Keep unspent only
-        if ( o.status != "Unspent" ) // Interesting only in Unspent outputs
+        if (o.status != "Unspent") // Interesting only in Unspent outputs
             continue;
         // Skip mined that can't spend
-        if (o.coinbase && o.numOfConfirms.toLong()<=1440 )
+        if (o.coinbase && o.numOfConfirms.toLong() <= 1440)
             continue;
         if (!o.coinbase && o.numOfConfirms.toInt() < appContext->getSendCoinsParams().inputConfirmationNumber)
             continue;
@@ -283,121 +223,14 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
 
         allOutputs.push_back(o.outputCommitment);
         totalNanoCoins += o.valueNano;
-
-        core::HodlOutputInfo ho = hodlStatus->getHodlOutput("", o.outputCommitment);
-
-        if ( ho.weight > 0.0 ) {
-            o.weight = ho.weight;
-            hodlOuts.push_back(QPair<wallet::WalletOutput, core::HodlOutputInfo>(o, ho));
-        }
-        else {
-            o.weight = 0.01;
-            freeOuts.insert(o.valueNano, o);  // inserts by value
-            freeNanoCoins += o.valueNano;
-        }
+        o.weight = 1.0;
+        freeOuts.insert(o.valueNano, o);  // inserts by value
+        freeNanoCoins += o.valueNano;
     }
 
-    if (hodlOuts.size()==0) {
-        // nothing on this account is in HODL
-        if (appContext->isLockOutputEnabled()) {
-            resultOutputs = allOutputs;
-            *txnFee = getTxnFeeFromSpendableOutputs(nanoCoins, freeOuts, outputsNumber, totalNanoCoins, resultOutputs);
-        }
-        return true;
-    }
-
-    if (nanoCoins<0) {
-        // handle spending all spendable outputs
-        QVector<core::HodlOutputInfo> spentOuts;
-        for (const auto & ho : hodlOuts ) {
-            spentOuts.push_back(ho.second);
-            // combine the HODL outputs by value with the free outputs
-            freeOuts.insert(ho.first.valueNano, ho.first);
-        }
-
-        // Ask user if he wants to spend all and continue...
-        if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionHTMLDlg("HODL Output Spending",
-                generateMessageHtmlOutputsToSpend( spentOuts ),
-                "Cancel", "Continue",
-                "Cancel operation, keep outputs in HODL",
-                "Continue and spend those outputs, they will be excluded form the HODL",
-                true, false, 1.4) ) {
-            resultOutputs = allOutputs;
-            int changeOutputs = 0;  // we don't expect any change since we are spending all of our outputs
-            *txnFee = getTxnFeeFromSpendableOutputs(nanoCoins, freeOuts, changeOutputs, totalNanoCoins, resultOutputs);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    std::sort( hodlOuts.begin(), hodlOuts.end(), [](const QPair<wallet::WalletOutput, core::HodlOutputInfo> & a, const QPair<wallet::WalletOutput, core::HodlOutputInfo> & b) {
-        return a.second.weight < b.second.weight;
-    });
-
-    Q_ASSERT(nanoCoins>0);
-    // Applying the maximum possible fees. It is acceptable for output selection.
-    // Add 1 to outputsNumber for output used by txn receiver
-    int64_t maxFee = calcTxnFee(1, outputsNumber+1, 1);
-
-    // Calculate what outputs need to be selected...
-    if (freeNanoCoins >= nanoCoins + maxFee) {
-        *txnFee = getTxnFeeFromSpendableOutputs(nanoCoins, freeOuts, outputsNumber, freeNanoCoins, resultOutputs);
-        return true;
-    }
-
-    // Need to spend some HODL outputs
-    QStringList hodlResultOutputs;
-
-    nanoCoins += maxFee;
-    int64_t hodlCoins = nanoCoins - freeNanoCoins;
-    QVector<wallet::WalletOutput> spentOuts;
-    double lastW = 0.0;
-    int hodlOutsIdx=0;
-    for (;hodlOutsIdx<hodlOuts.size() && hodlCoins>0; hodlOutsIdx++) {
-        spentOuts.push_back( hodlOuts[hodlOutsIdx].first );
-        lastW = hodlOuts[hodlOutsIdx].second.weight;
-        hodlCoins -= hodlOuts[hodlOutsIdx].first.valueNano;
-    }
-    for (;hodlOutsIdx<hodlOuts.size();hodlOutsIdx++) {
-        if ( lastW < hodlOuts[hodlOutsIdx].second.weight)
-            break;
-        spentOuts.push_back( hodlOuts[hodlOutsIdx].first );
-    }
-
-    bool res = calcOutputsToSpend( nanoCoins - freeNanoCoins, spentOuts, hodlResultOutputs );
-    if (!res) {
-        // spend all case, very possible because we don't control the balance
-        return getOutputsToSend( accountName, outputsNumber, -1, wallet, hodlStatus, appContext, resultOutputs, txnFee );
-    }
-
-    // Let's ask for outptus
-    QVector<core::HodlOutputInfo> hodlOuts2ask;
-    for (int i=0;i<hodlOutsIdx;i++) {
-        core::HodlOutputInfo & ho = hodlOuts[i].second;
-        if ( hodlResultOutputs.contains( ho.outputCommitment) )
-            hodlOuts2ask.push_back(ho);
-    }
-    Q_ASSERT( hodlOuts2ask.size() == hodlResultOutputs.size() );
-
-    if (core::WndManager::RETURN_CODE::BTN2 != core::getWndManager()->questionHTMLDlg("HODL Output Spending",
-                        generateMessageHtmlOutputsToSpend( hodlOuts2ask ),
-                        "Cancel", "Continue",
-                        "Cancel operation, keep outputs in HODL",
-                        "Continue and spend those outputs, they will be excluded form the HODL",
-                        true, false, 1.4) )
-        return false;
-
-    // User approve the spending, preparing the list of outputs...
-    resultOutputs = hodlResultOutputs;
-    for ( const auto & o : freeOuts.values() )
-        resultOutputs.push_back( o.outputCommitment );
-
-    // calculate transaction fee
-    uint64_t numInputs = resultOutputs.size();
-    *txnFee = calcTxnFee(numInputs, outputsNumber + 1, 1);
-
+    // nothing on this account is in HODL
+    resultOutputs = allOutputs;
+    *txnFee = getTxnFeeFromSpendableOutputs(nanoCoins, freeOuts, outputsNumber, totalNanoCoins, resultOutputs);
     return true;
 }
 

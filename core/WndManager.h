@@ -83,16 +83,8 @@ public:
     virtual void pageSendOffline( QString selectedAccount, int64_t amount ) = 0;
     virtual void pageTransactions() = 0;
 
-    virtual void pageHodl() = 0;
-    virtual void pageHodlNode() = 0;
-    virtual void pageHodlCold() = 0;
-    virtual void pageHodlClaim(QString walletHash) = 0;
-    // return true(first) if press OK and input signature value(second)
-    virtual QPair<bool, QString> hodlGetSignatureDlg(QString challenge) = 0;
     virtual void pageAccounts() = 0;
     virtual void pageAccountTransfer() = 0;
-    virtual void pageAirdrop() = 0;
-    virtual void pageAirdropForBTC(QString btcAddress, QString challenge, QString identifier) = 0;
     virtual void pageNodeInfo() = 0;
     virtual void pageContacts() = 0;
     virtual void pageEvents() = 0;

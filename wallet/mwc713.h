@@ -18,8 +18,8 @@
 #include "wallet.h"
 #include <QObject>
 #include <QProcess>
-#include <core/HodlStatus.h>
 #include "../core/global.h"
+#include <QMap>
 
 namespace tries {
     class Mwc713InputParser;
@@ -47,9 +47,6 @@ public:
 public:
     MWC713(QString mwc713path, QString mwc713configPath, core::AppContext * appContext, node::MwcNode * mwcNode);
     virtual ~MWC713() override;
-
-    void setHodlStatus(core::HodlStatus * _hodlStatus) {hodlStatus = _hodlStatus; Q_ASSERT(hodlStatus);}
-
 
     // Return true if wallet is running
     virtual bool isRunning() override {return mwc713process!= nullptr;}
@@ -436,7 +433,6 @@ public:
     void updateSyncAsDone();
 
     Mwc713EventManager * getEventCollector() {return eventCollector;}
-    core::HodlStatus *   getHodlStatus() {return hodlStatus;}
 
 
     void setRequestSwapTrades(QVector<SwapInfo> swapTrades, QString error);
@@ -500,7 +496,6 @@ private:
 private:
     core::AppContext * appContext = nullptr; // app context to store current account name
     node::MwcNode * mwcNode = nullptr;
-    core::HodlStatus * hodlStatus = nullptr;
 
     #ifdef Q_OS_WIN
         const QString TOR_NAME = "tor.exe";

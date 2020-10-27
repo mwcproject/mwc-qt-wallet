@@ -55,14 +55,11 @@ private slots:
     void onUpdateButtonsState( int state );
 
     // UI
-    void on_airdropToolButton_clicked();
     void on_sendToolButton_clicked();
     void on_receiveToolButton_clicked();
     void on_transactionToolButton_clicked();
-    void on_hodlToolButton_clicked();
+    void on_swapToolButton_clicked();
     void on_finalizeToolButton_clicked();
-
-
 
 private:
     Ui::MwcToolbar *ui;

@@ -23,7 +23,6 @@ class Accounts;
 
 namespace bridge {
 class Accounts;
-class HodlStatus;
 class Config;
 class Wallet;
 class Util;
@@ -66,12 +65,10 @@ private:
 private:
     Ui::Accounts *ui;
     bridge::Config * config = nullptr;
-    bridge::HodlStatus * hodlStatus = nullptr;
     bridge::Wallet * wallet = nullptr;
     bridge::Accounts * accState = nullptr; // place holder
     bridge::Util * util = nullptr;
 
-    bool inHodl = false;
     QVector<QString> accounts; // current shown data
 };
 

@@ -14,6 +14,7 @@
 
 #include "MockWallet.h"
 #include "../util/crypto.h"
+#include <QMap>
 
 namespace wallet {
 

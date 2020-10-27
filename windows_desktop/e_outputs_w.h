@@ -27,7 +27,6 @@ class Outputs;
 
 namespace bridge {
 class Config;
-class HodlStatus;
 class Wallet;
 class Outputs;
 }
@@ -97,13 +96,11 @@ private:
 private:
     Ui::Outputs *ui;
     bridge::Config * config = nullptr;
-    bridge::HodlStatus * hodlStatus = nullptr;
     bridge::Wallet * wallet = nullptr;
     bridge::Outputs * outputs = nullptr; // needed as output windows active flag
 
     QVector<OutputData> allData; // all outputs
 
-    bool inHodl = false; // If acount enrolled in HODL. Requested once to eliminate race conditions
     bool canLockOutputs = false;
 
     static bool lockMessageWasShown;

@@ -148,7 +148,7 @@ bool Send::sendMwcOffline( QString account, int64_t amount, QString message) {
     QStringList outputs;
     uint64_t txnFee = 0;
     if (! util::getOutputsToSend( account, sendParams.changeOutputs, amount,
-                                  context->wallet, context->hodlStatus, context->appContext,
+                                  context->wallet, context->appContext,
                                   outputs, &txnFee) )
         return false; // User reject something
 
@@ -274,7 +274,7 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
     QStringList outputs;
     uint64_t txnFee = 0;
     if (! util::getOutputsToSend( account, sendParams.changeOutputs, amount,
-                                  context->wallet, context->hodlStatus, context->appContext,
+                                  context->wallet, context->appContext,
                                   outputs, &txnFee ) )
         return false; // User reject something
 

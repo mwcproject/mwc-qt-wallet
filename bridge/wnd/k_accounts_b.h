@@ -27,9 +27,9 @@ public:
     ~Accounts();
 
     // Return data ready to insert into the Accounts table
-    // Data returned in series of 6 (isHodl==true) or 5 (isHodl==false)
-    // [accountName, Spendable, Awaiting, Locked, Total, [in Hodl]]
-    Q_INVOKABLE QVector<QString> getAccountsBalancesToShow(bool inHodl);
+    // Data returned in series of
+    // [accountName, Spendable, Awaiting, Locked, Total
+    Q_INVOKABLE QVector<QString> getAccountsBalancesToShow();
 
     // Validate new account name. Return Empty string for ok.
     // Otherwise return error message

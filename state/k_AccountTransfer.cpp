@@ -116,7 +116,7 @@ bool AccountTransfer::transferFunds(const QString & from,
     QStringList outputs; // empty is valid value. Empty - mwc713 will use default algorithm.
     uint64_t txnFee = 0; // not used here yet
     // nanoCoins < 0  - All
-    if (! util::getOutputsToSend( accFrom.accountName, prms.changeOutputs, nanoCoins, context->wallet, getContext()->hodlStatus, context->appContext, outputs, &txnFee) ) {
+    if (! util::getOutputsToSend( accFrom.accountName, prms.changeOutputs, nanoCoins, context->wallet, context->appContext, outputs, &txnFee) ) {
         for (auto b : bridge::getBridgeManager()->getAccountTransfer())
             b->hideProgress();
         return false; // User cancel transaction

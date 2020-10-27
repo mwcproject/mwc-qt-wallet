@@ -1187,9 +1187,6 @@ void MWC713::updateAccountFinalize() {
     accountInfoNoLocks = collectedAccountInfo;
     collectedAccountInfo.clear();
 
-    Q_ASSERT(hodlStatus);
-    hodlStatus->finishWalletOutputs();
-
     QString accountBalanceStr;
 
     for (const auto & acc: accountInfoNoLocks) {

@@ -14,7 +14,6 @@
 
 #include "e_showoutputdlg.h"
 #include "ui_e_showoutputdlg.h"
-#include "../bridge/hodlstatus_b.h"
 #include "../bridge/config_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/util_b.h"
@@ -28,7 +27,6 @@ ShowOutputDlg::ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output
         ui(new Ui::ShowOutputDlg) {
     ui->setupUi(this);
 
-    hodl = new bridge::HodlStatus(this);
     config = new bridge::Config(this);
     wallet = new bridge::Wallet(this);
     util = new bridge::Util(this);
@@ -43,13 +41,6 @@ ShowOutputDlg::ShowOutputDlg(QWidget *parent, const wallet::WalletOutput &output
     ui->commitment->setText(output.outputCommitment);
 
     blockExplorerUrl = config->getBlockExplorerUrl(config->getNetwork());
-
-    if (!hodl->isInHodl("")) {
-        ui->hodl->setText("N/A");
-    }
-    else {
-        ui->hodl->setText( hodl->isOutputInHODL(output.outputCommitment) ? "Yes" : "No" );
-    }
 
     commitment = output.outputCommitment;
 

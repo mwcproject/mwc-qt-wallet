@@ -18,10 +18,6 @@
 #include "../mwc713task.h"
 #include "../../util/stringutils.h"
 
-namespace core {
-class HodlStatus;
-}
-
 namespace wallet {
 
 

@@ -102,9 +102,6 @@ const QString PAGE_G_RECEIVE_TRANS  = "Receive File Transaction";
 const QString PAGE_K_ACCOUNTS       = "Accounts";
 const QString PAGE_K_ACCOUNT_TRANSFER = "Transfer coins between accounts";
 
-const QString PAGE_M_AIRDROP        = "Airdrop";
-const QString PAGE_M_AIRDROP_CLAIM  = "Claim coins for BTC address";
-
 const QString PAGE_S_SWAP_LIST      = "MWC Swap Trades";
 const QString PAGE_S_SWAP_NEW       = "New Swap Trade";
 const QString PAGE_S_SWAP_EDIT      = "Swap Trade";
@@ -121,9 +118,6 @@ const QString PAGE_X_NODE_CONFIG    = "Node Config";
 const QString PAGE_X_RESYNC         = "Re-sync wallet with MWC Node";
 
 const QString PAGE_Y_SELECT_RUNNING_MODE = "Select Running Mode";
-
-const QString PAGE_HODL             = "HODL";
-const QString PAGE_HODL_CLAIM       = "Claim HODL coins";
 
 // Desktop support for App restart
 #ifdef WALLET_DESKTOP

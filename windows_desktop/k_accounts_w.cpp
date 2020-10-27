@@ -20,7 +20,6 @@
 #include "../control_desktop/inputdialog.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/config_b.h"
-#include "../bridge/hodlstatus_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/wnd/k_accounts_b.h"
 #include "../bridge/util_b.h"
@@ -34,7 +33,6 @@ Accounts::Accounts(QWidget *parent) :
     ui->setupUi(this);
 
     config = new bridge::Config(this);
-    hodlStatus = new bridge::HodlStatus(this);
     wallet = new bridge::Wallet(this);
     accState = new bridge::Accounts(this);
     util = new bridge::Util(this);
@@ -57,8 +55,6 @@ Accounts::Accounts(QWidget *parent) :
     if (config->isColdWallet()) {
         ui->transferButton->hide();
     }
-
-    inHodl = hodlStatus->isInHodl("");
 
     initTableHeaders();
 
@@ -89,22 +85,11 @@ void Accounts::initTableHeaders() {
         widths = QVector<int>{250,110,90,90,90};
     }
     Q_ASSERT( widths.size() == 5 );
-
     ui->accountList->setColumnWidths( widths );
-
-    if (inHodl) {
-        ui->accountList->setColumnCount(widths.size()+1);
-        ui->accountList->setColumnWidth(widths.size(),60);
-        QTableWidgetItem * itm = new QTableWidgetItem("HODL") ;
-        ui->accountList->setHorizontalHeaderItem( widths.size(), itm );
-    }
 }
 
 void Accounts::saveTableHeaders() {
     QVector<int>  width = ui->accountList->getColumnWidths();
-    if (inHodl)
-        width.pop_back();
-
     config->updateColumnsWidhts("AccountTblColWidth", width);
 }
 
@@ -121,11 +106,11 @@ void Accounts::onSgnWalletBalanceUpdated()
 
     accounts = wallet->getWalletBalance(true,false,false);
 
-    QVector<QString> data2show = accState->getAccountsBalancesToShow(inHodl);
+    QVector<QString> data2show = accState->getAccountsBalancesToShow();
 
     // update the list with accounts
     ui->accountList->clearData();
-    int rowSz = inHodl ? 6: 5;
+    int rowSz = 5;
 
     for (int r=0; r<data2show.size()-rowSz+1; r+=rowSz) {
         QVector<QString> data;

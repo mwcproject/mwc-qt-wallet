@@ -19,7 +19,6 @@
 #include "../dialogs_desktop/e_showoutputdlg.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/config_b.h"
-#include "../bridge/hodlstatus_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/wnd/e_outputs_b.h"
 #include "../control_desktop/richbutton.h"
@@ -51,7 +50,6 @@ Outputs::Outputs(QWidget *parent) :
     ui->setupUi(this);
 
     config = new bridge::Config(this);
-    hodlStatus = new bridge::HodlStatus(this);
     wallet = new bridge::Wallet(this);
     outputs = new bridge::Outputs(this);
 
@@ -73,7 +71,6 @@ Outputs::Outputs(QWidget *parent) :
 
     QString accName = updateAccountsData();
 
-    inHodl = hodlStatus->isInHodl();
     canLockOutputs = config->isLockOutputEnabled();
 
     requestOutputs(accName);

@@ -506,13 +506,6 @@ int main(int argc, char *argv[])
 
         state::StateContext context( &appContext, wallet, mwcNode );
 
-        core::HodlStatus hodlStatus(&context);
-        context.setHodlStatus(&hodlStatus);
-        wallet->setHodlStatus(&hodlStatus);
-
-//        core::WalletNotes walletNotes(&context);
-//        appContext.setWalletNotes(&walletNotes);
-
         state::setStateContext(&context);
 
         state::StateMachine::initStateMachine();

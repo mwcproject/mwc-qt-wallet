@@ -18,7 +18,6 @@
 
 #include "wallet.h"
 #include <QObject>
-#include <core/HodlStatus.h>
 #include "../core/global.h"
 
 #define INITIALIZED_WALLET
@@ -36,9 +35,6 @@ Q_OBJECT
 public:
     MockWallet(core::AppContext * appContext);
     virtual ~MockWallet() override;
-
-    void setHodlStatus(core::HodlStatus * hodlStatus) {Q_UNUSED(hodlStatus);}
-
 
     virtual bool isWalletRunningAndLoggedIn() const override {return running;}
 

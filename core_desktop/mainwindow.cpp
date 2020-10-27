@@ -411,8 +411,6 @@ void MainWindow::updateMenu() {
     ui->actionNode_Overview->setEnabled(canSwitchState);
     ui->actionResync_with_full_node->setEnabled(canSwitchState && !isOnlineNode);
     ui->actionOutputs->setEnabled(canSwitchState && !isOnlineNode);
-    ui->actionAirdrop->setEnabled(canSwitchState && isOnlineWallet);
-    ui->actionHODL->setEnabled(canSwitchState && !isColdWallet);
     ui->actionWallet_accounts->setEnabled(canSwitchState && !isOnlineNode);
     ui->actionAccounts->setEnabled(canSwitchState && !isOnlineNode);
     ui->actionContacts->setEnabled(canSwitchState && !isOnlineNode);
@@ -427,6 +425,8 @@ void MainWindow::updateMenu() {
     ui->actionRoadmap->setEnabled(!isColdWallet);
     ui->actionMWC_website->setEnabled(!isColdWallet);
     ui->actionExchanges->setEnabled(!isColdWallet);
+
+    ui->actionAtomicSwap->setEnabled(canSwitchState && isOnlineWallet);
 }
 
 
@@ -483,19 +483,9 @@ void MainWindow::on_actionOutputs_triggered()
     stateMachine->setActionWindow( state::STATE::OUTPUTS );
 }
 
-void MainWindow::on_actionAirdrop_triggered()
+void MainWindow::on_actionAtomicSwap_triggered()
 {
-   if ( QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier ) {
-       stateMachine->setActionWindow(state::STATE::SWAP);
-   }
-   else {
-       stateMachine->setActionWindow(state::STATE::AIRDRDOP_MAIN);
-   }
-}
-
-void MainWindow::on_actionHODL_triggered()
-{
-    stateMachine->setActionWindow( state::STATE::HODL );
+    stateMachine->setActionWindow( state::STATE::SWAP );
 }
 
 void MainWindow::on_actionWallet_accounts_triggered()

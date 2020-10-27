@@ -34,11 +34,9 @@ Accounts::~Accounts() {
 }
 
 // Return data ready to insert into the Accounts table
-// Data returned in series of 6 (isHodl==true) or 5 (isHodl==false)
-// [accountName, Spendable, Awaiting, Locked, Total, [in Hodl]]
-QVector<QString> Accounts::getAccountsBalancesToShow(bool inHodl) {
+// [accountName, Spendable, Awaiting, Locked, Total
+QVector<QString> Accounts::getAccountsBalancesToShow() {
     wallet::Wallet * wallet = state::getStateContext()->wallet;
-    core::HodlStatus * hodlStatus = state::getStateContext()->hodlStatus;
 
     QVector<wallet::AccountInfo> accounts = wallet->getWalletBalance();
     const QMap<QString, QVector<wallet::WalletOutput> > & walletOutputs = wallet->getwalletOutputs();
@@ -47,22 +45,6 @@ QVector<QString> Accounts::getAccountsBalancesToShow(bool inHodl) {
     for (auto & acc : accounts) {
         QVector<QString> data{ acc.accountName, util::nano2one(acc.currentlySpendable), util::nano2one(acc.awaitingConfirmation),
                                util::nano2one(acc.lockedByPrevTransaction), util::nano2one(acc.total) };
-
-        if ( inHodl ) {
-            QVector<wallet::WalletOutput> accountOutputs = walletOutputs.value(acc.accountName);
-
-            int64_t hodlBalancePerClass = 0;
-
-            for (const auto & out : accountOutputs) {
-                core::HodlOutputInfo hOut = hodlStatus->getHodlOutput("", out.outputCommitment );
-                if ( hOut.isValid() ) {
-                    hodlBalancePerClass += out.valueNano;
-                }
-            }
-
-            data.push_back( util::nano2one(hodlBalancePerClass) );
-        }
-
         result.append(data);
     }
     return result;

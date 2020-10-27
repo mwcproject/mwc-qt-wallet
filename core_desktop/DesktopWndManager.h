@@ -78,16 +78,8 @@ public:
     virtual void pageSendOffline( QString selectedAccount, int64_t amount ) override;
     virtual void pageTransactions() override;
 
-    virtual void pageHodl() override;
-    virtual void pageHodlNode() override;
-    virtual void pageHodlCold() override;
-    virtual void pageHodlClaim(QString walletHash) override;
-    // return true(first) if press OK and input signature value(second)
-    virtual QPair<bool, QString> hodlGetSignatureDlg(QString challenge) override;
     virtual void pageAccounts() override;
     virtual void pageAccountTransfer() override;
-    virtual void pageAirdrop() override;
-    virtual void pageAirdropForBTC(QString btcAddress, QString challenge, QString identifier) override;
     virtual void pageNodeInfo() override;
     virtual void pageContacts() override;
     virtual void pageEvents() override;

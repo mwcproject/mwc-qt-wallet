@@ -19,7 +19,6 @@
 #include "../state/state.h"
 #include "../state/m_airdrop.h"
 #include "../wallet/wallet.h"
-#include "../core/HodlStatus.h"
 #include "../core/Config.h"
 #include <QDebug>
 
@@ -119,10 +118,6 @@ public:
     QString getCurrentAccountName(const QString & walletDataDir) const {return currentAccountName.value(walletDataDir, "default");};
     void setCurrentAccountName(const QString & walletDataDir, const QString & currentAccount) {currentAccountName.insert(walletDataDir, currentAccount);}
 
-    // AirdropRequests will handle differently
-    void saveAirdropRequests( const QVector<state::AirdropRequests> & data );
-    QVector<state::AirdropRequests> loadAirdropRequests() const;
-
     // -------------- Contacts
     // Get the contacts
     QVector<ContactRecord> getContacts() const {return contactList;}
@@ -159,10 +154,6 @@ public:
     // HODL registration time.
     int64_t getHodlRegistrationTime(const QString & hash) const;
     void    setHodlRegistrationTime(const QString & hash, int64_t time);
-
-    // HODL outputs data
-    void saveHodlOutputs( const QString & rootPubKeyHash, const QMap<QString, core::HodlOutputInfo> & hodlOutputs );
-    QMap<QString, core::HodlOutputInfo> loadHodlOutputs(const QString & rootPubKeyHash );
 
     QString getNote(const QString& key);
     void updateNote(const QString& key, const QString& note);

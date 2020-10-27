@@ -25,7 +25,6 @@
 #include "../windows_desktop/c_enterseed.h"
 #include "../windows_desktop/e_receive_w.h"
 #include "../windows_desktop/e_outputs_w.h"
-#include "../windows_desktop/e_receive_w.h"
 #include "../windows_desktop/e_listening_w.h"
 #include "../windows_desktop/g_finalize_w.h"
 #include "../windows_desktop/g_filetransaction_w.h"
@@ -33,16 +32,9 @@
 #include "../windows_desktop/g_sendOnline.h"
 #include "../windows_desktop/g_sendOffline.h"
 #include "../windows_desktop/e_transactions_w.h"
-#include "../windows_desktop/h_hodl_w.h"
-#include "../windows_desktop/h_hodlcold_w.h"
-#include "../windows_desktop/h_hodlnode_w.h"
-#include "../windows_desktop/h_hodlclaim_w.h"
-#include "../dialogs_desktop/h_hodlgetsignature.h"
 #include "../dialogs_desktop/g_sendconfirmationdlg.h"
 #include "../windows_desktop/k_accounts_w.h"
 #include "../windows_desktop/k_accounttransfer_w.h"
-#include "../windows_desktop/m_airdrop_w.h"
-#include "../windows_desktop/m_airdropforbtc_w.h"
 #include "../windows_desktop/u_nodeinfo_w.h"
 #include "../windows_desktop/w_contacts_w.h"
 #include "../windows_desktop/x_events_w.h"
@@ -238,35 +230,6 @@ void DesktopWndManager::pageTransactions() {
                       new wnd::Transactions( windowManager->getInWndParent()));
 }
 
-void DesktopWndManager::pageHodl() {
-    windowManager->switchToWindowEx( mwc::PAGE_HODL,
-                                     new wnd::Hodl( windowManager->getInWndParent()));
-}
-
-void DesktopWndManager::pageHodlNode() {
-    windowManager->switchToWindowEx( mwc::PAGE_HODL,
-                                     new wnd::HodlNode( windowManager->getInWndParent()));
-}
-
-void DesktopWndManager::pageHodlCold() {
-    windowManager->switchToWindowEx( mwc::PAGE_HODL,
-                                     new wnd::HodlCold( windowManager->getInWndParent()));
-}
-
-void DesktopWndManager::pageHodlClaim(QString walletHash)  {
-    windowManager->switchToWindowEx( mwc::PAGE_HODL_CLAIM,
-                                     new wnd::HodlClaim( windowManager->getInWndParent(), walletHash));
-}
-
-// return true(first) if press OK and input signature value(second)
-QPair<bool, QString> DesktopWndManager::hodlGetSignatureDlg(QString challenge) {
-    dlg::HodlGetSignature signatureDlg(nullptr, challenge);
-    if ( signatureDlg.exec() == QDialog::Accepted) {
-        return QPair<bool, QString>(true, signatureDlg.getSignature());
-    }
-    return QPair<bool, QString>(false, "");
-}
-
 void DesktopWndManager::pageAccounts() {
     windowManager->switchToWindowEx( mwc::PAGE_K_ACCOUNTS,
                new wnd::Accounts( windowManager->getInWndParent()));
@@ -275,16 +238,6 @@ void DesktopWndManager::pageAccounts() {
 void DesktopWndManager::pageAccountTransfer() {
     windowManager->switchToWindowEx( mwc::PAGE_K_ACCOUNT_TRANSFER,
                new wnd::AccountTransfer( windowManager->getInWndParent()));
-}
-
-void DesktopWndManager::pageAirdrop() {
-    windowManager->switchToWindowEx( mwc::PAGE_M_AIRDROP,
-             new wnd::Airdrop( windowManager->getInWndParent()));
-}
-
-void DesktopWndManager::pageAirdropForBTC(QString btcAddress, QString challenge, QString identifier) {
-    windowManager->switchToWindowEx( mwc::PAGE_M_AIRDROP_CLAIM,
-               new wnd::AirdropForBTC( windowManager->getInWndParent(), btcAddress, challenge, identifier ) );
 }
 
 void DesktopWndManager::pageNodeInfo() {

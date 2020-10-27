@@ -19,7 +19,6 @@
 #include "../wallet/wallet.h"
 
 namespace core {
-class HodlStatus;
 class AppContext;
 }
 
@@ -34,7 +33,6 @@ namespace util {
     // return false if User cancel this action.
     bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins,
                            wallet::Wallet * wallet,
-                           core::HodlStatus * hodlStatus,
                            core::AppContext * appContext,
                            QStringList & resultOutputs, uint64_t* txnFee );
 

@@ -7,8 +7,6 @@
         <file>img/Receive@2x.svg</file>
         <file>img/Send@2x.svg</file>
         <file>img/Transactions@2x.svg</file>
-        <file>img/Airdrop@2x.svg</file>
-        <file>img/HODL@2x.svg</file>
         <file>img/TBLogo@2x.svg</file>
         <file>img/StatusFail@2x.svg</file>
         <file>img/StatusOk@2x.svg</file>
@@ -42,7 +40,6 @@
         <file>img/Difficulty@2x.svg</file>
         <file>img/purpLeft@2x.svg</file>
         <file>img/purpRight@2x.svg</file>
-        <file>img/HODL_big@2x.svg</file>
         <file>help/accounts.html</file>
         <file>help/contacts.html</file>
         <file>help/event_log.html</file>
@@ -94,5 +91,6 @@
         <file>img/iconUnconfirmed@2x.svg</file>
         <file>img/iconCoinbase@2x.svg</file>
         <file>img/iconClose@2x.svg</file>
+        <file>img/swap@2x.svg</file>
     </qresource>
 </RCC>

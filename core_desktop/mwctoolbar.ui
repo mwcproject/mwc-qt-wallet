@@ -193,13 +193,13 @@ color: #FFFFFF;</string>
        <property name="minimumSize">
         <size>
          <width>131</width>
-         <height>62</height>
+         <height>80</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>131</width>
-         <height>62</height>
+         <height>80</height>
         </size>
        </property>
        <property name="cursor">
@@ -221,7 +221,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>18</height>
+         <height>29</height>
         </size>
        </property>
        <property name="checkable">
@@ -240,13 +240,13 @@ color: #FFFFFF;</string>
        <property name="minimumSize">
         <size>
          <width>131</width>
-         <height>62</height>
+         <height>80</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>131</width>
-         <height>62</height>
+         <height>80</height>
         </size>
        </property>
        <property name="cursor">
@@ -268,7 +268,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>18</height>
+         <height>29</height>
         </size>
        </property>
        <property name="checkable">
@@ -287,13 +287,13 @@ color: #FFFFFF;</string>
        <property name="minimumSize">
         <size>
          <width>131</width>
-         <height>62</height>
+         <height>80</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>131</width>
-         <height>62</height>
+         <height>80</height>
         </size>
        </property>
        <property name="cursor">
@@ -315,7 +315,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>18</height>
+         <height>29</height>
         </size>
        </property>
        <property name="checkable">
@@ -334,13 +334,13 @@ color: #FFFFFF;</string>
        <property name="minimumSize">
         <size>
          <width>131</width>
-         <height>62</height>
+         <height>80</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>131</width>
-         <height>62</height>
+         <height>80</height>
         </size>
        </property>
        <property name="cursor">
@@ -362,7 +362,7 @@ color: #FFFFFF;</string>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>18</height>
+         <height>29</height>
         </size>
        </property>
        <property name="checkable">
@@ -377,17 +377,17 @@ color: #FFFFFF;</string>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="airdropToolButton">
+      <widget class="QToolButton" name="swapToolButton">
        <property name="minimumSize">
         <size>
          <width>131</width>
-         <height>62</height>
+         <height>80</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>131</width>
-         <height>62</height>
+         <height>80</height>
         </size>
        </property>
        <property name="cursor">
@@ -397,67 +397,20 @@ color: #FFFFFF;</string>
         <enum>Qt::TabFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Click here to claim your MWC from the Airdrop</string>
+        <string>Peer to peer Atomic Swaps</string>
        </property>
        <property name="text">
-        <string notr="true">Airdrop</string>
+        <string notr="true">Swap</string>
        </property>
        <property name="icon">
         <iconset>
-         <normalon>:/img/Airdrop@2x.svg</normalon>
+         <normalon>:/img/swap@2x.svg</normalon>
         </iconset>
        </property>
        <property name="iconSize">
         <size>
          <width>45</width>
-         <height>18</height>
-        </size>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextUnderIcon</enum>
-       </property>
-       <property name="autoRaise">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="hodlToolButton">
-       <property name="minimumSize">
-        <size>
-         <width>131</width>
-         <height>62</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>131</width>
-         <height>62</height>
-        </size>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
-       </property>
-       <property name="toolTip">
-        <string>Click here to Register/Claim your coins from the HODL program</string>
-       </property>
-       <property name="text">
-        <string notr="true">HODL</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources_desktop.qrc">
-         <normaloff>:/img/HODL@2x.svg</normaloff>:/img/HODL@2x.svg</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>45</width>
-         <height>18</height>
+         <height>29</height>
         </size>
        </property>
        <property name="checkable">

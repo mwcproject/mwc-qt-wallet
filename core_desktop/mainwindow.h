@@ -81,8 +81,6 @@ private slots:
     void on_actionNode_Overview_triggered();
     void on_actionResync_with_full_node_triggered();
     void on_actionOutputs_triggered();
-    void on_actionAirdrop_triggered();
-    void on_actionHODL_triggered();
     void on_actionWallet_accounts_triggered();
     void on_actionAccounts_triggered();
     void on_actionContacts_triggered();
@@ -96,6 +94,7 @@ private slots:
     void on_actionGood_Money_triggered();
     void on_actionRoadmap_triggered();
     void on_actionMWC_website_triggered();
+    void on_actionAtomicSwap_triggered();
 
 private:
     void updateLeftBar(bool show);

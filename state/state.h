@@ -21,7 +21,6 @@ namespace core {
     class WindowManager;
     class MainWindow;
     class AppContext;
-    class HodlStatus;
 }
 
 namespace wallet {
@@ -45,7 +44,7 @@ enum STATE {
     ACCOUNTS = 4,               // Wallet accounts.              Note!!!  Keep accounts first Action page.
     ACCOUNT_TRANSFER= 5,        // Transfer funds from account to account
     EVENTS = 6,                 // Wallet events (logs)
-    HODL = 7,                   // Hodl program.
+    //HODL = 7,                   // Hodl program.
     SEND = 8,                   // Send coins Page
     RECEIVE_COINS = 9,          // Receive coins
     LISTENING = 10,             // Listening API setting/status
@@ -53,7 +52,7 @@ enum STATE {
     OUTPUTS = 12,               // Outputs for this wallet
     CONTACTS = 13,              // Contact page. COntacts supported by wallet713
     WALLET_CONFIG = 14,         // Wallet config
-    AIRDRDOP_MAIN = 15,         // Starting airdrop page
+    //AIRDRDOP_MAIN = 15,         // Starting airdrop page
     SHOW_SEED = 16,             // Show Seed
     NODE_INFO = 17,             // Show node info
     RESYNC = 18,                // Re-sync account with a node
@@ -85,14 +84,12 @@ struct StateContext {
     wallet::Wallet      * const wallet = nullptr; //wallet caller interface
     node::MwcNode       * const mwcNode = nullptr;
     StateMachine        * stateMachine = nullptr;
-    core::HodlStatus    * hodlStatus = nullptr;
 
     StateContext(core::AppContext * _appContext, wallet::Wallet * _wallet,
                  node::MwcNode * _mwcNode) :
         appContext(_appContext), wallet(_wallet), mwcNode(_mwcNode), stateMachine(nullptr) {}
 
     void setStateMachine(StateMachine * sm) {stateMachine=sm;}
-    void setHodlStatus(core::HodlStatus* hs) {hodlStatus=hs;}
 };
 
 void setStateContext(StateContext * context);

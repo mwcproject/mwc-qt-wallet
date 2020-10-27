@@ -23,7 +23,6 @@ class ShowOutputDlg;
 }
 
 namespace bridge {
-class HodlStatus;
 class Config;
 class Wallet;
 class Util;
@@ -54,7 +53,6 @@ private:
 private:
     Ui::ShowOutputDlg *ui;
 
-    bridge::HodlStatus * hodl = nullptr;
     bridge::Config * config = nullptr;
     bridge::Wallet * wallet = nullptr;
     bridge::Util * util = nullptr;

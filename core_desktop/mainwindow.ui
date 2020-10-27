@@ -312,6 +312,8 @@
     <addaction name="actionTransactions"/>
     <addaction name="actionOutputs"/>
     <addaction name="separator"/>
+    <addaction name="actionAtomicSwap"/>
+    <addaction name="separator"/>
     <addaction name="actionAccounts"/>
     <addaction name="actionEvent_log"/>
     <addaction name="separator"/>
@@ -327,13 +329,6 @@
     <addaction name="actionNode_Overview"/>
     <addaction name="separator"/>
     <addaction name="actionResync_with_full_node"/>
-   </widget>
-   <widget class="QMenu" name="menuMWC">
-    <property name="title">
-     <string>MWC</string>
-    </property>
-    <addaction name="actionAirdrop"/>
-    <addaction name="actionHODL"/>
    </widget>
    <widget class="QMenu" name="menuAccount">
     <property name="title">
@@ -481,6 +476,14 @@
   <action name="actionExchanges">
    <property name="text">
     <string>Exchanges</string>
+   </property>
+  </action>
+  <action name="actionAtomicSwap">
+   <property name="text">
+    <string>Atomic Swap</string>
+   </property>
+   <property name="toolTip">
+    <string>Peer to peer atomic Swap</string>
    </property>
   </action>
  </widget>

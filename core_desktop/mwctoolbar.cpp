@@ -38,8 +38,7 @@ MwcToolbar::MwcToolbar(QWidget *parent) :
     coreWindow = new CoreWindow(this);
 
     if (config->isColdWallet()) {
-        //ui->hodlToolButton->hide();
-        ui->airdropToolButton->hide();
+        ui->swapToolButton->hide();
     }
 
     QObject::connect( wallet, &Wallet::sgnWalletBalanceUpdated,
@@ -60,11 +59,10 @@ MwcToolbar::~MwcToolbar()
 
 // state::STATE state
 void MwcToolbar::onUpdateButtonsState( int state ) {
-    ui->airdropToolButton->setChecked( state==state::AIRDRDOP_MAIN );
     ui->sendToolButton->setChecked( state==state::SEND );
     ui->receiveToolButton->setChecked( state==state::RECEIVE_COINS );
     ui->transactionToolButton->setChecked( state==state::TRANSACTIONS );
-    ui->hodlToolButton->setChecked( state==state::HODL );
+    ui->swapToolButton->setChecked( state==state::SWAP );
     ui->finalizeToolButton->setChecked( state==state::FINALIZE );
 }
 
@@ -74,11 +72,6 @@ void MwcToolbar::paintEvent(QPaintEvent *)
      opt.init(this);
      QPainter p(this);
      style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
-}
-
-void MwcToolbar::on_airdropToolButton_clicked()
-{
-    stateMachine->setActionWindow( state::STATE::AIRDRDOP_MAIN );
 }
 
 void MwcToolbar::on_sendToolButton_clicked()
@@ -101,11 +94,6 @@ void MwcToolbar::on_transactionToolButton_clicked()
     stateMachine->setActionWindow( state::STATE::TRANSACTIONS );
 }
 
-void MwcToolbar::on_hodlToolButton_clicked()
-{
-    stateMachine->setActionWindow( state::STATE::HODL );
-}
-
 // Account info is updated
 void MwcToolbar::onWalletBalanceUpdated() {
     qDebug() << "get onWalletBalanceUpdated. Updating the balance";
@@ -120,8 +108,9 @@ void MwcToolbar::onLogout() {
     ui->totalMwc->setText("");
 }
 
-
-
+void core::MwcToolbar::on_swapToolButton_clicked()
+{
+    stateMachine->setActionWindow( state::STATE::SWAP );
 }
 
-
+}

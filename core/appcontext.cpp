@@ -33,8 +33,6 @@ namespace core {
 
 const static QString settingsFileName("context.dat");
 const static QString notesFileName("notes.dat");
-const static QString airdropRequestsFileName("requests.dat");
-const static QString hodlOutputsPrefix("ho_");
 
 
 void SendCoinsParams::saveData(QDataStream & out) const {
@@ -85,20 +83,6 @@ bool ContactRecord::loadData( QDataStream & in) {
 
 AppContext::AppContext() {
     loadData();
-
-    // Check if airdrop request need to be cleaned up
-    QVector<state::AirdropRequests> airDropData = loadAirdropRequests();
-
-    int64_t cleanTimeLimit = QDateTime::currentMSecsSinceEpoch() - mwc::AIRDROP_TRANS_KEEP_TIME_MS;
-    int sz = airDropData.size();
-    for (int t=sz-1; t>=0; t--) {
-        if (airDropData[t].timestamp < cleanTimeLimit) {
-            airDropData.remove(t);
-        }
-    }
-
-    if (sz != airDropData.size())
-        saveAirdropRequests(airDropData);
 }
 
 AppContext::~AppContext() {
@@ -594,75 +578,6 @@ void AppContext::setShowOutputAll(bool all) {
     showOutputAll = all;
 }
 
-
-// AirdropRequests will handle differently
-void AppContext::saveAirdropRequests( const QVector<state::AirdropRequests> & data ) {
-    QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
-    if (!dataPath.first) {
-        core::getWndManager()->messageTextDlg("Error", dataPath.second);
-        QCoreApplication::exit();
-        return;
-    }
-
-    QString filePath = dataPath.second + "/" + airdropRequestsFileName;
-    QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly)) {
-        core::getWndManager()->messageTextDlg("ERROR",
-                                     "Unable save to aidrop requests to " + filePath +
-                                     "\nError: " + file.errorString());
-        return;
-    }
-
-    QDataStream out(&file);
-    out.setVersion(QDataStream::Qt_5_7);
-
-    out << 0x8327d1;
-    int sz = data.size();
-    out << sz;
-    for (auto & d : data ) {
-        d.saveData(out);
-    }
-}
-
-QVector<state::AirdropRequests> AppContext::loadAirdropRequests() const {
-
-    QVector<state::AirdropRequests> res;
-
-    QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
-    if (!dataPath.first) {
-        core::getWndManager()->messageTextDlg("Error", dataPath.second);
-        QCoreApplication::exit();
-        return res;
-    }
-
-    QFile file(dataPath.second + "/" + airdropRequestsFileName);
-    if ( !file.open(QIODevice::ReadOnly) ) {
-        // first run, no file exist
-        return res;
-    }
-
-    QDataStream in(&file);
-    in.setVersion(QDataStream::Qt_5_7);
-
-    int id = 0;
-    in >> id;
-    if (id!=0x8327d1)
-        return res;
-
-    int sz = 0;
-    in >> sz;
-
-    while(sz>0) {
-        sz--;
-        state::AirdropRequests req;
-        if (!req.loadData(in))
-            break;
-        res.push_back(req);
-    }
-
-    return res;
-}
-
 // -------------- Contacts
 
 // Add new contact
@@ -845,77 +760,6 @@ int64_t AppContext::getHodlRegistrationTime(const QString & hash) const {
 
 void AppContext::setHodlRegistrationTime(const QString & hash, int64_t time) {
     hodlRegistrations.insert( hash, qlonglong(time) );
-}
-
-void AppContext::saveHodlOutputs( const QString & rootPubKeyHash, const QMap<QString, core::HodlOutputInfo> & hodlOutputs ) {
-    Q_ASSERT(!rootPubKeyHash.isEmpty());
-    QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
-    if (!dataPath.first) {
-        core::getWndManager()->messageTextDlg("Error", dataPath.second);
-        QCoreApplication::exit();
-        return;
-    }
-
-    QString filePath = dataPath.second + "/" + hodlOutputsPrefix+rootPubKeyHash + ".dat";
-
-    QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly)) {
-        core::getWndManager()->messageTextDlg("ERROR",
-                                         "Unable to store HODL cache to " + filePath +
-                                         "\nError: " + file.errorString());
-        return;
-    }
-
-    QDataStream out(&file);
-    out.setVersion(QDataStream::Qt_5_7);
-
-    out << 0x324745;
-    int sz = hodlOutputs.size();
-    out << sz;
-    for (auto ho = hodlOutputs.begin(); ho!=hodlOutputs.end(); ho++ ) {
-        ho.value().saveData(out);
-    }
-
-}
-QMap<QString, core::HodlOutputInfo> AppContext::loadHodlOutputs(const QString & rootPubKeyHash ) {
-    QMap<QString, core::HodlOutputInfo> res;
-
-    QPair<bool,QString> dataPath = ioutils::getAppDataPath("context");
-    if (!dataPath.first) {
-        core::getWndManager()->messageTextDlg("Error", dataPath.second);
-        QCoreApplication::exit();
-        return res;
-    }
-
-    QString filePath = dataPath.second + "/" + hodlOutputsPrefix+rootPubKeyHash + ".dat";
-
-    QFile file(filePath);
-    if ( !file.open(QIODevice::ReadOnly) ) {
-        // first run, no file exist
-        return res;
-    }
-
-    QDataStream in(&file);
-    in.setVersion(QDataStream::Qt_5_7);
-
-    int id = 0;
-    in >> id;
-    if (id!=0x324745)
-        return res;
-
-    int sz = 0;
-    in >> sz;
-
-    while(sz>0) {
-        sz--;
-        core::HodlOutputInfo req;
-        if (!req.loadData(in))
-            break;
-        res.insert( req.outputCommitment, req );
-    }
-
-    return res;
-
 }
 
 bool AppContext::isLockedOutputs(const QString & output) const {
