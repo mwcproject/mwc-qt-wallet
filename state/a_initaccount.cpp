@@ -88,6 +88,11 @@ NextStateRespond InitAccount::execute() {
     return NextStateRespond( NextStateRespond::RESULT::DONE );
 }
 
+// Restore form the seed is cancelled by user.
+void InitAccount::cancel() {
+    context->stateMachine->setActionWindow( state::STATE::START_WALLET, true );
+}
+
 // Executing another state
 void InitAccount::exitingState() {
     context->stateMachine->unblockLogout("InitAccount");

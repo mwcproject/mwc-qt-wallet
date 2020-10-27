@@ -481,7 +481,7 @@
             <bool>true</bool>
            </property>
           </widget>
-          <widget class="QRadioButton" name="radioMainNet">
+          <widget class="control::MwcRadioButton" name="radioMainNet">
            <property name="geometry">
             <rect>
              <x>90</x>
@@ -500,7 +500,7 @@
             <string>MainNet </string>
            </property>
           </widget>
-          <widget class="QRadioButton" name="radioFloonet">
+          <widget class="control::MwcRadioButton" name="radioFloonet">
            <property name="geometry">
             <rect>
              <x>225</x>
@@ -669,6 +669,11 @@
    <class>control::MwcLabelMini</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcRadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>control_desktop/MwcRadioButton.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

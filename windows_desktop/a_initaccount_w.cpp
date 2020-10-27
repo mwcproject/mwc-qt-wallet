@@ -100,6 +100,7 @@ void InitAccount::on_password1Edit_textChanged(const QString &text) {
     }
 
     ui->passwordWndHolder->adjustSize();
+    repaint(); // QT by some reasons has issue with radios updates
 }
 
 void InitAccount::timerEvent(QTimerEvent *event) {

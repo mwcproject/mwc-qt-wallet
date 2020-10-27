@@ -56,6 +56,9 @@ public:
 
     // create form seed
     void createWalletWithSeed( QVector<QString> sd );
+
+    // Restore form the seed is cancelled by user.
+    void cancel();
 private slots:
     void onNewSeed(QVector<QString> seed);
 

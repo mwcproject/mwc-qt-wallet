@@ -36,7 +36,7 @@ void InitAccount::setPassword(QString password) {
 void InitAccount::cancelInitAccount() {
     // Not needed for now and implementaiton need to be done.
     // keeping the bridge method in case UI will need cancellation workflow
-    //getState()->cancel();
+    getState()->cancel();
 }
 
 // Create a wallet form the seed
