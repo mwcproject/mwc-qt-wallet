@@ -98,28 +98,22 @@ void Wallet::onConfigUpdate() {
     emit sgnConfigUpdate();
 }
 
-void Wallet::onListeningStartResults( bool mqTry, bool kbTry, bool tor,
+void Wallet::onListeningStartResults( bool mqTry, bool tor,
                               QStringList errorMessages, bool initialStart ) {
-    Q_UNUSED(mqTry)
-    Q_UNUSED(kbTry)
-    Q_UNUSED(tor)
     Q_UNUSED(errorMessages)
     Q_UNUSED(initialStart)
-    emit sgnListenerStartStop(mqTry, kbTry, tor);
+    emit sgnListenerStartStop(mqTry, false, tor);
 }
 
-void Wallet::onListeningStopResult(bool mqTry, bool kbTry, bool tor,
+void Wallet::onListeningStopResult(bool mqTry, bool tor,
                            QStringList errorMessages ) {
-    Q_UNUSED(mqTry)
-    Q_UNUSED(kbTry)
-    Q_UNUSED(tor)
     Q_UNUSED(errorMessages)
-    emit sgnListenerStartStop(mqTry, kbTry, tor);
+    emit sgnListenerStartStop(mqTry, false, tor);
 }
 
 
-void Wallet::onUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline) {
-    emit sgnUpdateListenerStatus( mqsOnline, keybaseOnline, torOnline );
+void Wallet::onUpdateListenerStatus(bool mqsOnline, bool torOnline) {
+    emit sgnUpdateListenerStatus( mqsOnline, false, torOnline );
 }
 
 void Wallet::onHttpListeningStatus(bool listening, QString additionalInfo) {
@@ -214,7 +208,8 @@ bool Wallet::getMqsListenerStatus() {
 }
 // return true is Keybase is online
 bool Wallet::getKeybaseListenerStatus()  {
-    return getWallet()->getListenerStatus().keybase;
+    Q_ASSERT(false); // Absolete functionality
+    return false;
 }
 // return true if Tor is online
 bool Wallet::getTorListenerStatus() {
@@ -227,30 +222,32 @@ bool Wallet::isMqsListenerStarted() {
 }
 // return true is Keybase is started
 bool Wallet::isKeybaseListenerStarted() {
-    return getWallet()->getListenerStartState().keybase;
+    Q_ASSERT(false); // Absolete functionality
+    return false;
 }
+
 bool Wallet::isTorListenerStarted() {
     return getWallet()->getListenerStartState().tor;
 }
 
 // Request start/stop listeners. Feedback should come with sgnUpdateListenerStatus
 void Wallet::requestStartMqsListener() {
-    getWallet()->listeningStart(true, false, false, false);
+    getWallet()->listeningStart(true, false, false);
 }
 void Wallet::requestStopMqsListener() {
-    getWallet()->listeningStop(true, false, false);
+    getWallet()->listeningStop(true, false);
 }
 void Wallet::requestStartKeybaseListener() {
-    getWallet()->listeningStart(false, true, false, false);
+    Q_ASSERT(false); // Absolete functionality
 }
 void Wallet::requestStopKeybaseListener() {
-    getWallet()->listeningStop(false, true, false);
+    Q_ASSERT(false); // Absolete functionality
 }
 void Wallet::requestStartTorListener() {
-    getWallet()->listeningStart(false, false, true, false);
+    getWallet()->listeningStart(false, true, false);
 }
 void Wallet::requestStopTorListener() {
-    getWallet()->listeningStop(false, false, true);
+    getWallet()->listeningStop(false, true);
 }
 
 void Wallet::repost(QString account, int id, bool fluff) {

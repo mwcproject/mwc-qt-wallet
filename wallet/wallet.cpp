@@ -140,7 +140,7 @@ void MwcNodeConnection::setData(NODE_CONNECTION_TYPE _connectionType, const QStr
 bool WalletConfig::operator == (const WalletConfig & other) const {
     bool ok = dataPath==other.dataPath &&
               mwcmqsDomainEx==other.mwcmqsDomainEx &&
-              keyBasePath==other.keyBasePath && foreignApi==other.foreignApi;
+              foreignApi==other.foreignApi;
 
     if (!ok)
         return ok;
@@ -155,7 +155,6 @@ bool WalletConfig::operator == (const WalletConfig & other) const {
 WalletConfig & WalletConfig::setData(QString _network,
                             QString _dataPath,
                             QString _mwcmqsDomain,
-                            QString _keyBasePath,
                             bool    _foreignApi,
                             QString _foreignApiAddress,
                             QString _foreignApiSecret,
@@ -163,7 +162,7 @@ WalletConfig & WalletConfig::setData(QString _network,
                             QString _tlsCertificateKey) {
     updateNetwork(_network);
     updateDataPath(_dataPath);
-    setDataWalletCfg(_mwcmqsDomain,_keyBasePath);
+    setDataWalletCfg(_mwcmqsDomain);
 
     return setForeignApi(_foreignApi, _foreignApiAddress, _foreignApiSecret, _tlsCertificateFile, _tlsCertificateKey);
 }
@@ -182,17 +181,15 @@ WalletConfig & WalletConfig::setForeignApi(bool _foreignApi,
 
 
 
-WalletConfig & WalletConfig::setDataWalletCfg( QString _mwcmqsDomain, QString _keyBasePath) {
+WalletConfig & WalletConfig::setDataWalletCfg( QString _mwcmqsDomain) {
     mwcmqsDomainEx = _mwcmqsDomain;
-    keyBasePath = _keyBasePath;
     return *this;
 }
 
 QString WalletConfig::toString() const {
     return "network=" + network + "\n" +
             "dataPath=" + dataPath + "\n" +
-            "mwcmqsDomainEx=" + mwcmqsDomainEx + "\n" +
-            "keyBasePath=" + keyBasePath;
+            "mwcmqsDomainEx=" + mwcmqsDomainEx;
 }
 
 // Get MQ/MQS host name. Depend on current config

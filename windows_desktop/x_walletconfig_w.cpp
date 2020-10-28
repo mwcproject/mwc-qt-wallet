@@ -47,44 +47,6 @@ static double id2scale(int scale) {
     }
 }
 
-// Check path and show warning is needed
-static bool checkKeyBasePath( QWidget * parent, QString keybasePath ) {
-    Q_UNUSED(parent)
-    Q_UNUSED(keybasePath)
-
-#ifdef Q_OS_WIN
-
-    // Under the windows we want user select Client, Not a GUI
-        // C:\Users\XXXX\AppData\Local\Keybase\keybase.exe        - ok
-        // C:\Users\XXXX\AppData\Local\Keybase\Gui\Keybase.exe    - GUI, will not work
-        if (!keybasePath.isEmpty() && (keybasePath.contains("Gui") || keybasePath.contains("gui")) ) {
-            if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText( parent, "Keybase path, Warning",
-                               "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
-                               "Cancel", "Use this path",
-                               "Drop my selection, I will select correct keybase client",
-                               "Apply my selection, I have non standard keybase installation, am sure that client is correct",
-                               true, false ) )
-                return false;
-        }
-#endif
-#ifdef Q_OS_DARWIN
-    // Mac OS
-    // /Applications/Keybase.app/Contents/MacOS/Keybase              - GUI, not OK
-    // /Applications/Keybase.app/Contents/SharedSupport/bin/keybase  - ok
-    if (!keybasePath.isEmpty() && !keybasePath.contains("bin") ) {
-        if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText( parent, "Keybase path, Warning",
-                     "Wallet requires keybase console client. Seems like you selected keybase GUI that doesn't provide needed functionality. Please double check if console client path was selected.",
-                     "Cancel", "Use this path",
-                     "Drop my selection, I will select correct keybase client",
-                     "Apply my selection, I have non standard keybase installation, am sure that client is correct",
-                     true, false ) )
-            return false;
-    }
-#endif
-
-    return true;
-}
-
 static QString calcMWCMW_DOMAIN_DEFAULT_STR() {
     return "default MWC MQS Domain";
 }
@@ -106,9 +68,8 @@ WalletConfig::WalletConfig(QWidget *parent) :
     updateLogsStateUI(walletLogsEnabled);
 
     autoStartMQSEnabled = walletConfig->getAutoStartMQSEnabled();
-    autoStartKeybaseEnabled = walletConfig->getAutoStartKeybaseEnabled();
     autoStartTorEnabled = walletConfig->getAutoStartTorEnabled();
-    updateAutoStartStateUI(autoStartMQSEnabled, autoStartKeybaseEnabled, autoStartTorEnabled);
+    updateAutoStartStateUI(autoStartMQSEnabled, autoStartTorEnabled);
 
     notificationWindowsEnabled = walletConfig->getNotificationWindowsEnabled();
     ui->notificationsEnabled->setChecked(notificationWindowsEnabled);
@@ -131,14 +92,11 @@ WalletConfig::WalletConfig(QWidget *parent) :
     ui->fontHolder->hide();
 #endif
 
-    keybasePath = walletConfig->getKeybasePath();
     mqsHost = walletConfig->getMqsHost();
     inputConfirmationsNumber = walletConfig->getInputConfirmationsNumber();
     changeOutputs = walletConfig->getChangeOutputs();
 
-    setValues(keybasePath,
-              mqsHost,
-              inputConfirmationsNumber, changeOutputs);
+    setValues(mqsHost, inputConfirmationsNumber, changeOutputs);
     updateButtons();
 }
 
@@ -148,11 +106,10 @@ WalletConfig::~WalletConfig()
     delete ui;
 }
 
-void WalletConfig::setValues(const QString & keyBasePath,
+void WalletConfig::setValues(
                              const QString & mwcmqHostNorm,
                              int inputConfirmationNumber,
                              int changeOutputs) {
-    ui->keybasePathEdit->setText( keybasePathConfig2InputStr(keyBasePath) );
     ui->mwcmqHost->setText( mwcDomainConfig2InputStr( mwcmqHostNorm ) );
 
     ui->confirmationNumberEdit->setText( QString::number(inputConfirmationNumber) );
@@ -166,12 +123,10 @@ void WalletConfig::updateButtons() {
         ui->walletInstanceNameEdit->text().trimmed() == walletInstanceName &&
         getcheckedSizeButton() == uiScale &&
         walletLogsEnabled == ui->logsEnableBtn->isChecked() &&
-        keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == keybasePath &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == mqsHost &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(inputConfirmationsNumber) &&
         ui->changeOutputsEdit->text().trimmed() == QString::number(changeOutputs) &&
         autoStartMQSEnabled == ui->start_mqs->isChecked() &&
-        autoStartKeybaseEnabled == ui->start_keybase->isChecked() &&
         autoStartTorEnabled == ui->start_tor->isChecked() &&
         notificationWindowsEnabled == ui->notificationsEnabled->isChecked() &&
         logoutTimeout == currentLogoutTimeout &&
@@ -184,12 +139,10 @@ void WalletConfig::updateButtons() {
         true == ui->logsEnableBtn->isChecked() &&
         // 713 directory is skipped intentionally. We don't want to reset it because user is expected to have many such directories
         // ui->mwc713directoryEdit->text().trimmed() == defaultWalletConfig.getDataPath() &&
-        keybasePathInputStr2Config( ui->keybasePathEdit->text().trimmed() ) == walletConfig->getDefaultKeybasePath() &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == walletConfig->getDefaultMqsHost() &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(walletConfig->getDefaultInputConfirmationsNumber()) &&
         ui->changeOutputsEdit->text().trimmed() == QString::number(walletConfig->getDefaultChangeOutputs()) &&
         ui->start_mqs->isChecked() == true &&
-        ui->start_keybase->isChecked() == true &&
         ui->start_tor->isChecked() == true &&
         ui->logout_20->isChecked() == true &&
         ui->outputLockingCheck->isChecked() == false;
@@ -206,59 +159,8 @@ QString WalletConfig::mwcDomainInputStr2Config(QString mwcDomain) {
     return mwcDomain == calcMWCMW_DOMAIN_DEFAULT_STR() ? "" : mwcDomain;
 }
 
-QString WalletConfig::keybasePathConfig2InputStr(QString kbpath) {
-    if (kbpath.isEmpty())
-        return "default";
-
-    QFileInfo check(kbpath);
-    if (check.exists() && check.isFile())
-        return kbpath;
-
-    return "Not Found";
-}
-
-QString WalletConfig::keybasePathInputStr2Config(QString kbpath) {
-    if (kbpath == "default")
-        return "";
-
-    if (kbpath == "Not Found")
-        return walletConfig->getKeybasePath();
-
-    return kbpath;
-}
-
 void WalletConfig::on_mwcmqHost_textEdited(const QString &)
 {
-    updateButtons();
-}
-
-void WalletConfig::on_keybasePathEdit_textChanged(const QString &)
-{
-    updateButtons();
-}
-
-void WalletConfig::on_keybasePathSelect_clicked()
-{
-    util::TimeoutLockObject to( "WalletConfig" );
-
-    const QStringList appDirs = QStandardPaths::standardLocations(QStandardPaths::ApplicationsLocation);
-
-    QString keybase = QFileDialog::getOpenFileName(this, tr("Keybase binary location"),
-                                                   appDirs.isEmpty() ? "" : appDirs[0]);
-
-    auto fileOk = util::validateMwc713Str(keybase);
-    if (!fileOk.first) {
-        core::getWndManager()->messageTextDlg("File Path",
-                                              "This file path is not acceptable.\n" + fileOk.second);
-        return;
-    }
-
-    if ( keybase.isEmpty() || !checkKeyBasePath(this, keybase) ) {
-        ui->keybasePathEdit->setFocus();
-        return;
-    }
-
-    ui->keybasePathEdit->setText( keybase );
     updateButtons();
 }
 
@@ -274,8 +176,7 @@ void WalletConfig::on_changeOutputsEdit_textEdited(const QString &)
 
 void WalletConfig::on_restoreDefault_clicked()
 {
-    setValues(walletConfig->getDefaultKeybasePath(),
-              walletConfig->getMqsHost(),
+    setValues(walletConfig->getMqsHost(),
               walletConfig->getDefaultInputConfirmationsNumber(),
               walletConfig->getDefaultChangeOutputs());
 
@@ -283,7 +184,7 @@ void WalletConfig::on_restoreDefault_clicked()
 
     updateLogsStateUI(true);
 
-    updateAutoStartStateUI(true, true, true);
+    updateAutoStartStateUI(true, true);
 
     currentLogoutTimeout = 20 * 60;
     updateAutoLogoutStateUI(20 * 60);
@@ -303,20 +204,6 @@ bool WalletConfig::applyChanges() {
     if (newWalletInstanceName.isEmpty()) {
         control::MessageBox::messageText(this, "Input", "Please specify non empty wallet insatance name");
         ui->walletInstanceNameEdit->setFocus();
-        return false;
-    }
-
-    // keybase path
-    QString keybasePath = keybasePathInputStr2Config(ui->keybasePathEdit->text().trimmed());
-    QPair <bool, QString> res = util::validateMwc713Str(keybasePath);
-    if (!res.first) {
-        control::MessageBox::messageText(this, "Input", res.second);
-        ui->keybasePathEdit->setFocus();
-        return false;
-    }
-
-    if (!checkKeyBasePath(this, keybasePath)) {
-        ui->keybasePathEdit->setFocus();
         return false;
     }
 
@@ -389,12 +276,6 @@ bool WalletConfig::applyChanges() {
         walletConfig->updateAutoStartMQSEnabled(ui->start_mqs->isChecked());
     }
     autoStartMQSEnabled = ui->start_mqs->isChecked();
-
-    bool need2updateAutoStartKeybaseEnabled = (autoStartKeybaseEnabled != ui->start_keybase->isChecked());
-    if (need2updateAutoStartKeybaseEnabled) {
-        walletConfig->updateAutoStartKeybaseEnabled(ui->start_keybase->isChecked());
-    }
-    autoStartKeybaseEnabled = ui->start_keybase->isChecked();
 
     // Check if Foreign API configured correctly
     if ( ui->start_tor->isChecked() ) {
@@ -477,9 +358,8 @@ bool WalletConfig::applyChanges() {
         walletInstanceName = newWalletInstanceName;
     }
 
-    if (!(keybasePath == this->keybasePath &&
-          mwcmqHost == mqsHost)) {
-        if (walletConfig->updateWalletConfig( mwcmqHost, keybasePath, need2updateGuiSize )) {
+    if (mwcmqHost != mqsHost) {
+        if (walletConfig->updateWalletConfig( mwcmqHost, "", need2updateGuiSize)) {
             return false;
         }
     }
@@ -593,11 +473,6 @@ void WalletConfig::on_start_mqs_clicked()
     updateButtons();
 }
 
-void WalletConfig::on_start_keybase_clicked()
-{
-    updateButtons();
-}
-
 void WalletConfig::on_start_tor_clicked()
 {
     updateButtons();
@@ -608,9 +483,8 @@ void WalletConfig::on_walletInstanceNameEdit_textChanged(const QString &)
     updateButtons();
 }
 
-void WalletConfig::updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartKeybase, bool isAutoStartTor) {
+void WalletConfig::updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartTor) {
     ui->start_mqs->setChecked(isAutoStartMQS);
-    ui->start_keybase->setChecked(isAutoStartKeybase);
     ui->start_tor->setChecked(isAutoStartTor);
 }
 

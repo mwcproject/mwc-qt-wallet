@@ -170,8 +170,6 @@ QPair<bool, ADDRESS_TYPE> verifyAddress(QString address) {
         else
             return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::HTTPS);
     }
-    else if ( protocol == "keybase")
-        return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::KEYBASE);
     else if ( protocol == "mwcmq" || protocol == "mwcmqs" )
         return checkMwcMqAddress( address );
     else // Unknown protocol
@@ -189,7 +187,6 @@ QString fullFormalAddress(ADDRESS_TYPE type, QString address) {
             QPair<QString, QString>  protAddr = split2ProtocolAddress(address);
             return "mwcmqs://" + protAddr.second;
         }
-        case ADDRESS_TYPE::KEYBASE:
         case ADDRESS_TYPE::HTTPS:
         case ADDRESS_TYPE::TOR:
         {

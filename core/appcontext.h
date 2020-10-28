@@ -136,10 +136,6 @@ public:
     bool isAutoStartMQSEnabled() const {return autoStartMQSEnabled;}
     void setAutoStartMQSEnabled(bool enabled);
 
-    // ----- Auto Start Keybase --------
-    bool isAutoStartKeybaseEnabled() const {return autoStartKeybaseEnabled;}
-    void setAutoStartKeybaseEnabled(bool enabled);
-
     // ----- Auto Start Tor ------
     bool isAutoStartTorEnabled() const {return autoStartTorEnabled;}
     void setAutoStartTorEnabled(bool enabled);
@@ -239,7 +235,6 @@ private:
     bool logsEnabled = true;
 
     bool autoStartMQSEnabled = true;
-    bool autoStartKeybaseEnabled = true;
     bool autoStartTorEnabled = true;
 
     // Because of Custom node logic, we have to track config changes

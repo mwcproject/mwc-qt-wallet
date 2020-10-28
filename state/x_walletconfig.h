@@ -49,9 +49,6 @@ public:
     bool getAutoStartTorEnabled();
     void updateAutoStartTorEnabled(bool enabled);
 
-    bool getAutoStartKeybaseEnabled();
-    void updateAutoStartKeybaseEnabled(bool enabled);
-
     bool isOutputLockingEnabled();
     void setOutputLockingEnabled(bool lockingEnabled);
 

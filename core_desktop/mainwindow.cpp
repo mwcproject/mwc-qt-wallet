@@ -302,22 +302,15 @@ void MainWindow::onApplicationStateChange(Qt::ApplicationState state) {
 
 void MainWindow::updateListenerBtn() {
     bool mqsStatus = wallet->getMqsListenerStatus();
-    bool keybaseStatus = wallet->getKeybaseListenerStatus();
     bool torStatus = wallet->getTorListenerStatus();
     QString httpListenerStatus = wallet->getHttpListeningStatus();
 
-    qDebug() << "updateListenerBtn: mqsStatus=" << mqsStatus << " keybaseStatus=" << keybaseStatus << " torStatus=" << torStatus << " httpListenerStatus=" << httpListenerStatus;
+    qDebug() << "updateListenerBtn: mqsStatus=" << mqsStatus << " torStatus=" << torStatus << " httpListenerStatus=" << httpListenerStatus;
 
-    bool listening = mqsStatus | keybaseStatus | torStatus;
+    bool listening = mqsStatus | torStatus;
     QString listenerNames;
     if (mqsStatus)
         listenerNames +=  QString("MWC MQS");
-
-    if (keybaseStatus) {
-        if (!listenerNames.isEmpty())
-            listenerNames += ", ";
-        listenerNames += "Keybase";
-    }
 
     if (torStatus) {
         if (!listenerNames.isEmpty())

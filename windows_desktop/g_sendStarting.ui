@@ -93,7 +93,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Send MWC online with MWC MQS, Keybase, HTTP(S) or TOR</string>
+         <string>Send MWC online with MWC MQS, HTTP(S) or TOR</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>

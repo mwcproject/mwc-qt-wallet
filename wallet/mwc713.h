@@ -100,11 +100,11 @@ public:
     virtual ListenerStatus getListenerStartState() override;
 
     // Start listening through services
-    virtual void listeningStart(bool startMq, bool startKb, bool startTor, bool initialStart)  override;
+    virtual void listeningStart(bool startMq, bool startTor, bool initialStart)  override;
     // Check Signal: onStartListening
 
     // Stop listening through services
-    virtual void listeningStop(bool stopMq, bool stopKb, bool stopTor)  override;
+    virtual void listeningStop(bool stopMq, bool stopTor)  override;
     // Check signal: onListeningStopResult
 
     // Get latest Mwc MQ address that we see
@@ -355,15 +355,14 @@ public:
 
     void setGettedSeed( QVector<QString> seed );
 
-    void setListeningStartResults( bool mqTry, bool kbTry, bool torTry, // what we try to start
+    void setListeningStartResults( bool mqTry, bool torTry, // what we try to start
             QStringList errorMessages, bool initialStart );
 
-    void setListeningStopResult(bool mqTry, bool kbTry, bool torTry, // what we try to stop
+    void setListeningStopResult(bool mqTry, bool torTry, // what we try to stop
                                 QStringList errorMessages );
 
     // tid - thread ID that is responsible for listening. mwc713 can do start/stop async. tid will be used to find who is listening...
     void setMwcMqListeningStatus(bool online, QString tid, bool startStopEvents); // Start stop event are major, they can change active tid
-    void setKeybaseListeningStatus(bool online);
     void setTorListeningStatus(bool online);
 
     // info: if online  - Address, offlone - Error message or empty.
@@ -528,10 +527,8 @@ private:
 
     // listening statuses
     bool mwcMqOnline = false;
-    bool keybaseOnline = false;
     bool torOnline = false;
     bool mwcMqStarted = false;
-    bool keybaseStarted = false;
     bool torStarted = false;
     // MWC MQS will try to start forever.
     bool mwcMqStartRequested = false;

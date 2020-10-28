@@ -152,14 +152,6 @@ void WalletConfig::updateAutoStartTorEnabled(bool enabled) {
     context->appContext->setAutoStartTorEnabled(enabled);
 }
 
-bool WalletConfig::getAutoStartKeybaseEnabled() {
-    return context->appContext->isAutoStartKeybaseEnabled();
-}
-
-void WalletConfig::updateAutoStartKeybaseEnabled(bool enabled) {
-    context->appContext->setAutoStartKeybaseEnabled(enabled);
-}
-
 bool WalletConfig::isOutputLockingEnabled() {
     return context->appContext->isLockOutputEnabled();
 }

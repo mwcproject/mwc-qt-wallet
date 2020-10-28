@@ -94,35 +94,27 @@ void MockWallet::getSeed(const QString & walletPassword) {
 
 // Start listening through services
 // Check Signal: onStartListening
-void MockWallet::listeningStart(bool startMq, bool startKb, bool startTor, bool initialStart) {
+void MockWallet::listeningStart(bool startMq, bool startTor, bool initialStart) {
     if (startMq) {
         listener_mwcmqs = true;
-        emit onListeningStartResults(true, false, false, {}, initialStart);
-    }
-    if (startKb) {
-        listener_keybase = true;
-        emit onListeningStartResults(false, true, false, {}, initialStart);
+        emit onListeningStartResults(true, false, {}, initialStart);
     }
     if (startTor) {
         listener_tor = true;
-        emit onListeningStartResults(false, false, true, {}, initialStart);
+        emit onListeningStartResults(false, true, {}, initialStart);
     }
 }
 
 // Stop listening through services
 // Check signal: onListeningStopResult
-void MockWallet::listeningStop(bool stopMq, bool stopKb, bool stopTor) {
+void MockWallet::listeningStop(bool stopMq, bool stopTor) {
     if (stopMq) {
         listener_mwcmqs = false;
-        emit onListeningStopResult(true, false, false, {});
-    }
-    if (stopKb) {
-        listener_keybase = false;
-        emit onListeningStopResult(false, true, false, {});
+        emit onListeningStopResult(true, false, {});
     }
     if (stopTor) {
         listener_tor = stopTor;
-        emit onListeningStopResult(false, false, true, {});
+        emit onListeningStopResult(false, true, {});
     }
 }
 
@@ -231,7 +223,6 @@ const WalletConfig & MockWallet::getWalletConfig() {
     config.setData("Floonet",
             "mock_wallet_data",
             "mwcmqsDomain",
-            "keyBasePath",
             false,
             "127.0.0.1",
             "",

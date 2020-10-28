@@ -111,7 +111,6 @@ private:
 
 public:
     QString mwcmqsDomainEx;// empty - default value
-    QString keyBasePath;
 
     // Http listening params...
     bool foreignApi = false; // Is foreign API is enabled
@@ -121,18 +120,17 @@ public:
     QString tlsCertificateFile;
     QString tlsCertificateKey;
 
-    WalletConfig() : network("Mainnet"), dataPath("Undefined"), keyBasePath("Undefined") {}
+    WalletConfig() : network("Mainnet"), dataPath("Undefined") {}
     WalletConfig(const WalletConfig & other) = default;
     WalletConfig &operator = (const WalletConfig & other) = default;
 
     bool operator == (const WalletConfig & other) const;
 
-    bool isDefined() const { return  dataPath!="Undefined" && keyBasePath!="Undefined"; }
+    bool isDefined() const { return  dataPath!="Undefined"; }
 
     WalletConfig & setData(QString network,
                 QString dataPath,
                 QString mwcmqsDomain,
-                QString keyBasePath,
                 bool foreignApi,
                 QString foreignApiAddress,
                 QString foreignApiSecret,
@@ -143,7 +141,7 @@ public:
                        QString foreignApiAddress, QString foreignApiSecret,
                        QString tlsCertificateFile, QString tlsCertificateKey);
 
-    WalletConfig & setDataWalletCfg(QString mwcmqsDomain, QString keyBasePath);
+    WalletConfig & setDataWalletCfg(QString mwcmqsDomain);
 
     void updateDataPath(const QString & path) {dataPath=path;}
     void updateNetwork(const QString & mw) { Q_ASSERT(!mw.isEmpty()); network=mw; }
@@ -400,11 +398,10 @@ struct SwapJournalMessage {
 // Some startus booleans for 3 listeners
 struct ListenerStatus {
     bool mqs = false;
-    bool keybase = false;
     bool tor = false;
 
     ListenerStatus() = default;
-    ListenerStatus(bool _mqs, bool _keybase, bool _tor) : mqs(_mqs), keybase(_keybase),  tor(_tor) {}
+    ListenerStatus(bool _mqs, bool _tor) : mqs(_mqs), tor(_tor) {}
 
     ListenerStatus(const ListenerStatus & item) = default;
     ListenerStatus & operator = (const ListenerStatus & item) = default;
@@ -474,11 +471,11 @@ public:
     virtual ListenerStatus getListenerStartState()  = 0;
 
     // Start listening through services
-    virtual void listeningStart(bool startMq, bool startKb, bool startTor, bool initialStart)  = 0;
+    virtual void listeningStart(bool startMq, bool startTor, bool initialStart)  = 0;
     // Check Signal: onListeningStartResults
 
     // Stop listening through services
-    virtual void listeningStop(bool stopMq, bool stopKb, bool stopTor)  = 0;
+    virtual void listeningStop(bool stopMq, bool stopTor)  = 0;
     // Check signal: onListeningStopResult
 
     // Get latest Mwc MQ address that we see
@@ -753,10 +750,10 @@ signals:
     void onRecoverResult(bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages);
 
     // Listening, you will not be able to get a results
-    void onListeningStartResults( bool mqTry, bool kbTry, bool tor, // what we try to start
+    void onListeningStartResults( bool mqTry, bool tor, // what we try to start
                                    QStringList errorMessages, bool initialStart ); // error messages, if get some
 
-    void onListeningStopResult(bool mqTry, bool kbTry, bool tor, // what we try to stop
+    void onListeningStopResult(bool mqTry, bool tor, // what we try to stop
                                 QStringList errorMessages );
 
     // Account info is updated
@@ -801,7 +798,7 @@ signals:
 
 
     // Listener status listeners...
-    void onListenersStatus(bool mqsOnline, bool keybaseOnline, bool torOnline);
+    void onListenersStatus(bool mqsOnline, bool torOnline);
     // mwc713 get an error  ERROR: new login detected. mwcmqs listener will stop!
     void onListenerMqCollision();
 

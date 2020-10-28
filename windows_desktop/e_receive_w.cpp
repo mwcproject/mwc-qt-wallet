@@ -83,10 +83,6 @@ void Receive::updateStatus() {
     ui->mwcmqStatusImg->setPixmap( QPixmap(mqsOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->mwcmqStatusLabel->setText( mqsOnline ? "Online" : "Offline" );
 
-    bool keybaseOnline = wallet->getKeybaseListenerStatus();
-    ui->keybaseStatusImg->setPixmap( QPixmap(keybaseOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
-    ui->keybaseStatusLabel->setText( keybaseOnline ? "Online" : "Offline" );
-
     bool torOnline = wallet->getTorListenerStatus();
     ui->torStatusImg->setPixmap( QPixmap(torOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->torStatusLabel->setText( torOnline ? "Online" : "Offline" );

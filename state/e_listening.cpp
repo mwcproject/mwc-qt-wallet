@@ -59,11 +59,10 @@ NextStateRespond Listening::execute() {
 
 
 // Listening, you will not be able to get a results
-void Listening::onListeningStartResults( bool mqTry, bool kbTry, bool torTry, // what we try to start
+void Listening::onListeningStartResults( bool mqTry, bool torTry, // what we try to start
                                QStringList errorMessages, bool initialStart ) // error messages, if get some
 {
     Q_UNUSED(mqTry)
-    Q_UNUSED(kbTry)
     Q_UNUSED(torTry)
 
     if ( !errorMessages.empty() && !initialStart ) {
@@ -71,27 +70,18 @@ void Listening::onListeningStartResults( bool mqTry, bool kbTry, bool torTry, //
         for (auto & s : errorMessages)
             msg += s + '\n';
 
-        if (kbTry) {
-
-            const wallet::WalletConfig & cfg = context->wallet->getWalletConfig();
-            if (!cfg.keyBasePath.isEmpty() ) {
-                msg += "\nYour current keybase path:\n" + cfg.keyBasePath + "\nThe keybase path can be changed at 'Wallet Configuration' page.";
-            }
-        }
-
         if (msg.contains("mwcmq") && msg.contains("already started") ) {
             msg = "MWC MQS listener is running, but it lost connection and trying to reconnect in background to " +
                     context->wallet->getWalletConfig().getMwcMqHostFull() +".\nPlease check your network connection";
         }
 
-        core::getWndManager()->messageTextDlg("Start listening Error", msg);
+        core::getWndManager()->messageTextDlg("Start listener Error", msg);
     }
 }
 
-void Listening::onListeningStopResult(bool mqTry, bool kbTry, bool torTry, // what we try to stop
+void Listening::onListeningStopResult(bool mqTry, bool torTry, // what we try to stop
                             QStringList errorMessages ) {
     Q_UNUSED(mqTry)
-    Q_UNUSED(kbTry)
     Q_UNUSED(torTry)
 
     if (!errorMessages.empty()) {
@@ -99,7 +89,7 @@ void Listening::onListeningStopResult(bool mqTry, bool kbTry, bool torTry, // wh
         for (auto & s : errorMessages)
             msg += s + "\n";
 
-        core::getWndManager()->messageTextDlg("Stop listening Error", msg);
+        core::getWndManager()->messageTextDlg("Stop listener Error", msg);
     }
 }
 

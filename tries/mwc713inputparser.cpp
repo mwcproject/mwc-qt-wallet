@@ -183,13 +183,6 @@ void Mwc713InputParser::initListening() {
                                                            new TriePhraseSection("]")
                                                    }));
 
-    // Keybase separately
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_ON,
-                                                    QVector<BaseTrieSection*>{
-                                                            new TriePhraseSection("listener started for ["),
-                                                            new TriePhraseSection("keybase]", 1) // keybase need go to accumulators, last symbol will be skipped
-                                                    }));
-
     // Tor "(i.e. Tor listener started for [http://qx4szwqcqtzo4e9krca357hskg53pjh2uxhsdo854updvmr3o4msc3qd.onion])"
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_ON,
                                                     QVector<BaseTrieSection*>{
@@ -206,14 +199,6 @@ void Mwc713InputParser::initListening() {
                                                             new TriePhraseSection("] stopped. tid=["),
                                                             new TrieAnySection(100, TrieAnySection::NOT_SPACES, "", "]", 3), // thread ID
                                                             new TriePhraseSection("]")
-                                                    }));
-
-    // Keysbase separately
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_OFF,
-                                                    QVector<BaseTrieSection*>{
-                                                            new TriePhraseSection("listener ["),
-                                                            new TriePhraseSection("keybase]", 1), // keybase need go to accumulators, last symbol will be skipped
-                                                            new TriePhraseSection(" stopped")
                                                     }));
 
     // Stopping Tor listener...
@@ -242,16 +227,6 @@ void Mwc713InputParser::initListening() {
                                                             new TrieAnySection(100, TrieAnySection::NOT_SPACES, "", "]", 3), // thread ID
                                                             new TriePhraseSection("]")
                                                     }));
-
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_KB_LOST_CONNECTION,
-                                                QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("listener [keybase] lost connection.")
-                                                }));
-
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_KB_GET_CONNECTION,
-                                                QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("listener [keybase] reestablished connection.")
-                                                }));
 
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_TOR_LOST_CONNECTION,
                                                 QVector<BaseTrieSection*>{

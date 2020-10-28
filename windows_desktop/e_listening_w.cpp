@@ -42,8 +42,11 @@ Listening::Listening(QWidget *parent) :
                       this, &Listening::onSgnMwcAddressWithIndex, Qt::QueuedConnection);
     QObject::connect( wallet, &bridge::Wallet::sgnListenerStartStop,
                       this, &Listening::onSgnListenerStartStop, Qt::QueuedConnection);
+    QObject::connect( wallet, &bridge::Wallet::sgnFileProofAddress,
+                      this, &Listening::onSgnFileProofAddress, Qt::QueuedConnection);
 
     updateStatuses();
+    wallet->requestFileProofAddress();
     wallet->requestMqsAddress();
 
     ui->mwcMQlable->setText("MWC MQS");
@@ -68,11 +71,10 @@ void Listening::onSgnHttpListeningStatus(bool listening, QString additionalInfo)
     updateStatuses();
 }
 
-void Listening::onSgnListenerStartStop(bool mqs, bool keybase, bool tor) {
+void Listening::onSgnListenerStartStop(bool mqs, bool _keybase, bool tor) {
+    Q_UNUSED(_keybase);
     if (mqs)
         mqsInProgress = false;
-    if (keybase)
-        keybaseInProgress = false;
     if (tor)
         torInProgress = false;
 
@@ -80,22 +82,23 @@ void Listening::onSgnListenerStartStop(bool mqs, bool keybase, bool tor) {
 }
 
 void Listening::onSgnMwcAddressWithIndex(QString mwcAddress, int idx) {
-    updateMwcMqAddress(mwcAddress, idx);
+    ui->mwcmqsAddress->setText( mwcAddress );
+    ui->mwcmqsAddressIndexLabel->setText( idx>=0 ? ("Address Index: " + QString::number(idx)) : "" );
+    ui->torAddressIndexLabel->setText( idx>=0 ? ("Address Index: " + QString::number(idx)) : "" );
 }
 
-void Listening::updateMwcMqAddress(QString address, int addrIdx) {
-    ui->mwcMqAddress->setText( address );
-    ui->mwcMqAddressIndexLabel->setText( addrIdx>=0 ? ("Address Index: " + QString::number(addrIdx)) : "" );
+void Listening::onSgnFileProofAddress(QString proofAddress) // tor address
+{
+    ui->torAddress->setText( "http://" + proofAddress + ".onion" );
 }
+
 
 void Listening::updateStatuses() {
 
     bool mqsStatus = wallet->getMqsListenerStatus();
-    bool keybaseStatus = wallet->getKeybaseListenerStatus();
     bool torStatus = wallet->getTorListenerStatus();
 
     bool mqsStarted = wallet->isMqsListenerStarted();
-    bool keybaseStarted = wallet->isKeybaseListenerStarted();
     bool torStarted = wallet->isTorListenerStarted();
 
     // MWC MQ
@@ -117,29 +120,8 @@ void Listening::updateStatuses() {
         ui->mwcMqTriggerButton->setText(mqsInProgress ? "Starting..." : "Start");
         ui->mwcMqTriggerButton->setToolTip("Start the MWC MQS Listener");
     }
-    ui->mwcMqNextAddress->setEnabled(!mqsStarted);
-    ui->mwcMqToIndex->setEnabled(!mqsStarted);
-
-    ui->keybaseStatusImg->setPixmap(
-            QPixmap(keybaseStatus ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
-    ui->keybaseStatusImg->setToolTip(
-            keybaseStatus ? "Listener connected to keybase" : "Listener diconnected from keybase");
-    ui->keybaseStatusTxt->setText(keybaseStatus ? "Online" : "Offline");
-
-    // Keybase
-    if (keybaseStarted) {
-        if (keybaseStatus) {
-            ui->keybaseTriggerButton->setText(keybaseInProgress ? "Stopping..." : "Stop");
-            ui->keybaseTriggerButton->setToolTip("Stop the Keybase Listener");
-        } else {
-            ui->keybaseTriggerButton->setText("Stop to retry");
-            ui->keybaseTriggerButton->setToolTip(
-                    "Keybase Listener already running and trying to reconnect. Click to restart the Keybase Listener");
-        }
-    } else {
-        ui->keybaseTriggerButton->setText(keybaseInProgress ? "Starting..." : "Start");
-        ui->keybaseTriggerButton->setToolTip("Start the Keybase Listener");
-    }
+    ui->mwcMqNextAddress->setEnabled(!mqsStarted && !torStarted);
+    ui->mwcMqToIndex->setEnabled(!mqsStarted && !torStarted);
 
     ui->torStatusImg->setPixmap(
             QPixmap(torStatus ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
@@ -227,6 +209,7 @@ void Listening::on_mwcMqNextAddress_clicked()
 
     warnMsgShown = true;
     wallet->requestNextMqsAddress();
+    wallet->requestFileProofAddress();
 }
 
 void Listening::on_mwcMqToIndex_clicked()
@@ -249,22 +232,7 @@ void Listening::on_mwcMqToIndex_clicked()
     }
 
     wallet->requestChangeMqsAddress(idx);
-}
-
-void Listening::on_keybaseTriggerButton_clicked()
-{
-    if (keybaseInProgress)
-        return;
-    keybaseInProgress = true;
-
-    if (wallet->isKeybaseListenerStarted()) {
-        ui->keybaseTriggerButton->setText("Stopping...");
-        wallet->requestStopKeybaseListener();
-    }
-    else {
-        ui->keybaseTriggerButton->setText("Starting...");
-        wallet->requestStartKeybaseListener();
-    }
+    wallet->requestFileProofAddress();
 }
 
 void Listening::on_torTriggerButton_clicked()

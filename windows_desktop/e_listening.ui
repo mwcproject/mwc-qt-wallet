@@ -55,13 +55,13 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>550</width>
+         <width>620</width>
          <height>480</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>550</width>
+         <width>620</width>
          <height>480</height>
         </size>
        </property>
@@ -74,40 +74,6 @@
        <property name="lineWidth">
         <number>0</number>
        </property>
-       <widget class="control::MwcPushButtonNormal" name="keybaseTriggerButton">
-        <property name="geometry">
-         <rect>
-          <x>366</x>
-          <y>234</y>
-          <width>175</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Start/Stop listening for messages at Keybase</string>
-        </property>
-        <property name="text">
-         <string>Start</string>
-        </property>
-       </widget>
        <widget class="QLabel" name="mwcMqStatusImg">
         <property name="geometry">
          <rect>
@@ -133,7 +99,7 @@
        <widget class="control::MwcPushButtonNormal" name="mwcMqTriggerButton">
         <property name="geometry">
          <rect>
-          <x>366</x>
+          <x>446</x>
           <y>10</y>
           <width>175</width>
           <height>40</height>
@@ -164,28 +130,12 @@
          <string>Start</string>
         </property>
        </widget>
-       <widget class="control::MwcLabelTiny" name="keybaseStatusTxt">
+       <widget class="control::MwcLineEditNormal" name="mwcmqsAddress">
         <property name="geometry">
          <rect>
-          <x>30</x>
-          <y>249</y>
-          <width>81</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Online</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="control::MwcLineEditNormal" name="mwcMqAddress">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
+          <x>0</x>
           <y>70</y>
-          <width>531</width>
+          <width>620</width>
           <height>40</height>
          </rect>
         </property>
@@ -224,41 +174,6 @@
          <string>MWC MQS</string>
         </property>
        </widget>
-       <widget class="QLabel" name="keybaseStatusImg">
-        <property name="geometry">
-         <rect>
-          <x>120</x>
-          <y>234</y>
-          <width>21</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Keybase listener status</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../resources_desktop.qrc">:/img/StatusOk@2x.svg</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelNormal" name="label_4">
-        <property name="geometry">
-         <rect>
-          <x>30</x>
-          <y>224</y>
-          <width>85</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Keybase</string>
-        </property>
-       </widget>
        <widget class="control::MwcLabelTiny" name="mwcMqStatusTxt">
         <property name="geometry">
          <rect>
@@ -278,8 +193,8 @@
        <widget class="control::MwcPushButtonNormal" name="mwcMqToIndex">
         <property name="geometry">
          <rect>
-          <x>366</x>
-          <y>141</y>
+          <x>445</x>
+          <y>310</y>
           <width>175</width>
           <height>40</height>
          </rect>
@@ -303,7 +218,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Select a specific index for your MWC MQS address</string>
+         <string>Select a specific index for your TOR and MWC MQS address</string>
         </property>
         <property name="text">
          <string>To index</string>
@@ -312,8 +227,8 @@
        <widget class="control::MwcPushButtonNormal" name="mwcMqNextAddress">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>141</y>
+          <x>4</x>
+          <y>310</y>
           <width>175</width>
           <height>40</height>
          </rect>
@@ -337,16 +252,16 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Use the next address for listening to MWC MQS messages</string>
+         <string>Use the next address for listening to TOR and MWC MQS messages</string>
         </property>
         <property name="text">
          <string>Next Address</string>
         </property>
        </widget>
-       <widget class="control::MwcLabelTiny" name="mwcMqAddressIndexLabel">
+       <widget class="control::MwcLabelTiny" name="mwcmqsAddressIndexLabel">
         <property name="geometry">
          <rect>
-          <x>30</x>
+          <x>29</x>
           <y>110</y>
           <width>201</width>
           <height>20</height>
@@ -362,26 +277,10 @@
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
-       <widget class="control::MwcLine" name="frame_2">
-        <property name="geometry">
-         <rect>
-          <x>171</x>
-          <y>210</y>
-          <width>201</width>
-          <height>2</height>
-         </rect>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-       </widget>
        <widget class="control::MwcLine" name="frame_3">
         <property name="geometry">
          <rect>
-          <x>170</x>
+          <x>210</x>
           <y>380</y>
           <width>201</width>
           <height>2</height>
@@ -448,7 +347,7 @@
        <widget class="control::MwcPushButtonNormal" name="httpConfigButton">
         <property name="geometry">
          <rect>
-          <x>370</x>
+          <x>445</x>
           <y>410</y>
           <width>175</width>
           <height>40</height>
@@ -502,7 +401,7 @@
         <property name="geometry">
          <rect>
           <x>30</x>
-          <y>330</y>
+          <y>165</y>
           <width>81</width>
           <height>20</height>
          </rect>
@@ -518,7 +417,7 @@
         <property name="geometry">
          <rect>
           <x>120</x>
-          <y>315</y>
+          <y>150</y>
           <width>21</width>
           <height>21</height>
          </rect>
@@ -540,7 +439,7 @@
         <property name="geometry">
          <rect>
           <x>30</x>
-          <y>305</y>
+          <y>140</y>
           <width>85</width>
           <height>31</height>
          </rect>
@@ -552,8 +451,8 @@
        <widget class="control::MwcPushButtonNormal" name="torTriggerButton">
         <property name="geometry">
          <rect>
-          <x>366</x>
-          <y>315</y>
+          <x>446</x>
+          <y>150</y>
           <width>175</width>
           <height>40</height>
          </rect>
@@ -581,6 +480,69 @@
         </property>
         <property name="text">
          <string>Start</string>
+        </property>
+       </widget>
+       <widget class="control::MwcLabelTiny" name="torAddressIndexLabel">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>245</y>
+          <width>201</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgba(255,255,255, 0.7)</string>
+        </property>
+        <property name="text">
+         <string>Address index: 4</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="control::MwcLineEditNormal" name="torAddress">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>205</y>
+          <width>620</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>You MWC MQS address</string>
+        </property>
+        <property name="maxLength">
+         <number>1024</number>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="control::MwcLabelSmall" name="label">
+        <property name="geometry">
+         <rect>
+          <x>15</x>
+          <y>285</y>
+          <width>511</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Please stop TOR and MWC MQS listeners in order to change the wallet addess</string>
         </property>
        </widget>
       </widget>
@@ -632,6 +594,11 @@
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelTiny</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
@@ -642,18 +609,12 @@
    <header>control_desktop/MwcFrameWithBorder.h</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>control::MwcLabelTiny</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>mwcMqTriggerButton</tabstop>
-  <tabstop>mwcMqAddress</tabstop>
+  <tabstop>mwcmqsAddress</tabstop>
   <tabstop>mwcMqNextAddress</tabstop>
   <tabstop>mwcMqToIndex</tabstop>
-  <tabstop>keybaseTriggerButton</tabstop>
   <tabstop>torTriggerButton</tabstop>
   <tabstop>httpConfigButton</tabstop>
  </tabstops>

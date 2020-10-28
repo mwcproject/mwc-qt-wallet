@@ -63,7 +63,7 @@ bool Util::isPublicKeyValid(QString str) {
 
 
 // Verify address and return the address type.
-// Return values: "unknown", "https", "tor", "keybase", "mwcmqs"
+// Return values: "unknown", "https", "tor", "mwcmqs"
 QString Util::verifyAddress(QString address) {
     QPair<bool, util::ADDRESS_TYPE> res = util::verifyAddress(address);
     if (!res.first)
@@ -72,7 +72,6 @@ QString Util::verifyAddress(QString address) {
     switch (res.second) {
         case util::ADDRESS_TYPE::HTTPS: return "https";
         case util::ADDRESS_TYPE::TOR: return "tor";
-        case util::ADDRESS_TYPE::KEYBASE: return "ketbase";
         case util::ADDRESS_TYPE::MWC_MQ: return "mwcmqs";
         default: return "unknown";
     }

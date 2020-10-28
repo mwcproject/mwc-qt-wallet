@@ -38,9 +38,6 @@ public:
     ~WalletConfig();
 
 private slots:
-    void on_keybasePathEdit_textChanged(const QString &arg1);
-    void on_keybasePathSelect_clicked();
-
     void on_confirmationNumberEdit_textChanged(const QString &arg1);
     void on_changeOutputsEdit_textEdited(const QString &arg1);
 
@@ -60,15 +57,13 @@ private slots:
     void on_logout_30_clicked();
     void on_logout_never_clicked();
     void on_start_mqs_clicked();
-    void on_start_keybase_clicked();
     void on_outputLockingCheck_stateChanged(int arg1);
     void on_start_tor_clicked();
     void on_walletInstanceNameEdit_textChanged(const QString &arg1);
     void on_notificationsEnabled_clicked();
 
 private:
-    void setValues(const QString & keyBasePath,
-                   const QString & mwcmqHost,
+    void setValues(const QString & mwcmqHost,
                    int inputConfirmationNumber,
                    int changeOutputs);
     // return true if data is fine. In case of error will show message for the user
@@ -76,9 +71,6 @@ private:
 
     QString mwcDomainConfig2InputStr(QString mwcDomain);
     QString mwcDomainInputStr2Config(QString mwcDomain);
-
-    QString keybasePathConfig2InputStr(QString kbpath);
-    QString keybasePathInputStr2Config(QString kbpath);
 
         // Update button state
     void updateButtons();
@@ -88,7 +80,7 @@ private:
 
     void updateLogsStateUI(bool enabled);
 
-    void updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartKeybase, bool isAutoStartTor);
+    void updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartTor);
 
     void updateAutoLogoutStateUI(int64_t time);
 
@@ -107,14 +99,12 @@ private:
 
     bool walletLogsEnabled = false;
     bool autoStartMQSEnabled = true;
-    bool autoStartKeybaseEnabled = true;
     bool autoStartTorEnabled = true;
     bool outputLockingEnabled = false;
     bool notificationWindowsEnabled = true;
     int64_t logoutTimeout = 20 * 60;
     int64_t currentLogoutTimeout = 20 * 60;
 
-    QString keybasePath;
     QString mqsHost;
     int inputConfirmationsNumber = 1;
     int changeOutputs = 1;

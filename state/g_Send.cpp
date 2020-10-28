@@ -237,20 +237,6 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
             }
             break;
         }
-        case util::ADDRESS_TYPE::KEYBASE: {
-            genProof = false; // For Keybase proof doesn't work in any case
-            if (!listenerStart.keybase) {
-                core::getWndManager()->messageTextDlg("Listener is Offline",
-                                                      "Keybase listener is not started. Please start Keybase listener first." );
-                return false;
-            }
-            if (!listenerStatus.keybase) {
-                core::getWndManager()->messageTextDlg("Listener is Offline",
-                                                      "Keybase listener is not online even it was started. Please check your Keybase client setup.");
-                return false;
-            }
-            break;
-        }
         case util::ADDRESS_TYPE::TOR: {
             if (!listenerStart.tor) {
                 core::getWndManager()->messageTextDlg("Listener is Offline",

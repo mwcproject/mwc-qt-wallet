@@ -37,20 +37,20 @@ public:
     Q_INVOKABLE double getGuiScale();
     Q_INVOKABLE bool getWalletLogsEnabled();
     Q_INVOKABLE bool getAutoStartMQSEnabled();
-    Q_INVOKABLE bool getAutoStartKeybaseEnabled();
+    Q_INVOKABLE bool getAutoStartKeybaseEnabled(); // Absolete
     Q_INVOKABLE bool getAutoStartTorEnabled();
     Q_INVOKABLE int getLogoutTimeMs();
     Q_INVOKABLE bool isOutputLockingEnabled();
     Q_INVOKABLE bool getNotificationWindowsEnabled();
 
     Q_INVOKABLE QString getDataPath();
-    Q_INVOKABLE QString getKeybasePath();
+    Q_INVOKABLE QString getKeybasePath(); // Absolete
     Q_INVOKABLE QString getMqsHost();
     Q_INVOKABLE int getInputConfirmationsNumber();
     Q_INVOKABLE int getChangeOutputs();
 
     Q_INVOKABLE double getInitGuiScale();
-    Q_INVOKABLE QString getDefaultKeybasePath();
+    Q_INVOKABLE QString getDefaultKeybasePath(); // Absolete
     Q_INVOKABLE QString getDefaultMqsHost();
     Q_INVOKABLE int getDefaultInputConfirmationsNumber();
     Q_INVOKABLE int getDefaultChangeOutputs();
@@ -67,7 +67,8 @@ public:
 
     Q_INVOKABLE bool updateTimeoutValue(int timeout);
 
-    Q_INVOKABLE bool updateWalletConfig( QString mwcmqsDomain, QString keyBasePath, bool need2updateGuiSize );
+    // keyBasePath is absolete
+    Q_INVOKABLE bool updateWalletConfig( QString mwcmqsDomain, QString _keyBasePath, bool need2updateGuiSize );
 
 };
 

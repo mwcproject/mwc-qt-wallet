@@ -245,7 +245,7 @@
               <string>Click here to view Listener settings.</string>
              </property>
              <property name="text">
-              <string>MWC MQ, Keybase</string>
+              <string>TOR</string>
              </property>
              <property name="icon">
               <iconset>
@@ -355,7 +355,6 @@
    <addaction name="menuWallet"/>
    <addaction name="menuNetwork"/>
    <addaction name="menuAccount"/>
-   <addaction name="menuMWC"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionSend">

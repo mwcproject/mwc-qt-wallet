@@ -98,18 +98,18 @@ public:
 
     // Checking if wallet is listening through services
     // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
-    virtual ListenerStatus getListenerStatus() override { return ListenerStatus(listener_mwcmqs, listener_keybase, listener_tor); }
+    virtual ListenerStatus getListenerStatus() override { return ListenerStatus(listener_mwcmqs, listener_tor); }
 
     // return:  <mwcmq status>, <keybase status>.   true mean was started and need to be stopped, false - never started or was stopped
-    virtual ListenerStatus getListenerStartState() override { return ListenerStatus(listener_mwcmqs, listener_keybase, listener_tor); }
+    virtual ListenerStatus getListenerStartState() override { return ListenerStatus(listener_mwcmqs, listener_tor); }
 
     // Start listening through services
     // Check Signal: onStartListening
-    virtual void listeningStart(bool startMq, bool startKb, bool startTor, bool initialStart)  override;
+    virtual void listeningStart(bool startMq, bool startTor, bool initialStart)  override;
 
     // Stop listening through services
     // Check signal: onListeningStopResult
-    virtual void listeningStop(bool stopMq, bool stopKb, bool stopTor)  override;
+    virtual void listeningStop(bool stopMq, bool stopTor)  override;
 
     // Get latest Mwc MQ address that we see
     virtual QString getMqsAddress() override;
@@ -340,7 +340,6 @@ private:
     QString passwordHash;
     bool running = false;
     bool listener_mwcmqs = false;
-    bool listener_keybase = false;
     bool listener_tor = false;
 
     QString mwcAddress; // Address from mwc listener

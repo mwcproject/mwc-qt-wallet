@@ -41,8 +41,8 @@ public:
     const static int64_t TIMEOUT = 30000; // Tor can be slow and it is sync now
 
     // Start one listen per request. mwc713 doesn't support both
-    TaskListeningStart(MWC713 *wallet713, bool startMq, bool startKeybase, bool startTor, bool _initialStart ) :
-            Mwc713Task("TaskListeningStart", calcCommand(startMq, startKeybase, startTor), wallet713,""),
+    TaskListeningStart(MWC713 *wallet713, bool startMq, bool startTor, bool _initialStart ) :
+            Mwc713Task("TaskListeningStart", calcCommand(startMq, startTor), wallet713,""),
             initialStart(_initialStart)
     {}
 
@@ -52,7 +52,7 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
-    QString calcCommand(bool startMq, bool startKeybase, bool startTor) const;
+    QString calcCommand(bool startMq, bool startTor) const;
 
     bool initialStart;
 };
@@ -64,8 +64,8 @@ public:
     const static int64_t TIMEOUT = 20000; // Tor can be slow and it is sync now
 
     // Start one listen per request. mwc713 doesn't support both
-    TaskListeningStop(MWC713 *wallet713, bool stopMq, bool stopKeybase, bool stopTor) :
-            Mwc713Task("TaskListeningStop", calcCommand(stopMq, stopKeybase, stopTor), wallet713,"") {}
+    TaskListeningStop(MWC713 *wallet713, bool stopMq, bool stopTor) :
+            Mwc713Task("TaskListeningStop", calcCommand(stopMq, stopTor), wallet713,"") {}
 
     virtual ~TaskListeningStop() override {}
 
@@ -73,7 +73,7 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
-    QString calcCommand(bool stopMq, bool stopKeybase, bool stopTor) const;
+    QString calcCommand(bool stopMq, bool stopTor) const;
 };
 
 

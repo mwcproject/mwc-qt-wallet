@@ -229,7 +229,8 @@ bool AppContext::loadDataImpl() {
     }
 
     if (id>=0x4791) {
-        in >> autoStartKeybaseEnabled;
+        bool b; // legacy autoStartKeybaseEnabled
+        in >> b;
     }
 
     // the format for saving notes and where they are saved has changed
@@ -358,7 +359,8 @@ void AppContext::saveData() const {
     out << hodlRegistrations;
 
     out << autoStartMQSEnabled;
-    out << autoStartKeybaseEnabled;
+    bool b = false; // legacy autoStartKeybaseEnabled
+    out << b;
 
     // if dialogs which display notes have not been accessed, the
     // older format notes will not have been migrated, so we need to
@@ -564,13 +566,6 @@ void AppContext::setAutoStartTorEnabled(bool enabled) {
     if (enabled == autoStartTorEnabled)
         return;
     autoStartTorEnabled = enabled;
-    saveData();
-}
-
-void AppContext::setAutoStartKeybaseEnabled(bool enabled) {
-    if (enabled == autoStartKeybaseEnabled)
-        return;
-    autoStartKeybaseEnabled = enabled;
     saveData();
 }
 

@@ -39,7 +39,7 @@ public:
 
 private slots:
     void onSgnLoginResult(bool ok);
-    void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
+    void onSgnUpdateListenerStatus(bool mwcOnline, bool tor);
     void onSgnHttpListeningStatus(bool listening, QString additionalInfo);
     void onSgnUpdateSyncProgress(double progressPercent);
 
@@ -52,7 +52,6 @@ private:
     virtual void panelWndStarted() override;
 
     void updateMwcMqState(bool online);
-    void updateKeybaseState(bool online);
     void updateTorState(bool online);
     void updateHttpState(bool online);
 

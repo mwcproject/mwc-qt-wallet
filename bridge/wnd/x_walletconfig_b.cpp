@@ -66,7 +66,8 @@ bool WalletConfig::getAutoStartMQSEnabled() {
 }
 
 bool WalletConfig::getAutoStartKeybaseEnabled() {
-    return getState()->getAutoStartKeybaseEnabled();
+    Q_ASSERT(false);
+    return false;
 }
 
 bool WalletConfig::getAutoStartTorEnabled() {
@@ -89,8 +90,10 @@ QString WalletConfig::getDataPath() {
     return getWallet()->getWalletConfig().getDataPath();
 }
 QString WalletConfig::getKeybasePath() {
-    return getWallet()->getWalletConfig().keyBasePath;
+    Q_ASSERT(false); // retired code
+    return "ABSOLETE";
 }
+
 QString WalletConfig::getMqsHost() {
     return getWallet()->getWalletConfig().mwcmqsDomainEx;
 }
@@ -104,7 +107,8 @@ double WalletConfig::getInitGuiScale() {
     return getState()->getInitGuiScale();
 }
 QString WalletConfig::getDefaultKeybasePath() {
-    return getWallet()->getDefaultConfig().keyBasePath;
+    Q_ASSERT(false); // // absolete code
+    return "ABSOLETE";
 }
 
 QString WalletConfig::getDefaultMqsHost() {
@@ -131,8 +135,9 @@ void WalletConfig::updateAutoStartMQSEnabled(bool enabled) {
     getState()->updateAutoStartMQSEnabled(enabled);
 }
 void WalletConfig::updateAutoStartKeybaseEnabled(bool enabled) {
-    getState()->updateAutoStartKeybaseEnabled(enabled);
+    Q_ASSERT(false); // absolete code
 }
+
 void WalletConfig::updateAutoStartTorEnabled(bool enabled) {
     getState()->updateAutoStartTorEnabled(enabled);
 }
@@ -149,9 +154,12 @@ bool WalletConfig::updateTimeoutValue(int timeout) {
     return getState()->updateTimeoutValue(timeout);
 }
 
-bool WalletConfig::updateWalletConfig( QString mwcmqsDomain, QString keyBasePath, bool need2updateGuiSize) {
+bool WalletConfig::updateWalletConfig( QString mwcmqsDomain, QString _keyBasePath, bool need2updateGuiSize) {
+    Q_UNUSED(_keyBasePath)
+    Q_ASSERT(_keyBasePath.isEmpty()); // keybase is absolete
+
     auto config = getWallet()->getWalletConfig();
-    config.setDataWalletCfg(mwcmqsDomain, keyBasePath);
+    config.setDataWalletCfg(mwcmqsDomain);
     return getState()->setWalletConfig(config, need2updateGuiSize);
 }
 

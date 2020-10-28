@@ -58,7 +58,6 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
     if (lockMode) {
         if (config->isOnlineWallet()) {
             updateMwcMqState(wallet->getMqsListenerStatus());
-            updateKeybaseState(wallet->getKeybaseListenerStatus());
             updateTorState(wallet->getTorListenerStatus());
 
             QString httpStatus = wallet->getHttpListeningStatus();
@@ -172,13 +171,6 @@ void InputPassword::updateMwcMqState(bool online) {
     ui->mwcMqStatusTxt->setText(online ? "Online" : "Offline");
 }
 
-void InputPassword::updateKeybaseState(bool online) {
-
-    ui->keybaseStatusImg->setPixmap(QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
-    ui->keybaseStatusImg->setToolTip(online ? "Listener connected to keybase" : "Listener diconnected from keybase");
-    ui->keybaseStatusTxt->setText(online ? "Online" : "Offline");
-}
-
 void InputPassword::updateTorState(bool online) {
     ui->torStatusImg->setPixmap(QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
     ui->torStatusImg->setToolTip(online ? "Listener connected to keybase" : "Listener diconnected from keybase");
@@ -192,9 +184,8 @@ void InputPassword::updateHttpState(bool online) {
     ui->httpStatusTxt->setText(online ? "Online" : "Offline");
 }
 
-void InputPassword::onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor) {
+void InputPassword::onSgnUpdateListenerStatus(bool mwcOnline, bool tor) {
     updateMwcMqState(mwcOnline);
-    updateKeybaseState(keybaseOnline);
     updateTorState(tor);
 }
 

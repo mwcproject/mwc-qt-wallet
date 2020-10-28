@@ -33,15 +33,13 @@ public:
 
     // return true if MQS is online
     Q_INVOKABLE bool getMqsListenerStatus();
-    // return true if Keybase is online
-    Q_INVOKABLE bool getKeybaseListenerStatus();
+    Q_INVOKABLE bool getKeybaseListenerStatus(); // Absolete
     // return true if Tor is online
     Q_INVOKABLE bool getTorListenerStatus();
 
     // return true if MQS is started
     Q_INVOKABLE bool isMqsListenerStarted();
-    // return true if Keybase is started
-    Q_INVOKABLE bool isKeybaseListenerStarted();
+    Q_INVOKABLE bool isKeybaseListenerStarted();  // Absolete
     // return true if Tor is started
     Q_INVOKABLE bool isTorListenerStarted();
 
@@ -148,6 +146,7 @@ signals:
     // Updates from the wallet and notification system
     void sgnNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL values
     void sgnConfigUpdate();
+    // keybaseOnline  is absolete, always false
     void sgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
     void sgnHttpListeningStatus(bool listening, QString additionalInfo);
     void sgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, double totalDifficulty, int connections );
@@ -157,7 +156,8 @@ signals:
     void sgnLogout();
 
     // Some of listeners was started, stopped
-    void sgnListenerStartStop(bool mqTry, bool kbTry, bool tor);
+    // kbTry  is absolete, allways false value
+    void sgnListenerStartStop(bool mqTry, bool _kbTry, bool tor);
 
     // Get MWC MQ address with index
     void sgnMwcAddressWithIndex(QString mwcAddress, int idx);
@@ -205,11 +205,11 @@ private slots:
     // Signals that comes from wallet & notification system
     void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
     void onConfigUpdate();
-    void onListeningStartResults( bool mqTry, bool kbTry, bool tor,
+    void onListeningStartResults( bool mqTry, bool tor,
                                   QStringList errorMessages, bool initialStart ); // error messages, if get some
-    void onListeningStopResult(bool mqTry, bool kbTry, bool tor,
+    void onListeningStopResult(bool mqTry, bool tor,
                                QStringList errorMessages );
-    void onUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline);
+    void onUpdateListenerStatus(bool mqsOnline, bool torOnline);
     void onHttpListeningStatus(bool listening, QString additionalInfo);
     void onUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
     void onUpdateSyncProgress(double progressPercent);

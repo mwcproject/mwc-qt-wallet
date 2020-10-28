@@ -50,7 +50,7 @@
       <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_main">
       <property name="minimumSize">
@@ -72,27 +72,14 @@
         <number>0</number>
        </property>
        <item>
-        <layout class="QGridLayout" name="gridLayout" columnstretch="4,5,0">
+        <layout class="QGridLayout" name="gridLayout" columnstretch="4,0,0">
          <property name="horizontalSpacing">
           <number>30</number>
          </property>
          <property name="verticalSpacing">
           <number>1</number>
          </property>
-         <item row="12" column="2">
-          <widget class="control::MwcLabelSmall" name="label_5">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Change outputs</string>
-           </property>
-          </widget>
-         </item>
-         <item row="15" column="0" colspan="3">
+         <item row="13" column="0" colspan="3">
           <widget class="control::MwcLabelLarge" name="label_9">
            <property name="text">
             <string>Wallet Instance</string>
@@ -102,87 +89,7 @@
            </property>
           </widget>
          </item>
-         <item row="16" column="0">
-          <widget class="control::MwcLabelSmall" name="label_10">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Wallet instance name</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0" colspan="2">
-          <widget class="control::MwcLineEditNormal" name="mwcmqHost">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>200000</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maxLength">
-            <number>512</number>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="3">
-          <widget class="control::MwcLabelSmall" name="label_4">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Keybase console client path</string>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="1">
-          <widget class="QWidget" name="widget" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>20</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>15</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="12" column="0" colspan="2">
-          <widget class="control::MwcLabelSmall" name="label_6">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Number of confirmations</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
+         <item row="2" column="1">
           <widget class="QWidget" name="widget_3" native="true">
            <property name="minimumSize">
             <size>
@@ -198,17 +105,7 @@
            </property>
           </widget>
          </item>
-         <item row="11" column="0" colspan="3">
-          <widget class="control::MwcLabelLarge" name="label_8">
-           <property name="text">
-            <string>Send MWC parameters</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="16" column="1" colspan="2">
+         <item row="14" column="1" colspan="2">
           <widget class="control::MwcLabelSmall" name="label_7">
            <property name="maximumSize">
             <size>
@@ -221,51 +118,39 @@
            </property>
           </widget>
          </item>
-         <item row="13" column="0" colspan="2">
-          <widget class="control::MwcLineEditNormal" name="confirmationNumberEdit">
+         <item row="12" column="1">
+          <widget class="QWidget" name="widget_2" native="true">
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>40</height>
+             <height>20</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>40</height>
+             <height>15</height>
             </size>
-           </property>
-           <property name="maxLength">
-            <number>2</number>
            </property>
           </widget>
          </item>
-         <item row="3" column="2">
-          <widget class="control::MwcPushButtonNormal" name="keybasePathSelect">
+         <item row="8" column="1">
+          <widget class="QWidget" name="widget" native="true">
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>40</height>
+             <height>20</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>40</height>
+             <height>15</height>
             </size>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::StrongFocus</enum>
-           </property>
-           <property name="toolTip">
-            <string>Select Keybase binary location</string>
-           </property>
-           <property name="text">
-            <string>Select</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="0" colspan="2">
+         <item row="3" column="0" colspan="2">
           <widget class="control::MwcLabelSmall" name="label_2">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -284,7 +169,100 @@
            </property>
           </widget>
          </item>
-         <item row="13" column="2">
+         <item row="10" column="2">
+          <widget class="control::MwcLabelSmall" name="label_5">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>22</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Change outputs</string>
+           </property>
+          </widget>
+         </item>
+         <item row="15" column="1" colspan="2">
+          <widget class="control::MwcLineEditNormal" name="walletDataPath">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0" colspan="2">
+          <widget class="control::MwcLineEditNormal" name="mwcmqHost">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>200000</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maxLength">
+            <number>512</number>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="0" colspan="2">
+          <widget class="control::MwcLineEditNormal" name="confirmationNumberEdit">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maxLength">
+            <number>2</number>
+           </property>
+          </widget>
+         </item>
+         <item row="14" column="0">
+          <widget class="control::MwcLabelSmall" name="label_10">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>22</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Wallet instance name</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0" colspan="3">
+          <widget class="control::MwcLabelLarge" name="label_8">
+           <property name="text">
+            <string>Send MWC parameters</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="2">
           <widget class="control::MwcLineEditNormal" name="changeOutputsEdit">
            <property name="minimumSize">
             <size>
@@ -303,42 +281,20 @@
            </property>
           </widget>
          </item>
-         <item row="14" column="1">
-          <widget class="QWidget" name="widget_2" native="true">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>20</height>
-            </size>
-           </property>
+         <item row="10" column="0" colspan="2">
+          <widget class="control::MwcLabelSmall" name="label_6">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>15</height>
+             <height>22</height>
             </size>
+           </property>
+           <property name="text">
+            <string>Number of confirmations</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0" colspan="2">
-          <widget class="control::MwcLineEditNormal" name="keybasePathEdit">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>20000</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maxLength">
-            <number>4096</number>
-           </property>
-          </widget>
-         </item>
-         <item row="17" column="0">
+         <item row="15" column="0">
           <widget class="control::MwcLineEditNormal" name="walletInstanceNameEdit">
            <property name="minimumSize">
             <size>
@@ -354,25 +310,6 @@
            </property>
            <property name="maxLength">
             <number>64</number>
-           </property>
-          </widget>
-         </item>
-         <item row="17" column="1" colspan="2">
-          <widget class="control::MwcLineEditNormal" name="walletDataPath">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="readOnly">
-            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -699,16 +636,6 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="start_keybase">
-             <property name="text">
-              <string>KeyBase</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QCheckBox" name="start_tor">
              <property name="text">
               <string>Tor</string>
@@ -839,7 +766,7 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_10">
            <property name="spacing">
-            <number>30</number>
+            <number>0</number>
            </property>
            <property name="leftMargin">
             <number>25</number>
@@ -847,6 +774,22 @@
            <property name="topMargin">
             <number>10</number>
            </property>
+           <item>
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>10</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item>
             <widget class="QCheckBox" name="notificationsEnabled">
              <property name="toolTip">
@@ -862,6 +805,19 @@
               <bool>true</bool>
              </property>
             </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -1018,17 +974,13 @@
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
-  <tabstop>keybasePathEdit</tabstop>
-  <tabstop>keybasePathSelect</tabstop>
   <tabstop>mwcmqHost</tabstop>
   <tabstop>confirmationNumberEdit</tabstop>
   <tabstop>changeOutputsEdit</tabstop>
   <tabstop>walletInstanceNameEdit</tabstop>
   <tabstop>walletDataPath</tabstop>
   <tabstop>start_mqs</tabstop>
-  <tabstop>start_keybase</tabstop>
   <tabstop>start_tor</tabstop>
-  <tabstop>notificationsEnabled</tabstop>
   <tabstop>logout_3</tabstop>
   <tabstop>logout_5</tabstop>
   <tabstop>logout_10</tabstop>

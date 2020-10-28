@@ -40,25 +40,23 @@ private slots:
     void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
     void onSgnHttpListeningStatus(bool listening, QString additionalInfo);
     void onSgnMwcAddressWithIndex(QString mwcAddress, int idx);
-    void onSgnListenerStartStop(bool mqs, bool keybase, bool tor);
+    void onSgnListenerStartStop(bool mqs, bool _keybase, bool tor);
+    void onSgnFileProofAddress(QString proofAddress); // tor address
 
     void on_mwcMqTriggerButton_clicked();
     void on_mwcMqNextAddress_clicked();
     void on_mwcMqToIndex_clicked();
-    void on_keybaseTriggerButton_clicked();
     void on_httpConfigButton_clicked();
     void on_torTriggerButton_clicked();
 
 private:
     void updateStatuses();
-    void updateMwcMqAddress(QString address, int addrIdx);
 private:
     Ui::Listening *ui;
     bridge::Wallet * wallet = nullptr;
     bridge::Config * config = nullptr;
 
     bool mqsInProgress = false;
-    bool keybaseInProgress = false;
     bool torInProgress = false;
 };
 
