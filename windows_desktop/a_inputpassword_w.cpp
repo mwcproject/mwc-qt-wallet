@@ -173,7 +173,7 @@ void InputPassword::updateMwcMqState(bool online) {
 
 void InputPassword::updateTorState(bool online) {
     ui->torStatusImg->setPixmap(QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
-    ui->torStatusImg->setToolTip(online ? "Listener connected to keybase" : "Listener diconnected from keybase");
+    ui->torStatusImg->setToolTip(online ? "Listener connected to TOR" : "Listener diconnected from TOR");
     ui->torStatusTxt->setText(online ? "Online" : "Offline");
 }
 

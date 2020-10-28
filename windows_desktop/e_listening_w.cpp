@@ -57,9 +57,10 @@ Listening::~Listening()
     delete ui;
 }
 
-void Listening::onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor) {
+// _keybaseOnline is absolete
+void Listening::onSgnUpdateListenerStatus(bool mwcOnline, bool _keybaseOnline, bool tor) {
     Q_UNUSED(mwcOnline);
-    Q_UNUSED(keybaseOnline);
+    Q_UNUSED(_keybaseOnline);
     Q_UNUSED(tor);
 
     updateStatuses();
@@ -71,6 +72,7 @@ void Listening::onSgnHttpListeningStatus(bool listening, QString additionalInfo)
     updateStatuses();
 }
 
+// _keybase is absolete
 void Listening::onSgnListenerStartStop(bool mqs, bool _keybase, bool tor) {
     Q_UNUSED(_keybase);
     if (mqs)

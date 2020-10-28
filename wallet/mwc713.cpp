@@ -490,7 +490,6 @@ QString MWC713::getPasswordHash() {
 }
 
 // Checking if wallet is listening through services
-// return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
 ListenerStatus MWC713::getListenerStatus()  {
     return ListenerStatus(mwcMqOnline, torOnline);
 }
@@ -1785,6 +1784,8 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
 
     QStringList newConfLines;
 
+    // TODO  Clean up keybase_binary & keybase_listener_auto_start
+    // First need to wait until mwc713 will stor to support keybase
     QStringList prefixesToCheck{"wallet713_data_path", "keybase_binary", "mwcmqs_domain",
                                 "chain", "grinbox_listener_auto_start", "keybase_listener_auto_start",
                                 "foreign_api", "foreign_api_address", "foreign_api_secret",

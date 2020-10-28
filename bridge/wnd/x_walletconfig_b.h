@@ -60,7 +60,7 @@ public:
     Q_INVOKABLE void updateWalletLogsEnabled(bool logsEnabled, bool needCleanupLogs);
     Q_INVOKABLE void updateGuiScale(double scale);
     Q_INVOKABLE void updateAutoStartMQSEnabled(bool enabled);
-    Q_INVOKABLE void updateAutoStartKeybaseEnabled(bool enabled);
+    Q_INVOKABLE void updateAutoStartKeybaseEnabled(bool enabled);  // Absolete
     Q_INVOKABLE void updateAutoStartTorEnabled(bool enabled);
     Q_INVOKABLE void setOutputLockingEnabled(bool enabled);
     Q_INVOKABLE void setNotificationWindowsEnabled(bool enabled);

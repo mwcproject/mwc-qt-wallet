@@ -50,7 +50,7 @@ private slots:
     void onSgnMwcAddressWithIndex(QString mwcAddress, int idx);
     void onSgnTorAddress(QString tor);
     void onSgnFileProofAddress(QString proofAddress);
-    void onSgnUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline);
+    void onSgnUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline); // keybaseOnline is absolete
 
     void on_accountComboBox_activated(int index);
     void on_recieveFileButton_clicked();

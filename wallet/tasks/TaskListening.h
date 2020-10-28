@@ -20,7 +20,7 @@
 namespace wallet {
 
 // It is listener task. No input can be defined.
-// Listening for MWC MQ & keybase connection statuses
+// Listening for MWC MQ & tor connection statuses
 class TaskListeningListener : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 3600*1000*5; // NA in any case

@@ -66,7 +66,7 @@ bool WalletConfig::getAutoStartMQSEnabled() {
 }
 
 bool WalletConfig::getAutoStartKeybaseEnabled() {
-    Q_ASSERT(false);
+    Q_ASSERT(false); // Absolete
     return false;
 }
 
@@ -90,7 +90,7 @@ QString WalletConfig::getDataPath() {
     return getWallet()->getWalletConfig().getDataPath();
 }
 QString WalletConfig::getKeybasePath() {
-    Q_ASSERT(false); // retired code
+    Q_ASSERT(false); // absolete code
     return "ABSOLETE";
 }
 

@@ -465,9 +465,7 @@ public:
     //--------------- Listening
 
     // Checking if wallet is listening through services
-    // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
     virtual ListenerStatus getListenerStatus()  = 0;
-    // return:  <mwcmq status>, <keybase status>.   true mean was started and need to be stopped, false - never started or was stopped
     virtual ListenerStatus getListenerStartState()  = 0;
 
     // Start listening through services

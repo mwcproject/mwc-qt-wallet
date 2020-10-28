@@ -234,6 +234,7 @@ void MainWindow::on_helpButton_clicked()
     helpDlg.exec();
 }
 
+// keybaseOnline is absolete
 void MainWindow::onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor) {
     Q_UNUSED(mwcOnline)
     Q_UNUSED(keybaseOnline)

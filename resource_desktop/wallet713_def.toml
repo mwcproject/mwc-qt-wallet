@@ -8,9 +8,6 @@
 # Path for mwc713 wallet data
 # wallet713_data_path = "wallet713_data"
 
-# Path to the keybase binary
-# keybase_binary = "keybase"
-
 # MWC MQS connection settings. By default mwc713 using thhis method for communication.
 # mwcmqs_domain: mqs.mwc.mw
 # mwcmqs_port: 443
@@ -28,16 +25,10 @@
 # Start Message Queue listener automatically if wallet password was provided at start.
 # grinbox_listener_auto_start = true
 
-# Start KeyBase listener automatically if wallet password was provided at start.
-# keybase_listener_auto_start = true
-
 # Specify maximum amount in nano MWC if you want this wallet automatically accept invoices.
 # Example for 5 MWCs:  max_auto_accept_invoice = 50000000000
 # Note! Change it if you really understand what you are going!
 # max_auto_accept_invoice =
-
-# KetBase TTL period
-# default_keybase_ttl = "24h"
 
 # Enable Owner API for this wallet. See for details: https://github.com/mwcproject/mwc713/blob/master/docs/API_documentation.md
 # owner_api = false

@@ -175,6 +175,7 @@ void Receive::onSgnFileProofAddress(QString proofAddress) {
     ui->fileAddress->setText(proofAddress);
 }
 
+// keybaseOnline is absolete
 void Receive::onSgnUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline) {
     Q_UNUSED(mqsOnline)
     Q_UNUSED(keybaseOnline)

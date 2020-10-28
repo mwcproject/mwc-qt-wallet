@@ -134,13 +134,10 @@ bool TaskListeningStart::processTask(const QVector<WEvent> &events) {
     }
 
     bool mqs = false;
-    bool keybase = false;
     bool tor = false;
     for (const WEvent & l : filterEvents(events, WALLET_EVENTS::S_LINE ) ) {
         if (l.message.contains("Starting mwcmqs listener"))
             mqs = true;
-        if (l.message.contains("Starting keybase listener"))
-            keybase = true;
         if (l.message.contains("Starting Tor listener"))
             tor = true;
     }

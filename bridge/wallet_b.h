@@ -46,8 +46,8 @@ public:
     // Request start/stop listeners. Feedback should come with sgnUpdateListenerStatus
     Q_INVOKABLE void requestStartMqsListener();
     Q_INVOKABLE void requestStopMqsListener();
-    Q_INVOKABLE void requestStartKeybaseListener();
-    Q_INVOKABLE void requestStopKeybaseListener();
+    Q_INVOKABLE void requestStartKeybaseListener(); // Absolete
+    Q_INVOKABLE void requestStopKeybaseListener(); // Absolete
     Q_INVOKABLE void requestStartTorListener();
     Q_INVOKABLE void requestStopTorListener();
 

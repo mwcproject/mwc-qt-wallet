@@ -97,10 +97,8 @@ public:
     //--------------- Listening
 
     // Checking if wallet is listening through services
-    // return:  <mwcmq status>, <keybase status>.   true mean online, false - offline
     virtual ListenerStatus getListenerStatus() override { return ListenerStatus(listener_mwcmqs, listener_tor); }
 
-    // return:  <mwcmq status>, <keybase status>.   true mean was started and need to be stopped, false - never started or was stopped
     virtual ListenerStatus getListenerStartState() override { return ListenerStatus(listener_mwcmqs, listener_tor); }
 
     // Start listening through services
