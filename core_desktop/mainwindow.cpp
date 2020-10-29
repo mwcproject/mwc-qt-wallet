@@ -34,6 +34,7 @@
 #include "../core/global.h"
 #include "../core/WalletApp.h"
 #include "../core_desktop/statuswndmgr.h"
+#include <QSettings>
 
 namespace core {
 
@@ -103,6 +104,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // Want to delete children when they close
     setAttribute( Qt::WA_DeleteOnClose, true );
 
+    // Restoring app geometry.
+    // QT should handle all corner cases
+    QSettings settings("MWC", "wmc-qt-wallet");
+    restoreGeometry(settings.value("geometry").toByteArray());
+    restoreState(settings.value("windowState").toByteArray());
+
     // Update size by max screen size
     QSize wndSize = frameSize();
     QSize newSize = wndSize;
@@ -131,6 +138,14 @@ MainWindow::~MainWindow()
     delete ui;
     delete statusMgr;
 }
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    QSettings settings("MWC", "wmc-qt-wallet");
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("windowState", saveState());
+    QMainWindow::closeEvent(event);
+}
+
 
 void MainWindow::restore() {
     // called from the pending messages window when it has

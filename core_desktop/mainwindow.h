@@ -54,6 +54,9 @@ public:
     void hideWindow(StatusWnd* swnd);
     void statusDone(StatusWnd* swnd);
 
+protected:
+    virtual void closeEvent(QCloseEvent *event) override;
+
 private slots:
     // Update tb & menu actions
     void onSgnUpdateActionStates(int actionState); // state::STATE
