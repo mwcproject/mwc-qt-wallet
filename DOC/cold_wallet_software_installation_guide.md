@@ -6,9 +6,15 @@ Last Updated: September. 3, 2020
 
 # Overview
 
-A cold wallet is intended to keep your MWC safe by storing your MWC in offline storage. Once set up, your cold wallet should never be connected to the internet. This will prevent hackers from being able to access your wallet and steal your funds.
+A cold wallet is intended to keep your MWC funds safe by storing your MWC funds in offline storage. Once set up, your cold wallet should never be connected to the internet. This will prevent hackers from being able to access your wallet and steal your funds.
 
-An MWC Cold Wallet runs on a USB device which you boot to whenever you want to access your cold wallet. This guide is intended to help guide you through the process of initially installing the software needed to run your cold wallet and then later upgrading your software while keeping the cold wallet offline.
+An MWC Cold Wallet runs on a device which you boot to whenever you want to access your cold wallet. The information in this document is intended to help guide you through the process of initially installing the software needed to run your cold wallet and then later upgrading your software while keeping the cold wallet offline.
+
+An MWC Cold Wallet can be run on a dedicated laptop or computer which is never connected to the internet. However, dedicating such a device may be cost prohibitive. If using an older device, you should consider what would happen if your disk drive failed and ensure you have a backup.
+
+A lower cost alternative is to create a bootable USB device to run your cold wallet. Using a USB device could cause the device to wear relatively fast. USB devices can withstand between 10,000 and 100,000 write/erase cycles. If you are just running your cold wallet periodically, your USB device should last for quite a while. However, you should ensure you create a backup of your USB device periodically in case your original USB device with your cold wallet fails.
+
+This document focuses on installing MWC Qt Wallet on a USB drive. However, the steps would be similar if you use a desktop or laptop running Ubuntu.
 
 
 # Prerequisites
