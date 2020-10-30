@@ -135,9 +135,9 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
                 return;
             }
 
-            QString transactionFN = walletPath.second + "/saved_txs/" + trInfo.transactionId + ".grintx";
+            QString transactionFN = walletPath.second + "/saved_txs/" + trInfo.transactionId + ".mwctx";
             if ( !QFile(transactionFN).exists() ) {
-                core::getWndManager()->messageTextDlg("Internal Error", "Transaction file for id '" + trInfo.transactionId + "' not found. wmc713 didn't create expected file.");
+                core::getWndManager()->messageTextDlg("Internal Error", "Transaction file for id '" + trInfo.transactionId + "' not found. mwc713 didn't create expected file.");
                 return;
             }
 
