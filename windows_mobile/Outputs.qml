@@ -184,6 +184,11 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
+                        if (index < 0 || index >= allData.length)
+                            return
+                        const output = outputsModel.get(index)
+                        const outputNote = config.getOutputNote(output.outputCommitment)
+                        outputDetailItem.open(output, outputNote)
                     }
                 }
 
@@ -538,6 +543,17 @@ Item {
                 refreshOutputs()
             }
         }
+    }
+
+    OutputDetail {
+        id: outputDetailItem
+        anchors.left: parent.left
+        anchors.leftMargin: dp(30)
+        anchors.right: parent.right
+        anchors.rightMargin: dp(30)
+        anchors.verticalCenter: parent.verticalCenter
+        visible: false
+        height: dp(700)
     }
 
     Rectangle {
