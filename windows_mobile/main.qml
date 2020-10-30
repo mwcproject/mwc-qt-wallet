@@ -225,6 +225,12 @@ Window {
             visible: currentState === 6
         }
 
+        WalletConfig {
+            id: walletConfigItem
+            anchors.fill: parent
+            visible: currentState === 14
+        }
+
         SendConfirmation {
             id: sendConfirmationItem
             anchors.verticalCenter: parent.verticalCenter
