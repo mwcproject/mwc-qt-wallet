@@ -1,7 +1,22 @@
 
-# MWC Cold Wallet Software Installation Guide
+**MWC Cold Wallet Software Installation Guide**
 
-Last Updated: September. 3, 2020
+**Contents:**
+- [Overview](#overview)
+- [Prerequisites](#prerequisites)
+- [Copy Files](#copy-files)
+- [Installation Procedure](#installation-procedure)
+  * [Disconnect From Network](#disconnect-from-network)
+  * [Boot Up Live Ubuntu USB Device](#boot-up-live-ubuntu-usb-device)
+  * [Disable All Network Connections](#disable-all-network-connections)
+  * [Copy Files From File Transfer USB Device](#copy-files-from-file-transfer-usb-device)
+  * [Install MWC Qt Wallet onto USB Device](#install-mwc-qt-wallet-onto-usb-device)
+  * [Finish Cold Wallet Setup](#finish-cold-wallet-setup)
+- [Upgrade MWC Cold Wallet on Persistent Drive](#upgrade-mwc-cold-wallet-on-persistent-drive)
+  * [Prerequisites](#prerequisites)
+  * [Download Latest MWC Qt Wallet Installation File](#download-latest-mwc-qt-wallet-installation-file)
+  * [Uninstall mwc-qt-wallet Package](#uninstall-mwc-qt-wallet-package)
+  * [Install Latest MWC Qt Wallet Software](#install-latest-mwc-qt-wallet-software)
 
 
 # Overview
@@ -204,11 +219,8 @@ Keep your USB device with MWC Qt Wallet installed in your computer.
 If you have created a bootable Ubuntu USB device with persistent storage, you will not now need to keep installing MWC Qt Wallet, and restoring your wallet from its seed, each time you want to run your cold wallet. 
 
 You are now ready to setup your cold wallet following the instructions in:
-*   [https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md)
+*   [Create/Manage Cold Wallet](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md)
 
-Start with the section “Online Node Host”.
-
-When you come to the section “Cold Wallet Setup” you can skip steps 1 thru 5. Continue to follow the directions in “Cold Wallet Setup” starting with step 6.
 
 # Upgrade MWC Cold Wallet on Persistent Drive
 
@@ -248,7 +260,7 @@ To ensure that you are not connected to your network, click the down arrow in th
 *   Select Settings->Wi-Fi
 *   Verify that you are in airplane mode.
 
-See the section _Disable All Network Connections_ in the installation instructions at the beginning of this file for more information.
+See the section [Disable All Network Connections](#disable-all-network-connections) at the beginning of this guide for more information.
 
 ### Uninstall Using Command Line
 To uninstall the mwc-qt-wallet package, follow these steps:

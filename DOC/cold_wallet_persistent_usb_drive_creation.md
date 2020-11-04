@@ -1,34 +1,39 @@
 
 
-# Creating a USB Device With Persistent Storage For MWC Cold Wallet
+**Creating a USB Device With Persistent Storage For MWC Cold Wallet**
 
-Last Updated: September 3, 2020
+**Contents:**
+- [Overview](#overview)
+- [Prerequisites](#prerequisites)
+- [Run Ubuntu](#run-ubuntu)
+- [Create Live Ubuntu Drive With Persistent Storage](#create-live-ubuntu-drive-with-persistent-storage)
+  * [Download Ubuntu](#download-ubuntu)
+  * [Install mkusb](#install-mkusb)
+  * [Identify Empty USB Device](#identify-empty-usb-device)
+  * [Run mkusb](#run-mkusb)
+- [MWC Cold Wallet Software Installation](#mwc-cold-wallet-software-installation)
+- [Cold Wallet Setup](#cold-wallet-setup)
 
 
 # Overview
 
 A cold wallet is intended to keep your MWC safe by storing your MWC funds in offline storage. Once set up, your cold wallet should never be connected to the internet. This will prevent hackers from being able to access your wallet and steal your funds.
 
-Our previous instructions for creating or running an MWC Cold Wallet using USB devices required the use of a bootable live Ubuntu USB device and a second USB device for your MWC Cold Wallet. The live Ubuntu USB device could not store files, hence the reason for the second USB device to hold your wallet.
-
 With Ubuntu it is now possible to create a live USB device with persistent storage. Therefore you can create a USB device which can be booted and also contains your cold wallet. Persistence doesn’t work with every Linux distribution but it is known to work with versions of Ubuntu 18.04 LTS or later. I’ve tested the following procedure using the latest version of Ubuntu available at the time of this writing (20.04.1).
 
 This document describes the procedure where you can create a USB device running Ubuntu and which supports persistent storage. This USB device can then be used to install and set up an MWC cold wallet. Your MWC cold wallet will then run on a single USB device which you boot to whenever you want to access your cold wallet. 
 
+Creating a cold wallet on a persistent USB device will allow you to not have to recover your cold wallet from its seed each time you want to run it. The cold wallet software will be contained on your persistent USB device and you will only need to upload the latest blockchain data from an online node each time you run your cold wallet.
+
 The procedure to install the software needed to run an MWC cold wallet can be found at:
-
-
 
 *   [MWC Cold Wallet Software Installation Guide](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet_software_installation_guide.md)
 
 The procedure to set up an MWC cold wallet, after the software has been installed on your USB stick, can be found at:
 
-
-
 *   [Create/Manage Cold Wallet](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md)
 
-Once you have your MWC cold wallet set up on a USB stick you’ve created following this procedure, it will no longer be necessary to boot from a separate live Ubuntu USB stick in order to access your cold wallet.
-
+Once you have your MWC cold wallet set up on a USB stick you’ve created following this procedure, you will just need to boot using your cold wallet USB stick inorder to access your cold wallet.
 
 # Prerequisites
 *   A USB device with at least 64GB of memory. 128GB is probably better.
@@ -46,8 +51,6 @@ Mac: [https://ubuntu.com/tutorials/create-a-usb-stick-on-macos#1-overview](https
 
 Mac Requirements:
 
-
-
 *   40GB or larger USB device
 *   An Apple computer or laptop running macOS
 *   Etcher, a free and open source USB device writing tool. See [https://www.balena.io/etcher/](https://www.balena.io/etcher/)
@@ -57,8 +60,6 @@ Windows: [https://ubuntu.com/tutorials/create-a-usb-stick-on-windows#1-overview]
 
 Windows Requirements:
 
-
-
 *   A 40GB or larger USB device
 *   Microsoft Windows XP or later
 *   Rufus, a free and open source USB device writing tool. See [https://rufus.ie/](https://rufus.ie/)
@@ -66,15 +67,11 @@ Windows Requirements:
 
 The following site describes a similar procedure on Windows using Etcher:
 
-
-
 *   [https://linuxize.com/post/how-to-create-a-bootable-ubuntu-18-04-usb-stick/](https://linuxize.com/post/how-to-create-a-bootable-ubuntu-18-04-usb-stick/)
 
 Once you have created your bootable live Ubuntu USB device, boot your computer using it.
 
 Mac:
-
-
 
 *   Hold the alt/option button after hearing the power on chimes.
 *   Connect to your network
@@ -104,8 +101,6 @@ Note: Clicking the download arrow at the top-right of the Firefox status bar wil
 
 The tool we are going to use to create our persistent USB device is called mkusb. mkusb is not part of the standard Ubuntu installation so we need to update the Ubuntu repository to install it. Open a terminal window and run the following commands;
 
-
-
 *   sudo add-apt-repository universe
 *   sudo add-apt-repository ppa:mkusb/ppa
 *   sudo apt-get update
@@ -132,7 +127,6 @@ Plug in your new USB device and run _lsblk_ again.
 Your USB device should show up as an additional device at the bottom of the list. The device that was not listed when you previously ran _lsblk_ is your USB device. Make a note of the name of the new USB device (e.g. sde).
 
 <img src="cold_wallet_persistent_usb_images/image2.png" max-width="300" height="300"/>
-
 
 
 ### Run mkusb 
@@ -251,30 +245,17 @@ Then power off your computer and remove the USB device, without persistent stora
 
 You are now ready to install the software needed to create and run an MWC cold wallet onto your new bootable live Ubuntu USB device with persistent storage. See the installation instructions at the following link:
 
-
-
 *   [MWC Cold Wallet Software Installation Guide](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet_software_installation_guide.md)
 
 
 # Cold Wallet Setup
 
-One you have installed the software necessary to create and run an MWC cold wallet, you then need to setup your cold wallet following the instructions in:
-
-
-
-*   [Create/Manage Cold Wallet](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md)
-
-Since you have created a live Ubuntu USB device with persistent storage and installed the software necessary to run a cold wallet, you will not need 2 USB devices to startup your wallet as described in the first part of the instructions. You now only need to use the one we just created with mwc-qt-wallet on it. However, you will still need a second USB device to transfer files between your online node and cold wallet.
-
-To set up your MWC cold wallet, start with the section in the instructions titled “Online Node Host”.
-
-When you come to the section “Cold Wallet Setup” you can skip steps 1 thru 5. Instead do the following:
-
-
+Once you have installed the software necessary to create and run an MWC cold wallet:
 
 *   Boot from your USB device but *DO NOT CONNECT TO YOUR NETWORK*
 *   Once you have booted from your USB device, verify that you are *not* connected to your network. See the section in the installation guide _Verify Network Connection_ for information on how to see if your computer has any network connections. From this point on and whenever you use your cold wallet, you do not want any network connections.
+*   Finish setting up your cold wallet following the instruction in: <br/>
+    *   [Create/Manage Cold Wallet](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md)
 
-Note: Some versions of Ubuntu (e.g. 18.04.5) will automatically reconnect to the network they have previously been connected to, even though you do not connect to a network during initial boot up.
+Note: Some versions of Ubuntu (e.g. 18.04.5) will automatically reconnect to the network they have previously been connected to, even though you do not connect to a network during initial boot up. Always verify you are not connected to the network when booting up your cold wallet USB device.
 
-Then continue to follow the directions in “Cold Wallet Setup” starting with step 6.
