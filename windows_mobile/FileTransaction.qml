@@ -34,9 +34,13 @@ Item {
     function confirmationCallback(ret) {
         if (ret) {
             rect_progress.visible = true
-            const filepath = decodeURIComponent(transactionFileName)
-            const path = "/mnt/user/0/primary/" + filepath.substring(filepath.search("primary:") + 8, filepath.length)
-            fileTransaction.ftContinue( path, resTxFN, config.isFluffSet() )
+            if (isFinalize) {
+                fileTransaction.ftContinue( transactionFileName, resTxFN, config.isFluffSet() )
+            } else {
+                const filepath = decodeURIComponent(transactionFileName)
+                const path = "/mnt/user/0/primary/" + filepath.substring(filepath.search("primary:") + 8, filepath.length)
+                fileTransaction.ftContinue( path, resTxFN, config.isFluffSet() )
+            }
         }
     }
 

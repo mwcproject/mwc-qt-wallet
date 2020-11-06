@@ -20,6 +20,9 @@ Item {
     function open(title, message, isTwoButtons, noBtnText, yesBtnText, passwordHash, blockButton, _ttl_blocks, _callback) {
         text_title.text = title
         text_message.text = message
+        label_password.visible = false
+        textfield_password.visible = false
+        textfield_password.text = ""
         if (isTwoButtons) {
             text_yesbutton.text = yesBtnText
             text_nobutton.text = noBtnText
@@ -28,9 +31,6 @@ Item {
             button_no.visible = true
             callback = _callback
             blockingPasswordHash = ""
-            label_password.visible = false
-            textfield_password.visible = false
-            textfield_password.text = ""
 
             if (passwordHash !== "") {
                 messagebox.height = text_message.height + dp(350)

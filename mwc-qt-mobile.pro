@@ -72,3 +72,5 @@ DISTFILES += \
     android/src/com/mwc/mobile/QtAndroidService.java
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+
+ANDROID_ABIS = x86

@@ -91,7 +91,8 @@ Item {
             // unescape html codes like '%23' for '#'
             const cleanPath = decodeURIComponent(path);
             config.updatePathFor("fileGen", cleanPath)
-            finalize.uploadFileTransaction(fileDialog.file.toString());
+            const filepath = "/mnt/user/0/primary/" + cleanPath.substring(cleanPath.search("primary:") + 8, cleanPath.length)
+            finalize.uploadFileTransaction(filepath);
         }
     }
 

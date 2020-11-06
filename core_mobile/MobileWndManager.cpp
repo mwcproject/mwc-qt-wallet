@@ -282,41 +282,10 @@ void MobileWndManager::pageSendOffline( QString selectedAccount, int64_t amount 
 void MobileWndManager::pageTransactions() {
     mainWindow->setProperty("currentState", state::STATE::TRANSACTIONS);
 }
-
-void MobileWndManager::pageHodl() {
-    Q_ASSERT(false); // implement me
-}
-void MobileWndManager::pageHodlNode() {
-    Q_ASSERT(false); // implement me
-}
-void MobileWndManager::pageHodlCold() {
-    Q_ASSERT(false); // implement me
-}
-void MobileWndManager::pageHodlClaim(QString walletHash) {
-    Q_UNUSED(walletHash)
-
-    Q_ASSERT(false); // implement me
-}
-    // return true(first) if press OK and input signature value(second)
-QPair<bool, QString> MobileWndManager::hodlGetSignatureDlg(QString challenge) {
-    Q_UNUSED(challenge)
-    Q_ASSERT(false); // implement me
-    return QPair<bool, QString>(false, "");
-}
 void MobileWndManager::pageAccounts() {
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageAccountTransfer() {
-    Q_ASSERT(false); // implement me
-}
-void MobileWndManager::pageAirdrop() {
-    Q_ASSERT(false); // implement me
-}
-void MobileWndManager::pageAirdropForBTC(QString btcAddress, QString challenge, QString identifier) {
-    Q_UNUSED(btcAddress)
-    Q_UNUSED(challenge)
-    Q_UNUSED(identifier)
-
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageNodeInfo() {
