@@ -1,10 +1,86 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
+import ConfigBridge 1.0
+import WalletConfigBridge 1.0
+import UtilBridge 1.0
 
 Item {
+    property string walletInstanceName
+    property int inputConfirmationsNumber
+    property int changeOutputs
+    property bool walletLogsEnabled
+    property bool autoStartMQSEnabled
+    property bool autoStartTorEnabled
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
+
+    WalletConfigBridge {
+        id: walletConfig
+    }
+
+    ConfigBridge {
+        id: config
+    }
+
+    function updateButtons() {
+        const currentWalletLogsEnabled = combobox_wallet_logs.currentIndex === 0 ? true: false
+        const sameWithCurrent =
+            textfield_wallet_instance_name.text.trim() === walletInstanceName &&
+            walletLogsEnabled === currentWalletLogsEnabled &&
+            textfield_send_num_confirmation.text.trim() == Number(inputConfirmationsNumber).toString() &&
+            textfield_change_outputs.text.trim() === Number(changeOutputs).toString() &&
+            autoStartMQSEnabled === checkbox_mqs.checked &&
+            autoStartTorEnabled === checkbox_tor.checked
+
+        walletConfig.canApplySettings(!sameWithCurrent);
+
+        const sameWithDefault =
+            true === currentWalletLogsEnabled &&
+            textfield_send_num_confirmation.text.trim() === Number(walletConfig.getDefaultInputConfirmationsNumber()).toString() &&
+            textfield_change_outputs.text.trim() === Number(walletConfig.getDefaultChangeOutputs()).toString() &&
+            checkbox_mqs.checked === true &&
+            checkbox_tor.checked === true
+
+        button_reset.enabled = !sameWithDefault
+        button_apply.enabled = !sameWithCurrent
+    }
+
+    function isInteger(value) {
+      return /^\d+$/.test(value)
+    }
+
+    function logEnableUpdateCallback(needCleanupLogs) {
+        walletConfig.updateWalletLogsEnabled(false, needCleanupLogs)
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            walletLogsEnabled = walletConfig.getWalletLogsEnabled()
+            combobox_wallet_logs.currentIndex = walletLogsEnabled ? 0 : 1
+            autoStartMQSEnabled = walletConfig.getAutoStartMQSEnabled()
+            checkbox_mqs.checked = autoStartMQSEnabled
+            autoStartTorEnabled = walletConfig.getAutoStartTorEnabled()
+            checkbox_tor.checked = autoStartTorEnabled
+            const instanceInfo = config.getCurrentWalletInstance()
+            walletInstanceName = instanceInfo[2]
+            textfield_wallet_instance_name.text = walletInstanceName
+            inputConfirmationsNumber = walletConfig.getInputConfirmationsNumber()
+            textfield_send_num_confirmation.text = inputConfirmationsNumber
+            changeOutputs = walletConfig.getChangeOutputs()
+            textfield_change_outputs.text = changeOutputs
+            updateButtons()
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            textfield_wallet_instance_name.focus = false
+            textfield_send_num_confirmation.focus = false
+            textfield_change_outputs.focus = false
+        }
+    }
 
     Text {
         id: label_auto_start
@@ -35,7 +111,7 @@ Item {
             text: qsTr("MWC MQS")
             font.pixelSize: dp(17)
             anchors.left: parent.left
-            anchors.leftMargin: dp(40)
+            anchors.leftMargin: parent.width / 2 - dp(100)
             anchors.top: parent.top
             anchors.topMargin: dp(35)
 
@@ -50,17 +126,21 @@ Item {
                     height: dp(20)
                     anchors.fill: parent
                     fillMode: Image.PreserveAspectFit
-                    source: checkbox_mqs.checked ? "../img/purpleCheckOn@2x.svg" : "../img/purpleCheckOff@2x.svg"
+                    source: checkbox_mqs.checked ? "../img/CheckOn@2x.svg" : "../img/CheckOff@2x.svg"
                 }
             }
 
             contentItem: Text {
                 text: checkbox_mqs.text
                 font: checkbox_mqs.font
-                color: "#3600C9"
+                color: "white"
                 verticalAlignment: Text.AlignVCenter
                 anchors.left: checkbox_mqs.indicator.right
-                anchors.leftMargin: checkbox_mqs.spacing
+                anchors.leftMargin: dp(25)
+            }
+
+            onCheckStateChanged: {
+                updateButtons()
             }
         }
 
@@ -69,7 +149,7 @@ Item {
             text: qsTr("TOR")
             font.pixelSize: dp(17)
             anchors.left: parent.left
-            anchors.leftMargin: dp(40)
+            anchors.leftMargin: parent.width / 2 - dp(100)
             anchors.top: checkbox_mqs.bottom
             anchors.topMargin: dp(15)
 
@@ -84,17 +164,21 @@ Item {
                     height: dp(20)
                     anchors.fill: parent
                     fillMode: Image.PreserveAspectFit
-                    source: checkbox_tor.checked ? "../img/purpleCheckOn@2x.svg" : "../img/purpleCheckOff@2x.svg"
+                    source: checkbox_tor.checked ? "../img/CheckOn@2x.svg" : "../img/CheckOff@2x.svg"
                 }
             }
 
             contentItem: Text {
                 text: checkbox_tor.text
                 font: checkbox_tor.font
-                color: "#3600C9"
+                color: "white"
                 verticalAlignment: Text.AlignVCenter
                 anchors.left: checkbox_tor.indicator.right
-                anchors.leftMargin: checkbox_tor.spacing
+                anchors.leftMargin: dp(25)
+            }
+
+            onCheckStateChanged: {
+                updateButtons()
             }
         }
     }
@@ -129,6 +213,9 @@ Item {
             color: "#8633E0"
             radius: dp(5)
         }
+        onTextChanged: {
+            updateButtons()
+        }
     }
 
     Text {
@@ -150,8 +237,7 @@ Item {
         font.pixelSize: dp(18)
         color: "white"
         text: ""
-        anchors.bottom: label_change_outputs.top
-        anchors.bottomMargin: dp(15)
+        anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
@@ -161,6 +247,9 @@ Item {
             color: "#8633E0"
             radius: dp(5)
         }
+        onTextChanged: {
+            updateButtons()
+        }
     }
 
     Text {
@@ -169,8 +258,7 @@ Item {
         color: "white"
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        anchors.bottom: textfield_change_outputs.top
-        anchors.bottomMargin: dp(10)
+        anchors.top: textfield_send_num_confirmation.bottom
         anchors.topMargin: dp(15)
         font.pixelSize: dp(14)
     }
@@ -183,7 +271,8 @@ Item {
         font.pixelSize: dp(18)
         color: "white"
         text: ""
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.top: label_change_outputs.bottom
+        anchors.topMargin: dp(10)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
@@ -192,6 +281,9 @@ Item {
         background: Rectangle {
             color: "#8633E0"
             radius: dp(5)
+        }
+        onTextChanged: {
+            updateButtons()
         }
     }
 
@@ -208,6 +300,12 @@ Item {
 
     ComboBox {
         id: combobox_wallet_logs
+
+        onCurrentIndexChanged: {
+            if (combobox_wallet_logs.currentIndex >= 0) {
+                updateButtons()
+            }
+        }
 
         delegate: ItemDelegate {
             width: combobox_wallet_logs.width
@@ -330,23 +428,92 @@ Item {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: dp(30)
         anchors.right: parent.right
-        anchors.rightMargin: dp(70)
+        anchors.rightMargin: dp(100)
 
         background: Rectangle {
-            color: button_apply.enabled ? "#6F00D6" : "white"
+            color: button_apply.enabled ? "white" : "#00000000"
             radius: dp(5)
             border.width: dp(2)
-            border.color: button_apply.enabled ? "#6F00D6" : "gray"
+            border.color: button_apply.enabled ? "white" : "gray"
             Text {
                 text: qsTr("Apply")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
-                color: button_apply.enabled ? "white" : "gray"
+                color: button_apply.enabled ? "#6F00D6" : "gray"
             }
         }
 
         onClicked: {
+            const newWalletInstanceName = textfield_wallet_instance_name.text.trim()
+            if (newWalletInstanceName === "") {
+                messagebox.open(qsTr("Input"), qsTr("Please specify non empty wallet insatance name"))
+                textfield_wallet_instance_name.focus = true
+                return;
+            }
+
+            let ok = isInteger(textfield_send_num_confirmation.text.trim())
+            let confirmations
+            if (ok) {
+                confirmations = parseInt(textfield_send_num_confirmation.text.trim())
+            }
+            if (!ok || confirmations <= 0 || confirmations > 10) {
+                messagebox.open(qsTr("Input"), qsTr("Please input the number of confirmations in the range from 1 to 10"))
+                textfield_send_num_confirmation.focus = true
+                return;
+            }
+
+            ok = isInteger(textfield_change_outputs.text.trim())
+            let outputs
+            if (ok) {
+                outputs = parseInt(textfield_change_outputs.text.trim())
+            }
+            if (!ok || outputs <= 0 || outputs >= 100) {
+                messagebox.open(qsTr("Input"), qsTr("Please input the change output number in the range from 1 to 100"))
+                textfield_change_outputs.focus = true
+                return
+            }
+
+            if (!(confirmations === inputConfirmationsNumber && outputs === changeOutputs)) {
+                walletConfig.setSendCoinsParams(confirmations, outputs)
+                inputConfirmationsNumber = confirmations
+                changeOutputs = outputs
+            }
+
+            const currentWalletLogsEnabled = combobox_wallet_logs.currentIndex === 0 ? true : false
+            const need2updateLogEnabled = walletLogsEnabled !== currentWalletLogsEnabled
+            if (need2updateLogEnabled) {
+                if (!currentWalletLogsEnabled) {
+                    messagebox.open("Wallet Logs",
+                           "You just disabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n
+                            Please note, the logs can contain private information about your transactions and accounts.\n
+                            Do you want to clean up existing logs from your wallet?",
+                            true, "Keep the logs", "Clean up", "", "", "", logEnableUpdateCallback)
+                } else {
+                    messagebox.open(qsTr("Wallet Logs"), qsTr("You just enabled the logs. Log files location:\n~/mwc-qt-wallet/logs\nPlease note, the logs can contain private infromation about your transactions and accounts."))
+                }
+            }
+
+            walletLogsEnabled = currentWalletLogsEnabled
+
+            const need2updateAutoStartMQSEnabled = autoStartMQSEnabled !== checkbox_mqs.checked
+            if (need2updateAutoStartMQSEnabled) {
+                walletConfig.updateAutoStartMQSEnabled(checkbox_mqs.checked)
+            }
+            autoStartMQSEnabled = checkbox_mqs.checked
+
+            const need2updateAutoStartTorEnabled = autoStartTorEnabled !== checkbox_tor.checked
+            if (need2updateAutoStartTorEnabled) {
+                walletConfig.updateAutoStartTorEnabled(checkbox_tor.checked)
+            }
+            autoStartTorEnabled = checkbox_tor.checked
+
+            if (newWalletInstanceName !== walletInstanceName) {
+                config.updateActiveInstanceName(newWalletInstanceName)
+                walletInstanceName = newWalletInstanceName
+            }
+
+            updateButtons()
         }
     }
 
@@ -357,23 +524,35 @@ Item {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: dp(30)
         anchors.left: parent.left
-        anchors.leftMargin: dp(70)
+        anchors.leftMargin: dp(100)
 
         background: Rectangle {
-            color: "#ffffff"
+            color: "#00000000"
             radius: dp(5)
             border.width: dp(2)
-            border.color: "#3600C9"
+            border.color: button_reset.enabled ? "white" : "grey"
             Text {
                 text: qsTr("Reset")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
-                color: "#3600C9"
+                color: button_reset.enabled ? "white" : "grey"
             }
         }
 
         onClicked: {
+            textfield_send_num_confirmation.text = walletConfig.getDefaultInputConfirmationsNumber()
+            textfield_change_outputs.text = walletConfig.getDefaultChangeOutputs()
+            combobox_wallet_logs.currentIndex = 0
+            checkbox_mqs.checked = true
+            checkbox_tor.checked = true
+
+            updateButtons()
         }
+    }
+
+    MessageBox {
+        id: messagebox
+        anchors.verticalCenter: parent.verticalCenter
     }
 }

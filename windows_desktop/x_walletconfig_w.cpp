@@ -229,7 +229,7 @@ bool WalletConfig::applyChanges() {
     }
 
     int changeOutputs = ui->changeOutputsEdit->text().trimmed().toInt(&ok);
-    if (!ok || changeOutputs <= 0 || confirmations >= 100) {
+    if (!ok || changeOutputs <= 0 || changeOutputs >= 100) {
         control::MessageBox::messageText(this, "Input",
                                          "Please input the change output number in the range from 1 to 100");
         ui->changeOutputsEdit->setFocus();
