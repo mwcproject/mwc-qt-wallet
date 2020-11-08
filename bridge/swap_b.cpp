@@ -18,13 +18,14 @@
 #include "../state/s_swap.h"
 #include "../state/u_nodeinfo.h"
 #include "../core/appcontext.h"
+#include "../util/address.h"
 
 namespace bridge {
 
 static wallet::Wallet * getWallet() { return state::getStateContext()->wallet; }
 static core::AppContext * getAppContext() { return state::getStateContext()->appContext; }
 static state::Swap * getSwap() {return (state::Swap *) state::getState(state::STATE::SWAP); }
-static state::NodeInfo * getNodeInfo() {return (state::NodeInfo *) state::getState(state::STATE::NODE_INFO); }
+//static state::NodeInfo * getNodeInfo() {return (state::NodeInfo *) state::getState(state::STATE::NODE_INFO); }
 
 
 Swap::Swap(QObject *parent) : QObject(parent) {
@@ -59,6 +60,9 @@ Swap::Swap(QObject *parent) : QObject(parent) {
     state::Swap * swap = getSwap();
     QObject::connect(swap, &state::Swap::onSwapTradeStatusUpdated,
                      this, &Swap::onSwapTradeStatusUpdated, Qt::QueuedConnection);
+    QObject::connect(swap, &state::Swap::onCreateStartSwap,
+                     this, &Swap::onCreateStartSwap, Qt::QueuedConnection);
+
 }
 
 Swap::~Swap() {}
@@ -102,11 +106,6 @@ void Swap::onRequestSwapTrades(QVector<wallet::SwapInfo> swapTrades) {
     emit sgnSwapTradesResult( trades );
 }
 
-// Switch to New Trade Window
-void Swap::startNewTrade() {
-    getSwap()->startNewTrade();
-}
-
 // Cancel the trade. Send signal to the cancel the trade.
 // Trade cancelling might take a while.
 void Swap::cancelTrade(QString swapId) {
@@ -133,102 +132,9 @@ void Swap::onDeleteSwapTrade(QString swapId, QString errMsg) {
     emit sgnDeleteSwapTrade(swapId, errMsg);
 }
 
-
-// Get the list of secondary currencies that we are supporting
-QVector<QString> Swap::getSecondaryCurrencyList() {
-    return QVector<QString>{"BCH"};
-}
-
-// Calculate recommended confirmations number for MWC.
-int Swap::calcConfirmationsForMwcAmount(double mwcAmount) {
-    int height = getNodeInfo()->getCurrentNodeHeight();
-    if (height<=0)
-        return -1;
-
-    /* Schdule (from the block)
-    202500, 2.38095238
-    212580, 0.6
-    385380, 0.45
-    471780, 0.3
-    644580, 0.25
-    903780, 0.2
-    1162980, 0.15
-    1687140, 0.1
-    2211300, 0.05
-    5356260, 0.025
-    */
-
-    double gain; // Assume that Fees as such large
-    if (height<385380)
-        gain = 0.6;
-    else if (height<471780)
-        gain = 0.45;
-    else if (height<644580)
-        gain = 0.3;
-    else if (height<903780)
-        gain = 0.25;
-    else if (height<1162980)
-        gain = 0.2;
-    else if (height<1687140)
-        gain = 0.15;
-    else if (height<2211300)
-        gain = 0.1;
-    else if (height<5356260)
-        gain = 0.05;
-    else
-        gain = 0.025;
-
-    double confirmations = mwcAmount / gain;
-    if (confirmations<10.0)
-        return 10;
-
-    if (confirmations>10000.0)
-        return 10000;
-
-    return int(confirmations + 0.5);
-}
-
-// Get a minimum/maximum possible number of confiormations for the secondary currency.
-QVector<int> Swap::getConfirmationLimitForSecondary(QString secondaryName) {
-    if (secondaryName == "BCH") {
-        return QVector<int>{1, 1000};
-    }
-    Q_ASSERT(false);
-    return QVector<int>{1, 1000};
-}
-
-// Create a new trade. Responce will be send back with a signal
-void Swap::createNewTrade( double mwc, double btc, QString secondary,
-                                     QString redeemAddress,
-                                     bool sellerLockFirst,
-                                     int messageExchangeTimeMinutes,
-                                     int redeemTimeMinutes,
-                                     int mwcConfirmationNumber,
-                                     int secondaryConfirmationNumber,
-                                     QString communicationMethod,
-                                     QString communicationAddress) {
-
-    int minConf = getAppContext()->getSendCoinsParams().inputConfirmationNumber;
-
-    getWallet()->createNewSwapTrade( minConf, mwc, btc, secondary,
-            redeemAddress,
-            sellerLockFirst,
-            messageExchangeTimeMinutes,
-            redeemTimeMinutes,
-            mwcConfirmationNumber,
-            secondaryConfirmationNumber,
-            communicationMethod,
-            communicationAddress );
-}
-
-void Swap::onCreateNewSwapTrade(QString swapId, QString errMsg) {
-    emit sgnCreateNewTradeResult(swapId, errMsg);
-}
-
 void Swap::onCancelSwapTrade(QString swapId, QString error) {
     emit sgnCancelTrade(swapId, error);
 }
-
 
 // Requesting all details about the single swap Trade
 // Respond will be with sent back with sgnRequestTradeDetails
@@ -285,10 +191,59 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
     }
 
     // [1] - Description in HTML format. Role can be calculated form here as "Selling ..." or "Buying ..."
-    QString description;
+
+
+    QString reportStr = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">"
+                        "<html><body style=\"font-family:'Open Sans'; font-size:medium; font-weight:normal; font-style:normal; color:white; background-color:transparent;\">";
+
+
+    reportStr += QString("<p>") + (swap.isSeller ? "Selling" : "Buying") + " <b style=\"color:yellow;\">" + util::trimStrAsDouble(QString::number( swap.mwcAmount, 'f' ), 10) +
+            " MWC</b> for <b style=\"color:yellow;\">" + util::trimStrAsDouble(QString::number( swap.secondaryAmount, 'f' ), 10) + " " + swap.secondaryCurrency + "</b>.</p>";
+
+    reportStr += "<p>";
+    reportStr += "Required confirmations: <b style=\"color:yellow;\">" + QString::number(swap.mwcConfirmations) +
+                 " for MWC</b> and <b style=\"color:yellow;\">" + QString::number(swap.secondaryConfirmations) + " for " + swap.secondaryCurrency + "</b>.</p>";
+
+
+    reportStr += "<p>Time limits: <b style=\"color:yellow;\">" + util::interval2String(swap.messageExchangeTimeLimit, false, 2) +
+            "</b> for messages exchange and <b style=\"color:yellow;\">" +  util::interval2String(swap.redeemTimeLimit, false, 2)+"</b> for redeem or refund<p/>";
+
+    reportStr += "<p>Locking order: " + (swap.sellerLockingFirst ? "<b style=\"color:yellow;\">Lock MWC</b> first" : ("<b style=\"color:yellow;\">Lock " + swap.secondaryCurrency + "</b> first")) + "</p>";
+
+    QString lockTime = calcTimeLeft(swap.mwcLockTime);
+    reportStr += "<p>";
+    if (lockTime.size()>0)
+        reportStr += "MWC funds locked until block <b style=\"color:yellow;\">" + QString::number(swap.mwcLockHeight) + "</b>, expected to be mined in <b style=\"color:yellow;\">" + lockTime + "</b>.<br/>";
+    else
+        reportStr += "MWC Lock expired.<br/>";
+
+    QString secLockTime = calcTimeLeft(swap.secondaryLockTime);
+    if (secLockTime.size()>0) {
+        reportStr += swap.secondaryCurrency + " funds locked for <b style=\"color:yellow;\">" + secLockTime + "</b>.";
+    }
+    else {
+        reportStr += swap.secondaryCurrency + " lock expired";
+    }
+    reportStr += "</p>";
+
+    QString address = swap.communicationAddress;
+    if (swap.communicationMethod=="mwcmqs")
+        address = "mwcmqs://" + address;
+    else if (swap.communicationMethod=="tor")
+        address = "http://" + address + ".onion";
+    else {
+        Q_ASSERT(false); // QT wallet doesn't expect anything else.
+    }
+    reportStr += "<p>Trading with : <b style=\"color:yellow;\">" +  address + "</b></p>";
+    reportStr += "</body></html>";
+    swapInfo.push_back(reportStr);
+
+
+
+/*    QString description;
     if (swap.isSeller) {
         description += "Selling <b>" + QString::number( swap.mwcAmount ) + "</b> MWC for <b>" + QString::number(swap.secondaryAmount) + "</b> " +
-                swap.secondaryCurrency + ". " + swap.secondaryCurrency + " redeem address: " + swap.secondaryAddress + "<br/>";
+                swap.secondaryCurrency + "." + swap.secondaryCurrency + " redeem address: " + swap.secondaryAddress + "<br/>";
     }
     else {
         description += "Buying <b>" + QString::number( swap.mwcAmount ) + "</b> MWC for <b>" + QString::number(swap.secondaryAmount) + "</b> " + swap.secondaryCurrency + "<br/>";
@@ -311,7 +266,7 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
         description += swap.secondaryCurrency + " lock expired<br/>";
     }
     description += (swap.isSeller ? "Buyer" : "Seller" ) + QString(" address: ") + swap.communicationMethod + ", " + swap.communicationAddress + "<br/>";
-    swapInfo.push_back(description);
+    swapInfo.push_back(description);*/
 
     // [2] - Redeem address
     swapInfo.push_back(swap.secondaryAddress);
@@ -365,17 +320,6 @@ void Swap::onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg) {
     }
 }
 
-
-// Start swap processing
-void Swap::startAutoSwapTrade(QString swapId) {
-    getSwap()->runTrade(swapId);
-}
-
-// Stop swap processing
-void Swap::stopAutoSwapTrade(QString swapId) {
-    getSwap()->stopTrade(swapId);
-}
-
 void Swap::onSwapTradeStatusUpdated(QString swapId, QString currentAction, QString currentState,
                               QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                               QVector<wallet::SwapJournalMessage> tradeJournal) {
@@ -407,6 +351,230 @@ void Swap::onBackupSwapTradeData(QString swapId, QString exportedFileName, QStri
 void Swap::onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage) {
     emit sgnRestoreSwapTradeData(swapId, importedFilename, errorMessage);
 }
+
+
+// Switch to New Trade Window
+void Swap::initiateNewTrade() {
+    getSwap()->initiateNewTrade();
+}
+
+void Swap::showNewTrade1() {
+    getSwap()->showNewTrade1();
+}
+void Swap::showNewTrade2() {
+    getSwap()->showNewTrade2();
+}
+
+// Apply params from trade1 and switch to trade2 panel
+// Response: sgnApplyNewTrade1Params(bool ok, QString errorMessage)
+void Swap::applyNewTrade1Params(QString account, QString secCurrency, QString mwcAmount, QString secAmount,
+                                      QString secAddress, QString sendToAddress ) {
+
+    QPair< bool, util::ADDRESS_TYPE > addressRes = util::verifyAddress(sendToAddress);
+    if ( !addressRes.first ) {
+        emit sgnApplyNewTrade1Params (false, "Unable to parse the other wallet address " + sendToAddress);
+        return;
+    }
+
+    QString addrType;
+
+    switch (addressRes.second) {
+        case util::ADDRESS_TYPE::MWC_MQ: {
+            addrType = "mwcmqs";
+            break;
+        }
+        case util::ADDRESS_TYPE::TOR: {
+            addrType = "tor";
+            break;
+        }
+        default: {
+            emit sgnApplyNewTrade1Params(false, "Automated swaps working only with MQS and TOR addresses.");
+            return;
+
+        }
+    }
+
+    // We need to use wallet for verification. start new with a dry run will work great
+    getWallet()->createNewSwapTrade(account,
+                                    getAppContext()->getSendCoinsParams().inputConfirmationNumber,
+                                    mwcAmount, secAmount, secCurrency,
+                                    secAddress,
+                                    true,
+                                    60,
+                                    60,
+                                    60,
+                                    6,
+                                    addrType,
+                                    sendToAddress,
+                                    "",
+                                    "",
+                                    true,
+                                    "applyNewTrade1Params",
+                                    {account, secCurrency, mwcAmount, secAmount, secAddress, sendToAddress} );
+
+
+    // Respond at onCreateNewSwapTrade, tag applyNewTrade1Params
+}
+
+// Apply params from trade2 panel and switch to the review (panel3)
+// Response: sgnApplyNewTrade2Params(bool ok, QString errorMessage)
+void Swap::applyNewTrade2Params(QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks,
+                                      double secTxFee, QString electrumXUrl) {
+
+    QString sendToAddress = getSwap()->getBuyerAddress();
+    QPair< bool, util::ADDRESS_TYPE > addressRes = util::verifyAddress(sendToAddress);
+    Q_ASSERT(addressRes.first);
+
+    QString addrType;
+    switch (addressRes.second) {
+        case util::ADDRESS_TYPE::MWC_MQ: {
+            addrType = "mwcmqs";
+            break;
+        }
+        case util::ADDRESS_TYPE::TOR: {
+            addrType = "tor";
+            break;
+        }
+        default: {
+            Q_ASSERT(false);
+            return;
+        }
+    }
+
+
+    // We need to use wallet for verification. start new with a dry run will work great
+    getWallet()->createNewSwapTrade( getSwap()->getAccount(),
+                                    getAppContext()->getSendCoinsParams().inputConfirmationNumber,
+                                    getSwap()->getMwc2Trade(), getSwap()->getSec2Trade(), getSwap()->getCurrentSecCurrency(),
+                                    getSwap()->getSecAddress(),
+                                    true,
+                                    offerExpTime,
+                                    redeemTime,
+                                    mwcBlocks,
+                                    secBlocks,
+                                    addrType,
+                                    sendToAddress,
+                                    electrumXUrl,
+                                    "",
+                                    true,
+                                    "applyNewTrade2Params",
+                                    {electrumXUrl} );
+
+    getSwap()->applyNewTrade21Params(secCurrency, offerExpTime, redeemTime, mwcBlocks, secBlocks,
+            secTxFee);
+
+    // Respond at onCreateNewSwapTrade, tag applyNewTrade2Params
+}
+
+void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> params, QString swapId, QString errMsg) {
+    Q_UNUSED(swapId)
+    if (tag == "applyNewTrade1Params") {
+        Q_ASSERT(dryRun);
+        Q_ASSERT(params.size()==6);
+        emit sgnApplyNewTrade1Params(errMsg.isEmpty(), errMsg);
+        if (errMsg.isEmpty()) {
+            getSwap()->applyNewTrade1Params( params[0], params[1], params[2], params[3], params[4], params[5] );
+        }
+        return;
+    }
+    else if (tag == "applyNewTrade2Params") {
+        Q_ASSERT(dryRun);
+        Q_ASSERT(params.size()==1);
+        emit sgnApplyNewTrade2Params(errMsg.isEmpty(), errMsg);
+        if (errMsg.isEmpty()) {
+            getSwap()->applyNewTrade22Params( params[0] );
+        }
+        return;
+    }
+    // Just a message from different request.
+}
+
+
+// Create and start a new swap. The data must be submitted by that moment
+// Response: sgnCreateStartSwap(bool ok, QString errorMessage)
+void Swap::createStartSwap() {
+    getSwap()->createStartSwap();
+}
+
+void Swap::onCreateStartSwap(bool ok, QString errorMessage) {
+    emit sgnCreateStartSwap(ok, errorMessage);
+}
+
+// Account that is related to this swap trade
+QString Swap::getAccount() {
+    return getSwap()->getAccount();
+}
+
+// List of the secondary currencies that wallet support
+QVector<QString> Swap::secondaryCurrencyList() {
+    return getSwap()->secondaryCurrencyList();
+}
+
+QString Swap::getCurrentSecCurrency() {
+    return getSwap()->getCurrentSecCurrency();
+}
+
+QString Swap::getCurrentSecCurrencyFeeUnits() {
+    return getSwap()->getCurrentSecCurrencyFeeUnits();
+}
+
+void Swap::setCurrentSecCurrency(QString secCurrency) {
+    getSwap()->setCurrentSecCurrency(secCurrency);
+}
+
+QString Swap::getMwc2Trade() {
+    return getSwap()->getMwc2Trade();
+}
+
+QString Swap::getSec2Trade() {
+    return getSwap()->getSec2Trade();
+}
+
+QString Swap::getSecAddress() {
+    return getSwap()->getSecAddress();
+}
+
+bool    Swap::isLockMwcFirst() {
+    return getSwap()->isLockMwcFirst();
+}
+
+QString Swap::getBuyerAddress() {
+    return getSwap()->getBuyerAddress();
+}
+
+// Return pairs of the expiration interval combo:
+// <Interval is string> <Value in minutes>
+QVector<QString> Swap::getExpirationIntervals() {
+    return getSwap()->getExpirationIntervals();
+}
+
+int Swap::getOfferExpirationInterval() {
+    return getSwap()->getOfferExpirationInterval();
+}
+int Swap::getSecRedeemTime() {
+    return getSwap()->getSecRedeemTime();
+}
+double Swap::getSecTransactionFee() {
+    return getSwap()->getSecTransactionFee();
+}
+
+int Swap::getMwcConfNumber() {
+    return getSwap()->getMwcConfNumber();
+}
+
+int Swap::getSecConfNumber() {
+    return getSwap()->getSecConfNumber();
+}
+
+QString Swap::getElectrumXprivateUrl() {
+    return getSwap()->getElectrumXprivateUrl();
+}
+
+// Calculate the locking time for a NEW not yet created swap offer.
+QVector<QString> Swap::getLockTime( QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks ) {
+    return getSwap()->getLockTime( secCurrency, offerExpTime, redeemTime, mwcBlocks, secBlocks );
+}
+
 
 }
 

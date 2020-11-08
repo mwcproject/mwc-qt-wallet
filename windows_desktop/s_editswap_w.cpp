@@ -27,12 +27,10 @@ EditSwap::EditSwap(QWidget *parent, QString _swapId) :
 
     swap = new bridge::Swap(this);
     connect(swap, &bridge::Swap::sgnRequestTradeDetails, this, &EditSwap::sgnRequestTradeDetails, Qt::QueuedConnection);
-    connect(swap, &bridge::Swap::sgnUpdateCommunication, this, &EditSwap::sgnUpdateXXX, Qt::QueuedConnection);
     connect(swap, &bridge::Swap::sgnUpdateSecondaryAddress, this, &EditSwap::sgnUpdateXXX, Qt::QueuedConnection);
     connect(swap, &bridge::Swap::sgnUpdateSecondaryFee, this, &EditSwap::sgnUpdateXXX, Qt::QueuedConnection);
-    connect(swap, &bridge::Swap::sgnCancelTrade, this, &EditSwap::sgnCancelTrade, Qt::QueuedConnection);
 
-    ui->swapIdLabel->setText("SwapId: " + swapId);
+    setPageTitle("Trade: " + swapId);
 
     ui->progress->initLoader(true);
     swap->requestTradeDetails(swapId);
@@ -72,31 +70,22 @@ void EditSwap::sgnRequestTradeDetails( QVector<QString> swapInfo,
     if (swapInfo.size() != 8 || swapInfo[0] != swapId)
         return; // Invalid message or invalid destination
 
+    QString secCurrency = swapInfo[3];
+    QString secCurrencyFeeUnits = swapInfo[5]; // - secondary fee units
+
+    ui->secondaryAddressLabel->setText( secCurrency + " address to receive coins");
+    ui->secTransFeeLabel->setText(secCurrency + " transaction fee");
+    ui->updateBtn->setText("Update "+ secCurrency +" transaction details");
+    ui->secFeeUnitsLabel->setText(secCurrencyFeeUnits);
+
     QString tradeDescription = swapInfo[1];
-    seller = tradeDescription.startsWith("Selling");
     ui->tradeDesriptionLabel->setText(tradeDescription);
     redeemAddress = swapInfo[2];
     secondaryCurrency = swapInfo[3];
     secondaryFee = swapInfo[4];
-    ui->secondaryFeeUnitsLabel->setText(swapInfo[5]);
-    communicationMethod = swapInfo[6];
-    communicaitonAddress = swapInfo[7];
 
     ui->redeemAddressEdit->setText(redeemAddress);
-    ui->secondaryFeeLabel->setText(secondaryCurrency + " fee:");
     ui->secondaryFeeEdit->setText(secondaryFee);
-
-    if (seller) {
-        ui->addressBox->setTitle("Buyer Address");
-        ui->secondaryAddressLabel->setText("Redeem address");
-    } else {
-        ui->addressBox->setTitle("Seller Address");
-        ui->secondaryAddressLabel->setText("Refund address");
-    }
-
-    ui->mwcmqsRadio->setChecked(communicationMethod == "mwcmqs");
-    ui->torRadio->setChecked(communicationMethod == "tor");
-    ui->destinationEdit->setText(communicaitonAddress);
 
     updateButtons();
 }
@@ -107,25 +96,19 @@ void EditSwap::sgnUpdateXXX(QString swId, QString errorMsg) {
 
     if (!errorMsg.isEmpty()) {
         control::MessageBox::messageText(this, "Error", "Unable to update data for swap " + swapId + "\n\n" + errorMsg);
+        ui->progress->hide();
     }
+    else {
+        // OK, let's refresh...
+        swap->requestTradeDetails(swapId);
+    }
+
+    updateButtons();
 }
-
-QString EditSwap::getCommunicationMethod() const {
-    if (ui->mwcmqsRadio->isChecked())
-        return "mwcmqs";
-    if (ui->torRadio->isChecked())
-        return "tor";
-
-    Q_ASSERT(false);
-    return "";
-}
-
 
 bool EditSwap::isCanUpdate() const {
     return !(redeemAddress == ui->redeemAddressEdit->text() &&
-            secondaryFee == ui->secondaryFeeEdit->text() &&
-            communicationMethod == getCommunicationMethod() &&
-            communicaitonAddress == ui->destinationEdit->text());
+            secondaryFee == ui->secondaryFeeEdit->text() );
 }
 
 void EditSwap::updateButtons(bool first_call) {
@@ -135,9 +118,6 @@ void EditSwap::updateButtons(bool first_call) {
     ui->updateBtn->setEnabled(canUpdate);
     ui->tradeDetailsBtn->setEnabled(!canUpdate);
     QString secondaryAddress = ui->redeemAddressEdit->text();
-    bool isTradeRunning = swap->isRunning(swapId);
-    ui->startButton->setEnabled(!isTradeRunning && !canUpdate && !secondaryAddress.isEmpty());
-    ui->stopButton->setEnabled(isTradeRunning);
 }
 
 
@@ -151,48 +131,24 @@ void EditSwap::on_secondaryFeeEdit_textEdited(const QString &str) {
     updateButtons();
 }
 
-void EditSwap::on_mwcmqsRadio_toggled(bool checked) {
-    Q_UNUSED(checked)
-    updateButtons();
-}
-
-void EditSwap::on_torRadio_toggled(bool checked) {
-    Q_UNUSED(checked)
-    updateButtons();
-}
-
-void EditSwap::on_destinationEdit_textEdited(const QString &str) {
-    Q_UNUSED(str)
-    updateButtons();
-}
-
 void EditSwap::on_updateBtn_clicked() {
     // Check what we need update...
-    if (ui->destinationEdit->text().isEmpty()) {
-        control::MessageBox::messageText(this, "Input", QString("Please define ") +
-                (seller ? "Buyer" : "Seller") + " address");
-        ui->destinationEdit->setFocus();
-        return;
-    }
 
     if ( ui->redeemAddressEdit->text().isEmpty() ) {
-        control::MessageBox::messageText(this, "Input", QString("Please define ") + secondaryCurrency + " " +
-                (seller ? "redeem" : "refund") +  " address" );
+        control::MessageBox::messageText(this, "Input", QString("Please define ") + secondaryCurrency +
+                 " address to receive the coins." );
         return;
     }
 
     QString fee = ui->secondaryFeeEdit->text();
     bool ok = false;
     double feeDbl = fee.toDouble(&ok);
-    if ( fee.isEmpty() || !ok ) {
+    if ( fee.isEmpty() || !ok || feeDbl<=0.0 ) {
         control::MessageBox::messageText(this, "Input", QString("Please define ") + secondaryCurrency + " fee value" );
         return;
     }
 
     ui->progress->show();
-    if (!(communicationMethod == getCommunicationMethod() && communicaitonAddress == ui->destinationEdit->text())) {
-        swap->updateCommunication(swapId, getCommunicationMethod(), ui->destinationEdit->text());
-    }
 
     if ( redeemAddress != ui->redeemAddressEdit->text() ) {
         swap->updateSecondaryAddress(swapId, ui->redeemAddressEdit->text());
@@ -201,7 +157,6 @@ void EditSwap::on_updateBtn_clicked() {
     {
         swap->updateSecondaryFee(swapId, feeDbl);
     }
-    swap->requestTradeDetails(swapId);
     updateButtons();
 }
 
@@ -216,44 +171,15 @@ void EditSwap::on_tradeDetailsBtn_clicked() {
     swap->showTradeDetails(swapId);
 }
 
-void EditSwap::on_startButton_clicked() {
-    swap->startAutoSwapTrade(swapId);
-    updateButtons();
-}
-
-void EditSwap::on_stopButton_clicked() {
-    swap->stopAutoSwapTrade(swapId);
-    updateButtons();
-}
-
 void EditSwap::on_backButton_clicked() {
-    swap->pageTradeList();
-}
-
-void EditSwap::on_cancelButton_clicked()
-{
-    if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText(this, "Warning", "Are you sure you want to cancel this trade? Please note, that refund process might take time and you wallet need to be online to do that. If your wallet will not be online until the swap process will be finished, you might lost the funds.",
-                                                                                  "No", "Yes",
-                                                                                  "Continue this swap trade", "Cancel the trade and get a refund if needed",
-                                                                                  true, false))
-        return;
-
-    ui->progress->show();
-    swap->cancelTrade(swapId);
-}
-
-void EditSwap::sgnCancelTrade(QString swId, QString error) {
-    if (swapId != swId)
-        return;
-
-    ui->progress->hide();
-
-    if (!error.isEmpty()) {
-        control::MessageBox::messageText(this, "Trade cancellation", "Unable to cancel the swap " + swapId + "\n\n" + error);
-        return;
+    if (isCanUpdate()) {
+        if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText(this, "Warning", "You have not saved data. Do you want to drop the data and return back?",
+                                                                                      "No", "Yes",
+                                                                                      "Stay in this page", "Drop unsaved data and switch",
+                                                                                      true, false))
+            return;
     }
-    // Go back on cancel
-    on_backButton_clicked();
+    swap->pageTradeList();
 }
 
 }

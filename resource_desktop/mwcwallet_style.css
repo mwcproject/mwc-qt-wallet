@@ -491,6 +491,15 @@ control--MwcComboBox
 control--MwcComboBox:enabled:!focus::hover
 {
     background-color: rgba(255, 255, 255, 0.4);
+    border: transparent;
+}
+
+control--MwcComboBox:enabled:focus {
+    border: 2px solid #CCFF33;
+}
+
+control--MwcComboBox:!focus {
+    border: transparent;
 }
 
 control--MwcComboBox::drop-down {

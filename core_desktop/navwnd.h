@@ -31,7 +31,9 @@ public:
     explicit NavWnd(QWidget *parent, bool createNavigationButtons=true);
 
 protected:
-    void resizeEvent(QResizeEvent *event);
+    void setPageTitle(QString title);
+
+    virtual void resizeEvent(QResizeEvent *event) override;
 
 private:
     NavBar * topRightButtonWnd = nullptr;

@@ -87,6 +87,7 @@
 #include "bridge/wnd/g_filetransaction_b.h"
 #include "bridge/wnd/e_outputs_b.h"
 #include "bridge/wnd/x_walletconfig_b.h"
+#include "core/MessageMapper.h"
 
 #ifdef WALLET_MOBILE
 #include <QQmlApplicationEngine>
@@ -169,11 +170,6 @@ QPair<bool, QString> readConfig(QApplication & app) {
     QString mwc_path = reader.getString("mwc_path");
     QString wallet713_path = reader.getString("wallet713_path");
     QString mwczip_path = reader.getString("mwczip_path");
-    QString airdropUrlMainNet = reader.getString("airdrop_url_mainnet");
-    QString airdropUrlTestNet = reader.getString("airdrop_url_testnet");
-
-    QString hodlUrlMainnet = reader.getString("hodl_url_mainnet");
-    QString hodlUrlTestnet = reader.getString("hodl_url_testnet");
 
     QString logoutTimeoutStr = reader.getString("logoutTimeout");
     QString timeoutMultiplier = reader.getString("timeoutMultiplier");
@@ -201,19 +197,7 @@ QPair<bool, QString> readConfig(QApplication & app) {
     if ( timeoutMultiplierVal < 0.01 )
         timeoutMultiplierVal = 1.0;
 
-    if (airdropUrlMainNet.isEmpty())
-        airdropUrlMainNet = "https://wallet.mwc.mw";
-
-    if (airdropUrlTestNet.isEmpty())
-        airdropUrlTestNet = "https://seed2.mwc.mw:8443";
-
-    if (hodlUrlMainnet.isEmpty())
-        hodlUrlMainnet = "https://wallet.mwc.mw";
-
-    if (hodlUrlTestnet.isEmpty())
-        hodlUrlTestnet = "https://seed2.mwc.mw:8443";
-
-    if ( mwc_path.isEmpty() || wallet713_path.isEmpty() || airdropUrlMainNet.isEmpty() || airdropUrlTestNet.isEmpty() || hodlUrlMainnet.isEmpty() || hodlUrlTestnet.isEmpty() ) {
+    if ( mwc_path.isEmpty() || wallet713_path.isEmpty() ) {
         qDebug() << "Failed to read all expected data from config file " << config;
         return QPair<bool, QString>(false, "Not found all expected fields at config file " + config);
     }
@@ -258,7 +242,7 @@ QPair<bool, QString> readConfig(QApplication & app) {
 
 
     Q_ASSERT(runMode.first);
-    config::setConfigData( runMode.second, mwc_path, wallet713_path, mwczip_path, airdropUrlMainNet, airdropUrlTestNet, hodlUrlMainnet, hodlUrlTestnet, logoutTimeout*1000L, timeoutMultiplierVal, sendTimeoutMs );
+    config::setConfigData( runMode.second, mwc_path, wallet713_path, mwczip_path, logoutTimeout*1000L, timeoutMultiplierVal, sendTimeoutMs );
 
     return QPair<bool, QString>(true, "");
 }
@@ -367,6 +351,7 @@ int main(int argc, char *argv[])
     test::testWordSequences();
     test::testWordDictionary();
     test::testPasswordAnalyser();
+    test::testMessageMapper();
 #endif
 
 

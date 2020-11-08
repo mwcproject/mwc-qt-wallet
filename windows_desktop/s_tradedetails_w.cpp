@@ -32,10 +32,11 @@ TradeDetails::TradeDetails(QWidget *parent, QString _swapId) :
 
     ui->progress->initLoader(true);
 
-    ui->swapIdLabel->setText("SwapId: " + swapId);
+    setPageTitle("Trade: " + swapId);
 
-    ui->executionPlanList->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    ui->journalList->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    // Just want to match them.
+    ui->executionPlan->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    ui->tradeJournal->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
     swap->requestTradeDetails(swapId);
 }
@@ -47,32 +48,57 @@ TradeDetails::~TradeDetails() {
 void TradeDetails::updateData(const QVector<QString> & executionPlan,
                               const QString & currentAction,
                               const QVector<QString> & tradeJournal) {
-    ui->executionPlanList->clearData();
-    ui->journalList->clearData();
-    ui->currentStatusLabel->setText("");
 
+    // Execution plan...
+    ui->executionPlan->clearAll();
     Q_ASSERT(executionPlan.size()%3==0);
+    bool past = true;
     for (int i=2; i<executionPlan.size(); i+=3) {
-        bool active = (executionPlan[i-2] == "true");
-        QString requred = executionPlan[i-1];
+        bool active = (executionPlan[i - 2] == "true");
+        QString requred = executionPlan[i - 1];
         QString stage = executionPlan[i];
-        if (active) {
-            stage = ">> " + stage;
-        }
-        else {
-            stage = "   " + stage;
-        }
-        ui->executionPlanList->appendRow( QVector<QString>{ stage, requred }, active ? 1.0 : -1.0 );
+
+        // we have one space there
+        requred.replace(" ", "  ");
+
+        if (active)
+            past = false;
+
+        control::RichItem *itm = control::createMarkedItem(QString::number(i/3), ui->executionPlan, active,
+                    control::LEFT_MARK_SIZE, control::LEFT_MARK_SIZE,
+                    6, 8);
+
+        itm->hbox()
+            .addWidget(control::createLabel(itm, true, past, active ? (currentAction.isEmpty() ? stage : currentAction) : stage) )
+            .addWidget(control::createLabel(itm, false, past, requred)).setFixedWidth(170)
+            .pop();
+
+        itm->apply();
+
+        ui->executionPlan->addItem(itm);
     }
+    ui->executionPlan->apply();
 
-    ui->currentStatusLabel->setText("Current status: <b>" + currentAction + "</b>");
-
+    // The trade journal
+    ui->tradeJournal->clearAll();
     Q_ASSERT(tradeJournal.size()%2==0);
     for (int i=1; i<tradeJournal.size(); i+=2) {
         QString message = tradeJournal[i-1];
         QString data = tradeJournal[i];
-        ui->journalList->appendRow( QVector<QString>{data, message} );
+
+        control::RichItem *itm = control::createMarkedItem(QString::number(i/3), ui->executionPlan, false,
+                                                           control::LEFT_MARK_SIZE, control::LEFT_MARK_SIZE,
+                                                           6, 8);
+
+        itm->hbox()
+                .addWidget(control::createLabel(itm, true, false, message))
+                .addWidget(control::createLabel(itm, false, false, data)).setFixedWidth(170)
+                .pop();
+        itm->apply();
+
+        ui->tradeJournal->addItem(itm);
     }
+    ui->tradeJournal->apply();
 }
 
 
@@ -88,9 +114,9 @@ void TradeDetails::sgnRequestSwapDetails(QVector<QString> swapInfo,
         return;
 
     ui->progress->hide();
-    ui->executionPlanList->clearData();
-    ui->journalList->clearData();
-    ui->currentStatusLabel->setText("");
+
+    ui->executionPlan->clearAll();
+    ui->tradeJournal->clearAll();
 
     if (!errMsg.isEmpty()) {
         Q_ASSERT(swapInfo.size()>=1);

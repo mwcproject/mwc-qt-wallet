@@ -1,0 +1,21 @@
+# It is a message mappers files for the mwc-wallet messages that we need to show to the users nice way.
+# Format:
+# <regex exprettion to rase the message>
+# <mapper string>  - string with regex groups.
+# empty line (separator)
+
+# Swap Error , Electrum Node error, Unable to contact the secondary ElectrumX client btc.test2.swap.mwc.mw:8000, Swap Rpc error: Unable connect to btc.test2.swap.mwc.mw:8000, Swap I/O: Connection refused (os error 61)
+Swap Error , Electrum Node error, Unable to contact the (.+) ElectrumX client .+, Swap Rpc error: (.+), Swap I\/O: (.+)
+The $1 ElectrumX client is not accessible. $2, $3
+
+#LibWallet Error, Swap Error , Electrum Node error, Unable to determine height
+LibWallet Error, Swap Error , Electrum Node error, (.+)
+ElectrumX server error: $1
+
+# Swap Error , Swap generic error, Unable to parse secondary currency redeem address mzhdk3nzaQPx52LFL2P2oqWTsa6c9eo5, base58: base58ck checksum 0x745e7c87 does not match expected 0xf47d9508
+Swap Error , Swap generic error, Unable to parse secondary currency redeem address (.*), base58: (.*)
+Unable to parse the address $1, $2
+
+# LibWallet Error, Unable to adjust Swap c858d985-cd18-4c0e-9a4a-41ffbe2ee12b: Swap Error , Swap generic error, Unable to parse BCH address myPKtHbX9Kv1z3AAC69vdMoBqHMi5Hy13r, base58: base58ck checksum 0x255b5881 does not match expected 0x245b5881
+LibWallet Error, Unable to adjust Swap (.*): Swap Error , Swap generic error, Unable to parse (.*) address (.*), base58: (.*)
+Invalid $2 address $3. $4

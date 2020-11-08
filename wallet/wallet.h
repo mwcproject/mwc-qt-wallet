@@ -661,10 +661,10 @@ public:
     virtual void deleteSwapTrade(QString swapId) = 0;
 
     // Create a new Swap trade deal.
-    // Check Signal: void onCreateNewSwapTrade(QString swapId);
-    virtual void createNewSwapTrade(
+    // Check Signal: void onCreateNewSwapTrade(tag, dryRun, QVector<QString> params, QString swapId, QString err);
+    virtual void createNewSwapTrade(QString account,
                                     int min_confirmations, // minimum number of confimations
-                                    double mwc, double btc, QString secondary,
+                                    QString mwcAmount, QString secAmount, QString secondary,
                                     QString redeemAddress,
                                     bool sellerLockFirst,
                                     int messageExchangeTimeMinutes,
@@ -672,7 +672,12 @@ public:
                                     int mwcConfirmationNumber,
                                     int secondaryConfirmationNumber,
                                     QString communicationMethod,
-                                    QString communicationAddress ) = 0;
+                                    QString communicationAddress,
+                                    QString electrum_uri1,
+                                    QString electrum_uri2,
+                                    bool dryRun,
+                                    QString tag,
+                                    QVector<QString> params ) = 0;
 
     // Cancel the trade
     // Check Signal: void onCancelSwapTrade(QString swapId, QString error);
@@ -708,7 +713,7 @@ public:
 
     // Request proff address from http transaction
     // apiSecret - if foreign API secret, optional. Normally it is empty
-    // Chack signal: onRequestRecieverWalletAddress(QString url, QString address, QString error)
+    // Check signal: onRequestRecieverWalletAddress(QString url, QString address, QString error)
     virtual void requestRecieverWalletAddress(QString url, QString apiSecret) = 0;
 private:
 signals:
@@ -819,7 +824,7 @@ signals:
     void onDeleteSwapTrade(QString swapId, QString errMsg);
 
     // Response from createNewSwapTrade, SwapId on OK,  errMsg on failure
-    void onCreateNewSwapTrade(QString swapId, QString errMsg);
+    void onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> params, QString swapId, QString errMsg);
 
     // Response from cancelSwapTrade
     void onCancelSwapTrade(QString swapId, QString error);

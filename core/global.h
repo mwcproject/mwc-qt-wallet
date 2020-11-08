@@ -104,8 +104,6 @@ const QString PAGE_K_ACCOUNT_TRANSFER = "Transfer coins between accounts";
 
 const QString PAGE_S_SWAP_LIST      = "MWC Swap Trades";
 const QString PAGE_S_SWAP_NEW       = "New Swap Trade";
-const QString PAGE_S_SWAP_EDIT      = "Swap Trade";
-const QString PAGE_S_SWAP_DETAILS   = "Swap Trade";
 
 const QString PAGE_U_NODE_STATUS    = "MWC Node Status";
 

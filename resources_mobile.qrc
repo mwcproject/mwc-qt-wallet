@@ -4,6 +4,8 @@
         <file>resource/passwords-10k.dat</file>
         <file>resource/passwords-1k.dat</file>
         <file>resource/passwords-1M.dat</file>
+        <file>resource/notification_mappers.txt</file>
+        <file>resource/mwc713_mappers.txt</file>
         <file>txt/bip39_words.txt</file>
         <file>windows_mobile/main.qml</file>
         <file>windows_mobile/Inputpassword.qml</file>

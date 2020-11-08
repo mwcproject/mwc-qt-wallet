@@ -164,7 +164,7 @@ bool AppContext::loadDataImpl() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x479D)
+    if (id<0x4783 || id>0x479E)
          return false;
 
     QString mockStr;
@@ -302,6 +302,10 @@ bool AppContext::loadDataImpl() {
         in >> swapEnforceBackup;
     }
 
+    if (id>=0x479E) {
+        in >> lastUsedSwapCurrency;
+    }
+
     return true;
 }
 
@@ -329,7 +333,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x479D;
+    out << 0x479E;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -396,6 +400,8 @@ void AppContext::saveData() const {
     out << swapTabSselection;
 
     out << swapEnforceBackup;
+
+    out << lastUsedSwapCurrency;
 }
 
 void AppContext::loadNotesData() {

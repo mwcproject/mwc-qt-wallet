@@ -14,6 +14,7 @@
 
 #include "richvbox.h"
 #include <QVBoxLayout>
+#include <QScrollBar>
 
 namespace control {
 
@@ -21,12 +22,13 @@ RichVBox::RichVBox(QWidget *parent) : QScrollArea(parent)
 {
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 
-    this->setStyleSheet( "border: transparent; background: transparent" );
+    this->setStyleSheet( "border: 1px solid rgba(255, 255, 255, 0.2); background: transparent" );
 //    setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     vlist = new QWidget (this);
+    vlist->setStyleSheet( "border: transparent; padding: 0px" );
     layout = new QVBoxLayout(vlist);
     layout->setContentsMargins(0,0,3,0); // Have 3 on the right because of the scroll bar.
     vlist->setLayout( layout );

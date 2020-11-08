@@ -120,18 +120,65 @@ bool TaskDeleteSwapTrade::processTask(const QVector<WEvent> &events) {
 }
 
 // ------------------------- TaskCreateNewSwapTrade ---------------------
+
+QString TaskCreateNewSwapTrade::generateCommandLine(int min_confirmations,
+                            QString mwcAmount, QString  secAmount, QString secondary,
+                            QString redeemAddress,
+                            bool sellerLockFirst,
+                            int messageExchangeTimeMinutes,
+                            int redeemTimeMinutes,
+                            int mwcConfirmationNumber,
+                            int secondaryConfirmationNumber,
+                            QString communicationMethod,
+                            QString communicationAddress,
+                            QString electrum_uri1,
+                            QString electrum_uri2,
+                            bool dryRun) const
+{
+    Q_ASSERT(messageExchangeTimeMinutes>0);
+    Q_ASSERT(redeemTimeMinutes>0);
+    Q_ASSERT(mwcConfirmationNumber>0);
+    Q_ASSERT(secondaryConfirmationNumber>0);
+
+    QString cmdLine = "swap_start --message_exchange_time " + QString::number(messageExchangeTimeMinutes) +
+            " --mwc_amount " + mwcAmount +
+            " --mwc_confirmations " + QString::number(mwcConfirmationNumber) +
+            " --secondary_confirmations " + QString::number(secondaryConfirmationNumber) +
+            " --redeem_time " + QString::number(redeemTimeMinutes) +
+            " --secondary_address " + redeemAddress +
+            " --secondary_amount " + secAmount +
+            " --secondary_currency " + secondary +
+            " --method " + communicationMethod +
+            " --dest " + communicationAddress +
+            " --who_lock_first " + (sellerLockFirst ? "seller" : "buyer");
+
+    if (min_confirmations>0)
+        cmdLine += " --min_conf " + QString::number(min_confirmations);
+
+    if (!electrum_uri1.isEmpty())
+        cmdLine += " --electrum_uri1 " + electrum_uri1;
+    if (!electrum_uri2.isEmpty())
+        cmdLine += " --electrum_uri2 " + electrum_uri2;
+
+    if (dryRun)
+        cmdLine += " --dry_run";
+
+    return cmdLine;
+}
+
+
 bool TaskCreateNewSwapTrade::processTask(const QVector<WEvent> &events) {
     QVector<WEvent> lns = filterEvents(events, WALLET_EVENTS::S_LINE);
 
     for (auto &ln : lns) {
         if (ln.message.startsWith("New Swap Trade created:")) {
             QString swapId = ln.message.mid(strlen("New Swap Trade created:")).trimmed();
-            wallet713->setCreateNewSwapTrade(swapId, "");
+            wallet713->setCreateNewSwapTrade( tag, dryRun, params, swapId, "");
             return true;
         }
     }
 
-    wallet713->setCreateNewSwapTrade("", getErrorMessage(events, "Unable to create a new Swap Trade"));
+    wallet713->setCreateNewSwapTrade(tag, dryRun, params, "", getErrorMessage(events, "Unable to create a new Swap Trade"));
     return true;
 }
 

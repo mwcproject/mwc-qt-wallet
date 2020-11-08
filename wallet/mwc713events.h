@@ -37,8 +37,8 @@ enum WALLET_EVENTS {
     S_PASSWORD_ERROR=4, // Incorrect password error
     S_NEED2UNLOCK=5, // Need to unlock with password and optional account
     S_GENERIC_ERROR=7, // error printed by wallet           Message: error
-    S_GENERIC_WARNING=8, // error printed by wallet           Message: error
-    S_GENERIC_INFO=9, // error printed by wallet           Message: error
+    S_GENERIC_WARNING=8, // warning printed by wallet           Message: error
+    S_GENERIC_INFO=9, // info printed by wallet           Message: error
     S_YOUR_MWC_ADDRESS=11, // Your mwc address/Your mwcmq address:...  Message: address
     S_MWC_ADDRESS_INDEX = 12, // Derived with index [7]     Message: index
     S_NODE_API_ERROR = 13, // NODE api returns error

@@ -233,6 +233,7 @@ void Transactions::updateData() {
 }
 
 void Transactions::richButtonPressed(control::RichButton * button, QString coockie) {
+    Q_UNUSED(button)
     QStringList res = coockie.split(':');
     if (res.size()<2) {
         Q_ASSERT(false);

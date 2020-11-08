@@ -37,7 +37,6 @@ public:
 
 private:
     void updateButtons(bool first_call = false);
-    QString getCommunicationMethod() const;
     bool isCanUpdate() const;
 
 private slots:
@@ -47,30 +46,20 @@ private slots:
                                   QVector<QString> tradeJournal,
                                   QString errMsg );
     void sgnUpdateXXX(QString swapId, QString errorMsg);
-    void sgnCancelTrade(QString swapId, QString error);
 
     void on_redeemAddressEdit_textEdited(const QString &arg1);
     void on_secondaryFeeEdit_textEdited(const QString &arg1);
-    void on_mwcmqsRadio_toggled(bool checked);
-    void on_torRadio_toggled(bool checked);
-    void on_destinationEdit_textEdited(const QString &arg1);
     void on_updateBtn_clicked();
     void on_tradeDetailsBtn_clicked();
-    void on_startButton_clicked();
-    void on_stopButton_clicked();
     void on_backButton_clicked();
-    void on_cancelButton_clicked();
 
 private:
     Ui::EditSwap *ui;
     bridge::Swap * swap = nullptr;
     QString swapId;
-    bool seller = true;
     QString redeemAddress;
     QString secondaryCurrency;
     QString secondaryFee;
-    QString communicationMethod;
-    QString communicaitonAddress;
 };
 
 }

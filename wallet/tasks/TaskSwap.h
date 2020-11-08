@@ -77,11 +77,11 @@ private:
 // Create new swap trade
 class TaskCreateNewSwapTrade : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 1000*15;
+    const static int64_t TIMEOUT = 1000*45; // In case of network issues, it will take time for retry
 
     TaskCreateNewSwapTrade( MWC713 *wallet713,
                             int min_confirmations,
-                            double mwc, double btc, QString secondary,
+                            QString mwcAmount, QString  secAmount, QString secondary,
                             QString redeemAddress,
                             bool sellerLockFirst,
                             int messageExchangeTimeMinutes,
@@ -89,27 +89,43 @@ public:
                             int mwcConfirmationNumber,
                             int secondaryConfirmationNumber,
                             QString communicationMethod,
-                            QString communicationAddress ) :
+                            QString communicationAddress,
+                            QString electrum_uri1,
+                            QString electrum_uri2,
+                            bool _dryRun,
+                            QString _tag,
+                            QVector<QString> _params ) :
             Mwc713Task("TaskCreateNewSwapTrade",
-                       "swap_start --message_exchange_time " + QString::number(messageExchangeTimeMinutes) +
-                           " --min_conf " + QString::number(min_confirmations) +
-                           " --mwc_amount " + QString::number(mwc) +
-                           " --mwc_confirmations " + QString::number(mwcConfirmationNumber) +
-                           " --secondary_confirmations " + QString::number(secondaryConfirmationNumber) +
-                           " --redeem_time " + QString::number(redeemTimeMinutes) +
-                           " --secondary_address " + redeemAddress +
-                           " --secondary_amount " + QString::number(btc) +
-                           " --secondary_currency " + secondary +
-                           " --method " + communicationMethod +
-                           " --dest " + communicationAddress +
-                           " --who_lock_first " + (sellerLockFirst ? "seller" : "buyer"),
-                           wallet713, "") {}
+                       generateCommandLine(min_confirmations,mwcAmount, secAmount, secondary,
+                                    redeemAddress, sellerLockFirst, messageExchangeTimeMinutes,
+                                    redeemTimeMinutes, mwcConfirmationNumber, secondaryConfirmationNumber,
+                                    communicationMethod, communicationAddress, electrum_uri1,
+                                    electrum_uri2, _dryRun),
+                       wallet713, ""), tag(_tag), dryRun(_dryRun), params(_params) {}
 
     virtual ~TaskCreateNewSwapTrade() override {}
 
     virtual bool processTask(const QVector<WEvent> &events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    QString generateCommandLine(int min_confirmations,
+                                QString mwcAmount, QString  secAmount, QString secondary,
+                                QString redeemAddress,
+                                bool sellerLockFirst,
+                                int messageExchangeTimeMinutes,
+                                int redeemTimeMinutes,
+                                int mwcConfirmationNumber,
+                                int secondaryConfirmationNumber,
+                                QString communicationMethod,
+                                QString communicationAddress,
+                                QString electrum_uri1,
+                                QString electrum_uri2,
+                                bool dryRun) const;
+
+    QString tag;
+    bool dryRun;
+    QVector<QString> params;
 };
 
 // Cancel swap trade.

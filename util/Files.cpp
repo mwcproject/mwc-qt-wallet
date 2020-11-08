@@ -21,7 +21,7 @@ namespace util {
 QStringList readTextFile( QString fileName, bool trimmed, bool cleanEMptyLines, std::function<void()> openOpenErrorCallback ) {
     QFile file(fileName);
     QStringList res;
-    if (!file.open(QFile::ReadOnly)) {
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
         openOpenErrorCallback();
         return res;
     }

@@ -164,7 +164,7 @@ private:
 // node info command
 class TaskNodeInfo: public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 30000;
+    const static int64_t TIMEOUT = 1000 * 45;
 
     TaskNodeInfo( MWC713 * wallet713) :
             Mwc713Task("TaskNodeInfo","nodeinfo", wallet713, "") {}

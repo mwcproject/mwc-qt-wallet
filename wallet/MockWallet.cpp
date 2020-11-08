@@ -519,22 +519,27 @@ void MockWallet::deleteSwapTrade(QString swapId) {
 }
 
 // Create a new Swap trade deal.
-// Check Signal: void onCreateNewSwapTrade(QString swapId, QString err);
-void MockWallet::createNewSwapTrade(
-        int min_confirmations, // minimum number of confimations
-        double mwc, double btc, QString secondary,
-        QString redeemAddress,
-        bool sellerLockFirst,
-        int messageExchangeTimeMinutes,
-        int redeemTimeMinutes,
-        int mwcConfirmationNumber,
-        int secondaryConfirmationNumber,
-        QString communicationMethod,
-        QString communicationAddress ) {
-
+// Check Signal: void onCreateNewSwapTrade(tag, dryRun, QString swapId, QString err);
+void MockWallet::createNewSwapTrade(QString account,
+                                    int min_confirmations, // minimum number of confimations
+                                    QString mwcAmount, QString secAmount, QString secondary,
+                                    QString redeemAddress,
+                                    bool sellerLockFirst,
+                                    int messageExchangeTimeMinutes,
+                                    int redeemTimeMinutes,
+                                    int mwcConfirmationNumber,
+                                    int secondaryConfirmationNumber,
+                                    QString communicationMethod,
+                                    QString communicationAddress,
+                                    QString electrum_uri1,
+                                    QString electrum_uri2,
+                                    bool dryRun,
+                                    QString tag,
+                                    QVector<QString> params ) {
+    Q_UNUSED(account)
     Q_UNUSED(min_confirmations)
-    Q_UNUSED(mwc)
-    Q_UNUSED(btc)
+    Q_UNUSED(mwcAmount)
+    Q_UNUSED(secAmount)
     Q_UNUSED(secondary)
     Q_UNUSED(redeemAddress)
     Q_UNUSED(sellerLockFirst)
@@ -544,8 +549,10 @@ void MockWallet::createNewSwapTrade(
     Q_UNUSED(secondaryConfirmationNumber)
     Q_UNUSED(communicationMethod)
     Q_UNUSED(communicationAddress)
+    Q_UNUSED(electrum_uri1);
+    Q_UNUSED(electrum_uri2);
 
-    emit onCreateNewSwapTrade("XXXXX-new-trade-id-XXXXX", "");
+    emit onCreateNewSwapTrade(tag, dryRun, params, "XXXXX-new-trade-id-XXXXX", "");
 }
 
 // Cancel the trade

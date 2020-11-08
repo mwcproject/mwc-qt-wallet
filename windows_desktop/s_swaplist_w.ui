@@ -516,7 +516,7 @@ Please note, swap trade files are encrypted, so you can only restore it to the s
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>411</width>
+          <width>40</width>
           <height>20</height>
          </size>
         </property>
@@ -618,15 +618,15 @@ Please note, swap trade files are encrypted, so you can only restore it to the s
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcPushButtonRound</class>
-   <extends>QPushButton</extends>
-   <header>control_desktop/MwcPushButton.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::RichVBox</class>
    <extends>QWidget</extends>
    <header>control_desktop/richvbox.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcPushButtonRound</class>
+   <extends>QPushButton</extends>
+   <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcToolButtonUnderscore</class>

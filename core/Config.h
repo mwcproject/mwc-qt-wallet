@@ -50,8 +50,6 @@ void setMwcGuiWalletConf( QString conf );
  * @param timeoutMultiplier     - Multiplier for jobs timeouts. Default is 1.0
  */
 void setConfigData(WALLET_RUN_MODE runMode, QString mwcPath, QString wallet713path, QString mwczipPath,
-                   QString airdropUrlMainNetUrl, QString airdropUrlTestNetUrl,
-                   QString hodlUrlMainNetUrl, QString hodlUrlTestNetUrl,
                    int64_t logoutTimeMs,
                    double timeoutMultiplier,
                    int sendTimeoutMs);
@@ -67,10 +65,6 @@ const QString & getMwcGuiWalletConf();
 const QString & getMwcPath(); // Not using now because so far there is no local node is running
 const QString & getWallet713path();
 const QString & getMwcZipPath();
-const QString & getAirdropMainNetUrl();
-const QString & getAirdropTestNetUrl();
-const QString & getHodlMainNetUrl();
-const QString & getHodlTestNetUrl();
 
 int64_t         getLogoutTimeMs();
 void         setLogoutTimeMs(int64_t timeMs);

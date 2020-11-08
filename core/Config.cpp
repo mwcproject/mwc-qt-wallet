@@ -22,10 +22,6 @@ static QString mwcGuiWalletConf;
 static QString mwcPath;
 static QString mwczipPath;
 static QString wallet713path;
-static QString airdropUrlMainNetUrl;
-static QString airdropUrlTestNetUrl;
-static QString hodlUrlMainNetUrl;
-static QString hodlUrlTestNetUrl;
 static int64_t logoutTimeMs = 1000*60*15; // 15 minutes is default
 static double  timeoutMultiplier = 1.0;
 static int     sendTimeoutMs = 60000; // 1 minute
@@ -58,16 +54,12 @@ void setMwcGuiWalletConf( QString conf ) {
  * COnfiguration for mwc-mq-wallet
  * @param mwcPath               - path to mwc-node.  Not used now
  * @param wallet713path         - path to mwc713
- * @param airdropUrlMainNetUrl  - Airdrop server claims URL for main net
- * @param airdropUrlTestNetUrl  - Airdrop server claims URL for floo net
  * @param logoutTimeMs          - Automatic locking for the wallet
  * @param timeoutMultiplier     - Multiplier for jobs timeouts. Default is 1.0
  * @param useMwcMqS             - true: use mwc mqs for slates exchange.  false: using mwc mq (non secure grin box) for slates exchange
  * @param sendTimeoutMs         - timeout for mwc mq send. Expected that 2nd party is online. Otherwise we will ask user if he want to stop waiting and cancel transaction.
  */
 void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet713path, QString _mwczipPath,
-                   QString _airdropUrlMainNetUrl, QString _airdropUrlTestNetUrl,
-                   QString _hodlUrlMainNetUrl, QString _hodlUrlTestNetUrl,
                    int64_t  _logoutTimeMs,
                    double _timeoutMultiplier,
                    int _sendTimeoutMs) {
@@ -84,10 +76,6 @@ void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet71
         mwczipPath = _mwczipPath;
     }
 
-    airdropUrlMainNetUrl = _airdropUrlMainNetUrl;
-    airdropUrlTestNetUrl = _airdropUrlTestNetUrl;
-    hodlUrlMainNetUrl = _hodlUrlMainNetUrl;
-    hodlUrlTestNetUrl = _hodlUrlTestNetUrl;
     logoutTimeMs = _logoutTimeMs;
     timeoutMultiplier = _timeoutMultiplier;
     sendTimeoutMs = _sendTimeoutMs;
@@ -105,11 +93,6 @@ const QString & getMwcGuiWalletConf() {return mwcGuiWalletConf;}
 const QString & getMwcPath() {return mwcPath;}
 const QString & getWallet713path() {return wallet713path;}
 const QString & getMwcZipPath() {return mwczipPath;}
-const QString & getAirdropMainNetUrl() {return airdropUrlMainNetUrl;}
-const QString & getAirdropTestNetUrl() {return airdropUrlTestNetUrl;}
-
-const QString & getHodlMainNetUrl() { return hodlUrlMainNetUrl;}
-const QString & getHodlTestNetUrl() { return hodlUrlTestNetUrl;}
 
 int64_t         getLogoutTimeMs() {return logoutTimeMs;}
 void         setLogoutTimeMs(int64_t timeMs) {logoutTimeMs = timeMs;}
@@ -142,8 +125,6 @@ QString toString() {
             "wallet713path=" + wallet713path + "\n" +
             "sendTimeoutMs=" + QString::number(sendTimeoutMs) + "\n" +
             "run_mode=" + runModeStr + "\n" +
-            "airdropUrlMainNetUrl=" + airdropUrlMainNetUrl + "\n" +
-            "airdropUrlTestNetUrl=" + airdropUrlTestNetUrl + "\n" +
             "timeoutMultiplier=" + QString::number(timeoutMultiplier) + "\n" +
             "logoutTimeMs=" + QString::number(logoutTimeMs);
 }

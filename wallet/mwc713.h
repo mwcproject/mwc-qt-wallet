@@ -276,10 +276,10 @@ public:
     virtual void deleteSwapTrade(QString swapId) override;
 
     // Create a new Swap trade deal.
-    // Check Signal: void onCreateNewSwapTrade(QString swapId);
-    virtual void createNewSwapTrade(
+    // Check Signal: void onCreateNewSwapTrade(tag, dryRun, QVector<QString> params, QString swapId, QString err);
+    virtual void createNewSwapTrade(QString account,
                                     int min_confirmations, // minimum number of confimations
-                                    double mwc, double btc, QString secondary,
+                                    QString mwcAmount, QString secAmount, QString secondary,
                                     QString redeemAddress,
                                     bool sellerLockFirst,
                                     int messageExchangeTimeMinutes,
@@ -287,7 +287,12 @@ public:
                                     int mwcConfirmationNumber,
                                     int secondaryConfirmationNumber,
                                     QString communicationMethod,
-                                    QString communicationAddress ) override;
+                                    QString communicationAddress,
+                                    QString electrum_uri1,
+                                    QString electrum_uri2,
+                                    bool dryRun,
+                                    QString tag,
+                                    QVector<QString> params ) override;
 
     // Cancel the trade
     // Check Signal: void onCancelSwapTrade(QString swapId, QString error);
@@ -434,7 +439,7 @@ public:
 
     void setRequestSwapTrades(QVector<SwapInfo> swapTrades, QString error);
     void setDeleteSwapTrade(QString swapId, QString errMsg);
-    void setCreateNewSwapTrade(QString swapId, QString errMsg);
+    void setCreateNewSwapTrade( QString tag, bool dryRun, QVector<QString> params, QString swapId, QString errMsg );
     void setCancelSwapTrade(QString swapId, QString errMsg);
     void setRequestTradeDetails( SwapTradeInfo swap,
                                 QVector<SwapExecutionPlanRecord> executionPlan,

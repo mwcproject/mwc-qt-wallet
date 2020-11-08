@@ -197,6 +197,8 @@ public:
     bool getSwapEnforceBackup() const {return swapEnforceBackup;}
     void setSwapEnforceBackup(bool doBackup);
 
+    QString getLastUsedSwapCurrency() const {return lastUsedSwapCurrency;}
+    void    setLastUsedSwapCurrency(const QString & currency) {lastUsedSwapCurrency = currency;}
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -296,6 +298,9 @@ private:
 
     // Enforce a backup for the swaps. Before lock stage user will be asked to save the trade file somewhere
     bool swapEnforceBackup = true;
+
+    // Last used currency for swaps
+    QString lastUsedSwapCurrency;
 };
 
 template <class T>

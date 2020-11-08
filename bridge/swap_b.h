@@ -32,9 +32,6 @@ public:
     // request the list of swap trades
     Q_INVOKABLE void requestSwapTrades();
 
-    // Switch to New Trade Window
-    Q_INVOKABLE void startNewTrade();
-
     // Cancel the trade. Send signal to the cancel the trade.
     // Trade cancelling might take a while.
     // Response send back with a signal  sgnCancelTrade
@@ -48,26 +45,6 @@ public:
 
     // Deleting swapId. Response will be send back at sgnDeleteSwapTrade
     Q_INVOKABLE void deleteSwapTrade(QString swapId);
-
-    // Get the list of secondary currencies that we are supporting
-    Q_INVOKABLE QVector<QString> getSecondaryCurrencyList();
-
-    // Calculate recommended confirmations number for MWC.
-    Q_INVOKABLE int calcConfirmationsForMwcAmount(double mwcAmount);
-
-    // Get a minimum/maximum possible number of confiormations for the secondary currency.
-    Q_INVOKABLE QVector<int> getConfirmationLimitForSecondary(QString secondaryName);
-
-    // Create a new trade. Response will be send back with a signal
-    Q_INVOKABLE void createNewTrade( double mwc, double btc, QString secondary,
-                                     QString redeemAddress,
-                                     bool sellerLockFirst,
-                                     int messageExchangeTimeMinutes,
-                                     int redeemTimeMinutes,
-                                     int mwcConfirmationNumber,
-                                     int secondaryConfirmationNumber,
-                                     QString communicationMethod,
-                                     QString communicationAddress);
 
     // Requesting all details about the single swap Trade
     // Respond will be with sent back with sgnRequestTradeDetails
@@ -88,12 +65,6 @@ public:
     // Respond will come with sgnUpdateSecondaryFee
     Q_INVOKABLE void updateSecondaryFee(QString swapId, double fee);
 
-    // Start swap processing
-    Q_INVOKABLE void startAutoSwapTrade(QString swapId);
-
-    // Stop swap processing
-    Q_INVOKABLE void stopAutoSwapTrade(QString swapId);
-
     // Backup/export swap trade data into the file
     // Respond with sgnBackupSwapTradeData
     Q_INVOKABLE void backupSwapTradeData(QString swapId, QString backupFileName);
@@ -101,6 +72,59 @@ public:
     // Import/restore swap trade data from the file
     // Respond with sgnRestoreSwapTradeData
     Q_INVOKABLE void restoreSwapTradeData(QString filename);
+
+
+    // Initiate a new trade. So prepare the data and switch to the first new trade panel
+    Q_INVOKABLE void initiateNewTrade();
+
+    // Switch to New Trade Windows
+    Q_INVOKABLE void showNewTrade1();
+    Q_INVOKABLE void showNewTrade2();
+    // Apply params from trade1 and switch to trade2 panel
+    // Response: sgnApplyNewTrade1Params(bool ok, QString errorMessage)
+    Q_INVOKABLE void applyNewTrade1Params(QString account, QString secCurrency, QString mwcAmount, QString secAmount,
+                                          QString secAddress, QString sendToAddress );
+    // Apply params from trade2 panel and switch to the review (panel3)
+    // Response: sgnApplyNewTrade2Params(bool ok, QString errorMessage)
+    Q_INVOKABLE void applyNewTrade2Params(QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks,
+                                          double secTxFee, QString electrumXUrl);
+
+    // Create and start a new swap. The data must be submitted by that moment
+    // Response: sgnCreateStartSwap(bool ok, QString errorMessage)
+    Q_INVOKABLE void createStartSwap();
+
+
+    // Account that is related to this swap trade
+    Q_INVOKABLE QString getAccount();
+
+    // List of the secondary currencies that wallet support
+    Q_INVOKABLE QVector<QString> secondaryCurrencyList();
+
+    // Current selected currency to trade
+    Q_INVOKABLE QString getCurrentSecCurrency();
+    Q_INVOKABLE QString getCurrentSecCurrencyFeeUnits();
+    Q_INVOKABLE void setCurrentSecCurrency(QString secCurrency);
+
+    // Current trade parameters.
+    Q_INVOKABLE QString getMwc2Trade();
+    Q_INVOKABLE QString getSec2Trade();
+    Q_INVOKABLE QString getSecAddress();
+    Q_INVOKABLE bool isLockMwcFirst();
+    Q_INVOKABLE QString getBuyerAddress();
+
+    // Return pairs of the expiration interval combo:
+    // <Interval is string> <Value in minutes>
+    Q_INVOKABLE QVector<QString> getExpirationIntervals();
+
+    Q_INVOKABLE int getOfferExpirationInterval();
+    Q_INVOKABLE int getSecRedeemTime();
+    Q_INVOKABLE double getSecTransactionFee();
+    Q_INVOKABLE int getMwcConfNumber();
+    Q_INVOKABLE int getSecConfNumber();
+    Q_INVOKABLE QString getElectrumXprivateUrl();
+
+    // Calculate the locking time for a NEW not yet created swap offer.
+    Q_INVOKABLE QVector<QString> getLockTime( QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks );
 signals:
     // Result of deleteSwapTrade call.
     void sgnDeleteSwapTrade(QString swapId, QString error);
@@ -111,9 +135,6 @@ signals:
     // Result comes in series of 9 item tuples:
     // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <State>, <initiate_time_interval>, <expire_time_interval>  <secondary_address> >, ....
     void sgnSwapTradesResult( QVector<QString> trades );
-
-    // Response from createNewSwapTrade, SwapId on OK,  errMsg on failure
-    void sgnCreateNewTradeResult( QString swapId, QString errMsg);
 
     // Response from requestTradeDetails call
     // swapInfo data
@@ -162,10 +183,18 @@ signals:
     // Import/restore swap trade data from the file
     // Respond from restoreSwapTradeData
     void sgnRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
+
+    // Response from ApplyNewTrade1Params
+    void sgnApplyNewTrade1Params(bool ok, QString errorMessage);
+    // Response from ApplyNewTrade2Params
+    void sgnApplyNewTrade2Params(bool ok, QString errorMessage);
+    // Response from ApplyNewTrade2Params
+    void sgnCreateStartSwap(bool ok, QString errorMessage);
+
 private slots:
     void onRequestSwapTrades(QVector<wallet::SwapInfo> swapTrades);
     void onDeleteSwapTrade(QString swapId, QString errMsg);
-    void onCreateNewSwapTrade(QString swapId, QString errMsg);
+    void onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> params, QString swapId, QString errMsg);
     void onCancelSwapTrade(QString swapId, QString error);
     void onRequestTradeDetails( wallet::SwapTradeInfo swap,
                                 QVector<wallet::SwapExecutionPlanRecord> executionPlan,
@@ -183,6 +212,7 @@ private slots:
     void onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage);
     void onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
 
+    void onCreateStartSwap(bool ok, QString errorMessage);
 };
 
 }

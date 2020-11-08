@@ -282,18 +282,23 @@ public:
     virtual void deleteSwapTrade(QString swapId) override;
 
     // Create a new Swap trade deal.
-    // Check Signal: void onCreateNewSwapTrade(QString swapId);
-    virtual void createNewSwapTrade(
-            int min_confirmations, // minimum number of confimations
-            double mwc, double btc, QString secondary,
-            QString redeemAddress,
-            bool sellerLockFirst,
-            int messageExchangeTimeMinutes,
-            int redeemTimeMinutes,
-            int mwcConfirmationNumber,
-            int secondaryConfirmationNumber,
-            QString communicationMethod,
-            QString communicationAddress ) override;
+    // Check Signal: void onCreateNewSwapTrade(tag, dryRun, QVector<QString> params, QString swapId, QString err);
+    virtual void createNewSwapTrade(QString account,
+                                    int min_confirmations, // minimum number of confimations
+                                    QString mwcAmount, QString secAmount, QString secondary,
+                                    QString redeemAddress,
+                                    bool sellerLockFirst,
+                                    int messageExchangeTimeMinutes,
+                                    int redeemTimeMinutes,
+                                    int mwcConfirmationNumber,
+                                    int secondaryConfirmationNumber,
+                                    QString communicationMethod,
+                                    QString communicationAddress,
+                                    QString electrum_uri1,
+                                    QString electrum_uri2,
+                                    bool dryRun,
+                                    QString tag,
+                                    QVector<QString> params ) override;
 
     // Cancel the trade
     // Check Signal: void onCancelSwapTrade(QString swapId, QString error);

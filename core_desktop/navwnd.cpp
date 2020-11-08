@@ -54,6 +54,11 @@ void NavWnd::resizeEvent(QResizeEvent *event) {
     }
 }
 
+void NavWnd::setPageTitle(QString title) {
+    if (panelTitle)
+        panelTitle->setTitle(title);
+}
+
 
 }
 

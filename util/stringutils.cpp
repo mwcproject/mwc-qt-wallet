@@ -113,9 +113,6 @@ QPair<bool,int64_t> one2nano(QString str) {
 
 // Trim string that represent double. 23434.32345, len 7 => 23434.32; 23434.32345, len 5 => 23434
 QString trimStrAsDouble(const QString & dblStr, int maxLen) {
-    if (dblStr.size() < maxLen)
-        return dblStr;
-
     QString res = dblStr;
     int ptIdx = res.indexOf('.');
     if (ptIdx<=0)
@@ -278,7 +275,7 @@ QString interval2String(int64_t intervalSec, bool shortUnits, int tiers) {
         intervalSec %= 3600;
     }
     else if (min>0) {
-        res = QString::number(hrs) + (shortUnits ? "m" : " min");
+        res = QString::number(min) + (shortUnits ? "m" : " min");
         intervalSec %= 60;
     }
     else {

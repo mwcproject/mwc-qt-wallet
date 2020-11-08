@@ -7,6 +7,9 @@ static QString currentTitle;
 static PanelTitle * currentWnd = nullptr;
 
 void setCurrentTitle(const QString & title) {
+    if (title.isEmpty())
+        return;
+
     currentTitle = title;
     if (currentWnd)
         currentWnd->setTitle(currentTitle);

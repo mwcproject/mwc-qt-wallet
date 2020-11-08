@@ -135,6 +135,7 @@ void WalletConfig::updateAutoStartMQSEnabled(bool enabled) {
     getState()->updateAutoStartMQSEnabled(enabled);
 }
 void WalletConfig::updateAutoStartKeybaseEnabled(bool enabled) {
+    Q_UNUSED(enabled);
     Q_ASSERT(false); // absolete code
 }
 

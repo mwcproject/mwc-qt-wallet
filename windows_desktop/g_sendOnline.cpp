@@ -17,7 +17,6 @@
 #include "../dialogs_desktop/sendcoinsparamsdialog.h"
 #include "../control_desktop/messagebox.h"
 #include "../util_desktop/timeoutlock.h"
-#include "../dialogs_desktop/g_sendconfirmationdlg.h"
 #include "../dialogs_desktop/w_selectcontact.h"
 #include "../bridge/util_b.h"
 #include "../bridge/config_b.h"

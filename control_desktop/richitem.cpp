@@ -155,18 +155,21 @@ void RichItem::keyPressEvent(QKeyEvent *event) {
 //  Helpers
 
 // Create Mark + v layout that ready to accept the rows
-RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked ) {
+RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked, int leftMarkSize,
+                            int leftMarkSpacing,
+                            int vboxSpacing,
+                            int vboxMargin ) {
     control::RichItem * itm = new control::RichItem( itemId, parent);
 
     // Level Indicator
-    itm->hbox().setSpacing(control::LEFT_MARK_SPACING)
-            .setContentsMargins(0, 0, control::LEFT_MARK_SIZE + control::LEFT_MARK_SPACING, 0)
+    itm->hbox().setSpacing(leftMarkSpacing)
+            .setContentsMargins(0, 0, leftMarkSize + leftMarkSpacing, 0)
             .addWidget( new QWidget(itm) )
-            .setFixedWidth( control::LEFT_MARK_SIZE )
+            .setFixedWidth( leftMarkSize )
             .setWidgetStyleSheet(marked ? control::LEFT_MARK_ON : control::LEFT_MARK_OFF);
 
-    itm->vbox().setSpacing(VBOX_SPACING)
-            .setContentsMargins(0, VBOX_MARGIN, 0, VBOX_MARGIN);
+    itm->vbox().setSpacing(vboxSpacing)
+            .setContentsMargins(0, vboxMargin, 0, vboxMargin);
 
     return itm;
 }

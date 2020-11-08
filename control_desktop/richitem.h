@@ -91,7 +91,11 @@ private:
 // Helpers, Control builder
 
 // Create Mark + v layout that ready to accept the rows
-RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked );
+RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked,
+                            int leftMarkSize = LEFT_MARK_SIZE,
+                            int leftMarkSpacing = LEFT_MARK_SPACING,
+                            int vboxSpacing = VBOX_SPACING,
+                            int vboxMargin = VBOX_MARGIN );
 
 // Create a lable with a text
 QLabel *  createLabel( control::RichItem * parent, bool wordwrap, bool lowLight, QString text, int fontSize = FONT_NORMAL );

@@ -92,5 +92,7 @@
         <file>img/iconCoinbase@2x.svg</file>
         <file>img/iconClose@2x.svg</file>
         <file>img/swap@2x.svg</file>
+        <file>resource/notification_mappers.txt</file>
+        <file>resource/mwc713_mappers.txt</file>
     </qresource>
 </RCC>

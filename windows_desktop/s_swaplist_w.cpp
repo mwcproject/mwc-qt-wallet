@@ -100,7 +100,7 @@ void SwapList::onItemActivated(QString id) {
 }
 
 void SwapList::on_newTradeButton_clicked() {
-    swap->startNewTrade();
+    swap->initiateNewTrade();
 }
 
 void SwapList::sgnSwapTradesResult(QVector<QString> trades) {
@@ -157,7 +157,7 @@ void SwapList::updateTradeListData() {
         // are close to expiration and require the backup...
         const bool marked = false;
 
-        // Here we have only Hirizontal layout. I tis simple and swap related only.
+        // Here we have only Hirizontal layout. It is simple and swap related only.
         control::RichItem *itm = control::createMarkedItem(sw.tradeId, ui->swapsTable, marked);
 
         { // first line...
@@ -186,7 +186,7 @@ void SwapList::updateTradeListData() {
 
             if (!sw.expirationTimeInterval.isEmpty())
                 itm->addWidget(control::createLabel(itm, false, true,
-                                                    "expires " + sw.initiatedTimeInterval + " ago")).setMinWidth(120);
+                                                    "expires in " + sw.expirationTimeInterval)).setMinWidth(120);
 
             itm->pop();
         }

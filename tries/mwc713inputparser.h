@@ -18,6 +18,7 @@
 #include "inputparser.h"
 #include <QObject>
 #include "../wallet/mwc713events.h"
+#include "../core/MessageMapper.h"
 
 namespace tries {
 
@@ -67,6 +68,8 @@ signals:
 
 protected:
     InputParser parser; // Work horse that is parsing all inputs
+    notify::MessageMapper msgMapper;
+
 };
 
 }

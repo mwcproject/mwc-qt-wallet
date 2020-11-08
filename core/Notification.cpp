@@ -19,6 +19,7 @@
 #include <QSet>
 #include <QVector>
 #include "WndManager.h"
+#include "MessageMapper.h"
 
 namespace notify {
 
@@ -45,7 +46,6 @@ void addFalseMessage(const QString & msg) {
 void remeoveFalseMessage(const QString & msg) {
     falseMessages.remove(msg);
 }
-
 
 const int MESSAGE_SIZE_LIMIT = 1000;
 static QVector<NotificationMessage> notificationMessages;
@@ -134,6 +134,14 @@ void appendNotificationMessage( MESSAGE_LEVEL level, QString message ) {
 
     if (falseMessages.contains(message)) {
         return;
+    }
+
+    static MessageMapper msgMapper(":/resource/notification_mappers.txt");
+
+    QString m = msgMapper.processMessage(message);
+    if (m != message) {
+        logger::logInfo("Notification", "Message is updated: " + m );
+        message = m;
     }
 
     if (level == MESSAGE_LEVEL::FATAL_ERROR) {

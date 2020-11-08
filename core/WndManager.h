@@ -100,7 +100,9 @@ public:
 
     // Swap pages
     virtual void pageSwapList() = 0;
-    virtual void pageSwapNew() = 0;
+    virtual void pageSwapNew1() = 0;
+    virtual void pageSwapNew2() = 0;
+    virtual void pageSwapNew3() = 0;
     virtual void pageSwapEdit(QString swapId) = 0;
     virtual void pageSwapTradeDetails(QString swapId) = 0;
 

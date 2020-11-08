@@ -44,7 +44,9 @@
 #include "../windows_desktop/y_selectmode_w.h"
 #include "../windows_desktop/s_swaplist_w.h"
 #include "../windows_desktop/s_editswap_w.h"
-#include "../windows_desktop/s_newswap_w.h"
+#include "../windows_desktop/s_newswap1_w.h"
+#include "../windows_desktop/s_newswap2_w.h"
+#include "../windows_desktop/s_newswap3_w.h"
 #include "../windows_desktop/s_tradedetails_w.h"
 #include <QFileDialog>
 #include "../core/WalletApp.h"
@@ -286,17 +288,27 @@ void DesktopWndManager::pageSwapList() {
     windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_LIST,
         new wnd::SwapList( windowManager->getInWndParent()));
 }
-void DesktopWndManager::pageSwapNew() {
-    windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_NEW,
-        new wnd::NewSwap( windowManager->getInWndParent()));
+
+void DesktopWndManager::pageSwapNew1() {
+    windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_NEW + " 1/3",
+                                     new wnd::NewSwap1( windowManager->getInWndParent()));
+}
+
+void DesktopWndManager::pageSwapNew2() {
+    windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_NEW + " 2/3",
+                                     new wnd::NewSwap2( windowManager->getInWndParent()));
+}
+void DesktopWndManager::pageSwapNew3() {
+    windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_NEW + " 3/3",
+                                     new wnd::NewSwap3( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageSwapEdit(QString swapId) {
-    windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_EDIT,
+    windowManager->switchToWindowEx( "",
          new wnd::EditSwap( windowManager->getInWndParent(), swapId));
 }
 void DesktopWndManager::pageSwapTradeDetails(QString swapId) {
-    windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_DETAILS,
+    windowManager->switchToWindowEx( "",
          new wnd::TradeDetails( windowManager->getInWndParent(), swapId));
 }
 

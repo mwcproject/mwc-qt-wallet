@@ -21,7 +21,7 @@
 #include "../tries/mwc713inputparser.h"
 #include "mwc713events.h"
 #include <QApplication>
-#include <core/Notification.h>
+#include "core/Notification.h"
 #include "tasks/TaskStarting.h"
 #include "tasks/TaskWallet.h"
 #include "tasks/TaskListening.h"
@@ -33,9 +33,7 @@
 #include "tasks/TaskTransaction.h"
 #include "tasks/TaskSwap.h"
 #include "../util/Log.h"
-#include "../core/global.h"
 #include "../core/appcontext.h"
-#include "../core/Config.h"
 #include "../util/ConfigReader.h"
 #include "../util/Files.h"
 #include "../util/Process.h"
@@ -826,10 +824,10 @@ void MWC713::deleteSwapTrade(QString swapId) {
 }
 
 // Create a new Swap trade deal.
-// Check Signal: void onCreateNewSwapTrade(QString swapId);
-void MWC713::createNewSwapTrade(
+// Check Signal: void onCreateNewSwapTrade(tag, dryRun, QVector<QString> params, QString swapId, QString err);
+void MWC713::createNewSwapTrade(QString account,
                                 int min_confirmations, // minimum number of confimations
-                                double mwc, double btc, QString secondary,
+                                QString mwcAmount, QString secAmount, QString secondary,
                                 QString redeemAddress,
                                 bool sellerLockFirst,
                                 int messageExchangeTimeMinutes,
@@ -837,10 +835,17 @@ void MWC713::createNewSwapTrade(
                                 int mwcConfirmationNumber,
                                 int secondaryConfirmationNumber,
                                 QString communicationMethod,
-                                QString communicationAddress ) {
+                                QString communicationAddress,
+                                QString electrum_uri1,
+                                QString electrum_uri2,
+                                bool dryRun,
+                                QString tag,
+                                QVector<QString> params ) {
+
+    eventCollector->addTask( new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT );
 
     eventCollector->addTask(new TaskCreateNewSwapTrade(this, min_confirmations, // minimum number of confimations
-                                                       mwc, btc, secondary,
+                                                       mwcAmount, secAmount, secondary.toLower(),
                                                        redeemAddress,
                                                        sellerLockFirst,
                                                        messageExchangeTimeMinutes,
@@ -848,7 +853,13 @@ void MWC713::createNewSwapTrade(
                                                        mwcConfirmationNumber,
                                                        secondaryConfirmationNumber,
                                                        communicationMethod,
-                                                       communicationAddress), TaskCreateNewSwapTrade::TIMEOUT);
+                                                       communicationAddress,
+                                                       electrum_uri1,
+                                                       electrum_uri2,
+                                                       dryRun, tag, params), TaskCreateNewSwapTrade::TIMEOUT);
+
+    if (account!=currentAccount)
+        eventCollector->addTask( new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT );
 }
 
 // Cancel the trade
@@ -1477,9 +1488,9 @@ void MWC713::setDeleteSwapTrade(QString swapId, QString errMsg) {
     emit onDeleteSwapTrade( swapId, errMsg );
 }
 
-void MWC713::setCreateNewSwapTrade(QString swapId, QString errMsg) {
-    logger::logEmit("MWC713", "onCreateNewSwapTrade", swapId + ", " + errMsg );
-    emit onCreateNewSwapTrade( swapId, errMsg );
+void MWC713::setCreateNewSwapTrade( QString tag, bool dryRun, QVector<QString> params, QString swapId, QString errMsg ) {
+    logger::logEmit("MWC713", "onCreateNewSwapTrade", tag + ", " + (dryRun?"dryRun:ON, ":"") + swapId + ", " + errMsg );
+    emit onCreateNewSwapTrade( tag, dryRun, params, swapId, errMsg );
 
 }
 

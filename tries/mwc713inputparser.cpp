@@ -22,7 +22,9 @@
 
 namespace tries {
 
-Mwc713InputParser::Mwc713InputParser() {
+Mwc713InputParser::Mwc713InputParser() :
+        msgMapper(":/resource/mwc713_mappers.txt")
+{
     initWalletReady();
     initWelcome();
     initInit();
@@ -60,6 +62,14 @@ void Mwc713InputParser::processInput(QString message) {
         }
 
         wallet::WALLET_EVENTS evt = (wallet::WALLET_EVENTS) res.parserId;
+
+        if (evt == wallet::WALLET_EVENTS::S_GENERIC_ERROR || evt == wallet::WALLET_EVENTS::S_GENERIC_WARNING || evt == wallet::WALLET_EVENTS::S_GENERIC_INFO) {
+            QString m = msgMapper.processMessage(message);
+            if (m != message) {
+                qDebug() << "Message is updated to " << m;
+                message = m;
+            }
+        }
 
         logger::logParsingEvent( evt, message );
 

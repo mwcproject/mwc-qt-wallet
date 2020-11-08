@@ -39,7 +39,6 @@ QVector<QString> Accounts::getAccountsBalancesToShow() {
     wallet::Wallet * wallet = state::getStateContext()->wallet;
 
     QVector<wallet::AccountInfo> accounts = wallet->getWalletBalance();
-    const QMap<QString, QVector<wallet::WalletOutput> > & walletOutputs = wallet->getwalletOutputs();
     QVector<QString> result;
 
     for (auto & acc : accounts) {
