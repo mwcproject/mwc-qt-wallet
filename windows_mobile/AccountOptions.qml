@@ -17,8 +17,10 @@ Item {
         id: wallet
     }
 
-    function showPassphraseCallback(ret) {
-        stateMachine.activateShowSeed(passwordHash)
+    function showPassphraseCallback(ret, password) {
+        if (ret) {
+            stateMachine.activateShowSeed(password)
+        }
     }
 
     Button {
@@ -110,5 +112,10 @@ Item {
         onClicked: {
             console.log("Log Out")
         }
+    }
+
+    MessageBox {
+        id: messagebox
+        anchors.verticalCenter: parent.verticalCenter
     }
 }

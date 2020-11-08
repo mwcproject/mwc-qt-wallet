@@ -217,7 +217,7 @@ Item {
 
             onClicked: {
                 messagebox.visible = false
-                callback(true)
+                callback(true, textfield_password.text)
             }
         }
 
