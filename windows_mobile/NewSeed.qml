@@ -19,13 +19,12 @@ Item {
 
     Connections {
         target: newSeed
-        onSgnShowSeedData: {
-            console.log("Retrieving seeds from mwc713: ", seed)
-//            if (seed.size()<2) {
-//                control::MessageBox::messageText( this, "Getting Passphrase Failure", "Unable to retrieve a passphrase from mwc713. " + (seed.size()>0 ? seed[0] : "") );
-//                return;
-//            }
-//            updateSeedData("Mnemonic passphrase:", seed);
+        onSgnShowSeedData: (seed) => {
+            console.log(111, seed)
+            if (seed.length < 2) {
+                messagebox.open(qsTr("Getting Passphrase Failure"), qsTr("Unable to retrieve a passphrase from mwc713. " + (seed.length > 0 ? seed[0] : "")))
+                return;
+            }
         }
     }
 
@@ -77,7 +76,7 @@ Item {
         Text {
             id: text_seed
             color: "#ffffff"
-            text: qsTr("New Seed")
+            text: qsTr("Waiting for the mnemonic passphrase from mwc713...")
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             anchors.top: rect_splitter.bottom
             anchors.topMargin: dp(20)
@@ -108,6 +107,7 @@ Item {
         id: button_next
         height: dp(70)
         width: dp(180)
+        visible: false
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: label_description.bottom
         anchors.topMargin: dp(50)
@@ -130,5 +130,10 @@ Item {
         onClicked: {
             newSeed.doneWithNewSeed()
         }
+    }
+
+    MessageBox {
+        id: messagebox
+        anchors.verticalCenter: parent.verticalCenter
     }
 }

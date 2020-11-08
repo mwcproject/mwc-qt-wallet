@@ -231,6 +231,12 @@ Window {
             visible: currentState === 14
         }
 
+        NewSeed {
+            id: newSeedItem
+            anchors.fill: parent
+            visible: currentState === 16
+        }
+
         SendConfirmation {
             id: sendConfirmationItem
             anchors.verticalCenter: parent.verticalCenter

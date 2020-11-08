@@ -36,6 +36,9 @@ Item {
         case 14:
             text_title.text = qsTr("Wallet  >   Settings   >   Config")
             break
+        case 16:
+            text_title.text = qsTr("Wallet  >   Account Options   >   Passphrase")
+            break
         case 19:
             text_title.text = qsTr("Wallet  >   Finalize")
             break
