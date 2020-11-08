@@ -322,7 +322,16 @@ void MobileWndManager::pageAccountOptions() {
 void MobileWndManager::pageSwapList() {
     Q_ASSERT(false); // implement me
 }
-void MobileWndManager::pageSwapNew() {
+
+void MobileWndManager::pageSwapNew1() {
+    Q_ASSERT(false); // implement me
+}
+
+void MobileWndManager::pageSwapNew2() {
+    Q_ASSERT(false); // implement me
+}
+
+void MobileWndManager::pageSwapNew3() {
     Q_ASSERT(false); // implement me
 }
 

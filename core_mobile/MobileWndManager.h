@@ -96,7 +96,9 @@ public:
 
     // Swap pages
     virtual void pageSwapList() override;
-    virtual void pageSwapNew() override;
+    virtual void pageSwapNew1() override;
+    virtual void pageSwapNew2() override;
+    virtual void pageSwapNew3() override;
     virtual void pageSwapEdit(QString swapId) override;
     virtual void pageSwapTradeDetails(QString swapId) override;
 
