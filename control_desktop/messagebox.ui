@@ -330,13 +330,13 @@ p, li { white-space: pre-wrap; }
       <widget class="control::MwcPushButtonNormal" name="button1">
        <property name="minimumSize">
         <size>
-         <width>140</width>
+         <width>180</width>
          <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>14000</width>
+         <width>180</width>
          <height>40</height>
         </size>
        </property>
@@ -368,13 +368,13 @@ p, li { white-space: pre-wrap; }
       <widget class="control::MwcPushButtonNormal" name="button2">
        <property name="minimumSize">
         <size>
-         <width>140</width>
+         <width>180</width>
          <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>14000</width>
+         <width>180</width>
          <height>40</height>
         </size>
        </property>

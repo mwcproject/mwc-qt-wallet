@@ -80,6 +80,9 @@ Swap::Swap(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onLogout, this, &Swap::onLogout, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onRequestSwapTrades, this, &Swap::onRequestSwapTrades, Qt::QueuedConnection );
 
+    // You get an offer to swap BCH to MWC. SwapID is ffa15dbd-85a9-4fc9-a3c0-4cfdb144862b
+    // Listen to a new swaps...
+
     startTimer(1000); // 1 second timer is fine. Timer is for try.
 
     updateFeesIsNeeded();
@@ -104,8 +107,8 @@ void Swap::pageTradeList() {
 }
 
 // Edit/View Trade Page
-void Swap::viewTrade(QString swapId) {
-    core::getWndManager()->pageSwapEdit(swapId);
+void Swap::viewTrade(QString swapId, QString stateCmd) {
+    core::getWndManager()->pageSwapEdit(swapId, stateCmd);
 }
 
 // Show trade details page
@@ -117,11 +120,22 @@ bool Swap::isTradeRunning(const QString & swapId) const {
     return runningSwaps.contains(swapId);
 }
 
-// Number of trades that are in progress
-int Swap::getRunningTradesNumber() const {
-    return runningSwaps.size();
+QVector<QString> Swap::getRunningTrades() const {
+    QVector<QString> res;
+    for (const auto & sw : runningSwaps)
+        res.append(sw.swapId);
+
+    return res;
 }
 
+QVector<QString> Swap::getRunningCriticalTrades() const {
+    QVector<QString> res;
+    for (const auto & sw : runningSwaps) {
+        if ( context->appContext->getMaxBackupStatus(sw.swapId, bridge::getSwapBackup(sw.stateCmd)) >=2 )
+            res.append(sw.swapId);
+    }
+    return res;
+}
 
 // Run the trade
 void Swap::runTrade(QString swapId, QString statusCmd) {
@@ -159,7 +173,7 @@ void Swap::timerEvent(QTimerEvent *event) {
         int taskBkId = bridge::getSwapBackup(nextTask.stateCmd);
         int expBkId = context->appContext->getSwapBackStatus(nextTask.swapId);
         if (taskBkId > expBkId) {
-            if (context->appContext->getSwapEnforceBackup()) {
+            if (context->appContext->getSwapEnforceBackup() && expBkId==0) {
                 runningSwaps[nextTask.swapId].lastUpdatedTime = LONG_LONG_MAX;
                 // Note, we are in the eventing loop, so modal will create a new one!!!
                 core::getWndManager()->showBackupDlg(nextTask.swapId, taskBkId);
@@ -226,12 +240,16 @@ void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString curre
 }
 
 void Swap::onNewSwapTrade(QString currency, QString swapId) {
-    core::getWndManager()->messageTextDlg("New Swap Offer",
-             "You get a new Swap Offer to Buy " + currency + " coins for your MWC.\nTrade SwapId: " + swapId +
-             "\n\nPlease reviews this offer befo run is and accept. Please check if all details like amounts, lock order, confirmation number are meet your expectations.\n\n"
-             "Please remember that number of confirmations should match the amount.\n"
-             "During the trade process the funds are locked. If other party abandon the trade, your funds will be locked for some time.\n\n"
-             "During the whole wap trade process please keep your wallet online and this trade 'Running'");
+    if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg("New Swap Offer",
+             "You get a new Swap Offer to Buy MWC coins for your "+currency+".\n\nTrade SwapId: " + swapId +
+             "\n\nPlease reviews this offer before accept it. Check if amounts, lock order, confirmation number are meet your expectations.\n\n"
+             "Double check that number of confirmations are matching the amount.",
+             "Will check Later", "Review and Accept",
+             "Later I will switch to the swap page and check it", "Review and Accept the trade now",
+             false, true) ) {
+        // Switching to the review page...
+        viewTrade(swapId, "BuyerOfferCreated");
+    }
 }
 
 // Request latest fees for the coins
@@ -469,6 +487,31 @@ QVector<QString> Swap::getLockTime( QString secCurrency, int offerExpTime, int r
     };
 }
 
+// Accept a new trade and start run it. By that moment the trade must abe reviews and all set
+void Swap::acceptTheTrade(QString swapId) {
+    // Update config...
+    context->appContext->setTradeAcceptedFlag(swapId, true);
+
+    // We want to show the incoming trades
+    context->appContext->setSwapTabSelection(0);
+
+    // Start monitoring
+    runTrade(swapId, "BuyerOfferCreated");
+
+    // Switch to the trades lists
+    pageTradeList();
+}
+
+// Get Tx fee for secondary currency
+double Swap::getSecondaryFee(QString secCurrency) {
+    for (const SecCurrencyInfo & ci : SWAP_CURRENCY_LIST ) {
+        if (ci.currency == secCurrency)
+            return ci.fxFee;
+    }
+
+    return -1.0;
+}
+
 
 // Calculate recommended confirmations number for MWC.
 int Swap::calcConfirmationsForMwcAmount(double mwcAmount) {
@@ -569,7 +612,12 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
     runningSwaps.clear();
 
     for (const wallet::SwapInfo & sw : swapTrades) {
-        if (!bridge::isSwapDone(sw.stateCmd) && !bridge::isSwapWatingToAccept(sw.stateCmd)) {
+
+        bool need2accept = false;
+        if (bridge::isSwapWatingToAccept(sw.stateCmd))
+            need2accept = !context->appContext->isTradeAccepted(sw.swapId);
+
+        if (!bridge::isSwapDone(sw.stateCmd) && !need2accept) {
             runTrade(sw.swapId, sw.stateCmd);
         }
     }

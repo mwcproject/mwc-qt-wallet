@@ -304,9 +304,9 @@ void DesktopWndManager::pageSwapNew3() {
                                      new wnd::NewSwap3( windowManager->getInWndParent()));
 }
 
-void DesktopWndManager::pageSwapEdit(QString swapId) {
+void DesktopWndManager::pageSwapEdit(QString swapId, QString stateCmd) {
     windowManager->switchToWindowEx( "",
-         new wnd::EditSwap( windowManager->getInWndParent(), swapId));
+         new wnd::EditSwap( windowManager->getInWndParent(), swapId, stateCmd));
 }
 void DesktopWndManager::pageSwapTradeDetails(QString swapId) {
     windowManager->switchToWindowEx( "",

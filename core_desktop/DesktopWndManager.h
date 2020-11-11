@@ -97,7 +97,7 @@ public:
     virtual void pageSwapNew1() override;
     virtual void pageSwapNew2() override;
     virtual void pageSwapNew3() override;
-    virtual void pageSwapEdit(QString swapId) override;
+    virtual void pageSwapEdit(QString swapId, QString stateCmd) override;
     virtual void pageSwapTradeDetails(QString swapId) override;
 
     virtual void showBackupDlg(QString swapId, int backupId) override;

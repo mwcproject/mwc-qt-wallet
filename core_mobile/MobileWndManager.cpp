@@ -335,8 +335,9 @@ void MobileWndManager::pageSwapNew3() {
     Q_ASSERT(false); // implement me
 }
 
-void MobileWndManager::pageSwapEdit(QString swapId) {
+void MobileWndManager::pageSwapEdit(QString swapId, QString stateCmd) {
     Q_UNUSED(swapId)
+    Q_UNUSED(stateCmd)
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageSwapTradeDetails(QString swapId) {

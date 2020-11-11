@@ -40,7 +40,7 @@ public:
     // Show first page with trade List
     void pageTradeList();
     // Edit/View Trade Page
-    void viewTrade(QString swapId);
+    void viewTrade(QString swapId, QString stateCmd);
     // Show trade details page
     void showTradeDetails(QString swapId);
 
@@ -48,7 +48,8 @@ public:
     bool isTradeRunning(const QString & swapId) const;
 
     // Number of trades that are in progress
-    int getRunningTradesNumber() const;
+    QVector<QString> getRunningTrades() const;
+    QVector<QString> getRunningCriticalTrades() const;
 
     // Reset the new trade data and switch to the first page.
     void initiateNewTrade();
@@ -103,8 +104,13 @@ public:
     QString getElectrumXprivateUrl() const {return newSwapElectrumXUrl;}
 
     // Calculate the locking time for a NEW not yet created swap offer.
-    Q_INVOKABLE QVector<QString> getLockTime( QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks );
+    QVector<QString> getLockTime( QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks );
 
+    // Accept a new trade and start run it. By that moment the trade must abe reviews and all set
+    void acceptTheTrade(QString swapId);
+
+    // Get Tx fee for secondary currency
+    double getSecondaryFee(QString secCurrency);
 private:
 signals:
 

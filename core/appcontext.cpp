@@ -168,7 +168,7 @@ bool AppContext::loadDataImpl() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x479F)
+    if (id<0x4783 || id>0x47A1)
          return false;
 
     QString mockStr;
@@ -314,6 +314,14 @@ bool AppContext::loadDataImpl() {
         in >> swapTradesBackupStatus;
     }
 
+    if (id>=0x47A0) {
+        in >> swapMaxBackupStatus;
+    }
+
+    if (id>=0x47A1) {
+        in >> acceptedSwaps;
+    }
+
     return true;
 }
 
@@ -341,7 +349,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x479F;
+    out << 0x47A1;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -413,6 +421,9 @@ void AppContext::saveData() const {
 
     out << swapTradesBackupStatus;
 
+    out << swapMaxBackupStatus;
+
+    out << acceptedSwaps;
 }
 
 void AppContext::loadNotesData() {
@@ -860,6 +871,21 @@ void AppContext::setSwapBackStatus(const QString & swapId, int status) {
     saveData();
 }
 
+int AppContext::getMaxBackupStatus(QString swapId, int status) {
+    int st = swapMaxBackupStatus.value(swapId, 0);
+    st = std::max(st,status);
+    swapMaxBackupStatus.insert( swapId, st );
+    return st;
+}
+
+// Check fir accepted trades (we don't want ask to acceptance twice. The workflow can return back)
+bool AppContext::isTradeAccepted(const QString & swapId) const {
+    return acceptedSwaps.value(swapId, false);
+}
+
+void AppContext::setTradeAcceptedFlag(const QString & swapId, bool accepted) {
+    acceptedSwaps.insert(swapId, accepted);
+}
 
 
 }

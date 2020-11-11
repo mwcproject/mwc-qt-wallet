@@ -23,6 +23,7 @@ class EditSwap;
 
 namespace bridge {
 class Swap;
+class Config;
 }
 
 namespace wnd {
@@ -32,12 +33,15 @@ Q_OBJECT
 
 public:
     // swapId - what trade deal we are editing
-    explicit EditSwap(QWidget *parent, QString swapId);
+    explicit EditSwap(QWidget *parent, QString swapId, QString stateCmd);
     ~EditSwap();
 
 private:
     void updateButtons(bool first_call = false);
     bool isCanUpdate() const;
+
+    // Validate the data and call for update. Return number of update calls.
+    int requestUpdateData();
 
 private slots:
     void sgnRequestTradeDetails(  QVector<QString> swapInfo,
@@ -58,11 +62,15 @@ private slots:
 private:
     Ui::EditSwap *ui;
     bridge::Swap * swap = nullptr;
+    bridge::Config * config = nullptr;
     QString swapId;
     QString redeemAddress;
     QString secondaryCurrency;
     QString secondaryFee;
     QString electrumX;
+
+    bool    acceptanceMode = false;
+    int     requests2accept = -1;
 };
 
 }

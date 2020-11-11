@@ -204,6 +204,11 @@ public:
     int  getSwapBackStatus(const QString & swapId) const;
     void setSwapBackStatus(const QString & swapId, int status);
 
+    int getMaxBackupStatus(QString swapId, int status);
+
+    // Check fir accepted trades (we don't want ask to acceptance twice. The workflow can return back)
+    bool isTradeAccepted(const QString & swapId) const;
+    void setTradeAcceptedFlag(const QString & swapId, bool accepted);
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -308,7 +313,12 @@ private:
     QString lastUsedSwapCurrency;
 
     // Backup status for the swaps
-    QMap<QString, int> swapTradesBackupStatus;
+    QMap<QString, int>
+    swapTradesBackupStatus;
+    QMap<QString, int> swapMaxBackupStatus;
+
+    // Accepted trades (we don't want ask to acceptance twice. The workflow can return back)
+    QMap<QString, bool> acceptedSwaps;
 };
 
 template <class T>

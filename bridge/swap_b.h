@@ -38,7 +38,7 @@ public:
     Q_INVOKABLE void cancelTrade(QString swapId);
 
     // Switch to editTrade Window
-    Q_INVOKABLE void viewTrade(QString swapId);
+    Q_INVOKABLE void viewTrade(QString swapId, QString stateCmd);
 
     // Switch to trade Details Window
     Q_INVOKABLE void showTradeDetails(QString swapId);
@@ -53,8 +53,11 @@ public:
     // Check if this Trade is running in auto mode now
     Q_INVOKABLE bool isRunning(QString swapId);
 
-    // Number of trades that are in progress
-    Q_INVOKABLE int getRunningTradesNumber();
+    // trade Ids that are in progress
+    Q_INVOKABLE QVector<QString> getRunningTrades();
+
+    // Critical Trade Ids that are in progress
+    Q_INVOKABLE QVector<QString> getRunningCriticalTrades();
 
     // Update communication method.
     // Respond will be at sgnUpdateCommunication
@@ -141,6 +144,10 @@ public:
     Q_INVOKABLE int  getSwapBackup(QString stateCmd);
     Q_INVOKABLE bool isSwapWatingToAccept(QString stateCmd);
 
+    // Accept a new trade and start run it. By that moment the trade must abe reviews and all set
+    Q_INVOKABLE void acceptTheTrade(QString swapId);
+
+    Q_INVOKABLE QString getSecondaryFee(QString secCurrency);
 signals:
     // Result of deleteSwapTrade call.
     void sgnDeleteSwapTrade(QString swapId, QString error);

@@ -15,23 +15,34 @@
 #include "s_editswap_w.h"
 #include "ui_s_editswap_w.h"
 #include "../bridge/swap_b.h"
+#include "../bridge/config_b.h"
 #include "../control_desktop/messagebox.h"
 
 namespace wnd {
 
-EditSwap::EditSwap(QWidget *parent, QString _swapId) :
+EditSwap::EditSwap(QWidget *parent, QString _swapId, QString _stateCmd) :
         core::NavWnd(parent),
         ui(new Ui::EditSwap),
         swapId(_swapId) {
     ui->setupUi(this);
 
     swap = new bridge::Swap(this);
+    config = new bridge::Config(this);
+
     connect(swap, &bridge::Swap::sgnRequestTradeDetails, this, &EditSwap::sgnRequestTradeDetails, Qt::QueuedConnection);
     connect(swap, &bridge::Swap::sgnUpdateSecondaryAddress, this, &EditSwap::sgnUpdateXXX, Qt::QueuedConnection);
     connect(swap, &bridge::Swap::sgnUpdateSecondaryFee, this, &EditSwap::sgnUpdateXXX, Qt::QueuedConnection);
     connect(swap, &bridge::Swap::sgnUpdateElectrumX, this, &EditSwap::sgnUpdateXXX, Qt::QueuedConnection);
 
     setPageTitle("Trade: " + swapId);
+
+    // Check if we need to accept the deal.
+    acceptanceMode = !config->isTradeAccepted(swapId) && swap->isSwapWatingToAccept(_stateCmd);
+
+    if (acceptanceMode) {
+        ui->updateBtn->hide();
+        ui->tradeDetailsBtn->setText("Accept");
+    }
 
     ui->progress->initLoader(true);
     swap->requestTradeDetails(swapId);
@@ -90,25 +101,18 @@ void EditSwap::sgnRequestTradeDetails( QVector<QString> swapInfo,
     secondaryFee = swapInfo[4];
     electrumX = swapInfo[8];
 
-    ui->redeemAddressEdit->setText(redeemAddress);
-    ui->secondaryFeeEdit->setText(secondaryFee);
-    ui->electrumXEdit->setText(electrumX);
-
-    updateButtons();
-}
-
-void EditSwap::sgnUpdateXXX(QString swId, QString errorMsg) {
-    if (swapId != swId)
-        return;
-
-    if (!errorMsg.isEmpty()) {
-        control::MessageBox::messageText(this, "Error", "Unable to update data for swap " + swapId + "\n\n" + errorMsg);
-        ui->progress->hide();
+    if (acceptanceMode) {
+        redeemAddress = "";
+        secondaryFee = "";
+        electrumX = "";
+        ui->secondaryFeeEdit->setText(swap->getSecondaryFee( secondaryCurrency ));
     }
     else {
-        // OK, let's refresh...
-        swap->requestTradeDetails(swapId);
+        ui->secondaryFeeEdit->setText(secondaryFee);
     }
+
+    ui->redeemAddressEdit->setText(redeemAddress);
+    ui->electrumXEdit->setText(electrumX);
 
     updateButtons();
 }
@@ -120,12 +124,14 @@ bool EditSwap::isCanUpdate() const {
 }
 
 void EditSwap::updateButtons(bool first_call) {
+    if (acceptanceMode)
+        return;
+
     bool canUpdate = false;
     if (!first_call)
         canUpdate = isCanUpdate();
     ui->updateBtn->setEnabled(canUpdate);
     ui->tradeDetailsBtn->setEnabled(!canUpdate);
-    QString secondaryAddress = ui->redeemAddressEdit->text();
 }
 
 
@@ -145,14 +151,48 @@ void EditSwap::on_electrumXEdit_textEdited(const QString &str)
     updateButtons();
 }
 
-
 void EditSwap::on_updateBtn_clicked() {
     // Check what we need update...
+    if (requestUpdateData() < 0)
+        return;
 
+    updateButtons();
+}
+
+void EditSwap::on_tradeDetailsBtn_clicked() {
+    if (acceptanceMode) {
+        // Acceptance Mode
+
+        int request = requestUpdateData();
+
+        if (request < 0)
+            return;
+
+        Q_ASSERT(request>=2);
+        requests2accept = request;
+        ui->tradeDetailsBtn->setEnabled(false);
+    }
+    else {
+        // Normal usage, view and switch to the Details
+        if (isCanUpdate()) {
+            if (core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText(this, "Warning",
+                                                                                         "You have not saved data. Do you want to drop the data and switch to the details?",
+                                                                                         "No", "Yes",
+                                                                                         "Stay in this page",
+                                                                                         "Drop unsaved data and switch",
+                                                                                         true, false))
+                return;
+        }
+        swap->showTradeDetails(swapId);
+    }
+}
+
+// Validate the data and call for update. Return number of update calls.
+int EditSwap::requestUpdateData() {
     if ( ui->redeemAddressEdit->text().isEmpty() ) {
         control::MessageBox::messageText(this, "Input", QString("Please define ") + secondaryCurrency +
-                 " address to receive the coins." );
-        return;
+                                                        " address to receive the coins." );
+        return -1;
     }
 
     QString fee = ui->secondaryFeeEdit->text();
@@ -160,34 +200,53 @@ void EditSwap::on_updateBtn_clicked() {
     double feeDbl = fee.toDouble(&ok);
     if ( fee.isEmpty() || !ok || feeDbl<=0.0 ) {
         control::MessageBox::messageText(this, "Input", QString("Please define ") + secondaryCurrency + " fee value" );
-        return;
+        return -1;
     }
 
     ui->progress->show();
+    int res = 0;
 
     if ( redeemAddress != ui->redeemAddressEdit->text() ) {
         swap->updateSecondaryAddress(swapId, ui->redeemAddressEdit->text());
+        res++;
     }
     if (secondaryFee != ui->secondaryFeeEdit->text())
     {
         swap->updateSecondaryFee(swapId, feeDbl);
+        res++;
     }
     if (electrumX != ui->electrumXEdit->text()) {
         swap->updateElectrumX(swapId,  ui->electrumXEdit->text() );
+        res++;
+    }
+    return res;
+}
+
+
+void EditSwap::sgnUpdateXXX(QString swId, QString errorMsg) {
+    if (swapId != swId)
+        return;
+
+    if (!errorMsg.isEmpty()) {
+        control::MessageBox::messageText(this, "Error", "Unable to update data for swap " + swapId + "\n\n" + errorMsg);
+        ui->progress->hide();
+    }
+    else {
+        if (acceptanceMode) {
+            requests2accept--;
+            if (requests2accept==0) {
+                // We are good, we can accept the trade!!!
+
+                swap->acceptTheTrade(swapId);
+            }
+        }
+        else {
+            // OK, let's refresh...
+            swap->requestTradeDetails(swapId);
+        }
     }
 
     updateButtons();
-}
-
-void EditSwap::on_tradeDetailsBtn_clicked() {
-    if (isCanUpdate()) {
-        if ( core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText(this, "Warning", "You have not saved data. Do you want to drop the data and switch to the details?",
-                                          "No", "Yes",
-                                          "Stay in this page", "Drop unsaved data and switch",
-                                          true, false))
-            return;
-    }
-    swap->showTradeDetails(swapId);
 }
 
 void EditSwap::on_backButton_clicked() {

@@ -72,19 +72,30 @@ void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, 
     else
         deleteBtn->hide();
 
+    Q_ASSERT(acceptBtn);
+    bool hasAccept = false;
+    if (!config->isTradeAccepted(tradeId) && swap->isSwapWatingToAccept(stateCmd)) {
+        acceptBtn->show();
+        hasAccept = true;
+    }
+    else {
+        acceptBtn->hide();
+    }
+
     Q_ASSERT(backupBtn);
     int doneBackup = config->getSwapBackStatus(tradeId);
     int swBackup = swap->getSwapBackup(stateCmd);
-    if (swBackup > doneBackup)
+    // We don't want to see Accpept and backup together. Even it works, there is no enough space in the UI.
+    if (swBackup > doneBackup && !hasAccept)
         backupBtn->show();
     else
         backupBtn->hide();
 
-    Q_ASSERT(acceptBtn);
-    if (swap->isSwapWatingToAccept(stateCmd))
-        acceptBtn->show();
+    Q_ASSERT(markWnd);
+    if ( config->getMaxBackupStatus(tradeId, swBackup) >=2 )
+        markWnd->setStyleSheet(control::LEFT_MARK_ON);
     else
-        acceptBtn->hide();
+        markWnd->setStyleSheet(control::LEFT_MARK_OFF);
 }
 
 
@@ -152,7 +163,13 @@ void SwapList::requestSwapList() {
 }
 
 void SwapList::onItemActivated(QString id) {
-    swap->viewTrade(id);
+
+    for (  const SwapTradeInfo & sw : swapList ) {
+        if (id == sw.tradeId) {
+            swap->viewTrade(id, sw.stateCmd);
+            break;
+        }
+    }
 }
 
 void SwapList::on_newTradeButton_clicked() {
@@ -228,6 +245,8 @@ void SwapList::updateTradeListData() {
         // Here we have only Hirizontal layout. It is simple and swap related only.
         control::RichItem *itm = control::createMarkedItem(sw.tradeId, ui->swapsTable, marked);
 
+        sw.markWnd = itm->getCurrentWidget();
+
         { // first line...
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
 
@@ -292,7 +311,7 @@ void SwapList::updateTradeListData() {
 
         sw.acceptBtn = itm->addWidget((new control::RichButton(itm, "Accept", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
                                                 "Review and accept this swap Trade", BTN_FONT_SIZE))->
-                setCallback(this, "Accept:" + sw.tradeId)).getCurrentWidget();
+                setCallback(this, "Accept:" + sw.tradeId + ":"+sw.stateCmd)).getCurrentWidget();
 
         itm->addVSpacer();
 
@@ -374,7 +393,9 @@ void SwapList::richButtonPressed(control::RichButton *button, QString cookie) {
         ui->progress->show();
     } else if (cmd == "Accept") {
         // Accept mean that user need to review the deal. I tis not implemented now, waiting for Brent. We might just go with a modal for that.
-        swap->viewTrade(tradeId);
+        Q_ASSERT( dt.size() == 3);
+        QString stateCmd = dt[2];
+        swap->viewTrade(tradeId, stateCmd);
     } else {
         Q_ASSERT(false);
     }

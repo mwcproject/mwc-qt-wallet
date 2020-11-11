@@ -109,8 +109,8 @@ void Swap::cancelTrade(QString swapId) {
 
 
 // Switch to editTrade Window
-void Swap::viewTrade(QString swapId) {
-    getSwap()->viewTrade(swapId);
+void Swap::viewTrade(QString swapId, QString stateCmd) {
+    getSwap()->viewTrade(swapId, stateCmd);
 }
 
 // Switch to trade Details Window
@@ -288,8 +288,12 @@ bool Swap::isRunning(QString swapId) {
 }
 
 // Number of trades that are in progress
-int Swap::getRunningTradesNumber() {
-    return getSwap()->getRunningTradesNumber();
+QVector<QString> Swap::getRunningTrades() {
+    return getSwap()->getRunningTrades();
+}
+
+QVector<QString> Swap::getRunningCriticalTrades() {
+    return getSwap()->getRunningCriticalTrades();
 }
 
 // Update communication method.
@@ -664,16 +668,25 @@ int Swap::getSwapBackup(QString stateCmd) {
 }
 
 bool isSwapWatingToAccept(const QString & stateCmd) {
-    return stateCmd=="BuyerOfferCreated";
+    return stateCmd=="BuyerOfferCreated" || stateCmd=="BuyerSendingAcceptOfferMessage";
 }
 
 bool Swap::isSwapWatingToAccept(QString stateCmd) {
     return bridge::isSwapWatingToAccept(stateCmd);
 }
 
+// Accept a new trade and start run it. By that moment the trade must abe reviews and all set
+void Swap::acceptTheTrade(QString swapId) {
+    getSwap()->acceptTheTrade(swapId);
+}
 
+QString Swap::getSecondaryFee(QString secCurrency) {
+    double fee = getSwap()->getSecondaryFee(secCurrency);
+    if (fee<=0.0)
+        return "";
 
-
+    return util::trimStrAsDouble(QString::number( fee, 'f' ), 10);
+}
 
 }
 

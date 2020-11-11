@@ -158,6 +158,11 @@ public:
     // Backup status. We will ask user to do a backup for this swap.
     Q_INVOKABLE int  getSwapBackStatus(QString swapId);
     Q_INVOKABLE void setSwapBackStatus(QString swapId, int status);
+
+    Q_INVOKABLE int  getMaxBackupStatus(QString swapId, int status);
+
+    Q_INVOKABLE bool isTradeAccepted(QString swapId);
+    Q_INVOKABLE void setTradeAcceptedFlag(QString swapId, bool accepted);
 };
 
 }

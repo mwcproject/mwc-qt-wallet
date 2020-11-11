@@ -142,11 +142,31 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *event) {
 
     // Check if any swaps are running
-    int swapsNumber = swap->getRunningTradesNumber();
+
+    QVector<QString> critSwaps = swap->getRunningCriticalTrades();
+    if (!critSwaps.isEmpty()) {
+        // We can't exit, it is not safe. Not allowed.
+
+        QString swaps;
+        for (auto & s : critSwaps) {
+            if (!swaps.isEmpty())
+                swaps+=", ";
+            swaps += s;
+        }
+
+        core::getWndManager()->messageTextDlg("Swap Trades in critical stage",
+              "You have swap trades " + swaps + " in critical stage. The wallet must be online to monitor the trades status, otherwise you might loose your funds."
+              " You can't close your wallet until they will be finished.");
+        event->ignore();
+        return;
+    }
+
+
+    int swapsNumber = swap->getRunningTrades().size();
 
     if (swapsNumber>0){
         if ( core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg("Swap Trades", "Your have active " + QString::number(swapsNumber) + "trade" + (swapsNumber>1?"s":"") +
-                                    " running. Wallet need to stay online until the trade will be finished, otherwise you might loose your funds.\n\n"
+                                    " running. Wallet need to stay online to process the swaps.\n\n"
                                     "Are you sure you want to close the wallet even your trades are not finished?",
             "No", "Yes",
             "Keep my wallet running", "Close the wallet",

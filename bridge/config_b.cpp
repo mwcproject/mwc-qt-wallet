@@ -334,7 +334,19 @@ int  Config::getSwapBackStatus(QString swapId) {
 }
 
 void Config::setSwapBackStatus(QString swapId, int status) {
-    return getAppContext()->setSwapBackStatus(swapId, status);
+    getAppContext()->setSwapBackStatus(swapId, status);
+}
+
+int  Config::getMaxBackupStatus(QString swapId, int status) {
+    return getAppContext()->getMaxBackupStatus(swapId, status);
+}
+
+bool Config::isTradeAccepted(QString swapId) {
+    return getAppContext()->isTradeAccepted(swapId);
+}
+
+void Config::setTradeAcceptedFlag(QString swapId, bool accepted) {
+    getAppContext()->setTradeAcceptedFlag(swapId, accepted);
 }
 
 

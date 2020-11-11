@@ -46,7 +46,7 @@ public:
     virtual RETURN_CODE questionHTMLDlg( QString title, QString message, QString btn1, QString btn2,
                 QString btn1Tooltip, QString btn2Tooltip,
                 bool default1=false, bool default2=true, double widthScale = 1.0 ) = 0;
-    // Password accepted as a HASH. EMpty String mean that no password is set.
+    // Password accepted as a HASH. Empty String mean that no password is set.
     // After return, passwordHash value will have input raw Password value. So it can be user for wallet
     virtual RETURN_CODE questionTextDlg( QString title, QString message, QString btn1, QString btn2,
             QString btn1Tooltip, QString btn2Tooltip,
@@ -103,7 +103,7 @@ public:
     virtual void pageSwapNew1() = 0;
     virtual void pageSwapNew2() = 0;
     virtual void pageSwapNew3() = 0;
-    virtual void pageSwapEdit(QString swapId) = 0;
+    virtual void pageSwapEdit(QString swapId, QString stateCmd) = 0;
     virtual void pageSwapTradeDetails(QString swapId) = 0;
 
     virtual void showBackupDlg(QString swapId, int backupId) = 0;

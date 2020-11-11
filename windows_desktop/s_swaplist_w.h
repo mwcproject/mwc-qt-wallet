@@ -49,6 +49,7 @@ struct SwapTradeInfo {
     int64_t expirationTime; // timestamp in seconds
     QString secondary_address;
 
+    QWidget * markWnd = nullptr;
     QLabel * initTimeLable = nullptr;
     QLabel * expirationLable = nullptr;
     QLabel * statusLable = nullptr;
@@ -78,7 +79,7 @@ struct SwapTradeInfo {
     // Reset all UI related data
     void resetUI() {
         initTimeLable = expirationLable = statusLable = nullptr;
-        cancelBtn = deleteBtn = backupBtn = acceptBtn = nullptr;
+        markWnd = cancelBtn = deleteBtn = backupBtn = acceptBtn = nullptr;
     }
 
     // Update current state and UI
