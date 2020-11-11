@@ -147,5 +147,10 @@ QString Util::trimStrAsDouble(const QString & dblStr, int maxLen) {
     return util::trimStrAsDouble(dblStr, maxLen);
 }
 
+// Convert time interval in seconds into 2 sevel word description.
+QString Util::interval2String(int intervalSec, bool shortUnits, int tiers) {
+    return util::interval2String(intervalSec, shortUnits, tiers);
+}
+
 
 }

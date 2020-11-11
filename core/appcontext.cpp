@@ -90,9 +90,13 @@ AppContext::~AppContext() {
 }
 
 // Get last path state. Default: Home dir
-QString AppContext::getPathFor( QString name ) const {
-    if (!pathStates.contains(name))
-        return QDir::homePath();
+QString AppContext::getPathFor( QString name, bool returnEmptyForNew ) const {
+    if (!pathStates.contains(name)) {
+        if (returnEmptyForNew)
+            return "";
+        else
+            return QDir::homePath();
+    }
 
     return pathStates[name];
 }
@@ -164,7 +168,7 @@ bool AppContext::loadDataImpl() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x479E)
+    if (id<0x4783 || id>0x479F)
          return false;
 
     QString mockStr;
@@ -306,6 +310,10 @@ bool AppContext::loadDataImpl() {
         in >> lastUsedSwapCurrency;
     }
 
+    if (id>=0x479F) {
+        in >> swapTradesBackupStatus;
+    }
+
     return true;
 }
 
@@ -333,7 +341,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x479E;
+    out << 0x479F;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -402,6 +410,9 @@ void AppContext::saveData() const {
     out << swapEnforceBackup;
 
     out << lastUsedSwapCurrency;
+
+    out << swapTradesBackupStatus;
+
 }
 
 void AppContext::loadNotesData() {
@@ -839,6 +850,16 @@ void AppContext::setSwapEnforceBackup(bool doBackup) {
     swapEnforceBackup = doBackup;
     saveData();
 }
+
+int  AppContext::getSwapBackStatus(const QString & swapId) const {
+    return swapTradesBackupStatus.value(swapId, 0);
+}
+
+void AppContext::setSwapBackStatus(const QString & swapId, int status) {
+    swapTradesBackupStatus[swapId] = status;
+    saveData();
+}
+
 
 
 }

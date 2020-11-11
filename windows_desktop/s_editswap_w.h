@@ -53,6 +53,8 @@ private slots:
     void on_tradeDetailsBtn_clicked();
     void on_backButton_clicked();
 
+    void on_electrumXEdit_textEdited(const QString &arg1);
+
 private:
     Ui::EditSwap *ui;
     bridge::Swap * swap = nullptr;
@@ -60,6 +62,7 @@ private:
     QString redeemAddress;
     QString secondaryCurrency;
     QString secondaryFee;
+    QString electrumX;
 };
 
 }

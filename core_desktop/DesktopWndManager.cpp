@@ -54,6 +54,7 @@
 #include "../util_desktop/timeoutlock.h"
 #include "../util/Process.h"
 #include "../dialogs_desktop/showwalletstoppingmessagedlg.h"
+#include "../dialogs_desktop/s_swapbackupdlg.h"
 
 namespace core {
 
@@ -310,6 +311,12 @@ void DesktopWndManager::pageSwapEdit(QString swapId) {
 void DesktopWndManager::pageSwapTradeDetails(QString swapId) {
     windowManager->switchToWindowEx( "",
          new wnd::TradeDetails( windowManager->getInWndParent(), swapId));
+}
+
+void DesktopWndManager::showBackupDlg(QString swapId, int backupId) {
+    util::TimeoutLockObject to( "SwapBackupDlg" );
+    dlg::SwapBackupDlg  backup(nullptr, swapId, backupId);
+    backup.exec();
 }
 
 

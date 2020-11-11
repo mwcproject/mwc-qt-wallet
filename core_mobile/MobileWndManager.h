@@ -102,6 +102,7 @@ public:
     virtual void pageSwapEdit(QString swapId) override;
     virtual void pageSwapTradeDetails(QString swapId) override;
 
+    virtual void showBackupDlg(QString swapId, int backupId) override;
 private:
     QQmlApplicationEngine * engine = nullptr;
     QObject * mainWindow = nullptr;

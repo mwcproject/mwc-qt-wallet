@@ -19,3 +19,7 @@ Unable to parse the address $1, $2
 # LibWallet Error, Unable to adjust Swap c858d985-cd18-4c0e-9a4a-41ffbe2ee12b: Swap Error , Swap generic error, Unable to parse BCH address myPKtHbX9Kv1z3AAC69vdMoBqHMi5Hy13r, base58: base58ck checksum 0x255b5881 does not match expected 0x245b5881
 LibWallet Error, Unable to adjust Swap (.*): Swap Error , Swap generic error, Unable to parse (.*) address (.*), base58: (.*)
 Invalid $2 address $3. $4
+
+# LibWallet Error, Swap Error , Swap Rpc error: Unable connect to bch.test1.swap.mwc.mw:18335, Swap I/O: Connection refused (os error 61)
+LibWallet Error, Swap Error , Swap Rpc error: Unable connect to (.*), Swap I/O: (.*)
+Unable connect to electrumX server $1. $2

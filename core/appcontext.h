@@ -104,7 +104,7 @@ public:
     void setSendCoinsParams(SendCoinsParams params) { sendCoinsParams=params; }
 
     // Get last path state. Default: Home dir
-    QString getPathFor( QString name ) const;
+    QString getPathFor( QString name, bool returnEmptyForNew = false ) const;
     // update path state
     void updatePathFor( QString name, QString path );
 
@@ -199,6 +199,11 @@ public:
 
     QString getLastUsedSwapCurrency() const {return lastUsedSwapCurrency;}
     void    setLastUsedSwapCurrency(const QString & currency) {lastUsedSwapCurrency = currency;}
+
+    // return 0 for the first call.
+    int  getSwapBackStatus(const QString & swapId) const;
+    void setSwapBackStatus(const QString & swapId, int status);
+
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -301,6 +306,9 @@ private:
 
     // Last used currency for swaps
     QString lastUsedSwapCurrency;
+
+    // Backup status for the swaps
+    QMap<QString, int> swapTradesBackupStatus;
 };
 
 template <class T>

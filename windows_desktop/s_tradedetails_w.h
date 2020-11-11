@@ -40,7 +40,8 @@ private slots:
                                QVector<QString> tradeJournal,
                                QString errMsg);
 
-    void sgnSwapTradeStatusUpdated(QString swapId, QString currentAction, QString currentState,
+    void sgnSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
+                                   int64_t expirationTime,
                                    QVector<QString> executionPlan,
                                    QVector<QString> tradeJournal);
 

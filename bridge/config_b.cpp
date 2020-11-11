@@ -202,8 +202,8 @@ void Config::updateColumnsWidhts( QString tableId, QVector<int> widths ) {
 }
 
 // Get last saved path for that pathId.
-QString Config::getPathFor(QString pathId) {
-    return getAppContext()->getPathFor(pathId);
+QString Config::getPathFor(QString pathId, bool returnEmptyForNew) {
+    return getAppContext()->getPathFor(pathId, returnEmptyForNew);
 }
 // Save last selected path by user
 void Config::updatePathFor(QString pathId, QString path) {
@@ -327,6 +327,14 @@ void Config::setSwapEnforceBackup(bool doBackup) {
 
 bool Config::getSwapEnforceBackup() {
     return getAppContext()->getSwapEnforceBackup();
+}
+
+int  Config::getSwapBackStatus(QString swapId) {
+    return getAppContext()->getSwapBackStatus(swapId);
+}
+
+void Config::setSwapBackStatus(QString swapId, int status) {
+    return getAppContext()->setSwapBackStatus(swapId, status);
 }
 
 

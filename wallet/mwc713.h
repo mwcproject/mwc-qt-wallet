@@ -268,8 +268,8 @@ public:
     // ---------------- Swaps -------------
 
     // Request all running swap trades.
-    // Check Signal: void onRequestSwapTrades(QVector<SwapInfo> swapTrades);
-    virtual void requestSwapTrades() override;
+    // Check Signal: void onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error);
+    virtual void requestSwapTrades(QString cookie) override;
 
     // Delete the swap trade
     // Check Signal: void onDeleteSwapTrade(QString swapId, QString errMsg)
@@ -311,7 +311,7 @@ public:
     virtual void adjustSwapData( QString swapId, QString adjustCmd, QString param1 = "", QString param2 = "" ) override;
 
     // Perform a auto swap step for this trade.
-    // Check Signal: void onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+    // Check Signal: void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
     //                       QVector<SwapExecutionPlanRecord> executionPlan,
     //                       QVector<SwapJournalMessage> tradeJournal,
     //                       QString error );
@@ -437,7 +437,7 @@ public:
     Mwc713EventManager * getEventCollector() {return eventCollector;}
 
 
-    void setRequestSwapTrades(QVector<SwapInfo> swapTrades, QString error);
+    void setRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error);
     void setDeleteSwapTrade(QString swapId, QString errMsg);
     void setCreateNewSwapTrade( QString tag, bool dryRun, QVector<QString> params, QString swapId, QString errMsg );
     void setCancelSwapTrade(QString swapId, QString errMsg);
@@ -448,7 +448,7 @@ public:
                                 QString error );
     void setAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
 
-    void setPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+    void setPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
                                QVector<SwapExecutionPlanRecord> executionPlan,
                                QVector<SwapJournalMessage> tradeJournal,
                                QString error );

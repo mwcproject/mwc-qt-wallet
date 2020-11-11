@@ -16,22 +16,77 @@
 #include "ui_s_swaplist_w.h"
 #include "../bridge/swap_b.h"
 #include "../bridge/config_b.h"
+#include "../bridge/util_b.h"
 #include "../control_desktop/messagebox.h"
 #include "../control_desktop/richvbox.h"
 #include "../control_desktop/richitem.h"
 #include <QFileDialog>
+#include <QSet>
 
 namespace wnd {
 
-///////////////////////////////////////////////////////////////////////
-// SwapTradeInfo
+// Update current state and UI
+void SwapTradeInfo::updateData(QString _stateCmd, QString _status, int64_t _expirationTime,
+                               bridge::Util * util, bridge::Config * config, bridge::Swap * swap) {
+    stateCmd = _stateCmd;
+    status = _status;
+    expirationTime = _expirationTime;
+    Q_ASSERT(util);
 
-bool SwapTradeInfo::isDeletable() const {
-    if (!isValid())
-        return false;
-
-    return state.contains("was cancelled") || state.contains("successfully complete");
+    applyState2Ui(util, config, swap);
 }
+
+void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, bridge::Swap * swap) {
+    if (initTimeLable == nullptr)
+        return; // All null
+
+    int64_t timestampSec = QDateTime::currentSecsSinceEpoch();
+
+    Q_ASSERT(initTimeLable);
+    if (initiatedTime>0)
+        initTimeLable->setText( "initiated " + util->interval2String( timestampSec - initiatedTime, false ) + " ago" );
+    else
+        initTimeLable->setText("");
+
+    Q_ASSERT( expirationLable );
+    if (expirationTime>0) {
+        expirationLable->show();
+        expirationLable->setText( "expires in " + util->interval2String( expirationTime - timestampSec, false ) );
+    }
+    else {
+        expirationLable->hide();
+    }
+
+    Q_ASSERT(statusLable);
+    statusLable->setText("Status: " + status);
+
+    Q_ASSERT(cancelBtn);
+    if ( swap->isSwapCancellable(stateCmd))
+        cancelBtn->show();
+    else
+        cancelBtn->hide();
+
+    Q_ASSERT(deleteBtn);
+    if ( swap->isSwapDone(stateCmd))
+        deleteBtn->show();
+    else
+        deleteBtn->hide();
+
+    Q_ASSERT(backupBtn);
+    int doneBackup = config->getSwapBackStatus(tradeId);
+    int swBackup = swap->getSwapBackup(stateCmd);
+    if (swBackup > doneBackup)
+        backupBtn->show();
+    else
+        backupBtn->hide();
+
+    Q_ASSERT(acceptBtn);
+    if (swap->isSwapWatingToAccept(stateCmd))
+        acceptBtn->show();
+    else
+        acceptBtn->hide();
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 // SwapList
@@ -45,6 +100,7 @@ SwapList::SwapList(QWidget *parent) :
 
     swap = new bridge::Swap(this);
     config = new bridge::Config(this);
+    util = new bridge::Util(this);
 
     connect(swap, &bridge::Swap::sgnSwapTradesResult, this, &SwapList::sgnSwapTradesResult, Qt::QueuedConnection);
     connect(swap, &bridge::Swap::sgnDeleteSwapTrade, this, &SwapList::sgnDeleteSwapTrade, Qt::QueuedConnection);
@@ -92,7 +148,7 @@ void SwapList::selectSwapTab(int selection) {
 
 void SwapList::requestSwapList() {
     ui->progress->show();
-    swap->requestSwapTrades();
+    swap->requestSwapTrades("SwapListWnd");
 }
 
 void SwapList::onItemActivated(QString id) {
@@ -103,30 +159,42 @@ void SwapList::on_newTradeButton_clicked() {
     swap->initiateNewTrade();
 }
 
-void SwapList::sgnSwapTradesResult(QVector<QString> trades) {
+void SwapList::sgnSwapTradesResult(QString cookie, QVector<QString> trades, QString error) {
+    if (cookie != "SwapListWnd")
+        return;
+
     ui->progress->hide();
     swapList.clear();
+
     // Result comes in series of 9 item tuples:
     // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <State>, <initiate_time_interval>, <expire_time_interval>  <secondary_address> >, ....
-    for (int i = 8; i < trades.size(); i += 9) {
-        SwapTradeInfo sti(trades[i - 8] == "true", trades[i - 7], trades[i - 6], trades[i - 5], trades[i - 4],
-                          trades[i - 3], trades[i - 2], trades[i - 1], trades[i]);
+    for (int i = 9; i < trades.size(); i += 10) {
+        SwapTradeInfo sti(trades[i - 9] == "true", trades[i - 8], trades[i - 7], trades[i - 6], trades[i - 5], trades[i - 4],
+                          trades[i - 3], trades[i - 2].toLongLong(), trades[i - 1].toLongLong(), trades[i]);
         swapList.push_back(sti);
     }
 
     updateTradeListData();
+
+    if (!error.isEmpty()) {
+        control::MessageBox::messageText(this, "Error", "Unable to request a list of Swap trades.\n\n" + error);
+    }
 }
 
 void SwapList::updateTradeListData() {
     ui->swapsTable->clearAll();
+    for (auto &sw : swapList)
+        sw.resetUI();
 
     int incSwTrades = 0;
     int outSwTrades = 0;
     int compSwTrades = 0;
 
-    for (const auto &sw : swapList) {
+    for (auto &sw : swapList) {
 
-        if (sw.isDeletable()) {
+        bool done = swap->isSwapDone(sw.stateCmd);
+
+        if (done) {
             compSwTrades++;
         } else {
             if (sw.isSeller)
@@ -137,15 +205,15 @@ void SwapList::updateTradeListData() {
 
         switch (swapTabSelection) {
             case 0: // incoming swaps
-                if (sw.isDeletable() || sw.isSeller)
+                if (done || sw.isSeller)
                     continue;
                 break;
             case 1:
-                if (sw.isDeletable() || !sw.isSeller)
+                if (done || !sw.isSeller)
                     continue;
                 break;
             case 2:
-                if (!sw.isDeletable())
+                if (!done)
                     continue;
                 break;
             default:
@@ -179,15 +247,9 @@ void SwapList::updateTradeListData() {
                                                     sw.mwcAmount + " MWC"));
             }
             itm->setMinWidth(250);
-            itm->addWidget(control::createLabel(itm, false, true, sw.initiatedTimeInterval.isEmpty() ? "" :
-                                                                  "initiated " + sw.initiatedTimeInterval +
-                                                                  " ago")).setMinWidth(120);
+            sw.initTimeLable = (QLabel*) itm->addWidget(control::createLabel(itm, false, true, "")).setMinWidth(120).getCurrentWidget();
             itm->addHSpacer();
-
-            if (!sw.expirationTimeInterval.isEmpty())
-                itm->addWidget(control::createLabel(itm, false, true,
-                                                    "expires in " + sw.expirationTimeInterval)).setMinWidth(120);
-
+            sw.expirationLable = (QLabel*) itm->addWidget(control::createLabel(itm, false, true,"")).setMinWidth(120).getCurrentWidget();
             itm->pop();
         }
 
@@ -200,7 +262,7 @@ void SwapList::updateTradeListData() {
                     350);
             itm->pop();
         }
-        itm->addWidget(control::createLabel(itm, true, false, "Status: " + sw.state, control::FONT_SMALL));
+        sw.statusLable = (QLabel*) itm->addWidget(control::createLabel(itm, true, false, "", control::FONT_SMALL)).getCurrentWidget();
 
         // Buttons need to go in full size.
         // So we need to finish the main vertical layout
@@ -213,38 +275,30 @@ void SwapList::updateTradeListData() {
         const int BTN_FONT_SIZE = 13;
         const int BTN_WIDTH = 80;
 
-        if (sw.isCancellable()) {
-            itm->addWidget(
+        sw.cancelBtn = itm->addWidget(
                     (new control::RichButton(itm, "Cancel", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
                                              "Cancel this swap Trade", BTN_FONT_SIZE))->
-                            setCallback(this, "Cancel:" + sw.tradeId));
-        }
+                            setCallback(this, "Cancel:" + sw.tradeId)).getCurrentWidget();
 
-        if (sw.isDeletable()) {
-            itm->addWidget(
-                    (new control::RichButton(itm, "Delete", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
-                                             "Cancel this swap Trade", BTN_FONT_SIZE))->
-                            setCallback(this, "Delete:" + sw.tradeId));
-        }
+        sw.deleteBtn = itm->addWidget(
+                (new control::RichButton(itm, "Delete", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
+                                         "Cancel this swap Trade", BTN_FONT_SIZE))->
+                        setCallback(this, "Delete:" + sw.tradeId)).getCurrentWidget();
 
-        if (!sw.isSeller) {
-            // Buyer can backup immediatelly.
-            itm->addWidget((new control::RichButton(itm, "Backup", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
-                                                    "Backup your trade data, so you will be able to get a refund in case of the hardware failure",
-                                                    BTN_FONT_SIZE))->
-                    setCallback(this, "Backup:" + sw.tradeId));
-        }
+        sw.backupBtn = itm->addWidget((new control::RichButton(itm, "Backup", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
+                                                "Backup your trade data, so you will be able to get a refund in case of the hardware failure",
+                                                BTN_FONT_SIZE))->
+                setCallback(this, "Backup:" + sw.tradeId + ":"+sw.stateCmd)).getCurrentWidget();
 
-        // Check if this Trade is not running, it is mean it need to be accepted to start
-        if (!sw.isDeletable() && !swap->isRunning(sw.tradeId)) {
-            itm->addWidget((new control::RichButton(itm, "Accept", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
-                                                    "Review and accept this swap Trade", BTN_FONT_SIZE))->
-                    setCallback(this, "Accept:" + sw.tradeId));
-        }
+        sw.acceptBtn = itm->addWidget((new control::RichButton(itm, "Accept", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
+                                                "Review and accept this swap Trade", BTN_FONT_SIZE))->
+                setCallback(this, "Accept:" + sw.tradeId)).getCurrentWidget();
 
         itm->addVSpacer();
 
         ui->swapsTable->addItem(itm);
+
+        sw.applyState2Ui(util, config, swap);
     }
     ui->swapsTable->apply();
 
@@ -254,11 +308,11 @@ void SwapList::updateTradeListData() {
     ui->completedSwaps->setText("Completed Swaps (" + QString::number(compSwTrades) + ")");
 }
 
-void SwapList::richButtonPressed(control::RichButton *button, QString coockie) {
+void SwapList::richButtonPressed(control::RichButton *button, QString cookie) {
     Q_UNUSED(button);
 
-    QStringList dt = coockie.split(':');
-    if (dt.size() != 2) {
+    QStringList dt = cookie.split(':');
+    if (dt.size() < 2) {
         Q_ASSERT(false);
         return;
     }
@@ -312,6 +366,11 @@ void SwapList::richButtonPressed(control::RichButton *button, QString coockie) {
 
         // Requesting export from the wallet
         swap->backupSwapTradeData(tradeId, fileName);
+
+        Q_ASSERT( dt.size() == 3);
+        QString stateCmd = dt[2];
+        config->setSwapBackStatus(tradeId, swap->getSwapBackup(stateCmd));
+
         ui->progress->show();
     } else if (cmd == "Accept") {
         // Accept mean that user need to review the deal. I tis not implemented now, waiting for Brent. We might just go with a modal for that.
@@ -364,7 +423,8 @@ void SwapList::sgnDeleteSwapTrade(QString swapId, QString error) {
     on_refreshButton_clicked();
 }
 
-void SwapList::sgnSwapTradeStatusUpdated(QString swapId, QString currentAction, QString currentState,
+void SwapList::sgnSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
+                                         int64_t expirationTime,
                                          QVector<QString> executionPlan,
                                          QVector<QString> tradeJournal) {
     Q_UNUSED(swapId)
@@ -375,23 +435,15 @@ void SwapList::sgnSwapTradeStatusUpdated(QString swapId, QString currentAction, 
 
     // need to implement. There are warnings, KEEP THEM as TODO
 
-/*    for (int i = 0; i < swapList.size(); i++) {
+    for (int i = 0; i < swapList.size(); i++) {
         auto &sw = swapList[i];
         if (sw.tradeId == swapId) {
             // Updating this record
-            if (swap->isRunning(swapId)) {
-                sw.status = "Running";
-                sw.state = currentAction;
-            } else {
-                sw.status = "Done";
-                sw.state = currentState;
-            }
-
-            ui->tradeList->setItemText(i, 2, sw.state);
-            ui->tradeList->setItemText(i, 3, sw.status);
+            sw.updateData(stateCmd, currentAction.isEmpty() ? currentState : currentAction, expirationTime,
+                    util, config, swap);
             break;
         }
-    }*/
+    }
 }
 
 void SwapList::sgnNewSwapTrade(QString currency, QString swapId) {

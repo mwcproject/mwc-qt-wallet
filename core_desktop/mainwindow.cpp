@@ -17,8 +17,6 @@
 #include <QTime>
 #include <QDebug>
 #include <QContextMenuEvent>
-//#include "../state/statemachine.h"
-//#include "util/stringutils.h"
 #include "../control_desktop/messagebox.h"
 #include "../dialogs_desktop/helpdlg.h"
 #include "../bridge/config_b.h"
@@ -26,6 +24,7 @@
 #include "../bridge/wallet_b.h"
 #include "../bridge/statemachine_b.h"
 #include "../bridge/util_b.h"
+#include "../bridge/swap_b.h"
 #include <QPushButton>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -51,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     wallet = new bridge::Wallet(this);
     stateMachine = new bridge::StateMachine(this);
     util = new bridge::Util(this);
+    swap = new bridge::Swap(this);
 
     QObject::connect( coreWindow, &CoreWindow::sgnUpdateActionStates,
                       this, &MainWindow::onSgnUpdateActionStates, Qt::QueuedConnection);
@@ -140,6 +140,23 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
+
+    // Check if any swaps are running
+    int swapsNumber = swap->getRunningTradesNumber();
+
+    if (swapsNumber>0){
+        if ( core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg("Swap Trades", "Your have active " + QString::number(swapsNumber) + "trade" + (swapsNumber>1?"s":"") +
+                                    " running. Wallet need to stay online until the trade will be finished, otherwise you might loose your funds.\n\n"
+                                    "Are you sure you want to close the wallet even your trades are not finished?",
+            "No", "Yes",
+            "Keep my wallet running", "Close the wallet",
+            true, false) )
+        {
+            event->ignore();
+            return;
+        }
+    }
+
     QSettings settings("MWC", "wmc-qt-wallet");
     settings.setValue("geometry", saveGeometry());
     settings.setValue("windowState", saveState());

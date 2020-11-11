@@ -29,6 +29,7 @@ EditSwap::EditSwap(QWidget *parent, QString _swapId) :
     connect(swap, &bridge::Swap::sgnRequestTradeDetails, this, &EditSwap::sgnRequestTradeDetails, Qt::QueuedConnection);
     connect(swap, &bridge::Swap::sgnUpdateSecondaryAddress, this, &EditSwap::sgnUpdateXXX, Qt::QueuedConnection);
     connect(swap, &bridge::Swap::sgnUpdateSecondaryFee, this, &EditSwap::sgnUpdateXXX, Qt::QueuedConnection);
+    connect(swap, &bridge::Swap::sgnUpdateElectrumX, this, &EditSwap::sgnUpdateXXX, Qt::QueuedConnection);
 
     setPageTitle("Trade: " + swapId);
 
@@ -66,14 +67,18 @@ void EditSwap::sgnRequestTradeDetails( QVector<QString> swapInfo,
         return;
     }
 
-    Q_ASSERT(swapInfo.size() == 8);
-    if (swapInfo.size() != 8 || swapInfo[0] != swapId)
+    Q_ASSERT(swapInfo.size() == 9);
+    if (swapInfo.size() != 9 || swapInfo[0] != swapId)
         return; // Invalid message or invalid destination
 
     QString secCurrency = swapInfo[3];
     QString secCurrencyFeeUnits = swapInfo[5]; // - secondary fee units
 
-    ui->secondaryAddressLabel->setText( secCurrency + " address to receive coins");
+    if (secCurrency=="BCH")
+        ui->secondaryAddressLabel->setText("Legacy BCH address to receive the coins");
+    else
+        ui->secondaryAddressLabel->setText(secCurrency + " address to receive the coins");
+
     ui->secTransFeeLabel->setText(secCurrency + " transaction fee");
     ui->updateBtn->setText("Update "+ secCurrency +" transaction details");
     ui->secFeeUnitsLabel->setText(secCurrencyFeeUnits);
@@ -83,9 +88,11 @@ void EditSwap::sgnRequestTradeDetails( QVector<QString> swapInfo,
     redeemAddress = swapInfo[2];
     secondaryCurrency = swapInfo[3];
     secondaryFee = swapInfo[4];
+    electrumX = swapInfo[8];
 
     ui->redeemAddressEdit->setText(redeemAddress);
     ui->secondaryFeeEdit->setText(secondaryFee);
+    ui->electrumXEdit->setText(electrumX);
 
     updateButtons();
 }
@@ -108,7 +115,8 @@ void EditSwap::sgnUpdateXXX(QString swId, QString errorMsg) {
 
 bool EditSwap::isCanUpdate() const {
     return !(redeemAddress == ui->redeemAddressEdit->text() &&
-            secondaryFee == ui->secondaryFeeEdit->text() );
+            secondaryFee == ui->secondaryFeeEdit->text() &&
+            electrumX == ui->electrumXEdit->text());
 }
 
 void EditSwap::updateButtons(bool first_call) {
@@ -130,6 +138,13 @@ void EditSwap::on_secondaryFeeEdit_textEdited(const QString &str) {
     Q_UNUSED(str)
     updateButtons();
 }
+
+void EditSwap::on_electrumXEdit_textEdited(const QString &str)
+{
+    Q_UNUSED(str)
+    updateButtons();
+}
+
 
 void EditSwap::on_updateBtn_clicked() {
     // Check what we need update...
@@ -157,6 +172,10 @@ void EditSwap::on_updateBtn_clicked() {
     {
         swap->updateSecondaryFee(swapId, feeDbl);
     }
+    if (electrumX != ui->electrumXEdit->text()) {
+        swap->updateElectrumX(swapId,  ui->electrumXEdit->text() );
+    }
+
     updateButtons();
 }
 
@@ -183,3 +202,4 @@ void EditSwap::on_backButton_clicked() {
 }
 
 }
+

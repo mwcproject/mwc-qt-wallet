@@ -6,16 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>941</width>
-    <height>752</height>
+    <width>1032</width>
+    <height>857</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0,0,0,0,0,0,0,0,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
    <property name="spacing">
-    <number>3</number>
+    <number>1</number>
    </property>
    <property name="leftMargin">
     <number>40</number>
@@ -77,7 +77,7 @@
     </widget>
    </item>
    <item>
-    <spacer name="verticalSpacer">
+    <spacer name="verticalSpacer_7">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
@@ -142,6 +142,69 @@
      </property>
      <property name="placeholderText">
       <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="control::MwcLabelSmall" name="label_19">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>22</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>ElectrumX private instance URL. Private instance provides extra security for the trade</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="control::MwcLineEditNormal" name="electrumXEdit">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>200000</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Private ElectrumX hosp and port to connect</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="maxLength">
+      <number>512</number>
+     </property>
+     <property name="placeholderText">
+      <string>Private ElectrumX server &lt;host&gt;:&lt;port&gt; (otional)</string>
      </property>
     </widget>
    </item>

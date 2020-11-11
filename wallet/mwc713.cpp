@@ -812,9 +812,9 @@ void MWC713::repost(QString account, int index, bool fluff) {
 }
 
 // Request all running swap trades.
-// Check Signal: void onRequestSwapTrades(QVector<SwapInfo> swapTrades);
-void MWC713::requestSwapTrades() {
-    eventCollector->addTask( new TaskGetSwapTrades(this), TaskGetSwapTrades::TIMEOUT );
+// Check Signal: void onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error);
+void MWC713::requestSwapTrades(QString cookie) {
+    eventCollector->addTask( new TaskGetSwapTrades(this, cookie), TaskGetSwapTrades::TIMEOUT );
 }
 
 // Delete the swap trade
@@ -881,7 +881,7 @@ void MWC713::adjustSwapData( QString swapId, QString adjustCmd, QString param1, 
 }
 
 // Perform a auto swap step for this trade.
-// Check Signal: void onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+// Check Signal: void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
 //                       QVector<SwapExecutionPlanRecord> executionPlan,
 //                       QVector<SwapJournalMessage> tradeJournal,
 //                       QString error );
@@ -1478,9 +1478,9 @@ void MWC713::updateSyncAsDone() {
     lastSyncTime = QDateTime::currentMSecsSinceEpoch();
 }
 
-void MWC713::setRequestSwapTrades( QVector<SwapInfo> swapTrades, QString error ) {
-    logger::logEmit("MWC713", "onRequestSwapTrades", "Trades: " + QString::number(swapTrades.size()) + ", Error: " + error );
-    emit onRequestSwapTrades( swapTrades, error );
+void MWC713::setRequestSwapTrades( QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error ) {
+    logger::logEmit("MWC713", "onRequestSwapTrades", "Cookie:" + cookie + " Trades: " + QString::number(swapTrades.size()) + ", Error: " + error );
+    emit onRequestSwapTrades( cookie, swapTrades, error );
 }
 
 void MWC713::setDeleteSwapTrade(QString swapId, QString errMsg) {
@@ -1513,13 +1513,13 @@ void MWC713::setAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg
     emit onAdjustSwapData( swapId, adjustCmd, errMsg );
 }
 
-void MWC713::setPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+void MWC713::setPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
                             QVector<SwapExecutionPlanRecord> executionPlan,
                             QVector<SwapJournalMessage> tradeJournal,
                             QString error ) {
-    logger::logEmit( "MWC713", "onPerformAutoSwapStep", swapId + ", " + currentAction + ", " + currentState + ", " + error );
+    logger::logEmit( "MWC713", "onPerformAutoSwapStep", swapId + ", " + stateCmd + ", " + currentAction + ", " + currentState + ", " + error );
 
-    emit onPerformAutoSwapStep(swapId, swapIsDone, currentAction, currentState,
+    emit onPerformAutoSwapStep(swapId, stateCmd, currentAction, currentState,
                                executionPlan,
                                tradeJournal,
                                error );

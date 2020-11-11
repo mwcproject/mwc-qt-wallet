@@ -128,10 +128,14 @@ void TradeDetails::sgnRequestSwapDetails(QVector<QString> swapInfo,
     updateData(executionPlan, currentAction, tradeJournal);
 }
 
-void TradeDetails::sgnSwapTradeStatusUpdated(QString reqSwapId, QString currentAction, QString currentState,
+void TradeDetails::sgnSwapTradeStatusUpdated(QString reqSwapId, QString stateCmd, QString currentAction, QString currentState,
+                               int64_t expirationTime,
                                QVector<QString> executionPlan,
                                QVector<QString> tradeJournal) {
     Q_UNUSED(currentState);
+    Q_UNUSED(stateCmd);
+    Q_UNUSED(expirationTime);
+
     if (reqSwapId != swapId)
         return;
 

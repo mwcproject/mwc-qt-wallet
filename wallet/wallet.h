@@ -336,15 +336,15 @@ struct SwapInfo {
     QString secondaryCurrency;
     QString swapId;
     int64_t startTime = 0;
-    QString state;
+    QString stateCmd; // state as command
+    QString state; // State as string description
     QString action;
     int64_t expiration = 0;
-    bool    done = false;
     bool    isSeller;
     QString secondaryAddress;
 
     void setData( QString mwcAmount, QString secondaryAmount, QString secondaryCurrency,
-                  QString swapId, int64_t startTime, QString state, QString action,
+                  QString swapId, int64_t startTime, QString stateCmd, QString state, QString action,
                   int64_t expiration, bool isSeller, QString secondaryAddress );
 };
 
@@ -371,13 +371,15 @@ struct SwapTradeInfo {
     QString communicationMethod;
     QString communicationAddress;
 
+    QString electrumNodeUri; // Private electrumX URI
+
 
     void setData( QString swapId, bool isSeller,  double mwcAmount, double secondaryAmount,
                 QString secondaryCurrency,  QString secondaryAddress, double secondaryFee,
                 QString secondaryFeeUnits, int mwcConfirmations, int secondaryConfirmations,
                 int messageExchangeTimeLimit, int redeemTimeLimit, bool sellerLockingFirst,
                 int mwcLockHeight, int64_t mwcLockTime, int64_t secondaryLockTime,
-                QString communicationMethod, QString communicationAddress );
+                QString communicationMethod, QString communicationAddress, QString electrumNodeUri );
 };
 
 struct SwapExecutionPlanRecord {
@@ -653,8 +655,8 @@ public:
     // ---------------- Swaps -------------
 
     // Request all running swap trades.
-    // Check Signal: void onRequestSwapTrades(QVector<SwapInfo> swapTrades, QString error);
-    virtual void requestSwapTrades() = 0;
+    // Check Signal: void onRequestSwapTrades(QString cookie, QVector<SwapInfo> swapTrades, QString error);
+    virtual void requestSwapTrades(QString cookie) = 0;
 
     // Delete the swap trade
     // Check Signal: void onDeleteSwapTrade(QString swapId, QString errMsg)
@@ -697,7 +699,7 @@ public:
     virtual void adjustSwapData( QString swapId, QString adjustCmd, QString param1 = "", QString param2 = "" ) = 0;
 
     // Perform a auto swap step for this trade.
-    // Check Signal: void onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+    // Check Signal: void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
     //                       QVector<SwapExecutionPlanRecord> executionPlan,
     //                       QVector<SwapJournalMessage> tradeJournal,
     //                       QString error );
@@ -818,7 +820,7 @@ signals:
     void onUpdateSyncProgress(double progressPercent);
 
     // Response from requestSwapTrades
-    void onRequestSwapTrades(QVector<SwapInfo> swapTrades, QString error);
+    void onRequestSwapTrades(QString cookie, QVector<SwapInfo> swapTrades, QString error);
 
     // Response form deleteSwapTrade. OK - errMsg will be empty
     void onDeleteSwapTrade(QString swapId, QString errMsg);
@@ -840,7 +842,7 @@ signals:
     void onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
 
     // Response from performAutoSwapStep
-    void onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+    void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
                            QVector<SwapExecutionPlanRecord> executionPlan,
                            QVector<SwapJournalMessage> tradeJournal,
                            QString error );

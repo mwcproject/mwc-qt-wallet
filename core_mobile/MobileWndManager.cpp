@@ -337,13 +337,18 @@ void MobileWndManager::pageSwapNew3() {
 
 void MobileWndManager::pageSwapEdit(QString swapId) {
     Q_UNUSED(swapId)
-
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageSwapTradeDetails(QString swapId) {
     Q_UNUSED(swapId)
-
     Q_ASSERT(false); // implement me
 }
+
+void MobileWndManager::showBackupDlg(QString swapId, int backupId) {
+    Q_UNUSED(swapId)
+    Q_UNUSED(backupId)
+    Q_ASSERT(false); // implement me
+}
+
 
 }

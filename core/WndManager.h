@@ -106,6 +106,7 @@ public:
     virtual void pageSwapEdit(QString swapId) = 0;
     virtual void pageSwapTradeDetails(QString swapId) = 0;
 
+    virtual void showBackupDlg(QString swapId, int backupId) = 0;
 };
 
 void setWndManager(WndManager * mgr);

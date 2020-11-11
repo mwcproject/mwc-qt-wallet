@@ -58,7 +58,7 @@ bool TaskGetSwapTrades::processTask(const QVector<WEvent> &events) {
             QVector<wallet::SwapInfo> swapTrades;
 
             if (error.error != QJsonParseError::NoError || !jsonDoc.isArray()) {
-                wallet713->setRequestSwapTrades(swapTrades, "Unable to parse mwc713 output");
+                wallet713->setRequestSwapTrades(cookie, swapTrades, "Unable to parse mwc713 output");
                 return true;
             }
 
@@ -70,7 +70,7 @@ bool TaskGetSwapTrades::processTask(const QVector<WEvent> &events) {
             for (int i = 0; i < arr.size(); i++) {
                 QJsonValue val = arr.at(i);
                 if (!val.isObject()) {
-                    wallet713->setRequestSwapTrades(swapTrades, "Unable to parse mwc713 output");
+                    wallet713->setRequestSwapTrades(cookie, swapTrades, "Unable to parse mwc713 output");
                     return true;
                 }
                 QJsonObject swapInfoJson = val.toObject();
@@ -81,11 +81,13 @@ bool TaskGetSwapTrades::processTask(const QVector<WEvent> &events) {
                         swapInfoJson["secondary_currency"].toString(),
                         swapInfoJson["swap_id"].toString(),
                         swapInfoJson["start_time"].toString().toLongLong(),
+                        swapInfoJson["state_cmd"].toString(),
                         swapInfoJson["state"].toString(),
                         swapInfoJson["action"].toString(),
                         swapInfoJson["expiration"].toString().toLongLong(),
                         swapInfoJson["is_seller"].toBool(),
-                        swapInfoJson["secondary_address"].toString());
+                        swapInfoJson["secondary_address"].toString()
+                  );
 
                 swapTrades.push_back(swap_info);
             }
@@ -95,12 +97,12 @@ bool TaskGetSwapTrades::processTask(const QVector<WEvent> &events) {
             });
 
             // Success case
-            wallet713->setRequestSwapTrades(swapTrades, "");
+            wallet713->setRequestSwapTrades(cookie, swapTrades, "");
             return true;
         }
     }
 
-    wallet713->setRequestSwapTrades({}, getErrorMessage(events, "Unable to read swap list data"));
+    wallet713->setRequestSwapTrades(cookie, {}, getErrorMessage(events, "Unable to read swap list data"));
     return true;
 }
 
@@ -238,7 +240,8 @@ bool TaskTradeDetails::processTask(const QVector<WEvent> &events) {
                          swapObj["sellerLockingFirst"].toBool(),
                          swapObj["mwcLockHeight"].toInt(), swapObj["mwcLockTime"].toString().toLongLong(),
                          swapObj["secondaryLockTime"].toString().toLongLong(),
-                         swapObj["communicationMethod"].toString(), swapObj["communicationAddress"].toString());
+                         swapObj["communicationMethod"].toString(), swapObj["communicationAddress"].toString(),
+                         swapObj["electrumNodeUri1"].toString());
 
             QJsonArray execPlan = swapObj["roadmap"].toArray();
             for (int i = 0; i < execPlan.size(); i++) {
@@ -296,6 +299,8 @@ QString TaskAdjustTrade::generateCommandLine(const QString &swapId, const QStrin
         return "swap --adjust secondary_address --secondary_address " + param1 + " -i " + swapId;
     } else if (adjustCmd == "secondary_fee") {
         return "swap --adjust secondary_fee --secondary_fee " + param1 + " -i " + swapId;
+    } else if (adjustCmd == "electrumx_uri") {
+        return "swap --adjust electrumx_uri --electrum_uri1 " + param1 + " -i " + swapId;
     } else {
         Q_ASSERT(false);
         return "";
@@ -318,7 +323,7 @@ bool TaskPerformAutoSwapStep::processTask(const QVector<WEvent> &events) {
             QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonStr.toUtf8(), &error);
 
             if (error.error != QJsonParseError::NoError || !jsonDoc.isObject()) {
-                wallet713->setPerformAutoSwapStep(swapId, false, "", "",
+                wallet713->setPerformAutoSwapStep(swapId, "", "", "",
                                                   executionPlan, tradeJournal,
                                                   "Unable to parse mwc713 output for autoswap trade " + swapId);
                 return true;
@@ -353,17 +358,18 @@ bool TaskPerformAutoSwapStep::processTask(const QVector<WEvent> &events) {
 
             // Success case
             wallet713->setPerformAutoSwapStep(swapId,
-                                              swapObj["autowsap_done"].toBool(),
+                                              swapObj["stateCmd"].toString(),
                                               currentAction,
                                               swapObj["currentState"].toString(),
                                               executionPlan,
                                               tradeJournal,
                                               "");
+
             return true;
         }
     }
 
-    wallet713->setPerformAutoSwapStep(swapId, false, "", "",
+    wallet713->setPerformAutoSwapStep(swapId, "", "", "",
                                       executionPlan, tradeJournal,
                                       "Unable to read output for autoswap trade " + swapId);
     return true;

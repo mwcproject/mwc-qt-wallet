@@ -25,9 +25,10 @@ namespace state {
 
 struct AutoswapTask {
     QString swapId;
+    QString stateCmd;
     int64_t lastUpdatedTime = 0;
 
-    void setData(QString _swapId, int64_t _lastUpdatedTime) { swapId = _swapId; lastUpdatedTime = _lastUpdatedTime; }
+    void setData(QString _swapId, QString _stateCmd, int64_t _lastUpdatedTime) { swapId = _swapId; stateCmd= _stateCmd; lastUpdatedTime = _lastUpdatedTime; }
 };
 
 class Swap : public util::HttpClient, public State {
@@ -43,7 +44,11 @@ public:
     // Show trade details page
     void showTradeDetails(QString swapId);
 
+    // Check if Trade is running
     bool isTradeRunning(const QString & swapId) const;
+
+    // Number of trades that are in progress
+    int getRunningTradesNumber() const;
 
     // Reset the new trade data and switch to the first page.
     void initiateNewTrade();
@@ -103,7 +108,7 @@ public:
 private:
 signals:
 
-    void onSwapTradeStatusUpdated(QString swapId, QString currentAction, QString currentState,
+    void onSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
                                QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                                QVector<wallet::SwapJournalMessage> tradeJournal);
 
@@ -124,16 +129,26 @@ private:
     void resetNewSwapData();
 
     // Start trade to run
-    void runTrade(QString swapId);
+    void runTrade(QString swapId, QString statusCmd);
 
     int calcConfirmationsForMwcAmount(double mwcAmount);
 
     // Request latest fees for the coins
     void updateFeesIsNeeded();
+
+
+
 private
 slots:
+    // Login/logot from the wallet. Need to start/stop swaps
+    void onLoginResult(bool ok);
+    void onLogout();
 
-    void onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+    // Response from requestSwapTrades
+    void onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error);
+
+
+    void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
                                QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                                QVector<wallet::SwapJournalMessage> tradeJournal,
                                QString error );
@@ -149,6 +164,8 @@ private:
     QString  runningTask;
 
     QSet<QString> shownMessages;
+    QMap<QString, int> shownBackupMessages;
+
 
     // New trade data.
     QString newSwapAccount;

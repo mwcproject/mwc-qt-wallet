@@ -100,6 +100,7 @@ public:
     virtual void pageSwapEdit(QString swapId) override;
     virtual void pageSwapTradeDetails(QString swapId) override;
 
+    virtual void showBackupDlg(QString swapId, int backupId) override;
 private:
     WindowManager * windowManager = nullptr;
     MainWindow    * mainWindow = nullptr;

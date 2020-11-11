@@ -94,7 +94,7 @@ struct StateContext {
 
 void setStateContext(StateContext * context);
 StateContext * getStateContext();
-// Shortcut to state if state_machine. Callir suppose to know the class name
+// Shortcut to state of state_machine. Callir suppose to know the class name
 State * getState(STATE state);
 
 // Single state of the app that is described with Dialog

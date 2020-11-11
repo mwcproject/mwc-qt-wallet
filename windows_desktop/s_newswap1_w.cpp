@@ -187,7 +187,10 @@ void NewSwap1::updateSecCurrencyStatus() {
 
     ui->rateLabel->setText("MWC to " + selectedCur + " rate:");
     ui->secAddressEdit->setText("");
-    ui->secAddressEdit->setPlaceholderText(selectedCur + " address to receive the coins");
+    if (selectedCur=="BCH")
+        ui->secAddressEdit->setPlaceholderText("Legacy BCH address to receive the coins");
+    else
+        ui->secAddressEdit->setPlaceholderText(selectedCur + " address to receive the coins");
 }
 
 

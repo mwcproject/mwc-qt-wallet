@@ -274,8 +274,8 @@ public:
     virtual void requestFileProofAddress() override;
 
     // Request all running swap trades.
-    // Check Signal: void onRequestSwapTrades(QVector<SwapInfo> swapTrades, QString error);
-    virtual void requestSwapTrades() override;
+    // Check Signal: void onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error);
+    virtual void requestSwapTrades(QString cookie) override;
 
     // Delete the swap trade
     // Check Signal: void onDeleteSwapTrade(QString swapId, QString errMsg)
@@ -318,7 +318,7 @@ public:
     virtual void adjustSwapData( QString swapId, QString adjustCmd, QString param1 = "", QString param2 = "" ) override;
 
     // Perform a auto swap step for this trade.
-    // Check Signal: void onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+    // Check Signal: void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
     //                       QVector<SwapExecutionPlanRecord> executionPlan,
     //                       QVector<SwapJournalMessage> tradeJournal,
     //                       QString error );

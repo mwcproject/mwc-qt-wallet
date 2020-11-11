@@ -483,12 +483,14 @@ void WalletUtxoSignature::setData(int64_t _coinNano, // Output amount
 // SwapInfo
 
 void SwapInfo::setData( QString _mwcAmount, QString _secondaryAmount, QString _secondaryCurrency,
-              QString _swapId, int64_t _startTime, QString _state, QString _action, int64_t _expiration, bool _isSeller, QString _secondaryAddress ) {
+              QString _swapId, int64_t _startTime, QString _stateCmd, QString _state, QString _action, int64_t _expiration,
+              bool _isSeller, QString _secondaryAddress ) {
     mwcAmount = _mwcAmount;
     secondaryAmount = _secondaryAmount;
     secondaryCurrency = _secondaryCurrency;
     swapId = _swapId;
     startTime = _startTime;
+    stateCmd = _stateCmd;
     state = _state;
     action = _action;
     expiration = _expiration;
@@ -504,7 +506,7 @@ void SwapTradeInfo::setData( QString _swapId, bool _isSeller, double _mwcAmount,
               QString _secondaryFeeUnits, int _mwcConfirmations, int _secondaryConfirmations,
               int _messageExchangeTimeLimit, int _redeemTimeLimit, bool _sellerLockingFirst,
               int _mwcLockHeight, int64_t _mwcLockTime, int64_t _secondaryLockTime,
-              QString _communicationMethod, QString _communicationAddress ) {
+              QString _communicationMethod, QString _communicationAddress, QString _electrumNodeUri ) {
 
     swapId = _swapId;
     isSeller = _isSeller;
@@ -524,6 +526,7 @@ void SwapTradeInfo::setData( QString _swapId, bool _isSeller, double _mwcAmount,
     secondaryLockTime = _secondaryLockTime;
     communicationMethod = _communicationMethod;
     communicationAddress = _communicationAddress;
+    electrumNodeUri = _electrumNodeUri;
 }
 
 ////////////////////////////////////////////////////////////////////

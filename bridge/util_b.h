@@ -81,6 +81,9 @@ public:
     // Trim string that represent double. 23434.32345, len 7 => 23434.32; 23434.32345, len 5 => 23434
     Q_INVOKABLE QString trimStrAsDouble(const QString & dblStr, int maxLen);
 
+    // Convert time interval in seconds into 2 sevel word description.
+    Q_INVOKABLE QString interval2String(int intervalSec, bool shortUnits, int tiers = 2);
+
 private:
     util::PasswordAnalyser * pa = nullptr;
     // PasswordAnalyser last respond values

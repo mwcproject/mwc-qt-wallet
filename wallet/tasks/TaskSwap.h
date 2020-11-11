@@ -42,16 +42,19 @@ class TaskGetSwapTrades : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*40; // 40 seconds can be possible because of the status update and connection errors
 
-    TaskGetSwapTrades( MWC713 *wallet713 ) :
+    TaskGetSwapTrades( MWC713 *wallet713, QString _cookie ) :
                 Mwc713Task("TaskSwapTrades",
                 "swap --list --check --json_format",
-                wallet713, "") {}
+                wallet713, ""),
+                cookie(_cookie) {}
 
     virtual ~TaskGetSwapTrades() override {}
 
     virtual bool processTask(const QVector<WEvent> &events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    QString cookie;
 };
 
 // Delete single trade.

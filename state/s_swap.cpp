@@ -21,6 +21,7 @@
 #include "../util/address.h"
 #include "u_nodeinfo.h"
 #include <QDateTime>
+#include "../bridge/swap_b.h"
 
 namespace state {
 
@@ -75,6 +76,10 @@ Swap::Swap(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onNewSwapTrade, this, &Swap::onNewSwapTrade, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onCreateNewSwapTrade, this, &Swap::onCreateNewSwapTrade, Qt::QueuedConnection );
 
+    QObject::connect( context->wallet, &wallet::Wallet::onLoginResult, this, &Swap::onLoginResult, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onLogout, this, &Swap::onLogout, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onRequestSwapTrades, this, &Swap::onRequestSwapTrades, Qt::QueuedConnection );
+
     startTimer(1000); // 1 second timer is fine. Timer is for try.
 
     updateFeesIsNeeded();
@@ -112,11 +117,16 @@ bool Swap::isTradeRunning(const QString & swapId) const {
     return runningSwaps.contains(swapId);
 }
 
+// Number of trades that are in progress
+int Swap::getRunningTradesNumber() const {
+    return runningSwaps.size();
+}
+
 
 // Run the trade
-void Swap::runTrade(QString swapId) {
+void Swap::runTrade(QString swapId, QString statusCmd) {
     AutoswapTask task;
-    task.setData(swapId, 0);
+    task.setData(swapId, statusCmd, 0);
     runningSwaps.insert(swapId, task);
 }
 
@@ -137,16 +147,42 @@ void Swap::timerEvent(QTimerEvent *event) {
         }
     }
 
-    // Let's run every minute, it should be enough
-    if (curTime - nextTask.lastUpdatedTime > 60) {
+    if (nextTask.lastUpdatedTime == LONG_LONG_MAX)
+        return; // Still nothing to do. There are some are serving
+
+    // Let's run every 30 seconds, it should be enough
+    if (curTime - nextTask.lastUpdatedTime > 30) {
         // starting the task
-        runningTask = nextTask.swapId;
         runningSwaps[nextTask.swapId].lastUpdatedTime = curTime;
+
+        // Let's check if the backup is needed..
+        int taskBkId = bridge::getSwapBackup(nextTask.stateCmd);
+        int expBkId = context->appContext->getSwapBackStatus(nextTask.swapId);
+        if (taskBkId > expBkId) {
+            if (context->appContext->getSwapEnforceBackup()) {
+                runningSwaps[nextTask.swapId].lastUpdatedTime = LONG_LONG_MAX;
+                // Note, we are in the eventing loop, so modal will create a new one!!!
+                core::getWndManager()->showBackupDlg(nextTask.swapId, taskBkId);
+                runningSwaps[nextTask.swapId].lastUpdatedTime = 0;
+                return;
+            }
+            else {
+                if ( shownBackupMessages.value(nextTask.swapId, 0) < expBkId ) {
+                    shownBackupMessages.insert(nextTask.swapId, taskBkId);
+                    // Note, we are in the eventing loop, so modal will create a new one and soon timer will be called!!!
+                    core::getWndManager()->showBackupDlg(nextTask.swapId, taskBkId);
+                    runningSwaps[nextTask.swapId].lastUpdatedTime = 0;
+                    return;
+                }
+            }
+        }
+
+        runningTask = nextTask.swapId;
         context->wallet->performAutoSwapStep(nextTask.swapId);
     }
 }
 
-void Swap::onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString currentAction, QString currentState,
+void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
                            QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                            QVector<wallet::SwapJournalMessage> tradeJournal,
                            QString error ) {
@@ -170,12 +206,23 @@ void Swap::onPerformAutoSwapStep(QString swapId, bool swapIsDone, QString curren
         return;
     }
 
-    if (swapIsDone) {
-        runningSwaps.remove(swapId);
+    if (runningSwaps.contains(swapId)) {
+        if (runningSwaps[swapId].stateCmd != stateCmd) {
+            runningSwaps[swapId].stateCmd = stateCmd;
+            runningSwaps[swapId].lastUpdatedTime = 0; // process to the next step now (Backup need to be asked quickly)
+        }
     }
 
-    logger::logEmit( "SWAP", "onSwapTradeStatusUpdated", swapId + ", " + currentAction + ", " + currentState );
-    emit onSwapTradeStatusUpdated( swapId, currentAction, currentState, executionPlan, tradeJournal);
+    if ( bridge::isSwapDone(stateCmd)) {
+        runningSwaps.remove(swapId);
+
+        // Trigger refresh with "SwapListWnd"
+        // Note!!!! It is a hack, but it really reduce complexity of this case!!!
+        context->wallet->requestSwapTrades("SwapListWnd");
+    }
+
+    logger::logEmit( "SWAP", "onSwapTradeStatusUpdated", swapId + ", " + stateCmd + ", " + currentAction + ", " + currentState );
+    emit onSwapTradeStatusUpdated( swapId, stateCmd, currentAction, currentState, executionPlan, tradeJournal);
 }
 
 void Swap::onNewSwapTrade(QString currency, QString swapId) {
@@ -360,7 +407,7 @@ void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> param
         emit onCreateStartSwap(errMsg.isEmpty(), errMsg);
 
         if (errMsg.isEmpty()) {
-            runTrade(swapId);
+            runTrade(swapId, "SellerOfferCreated");
             core::getWndManager()->pageSwapList();
             core::getWndManager()->messageTextDlg("Swap Trade", "Congratulation! Your swap trade with ID " + swapId +
                                                                 " is sucessfully created.");
@@ -490,7 +537,43 @@ void Swap::resetNewSwapData() {
     newSwapElectrumXUrl = "";
 }
 
+void Swap::onLoginResult(bool ok) {
+    if (ok) {
+        qDebug() << "Requesting swap trades...";
+        context->wallet->requestSwapTrades("SwapInitRequest");
+    }
+}
 
+// Logout event
+void Swap::onLogout() {
+    if (!runningSwaps.isEmpty()) {
+        int sz = runningSwaps.size();
+        runningSwaps.clear();
+        core::getWndManager()->messageTextDlg("WARNING", "Because of the logout, " + QString::number(sz) +
+                    " swap trade"+ (sz>1 ? "s":"") +" are stopped. Please login back into your wallet as soon as possible. "
+                    "The wallet need to be active until the swap trade is finished. Otherwise you can loose the monet involved in this trade");
+    }
+}
+
+// Response from requestSwapTrades
+void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error) {
+    if (cookie!="SwapInitRequest")
+        return;
+
+    if (!error.isEmpty()) {
+        core::getWndManager()->messageTextDlg("Error", "Unable to request swap trades. If you have running trades, please solve this problem as soon as possible. If your wallet is not online, you might loos your trade funds.\n\n" + error);
+        return;
+    }
+
+    // Now starting the swaps
+    runningSwaps.clear();
+
+    for (const wallet::SwapInfo & sw : swapTrades) {
+        if (!bridge::isSwapDone(sw.stateCmd) && !bridge::isSwapWatingToAccept(sw.stateCmd)) {
+            runTrade(sw.swapId, sw.stateCmd);
+        }
+    }
+}
 
 
 }

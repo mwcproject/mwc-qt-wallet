@@ -30,6 +30,7 @@ namespace bridge {
     class Wallet;
     class StateMachine;
     class Util;
+    class Swap;
 }
 
 class QPushButton;
@@ -121,6 +122,7 @@ private:
     bridge::Wallet * wallet = nullptr;
     bridge::StateMachine * stateMachine = nullptr;
     bridge::Util * util = nullptr;
+    bridge::Swap * swap = nullptr;
     bool leftBarShown = true;
     core::StatusWndMgr* statusMgr = nullptr;
 };

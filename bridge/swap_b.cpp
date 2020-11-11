@@ -73,37 +73,32 @@ void Swap::pageTradeList() {
 }
 
 // request the list of swap trades
-void Swap::requestSwapTrades() {
-    getWallet()->requestSwapTrades();
+void Swap::requestSwapTrades(QString cookie) {
+    getWallet()->requestSwapTrades(cookie);
 }
 
-void Swap::onRequestSwapTrades(QVector<wallet::SwapInfo> swapTrades) {
-    // Result comes in series of 9 item tuples:
-    // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <State>, <initiate_time_interval>, <expire_time_interval>  <secondary_address> >, ....
+void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error) {
+    // Result comes in series of 10 item tuples:
+    // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <StateCmd>, <State>, <initiate_time>, <expire_time>  <secondary_address> >, ....
     QVector<QString> trades;
-    int64_t timestampSec = QDateTime::currentSecsSinceEpoch();
     for (const auto & st : swapTrades) {
         trades.push_back( st.isSeller ? "true" : "false" );
         trades.push_back( st.mwcAmount );
         trades.push_back( st.secondaryAmount );
         trades.push_back( st.secondaryCurrency );
         trades.push_back(st.swapId);
+        trades.push_back(st.stateCmd);
         if (st.action.isEmpty() || st.action=="None")
             trades.push_back(st.state);
         else
             trades.push_back(st.action);
 
-        trades.push_back( util::interval2String( timestampSec - st.startTime, false, 2 ));
-        if (st.expiration>0) {
-            trades.push_back( util::interval2String( st.expiration - timestampSec, true, 2 ));
-        }
-        else {
-            trades.push_back("");
-        }
+        trades.push_back(QString::number(st.startTime));
+        trades.push_back(QString::number(st.expiration));
         trades.push_back(st.secondaryAddress);
     }
 
-    emit sgnSwapTradesResult( trades );
+    emit sgnSwapTradesResult( cookie, trades, error );
 }
 
 // Cancel the trade. Send signal to the cancel the trade.
@@ -280,6 +275,8 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
     swapInfo.push_back(swap.communicationMethod);
     // [7] - Communication address
     swapInfo.push_back(swap.communicationAddress);
+    // [8] - private ElectrumX uri
+    swapInfo.push_back(swap.electrumNodeUri);
 
     emit sgnRequestTradeDetails( swapInfo, convertExecutionPlan(executionPlan), currentAction, convertTradeJournal(tradeJournal), errMsg );
 }
@@ -288,6 +285,11 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
 // Check if this Trade is running in auto mode now
 bool Swap::isRunning(QString swapId) {
     return getSwap()->isTradeRunning(swapId);
+}
+
+// Number of trades that are in progress
+int Swap::getRunningTradesNumber() {
+    return getSwap()->getRunningTradesNumber();
 }
 
 // Update communication method.
@@ -308,6 +310,12 @@ void Swap::updateSecondaryFee(QString swapId, double fee) {
     getWallet()->adjustSwapData(swapId, "secondary_fee", QString::number(fee) );
 }
 
+// Update electrumX private node URI
+// Respond will come with sgnUpdateElectrumX
+void Swap::updateElectrumX(QString swapId, QString electrumXnodeUri ) {
+    getWallet()->adjustSwapData(swapId, "electrumx_uri", electrumXnodeUri );
+}
+
 void Swap::onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg) {
     if (adjustCmd == "destination") {
         emit sgnUpdateCommunication(swapId, errMsg);
@@ -318,12 +326,24 @@ void Swap::onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg) {
     else if (adjustCmd=="secondary_fee") {
         emit sgnUpdateSecondaryFee(swapId,errMsg);
     }
+    else if (adjustCmd=="electrumx_uri") {
+        emit sgnUpdateElectrumX(swapId,errMsg);
+    }
 }
 
-void Swap::onSwapTradeStatusUpdated(QString swapId, QString currentAction, QString currentState,
+void Swap::onSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
                               QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                               QVector<wallet::SwapJournalMessage> tradeJournal) {
-    emit sgnSwapTradeStatusUpdated( swapId, currentAction, currentState,
+
+    int64_t expirationTime = 0;
+    for (const auto & ep : executionPlan) {
+        if (ep.active) {
+            expirationTime = ep.end_time;
+            break;
+        }
+    }
+
+    emit sgnSwapTradeStatusUpdated( swapId, stateCmd, currentAction, currentState, expirationTime,
             convertExecutionPlan(executionPlan),
             convertTradeJournal(tradeJournal));
 }
@@ -574,6 +594,85 @@ QString Swap::getElectrumXprivateUrl() {
 QVector<QString> Swap::getLockTime( QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks ) {
     return getSwap()->getLockTime( secCurrency, offerExpTime, redeemTime, mwcBlocks, secBlocks );
 }
+
+bool isSwapDone(const QString & stateCmd) {
+    return stateCmd.endsWith("Cancelled") || stateCmd.endsWith("Refunded")  || stateCmd.endsWith("Complete");
+}
+bool Swap::isSwapDone(QString stateCmd) {
+    return bridge::isSwapDone(stateCmd);
+}
+
+
+static QSet<QString> nonCancelableStates{ "SellerWaitingForRefundHeight", "SellerPostingRefundSlate", "SellerWaitingForRefundConfirmations", "SellerCancelledRefunded", "SellerCancelled",
+                                       "BuyerWaitingForRefundTime", "BuyerPostingRefundForSecondary", "BuyerWaitingForRefundConfirmations", "BuyerCancelledRefunded", "BuyerCancelled" };
+
+bool isSwapCancellable(const QString & stateCmd) {
+    return !nonCancelableStates.contains(stateCmd);
+}
+bool Swap::isSwapCancellable(QString stateCmd) {
+    return bridge::isSwapCancellable(stateCmd);
+}
+
+static QMap<QString, int> buildBackupMapping() {
+    QMap<QString, int> backups;
+    backups.insert("SellerOfferCreated", 0);
+    backups.insert("SellerSendingOffer", 0);
+    backups.insert("SellerWaitingForAcceptanceMessage",0);
+    backups.insert("SellerWaitingForBuyerLock",1);
+    backups.insert("SellerPostingLockMwcSlate",1);
+    backups.insert("SellerWaitingForLockConfirmations",1);
+    backups.insert("SellerWaitingForInitRedeemMessage",1);
+    backups.insert("SellerSendingInitRedeemMessage",2);
+    backups.insert("SellerWaitingForBuyerToRedeemMwc",2);
+    backups.insert("SellerRedeemSecondaryCurrency",2);
+    backups.insert("SellerWaitingForRedeemConfirmations",2);
+    backups.insert("SellerSwapComplete",0);
+    backups.insert("SellerWaitingForRefundHeight",1);
+    backups.insert("SellerPostingRefundSlate",1);
+    backups.insert("SellerWaitingForRefundConfirmations",1);
+    backups.insert("SellerCancelledRefunded",0);
+    backups.insert("SellerCancelled",0);
+
+    backups.insert("BuyerOfferCreated",0);
+    backups.insert("BuyerSendingAcceptOfferMessage",1);
+    backups.insert("BuyerWaitingForSellerToLock",1);
+    backups.insert("BuyerPostingSecondaryToMultisigAccount",1);
+    backups.insert("BuyerWaitingForLockConfirmations",1);
+    backups.insert("BuyerSendingInitRedeemMessage",1);
+    backups.insert("BuyerWaitingForRespondRedeemMessage",1);
+    backups.insert("BuyerRedeemMwc",2);
+    backups.insert("BuyerWaitForRedeemMwcConfirmations",2);
+    backups.insert("BuyerSwapComplete",0);
+
+    backups.insert("BuyerWaitingForRefundTime",1);
+    backups.insert("BuyerPostingRefundForSecondary",1);
+    backups.insert("BuyerWaitingForRefundConfirmations",1);
+    backups.insert("BuyerCancelledRefunded",0);
+    backups.insert("BuyerCancelled", 0);
+    return backups;
+}
+
+static QMap<QString, int> backupMapping = buildBackupMapping();
+
+int  getSwapBackup(const QString & stateCmd) {
+    Q_ASSERT(backupMapping.contains(stateCmd));
+    return backupMapping.value(stateCmd, 0);
+}
+
+int Swap::getSwapBackup(QString stateCmd) {
+    return bridge::getSwapBackup(stateCmd);
+}
+
+bool isSwapWatingToAccept(const QString & stateCmd) {
+    return stateCmd=="BuyerOfferCreated";
+}
+
+bool Swap::isSwapWatingToAccept(QString stateCmd) {
+    return bridge::isSwapWatingToAccept(stateCmd);
+}
+
+
+
 
 
 }

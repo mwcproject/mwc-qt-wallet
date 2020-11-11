@@ -95,7 +95,7 @@ public:
     Q_INVOKABLE void updateColumnsWidhts( QString tableId, QVector<int> widths );
 
     // Get last saved path for that pathId.
-    Q_INVOKABLE QString getPathFor(QString pathId);
+    Q_INVOKABLE QString getPathFor(QString pathId, bool returnEmptyForNew = false);
     // Save last selected path by user
     Q_INVOKABLE void updatePathFor(QString pathId, QString path);
 
@@ -151,8 +151,13 @@ public:
     // Update fluff flag value
     Q_INVOKABLE void setSwapTabSelection(int selection);
 
+    // Swap setting. Enforce will wait until user do the backup.
     Q_INVOKABLE void setSwapEnforceBackup(bool doBackup);
     Q_INVOKABLE bool getSwapEnforceBackup();
+
+    // Backup status. We will ask user to do a backup for this swap.
+    Q_INVOKABLE int  getSwapBackStatus(QString swapId);
+    Q_INVOKABLE void setSwapBackStatus(QString swapId, int status);
 };
 
 }
