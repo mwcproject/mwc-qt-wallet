@@ -147,7 +147,7 @@ void NewSwap1::on_nextButton_clicked() {
     }
 
     swap->applyNewTrade1Params(account, secCurrency, mwcAmount, secAmount,
-            secAddress, sendTo);
+            secAddress, sendTo, ui->lockMwcFirstCheck->isChecked());
 
     ui->progress->show();
 }

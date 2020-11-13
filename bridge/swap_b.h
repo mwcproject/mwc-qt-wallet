@@ -93,7 +93,7 @@ public:
     // Apply params from trade1 and switch to trade2 panel
     // Response: sgnApplyNewTrade1Params(bool ok, QString errorMessage)
     Q_INVOKABLE void applyNewTrade1Params(QString account, QString secCurrency, QString mwcAmount, QString secAmount,
-                                          QString secAddress, QString sendToAddress );
+                                          QString secAddress, QString sendToAddress, bool lockMwcFirst );
     // Apply params from trade2 panel and switch to the review (panel3)
     // Response: sgnApplyNewTrade2Params(bool ok, QString errorMessage)
     Q_INVOKABLE void applyNewTrade2Params(QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks,

@@ -22,6 +22,7 @@
 #include "u_nodeinfo.h"
 #include <QDateTime>
 #include "../bridge/swap_b.h"
+#include <QThread>
 
 namespace state {
 
@@ -69,6 +70,25 @@ static SecCurrencyInfo getCurrencyInfo(QString currency) {
     return SWAP_CURRENCY_LIST[0];
 }
 
+//////////////////////////////////////////////////////////////
+// Timer thread.
+
+bool TimerThread::alive = false;
+
+TimerThread::TimerThread(QObject * parent, long _interval) : QThread(parent), interval(_interval) {alive = true;}
+
+TimerThread::~TimerThread() {alive=false;}
+
+void TimerThread::run() {
+    long sleepInt = interval;
+    while (alive) {
+        QThread::msleep(sleepInt);
+        emit onTimerEvent();
+    }
+}
+
+/////////////////////////////////////////////////////////////
+
 Swap::Swap(StateContext * context) :
         State(context, STATE::SWAP)
 {
@@ -83,7 +103,9 @@ Swap::Swap(StateContext * context) :
     // You get an offer to swap BCH to MWC. SwapID is ffa15dbd-85a9-4fc9-a3c0-4cfdb144862b
     // Listen to a new swaps...
 
-    startTimer(1000); // 1 second timer is fine. Timer is for try.
+    TimerThread * timer = new TimerThread(this, 1000);
+    QObject::connect( timer, &TimerThread::onTimerEvent, this, &Swap::onTimerEvent, Qt::QueuedConnection );
+    timer->start();
 
     updateFeesIsNeeded();
 }
@@ -144,13 +166,17 @@ void Swap::runTrade(QString swapId, QString statusCmd) {
     runningSwaps.insert(swapId, task);
 }
 
-void Swap::timerEvent(QTimerEvent *event) {
-    Q_UNUSED(event)
-
+void Swap::onTimerEvent() {
     if (runningSwaps.isEmpty() || !runningTask.isEmpty())
         return;
 
-    int64_t curTime = QDateTime::currentSecsSinceEpoch();
+    int64_t curMsec = QDateTime::currentMSecsSinceEpoch();
+    if (curMsec-lastProcessedTimerData < 500)
+        return; // Skipping this event, Q migth be overloaded
+
+    lastProcessedTimerData = curMsec;
+
+    int64_t curTime = curMsec/1000;
 
     AutoswapTask nextTask;
     nextTask.lastUpdatedTime = curTime;
@@ -161,7 +187,7 @@ void Swap::timerEvent(QTimerEvent *event) {
         }
     }
 
-    if (nextTask.lastUpdatedTime == LONG_LONG_MAX)
+   if (nextTask.swapId.isEmpty() || nextTask.lastUpdatedTime == LONG_LONG_MAX)
         return; // Still nothing to do. There are some are serving
 
     // Let's run every 30 seconds, it should be enough
@@ -194,6 +220,7 @@ void Swap::timerEvent(QTimerEvent *event) {
         runningTask = nextTask.swapId;
         context->wallet->performAutoSwapStep(nextTask.swapId);
     }
+    lastProcessedTimerData = QDateTime::currentMSecsSinceEpoch();
 }
 
 void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
@@ -322,8 +349,13 @@ void Swap::showNewTrade2() {
     core::getWndManager()->pageSwapNew2();
 }
 
+// Apply params from trade1, not need to check
+void Swap::applyNewTrade11Params(bool mwcLockFirst) {
+    newSwapSellectLockFirst = mwcLockFirst;
+}
+
 // Apply params from trade1 and switch to trade2 panel. Expected that params are validated by the wallet(bridge)
-void Swap::applyNewTrade1Params(QString acccount, QString secCurrency, QString mwcAmount, QString secAmount,
+void Swap::applyNewTrade12Params(QString acccount, QString secCurrency, QString mwcAmount, QString secAmount,
                           QString secAddress, QString sendToAddress ) {
     newSwapAccount = acccount;
     newSwapCurrency = secCurrency;

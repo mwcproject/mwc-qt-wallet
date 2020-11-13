@@ -20,8 +20,32 @@
 #include <QMap>
 #include <QSet>
 #include "../util/httpclient.h"
+#include <QThread>
 
 namespace state {
+
+//////////////////////////////////////////////////////////////
+// Timer thread.
+
+// Very specific class. Make it pulbilly available only because of QT magic.
+// QT magic works great only if class has both declaration and implementation in different files.
+class TimerThread : public QThread {
+Q_OBJECT
+public:
+    TimerThread(QObject * parent, long _interval);
+    ~TimerThread();
+protected:
+    void run();
+private:
+signals:
+    void onTimerEvent();
+
+private:
+    long interval = 1000;
+    static bool alive; // one instance is running, static is for exiting. Should be safe
+};
+/////////////////////////////////////////////////////////////
+
 
 struct AutoswapTask {
     QString swapId;
@@ -58,8 +82,10 @@ public:
     // Show the trade page 2
     void showNewTrade2();
 
+    // Apply params from trade1, not need to check
+    void applyNewTrade11Params(bool mwcLockFirst);
     // Apply params from trade1 and switch to trade2 panel. Expected that params are validated by the wallet(bridge)
-    void applyNewTrade1Params(QString acccount, QString secCurrency, QString mwcAmount, QString secAmount,
+    void applyNewTrade12Params(QString acccount, QString secCurrency, QString mwcAmount, QString secAmount,
                                           QString secAddress, QString sendToAddress );
     // Apply part1 params from trade2 panel. Expected that params are validated by the windows
     void applyNewTrade21Params(QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks,
@@ -130,8 +156,6 @@ protected:
                                        const QString & param3,
                                        const QString & param4) override;
 private:
-    virtual void timerEvent(QTimerEvent *event) override;
-
     void resetNewSwapData();
 
     // Start trade to run
@@ -164,6 +188,7 @@ slots:
     // Response from createNewSwapTrade, SwapId on OK,  errMsg on failure
     void onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> params, QString swapId, QString errMsg);
 
+    void onTimerEvent();
 private:
     // Key: swapId,  Value: running Task
     QMap<QString, AutoswapTask> runningSwaps;
@@ -172,6 +197,7 @@ private:
     QSet<QString> shownMessages;
     QMap<QString, int> shownBackupMessages;
 
+    long lastProcessedTimerData = 0;
 
     // New trade data.
     QString newSwapAccount;

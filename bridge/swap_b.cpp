@@ -392,7 +392,7 @@ void Swap::showNewTrade2() {
 // Apply params from trade1 and switch to trade2 panel
 // Response: sgnApplyNewTrade1Params(bool ok, QString errorMessage)
 void Swap::applyNewTrade1Params(QString account, QString secCurrency, QString mwcAmount, QString secAmount,
-                                      QString secAddress, QString sendToAddress ) {
+                                      QString secAddress, QString sendToAddress, bool lockMwcFirst ) {
 
     QPair< bool, util::ADDRESS_TYPE > addressRes = util::verifyAddress(sendToAddress);
     if ( !addressRes.first ) {
@@ -417,6 +417,8 @@ void Swap::applyNewTrade1Params(QString account, QString secCurrency, QString mw
 
         }
     }
+
+    getSwap()->applyNewTrade11Params( lockMwcFirst );
 
     // We need to use wallet for verification. start new with a dry run will work great
     getWallet()->createNewSwapTrade(account,
@@ -497,7 +499,7 @@ void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> param
         Q_ASSERT(params.size()==6);
         emit sgnApplyNewTrade1Params(errMsg.isEmpty(), errMsg);
         if (errMsg.isEmpty()) {
-            getSwap()->applyNewTrade1Params( params[0], params[1], params[2], params[3], params[4], params[5] );
+            getSwap()->applyNewTrade12Params( params[0], params[1], params[2], params[3], params[4], params[5] );
         }
         return;
     }
@@ -607,8 +609,10 @@ bool Swap::isSwapDone(QString stateCmd) {
 }
 
 
-static QSet<QString> nonCancelableStates{ "SellerWaitingForRefundHeight", "SellerPostingRefundSlate", "SellerWaitingForRefundConfirmations", "SellerCancelledRefunded", "SellerCancelled",
-                                       "BuyerWaitingForRefundTime", "BuyerPostingRefundForSecondary", "BuyerWaitingForRefundConfirmations", "BuyerCancelledRefunded", "BuyerCancelled" };
+static QSet<QString> nonCancelableStates{ "SellerWaitingForBuyerToRedeemMwc", "SellerRedeemSecondaryCurrency", "SellerWaitingForRedeemConfirmations","SellerSwapComplete",
+                                                "SellerWaitingForRefundHeight", "SellerPostingRefundSlate", "SellerWaitingForRefundConfirmations", "SellerCancelledRefunded", "SellerCancelled",
+                                          "BuyerRedeemMwc", "BuyerWaitForRedeemMwcConfirmations", "BuyerSwapComplete",
+                                                "BuyerWaitingForRefundTime", "BuyerPostingRefundForSecondary", "BuyerWaitingForRefundConfirmations", "BuyerCancelledRefunded", "BuyerCancelled" };
 
 bool isSwapCancellable(const QString & stateCmd) {
     return !nonCancelableStates.contains(stateCmd);
