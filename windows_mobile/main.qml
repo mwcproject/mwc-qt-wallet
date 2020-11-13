@@ -219,6 +219,12 @@ Window {
             visible: currentState === 12
         }
 
+        Accounts {
+            id: accountsItem
+            anchors.fill: parent
+            visible: currentState === 4
+        }
+
         Notifications {
             id: notificationsItem
             anchors.fill: parent

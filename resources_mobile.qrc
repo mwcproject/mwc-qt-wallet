@@ -134,5 +134,7 @@
         <file>windows_mobile/Outputs.qml</file>
         <file>windows_mobile/OutputDetail.qml</file>
         <file>windows_mobile/WalletConfig.qml</file>
+        <file>windows_mobile/Accounts.qml</file>
+        <file>windows_mobile/InputDlg.qml</file>
     </qresource>
 </RCC>
