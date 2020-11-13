@@ -151,6 +151,10 @@ void SwapList::selectSwapTab(int selection) {
         ui->restoreTradeHolder->hide();
         ui->swapsTable->show();
         ui->refreshBtnsHolder->show();
+
+        swapList.clear();
+        ui->swapsTable->clearAll();
+
     }
     // Requesting swap list in any case because that routing does counting and update the tabs with number of items.
     requestSwapList();

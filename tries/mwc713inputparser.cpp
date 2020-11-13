@@ -447,7 +447,6 @@ void Mwc713InputParser::initTransactions() {
 void Mwc713InputParser::initSwaps() {
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SWAP_GET_OFFER,
                                                 QVector<BaseTrieSection*>{
-                                                        new TrieNewLineSection(),
                                                         new TriePhraseSection("You get an offer to swap "),
                                                         // Account name have extra character!
                                                         new TrieAnySection(10, TrieAnySection::NOT_SPACES | TrieAnySection::START_NEXT_EVERY_TRY, "","", 1),

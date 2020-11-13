@@ -83,7 +83,7 @@ void SwapBackupDlg::on_backupDataPath_textEdited(const QString &str)
 }
 
 void SwapBackupDlg::updateButtons() {
-    ui->skipButton->setEnabled( !config->getSwapEnforceBackup() );
+    ui->skipButton->setEnabled( backupId>1 || !config->getSwapEnforceBackup() );
     ui->backupButton->setEnabled( !ui->backupDataPath->text().isEmpty() );
 }
 

@@ -85,10 +85,7 @@ void EditSwap::sgnRequestTradeDetails( QVector<QString> swapInfo,
     QString secCurrency = swapInfo[3];
     QString secCurrencyFeeUnits = swapInfo[5]; // - secondary fee units
 
-    if (secCurrency=="BCH")
-        ui->secondaryAddressLabel->setText("Legacy BCH address to receive the coins");
-    else
-        ui->secondaryAddressLabel->setText(secCurrency + " address to receive the coins");
+    ui->secondaryAddressLabel->setText(secCurrency + " address to receive the coins");
 
     ui->secTransFeeLabel->setText(secCurrency + " transaction fee");
     ui->updateBtn->setText("Update "+ secCurrency +" transaction details");
