@@ -86,6 +86,7 @@ public:
                             int min_confirmations,
                             QString mwcAmount, QString  secAmount, QString secondary,
                             QString redeemAddress,
+                            double secTxFee,
                             bool sellerLockFirst,
                             int messageExchangeTimeMinutes,
                             int redeemTimeMinutes,
@@ -100,7 +101,7 @@ public:
                             QVector<QString> _params ) :
             Mwc713Task("TaskCreateNewSwapTrade",
                        generateCommandLine(min_confirmations,mwcAmount, secAmount, secondary,
-                                    redeemAddress, sellerLockFirst, messageExchangeTimeMinutes,
+                                    redeemAddress, secTxFee, sellerLockFirst, messageExchangeTimeMinutes,
                                     redeemTimeMinutes, mwcConfirmationNumber, secondaryConfirmationNumber,
                                     communicationMethod, communicationAddress, electrum_uri1,
                                     electrum_uri2, _dryRun),
@@ -115,6 +116,7 @@ private:
     QString generateCommandLine(int min_confirmations,
                                 QString mwcAmount, QString  secAmount, QString secondary,
                                 QString redeemAddress,
+                                double secTxFee,
                                 bool sellerLockFirst,
                                 int messageExchangeTimeMinutes,
                                 int redeemTimeMinutes,
@@ -252,6 +254,22 @@ private:
     QString fileName;
 };
 
+
+class TaskAdjustTradeState : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*30;
+
+    TaskAdjustTradeState( MWC713 *wallet713, const QString & swapId, const QString & newState ) :
+            Mwc713Task("TaskAdjustTradeState",
+                       "swap --adjust " + newState + " -i " + swapId,
+                       wallet713, "") {}
+
+    virtual ~TaskAdjustTradeState() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+};
 
 
 }

@@ -287,6 +287,7 @@ public:
                                     int min_confirmations, // minimum number of confimations
                                     QString mwcAmount, QString secAmount, QString secondary,
                                     QString redeemAddress,
+                                    double secTxFee,
                                     bool sellerLockFirst,
                                     int messageExchangeTimeMinutes,
                                     int redeemTimeMinutes,

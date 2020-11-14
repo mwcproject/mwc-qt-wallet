@@ -147,7 +147,11 @@ public:
     // Accept a new trade and start run it. By that moment the trade must abe reviews and all set
     Q_INVOKABLE void acceptTheTrade(QString swapId);
 
+    // Request secondary fee for the currency
     Q_INVOKABLE QString getSecondaryFee(QString secCurrency);
+
+    // Tweak the swap tarde state. ONLY for dev help usage.
+    Q_INVOKABLE void adjustTradeState(QString swapId, QString newState);
 signals:
     // Result of deleteSwapTrade call.
     void sgnDeleteSwapTrade(QString swapId, QString error);

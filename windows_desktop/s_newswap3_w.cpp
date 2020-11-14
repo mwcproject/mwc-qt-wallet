@@ -119,6 +119,4 @@ void NewSwap3::updateSwapReview() {
     ui->offerDetailsEdit->setHtml(reportStr);
 }
 
-
-
 }

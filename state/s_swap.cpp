@@ -368,6 +368,10 @@ void Swap::applyNewTrade11Params(bool mwcLockFirst) {
 // Apply params from trade1 and switch to trade2 panel. Expected that params are validated by the wallet(bridge)
 void Swap::applyNewTrade12Params(QString acccount, QString secCurrency, QString mwcAmount, QString secAmount,
                           QString secAddress, QString sendToAddress ) {
+
+    bool need2recalc1 = (newSwapMwc2Trade != mwcAmount);
+    bool need2recalc2 = (newSwapCurrency2recalc != secCurrency);
+
     newSwapAccount = acccount;
     newSwapCurrency = secCurrency;
     newSwapMwc2Trade = mwcAmount;
@@ -381,10 +385,16 @@ void Swap::applyNewTrade12Params(QString acccount, QString secCurrency, QString 
     if (newSwapRedeemTime<=0)
         newSwapRedeemTime = 60;
 
-    newSwapMwcConfNumber = calcConfirmationsForMwcAmount( newSwapMwc2Trade.toDouble() );
-    SecCurrencyInfo sci = getCurrencyInfo(secCurrency);
-    newSwapSecConfNumber = sci.confNumber;
-    newSwapSecTxFee = sci.fxFee; // Expected that txFee is already request by API. If not, user will need to input it manually.
+    if (need2recalc1) {
+        newSwapMwcConfNumber = calcConfirmationsForMwcAmount(newSwapMwc2Trade.toDouble());
+    }
+
+    if (need2recalc2) {
+        SecCurrencyInfo sci = getCurrencyInfo(secCurrency);
+        newSwapSecConfNumber = sci.confNumber;
+        newSwapSecTxFee = sci.fxFee; // Expected that txFee is already request by API. If not, user will need to input it manually.
+        newSwapCurrency2recalc = secCurrency;
+    }
 
     core::getWndManager()->pageSwapNew2();
 }
@@ -442,6 +452,7 @@ void Swap::createStartSwap() {
     context->wallet->createNewSwapTrade( newSwapAccount, minConf,
                                    newSwapMwc2Trade, newSwapSec2Trade, newSwapCurrency,
             newSwapSecAddress,
+            newSwapSecTxFee,
             newSwapSellectLockFirst,
             newSwapOfferExpirationTime,
             newSwapRedeemTime,
@@ -621,6 +632,7 @@ void Swap::resetNewSwapData() {
     newSwapMwcConfNumber = -1;
     newSwapSecConfNumber = -1;
     newSwapElectrumXUrl = "";
+    newSwapCurrency2recalc = "";
 }
 
 void Swap::onLoginResult(bool ok) {

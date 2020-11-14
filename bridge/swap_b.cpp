@@ -222,12 +222,14 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
     reportStr += "</p>";
 
     QString address = swap.communicationAddress;
-    if (swap.communicationMethod=="mwcmqs")
-        address = "mwcmqs://" + address;
-    else if (swap.communicationMethod=="tor")
-        address = "http://" + address + ".onion";
-    else {
-        Q_ASSERT(false); // QT wallet doesn't expect anything else.
+    if (!address.contains("://")) {
+        if (swap.communicationMethod == "mwcmqs")
+            address = "mwcmqs://" + address;
+        else if (swap.communicationMethod == "tor")
+            address = "http://" + address + ".onion";
+        else {
+            Q_ASSERT(false); // QT wallet doesn't expect anything else.
+        }
     }
     reportStr += "<p>Trading with : <b style=\"color:yellow;\">" +  address + "</b></p>";
     reportStr += "</body></html>";
@@ -425,6 +427,7 @@ void Swap::applyNewTrade1Params(QString account, QString secCurrency, QString mw
                                     getAppContext()->getSendCoinsParams().inputConfirmationNumber,
                                     mwcAmount, secAmount, secCurrency,
                                     secAddress,
+                                    1.0,
                                     true,
                                     60,
                                     60,
@@ -473,6 +476,7 @@ void Swap::applyNewTrade2Params(QString secCurrency, int offerExpTime, int redee
                                     getAppContext()->getSendCoinsParams().inputConfirmationNumber,
                                     getSwap()->getMwc2Trade(), getSwap()->getSec2Trade(), getSwap()->getCurrentSecCurrency(),
                                     getSwap()->getSecAddress(),
+                                     secTxFee,
                                     true,
                                     offerExpTime,
                                     redeemTime,
@@ -691,6 +695,12 @@ QString Swap::getSecondaryFee(QString secCurrency) {
 
     return util::trimStrAsDouble(QString::number( fee, 'f' ), 10);
 }
+
+// Tweak the swap tarde state. ONLY for dev help usage.
+void Swap::adjustTradeState(QString swapId, QString newState) {
+    getWallet()->adjustTradeState(swapId, newState);
+}
+
 
 }
 

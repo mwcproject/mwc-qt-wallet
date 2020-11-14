@@ -48,6 +48,9 @@ private slots:
     void on_backButton_clicked();
     void on_refreshButton_clicked();
 
+protected:
+    virtual void mouseDoubleClickEvent(QMouseEvent *event);
+
 private:
     void updateData(const QVector<QString> & executionPlan,
                    const QString & currentAction,

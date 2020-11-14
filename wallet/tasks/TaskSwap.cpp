@@ -19,6 +19,7 @@
 #include <QJsonValue>
 #include "../mwc713.h"
 #include "utils.h"
+#include "../../core/Notification.h"
 
 namespace wallet {
 
@@ -126,6 +127,7 @@ bool TaskDeleteSwapTrade::processTask(const QVector<WEvent> &events) {
 QString TaskCreateNewSwapTrade::generateCommandLine(int min_confirmations,
                             QString mwcAmount, QString  secAmount, QString secondary,
                             QString redeemAddress,
+                            double secTxFee,
                             bool sellerLockFirst,
                             int messageExchangeTimeMinutes,
                             int redeemTimeMinutes,
@@ -148,6 +150,7 @@ QString TaskCreateNewSwapTrade::generateCommandLine(int min_confirmations,
             " --secondary_confirmations " + QString::number(secondaryConfirmationNumber) +
             " --redeem_time " + QString::number(redeemTimeMinutes) +
             " --secondary_address " + redeemAddress +
+            " --secondary_fee " + QString::number(secTxFee) +
             " --secondary_amount " + secAmount +
             " --secondary_currency " + secondary +
             " --method " + communicationMethod +
@@ -419,5 +422,23 @@ bool TaskRestoreSwapTradeData::processTask(const QVector<WEvent> &events) {
                                       getErrorMessage(events, "Unable to restore the trade form the file " + fileName));
     return true;
 }
+
+// ------------------------- TaskAdjustTradeState ----------------------------
+bool TaskAdjustTradeState::processTask(const QVector<WEvent> &events) {
+    QVector<WEvent> lns = filterEvents(events, WALLET_EVENTS::S_LINE);
+
+    for (const auto & l : lns) {
+        if (l.message.contains("was successfully adjusted")) {
+            // We are good.
+            // Swap trade b87f00f4-381b-4f38-aec2-972871f47c76 was successfully adjusted. New state: Post Refund Transaction
+            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, l.message );
+            return true;
+        }
+    }
+
+    // Probably error happens. Should be reported automatically
+    return true;
+}
+
 
 }

@@ -217,6 +217,8 @@ private:
     int     newSwapMwcConfNumber = -1;
     int     newSwapSecConfNumber = -1;
     QString newSwapElectrumXUrl;
+
+    QString newSwapCurrency2recalc;
 };
 
 }

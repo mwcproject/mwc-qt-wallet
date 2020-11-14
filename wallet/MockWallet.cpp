@@ -524,6 +524,7 @@ void MockWallet::createNewSwapTrade(QString account,
                                     int min_confirmations, // minimum number of confimations
                                     QString mwcAmount, QString secAmount, QString secondary,
                                     QString redeemAddress,
+                                    double secTxFee,
                                     bool sellerLockFirst,
                                     int messageExchangeTimeMinutes,
                                     int redeemTimeMinutes,
@@ -542,6 +543,7 @@ void MockWallet::createNewSwapTrade(QString account,
     Q_UNUSED(secAmount)
     Q_UNUSED(secondary)
     Q_UNUSED(redeemAddress)
+    Q_UNUSED(secTxFee)
     Q_UNUSED(sellerLockFirst)
     Q_UNUSED(messageExchangeTimeMinutes)
     Q_UNUSED(redeemTimeMinutes)
