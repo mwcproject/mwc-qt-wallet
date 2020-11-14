@@ -38,6 +38,7 @@ NewSwap2::NewSwap2(QWidget *parent) :
     ui->secTransFeeLabel->setText(secCurrency + " transaction fee");
     ui->secTransFeeEdit->setText( util->trimStrAsDouble( QString::number( swap->getSecTransactionFee(), 'f'), 10 ) );
     ui->secFeeUnitsLabel->setText(swap->getCurrentSecCurrencyFeeUnits());
+    ui->secRedeemLabel->setText(secCurrency + " redeem time");
 
     ui->mwcBlocksEdit->setText( QString::number(swap->getMwcConfNumber()) );
     ui->secBlocksLabel->setText(secCurrency);

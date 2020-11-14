@@ -73,17 +73,25 @@ static SecCurrencyInfo getCurrencyInfo(QString currency) {
 //////////////////////////////////////////////////////////////
 // Timer thread.
 
-bool TimerThread::alive = false;
-
+// We don't want it to be dependent. QT unable to delete it nicely.
+// Let QT handle that on connections level
 TimerThread::TimerThread(QObject * parent, long _interval) : QThread(parent), interval(_interval) {alive = true;}
 
-TimerThread::~TimerThread() {alive=false;}
+TimerThread::~TimerThread() {}
+
+void TimerThread::stop() {
+    alive=false;
+}
 
 void TimerThread::run() {
-    long sleepInt = interval;
+    int k = 0;
     while (alive) {
-        QThread::msleep(sleepInt);
-        emit onTimerEvent();
+        QThread::msleep(interval/10);
+        if (k>10) {
+            emit onTimerEvent();
+            k=0;
+        }
+        k++;
     }
 }
 
@@ -103,7 +111,7 @@ Swap::Swap(StateContext * context) :
     // You get an offer to swap BCH to MWC. SwapID is ffa15dbd-85a9-4fc9-a3c0-4cfdb144862b
     // Listen to a new swaps...
 
-    TimerThread * timer = new TimerThread(this, 1000);
+    timer = new TimerThread(this, 1000);
     QObject::connect( timer, &TimerThread::onTimerEvent, this, &Swap::onTimerEvent, Qt::QueuedConnection );
     timer->start();
 
@@ -111,7 +119,10 @@ Swap::Swap(StateContext * context) :
 }
 
 Swap::~Swap() {
+    timer->stop();
+    timer->wait();
 
+    delete timer;
 }
 
 NextStateRespond Swap::execute() {

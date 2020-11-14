@@ -33,7 +33,9 @@ class TimerThread : public QThread {
 Q_OBJECT
 public:
     TimerThread(QObject * parent, long _interval);
-    ~TimerThread();
+    virtual ~TimerThread();
+
+    void stop();
 protected:
     void run();
 private:
@@ -42,7 +44,7 @@ signals:
 
 private:
     long interval = 1000;
-    static bool alive; // one instance is running, static is for exiting. Should be safe
+    bool alive = true;
 };
 /////////////////////////////////////////////////////////////
 
@@ -190,6 +192,8 @@ slots:
 
     void onTimerEvent();
 private:
+    TimerThread * timer = nullptr;
+
     // Key: swapId,  Value: running Task
     QMap<QString, AutoswapTask> runningSwaps;
     QString  runningTask;
