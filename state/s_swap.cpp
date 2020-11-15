@@ -239,6 +239,7 @@ void Swap::onTimerEvent() {
 }
 
 void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
+                           QString lastProcessError,
                            QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                            QVector<wallet::SwapJournalMessage> tradeJournal,
                            QString error ) {
@@ -258,7 +259,8 @@ void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString curre
 
     // Running task is executed, let's update it
     if (!error.isEmpty()) {
-        core::getWndManager()->messageTextDlg("Swap Processing Error", "Autoswap step is failed for swap " + swapId + "\n\n" + error );
+        //core::getWndManager()->messageTextDlg("Swap Processing Error", "Autoswap step is failed for swap " + swapId + "\n\n" + error );
+        emit onSwapTradeStatusUpdated( swapId, stateCmd, currentAction, currentState, error, executionPlan, tradeJournal);
         return;
     }
 
@@ -277,8 +279,8 @@ void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString curre
         context->wallet->requestSwapTrades("SwapListWnd");
     }
 
-    logger::logEmit( "SWAP", "onSwapTradeStatusUpdated", swapId + ", " + stateCmd + ", " + currentAction + ", " + currentState );
-    emit onSwapTradeStatusUpdated( swapId, stateCmd, currentAction, currentState, executionPlan, tradeJournal);
+    logger::logEmit( "SWAP", "onSwapTradeStatusUpdated", swapId + ", " + stateCmd + ", " + currentAction + ", " + currentState + ", " + lastProcessError );
+    emit onSwapTradeStatusUpdated( swapId, stateCmd, currentAction, currentState, lastProcessError, executionPlan, tradeJournal);
 }
 
 void Swap::onNewSwapTrade(QString currency, QString swapId) {

@@ -87,7 +87,8 @@ bool TaskGetSwapTrades::processTask(const QVector<WEvent> &events) {
                         swapInfoJson["action"].toString(),
                         swapInfoJson["expiration"].toString().toLongLong(),
                         swapInfoJson["is_seller"].toBool(),
-                        swapInfoJson["secondary_address"].toString()
+                        swapInfoJson["secondary_address"].toString(),
+                        swapInfoJson["last_process_error"].toString()
                   );
 
                 swapTrades.push_back(swap_info);
@@ -326,7 +327,7 @@ bool TaskPerformAutoSwapStep::processTask(const QVector<WEvent> &events) {
             QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonStr.toUtf8(), &error);
 
             if (error.error != QJsonParseError::NoError || !jsonDoc.isObject()) {
-                wallet713->setPerformAutoSwapStep(swapId, "", "", "",
+                wallet713->setPerformAutoSwapStep(swapId, "", "", "", "",
                                                   executionPlan, tradeJournal,
                                                   "Unable to parse mwc713 output for autoswap trade " + swapId);
                 return true;
@@ -364,6 +365,7 @@ bool TaskPerformAutoSwapStep::processTask(const QVector<WEvent> &events) {
                                               swapObj["stateCmd"].toString(),
                                               currentAction,
                                               swapObj["currentState"].toString(),
+                                              swapObj["last_process_error"].toString(),
                                               executionPlan,
                                               tradeJournal,
                                               "");
@@ -372,9 +374,9 @@ bool TaskPerformAutoSwapStep::processTask(const QVector<WEvent> &events) {
         }
     }
 
-    wallet713->setPerformAutoSwapStep(swapId, "", "", "",
+    wallet713->setPerformAutoSwapStep(swapId, "", "", "","",
                                       executionPlan, tradeJournal,
-                                      "Unable to read output for autoswap trade " + swapId);
+                                      getErrorMessage(events, "Unable to read output for autoswap trade " + swapId));
     return true;
 }
 

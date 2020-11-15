@@ -143,6 +143,7 @@ private:
 signals:
 
     void onSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
+                               QString lastProcessError,
                                QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                                QVector<wallet::SwapJournalMessage> tradeJournal);
 
@@ -181,6 +182,7 @@ slots:
 
 
     void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
+                               QString lastProcessError,
                                QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                                QVector<wallet::SwapJournalMessage> tradeJournal,
                                QString error );

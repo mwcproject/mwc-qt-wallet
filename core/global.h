@@ -132,7 +132,10 @@ bool isFinalize();
 void setWalletLocked(bool locked);
 bool isWalletLocked();
 
-}
+// Swap error indications. We don't want to track, just a show indicator
+void reportSwapError();
+bool hasSwapErrors(int timeIntervalMSec); // Check if error recently was reported
 
+}
 
 #endif // GLOBALMWC_H

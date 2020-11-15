@@ -23,3 +23,27 @@ Invalid $2 address $3. $4
 # LibWallet Error, Swap Error , Swap Rpc error: Unable connect to bch.test1.swap.mwc.mw:18335, Swap I/O: Connection refused (os error 61)
 LibWallet Error, Swap Error , Swap Rpc error: Unable connect to (.*), Swap I/O: (.*)
 Unable connect to electrumX server $1. $2
+
+# LibWallet Error, Swap Error , Swap LibWaller error: Client Callback Error, Error calling get_tip: Request error: Cannot make request: error trying to connect: dns error: failed to lookup address information: nodename nor servname provided, or not known
+LibWallet Error, Swap Error , Swap LibWaller error: Client Callback Error, Error calling get_tip: .*
+Unable to reach MWC node. Please check your network connection.
+
+# Generic error: mqcmqs listener is not running. Please start it with 'listen' command or '--start_listener' argument
+Generic error: mqcmqs listener is not running. Please start it with 'listen' command or '--start_listener' argument
+MWC MQS listener is not running. Please start it at Listeners page.
+
+# Swap Error , Swap LibWaller error: Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool General error failed to validate tx, Already Spent: Commitment(08d62922ddccaa670ae86a7d989d7c75ace707a01a0d9b4c1bf8982ec243e13819) \n Cause: Unknown \n Backtrace: "}
+.*Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool General error failed to validate tx, Already Spent: Commitment\((.*)\) .*
+Unable to publish MWC slate. Output $1 is already spent and stored on the blockchain.
+
+# LibWallet Error, Swap Error , Swap trade 576dda8b-baa3-42b6-a16c-4c91104b0ce7 not found
+LibWallet Error, Swap Error , Swap trade .* not found
+Swap trade $1 not found
+
+# Unable to start Tor listener. Tor Process Error: Unable to start tor at /Users/bay/mwc-qt-wallet/gui_wallet713_data/tor/listener/torrc, Tor process error, TOR executable (`No such file or directory (os error 2)`) not found. Please ensure Tor is installed and on the path: "/Users/mw/build-mwc-wallet-desktop-Desktop_Qt_5_9_9_clang_64bit-Debug/mwc-qt-wallet.app/Contents/MacOS/tor"
+Unable to start Tor listener. Tor Process Error: Unable to start tor at (.*), Tor process error, (.*)
+Unable to start tor at $1, $2
+
+# Tor listener failed to start. HTTP listener must be enabled. Tor Process Error: Unable to start Tor process /Users/bay/mwc-qt-wallet/gui_wallet713_data/tor/sender/torrc, Process("TOR executable (`No such file or directory (os error 2)`) not found. Please ensure Tor is installed and on the path: \"/Users/mw/build-mwc-wallet-desktop-Desktop_Qt_5_9_9_clang_64bit-Debug/mwc-qt-wallet.app/Contents/MacOS/tor\"")
+Tor listener failed to start. HTTP listener must be enabled. Tor Process Error: Unable to start Tor process (.*), Process\("(.*)"\)
+Does HTTP listener enabled? Unable to start tor at $1, $2

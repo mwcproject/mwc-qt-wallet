@@ -484,7 +484,7 @@ void WalletUtxoSignature::setData(int64_t _coinNano, // Output amount
 
 void SwapInfo::setData( QString _mwcAmount, QString _secondaryAmount, QString _secondaryCurrency,
               QString _swapId, int64_t _startTime, QString _stateCmd, QString _state, QString _action, int64_t _expiration,
-              bool _isSeller, QString _secondaryAddress ) {
+              bool _isSeller, QString _secondaryAddress, QString _lastProcessError ) {
     mwcAmount = _mwcAmount;
     secondaryAmount = _secondaryAmount;
     secondaryCurrency = _secondaryCurrency;
@@ -496,6 +496,7 @@ void SwapInfo::setData( QString _mwcAmount, QString _secondaryAmount, QString _s
     expiration = _expiration;
     isSeller = _isSeller;
     secondaryAddress = _secondaryAddress;
+    lastProcessError = _lastProcessError;
 }
 
 /////////////////////////////////////////////////////////////////////////////////

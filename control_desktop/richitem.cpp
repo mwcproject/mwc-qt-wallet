@@ -188,10 +188,12 @@ RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked, int le
     return itm;
 }
 
-QLabel * createLabel( control::RichItem * parent, bool wordwrap, bool lowLight, QString text, int fontSize ) {
+QLabel * createLabel( control::RichItem * parent, bool wordwrap, bool lowLight, QString text, int fontSize, QString color  ) {
     QLabel * l = new QLabel(parent);
     l->setWordWrap(wordwrap);
-    l->setStyleSheet( (lowLight ? ("color: " + control::LOW_LIGHT_COLOR + "; ") : "") + "border: transparent; background: transparent; font-weight: 400; font-size: " + QString::number(fontSize) + "px;");
+    l->setStyleSheet( (lowLight ? ("color: " + control::LOW_LIGHT_COLOR + "; ") : "") +
+            "border: transparent; background: transparent; font-weight: 400; font-size: " + QString::number(fontSize) + "px;" +
+            (color.isEmpty() ? "" : " color: " + color + ";"));
     l->setText(text);
     return l;
 }

@@ -320,6 +320,7 @@ public:
 
     // Perform a auto swap step for this trade.
     // Check Signal: void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
+    //                       QString lastProcessError,
     //                       QVector<SwapExecutionPlanRecord> executionPlan,
     //                       QVector<SwapJournalMessage> tradeJournal,
     //                       QString error );

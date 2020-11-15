@@ -16,6 +16,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include "../core/Config.h"
+#include <QDateTime>
 
 namespace mwc {
 
@@ -99,6 +100,15 @@ void setWalletLocked(bool locked) {
 
 bool isWalletLocked() {
     return walletLocked;
+}
+
+static int64_t lastErrorEvent = 0;
+void reportSwapError() {
+    lastErrorEvent = QDateTime::currentMSecsSinceEpoch();
+}
+
+bool hasSwapErrors(int timeIntervalMSec) { // Check if error recently was reported
+    return lastErrorEvent > QDateTime::currentMSecsSinceEpoch() - timeIntervalMSec;
 }
 
 }

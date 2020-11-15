@@ -342,10 +342,11 @@ struct SwapInfo {
     int64_t expiration = 0;
     bool    isSeller;
     QString secondaryAddress;
+    QString lastProcessError;
 
     void setData( QString mwcAmount, QString secondaryAmount, QString secondaryCurrency,
                   QString swapId, int64_t startTime, QString stateCmd, QString state, QString action,
-                  int64_t expiration, bool isSeller, QString secondaryAddress );
+                  int64_t expiration, bool isSeller, QString secondaryAddress, QString lastProcessError );
 };
 
 struct SwapTradeInfo {
@@ -701,6 +702,7 @@ public:
 
     // Perform a auto swap step for this trade.
     // Check Signal: void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
+    //                       QString lastProcessError,
     //                       QVector<SwapExecutionPlanRecord> executionPlan,
     //                       QVector<SwapJournalMessage> tradeJournal,
     //                       QString error );
@@ -848,6 +850,7 @@ signals:
 
     // Response from performAutoSwapStep
     void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
+                           QString lastProcessError,
                            QVector<SwapExecutionPlanRecord> executionPlan,
                            QVector<SwapJournalMessage> tradeJournal,
                            QString error );

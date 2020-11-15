@@ -21,6 +21,7 @@
 #include "../bridge/wallet_b.h"
 #include "../bridge/statemachine_b.h"
 #include "../bridge/corewindow_b.h"
+#include "../core/global.h"
 
 using namespace bridge;
 
@@ -50,6 +51,8 @@ MwcToolbar::MwcToolbar(QWidget *parent) :
 
     QObject::connect( coreWindow, &CoreWindow::sgnUpdateActionStates,
                       this, &MwcToolbar::onUpdateButtonsState, Qt::QueuedConnection );
+
+    startTimer(300);
 }
 
 MwcToolbar::~MwcToolbar()
@@ -108,9 +111,22 @@ void MwcToolbar::onLogout() {
     ui->totalMwc->setText("");
 }
 
-void core::MwcToolbar::on_swapToolButton_clicked()
+void MwcToolbar::on_swapToolButton_clicked()
 {
     stateMachine->setActionWindow( state::STATE::SWAP );
+}
+
+void MwcToolbar::timerEvent(QTimerEvent *event)
+{
+    static int counter = 0;
+
+    Q_UNUSED(event);
+    if (mwc::hasSwapErrors(30000)) {
+        ui->swapToolButton->setIcon( QIcon( QPixmap( (counter++ % 2)==0 ? ":/img/swap@2x.svg" : ":/img/swap_yellow@2x.svg" )));
+    }
+    else {
+        ui->swapToolButton->setIcon( QIcon( QPixmap( ":/img/swap@2x.svg" )));
+    }
 }
 
 }

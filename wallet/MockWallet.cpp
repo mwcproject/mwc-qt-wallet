@@ -507,7 +507,7 @@ void MockWallet::requestSwapTrades(QString cookie) {
     SwapInfo sw;
     sw.setData( "123.456", "0.00123", "BCH",
                          "XXXXX-XXXXXXXXXX-XXXXXX", 1603424302, "SellerCancelled", "State for this trade", "Action fro this trade",
-                          1603454302, true, "mmmGZgkyaVvYnvkp6b4EXgsgN2UubNNZ1s" );
+                          1603454302, true, "mmmGZgkyaVvYnvkp6b4EXgsgN2UubNNZ1s", "" );
 
     emit onRequestSwapTrades(cookie, {sw}, "");
 }
@@ -588,11 +588,12 @@ void MockWallet::adjustSwapData( QString swapId, QString adjustCmd, QString para
 
 // Perform a auto swap step for this trade.
 // Check Signal: void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
+//                       QString lastProcessError,
 //                       QVector<SwapExecutionPlanRecord> executionPlan,
 //                       QVector<SwapJournalMessage> tradeJournal,
 //                       QString error );
 void MockWallet::performAutoSwapStep( QString swapId ) {
-    emit onPerformAutoSwapStep(swapId, "SellerSendingOffer", "current Action", "current State", {}, {}, "");
+    emit onPerformAutoSwapStep(swapId, "SellerSendingOffer", "current Action", "current State", "", {}, {}, "");
 }
 
 // Backup/export swap trade data file

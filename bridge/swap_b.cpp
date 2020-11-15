@@ -19,6 +19,7 @@
 #include "../state/u_nodeinfo.h"
 #include "../core/appcontext.h"
 #include "../util/address.h"
+#include "../core/MessageMapper.h"
 
 namespace bridge {
 
@@ -27,6 +28,10 @@ static core::AppContext * getAppContext() { return state::getStateContext()->app
 static state::Swap * getSwap() {return (state::Swap *) state::getState(state::STATE::SWAP); }
 //static state::NodeInfo * getNodeInfo() {return (state::NodeInfo *) state::getState(state::STATE::NODE_INFO); }
 
+static QString mapMwc713Message(const QString & message) {
+    static notify::MessageMapper mapper(":/resource/mwc713_mappers.txt");
+    return mapper.processMessage(message);
+}
 
 Swap::Swap(QObject *parent) : QObject(parent) {
     wallet::Wallet *wallet = state::getStateContext()->wallet;
@@ -78,8 +83,8 @@ void Swap::requestSwapTrades(QString cookie) {
 }
 
 void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error) {
-    // Result comes in series of 10 item tuples:
-    // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <StateCmd>, <State>, <initiate_time>, <expire_time>  <secondary_address> >, ....
+    // Result comes in series of 11 item tuples:
+    // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <StateCmd>, <State>, <initiate_time>, <expire_time>  <secondary_address> <last_process_error> >, ....
     QVector<QString> trades;
     for (const auto & st : swapTrades) {
         trades.push_back( st.isSeller ? "true" : "false" );
@@ -96,6 +101,7 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
         trades.push_back(QString::number(st.startTime));
         trades.push_back(QString::number(st.expiration));
         trades.push_back(st.secondaryAddress);
+        trades.push_back( mapMwc713Message(st.lastProcessError) );
     }
 
     emit sgnSwapTradesResult( cookie, trades, error );
@@ -308,6 +314,7 @@ void Swap::onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg) {
 }
 
 void Swap::onSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
+                              QString lastProcessError,
                               QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                               QVector<wallet::SwapJournalMessage> tradeJournal) {
 
@@ -319,7 +326,11 @@ void Swap::onSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString cu
         }
     }
 
-    emit sgnSwapTradeStatusUpdated( swapId, stateCmd, currentAction, currentState, expirationTime,
+    for (auto & tj : tradeJournal) {
+        tj.message = mapMwc713Message(tj.message);
+    }
+
+    emit sgnSwapTradeStatusUpdated( swapId, stateCmd, currentAction, currentState, expirationTime, mapMwc713Message(lastProcessError),
             convertExecutionPlan(executionPlan),
             convertTradeJournal(tradeJournal));
 }

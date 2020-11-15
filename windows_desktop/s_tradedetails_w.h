@@ -42,6 +42,7 @@ private slots:
 
     void sgnSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
                                    int64_t expirationTime,
+                                   QString lastProcessError,
                                    QVector<QString> executionPlan,
                                    QVector<QString> tradeJournal);
 

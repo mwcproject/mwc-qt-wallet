@@ -159,8 +159,8 @@ signals:
     // Result of cancelTrade. Ok - empty error.
     void sgnCancelTrade(QString swapId, QString error);
 
-    // Result comes in series of 10 item tuples:
-    // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <StateCmd>, <status>, <initiate_time>, <expire_time>  <secondary_address> >, ....
+    // Result comes in series of 11 item tuples:
+    // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <StateCmd>, <status>, <initiate_time>, <expire_time>  <secondary_address> <last_process_error> >, ....
     // error is empty on success
     void sgnSwapTradesResult( QString cookie, QVector<QString> trades, QString error );
 
@@ -201,6 +201,7 @@ signals:
     // tradeJournal, array of duplets: < <message>, <time> >, ...
     void sgnSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
                                    int64_t expirationTime,
+                                   QString lastProcessError,
                                    QVector<QString> executionPlan,
                                    QVector<QString> tradeJournal);
 
@@ -236,6 +237,7 @@ private slots:
     void onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
 
     void onSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
+                                  QString lastProcessError,
                                   QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                                   QVector<wallet::SwapJournalMessage> tradeJournal);
 

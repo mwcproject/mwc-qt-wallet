@@ -44,6 +44,7 @@ public:
 
 protected:
     virtual void paintEvent(QPaintEvent *) override;
+    virtual void timerEvent(QTimerEvent *event) override;
 
 private slots:
 

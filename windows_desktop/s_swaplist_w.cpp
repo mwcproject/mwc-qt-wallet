@@ -26,11 +26,19 @@
 namespace wnd {
 
 // Update current state and UI
-void SwapTradeInfo::updateData(QString _stateCmd, QString _status, int64_t _expirationTime,
+void SwapTradeInfo::updateData(QString _stateCmd, QString _status, QString _lastProcessError, int64_t _expirationTime,
                                bridge::Util * util, bridge::Config * config, bridge::Swap * swap) {
-    stateCmd = _stateCmd;
-    status = _status;
-    expirationTime = _expirationTime;
+    if (!_stateCmd.isEmpty())
+        stateCmd = _stateCmd;
+
+    if (!_status.isEmpty())
+        status = _status;
+
+    if (_lastProcessError.isEmpty() || _expirationTime>0)
+        expirationTime = _expirationTime;
+
+    lastProcessError = _lastProcessError;
+
     Q_ASSERT(util);
 
     applyState2Ui(util, config, swap);
@@ -59,6 +67,15 @@ void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, 
 
     Q_ASSERT(statusLable);
     statusLable->setText("Status: " + status);
+
+    Q_ASSERT(lastErrorLable);
+    lastErrorLable->setText( lastProcessError.isEmpty() ? "" : "Error: " + lastProcessError);
+    if (lastProcessError.isEmpty()) {
+        lastErrorLable->hide();
+    }
+    else {
+        lastErrorLable->show();
+    }
 
     Q_ASSERT(cancelBtn);
     if ( swap->isSwapCancellable(stateCmd))
@@ -93,7 +110,7 @@ void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, 
         backupBtn->hide();
 
     Q_ASSERT(markWnd);
-    if ( config->getMaxBackupStatus(tradeId, swBackup) >=2 )
+    if ( config->getMaxBackupStatus(tradeId, swBackup) >=2 || !lastProcessError.isEmpty() )
         markWnd->setStyleSheet(control::LEFT_MARK_ON);
     else
         markWnd->setStyleSheet(control::LEFT_MARK_OFF);
@@ -188,11 +205,11 @@ void SwapList::sgnSwapTradesResult(QString cookie, QVector<QString> trades, QStr
     ui->progress->hide();
     swapList.clear();
 
-    // Result comes in series of 9 item tuples:
-    // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <State>, <initiate_time_interval>, <expire_time_interval>  <secondary_address> >, ....
-    for (int i = 9; i < trades.size(); i += 10) {
-        SwapTradeInfo sti(trades[i - 9] == "true", trades[i - 8], trades[i - 7], trades[i - 6], trades[i - 5], trades[i - 4],
-                          trades[i - 3], trades[i - 2].toLongLong(), trades[i - 1].toLongLong(), trades[i]);
+    // Result comes in series of 11 item tuples:
+    // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <State>, <initiate_time_interval>, <expire_time_interval>  <secondary_address> <last_process_error> >, ....
+    for (int i = 10; i < trades.size(); i += 11) {
+        SwapTradeInfo sti(trades[i - 10] == "true", trades[i - 9], trades[i - 8], trades[i - 7], trades[i - 6], trades[i - 5],
+                          trades[i - 4], trades[i - 3].toLongLong(), trades[i - 2].toLongLong(), trades[i-1], trades[i]);
         swapList.push_back(sti);
     }
 
@@ -287,6 +304,8 @@ void SwapList::updateTradeListData() {
             itm->pop();
         }
         sw.statusLable = (QLabel*) itm->addWidget(control::createLabel(itm, true, false, "", control::FONT_SMALL)).getCurrentWidget();
+
+        sw.lastErrorLable = (QLabel*) itm->addWidget(control::createLabel(itm, true, false, "", control::FONT_NORMAL, "#CCFF33")).getCurrentWidget();
 
         // Buttons need to go in full size.
         // So we need to finish the main vertical layout
@@ -451,6 +470,7 @@ void SwapList::sgnDeleteSwapTrade(QString swapId, QString error) {
 
 void SwapList::sgnSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
                                          int64_t expirationTime,
+                                         QString lastProcessError,
                                          QVector<QString> executionPlan,
                                          QVector<QString> tradeJournal) {
     Q_UNUSED(swapId)
@@ -465,7 +485,7 @@ void SwapList::sgnSwapTradeStatusUpdated(QString swapId, QString stateCmd, QStri
         auto &sw = swapList[i];
         if (sw.tradeId == swapId) {
             // Updating this record
-            sw.updateData(stateCmd, currentAction.isEmpty() ? currentState : currentAction, expirationTime,
+            sw.updateData(stateCmd, currentAction.isEmpty() ? currentState : currentAction, lastProcessError, expirationTime,
                     util, config, swap);
             break;
         }
@@ -506,8 +526,6 @@ void SwapList::sgnRestoreSwapTradeData(QString swapId, QString importedFilename,
     }
 
     on_refreshButton_clicked();
-    control::MessageBox::messageText(this, "Restore",
-                                     "Your trade " + swapId + " is successfully restored.");
 }
 
 void SwapList::on_outgoingSwaps_clicked() {

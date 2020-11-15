@@ -48,11 +48,13 @@ struct SwapTradeInfo {
     int64_t initiatedTime; // timestamp in seconds
     int64_t expirationTime; // timestamp in seconds
     QString secondary_address;
+    QString lastProcessError;
 
     QWidget * markWnd = nullptr;
     QLabel * initTimeLable = nullptr;
     QLabel * expirationLable = nullptr;
     QLabel * statusLable = nullptr;
+    QLabel * lastErrorLable = nullptr;
     QWidget * cancelBtn = nullptr;
     QWidget * deleteBtn = nullptr;
     QWidget * backupBtn = nullptr;
@@ -71,19 +73,20 @@ struct SwapTradeInfo {
                    const QString & _status,
                    int64_t         _initiatedTime,
                    int64_t         _expirationTime,
-                   const QString & _secondary_address) :
+                   const QString & _secondary_address,
+                   const QString & _lastProcessError) :
             isSeller(_isSeller), mwcAmount(_mwcAmount), secondaryAmount(_secondaryAmount), secondaryCurrency(_secondaryCurrency),
             tradeId(_tradeId), stateCmd(_stateCmd), status(_status), initiatedTime(_initiatedTime), expirationTime(_expirationTime),
-            secondary_address(_secondary_address) {}
+            secondary_address(_secondary_address), lastProcessError(_lastProcessError) {}
 
     // Reset all UI related data
     void resetUI() {
-        initTimeLable = expirationLable = statusLable = nullptr;
+        lastErrorLable = initTimeLable = expirationLable = statusLable = nullptr;
         markWnd = cancelBtn = deleteBtn = backupBtn = acceptBtn = nullptr;
     }
 
     // Update current state and UI
-    void updateData(QString stateCmd, QString status, int64_t expirationTime, bridge::Util * util, bridge::Config * config, bridge::Swap * swap);
+    void updateData(QString stateCmd, QString status, QString lastProcessError, int64_t expirationTime, bridge::Util * util, bridge::Config * config, bridge::Swap * swap);
 
     void applyState2Ui(bridge::Util * util, bridge::Config * config, bridge::Swap * swap);
 };
@@ -107,6 +110,7 @@ private slots:
     void sgnDeleteSwapTrade(QString swapId, QString error);
     void sgnSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
                                    int64_t expirationTime,
+                                   QString lastProcessError,
                                    QVector<QString> executionPlan,
                                    QVector<QString> tradeJournal);
     void sgnNewSwapTrade(QString currency, QString swapId);

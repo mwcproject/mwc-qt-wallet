@@ -884,6 +884,7 @@ void MWC713::adjustSwapData( QString swapId, QString adjustCmd, QString param1, 
 
 // Perform a auto swap step for this trade.
 // Check Signal: void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
+//                       QString lastProcessError,
 //                       QVector<SwapExecutionPlanRecord> executionPlan,
 //                       QVector<SwapJournalMessage> tradeJournal,
 //                       QString error );
@@ -1523,12 +1524,18 @@ void MWC713::setAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg
 }
 
 void MWC713::setPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
+                            QString lastProcessError,
                             QVector<SwapExecutionPlanRecord> executionPlan,
                             QVector<SwapJournalMessage> tradeJournal,
                             QString error ) {
-    logger::logEmit( "MWC713", "onPerformAutoSwapStep", swapId + ", " + stateCmd + ", " + currentAction + ", " + currentState + ", " + error );
+    logger::logEmit( "MWC713", "onPerformAutoSwapStep", swapId + ", " + stateCmd + ", " + currentAction + ", " + currentState + ", " + lastProcessError + ", " + error );
+
+    if (!lastProcessError.isEmpty() || !error.isEmpty()) {
+        mwc::reportSwapError();
+    }
 
     emit onPerformAutoSwapStep(swapId, stateCmd, currentAction, currentState,
+                               lastProcessError,
                                executionPlan,
                                tradeJournal,
                                error );

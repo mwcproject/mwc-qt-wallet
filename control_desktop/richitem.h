@@ -98,7 +98,8 @@ RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked,
                             int vboxMargin = VBOX_MARGIN );
 
 // Create a lable with a text
-QLabel *  createLabel( control::RichItem * parent, bool wordwrap, bool lowLight, QString text, int fontSize = FONT_NORMAL );
+// color - css format color as style accept it, can't be used with 'lowLight'
+QLabel *  createLabel( control::RichItem * parent, bool wordwrap, bool lowLight, QString text, int fontSize = FONT_NORMAL, QString color = "" );
 
 // Create a lable with an icon
 QLabel *  createIcon( control::RichItem * parent, QString pixmapPath, int cx, int cy );
