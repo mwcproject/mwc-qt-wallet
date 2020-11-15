@@ -613,9 +613,10 @@
  <tabstops>
   <tabstop>mwcMqTriggerButton</tabstop>
   <tabstop>mwcmqsAddress</tabstop>
+  <tabstop>torTriggerButton</tabstop>
+  <tabstop>torAddress</tabstop>
   <tabstop>mwcMqNextAddress</tabstop>
   <tabstop>mwcMqToIndex</tabstop>
-  <tabstop>torTriggerButton</tabstop>
   <tabstop>httpConfigButton</tabstop>
  </tabstops>
  <resources>
