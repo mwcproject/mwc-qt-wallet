@@ -190,6 +190,11 @@ slots:
     // Response from createNewSwapTrade, SwapId on OK,  errMsg on failure
     void onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> params, QString swapId, QString errMsg);
 
+    // Wallet just cancelled the swap. We need to stop execute it.
+    void onCancelSwapTrade(QString swapId, QString error);
+    // Just restore the swap. We need to run it.
+    void onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
+
     void onTimerEvent();
 private:
     TimerThread * timer = nullptr;

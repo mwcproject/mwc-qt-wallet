@@ -227,6 +227,9 @@ void EditSwap::sgnUpdateXXX(QString swId, QString errorMsg) {
     if (!errorMsg.isEmpty()) {
         control::MessageBox::messageText(this, "Error", "Unable to update data for swap " + swapId + "\n\n" + errorMsg);
         ui->progress->hide();
+        if (acceptanceMode) {
+            ui->tradeDetailsBtn->setEnabled(true);
+        }
     }
     else {
         if (acceptanceMode) {

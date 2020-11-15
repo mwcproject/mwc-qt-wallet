@@ -103,10 +103,11 @@ Swap::Swap(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onPerformAutoSwapStep, this, &Swap::onPerformAutoSwapStep, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onNewSwapTrade, this, &Swap::onNewSwapTrade, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onCreateNewSwapTrade, this, &Swap::onCreateNewSwapTrade, Qt::QueuedConnection );
-
     QObject::connect( context->wallet, &wallet::Wallet::onLoginResult, this, &Swap::onLoginResult, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onLogout, this, &Swap::onLogout, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onRequestSwapTrades, this, &Swap::onRequestSwapTrades, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onCancelSwapTrade, this, &Swap::onCancelSwapTrade, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onRestoreSwapTradeData, this, &Swap::onRestoreSwapTradeData, Qt::QueuedConnection );
 
     // You get an offer to swap BCH to MWC. SwapID is ffa15dbd-85a9-4fc9-a3c0-4cfdb144862b
     // Listen to a new swaps...
@@ -172,6 +173,9 @@ QVector<QString> Swap::getRunningCriticalTrades() const {
 
 // Run the trade
 void Swap::runTrade(QString swapId, QString statusCmd) {
+    if (swapId.isEmpty())
+        return;
+
     AutoswapTask task;
     task.setData(swapId, statusCmd, 0);
     runningSwaps.insert(swapId, task);
@@ -278,16 +282,24 @@ void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString curre
 }
 
 void Swap::onNewSwapTrade(QString currency, QString swapId) {
-    if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg("New Swap Offer",
-             "You get a new Swap Offer to Buy MWC coins for your "+currency+".\n\nTrade SwapId: " + swapId +
-             "\n\nPlease reviews this offer before accept it. Check if amounts, lock order, confirmation number are meet your expectations.\n\n"
-             "Double check that number of confirmations are matching the amount.",
-             "Will check Later", "Review and Accept",
-             "Later I will switch to the swap page and check it", "Review and Accept the trade now",
-             false, true) ) {
-        // Switching to the review page...
-        viewTrade(swapId, "BuyerOfferCreated");
+    const QString title = "New Swap Offer";
+    const QString msg = "You get a new Swap Offer to Buy MWC coins for your "+currency+".\n\nTrade SwapId: " + swapId +
+                        "\n\nPlease reviews this offer before accept it. Check if amounts, lock order, confirmation number are meet your expectations.\n\n"
+                        "Double check that number of confirmations are matching the amount.";
+
+    if (mwc::isWalletLocked()) {
+        core::getWndManager()->messageTextDlg(title, msg);
     }
+    else {
+        if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg( title, msg,
+                "Will check Later", "Review and Accept",
+                "Later I will switch to the swap page and check it", "Review and Accept the trade now",
+                false, true) ) {
+            // Switching to the review page...
+            viewTrade(swapId, "BuyerOfferCreated");
+        }
+    }
+
 }
 
 // Request latest fees for the coins
@@ -480,12 +492,28 @@ void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> param
 
         if (errMsg.isEmpty()) {
             runTrade(swapId, "SellerOfferCreated");
-            core::getWndManager()->pageSwapList();
+            showTradeDetails(swapId);
             core::getWndManager()->messageTextDlg("Swap Trade", "Congratulation! Your swap trade with ID " + swapId +
                                                                 " is sucessfully created.");
         }
     }
 }
+
+// Wallet just cancelled the swap. We need to stop execute it.
+void Swap::onCancelSwapTrade(QString swapId, QString error) {
+    if (error.isEmpty()) {
+       runningSwaps.remove(swapId);
+    }
+}
+
+void Swap::onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage) {
+    if (errorMessage.isEmpty()) {
+        AutoswapTask task;
+        task.setData(swapId, "", 0);
+        runningSwaps.insert(swapId, task);
+    }
+}
+
 
 // List of the secondary currencies that wallet support
 QVector<QString> Swap::secondaryCurrencyList() {

@@ -24,6 +24,7 @@
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/a_inputpassword_b.h"
 #include <QDir>
+#include "../util/crypto.h"
 
 namespace state {
 
@@ -64,6 +65,7 @@ NextStateRespond InputPassword::execute() {
 
     if (!lockStr.isEmpty()) {
         inLockMode = true;
+        lockedWalletPath = context->appContext->getCurrentWalletInstance(true);
         mwc::setWalletLocked(inLockMode);
         // wallet locking mode
         core::getWndManager()->pageInputPassword(mwc::PAGE_A_ACCOUNT_UNLOCK, true);
@@ -75,6 +77,27 @@ NextStateRespond InputPassword::execute() {
 }
 
 void InputPassword::submitPassword(const QString & password) {
+    // Check if we can skip logout/login step.
+    // If wallet wasn't changed, there is no reason logout and restart all listeners.
+    if (inLockMode && lockedWalletPath == context->appContext->getCurrentWalletInstance(true) &&
+                context->appContext->getActiveWndState() != STATE::SHOW_SEED) {
+        // We can just verify the password and we should be good
+
+        if (crypto::calcHSA256Hash(password) !=
+                context->wallet->getPasswordHash() ) {
+            // mwaasage match with mwc713 returns
+            core::getWndManager()->messageTextDlg("Password", "Password supplied was incorrect. Please input correct password.");
+            return;
+        }
+        // We are good here, let's unlock the wallet
+
+        inLockMode = false;
+        mwc::setWalletLocked(inLockMode);
+
+        context->stateMachine->executeFrom(STATE::NONE);
+        return;
+    }
+
     // Check if we need to logout first. It is very valid case if we in lock mode
     if ( context->wallet->isRunning() )
         context->wallet->logout(true);

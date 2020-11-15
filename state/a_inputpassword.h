@@ -41,6 +41,7 @@ protected slots:
     void onWalletBalanceUpdated();
 private:
     bool inLockMode = false;
+    QString lockedWalletPath;
 };
 
 }

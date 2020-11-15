@@ -76,6 +76,7 @@ void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, 
     bool hasAccept = false;
     if (!config->isTradeAccepted(tradeId) && swap->isSwapWatingToAccept(stateCmd)) {
         acceptBtn->show();
+        statusLable->setText("Status: Not running. Please accept the offer first.");
         hasAccept = true;
     }
     else {

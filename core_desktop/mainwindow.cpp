@@ -165,8 +165,8 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     int swapsNumber = swap->getRunningTrades().size();
 
     if (swapsNumber>0){
-        if ( core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg("Swap Trades", "Your have active " + QString::number(swapsNumber) + "trade" + (swapsNumber>1?"s":"") +
-                                    " running. Wallet need to stay online to process the swaps.\n\n"
+        if ( core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg("Swap Trades", "You have " + QString::number(swapsNumber) + " trade" + (swapsNumber>1?"s":"") +
+                                    " in progress. Wallet need to stay online to process the swaps.\n\n"
                                     "Are you sure you want to close the wallet even your trades are not finished?",
             "No", "Yes",
             "Keep my wallet running", "Close the wallet",

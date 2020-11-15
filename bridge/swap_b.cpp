@@ -235,36 +235,6 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
     reportStr += "</body></html>";
     swapInfo.push_back(reportStr);
 
-
-
-/*    QString description;
-    if (swap.isSeller) {
-        description += "Selling <b>" + QString::number( swap.mwcAmount ) + "</b> MWC for <b>" + QString::number(swap.secondaryAmount) + "</b> " +
-                swap.secondaryCurrency + "." + swap.secondaryCurrency + " redeem address: " + swap.secondaryAddress + "<br/>";
-    }
-    else {
-        description += "Buying <b>" + QString::number( swap.mwcAmount ) + "</b> MWC for <b>" + QString::number(swap.secondaryAmount) + "</b> " + swap.secondaryCurrency + "<br/>";
-    }
-
-    description += "Requied lock confirmations: <b>" + QString::number(swap.mwcConfirmations)+"</b> for MWC and <b>"+ QString::number(swap.secondaryConfirmations) +"</b> for " + swap.secondaryCurrency + "<br/>";
-    description += "Time limits: <b>"+QString::number(swap.messageExchangeTimeLimit/60)+"</b> minutes for messages exchange and <b>"+QString::number(swap.redeemTimeLimit/60)+"</b> minutes for redeem or refund<br/>";
-    description += "Locking order: " + (swap.sellerLockingFirst ? "Seller lock MWC first" : ("Buyer lock " + swap.secondaryCurrency + " first")) + "<br/>";
-    QString lockTime = calcTimeLeft(swap.mwcLockTime);
-    if (lockTime.size()>0)
-        description += "MWC funds locked until block " + QString::number(swap.mwcLockHeight) + ", expected to be mined in " + lockTime + "<br/>";
-    else
-        description += "MWC Lock expired.<br/>";
-
-    QString secLockTime = calcTimeLeft(swap.secondaryLockTime);
-    if (secLockTime.size()>0) {
-        description += swap.secondaryCurrency + " funds locked for " + secLockTime + "<br/>";
-    }
-    else {
-        description += swap.secondaryCurrency + " lock expired<br/>";
-    }
-    description += (swap.isSeller ? "Buyer" : "Seller" ) + QString(" address: ") + swap.communicationMethod + ", " + swap.communicationAddress + "<br/>";
-    swapInfo.push_back(description);*/
-
     // [2] - Redeem address
     swapInfo.push_back(swap.secondaryAddress);
     // [3] - secondary currency name
@@ -667,6 +637,8 @@ static QMap<QString, int> buildBackupMapping() {
 static QMap<QString, int> backupMapping = buildBackupMapping();
 
 int  getSwapBackup(const QString & stateCmd) {
+    if (stateCmd.isEmpty())
+        return 0;
     Q_ASSERT(backupMapping.contains(stateCmd));
     return backupMapping.value(stateCmd, 0);
 }
