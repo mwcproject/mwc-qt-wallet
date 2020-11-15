@@ -509,6 +509,7 @@ void Swap::onCancelSwapTrade(QString swapId, QString error) {
 }
 
 void Swap::onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage) {
+    Q_UNUSED(importedFilename)
     if (errorMessage.isEmpty()) {
         AutoswapTask task;
         task.setData(swapId, "", 0);

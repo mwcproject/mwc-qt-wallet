@@ -24,7 +24,7 @@ namespace notify {
 // Message mapper needed for notificaitons mapping. We want to handle messages like this:
 // Swap Error , Electrum Node error, Unable to contact the secondary ElectrumX client btc.test2.swap.mwc.mw:8000, Swap Rpc error: Unable connect to btc.test2.swap.mwc.mw:8000, Swap I/O: Connection refused (os error 61)
 //
-// Mapper is providing bunch of regex parsers that will be apply to every income messge.\
+// Mapper is providing bunch of regex parsers that will be apply to every income messge.
 // Note!!!  Parsers are applied one by one, so performance is limited. For notifications it is good enough.
 //          But if you want to handle high traffic, please concider to use one parser for all.
 // Note!!!  This mapper has tests, maintain it for every new mapper!!!!

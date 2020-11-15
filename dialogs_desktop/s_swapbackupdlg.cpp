@@ -113,6 +113,8 @@ void SwapBackupDlg::on_backupButton_clicked()
 }
 
 void SwapBackupDlg::sgnBackupSwapTradeData(QString _swapId, QString exportedFileName, QString errorMessage) {
+    Q_UNUSED(exportedFileName)
+
     if (swapId != _swapId)
         return;
 

@@ -731,6 +731,8 @@ QPair<QVector<QString>, int> AppContext::getWalletInstances(bool hasSeed) const 
             return QPair<QVector<QString>, int> (paths,0);
         }
     }
+    Q_ASSERT(false);
+    return QPair<QVector<QString>, int> ({},0);
 }
 // Return path to current wallet instance. Expected that at least 1 instance does exist
 QString AppContext::getCurrentWalletInstance(bool hasSeed) const {

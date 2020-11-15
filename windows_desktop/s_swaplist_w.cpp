@@ -516,6 +516,7 @@ void SwapList::sgnBackupSwapTradeData(QString swapId, QString exportedFileName, 
 }
 
 void SwapList::sgnRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage) {
+    Q_UNUSED(swapId)
     ui->progress->hide();
 
     if (errorMessage.length() > 0) {
