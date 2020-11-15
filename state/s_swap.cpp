@@ -495,8 +495,8 @@ void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> param
         if (errMsg.isEmpty()) {
             runTrade(swapId, "SellerOfferCreated");
             showTradeDetails(swapId);
-            core::getWndManager()->messageTextDlg("Swap Trade", "Congratulation! Your swap trade with ID " + swapId +
-                                                                " is sucessfully created.");
+            core::getWndManager()->messageTextDlg("Swap Trade", "Congratulation! Your swap trade with ID\n" + swapId +
+                                                                "\nis sucessfully created.");
         }
     }
 }

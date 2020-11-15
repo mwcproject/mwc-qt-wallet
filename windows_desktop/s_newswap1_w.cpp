@@ -215,14 +215,13 @@ void NewSwap1::onSgnWalletBalanceUpdated() {
 }
 
 void NewSwap1::on_accountComboBox_currentIndexChanged(int index) {
-    Q_UNUSED(index)
-/*    if (index<0)
+    if (index<0)
         return;
 
     QString account = ui->accountComboBox->currentData().toString();
     if (account.isEmpty())
-        return;*/
-//    wallet->switchAccount(account);
+        return;
+    swap->setAccount(account);
 }
 
 double NewSwap1::getSelectedAccountBalance(QString account) {

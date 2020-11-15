@@ -106,6 +106,7 @@ public:
 
     // Account that is related to this swap trade
     Q_INVOKABLE QString getAccount();
+    Q_INVOKABLE void setAccount(QString accountName);
 
     // List of the secondary currencies that wallet support
     Q_INVOKABLE QVector<QString> secondaryCurrencyList();

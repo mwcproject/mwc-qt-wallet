@@ -103,6 +103,7 @@ public:
 
     // Account that is related to this swap trade
     QString getAccount() const {return  newSwapAccount;}
+    void setAccount(QString accountName) {newSwapAccount = accountName;}
 
     // List of the secondary currencies that wallet support
     QVector<QString> secondaryCurrencyList();

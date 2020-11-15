@@ -515,6 +515,9 @@ void Swap::onCreateStartSwap(bool ok, QString errorMessage) {
 QString Swap::getAccount() {
     return getSwap()->getAccount();
 }
+void Swap::setAccount(QString accountName) {
+    getSwap()->setAccount(accountName);
+}
 
 // List of the secondary currencies that wallet support
 QVector<QString> Swap::secondaryCurrencyList() {
