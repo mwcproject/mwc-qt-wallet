@@ -40,13 +40,13 @@ The following describes the general behavior of the status windows:
 
 # Status Window Content
 
-The status windows display the notification messages which are stored in the Event Log. There is a signal which triggers when messages come into Qt Wallet which the main window and the Event Log both listen for. The status windows are tied into the main window’s handling of status bar messages but does not replace the current use of the status bar. So there are 3 places where you can see the same notification message:
+The status windows display the notification messages which are stored in the Notifications. There is a signal which triggers when messages come into Qt Wallet which the main window and the Notifications both listen for. The status windows are tied into the main window’s handling of status bar messages but does not replace the current use of the status bar. So there are 3 places where you can see the same notification message:
 
 1. Main window status bar
 
 2. Status window
 
-3. Event log
+3. Notifications
 
 <img src="status_windows_images/image_7.png" max-width="300" height="300"/>
 

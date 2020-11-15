@@ -109,7 +109,7 @@ const QString PAGE_U_NODE_STATUS    = "MWC Node Status";
 
 const QString PAGE_W_CONTACTS       = "Contacts";
 
-const QString PAGE_X_EVENTS         = "Event log";
+const QString PAGE_X_EVENTS         = "Notifications";
 const QString PAGE_X_SHOW_PASSPHRASE= "Wallet mnemonic passphrase";
 const QString PAGE_X_WALLET_CONFIG  = "Wallet Config";
 const QString PAGE_X_NODE_CONFIG    = "Node Config";

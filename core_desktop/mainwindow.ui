@@ -429,7 +429,7 @@
   </action>
   <action name="actionEvent_log">
    <property name="text">
-    <string>Event log</string>
+    <string>Notifications</string>
    </property>
   </action>
   <action name="actionLogout">

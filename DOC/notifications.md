@@ -13,7 +13,7 @@
 
 # Notification Windows
 
-MWC Qt Wallet has been enhanced to display notification messages in windows which appear and disappear in the lower right hand corner of your wallet. The notifications displayed are a subset of the events which can be found in the Event Log and the status messages which are displayed in the bottom status bar. The intent is to display those messages which would be of most interest to wallet users, such as listener status, receipt of MWC, and transaction and output status.
+MWC Qt Wallet has been enhanced to display notification messages in windows which appear and disappear in the lower right hand corner of your wallet. The notifications displayed are a subset of the events which can be found in the Notifications and the status messages which are displayed in the bottom status bar. The intent is to display those messages which would be of most interest to wallet users, such as listener status, receipt of MWC, and transaction and output status.
 
 <img src="status_windows_images/image_1.png" max-width="300" height="300"/>
 
@@ -23,7 +23,7 @@ Each notification message is displayed for around 10 seconds and will appear on 
 
 A maximum of 5 notication windows will be displayed at any one time. When a notification window disappears, the windows still being displayed will shift downward to take its place and any waiting notifications will then be displayed.
 
-Up to 25 notifications can be pending at any one time. Any additional notifications will not be queued until space in the queue becomes available. You can examine the Event Log to see the full list of notifications for your wallet.
+Up to 25 notifications can be pending at any one time. Any additional notifications will not be queued until space in the queue becomes available. You can examine the Notifications to see the full list of notifications for your wallet.
 
 
 <img src="status_windows_images/image_7.png" max-width="300" height="300"/>
