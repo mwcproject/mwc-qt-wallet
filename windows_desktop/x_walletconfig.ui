@@ -50,13 +50,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>400</height>
+       <height>420</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>400</height>
+       <height>420</height>
       </size>
      </property>
      <property name="font">
@@ -68,7 +68,7 @@
       <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_main">
       <property name="minimumSize">
@@ -310,6 +310,12 @@
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="0" column="0">
           <widget class="QGroupBox" name="autoStart">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>11000</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -351,6 +357,12 @@
          </item>
          <item row="0" column="1" rowspan="2">
           <widget class="QGroupBox" name="autoLogout">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>2500</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -459,6 +471,12 @@
          </item>
          <item row="1" column="0">
           <widget class="QGroupBox" name="notificationsGroup">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>140</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true"/>
            </property>
@@ -529,6 +547,12 @@
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="QGroupBox" name="outputLockingGroup">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>70</height>
+            </size>
+           </property>
            <property name="statusTip">
             <string>Enable the ability to lock individual outputs to prevent them from being spent.</string>
            </property>
@@ -918,8 +942,14 @@
   <tabstop>logout_20</tabstop>
   <tabstop>logout_30</tabstop>
   <tabstop>logout_never</tabstop>
+  <tabstop>notificationsEnabled</tabstop>
   <tabstop>outputLockingCheck</tabstop>
   <tabstop>logsEnableBtn</tabstop>
+  <tabstop>mwcmqHost</tabstop>
+  <tabstop>confirmationNumberEdit</tabstop>
+  <tabstop>changeOutputsEdit</tabstop>
+  <tabstop>walletInstanceNameEdit</tabstop>
+  <tabstop>walletDataPath</tabstop>
   <tabstop>restoreDefault</tabstop>
   <tabstop>applyButton</tabstop>
  </tabstops>
