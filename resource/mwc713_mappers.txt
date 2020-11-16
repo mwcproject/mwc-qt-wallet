@@ -47,3 +47,12 @@ Unable to start tor at $1, $2
 # Tor listener failed to start. HTTP listener must be enabled. Tor Process Error: Unable to start Tor process /Users/bay/mwc-qt-wallet/gui_wallet713_data/tor/sender/torrc, Process("TOR executable (`No such file or directory (os error 2)`) not found. Please ensure Tor is installed and on the path: \"/Users/mw/build-mwc-wallet-desktop-Desktop_Qt_5_9_9_clang_64bit-Debug/mwc-qt-wallet.app/Contents/MacOS/tor\"")
 Tor listener failed to start. HTTP listener must be enabled. Tor Process Error: Unable to start Tor process (.*), Process\("(.*)"\)
 Does HTTP listener enabled? Unable to start tor at $1, $2
+
+# Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Duplicate tx"}
+Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Duplicate tx"}
+Transaction is already posted and stored at the transaction pool
+
+# Reproduce: send, cancel before it is mined, send once more.
+# failed posting transaction!, Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Invalid Tx Tx Serialization error, Serialization Unexpected Duplicate"}
+failed posting transaction!, Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Invalid Tx Tx Serialization error, Serialization Unexpected Duplicate"}
+Transaction with same inputs is already posted. Probably you cancelled transaction that was posted and will be mined soon. Please wait few minutes until your first transaction will be mined and your cancellation will be reverted.
