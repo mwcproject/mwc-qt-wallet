@@ -119,7 +119,7 @@ void SendOnline::on_sendButton_clicked()
         return;
     }
 
-    QString description = ui->descriptionEdit->toPlainText().trimmed();
+    QString description = ui->descriptionEdit->toPlainText().trimmed().replace('\n', ' ');
 
     {
         QString valRes = util->validateMwc713Str(description);
