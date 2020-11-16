@@ -18,6 +18,9 @@ Item {
 
     function updateTitle(state) {
         switch (state) {
+        case 4:
+            text_title.text = qsTr("Wallet  >   Accounts")
+            break
         case 6:
             text_title.text = qsTr("Wallet  >   Notifications")
             break
