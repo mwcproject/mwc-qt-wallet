@@ -56,3 +56,8 @@ Transaction is already posted and stored at the transaction pool
 # failed posting transaction!, Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Invalid Tx Tx Serialization error, Serialization Unexpected Duplicate"}
 failed posting transaction!, Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Invalid Tx Tx Serialization error, Serialization Unexpected Duplicate"}
 Transaction with same inputs is already posted. Probably you cancelled transaction that was posted and will be mined soon. Please wait few minutes until your first transaction will be mined and your cancellation will be reverted.
+
+# Adapter Callback Error, Performing version check (is recipient listening?): Request error: Cannot make request: error trying to connect: deadline has elapsed
+# Adapter Callback Error, Performing version check (is recipient listening?): Request error: Cannot make request: error trying to connect: dns error: failed to lookup address information: nodename nor servname provided, or not known
+Adapter Callback Error, Performing version check \(is recipient listening\?\): Request error: Cannot make request: error trying to connect: (.*)
+Unable connect to receiver wallet. Probably it is offline or you have network connection problems. $1
