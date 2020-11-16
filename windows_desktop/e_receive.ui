@@ -71,7 +71,7 @@
        <widget class="QLabel" name="mwcmqStatusImg">
         <property name="geometry">
          <rect>
-          <x>165</x>
+          <x>215</x>
           <y>10</y>
           <width>21</width>
           <height>21</height>
@@ -93,9 +93,9 @@
        <widget class="control::MwcLabelTiny" name="mwcmqStatusLabel">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>100</x>
           <y>28</y>
-          <width>166</width>
+          <width>111</width>
           <height>16</height>
          </rect>
         </property>
@@ -111,7 +111,7 @@
          <rect>
           <x>0</x>
           <y>1</y>
-          <width>161</width>
+          <width>216</width>
           <height>26</height>
          </rect>
         </property>
@@ -125,9 +125,9 @@
        <widget class="control::MwcLabelLarge" name="httpLabel">
         <property name="geometry">
          <rect>
-          <x>451</x>
+          <x>496</x>
           <y>1</y>
-          <width>116</width>
+          <width>71</width>
           <height>21</height>
          </rect>
         </property>
@@ -141,9 +141,9 @@
        <widget class="control::MwcLabelTiny" name="httpStatusLabel">
         <property name="geometry">
          <rect>
-          <x>470</x>
+          <x>510</x>
           <y>28</y>
-          <width>126</width>
+          <width>66</width>
           <height>16</height>
          </rect>
         </property>
@@ -179,9 +179,9 @@
        <widget class="control::MwcLabelLarge" name="label_7">
         <property name="geometry">
          <rect>
-          <x>246</x>
+          <x>315</x>
           <y>1</y>
-          <width>106</width>
+          <width>66</width>
           <height>16</height>
          </rect>
         </property>
@@ -195,9 +195,9 @@
        <widget class="control::MwcLabelTiny" name="torStatusLabel">
         <property name="geometry">
          <rect>
-          <x>272</x>
+          <x>320</x>
           <y>28</y>
-          <width>96</width>
+          <width>66</width>
           <height>16</height>
          </rect>
         </property>
@@ -211,7 +211,7 @@
        <widget class="QLabel" name="torStatusImg">
         <property name="geometry">
          <rect>
-          <x>360</x>
+          <x>385</x>
           <y>10</y>
           <width>21</width>
           <height>21</height>
@@ -628,11 +628,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
@@ -648,14 +643,19 @@
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelTiny</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcComboBox</class>
