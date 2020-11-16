@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>806</width>
-    <height>750</height>
+    <height>725</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,2,0,0,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,2,0,0,0,0,0,0">
    <property name="spacing">
     <number>20</number>
    </property>
@@ -278,9 +278,29 @@ p, li { white-space: pre-wrap; }
     </layout>
    </item>
    <item>
-    <widget class="control::MwcLabelLarge" name="label_4">
+    <spacer name="verticalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="control::MwcLabelNormal" name="label_4">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;WARNING: &lt;br/&gt;this proof should only be considered valid if the kernel is actually on-chain with sufficient confirmations. Please use a MWC block explorer to verify this is the case by pressing &amp;quot;View&amp;quot; buttons.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>WARNING:
+this proof should only be considered valid if the kernel is actually on-chain with sufficient confirmations. Please use a MWC block explorer to verify this is the case by pressing &quot;View&quot; buttons</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -289,6 +309,22 @@ p, li { white-space: pre-wrap; }
       <bool>true</bool>
      </property>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>25</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -357,6 +393,11 @@ p, li { white-space: pre-wrap; }
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
