@@ -35,10 +35,15 @@ NewSeed::NewSeed( QWidget *parent,
     QObject::connect( newSeed, &bridge::NewSeed::sgnShowSeedData,
                       this, &NewSeed::onSgnShowSeedData, Qt::QueuedConnection);
 
-    if ( hideSubmitButton )
+    ui->progress->initLoader(false);
+
+    if ( hideSubmitButton ) {
         ui->submitButton->hide();
-    else
+        ui->progress->show();
+    }
+    else {
         utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()) );
+    }
 
     if (!seed.isEmpty()) {
         updateSeedData("Mnemonic passphrase:",seed); // Seed allways comes from ctor. Mean we are created a new account with a seed.
@@ -67,6 +72,8 @@ void NewSeed::onSgnShowSeedData(QVector<QString> seed) {
 }
 
 void NewSeed::updateSeedData( const QString & name, const QVector<QString> & seed) {
+    ui->progress->hide();
+
     int maxWrdLen = 0;
     for (const auto & s : seed)
         maxWrdLen = std::max(maxWrdLen, s.length());

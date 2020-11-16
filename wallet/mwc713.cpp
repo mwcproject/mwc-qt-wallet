@@ -475,12 +475,7 @@ void MWC713::getSeed(const QString & walletPassword)  {
         return;
     }
 
-    ListenerStatus lsnState = getListenerStartState();
-    listeningStop(lsnState.mqs, lsnState.tor);
-
     eventCollector->addTask(task , TaskRecoverShowMnenonic::TIMEOUT );
-
-    listeningStart(lsnState.mqs, lsnState.tor, true);
 }
 
 QString MWC713::getPasswordHash() {

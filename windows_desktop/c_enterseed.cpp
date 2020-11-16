@@ -38,6 +38,8 @@ EnterSeed::EnterSeed(QWidget *parent) :
     ui->seedText->setReadOnly(false);
     ui->seedText->setAcceptRichText(false);
 
+    ui->progress->initLoader(false);
+
     utils::defineDefaultButtonSlot(this, SLOT(on_Enter()) );
 }
 
