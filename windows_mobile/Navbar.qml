@@ -578,6 +578,7 @@ Item {
                     if (accountComboBox.currentIndex >= 0) {
                         const selectedAccount = accountItems.get(accountComboBox.currentIndex).account
                         wallet.switchAccount(selectedAccount)
+                        updateInstanceAccountText()
                     }
                 }
 
