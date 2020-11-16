@@ -516,7 +516,7 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="text">
-            <string>TestNet</string>
+            <string>Floonet</string>
            </property>
           </widget>
          </widget>
@@ -570,6 +570,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>70</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -582,6 +585,37 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="control::MwcPushButtonNormal" name="cancelButton">
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Continue with creation of a new wallet</string>
+       </property>
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="control::MwcPushButtonNormal" name="submitButton">
@@ -651,14 +685,14 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcPushButtonTiny</class>
@@ -677,13 +711,14 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>changeDirButton</tabstop>
   <tabstop>instanceNameEdit</tabstop>
   <tabstop>password1Edit</tabstop>
   <tabstop>password2Edit</tabstop>
   <tabstop>radioMainNet</tabstop>
   <tabstop>radioFloonet</tabstop>
+  <tabstop>cancelButton</tabstop>
   <tabstop>submitButton</tabstop>
-  <tabstop>changeDirButton</tabstop>
  </tabstops>
  <resources>
   <include location="../resources_desktop.qrc"/>

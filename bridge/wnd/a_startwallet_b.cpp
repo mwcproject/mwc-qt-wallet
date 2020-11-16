@@ -31,4 +31,10 @@ void StartWallet::createNewWalletInstance(QString path, bool restoreWallet) {
     ((state::StartWallet *) state::getState(state::STATE::START_WALLET)) -> createNewWalletInstance(path, restoreWallet);
 }
 
+// Cancel this workflow and return back
+void StartWallet::cancel() {
+    ((state::StartWallet *) state::getState(state::STATE::START_WALLET)) -> cancel();
+}
+
+
 }

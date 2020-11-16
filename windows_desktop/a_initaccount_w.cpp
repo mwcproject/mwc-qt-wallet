@@ -211,4 +211,10 @@ void InitAccount::on_changeDirButton_clicked() {
     ui->createdDirLabel->setText("You are saving your data to:\n" + wallet_dir);
 }
 
+void InitAccount::on_cancelButton_clicked()
+{
+    startWallet->cancel();
 }
+
+}
+

@@ -29,6 +29,9 @@ public:
     // path - wallet data location or empty for the next available_path (new wallet case only)
     // restoreWallet - true if the next new wallet will be restore from the seed.
     Q_INVOKABLE void createNewWalletInstance(QString path, bool restoreWallet);
+
+    // Cancel this workflow and return back
+    Q_INVOKABLE void cancel();
 private:
 };
 

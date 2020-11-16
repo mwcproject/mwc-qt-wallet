@@ -278,13 +278,13 @@
       <widget class="QToolButton" name="runOnlineNodeButton">
        <property name="minimumSize">
         <size>
-         <width>170</width>
+         <width>190</width>
          <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>170</width>
+         <width>190</width>
          <height>40</height>
         </size>
        </property>

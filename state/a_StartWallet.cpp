@@ -109,4 +109,9 @@ void StartWallet::createNewWalletInstance(QString path, bool restoreWallet) {
     context->stateMachine->executeFrom(STATE::START_WALLET);
 }
 
+void StartWallet::cancel() {
+    context->stateMachine->executeFrom(STATE::NONE);
+}
+
+
 }

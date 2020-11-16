@@ -46,6 +46,8 @@ private slots:
     void on_runOnlineNodeButton_clicked();
     void on_changeDirButton_clicked();
 
+    void on_cancelButton_clicked();
+
 private:
     void updatePassState();
 

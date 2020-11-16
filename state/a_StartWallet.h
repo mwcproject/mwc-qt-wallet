@@ -29,6 +29,7 @@ public:
 
     void createNewWalletInstance(QString path, bool restoreWallet);
 
+    void cancel();
 protected:
     virtual NextStateRespond execute() override;
 
