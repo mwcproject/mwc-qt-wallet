@@ -109,23 +109,30 @@ int Send::initialSendSelection( bool isOnlineSelected, QString account, QString 
     }
 
     QPair<bool, int64_t> mwcAmount;
-    if (sendAmount != "All") {
-        mwcAmount = util::one2nano(sendAmount);
-        if (!mwcAmount.first || mwcAmount.second<=0) {
+    mwcAmount = util::one2nano(sendAmount);
+    if (!mwcAmount.first || mwcAmount.second<=0) {
             core::getWndManager()->messageTextDlg("Incorrect Input", "Please specify the number of MWC to send");
             return 2;
-        }
     }
-    else { // All
-        mwcAmount = QPair<bool, int64_t>(true, -1);
-    }
+
+    core::SendCoinsParams sendParams = context->appContext->getSendCoinsParams();
 
     // init expected to be fixed, so no need to disable the message
     if ( mwcAmount.second > selectedAccount.currentlySpendable ) {
 
-        QString msg2print = generateAmountErrorMsg( mwcAmount.second, selectedAccount, context->appContext->getSendCoinsParams() );
+        QString msg2print = generateAmountErrorMsg( mwcAmount.second, selectedAccount, sendParams );
 
         core::getWndManager()->messageTextDlg("Incorrect Input", msg2print );
+        return 2;
+    }
+
+    // Check if we have extra for fee
+    QStringList txnOutputList;
+    uint64_t fee = util::getTxnFee( selectedAccount.accountName, mwcAmount.second, context->wallet,
+                       context->appContext, sendParams.changeOutputs,
+                       txnOutputList);
+    if (fee < mwc::BASE_TRANSACTION_FEE) {
+        core::getWndManager()->messageTextDlg("Incorrect Input", "Your account doesn't have enough MWC to send and cover this transaction fees." );
         return 2;
     }
 

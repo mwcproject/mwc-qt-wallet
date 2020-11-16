@@ -449,7 +449,7 @@ QString txnFeeToString(uint64_t nanoTxnFee) {
 }
 
 QString getAllSpendableAmount(const QString& accountName, wallet::Wallet* wallet, core::AppContext* appContext) {
-    QString allSpendableAmount = "All";
+    QString allSpendableAmount = "";
 
     QMultiMap<int64_t, wallet::WalletOutput> spendableOutputs;
     findSpendableOutputs(accountName, wallet, appContext, spendableOutputs);
@@ -458,6 +458,11 @@ QString getAllSpendableAmount(const QString& accountName, wallet::Wallet* wallet
         int64_t totalSpendableCoins = getTotalCoinsFromMap(spendableOutputs);
         // we don't expect any change since we are spending all coin
         uint64_t txnFee = calcTxnFee(numSpendableOutputs, 1, 1);
+        if (txnFee>=totalSpendableCoins) {
+            core::getWndManager()->messageTextDlg("Too small amount", "Your total amount is not enougn to cover the transaction fees."
+                            " Because of that you can't spend such a small amount. In order to spend all coins, please add more funds to this account.");
+            return "";
+        }
         int64_t allAmount = totalSpendableCoins - txnFee;
         allSpendableAmount = util::nano2one(allAmount);
     }
