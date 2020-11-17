@@ -458,7 +458,7 @@ QString getAllSpendableAmount(const QString& accountName, wallet::Wallet* wallet
         int64_t totalSpendableCoins = getTotalCoinsFromMap(spendableOutputs);
         // we don't expect any change since we are spending all coin
         uint64_t txnFee = calcTxnFee(numSpendableOutputs, 1, 1);
-        if (txnFee>=totalSpendableCoins) {
+        if (int64_t(txnFee)>=totalSpendableCoins) {
             core::getWndManager()->messageTextDlg("Too small amount", "Your total amount is not enougn to cover the transaction fees."
                             " Because of that you can't spend such a small amount. In order to spend all coins, please add more funds to this account.");
             return "";

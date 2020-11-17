@@ -31,10 +31,11 @@ static bool ProcessRecoverTask(const QVector<WEvent> &events,MWC713 *wallet713) 
     QVector< WEvent > error = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
 
     QStringList errorMessages;
-    for (auto & evt : error) {
-        if (!evt.message.isEmpty())
-            errorMessages.append(evt.message);
-    }
+    // Note!!!  Under the windoes we have event duplicaitons because we read them first the normal way
+    // Second time - from the buffer of exit.
+    // We don't want to deal with buffer duplicaiton, just get the first error is enough.
+    if (error.size()>0)
+        errorMessages.push_back(error[0].message);
 
     wallet713->setRecoveryResults( staring.size() > 0, done.size()>0,
                                    mqAddr.size()<1 ? "" : mqAddr[0].message,
