@@ -61,3 +61,8 @@ Transaction with same inputs is already posted. Probably you cancelled transacti
 # Adapter Callback Error, Performing version check (is recipient listening?): Request error: Cannot make request: error trying to connect: dns error: failed to lookup address information: nodename nor servname provided, or not known
 Adapter Callback Error, Performing version check \(is recipient listening\?\): Request error: Cannot make request: error trying to connect: (.*)
 Unable connect to receiver wallet. Probably it is offline or you have network connection problems. $1
+
+# TOR is already running. It is OK case
+# Tor listener failed to start. HTTP listener must be enabled. Tor Process Error: Unable to start Tor process /Users/bay/.mwc713/floo/wallet713_data/tor/sender/torrc, Tor("[err] Reading config failed--see warnings above.", ["[warn] Path for DataDirectory (./data) is relative and will resolve to /Users/bay/.mwc713/floo/wallet713_data/tor/sender/./data. Is this what you wanted?", "[warn] Could not bind to 127.0.0.1:59051: Address already in use. Is Tor already running?", "[warn] Failed to parse/validate config: Failed to bind one of the listener ports."])
+Tor listener failed to start. HTTP listener must be enabled. Tor Process Error: Unable to start Tor process .* Address already in use. Is Tor already running\?", .*
+Unable to start TOR process. Looks like it is already running.
