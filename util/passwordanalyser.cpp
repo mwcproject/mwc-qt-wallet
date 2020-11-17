@@ -143,7 +143,7 @@ QPair<QString, bool> PasswordAnalyser::getPasswordQualityReport(const QString & 
         if (seqWords.size()>0)
             respondStr += "<br>Sequences: " + seqWords.join(", ");
         if (dictWords.size()>0)
-            respondStr += "<br>Dictionary words: " + dictWords.join(", ");
+            respondStr += "<br>Common words: " + dictWords.join(", ");
 
         respondStr += "</font>";
 
@@ -159,7 +159,7 @@ QPair<QString, bool> PasswordAnalyser::getPasswordQualityReport(const QString & 
     if (seqWords.size()>0)
         respondStr += "<br>Sequences: " + seqWords.join(", ");
     if (dictWords.size()>0)
-        respondStr += "<br>Dictionary words: " + dictWords.join(", ");
+        respondStr += "<br>Common words: " + dictWords.join(", ");
 
     respondStr += "</font>";
 
