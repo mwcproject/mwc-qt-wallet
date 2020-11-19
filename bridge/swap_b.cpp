@@ -191,6 +191,10 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
         return;
     }
 
+    for (auto & tj : tradeJournal) {
+        tj.message = mapMwc713Message(tj.message);
+    }
+
     // [1] - Description in HTML format. Role can be calculated form here as "Selling ..." or "Buying ..."
 
 

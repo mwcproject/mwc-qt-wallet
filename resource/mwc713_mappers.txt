@@ -48,9 +48,14 @@ Unable to start tor at $1, $2
 Tor listener failed to start. HTTP listener must be enabled. Tor Process Error: Unable to start Tor process (.*), Process\("(.*)"\)
 Does HTTP listener enabled? Unable to start tor at $1, $2
 
+# The node is offline of miner is slow. It is a post retry respond
+# Swap Error , Swap LibWaller error: Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Duplicate tx"}
+Swap Error , Swap LibWaller error: Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Duplicate tx"}
+MWC transaction stays at the transaction pool of MWC node for a long time. Please check if your node can reach the network and miners.
+
 # Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Duplicate tx"}
 Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Duplicate tx"}
-Transaction is already posted and stored at the transaction pool
+Transaction is already posted and stored at the transaction pool. If transaction is not confirmed for a long time, please check if your MWC node can reach the network and miners.
 
 # Reproduce: send, cancel before it is mined, send once more.
 # failed posting transaction!, Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Invalid Tx Tx Serialization error, Serialization Unexpected Duplicate"}
