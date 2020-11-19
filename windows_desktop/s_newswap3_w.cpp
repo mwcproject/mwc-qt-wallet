@@ -104,8 +104,8 @@ void NewSwap3::updateSwapReview() {
 
     reportStr += "<p>";
     reportStr += "In case if trade will be cancelled, the coins will be locked:<br>";
-    reportStr += "&emsp; &#9702; My <b style=\"color:yellow;\">MWC</b> will be lockied for <b style=\"color:yellow;\">" + lockTime[0] + "</b>.<br>";
-    reportStr += "&emsp; &#9702; Other party <b style=\"color:yellow;\">"+secCur+"</b> will be lockied for <b style=\"color:yellow;\">" + lockTime[1] + "</b>.</p>";
+    reportStr += "&emsp; &#9702; My <b style=\"color:yellow;\">MWC</b> will be locked for <b style=\"color:yellow;\">" + lockTime[0] + "</b>.<br>";
+    reportStr += "&emsp; &#9702; Other party <b style=\"color:yellow;\">"+secCur+"</b> will be locked for <b style=\"color:yellow;\">" + lockTime[1] + "</b>.</p>";
 
     reportStr += "<p>";
     reportStr += secCur + " redeem address: <b style=\"color:yellow;\">" + swap->getSecAddress() + "</b></p>";
