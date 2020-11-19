@@ -497,7 +497,7 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="text">
-            <string>MainNet </string>
+            <string>Mainnet </string>
            </property>
           </widget>
           <widget class="control::MwcRadioButton" name="radioFloonet">

@@ -205,7 +205,7 @@ Item {
 
         Text {
             id: label_mainnet
-            text: qsTr("MainNet")
+            text: qsTr("Mainnet")
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: image_mainnet.left
             anchors.rightMargin: dp(15)
