@@ -393,14 +393,23 @@ void Swap::applyNewTrade12Params(QString acccount, QString secCurrency, QString 
     newSwapSecAddress = secAddress;
     newSwapBuyerAddress = sendToAddress;
 
-    // Calculating the step 2 parameters ONCE.
-    if (newSwapOfferExpirationTime <= 0)
-        newSwapOfferExpirationTime = 60;
-    if (newSwapRedeemTime<=0)
-        newSwapRedeemTime = 60;
-
     if (need2recalc1) {
         newSwapMwcConfNumber = calcConfirmationsForMwcAmount(newSwapMwc2Trade.toDouble());
+    }
+
+    if (newSwapRedeemTime<=0 || newSwapOfferExpirationTime <= 0 || need2recalc1) {
+        if (newSwapMwcConfNumber > 3000)
+            newSwapOfferExpirationTime = 300;
+        else if (newSwapMwcConfNumber > 1800)
+            newSwapOfferExpirationTime = 180;
+        else if (newSwapMwcConfNumber > 1200)
+            newSwapOfferExpirationTime = 120;
+        else if (newSwapMwcConfNumber > 900)
+            newSwapOfferExpirationTime = 90;
+        else
+            newSwapOfferExpirationTime = 60;
+
+        newSwapRedeemTime = newSwapOfferExpirationTime;
     }
 
     if (need2recalc2) {
