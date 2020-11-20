@@ -298,6 +298,11 @@ bool AppContext::loadDataImpl() {
         in >> notificationWindowsEnabled;
     }
 
+#ifdef Q_OS_WIN
+    // Disable in windows because Modal functionality is brocken
+    notificationWindowsEnabled = false;
+#endif
+
     if (id>=0x479C) {
         in >> swapTabSselection;
     }
