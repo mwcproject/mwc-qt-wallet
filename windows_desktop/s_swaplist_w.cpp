@@ -407,6 +407,8 @@ void SwapList::richButtonPressed(control::RichButton *button, QString cookie) {
         QFileInfo flInfo(fileName);
         config->updatePathFor("SwapTrades", flInfo.path());
 
+        swapBackupInProgress = true;
+
         // Requesting export from the wallet
         swap->backupSwapTradeData(tradeId, fileName);
 
@@ -503,6 +505,11 @@ void SwapList::sgnNewSwapTrade(QString currency, QString swapId) {
 // On OK will get exportedFileName
 void SwapList::sgnBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage) {
     ui->progress->hide();
+
+    if (!swapBackupInProgress)
+        return;
+
+    swapBackupInProgress = false;
 
     if (errorMessage.length() > 0) {
         control::MessageBox::messageText(this, "Backup Error",

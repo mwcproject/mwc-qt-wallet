@@ -142,6 +142,8 @@ private:
 
     QVector<SwapTradeInfo> swapList;
     int swapTabSelection = 0; // 0 - 2 as shown in UI: incoming, outgoing, complete
+
+    bool swapBackupInProgress = false;
 };
 
 }
