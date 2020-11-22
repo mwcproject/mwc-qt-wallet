@@ -201,11 +201,6 @@ QLineEdit:focus {
     background: rgba(255, 255, 255, 0.15);
 }
 
-/* By some reasons Windows needs that for placeholder */
-QLineEdit[text=""] {
-    color: white;
-}
-
 /* ------------------------------ */
 
 QTextEdit {

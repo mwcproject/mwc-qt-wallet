@@ -212,16 +212,26 @@ void Transactions::updateData() {
 
         // Address field...
         if (!trans.address.isEmpty()) {
+            itm->hbox().setContentsMargins(0, 0, 0, 0);
             itm->addWidget(control::createLabel(itm, false, true, trans.address, control::FONT_SMALL));
+            itm->addHSpacer().pop();
         }
 
         // And the last optional line is comment
-        QString txnNote = config->getTxNote(trans.txid);
+        QLabel *noteL = nullptr;
+        {
+            QString txnNote = config->getTxNote(trans.txid);
 
-        itm->addWidget(control::createLabel(itm, true, false, txnNote));
-        QLabel *noteL = (QLabel *) itm->getCurrentWidget();
-        if (txnNote.isEmpty())
-            noteL->hide();
+            itm->hbox().setContentsMargins(0, 0, 0, 0);
+            itm->addWidget(control::createLabel(itm, true, false, txnNote));
+            //itm->addHSpacer();
+            itm->pop();
+
+            noteL = (QLabel *) itm->getCurrentWidget();
+            if (txnNote.isEmpty())
+                noteL->hide();
+        }
+        Q_ASSERT(noteL);
 
         itm->apply();
 

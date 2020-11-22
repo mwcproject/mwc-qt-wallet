@@ -28,6 +28,7 @@ const QString HORZ_LINE = "background: rgba(255, 255, 255, 0.5); border: transpa
 const int     LEFT_MARK_SIZE = 3;
 const int     LEFT_MARK_SPACING = 20;
 const QString LOW_LIGHT_COLOR = "#BF84FF";
+const QString LOW_LIGHT_SELECTED_COLOR = "#DFB4FF";
 const int     VBOX_MARGIN = 20;
 const int     VBOX_SPACING = 5;
 const int     ROW_HEIGHT = 16; // use it for non text elements like icons

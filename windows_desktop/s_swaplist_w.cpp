@@ -297,13 +297,18 @@ void SwapList::updateTradeListData() {
         // Second Line
         {
             itm->addFixedVSpacer(control::VBOX_SPACING); // add extra spacing
-            itm->hbox();
+            itm->hbox().setContentsMargins(0, 0, 0, 0);
             itm->addWidget(
                     control::createLabel(itm, false, true, "Trade ID: " + sw.tradeId, control::FONT_SMALL)).setMinWidth(
                     350);
-            itm->pop();
+            itm->addHSpacer().pop();
         }
-        sw.statusLable = (QLabel*) itm->addWidget(control::createLabel(itm, true, false, "", control::FONT_SMALL)).getCurrentWidget();
+        {
+            itm->hbox().setContentsMargins(0, 0, 0, 0);
+            sw.statusLable = (QLabel *) itm->addWidget(
+                    control::createLabel(itm, false, false, "", control::FONT_SMALL)).getCurrentWidget();
+            itm->addHSpacer().pop();
+        }
 
         sw.lastErrorLable = (QLabel*) itm->addWidget(control::createLabel(itm, true, false, "", control::FONT_NORMAL, "#CCFF33")).getCurrentWidget();
 

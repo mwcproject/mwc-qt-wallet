@@ -191,9 +191,22 @@ RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked, int le
 QLabel * createLabel( control::RichItem * parent, bool wordwrap, bool lowLight, QString text, int fontSize, QString color  ) {
     QLabel * l = new QLabel(parent);
     l->setWordWrap(wordwrap);
-    l->setStyleSheet( (lowLight ? ("color: " + control::LOW_LIGHT_COLOR + "; ") : "") +
-            "border: transparent; background: transparent; font-weight: 400; font-size: " + QString::number(fontSize) + "px;" +
-            (color.isEmpty() ? "" : " color: " + color + ";"));
+    l->setTextInteractionFlags(Qt::TextSelectableByMouse);
+
+    QString selectedColor;
+    if (lowLight) {
+        color = control::LOW_LIGHT_COLOR;
+        selectedColor = control::LOW_LIGHT_SELECTED_COLOR;
+    }
+    if (color.isEmpty()) {
+        color = "white";
+    }
+    if (selectedColor.isEmpty())
+        selectedColor = color;
+
+    l->setStyleSheet( "color: " + color + "; " +
+            "border: transparent; background: transparent; font-weight: 400; font-size: " + QString::number(fontSize) + "px; " +
+            "selection-background-color: rgba(255, 255, 255, 0.3); selection-color: "+selectedColor+"; " );
     l->setText(text);
     return l;
 }

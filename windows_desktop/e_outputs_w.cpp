@@ -186,14 +186,27 @@ void Outputs::updateShownData() {
         }
 
         // line with commit
-        itm->addWidget( control::createLabel(itm, false, true, out.outputCommitment, control::FONT_SMALL) );
+        {
+            itm->hbox().setContentsMargins(0, 0, 0, 0);
+            itm->addWidget(control::createLabel(itm, false, true, out.outputCommitment, control::FONT_SMALL));
+            itm->addHSpacer();
+            itm->pop();
+        }
 
         // And the last optional line is comment
-        QString outputNote = config->getOutputNote(out.outputCommitment);
-        itm->addWidget( control::createLabel(itm, true, false,outputNote));
-        QLabel * noteL = (QLabel *) itm->getCurrentWidget();
-        if (outputNote.isEmpty())
-            noteL->hide();
+        QLabel *noteL = nullptr;
+        {
+            QString outputNote = config->getOutputNote(out.outputCommitment);
+            itm->hbox().setContentsMargins(0, 0, 0, 0);
+            itm->addWidget(control::createLabel(itm, true, false, outputNote));
+            noteL = (QLabel *) itm->getCurrentWidget();
+            //itm->addHSpacer();
+            itm->pop();
+
+            if (outputNote.isEmpty())
+                noteL->hide();
+        }
+        Q_ASSERT(noteL);
 
         itm->apply();
 
