@@ -44,6 +44,8 @@ EditSwap::EditSwap(QWidget *parent, QString _swapId, QString _stateCmd) :
         ui->tradeDetailsBtn->setText("Accept");
     }
 
+    ui->secondaryAddressLabel->setText("");
+
     ui->progress->initLoader(true);
     swap->requestTradeDetails(swapId);
     updateButtons(true);
@@ -85,7 +87,14 @@ void EditSwap::sgnRequestTradeDetails( QVector<QString> swapInfo,
     QString secCurrency = swapInfo[3];
     QString secCurrencyFeeUnits = swapInfo[5]; // - secondary fee units
 
-    ui->secondaryAddressLabel->setText(secCurrency + " address to receive the coins");
+    // [1] - Description in HTML format. Role can be calculated form here as "Selling ..." or "Buying ..."
+    int sellIdx = swapInfo[1].indexOf("Selling"); // Text in HTML formal, "Start With" will not work
+    bool seller = sellIdx>200 && sellIdx<300;
+
+    if (seller)
+        ui->secondaryAddressLabel->setText(secCurrency + " address to receive the coins");
+    else
+        ui->secondaryAddressLabel->setText(secCurrency + " address for the refund in case of trade cancellation");
 
     ui->secTransFeeLabel->setText(secCurrency + " transaction fee");
     ui->updateBtn->setText("Update "+ secCurrency +" transaction details");

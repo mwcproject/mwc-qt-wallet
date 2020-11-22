@@ -573,6 +573,11 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
@@ -581,11 +586,6 @@
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>

@@ -205,8 +205,8 @@ void Swap::onTimerEvent() {
    if (nextTask.swapId.isEmpty() || nextTask.lastUpdatedTime == LONG_LONG_MAX)
         return; // Still nothing to do. There are some are serving
 
-    // Let's run every 30 seconds, it should be enough
-    if (curTime - nextTask.lastUpdatedTime > 30) {
+    // Let's run every 60 seconds, it should be enough
+    if (curTime - nextTask.lastUpdatedTime > 60) {
         // starting the task
         runningSwaps[nextTask.swapId].lastUpdatedTime = curTime;
 

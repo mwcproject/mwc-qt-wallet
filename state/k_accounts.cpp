@@ -35,7 +35,7 @@ Accounts::Accounts(StateContext * context) :
 
     startingTime = 0;
 
-    startTimer(37000);
+    startTimer(61*1000);
 }
 
 Accounts::~Accounts() {}
