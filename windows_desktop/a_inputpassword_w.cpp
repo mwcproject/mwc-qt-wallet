@@ -51,8 +51,6 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
 
     ui->progress->initLoader(false);
 
-    setFocusPolicy(Qt::StrongFocus);
-
     utils::defineDefaultButtonSlot(this, SLOT(on_submitButton_clicked()));
 
     if (lockMode) {

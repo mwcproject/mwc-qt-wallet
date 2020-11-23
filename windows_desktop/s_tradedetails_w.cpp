@@ -39,7 +39,6 @@ TradeDetails::TradeDetails(QWidget *parent, QString _swapId) :
     // Just want to match them.
     ui->executionPlan->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     ui->tradeJournal->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    ui->tradeJournal->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     swap->requestTradeDetails(swapId);
 }
@@ -95,8 +94,7 @@ void TradeDetails::updateData(const QVector<QString> & executionPlan,
                                                            6, 8);
 
         itm->hbox()
-                .addWidget(control::createLabel(itm, false, false, message))
-                .addHSpacer()
+                .addWidget(control::createLabel(itm, true, false, message))
                 .addWidget(control::createLabel(itm, false, false, data)).setFixedWidth(170)
                 .pop();
         itm->apply();

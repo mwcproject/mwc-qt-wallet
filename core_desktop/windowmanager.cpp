@@ -55,6 +55,7 @@ QWidget * WindowManager::switchToWindowEx( const QString & pageName, QWidget * n
     currentWnd->setAttribute( Qt::WA_DeleteOnClose );
     pageHostWnd->layout()->addWidget(currentWnd);
     currentWnd->show();
+    currentWnd->activateWindow();
 
     pageHostWnd->repaint();
     currentWnd->repaint();
