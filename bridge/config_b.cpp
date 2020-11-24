@@ -78,7 +78,6 @@ QVector<QString> Config::getWalletInstances(bool hasSeed) {
 
     // Expected that data is available
     Q_ASSERT(!instances.first.isEmpty());
-
     if (instances.first.isEmpty())
         return {};
 
