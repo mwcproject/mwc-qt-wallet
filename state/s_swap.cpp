@@ -285,16 +285,16 @@ void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString curre
 
 void Swap::onNewSwapTrade(QString currency, QString swapId) {
     const QString title = "New Swap Offer";
-    const QString msg = "You get a new Swap Offer to Buy MWC coins for your "+currency+".\n\nTrade SwapId: " + swapId +
-                        "\n\nPlease reviews this offer before accept it. Check if amounts, lock order, confirmation number are meet your expectations.\n\n"
-                        "Double check that number of confirmations are matching the amount.";
+    const QString msg = "You have received a new Swap Offer to exchange MWC for your "+currency+".\n\nTrade SwapId: " + swapId +
+                        "\n\nPlease review this offer before you accept it. Check if the amounts, lock order, and confirmation number meet your expectations.\n\n"
+                        "Double check that the number of confirmations are match the amount.";
 
     if (mwc::isWalletLocked()) {
         core::getWndManager()->messageTextDlg(title, msg);
     }
     else {
         if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg( title, msg,
-                "Will check Later", "Review and Accept",
+                "Check Later", "Review and Accept",
                 "Later I will switch to the swap page and check it", "Review and Accept the trade now",
                 false, true) ) {
             // Switching to the review page...
@@ -505,7 +505,7 @@ void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> param
             runTrade(swapId, "SellerOfferCreated");
             showTradeDetails(swapId);
             core::getWndManager()->messageTextDlg("Swap Trade", "Congratulation! Your swap trade with ID\n" + swapId +
-                                                                "\nis sucessfully created.");
+                                                                "\nwas successfully created.");
         }
     }
 }

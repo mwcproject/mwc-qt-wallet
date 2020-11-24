@@ -56,7 +56,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Please backup a data for the Swap Trade XXXXXXX. </string>
+    <string>Please backup the data for the Swap Trade XXXXXXX. </string>
    </property>
   </widget>
   <widget class="control::MwcLabelNormal" name="label_2">
@@ -69,7 +69,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>We strongly recommend to backup the trade data to the separate data storage like USB Drive. In case of storage failure this backup will be the only way to restore the trade and get an access to your locked funds.</string>
+    <string>We strongly recommend that you backup the trade data to a separate data storage device, like a USB Drive. In case of storage failure this backup will be the only way to restore the trade and get access to your locked funds.</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
@@ -240,17 +240,17 @@
    <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>

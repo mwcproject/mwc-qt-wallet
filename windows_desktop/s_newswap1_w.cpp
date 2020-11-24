@@ -124,7 +124,7 @@ void NewSwap1::on_nextButton_clicked() {
 
     QString secAddress = ui->secAddressEdit->text();
     if (secAddress.isEmpty()) {
-        control::MessageBox::messageText(this, "Incorrect Input", "Please specify "+ secCurrency +" address to redeem the coins");
+        control::MessageBox::messageText(this, "Incorrect Input", "Please specify a "+ secCurrency +" address to redeem the coins");
         ui->secAddressEdit->setFocus();
         return;
     }
@@ -141,7 +141,7 @@ void NewSwap1::on_nextButton_clicked() {
 
     if (sendTo.size() == 0 ) {
         control::MessageBox::messageText(this, "Incorrect Input",
-                                         "Please specify a valid address for sending this offer." );
+                                         "Please specify a valid MWC wallet address to send your MWC to." );
         ui->sendAddressEdit->setFocus();
         return;
     }

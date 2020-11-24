@@ -98,7 +98,7 @@ void NewSwap2::on_reviewButton_clicked() {
     bool secTxFeeOk = false;
     double secTxFee = ui->secTransFeeEdit->text().toDouble(&secTxFeeOk);
     if (!secTxFeeOk || secTxFee<0.01) {
-        control::MessageBox::messageText(this, "Incorrect Input", "Please specify correct "+secCurrency+" transaction fee.");
+        control::MessageBox::messageText(this, "Incorrect Input", "Please specify a correct "+secCurrency+" transaction fee.");
         ui->secTransFeeEdit->setFocus();
         return;
     }
@@ -106,7 +106,7 @@ void NewSwap2::on_reviewButton_clicked() {
     bool mwcBlocksOk = false;
     int  mwcBlocks = ui->mwcBlocksEdit->text().toInt(&mwcBlocksOk);
     if (!mwcBlocksOk || mwcBlocks<=0) {
-        control::MessageBox::messageText(this, "Incorrect Input", "Please specify number of confirmations for MWC coins.");
+        control::MessageBox::messageText(this, "Incorrect Input", "Please specify the number of confirmations for MWC coins.");
         ui->mwcBlocksEdit->setFocus();
         return;
     }
@@ -114,7 +114,7 @@ void NewSwap2::on_reviewButton_clicked() {
     bool secBlocksOk = false;
     int  secBlocks = ui->secBlocksEdit->text().toInt(&secBlocksOk);
     if (!secBlocksOk || secBlocks<=0) {
-        control::MessageBox::messageText(this, "Incorrect Input", "Please specify number of confirmations for "+secCurrency+" coins.");
+        control::MessageBox::messageText(this, "Incorrect Input", "Please specify the number of confirmations for "+secCurrency+" coins.");
         ui->secBlocksEdit->setFocus();
         return;
     }

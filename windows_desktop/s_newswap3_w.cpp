@@ -90,7 +90,7 @@ void NewSwap3::updateSwapReview() {
     reportStr += "Selling <b style=\"color:yellow;\">" + swap->getMwc2Trade() + " MWC</b> for <b style=\"color:yellow;\">" + swap->getSec2Trade() + " " + secCur + "</b>.</p>";
 
     reportStr += "<p>";
-    reportStr += "Requied lock confirmations: <b style=\"color:yellow;\">" + QString::number(mwcBlocks) +
+    reportStr += "Required lock confirmations: <b style=\"color:yellow;\">" + QString::number(mwcBlocks) +
             " for MWC</b> and <b style=\"color:yellow;\">" + QString::number(secBlocks) + " for " + secCur + "</b>.</p>";
 
 
@@ -103,9 +103,9 @@ void NewSwap3::updateSwapReview() {
     reportStr += "Coins lock order: <b style=\"color:yellow;\">" + (swap->isLockMwcFirst() ? QString("I am locking MWC first") : (QString("Another party locking ") + secCur + " first")) + "</b>.</p>";
 
     reportStr += "<p>";
-    reportStr += "In case if trade will be cancelled, the coins will be locked:<br>";
+    reportStr += "In case the trade is cancelled, the coins will be locked:<br>";
     reportStr += "&emsp; &#9702; My <b style=\"color:yellow;\">MWC</b> will be locked for <b style=\"color:yellow;\">" + lockTime[0] + "</b>.<br>";
-    reportStr += "&emsp; &#9702; Other party <b style=\"color:yellow;\">"+secCur+"</b> will be locked for <b style=\"color:yellow;\">" + lockTime[1] + "</b>.</p>";
+    reportStr += "&emsp; &#9702; Other party's <b style=\"color:yellow;\">"+secCur+"</b> will be locked for <b style=\"color:yellow;\">" + lockTime[1] + "</b>.</p>";
 
     reportStr += "<p>";
     reportStr += secCur + " redeem address: <b style=\"color:yellow;\">" + swap->getSecAddress() + "</b></p>";

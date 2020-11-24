@@ -31,7 +31,7 @@ SwapBackupDlg::SwapBackupDlg(QWidget *parent, QString _swapId, int _backupId) :
     ui->setupUi(this);
 
     ui->title->setText("Backup Trade " + swapId);
-    ui->label1->setText("Please backup a data for the Swap Trade " + swapId + ".");
+    ui->label1->setText("Please backup the data for the Swap Trade " + swapId + ".");
 
     config = new bridge::Config(this);
     swap = new bridge::Swap(this);

@@ -211,20 +211,20 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
 
 
     reportStr += "<p>Time limits: <b style=\"color:yellow;\">" + util::interval2String(swap.messageExchangeTimeLimit, false, 2) +
-            "</b> for messages exchange and <b style=\"color:yellow;\">" +  util::interval2String(swap.redeemTimeLimit, false, 2)+"</b> for redeem or refund<p/>";
+            "</b> for messages to be exchanged and <b style=\"color:yellow;\">" +  util::interval2String(swap.redeemTimeLimit, false, 2)+"</b> for redeem or refund<p/>";
 
     reportStr += "<p>Locking order: " + (swap.sellerLockingFirst ? "<b style=\"color:yellow;\">Lock MWC</b> first" : ("<b style=\"color:yellow;\">Lock " + swap.secondaryCurrency + "</b> first")) + "</p>";
 
     QString lockTime = calcTimeLeft(swap.mwcLockTime);
     reportStr += "<p>";
     if (lockTime.size()>0)
-        reportStr += "MWC funds locked until block <b style=\"color:yellow;\">" + QString::number(swap.mwcLockHeight) + "</b>, expected to be mined in <b style=\"color:yellow;\">" + lockTime + "</b>.<br/>";
+        reportStr += "MWC funds will be locked until block <b style=\"color:yellow;\">" + QString::number(swap.mwcLockHeight) + "</b>, and are expected to be mined in <b style=\"color:yellow;\">" + lockTime + "</b>.<br/>";
     else
         reportStr += "MWC Lock expired.<br/>";
 
     QString secLockTime = calcTimeLeft(swap.secondaryLockTime);
     if (secLockTime.size()>0) {
-        reportStr += swap.secondaryCurrency + " funds locked for <b style=\"color:yellow;\">" + secLockTime + "</b>.";
+        reportStr += swap.secondaryCurrency + " funds will be locked for <b style=\"color:yellow;\">" + secLockTime + "</b>.";
     }
     else {
         reportStr += swap.secondaryCurrency + " lock expired";

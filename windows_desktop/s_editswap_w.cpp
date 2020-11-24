@@ -196,7 +196,7 @@ void EditSwap::on_tradeDetailsBtn_clicked() {
 // Validate the data and call for update. Return number of update calls.
 int EditSwap::requestUpdateData() {
     if ( ui->redeemAddressEdit->text().isEmpty() ) {
-        control::MessageBox::messageText(this, "Input", QString("Please define ") + secondaryCurrency +
+        control::MessageBox::messageText(this, "Input", QString("Please define the ") + secondaryCurrency +
                                                         " address to receive the coins." );
         return -1;
     }
