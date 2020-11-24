@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>844</width>
+    <width>880</width>
     <height>711</height>
    </rect>
   </property>
@@ -348,7 +348,7 @@
          <widget class="control::MwcLineEditNormal" name="mwcmqAddress">
           <property name="minimumSize">
            <size>
-            <width>600</width>
+            <width>0</width>
             <height>40</height>
            </size>
           </property>
@@ -405,7 +405,7 @@
          <widget class="control::MwcLineEditNormal" name="torAddress">
           <property name="minimumSize">
            <size>
-            <width>600</width>
+            <width>0</width>
             <height>40</height>
            </size>
           </property>
@@ -462,7 +462,7 @@
          <widget class="control::MwcLineEditNormal" name="fileAddress">
           <property name="minimumSize">
            <size>
-            <width>600</width>
+            <width>0</width>
             <height>40</height>
            </size>
           </property>
