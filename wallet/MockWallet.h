@@ -339,6 +339,10 @@ public:
     // Chack signal: onRequestRecieverWalletAddress(QString url, QString address, QString error)
     virtual void requestRecieverWalletAddress(QString url, QString apiSecret) override;
 
+    // Adjust trade state. It is dev support functionality, so no feedback will be provided.
+    // In case you need it, add the signal as usual
+    virtual void adjustTradeState(QString swapId, QString newState) override;
+
 private:
     core::AppContext * appContext; // app context to store current account name
 

@@ -617,5 +617,11 @@ void MockWallet::requestRecieverWalletAddress(QString url, QString apiSecret) {
     emit onRequestRecieverWalletAddress(url, "dhfkldgsfjfdkljhfdkjhkfdghgkfdhgkjh", "");
 }
 
+// Adjust trade state. It is dev support functionality, so no feedback will be provided.
+// In case you need it, add the signal as usual
+void MockWallet::adjustTradeState(QString swapId, QString newState) {
+    Q_UNUSED(swapId)
+    Q_UNUSED(newState)
+};
 
 }

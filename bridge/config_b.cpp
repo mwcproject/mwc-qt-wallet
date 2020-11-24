@@ -75,8 +75,13 @@ void Config::saveForeignApiConfig(bool foreignApi,
 // <selected path_id>, < <path_id>, <instance name>, <network> >, ...  >
 QVector<QString> Config::getWalletInstances(bool hasSeed) {
     QPair<QVector<QString>, int> instances = getAppContext()->getWalletInstances(hasSeed);
+
     // Expected that data is available
     Q_ASSERT(!instances.first.isEmpty());
+
+    if (instances.first.isEmpty())
+        return {};
+
     QVector<QString> result;
     result.push_back(instances.first[instances.second]);
 

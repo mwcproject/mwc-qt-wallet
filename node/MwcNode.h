@@ -72,7 +72,7 @@ public:
     bool isRunning() const {return nodeProcess!= nullptr;}
     const QString & getCurrentNetwork() const { return lastUsedNetwork; }
 
-    void start( const QString & dataPath, const QString & network );
+    void start( const QString & dataPath, const QString & network, bool tor );
     void stop();
 
     QString getMwcStatus() const { return nodeStatusString; }
@@ -83,7 +83,7 @@ public:
 
     QString getLogsLocation() const;
 private:
-    QProcess * initNodeProcess( const QString & dataPath, const QString & network );
+    QProcess * initNodeProcess( const QString & dataPath, const QString & network, bool tor );
 
     void nodeProcDisconnect();
     void nodeProcConnect(QProcess * process);
@@ -159,6 +159,7 @@ private:
     int restartCounter = 0;
 
     QString lastDataPath;
+    bool lastTor = false;
 
     int64_t nodeStartTime = 0;
     QString commandLine;

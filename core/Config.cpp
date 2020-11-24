@@ -21,6 +21,7 @@ static QString mwc713conf;
 static QString mwcGuiWalletConf;
 static QString mwcPath;
 static QString mwczipPath;
+static QString torPath;
 static QString wallet713path;
 static int64_t logoutTimeMs = 1000*60*15; // 15 minutes is default
 static double  timeoutMultiplier = 1.0;
@@ -50,6 +51,15 @@ void setMwcGuiWalletConf( QString conf ) {
     mwcGuiWalletConf = conf;
 }
 
+static QString calcBuildInAppPath(const QString & wallet713path, QString targetAppPath, const QString & appName) {
+    if (targetAppPath.isEmpty()) {
+        int pos = wallet713path.lastIndexOf("mwc713", -1, Qt::CaseInsensitive );
+        if (pos>=0)
+            targetAppPath = wallet713path.left(pos) + appName + wallet713path.right( wallet713path.length() - pos - strlen("mwc713") );
+    }
+    return targetAppPath;
+};
+
 /**
  * COnfiguration for mwc-mq-wallet
  * @param mwcPath               - path to mwc-node.  Not used now
@@ -60,6 +70,7 @@ void setMwcGuiWalletConf( QString conf ) {
  * @param sendTimeoutMs         - timeout for mwc mq send. Expected that 2nd party is online. Otherwise we will ask user if he want to stop waiting and cancel transaction.
  */
 void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet713path, QString _mwczipPath,
+                   QString _torPath,
                    int64_t  _logoutTimeMs,
                    double _timeoutMultiplier,
                    int _sendTimeoutMs) {
@@ -67,14 +78,8 @@ void setConfigData(WALLET_RUN_MODE _runMode, QString _mwcPath, QString _wallet71
     mwcPath = _mwcPath;
     wallet713path = _wallet713path;
 
-    if (_mwczipPath.isEmpty()) {
-        int pos = wallet713path.lastIndexOf("mwc713", -1, Qt::CaseInsensitive );
-        if (pos>=0)
-            mwczipPath = wallet713path.left(pos) + "mwczip" + wallet713path.right( wallet713path.length() - pos - strlen("mwc713") );
-    }
-    else {
-        mwczipPath = _mwczipPath;
-    }
+    mwczipPath = calcBuildInAppPath(wallet713path, _mwczipPath, "mwczip");
+    torPath = calcBuildInAppPath(wallet713path, _torPath, "tor");
 
     logoutTimeMs = _logoutTimeMs;
     timeoutMultiplier = _timeoutMultiplier;
@@ -93,6 +98,7 @@ const QString & getMwcGuiWalletConf() {return mwcGuiWalletConf;}
 const QString & getMwcPath() {return mwcPath;}
 const QString & getWallet713path() {return wallet713path;}
 const QString & getMwcZipPath() {return mwczipPath;}
+const QString & getTorPath() {return torPath;}
 
 int64_t         getLogoutTimeMs() {return logoutTimeMs;}
 void         setLogoutTimeMs(int64_t timeMs) {logoutTimeMs = timeMs;}

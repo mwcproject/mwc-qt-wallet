@@ -69,10 +69,11 @@ QString MwcNode::getLogsLocation() const {
 }
 
 
-void MwcNode::start(const QString & dataPath, const QString & network ) {
+void MwcNode::start(const QString & dataPath, const QString & network, bool tor ) {
     qDebug() << "MwcNode::start for network " + network;
 
     lastUsedNetwork = network;
+    lastTor = tor;
     nodeSecret = "";
     nodeWorkDir = "";
     nonEmittedOutput = "";
@@ -97,7 +98,7 @@ void MwcNode::start(const QString & dataPath, const QString & network ) {
     initChainHeight = 0;
 
     // Creating process and starting
-    nodeProcess = initNodeProcess(dataPath, network);
+    nodeProcess = initNodeProcess(dataPath, network, tor);
     nodeOutputParser = new tries::NodeOutputParser();
 
     connect( nodeOutputParser, &tries::NodeOutputParser::nodeOutputGenericEvent, this, &MwcNode::nodeOutputGenericEvent, Qt::QueuedConnection);
@@ -169,7 +170,7 @@ void MwcNode::stop() {
 
 // pass - provide password through env variable. If pass empty - nothing will be done
 // paramsPlus - additional parameters for the process
-QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & network ) {
+QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & network, bool tor ) {
     lastDataPath = dataPath;
 
     QPair<bool,QString> nodeDataFullPath = getMwcNodePath(dataPath, network);
@@ -179,7 +180,7 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
         return nullptr;
     }
     nodeWorkDir = nodeDataFullPath.second;
-    MwcNodeConfig nodeConf = getCurrentMwcNodeConfig( dataPath, network );
+    MwcNodeConfig nodeConf = getCurrentMwcNodeConfig( dataPath, network, tor );
 
     QString nodeExecutablePath = QFileInfo(nodePath).canonicalFilePath();
     if (nodeExecutablePath.isEmpty()) {
@@ -193,6 +194,10 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
     // Creating process and starting
     QProcess * process = new QProcess();
     process->setProcessChannelMode(QProcess::MergedChannels);
+
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert( "TOR_EXE_NAME", config::getTorPath() );
+    process->setProcessEnvironment(env);
 
     // Let's check if we are fine with directories
 
@@ -328,8 +333,8 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
     if ( !isFinalRun() ) {
         // First try to stop another instamse if it is there
         restartCounter++;
-        MwcNodeConfig mainnetConfig = getCurrentMwcNodeConfig(lastDataPath, "Mainnet");
-        MwcNodeConfig floonetConfig = getCurrentMwcNodeConfig(lastDataPath, "Floonet");
+        MwcNodeConfig mainnetConfig = getCurrentMwcNodeConfig(lastDataPath, "Mainnet", lastTor);
+        MwcNodeConfig floonetConfig = getCurrentMwcNodeConfig(lastDataPath, "Floonet", lastTor);
 
         // Let's request other embedded local node to stop. There is a high chance that it is running and take the port.
         if (!mainnetConfig.secret.isEmpty())
@@ -361,7 +366,7 @@ void MwcNode::onRestartNode() {
     // Because starting process is long, user might go forward, so in the progress might be another instance.
     // It is fine, this task is already executed
     if (!isRunning())
-        start( lastDataPath, lastUsedNetwork );
+        start( lastDataPath, lastUsedNetwork, lastTor );
 }
 
 
@@ -765,7 +770,7 @@ void MwcNode::timerEvent(QTimerEvent *event) {
 
     if (need2restart) {
         stop();
-        start(lastDataPath, lastUsedNetwork);
+        start(lastDataPath, lastUsedNetwork, lastTor);
         return;
     }
 

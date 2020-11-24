@@ -74,7 +74,7 @@ bool MWC713::checkWalletInitialized(bool hasSeed) {
         return false;
 
     Q_ASSERT(mwc713process==nullptr);
-    mwc713process = initMwc713process( {"TOR_EXE_NAME", QCoreApplication::applicationDirPath() + QDir::separator() + TOR_NAME}, {"state"}, false );
+    mwc713process = initMwc713process( {"TOR_EXE_NAME", config::getTorPath()}, {"state"}, false );
 
     if (mwc713process==nullptr)
         return false;
@@ -241,7 +241,7 @@ void MWC713::start()  {
     qDebug() << "Starting MWC713 at " << mwc713Path << " for config " << mwc713configPath;
 
     // Creating process and starting
-    mwc713process = initMwc713process({"TOR_EXE_NAME", QCoreApplication::applicationDirPath() + QDir::separator() + TOR_NAME}, {} );
+    mwc713process = initMwc713process({"TOR_EXE_NAME", config::getTorPath()}, {} );
     if (mwc713process==nullptr)
         return;
 
@@ -278,7 +278,7 @@ void MWC713::start2init(QString password) {
 
     // Creating process and starting
 
-    mwc713process = initMwc713process({"TOR_EXE_NAME", QCoreApplication::applicationDirPath() + QDir::separator() + TOR_NAME, "MWC_PASSWORD", password}, {"init"} );
+    mwc713process = initMwc713process({"TOR_EXE_NAME", config::getTorPath(), "MWC_PASSWORD", password}, {"init"} );
     if (mwc713process==nullptr)
         return;
 
@@ -324,7 +324,7 @@ void MWC713::start2recover(const QVector<QString> & seed, QString password) {
 
     // Creating process and starting
     // Mnemonic will moved into variables
-    mwc713process = initMwc713process({"TOR_EXE_NAME", QCoreApplication::applicationDirPath() + QDir::separator() + TOR_NAME, "MWC_PASSWORD", password, "MWC_MNEMONIC", seedStr}, {"recover", "--mnemonic", "env" } );
+    mwc713process = initMwc713process({"TOR_EXE_NAME", config::getTorPath(), "MWC_PASSWORD", password, "MWC_MNEMONIC", seedStr}, {"recover", "--mnemonic", "env" } );
     if (mwc713process==nullptr)
         return;
 
@@ -1879,7 +1879,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
                 break;
             case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL: {
                 node::MwcNodeConfig nodeConfig = node::getCurrentMwcNodeConfig(connection.localNodeDataPath,
-                                                                               config.getNetwork());
+                                                                               config.getNetwork(), appContext->useTorForNode() );
                 newConfLines.insert(appentIdx,"mwc_node_uri = \"http://127.0.0.1:13413\"");
                 newConfLines.insert(appentIdx,"mwc_node_secret = \"" + nodeConfig.secret + "\"");
                 needLocalMwcNode = true;
@@ -1908,7 +1908,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
             }
 
             if (!mwcNode->isRunning() && canStartNode) {
-                mwcNode->start(connection.localNodeDataPath, config.getNetwork());
+                mwcNode->start(connection.localNodeDataPath, config.getNetwork(), appContext->useTorForNode());
             }
         }
     }

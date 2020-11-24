@@ -40,7 +40,7 @@ void MwcNodeConfig::setData(QString _network, QString _host, QString _port, QStr
     secret  = _secret;
 }
 
-static void updateMwcNodeConfig(const QString & nodeDataPath, const QString & network ) {
+static void updateMwcNodeConfig(const QString & nodeDataPath, const QString & network, bool tor ) {
     QPair<bool,QString> walletPath = getMwcNodePath(nodeDataPath, network);
     if (!walletPath.first) {
         core::getWndManager()->messageTextDlg( "Error", walletPath.second);
@@ -71,16 +71,19 @@ static void updateMwcNodeConfig(const QString & nodeDataPath, const QString & ne
     }
 
     QString mwcServerTomlFN = walletPath.second + "mwc-server.toml";
-    if (! QFile::exists(mwcServerTomlFN) ) {
-        QFile::copy( network.toLower().contains("main") ? mwc::MWC_NODE_CONFIG_MAIN : mwc::MWC_NODE_CONFIG_FLOO, mwcServerTomlFN );
-        QFile::setPermissions( mwcServerTomlFN, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup );
-    }
+    // Copy with every run because of the tor flag
+    QFile::remove(mwcServerTomlFN); // QT doesn't eoverwite the file, that is why we need to delete it first
+    QFile::copy( network.toLower().contains("main") ?
+                     (tor ? mwc::MWC_NODE_CONFIG_TOR_MAIN : mwc::MWC_NODE_CONFIG_IP_MAIN ) :
+                     (tor ? mwc::MWC_NODE_CONFIG_TOR_FLOO : mwc::MWC_NODE_CONFIG_IP_FLOO ),
+             mwcServerTomlFN );
+    QFile::setPermissions( mwcServerTomlFN, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup );
 }
 
 
-MwcNodeConfig getCurrentMwcNodeConfig(const QString & nodeDataPath, const QString & network) {
+MwcNodeConfig getCurrentMwcNodeConfig(const QString & nodeDataPath, const QString & network, bool tor) {
 
-    updateMwcNodeConfig( nodeDataPath, network );
+    updateMwcNodeConfig( nodeDataPath, network, tor );
 
     QPair<bool,QString> nodeDataFullPath = getMwcNodePath(nodeDataPath, network);
     if (!nodeDataFullPath.first) {

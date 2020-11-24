@@ -139,6 +139,8 @@ public:
     // ----- Auto Start Tor ------
     bool isAutoStartTorEnabled() const {return autoStartTorEnabled;}
     void setAutoStartTorEnabled(bool enabled);
+    // Not will be started with TOR if it is online node or Tor autostart enabled
+    bool useTorForNode() const;
 
     // ----- Outputs: All/Unspent
     bool isShowOutputAll() const {return showOutputAll;}

@@ -259,10 +259,9 @@ void NodeInfo::exportBlockchainData(QString fileName) {
 
     QPair<bool, QString> res = compress::compressFolder( nodePath.second + "chain_data/", fileName, network );
 
-
     QCoreApplication::processEvents();
 
-    context->mwcNode->start(currentNodeConnection.localNodeDataPath, network);
+    context->mwcNode->start(currentNodeConnection.localNodeDataPath, network, context->appContext->useTorForNode());
 
     QCoreApplication::processEvents();
 
@@ -306,7 +305,7 @@ void NodeInfo::importBlockchainData(QString fileName) {
 
     QCoreApplication::processEvents();
 
-    context->mwcNode->start(currentNodeConnection.localNodeDataPath, network);
+    context->mwcNode->start(currentNodeConnection.localNodeDataPath, network, context->appContext->useTorForNode());
 
     QCoreApplication::processEvents();
 
@@ -373,7 +372,7 @@ void NodeInfo::resetEmbeddedNodeData() {
 
     QCoreApplication::processEvents();
 
-    context->mwcNode->start(currentNodeConnection.localNodeDataPath, network);
+    context->mwcNode->start(currentNodeConnection.localNodeDataPath, network, context->appContext->useTorForNode());
 
     notify::notificationStateClean( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 

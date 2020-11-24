@@ -506,17 +506,6 @@ private:
     core::AppContext * appContext = nullptr; // app context to store current account name
     node::MwcNode * mwcNode = nullptr;
 
-    #ifdef Q_OS_WIN
-        const QString TOR_NAME = "tor.exe";
-    #else
-        #ifdef WALLET_DESKTOP
-            const QString TOR_NAME = "tor";
-        #endif
-        #ifdef WALLET_MOBILE
-            const QString TOR_NAME = "tor.so";
-        #endif
-    #endif
-
     QString mwc713Path; // path to the backed binary
     QString mwc713configPath; // config file for mwc713
     QProcess * mwc713process = nullptr;

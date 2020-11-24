@@ -602,6 +602,13 @@ void AppContext::setAutoStartTorEnabled(bool enabled) {
     saveData();
 }
 
+bool AppContext::useTorForNode() const {
+    bool tor = isAutoStartTorEnabled();
+    if (config::isOnlineNode())
+        tor = true;
+    return tor;
+}
+
 void AppContext::setShowOutputAll(bool all) {
     showOutputAll = all;
 }

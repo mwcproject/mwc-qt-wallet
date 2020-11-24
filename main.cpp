@@ -170,6 +170,7 @@ QPair<bool, QString> readConfig(QApplication & app) {
     QString mwc_path = reader.getString("mwc_path");
     QString wallet713_path = reader.getString("wallet713_path");
     QString mwczip_path = reader.getString("mwczip_path");
+    QString tor_path = reader.getString("tor_path");
 
     QString logoutTimeoutStr = reader.getString("logoutTimeout");
     QString timeoutMultiplier = reader.getString("timeoutMultiplier");
@@ -223,6 +224,13 @@ QPair<bool, QString> readConfig(QApplication & app) {
         mwc_path += ".exe";
 #endif
     }
+
+    if (tor_path == "build in") {
+        tor_path = QCoreApplication::applicationDirPath() + "/" + "tor";
+#ifdef Q_OS_WIN
+        mwc_path += ".exe";
+#endif
+    }
 #endif
 
 #ifdef WALLET_MOBILE
@@ -238,11 +246,15 @@ QPair<bool, QString> readConfig(QApplication & app) {
     if (mwczip_path == "build in") {
         mwczip_path = QCoreApplication::applicationDirPath() + "/mwczip.so";
     }
+
+    if (tor_path == "build in") {
+        tor_path = QCoreApplication::applicationDirPath() + "/tor.so";
+    }
 #endif
 
 
     Q_ASSERT(runMode.first);
-    config::setConfigData( runMode.second, mwc_path, wallet713_path, mwczip_path, logoutTimeout*1000L, timeoutMultiplierVal, sendTimeoutMs );
+    config::setConfigData( runMode.second, mwc_path, wallet713_path, mwczip_path, tor_path, logoutTimeout*1000L, timeoutMultiplierVal, sendTimeoutMs );
 
     return QPair<bool, QString>(true, "");
 }

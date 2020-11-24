@@ -722,7 +722,7 @@ public:
     virtual void requestRecieverWalletAddress(QString url, QString apiSecret) = 0;
 
     // Adjust trade state. It is dev support functionality, so no feedback will be provided.
-    // In case you need it, add the signal as usuall
+    // In case you need it, add the signal as usual
     virtual void adjustTradeState(QString swapId, QString newState) = 0;
 private:
 signals:

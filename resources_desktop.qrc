@@ -2,8 +2,10 @@
     <qresource prefix="/">
         <file>txt/bip39_words.txt</file>
         <file>resource_desktop/mwcwallet_style.css</file>
-        <file>resource_desktop/mwc-server-floo.toml</file>
-        <file>resource_desktop/mwc-server-main.toml</file>
+        <file>resource_desktop/mwc-server-floo-ip.toml</file>
+        <file>resource_desktop/mwc-server-main-ip.toml</file>
+        <file>resource_desktop/mwc-server-floo-tor.toml</file>
+        <file>resource_desktop/mwc-server-main-tor.toml</file>
         <file>img/Receive@2x.svg</file>
         <file>img/Send@2x.svg</file>
         <file>img/Transactions@2x.svg</file>

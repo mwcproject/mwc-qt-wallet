@@ -33,7 +33,7 @@ struct MwcNodeConfig {
 QPair<bool,QString> getMwcNodePath(const QString & nodeDataPath, const QString & network);
 
 // Update first and then get.
-MwcNodeConfig getCurrentMwcNodeConfig(const QString & nodeDataPath, const QString & network );
+MwcNodeConfig getCurrentMwcNodeConfig(const QString & nodeDataPath, const QString & network, bool tor );
 
 }
 
