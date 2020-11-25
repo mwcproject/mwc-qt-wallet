@@ -41,6 +41,8 @@ private slots:
     void on_backButton_clicked();
     void on_sendOfferButton_clicked();
 
+    void on_noteEdit_textEdited(const QString &arg1);
+
 private:
     void updateSwapReview();
 

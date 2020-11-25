@@ -114,6 +114,14 @@ void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, 
         markWnd->setStyleSheet(control::LEFT_MARK_ON);
     else
         markWnd->setStyleSheet(control::LEFT_MARK_OFF);
+
+    Q_ASSERT(noteLabel);
+    QString noteStr = config->getSwapNote(tradeId);
+    noteLabel->setText(noteStr);
+    if (noteStr.isEmpty())
+        noteLabel->hide();
+    else
+        noteLabel->show();
 }
 
 
@@ -308,6 +316,13 @@ void SwapList::updateTradeListData() {
             sw.statusLable = (QLabel *) itm->addWidget(
                     control::createLabel(itm, false, false, "", control::FONT_SMALL)).getCurrentWidget();
             itm->addHSpacer().pop();
+        }
+        {
+            itm->hbox().setContentsMargins(0, 0, 0, 0);
+            sw.noteLabel = (QLabel *) itm->addWidget(
+                    control::createLabel(itm, true, false, "")).getCurrentWidget();
+            itm->pop();
+            sw.noteLabel->hide();
         }
 
         sw.lastErrorLable = (QLabel*) itm->addWidget(control::createLabel(itm, true, false, "", control::FONT_NORMAL, "#CCFF33")).getCurrentWidget();

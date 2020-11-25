@@ -6,31 +6,31 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>999</width>
-    <height>730</height>
+    <width>979</width>
+    <height>772</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,0,0,0,0,0,0,0,0,0,0">
    <property name="spacing">
-    <number>1</number>
+    <number>3</number>
    </property>
    <property name="leftMargin">
     <number>40</number>
    </property>
    <property name="topMargin">
-    <number>90</number>
+    <number>80</number>
    </property>
    <property name="rightMargin">
     <number>40</number>
    </property>
    <property name="bottomMargin">
-    <number>40</number>
+    <number>30</number>
    </property>
    <item>
-    <spacer name="verticalSpacer_5">
+    <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
@@ -77,221 +77,6 @@
     </widget>
    </item>
    <item>
-    <spacer name="verticalSpacer_7">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <widget class="control::MwcLabelSmall" name="secondaryAddressLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>22</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>XXX address to receive coins</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="control::MwcLineEditNormal" name="redeemAddressEdit">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="toolTip">
-      <string>Address to receive the coins</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="maxLength">
-      <number>1024</number>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <widget class="control::MwcLabelSmall" name="label_19">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>22</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>ElectrumX private instance URL. Private instances provide extra security for the trade</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="control::MwcLineEditNormal" name="electrumXEdit">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>200000</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="toolTip">
-      <string>Private ElectrumX hosp and port to connect</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="maxLength">
-      <number>512</number>
-     </property>
-     <property name="placeholderText">
-      <string>Private ElectrumX server &lt;host&gt;:&lt;port&gt; (otional)</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2,1">
-     <property name="spacing">
-      <number>20</number>
-     </property>
-     <item>
-      <widget class="control::MwcLabelNormal" name="secTransFeeLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>22</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>XXX transaction fee</string>
-       </property>
-       <property name="textInteractionFlags">
-        <set>Qt::LinksAccessibleByMouse</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="control::MwcLineEditNormal" name="secondaryFeeEdit">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>40</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>200000</width>
-         <height>40</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Secondary currency transaction fee</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="maxLength">
-        <number>512</number>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="control::MwcLabelNormal" name="secFeeUnitsLabel">
-       <property name="text">
-        <string>satoshi per byte</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
     <spacer name="verticalSpacer_3">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -308,57 +93,325 @@
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1">
+     <property name="spacing">
+      <number>40</number>
+     </property>
      <item>
-      <spacer name="horizontalSpacer">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>3</number>
+       </property>
+       <item>
+        <widget class="control::MwcLabelSmall" name="secondaryAddressLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>22</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>XXX address to receive coins</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="control::MwcLineEditNormal" name="redeemAddressEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Address to receive the coins</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="maxLength">
+          <number>1024</number>
+         </property>
+         <property name="placeholderText">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>3</number>
+       </property>
+       <item>
+        <widget class="control::MwcLabelSmall" name="label_19">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>22</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Private ElectrumX instance to provide extra security</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="control::MwcLineEditNormal" name="electrumXEdit">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200000</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Private ElectrumX hosp and port to connect</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="maxLength">
+          <number>512</number>
+         </property>
+         <property name="placeholderText">
+          <string>Private ElectrumX server &lt;host&gt;:&lt;port&gt; (otional)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_5">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,1">
+     <property name="spacing">
+      <number>40</number>
+     </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>20</number>
+       </property>
+       <item>
+        <widget class="control::MwcLabelNormal" name="secTransFeeLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>22</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>XXX transaction fee</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="control::MwcLineEditNormal" name="secondaryFeeEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>1200</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Secondary currency transaction fee</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="maxLength">
+          <number>512</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="control::MwcLabelNormal" name="secFeeUnitsLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>satoshi per byte</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <item>
+        <spacer name="horizontalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="control::MwcPushButtonNormal" name="updateBtn">
+         <property name="minimumSize">
+          <size>
+           <width>260</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Apply chnages to the swap trade</string>
+         </property>
+         <property name="text">
+          <string>Update XXX transaction details</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,3,1">
+     <property name="spacing">
+      <number>10</number>
+     </property>
+     <property name="topMargin">
+      <number>15</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <spacer name="horizontalSpacer_10">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
-         <height>20</height>
+         <height>1</height>
         </size>
        </property>
       </spacer>
      </item>
      <item>
-      <widget class="control::MwcPushButtonNormal" name="updateBtn">
+      <widget class="control::MwcLine" name="frame_9">
        <property name="minimumSize">
         <size>
-         <width>300</width>
-         <height>40</height>
+         <width>0</width>
+         <height>2</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>40</height>
+         <height>2</height>
         </size>
        </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
        </property>
-       <property name="focusPolicy">
-        <enum>Qt::StrongFocus</enum>
-       </property>
-       <property name="toolTip">
-        <string>Apply chnages to the swap trade</string>
-       </property>
-       <property name="text">
-        <string>Update XXX transaction details</string>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
        </property>
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_2">
+      <spacer name="horizontalSpacer_9">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
-         <height>20</height>
+         <height>1</height>
         </size>
        </property>
       </spacer>
@@ -366,7 +419,54 @@
     </layout>
    </item>
    <item>
-    <spacer name="verticalSpacer_4">
+    <widget class="control::MwcLabelSmall" name="label_20">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>22</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Swap trade note</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="control::MwcLineEditNormal" name="noteEdit">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>200000</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Note for this swap trade</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="maxLength">
+      <number>512</number>
+     </property>
+     <property name="placeholderText">
+      <string>Note (optional)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_6">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
@@ -555,7 +655,7 @@
     </layout>
    </item>
    <item>
-    <spacer name="verticalSpacer_6">
+    <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
@@ -595,11 +695,15 @@
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
+  <customwidget>
+   <class>control::MwcLine</class>
+   <extends>QFrame</extends>
+   <header>control_desktop/MwcFrameWithBorder.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>redeemAddressEdit</tabstop>
   <tabstop>secondaryFeeEdit</tabstop>
-  <tabstop>updateBtn</tabstop>
   <tabstop>backButton</tabstop>
   <tabstop>tradeDetailsBtn</tabstop>
  </tabstops>

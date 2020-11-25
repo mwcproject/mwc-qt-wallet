@@ -55,6 +55,7 @@ struct SwapTradeInfo {
     QLabel * expirationLable = nullptr;
     QLabel * statusLable = nullptr;
     QLabel * lastErrorLable = nullptr;
+    QLabel * noteLabel = nullptr;
     QWidget * cancelBtn = nullptr;
     QWidget * deleteBtn = nullptr;
     QWidget * backupBtn = nullptr;
@@ -81,7 +82,7 @@ struct SwapTradeInfo {
 
     // Reset all UI related data
     void resetUI() {
-        lastErrorLable = initTimeLable = expirationLable = statusLable = nullptr;
+        noteLabel = lastErrorLable = initTimeLable = expirationLable = statusLable = nullptr;
         markWnd = cancelBtn = deleteBtn = backupBtn = acceptBtn = nullptr;
     }
 

@@ -44,6 +44,8 @@ NewSwap2::NewSwap2(QWidget *parent) :
     ui->secBlocksLabel->setText(secCurrency);
     ui->secBlocksEdit->setText( QString::number(swap->getSecConfNumber()) );
 
+    ui->electrumXEdit->setText( swap->getElectrumXprivateUrl() );
+
     ui->secLockCurrencyLabel->setText(secCurrency);
 
     updateFundsLockTime();

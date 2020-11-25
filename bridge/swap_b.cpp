@@ -691,6 +691,15 @@ void Swap::adjustTradeState(QString swapId, QString newState) {
     getWallet()->adjustTradeState(swapId, newState);
 }
 
+QString Swap::getNote() {
+    return getSwap()->getNote();
+}
+
+void Swap::setNote(QString note) {
+    getSwap()->setNote(note);
+}
+
+
 
 }
 

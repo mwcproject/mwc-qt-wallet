@@ -132,6 +132,10 @@ public:
     Q_INVOKABLE void deleteTxNote(QString txUuid);
     // Update the note for this transaction
     Q_INVOKABLE void updateTxNote(QString txUuid, QString note);
+    // Read a note for this commitment
+    Q_INVOKABLE QString getSwapNote(QString swapId);
+    // Update the note for this commit
+    Q_INVOKABLE void updateSwapNote(QString swapId, QString note);
 
     // Check if 'fluff' flag is set
     Q_INVOKABLE bool isFluffSet();

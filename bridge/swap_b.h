@@ -134,6 +134,9 @@ public:
     Q_INVOKABLE int getSecConfNumber();
     Q_INVOKABLE QString getElectrumXprivateUrl();
 
+    Q_INVOKABLE QString getNote();
+    Q_INVOKABLE void setNote(QString note);
+
     // Calculate the locking time for a NEW not yet created swap offer.
     Q_INVOKABLE QVector<QString> getLockTime( QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks );
 

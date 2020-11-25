@@ -291,6 +291,19 @@ void Config::updateTxNote(QString txUuid, QString note) {
     getAppContext()->updateNote( "tx_"+txUuid, note);
 }
 
+// Read a note for this commitment
+QString Config::getSwapNote(QString swapId) {
+    return getAppContext()->getNote("swap_"+swapId);
+}
+
+// Update the note for this commit
+void Config::updateSwapNote(QString swapId, QString note) {
+    if (note.isEmpty())
+        getAppContext()->deleteNote("swap_"+swapId);
+    else
+        getAppContext()->updateNote("swap_"+swapId, note);
+}
+
 // Check if 'fluff' flag is set
 bool Config::isFluffSet() {
     return getAppContext()->isFluffSet();

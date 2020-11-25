@@ -304,7 +304,7 @@ QString TaskAdjustTrade::generateCommandLine(const QString &swapId, const QStrin
     } else if (adjustCmd == "secondary_fee") {
         return "swap --adjust secondary_fee --secondary_fee " + param1 + " -i " + swapId;
     } else if (adjustCmd == "electrumx_uri") {
-        return "swap --adjust electrumx_uri --electrum_uri1 " + param1 + " -i " + swapId;
+        return "swap --adjust electrumx_uri --electrum_uri1 \"" + param1 + "\" -i " + swapId;
     } else {
         Q_ASSERT(false);
         return "";

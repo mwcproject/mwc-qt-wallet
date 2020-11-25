@@ -59,6 +59,8 @@ private slots:
 
     void on_electrumXEdit_textEdited(const QString &arg1);
 
+    void on_noteEdit_textEdited(const QString &arg1);
+
 private:
     Ui::EditSwap *ui;
     bridge::Swap * swap = nullptr;

@@ -502,6 +502,10 @@ void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> param
         emit onCreateStartSwap(errMsg.isEmpty(), errMsg);
 
         if (errMsg.isEmpty()) {
+            // Updating the note
+            if (!newSwapNote.isEmpty())
+                context->appContext->updateNote("swap_" + swapId, newSwapNote);
+
             runTrade(swapId, "SellerOfferCreated");
             showTradeDetails(swapId);
             core::getWndManager()->messageTextDlg("Swap Trade", "Congratulation! Your swap trade with ID\n" + swapId +
@@ -673,6 +677,7 @@ void Swap::resetNewSwapData() {
     newSwapSecConfNumber = -1;
     newSwapElectrumXUrl = "";
     newSwapCurrency2recalc = "";
+    newSwapNote = "";
 }
 
 void Swap::onLoginResult(bool ok) {

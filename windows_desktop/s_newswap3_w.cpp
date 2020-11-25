@@ -117,6 +117,13 @@ void NewSwap3::updateSwapReview() {
     reportStr += "</body></html>";
 
     ui->offerDetailsEdit->setHtml(reportStr);
+
+    ui->noteEdit->setText( swap->getNote() );
+}
+
+void NewSwap3::on_noteEdit_textEdited(const QString &text)
+{
+    swap->setNote(text);
 }
 
 }

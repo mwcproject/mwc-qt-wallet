@@ -140,6 +140,10 @@ public:
 
     // Get Tx fee for secondary currency
     double getSecondaryFee(QString secCurrency);
+
+    QString getNote() const {return newSwapNote;}
+    void setNote(QString note) {newSwapNote = note;}
+
 private:
 signals:
 
@@ -225,6 +229,7 @@ private:
     int     newSwapMwcConfNumber = -1;
     int     newSwapSecConfNumber = -1;
     QString newSwapElectrumXUrl;
+    QString newSwapNote;
 
     QString newSwapCurrency2recalc;
 };
