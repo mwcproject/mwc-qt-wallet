@@ -1,9 +1,60 @@
 import QtQuick 2.0
 import QtQuick.Window 2.0
+import NodeInfoBridge 1.0
+import UtilBridge 1.0
 
 Item {
+    property string lastShownErrorMessage
+    property int nodeHeightDiffLimit: 5
+
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
+
+    NodeInfoBridge {
+        id: nodeInfo
+    }
+
+    UtilBridge {
+        id: util
+    }
+
+    Connections {
+        target: nodeInfo
+        onSgnSetNodeStatus: (localNodeStatus, online, errMsg, nodeHeight, peerHeight, totalDifficulty2show, connections) => {
+            if (!online) {
+                text_status.text = "Offline"
+                text_status.color = "#CCFF33"
+                text_connections.text = "-"
+                text_blocks.text = "-"
+                text_difficulty.text = "-"
+                if (lastShownErrorMessage !== errMsg) {
+                    messagebox.open(qsTr("MWC Node connection error"), qsTr("Unable to retrieve MWC Node status.\n" + errMsg))
+                    lastShownErrorMessage = errMsg
+                }
+            } else {
+                if (nodeHeight + nodeHeightDiffLimit < peerHeight) {
+                    text_status.text = "Syncing"
+                    text_status.color = "#CCFF33"
+                }
+                else {
+                    text_status.text = "Online"
+                    text_status.color = "white"
+                }
+
+                if (connections <= 0) {
+                    text_connections.text = "None"
+                    text_connections.color = "#CCFF33"
+                }
+                else {
+                    text_connections.text = Number(connections).toString()
+                    text_connections.color = "white"
+                }
+
+                text_blocks.text = util.longLong2Str(nodeHeight)
+                text_difficulty.text = totalDifficulty2show
+            }
+        }
+    }
 
     Rectangle {
         id: rect_status
@@ -223,5 +274,10 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             font.pixelSize: dp(17)
         }
+    }
+
+    MessageBox {
+        id: messagebox
+        anchors.verticalCenter: parent.verticalCenter
     }
 }
