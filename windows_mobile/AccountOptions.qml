@@ -23,6 +23,12 @@ Item {
         }
     }
 
+    function changeInstanceCallback(ret) {
+        if (ret) {
+            stateMachine.logout()
+        }
+    }
+
     Button {
         id: button_show_passphrase
         height: dp(72)
@@ -110,7 +116,7 @@ Item {
             }
         }
         onClicked: {
-            console.log("Log Out")
+            messagebox.open(qsTr("Change Instance"), qsTr("Changing an instance will log you out of this current wallet instance. Are you sure you want to log out?"), true, "No", "Yes", "", "", "", changeInstanceCallback)
         }
     }
 
