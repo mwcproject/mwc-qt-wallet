@@ -21,6 +21,9 @@ Item {
         case 4:
             text_title.text = qsTr("Wallet  >   Accounts")
             break
+        case 5:
+            text_title.text = qsTr("Wallet  >   AccountTransfer")
+            break
         case 6:
             text_title.text = qsTr("Wallet  >   Notifications")
             break
