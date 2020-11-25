@@ -225,6 +225,12 @@ Window {
             visible: currentState === 4
         }
 
+        AccountTransfer {
+            id: accountTransferItem
+            anchors.fill: parent
+            visible: currentState === 5
+        }
+
         Notifications {
             id: notificationsItem
             anchors.fill: parent
