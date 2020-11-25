@@ -87,6 +87,8 @@ void MwcNode::start(const QString & dataPath, const QString & network, bool tor 
     qDebug() << "Starting mwc-node  " << nodePath;
 
     respondTimelimit = QDateTime::currentMSecsSinceEpoch() + int64_t(START_TIMEOUT * config::getTimeoutMultiplier());
+    if (tor)
+        respondTimelimit += START_TOR_TIMEOUT;
 
     nodeNoPeersFailCounter = 0;
     nodeOutOfSyncCounter = 0;
@@ -125,7 +127,7 @@ void MwcNode::stop() {
 
             // Waiting for ptocess to finish...
             int64_t startTime = QDateTime::currentMSecsSinceEpoch();
-            int64_t limitTime = startTime + int64_t(1000*20*config::getTimeoutMultiplier()); // about 30 seconds
+            int64_t limitTime = startTime + int64_t(1000*120*config::getTimeoutMultiplier()); // about 2 minutes is a reasonamble time to stop, if wee have tor, it is slow
 
             while( nodeProcess->state() == QProcess::Running ) {
                 if (QDateTime::currentMSecsSinceEpoch() > limitTime) {
@@ -355,7 +357,7 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
     else {
         reportNodeFatalError( "mwc-node process exited due some unexpected error. The exit code: " + QString::number(exitCode) + "\n\n"
                               "Please check if you have enough disk space, and no antivirus preventing mwc-node to start.\n"
-                              "Check if another instance of mwc-node is already running. In this case please terminate that process, or reboot your computer.\n\n"
+                              "Check if "+ (lastTor?"TOR process or ":"") + "another instance of mwc-node is already running. In this case please terminate that process, or reboot your computer.\n\n"
                               "If steps above didn't help, please try to clean up mwc-node data at\n" + nodeWorkDir +
                               "\n\nYou might use command line for troubleshooting:\n\n>> cd '" + nodeWorkDir + "'\n>> " +  commandLine + "\n\n");
     }
@@ -412,7 +414,7 @@ void MwcNode::mwcNodeReadyReadStandardOutput() {
     }
 }
 
-enum class SYNC_STATE {GETTING_HEADERS, TXHASHSET_REQUEST, TXHASHSET_GET, VERIFY_RANGEPROOFS_FOR_TXHASHSET, VERIFY_KERNEL_SIGNATURES, GETTING_BLOCKS };
+enum class SYNC_STATE {GETTING_HEADERS, TXHASHSET_REQUEST, TXHASHSET_IN_PROGRESS, TXHASHSET_GET, VERIFY_RANGEPROOFS_FOR_TXHASHSET, VERIFY_KERNEL_SIGNATURES, GETTING_BLOCKS };
 // return progress in the range [0-1.0]
 static QString calcProgressStr( int initChainHeight , int txhashsetHeight, int peersMaxHeight, SYNC_STATE syncState, int value ) {
     // timing:
@@ -426,7 +428,7 @@ static QString calcProgressStr( int initChainHeight , int txhashsetHeight, int p
     // Calculating shares for operations. Note, txHash stage is optional.
     double getTxHashShare, verifyRangeProofsShare, verifyKernelSignaturesShare;
     if (txhashsetHeight>0) {
-        getTxHashShare = 0.05;
+        getTxHashShare = 0.15;
         double hashSetW = (txhashsetHeight - initChainHeight);
         double blocksSet = (peersMaxHeight - txhashsetHeight) * 100.0;
         double txShare = hashSetW / ( hashSetW + blocksSet );
@@ -453,6 +455,9 @@ static QString calcProgressStr( int initChainHeight , int txhashsetHeight, int p
         }
         case SYNC_STATE::TXHASHSET_REQUEST:
             progressRes = getHeadersShare;
+            break;
+        case SYNC_STATE::TXHASHSET_IN_PROGRESS:
+            progressRes = getHeadersShare + getTxHashShare * (value/100.0);
             break;
         case SYNC_STATE::TXHASHSET_GET:
             progressRes = getHeadersShare + getTxHashShare;
@@ -569,7 +574,27 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             emit onMwcStatusUpdate(nodeStatusString);
             break;
         }
-            // expected no break
+        case tries::NODE_OUTPUT_EVENT::TXHASHSET_ARCHIVE_IN_PROGRESS: {
+            // archive can be large, let's wait extra
+            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
+            nodeOutOfSyncCounter = 0;
+
+            // for progress need to parse the second element
+            QStringList params = message.split('|');
+            Q_ASSERT(params.size()==2);
+            if (params.size() >= 2) {
+                // Downloading 624 MB chain state, done 118 MB
+                // 624  118
+                int total = params[0].toInt();
+                int done = params[1].toInt();
+                if (total>0 && done<total) {
+                    nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::TXHASHSET_IN_PROGRESS, done * 100 / total );
+                    emit onMwcStatusUpdate(nodeStatusString);
+                }
+            }
+            break;
+        }
+        // expected no break
         case tries::NODE_OUTPUT_EVENT::HANDLE_TXHASHSET_ARCHIVE: {
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
@@ -706,11 +731,17 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             break;
         case tries::NODE_OUTPUT_EVENT::ADDRESS_ALREADY_IN_USE:
             if (isFinalRun()) {
-                reportNodeFatalError("Unable to start local mwc-node because of error:\n"
-                                     "'Address already in use'\n"
-                                     "It is likely that another mwc-node instance is still running, "
-                                     "or there is another app active "
-                                     "and using the same ports.");
+                QString message = "Unable to start local mwc-node because of error:\n"
+                                  "'Address already in use'\n";
+                if (lastTor) {
+                    message += "Very likely tor process is already running. Please stop running tor process, or reboot your computer.";
+                }
+                else {
+                    message += "It is likely that another mwc-node instance is still running, "
+                               "another app active and using the same ports.";
+                }
+
+                reportNodeFatalError(message);
             }
             break;
         default:
