@@ -351,6 +351,8 @@ int main(int argc, char *argv[])
     #endif
 
 #if defined(QT_DEBUG) && defined(WALLET_DESKTOP)
+// Windows debugger so bad, it can even profile the code
+#ifndef Q_OS_WIN
     // Generation of the dictionaries.
     // Don't uncomment it!
     // misk::provisionDictionary();
@@ -364,6 +366,7 @@ int main(int argc, char *argv[])
     test::testWordDictionary();
     test::testPasswordAnalyser();
     test::testMessageMapper();
+#endif
 #endif
 
 

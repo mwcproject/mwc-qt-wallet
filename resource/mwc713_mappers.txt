@@ -76,3 +76,6 @@ Unable to start TOR process. Looks like it is already running.
 LibWallet Error, Unable to export trade data, Swap I/O: (.*)
 $1
 
+#Swap Error , Swap generic error, MWC node is syncing and not ready yet
+Swap Error , Swap generic error, MWC node is syncing and not ready yet
+Unable to start a swap trade. MWC node is syncing and not ready.
