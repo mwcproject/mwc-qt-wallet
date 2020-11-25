@@ -249,6 +249,12 @@ Window {
             visible: currentState === 16
         }
 
+        NodeInfo {
+            id: nodeInfoItem
+            anchors.fill: parent
+            visible: currentState === 17
+        }
+
         SendConfirmation {
             id: sendConfirmationItem
             anchors.verticalCenter: parent.verticalCenter

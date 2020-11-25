@@ -89,7 +89,7 @@ Item {
             }
         }
         onClicked: {
-            console.log("Node Overview")
+            stateMachine.setActionWindow(17)    // NodeInfo Page
         }
     }
 

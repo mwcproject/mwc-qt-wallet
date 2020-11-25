@@ -22,10 +22,10 @@ Item {
             text_title.text = qsTr("Wallet  >   Accounts")
             break
         case 5:
-            text_title.text = qsTr("Wallet  >   AccountTransfer")
+            text_title.text = qsTr("Wallet  >   Accounts  >   AccountTransfer")
             break
         case 6:
-            text_title.text = qsTr("Wallet  >   Notifications")
+            text_title.text = qsTr("Notifications")
             break
         case 8:
             text_title.text = qsTr("Wallet  >   Send")
@@ -40,10 +40,13 @@ Item {
             text_title.text = qsTr("Wallet  >   Outputs")
             break
         case 14:
-            text_title.text = qsTr("Wallet  >   Settings   >   Config")
+            text_title.text = qsTr("Wallet Settings   >   Config")
             break
         case 16:
-            text_title.text = qsTr("Wallet  >   Account Options   >   Passphrase")
+            text_title.text = qsTr("Account Options   >   Passphrase")
+            break
+        case 17:
+            text_title.text = qsTr("Wallet Settings   >   NodeInfo")
             break
         case 19:
             text_title.text = qsTr("Wallet  >   Finalize")
