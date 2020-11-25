@@ -216,6 +216,9 @@ void Send::respSendFile( bool success, QStringList errors, QString fileName ) {
 }
 
 bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QString apiSecret, QString message) {
+    while(address.endsWith("/"))
+        address = address.left(address.length()-1);
+
     // Let's  verify address first
     QPair< bool, util::ADDRESS_TYPE > addressRes = util::verifyAddress(address);
     if ( !addressRes.first ) {

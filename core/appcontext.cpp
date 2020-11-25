@@ -475,7 +475,7 @@ void AppContext::saveNotesData() const {
         return;
     }
 
-    QString filePath = dataPath.second + "/" + notesFileName + ".bak";
+    QString filePath = dataPath.second + "/" + notesFileName;
     {
         QFile file(filePath);
         if (!file.open(QIODevice::WriteOnly)) {
@@ -499,13 +499,6 @@ void AppContext::saveNotesData() const {
             return;
         }
         file.close();
-    }
-    // Rename suppose to be atomic, no data loss expected
-    int res = std::rename( filePath.toStdString().c_str(), (dataPath.second + "/" + notesFileName).toStdString().c_str() );
-    if (res!=0) {
-        core::getWndManager()->messageTextDlg(
-                "ERROR",
-                "Unable to save Notes data, file move system error code: " + QString::number(res));
     }
 }
 

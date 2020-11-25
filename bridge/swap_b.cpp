@@ -381,6 +381,9 @@ void Swap::showNewTrade2() {
 void Swap::applyNewTrade1Params(QString account, QString secCurrency, QString mwcAmount, QString secAmount,
                                       QString secAddress, QString sendToAddress, bool lockMwcFirst ) {
 
+    while(sendToAddress.endsWith("/"))
+        sendToAddress = sendToAddress.left(sendToAddress.length()-1);
+
     QPair< bool, util::ADDRESS_TYPE > addressRes = util::verifyAddress(sendToAddress);
     if ( !addressRes.first ) {
         emit sgnApplyNewTrade1Params (false, "Unable to parse the other wallet address " + sendToAddress);

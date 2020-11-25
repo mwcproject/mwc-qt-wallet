@@ -45,6 +45,9 @@ void ContactEditDlg::on_applyButton_clicked()
     contact.name = ui->nameEdit->text().trimmed();
     contact.address = ui->addressEdit->text().trimmed();
 
+    while(contact.address.endsWith("/"))
+        contact.address = contact.address.left(contact.address.length()-1);
+
     if ( contact.name.isEmpty() )
     {
         control::MessageBox::messageText(this, "Need Info", "Please specify a name for your contact");

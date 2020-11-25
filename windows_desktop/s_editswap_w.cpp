@@ -55,6 +55,7 @@ EditSwap::EditSwap(QWidget *parent, QString _swapId, QString _stateCmd) :
 }
 
 EditSwap::~EditSwap() {
+    config->updateSwapNote(swapId, ui->noteEdit->text());
     delete ui;
 }
 
@@ -269,7 +270,7 @@ void EditSwap::on_backButton_clicked() {
 }
 
 void EditSwap::on_noteEdit_textEdited(const QString &str) {
-    config->updateSwapNote(swapId, str);
+    Q_UNUSED(str)
 }
 
 }
