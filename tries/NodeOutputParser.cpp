@@ -28,6 +28,7 @@ QString toString(NODE_OUTPUT_EVENT event) {
         // Very first sync events. Archive processing
         case NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_HEADER:  return "MWC_NODE_RECEIVE_HEADER";
         case NODE_OUTPUT_EVENT::ASK_FOR_TXHASHSET_ARCHIVE:  return "ASK_FOR_TXHASHSET_ARCHIVE";
+        case NODE_OUTPUT_EVENT::TXHASHSET_ARCHIVE_IN_PROGRESS:  return "TXHASHSET_ARCHIVE_IN_PROGRESS";
         case NODE_OUTPUT_EVENT::HANDLE_TXHASHSET_ARCHIVE:  return "HANDLE_TXHASHSET_ARCHIVE";
         case NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET:  return "VERIFY_RANGEPROOFS_FOR_TXHASHSET";
         case NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES:  return "VERIFY_KERNEL_SIGNATURES";
@@ -84,6 +85,16 @@ NodeOutputParser::NodeOutputParser() {
                                                          new TriePhraseSection(" for txhashset archive at"),
                                                          // at {}. size={}
                                                          new TrieAnySection(70, TrieAnySection::NOT_NEW_LINE, "","", 2),
+                                                 }));
+
+    // grin_servers::grin::sync::state_sync - Downloading 624 MB chain state, done 6 MB
+    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::TXHASHSET_ARCHIVE_IN_PROGRESS,
+                                                 QVector<BaseTrieSection *>{
+                                                         new TriePhraseSection("state_sync - Downloading "),
+                                                         new TrieAnySection(20, TrieAnySection::NOT_SPACES, "","", 1),
+                                                         new TriePhraseSection(" MB chain state, done "),
+                                                         new TrieAnySection(20, TrieAnySection::NOT_SPACES, "","", 2),
+                                                         new TriePhraseSection(" MB"),
                                                  }));
 
     // 20191011 17:59:14.101 INFO grin_p2p::protocol - handle_payload: txhashset archive for 0a78e3f9d6c5 at 114586. size=128918334

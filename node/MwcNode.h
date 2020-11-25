@@ -38,7 +38,9 @@ const int64_t CHECK_NODE_PERIOD = 5 * 1000; // Timer check period. API calls to 
 const int64_t NODE_OUT_OF_SYNC_FAILURE_LIMIT = 60; // Node ouf of sync and nothing was updated...
 const int64_t NODE_NO_PEERS_FAILURE_LIMITS = 60; // Let's wait 5 minutes before restarts
 
-const int64_t START_TIMEOUT   = 90*1000;
+const int64_t START_TIMEOUT   = 120*1000;
+const int64_t START_TOR_TIMEOUT = 60*10*1000; // Tor can start for a very long time. Let's wait for extra 10 minutes if we are using tor
+
 // messages from NodeOutputParser
 const int64_t MWC_NODE_STARTED_TIMEOUT = 180*1000; // It can take some time to find peers
 const int64_t MWC_NODE_SYNC_MESSAGES = 60*1000; // Sync supposed to be agile
