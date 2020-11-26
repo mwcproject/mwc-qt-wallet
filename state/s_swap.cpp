@@ -700,8 +700,16 @@ void Swap::onLogout() {
 
 // Response from requestSwapTrades
 void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error) {
-    if (cookie!="SwapInitRequest")
+    if (cookie!="SwapInitRequest") {
+        // Watching case. Let's remove the finished trades.
+        for (const wallet::SwapInfo & sw : swapTrades) {
+            if (bridge::isSwapDone(sw.stateCmd)) {
+                runningSwaps.remove(sw.swapId);
+            }
+        }
+
         return;
+    }
 
     if (!error.isEmpty()) {
         core::getWndManager()->messageTextDlg("Error", "Unable to request swap trades. If you have running trades, please solve this problem as soon as possible. If your wallet is not online, you might loos your trade funds.\n\n" + error);

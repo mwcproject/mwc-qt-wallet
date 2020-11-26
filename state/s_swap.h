@@ -183,8 +183,8 @@ slots:
     void onLogout();
 
     // Response from requestSwapTrades
+    // Also we are watching to accasional requests to wallet. The state can be changed, so the 'running '
     void onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error);
-
 
     void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
                                QString lastProcessError,

@@ -30,6 +30,7 @@ public:
     Q_INVOKABLE void pageTradeList();
 
     // request the list of swap trades
+    // Response send back with a signal:   sgnSwapTradesResult( QString cookie, QVector<QString> trades, QString error );
     Q_INVOKABLE void requestSwapTrades(QString cookie);
 
     // Cancel the trade. Send signal to the cancel the trade.
