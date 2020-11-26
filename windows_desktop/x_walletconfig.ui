@@ -7,21 +7,21 @@
     <x>0</x>
     <y>0</y>
     <width>942</width>
-    <height>719</height>
+    <height>639</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="2,0,0,3">
+  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="2,0,0,0,3">
    <property name="spacing">
-    <number>30</number>
+    <number>8</number>
    </property>
    <property name="leftMargin">
     <number>40</number>
    </property>
    <property name="topMargin">
-    <number>50</number>
+    <number>65</number>
    </property>
    <property name="rightMargin">
     <number>40</number>
@@ -809,6 +809,83 @@
     </widget>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="leftMargin">
+      <number>8</number>
+     </property>
+     <item>
+      <spacer name="horizontalSpacer_7">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="control::MwcLabelProgress" name="progress">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="widget" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>1</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1</width>
+         <height>25</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_8">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <property name="spacing">
       <number>35</number>
@@ -930,6 +1007,11 @@
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

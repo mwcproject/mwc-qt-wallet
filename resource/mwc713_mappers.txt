@@ -79,3 +79,7 @@ $1
 #Swap Error , Swap generic error, MWC node is syncing and not ready yet
 Swap Error , Swap generic error, MWC node is syncing and not ready yet
 Unable to start a swap trade. MWC node is syncing and not ready.
+
+#LibWallet Error, Unable to List Swap trades: Swap Error , Swap LibWaller error: Client Callback Error, Error calling get_kernel: Request error: Cannot make request: error trying to connect: tcp connect error: Connection refused (os error 61)
+LibWallet Error, Unable to List Swap trades: Swap Error , Swap LibWaller error: Client Callback Error, Error calling get_kernel: Request error: Cannot make request: error trying to connect: (.*)
+Unable to contact MWC node: $1
