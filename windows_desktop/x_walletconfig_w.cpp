@@ -207,7 +207,7 @@ bool WalletConfig::applyChanges() {
 
     QString newWalletInstanceName = ui->walletInstanceNameEdit->text().trimmed();
     if (newWalletInstanceName.isEmpty()) {
-        control::MessageBox::messageText(this, "Input", "Please specify non empty wallet insatance name");
+        control::MessageBox::messageText(this, "Input", "Please specify non empty wallet instance name");
         ui->walletInstanceNameEdit->setFocus();
         return false;
     }
@@ -364,16 +364,20 @@ bool WalletConfig::applyChanges() {
     }
 
     if (mwcmqHost != mqsHost) {
+        ui->progress->show();
         if (walletConfig->updateWalletConfig( mwcmqHost, "", need2updateGuiSize)) {
             return false;
         }
     }
 
     if (need2updateGuiSize) {
+        ui->progress->show();
         // Restating the wallet
         walletConfig->restartQtWallet();
         return false;   // need to be restarted. Just want to cancell caller of caller changes state operation
     }
+
+    ui->progress->hide();
 
     updateButtons();
     return true; // We are good. Changes was applied
