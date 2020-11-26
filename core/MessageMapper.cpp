@@ -64,7 +64,8 @@ MessageMapper::MessageMapper(const QString & fileName) {
 MessageMapper::~MessageMapper() {
 }
 
-QString MessageMapper::processMessage(const QString & message) const {
+QString MessageMapper::processMessage(QString message) const {
+    message = message.simplified();
     for (const auto & m : mappers) {
         QString res = m.process(message);
         if (!res.isEmpty())

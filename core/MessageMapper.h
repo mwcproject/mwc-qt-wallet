@@ -44,7 +44,7 @@ public:
     ~MessageMapper();
 
     // Proces sthe messag eand return the result.
-    QString processMessage(const QString & message) const;
+    QString processMessage(QString message) const;
 private:
     // Reading config with regular expressions.
     void readMappingConfig(const QString & fileName);

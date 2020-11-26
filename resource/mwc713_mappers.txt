@@ -83,3 +83,7 @@ Unable to start a swap trade. MWC node is syncing and not ready.
 #LibWallet Error, Unable to List Swap trades: Swap Error , Swap LibWaller error: Client Callback Error, Error calling get_kernel: Request error: Cannot make request: error trying to connect: tcp connect error: Connection refused (os error 61)
 LibWallet Error, Unable to List Swap trades: Swap Error , Swap LibWaller error: Client Callback Error, Error calling get_kernel: Request error: Cannot make request: error trying to connect: (.*)
 Unable to contact MWC node: $1
+
+#Swap Error , Electrum Node error, Received error: the transaction was rejected by network rules. min relay fee not met, 0 < 277 [0200000001755112cfda7cb70cd3ff40458e7a0e08cb0960ab9fb1a765e69c985c0de441e700000000c0483045022100da056290eee0a2ef978fd7c6eb00f02beb54ffae0f54f55ccf1ac8747f380d2702205a04496013fde60dde3e8f0b9a68c81aecbc785cd59fe30e504e67c31645ae8d01514c746304887bbf5fb17521021544344ccb4e8a4137e4df3ce6d633f163cf4466b828238e0d6d32919dec5d8dac675221021686dc91f120b944fd5f4f8b81399923b9ce6f08903baa29a8c6f49a9406667c21021544344ccb4e8a4137e4df3ce6d633f163cf4466b828238e0d6d32919dec5d8d52ae680000000001a00f0000000000001976a914eb179d4cedaf63b153d1bc69c3c768cbad06b01388ac897bbf5f]
+Swap Error , Electrum Node error, Received error: the transaction was rejected by network rules. (.*)
+The transaction was rejected by network rules: $1
