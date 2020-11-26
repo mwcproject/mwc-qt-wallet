@@ -92,6 +92,8 @@ WalletConfig::WalletConfig(QWidget *parent) :
     ui->fontHolder->hide();
 #endif
 
+    ui->progress->initLoader(false);
+
     mqsHost = walletConfig->getMqsHost();
     inputConfirmationsNumber = walletConfig->getInputConfirmationsNumber();
     changeOutputs = walletConfig->getChangeOutputs();
