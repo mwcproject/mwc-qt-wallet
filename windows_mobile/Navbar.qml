@@ -18,8 +18,14 @@ Item {
 
     function updateTitle(state) {
         switch (state) {
+        case 4:
+            text_title.text = qsTr("Wallet  >   Accounts")
+            break
+        case 5:
+            text_title.text = qsTr("Wallet  >   Accounts  >   AccountTransfer")
+            break
         case 6:
-            text_title.text = qsTr("Wallet  >   Notifications")
+            text_title.text = qsTr("Notifications")
             break
         case 8:
             text_title.text = qsTr("Wallet  >   Send")
@@ -34,7 +40,13 @@ Item {
             text_title.text = qsTr("Wallet  >   Outputs")
             break
         case 14:
-            text_title.text = qsTr("Wallet  >   Settings   >   Config")
+            text_title.text = qsTr("Wallet Settings   >   Config")
+            break
+        case 16:
+            text_title.text = qsTr("Account Options   >   Passphrase")
+            break
+        case 17:
+            text_title.text = qsTr("Wallet Settings   >   NodeInfo")
             break
         case 19:
             text_title.text = qsTr("Wallet  >   Finalize")
@@ -575,6 +587,7 @@ Item {
                     if (accountComboBox.currentIndex >= 0) {
                         const selectedAccount = accountItems.get(accountComboBox.currentIndex).account
                         wallet.switchAccount(selectedAccount)
+                        updateInstanceAccountText()
                     }
                 }
 

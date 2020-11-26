@@ -87,6 +87,9 @@
 #include "bridge/wnd/g_filetransaction_b.h"
 #include "bridge/wnd/e_outputs_b.h"
 #include "bridge/wnd/x_walletconfig_b.h"
+#include "bridge/wnd/k_accounts_b.h"
+#include "bridge/wnd/k_accounttransfer_b.h"
+#include "bridge/wnd/u_nodeInfo_b.h"
 #include "core/MessageMapper.h"
 
 #ifdef WALLET_MOBILE
@@ -296,6 +299,9 @@ int main(int argc, char *argv[])
     qmlRegisterType<bridge::FileTransaction>("FileTransactionBridge", 1, 0, "FileTransactionBridge");
     qmlRegisterType<bridge::Outputs>("OutputsBridge", 1, 0, "OutputsBridge");
     qmlRegisterType<bridge::WalletConfig>("WalletConfigBridge", 1, 0, "WalletConfigBridge");
+    qmlRegisterType<bridge::Accounts>("AccountsBridge", 1, 0, "AccountsBridge");
+    qmlRegisterType<bridge::AccountTransfer>("AccountTransferBridge", 1, 0, "AccountTransferBridge");
+    qmlRegisterType<bridge::NodeInfo>("NodeInfoBridge", 1, 0, "NodeInfoBridge");
 
     core::MobileWndManager * wndManager = new core::MobileWndManager();
 #endif

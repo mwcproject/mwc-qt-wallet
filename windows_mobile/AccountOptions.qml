@@ -1,10 +1,33 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
+import StateMachineBridge 1.0
+import WalletBridge 1.0
 
 Item {
+    property string passwordHash
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
+
+    StateMachineBridge {
+        id: stateMachine
+    }
+
+    WalletBridge {
+        id: wallet
+    }
+
+    function showPassphraseCallback(ret, password) {
+        if (ret) {
+            stateMachine.activateShowSeed(password)
+        }
+    }
+
+    function changeInstanceCallback(ret) {
+        if (ret) {
+            stateMachine.logout()
+        }
+    }
 
     Button {
         id: button_show_passphrase
@@ -29,7 +52,18 @@ Item {
             }
         }
         onClicked: {
-            console.log("Show Passphrase")
+            // state::STATE::SHOW_SEED = 16
+            if (stateMachine.canSwitchState(16)) {
+                passwordHash = wallet.getPasswordHash()
+
+                if (passwordHash !== "") {
+                    messagebox.open("Wallet Password", "You are going to view wallet mnemonic passphrase.\n\nPlease input your wallet password to continue",
+                            true, "Cancel", "Confirm", passwordHash, 1, "", showPassphraseCallback)
+                    return;
+                }
+                // passwordHash should contain raw password value form the messgage box
+                stateMachine.activateShowSeed(passwordHash)
+            }
         }
     }
 
@@ -82,7 +116,12 @@ Item {
             }
         }
         onClicked: {
-            console.log("Log Out")
+            messagebox.open(qsTr("Change Instance"), qsTr("Changing an instance will log you out of this current wallet instance. Are you sure you want to log out?"), true, "No", "Yes", "", "", "", changeInstanceCallback)
         }
+    }
+
+    MessageBox {
+        id: messagebox
+        anchors.verticalCenter: parent.verticalCenter
     }
 }

@@ -172,7 +172,7 @@ void AccountTransfer::on_accountToCB_currentIndexChanged(int index)
     QString fromAcc = getSelectedAccount( ui->accountFromCB, false );
     QString toAcc   = getSelectedAccount( ui->accountToCB, false );
 
-    if (fromAcc==toAcc && !fromAcc.isEmpty()) {
+    if (fromAcc==toAcc && !toAcc.isEmpty()) {
         ui->accountFromCB->setCurrentIndex(-1);
     }
 }

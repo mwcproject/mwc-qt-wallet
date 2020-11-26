@@ -219,6 +219,18 @@ Window {
             visible: currentState === 12
         }
 
+        Accounts {
+            id: accountsItem
+            anchors.fill: parent
+            visible: currentState === 4
+        }
+
+        AccountTransfer {
+            id: accountTransferItem
+            anchors.fill: parent
+            visible: currentState === 5
+        }
+
         Notifications {
             id: notificationsItem
             anchors.fill: parent
@@ -229,6 +241,18 @@ Window {
             id: walletConfigItem
             anchors.fill: parent
             visible: currentState === 14
+        }
+
+        NewSeed {
+            id: newSeedItem
+            anchors.fill: parent
+            visible: currentState === 16
+        }
+
+        NodeInfo {
+            id: nodeInfoItem
+            anchors.fill: parent
+            visible: currentState === 17
         }
 
         SendConfirmation {
