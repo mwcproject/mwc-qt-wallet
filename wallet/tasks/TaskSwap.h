@@ -44,7 +44,7 @@ public:
 
     TaskGetSwapTrades( MWC713 *wallet713, QString _cookie ) :
                 Mwc713Task("TaskSwapTrades",
-                "swap --list --check --json_format",
+                "swap --list --check --json_format --wait_for_backup1",
                 wallet713, ""),
                 cookie(_cookie) {}
 
@@ -158,9 +158,10 @@ class TaskTradeDetails : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*120;
 
-    TaskTradeDetails( MWC713 *wallet713, QString _swapId ) :
+    TaskTradeDetails( MWC713 *wallet713, QString _swapId, bool waitForBackup1 ) :
             Mwc713Task("TaskTradeDetails",
-                       "swap --check  --json_format -i " + _swapId,
+                       "swap --check --json_format -i " + _swapId +
+                                (waitForBackup1 ? " --wait_for_backup1" : ""),
                        wallet713, ""),
             swapId(_swapId) {}
 
@@ -201,9 +202,10 @@ class TaskPerformAutoSwapStep : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*120;
 
-    TaskPerformAutoSwapStep( MWC713 *wallet713, const QString & _swapId ) :
+    TaskPerformAutoSwapStep( MWC713 *wallet713, const QString & _swapId, bool waitForBackup1 ) :
                 Mwc713Task("TaskPerformAutoSwapStep_" + _swapId,
-                    "swap --autoswap --json_format -i " + _swapId,
+                    "swap --autoswap --json_format -i " + _swapId +
+                            (waitForBackup1 ? " --wait_for_backup1" : ""),
                     wallet713, ""),
     swapId(_swapId) {}
 

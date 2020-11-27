@@ -853,7 +853,10 @@ QString AppContext::getNote(const QString& key) {
 }
 
 void AppContext::updateNote(const QString& key, const QString& note) {
-    Q_ASSERT(notesLoaded); // we suppose to load first
+    if (!notesLoaded) {
+        loadNotesData();
+    }
+
     if (note.isEmpty())
         notes.remove(key);
     else
@@ -862,7 +865,9 @@ void AppContext::updateNote(const QString& key, const QString& note) {
 }
 
 void AppContext::deleteNote(const QString& key) {
-    Q_ASSERT(notesLoaded); // we suppose to load first
+    if (!notesLoaded) {
+        loadNotesData();
+    }
     notes.remove(key);
     saveNotesData();
 }

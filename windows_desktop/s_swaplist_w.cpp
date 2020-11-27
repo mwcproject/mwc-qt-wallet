@@ -400,6 +400,7 @@ void SwapList::richButtonPressed(control::RichButton *button, QString cookie) {
             return;
 
         ui->progress->show();
+        button->hide();
         swap->cancelTrade(tradeId);
     } else if (cmd == "Delete") {
         if (core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionText(
@@ -409,6 +410,7 @@ void SwapList::richButtonPressed(control::RichButton *button, QString cookie) {
                 "Don't delete this swap record", "Yes, delete this swap record",
                 false, true)) {
             ui->progress->show();
+            button->hide();
             swap->deleteSwapTrade(tradeId);
         }
     } else if (cmd == "Backup") {

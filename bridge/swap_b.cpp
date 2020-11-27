@@ -140,7 +140,10 @@ void Swap::onCancelSwapTrade(QString swapId, QString error) {
 // Requesting all details about the single swap Trade
 // Respond will be with sent back with sgnRequestTradeDetails
 void Swap::requestTradeDetails(QString swapId) {
-    getWallet()->requestTradeDetails(swapId);
+    int expBkId = getAppContext()->getSwapBackStatus(swapId);
+    bool waiting4backup = getAppContext()->getSwapEnforceBackup() && expBkId==0;
+
+    getWallet()->requestTradeDetails(swapId, waiting4backup);
 }
 
 QString calcTimeLeft(int64_t time) {

@@ -570,8 +570,9 @@ void MockWallet::cancelSwapTrade(QString swapId) {
 //                            QString currentAction,
 //                            QVector<SwapJournalMessage> tradeJournal,
 //                            QString error );
-void MockWallet::requestTradeDetails(QString swapId ) {
+void MockWallet::requestTradeDetails(QString swapId, bool waitForBackup1 ) {
     Q_UNUSED(swapId)
+    Q_UNUSED(waitForBackup1)
     SwapTradeInfo sw;
     emit onRequestTradeDetails( sw, {}, "current action", {}, "");
 }
@@ -592,7 +593,8 @@ void MockWallet::adjustSwapData( QString swapId, QString adjustCmd, QString para
 //                       QVector<SwapExecutionPlanRecord> executionPlan,
 //                       QVector<SwapJournalMessage> tradeJournal,
 //                       QString error );
-void MockWallet::performAutoSwapStep( QString swapId ) {
+void MockWallet::performAutoSwapStep( QString swapId, bool waitForBackup1 ) {
+    Q_UNUSED(waitForBackup1)
     emit onPerformAutoSwapStep(swapId, "SellerSendingOffer", "current Action", "current State", "", {}, {}, "");
 }
 

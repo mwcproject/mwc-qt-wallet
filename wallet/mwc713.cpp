@@ -883,8 +883,8 @@ void MWC713::cancelSwapTrade(QString swapId) {
 
 // Request details about this trade.
 // Check Signal: void onRequestTradeDetails( SwapTradeInfo swap )
-void MWC713::requestTradeDetails(QString swapId) {
-    eventCollector->addTask( new TaskTradeDetails(this, swapId), TaskTradeDetails::TIMEOUT );
+void MWC713::requestTradeDetails(QString swapId, bool waitForBackup1) {
+    eventCollector->addTask( new TaskTradeDetails(this, swapId, waitForBackup1), TaskTradeDetails::TIMEOUT );
 }
 
 // Adjust swap stade values. params are optional
@@ -899,8 +899,8 @@ void MWC713::adjustSwapData( QString swapId, QString adjustCmd, QString param1, 
 //                       QVector<SwapExecutionPlanRecord> executionPlan,
 //                       QVector<SwapJournalMessage> tradeJournal,
 //                       QString error );
-void MWC713::performAutoSwapStep( QString swapId ) {
-    TaskPerformAutoSwapStep * task = new TaskPerformAutoSwapStep(this, swapId);
+void MWC713::performAutoSwapStep( QString swapId, bool waitForBackup1 ) {
+    TaskPerformAutoSwapStep * task = new TaskPerformAutoSwapStep(this, swapId, waitForBackup1);
     if ( eventCollector->hasTask(task) ) {
         delete task;
         return;

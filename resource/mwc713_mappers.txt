@@ -91,3 +91,7 @@ The transaction was rejected by network rules: $1
 #Swap Error , Swap LibWallet error: Client Callback Error, Error calling get_tip: Request error: Cannot make request: error trying to connect: deadline has elapsed
 Swap Error , Swap LibWallet error: Client Callback Error, Error calling get_tip: Request error: Cannot make request: (.*)
 Unable to contact MWC node, $1
+
+# Swap Error , Unable to deliver the message 00ac6fb3-b751-402d-b2bc-f1ca67e7dbbf by tor: Adapter Callback Error, Posting swap message (is recipient listening?): Request error: Cannot make request: connection error: timed out
+Swap Error , Unable to deliver the message (.*) by (.*): Adapter Callback Error, Posting swap message (is recipient listening?): Request error: Cannot make request: (.*)
+Unable to send message to another wallet for trade $1, $2

@@ -202,9 +202,6 @@ void Swap::onTimerEvent() {
         }
     }
 
-   if (nextTask.swapId.isEmpty() || nextTask.lastUpdatedTime == LONG_LONG_MAX)
-        return; // Still nothing to do. There are some are serving
-
     // Let's run every 60 seconds, it should be enough
     if (curTime - nextTask.lastUpdatedTime > 60) {
         // starting the task
@@ -214,26 +211,21 @@ void Swap::onTimerEvent() {
         int taskBkId = bridge::getSwapBackup(nextTask.stateCmd);
         int expBkId = context->appContext->getSwapBackStatus(nextTask.swapId);
         if (taskBkId > expBkId) {
-            if (context->appContext->getSwapEnforceBackup() && expBkId==0) {
-                runningSwaps[nextTask.swapId].lastUpdatedTime = LONG_LONG_MAX;
-                // Note, we are in the eventing loop, so modal will create a new one!!!
+            if (shownBackupMessages.value(nextTask.swapId, 0) < taskBkId) {
+                shownBackupMessages.insert(nextTask.swapId, taskBkId);
+                // Note, we are in the eventing loop, so modal will create a new one and soon timer will be called!!!
                 core::getWndManager()->showBackupDlg(nextTask.swapId, taskBkId);
-                runningSwaps[nextTask.swapId].lastUpdatedTime = 0;
-                return;
-            }
-            else {
-                if ( shownBackupMessages.value(nextTask.swapId, 0) < expBkId ) {
-                    shownBackupMessages.insert(nextTask.swapId, taskBkId);
-                    // Note, we are in the eventing loop, so modal will create a new one and soon timer will be called!!!
-                    core::getWndManager()->showBackupDlg(nextTask.swapId, taskBkId);
-                    runningSwaps[nextTask.swapId].lastUpdatedTime = 0;
-                    return;
-                }
+                expBkId = context->appContext->getSwapBackStatus(nextTask.swapId);
+                if (runningSwaps.contains(nextTask.swapId))
+                    runningSwaps[nextTask.swapId].lastUpdatedTime = 0; // to trigger processing and update
             }
         }
 
         runningTask = nextTask.swapId;
-        context->wallet->performAutoSwapStep(nextTask.swapId);
+
+        bool waiting4backup = context->appContext->getSwapEnforceBackup() && expBkId==0;
+        logger::logInfo( "SWAP", "Swap processing step for " + nextTask.swapId + ", " + nextTask.stateCmd + " ,waiting4backup=" + (waiting4backup?"true":"false") );
+        context->wallet->performAutoSwapStep(nextTask.swapId, waiting4backup);
     }
     lastProcessedTimerData = QDateTime::currentMSecsSinceEpoch();
 }
