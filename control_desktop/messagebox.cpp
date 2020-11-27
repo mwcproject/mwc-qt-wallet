@@ -22,6 +22,7 @@
 #include <QScrollBar>
 #include <QThread>
 #include "../util/crypto.h"
+#include "../util_desktop/widgetutils.h"
 
 namespace control {
 
@@ -55,38 +56,8 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
 
     ui->title->setText(title);
 
-    // Setting text option
-    QTextOption textOption;
-    textOption.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
-    textOption.setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
-    ui->text3->document()->setDefaultTextOption( textOption );
+    utils::resizeEditByContent(this, ui->text3, htmlMsg, message);
 
-    // prepare for rendering
-    QSize curSz = ui->text3->size();
-
-    // text as a data should work for as.
-    if (htmlMsg)
-        ui->text3->setHtml( "<center>" + message + "</center>" );
-    else
-        ui->text3->setPlainText(message);
-
-    // size is the wierdest part. We are renderind document to get a size form it.
-    // Document talk in Pt, so need to convert into px. Conversion is not very accurate
-    ui->text3->document()->adjustSize();
-    int h = int(curSz.height());
-    ui->text3->adjustSize();
-
-    // Second Ajustment with a scroll br that works great
-    QScrollBar * vSb = ui->text3->verticalScrollBar();
-    int scrollDiff = vSb->maximum() - vSb->minimum();
-    int page = vSb->pageStep();
-
-    if (scrollDiff >0) {
-        h = int( h * double(scrollDiff + page)/page * 1.2 + 1); // Under the Windows we are having 1 line to scroll, lets compensate it
-    }
-    ui->text3->setMaximumHeight( h );
-    ui->text3->setMinimumHeight( h );
-    ui->text3->adjustSize();
 
     if (blockingPasswordHash.isEmpty()) {
         ui->passwordFrame->hide();

@@ -22,6 +22,7 @@
 #include <QThread>
 #include "../bridge/util_b.h"
 #include "../bridge/config_b.h"
+#include "../util_desktop/widgetutils.h"
 
 namespace dlg {
 
@@ -50,35 +51,7 @@ SendConfirmationDlg::SendConfirmationDlg( QWidget *parent, QString title, QStrin
 
     ui->title->setText(title);
 
-    // Setting text option
-    QTextOption textOption;
-    textOption.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
-    textOption.setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
-    ui->text3->document()->setDefaultTextOption( textOption );
-
-    // prepare for rendering
-    QSize curSz = ui->text3->size();
-
-    // text as a data should work for as.
-    ui->text3->setPlainText(message);
-
-    // size is the wierdest part. We are renderind document to get a size form it.
-    // Document tolk in Pt, so need to convert into px. Conversion is not very accurate
-    ui->text3->document()->adjustSize();
-    int h = int(curSz.height());
-    ui->text3->adjustSize();
-
-    // Second Ajustment with a scroll br that works great
-    QScrollBar * vSb = ui->text3->verticalScrollBar();
-    int scrollDiff = vSb->maximum() - vSb->minimum();
-    int page = vSb->pageStep();
-
-    if (scrollDiff >0) {
-        h = int( h * double(scrollDiff + page)/page + 1);
-    }
-    ui->text3->setMaximumHeight( h );
-    ui->text3->setMinimumHeight( h );
-    ui->text3->adjustSize();
+    utils::resizeEditByContent(this, ui->text3, false, message);
 
     ui->fluffCheckBox->setCheckState( config->isFluffSet() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
 

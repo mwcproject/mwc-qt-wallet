@@ -16,10 +16,15 @@
 #define WIDGETUTILS_H
 
 class QWidget;
+class QTextEdit;
+class QString;
 
 namespace utils {
 
     void defineDefaultButtonSlot( QWidget *parent, const char *slot );
+
+    // Just a resize the edit inside Widget to the content will fit
+    void resizeEditByContent( QWidget * parentWindow, QTextEdit * edit, bool html, const QString & message );
 
 }
 

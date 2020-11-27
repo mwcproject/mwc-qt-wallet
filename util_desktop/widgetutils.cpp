@@ -15,6 +15,9 @@
 #include "widgetutils.h"
 #include <QWidget>
 #include <QShortcut>
+#include <QTextEdit>
+#include <QScrollBar>
+#include <QCoreApplication>
 
 namespace utils {
 
@@ -23,6 +26,57 @@ void defineDefaultButtonSlot( QWidget *parent, const char *slot ) {
     new QShortcut( QKeySequence(Qt::Key_Return), parent, slot );
     new QShortcut( QKeySequence(Qt::Key_Enter), parent, slot );
 }
+
+// Just a resize the edit inside Widget to the content will fit
+void resizeEditByContent( QWidget * parentWindow, QTextEdit * edit, bool html, const QString & message ) {
+    Q_ASSERT(parentWindow);
+    Q_ASSERT(edit);
+
+        // Setting text option
+        QTextOption textOption;
+        textOption.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+        textOption.setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+        edit->document()->setDefaultTextOption(textOption);
+
+        // text as a data should work for as.
+        if (html)
+            edit->setHtml( "<center>" + message + "</center>" );
+        else
+            edit->setPlainText(message);
+
+        bool resized = false;
+
+        do {
+            // prepare for rendering
+            QSize curSz = edit->size();
+
+            // size is the wierdest part. We are renderind document to get a size form it.
+            // Document tolk in Pt, so need to convert into px. Conversion is not very accurate
+            edit->document()->adjustSize();
+            int h = int(curSz.height());
+            edit->adjustSize();
+
+            // Second Ajustment with a scroll br that works great
+            QScrollBar *vSb = edit->verticalScrollBar();
+            int scrollDiff = vSb->maximum() - vSb->minimum();
+            int page = vSb->pageStep();
+
+            resized = false;
+            if (scrollDiff > 0) {
+                h = int(h * double(scrollDiff + page) / page + 1);
+                resized = true;
+            }
+
+            edit->setMaximumHeight(h);
+            edit->setMinimumHeight(h);
+            edit->adjustSize();
+
+            parentWindow->adjustSize();
+
+            QCoreApplication::processEvents();
+        } while (resized);
+}
+
 
 }
 
