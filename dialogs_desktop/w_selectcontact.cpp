@@ -37,6 +37,7 @@ SelectContact::SelectContact(QWidget *parent) :
 
 SelectContact::~SelectContact()
 {
+    saveTableHeaders();
     delete ui;
 }
 
@@ -60,7 +61,7 @@ void SelectContact::initTableHeaders() {
     // Creatign columns
     QVector<int> widths = config->getColumnsWidhts("ContactsTable");
     if ( widths.size() != 3 ) {
-        widths = QVector<int>{35,150,400};
+        widths = QVector<int>{35,150,600};
     }
     Q_ASSERT( widths.size() == 3 );
     ui->contactsTable->setColumnWidths( widths );
@@ -78,6 +79,8 @@ void SelectContact::updateContactTable(const QString & searchStr) {
     Q_ASSERT(contactPairs.size() % 2 == 0 );
 
     ui->contactsTable->clearData();
+    ui->contactsTable->setTextAlignment( Qt::AlignLeft | Qt::AlignVCenter );
+
     for (int k=1; k<contactPairs.size(); k+=2 ) {
         QString name = contactPairs[k-1];
         QString address = contactPairs[k];
