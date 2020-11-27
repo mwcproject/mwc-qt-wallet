@@ -1908,7 +1908,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
         }
         else {
             if (mwcNode->isRunning()) {
-                if (mwcNode->getCurrentNetwork() != config.getNetwork()) {
+                if (mwcNode->getCurrentNetwork() != config.getNetwork() || mwcNode->usingTor() != appContext->useTorForNode() ) {
                     mwcNode->stop();
                 }
             }

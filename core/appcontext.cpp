@@ -168,7 +168,7 @@ bool AppContext::loadDataImpl() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x47A1)
+    if (id<0x4783 || id>0x47A2)
          return false;
 
     QString mockStr;
@@ -327,6 +327,9 @@ bool AppContext::loadDataImpl() {
         in >> acceptedSwaps;
     }
 
+    if (id>=0x47A2)
+        in >> noTorForEmbeddedNode;
+
     return true;
 }
 
@@ -354,7 +357,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x47A1;
+    out << 0x47A2;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -429,6 +432,8 @@ void AppContext::saveData() const {
     out << swapMaxBackupStatus;
 
     out << acceptedSwaps;
+
+    out << noTorForEmbeddedNode;
 }
 
 void AppContext::loadNotesData() {
@@ -599,11 +604,19 @@ bool AppContext::useTorForNode() const {
     bool tor = isAutoStartTorEnabled();
     if (config::isOnlineNode())
         tor = true;
-    return tor;
+    return tor && (!noTorForEmbeddedNode);
 }
 
 void AppContext::setShowOutputAll(bool all) {
     showOutputAll = all;
+}
+
+void AppContext::setNoTorForEmbeddedNode(bool noTor) {
+    if (noTorForEmbeddedNode == noTor)
+        return;
+
+    noTorForEmbeddedNode = noTor;
+    saveData();
 }
 
 // -------------- Contacts

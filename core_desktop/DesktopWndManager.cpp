@@ -55,6 +55,8 @@
 #include "../util/Process.h"
 #include "../dialogs_desktop/showwalletstoppingmessagedlg.h"
 #include "../dialogs_desktop/s_swapbackupdlg.h"
+#include "../state/state.h"
+#include "../state/u_nodeinfo.h"
 
 namespace core {
 
@@ -244,7 +246,26 @@ void DesktopWndManager::pageAccountTransfer() {
 }
 
 void DesktopWndManager::pageNodeInfo() {
-    windowManager->switchToWindowEx( mwc::PAGE_U_NODE_STATUS,
+    state::NodeInfo * ni =  (state::NodeInfo *)state::getState(state::STATE::NODE_INFO);
+    Q_ASSERT(ni);
+
+    wallet::MwcNodeConnection connectionInfo = ni->getNodeConnection();
+    QString nodeType;
+    switch(connectionInfo.connectionType) {
+        case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD:
+            nodeType = "Cloud";
+            break;
+        case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CUSTOM:
+            nodeType = "Custom";
+            break;
+        case wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL:
+            nodeType = "Embedded";
+            break;
+        default:
+            Q_ASSERT(false);
+    }
+
+    windowManager->switchToWindowEx( mwc::PAGE_U_NODE_STATUS + " (" + nodeType + ")",
              new wnd::NodeInfo( windowManager->getInWndParent()));
 }
 

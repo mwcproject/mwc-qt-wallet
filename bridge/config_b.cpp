@@ -366,5 +366,13 @@ void Config::setTradeAcceptedFlag(QString swapId, bool accepted) {
     getAppContext()->setTradeAcceptedFlag(swapId, accepted);
 }
 
+// Setting is MWC Node prohibited to use TOR
+bool Config::getNoTorForEmbeddedNode() {
+    return getAppContext()->getNoTorForEmbeddedNode();
+}
+void Config::setNoTorForEmbeddedNode(bool noTor) {
+    getAppContext()->setNoTorForEmbeddedNode(noTor);
+}
+
 
 }

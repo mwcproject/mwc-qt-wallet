@@ -167,6 +167,10 @@ public:
 
     Q_INVOKABLE bool isTradeAccepted(QString swapId);
     Q_INVOKABLE void setTradeAcceptedFlag(QString swapId, bool accepted);
+
+    // Setting is MWC Node prohibited to use TOR
+    Q_INVOKABLE bool getNoTorForEmbeddedNode();
+    Q_INVOKABLE void setNoTorForEmbeddedNode(bool noTor);
 };
 
 }

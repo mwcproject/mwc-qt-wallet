@@ -21,6 +21,7 @@
 #include <QFileDialog>
 #include "../util/ioutils.h"
 #include <QDir>
+#include "../bridge/config_b.h"
 
 namespace dlg {
 
@@ -31,6 +32,8 @@ ChangeNode::ChangeNode(QWidget * parent, const wallet::MwcNodeConnection & _node
         nodeConnection( _nodeConnection )
 {
     ui->setupUi(this);
+
+    config = new bridge::Config(this);
 
     ui->radioCloudNode->setChecked( nodeConnection.connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD );
     ui->radioEmbeddedNode->setChecked( nodeConnection.connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL );
@@ -52,6 +55,8 @@ ChangeNode::ChangeNode(QWidget * parent, const wallet::MwcNodeConnection & _node
     ui->mwcNodeSecretEdit->setText( nodeConnection.mwcNodeSecret );
 
     ui->nodeDataLocation->setText( nodeConnection.localNodeDataPath );
+
+    ui->noTorCheck->setChecked(config->getNoTorForEmbeddedNode());
 }
 
 ChangeNode::~ChangeNode() {
@@ -201,8 +206,9 @@ void ChangeNode::on_applyButton_clicked() {
         resCon.setAsCustom( mwcNodeUri, mwcNodeSecret );
     }
 
+    bool noTor = ui->noTorCheck->isChecked();
 
-    if ( resCon == nodeConnection ) {
+    if ( resCon == nodeConnection && noTor == config->getNoTorForEmbeddedNode() ) {
         reject(); // nothing was changed. It is a reject.
         return;
     }
@@ -214,6 +220,8 @@ void ChangeNode::on_applyButton_clicked() {
                                       true, false) != core::WndManager::RETURN_CODE::BTN1 ) {
         return;
     }
+
+    config->setNoTorForEmbeddedNode(noTor);
 
     nodeConnection = resCon;
 

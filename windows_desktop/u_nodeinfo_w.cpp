@@ -214,6 +214,7 @@ void NodeInfo::on_changeNodeButton_clicked()
     dlg::ChangeNode changeNodeDlg(this, nodeConn, config->getNetwork() );
 
     if ( changeNodeDlg.exec() == QDialog::Accepted ) {
+        ui->progress->show(); // We are restarting, might take a while. Let's show the progress
         nodeInfo->updateNodeConnection( changeNodeDlg.getNodeConnectionConfig().toJson() );
     }
 }

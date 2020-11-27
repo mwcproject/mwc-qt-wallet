@@ -211,6 +211,10 @@ public:
     // Check fir accepted trades (we don't want ask to acceptance twice. The workflow can return back)
     bool isTradeAccepted(const QString & swapId) const;
     void setTradeAcceptedFlag(const QString & swapId, bool accepted);
+
+    bool getNoTorForEmbeddedNode() const {return noTorForEmbeddedNode;}
+    void setNoTorForEmbeddedNode(bool noTor);
+
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -321,6 +325,9 @@ private:
 
     // Accepted trades (we don't want ask to acceptance twice. The workflow can return back)
     QMap<QString, bool> acceptedSwaps;
+
+    // Ban tor usage for embedded node
+    bool noTorForEmbeddedNode = false;
 };
 
 template <class T>

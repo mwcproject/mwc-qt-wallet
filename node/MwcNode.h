@@ -73,6 +73,7 @@ public:
 
     bool isRunning() const {return nodeProcess!= nullptr;}
     const QString & getCurrentNetwork() const { return lastUsedNetwork; }
+    bool usingTor() const {return lastTor;}
 
     void start( const QString & dataPath, const QString & network, bool tor );
     void stop();

@@ -22,6 +22,10 @@ namespace Ui {
 class ChangeNode;
 }
 
+namespace bridge {
+class Config;
+}
+
 namespace dlg {
 
 class ChangeNode : public control::MwcDialog {
@@ -43,8 +47,9 @@ private slots:
     void on_selectNodeDataLocationBtn_clicked();
 private:
     Ui::ChangeNode *ui;
-
     wallet::MwcNodeConnection nodeConnection;
+
+    bridge::Config * config = nullptr;
 };
 
 }
