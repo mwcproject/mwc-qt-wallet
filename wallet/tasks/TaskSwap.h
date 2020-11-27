@@ -40,7 +40,7 @@ public:
 // Get list of the trades
 class TaskGetSwapTrades : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 1000*40; // 40 seconds can be possible because of the status update and connection errors
+    const static int64_t TIMEOUT = 1000*120; // 120 seconds can be possible because of the status update and connection errors
 
     TaskGetSwapTrades( MWC713 *wallet713, QString _cookie ) :
                 Mwc713Task("TaskSwapTrades",
@@ -60,7 +60,7 @@ private:
 // Delete single trade.
 class TaskDeleteSwapTrade : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 1000*2;
+    const static int64_t TIMEOUT = 1000*120;
 
     TaskDeleteSwapTrade( MWC713 *wallet713, QString _swapId ) :
             Mwc713Task("TaskDeleteSwapTrades",
@@ -80,7 +80,7 @@ private:
 // Create new swap trade
 class TaskCreateNewSwapTrade : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 1000*45; // In case of network issues, it will take time for retry
+    const static int64_t TIMEOUT = 1000*120; // In case of network issues, it will take time for retry
 
     TaskCreateNewSwapTrade( MWC713 *wallet713,
                             int min_confirmations,
@@ -136,7 +136,7 @@ private:
 // Cancel swap trade.
 class TaskCancelSwapTrade : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 1000*4;
+    const static int64_t TIMEOUT = 1000*120;
 
     TaskCancelSwapTrade( MWC713 *wallet713, QString _swapId ) :
             Mwc713Task("TaskCancelSwapTrade",
@@ -156,7 +156,7 @@ private:
 // Cancel swap trade and swap trade details.
 class TaskTradeDetails : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 1000*10;
+    const static int64_t TIMEOUT = 1000*120;
 
     TaskTradeDetails( MWC713 *wallet713, QString _swapId ) :
             Mwc713Task("TaskTradeDetails",
@@ -176,7 +176,7 @@ private:
 // Adjust swap trade record.
 class TaskAdjustTrade : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 1000*10;
+    const static int64_t TIMEOUT = 1000*120;
 
     TaskAdjustTrade( MWC713 *wallet713, const QString & _swapId, const QString &adjustCmd, const QString & param1, const QString & param2 ) :
             Mwc713Task("TaskTradeDetails",
@@ -199,10 +199,10 @@ private:
 // Perform auto swap single step
 class TaskPerformAutoSwapStep : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 1000*20;
+    const static int64_t TIMEOUT = 1000*120;
 
     TaskPerformAutoSwapStep( MWC713 *wallet713, const QString & _swapId ) :
-                Mwc713Task("TaskTradeDetails",
+                Mwc713Task("TaskPerformAutoSwapStep_" + _swapId,
                     "swap --autoswap --json_format -i " + _swapId,
                     wallet713, ""),
     swapId(_swapId) {}
@@ -218,7 +218,7 @@ private:
 
 class TaskBackupSwapTradeData : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 1000*2;
+    const static int64_t TIMEOUT = 1000*120;
 
     TaskBackupSwapTradeData( MWC713 *wallet713, const QString & _swapId, const QString & backupFileName ) :
             Mwc713Task("TaskBackupSwapTradeData",
@@ -237,7 +237,7 @@ private:
 
 class TaskRestoreSwapTradeData : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 1000*3;
+    const static int64_t TIMEOUT = 1000*120;
 
     TaskRestoreSwapTradeData( MWC713 *wallet713, const QString & _fileName ) :
             Mwc713Task("TaskBackupSwapTradeData",
@@ -257,7 +257,7 @@ private:
 
 class TaskAdjustTradeState : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 1000*30;
+    const static int64_t TIMEOUT = 1000*120;
 
     TaskAdjustTradeState( MWC713 *wallet713, const QString & swapId, const QString & newState ) :
             Mwc713Task("TaskAdjustTradeState",

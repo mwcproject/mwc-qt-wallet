@@ -884,7 +884,13 @@ void MWC713::adjustSwapData( QString swapId, QString adjustCmd, QString param1, 
 //                       QVector<SwapJournalMessage> tradeJournal,
 //                       QString error );
 void MWC713::performAutoSwapStep( QString swapId ) {
-    eventCollector->addTask( new TaskPerformAutoSwapStep(this, swapId), TaskPerformAutoSwapStep::TIMEOUT );
+    TaskPerformAutoSwapStep * task = new TaskPerformAutoSwapStep(this, swapId);
+    if ( eventCollector->hasTask(task) ) {
+        delete task;
+        return;
+    }
+
+    eventCollector->addTask( task, TaskPerformAutoSwapStep::TIMEOUT );
 }
 
 // Backup/export swap trade data file
