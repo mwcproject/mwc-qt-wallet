@@ -702,6 +702,10 @@ void MWC713::sendTo( const QString &account, int64_t coinNano, const QString & a
 // Check signal:  onSendFile
 void MWC713::sendFile( const QString &account, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, int ttl_blocks, bool generateProof )  {
 
+#ifdef Q_OS_WIN
+    fileTx.replace('\\', '/');
+#endif
+
     if ( ! util::validateMwc713Str(fileTx, false).first ) {
         setSendFileResult( false, QStringList{"Unable to create file with name '"+fileTx+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."} , fileTx );
         return;
@@ -717,6 +721,10 @@ void MWC713::sendFile( const QString &account, int64_t coinNano, QString message
 // Receive transaction. Will generate *.response file in the same dir
 // Check signal:  onReceiveFile
 void MWC713::receiveFile( QString fileTx, QString identifier)  {
+#ifdef Q_OS_WIN
+    fileTx.replace('\\', '/');
+#endif
+
     if ( ! util::validateMwc713Str(fileTx, false).first ) {
         setReceiveFile( false, QStringList{"Unable to process file with name '"+fileTx+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."}, fileTx, "" );
         return;
@@ -728,6 +736,10 @@ void MWC713::receiveFile( QString fileTx, QString identifier)  {
 // finalize transaction and broadcast it
 // Check signal:  onFinalizeFile
 void MWC713::finalizeFile( QString fileTxResponse, bool fluff )  {
+#ifdef Q_OS_WIN
+    fileTxResponse.replace('\\', '/');
+#endif
+
     if ( ! util::validateMwc713Str(fileTxResponse, false).first ) {
         setFinalizeFile( false, QStringList{"Unable to process file with name '"+fileTxResponse+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."}, fileTxResponse );
         return;
@@ -739,6 +751,10 @@ void MWC713::finalizeFile( QString fileTxResponse, bool fluff )  {
 // submit finalized transaction. Make sense for cold storage => online node operation
 // Check Signal: onSubmitFile(bool ok, String message)
 void MWC713::submitFile( QString fileTx ) {
+#ifdef Q_OS_WIN
+    fileTx.replace('\\', '/');
+#endif
+
     eventCollector->addTask( new TaskSubmitFile(this, fileTx), TaskSubmitFile::TIMEOUT );
 }
 
@@ -896,12 +912,18 @@ void MWC713::performAutoSwapStep( QString swapId ) {
 // Backup/export swap trade data file
 // Check Signal: onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage)
 void MWC713::backupSwapTradeData(QString swapId, QString backupFileName) {
+#ifdef Q_OS_WIN
+    backupFileName.replace('\\', '/');
+#endif
     eventCollector->addTask( new TaskBackupSwapTradeData(this, swapId, backupFileName), TaskBackupSwapTradeData::TIMEOUT );
 }
 
 // Restore/import swap trade from the file
 // Check Signal: onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
 void MWC713::restoreSwapTradeData(QString filename) {
+#ifdef Q_OS_WIN
+    filename.replace('\\', '/');
+#endif
     eventCollector->addTask( new TaskRestoreSwapTradeData(this, filename), TaskRestoreSwapTradeData::TIMEOUT );
 }
 
@@ -938,6 +960,10 @@ void MWC713::cancelTransacton(QString account, int64_t txIdx)  {
 // Generating transaction proof for mwcbox transaction. This transaction must be broadcasted to the chain
 // Check Signal: onExportProof( bool success, QString fn, QString msg );
 void MWC713::generateMwcBoxTransactionProof( int64_t transactionId, QString resultingFileName )  {
+#ifdef Q_OS_WIN
+    resultingFileName.replace('\\', '/');
+#endif
+
     if ( ! util::validateMwc713Str(resultingFileName, false).first ) {
         setExportProofResults( false, resultingFileName, "Unable to store file with name '"+resultingFileName+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only." );
         return;
@@ -949,6 +975,10 @@ void MWC713::generateMwcBoxTransactionProof( int64_t transactionId, QString resu
 // Verify the proof for transaction
 // Check Signal: onVerifyProof( bool success, QString msg );
 void MWC713::verifyMwcBoxTransactionProof( QString proofFileName )  {
+#ifdef Q_OS_WIN
+    proofFileName.replace('\\', '/');
+#endif
+
     if ( ! util::validateMwc713Str(proofFileName, false).first ) {
         setVerifyProofResults( false, proofFileName, "Unable to process '"+proofFileName+"' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only." );
         return;

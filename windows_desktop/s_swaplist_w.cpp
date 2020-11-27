@@ -159,6 +159,7 @@ SwapList::SwapList(QWidget *parent) :
 
 SwapList::~SwapList() {
     delete ui;
+    ui=nullptr;
 }
 
 void SwapList::selectSwapTab(int selection) {
@@ -373,6 +374,11 @@ void SwapList::updateTradeListData() {
 
 void SwapList::richButtonPressed(control::RichButton *button, QString cookie) {
     Q_UNUSED(button);
+
+    if (ui==nullptr) {
+        Q_ASSERT(false);
+        return;
+    }
 
     QStringList dt = cookie.split(':');
     if (dt.size() < 2) {

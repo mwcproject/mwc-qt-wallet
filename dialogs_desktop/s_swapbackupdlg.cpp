@@ -39,8 +39,8 @@ SwapBackupDlg::SwapBackupDlg(QWidget *parent, QString _swapId, int _backupId) :
     connect(swap, &bridge::Swap::sgnBackupSwapTradeData, this, &SwapBackupDlg::sgnBackupSwapTradeData, Qt::QueuedConnection);
 
     QString path = config->getPathFor("SwapBackupDlg", true);
-    if (!path.isEmpty())
-        ui->backupDataPath->setText(path + QDir::separator() + "trade_" + swapId + ".trade" );
+    if (!path.isEmpty()) // QDir::separator does return value that rust doesn't understand well. That will be corrected but still it looks bad.
+        ui->backupDataPath->setText(path + "/trade_" + swapId + ".trade" );
 
     updateButtons();
 }
