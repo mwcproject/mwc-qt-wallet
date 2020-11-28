@@ -98,11 +98,6 @@ WalletConfig::WalletConfig(QWidget *parent) :
     inputConfirmationsNumber = walletConfig->getInputConfirmationsNumber();
     changeOutputs = walletConfig->getChangeOutputs();
 
-#ifdef Q_OS_WIN
-    // Disable in windows because Modal functionality is brocken
-    ui->notificationsEnabled->setEnabled(false);
-#endif
-
     setValues(mqsHost, inputConfirmationsNumber, changeOutputs);
     updateButtons();
 }
