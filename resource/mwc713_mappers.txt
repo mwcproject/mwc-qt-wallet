@@ -104,3 +104,10 @@ Tor listener is not running, please start it first
 Generic error: Foreign API is not active and tor listener is not running.
 Foreign API is not active and tor listener is not running. Please restart your wallet and make sure that you don't have other instances running.
 
+#Foreign API Listener failed. Generic error: API thread panicked :Any
+Foreign API Listener failed. Generic error: API thread panicked :Any
+Unable to start foreign API. Probably another instance of the wallet already running
+
+# Generic error, Foreign API is not running. Unable to start tor listener.
+Generic error, Foreign API is not running. Unable to start tor listener.
+Unable to start TOR because of Foreign API failure.

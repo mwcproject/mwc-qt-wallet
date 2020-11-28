@@ -109,7 +109,7 @@ bool TaskAccountCreate::processTask(const QVector<WEvent> &events) {
 bool TaskAccountSwitch::processTask(const QVector<WEvent> &events) {
     QVector< WEvent > errors = filterEvents( events, WALLET_EVENTS::S_GENERIC_ERROR );
     for ( const auto & e : errors) {
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Account switch error: " + e.message );
+        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to switch account. " + e.message );
     }
     return true;
 }

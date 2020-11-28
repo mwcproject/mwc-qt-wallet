@@ -111,8 +111,6 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
             QString error = evt.message;
             wallet713->setHttpListeningStatus(false, error);
-            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING,
-                                               "mwc713 Unable to start Http Foreign API. Error: " + error );
             return true;
         }
 
