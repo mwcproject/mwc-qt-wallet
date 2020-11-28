@@ -158,6 +158,7 @@ SwapList::SwapList(QWidget *parent) :
 }
 
 SwapList::~SwapList() {
+    clearSwapList();
     delete ui;
     ui=nullptr;
 }
@@ -179,7 +180,7 @@ void SwapList::selectSwapTab(int selection) {
         ui->swapsTable->show();
         ui->refreshBtnsHolder->show();
 
-        swapList.clear();
+        clearSwapList();
         ui->swapsTable->clearAll();
 
     }
@@ -212,7 +213,7 @@ void SwapList::sgnSwapTradesResult(QString cookie, QVector<QString> trades, QStr
         return;
 
     ui->progress->hide();
-    swapList.clear();
+    clearSwapList();
 
     // Result comes in series of 11 item tuples:
     // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <State>, <initiate_time_interval>, <expire_time_interval>  <secondary_address> <last_process_error> >, ....
@@ -228,6 +229,22 @@ void SwapList::sgnSwapTradesResult(QString cookie, QVector<QString> trades, QStr
         control::MessageBox::messageText(this, "Error", "Unable to request a list of Swap trades.\n\n" + error);
     }
 }
+
+void SwapList::clearSwapList() {
+    for (auto &sw : swapList) {
+        if (sw.cancelBtn)
+            sw.cancelBtn->setCallback(nullptr, "");
+        if (sw.deleteBtn)
+            sw.deleteBtn->setCallback(nullptr, "");
+        if (sw.backupBtn)
+            sw.backupBtn->setCallback(nullptr, "");
+        if (sw.acceptBtn)
+            sw.acceptBtn->setCallback(nullptr, "");
+    }
+
+    swapList.clear();
+}
+
 
 void SwapList::updateTradeListData() {
     ui->swapsTable->clearAll();
@@ -339,22 +356,22 @@ void SwapList::updateTradeListData() {
         const int BTN_FONT_SIZE = 13;
         const int BTN_WIDTH = 80;
 
-        sw.cancelBtn = itm->addWidget(
+        sw.cancelBtn = (control::RichButton *) itm->addWidget(
                     (new control::RichButton(itm, "Cancel", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
                                              "Cancel this swap Trade", BTN_FONT_SIZE))->
                             setCallback(this, "Cancel:" + sw.tradeId)).getCurrentWidget();
 
-        sw.deleteBtn = itm->addWidget(
+        sw.deleteBtn = (control::RichButton *) itm->addWidget(
                 (new control::RichButton(itm, "Delete", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
                                          "Cancel this swap Trade", BTN_FONT_SIZE))->
                         setCallback(this, "Delete:" + sw.tradeId)).getCurrentWidget();
 
-        sw.backupBtn = itm->addWidget((new control::RichButton(itm, "Backup", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
+        sw.backupBtn = (control::RichButton *) itm->addWidget((new control::RichButton(itm, "Backup", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
                                                 "Backup your trade data, so you will be able to get a refund in case of the hardware failure",
                                                 BTN_FONT_SIZE))->
                 setCallback(this, "Backup:" + sw.tradeId + ":"+sw.stateCmd)).getCurrentWidget();
 
-        sw.acceptBtn = itm->addWidget((new control::RichButton(itm, "Accept", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
+        sw.acceptBtn = (control::RichButton *) itm->addWidget((new control::RichButton(itm, "Accept", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
                                                 "Review and accept this swap Trade", BTN_FONT_SIZE))->
                 setCallback(this, "Accept:" + sw.tradeId + ":"+sw.stateCmd)).getCurrentWidget();
 
@@ -373,13 +390,6 @@ void SwapList::updateTradeListData() {
 }
 
 void SwapList::richButtonPressed(control::RichButton *button, QString cookie) {
-    Q_UNUSED(button);
-
-    if (ui==nullptr) {
-        Q_ASSERT(false);
-        return;
-    }
-
     QStringList dt = cookie.split(':');
     if (dt.size() < 2) {
         Q_ASSERT(false);
@@ -390,6 +400,7 @@ void SwapList::richButtonPressed(control::RichButton *button, QString cookie) {
     QString tradeId = dt[1];
 
     if (cmd == "Cancel") {
+        button->hide();
         if (core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionText(this, "Warning",
                                                                                      "Are you sure you want to cancel this trade? Please note, that refund process might take time and your wallet need to be online to do that. "
                                                                                      "If your wallet will not be online until the swap process will be finished, you might lost the funds.",
@@ -400,9 +411,9 @@ void SwapList::richButtonPressed(control::RichButton *button, QString cookie) {
             return;
 
         ui->progress->show();
-        button->hide();
         swap->cancelTrade(tradeId);
     } else if (cmd == "Delete") {
+        button->hide();
         if (core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionText(
                 this, "Swap Trade",
                 "Are you sure that you want to delete the swap " + tradeId + " from your records?",
@@ -410,7 +421,6 @@ void SwapList::richButtonPressed(control::RichButton *button, QString cookie) {
                 "Don't delete this swap record", "Yes, delete this swap record",
                 false, true)) {
             ui->progress->show();
-            button->hide();
             swap->deleteSwapTrade(tradeId);
         }
     } else if (cmd == "Backup") {

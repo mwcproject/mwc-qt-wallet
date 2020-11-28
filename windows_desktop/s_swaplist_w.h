@@ -56,10 +56,10 @@ struct SwapTradeInfo {
     QLabel * statusLable = nullptr;
     QLabel * lastErrorLable = nullptr;
     QLabel * noteLabel = nullptr;
-    QWidget * cancelBtn = nullptr;
-    QWidget * deleteBtn = nullptr;
-    QWidget * backupBtn = nullptr;
-    QWidget * acceptBtn = nullptr;
+    control::RichButton * cancelBtn = nullptr;
+    control::RichButton * deleteBtn = nullptr;
+    control::RichButton * backupBtn = nullptr;
+    control::RichButton * acceptBtn = nullptr;
 
     SwapTradeInfo() = default;
     SwapTradeInfo(const SwapTradeInfo & obj) = default;
@@ -83,7 +83,8 @@ struct SwapTradeInfo {
     // Reset all UI related data
     void resetUI() {
         noteLabel = lastErrorLable = initTimeLable = expirationLable = statusLable = nullptr;
-        markWnd = cancelBtn = deleteBtn = backupBtn = acceptBtn = nullptr;
+        markWnd = nullptr;
+        cancelBtn = deleteBtn = backupBtn = acceptBtn = nullptr;
     }
 
     // Update current state and UI
@@ -103,6 +104,7 @@ private:
     void selectSwapTab(int selection);
     void updateTradeListData();
 
+    void clearSwapList();
 protected:
     virtual void richButtonPressed(control::RichButton * button, QString coockie);
 
