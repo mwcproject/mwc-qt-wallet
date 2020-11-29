@@ -42,6 +42,15 @@ SwapBackupDlg::SwapBackupDlg(QWidget *parent, QString _swapId, int _backupId) :
     if (!path.isEmpty()) // QDir::separator does return value that rust doesn't understand well. That will be corrected but still it looks bad.
         ui->backupDataPath->setText(path + "/trade_" + swapId + ".trade" );
 
+    QString text2update = ui->mainTextLabel->text();
+    if (backupId==1) {
+        text2update += "\n\nThis backup allows to lock funds or do a refund. It doesn't have data to process redeem stage!";
+    }
+    else {
+        text2update += "\n\nThis backup allows to finish this trade with redeem or refund.";
+    }
+    ui->mainTextLabel->setText(text2update);
+
     updateButtons();
 }
 

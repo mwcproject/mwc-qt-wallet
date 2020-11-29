@@ -111,3 +111,7 @@ Unable to start foreign API. Probably another instance of the wallet already run
 # Generic error, Foreign API is not running. Unable to start tor listener.
 Generic error, Foreign API is not running. Unable to start tor listener.
 Unable to start TOR because of Foreign API failure.
+
+#Swap Error , Swap LibWallet error: Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool General error failed to validate tx, Duplicate Commitment: Commitment(084e1265760cc06442027361950612ca254e2440e650933483460c79d677afc31c) \n Cause: Unknown \n Backtrace: "}
+Swap Error , Swap LibWallet error: Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool General error failed to validate tx, Duplicate Commitment: Commitment\((.*)\) \\n Cause: Unknown \\n Backtrace: "}
+Output with commitment $1 already exists

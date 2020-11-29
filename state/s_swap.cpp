@@ -704,7 +704,7 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
     }
 
     if (!error.isEmpty()) {
-        core::getWndManager()->messageTextDlg("Error", "Unable to request swap trades. If you have running trades, please solve this problem as soon as possible. If your wallet is not online, you might loos your trade funds.\n\n" + error);
+        core::getWndManager()->messageTextDlg("Error", "Unable to request swap trades. If you have running trades, please solve this problem as soon as possible. If your wallet is not online, you might loose your trade funds.\n\n" + error);
         return;
     }
 

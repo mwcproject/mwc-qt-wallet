@@ -236,14 +236,14 @@
         <property name="text">
          <string>
 
-Trades data contains refund slates and private keys for the redeem operation. In case of the hardware failure you might lost this data and as a result you might loose your funds. That is why we strongly recommend to keep the copy of your trade file on the separate drive like USB stick.
+Trades data contains refund slates and private keys for the redeem operation. In case of the hardware failure you might lost this data and, as a result, you might loose your funds. That is why we strongly recommend to keep the copy of your trade data on the separate drive like USB stick.
 
-If you have your backup, in worst case scenario you will be able to restore your MWC wallet from the mnemonic phrase, restore your swap trades, and finish the swap process.
+The first and the most important backup is done before initial lock of coins at multisig account. With this backup you will be able to continue locking or refund your funds.
+The second backup is initiated before redeem phase. With this data you will be able to finish redeem or do a refund.
 
-The best opportunity to backup the trade data is before the initial funds lock.
+If you have your backup, in worst case scenario you will be able to restore your MWC wallet from the mnemonic phrase, restore your swap trades, and at least refund you locked coins. To finish redeem transaction, you need a second backup that is optional.
 
-Please note, swap trade files are encrypted, so you can only restore it to the same wallet only.
-</string>
+Please note, swap trade files are encrypted, so you can restore it into the wallet with the same seed.</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -608,14 +608,14 @@ Please note, swap trade files are encrypted, so you can only restore it to the s
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::RichVBox</class>
