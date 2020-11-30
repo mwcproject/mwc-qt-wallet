@@ -86,41 +86,6 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
 };
 
-// Just a callback, not a real task
-class TaskAllTransactionsStart : public Mwc713Task {
-public:
-    TaskAllTransactionsStart( MWC713 * wallet713 ) :
-            Mwc713Task("TaskAllTransactionsStart", "", wallet713,"") {}
-
-    virtual bool processTask(const QVector<WEvent> &events) override;
-    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>();}
-};
-
-class TaskAllTransactionsEnd : public Mwc713Task {
-public:
-    TaskAllTransactionsEnd( MWC713 * wallet713 ) :
-            Mwc713Task("TaskAllTransactionsEnd", "", wallet713,"") {}
-
-    virtual bool processTask(const QVector<WEvent> &events) override;
-    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>();}
-};
-
-class TaskAllTransactions : public Mwc713Task {
-public:
-    const static int64_t TIMEOUT = 1000*180;
-
-    TaskAllTransactions( MWC713 * wallet713) :
-            Mwc713Task("Transactions", "txs", wallet713, "") {}
-
-    virtual ~TaskAllTransactions() override {}
-
-    virtual bool processTask(const QVector<WEvent> & events) override;
-
-    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
-};
-
-
-
 class TaskTransCancel : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*7;

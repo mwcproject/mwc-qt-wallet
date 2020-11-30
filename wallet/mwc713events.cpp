@@ -123,30 +123,55 @@ bool Mwc713EventManager::hasTask(Mwc713Task * task) {
 
 
 // Add task (single wallet action) to perform.
+// tasks  - pairs of task + timeouts. All tasks creates a group that is not divisible buy other tasks.
 // This tale ownership of object
 // Note:  if timeout <= 0, task will be executed immediately
 //   idx == -1 - push_back, otherwise will insert into the index position
 // Return: true if task was added.  False - was ignored
-void Mwc713EventManager::addTask( Mwc713Task * task, int64_t timeout, int idx ) {
+void Mwc713EventManager::addTask( TASK_PRIORITY priority, QVector< QPair<Mwc713Task*, int64_t>> tasks, int idx ) {
     QMutexLocker l( &taskQMutex );
 
     // timeout multiplier will be applyed to the task because we want apply this value as late as posiible.
     // User might change it at any moment.
     if (idx<0) {
-        taskQ.push_back(taskInfo(task, timeout));
+        // search for position to insert
+        for (int pos = 0; pos<taskQ.size(); pos++) {
+            if (taskQ[pos].wasStarted || taskQ[pos].priority >= priority)
+                continue;
+
+            if (pos > 0 && taskQ[pos - 1].groupId == taskQ[pos].groupId)
+                continue;
+
+            groupId++;
+
+            for (int r = tasks.size() - 1; r >= 0; r--) {
+                taskQ.insert(pos, taskInfo(groupId, priority, tasks[r].first, tasks[r].second));
+            }
+
+            tasks.clear();
+            break;
+        }
+
+        if (!tasks.isEmpty()) {
+            groupId++;
+            for (auto & t : tasks) {
+                taskQ.push_back(taskInfo(groupId, priority, t.first, t.second));
+            }
+        }
+        // Let's
     }
     else {
         if (idx==0) {
             Q_ASSERT(taskQ.isEmpty() || !taskQ.front().wasStarted);
         }
-        taskQ.insert(idx, taskInfo(task, timeout));
+
+        groupId++;
+        for (int r=tasks.size()-1; r>=0; r--) {
+            taskQ.insert(idx, taskInfo(groupId, priority, tasks[r].first, tasks[r].second ));
+        }
     }
 
     processNextTask();
-
-    if (taskExecutionTimeLimit==0) {
-         taskExecutionTimeLimit = QDateTime::currentMSecsSinceEpoch() + (int64_t)(timeout * config::getTimeoutMultiplier());
-    }
 }
 
 // Running and waiting tasks number

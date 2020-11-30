@@ -29,6 +29,12 @@ namespace wallet {
 class Mwc713Task;
 class MWC713;
 
+enum TASK_PRIORITY {
+    TASK_IDLE = 1, // Task that are running in the background
+    TASK_NORMAL = 2, // Normal priority
+    TASK_NOW = 3,  // Quick response is expected
+};
+
 // Wallet event codes
 enum WALLET_EVENTS {
     S_READY=1, // Wallet ready and waiting for intoput
@@ -105,12 +111,14 @@ struct WEvent {
 };
 
 struct taskInfo {
+    int         groupId = -1;
+    TASK_PRIORITY priority = TASK_PRIORITY::TASK_NORMAL;
     Mwc713Task* task = nullptr; // task
     bool        wasStarted   = false;
     int         timeout = -1; // timeout for this task
 
     taskInfo() = default;
-    taskInfo(Mwc713Task* _task, int _timeout) : task(_task), timeout(_timeout) {}
+    taskInfo(int _groupId, TASK_PRIORITY _priority, Mwc713Task* _task, int _timeout) : groupId(_groupId), priority(_priority), task(_task), timeout(_timeout) {}
     taskInfo(const taskInfo&) = default;
     taskInfo & operator=(const taskInfo&) = default;
 };
@@ -135,7 +143,7 @@ public:
     // Note:  if timeout <= 0, task will be executed immediately
     //   idx == -1 - push_back, otherwise will insert into the index position
     // Return: true if task was added.  False - was ignored
-    void addTask( Mwc713Task * task, int64_t timeout, int idx = -1);
+    void addTask( TASK_PRIORITY priority, QVector< QPair<Mwc713Task*, int64_t>> tasks, int idx = -1);
 
     // Check if task already exist
     bool hasTask(Mwc713Task * task);
@@ -171,6 +179,7 @@ private:
 
     QMutex taskQMutex; // recursive
     QVector< taskInfo > taskQ; // Owner of the tasks
+    int groupId = 0;
 
     // Events for a new task
     QVector<WEvent> events;

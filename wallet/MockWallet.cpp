@@ -444,31 +444,6 @@ void MockWallet::getTransactionById(QString account, int64_t txIdx) {
     emit onTransactionById( true, account, 1234, tx, {}, {} );
 }
 
-// Read all transactions for all accounts. Might take time...
-// Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
-void MockWallet::getAllTransactions() {
-    WalletTransaction tx;
-    tx.setData(2,
-               WalletTransaction::TRANSACTION_TYPE::SEND,
-               "4",
-               "address",
-               "02-02-2020 10:00",
-               true,
-               1234,
-               1234,
-               "02-02-2020 10:00",
-               1,
-               2,
-               1000000000,
-               1000000000,
-               10000000,
-               1000000000,
-               false,
-               "3746538765238745643");
-
-    emit onAllTransactions( {tx} );
-}
-
 // Get root public key with signed message. Message is optional, can be empty
 // Check Signal: onRootPublicKey( QString rootPubKey, QString message, QString signature )
 void MockWallet::getRootPublicKey(QString message2sign) {

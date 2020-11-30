@@ -32,6 +32,7 @@ class AppContext;
 namespace wallet {
 
 class Mwc713EventManager;
+class Mwc713Task;
 
 class MWC713 : public Wallet
 {
@@ -146,9 +147,6 @@ public:
 
     virtual QString getCurrentAccountName()  override {return currentAccount;}
 
-    // Request sync (update_wallet_state) for the
-    virtual void sync(bool showSyncProgress, bool enforce) override;
-
     // Request Wallet balance update. It is a multistep operation
     virtual void updateWalletBalance(bool enforceSync, bool showSyncProgress, bool skipSync=false) override;
     // Check signal: onWalletBalanceUpdated
@@ -252,10 +250,6 @@ public:
     // get Extended info for specific transaction
     // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
     virtual void getTransactionById(QString account, int64_t txIdx )  override;
-
-    // Read all transactions for all accounts. Might take time...
-    // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
-    virtual void getAllTransactions() override;
 
     // Get root public key with signed message. Message is optional, can be empty
     // Check Signal: onRootPublicKey( QString rootPubKey, QString message, QString signature )
@@ -430,11 +424,6 @@ public:
     void notifyListenerMqCollision();
     void notifyMqFailedToStart();
 
-    //-------------
-    void processAllTransactionsStart();
-    void processAllTransactionsAppend(const QVector<WalletTransaction> & trVector);
-    void processAllTransactionsEnd();
-
     // -----------------
     void updateSyncProgress(double progressPercent);
 
@@ -471,7 +460,8 @@ public:
 
     void setRepost(int txIdx, QString err);
 private:
-
+    // Request sync (update_wallet_state) if it is not at the task Q.
+    QVector<QPair<Mwc713Task*,int64_t>> create_sync_if_need(bool showSyncProgress, bool enforce);
 
     void mwc713connect(QProcess * process, bool trackProcessExit);
     void mwc713disconnect();
@@ -557,8 +547,6 @@ private:
     QString walletPasswordHash;
 
     QVector<AccountInfo> collectedAccountInfo;
-
-    QVector<WalletTransaction> collectedTransactions;
 
     int64_t walletStartTime = 0;
     QString commandLine;

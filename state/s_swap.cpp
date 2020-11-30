@@ -693,10 +693,17 @@ void Swap::onLogout() {
 // Response from requestSwapTrades
 void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error) {
     if (cookie!="SwapInitRequest") {
-        // Watching case. Let's remove the finished trades.
+        // Watching case. Let's remove the finished trades and reviews if we are running non finished.
         for (const wallet::SwapInfo & sw : swapTrades) {
             if (bridge::isSwapDone(sw.stateCmd)) {
                 runningSwaps.remove(sw.swapId);
+            }
+            else {
+                if (!runningSwaps.contains(sw.swapId)) {
+                    AutoswapTask task;
+                    task.setData(sw.swapId, "", 0);
+                    runningSwaps.insert(sw.swapId, task);
+                }
             }
         }
 

@@ -492,35 +492,6 @@ bool TaskTransactionsById::processTask(const QVector<WEvent> & events) {
     return true;
 }
 
-
-// Just a callback, not a real task
-bool TaskAllTransactionsStart::processTask(const QVector<WEvent> &events) {
-    Q_UNUSED(events)
-    wallet713->processAllTransactionsStart();
-    return true;
-}
-
-bool TaskAllTransactionsEnd::processTask(const QVector<WEvent> &events) {
-    Q_UNUSED(events)
-    wallet713->processAllTransactionsEnd();
-    return true;
-}
-
-bool TaskAllTransactions::processTask(const QVector<WEvent> & events) {
-    QString account;
-    int64_t height = -1;
-    QVector<WalletTransaction> trVector;
-
-    parseTransactions(events, // in
-                    account, height, trVector); // out
-
-    wallet713->processAllTransactionsAppend( trVector );
-
-    return true;
-}
-
-
-
 // ------------------------- TaskTransCancel ---------------------------
 
 bool TaskTransCancel::processTask(const QVector<WEvent> & events) {

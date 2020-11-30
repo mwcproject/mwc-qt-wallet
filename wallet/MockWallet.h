@@ -146,9 +146,6 @@ public:
 
     virtual QString getCurrentAccountName()  override {return currentAccount;}
 
-    // Request sync (update_wallet_state) for the
-    virtual void sync(bool showSyncProgress, bool enforce) override { Q_UNUSED(showSyncProgress); Q_UNUSED(enforce); }
-
     // Request Wallet balance update. It is a multistep operation
     // Check signal: onWalletBalanceUpdated
     //          onWalletBalanceProgress
@@ -255,10 +252,6 @@ public:
     // get Extended info for specific transaction
     // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
     virtual void getTransactionById(QString account, int64_t txIdx )  override;
-
-    // Read all transactions for all accounts. Might take time...
-    // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
-    virtual void getAllTransactions() override;
 
     // Get root public key with signed message. Message is optional, can be empty
     // Check Signal: onRootPublicKey( QString rootPubKey, QString message, QString signature )

@@ -48,12 +48,6 @@ NextStateRespond Finalize::execute() {
     if (context->appContext->getActiveWndState() != STATE::FINALIZE)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    // !!!! Note.  Currently we don't need any transaction info. But code works. Just uncomment it and data will be pushed.
-    // will get respond at onAllTransactions
-    // This task consider backgroud and we don't care if it is not finished.
-    // That is why no progress will be printed.
-    //context->wallet->getAllTransactions();
-
     ftBack();
 
     return NextStateRespond(NextStateRespond::RESULT::WAIT_FOR_ACTION);

@@ -238,8 +238,10 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
             lockedNano == acc.lockedByPrevTransaction &&
             spendableNano == acc.currentlySpendable);
 
+    auto timeout = TaskOutputsForAccount::TIMEOUT;
+
     if (!noChange)
-        wallet713->getEventCollector()->addTask( new TaskOutputsForAccount( wallet713, acc.accountName), TaskOutputsForAccount::TIMEOUT, 0 );
+        wallet713->getEventCollector()->addTask( TASK_PRIORITY::TASK_NOW, { QPair<Mwc713Task*,int64_t>(new TaskOutputsForAccount( wallet713, acc.accountName), timeout)}, 0 );
 
     wallet713->infoResults( currentAccountName, height,
                             totalNano, waitingConfNano, waitingFinalizetinNano, lockedNano, spendableNano,

@@ -524,10 +524,6 @@ public:
 
     virtual QString getCurrentAccountName()  = 0;
 
-    // Request sync (update_wallet_state) for the
-    virtual void sync(bool showSyncProgress, bool enforce) = 0;
-
-
     // Request Wallet balance update. It is a multistep operation
     // Check signal: onWalletBalanceUpdated
     //          onWalletBalanceProgress
@@ -631,11 +627,6 @@ public:
     // Cancel transaction
     // Check Signal:  onCancelTransacton
     virtual void cancelTransacton(QString account, int64_t txIdx)  = 0;
-
-    // Read all transactions for all accounts. Might take time...
-    // Check Signal: onAllTransactions( QVector<WalletTransaction> Transactions)
-    virtual void getAllTransactions() = 0;
-
 
     // ----------- HODL
     // https://github.com/mimblewimble/grin/pull/2374
