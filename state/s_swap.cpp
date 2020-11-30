@@ -569,7 +569,8 @@ QVector<QString> Swap::getLockTime( QString secCurrency, int offerExpTime, int r
     int secLockTime = secBlocks * sci.blockIntervalSec * 11 / 10;
 
     int mwcLockTimeInterval = offerExpTime*60 + std::max( mwcLockTime, secLockTime) + offerExpTime*60 + redeemTime*60 + mwcLockTime;
-    int secLockTimeInterval = mwcLockTimeInterval + redeemTime*60 + redeemTime*60 + mwcLockTime + secLockTime;
+    // Add 5 blocks that we reserve because of 'non-final' tx pool feature on BTC side.
+    int secLockTimeInterval = mwcLockTimeInterval + redeemTime*60 + redeemTime*60 + mwcLockTime + secLockTime + sci.blockIntervalSec * 5;
 
     return QVector<QString>{
             util::interval2String(mwcLockTimeInterval, false, 2),
