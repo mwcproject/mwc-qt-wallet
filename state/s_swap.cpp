@@ -691,6 +691,18 @@ void Swap::onLogout() {
     }
 }
 
+void Swap::runSwapIfNeed(const wallet::SwapInfo & sw) {
+    if (runningSwaps.contains(sw.swapId))
+        return;
+
+    bool need2accept = false;
+    if (bridge::isSwapWatingToAccept(sw.stateCmd))
+        need2accept = !context->appContext->isTradeAccepted(sw.swapId);
+
+    if (!bridge::isSwapDone(sw.stateCmd) && !need2accept)
+        runTrade(sw.swapId, sw.stateCmd);
+}
+
 // Response from requestSwapTrades
 void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error) {
     if (cookie!="SwapInitRequest") {
@@ -700,11 +712,7 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
                 runningSwaps.remove(sw.swapId);
             }
             else {
-                if (!runningSwaps.contains(sw.swapId)) {
-                    AutoswapTask task;
-                    task.setData(sw.swapId, "", 0);
-                    runningSwaps.insert(sw.swapId, task);
-                }
+                runSwapIfNeed(sw);
             }
         }
 
@@ -720,14 +728,7 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
     runningSwaps.clear();
 
     for (const wallet::SwapInfo & sw : swapTrades) {
-
-        bool need2accept = false;
-        if (bridge::isSwapWatingToAccept(sw.stateCmd))
-            need2accept = !context->appContext->isTradeAccepted(sw.swapId);
-
-        if (!bridge::isSwapDone(sw.stateCmd) && !need2accept) {
-            runTrade(sw.swapId, sw.stateCmd);
-        }
+        runSwapIfNeed(sw);
     }
 }
 

@@ -174,7 +174,7 @@ private:
     // Request latest fees for the coins
     void updateFeesIsNeeded();
 
-
+    void runSwapIfNeed(const wallet::SwapInfo & sw);
 
 private
 slots:
