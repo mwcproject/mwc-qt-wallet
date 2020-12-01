@@ -25,6 +25,7 @@ namespace bridge {
 class Swap;
 class Wallet;
 class Util;
+class Config;
 }
 
 namespace wnd {
@@ -63,6 +64,7 @@ private:
     bridge::Swap * swap = nullptr;
     bridge::Wallet * wallet = nullptr;
     bridge::Util * util = nullptr;
+    bridge::Config * config = nullptr;
 };
 
 }

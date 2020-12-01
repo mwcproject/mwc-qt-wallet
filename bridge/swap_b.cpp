@@ -200,13 +200,18 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
 
     // [1] - Description in HTML format. Role can be calculated form here as "Selling ..." or "Buying ..."
 
+    double rate = 0.0;
+    if (swap.mwcAmount>0 && swap.secondaryAmount>0)
+        rate = swap.secondaryAmount / swap.mwcAmount;
+
+    QString rateStr = util::trimStrAsDouble( QString::number( rate, 'f', 9 ), 13);
 
     QString reportStr = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">"
                         "<html><body style=\"font-family:'Open Sans'; font-size:medium; font-weight:normal; font-style:normal; color:white; background-color:transparent;\">";
 
 
     reportStr += QString("<p>") + (swap.isSeller ? "Selling" : "Buying") + " <b style=\"color:yellow;\">" + util::trimStrAsDouble(QString::number( swap.mwcAmount, 'f' ), 10) +
-            " MWC</b> for <b style=\"color:yellow;\">" + util::trimStrAsDouble(QString::number( swap.secondaryAmount, 'f' ), 10) + " " + swap.secondaryCurrency + "</b>.</p>";
+            " MWC</b> for <b style=\"color:yellow;\">" + util::trimStrAsDouble(QString::number( swap.secondaryAmount, 'f' ), 10) + " " + swap.secondaryCurrency + "</b>. Rate is <b style=\"color:yellow;\">" + rateStr + "</b></p>";
 
     reportStr += "<p>";
     reportStr += "Required confirmations: <b style=\"color:yellow;\">" + QString::number(swap.mwcConfirmations) +

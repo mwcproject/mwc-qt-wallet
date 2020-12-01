@@ -17,6 +17,7 @@
 #include "../bridge/swap_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/util_b.h"
+#include "../bridge/config_b.h"
 #include "../control_desktop/messagebox.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../dialogs_desktop/w_selectcontact.h"
@@ -31,6 +32,7 @@ NewSwap1::NewSwap1(QWidget *parent) :
     swap = new bridge::Swap(this);
     wallet = new bridge::Wallet(this);
     util = new bridge::Util(this);
+    config = new bridge::Config(this);
 
     connect(wallet, &bridge::Wallet::sgnWalletBalanceUpdated, this, &NewSwap1::onSgnWalletBalanceUpdated,
             Qt::QueuedConnection);
@@ -187,7 +189,18 @@ void NewSwap1::updateSecCurrencyStatus() {
 
     ui->rateLabel->setText("MWC to " + selectedCur + " rate:");
     ui->secAddressEdit->setText("");
-    ui->secAddressEdit->setPlaceholderText(selectedCur + " address to receive the coins");
+    QString addressPlaceholderText = selectedCur + " address to receive the coins";
+    if (selectedCur=="BTC") {
+        //
+        if (config->getNetwork().contains("main", Qt::CaseSensitivity::CaseInsensitive ))
+            addressPlaceholderText = "BTC Pubkey hash address. Leading symbol '1'";
+        else
+            addressPlaceholderText = "BTC testnet Pubkey hash address. Leading symbol 'm' or 'n'";
+    }
+    ui->secAddressEdit->setPlaceholderText(addressPlaceholderText);
+    ui->receiveLabel->setText(selectedCur + " receiving address:");
+
+    ui->secAmountEdit->setPlaceholderText(selectedCur + " amount");
 }
 
 
@@ -281,7 +294,7 @@ void NewSwap1::updateRateValue() {
     double sec = ui->secAmountEdit->text().toDouble(&secOk);
 
     if (mwcOk && secOk && mwc>0.0 && sec>0.0) {
-        ui->swapRateEdit->setText( util->trimStrAsDouble( QString::number( sec/mwc, 'f' ), 10) );
+        ui->swapRateEdit->setText( util->trimStrAsDouble( QString::number( sec/mwc, 'f', 9 ), 13) );
     }
     else {
         ui->swapRateEdit->setText("");
@@ -296,7 +309,7 @@ void NewSwap1::updateSecValue() {
     double rate = ui->swapRateEdit->text().toDouble(&rateOk);
 
     if (mwcOk && rateOk && mwc>0.0 && rate>0.0) {
-        ui->secAmountEdit->setText( util->trimStrAsDouble( QString::number( mwc * rate, 'f' ), 10) );
+        ui->secAmountEdit->setText( util->trimStrAsDouble( QString::number( mwc * rate, 'f', 6 ), 13) );
     }
     else {
         ui->secAmountEdit->setText("");

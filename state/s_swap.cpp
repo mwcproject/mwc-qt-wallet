@@ -546,10 +546,6 @@ QString Swap::getCurrentSecCurrencyFeeUnits() const {
 
 QVector<QString> Swap::getExpirationIntervals() const {
     return QVector<QString>{
-        "10 minutes",           "10",
-        "20 minutes",           "20",
-        "30 minutes",           "30",
-        "45 minutes",           "45",
         "1 hour",               "60",
         "1 hour 30 minutes",    "90",
         "2 hours",              "120",

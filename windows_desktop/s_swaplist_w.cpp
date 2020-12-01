@@ -26,7 +26,7 @@
 namespace wnd {
 
 // Update current state and UI
-void SwapTradeInfo::updateData(QString _stateCmd, QString _status, QString _lastProcessError, int64_t _expirationTime,
+void SwapTradeInfo::updateData(QString _stateCmd, QString _status, QString _lastProcessError, int64_t _expirationTime, int swapTabSelection,
                                bridge::Util * util, bridge::Config * config, bridge::Swap * swap) {
     if (!_stateCmd.isEmpty())
         stateCmd = _stateCmd;
@@ -41,18 +41,26 @@ void SwapTradeInfo::updateData(QString _stateCmd, QString _status, QString _last
 
     Q_ASSERT(util);
 
-    applyState2Ui(util, config, swap);
+    applyState2Ui(util, config, swap, swapTabSelection);
 }
 
-void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, bridge::Swap * swap) {
+void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, bridge::Swap * swap, int swapTabSelection) {
     if (initTimeLable == nullptr)
         return; // All null
 
     int64_t timestampSec = QDateTime::currentSecsSinceEpoch();
 
     Q_ASSERT(initTimeLable);
-    if (initiatedTime>0)
-        initTimeLable->setText( "initiated " + util->interval2String( timestampSec - initiatedTime, false ) + " ago" );
+    if (initiatedTime>0) {
+        if (swapTabSelection==2) {
+            // For completed let's show the date
+            QDateTime iniTime = QDateTime::fromSecsSinceEpoch( initiatedTime, Qt::TimeSpec::UTC);
+            initTimeLable->setText(iniTime.toString("MMM d, yyyy / H:mmap"));
+        }
+        else {
+            initTimeLable->setText("initiated " + util->interval2String(timestampSec - initiatedTime, false) + " ago");
+        }
+    }
     else
         initTimeLable->setText("");
 
@@ -379,14 +387,14 @@ void SwapList::updateTradeListData() {
 
         ui->swapsTable->addItem(itm);
 
-        sw.applyState2Ui(util, config, swap);
+        sw.applyState2Ui(util, config, swap, swapTabSelection);
     }
     ui->swapsTable->apply();
 
     // Updating the counters for the tabs
     ui->incomingSwaps->setText("Incoming Swaps (" + QString::number(incSwTrades) + ")");
     ui->outgoingSwaps->setText("Outgoing Swaps (" + QString::number(outSwTrades) + ")");
-    ui->completedSwaps->setText("Completed Swaps (" + QString::number(compSwTrades) + ")");
+    ui->completedSwaps->setText("Completed / Cancelled (" + QString::number(compSwTrades) + ")");
 }
 
 void SwapList::richButtonPressed(control::RichButton *button, QString cookie) {
@@ -525,8 +533,9 @@ void SwapList::sgnSwapTradeStatusUpdated(QString swapId, QString stateCmd, QStri
         auto &sw = swapList[i];
         if (sw.tradeId == swapId) {
             // Updating this record
-            sw.updateData(stateCmd, currentAction.isEmpty() ? currentState : currentAction, lastProcessError, expirationTime,
-                    util, config, swap);
+            sw.updateData(stateCmd, currentAction.isEmpty() ? currentState : currentAction,
+                          lastProcessError, expirationTime, swapTabSelection,
+                          util, config, swap);
             break;
         }
     }

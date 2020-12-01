@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>846</width>
-    <height>606</height>
+    <width>947</width>
+    <height>734</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,7,1">
+  <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,7,1">
    <property name="topMargin">
     <number>80</number>
    </property>
@@ -96,14 +96,14 @@
       </spacer>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,1,0,1">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,2,0,1,2">
        <property name="spacing">
         <number>40</number>
        </property>
        <item>
         <widget class="control::MwcLabelNormal" name="label_2">
          <property name="text">
-          <string>Swap</string>
+          <string>Swap MWC</string>
          </property>
         </widget>
        </item>
@@ -134,14 +134,42 @@
           <number>32</number>
          </property>
          <property name="placeholderText">
-          <string>amount</string>
+          <string>MWC amount</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="control::MwcLabelNormal" name="label">
          <property name="text">
-          <string>MWC for</string>
+          <string>for</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="control::MwcComboBox" name="secCurrencyCombo">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>180</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Currency that you want to swap with</string>
          </property>
         </widget>
        </item>
@@ -172,51 +200,7 @@
           <number>32</number>
          </property>
          <property name="placeholderText">
-          <string>amount</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>3</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="control::MwcComboBox" name="secCurrencyCombo">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>50</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>120</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::StrongFocus</enum>
-         </property>
-         <property name="toolTip">
-          <string>Currency that you want to swap with</string>
+          <string>XXX amount</string>
          </property>
         </widget>
        </item>
@@ -239,18 +223,31 @@
       </spacer>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
-       <property name="spacing">
-        <number>25</number>
+      <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
+       <property name="leftMargin">
+        <number>0</number>
        </property>
-       <item>
+       <property name="horizontalSpacing">
+        <number>30</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>0</number>
+       </property>
+       <item row="2" column="0">
+        <widget class="QLabel" name="receiveLabel">
+         <property name="text">
+          <string>XXX receiving address:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
         <widget class="control::MwcLabelNormal" name="rateLabel">
          <property name="text">
           <string>MWC to BTC rate:</string>
          </property>
         </widget>
        </item>
-       <item>
+       <item row="0" column="1">
         <widget class="control::MwcLineEditNormal" name="swapRateEdit">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -284,51 +281,51 @@
          </property>
         </widget>
        </item>
+       <item row="2" column="1">
+        <widget class="control::MwcLineEditNormal" name="secAddressEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Address to receive the coins</string>
+         </property>
+         <property name="placeholderText">
+          <string>XXXX</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <spacer name="verticalSpacer_8">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>38</width>
+           <height>35</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
-     </item>
-     <item>
-      <spacer name="verticalSpacer_8">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>38</width>
-         <height>35</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="control::MwcLineEditNormal" name="secAddressEdit">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>40</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>40</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Address to receive the coins</string>
-       </property>
-       <property name="placeholderText">
-        <string>BTC address to receive the coins</string>
-       </property>
-      </widget>
      </item>
      <item>
       <spacer name="verticalSpacer_7">
@@ -785,8 +782,8 @@
  <tabstops>
   <tabstop>accountComboBox</tabstop>
   <tabstop>mwcAmountEdit</tabstop>
-  <tabstop>secAmountEdit</tabstop>
   <tabstop>secCurrencyCombo</tabstop>
+  <tabstop>secAmountEdit</tabstop>
   <tabstop>swapRateEdit</tabstop>
   <tabstop>secAddressEdit</tabstop>
   <tabstop>lockMwcFirstCheck</tabstop>

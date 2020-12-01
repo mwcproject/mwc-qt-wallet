@@ -150,7 +150,7 @@
         <string>Show accepted swap trades</string>
        </property>
        <property name="text">
-        <string>Completed Swaps</string>
+        <string>Completed / Cancelled</string>
        </property>
        <property name="checkable">
         <bool>true</bool>

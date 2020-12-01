@@ -88,9 +88,9 @@ struct SwapTradeInfo {
     }
 
     // Update current state and UI
-    void updateData(QString stateCmd, QString status, QString lastProcessError, int64_t expirationTime, bridge::Util * util, bridge::Config * config, bridge::Swap * swap);
+    void updateData(QString stateCmd, QString status, QString lastProcessError, int64_t expirationTime, int swapTabSelection, bridge::Util * util, bridge::Config * config, bridge::Swap * swap);
 
-    void applyState2Ui(bridge::Util * util, bridge::Config * config, bridge::Swap * swap);
+    void applyState2Ui(bridge::Util * util, bridge::Config * config, bridge::Swap * swap, int swapTabSelection);
 };
 
 class SwapList : public core::NavWnd, control::RichButtonPressCallback {

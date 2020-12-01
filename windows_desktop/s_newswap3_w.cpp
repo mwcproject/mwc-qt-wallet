@@ -82,12 +82,22 @@ void NewSwap3::updateSwapReview() {
     // <Interval is string> <Value in minutes>
     QVector<QString> expIntevals = swap->getExpirationIntervals();
 
+    QString mwcAmount = swap->getMwc2Trade();
+    QString secAmount = swap->getSec2Trade();
+
+    double rate = 0.0;
+    double mwc = mwcAmount.toDouble();
+    double sec = secAmount.toDouble();
+    if (mwc>0 && sec>0)
+        rate = sec / mwc;
+
+    QString rateStr = util->trimStrAsDouble( QString::number( rate, 'f', 9 ), 13);
 
     QString reportStr = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">"
                         "<html><body style=\"font-family:'Open Sans'; font-size:medium; font-weight:normal; font-style:normal; color:white; background-color:transparent;\">";
 
     reportStr += "<p>";
-    reportStr += "Selling <b style=\"color:yellow;\">" + swap->getMwc2Trade() + " MWC</b> for <b style=\"color:yellow;\">" + swap->getSec2Trade() + " " + secCur + "</b>.</p>";
+    reportStr += "Selling <b style=\"color:yellow;\">" + mwcAmount + " MWC</b> for <b style=\"color:yellow;\">" + secAmount + " " + secCur + "</b>. Rate is <b style=\"color:yellow;\">" + rateStr + "</b></p>";
 
     reportStr += "<p>";
     reportStr += "Required lock confirmations: <b style=\"color:yellow;\">" + QString::number(mwcBlocks) +
