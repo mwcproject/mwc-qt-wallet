@@ -136,7 +136,7 @@
       <widget class="control::MwcToolButtonUnderscore" name="completedSwaps">
        <property name="minimumSize">
         <size>
-         <width>180</width>
+         <width>220</width>
          <height>35</height>
         </size>
        </property>

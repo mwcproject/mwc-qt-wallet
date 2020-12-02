@@ -612,7 +612,7 @@ bool Swap::isSwapDone(QString stateCmd) {
 }
 
 
-static QSet<QString> nonCancelableStates{ "SellerWaitingForBuyerToRedeemMwc", "SellerRedeemSecondaryCurrency", "SellerWaitingForRedeemConfirmations","SellerSwapComplete",
+static QSet<QString> nonCancelableStates{ "SellerSendingInitRedeemMessage", "SellerWaitingForBuyerToRedeemMwc", "SellerRedeemSecondaryCurrency", "SellerWaitingForRedeemConfirmations","SellerSwapComplete",
                                                 "SellerWaitingForRefundHeight", "SellerPostingRefundSlate", "SellerWaitingForRefundConfirmations", "SellerCancelledRefunded", "SellerCancelled",
                                           "BuyerRedeemMwc", "BuyerWaitForRedeemMwcConfirmations", "BuyerSwapComplete",
                                                 "BuyerWaitingForRefundTime", "BuyerPostingRefundForSecondary", "BuyerWaitingForRefundConfirmations", "BuyerCancelledRefunded", "BuyerCancelled" };
