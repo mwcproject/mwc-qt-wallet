@@ -54,7 +54,7 @@ void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, 
     if (initiatedTime>0) {
         if (swapTabSelection==2) {
             // For completed let's show the date
-            QDateTime iniTime = QDateTime::fromSecsSinceEpoch( initiatedTime, Qt::TimeSpec::UTC);
+            QDateTime iniTime = QDateTime::fromSecsSinceEpoch( initiatedTime, Qt::TimeSpec::LocalTime);
             initTimeLable->setText(iniTime.toString("MMM d, yyyy / H:mmap"));
         }
         else {

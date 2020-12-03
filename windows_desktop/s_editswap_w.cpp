@@ -100,6 +100,15 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
     else
         ui->secondaryAddressLabel->setText(secCurrency + " address for the refund in case of trade cancellation");
 
+    QString addressPlaceholderText = secCurrency + " address";
+    if (secCurrency=="BTC") {
+        if (config->getNetwork().contains("main", Qt::CaseSensitivity::CaseInsensitive ))
+            addressPlaceholderText = "BTC Pubkey hash address. Leading symbol '1'";
+        else
+            addressPlaceholderText = "BTC testnet Pubkey hash address. Leading symbol 'm' or 'n'";
+    }
+    ui->redeemAddressEdit->setPlaceholderText(addressPlaceholderText);
+
     ui->secTransFeeLabel->setText(secCurrency + " transaction fee");
     ui->updateBtn->setText("Update " + secCurrency + " transaction details");
     ui->secFeeUnitsLabel->setText(secCurrencyFeeUnits);
