@@ -298,6 +298,12 @@ bool AppContext::loadDataImpl() {
         in >> notificationWindowsEnabled;
     }
 
+#ifdef Q_OS_WIN
+    // Disable in windows because notification bring the whole QT wallet on the top of other windows.
+    // Notications overlap other windows.
+    notificationWindowsEnabled = false;
+#endif
+
     if (id>=0x479C) {
         in >> swapTabSselection;
     }
