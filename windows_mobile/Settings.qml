@@ -11,6 +11,11 @@ Item {
         id: stateMachine
     }
 
+    function resyncCallback(ret) {
+        if (ret) {
+            stateMachine.activateResyncState()
+        }
+    }
 
     Button {
         id: button_wallet_configuration
@@ -116,7 +121,8 @@ Item {
             }
         }
         onClicked: {
-            console.log("Re-sync with Full Node")
+            messagebox.open("Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue?",
+                                        true, "No", "Yes", "", "", "", resyncCallback)
         }
     }
 }

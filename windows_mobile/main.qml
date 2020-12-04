@@ -64,8 +64,13 @@ Window {
 
     function updateInitParams(newParams) {
         initParams = newParams
-        if (currentState === 2) {
-            newInstanceItem.updateCurrentStep()
+        if (currentState === 2 || currentState === 18) {
+            progressWndItem.visible = false
+            const params = JSON.parse(initParams)
+            if (params.currentStep)
+                newInstanceItem.updateCurrentStep(params)
+            else
+                progressWndItem.init(params.callerId,params.msgProgress)
         }
     }
 
@@ -258,6 +263,12 @@ Window {
         SendConfirmation {
             id: sendConfirmationItem
             anchors.verticalCenter: parent.verticalCenter
+        }
+
+        ProgressWnd {
+            id: progressWndItem
+            anchors.fill: parent
+            visible: currentState === 2 || currentState === 18
         }
     }
 
