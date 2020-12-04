@@ -67,7 +67,7 @@ Item {
             }
         }
         onClicked: {
-            console.log("Listeners")
+            stateMachine.setActionWindow(10)    // Wallet Listeners Page
         }
     }
 

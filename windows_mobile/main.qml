@@ -260,15 +260,21 @@ Window {
             visible: currentState === 17
         }
 
-        SendConfirmation {
-            id: sendConfirmationItem
-            anchors.verticalCenter: parent.verticalCenter
+        Listeners {
+            id: listenersItem
+            anchors.fill: parent
+            visible: currentState === 10
         }
 
         ProgressWnd {
             id: progressWndItem
             anchors.fill: parent
             visible: currentState === 2 || currentState === 18
+        }
+
+        SendConfirmation {
+            id: sendConfirmationItem
+            anchors.verticalCenter: parent.verticalCenter
         }
     }
 
