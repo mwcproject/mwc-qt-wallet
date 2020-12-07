@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>995</width>
-    <height>848</height>
+    <width>957</width>
+    <height>844</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,0,0,0,0,0,0,0,0,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,0,0,0,0,0,0,0,0,0,0,0,0">
    <property name="spacing">
     <number>3</number>
    </property>
@@ -271,7 +271,7 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>80</width>
+           <width>120</width>
            <height>40</height>
           </size>
          </property>
@@ -356,6 +356,32 @@
       </layout>
      </item>
     </layout>
+   </item>
+   <item>
+    <spacer name="accept_verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="control::MwcLabelNormal" name="accept_note">
+     <property name="text">
+      <string>XXX sending address will be provided later when this swap trade will be started.</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,3,1">
@@ -676,6 +702,11 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
@@ -695,11 +726,6 @@
    <extends>QFrame</extends>
    <header>control_desktop/MwcFrameWithBorder.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

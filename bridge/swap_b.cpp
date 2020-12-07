@@ -694,7 +694,7 @@ QString Swap::getSecondaryFee(QString secCurrency) {
     if (fee<=0.0)
         return "";
 
-    return util::trimStrAsDouble(QString::number( fee, 'f' ), 10);
+    return util::trimStrAsDouble(QString::number( fee, 'f' ), 5);
 }
 
 // Tweak the swap tarde state. ONLY for dev help usage.

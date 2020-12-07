@@ -101,9 +101,9 @@ void NewSwap1::on_nextButton_clicked() {
     bool mwcOk = false;
     bool secOk = false;
 
-    QString mwcAmount = ui->mwcAmountEdit->text();
+    QString mwcAmount = ui->mwcAmountEdit->text().trimmed();
     double mwc = mwcAmount.toDouble(&mwcOk);
-    QString secAmount = ui->secAmountEdit->text();
+    QString secAmount = ui->secAmountEdit->text().trimmed();
     double sec = secAmount.toDouble(&secOk);
 
     if ( !mwcOk || mwc<=0.0 ) {
@@ -124,14 +124,14 @@ void NewSwap1::on_nextButton_clicked() {
         return;
     }
 
-    QString secAddress = ui->secAddressEdit->text();
+    QString secAddress = ui->secAddressEdit->text().trimmed();
     if (secAddress.isEmpty()) {
         control::MessageBox::messageText(this, "Incorrect Input", "Please specify a "+ secCurrency +" address to redeem the coins");
         ui->secAddressEdit->setFocus();
         return;
     }
 
-    QString sendTo = ui->sendAddressEdit->text();
+    QString sendTo = ui->sendAddressEdit->text().trimmed();
     {
         QString valRes = util->validateMwc713Str(sendTo);
         if (!valRes.isEmpty()) {
@@ -193,9 +193,9 @@ void NewSwap1::updateSecCurrencyStatus() {
     if (selectedCur=="BTC") {
         //
         if (config->getNetwork().contains("main", Qt::CaseSensitivity::CaseInsensitive ))
-            addressPlaceholderText = "BTC Pubkey hash address. Leading symbol '1'";
+            addressPlaceholderText = "BTC Legacy address. Leading symbol '1'";
         else
-            addressPlaceholderText = "BTC testnet Pubkey hash address. Leading symbol 'm' or 'n'";
+            addressPlaceholderText = "BTC testnet Legacy address. Leading symbol 'm' or 'n'";
     }
     ui->secAddressEdit->setPlaceholderText(addressPlaceholderText);
     ui->receiveLabel->setText(selectedCur + " receiving address:");

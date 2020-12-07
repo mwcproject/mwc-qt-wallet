@@ -103,9 +103,9 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
     QString addressPlaceholderText = secCurrency + " address";
     if (secCurrency=="BTC") {
         if (config->getNetwork().contains("main", Qt::CaseSensitivity::CaseInsensitive ))
-            addressPlaceholderText = "BTC Pubkey hash address. Leading symbol '1'";
+            addressPlaceholderText = "BTC Legacy address. Leading symbol '1'";
         else
-            addressPlaceholderText = "BTC testnet Pubkey hash address. Leading symbol 'm' or 'n'";
+            addressPlaceholderText = "BTC testnet Legacy address. Leading symbol 'm' or 'n'";
     }
     ui->redeemAddressEdit->setPlaceholderText(addressPlaceholderText);
 
@@ -125,8 +125,12 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
         secondaryFee = "";
         electrumX = "";
         ui->secondaryFeeEdit->setText(swap->getSecondaryFee(secondaryCurrency));
+        QString comment = ui->accept_note->text();
+        ui->accept_note->setText( secondaryCurrency + comment.mid(3) );
     } else {
         ui->secondaryFeeEdit->setText(secondaryFee);
+        ui->accept_verticalSpacer->setGeometry(QRect(0,0,1,1));
+        ui->accept_note->hide();
     }
 
     ui->redeemAddressEdit->setText(redeemAddress);
@@ -136,9 +140,9 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
 }
 
 bool EditSwap::isCanUpdate() const {
-    return !(redeemAddress == ui->redeemAddressEdit->text() &&
-             secondaryFee == ui->secondaryFeeEdit->text() &&
-             electrumX == ui->electrumXEdit->text());
+    return !(redeemAddress == ui->redeemAddressEdit->text().trimmed() &&
+             secondaryFee == ui->secondaryFeeEdit->text().trimmed() &&
+             electrumX == ui->electrumXEdit->text().trimmed());
 }
 
 void EditSwap::updateButtons(bool first_call) {
@@ -205,13 +209,13 @@ void EditSwap::on_tradeDetailsBtn_clicked() {
 
 // Validate the data and call for update. Return number of update calls.
 int EditSwap::requestUpdateData() {
-    if (ui->redeemAddressEdit->text().isEmpty()) {
+    if (ui->redeemAddressEdit->text().trimmed().isEmpty()) {
         control::MessageBox::messageText(this, "Input", QString("Please define the ") + secondaryCurrency +
                                                         " address to receive the coins.");
         return -1;
     }
 
-    QString fee = ui->secondaryFeeEdit->text();
+    QString fee = ui->secondaryFeeEdit->text().trimmed();
     bool ok = false;
     double feeDbl = fee.toDouble(&ok);
     if (fee.isEmpty() || !ok || feeDbl <= 0.0) {
@@ -222,16 +226,16 @@ int EditSwap::requestUpdateData() {
     ui->progress->show();
     int res = 0;
 
-    if (redeemAddress != ui->redeemAddressEdit->text()) {
-        swap->updateSecondaryAddress(swapId, ui->redeemAddressEdit->text());
+    if (redeemAddress != ui->redeemAddressEdit->text().trimmed()) {
+        swap->updateSecondaryAddress(swapId, ui->redeemAddressEdit->text().trimmed());
         res++;
     }
-    if (secondaryFee != ui->secondaryFeeEdit->text()) {
+    if (secondaryFee != ui->secondaryFeeEdit->text().trimmed()) {
         swap->updateSecondaryFee(swapId, feeDbl);
         res++;
     }
-    if (electrumX != ui->electrumXEdit->text()) {
-        swap->updateElectrumX(swapId, ui->electrumXEdit->text());
+    if (electrumX != ui->electrumXEdit->text().trimmed()) {
+        swap->updateElectrumX(swapId, ui->electrumXEdit->text().trimmed());
         res++;
     }
     return res;

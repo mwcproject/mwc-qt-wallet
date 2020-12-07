@@ -36,7 +36,9 @@ NewSwap2::NewSwap2(QWidget *parent) :
 
     QString secCurrency = swap->getCurrentSecCurrency();
     ui->secTransFeeLabel->setText(secCurrency + " transaction fee");
-    ui->secTransFeeEdit->setText( util->trimStrAsDouble( QString::number( swap->getSecTransactionFee(), 'f'), 10 ) );
+    double fee = swap->getSecTransactionFee();
+    if (fee>0)
+        ui->secTransFeeEdit->setText( util->trimStrAsDouble( QString::number( fee, 'f'), 5 ) );
     ui->secFeeUnitsLabel->setText(swap->getCurrentSecCurrencyFeeUnits());
     ui->secRedeemLabel->setText(secCurrency + " redeem time");
 
@@ -121,7 +123,7 @@ void NewSwap2::on_reviewButton_clicked() {
         return;
     }
 
-    QString electrumXurl = ui->electrumXEdit->text();
+    QString electrumXurl = ui->electrumXEdit->text().trimmed();
 
     ui->progress_2->show();
     swap->applyNewTrade2Params(secCurrency, offerExpTime, redeemTime, mwcBlocks, secBlocks, secTxFee, electrumXurl);
