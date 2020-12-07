@@ -157,7 +157,7 @@ void SendOnline::onSgnShowSendResult( bool success, QString message ) {
         return;
     }
 
-    control::MessageBox::messageText( this, "Send request failed", message );
+    control::MessageBox::messageText( this, "Send request has failed", message );
 }
 
 void SendOnline::on_sendEdit_textChanged(const QString & address)

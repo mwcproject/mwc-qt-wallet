@@ -1458,7 +1458,7 @@ void MWC713::setCheckResult(bool ok, QString errors) {
     if (ok)
         appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Account re-sync was finished successfully.");
     else
-        appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Account re-sync was failed.");
+        appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Account re-sync has failed.");
 
     logger::logEmit( "MWC713", "onCheckResult", "ok="+QString::number(ok) );
     emit onCheckResult(ok, errors );
