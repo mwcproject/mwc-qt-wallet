@@ -180,6 +180,8 @@ signals:
     // [6] - communication method: mwcmqc|tor
     // [7] - Communication address
     // [8] - private ElectrumX uri
+    // [9] - MWC amount
+    // [10] - Secondary currency amount
     // ------ Error response
     // [0] - swapId
     // ---------------

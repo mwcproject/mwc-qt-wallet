@@ -84,8 +84,8 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
         return;
     }
 
-    Q_ASSERT(swapInfo.size() == 9);
-    if (swapInfo.size() != 9 || swapInfo[0] != swapId)
+    Q_ASSERT(swapInfo.size() == 11);
+    if (swapInfo.size() != 11 || swapInfo[0] != swapId)
         return; // Invalid message or invalid destination
 
     QString secCurrency = swapInfo[3];
@@ -127,6 +127,24 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
         ui->secondaryFeeEdit->setText(swap->getSecondaryFee(secondaryCurrency));
         QString comment = ui->accept_note->text();
         ui->accept_note->setText( secondaryCurrency + comment.mid(3) );
+
+        double mwcLimit = 0.1;
+        double secCurrencyLimit = 0.001;
+        if (!config->getNetwork().toLower().contains("main")) {
+            mwcLimit /= 10.0;
+            secCurrencyLimit /= 10.0;
+        }
+
+        double mwcAmount = swapInfo[9].toDouble();
+        double secAmount = swapInfo[10].toDouble();
+
+        if (mwcAmount < mwcLimit || secAmount < secCurrencyLimit ) {
+            // Normally it should never happpens. Just show the message in case if somebody will messup.
+            control::MessageBox::messageText(this, "WARNING", "This Swap offer has an unreasonable small amounts to trade. Because of that you can't accept it. We recommend you to cancel this offer.");
+            swap->pageTradeList();
+            return;
+        }
+
     } else {
         ui->secondaryFeeEdit->setText(secondaryFee);
         ui->accept_verticalSpacer->setGeometry(QRect(0,0,1,1));

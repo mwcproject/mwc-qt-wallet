@@ -267,6 +267,10 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
     swapInfo.push_back(swap.communicationAddress);
     // [8] - private ElectrumX uri
     swapInfo.push_back(swap.electrumNodeUri);
+    // [9] - MWC amount
+    swapInfo.push_back( QString::number(swap.mwcAmount) );
+    // [10] - Secondary currency amount
+    swapInfo.push_back( QString::number(swap.secondaryAmount) );
 
     emit sgnRequestTradeDetails( swapInfo, convertExecutionPlan(executionPlan), currentAction, convertTradeJournal(tradeJournal), errMsg );
 }
