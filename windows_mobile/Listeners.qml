@@ -31,7 +31,7 @@ Item {
             text_tor_address_index.text = idx >= 0 ? "Address Index: " + Number(idx).toString() : ""
         }
 
-        onSgnListenerStartStop: {
+        onSgnListenerStartStop: (mqs, _keybase, tor) => {
             if (mqs)
                 mqsInProgress = false
             if (tor)

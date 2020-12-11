@@ -9,6 +9,7 @@ import UtilBridge 1.0
 import Clipboard 1.0
 
 Item {
+    property string proofAddr
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
@@ -55,6 +56,10 @@ Item {
             updateStatus()
         }
 
+        onSgnFileProofAddress: (proofAddress) => {
+            proofAddr = proofAddress
+        }
+
         onSgnUpdateListenerStatus: {
             updateStatus()
         }
@@ -67,6 +72,7 @@ Item {
                 text_http.text = qsTr("Https")
             }
             updateAccountList()
+            wallet.requestFileProofAddress()
             updateStatus()
         }
     }
@@ -349,7 +355,7 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("Copy Address")
+                text: qsTr("MWCMQ")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
@@ -390,14 +396,41 @@ Item {
         }
     }
 
+    Button {
+        id: button_proof
+        width: parent.width / 2 - dp(40)
+        height: dp(72)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(30)
+        anchors.top: button_mwcmq.bottom
+        anchors.topMargin: dp(20)
+        background: Rectangle {
+            color: "#00000000"
+            radius: dp(5)
+            border.color: "white"
+            border.width: dp(2)
+            Text {
+                text: qsTr("Proof Address")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pixelSize: dp(18)
+                color: "white"
+            }
+        }
+        onClicked: {
+            clipboard.text = proofAddr
+            notification.text = "Address copied to the clipboard"
+            notification.open()
+        }
+    }
+
     Text {
         id: label_copy_clipboard
         color: "#BF84FF"
         text: "(Copies address to clipboard)"
         horizontalAlignment: Text.AlignHCenter
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: button_mwcmq.bottom
-        anchors.topMargin: dp(12)
+        anchors.horizontalCenter: button_tor.horizontalCenter
+        anchors.verticalCenter: button_proof.verticalCenter
         font.pixelSize: dp(13)
     }
 
@@ -407,7 +440,7 @@ Item {
         text: qsTr("Offline Method")
         anchors.left: parent.left
         anchors.leftMargin: dp(36)
-        anchors.top: label_copy_clipboard.bottom
+        anchors.top: button_proof.bottom
         anchors.topMargin: dp(35)
         font.pixelSize: dp(14)
     }
@@ -438,6 +471,16 @@ Item {
         }
     }
 
+    Text {
+        id: text_file
+        color: "#BF84FF"
+        text: qsTr("(sign transaction)")
+        anchors.horizontalCenter: button_tor.horizontalCenter
+        anchors.verticalCenter: button_file.verticalCenter
+        font.pixelSize: dp(13)
+        visible: !rect_progress.visible
+    }
+
     Rectangle {
         id: rect_progress
         width: dp(60)
@@ -450,16 +493,6 @@ Item {
             id: animation
             source: "../img/loading.gif"
         }
-    }
-
-    Text {
-        id: text_file
-        color: "#BF84FF"
-        text: qsTr("(sign transaction)")
-        anchors.horizontalCenter: button_file.horizontalCenter
-        anchors.top: button_file.bottom
-        anchors.topMargin: dp(12)
-        font.pixelSize: dp(13)
     }
 
     FileDialog {
