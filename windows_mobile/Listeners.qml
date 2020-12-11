@@ -17,7 +17,7 @@ Item {
     Connections {
         target: wallet
 
-        onSgnUpdateListenerStatus: (mwcOnline, _keybaseOnline, tor) => {
+        onSgnUpdateListenerStatus: {
             updateStatuses()
         }
 
@@ -31,7 +31,7 @@ Item {
             text_tor_address_index.text = idx >= 0 ? "Address Index: " + Number(idx).toString() : ""
         }
 
-        onSgnListenerStartStop: (mqs, _keybase, tor) => {
+        onSgnListenerStartStop: {
             if (mqs)
                 mqsInProgress = false
             if (tor)

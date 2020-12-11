@@ -91,7 +91,6 @@ Item {
 
     function updateStatus() {
         image_mwcmq.source = wallet.getMqsListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
-        image_keybase.source = wallet.getKeybaseListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
         image_http.source = wallet.getHttpListeningStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
         image_tor.source = wallet.getTorListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
     }
@@ -122,39 +121,6 @@ Item {
             id: text_mwcmq
             text: qsTr("MWCMQ")
             anchors.left: image_mwcmq.right
-            anchors.leftMargin: dp(10)
-            anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: dp(17)
-            color: "white"
-        }
-    }
-
-    Rectangle {
-        id: rect_keybase
-        width: dp(150)
-        height: dp(40)
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: dp(-250)
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: dp(100)
-        border.color: "white"
-        border.width: dp(2)
-        radius: dp(50)
-        color: "#00000000"
-
-        Image {
-            id: image_keybase
-            anchors.left: parent.left
-            anchors.leftMargin: dp(10)
-            anchors.verticalCenter: parent.verticalCenter
-            width: dp(20)
-            height: dp(20)
-        }
-
-        Text {
-            id: text_keybase
-            text: qsTr("Keybase")
-            anchors.left: image_keybase.right
             anchors.leftMargin: dp(10)
             anchors.verticalCenter: parent.verticalCenter
             font.pixelSize: dp(17)
@@ -199,8 +165,8 @@ Item {
         id: rect_http
         width: dp(150)
         height: dp(40)
-        anchors.top: rect_mwcmq.bottom
-        anchors.topMargin: dp(20)
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: dp(-250)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: dp(100)
         border.color: "white"

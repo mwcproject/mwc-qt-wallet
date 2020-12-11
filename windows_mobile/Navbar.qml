@@ -136,22 +136,13 @@ Item {
 
     function updateListenerBtn() {
         const mqsStatus = wallet.getMqsListenerStatus()
-        const keybaseStatus = wallet.getKeybaseListenerStatus()
         const torStatus = wallet.getTorListenerStatus()
         const httpListenerStatus = wallet.getHttpListeningStatus()
 
-        console.log("updateListenerBtn: mqsStatus =", mqsStatus, "keybaseStatus =", keybaseStatus, "torStatus =", torStatus, "httpListenerStatus =", httpListenerStatus)
-
-        let listening = mqsStatus | keybaseStatus | torStatus
+        let listening = mqsStatus | torStatus
         let listenerNames = ""
         if (mqsStatus)
             listenerNames +=  "MWC MQS"
-
-        if (keybaseStatus) {
-            if (listenerNames !== "")
-                listenerNames += ", "
-            listenerNames += "Keybase"
-        }
 
         if (torStatus) {
             if (listenerNames !== "")

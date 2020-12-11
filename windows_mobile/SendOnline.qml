@@ -128,7 +128,7 @@ Item {
             }
         }
         onTextEdited: {
-            text_formats.text = "FORMATS:  [mwcmqs://]<mqs_address>  keybase://<name>  http(s)://<host>:<port>"
+            text_formats.text = "FORMATS:  [mwcmqs://]<mqs_address>  http(s)://<host>:<port>"
         }
         onTextChanged: {
             const addrType = util.verifyAddress(textfield_send_to.text)
@@ -167,7 +167,7 @@ Item {
     Text {
         id: text_formats
         color: "#b3ffffff"
-        text: "FORMATS:  [mwcmqs://]<mqs_address>  keybase://<name>  http(s)://<host>:<port>"
+        text: "FORMATS:  [mwcmqs://]<mqs_address>  http(s)://<host>:<port>"
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         anchors.left: parent.left
