@@ -102,13 +102,13 @@ void Wallet::onListeningStartResults( bool mqTry, bool tor,
                               QStringList errorMessages, bool initialStart ) {
     Q_UNUSED(errorMessages)
     Q_UNUSED(initialStart)
-    emit sgnListenerStartStop(mqTry, false, tor);
+    emit sgnListenerStartStop(mqTry, tor);
 }
 
 void Wallet::onListeningStopResult(bool mqTry, bool tor,
                            QStringList errorMessages ) {
     Q_UNUSED(errorMessages)
-    emit sgnListenerStartStop(mqTry, false, tor);
+    emit sgnListenerStartStop(mqTry, tor);
 }
 
 

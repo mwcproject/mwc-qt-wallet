@@ -73,8 +73,7 @@ void Listening::onSgnHttpListeningStatus(bool listening, QString additionalInfo)
 }
 
 // _keybase is absolete
-void Listening::onSgnListenerStartStop(bool mqs, bool _keybase, bool tor) {
-    Q_UNUSED(_keybase);
+void Listening::onSgnListenerStartStop(bool mqs, bool tor) {
     if (mqs)
         mqsInProgress = false;
     if (tor)
