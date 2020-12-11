@@ -243,6 +243,7 @@ void MobileWndManager::pageFileTransaction(QString pageTitle, QString callerId,
     obj["amount"] = util::nano2one(transInfo.amount);
     obj["transactionId"] = transInfo.transactionId;
     obj["lockHeight"] = transInfo.lock_height > nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-";
+    obj["receiverAddress"] = transInfo.receiverAddress.isEmpty() ? "-" : transInfo.receiverAddress;
     obj["message"] = transInfo.message;
     obj["isFinalize"] = processButtonName == "Finalize";
 
