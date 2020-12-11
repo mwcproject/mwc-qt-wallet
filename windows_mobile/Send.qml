@@ -3,8 +3,10 @@ import QtQuick.Window 2.0
 import QtQuick.Controls 2.13
 import WalletBridge 1.0
 import SendBridge 1.0
+import ConfigBridge 1.0
 
 Item {
+    property bool showGenProofWarning: false
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
@@ -14,6 +16,10 @@ Item {
 
     SendBridge {
         id: send
+    }
+
+    ConfigBridge {
+        id: config
     }
 
     Connections {
@@ -38,6 +44,15 @@ Item {
         }
     }
 
+    function generateProofCallback(ok) {
+        if (ok) {
+            showGenProofWarning = true
+            config.setGenerateProof(true)
+        } else {
+            checkbox_tx_proof.checked = false
+        }
+    }
+
     onVisibleChanged: {
         if (visible) {
             rect_progress.visible = true
@@ -47,6 +62,7 @@ Item {
             rect_file.color = "#00000000"
             text_file_selected.visible = false
             textfield_amount.text = ""
+            checkbox_tx_proof.checked = config.getGenerateProof()
         }
     }
 
@@ -314,11 +330,53 @@ Item {
         }
     }
 
+    CheckBox {
+        id: checkbox_tx_proof
+        text: qsTr("Generate Transaction Proof")
+        font.pixelSize: dp(17)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(30)
+        anchors.top: textfield_amount.bottom
+        anchors.topMargin: dp(20)
+
+        indicator: Rectangle {
+            implicitWidth: dp(20)
+            implicitHeight: dp(20)
+            x: checkbox_tx_proof.leftPadding
+            y: parent.height / 2 - height / 2
+
+            Image {
+                width: dp(20)
+                height: dp(20)
+                anchors.fill: parent
+                fillMode: Image.PreserveAspectFit
+                source: checkbox_tx_proof.checked ? "../img/CheckOn@2x.svg" : "../img/CheckOff@2x.svg"
+            }
+        }
+
+        contentItem: Text {
+            text: checkbox_tx_proof.text
+            font: checkbox_tx_proof.font
+            color: "white"
+            verticalAlignment: Text.AlignVCenter
+            anchors.left: checkbox_tx_proof.indicator.right
+            anchors.leftMargin: dp(25)
+        }
+
+        onCheckStateChanged: {
+             if (checkbox_tx_proof.checked && !showGenProofWarning) {
+                 messagebox.open("Warning", "Transaction proof generation requires receiver wallet version 1.0.23 or higher.\n\nDo you want to generate proofs for all your send transactions?", true, "Cancel", "Generate proofs", "", "", "", generateProofCallback)
+             } else {
+                 config.setGenerateProof(checkbox_tx_proof.checked)
+             }
+        }
+    }
+
     Rectangle {
         id: rect_progress
         width: dp(60)
         height: dp(30)
-        anchors.top: button_all.bottom
+        anchors.top: checkbox_tx_proof.bottom
         anchors.topMargin: dp(50)
         anchors.horizontalCenter: parent.horizontalCenter
         color: "#00000000"
@@ -333,7 +391,7 @@ Item {
         id: button_next
         width: dp(150)
         height: dp(50)
-        anchors.top: button_all.bottom
+        anchors.top: checkbox_tx_proof.bottom
         anchors.topMargin: dp(50)
         anchors.horizontalCenter: parent.horizontalCenter
         visible: !rect_progress.visible
