@@ -44,6 +44,8 @@ Item {
         if (visible) {
             rect_progress.visible = false
             textfield_api_secret.visible = false
+//            ui->contactNameLable->setText("");
+//            ui->contactNameLable->hide();
         }
     }
 
@@ -128,14 +130,14 @@ Item {
             }
         }
         onTextEdited: {
-            text_formats.text = "FORMATS:  [mwcmqs://]<mqs_address>  keybase://<name>  http(s)://<host>:<port>"
+            text_formats.text = "FORMATS:  [mwcmqs://]<mqs_address>  http(s)://<host>:<port>"
         }
         onTextChanged: {
-            const addrType = util.verifyAddress(textfield_send_to.text)
-            if ( addrType === "https" || addrType ==="tor" )
-                textfield_api_secret.visible = true
-            else
-                textfield_api_secret.visible = false
+//            const addrType = util.verifyAddress(textfield_send_to.text)
+//            if ( addrType === "https" || addrType ==="tor" )
+//                textfield_api_secret.visible = true
+//            else
+//                textfield_api_secret.visible = false
         }
     }
 
@@ -167,7 +169,7 @@ Item {
     Text {
         id: text_formats
         color: "#b3ffffff"
-        text: "FORMATS:  [mwcmqs://]<mqs_address>  keybase://<name>  http(s)://<host>:<port>"
+        text: "FORMATS:  [mwcmqs://]<mqs_address>  http(s)://<host>:<port>"
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         anchors.left: parent.left

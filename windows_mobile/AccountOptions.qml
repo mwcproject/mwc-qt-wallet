@@ -89,7 +89,7 @@ Item {
             }
         }
         onClicked: {
-            console.log("List Contacts")
+            stateMachine.setActionWindow(13)    // Contacts Page
         }
     }
 

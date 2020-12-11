@@ -39,6 +39,9 @@ Item {
         case 12:
             text_title.text = qsTr("Wallet  >   Outputs")
             break
+        case 13:
+            text_title.text = qsTr("Account Options   >   Contacts")
+            break
         case 14:
             text_title.text = qsTr("Wallet Settings   >   Config")
             break
@@ -133,22 +136,13 @@ Item {
 
     function updateListenerBtn() {
         const mqsStatus = wallet.getMqsListenerStatus()
-        const keybaseStatus = wallet.getKeybaseListenerStatus()
         const torStatus = wallet.getTorListenerStatus()
         const httpListenerStatus = wallet.getHttpListeningStatus()
 
-        console.log("updateListenerBtn: mqsStatus =", mqsStatus, "keybaseStatus =", keybaseStatus, "torStatus =", torStatus, "httpListenerStatus =", httpListenerStatus)
-
-        let listening = mqsStatus | keybaseStatus | torStatus
+        let listening = mqsStatus | torStatus
         let listenerNames = ""
         if (mqsStatus)
             listenerNames +=  "MWC MQS"
-
-        if (keybaseStatus) {
-            if (listenerNames !== "")
-                listenerNames += ", "
-            listenerNames += "Keybase"
-        }
 
         if (torStatus) {
             if (listenerNames !== "")

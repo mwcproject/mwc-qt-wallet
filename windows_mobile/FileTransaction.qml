@@ -55,6 +55,7 @@ Item {
             text_amount.text = params.amount + " MWC"
             text_txid.text = params.transactionId
             text_lockheight.text = params.lockHeight
+            text_receiverAddress.text = params.receiverAddress
             text_message.text = params.message
             isFinalize = params.isFinalize
         }
@@ -146,10 +147,31 @@ Item {
     }
 
     Text {
-        id: label_message
+        id: label_receiverAddress
         anchors.left: parent.left
         anchors.leftMargin: dp(150) - width
         anchors.top: label_lockheight.bottom
+        anchors.topMargin: dp(30)
+        color: "#ffffff"
+        text: qsTr("Receiver Address:")
+        font.pixelSize: dp(20)
+    }
+
+    Text {
+        id: text_receiverAddress
+        anchors.left: label_receiverAddress.right
+        anchors.leftMargin: dp(20)
+        anchors.verticalCenter: label_receiverAddress.verticalCenter
+        color: "#ffffff"
+        text: qsTr("-")
+        font.pixelSize: dp(20)
+    }
+
+    Text {
+        id: label_message
+        anchors.left: parent.left
+        anchors.leftMargin: dp(150) - width
+        anchors.top: label_receiverAddress.bottom
         anchors.topMargin: dp(30)
         color: "#ffffff"
         text: qsTr("Message:")

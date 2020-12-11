@@ -41,7 +41,7 @@ private slots:
     void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
     void onSgnHttpListeningStatus(bool listening, QString additionalInfo);
     void onSgnMwcAddressWithIndex(QString mwcAddress, int idx);
-    void onSgnListenerStartStop(bool mqs, bool _keybase, bool tor); // _keybase is absolete
+    void onSgnListenerStartStop(bool mqs, bool tor); // _keybase is absolete
     void onSgnFileProofAddress(QString proofAddress); // tor address
 
     void on_mwcMqTriggerButton_clicked();

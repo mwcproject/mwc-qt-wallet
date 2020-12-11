@@ -57,15 +57,19 @@ Window {
         target: coreWindow
         onSgnUpdateActionStates: {
             currentState = actionState
-            console.log("current state: ", currentState)
             navbarItem.updateTitle(currentState)
         }
     }
 
     function updateInitParams(newParams) {
         initParams = newParams
-        if (currentState === 2) {
-            newInstanceItem.updateCurrentStep()
+        if (currentState === 2 || currentState === 18) {
+            progressWndItem.visible = false
+            const params = JSON.parse(initParams)
+            if (params.currentStep)
+                newInstanceItem.updateCurrentStep(params)
+            else
+                progressWndItem.init(params.callerId,params.msgProgress)
         }
     }
 
@@ -253,6 +257,24 @@ Window {
             id: nodeInfoItem
             anchors.fill: parent
             visible: currentState === 17
+        }
+
+        Listeners {
+            id: listenersItem
+            anchors.fill: parent
+            visible: currentState === 10
+        }
+
+        ProgressWnd {
+            id: progressWndItem
+            anchors.fill: parent
+            visible: currentState === 2 || currentState === 18
+        }
+
+        Contacts {
+            id: contactsItem
+            anchors.fill: parent
+            visible: currentState === 13
         }
 
         SendConfirmation {

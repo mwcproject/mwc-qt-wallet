@@ -157,7 +157,7 @@ signals:
 
     // Some of listeners was started, stopped
     // kbTry  is absolete, allways false value
-    void sgnListenerStartStop(bool mqTry, bool _kbTry, bool tor);
+    void sgnListenerStartStop(bool mqTry, bool tor);
 
     // Get MWC MQ address with index
     void sgnMwcAddressWithIndex(QString mwcAddress, int idx);

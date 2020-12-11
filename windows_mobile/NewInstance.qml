@@ -9,15 +9,12 @@ Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
-    function updateCurrentStep() {
-        const params = JSON.parse(initParams)
+    function updateCurrentStep(params) {
         currentStep = params.currentStep
         if (currentStep === 1) {
             newSeedItem.init(params.seed, params.hideSubmitButton)
         } else if (currentStep === 2) {
             newSeedTestItem.init(params.wordIndex)
-        } else if (currentStep === 4) {
-            progressWndItem.init(params.callerId,params.msgProgress)
         }
     }
 
@@ -74,12 +71,6 @@ Item {
             id: enterSeedItem
             anchors.fill: parent
             visible: currentStep === 3
-        }
-
-        ProgressWnd {
-            id: progressWndItem
-            anchors.fill: parent
-            visible: currentStep === 4
         }
     }
 

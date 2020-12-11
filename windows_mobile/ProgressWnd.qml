@@ -12,6 +12,7 @@ Item {
     function init(_callerId, msgProgress) {
         progressWnd.callerId = _callerId
         updateProgress(0, msgProgress)
+        visible = true
     }
 
     ProgressWndBridge {
