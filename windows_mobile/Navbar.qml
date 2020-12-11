@@ -39,6 +39,9 @@ Item {
         case 12:
             text_title.text = qsTr("Wallet  >   Outputs")
             break
+        case 13:
+            text_title.text = qsTr("Account Options   >   Contacts")
+            break
         case 14:
             text_title.text = qsTr("Wallet Settings   >   Config")
             break
