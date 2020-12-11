@@ -272,6 +272,12 @@ Window {
             visible: currentState === 2 || currentState === 18
         }
 
+        Contacts {
+            id: contactsItem
+            anchors.fill: parent
+            visible: currentState === 13
+        }
+
         SendConfirmation {
             id: sendConfirmationItem
             anchors.verticalCenter: parent.verticalCenter

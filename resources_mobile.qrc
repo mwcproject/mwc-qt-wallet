@@ -141,5 +141,7 @@
         <file>windows_mobile/AccountTransfer.qml</file>
         <file>windows_mobile/NodeInfo.qml</file>
         <file>windows_mobile/Listeners.qml</file>
+        <file>windows_mobile/Contacts.qml</file>
+        <file>windows_mobile/ContactEditDlg.qml</file>
     </qresource>
 </RCC>
