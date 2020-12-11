@@ -57,7 +57,6 @@ Window {
         target: coreWindow
         onSgnUpdateActionStates: {
             currentState = actionState
-            console.log("current state: ", currentState)
             navbarItem.updateTitle(currentState)
         }
     }

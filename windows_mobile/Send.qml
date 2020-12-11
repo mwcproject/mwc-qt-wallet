@@ -365,7 +365,7 @@ Item {
 
         onCheckStateChanged: {
              if (checkbox_tx_proof.checked && !showGenProofWarning) {
-                 messagebox.open("Warning", "Transaction proof generation requires receiver wallet version 1.0.23 or higher.\n\nDo you want to generate proofs for all your send transactions?", true, "Cancel", "Generate proofs", "", "", "", generateProofCallback)
+                 messagebox.open("Warning", "Transaction proof generation requires receiver wallet version 1.0.23 or higher.\n\nDo you want to generate proofs for all your send transactions?", true, "Cancel", "Generate", "", "", "", generateProofCallback)
              } else {
                  config.setGenerateProof(checkbox_tx_proof.checked)
              }

@@ -44,6 +44,8 @@ Item {
         if (visible) {
             rect_progress.visible = false
             textfield_api_secret.visible = false
+//            ui->contactNameLable->setText("");
+//            ui->contactNameLable->hide();
         }
     }
 
@@ -131,11 +133,11 @@ Item {
             text_formats.text = "FORMATS:  [mwcmqs://]<mqs_address>  http(s)://<host>:<port>"
         }
         onTextChanged: {
-            const addrType = util.verifyAddress(textfield_send_to.text)
-            if ( addrType === "https" || addrType ==="tor" )
-                textfield_api_secret.visible = true
-            else
-                textfield_api_secret.visible = false
+//            const addrType = util.verifyAddress(textfield_send_to.text)
+//            if ( addrType === "https" || addrType ==="tor" )
+//                textfield_api_secret.visible = true
+//            else
+//                textfield_api_secret.visible = false
         }
     }
 
