@@ -50,6 +50,7 @@ public:
 
 protected:
     virtual NextStateRespond execute() override;
+    virtual QString getHelpDocName() override {return "finalize.html";}
 
 private slots:
     void onFinalizeFile( bool success, QStringList errors, QString fileName );

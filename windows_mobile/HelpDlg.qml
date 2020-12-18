@@ -9,10 +9,61 @@ Item {
     readonly property int dpi: Screen.pixelDensity * 25.4
     function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
-    function open(html) {
+    function open(docName, html) {
+        switch (docName) {
+        case 'accounts.html':
+            text_title.text = "Help: Accounts"
+            break;
+        case 'contacts.html':
+            text_title.text = "Help: Contacts"
+            break;
+        case 'event_log.html':
+            text_title.text = "Help: Notifications"
+            break;
+        case 'finalize.html':
+            text_title.text = "Help: Finalize"
+            break;
+        case 'listener.html':
+            text_title.text = "Help: Listener"
+            break;
+        case 'node_overview.html':
+            text_title.text = "Help: Node Overview"
+            break;
+        case 'outputs.html':
+            text_title.text = "Help: Outputs"
+            break;
+        case 'receive.html':
+            text_title.text = "Help: Receive"
+            break;
+        case 'seed.html':
+            text_title.text = "Help: Mnemonic"
+            break;
+        case 'select_mode.html':
+            text_title.text = "Help: Select Running Mode"
+            break;
+        case 'send.html':
+            text_title.text = "Help: Send"
+            break;
+        case 'swap.html':
+            text_title.text = "Help: Swap"
+            break;
+        case 'transactions.html':
+            text_title.text = "Help: Transactions"
+            break;
+        case 'wallet_configuration.html':
+            text_title.text = "Help: Wallet Configuration"
+            break;
+        default:
+            text_title.text = "Help"
+            break;
+        }
+
         webview.loadHtml(html)
-        webview.reload()
-        delay(100, (function () {
+        webview.update()
+
+        delay(200, (function () {
+            webview.loadHtml(html)
+            webview.update()
             helpDlg.visible = true;
         }))
     }
@@ -44,7 +95,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: dp(-10)
             font.bold: true
-            font.pixelSize: dp(21)
+            font.pixelSize: dp(24)
         }
 
         Image {

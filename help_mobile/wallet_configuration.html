@@ -1,0 +1,20 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><body style="font-family:'Open Sans'; font-size:medium; font-weight:normal; font-style:normal; color:#5300CF; background-color:transparent;">
+<p style="line-height:150%;">This page allows the user to set specific parameters for the wallet. The parameters are as follows:</p>
+<ol style="-qt-list-indent: 1; margin: 10pt; margin-left: -15pt;">
+    <li style="line-height:150%;">Wallet folder name - This parameter is the folder where all of the configuration and logging is stored.
+        You can have multiple folders which store alternate instances of the MWC QT Wallet. Change this value to create a new folder.
+        <br/>Note: that if you change this option you will be logged out and need to log in again.</li>
+    <li style="line-height:150%;">MWCMQ Domain - This is the MWCMQ domain to connect to. By default, the mwcmq domain is <u>mq.mwc.mw</u>.
+        We operate this mwcmq, but anyone can operate an mwcmq instance and host a separate domain.
+        Since there is federation, you can send to another domain. You just need to specify this in the send tab address field.
+        For instance, if you wanted to send to example.com, you'd specify &lt;address&gt;@example.com. It might look like this:
+        q5i6TWUBnX1jWBxYdi8ByHGm17mSFJH5gAUWsboWo5kcMbr9vsAN@example.com. Generally most users will use the default settings here.</li>
+    <li style="line-height:150%;">Number of confirmations - this is the number of confirmations before funds are available.
+        By default, this will be set to 10 confirmations (note: the confirmation time is 1 minute, as opposed to Bitcoin which has 10 minute confirmations).
+        This can be set to as low as 1 confirmation if desired.</li>
+    <li style="line-height:150%;">Change outputs - this is the number of change outputs. This feature is primarily used for
+        debugging by developers, but generally a single change address is used, but more than one may be specified here.<br>Note: higher transaction fees will apply.</li>
+</ol>
+</body></html>
+

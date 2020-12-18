@@ -15,6 +15,9 @@ QtGui
 QtNetwork
 QtWidgets
 ui_*.h
+mwc
+mwczip
+tor
 
 .qmake.stash
 CMakeSettings.json

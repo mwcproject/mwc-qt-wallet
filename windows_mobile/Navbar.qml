@@ -396,11 +396,11 @@ Item {
                 onClicked: {
                     docName = stateMachine.getCurrentHelpDocName()
                     var xhr = new XMLHttpRequest
-                    xhr.open('GET', "qrc:/help/" + docName)
+                    xhr.open('GET', "qrc:/help_mobile/" + docName)
                     xhr.onreadystatechange = function() {
                         if (xhr.readyState === XMLHttpRequest.DONE) {
                             var response = xhr.responseText
-                            helpDlg.open(response)
+                            helpDlg.open(docName, response)
                         }
                     }
                     xhr.send()
