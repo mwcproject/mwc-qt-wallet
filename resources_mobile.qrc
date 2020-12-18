@@ -23,6 +23,7 @@
         <file>img/ComboBoxArrow@2x.svg</file>
         <file>img/ComboBoxArrowDlg@2x.svg</file>
         <file>img/Connections@2x.svg</file>
+        <file>img/Contact@2x.svg</file>
         <file>img/Delete@2x.svg</file>
         <file>img/DeleteDlg@2x.svg</file>
         <file>img/Difficulty@2x.svg</file>
@@ -143,5 +144,6 @@
         <file>windows_mobile/Listeners.qml</file>
         <file>windows_mobile/Contacts.qml</file>
         <file>windows_mobile/ContactEditDlg.qml</file>
+        <file>windows_mobile/SelectContact.qml</file>
     </qresource>
 </RCC>

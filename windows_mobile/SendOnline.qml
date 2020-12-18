@@ -18,6 +18,15 @@ Item {
         text_amount_to_send.text = qsTr("Amount to send: " + ( amount < 0 ? "All" : util.nano2one(Number(amount).toString())) + " MWC" )
     }
 
+    function onSelectContact(ok, contact) {
+        if (ok) {
+            textfield_send_to.text = contact.address
+            text_formats.visible = false
+            text_contact_name.text = "Contact: " + contact.name
+            text_contact_name.visible = true
+        }
+    }
+
     UtilBridge {
         id: util
     }
@@ -44,8 +53,8 @@ Item {
         if (visible) {
             rect_progress.visible = false
             textfield_api_secret.visible = false
-//            ui->contactNameLable->setText("");
-//            ui->contactNameLable->hide();
+            text_contact_name.text = ""
+            text_contact_name.visible = false
         }
     }
 
@@ -130,7 +139,9 @@ Item {
             }
         }
         onTextEdited: {
-            text_formats.text = "FORMATS:  [mwcmqs://]<mqs_address>  http(s)://<host>:<port>"
+            text_contact_name.text = ""
+            text_contact_name.visible = false
+            text_formats.visible = true
         }
         onTextChanged: {
 //            const addrType = util.verifyAddress(textfield_send_to.text)
@@ -153,16 +164,18 @@ Item {
             radius: dp(4)
             border.color: "white"
             border.width: dp(2)
-            Text {
-                text: qsTr("#")
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
-                color: "white"
-            }
+        }
+        Image {
+            width: dp(30)
+            height: dp(30)
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
+            fillMode: Image.PreserveAspectFit
+            source: "../img/Contact@2x.svg"
         }
 
         onClicked: {
+            selectContactItem.open(onSelectContact)
         }
     }
 
@@ -175,10 +188,22 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         anchors.right: parent.right
-        anchors.rightMargin: dp(30)
+        anchors.rightMargin: dp(90)
         anchors.bottom: textfield_api_secret.visible ? textfield_api_secret.top : textarea_description.top
         anchors.bottomMargin: dp(30)
         font.pixelSize: dp(13)
+    }
+
+    Text {
+        id: text_contact_name
+        color: "white"
+        text: ""
+        anchors.left: parent.left
+        anchors.leftMargin: dp(50)
+        anchors.bottom: textfield_api_secret.visible ? textfield_api_secret.top : textarea_description.top
+        anchors.bottomMargin: dp(30)
+        font.pixelSize: dp(13)
+        visible: false
     }
 
     TextField {
@@ -350,8 +375,9 @@ Item {
         visible: false
     }
 
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
+    SelectContact {
+        id: selectContactItem
+        anchors.fill: parent
+        visible: false
     }
 }
