@@ -51,7 +51,6 @@
 #include "util/Process.h"
 #include "tests/testStringUtils.h"
 #include <QtGlobal>
-#include <QFileDialog>
 #include <QGuiApplication>
 #include <QScreen>
 #include <QDesktopWidget>

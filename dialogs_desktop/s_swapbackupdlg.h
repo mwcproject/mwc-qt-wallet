@@ -24,6 +24,7 @@ class SwapBackupDlg;
 namespace bridge {
 class Config;
 class Swap;
+class Util;
 }
 
 namespace dlg {
@@ -55,6 +56,7 @@ private:
     int     backupId = 0;
     bridge::Config * config = nullptr;
     bridge::Swap * swap = nullptr;
+    bridge::Util * util = nullptr;
 };
 
 }

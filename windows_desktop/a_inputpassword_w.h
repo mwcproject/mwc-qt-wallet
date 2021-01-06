@@ -42,6 +42,7 @@ private slots:
     void onSgnUpdateListenerStatus(bool mwcOnline, bool tor);
     void onSgnHttpListeningStatus(bool listening, QString additionalInfo);
     void onSgnUpdateSyncProgress(double progressPercent);
+    void onSgnStartingCommand(QString actionName);
 
     void on_submitButton_clicked();
     void on_restoreInstanceButton_clicked();

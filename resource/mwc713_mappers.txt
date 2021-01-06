@@ -115,3 +115,23 @@ Unable to start TOR because of Foreign API failure.
 #Swap Error , Swap LibWallet error: Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool General error failed to validate tx, Duplicate Commitment: Commitment(084e1265760cc06442027361950612ca254e2440e650933483460c79d677afc31c) \n Cause: Unknown \n Backtrace: "}
 Swap Error , Swap LibWallet error: Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool General error failed to validate tx, Duplicate Commitment: Commitment\((.*)\) \\n Cause: Unknown \\n Backtrace: "}
 Output with commitment $1 already exists
+
+# Error: LibWallet Error, Slatepack decode error, Bad armor header
+Error: LibWallet Error, Slatepack decode error, Bad armor header
+Unable to recognize slatepack content in the string.
+
+# Error: LibWallet Error, Slatepack decode error, Unable to decrypt, ring::error::Unspecified
+Error: LibWallet Error, Slatepack decode error, Unable to decrypt, (.*)
+Unable to decrypt the slatepack content, probably this slatepack was created for wallet with another public address.
+
+# Error: IO error, Unable to build slate from the content, Can't parse slate version, Unable to find slate version at {kdjsfhlkdasjhl fadkljdhsafklsdfjah, key must be a string at line 1 column 2
+Error: IO error, Unable to build slate from the content, Can't parse slate version, Unable to find slate version at (.*)
+The JSon content is not an MWC slate.
+
+# LibWallet Error, Slatepack decode error, Slate from wrong network
+LibWallet Error, Slatepack decode error, Slate from wrong network
+The slate is from wrong network
+
+# LibWallet Error, Slatepack decode error, Bad armor header
+LibWallet Error, Slatepack decode error, (.*)
+Unable to decode the slatepack, $1

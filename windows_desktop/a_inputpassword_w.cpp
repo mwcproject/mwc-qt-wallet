@@ -48,6 +48,8 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
                      this, &InputPassword::onSgnUpdateListenerStatus, Qt::QueuedConnection);
     QObject::connect(wallet, &bridge::Wallet::sgnHttpListeningStatus,
                      this, &InputPassword::onSgnHttpListeningStatus, Qt::QueuedConnection);
+    QObject::connect(wallet, &bridge::Wallet::sgnStartingCommand,
+                     this, &InputPassword::onSgnStartingCommand, Qt::QueuedConnection);
 
     ui->progress->initLoader(false);
 
@@ -205,12 +207,16 @@ void InputPassword::on_newInstanceButton_clicked() {
     startWallet->createNewWalletInstance("", false);
 }
 
-void wnd::InputPassword::on_openWalletButton_clicked()
+void InputPassword::on_openWalletButton_clicked()
 {
     QString wallet_dir = core::selectWalletDirectory();
     if (wallet_dir.isEmpty())
          return;
     startWallet->createNewWalletInstance(wallet_dir, false);
+}
+
+void InputPassword::onSgnStartingCommand(QString actionName) {
+    ui->syncStatusMsg->setText(actionName);
 }
 
 }

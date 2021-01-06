@@ -437,7 +437,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </widget>
-       <widget class="control::MwcLabelNormal" name="label_9">
+       <widget class="control::MwcLabelNormal" name="receiverLabel">
         <property name="geometry">
          <rect>
           <x>84</x>
@@ -615,6 +615,11 @@ p, li { white-space: pre-wrap; }
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
@@ -623,11 +628,6 @@ p, li { white-space: pre-wrap; }
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>

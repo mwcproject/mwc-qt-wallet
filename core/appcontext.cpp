@@ -1,4 +1,4 @@
-// Copyright 2019 The MWC Developers
+// Copyright 2021 The MWC Developers
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 #include "appcontext.h"
 #include "../util/ioutils.h"
 #include "../util/Files.h"
+#include "../util/address.h"
 #include <QFile>
 #include <QTextStream>
 #include <QDataStream>
@@ -54,11 +55,20 @@ bool SendCoinsParams::loadData(QDataStream & in) {
 
 //////////////////////////////////////////////////////////////////
 
+ContactRecord::ContactRecord(const QString & n, const QString & a)
+{
+    name=n;
+    address=a;
+    pub_key = util::extractPubKeyFromAddress(address);
+}
+
+
 void ContactRecord::setData(QString _name,
                             QString _address)
 {
     name = _name;
     address = _address;
+    pub_key = util::extractPubKeyFromAddress(address);
 }
 
 void ContactRecord::saveData( QDataStream & out) const {
@@ -75,6 +85,9 @@ bool ContactRecord::loadData( QDataStream & in) {
 
     in >> name;
     in >> address;
+
+    pub_key = util::extractPubKeyFromAddress(address);
+
     return true;
 }
 
@@ -168,7 +181,7 @@ bool AppContext::loadDataImpl() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x47A2)
+    if (id<0x4783 || id>0x47A3)
          return false;
 
     QString mockStr;
@@ -331,6 +344,11 @@ bool AppContext::loadDataImpl() {
     if (id>=0x47A2)
         in >> noTorForEmbeddedNode;
 
+    if (id>=0x47A3) {
+        in >> sendSlatepack;
+        in >> sendLockOutput;
+    }
+
     return true;
 }
 
@@ -358,7 +376,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x47A2;
+    out << 0x47A3;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -435,6 +453,9 @@ void AppContext::saveData() const {
     out << acceptedSwaps;
 
     out << noTorForEmbeddedNode;
+
+    out << sendSlatepack;
+    out << sendLockOutput;
 }
 
 void AppContext::loadNotesData() {
@@ -618,6 +639,14 @@ void AppContext::setNoTorForEmbeddedNode(bool noTor) {
 
     noTorForEmbeddedNode = noTor;
     saveData();
+}
+
+void AppContext::setSendSlatepack(bool slatepack) {
+    sendSlatepack = slatepack;
+}
+
+void AppContext::setSendLockOutput(bool lock)  {
+    sendLockOutput = lock;
 }
 
 // -------------- Contacts

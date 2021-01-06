@@ -157,6 +157,18 @@ QString TaskListeningStart::calcCommand(bool startMq, bool startTor) const {
     return QString("listen -s");
 }
 
+QString TaskListeningStart::calcProgressStr(bool startMq, bool startTor) const {
+    if (startMq)
+        return "Starting MWC MQS listener...";
+
+    if (startTor)
+        return "Starting TOR listener...";
+
+    Q_ASSERT(false);
+    return "";
+}
+
+
 // -------------------------------- TaskListeningStop -------------------------------
 
 bool TaskListeningStop::processTask(const QVector<WEvent> &events) {
@@ -192,6 +204,17 @@ QString TaskListeningStop::calcCommand(bool stopMq, bool stopTor) const {
     Q_ASSERT(stopMq);
     // -s, --mwcmqs     mwcmqs listener
     return QString("stop -s");
+}
+
+QString TaskListeningStop::calcProgressStr(bool startMq, bool startTor) const {
+    if (startMq)
+        return "Stopping MWC MQS listener...";
+
+    if (startTor)
+        return "Stopping TOR listener...";
+
+    Q_ASSERT(false);
+    return "";
 }
 
 

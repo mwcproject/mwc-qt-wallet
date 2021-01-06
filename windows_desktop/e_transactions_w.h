@@ -27,6 +27,7 @@ namespace bridge {
 class Config;
 class Wallet;
 class Transactions;
+class Util;
 }
 
 namespace control {
@@ -96,6 +97,7 @@ private:
     bridge::Config * config = nullptr;
     bridge::Wallet * wallet = nullptr;
     bridge::Transactions * transaction = nullptr; // just a placeholder to signal that this window is online
+    bridge::Util * util = nullptr;
 
     QString account;
     QVector<TransactionData> allTrans;

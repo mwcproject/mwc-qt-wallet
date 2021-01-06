@@ -431,6 +431,11 @@ void MWC713::processStop(bool exitNicely) {
     QCoreApplication::processEvents();
 }
 
+// Wallet doing something. This message is needed for the progress.
+void MWC713::setStartingCommand(QString actionName) {
+    emit onStartingCommand(actionName);
+}
+
 // Check signal: onLoginResult(bool ok)
 void MWC713::loginWithPassword(QString password)  {
     qDebug() << "MWC713::loginWithPassword call";
@@ -777,6 +782,39 @@ void MWC713::submitFile( QString fileTx ) {
     eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, {TSK(new TaskSubmitFile(this, fileTx), TaskSubmitFile::TIMEOUT)} );
 }
 
+// Init send transaction with file output
+// Check signal:  onSendSlatepack
+void MWC713::sendSlatepack( const QString &account, int64_t coinNano, QString message,
+                            int inputConfirmationNumber, int changeOutputs, const QStringList & outputs,
+                            int ttl_blocks, bool generateProof,
+                            QString slatepackRecipientAddress, // optional. Encrypt SP if it is defined.
+                            bool isLockLater,
+                            QString tag ) {
+
+    // switch account first
+    QVector<QPair<Mwc713Task*,int64_t>> taskGroup {
+            TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+            TSK(new TaskSendSlatepack(this, coinNano, message, inputConfirmationNumber, changeOutputs, outputs,
+                                 ttl_blocks, generateProof, slatepackRecipientAddress, isLockLater, tag), TaskSendSlatepack::TIMEOUT)
+    };
+    if (account != currentAccount)
+        taskGroup.push_back( TSK(new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT) );
+
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, taskGroup );
+}
+
+// Receive transaction. Will generate *.response file in the same dir
+// Check signal:  onReceiveSlatepack
+void MWC713::receiveSlatepack( QString slatepack, QString tag) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, {TSK(new TaskReceiveSlatepack(this, slatepack, tag), TaskReceiveSlatepack::TIMEOUT)} );
+}
+
+// finalize transaction and broadcast it
+// Check signal:  onFinalizeSlatepack
+void MWC713::finalizeSlatepack( QString slatepack, bool fluff, QString tag ) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, {TSK(new TaskFinalizeSlatepack(this, slatepack, fluff, tag), TaskFinalizeSlatepack::TIMEOUT)} );
+}
+
 // Show outputs for the wallet
 // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> Transactions)
 void MWC713::getOutputs(QString account, bool show_spent, bool enforceSync)  {
@@ -948,6 +986,12 @@ void MWC713::requestRecieverWalletAddress(QString url, QString apiSecret) {
 // In case you need it, add the signal as usuall
 void MWC713::adjustTradeState(QString swapId, QString newState) {
     eventCollector->addTask( TASK_PRIORITY::TASK_NOW, {TSK(new TaskAdjustTradeState(this, swapId, newState), TaskAdjustTradeState::TIMEOUT)} );
+}
+
+// Decode the slatepack data (or validate slate json) are respond with Slate SJon that can be processed
+// Check Signal: onDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
+void MWC713::decodeSlatepack(QString slatepackContent) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, {TSK(new TaskDecodeSlatepack(this, slatepackContent), TaskDecodeSlatepack::TIMEOUT)} );
 }
 
 
@@ -1408,6 +1452,21 @@ void MWC713::setSubmitFile(bool success, QString message, QString fileName) {
     emit onSubmitFile(success, message, fileName);
 }
 
+void MWC713::setSendSlatepack( QString error, QString slatepack, QString tag ) {
+    logger::logEmit( "MWC713", "setSendSlatepack",  + " tag=" + tag + " error=" + error + " Slatepack: " + slatepack );
+    emit onSendSlatepack(tag, error, slatepack );
+
+}
+void MWC713::setReceiveSlatepack( QString error, QString slatepack, QString tag ) {
+    logger::logEmit( "MWC713", "setReceiveSlatepack",  + " tag=" + tag + " error=" + error + " Slatepack: " + slatepack );
+    emit onReceiveSlatepack(tag, error, slatepack );
+}
+
+void MWC713::setFinalizedSlatepack( QString error, QString txUuid, QString tag ) {
+    logger::logEmit( "MWC713", "setFinalizedSlatepack",  + " tag=" + tag + " error=" + error + " txUuid: " + txUuid );
+    emit onFinalizeSlatepack(tag, error, txUuid );
+}
+
 void MWC713::setTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions ) {
     logger::logEmit( "MWC713", "onTransactions", "account="+account );
     emit onTransactions( account, height, Transactions );
@@ -1603,6 +1662,9 @@ void MWC713::setRepost(int txIdx, QString err) {
     emit onRepost(txIdx, err);
 }
 
+void MWC713::setDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient ) {
+    emit onDecodeSlatepack( error, slatepack, slateJSon, content, sender, recipient );
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 //      mwc713  IOs

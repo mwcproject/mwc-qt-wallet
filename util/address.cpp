@@ -20,6 +20,7 @@
 namespace util {
 
 const int MWC_MQ_ADDR_LEN = 52;
+const int TOR_ADDR_LEN = 56;
 
 const QString Base58Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
@@ -81,6 +82,24 @@ static bool decodeBase58( QString sz, QByteArray & vch)
     while (it != b256.end())
         vch.push_back(*(it++));
     return true;
+}
+
+// Check if it is tor address
+static QPair<bool, ADDRESS_TYPE> checkTorAddress( QString address ) {
+    QString pk = extractPubKeyFromAddress(address);
+    if (pk.length() != TOR_ADDR_LEN) {
+        return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
+    }
+
+    // Check optional suffix '.onion'
+    int idx = address.lastIndexOf('.');
+    if (idx>=0) {
+        // Check for bad extention
+        if (!address.mid(idx).compare(".onion", Qt::CaseInsensitive))
+            return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
+    }
+
+    return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::TOR);
 }
 
 // mwc mq address might include the domain
@@ -157,8 +176,13 @@ QPair<bool, ADDRESS_TYPE> verifyAddress(QString address) {
     if (protAddr.second.isEmpty())
         return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
 
-    if (protAddr.first.isEmpty())
-        return checkMwcMqAddress( protAddr.second );
+    if (protAddr.first.isEmpty()) {
+        QPair<bool, ADDRESS_TYPE> mqsRes = checkMwcMqAddress(protAddr.second);
+        if (mqsRes.first)
+            return mqsRes;
+
+        return checkTorAddress(protAddr.second);
+    }
 
     QString protocol = protAddr.first;
     address = protAddr.second;
@@ -200,6 +224,27 @@ QString fullFormalAddress(ADDRESS_TYPE type, QString address) {
     }
 }
 
+QString extractPubKeyFromAddress(QString address) {
+    int idx1 = address.indexOf("//");
+    int idx2 = address.indexOf("@");
+    if (idx1>=0)
+        idx1+=2;
+    if (idx2>=0)
+        idx1+=1;
 
+    int sIdx = std::max(idx1, idx2);
+    int lidx = address.lastIndexOf(".");
+
+    if (sIdx<0)
+        sIdx = 0;
+
+    if (lidx<0)
+        lidx=address.length();
+
+    if (sIdx<lidx)
+        return address.mid(sIdx, lidx-sIdx);
+    else
+        return "";
+}
 
 }

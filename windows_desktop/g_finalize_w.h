@@ -24,6 +24,7 @@ class FinalizeUpload;
 namespace bridge {
 class Config;
 class Finalize;
+class Util;
 }
 
 namespace wnd {
@@ -39,10 +40,13 @@ public:
 private slots:
     void on_uploadFileBtn_clicked();
 
+    void on_pasteSlatepackBtn_clicked();
+
 private:
     Ui::FinalizeUpload *ui;
     bridge::Config * config = nullptr;
     bridge::Finalize * finalize = nullptr;
+    bridge::Util * util = nullptr;
 };
 
 }

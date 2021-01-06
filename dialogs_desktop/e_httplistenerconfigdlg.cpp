@@ -14,7 +14,6 @@
 
 #include "e_httplistenerconfigdlg.h"
 #include "ui_e_httplistenerconfigdlg.h"
-#include <QFileDialog>
 #include "../control_desktop/messagebox.h"
 #include <QFileInfo>
 #include "../bridge/util_b.h"
@@ -57,37 +56,22 @@ HttpListenerConfigDlg::~HttpListenerConfigDlg()
 
 void HttpListenerConfigDlg::on_selectPrivKeyButton_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select certificate private key"),
+    QString fileName = util->getOpenFileName("Select certificate private key",
                                                     "",
-                                                    tr("Certificate key pem (*.pem);;All files (*.*)"));
-
-    if (fileName.length()==0)
+                                                    "Certificate key pem (*.pem);;All files (*.*)");
+    if (fileName.isEmpty())
         return;
-
-    auto fileOk = util::validateMwc713Str(fileName);
-    if (!fileOk.first) {
-        core::getWndManager()->messageTextDlg("File Path",
-                                              "This file path is not acceptable.\n" + fileOk.second);
-        return;
-    }
-
     ui->tlsPrivateKeyEdit->setText(fileName);
 }
 
 void HttpListenerConfigDlg::on_selectFullchainButton_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select fullchain certificate"),
+    QString fileName = util->getOpenFileName("Select fullchain certificate",
                                                     "",
-                                                    tr("Fullchain certificate pem (*.pem);;All files (*.*)"));
+                                                    "Fullchain certificate pem (*.pem);;All files (*.*)");
 
-    if (fileName.length()==0)
+    if (fileName.isEmpty())
         return;
-    auto fileOk = util::validateMwc713Str(fileName);
-    if (!fileOk.first) {
-        core::getWndManager()->messageTextDlg("File Path",
-                                              "This file path is not acceptable.\n" + fileOk.second);
-        return;
-    }
 
     ui->tlsFullchainEdit->setText(fileName);
 }

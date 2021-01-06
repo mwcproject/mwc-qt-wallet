@@ -374,5 +374,22 @@ void Config::setNoTorForEmbeddedNode(bool noTor) {
     getAppContext()->setNoTorForEmbeddedNode(noTor);
 }
 
+// Slatepack format, selected value
+bool Config::getSendSlatepack() {
+    return getAppContext()->getSendSlatepack();
+}
+void Config::setSendSlatepack(bool slatepack) {
+    getAppContext()->setSendSlatepack(slatepack);
+}
+
+// Lock outputs for slatepacks send
+bool Config::getSendLockOutput() {
+    return getAppContext()->getSendLockOutput();
+}
+
+void Config::setSendLockOutput(bool lock) {
+    getAppContext()->setSendLockOutput(lock);
+}
+
 
 }

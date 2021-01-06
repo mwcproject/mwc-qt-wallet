@@ -31,6 +31,7 @@
 #include "../windows_desktop/g_sendStarting.h"
 #include "../windows_desktop/g_sendOnline.h"
 #include "../windows_desktop/g_sendOffline.h"
+#include "../windows_desktop/g_resultedslatepack_w.h"
 #include "../windows_desktop/e_transactions_w.h"
 #include "../dialogs_desktop/g_sendconfirmationdlg.h"
 #include "../windows_desktop/k_accounts_w.h"
@@ -124,6 +125,21 @@ QString DesktopWndManager::getSaveFileName(const QString &caption, const QString
     return fileName;
 }
 
+// QFileDialog::getSaveFileName call
+QString DesktopWndManager::getOpenFileName(const QString &caption, const QString &dir, const QString &filter) {
+    QString fileName = QFileDialog::getOpenFileName(nullptr, caption,
+                                                    dir,
+                                                    filter);
+
+    auto fileOk = util::validateMwc713Str(fileName);
+    if (!fileOk.first) {
+        core::getWndManager()->messageTextDlg("File Path",
+                                              "This file path is not acceptable.\n" + fileOk.second);
+        return "";
+    }
+    return fileName;
+}
+
 // Ask for confirmation
 bool DesktopWndManager::sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) {
     dlg::SendConfirmationDlg confirmDlg(nullptr, title, message, widthScale, passwordHash );
@@ -191,12 +207,13 @@ void DesktopWndManager::pageOutputs() {
 }
 
 void DesktopWndManager::pageFileTransaction(QString pageTitle, QString callerId,
-                                            const QString & fileName, const util::FileTransactionInfo & transInfo,
+                                            const QString & fileNameOrSlatepack,
+                                            const util::FileTransactionInfo & transInfo,
                                             int nodeHeight,
                                             QString transactionType, QString processButtonName) {
     windowManager->switchToWindowEx( pageTitle,
                         new wnd::FileTransaction( windowManager->getInWndParent(), callerId,
-                                fileName, transInfo, nodeHeight, transactionType, processButtonName) );
+                                                  fileNameOrSlatepack, transInfo, nodeHeight, transactionType, processButtonName) );
 }
 
 void DesktopWndManager::pageRecieve() {
@@ -233,6 +250,13 @@ void DesktopWndManager::pageSendOffline( QString selectedAccount, int64_t amount
 void DesktopWndManager::pageTransactions() {
     windowManager->switchToWindowEx( mwc::PAGE_E_TRANSACTION,
                       new wnd::Transactions( windowManager->getInWndParent()));
+}
+
+// slatepack - slatepack string value to show.
+// backStateId - state ID of the caller. On 'back' will switch to this state Id
+void DesktopWndManager::pageShowSlatepack(QString slatepack, int backStateId, QString txExtension) {
+    windowManager->switchToWindowEx( mwc::PAGE_G_SLATEPACK,
+                                     new wnd::ResultedSlatepack( windowManager->getInWndParent(), slatepack, backStateId, txExtension ));
 }
 
 void DesktopWndManager::pageAccounts() {

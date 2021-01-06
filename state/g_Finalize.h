@@ -35,11 +35,14 @@ public:
 
     void uploadFileTransaction(QString fileName);
 
+    void uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender );
+
 public:
     // wnd::FileTransactionWndHandler
     void ftBack();
     // Expected that user already made all possible appruvals
     void ftContinue(QString fileName, QString resultTxFileName, bool fluff);
+    void ftContinueSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff);
 
     bool needResultTxFileName();
 
@@ -52,8 +55,10 @@ protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "finalize.html";}
 
+    void finalizeForColdWallet(const util::FileTransactionInfo & trInfo);
 private slots:
     void onFinalizeFile( bool success, QStringList errors, QString fileName );
+    void onFinalizeSlatepack( QString tagId, QString error, QString txUuid );
     void onAllTransactions( QVector<wallet::WalletTransaction> Transactions);
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 private:

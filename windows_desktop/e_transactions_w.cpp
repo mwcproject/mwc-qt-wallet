@@ -14,7 +14,6 @@
 
 #include "e_transactions_w.h"
 #include "ui_e_transactions.h"
-#include <QFileDialog>
 #include "../control_desktop/messagebox.h"
 #include "../util_desktop/timeoutlock.h"
 #include <QDebug>
@@ -22,6 +21,7 @@
 #include "../dialogs_desktop/e_showtransactiondlg.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/config_b.h"
+#include "../bridge/util_b.h"
 #include "../bridge/wnd/e_transactions_b.h"
 #include "../core/global.h"
 
@@ -51,6 +51,7 @@ Transactions::Transactions(QWidget *parent) :
     config = new bridge::Config(this);
     wallet = new bridge::Wallet(this);
     transaction = new bridge::Transactions(this);
+    util = new bridge::Util(this);
 
     QObject::connect( wallet, &bridge::Wallet::sgnWalletBalanceUpdated,
                       this, &Transactions::onSgnWalletBalanceUpdated, Qt::QueuedConnection);
@@ -296,25 +297,11 @@ void Transactions::richButtonPressed(control::RichButton * button, QString coock
             return;
         }
 
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Create transaction proof file"),
-                                                        config->getPathFor("Transactions"),
-                                                        tr("transaction proof (*.proof)"));
-
-        if (fileName.length() == 0)
+        QString fileName = util->getSaveFileName("Create transaction proof file",
+                              "Transactions",
+                              "transaction proof (*.proof)", ".proof");
+        if (fileName.isEmpty())
             return;
-        auto fileOk = util::validateMwc713Str(fileName);
-        if (!fileOk.first) {
-            core::getWndManager()->messageTextDlg("File Path",
-                                                  "This file path is not acceptable.\n" + fileOk.second);
-            return;
-        }
-
-        if (!fileName.endsWith(".proof"))
-            fileName += ".proof";
-
-        // Update path
-        QFileInfo flInfo(fileName);
-        config->updatePathFor("Transactions", flInfo.path());
 
         wallet->generateTransactionProof(QString::number(tx2process.txIdx), fileName);
     }
@@ -424,22 +411,11 @@ void Transactions::on_validateProofButton_clicked()
 {
     util::TimeoutLockObject to( "Transactions" );
 
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open proof file"),
-                                 config->getPathFor("Transactions"),
-                                 tr("transaction proof (*.proof);;All files (*.*)"));
-
-    if (fileName.length()==0)
+    QString fileName = util->getOpenFileName("Open proof file",
+                                 "Transactions",
+                                 "transaction proof (*.proof);;All files (*.*)");
+    if (fileName.isEmpty())
         return;
-    auto fileOk = util::validateMwc713Str(fileName);
-    if (!fileOk.first) {
-        core::getWndManager()->messageTextDlg("File Path",
-                                              "This file path is not acceptable.\n" + fileOk.second);
-        return;
-    }
-
-    // Update path
-    QFileInfo flInfo(fileName);
-    config->updatePathFor( "Transactions", flInfo.path());
 
     wallet->verifyTransactionProof(fileName);
 }
@@ -448,28 +424,18 @@ void Transactions::on_exportButton_clicked()
 {
     util::TimeoutLockObject to( "Transactions" );
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Transactions"),
-                                                    config->getPathFor("TxExportCsv"),
-                                                    tr("Export Options (*.csv)"));
-
-    if (fileName.length()==0)
-        return;
-
-    QFileInfo flInfo(fileName);
-    config->updatePathFor("TxExportCsv", flInfo.path());
-
-    // check to ensure a file extension was specified as getSaveFileName
-    // allows files without an extension to be specified
-    if (!fileName.endsWith(".csv", Qt::CaseInsensitive))
-    {
-        // if no file extension is specified, default to exporting CSV files
-        fileName += ".csv";
-    }
-
     if (allTrans.isEmpty()) {
         control::MessageBox::messageText(this, "Export Error", "You don't have any transactions to export.");
         return;
     }
+
+    QString fileName = util->getSaveFileName("Export Transactions",
+                                                    "TxExportCsv",
+                                                    "Export Options (*.csv)",
+                                                    ".csv");
+
+    if (fileName.isEmpty())
+        return;
 
     // qt-wallet displays the transactions last to first
     // however when exporting the transactions, we want to export first to last

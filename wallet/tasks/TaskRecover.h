@@ -28,7 +28,7 @@ public:
 
     // Start one listen per request. mwc713 doesn't support both
     TaskRecoverProgressListener( MWC713 *wallet713 ) :
-            Mwc713Task("TaskRecoverProgressListener", "", wallet713,"") {}
+            Mwc713Task("TaskRecoverProgressListener", "", "", wallet713,"") {}
 
     virtual ~TaskRecoverProgressListener() override {}
 
@@ -46,7 +46,7 @@ public:
 
     // Expected that listening is already stopped
     TaskRecoverFull( MWC713 *wallet713) :
-            Mwc713Task("TaskRecover", "", wallet713, "recover from mnemonic") {}
+            Mwc713Task("TaskRecover", "", "", wallet713, "recover from mnemonic") {}
 
     virtual ~TaskRecoverFull() override {}
 
@@ -69,7 +69,7 @@ public:
 
     // Expected that listening is already stopped
     TaskRecoverShowMnenonic( MWC713 *wallet713, QString password ) :
-            Mwc713Task("TaskRecover", "recover -d -p " + util::toMwc713input(password), wallet713, "get mnemonic passphrase") {}
+            Mwc713Task("TaskRecover", "Restoring wallet from mnemonic passphrase...", "recover -d -p " + util::toMwc713input(password), wallet713, "get mnemonic passphrase") {}
 
     virtual ~TaskRecoverShowMnenonic() override {}
 
@@ -91,7 +91,7 @@ public:
 
     // Expected that listening is already stopped
     TaskCheck( MWC713 *wallet713, bool wait4listeners ) :
-            Mwc713Task("TaskRecover", "check", wallet713, ""), sleepBeforeStart(wait4listeners) {}
+            Mwc713Task("TaskRecover","", "check", wallet713, ""), sleepBeforeStart(wait4listeners) {}
 
     virtual ~TaskCheck() override {}
 

@@ -37,10 +37,14 @@ class SendOffline : public core::NavWnd
 public:
     explicit SendOffline(QWidget *parent, QString selectedAccount, int64_t amount);
     virtual ~SendOffline() override;
+protected:
+    void upadateSlatepackUI();
 
 private slots:
     void on_sendButton_clicked();
     void on_settingsBtn_clicked();
+    void on_slatepackCheck_stateChanged(int arg1);
+    void on_contactsButton_clicked();
 
     void onSgnShowSendResult( bool success, QString message );
 private:

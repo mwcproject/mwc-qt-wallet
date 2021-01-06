@@ -19,7 +19,6 @@
 #include <QScrollBar>
 #include "../util_desktop/timeoutlock.h"
 #include "../dialogs_desktop/u_mwcnodelogs.h"
-#include <QFileDialog>
 #include "../bridge/config_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/wnd/u_nodeInfo_b.h"
@@ -225,64 +224,41 @@ void NodeInfo::onSgnHideProgress() {
 
 void NodeInfo::on_saveBlockchianData_clicked()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Blockchain Data"),
-                                                       config->getPathFor("BlockchainData"),
-                                                       tr("MWC Blockchain Data (*.mwcblc)"));
+    QString fileName = util->getSaveFileName("Save Blockchain Data",
+                                              "BlockchainData",
+                                              "MWC Blockchain Data (*.mwcblc)",
+                                              ".mwcblc");
 
-    if (fileName.length()==0)
+    if (fileName.isEmpty())
           return;
-    auto fileOk = util::validateMwc713Str(fileName);
-    if (!fileOk.first) {
-        core::getWndManager()->messageTextDlg("File Path",
-                                              "This file path is not acceptable.\n" + fileOk.second);
-        return;
-    }
-
-    if (!fileName.endsWith(".mwcblc"))
-        fileName += ".mwcblc";
 
     ui->progress->show();
-    config->updatePathFor("BlockchainData", QFileInfo(fileName).absolutePath() );
     nodeInfo->exportBlockchainData(fileName);
 }
 
 void NodeInfo::on_loadBlockchainData_2_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Blockchain Data"),
-                                                    config->getPathFor("BlockchainData"),
-                                                    tr("MWC Blockchain Data (*.mwcblc);;All files (*.*)"));
+    QString fileName = util->getOpenFileName("Load Blockchain Data",
+                                                    "BlockchainData",
+                                                    "MWC Blockchain Data (*.mwcblc);;All files (*.*)");
 
-    if (fileName.length()==0)
+    if (fileName.isEmpty())
           return;
-    auto fileOk = util::validateMwc713Str(fileName);
-    if (!fileOk.first) {
-        core::getWndManager()->messageTextDlg("File Path",
-                                              "This file path is not acceptable.\n" + fileOk.second);
-        return;
-    }
 
     ui->progress->show();
-    config->updatePathFor("BlockchainData", QFileInfo(fileName).absolutePath() );
     nodeInfo->importBlockchainData(fileName);
 }
 
 void NodeInfo::on_publishTransaction_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Publish MWC transaction"),
-                                                    config->getPathFor("PublishTransaction"),
-                                                    tr("MWC transaction (*.mwctx)"));
+    QString fileName = util->getOpenFileName("Publish MWC transaction",
+                                                    "PublishTransaction",
+                                                    "MWC transaction (*.mwctx)");
 
-    if (fileName.length()==0)
+    if (fileName.isEmpty())
           return;
-    auto fileOk = util::validateMwc713Str(fileName);
-    if (!fileOk.first) {
-        core::getWndManager()->messageTextDlg("File Path",
-                                              "This file path is not acceptable.\n" + fileOk.second);
-        return;
-    }
 
     ui->progress->show();
-    config->updatePathFor("PublishTransaction", QFileInfo(fileName).absolutePath() );
     nodeInfo->publishTransaction(fileName);
 }
 

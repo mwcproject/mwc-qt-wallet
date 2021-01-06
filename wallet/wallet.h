@@ -593,6 +593,23 @@ public:
     // Check signal:  onFinalizeFile
     virtual void finalizeFile( QString fileTxResponse, bool fluff )  = 0;
 
+    // Init send transaction with file output
+    // Check signal:  onSendSlatepack
+    virtual void sendSlatepack( const QString &account, int64_t coinNano, QString message,
+                           int inputConfirmationNumber, int changeOutputs, const QStringList & outputs,
+                           int ttl_blocks, bool generateProof,
+                           QString slatepackRecipientAddress, // optional. Encrypt SP if it is defined.
+                           bool isLockLater,
+                           QString tag )  = 0;
+
+    // Receive transaction. Will generate *.response file in the same dir
+    // Check signal:  onReceiveSlatepack
+    virtual void receiveSlatepack( QString slatePack, QString tag)  = 0;
+
+    // finalize transaction and broadcast it
+    // Check signal:  onFinalizeSlatepack
+    virtual void finalizeSlatepack( QString slatepack, bool fluff, QString tag ) = 0;
+
     // submit finalized transaction. Make sense for cold storage => online node operation
     // Check Signal: onSubmitFile(bool ok, String message)
     virtual void submitFile( QString fileTx )  = 0;
@@ -715,8 +732,15 @@ public:
     // Adjust trade state. It is dev support functionality, so no feedback will be provided.
     // In case you need it, add the signal as usual
     virtual void adjustTradeState(QString swapId, QString newState) = 0;
+
+    // Decode the slatepack data (or validate slate json) are respond with Slate SJon that can be processed
+    // Check Signal: onDecodeSlatepack( QString error, QString slateJSon, QString content, QString sender, QString receiver )
+    virtual void decodeSlatepack(QString slatepackContent) = 0;
+
 private:
 signals:
+    // Wallet doing something. This message is needed for the progress.
+    void onStartingCommand(QString actionName);
 
     // Config was updated
     void onConfigUpdate();
@@ -778,6 +802,9 @@ signals:
     void onSendFile( bool success, QStringList errors, QString fileName );
     void onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
     void onFinalizeFile( bool success, QStringList errors, QString fileName );
+    void onSendSlatepack( QString tagId, QString error, QString slatepack );
+    void onReceiveSlatepack( QString tagId, QString error, QString slatepack );
+    void onFinalizeSlatepack( QString tagId, QString error, QString txUuid );
     void onSubmitFile(bool success, QString message, QString fileName);
 
     // set receive account name results
@@ -860,6 +887,9 @@ signals:
 
     // Response to the post command. Empty message - mean we are good, no errors.
     void onRepost(int txIdx, QString error);
+
+    // Response to decodeSlatepack
+    void onDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
 };
 
 }

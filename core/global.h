@@ -105,6 +105,7 @@ const QString PAGE_G_SEND_FILE      = "Send coins with file";
 const QString PAGE_G_FINALIZE_UPLOAD= "Finalize Transaction";
 const QString PAGE_G_FINALIZE_TRANS = "Finalize Transaction";
 const QString PAGE_G_RECEIVE_TRANS  = "Receive File Transaction";
+const QString PAGE_G_SLATEPACK      = "Resulting Slatepack";
 
 const QString PAGE_K_ACCOUNTS       = "Accounts";
 const QString PAGE_K_ACCOUNT_TRANSFER = "Transfer coins between accounts";

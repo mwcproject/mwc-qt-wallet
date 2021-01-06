@@ -14,12 +14,13 @@
 
 #include "g_finalize_w.h"
 #include "ui_g_finalize.h"
-#include <QFileDialog>
 #include "../control_desktop/messagebox.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/config_b.h"
+#include "../bridge/util_b.h"
 #include "../bridge/wnd/g_finalize_b.h"
 #include "../core/global.h"
+#include "../dialogs_desktop/g_inputslatepackdlg.h"
 
 namespace wnd {
 
@@ -32,6 +33,7 @@ Finalize::Finalize(QWidget *parent) :
 
     config = new bridge::Config(this);
     finalize = new bridge::Finalize(this);
+    util = new bridge::Util(this);
 }
 
 Finalize::~Finalize()
@@ -51,28 +53,27 @@ void Finalize::on_uploadFileBtn_clicked() {
 
     // Logic is implemented into This Window
     // It is really wrong, but also we don't want to have special state for that.
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Finalize transaction file"),
-                                                    config->getPathFor("fileGen"),
-                                                    tr("MWC response transaction (*.tx.response *.response);;All files (*.*)"));
-
-    if (fileName.length() == 0)
+    QString fileName = util->getOpenFileName( "Finalize transaction file",
+                                                    "fileGen",
+                                                    "MWC response transaction (*.tx.response *.response);;All files (*.*)");
+    if (fileName.isEmpty())
         return;
-    auto fileOk = util::validateMwc713Str(fileName);
-    if (!fileOk.first) {
-        core::getWndManager()->messageTextDlg("File Path",
-                                              "This file path is not acceptable.\n" + fileOk.second);
-        return;
-    }
-
-    // Update path
-    QFileInfo flInfo(fileName);
-    config->updatePathFor("fileGen", flInfo.path());
 
     finalize->uploadFileTransaction(fileName);
 }
 
+void Finalize::on_pasteSlatepackBtn_clicked()
+{
+    util::TimeoutLockObject to( "FinalizeUpload" );
+
+    dlg::InputSlatepackDlg inputSlateDlg("SendResponse", "Send response slate",
+                                         util::FileTransactionType::FINALIZE,  this);
+
+    if (inputSlateDlg.exec()  == QDialog::Accepted ) {
+        finalize->uploadSlatepackTransaction( inputSlateDlg.getSlatepack(), inputSlateDlg.getSlateJson(), inputSlateDlg.getSenderAddress() );
+    }
+}
 
 
 }
-
 

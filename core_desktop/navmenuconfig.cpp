@@ -20,6 +20,8 @@
 #include "../control_desktop/messagebox.h"
 #include "../bridge/config_b.h"
 #include "../bridge/statemachine_b.h"
+#include "../util_desktop/timeoutlock.h"
+#include "../dialogs_desktop/g_decodeslatepackdlg.h"
 
 namespace core {
 
@@ -80,6 +82,14 @@ void NavMenuConfig::on_selectRunningModeButton_clicked() {
     stateMachine->setActionWindow( state::STATE::WALLET_RUNNING_MODE );
     close();
 }
+
+void NavMenuConfig::on_viewSlatepackContentButton_clicked() {
+    util::TimeoutLockObject to( "Receive" );
+
+    dlg::DecodeSlatepackDlg  decodeSlatepackDlg(this);
+    decodeSlatepackDlg.exec();
+}
+
 
 void NavMenuConfig::on_resyncButton_clicked()
 {

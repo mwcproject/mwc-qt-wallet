@@ -67,7 +67,7 @@ void NewSwap1::on_contactsButton_clicked() {
 
     // Get the contacts
 
-    dlg::SelectContact dlg(this);
+    dlg::SelectContact dlg(this, true, true, false);
     if (dlg.exec() == QDialog::Accepted) {
         core::ContactRecord selectedContact = dlg.getSelectedContact();
         ui->sendAddressEdit->setText( selectedContact.address );

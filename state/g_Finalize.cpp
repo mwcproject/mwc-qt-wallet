@@ -31,7 +31,11 @@ Finalize::Finalize( StateContext * _context) :
     State(_context, STATE::FINALIZE)
 {
     QObject::connect( context->wallet, &wallet::Wallet::onFinalizeFile,
-                          this, &Finalize::onFinalizeFile, Qt::QueuedConnection );
+
+                      this, &Finalize::onFinalizeFile, Qt::QueuedConnection );
+
+    QObject::connect( context->wallet, &wallet::Wallet::onFinalizeSlatepack,
+                      this, &Finalize::onFinalizeSlatepack, Qt::QueuedConnection );
 
     QObject::connect( context->wallet, &wallet::Wallet::onAllTransactions,
                       this, &Finalize::onAllTransactions, Qt::QueuedConnection );
@@ -69,12 +73,10 @@ void Finalize::updateResultTxPath(QString path) {
     context->appContext->updatePathFor("resultTx", path);
 }
 
-
 void Finalize::uploadFileTransaction(QString fileName) {
 
     util::FileTransactionInfo transInfo;
-
-    QPair<bool, QString> perseResult = transInfo.parseTransaction(fileName, util::FileTransactionType::FINALIZE );
+    QPair<bool, QString> perseResult = transInfo.parseSlateFile(fileName, util::FileTransactionType::FINALIZE );
 
     if (!perseResult.first) {
         core::getWndManager()->messageTextDlg("Slate File", perseResult.second );
@@ -85,6 +87,22 @@ void Finalize::uploadFileTransaction(QString fileName) {
 
     core::getWndManager()->pageFileTransaction(mwc::PAGE_G_FINALIZE_TRANS, FINALIZE_CALLER_ID,
                                                fileName, transInfo, lastNodeHeight,
+                                               "Finalize Transaction", "Finalize");
+}
+
+void Finalize::uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender ) {
+    util::FileTransactionInfo transInfo;
+    QPair<bool, QString> perseResult = transInfo.parseSlateContent(slateJson, util::FileTransactionType::FINALIZE, sender );
+
+    if (!perseResult.first) {
+        core::getWndManager()->messageTextDlg("Slatepack validation", perseResult.second );
+        return;
+    }
+
+    file2TransactionsInfo.insert(transInfo.transactionId, transInfo);
+
+    core::getWndManager()->pageFileTransaction(mwc::PAGE_G_FINALIZE_TRANS, FINALIZE_CALLER_ID,
+                                               slatepack, transInfo, lastNodeHeight,
                                                "Finalize Transaction", "Finalize");
 }
 
@@ -100,6 +118,20 @@ void Finalize::ftContinue(QString fileName, QString resultTxFileName, bool fluff
 
     logger::logInfo("Finalize", "finalizing file " + fileName);
     context->wallet->finalizeFile(fileName, fluff);
+}
+
+
+// Expected that user already made all possible appruvals
+void Finalize::ftContinueSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff) {
+    if (!file2TransactionsInfo.contains(txUuid)) {
+        Q_ASSERT(false);
+        return;
+    }
+
+    file2TransactionsInfo[txUuid].resultingFN = resultTxFileName;
+
+    logger::logInfo("Finalize", "finalizing slatepack " + slatepack);
+    context->wallet->finalizeSlatepack(slatepack, fluff, txUuid );
 }
 
 void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileName ) {
@@ -121,40 +153,72 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
             core::getWndManager()->messageTextDlg("Finalize File Transaction", "File Transaction was finalized successfully.");
         }
         else {
-            // Cold wallet workflow, let's copy the transaction file
-            QPair<bool,QString> walletPath = ioutils::getAppDataPath( context->wallet->getWalletConfig().getDataPath() );
-            if (!walletPath.first) {
-                core::getWndManager()->messageTextDlg("Error", walletPath.second);
-                QCoreApplication::exit();
-                return;
-            }
-
-            QString transactionFN = walletPath.second + "/saved_txs/" + trInfo.transactionId + ".mwctx";
-            if ( !QFile(transactionFN).exists() ) {
-                core::getWndManager()->messageTextDlg("Internal Error", "Transaction file for id '" + trInfo.transactionId + "' not found. mwc713 didn't create expected file.");
-                return;
-            }
-
-
-            if ( QFile::exists(trInfo.resultingFN) )
-                QFile::remove(trInfo.resultingFN);
-
-            bool copyOk = QFile::copy(transactionFN, trInfo.resultingFN);
-
-            if (copyOk) {
-                core::getWndManager()->messageTextDlg("Finalize File Transaction", "File Transaction was finalized successfully but it is not published because you are running Cold Wallet.\n"
-                                             "Resulting transaction located at " + trInfo.resultingFN+ ". Please publish at with MWC Node, so it will be propagated to the blockchain network.");
-            }
-            else {
-                core::getWndManager()->messageTextDlg("IO Error", "File Transaction was finalized successfully but we wasn't be able to save file at the requested location. Please note, you need publish this transaction with MWC Node, so it will be propagated to the blockchain network."
-                                             "Your transaction location:\n" + transactionFN);
-            }
+            finalizeForColdWallet(trInfo);
         }
 
         ftBack();
     }
     else {
         core::getWndManager()->messageTextDlg("Failure", "File Transaction failed to finalize.\n" + errors.join("\n") );
+    }
+}
+
+void Finalize::onFinalizeSlatepack( QString tagId, QString error, QString txUuid ) {
+    logger::logInfo("Finalize", "Get slatepack finalize results. tagId=" + tagId + ", error=" + error + " txUuid=" + txUuid );
+
+    for (auto p : bridge::getBridgeManager()->getFileTransaction() )
+        p->hideProgress();
+
+    if (error.isEmpty()) {
+        if (!file2TransactionsInfo.contains(txUuid)) {
+            Q_ASSERT(false);
+            return;
+        }
+
+        const util::FileTransactionInfo & trInfo = file2TransactionsInfo[txUuid];
+        if (trInfo.resultingFN.isEmpty()) {
+            // Online wallet case. The normal workflow
+            core::getWndManager()->messageTextDlg("Finalize Slatepack Transaction", "Slatepack Transaction was finalized successfully.");
+        }
+        else {
+            finalizeForColdWallet(trInfo);
+        }
+
+        ftBack();
+    }
+    else {
+        core::getWndManager()->messageTextDlg("Failure", "File Transaction failed to finalize.\n" + error);
+    }
+}
+
+void Finalize::finalizeForColdWallet(const util::FileTransactionInfo & trInfo) {
+    // Cold wallet workflow, let's copy the transaction file
+    QPair<bool,QString> walletPath = ioutils::getAppDataPath( context->wallet->getWalletConfig().getDataPath() );
+    if (!walletPath.first) {
+        core::getWndManager()->messageTextDlg("Error", walletPath.second);
+        QCoreApplication::exit();
+        return;
+    }
+
+    QString transactionFN = walletPath.second + "/saved_txs/" + trInfo.transactionId + ".mwctx";
+    if ( !QFile(transactionFN).exists() ) {
+        core::getWndManager()->messageTextDlg("Internal Error", "Transaction file for id '" + trInfo.transactionId + "' not found. mwc713 didn't create expected file.");
+        return;
+    }
+
+
+    if ( QFile::exists(trInfo.resultingFN) )
+        QFile::remove(trInfo.resultingFN);
+
+    bool copyOk = QFile::copy(transactionFN, trInfo.resultingFN);
+
+    if (copyOk) {
+        core::getWndManager()->messageTextDlg("Finalize File Transaction", "Transaction was finalized successfully but it is not published because you are running Cold Wallet.\n"
+                                                                           "Resulting transaction located at " + trInfo.resultingFN+ ". Please publish at with MWC Node, so it will be propagated to the blockchain network.");
+    }
+    else {
+        core::getWndManager()->messageTextDlg("IO Error", "Transaction was finalized successfully but we wasn't be able to save file at the requested location. Please note, you need publish this transaction with MWC Node, so it will be propagated to the blockchain network."
+                                                          "Your transaction location:\n" + transactionFN);
     }
 }
 

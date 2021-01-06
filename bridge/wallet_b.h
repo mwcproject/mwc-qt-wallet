@@ -46,8 +46,6 @@ public:
     // Request start/stop listeners. Feedback should come with sgnUpdateListenerStatus
     Q_INVOKABLE void requestStartMqsListener();
     Q_INVOKABLE void requestStopMqsListener();
-    Q_INVOKABLE void requestStartKeybaseListener(); // Absolete
-    Q_INVOKABLE void requestStopKeybaseListener(); // Absolete
     Q_INVOKABLE void requestStartTorListener();
     Q_INVOKABLE void requestStopTorListener();
 
@@ -142,7 +140,14 @@ public:
     // Check Signal: sgnAccountRenamed(bool success, QString errorMessage);
     Q_INVOKABLE void renameAccount(QString oldName, QString newName);
 
+    // Decode the slatepack data
+    // Check Signal: sgnDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
+    Q_INVOKABLE void decodeSlatepack(QString slatepackContent);
 signals:
+    // Wallet notification about what is the command that is starting.
+    // Note, on idle it sends "empty" String. Not all commands sending an update
+    void sgnStartingCommand(QString actionName);
+
     // Updates from the wallet and notification system
     void sgnNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL values
     void sgnConfigUpdate();
@@ -201,7 +206,12 @@ signals:
 
     // respobd from repost.  OK is err is empty
     void sgnRepost(int txIdx, QString err);
+
+    // response form DecodeSlatepack. Ok if error is empty
+    void sgnDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
 private slots:
+    void onStartingCommand(QString actionName);
+
     // Signals that comes from wallet & notification system
     void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
     void onConfigUpdate();
@@ -234,6 +244,8 @@ private slots:
     void onAccountRenamed(bool success, QString errorMessage);
 
     void onRepost(int txIdx, QString err);
+
+    void onDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
 };
 
 }

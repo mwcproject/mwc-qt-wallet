@@ -315,8 +315,9 @@ bool TaskFinalizeFile::processTask(const QVector<WEvent> &events) {
 
     QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
 
+    //  txp1.tx.response finalized transaction edaf5197-677e-48eb-a414-db377896a8c3
     for ( auto ln : lns ) {
-        int idx = ln.message.indexOf(" finalized.");
+        int idx = ln.message.indexOf(" finalized ");
         if (idx>0) {
             QString fileName = ln.message.left(idx).trimmed();
             wallet713->setFinalizeFile(true, QStringList(), fileName );
@@ -343,6 +344,110 @@ bool TaskFinalizeFile::processTask(const QVector<WEvent> &events) {
 
 }
 
+// ----------------------- TaskSendSlatepack ---------------------------------
+
+QString TaskSendSlatepack::buildCommand( int64_t coinNano, QString message, int inputConfirmationNumber, int changeOutputs,
+                                         const QStringList & outputs, int ttl_blocks, bool generateProof, QString slatepackRecipientAddress,
+                                         bool isLockLater ) const {
+    QString cmd = "send ";
+    if (coinNano > 0)
+        cmd += util::nano2one(coinNano);
+
+    if (!message.isEmpty())
+    cmd += " --message " + util::toMwc713input(message); // Message symbols MUST be escaped.
+
+    if (!outputs.isEmpty()) {
+        cmd += " --confirmations 1 --strategy custom --outputs " + outputs.join(",");
+    }
+
+    if (outputs.isEmpty() && inputConfirmationNumber > 0)
+        cmd += " --confirmations " + QString::number(inputConfirmationNumber);
+
+    if (changeOutputs > 0)
+        cmd += " --change-outputs " + QString::number(changeOutputs);
+
+    // So far documentation doesn't specify difference between protocols
+    if (slatepackRecipientAddress.isEmpty())
+        cmd += " --slatepack";
+    else
+        cmd += " --slatepack_recipient " + slatepackRecipientAddress;
+
+    if (ttl_blocks > 0)
+        cmd += " --ttl-blocks " + QString::number(ttl_blocks);
+
+    if (generateProof)
+        cmd += " --proof";
+
+    if (isLockLater)
+        cmd += " --lock_later";
+
+    if (coinNano < 0)
+        cmd += " ALL";
+
+    qDebug() << "send slatepack Command: '" << cmd << "'";
+    return cmd;
+}
+
+bool TaskSendSlatepack::processTask(const QVector<WEvent> &events) {
+    QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
+
+    for ( auto & ln : lns ) {
+        if (ln.message.startsWith("Slatepack: ")) {
+            QString slatepack = ln.message.mid( strlen("Slatepack: ") ).trimmed();
+            wallet713->setSendSlatepack("", slatepack, tag);
+            return true;
+        }
+    }
+
+    wallet713->setSendSlatepack(getErrorMessage(events, "Unable to get a slate"), "", tag);
+    return true;
+}
+
+// ---------------------------- TaskReceiveSlatepack -----------------------------
+
+bool TaskReceiveSlatepack::processTask(const QVector<WEvent> &events) {
+    QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
+
+    for ( auto & ln : lns ) {
+        if (ln.message.startsWith("Slatepack: ")) {
+            QString slatepack = ln.message.mid( strlen("Slatepack: ") ).trimmed();
+            wallet713->setReceiveSlatepack("", slatepack, tag);
+            return true;
+        }
+    }
+
+    wallet713->setReceiveSlatepack(getErrorMessage(events, "Unable to get a slate"), "", tag);
+    return true;
+}
+
+// --------------------------- TaskFinalizeSlatepack ------------------------------------
+
+QString TaskFinalizeSlatepack::buildCommand(QString slatepack, bool fluff) const {
+    QString res("finalize ");
+    res += "--content \"" + slatepack + "\"";
+    if (fluff) {
+        res += " --fluff";
+    }
+    return res;
+}
+
+bool TaskFinalizeSlatepack::processTask(const QVector<WEvent> &events) {
+    QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
+
+    for ( auto & ln : lns ) {
+        int idx = ln.message.indexOf(" finalized transaction ");
+        if (idx>=0) {
+            idx += strlen(" finalized transaction ");
+            QString txId = ln.message.mid(idx).trimmed();
+            wallet713->setFinalizedSlatepack("", txId, tag);
+            return true;
+        }
+    }
+
+    wallet713->setFinalizedSlatepack(getErrorMessage(events, "Unable to finalize slatepack"), "", tag);
+    return true;
+}
+
 // --------------------------- TaskRequestRecieverWalletAddress ---------------------------
 
 bool TaskRequestRecieverWalletAddress::processTask(const QVector<WEvent> &events) {
@@ -359,6 +464,47 @@ bool TaskRequestRecieverWalletAddress::processTask(const QVector<WEvent> &events
 
     // reporting error
     wallet713->setRequestRecieverWalletAddress(url, "", getErrorMessage(events, "Unable to get a receiver wallet address for " + url));
+    return true;
+}
+
+// ---------------------------------- TaskDecodeSlatepack -------------------------------
+
+bool TaskDecodeSlatepack::processTask(const QVector<WEvent> &events) {
+    // Normally we have 3 lines.
+    // Slate: {"version_info":{"version":3, ...
+    // Content: InvoiceInitial
+    // Sender: None
+
+    QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
+
+    QString slate;
+    QString content;
+    QString sender;
+    QString recipient;
+
+    for (const auto & ln : lns) {
+        const QString msg = ln.message;
+        if (msg.startsWith("Slate: ")) {
+            slate = msg.mid(strlen("Slate: ")).trimmed();
+        }
+        else if ( msg.startsWith("Content: ") ) {
+            content = msg.mid(strlen("Content: ")).trimmed();
+        }
+        else if ( msg.startsWith("Sender: ") ) {
+            sender = msg.mid(strlen("Sender: ")).trimmed();
+        }
+        else if ( msg.startsWith("Recipient: ") ) {
+            recipient = msg.mid(strlen("Recipient: ")).trimmed();
+        }
+
+    }
+
+    if (slate.isEmpty() || content.isEmpty() || sender.isEmpty()) {
+        wallet713->setDecodeSlatepack( getErrorMessage(events, "Unable to decode a slatepack"), slatepack, "","","", "");
+    }
+    else {
+        wallet713->setDecodeSlatepack( "", slatepack, slate, content, sender, recipient);
+    }
     return true;
 }
 

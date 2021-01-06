@@ -29,10 +29,11 @@ class Mwc713Task
 {
 public:
     // shadowStr - specify if data in this task is private. That string will be used into the logs.
-    Mwc713Task(QString taskName, QString inputStr, MWC713 * wallet713, QString shadowStr);
+    Mwc713Task(QString taskName, QString taskProgressName, QString inputStr, MWC713 * wallet713, QString shadowStr);
     virtual ~Mwc713Task();
 
     const QString & getTaskName() const {return taskName;}
+    const QString & getTaskProgressName() const {return taskProgressName;}
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() = 0; // Set of final events that can trigger task execution and completion
 
@@ -59,7 +60,7 @@ public:
 
 protected:
     QString taskName;
-
+    QString taskProgressName; // EMpty - don't update the status
     // wallet to call back regarding the state change
     MWC713 * wallet713;
     QString inputStr; // string (command) to feed to a wallet

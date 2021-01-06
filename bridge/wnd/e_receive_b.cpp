@@ -31,8 +31,14 @@ Receive::~Receive() {
     getBridgeManager()->removeReceive(this);
 }
 
+// Sign file transaction
 void Receive::signTransaction(QString fileName) {
     getState()->signTransaction(fileName);
+}
+
+// Sign slatepack transaction. The primary data is slatepack.  slateJson can be calculated, passed becuase we already have after verification
+void Receive::signSlatepackTransaction(QString slatepack, QString slateJson, QString slateSenderAddress) {
+    getState()->signSlatepackTransaction(slatepack, slateJson, slateSenderAddress);
 }
 
 void Receive::onTransactionActionIsFinished( bool success, QString message ) {

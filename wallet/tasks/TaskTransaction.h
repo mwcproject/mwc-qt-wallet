@@ -27,7 +27,7 @@ public:
 
     // Outputs run with no-refresh because wallet responsible to call sync first
     TaskOutputs( MWC713 * wallet713, bool show_spent ) :
-        Mwc713Task("Outputs", QString("outputs") + (show_spent?" --show-spent":"") + " --no-refresh" , wallet713, "") {showSpent=show_spent;}
+        Mwc713Task("Outputs", "Requesting outputs...", QString("outputs") + (show_spent?" --show-spent":"") + " --no-refresh" , wallet713, "") {showSpent=show_spent;}
 
     virtual ~TaskOutputs() override {}
 
@@ -44,7 +44,7 @@ public:
     const static int64_t TIMEOUT = 1000*15;
 
     TaskOutputsForAccount( MWC713 * wallet713, QString _accountName) :
-            Mwc713Task("Outputs", "outputs --no-refresh", wallet713, ""),
+            Mwc713Task("Outputs", "Requesting outputs...", "outputs --no-refresh", wallet713, ""),
             accountName(_accountName) {}
 
     virtual ~TaskOutputsForAccount() override {}
@@ -62,7 +62,7 @@ public:
 
     // Transactions run with no-refresh because wallet responsible to call sync first
     TaskTransactions( MWC713 * wallet713) :
-            Mwc713Task("Transactions", "txs --show-full --no-refresh", wallet713, "") {}
+            Mwc713Task("Transactions", "Requesting transactions...", "txs --show-full --no-refresh", wallet713, "") {}
 
     virtual ~TaskTransactions() override {}
 
@@ -77,7 +77,7 @@ public:
 
     // Transactions run with no-refresh because wallet responsible to call sync first
     TaskTransactionsById( MWC713 * wallet713, int txId) :
-            Mwc713Task("Transactions", "txs --id " + QString::number(txId) +" --no-refresh", wallet713, "")  {}
+            Mwc713Task("Transactions", "Requesting transaction details...", "txs --id " + QString::number(txId) +" --no-refresh", wallet713, "")  {}
 
     virtual ~TaskTransactionsById() override {}
 
@@ -91,7 +91,7 @@ public:
     const static int64_t TIMEOUT = 1000*7;
 
     TaskTransCancel( MWC713 * wallet713, int64_t transId, QString _account ) :
-            Mwc713Task("TaskTransCancel", "cancel --id " + QString::number(transId) , wallet713, ""), transactionId(transId), account(_account) {}
+            Mwc713Task("TaskTransCancel", "Cancelling transaction...", "cancel --id " + QString::number(transId) , wallet713, ""), transactionId(transId), account(_account) {}
 
     virtual ~TaskTransCancel() override {}
 
@@ -110,7 +110,7 @@ public:
     const static int64_t TIMEOUT = 1000*7;
 
     TaskTransExportProof( MWC713 * wallet713, QString fileName, int64_t transId ) :
-            Mwc713Task("TransExportProof", "export-proof --file " + util::toMwc713input(fileName) + " --id " + QString::number(transId) , wallet713, ""), transactionId(transId), proofFileName(fileName) {}
+            Mwc713Task("TransExportProof", "Generating transaction proof file...", "export-proof --file " + util::toMwc713input(fileName) + " --id " + QString::number(transId) , wallet713, ""), transactionId(transId), proofFileName(fileName) {}
 
     virtual ~TaskTransExportProof () override {}
 
@@ -127,7 +127,7 @@ public:
     const static int64_t TIMEOUT = 1000*7;
 
     TaskTransVerifyProof( MWC713 * wallet713, QString fileName  ) :
-            Mwc713Task("TaskTransVerifyProof", "verify-proof --file " + util::toMwc713input(fileName), wallet713, ""), proofFileName(fileName) {}
+            Mwc713Task("TaskTransVerifyProof", "Verifying transaction proof file...", "verify-proof --file " + util::toMwc713input(fileName), wallet713, ""), proofFileName(fileName) {}
 
     virtual ~TaskTransVerifyProof () override {}
 

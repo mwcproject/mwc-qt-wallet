@@ -49,6 +49,7 @@ public:
 
     // QFileDialog::getSaveFileName call
     virtual QString getSaveFileName(const QString &caption, const QString &dir, const QString &filter) override;
+    virtual QString getOpenFileName(const QString &caption, const QString &dir, const QString &filter) override;
 
     // Ask for confirmation
     virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) override;
@@ -67,7 +68,7 @@ public:
     virtual void pageProgressWnd(QString pageTitle, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable ) override;
     virtual void pageOutputs() override;
     virtual void pageFileTransaction(QString pageTitle, QString callerId,
-                                     const QString & fileName, const util::FileTransactionInfo & transInfo,
+                                     const QString & fileNameOrSlatepack, const util::FileTransactionInfo & transInfo,
                                      int nodeHeight,
                                      QString transactionType, QString processButtonName) override;
     virtual void pageRecieve() override;
@@ -77,6 +78,9 @@ public:
     virtual void pageSendOnline( QString selectedAccount, int64_t amount ) override;
     virtual void pageSendOffline( QString selectedAccount, int64_t amount ) override;
     virtual void pageTransactions() override;
+    // slatepack - slatepack string value to show.
+    // backStateId - state ID of the caller. On 'back' will switch to this state Id
+    virtual void pageShowSlatepack(QString slatepack, int backStateId, QString txExtension) override;
 
     virtual void pageAccounts() override;
     virtual void pageAccountTransfer() override;

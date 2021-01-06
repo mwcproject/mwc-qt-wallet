@@ -58,11 +58,6 @@ public:
 
     node::MwcNode * getMwcNode() const;
 
-    QString getBlockchainDataPath() const;
-    void    updateBlockchainDataPath(QString path);
-    QString getPublishTransactionPath() const;
-    void    updatePublishTransactionPath(QString path);
-
     void exportBlockchainData(QString fileName);
     void importBlockchainData(QString fileName);
     void publishTransaction(QString fileName);

@@ -30,7 +30,7 @@ QString readStringFromJson(const QJsonObject & jsonObj, QString path, const QStr
 
 
 // Transaction type as intention - what we want ot do with that.
-enum class FileTransactionType { RECEIVE, FINALIZE };
+enum class FileTransactionType { RECEIVE = 1, FINALIZE = 2 };
 
 /////// ------------------ File Transaction processing ---------------------
 struct FileTransactionInfo {
@@ -38,14 +38,16 @@ struct FileTransactionInfo {
     QString transactionId;
     int64_t amount; // nanos
     int64_t fee;    // nanos
-    QString receiverAddress;
+    bool amount_fee_not_defined = false; // Slatepack finalize doesn't have this info
+    QString fromAddress;
     QString message;
     int     height;
     int     lock_height;
 
     QString resultingFN; // cookie data
 
-    QPair<bool, QString> parseTransaction( QString fileName, FileTransactionType type );
+    QPair<bool, QString> parseSlateContent( QString slateContent, FileTransactionType type, QString slateSenderAddress );
+    QPair<bool, QString> parseSlateFile( QString fileName, FileTransactionType type );
 };
 
 

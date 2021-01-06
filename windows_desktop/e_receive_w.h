@@ -25,6 +25,7 @@ namespace bridge {
 class Config;
 class Wallet;
 class Receive;
+class Util;
 }
 
 namespace wnd {
@@ -54,6 +55,8 @@ private slots:
 
     void on_accountComboBox_activated(int index);
     void on_recieveFileButton_clicked();
+    void on_recieveSlatepackButton_clicked();
+
 private:
     void updateAccountList();
 
@@ -62,6 +65,7 @@ private:
     bridge::Config * config = nullptr;
     bridge::Wallet * wallet = nullptr;
     bridge::Receive * receive = nullptr;
+    bridge::Util * util = nullptr;
 
     QString mwcAddress;
 };

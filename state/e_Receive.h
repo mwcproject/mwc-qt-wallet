@@ -29,10 +29,12 @@ public:
     virtual ~Receive() override;
 
     void signTransaction( QString fileName );
+    void signSlatepackTransaction(QString slatepack, QString slateJson, QString slateSenderAddress);
 
 public:
     void ftBack();
     void ftContinue(QString fileName, QString resultTxFileName, bool fluff);
+    void ftContinueSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff);
 
     bool needResultTxFileName() {return false;}
 
@@ -44,13 +46,14 @@ protected:
     virtual NextStateRespond execute() override;
     virtual QString getHelpDocName() override {return "receive.html";}
 
-    void respReceiveFile( bool success, QStringList errors, QString inFileName );
-
     bool isActive() const;
 private slots:
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
+    void onReceiveFile( bool success, QStringList errors, QString inFileName );
+    void onReceiveSlatepack( QString tagId, QString error, QString slatepack );
 private:
     int lastNodeHeight = 0;
+    bool signingFile = false; // what is signing now. File or Slatepack.
 };
 
 

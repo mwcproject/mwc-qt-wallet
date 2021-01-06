@@ -17,6 +17,7 @@
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../util/Log.h"
+#include "../util/filedialog.h"
 #include "../util/ui.h"
 #include "../core/global.h"
 #include "../core/Config.h"
@@ -60,6 +61,8 @@ Send::Send(StateContext * context) :
 
     QObject::connect(context->wallet, &wallet::Wallet::onSendFile,
                      this, &Send::respSendFile, Qt::QueuedConnection);
+    QObject::connect(context->wallet, &wallet::Wallet::onSendSlatepack,
+                     this, &Send::respSendSlatepack, Qt::QueuedConnection);
 
     // Need to update mwc node status because send can fail if node is not healthy.
     QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
@@ -147,7 +150,7 @@ int Send::initialSendSelection( bool isOnlineSelected, QString account, QString 
 }
 
 // Handle whole workflow to send offline
-bool Send::sendMwcOffline( QString account, int64_t amount, QString message) {
+bool Send::sendMwcOffline( QString account, int64_t amount, QString message, bool isSlatepack, bool isLockLater, QString slatepackRecipientAddress) {
 
     core::SendCoinsParams sendParams = context->appContext->getSendCoinsParams();
 
@@ -178,23 +181,29 @@ bool Send::sendMwcOffline( QString account, int64_t amount, QString message) {
                        hash, core::WndManager::RETURN_CODE::BTN2, &ttl_blocks) )
         return false;
 
-    QString fileName = core::getWndManager()->getSaveFileName( tr("Create Initial Transaction Slate File"),
-                                                    context->appContext->getPathFor("fileGen"),
-                                                    tr("MWC init transaction (*.tx)"));
-
-    if (fileName.length()==0)
-        return false;
-
-    if (!fileName.endsWith(".tx"))
-        fileName += ".tx";
-
-    // Update path
-    QFileInfo flInfo(fileName);
-    context->appContext->updatePathFor("fileGen", flInfo.path());
-
     core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
 
-    context->wallet->sendFile( account, amount, message, fileName,prms.inputConfirmationNumber, prms.changeOutputs, outputs, ttl_blocks, context->appContext->getGenerateProof() );
+    // Note, Send by file and slatepack responding with different signals
+
+    if ( isSlatepack) {
+        // Init send transaction with file output
+        // Check signal:  onSendSlatepack
+        context->wallet->sendSlatepack( account, amount, message,
+                                        prms.inputConfirmationNumber, prms.changeOutputs, outputs, ttl_blocks, context->appContext->getGenerateProof(),
+                                        slatepackRecipientAddress, // optional. Encrypt SP if it is defined.
+                                        isLockLater, "");
+    }
+    else {
+        // send as a file
+        QString fileName = util::getSaveFileName("Create Initial Transaction Slate File", "fileGen",
+                                                 "MWC init transaction (*.tx)", ".tx");
+        if (fileName.isEmpty())
+            return false;
+
+        context->wallet->sendFile(account, amount, message, fileName, prms.inputConfirmationNumber, prms.changeOutputs,
+                                  outputs, ttl_blocks, context->appContext->getGenerateProof());
+    }
+
     return true;
 }
 
@@ -214,6 +223,22 @@ void Send::respSendFile( bool success, QStringList errors, QString fileName ) {
         }
     }
 }
+
+void Send::respSendSlatepack( QString tagId, QString error, QString slatepack ) {
+    Q_UNUSED(tagId)
+    if (!error.isEmpty()) {
+        // show error...
+        if ( state::getStateMachine()->getCurrentStateId() == STATE::SEND ) {
+            for (auto b : bridge::getBridgeManager()->getSend())
+                b->showSendResult(false, error);
+        }
+        return;
+    }
+
+    // Let's show the slatepack
+    core::getWndManager()->pageShowSlatepack( slatepack, STATE::SEND, ".tx" );
+}
+
 
 bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QString apiSecret, QString message) {
     while(address.endsWith("/"))
@@ -253,6 +278,11 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
                                                       "Tor listener is not started. Please start Tor listener first." );
                 return false;
             }
+
+            // Let's convert tor address to the standard noration that mwc713 undertands
+            QString tor_pk = util::extractPubKeyFromAddress(address);
+            address = "http://" + tor_pk + ".onion";
+
             /*  Not checking offline because there is a high chance that send will work
              if (!listenerStatus.tor) {
                 core::getWndManager()->messageTextDlg("Listener is Offline",

@@ -16,7 +16,7 @@
 #include "ui_s_swapbackupdlg.h"
 #include "../bridge/config_b.h"
 #include "../bridge/swap_b.h"
-#include <QFileDialog>
+#include "../bridge/util_b.h"
 #include "../core/WndManager.h"
 #include "../control_desktop/messagebox.h"
 
@@ -35,6 +35,7 @@ SwapBackupDlg::SwapBackupDlg(QWidget *parent, QString _swapId, int _backupId) :
 
     config = new bridge::Config(this);
     swap = new bridge::Swap(this);
+    util = new bridge::Util(this);
 
     connect(swap, &bridge::Swap::sgnBackupSwapTradeData, this, &SwapBackupDlg::sgnBackupSwapTradeData, Qt::QueuedConnection);
 
@@ -61,23 +62,11 @@ SwapBackupDlg::~SwapBackupDlg()
 
 void SwapBackupDlg::on_selectPath_clicked()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Trade Backup"),
-                                                   config->getPathFor("SwapBackupDlg"),
-                                                   tr("Trade Backup (*.trade)"));
+    QString fileName = util->getSaveFileName("Trade Backup", "SwapBackupDlg",  "Trade Backup (*.trade)" , "*.trade");
 
-    if (fileName.length()==0)
+    if (fileName.isEmpty())
         return;
-    auto fileOk = util::validateMwc713Str(fileName);
-    if (!fileOk.first) {
-        core::getWndManager()->messageTextDlg("File Path",
-                                              "This file path is not acceptable.\n" + fileOk.second);
-        return;
-    }
 
-    if (!fileName.endsWith(".trade"))
-        fileName += ".trade";
-
-    config->updatePathFor("SwapBackupDlg", QFileInfo(fileName).absolutePath() );
     ui->backupDataPath->setText(fileName);
 
     updateButtons();

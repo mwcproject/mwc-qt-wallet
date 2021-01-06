@@ -41,8 +41,9 @@ public:
     Q_INVOKABLE bool isNodeHealthy();
 
     // Handle whole workflow to send offline
+    // apiSecret - is not needed. Pass empty String
     // return true if some long process was started.
-    Q_INVOKABLE bool sendMwcOffline( QString account, QString amountNano, QString message);
+    Q_INVOKABLE bool sendMwcOffline( QString account, QString amountNano, QString message, bool isSlatepack, bool isLockLater, QString slatepackRecipientAddress);
 
     // Handle whole workflow to send online
     // return true if some long process was started.

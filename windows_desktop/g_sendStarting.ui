@@ -238,7 +238,7 @@
           </rect>
          </property>
          <property name="text">
-          <string>File</string>
+          <string>File or SP</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

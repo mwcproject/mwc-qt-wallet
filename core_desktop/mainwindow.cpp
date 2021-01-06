@@ -73,6 +73,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(wallet, &Wallet::sgnUpdateSyncProgress,
                      this, &MainWindow::onSgnUpdateSyncProgress, Qt::QueuedConnection);
 
+    QObject::connect( wallet, &Wallet::sgnStartingCommand,
+                      this, &MainWindow::onSgnStartingCommand, Qt::QueuedConnection);
+
     updateListenerBtn();
     updateNetworkName();
     updateMenu();
@@ -243,6 +246,12 @@ void MainWindow::onSgnNewNotificationMessage(int level, QString message) {
     ui->statusBar->showMessage( prefix + message, (int)(timeout * config->getTimeoutMultiplier()) );
 }
 
+void MainWindow::onSgnStartingCommand(QString command) {
+    // We can print the current executing commnd into status line ONLY if normally we are using notification windows
+    if (statusMgr != nullptr) {
+        ui->statusBar->showMessage( command );
+    }
+}
 
 void MainWindow::updateLeftBar(bool show) {
     if (leftBarShown == show)

@@ -54,10 +54,11 @@ struct SendCoinsParams {
 struct ContactRecord {
     QString name;
     QString address;
+    QString pub_key;
 
     ContactRecord() = default;
     ContactRecord(const ContactRecord & other) = default;
-    ContactRecord(const QString & n, const QString & a) { name=n; address=a; }
+    ContactRecord(const QString & n, const QString & a);
 
     bool operator ==(const ContactRecord & o) {return name == o.name && address == o.address;}
 
@@ -215,6 +216,12 @@ public:
     bool getNoTorForEmbeddedNode() const {return noTorForEmbeddedNode;}
     void setNoTorForEmbeddedNode(bool noTor);
 
+    bool getSendSlatepack() const {return sendSlatepack;}
+    void setSendSlatepack(bool slatepack);
+
+    bool getSendLockOutput() const {return sendLockOutput; }
+    void setSendLockOutput(bool lock);
+
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -328,6 +335,10 @@ private:
 
     // Ban tor usage for embedded node
     bool noTorForEmbeddedNode = false;
+
+    // For offline send page, values for slatepack and lock after
+    bool sendSlatepack = false;
+    bool sendLockOutput = false;
 };
 
 template <class T>

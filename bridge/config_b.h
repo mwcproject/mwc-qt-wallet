@@ -171,6 +171,14 @@ public:
     // Setting is MWC Node prohibited to use TOR
     Q_INVOKABLE bool getNoTorForEmbeddedNode();
     Q_INVOKABLE void setNoTorForEmbeddedNode(bool noTor);
+
+    // Slatepack format, selected value
+    Q_INVOKABLE bool getSendSlatepack();
+    Q_INVOKABLE void setSendSlatepack(bool slatepack);
+
+    // Lock outputs for slatepacks send
+    Q_INVOKABLE bool getSendLockOutput();
+    Q_INVOKABLE void setSendLockOutput(bool lock);
 };
 
 }

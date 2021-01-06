@@ -25,6 +25,10 @@ void Finalize::uploadFileTransaction(QString fileName) {
     getState()->uploadFileTransaction(fileName);
 }
 
+void Finalize::uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender ) {
+    getState()->uploadSlatepackTransaction( slatepack, slateJson, sender );
+}
+
 // Check if the node healthy enough to do finalization.
 bool Finalize::isNodeHealthy() {
     return getState()->isNodeHealthy();

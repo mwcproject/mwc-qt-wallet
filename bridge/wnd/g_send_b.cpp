@@ -51,8 +51,8 @@ bool Send::isNodeHealthy() {
 
 // Handle whole workflow to send offline
 // return true if some long process was started.
-bool Send::sendMwcOffline( QString account, QString amountNano, QString message) {
-    return getState()->sendMwcOffline( account, amountNano.toLongLong(), message);
+bool Send::sendMwcOffline( QString account, QString amountNano, QString message, bool isSlatepack, bool isLockLater, QString slatepackRecipientAddress) {
+    return getState()->sendMwcOffline( account, amountNano.toLongLong(), message, isSlatepack, isLockLater, slatepackRecipientAddress);
 }
 
 // Handle whole workflow to send online

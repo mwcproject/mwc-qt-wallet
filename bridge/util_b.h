@@ -84,6 +84,33 @@ public:
     // Convert time interval in seconds into 2 sevel word description.
     Q_INVOKABLE QString interval2String(int intervalSec, bool shortUnits, int tiers = 2);
 
+    // Generating a QR image for the text content
+    // Result is 2 element array:
+    // res[0]  - size of the QR code
+    // res[1]  - SVG string that can draw the QR code. Seems like both Desctop and QML can draw the SVG path.
+    Q_INVOKABLE QVector<QString> generateQrCode(QString content);
+
+    // Parsing slate as a Json. Respond back with error or with Slate details
+    // slateContent  - slate sjon string to parse.
+    // fileTransactionType  - value of FileTransactionType
+    // Error case:
+    // res[0] - error message
+    // Normal case:
+    // res[0] = transactionId
+    // res[1] = amount
+    Q_INVOKABLE QVector<QString> parseSlateContent( QString slateContent, int fileTransactionType, QString slateSenderAddress );
+
+    // Open QFileDialog::getSaveFileName with all standard verificaitons that we normally have
+    // Return file name or empty value is request was cancelled or error happens
+    Q_INVOKABLE QString getSaveFileName(QString title, QString callerId, QString extentionsDlg, QString extentionFile);
+
+    // Open QFileDialog::getOpenFileName with all standard verificaitons that we normally have
+    // Return file name or empty value is request was cancelled or error happens
+    Q_INVOKABLE QString getOpenFileName(QString title, QString callerId, QString extentionsDlg);
+
+    // Write some text into the file
+    Q_INVOKABLE bool writeTextFile(QString fileName, QStringList lines );
+
 private:
     util::PasswordAnalyser * pa = nullptr;
     // PasswordAnalyser last respond values

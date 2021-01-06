@@ -48,6 +48,10 @@ void FileTransaction::ftContinue(QString fileName, QString resultTxFileName, boo
     CALL_STATE_METHOD(,ftContinue(fileName, resultTxFileName, fluff))
 }
 
+void FileTransaction::ftContinueSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff) {
+    CALL_STATE_METHOD(,ftContinueSlatepack(slatepack, txUuid, resultTxFileName, fluff))
+}
+
 bool FileTransaction::needResultTxFileName() {
     CALL_STATE_METHOD( return ,needResultTxFileName())
 }

@@ -31,6 +31,8 @@ Wallet::Wallet(QObject *parent) : QObject(parent) {
 
     wallet::Wallet *wallet = state::getStateContext()->wallet;
 
+    QObject::connect(wallet, &wallet::Wallet::onStartingCommand,
+                     this, &Wallet::onStartingCommand, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onConfigUpdate,
                      this, &Wallet::onConfigUpdate, Qt::QueuedConnection);
 
@@ -86,9 +88,15 @@ Wallet::Wallet(QObject *parent) : QObject(parent) {
                      this, &Wallet::onAccountRenamed, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onRepost,
                      this, &Wallet::onRepost, Qt::QueuedConnection);
+    QObject::connect(wallet, &wallet::Wallet::onDecodeSlatepack,
+                     this, &Wallet::onDecodeSlatepack, Qt::QueuedConnection);
 }
 
 Wallet::~Wallet() {}
+
+void Wallet::onStartingCommand(QString actionName) {
+    emit sgnStartingCommand(actionName);
+}
 
 void Wallet::onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message) {
     emit sgnNewNotificationMessage(int(level), message);
@@ -198,6 +206,10 @@ void Wallet::onAccountRenamed(bool success, QString errorMessage) {
     emit sgnAccountRenamed(success, errorMessage);
 }
 
+void Wallet::onDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient ) {
+    emit sgnDecodeSlatepack( error, slatepack, slateJSon, content, sender, recipient );
+}
+
 void Wallet::onRepost(int txIdx, QString err) {
     emit sgnRepost(txIdx, err);
 }
@@ -236,12 +248,6 @@ void Wallet::requestStartMqsListener() {
 }
 void Wallet::requestStopMqsListener() {
     getWallet()->listeningStop(true, false);
-}
-void Wallet::requestStartKeybaseListener() {
-    Q_ASSERT(false); // Absolete functionality
-}
-void Wallet::requestStopKeybaseListener() {
-    Q_ASSERT(false); // Absolete functionality
 }
 void Wallet::requestStartTorListener() {
     getWallet()->listeningStart(false, true, false);
@@ -413,5 +419,12 @@ void Wallet::createAccount( QString accountName ) {
 void Wallet::renameAccount(QString oldName, QString newName) {
     getWallet()->renameAccount(oldName, newName);
 }
+
+// Decode the slatepack data
+// Check Signal: sgnDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
+void Wallet::decodeSlatepack(QString slatepackContent) {
+    getWallet()->decodeSlatepack(slatepackContent);
+}
+
 
 }

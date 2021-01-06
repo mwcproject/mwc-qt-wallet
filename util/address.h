@@ -31,6 +31,10 @@ QPair<bool, ADDRESS_TYPE> verifyAddress(QString address);
 // address  - original address
 QString fullFormalAddress(ADDRESS_TYPE type, QString address);
 
+// Extract the middle part form the address. It is caller responsibility to verify the address type
+// This method will remove the preffix and suffix and return what is left
+QString extractPubKeyFromAddress(QString address);
+
 }
 
 #endif // ADDRESS_H

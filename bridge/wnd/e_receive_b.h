@@ -31,6 +31,10 @@ public:
     // sgnTransactionActionIsFinished will return some feedback if there are any.
     Q_INVOKABLE void signTransaction(QString fileName);
 
+    // Sign slatepack transaction. The primary data is a slatepack.  slateJson can be calculated, passed because we
+    // already have this info after verification.
+    Q_INVOKABLE void signSlatepackTransaction(QString slatepack, QString slateJson, QString slateSenderAddress);
+
 signals:
     // respond from signTransaction
     void sgnTransactionActionIsFinished( bool success, QString message );

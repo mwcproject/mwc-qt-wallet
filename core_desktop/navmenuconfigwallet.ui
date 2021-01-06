@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>187</width>
-    <height>292</height>
+    <height>342</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -172,6 +172,35 @@
    </property>
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="control::MwcFrameWithBorder" name="frame_7">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>289</y>
+     <width>156</width>
+     <height>2</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="control::NavMenuButton" name="viewSlatepackContentButton">
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>295</y>
+     <width>170</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>View Slatepack</string>
    </property>
   </widget>
  </widget>

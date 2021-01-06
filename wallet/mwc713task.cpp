@@ -16,8 +16,12 @@
 
 namespace wallet {
 
-Mwc713Task::Mwc713Task(QString _taskName, QString _inputStr, MWC713 * _wallet713, QString _shadowStr) :
-    taskName(_taskName), wallet713(_wallet713), inputStr(_inputStr), shadowStr(_shadowStr)
+Mwc713Task::Mwc713Task(QString _taskName, QString _taskProgressName, QString _inputStr, MWC713 * _wallet713, QString _shadowStr) :
+    taskName(_taskName),
+    taskProgressName(_taskProgressName),
+    wallet713(_wallet713),
+    inputStr(_inputStr),
+    shadowStr(_shadowStr)
 {
     Q_ASSERT(wallet713);
 }

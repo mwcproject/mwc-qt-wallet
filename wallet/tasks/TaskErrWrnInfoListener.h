@@ -26,7 +26,7 @@ public:
 
     // Start one listen per request. mwc713 doesn't support both
     TaskErrWrnInfoListener( MWC713 *wallet713 ) :
-            Mwc713Task("TaskErrWrnInfoListener", "", wallet713,"") {}
+            Mwc713Task("TaskErrWrnInfoListener", "", "", wallet713,"") {}
 
     virtual ~TaskErrWrnInfoListener() override {}
 

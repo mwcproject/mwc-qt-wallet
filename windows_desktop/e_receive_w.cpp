@@ -15,13 +15,14 @@
 #include "e_receive_w.h"
 #include "ui_e_receive.h"
 #include <QFileInfo>
-#include <QFileDialog>
 #include "../control_desktop/messagebox.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/config_b.h"
 #include "../bridge/wallet_b.h"
+#include "../bridge/util_b.h"
 #include "../bridge/wnd/e_receive_b.h"
 #include "../core/global.h"
+#include "../dialogs_desktop/g_inputslatepackdlg.h"
 
 namespace wnd {
 
@@ -32,9 +33,10 @@ Receive::Receive(QWidget *parent) :
     mwc::setFinalize(false);
     ui->setupUi(this);
 
-    config = new bridge::Config(this);
-    wallet = new bridge::Wallet(this);
+    config  = new bridge::Config(this);
+    wallet  = new bridge::Wallet(this);
     receive = new bridge::Receive(this);
+    util    = new bridge::Util(this);
 
     QObject::connect( receive, &bridge::Receive::sgnTransactionActionIsFinished,
                       this, &Receive::onSgnTransactionActionIsFinished, Qt::QueuedConnection);
@@ -90,8 +92,6 @@ void Receive::updateStatus() {
     bool httpOnline = wallet->getHttpListeningStatus()=="true";
     ui->httpStatusImg->setPixmap( QPixmap(httpOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->httpStatusLabel->setText( httpOnline ? "Online" : "Offline" );
-
-    ui->torAddress->setText( wallet->getTorAddress() );
 }
 
 
@@ -99,28 +99,31 @@ void Receive::on_recieveFileButton_clicked()
 {
     util::TimeoutLockObject to( "Receive" );
 
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open initial transaction file"),
-                                                    config->getPathFor("fileGen"),
-                                                    tr("MWC transaction (*.tx *.input);;All files (*.*)"));
-
-    if (fileName.length()==0)
+    QString fileName = util->getOpenFileName( "Open initial transaction file", "fileGen", "MWC transaction (*.tx *.input);;All files (*.*)");
+    if (fileName.isEmpty())
         return;
-    auto fileOk = util::validateMwc713Str(fileName);
-    if (!fileOk.first) {
-        core::getWndManager()->messageTextDlg("File Path",
-                                              "This file path is not acceptable.\n" + fileOk.second);
-        return;
-    }
-
-    // Update path
-    QFileInfo flInfo(fileName);
-    config->updatePathFor("fileGen", flInfo.path());
 
     ui->progress->show();
 
     receive->signTransaction(fileName);
     // Expected respond from state with result
 }
+
+
+void Receive::on_recieveSlatepackButton_clicked()
+{
+    util::TimeoutLockObject to( "Receive" );
+
+    dlg::InputSlatepackDlg inputSlateDlg("SendInitial", "Initial Send Slate",
+                           util::FileTransactionType::RECEIVE,  this);
+
+    if (inputSlateDlg.exec()  == QDialog::Accepted ) {
+        ui->progress->show();
+
+        receive->signSlatepackTransaction(inputSlateDlg.getSlatepack(), inputSlateDlg.getSlateJson(), inputSlateDlg.getSenderAddress() );
+    }
+}
+
 
 void Receive::onSgnTransactionActionIsFinished( bool success, QString message ) {
     util::TimeoutLockObject to( "Receive" );
@@ -185,5 +188,4 @@ void Receive::onSgnUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool
 
 
 }
-
 

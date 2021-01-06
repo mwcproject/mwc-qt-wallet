@@ -25,8 +25,11 @@ public:
     explicit Finalize(QObject * parent = nullptr) : QObject(parent) {}
     ~Finalize() {};
 
-    // Start Processing file slate.
+    // Finalize file slate.
     Q_INVOKABLE void uploadFileTransaction(QString fileName);
+
+    // Finalize slatepack slate.
+    Q_INVOKABLE void uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender );
 
     // Check if the node healthy enough to do finalization.
     Q_INVOKABLE bool isNodeHealthy();

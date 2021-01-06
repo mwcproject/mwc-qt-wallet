@@ -27,7 +27,7 @@ public:
     const static int64_t TIMEOUT = 5000;
 
     TaskInit(MWC713 *wallet713) :
-            Mwc713Task("TaskInit", "", wallet713, "") {} // no input for init
+            Mwc713Task("TaskInit", "", "", wallet713, "") {} // no input for init
 
     virtual ~TaskInit() override {}
 
@@ -46,7 +46,7 @@ public:
     const static int64_t TIMEOUT = 3000;
 
     TaskStop(MWC713 *wallet713) :
-            Mwc713Task("TaskStop", " ", wallet713, "") {} // no input for init
+            Mwc713Task("TaskStop", "", " ", wallet713, "") {} // no input for init
 
     virtual ~TaskStop() override {}
 
@@ -63,7 +63,7 @@ public:
     const static int64_t TIMEOUT = 5000;
 
     TaskUnlock( MWC713 * wallet713, QString password) :
-            Mwc713Task("Unlocking", buildWalletRequest(password), wallet713, "unlock") { hasPassword = !password.isEmpty(); }
+            Mwc713Task("Unlocking", "Unlocking wallet...", buildWalletRequest(password), wallet713, "unlock") { hasPassword = !password.isEmpty(); }
 
     virtual ~TaskUnlock() override {}
 
@@ -85,7 +85,7 @@ public:
     const static int64_t TIMEOUT = 5000;
 
     TaskInitW( MWC713 * wallet713, QString password) :
-            Mwc713Task("init -p", "init -p " + password, wallet713, "init with password (unlock)") {}
+            Mwc713Task("init", "Initializing wallet...", "init -p " + password, wallet713, "init with password (unlock)") {}
 
     virtual ~TaskInitW() override {}
 
@@ -101,7 +101,7 @@ public:
     const static int64_t TIMEOUT = 1000;
 
     TaskInitWpressEnter( MWC713 * wallet713) :
-            Mwc713Task("pressEnter", " ", wallet713, "") {}
+            Mwc713Task("pressEnter", "", " ", wallet713, "") {}
 
     virtual ~TaskInitWpressEnter() override {}
 
@@ -117,7 +117,7 @@ public:
 const static int64_t TIMEOUT = -1; // start now
 
 TaskLogout( MWC713 * wallet713) :
-        Mwc713Task("Logout", "", wallet713, "") {} // press enter to trigger ready.
+        Mwc713Task("Logout", "", "", wallet713, "") {} // press enter to trigger ready.
 
 virtual ~TaskLogout() override {}
 
@@ -132,7 +132,7 @@ public:
     const static int64_t TIMEOUT = -1;
 
     TaskExit( MWC713 * wallet713) :
-            Mwc713Task("Exit", "", wallet713, "") {} // press enter to trigger ready.
+            Mwc713Task("Exit","", "", wallet713, "") {} // press enter to trigger ready.
 
     virtual ~TaskExit() override {}
 
@@ -148,7 +148,7 @@ public:
 const static int64_t TIMEOUT = 3000;
 
 TaskGetNextKey( MWC713 * wallet713, int64_t amountNano, QString _btcaddress, QString _airDropAccPassword) :
-        Mwc713Task("TaskGetNextKey","getnextkey --amount " + QString::number(amountNano), wallet713, ""),
+        Mwc713Task("TaskGetNextKey","", "getnextkey --amount " + QString::number(amountNano), wallet713, ""),
         btcaddress(_btcaddress), airDropAccPassword(_airDropAccPassword) {}
 
 virtual ~TaskGetNextKey() override {}
@@ -167,7 +167,7 @@ public:
     const static int64_t TIMEOUT = 1000 * 45;
 
     TaskNodeInfo( MWC713 * wallet713) :
-            Mwc713Task("TaskNodeInfo","nodeinfo", wallet713, "") {}
+            Mwc713Task("TaskNodeInfo", "Requesting MWC node status...", "nodeinfo", wallet713, "") {}
 
     virtual ~TaskNodeInfo() override {}
 
@@ -182,7 +182,7 @@ public:
     const static int64_t TIMEOUT = 10000;
 
     TaskSubmitFile( MWC713 * wallet713, const QString & fileName) :
-            Mwc713Task("TaskSubmitFile","submit --file '" + fileName + "'", wallet713, ""), fileTx(fileName) {}
+            Mwc713Task("TaskSubmitFile", "Posting transaction...", "submit --file '" + fileName + "'", wallet713, ""), fileTx(fileName) {}
 
     virtual ~TaskSubmitFile() override {}
 
@@ -199,7 +199,7 @@ public:
     const static int64_t TIMEOUT = 3600*1000*5; // long task, put 5 hours to be sure
 
     TaskSync( MWC713 * wallet713, bool _showProgress) :
-            Mwc713Task("TaskSync","sync", wallet713, ""), showProgress(_showProgress) {}
+            Mwc713Task("TaskSync","Syncronizing data with blockchain...", "sync", wallet713, ""), showProgress(_showProgress) {}
 
     virtual ~TaskSync() override {}
 
@@ -220,7 +220,7 @@ public:
 
     // Start one listen per request. mwc713 doesn't support both
     TaskSyncProgressListener( MWC713 *wallet713 ) :
-            Mwc713Task("TaskSyncProgressListener", "", wallet713,"") {}
+            Mwc713Task("TaskSyncProgressListener", "", "", wallet713,"") {}
 
     virtual ~TaskSyncProgressListener() override {}
 
@@ -235,7 +235,7 @@ public:
     const static int64_t TIMEOUT = 2000;
 
     TaskRootPublicKey( MWC713 * wallet713, const QString & msg) :
-            Mwc713Task("TaskRootPublicKey", "getrootpublickey" +
+            Mwc713Task("TaskRootPublicKey", "", "getrootpublickey" +
                     (msg.isEmpty() ? "" : " --message " + util::toMwc713input(msg)),
                 wallet713, ""),
             message(msg) {}
@@ -256,7 +256,7 @@ public:
     const static int64_t TIMEOUT = 1000 * 30; // in case of error retry takes time
 
     TaskRepost( MWC713 * wallet713, int index, bool fluff) :
-            Mwc713Task("TaskRepost", "repost -i " + QString::number(index) +
+            Mwc713Task("TaskRepost", "Posting transaction...", "repost -i " + QString::number(index) +
                        (fluff ? " --fluff" : ""),
                        wallet713, ""),
                        idx(index)

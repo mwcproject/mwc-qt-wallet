@@ -27,6 +27,7 @@ namespace bridge {
 class FileTransaction;
 class Wallet;
 class Config;
+class Util;
 }
 
 namespace wnd {
@@ -37,7 +38,7 @@ Q_OBJECT
 public:
     explicit FileTransaction(QWidget *parent,
              QString callerId,
-             const QString & fileName, const util::FileTransactionInfo & transInfo,
+             const QString & fileNameOrSlatepack, const util::FileTransactionInfo & transInfo,
              int nodeHeight,
              QString transactionType, QString processButtonName);
 
@@ -54,8 +55,10 @@ private:
     bridge::FileTransaction * fileTransaction = nullptr;
     bridge::Wallet * wallet = nullptr;
     bridge::Config * config = nullptr;
+    bridge::Util * util = nullptr;
     QString callerId;
-    QString transactionFileName;
+    QString fileNameOrSlatepack;
+    QString txUuid;
 };
 
 }

@@ -191,8 +191,13 @@ int Mwc713EventManager::cancelTasksInQueue() {
 void Mwc713EventManager::processNextTask() {
     QMutexLocker l( &taskQMutex );
 
-    if (taskQ.empty())
+    if (taskQ.empty()) {
+        if (!lastWalletProgressCommand.isEmpty()) {
+            lastWalletProgressCommand = "";
+            mwc713wallet->setStartingCommand("");
+        }
         return; // Nothing to process
+    }
 
     // Check if we can perform the first task
     taskInfo & task = taskQ.front();
@@ -212,6 +217,14 @@ void Mwc713EventManager::processNextTask() {
 
         logger::logTask( "Mwc713EventManager", task.task, "Starting..." );
         task.task->onStarted();
+
+        QString progressName = task.task->getTaskProgressName();
+        if (!progressName.isEmpty()) {
+            if (lastWalletProgressCommand != progressName) {
+                lastWalletProgressCommand = progressName;
+                mwc713wallet->setStartingCommand(progressName);
+            }
+        }
 
         if (task.timeout > 0) {
             // schedule the task for execution

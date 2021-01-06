@@ -14,32 +14,34 @@
 
 #include "g_filetransaction_w.h"
 #include "ui_g_filetransaction.h"
-#include <QFileDialog>
 #include "../control_desktop/messagebox.h"
 #include "../dialogs_desktop/g_sendconfirmationdlg.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/wnd/g_filetransaction_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/config_b.h"
+#include "../bridge/util_b.h"
 #include "../core/global.h"
 
 namespace wnd {
 
 FileTransaction::FileTransaction(QWidget *parent,
                                  QString callerId,
-                                 const QString & fileName, const util::FileTransactionInfo & transInfo,
+                                 const QString & _fileNameOrSlatepack, const util::FileTransactionInfo & transInfo,
                                  int nodeHeight,
                                  QString transactionType, QString processButtonName) :
         core::NavWnd(parent),
         ui(new Ui::FileTransaction),
-        transactionFileName(fileName)
+        fileNameOrSlatepack(_fileNameOrSlatepack)
 {
     ui->setupUi(this);
+    txUuid = transInfo.transactionId;
 
     fileTransaction = new bridge::FileTransaction(this);
     fileTransaction->setCallerId(callerId);
     wallet = new bridge::Wallet(this);
     config = new bridge::Config(this);
+    util = new bridge::Util(this);
 
     QObject::connect( fileTransaction, &bridge::FileTransaction::sgnHideProgress,
                       this, &FileTransaction::onSgnHideProgress, Qt::QueuedConnection);
@@ -49,10 +51,18 @@ FileTransaction::FileTransaction(QWidget *parent,
     ui->transactionType->setText(transactionType);
     ui->processButton->setText(processButtonName);
 
-    ui->mwcLabel->setText( util::nano2one( transInfo.amount ) + " MWC" );
-    ui->transactionIdLabel->setText(transInfo.transactionId);
+    if (transactionType.contains("Receive", Qt::CaseInsensitive)) {
+        ui->receiverLabel->setText("<b>Sender Address:</b>");
+    }
+
+    if (transInfo.amount_fee_not_defined)
+        ui->mwcLabel->setText( "-" );
+    else
+        ui->mwcLabel->setText( util::nano2one( transInfo.amount ) + " MWC" );
+
+    ui->transactionIdLabel->setText(txUuid);
     ui->lockHeightLabel->setText( transInfo.lock_height>nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-" );
-    ui->receiverAddressLabel->setText(transInfo.receiverAddress.isEmpty() ? "-" : transInfo.receiverAddress);
+    ui->receiverAddressLabel->setText(transInfo.fromAddress.isEmpty() ? "-" : transInfo.fromAddress);
     ui->message->setText( transInfo.message );
 
     if (!fileTransaction->needResultTxFileName()) {
@@ -71,13 +81,15 @@ FileTransaction::FileTransaction(QWidget *parent,
     }
     else
     { // set default file name if possible
+        if (!fileNameOrSlatepack.startsWith("BEGINSLATE")) {
+            // it is a filename
+            QString resFN = fileNameOrSlatepack;
+            if (resFN.endsWith(".response"))
+                resFN = resFN.left(resFN.length() - int(strlen(".response")));
 
-        QString resFN = fileName;
-        if (resFN.endsWith(".response"))
-            resFN = resFN.left( resFN.length() - int(strlen(".response")) );
-
-        resFN += ".mwctx";
-        ui->resultingTxFileName->setText( resFN );
+            resFN += ".mwctx";
+            ui->resultingTxFileName->setText(resFN);
+        }
     }
 }
 
@@ -128,7 +140,16 @@ void FileTransaction::on_processButton_clicked()
         }
     }
     ui->progress->show();
-    fileTransaction->ftContinue( transactionFileName, resTxFN, config->isFluffSet() );
+
+    if (fileNameOrSlatepack.startsWith("BEGINSLATE")) {
+        fileTransaction->ftContinueSlatepack( fileNameOrSlatepack, txUuid, resTxFN, config->isFluffSet() );
+    }
+    else
+    { // file
+        fileTransaction->ftContinue( fileNameOrSlatepack, resTxFN, config->isFluffSet() );
+    }
+
+
 }
 
 void FileTransaction::onSgnHideProgress() {
@@ -138,28 +159,14 @@ void FileTransaction::onSgnHideProgress() {
 void FileTransaction::on_resultTransFileNameSelect_clicked()
 {
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Resulting MWC transaction"),
-                                                    config->getPathFor("resultTx"),
-                                                    tr("MWC transaction (*.mwctx)"));
+    QString fileName = util->getSaveFileName("Resulting MWC transaction",
+                                             "resultTx",
+                                             "MWC transaction (*.mwctx)",
+                                             ".mwctx");
 
-
-    if (fileName.length()==0)
+    if (fileName.isEmpty())
         return;
 
-    auto fileOk = util::validateMwc713Str(fileName);
-    if (!fileOk.first) {
-        core::getWndManager()->messageTextDlg("File Path",
-                                              "This file path is not acceptable.\n" + fileOk.second);
-        return;
-    }
-
-    if (!fileName.endsWith(".mwctx"))
-           fileName += ".mwctx";
-
-    // Update path
-    QFileInfo flInfo(fileName);
-
-    config->updatePathFor("resultTx", flInfo.path());
     ui->resultingTxFileName->setText(fileName);
 }
 

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <string>
 #include "util_b.h"
 #include "util/execute.h"
 #include "../util/Generator.h"
@@ -20,6 +21,10 @@
 #include "../util/passwordanalyser.h"
 #include "../util/Bip39.h"
 #include "../util/stringutils.h"
+#include "../util/QrCode.h"
+#include "../util/Json.h"
+#include "../util/filedialog.h"
+#include "../util/Files.h"
 
 namespace bridge {
 
@@ -152,5 +157,55 @@ QString Util::interval2String(int intervalSec, bool shortUnits, int tiers) {
     return util::interval2String(intervalSec, shortUnits, tiers);
 }
 
+using namespace qrcodegen;
+
+// Ganarating a QR image for the text content
+// Result is 2 element array:
+// res[0]  - size of the QR code
+// res[1]  - SVG string that can draw the QR code. Seems like both Desctop and QML can draw the SVG path.
+QVector<QString> Util::generateQrCode(QString content) {
+    const QrCode qrCodeResult = QrCode::encodeText(content.toStdString().c_str(), QrCode::Ecc::MEDIUM);
+
+    int size = qrCodeResult.getSize();
+    QString svgContent = QString::fromStdString( qrCodeResult.toSvgString(1) );
+    return { QString::number(size), svgContent };
+}
+
+// Parsing slate as a Json. Respond back with error or with Slate details
+// slateContent  - slate sjon string to parse.
+// fileTransactionType  - value of FileTransactionType
+// Error case:
+// res[0] - error message
+// Normal case:
+// res[0] = transactionId
+// res[1] = amount
+QVector<QString> Util::parseSlateContent( QString slateContent, int fileTransactionType, QString slateSenderAddress ) {
+    util::FileTransactionInfo fileInfo;
+
+    QPair<bool, QString> res = fileInfo.parseSlateContent( slateContent, util::FileTransactionType(fileTransactionType), slateSenderAddress );
+    if (!res.first) {
+        // error
+        return { res.second };
+    }
+
+    return { fileInfo.transactionId, QString::number(fileInfo.amount) };
+}
+
+// Open QFileDialog::getSaveFileName with all standard verificaitons that we normally have
+// Return file name or empty value is request was cancelled or error happens
+QString Util::getSaveFileName(QString title, QString callerId, QString extentionsDlg, QString extentionFile) {
+    return util::getSaveFileName(title, callerId, extentionsDlg, extentionFile);
+}
+
+// Open QFileDialog::getOpenFileName with all standard verificaitons that we normally have
+// Return file name or empty value is request was cancelled or error happens
+QString Util::getOpenFileName(QString title, QString callerId, QString extentionsDlg) {
+    return util::getOpenFileName(title, callerId, extentionsDlg);
+}
+
+// Write some text into the file
+bool Util::writeTextFile(QString fileName, QStringList lines ) {
+    return util::writeTextFile(fileName, lines);
+}
 
 }

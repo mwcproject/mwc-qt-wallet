@@ -18,16 +18,21 @@
 #include "../control_desktop/messagebox.h"
 #include "w_contacteditdlg.h"
 #include "../bridge/config_b.h"
+#include "../bridge/util_b.h"
 #include "../util_desktop/timeoutlock.h"
 
 namespace dlg {
 
-SelectContact::SelectContact(QWidget *parent) :
+SelectContact::SelectContact(QWidget *parent, bool _showTor, bool _showMQS, bool _showHttp) :
     control::MwcDialog(parent),
-    ui(new Ui::SelectContact)
+    ui(new Ui::SelectContact),
+    showTor(_showTor),
+    showMQS(_showMQS),
+    showHttp(_showHttp)
 {
     ui->setupUi(this);
     config = new bridge::Config(this);
+    util = new bridge::Util(this);
 
     initTableHeaders();
     updateContactTable("");
@@ -84,13 +89,19 @@ void SelectContact::updateContactTable(const QString & searchStr) {
     for (int k=1; k<contactPairs.size(); k+=2 ) {
         QString name = contactPairs[k-1];
         QString address = contactPairs[k];
-        if ( searchStr.isEmpty() || name.contains( searchStr ) ) {
-            ui->contactsTable->appendRow(QVector<QString>{
-                    QString::number( contacts.size()+1),
-                    name,
-                    address
-            });
-            contacts.push_back(core::ContactRecord(name, address));
+
+        QString addressType = util->verifyAddress(address);
+        if ((addressType=="tor" && showTor) ||
+                (addressType=="mwcmqs" && showMQS) ||
+                (addressType=="https" && showHttp) ) {
+            if (searchStr.isEmpty() || name.contains(searchStr)) {
+                ui->contactsTable->appendRow(QVector<QString>{
+                        QString::number(contacts.size() + 1),
+                        name,
+                        address
+                });
+                contacts.push_back(core::ContactRecord(name, address));
+            }
         }
     }
 }

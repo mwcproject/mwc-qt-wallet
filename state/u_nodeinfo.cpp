@@ -220,21 +220,6 @@ void NodeInfo::onMwcStatusUpdate( QString status ) {
         b->updateEmbeddedMwcNodeStatus(getMwcNodeStatus());
 }
 
-QString NodeInfo::getBlockchainDataPath() const {
-    return context->appContext->getPathFor("BlockchainData");
-}
-
-void    NodeInfo::updateBlockchainDataPath(QString path) {
-    context->appContext->updatePathFor("BlockchainData", path);
-}
-
-QString NodeInfo::getPublishTransactionPath() const {
-    return context->appContext->getPathFor("PublishTransaction");
-}
-void    NodeInfo::updatePublishTransactionPath(QString path) {
-    context->appContext->updatePathFor("PublishTransaction", path);
-}
-
 void NodeInfo::exportBlockchainData(QString fileName) {
     // 1. stop the mwc node
     // 2. Export node data

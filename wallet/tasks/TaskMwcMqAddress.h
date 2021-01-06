@@ -29,7 +29,7 @@ public:
     // idx     - index for generated address (genNext is true)
     // genNext:false - get current address with associated index
     TaskMwcMqAddress( MWC713 * wallet713, bool genNext, int idx ) :
-            Mwc713Task("TaskMwcMqAddress", calcCommandLine(genNext, idx), wallet713,"") {}
+            Mwc713Task("TaskMwcMqAddress", "Requesting MQS address...", calcCommandLine(genNext, idx), wallet713,"") {}
 
     virtual ~TaskMwcMqAddress() override {}
 
@@ -49,7 +49,7 @@ public:
     // idx     - index for generated address (genNext is true)
     // genNext:false - get current address with associated index
     TaskFileProofAddress( MWC713 * wallet713) :
-            Mwc713Task("FileProofAddress", "address --provable-address" , wallet713,"") {}
+            Mwc713Task("FileProofAddress", "Requesting Wallet Public address...", "address --provable-address" , wallet713,"") {}
 
     virtual ~TaskFileProofAddress() override {}
 

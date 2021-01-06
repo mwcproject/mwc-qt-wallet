@@ -24,7 +24,7 @@ namespace wallet {
 class TaskSlatesListener : public Mwc713Task {
 public:
     TaskSlatesListener( MWC713 * wallet713) :
-            Mwc713Task("TaskSlatesListener", "", wallet713, "") {}
+            Mwc713Task("TaskSlatesListener","", "", wallet713, "") {}
 
     virtual ~TaskSlatesListener() override {}
 
@@ -40,7 +40,7 @@ public:
     const static int64_t TIMEOUT = 1000*2;
 
     TaskSetReceiveAccount( MWC713 *wallet713, QString account ) :
-            Mwc713Task("TaskSetReceiveAccount",
+            Mwc713Task("TaskSetReceiveAccount","",
                        QString("set-recv ") + util::toMwc713input(account),
                        wallet713, "set-recv for " + account) {}
 
@@ -63,7 +63,7 @@ public:
     TaskSendMwc( MWC713 *wallet713, int64_t coinNano, const QString & address, const QString & apiSecret, QString message,
                  int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff, int ttl_blocks,
                  bool generateProof, const QString & expectedproofAddress ) :
-            Mwc713Task("TaskSendMwc",
+            Mwc713Task("TaskSendMwc", "Sending coins online...",
                     buildCommand( coinNano, address, apiSecret, message, inputConfirmationNumber, changeOutputs, outputs, fluff, ttl_blocks, generateProof, expectedproofAddress),
                     wallet713, ""), sendMwcNano(coinNano) {}
 
@@ -86,7 +86,7 @@ public:
 
     // Most are optional (empty values - ignore)
     TaskSendFile( MWC713 *wallet713, int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, int ttl_blocks, bool generateProof ) :
-            Mwc713Task("TaskSendFile",
+            Mwc713Task("TaskSendFile", "Sending coins offline...",
                        buildCommand(coinNano, message, fileTx, inputConfirmationNumber, changeOutputs, outputs, ttl_blocks, generateProof),
                        wallet713, "") {}
 
@@ -104,7 +104,7 @@ public:
     const static int64_t TIMEOUT = 1000*20;
 
     TaskReceiveFile( MWC713 *wallet713, QString fileName, QString identifier = "" ) :
-            Mwc713Task("TaskReceiveFile", buildCommand(fileName, identifier), wallet713,""), inFileName(fileName) {}
+            Mwc713Task("TaskReceiveFile", "Recieving file transaction...", buildCommand(fileName, identifier), wallet713,""), inFileName(fileName) {}
 
     virtual ~TaskReceiveFile() override {}
 
@@ -121,7 +121,7 @@ public:
     const static int64_t TIMEOUT = 1000*20;
 
     TaskFinalizeFile( MWC713 *wallet713, QString fileTxResponse, bool fluff ) :
-            Mwc713Task("TaskReceiveFile",  buildCommand(fileTxResponse, fluff), wallet713, "") {}
+            Mwc713Task("TaskReceiveFile", "Finalizing file transaction...", buildCommand(fileTxResponse, fluff), wallet713, "") {}
 
     virtual ~TaskFinalizeFile() override {}
 
@@ -132,12 +132,72 @@ private:
     QString buildCommand(QString filename, bool fluff) const;
 };
 
+class TaskSendSlatepack : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*20;
+
+    // Most are optional (empty values - ignore)
+    TaskSendSlatepack( MWC713 *wallet713, int64_t coinNano, QString message, int inputConfirmationNumber, int changeOutputs,
+                  const QStringList & outputs, int ttl_blocks, bool generateProof, QString slatepackRecipientAddress, bool isLockLater, QString _tag ) :
+            Mwc713Task("TaskSendSlatepack", "Sending slatepack transaction...",
+                       buildCommand(coinNano, message, inputConfirmationNumber, changeOutputs, outputs, ttl_blocks, generateProof, slatepackRecipientAddress, isLockLater),
+                       wallet713, ""),
+                       tag(_tag) {}
+
+    virtual ~TaskSendSlatepack() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    QString buildCommand( int64_t coinNano, QString message, int inputConfirmationNumber, int changeOutputs,
+                          const QStringList & outputs, int ttl_blocks, bool generateProof, QString slatepackRecipientAddress,
+                          bool isLockLater ) const;
+    QString tag;
+};
+
+class TaskReceiveSlatepack : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*20;
+
+    TaskReceiveSlatepack( MWC713 *wallet713, QString slatepack, QString _tag ) :
+            Mwc713Task("TaskReceiveFile", "Receiving slatepack transaction...", "receive --content \"" + slatepack + "\"", wallet713,""),
+            tag(_tag) {}
+
+    virtual ~TaskReceiveSlatepack() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    QString tag;
+};
+
+class TaskFinalizeSlatepack : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*20;
+
+    TaskFinalizeSlatepack( MWC713 *wallet713, QString slatepack, bool fluff, QString _tag ) :
+            Mwc713Task("TaskReceiveFile", "Finalizing slatepack transaction...", buildCommand(slatepack, fluff), wallet713, ""),
+            tag(_tag) {}
+
+    virtual ~TaskFinalizeSlatepack() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    QString buildCommand(QString slatepack, bool fluff) const;
+    QString tag;
+};
+
+
 class TaskRequestRecieverWalletAddress : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*40; // up to 30 seconds in case of network issues. We have retry logic there and it takes time
 
     TaskRequestRecieverWalletAddress( MWC713 *wallet713, QString _url, QString apiSecret ) :
-        Mwc713Task("TaskRequestRecieverWalletAddress", "check-proof --to " + _url +
+        Mwc713Task("TaskRequestRecieverWalletAddress", "Validating proof...", "check-proof --to " + _url +
                 (apiSecret.isEmpty()? "" : " --apisecret \"" + apiSecret + "\"" ), wallet713, ""),
             url(_url) {}
 
@@ -148,6 +208,23 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
     QString url;
+};
+
+class TaskDecodeSlatepack : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*5; // Should be very quick operation
+
+    TaskDecodeSlatepack( MWC713 *wallet713, QString _slatepack ) :
+            Mwc713Task("TaskDecodeSlatepack", "Decoding slatepack...", "decode_slatepack --slatepack \"" + _slatepack + "\"", wallet713, ""),
+            slatepack(_slatepack) {}
+
+    virtual ~TaskDecodeSlatepack() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    QString slatepack;
 };
 
 

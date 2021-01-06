@@ -13,7 +13,7 @@ set (Qt5_DIR "~/Qt/5.9.9/clang_64/lib/cmake/Qt5")
 #set (Qt5_DIR "/usr/local/opt/qt/lib/cmake/Qt5")
 #set (Qt5_DIR "C:/Qt/5.9.8/msvc2015_64/lib/cmake/Qt5")
 
-find_package(Qt5 COMPONENTS Core Gui Widgets Network REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Widgets Network Svg REQUIRED)
 
 
 ####################
@@ -67,7 +67,7 @@ ENDIF(APPLE)
 #
 
 add_executable(mwc-qt-wallet ${SOURCE_FILES} ${HEADER_FILES} ${UI_GENERATED_HEADERS} ${Cocoa_SRCS} resources_desktop.qrc)
-target_link_libraries(mwc-qt-wallet Qt5::Widgets Qt5::Gui Qt5::Core Qt5::Network ${AppKit})
+target_link_libraries(mwc-qt-wallet Qt5::Widgets Qt5::Gui Qt5::Core Qt5::Network Qt5::Svg ${AppKit})
 
 # Copy Qt runtime libraries to build directory
 # [Copying Qt DLLs to executable directory on Windows using CMake](https://stackoverflow.com/questions/40564443/)
@@ -78,6 +78,7 @@ add_custom_command(
         $<TARGET_FILE:Qt5::Gui>
         $<TARGET_FILE:Qt5::Widgets>
         $<TARGET_FILE:Qt5::Network>
+        $<TARGET_FILE:Qt5::Svg>
         $<TARGET_FILE_DIR:mwc-qt-wallet>
 )
 

@@ -40,13 +40,9 @@ public:
     //   2 - amount error
     int initialSendSelection( bool isOnlineSelected, QString account, QString sendAmount );
 
-    // Request for MWC to send
-    void sendMwcOnline( const wallet::AccountInfo & account, util::ADDRESS_TYPE type, QString address, int64_t mwcNano,
-            QString message, QString apiSecret, const QStringList & outputs, int changeOutputs, bool fluff );
-
     // Handle whole workflow to send offline
     // return true if some long process was started.
-    bool sendMwcOffline( QString account, int64_t amount, QString message);
+    bool sendMwcOffline( QString account, int64_t amount, QString message, bool isSlatepack, bool isLockLater, QString slatepackRecipientAddress);
 
     // Handle whole workflow to send online
     // return true if some long process was started.
@@ -63,6 +59,7 @@ private slots:
     void sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate );
 
     void respSendFile( bool success, QStringList errors, QString fileName );
+    void respSendSlatepack( QString tagId, QString error, QString slatepack );
 
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 

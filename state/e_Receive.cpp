@@ -32,7 +32,9 @@ Receive::Receive( StateContext * _context ) :
         State(_context, STATE::RECEIVE_COINS) {
 
     QObject::connect(context->wallet, &wallet::Wallet::onReceiveFile,
-                                   this, &Receive::respReceiveFile, Qt::QueuedConnection);
+                                   this, &Receive::onReceiveFile, Qt::QueuedConnection);
+    QObject::connect(context->wallet, &wallet::Wallet::onReceiveSlatepack,
+                     this, &Receive::onReceiveSlatepack, Qt::QueuedConnection);
 
     QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
                      this, &Receive::onNodeStatus, Qt::QueuedConnection);
@@ -52,12 +54,29 @@ NextStateRespond Receive::execute() {
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
+void Receive::signSlatepackTransaction(QString slatepack, QString slateJson, QString slateSenderAddress) {
+    util::FileTransactionInfo flTrInfo;
+    QPair<bool, QString> perseResult = flTrInfo.parseSlateContent( slateJson, util::FileTransactionType::RECEIVE, slateSenderAddress );
+
+    if (!perseResult.first) {
+        for (auto p : bridge::getBridgeManager()->getReceive() )
+            p->onTransactionActionIsFinished( false, perseResult.second );
+        return;
+    }
+
+    // We don't want to intercept the action from other windows like AirDrop...
+    if ( isActive() ) {
+        signingFile = false;
+        core::getWndManager()->pageFileTransaction(mwc::PAGE_G_RECEIVE_TRANS, RECEIVE_CALLER_ID, slatepack, flTrInfo, lastNodeHeight,
+                                                   "Receive Slatepack", "Generate Response");
+    }
+}
+
 
 void Receive::signTransaction( QString fileName ) {
-
     // Let's parse transaction first
     util::FileTransactionInfo flTrInfo;
-    QPair<bool, QString> perseResult = flTrInfo.parseTransaction( fileName, util::FileTransactionType::RECEIVE );
+    QPair<bool, QString> perseResult = flTrInfo.parseSlateFile( fileName, util::FileTransactionType::RECEIVE );
 
     if (!perseResult.first) {
         for (auto p : bridge::getBridgeManager()->getReceive() )
@@ -68,8 +87,9 @@ void Receive::signTransaction( QString fileName ) {
 
     // We don't want to intercept the action from other windows like AirDrop...
     if ( isActive() ) {
+        signingFile = true;
         core::getWndManager()->pageFileTransaction(mwc::PAGE_G_RECEIVE_TRANS, RECEIVE_CALLER_ID, fileName, flTrInfo, lastNodeHeight,
-                    "Receive File Transaction", "Generate Response");
+                    "Receive File Slate", "Generate Response");
     }
 }
 
@@ -77,14 +97,27 @@ void Receive::ftBack() {
     core::getWndManager()->pageRecieve();
 }
 
-void Receive::ftContinue(QString fileName, QString resultTxFileName, bool fluff) {
+void Receive::ftContinue(QString fileNameOrSlatepack, QString resultTxFileName, bool fluff) {
     Q_UNUSED(resultTxFileName)
     Q_UNUSED(fluff)
-    logger::logInfo("Receive", "Receive file " + fileName);
-    context->wallet->receiveFile( fileName );
+    logger::logInfo("Receive", "Receive " + fileNameOrSlatepack);
+    // It can be filename or slate
+    Q_ASSERT(signingFile);
+    context->wallet->receiveFile(fileNameOrSlatepack);
 }
 
-void Receive::respReceiveFile( bool success, QStringList errors, QString inFileName ) {
+void Receive::ftContinueSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff) {
+    Q_UNUSED(resultTxFileName)
+    Q_UNUSED(fluff)
+    Q_UNUSED(txUuid)
+    logger::logInfo("Receive", "Receive Slatepack " + slatepack);
+    // It can be filename or slate
+    Q_ASSERT(!signingFile);
+    context->wallet->receiveSlatepack(slatepack, "");
+}
+
+
+void Receive::onReceiveFile( bool success, QStringList errors, QString inFileName ) {
     // Checking if this state is really active on UI level
     if (isActive()) {
         for (auto p: bridge::getBridgeManager()->getFileTransaction())
@@ -101,6 +134,24 @@ void Receive::respReceiveFile( bool success, QStringList errors, QString inFileN
         }
     }
 }
+
+void Receive::onReceiveSlatepack( QString tagId, QString error, QString slatepack ) {
+    Q_UNUSED(tagId)
+    if (isActive()) {
+        for (auto p: bridge::getBridgeManager()->getFileTransaction())
+            p->hideProgress();
+
+        if (error.isEmpty()) {
+            Q_ASSERT(!slatepack.isEmpty());
+
+            core::getWndManager()->pageShowSlatepack(slatepack, STATE::RECEIVE_COINS, ".response" );
+        } else {
+            core::getWndManager()->messageTextDlg("Failure",
+                                                  "Unable to receive slatepack transaction.\n\n" + error);
+        }
+    }
+}
+
 
 void Receive::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
     Q_UNUSED(errMsg)

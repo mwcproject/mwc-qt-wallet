@@ -44,7 +44,6 @@ SendOnline::SendOnline(QWidget *parent,
 
     ui->contactNameLable->setText("");
     ui->contactNameLable->hide();
-    ui->apiSecretEdit->hide();
 
     ui->fromAccount->setText("From account: " + account );
     ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util->nano2one(QString::number(amount))) + " MWC" );
@@ -62,7 +61,7 @@ void SendOnline::on_contactsButton_clicked()
 
     // Get the contacts
 
-    dlg::SelectContact dlg(this);
+    dlg::SelectContact dlg(this, true, true, true);
     if (dlg.exec() == QDialog::Accepted) {
         core::ContactRecord selectedContact = dlg.getSelectedContact();
         ui->sendEdit->setText( selectedContact.address );
@@ -130,18 +129,8 @@ void SendOnline::on_sendButton_clicked()
         }
     }
 
-    QString apiSecret = ui->apiSecretEdit->text();
-    {
-        QString valRes = util->validateMwc713Str(apiSecret);
-        if (!valRes.isEmpty()) {
-            control::MessageBox::messageText(this, "Incorrect Input", valRes);
-            ui->apiSecretEdit->setFocus();
-            return;
-        }
-    }
-
     ui->progress->show();
-    if (!send->sendMwcOnline( account, QString::number(amount), sendTo, apiSecret, description))
+    if (!send->sendMwcOnline( account, QString::number(amount), sendTo, "", description))
         ui->progress->hide();
 }
 

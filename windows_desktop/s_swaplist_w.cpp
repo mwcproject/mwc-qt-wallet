@@ -20,7 +20,6 @@
 #include "../control_desktop/messagebox.h"
 #include "../control_desktop/richvbox.h"
 #include "../control_desktop/richitem.h"
-#include <QFileDialog>
 #include <QSet>
 
 namespace wnd {
@@ -432,26 +431,12 @@ void SwapList::richButtonPressed(control::RichButton *button, QString cookie) {
             swap->deleteSwapTrade(tradeId);
         }
     } else if (cmd == "Backup") {
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Backup the trade Data"),
-                                                        config->getPathFor("SwapTrades"),
-                                                        tr("MWC Swap Trade (*.trade)"));
+        QString fileName = util->getSaveFileName("Backup the trade Data",
+                                                        "SwapTrades",
+                                                        "MWC Swap Trade (*.trade)", ".trade");
 
-        if (fileName.length() == 0)
+        if (fileName.isEmpty())
             return;
-
-        auto fileOk = util::validateMwc713Str(fileName);
-        if (!fileOk.first) {
-            core::getWndManager()->messageTextDlg("File Path",
-                                                  "This file path is not acceptable.\n" + fileOk.second);
-            return;
-        }
-
-        if (!fileName.endsWith(".trade"))
-            fileName += ".trade";
-
-        // Update path
-        QFileInfo flInfo(fileName);
-        config->updatePathFor("SwapTrades", flInfo.path());
 
         swapBackupInProgress = true;
 
@@ -474,22 +459,11 @@ void SwapList::richButtonPressed(control::RichButton *button, QString cookie) {
 }
 
 void SwapList::on_restoreTradeBtn_clicked() {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Restore the trade Data"),
-                                                    config->getPathFor("SwapTrades"),
-                                                    tr("MWC Swap Trade (*.trade)"));
-
-    if (fileName.length() == 0)
+    QString fileName = util->getOpenFileName("Restore the trade Data",
+                                                    "SwapTrades",
+                                                    "MWC Swap Trade (*.trade)");
+    if ( fileName.isEmpty() )
         return;
-
-    auto fileOk = util::validateMwc713Str(fileName);
-    if (!fileOk.first) {
-        core::getWndManager()->messageTextDlg("File Path",
-                                              "This file path is not acceptable.\n" + fileOk.second);
-        return;
-    }
-
-    QFileInfo flInfo(fileName);
-    config->updatePathFor("SwapTrades", flInfo.path());
 
     // Requesting export from the wallet
     swap->restoreSwapTradeData(fileName);

@@ -144,6 +144,13 @@ QString MobileWndManager::getSaveFileName(const QString &caption, const QString 
     return fileName;
 }
 
+// QFileDialog::getLoadFileName call
+// Mobile migth never need that.
+QString MobileWndManager::getLoadFileName(const QString &caption, const QString &dir, const QString &filter) {
+    Q_ASSERT(false); // implement me
+}
+
+
 // Ask for confirmation
 bool MobileWndManager::sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) {
     Q_UNUSED(widthScale)
@@ -282,6 +289,19 @@ void MobileWndManager::pageSendOffline( QString selectedAccount, int64_t amount 
 void MobileWndManager::pageTransactions() {
     mainWindow->setProperty("currentState", state::STATE::TRANSACTIONS);
 }
+
+// slatepack - slatepack string value to show.
+// backStateId - state ID of the caller. On 'back' will switch to this state Id
+void MobileWndManager::pageShowSlatepack(QString slatepack, int backStateId, QString txExtension) {
+    Q_UNUSED(slatepack)
+    Q_UNUSED(backStateId)
+    Q_UNUSED(txExtension)
+    // This page should show the slatepack text so user can copy paste it. Also it will be noce to have a QR code
+    // windows. It is usefull for some cases, Jon had some examples. Also other wallets have it.
+    Q_ASSERT(false); // implement me
+}
+
+
 void MobileWndManager::pageAccounts() {
     Q_ASSERT(false); // implement me
 }

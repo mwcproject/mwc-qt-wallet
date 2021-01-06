@@ -177,7 +177,7 @@ Item {
                 return
             }
 
-            if (send.sendMwcOffline(selectedAccount, Number(amount).toString(), description)) {
+            if (send.sendMwcOffline(selectedAccount, Number(amount).toString(), description, false, false, "")) {
                 rect_progress.visible = true
             }
         }

@@ -26,6 +26,7 @@ class SelectContact;
 
 namespace bridge {
 class Config;
+class Util;
 }
 
 class QTableWidgetItem;
@@ -37,7 +38,7 @@ class SelectContact : public control::MwcDialog
     Q_OBJECT
 
 public:
-    explicit SelectContact(QWidget *parent );
+    SelectContact(QWidget *parent, bool showTor, bool showMQS, bool showHttp );
     virtual ~SelectContact() override;
 
     core::ContactRecord getSelectedContact() const {return selectedContact;}
@@ -63,6 +64,10 @@ private:
 private:
     Ui::SelectContact *ui;
     bridge::Config * config = nullptr;
+    bridge::Util * util = nullptr;
+    bool showTor = false;
+    bool showMQS = false;
+    bool showHttp = false;
 
     core::ContactRecord selectedContact;
     QVector<core::ContactRecord> contacts; // shown contacts

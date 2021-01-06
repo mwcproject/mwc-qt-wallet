@@ -18,6 +18,8 @@
 #include "Files.h"
 #include "stringutils.h"
 #include <QJsonArray>
+#include "../state/state.h"
+#include "../wallet/wallet.h"
 
 namespace util {
 
@@ -72,20 +74,35 @@ QString readStringFromJson(const QJsonObject & jsonObj, QString path, const QStr
 
 //////////////////////////////////////////////// FILE TRANSACTIONS ///////////////////////////////////////
 
-QPair<bool, QString> FileTransactionInfo::parseTransaction( QString fn, FileTransactionType type ) {
+QPair<bool, QString> FileTransactionInfo::parseSlateFile( QString fn, FileTransactionType type ) {
     QString jsonStr = readTextFile(fn).join(' ');
-
     qDebug() << "parseTransaction for " << fn << " Body:" << jsonStr;
 
-    QJsonObject json = jsonFromString(jsonStr);
+    fileName = fn;
+
+    return parseSlateContent( jsonStr, type, "" );
+}
+
+QPair<bool, QString> FileTransactionInfo::parseSlateContent( QString slateContent, FileTransactionType type, QString slateSenderAddress ) {
+
+    QJsonObject json = jsonFromString(slateContent);
 
     if (json.length()==0 ) {
-        return QPair<bool, QString>(false, "Content of the file " + fn + " has wrong format. It is not a MWC slate.");
+        return QPair<bool, QString>(false, "Transaction content has wrong format. It is not an MWC slate.");
     }
 
     bool ok1 = true, ok2 = true, ok3 = true, ok4 = true;
+    QString mwc = "mwc";
+    QString coin = readStringFromJson(json, "coin_type", &mwc );
+    if (coin != "mwc") {
+        return QPair<bool, QString>(false, "The slate is not form MWC network.");
+    }
 
-    fileName = fn;
+    QString expectedNetwork = state::getStateContext()->wallet->getWalletConfig().getNetwork().toLower();
+    QString network = readStringFromJson(json, "network_type", &expectedNetwork );
+    if (network != expectedNetwork) {
+        return QPair<bool, QString>(false, "The slate is form '"+network+"' network, expected is '"+expectedNetwork+"'.");
+    }
 
     // V1
     int version = readValueFromJson(json, "version").toInt(-1);
@@ -118,14 +135,35 @@ QPair<bool, QString> FileTransactionInfo::parseTransaction( QString fn, FileTran
             break;
         default:
             qDebug() << "Transaction file has unknown version " << version;
-            return QPair<bool, QString>(false, "Content of the file " + fn + " has unknown version. We unable to process this MWC slate.");
+            return QPair<bool, QString>(false, "Content of the slate has unknown version. We unable to process this MWC slate.");
     }
 
-    if (! (ok1 && ok2 && ok3 && ok4 && !transactionId.isEmpty() && amount>0 && fee>0 && height>0 && lock_height>=0) )
-        return  QPair<bool, QString>(false, "Content of the file " + fn + " is non complete MWC slate. Transaction details are not found.");
+    amount_fee_not_defined = false;
+    bool compact_slate = readValueFromJson(json, "compact_slate").toBool(false);
+    if (compact_slate && type == FileTransactionType::FINALIZE) {
+        amount_fee_not_defined = true;
+    }
+
+    if (! (ok1 && ok2 && ok3 && ok4 && !transactionId.isEmpty() && ((amount>0 && fee>0) || amount_fee_not_defined) && height>0 && lock_height>=0) )
+        return  QPair<bool, QString>(false, "Content of the slate is non complete MWC slate. Transaction details are not found.");
 
     // Looking for the receiver address
-    receiverAddress = readValueFromJson( json, "payment_proof.receiver_address" ).toString();
+    if (!slateSenderAddress.isEmpty()) {
+        fromAddress = slateSenderAddress;
+    }
+    else {
+        // get it from the slate now
+        switch (type) {
+            case FileTransactionType::RECEIVE:
+                fromAddress = readValueFromJson( json, "payment_proof.sender_address" ).toString();
+                break;
+            case FileTransactionType::FINALIZE:
+                fromAddress = readValueFromJson( json, "payment_proof.receiver_address" ).toString();
+                break;
+            default:
+                Q_ASSERT(false);
+        }
+    }
 
     // Same for v0, v1 & v2
     QJsonArray participant_data = readValueFromJson( json, "participant_data" ).toArray();
@@ -144,7 +182,7 @@ QPair<bool, QString> FileTransactionInfo::parseTransaction( QString fn, FileTran
     //  Finalize mast have part_sig
     // participant_data with part_sig exist for all slate versions...
     if ( pdSz==0 ) {
-        return QPair<bool, QString>(false, "Content of the file " + fn + " is non complete MWC slate, 'participant_data' not found.");
+        return QPair<bool, QString>(false, "Content of the slate is non complete MWC slate, 'participant_data' not found.");
     }
 
     bool hasPartSig = false;
@@ -158,12 +196,12 @@ QPair<bool, QString> FileTransactionInfo::parseTransaction( QString fn, FileTran
     switch (type) {
         case FileTransactionType::RECEIVE:
             if (pdSz>1 || hasPartSig) {
-                return QPair<bool, QString>(false, "You can't recieve the slate from the file " + fn + "\n\nThis slate was already received and need to be 'Finalized' now.");
+                return QPair<bool, QString>(false, "This slate was already received and need to be 'Finalized' now.");
             }
             break;
         case FileTransactionType::FINALIZE:
             if (!hasPartSig) {
-                return QPair<bool, QString>(false, "You can't finalize the slate from the file " + fn + "\n\nThis slate need to be signed with 'Recieve' operation first.");
+                return QPair<bool, QString>(false, "This slate need to be signed with 'Receive' operation first.");
             }
             break;
         default:

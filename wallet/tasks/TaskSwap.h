@@ -28,7 +28,7 @@ public:
     const static int64_t TIMEOUT = 3600*1000*5; // NA in any case
 
     TaskSwapNewTradeArrive( MWC713 *wallet713 ) :
-            Mwc713Task("TaskSwapNewTradeArrive", "", wallet713,"") {}
+            Mwc713Task("TaskSwapNewTradeArrive", "", "", wallet713,"") {}
 
     virtual ~TaskSwapNewTradeArrive() override {}
 
@@ -43,7 +43,7 @@ public:
     const static int64_t TIMEOUT = 1000*120; // 120 seconds can be possible because of the status update and connection errors
 
     TaskGetSwapTrades( MWC713 *wallet713, QString _cookie ) :
-                Mwc713Task("TaskSwapTrades",
+                Mwc713Task("TaskSwapTrades", "Collecting swap trades...",
                 "swap --list --check --json_format --wait_for_backup1",
                 wallet713, ""),
                 cookie(_cookie) {}
@@ -63,7 +63,7 @@ public:
     const static int64_t TIMEOUT = 1000*120;
 
     TaskDeleteSwapTrade( MWC713 *wallet713, QString _swapId ) :
-            Mwc713Task("TaskDeleteSwapTrades",
+            Mwc713Task("TaskDeleteSwapTrades", "Removinf Swap trade...",
                        "swap --remove -i " + _swapId,
                        wallet713, ""),
                        swapId(_swapId) {}
@@ -99,7 +99,7 @@ public:
                             bool _dryRun,
                             QString _tag,
                             QVector<QString> _params ) :
-            Mwc713Task("TaskCreateNewSwapTrade",
+            Mwc713Task("TaskCreateNewSwapTrade", "Creaating new Swap tarde...",
                        generateCommandLine(min_confirmations,mwcAmount, secAmount, secondary,
                                     redeemAddress, secTxFee, sellerLockFirst, messageExchangeTimeMinutes,
                                     redeemTimeMinutes, mwcConfirmationNumber, secondaryConfirmationNumber,
@@ -139,7 +139,7 @@ public:
     const static int64_t TIMEOUT = 1000*120;
 
     TaskCancelSwapTrade( MWC713 *wallet713, QString _swapId ) :
-            Mwc713Task("TaskCancelSwapTrade",
+            Mwc713Task("TaskCancelSwapTrade", "Cancelling Swap trade...",
                        "swap --adjust cancel -i " + _swapId,
                        wallet713, ""),
             swapId(_swapId) {}
@@ -159,7 +159,7 @@ public:
     const static int64_t TIMEOUT = 1000*120;
 
     TaskTradeDetails( MWC713 *wallet713, QString _swapId, bool waitForBackup1 ) :
-            Mwc713Task("TaskTradeDetails",
+            Mwc713Task("TaskTradeDetails", "Checking Swap trade status...",
                        "swap --check --json_format -i " + _swapId +
                                 (waitForBackup1 ? " --wait_for_backup1" : ""),
                        wallet713, ""),
@@ -180,7 +180,7 @@ public:
     const static int64_t TIMEOUT = 1000*120;
 
     TaskAdjustTrade( MWC713 *wallet713, const QString & _swapId, const QString &adjustCmd, const QString & param1, const QString & param2 ) :
-            Mwc713Task("TaskTradeDetails",
+            Mwc713Task("TaskTradeDetails", "Checking Swap trade details...",
                        generateCommandLine(_swapId, adjustCmd, param1, param2),
                        wallet713, ""),
             swapId(_swapId), adjustCommand(adjustCmd) {}
@@ -203,7 +203,7 @@ public:
     const static int64_t TIMEOUT = 1000*120;
 
     TaskPerformAutoSwapStep( MWC713 *wallet713, const QString & _swapId, bool waitForBackup1 ) :
-                Mwc713Task("TaskPerformAutoSwapStep_" + _swapId,
+                Mwc713Task("TaskPerformAutoSwapStep_" + _swapId, "Monitoring Swap trade...",
                     "swap --autoswap --json_format -i " + _swapId +
                             (waitForBackup1 ? " --wait_for_backup1" : ""),
                     wallet713, ""),
@@ -223,7 +223,7 @@ public:
     const static int64_t TIMEOUT = 1000*120;
 
     TaskBackupSwapTradeData( MWC713 *wallet713, const QString & _swapId, const QString & backupFileName ) :
-            Mwc713Task("TaskBackupSwapTradeData",
+            Mwc713Task("TaskBackupSwapTradeData", "Backing up the Swap trade...",
                     "swap --trade_export \"" + backupFileName + "\"  -i " + _swapId,
                     wallet713, ""),
     swapId(_swapId) {}
@@ -242,7 +242,7 @@ public:
     const static int64_t TIMEOUT = 1000*120;
 
     TaskRestoreSwapTradeData( MWC713 *wallet713, const QString & _fileName ) :
-            Mwc713Task("TaskBackupSwapTradeData",
+            Mwc713Task("TaskBackupSwapTradeData", "Restoring Swap trade...",
                        "swap --trade_import \"" + _fileName + "\"",
                        wallet713, ""),
             fileName(_fileName) {}
@@ -262,7 +262,7 @@ public:
     const static int64_t TIMEOUT = 1000*120;
 
     TaskAdjustTradeState( MWC713 *wallet713, const QString & swapId, const QString & newState ) :
-            Mwc713Task("TaskAdjustTradeState",
+            Mwc713Task("TaskAdjustTradeState", "Updating Swap trade settings...",
                        "swap --adjust " + newState + " -i " + swapId,
                        wallet713, "") {}
 

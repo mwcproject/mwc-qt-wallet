@@ -17,7 +17,6 @@
 #include "ui_navbar.h"
 #include "navmenuconfig.h"
 #include "navmenuaccount.h"
-#include <QFileDialog>
 #include "../util/Json.h"
 #include "../bridge/config_b.h"
 #include "../bridge/statemachine_b.h"

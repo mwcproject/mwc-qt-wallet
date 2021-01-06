@@ -17,7 +17,6 @@
 #include "../control_desktop/messagebox.h"
 #include <QFileInfo>
 #include <QHostInfo>
-#include <QFileDialog>
 #include <QStandardPaths>
 #include "../util_desktop/timeoutlock.h"
 #include "../dialogs_desktop/networkselectiondlg.h"
