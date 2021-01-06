@@ -51,7 +51,7 @@ public:
 
     // QFileDialog::getSaveFileName call
     virtual QString getSaveFileName(const QString &caption, const QString &dir, const QString &filter) override;
-    virtual QString getLoadFileName(const QString &caption, const QString &dir, const QString &filter) override;
+    virtual QString getOpenFileName(const QString &caption, const QString &dir, const QString &filter) override;
 
     // Ask for confirmation
     virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) override;

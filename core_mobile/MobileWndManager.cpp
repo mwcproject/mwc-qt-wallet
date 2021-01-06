@@ -146,7 +146,7 @@ QString MobileWndManager::getSaveFileName(const QString &caption, const QString 
 
 // QFileDialog::getLoadFileName call
 // Mobile migth never need that.
-QString MobileWndManager::getLoadFileName(const QString &caption, const QString &dir, const QString &filter) {
+QString MobileWndManager::getOpenFileName(const QString &caption, const QString &dir, const QString &filter) {
     Q_ASSERT(false); // implement me
 }
 
@@ -250,7 +250,7 @@ void MobileWndManager::pageFileTransaction(QString pageTitle, QString callerId,
     obj["amount"] = util::nano2one(transInfo.amount);
     obj["transactionId"] = transInfo.transactionId;
     obj["lockHeight"] = transInfo.lock_height > nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-";
-    obj["receiverAddress"] = transInfo.receiverAddress.isEmpty() ? "-" : transInfo.receiverAddress;
+    obj["receiverAddress"] = transInfo.fromAddress.isEmpty() ? "-" : transInfo.fromAddress;
     obj["message"] = transInfo.message;
     obj["isFinalize"] = processButtonName == "Finalize";
 
