@@ -413,7 +413,7 @@ Item {
             if (accountComboBox.currentIndex >= 0) {
                 const account = accountItems.get(accountComboBox.currentIndex).account
                 const sendAmount = textfield_amount.text.trim()
-                const res = send.initialSendSelection( text_online_selected.visible, account, sendAmount );
+                const res = send.initialSendSelection( text_online_selected.visible ? 1 : 2, account, sendAmount );
                 if (res === 1)
                     accountComboBox.focus = true
                 else if (res === 2)

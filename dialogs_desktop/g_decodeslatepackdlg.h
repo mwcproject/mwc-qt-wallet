@@ -43,7 +43,7 @@ protected:
 private slots:
     void on_slatepackEdit_textChanged();
 
-    void onSgnDecodeSlatepack(QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient);
+    void onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient);
 
     void on_closeButton_clicked();
 

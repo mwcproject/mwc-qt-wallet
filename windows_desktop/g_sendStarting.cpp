@@ -22,10 +22,6 @@
 
 namespace wnd {
 
-enum CHECKED_FR_ID {
-    ONLINE_ID = 1, FILE_ID = 2
-};
-
 SendStarting::SendStarting(QWidget *parent) :
         core::NavWnd(parent),
         ui(new Ui::SendStarting) {
@@ -43,24 +39,29 @@ SendStarting::SendStarting(QWidget *parent) :
 
     wallet->requestWalletBalanceUpdate();
 
-    ui->fileChecked->setId(FILE_ID);
-    ui->onlineChecked->setId(ONLINE_ID);
+    ui->onlineChecked->setId(bridge::SEND_SELECTED_METHOD::ONLINE_ID);
+    ui->fileChecked->setId(bridge::SEND_SELECTED_METHOD::FILE_ID);
+    ui->slatepackChecked->setId(bridge::SEND_SELECTED_METHOD::SLATEPACK_ID);
 
+    connect(ui->onlineChecked, &control::MwcCheckedFrame::onChecked, this, &SendStarting::onChecked,
+            Qt::QueuedConnection);
     connect(ui->fileChecked, &control::MwcCheckedFrame::onChecked, this, &SendStarting::onChecked,
             Qt::QueuedConnection);
-    connect(ui->onlineChecked, &control::MwcCheckedFrame::onChecked, this, &SendStarting::onChecked,
+    connect(ui->slatepackChecked, &control::MwcCheckedFrame::onChecked, this, &SendStarting::onChecked,
             Qt::QueuedConnection);
 
     if (config->isColdWallet()) {
         // Hide 'online option to send'
         ui->onlineChecked->hide();
         QRect rc = ui->fileChecked->frameGeometry();
-        ui->fileChecked->move( QPoint( (rc.right() - rc.width())/2, rc.top() ) );
+        ui->fileChecked->move( QPoint( (rc.right() - rc.width()), rc.top() ) );
+        rc = ui->slatepackChecked->frameGeometry();
+        ui->slatepackChecked->move( QPoint( rc.right() - rc.width()/2, rc.top() ) );
 
-        onChecked(FILE_ID);
+        onChecked(bridge::SEND_SELECTED_METHOD::SLATEPACK_ID);
     }
     else {
-        onChecked(ONLINE_ID);
+        onChecked( bridge::SEND_SELECTED_METHOD( config->getSendMethod()) );
     }
 
     ui->generatePoof->setCheckState( config->getGenerateProof() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
@@ -89,16 +90,30 @@ void SendStarting::onSgnWalletBalanceUpdated() {
 }
 
 void SendStarting::onChecked(int id) {
-    if (id == ONLINE_ID) {
+    selectedSendMethod = id;
+    if (id == bridge::SEND_SELECTED_METHOD::ONLINE_ID) {
         ui->onlineChecked->setChecked(true);
         ui->fileChecked->setChecked(false);
-        ui->fileLabel->hide();
+        ui->slatepackChecked->setChecked(false);
         ui->onlineLabel->show();
-    } else {
+        ui->fileLabel->hide();
+        ui->slatepackLabel->hide();
+    } else if (id == bridge::SEND_SELECTED_METHOD::FILE_ID) {
         ui->onlineChecked->setChecked(false);
         ui->fileChecked->setChecked(true);
-        ui->fileLabel->show();
+        ui->slatepackChecked->setChecked(false);
         ui->onlineLabel->hide();
+        ui->fileLabel->show();
+        ui->slatepackLabel->hide();
+    }
+    else {
+        selectedSendMethod = bridge::SEND_SELECTED_METHOD::SLATEPACK_ID;
+        ui->onlineChecked->setChecked(false);
+        ui->fileChecked->setChecked(false);
+        ui->slatepackChecked->setChecked(true);
+        ui->onlineLabel->hide();
+        ui->fileLabel->hide();
+        ui->slatepackLabel->show();
     }
 }
 
@@ -116,7 +131,9 @@ void SendStarting::on_nextButton_clicked() {
 
     QString sendAmount = ui->amountEdit->text().trimmed();
 
-    int res = send->initialSendSelection( ui->onlineChecked->isChecked(), account, sendAmount );
+    config->setSendMethod(selectedSendMethod);
+
+    int res = send->initialSendSelection( selectedSendMethod, account, sendAmount );
     if (res==1)
         ui->accountComboBox->setFocus();
     else if (res==2)

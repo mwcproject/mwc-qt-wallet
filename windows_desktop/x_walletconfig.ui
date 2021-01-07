@@ -68,7 +68,7 @@
       <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_main">
       <property name="minimumSize">
@@ -308,54 +308,7 @@
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
-          <widget class="QGroupBox" name="autoStart">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>11000</height>
-            </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true"/>
-           </property>
-           <property name="title">
-            <string>Auto-Start</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <property name="spacing">
-             <number>25</number>
-            </property>
-            <property name="leftMargin">
-             <number>20</number>
-            </property>
-            <property name="topMargin">
-             <number>25</number>
-            </property>
-            <item>
-             <widget class="QCheckBox" name="start_mqs">
-              <property name="text">
-               <string>MWC MQS</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="start_tor">
-              <property name="text">
-               <string>Tor</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="0" column="1" rowspan="2">
+         <item row="0" column="1" rowspan="3">
           <widget class="QGroupBox" name="autoLogout">
            <property name="maximumSize">
             <size>
@@ -469,6 +422,56 @@
            </layout>
           </widget>
          </item>
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="autoStart">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>11000</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="title">
+            <string>Auto-Start</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <property name="spacing">
+             <number>25</number>
+            </property>
+            <property name="leftMargin">
+             <number>20</number>
+            </property>
+            <property name="topMargin">
+             <number>20</number>
+            </property>
+            <property name="bottomMargin">
+             <number>15</number>
+            </property>
+            <item>
+             <widget class="QCheckBox" name="start_mqs">
+              <property name="text">
+               <string>MWC MQS</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="start_tor">
+              <property name="text">
+               <string>Tor</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
          <item row="1" column="0">
           <widget class="QGroupBox" name="notificationsGroup">
            <property name="maximumSize">
@@ -491,24 +494,11 @@
              <number>25</number>
             </property>
             <property name="topMargin">
-             <number>10</number>
+             <number>20</number>
             </property>
-            <item>
-             <spacer name="verticalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>10</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
+            <property name="bottomMargin">
+             <number>20</number>
+            </property>
             <item>
              <widget class="QCheckBox" name="notificationsEnabled">
               <property name="toolTip">
@@ -525,18 +515,39 @@
               </property>
              </widget>
             </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QGroupBox" name="slatepackBox">
+           <property name="title">
+            <string>Slatepacks</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <property name="leftMargin">
+             <number>25</number>
+            </property>
+            <property name="topMargin">
+             <number>20</number>
+            </property>
+            <property name="bottomMargin">
+             <number>20</number>
+            </property>
             <item>
-             <spacer name="verticalSpacer">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
+             <widget class="QCheckBox" name="lockLaterEnabled">
+              <property name="toolTip">
+               <string/>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
+              <property name="statusTip">
+               <string>Enable the display of status messages using windows in the lower right of the wallet.</string>
               </property>
-             </spacer>
+              <property name="text">
+               <string>Don't lock outputs until finalization</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>

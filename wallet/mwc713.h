@@ -347,8 +347,8 @@ public:
     virtual void adjustTradeState(QString swapId, QString newState) override;
 
     // Decode the slatepack data (or validate slate json) are respond with Slate SJon that can be processed
-    // Check Signal: onDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
-    virtual void decodeSlatepack(QString slatepackContent) override;
+    // Check Signal: onDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
+    virtual void decodeSlatepack(QString slatepackContent, QString tag) override;
 public:
     // launch exit command.
     void launchExitCommand();
@@ -488,7 +488,7 @@ public:
 
     void setRepost(int txIdx, QString err);
 
-    void setDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
+    void setDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
 private:
     // Request sync (update_wallet_state) if it is not at the task Q.
     QVector<QPair<Mwc713Task*,int64_t>> create_sync_if_need(bool showSyncProgress, bool enforce);

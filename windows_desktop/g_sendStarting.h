@@ -53,6 +53,8 @@ private:
     bridge::Wallet * wallet = nullptr;
     bridge::Config * config = nullptr;
     bridge::Send * send = nullptr;
+
+    int selectedSendMethod = 0;
 };
 
 

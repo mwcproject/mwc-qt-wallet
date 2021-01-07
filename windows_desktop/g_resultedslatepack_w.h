@@ -25,6 +25,7 @@ namespace bridge {
 class StateMachine;
 class Config;
 class Util;
+class Wallet;
 }
 
 namespace control {
@@ -38,25 +39,40 @@ Q_OBJECT
 
 public:
     // txExtention - extention for the slatepack file. Let's keep the same as a regular slate
-    explicit ResultedSlatepack(QWidget *parent, QString slatepack, int backStateId, QString txExtension );
+    explicit ResultedSlatepack(QWidget *parent, QString slatepack, int backStateId, QString txExtension, bool enableFinalize );
 
     ~ResultedSlatepack();
+
+protected:
+    void initiateSlateVerification(const QString &slate2check, QString tag);
 
 private slots:
     void on_backButton_clicked();
     void on_saveQrImageBtn_clicked();
     void on_saveSlatepackBtn_clicked();
     void on_backButton_2_clicked();
+    void on_finalizeSlatepack_textChanged();
+    void on_finalizeSlatepackBtn_clicked();
 
+    void onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient);
+
+    void sgnFinalizeSlatepack( QString tagId, QString error, QString txUuid );
 private:
     Ui::ResultedSlatepack *ui;
     bridge::StateMachine * stateMachine = nullptr;
     bridge::Config * config = nullptr;
     bridge::Util * util = nullptr;
+    bridge::Wallet * wallet = nullptr;
 
     int backStateId = -1;
     QString slatepack;
     QString txExtension;
+    bool    enableFinalize;
+
+    QString spInProgress;
+    QString slate2finalize;
+    int lastReportedError = 0;
+    QString transactionUUID; // uuid from the send slate
 };
 
 }

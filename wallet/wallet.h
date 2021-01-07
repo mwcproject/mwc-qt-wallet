@@ -734,8 +734,8 @@ public:
     virtual void adjustTradeState(QString swapId, QString newState) = 0;
 
     // Decode the slatepack data (or validate slate json) are respond with Slate SJon that can be processed
-    // Check Signal: onDecodeSlatepack( QString error, QString slateJSon, QString content, QString sender, QString receiver )
-    virtual void decodeSlatepack(QString slatepackContent) = 0;
+    // Check Signal: onDecodeSlatepack( QString tag, QString error, QString slateJSon, QString content, QString sender, QString receiver )
+    virtual void decodeSlatepack(QString slatepackContent, QString tag) = 0;
 
 private:
 signals:
@@ -889,7 +889,7 @@ signals:
     void onRepost(int txIdx, QString error);
 
     // Response to decodeSlatepack
-    void onDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
+    void onDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
 };
 
 }

@@ -50,13 +50,13 @@
        <property name="minimumSize">
         <size>
          <width>550</width>
-         <height>420</height>
+         <height>400</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>5500</width>
-         <height>420</height>
+         <height>400</height>
         </size>
        </property>
        <property name="frameShape">
@@ -65,7 +65,7 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,0,0,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,0,0">
         <property name="spacing">
          <number>20</number>
         </property>
@@ -129,7 +129,7 @@
               <bool>true</bool>
              </property>
             </widget>
-            <widget class="control::MwcLabelLarge" name="label_2">
+            <widget class="control::MwcLabelLarge" name="sendTitleLabel">
              <property name="geometry">
               <rect>
                <x>110</x>
@@ -218,51 +218,7 @@
            <string>Input message for this transaction.</string>
           </property>
           <property name="placeholderText">
-           <string>Description</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="control::MwcCheckBox" name="slatepackCheck">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::StrongFocus</enum>
-          </property>
-          <property name="toolTip">
-           <string>Send slate more secure and compact format</string>
-          </property>
-          <property name="text">
-           <string>Slatepack format (require wallet v4.0 or higher)</string>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="control::MwcCheckBox" name="lockOutputsLater">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::StrongFocus</enum>
-          </property>
-          <property name="toolTip">
-           <string>Pospone funds locking to finalize stage.</string>
-          </property>
-          <property name="text">
-           <string>Lock outputs at finalize stage</string>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
+           <string>Description (optional)</string>
           </property>
          </widget>
         </item>
@@ -567,14 +523,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelProgress</class>
@@ -591,16 +547,9 @@
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcCheckBox</class>
-   <extends>QCheckBox</extends>
-   <header>control_desktop/MwcCheckBox.h</header>
-  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>descriptionEdit</tabstop>
-  <tabstop>slatepackCheck</tabstop>
-  <tabstop>lockOutputsLater</tabstop>
   <tabstop>recipientAddress</tabstop>
   <tabstop>contactsButton</tabstop>
   <tabstop>settingsBtn</tabstop>

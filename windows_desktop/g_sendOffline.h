@@ -35,15 +35,12 @@ class SendOffline : public core::NavWnd
     Q_OBJECT
 
 public:
-    explicit SendOffline(QWidget *parent, QString selectedAccount, int64_t amount);
+    explicit SendOffline(QWidget *parent, QString selectedAccount, int64_t amount, bool slatepacks);
     virtual ~SendOffline() override;
-protected:
-    void upadateSlatepackUI();
 
 private slots:
     void on_sendButton_clicked();
     void on_settingsBtn_clicked();
-    void on_slatepackCheck_stateChanged(int arg1);
     void on_contactsButton_clicked();
 
     void onSgnShowSendResult( bool success, QString message );
@@ -55,6 +52,7 @@ private:
 
     QString selectedAccount;
     int64_t amount;
+    bool    slatepacks;
 };
 
 }

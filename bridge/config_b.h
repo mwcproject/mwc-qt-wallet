@@ -173,8 +173,8 @@ public:
     Q_INVOKABLE void setNoTorForEmbeddedNode(bool noTor);
 
     // Slatepack format, selected value
-    Q_INVOKABLE bool getSendSlatepack();
-    Q_INVOKABLE void setSendSlatepack(bool slatepack);
+    Q_INVOKABLE int getSendMethod();
+    Q_INVOKABLE void setSendMethod(int method);
 
     // Lock outputs for slatepacks send
     Q_INVOKABLE bool getSendLockOutput();

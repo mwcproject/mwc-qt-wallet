@@ -500,10 +500,10 @@ bool TaskDecodeSlatepack::processTask(const QVector<WEvent> &events) {
     }
 
     if (slate.isEmpty() || content.isEmpty() || sender.isEmpty()) {
-        wallet713->setDecodeSlatepack( getErrorMessage(events, "Unable to decode a slatepack"), slatepack, "","","", "");
+        wallet713->setDecodeSlatepack( tag, getErrorMessage(events, "Unable to decode a slatepack"), slatepack, "","","", "");
     }
     else {
-        wallet713->setDecodeSlatepack( "", slatepack, slate, content, sender, recipient);
+        wallet713->setDecodeSlatepack( tag, "", slatepack, slate, content, sender, recipient);
     }
     return true;
 }

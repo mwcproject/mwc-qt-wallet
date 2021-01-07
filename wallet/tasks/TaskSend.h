@@ -214,9 +214,10 @@ class TaskDecodeSlatepack : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*5; // Should be very quick operation
 
-    TaskDecodeSlatepack( MWC713 *wallet713, QString _slatepack ) :
+    TaskDecodeSlatepack( MWC713 *wallet713, QString _slatepack, QString _tag ) :
             Mwc713Task("TaskDecodeSlatepack", "Decoding slatepack...", "decode_slatepack --slatepack \"" + _slatepack + "\"", wallet713, ""),
-            slatepack(_slatepack) {}
+            slatepack(_slatepack),
+            tag(_tag) {}
 
     virtual ~TaskDecodeSlatepack() override {}
 
@@ -225,6 +226,7 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
     QString slatepack;
+    QString tag;
 };
 
 

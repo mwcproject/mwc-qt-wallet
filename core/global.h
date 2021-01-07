@@ -102,6 +102,7 @@ const QString PAGE_E_OUTPUTS        = "Outputs";
 const QString PAGE_G_SEND           = "Send coins";
 const QString PAGE_G_SEND_ONLINE    = "Send coins to address";
 const QString PAGE_G_SEND_FILE      = "Send coins with file";
+const QString PAGE_G_SEND_SLATEPACK = "Send coins with Slatepack";
 const QString PAGE_G_FINALIZE_UPLOAD= "Finalize Transaction";
 const QString PAGE_G_FINALIZE_TRANS = "Finalize Transaction";
 const QString PAGE_G_RECEIVE_TRANS  = "Receive File Transaction";

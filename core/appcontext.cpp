@@ -345,7 +345,9 @@ bool AppContext::loadDataImpl() {
         in >> noTorForEmbeddedNode;
 
     if (id>=0x47A3) {
-        in >> sendSlatepack;
+        int sm = bridge::SEND_SELECTED_METHOD::ONLINE_ID;
+        in >> sm;
+        sendMethod = bridge::SEND_SELECTED_METHOD(sm);
         in >> sendLockOutput;
     }
 
@@ -454,7 +456,8 @@ void AppContext::saveData() const {
 
     out << noTorForEmbeddedNode;
 
-    out << sendSlatepack;
+    int sm = int(sendMethod);
+    out << sm;
     out << sendLockOutput;
 }
 
@@ -641,8 +644,8 @@ void AppContext::setNoTorForEmbeddedNode(bool noTor) {
     saveData();
 }
 
-void AppContext::setSendSlatepack(bool slatepack) {
-    sendSlatepack = slatepack;
+void AppContext::setSendMethod(bridge::SEND_SELECTED_METHOD _sendMethod) {
+    sendMethod = _sendMethod;
 }
 
 void AppContext::setSendLockOutput(bool lock)  {

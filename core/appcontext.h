@@ -20,6 +20,7 @@
 #include "../state/m_airdrop.h"
 #include "../wallet/wallet.h"
 #include "../core/Config.h"
+#include "../bridge/wnd/g_send_b.h"
 #include <QDebug>
 
 class QAction;
@@ -216,8 +217,8 @@ public:
     bool getNoTorForEmbeddedNode() const {return noTorForEmbeddedNode;}
     void setNoTorForEmbeddedNode(bool noTor);
 
-    bool getSendSlatepack() const {return sendSlatepack;}
-    void setSendSlatepack(bool slatepack);
+    bridge::SEND_SELECTED_METHOD getSendMethod() const {return sendMethod;}
+    void setSendMethod(bridge::SEND_SELECTED_METHOD sendMethod);
 
     bool getSendLockOutput() const {return sendLockOutput; }
     void setSendLockOutput(bool lock);
@@ -337,8 +338,8 @@ private:
     bool noTorForEmbeddedNode = false;
 
     // For offline send page, values for slatepack and lock after
-    bool sendSlatepack = false;
-    bool sendLockOutput = false;
+    bridge::SEND_SELECTED_METHOD sendMethod = bridge::SEND_SELECTED_METHOD::ONLINE_ID;
+    bool sendLockOutput = true;
 };
 
 template <class T>

@@ -132,8 +132,8 @@ purpose of this document is to track changes on Desctop, so we migth update mobi
 ##bridge::Config 
 ```c++
     // Slatepack format, selected value
-    Q_INVOKABLE bool getSendSlatepack();
-    Q_INVOKABLE void setSendSlatepack(bool slatepack);
+    Q_INVOKABLE int getSendMethod();
+    Q_INVOKABLE void setSendMethod(int method);
 
     // Lock outputs for slatepacks send
     Q_INVOKABLE bool getSendLockOutput();
@@ -145,7 +145,11 @@ add parameters `bool isSlatepack, bool isLockLater, QString slatepackRecipientAd
 
 QML code is upadted with false values 
 ```c++
-    // Handle whole workflow to send offline
+    // Updated signature for 1st argument:
+    Q_INVOKABLE int initialSendSelection( int sendSelectedMethod, QString account, QString sendAmount );
+
+
+// Handle whole workflow to send offline
     // apiSecret - is not needed. Pass empty String
     // return true if some long process was started.
     Q_INVOKABLE bool sendMwcOffline( QString account, QString amountNano, QString message, bool isSlatepack, bool isLockLater, QString slatepackRecipientAddress);
@@ -203,19 +207,28 @@ QML code is upadted with false values
 ##bridge::Wallet
 ```c++
     // Decode the slatepack data
-    // Check Signal: sgnDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
-    Q_INVOKABLE void decodeSlatepack(QString slatepackContent);
+    // Check Signal: sgnDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
+    Q_INVOKABLE void decodeSlatepack(QString slatepackContent, QString tag);
+
+    // Finalize a slatepack.
+    // Check Signal sgnFinalizeSlatepack
+    Q_INVOKABLE void finalizeSlatepack( QString slatepack, bool fluff, QString tag );
 ```
 
 ##WndManager
 pageShowSlatepack  shows new ResultedSlatepack page.
 ```c++
+    // Removeed   virtual void pageSendOffline( QString selectedAccount, int64_t amount ) override;
+    virtual void pageSendFile( QString selectedAccount, int64_t amount ) override;
+    virtual void pageSendSlatepack( QString selectedAccount, int64_t amount ) override;
+
+
     // Show open file dialog. Might not be needed for mobile
     virtual QString getOpenFileName(const QString &caption, const QString &dir, const QString &filter) override;
 
     // slatepack - slatepack string value to show.
     // backStateId - state ID of the caller. On 'back' will switch to this state Id
-    virtual void pageShowSlatepack(QString slatepack, int backStateId, QString txExtension) override;
+    virtual void pageShowSlatepack(QString slatepack, int backStateId, QString txExtension, bool enableFinalize) override;
 ```
 
 Change:   `const QString & fileName`  to `const QString & fileNameOrSlatepack`
@@ -230,20 +243,17 @@ There are some logic change inside that window to handle files or slatepacks.
 
 ## Send Page (initial)
 
-Update `File`  to `File os SP`
-![](bridge_change_history_images/95d57109.png)
+Add 'Slatepack' button.
+![](bridge_change_history_images/a450e674.png)
 
-## Send Page (offline)
-Here are we have checkboxes for `slatepack`, and for `lock_later`.  Because of backward compartibility
-issues the lock_later will work with a slatepacks only. 
-
+## Send Page (Slatepacks)
 Recipient wallet address is optional and it is a tor address.
 
 The contact selection dialog must show ONLY tor addresses. Please check chenges at implementaiton of SelectContactDlg.
 
-![](bridge_change_history_images/ba187946.png)
+![](bridge_change_history_images/a9c1ad38.png)
 
-![](bridge_change_history_images/df51fccd.png)
+Please note, in the code it is seend to files dialog with some options. 
 
 ## Receive page:
 1. No tor address, instead the wallet public address that will be converted into tor if needed.
@@ -267,7 +277,7 @@ It is used for "Receive" and "Finalize" pages to request incode slate.
 
 In this example you can see responding encrypted slate with messages, so it is pretty large,
 
-Here is string representation
+Here is string representation at Receive 
 ![](bridge_change_history_images/6d88dd8b.png)
 
 And a QR code. Because message can be long, I made QR code window as large as possible.
@@ -276,6 +286,10 @@ For QML implementaiton we might add method that generate SVG image for the QR co
 Underling library does that, descktop just drawing on the image. Just check the implemntation.
 
 ![](bridge_change_history_images/d0c92fbe.png)
+
+The string representaiton at Send include the finalize same transaction feature.
+
+![](bridge_change_history_images/6852d4b2.png)
 
 ## Decode Slatepack Dialog
 The purpose of this dialog is mostly troubleshooting or just data exploring.

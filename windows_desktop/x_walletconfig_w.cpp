@@ -73,6 +73,9 @@ WalletConfig::WalletConfig(QWidget *parent) :
     notificationWindowsEnabled = walletConfig->getNotificationWindowsEnabled();
     ui->notificationsEnabled->setChecked(notificationWindowsEnabled);
 
+    lockLater = config->getSendLockOutput();
+    ui->lockLaterEnabled->setChecked(lockLater);
+
     currentLogoutTimeout = walletConfig->getLogoutTimeMs() / 1000;
     updateAutoLogoutStateUI(currentLogoutTimeout);
     logoutTimeout = currentLogoutTimeout;
@@ -136,6 +139,7 @@ void WalletConfig::updateButtons() {
         autoStartMQSEnabled == ui->start_mqs->isChecked() &&
         autoStartTorEnabled == ui->start_tor->isChecked() &&
         notificationWindowsEnabled == ui->notificationsEnabled->isChecked() &&
+        lockLater == ui->lockLaterEnabled->isChecked() &&
         logoutTimeout == currentLogoutTimeout &&
         outputLockingEnabled == ui->outputLockingCheck->isChecked();
 
@@ -349,6 +353,12 @@ bool WalletConfig::applyChanges() {
         notificationWindowsEnabled = notificationsEnabled;
     }
 
+    bool lockLaterVal = ui->lockLaterEnabled->isChecked();
+    if (lockLaterVal != lockLater) {
+        lockLater = lockLaterVal;
+        config->setSendLockOutput(ui->lockLaterEnabled->isChecked());
+    }
+
     bool lockingEnabled = ui->outputLockingCheck->isChecked();
     if (lockingEnabled != outputLockingEnabled) {
         walletConfig->setOutputLockingEnabled(lockingEnabled);
@@ -524,5 +534,11 @@ void WalletConfig::on_notificationsEnabled_clicked() {
     updateButtons();
 }
 
+void WalletConfig::on_lockLaterEnabled_clicked()
+{
+    updateButtons();
 }
+
+}
+
 

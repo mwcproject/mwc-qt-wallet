@@ -58,10 +58,13 @@ void DecodeSlatepackDlg::decodeSlate(const QString &slatepack) {
     }
 
     spInProgress = slatepack;
-    wallet->decodeSlatepack(slatepack);
+    wallet->decodeSlatepack(slatepack, "DecodeSlatepackDlg");
 }
 
-void DecodeSlatepackDlg::onSgnDecodeSlatepack(QString error, QString slatepack, QString slateJson, QString content, QString sender, QString recipient) {
+void DecodeSlatepackDlg::onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJson, QString content, QString sender, QString recipient) {
+    if (tag!="DecodeSlatepackDlg")
+        return;
+
     spInProgress = "";
     if (!error.isEmpty()) {
         ui->slateDetailsLabel->setText("<b>" + error + "</b>");

@@ -171,7 +171,7 @@ void Finalize::onFinalizeSlatepack( QString tagId, QString error, QString txUuid
 
     if (error.isEmpty()) {
         if (!file2TransactionsInfo.contains(txUuid)) {
-            Q_ASSERT(false);
+            // Expected because we can finalzie from send, vew slatepack page as well.
             return;
         }
 

@@ -989,9 +989,9 @@ void MWC713::adjustTradeState(QString swapId, QString newState) {
 }
 
 // Decode the slatepack data (or validate slate json) are respond with Slate SJon that can be processed
-// Check Signal: onDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
-void MWC713::decodeSlatepack(QString slatepackContent) {
-    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, {TSK(new TaskDecodeSlatepack(this, slatepackContent), TaskDecodeSlatepack::TIMEOUT)} );
+// Check Signal: onDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
+void MWC713::decodeSlatepack(QString slatepackContent, QString tag) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, {TSK(new TaskDecodeSlatepack(this, slatepackContent, tag), TaskDecodeSlatepack::TIMEOUT)} );
 }
 
 
@@ -1662,8 +1662,8 @@ void MWC713::setRepost(int txIdx, QString err) {
     emit onRepost(txIdx, err);
 }
 
-void MWC713::setDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient ) {
-    emit onDecodeSlatepack( error, slatepack, slateJSon, content, sender, recipient );
+void MWC713::setDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient ) {
+    emit onDecodeSlatepack( tag, error, slatepack, slateJSon, content, sender, recipient );
 }
 
 /////////////////////////////////////////////////////////////////////////////////

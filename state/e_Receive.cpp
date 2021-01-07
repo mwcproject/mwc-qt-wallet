@@ -144,7 +144,7 @@ void Receive::onReceiveSlatepack( QString tagId, QString error, QString slatepac
         if (error.isEmpty()) {
             Q_ASSERT(!slatepack.isEmpty());
 
-            core::getWndManager()->pageShowSlatepack(slatepack, STATE::RECEIVE_COINS, ".response" );
+            core::getWndManager()->pageShowSlatepack(slatepack, STATE::RECEIVE_COINS, ".response", false );
         } else {
             core::getWndManager()->messageTextDlg("Failure",
                                                   "Unable to receive slatepack transaction.\n\n" + error);

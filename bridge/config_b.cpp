@@ -375,11 +375,12 @@ void Config::setNoTorForEmbeddedNode(bool noTor) {
 }
 
 // Slatepack format, selected value
-bool Config::getSendSlatepack() {
-    return getAppContext()->getSendSlatepack();
+// Slatepack format, selected value
+int Config::getSendMethod() {
+    return getAppContext()->getSendMethod();
 }
-void Config::setSendSlatepack(bool slatepack) {
-    getAppContext()->setSendSlatepack(slatepack);
+void Config::setSendMethod(int method) {
+    getAppContext()->setSendMethod(bridge::SEND_SELECTED_METHOD(method));
 }
 
 // Lock outputs for slatepacks send

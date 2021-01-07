@@ -31,12 +31,14 @@ Send::~Send() {
 }
 
 // Process sept 1 send request.  sendAmount is a value as user input it
+// sendSelectedMethod values:
+//   ONLINE_ID = 1, FILE_ID = 2, SLATEPACK_ID = 2
 // return code:
 //   0 - ok
 //   1 - account error
 //   2 - amount error
-int Send::initialSendSelection( bool isOnlineSelected, QString account, QString sendAmount ) {
-    return getState()->initialSendSelection(isOnlineSelected, account, sendAmount);
+int Send::initialSendSelection( int sendSelectedMethod, QString account, QString sendAmount ) {
+    return getState()->initialSendSelection( bridge::SEND_SELECTED_METHOD(sendSelectedMethod), account, sendAmount);
 }
 
 

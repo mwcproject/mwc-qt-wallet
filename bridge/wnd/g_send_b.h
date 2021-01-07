@@ -20,6 +20,10 @@
 
 namespace bridge {
 
+enum SEND_SELECTED_METHOD {
+    ONLINE_ID = 1, FILE_ID = 2, SLATEPACK_ID = 3
+};
+
 class Send : public QObject {
 Q_OBJECT
 public:
@@ -31,11 +35,13 @@ public:
     void showSendResult( bool success, QString message );
 
     // Process sept 1 send request.  sendAmount is a value as user input it
+    // sendSelectedMethod values (SEND_SELECTED_METHOD):
+    //   ONLINE_ID = 1, FILE_ID = 2, SLATEPACK_ID = 2
     // return code:
     //   0 - ok
     //   1 - account error
     //   2 - amount error
-    Q_INVOKABLE int initialSendSelection( bool isOnlineSelected, QString account, QString sendAmount );
+    Q_INVOKABLE int initialSendSelection( int sendSelectedMethod, QString account, QString sendAmount );
 
     // Check if Node is healthy to do send.
     Q_INVOKABLE bool isNodeHealthy();

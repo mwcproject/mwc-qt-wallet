@@ -83,7 +83,7 @@
        <widget class="control::MwcCheckedFrame" name="onlineChecked">
         <property name="geometry">
          <rect>
-          <x>114</x>
+          <x>10</x>
           <y>0</y>
           <width>150</width>
           <height>208</height>
@@ -188,7 +188,7 @@
        <widget class="control::MwcCheckedFrame" name="fileChecked">
         <property name="geometry">
          <rect>
-          <x>330</x>
+          <x>226</x>
           <y>0</y>
           <width>150</width>
           <height>208</height>
@@ -238,7 +238,7 @@
           </rect>
          </property>
          <property name="text">
-          <string>File or SP</string>
+          <string>File</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -474,6 +474,114 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
        </widget>
+       <widget class="control::MwcCheckedFrame" name="slatepackChecked">
+        <property name="geometry">
+         <rect>
+          <x>440</x>
+          <y>0</y>
+          <width>150</width>
+          <height>208</height>
+         </rect>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Send MWC with Slatepack</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <widget class="QLabel" name="label_16">
+         <property name="geometry">
+          <rect>
+           <x>48</x>
+           <y>42</y>
+           <width>58</width>
+           <height>73</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap resource="../resources_desktop.qrc">:/img/File@2x.svg</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="control::MwcLabelLarge" name="label_17">
+         <property name="geometry">
+          <rect>
+           <x>27</x>
+           <y>132</y>
+           <width>103</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Slatepack</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+        <widget class="control::MwcLine" name="frame_11">
+         <property name="geometry">
+          <rect>
+           <x>33</x>
+           <y>165</y>
+           <width>91</width>
+           <height>2</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
+        <widget class="control::MwcLabelNormal" name="label_18">
+         <property name="geometry">
+          <rect>
+           <x>7</x>
+           <y>171</y>
+           <width>136</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Manual Process</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+        <widget class="control::MwcLabelSmall" name="slatepackLabel">
+         <property name="geometry">
+          <rect>
+           <x>18</x>
+           <y>12</y>
+           <width>124</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>SELECTED</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </widget>
       </widget>
      </item>
      <item>
@@ -615,6 +723,11 @@ p, li { white-space: pre-wrap; }
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
@@ -625,9 +738,9 @@ p, li { white-space: pre-wrap; }
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
+   <class>control::MwcCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>control_desktop/MwcCheckBox.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcComboBox</class>
@@ -651,15 +764,11 @@ p, li { white-space: pre-wrap; }
    <header>control_desktop/MwcCheckedFrame.h</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>control::MwcCheckBox</class>
-   <extends>QCheckBox</extends>
-   <header>control_desktop/MwcCheckBox.h</header>
-  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>onlineChecked</tabstop>
   <tabstop>fileChecked</tabstop>
+  <tabstop>slatepackChecked</tabstop>
   <tabstop>accountComboBox</tabstop>
   <tabstop>amountEdit</tabstop>
   <tabstop>allAmountButton</tabstop>

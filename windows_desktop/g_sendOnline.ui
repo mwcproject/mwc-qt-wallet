@@ -372,7 +372,7 @@
             <string>Input message for this transaction.</string>
            </property>
            <property name="placeholderText">
-            <string>Description</string>
+            <string>Description (optional)</string>
            </property>
           </widget>
          </item>

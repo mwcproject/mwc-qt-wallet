@@ -95,7 +95,7 @@ void Send::switchToStartingWindow() {
 //   0 - ok
 //   1 - account error
 //   2 - amount error
-int Send::initialSendSelection( bool isOnlineSelected, QString account, QString sendAmount ) {
+int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod, QString account, QString sendAmount ) {
 
     QVector<wallet::AccountInfo> balance = context->wallet->getWalletBalance();
     wallet::AccountInfo selectedAccount;
@@ -139,11 +139,17 @@ int Send::initialSendSelection( bool isOnlineSelected, QString account, QString 
         return 2;
     }
 
-    if (isOnlineSelected) {
+    if (sendSelectedMethod == bridge::SEND_SELECTED_METHOD::ONLINE_ID ) {
         core::getWndManager()->pageSendOnline(selectedAccount.accountName, mwcAmount.second);
     }
+    else if (sendSelectedMethod == bridge::SEND_SELECTED_METHOD::FILE_ID ) {
+        core::getWndManager()->pageSendFile(selectedAccount.accountName, mwcAmount.second);
+    }
+    else if (sendSelectedMethod == bridge::SEND_SELECTED_METHOD::SLATEPACK_ID ) {
+        core::getWndManager()->pageSendSlatepack(selectedAccount.accountName, mwcAmount.second);
+    }
     else {
-        core::getWndManager()->pageSendOffline(selectedAccount.accountName, mwcAmount.second);
+        Q_ASSERT(false);
     }
 
     return 0;
@@ -235,8 +241,8 @@ void Send::respSendSlatepack( QString tagId, QString error, QString slatepack ) 
         return;
     }
 
-    // Let's show the slatepack
-    core::getWndManager()->pageShowSlatepack( slatepack, STATE::SEND, ".tx" );
+    // Let's show the slatepack and enable in place finalization
+    core::getWndManager()->pageShowSlatepack( slatepack, STATE::SEND, ".tx", true );
 }
 
 

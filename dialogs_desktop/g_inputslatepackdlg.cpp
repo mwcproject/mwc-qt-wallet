@@ -41,8 +41,12 @@ InputSlatepackDlg::~InputSlatepackDlg() {
     delete ui;
 }
 
-void InputSlatepackDlg::onSgnDecodeSlatepack(QString error, QString slatepack, QString slateJson, QString content, QString sender, QString recipient) {
+void InputSlatepackDlg::onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJson, QString content, QString sender, QString recipient) {
     Q_UNUSED(recipient)
+
+    if (tag != "InputSlatepackDlg")
+        return;
+
     isSpValid = false;
     spInProgress = "";
     ui->slatepack_status->hide();
@@ -138,7 +142,7 @@ void InputSlatepackDlg::initiateSlateVerification(const QString &slate2check) {
     }
 
     spInProgress = slate2check;
-    wallet->decodeSlatepack(slate2check);
+    wallet->decodeSlatepack(slate2check, "InputSlatepackDlg");
 }
 
 }

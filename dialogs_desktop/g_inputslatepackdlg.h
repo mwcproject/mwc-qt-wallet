@@ -51,7 +51,7 @@ private slots:
     void on_cancelButton_clicked();
     void on_continueButton_clicked();
 
-    void onSgnDecodeSlatepack(QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient);
+    void onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient);
 
 private:
     Ui::InputSlatepackDlg *ui;

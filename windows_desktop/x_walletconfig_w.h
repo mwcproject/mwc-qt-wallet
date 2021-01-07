@@ -61,6 +61,7 @@ private slots:
     void on_start_tor_clicked();
     void on_walletInstanceNameEdit_textChanged(const QString &arg1);
     void on_notificationsEnabled_clicked();
+    void on_lockLaterEnabled_clicked();
 
 private:
     void setValues(const QString & mwcmqHost,
@@ -102,6 +103,7 @@ private:
     bool autoStartTorEnabled = true;
     bool outputLockingEnabled = false;
     bool notificationWindowsEnabled = true;
+    bool lockLater = true;
     int64_t logoutTimeout = 20 * 60;
     int64_t currentLogoutTimeout = 20 * 60;
 

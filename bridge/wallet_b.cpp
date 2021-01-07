@@ -90,6 +90,8 @@ Wallet::Wallet(QObject *parent) : QObject(parent) {
                      this, &Wallet::onRepost, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onDecodeSlatepack,
                      this, &Wallet::onDecodeSlatepack, Qt::QueuedConnection);
+    QObject::connect(wallet, &wallet::Wallet::onFinalizeSlatepack,
+                     this, &Wallet::onFinalizeSlatepack, Qt::QueuedConnection);
 }
 
 Wallet::~Wallet() {}
@@ -206,8 +208,12 @@ void Wallet::onAccountRenamed(bool success, QString errorMessage) {
     emit sgnAccountRenamed(success, errorMessage);
 }
 
-void Wallet::onDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient ) {
-    emit sgnDecodeSlatepack( error, slatepack, slateJSon, content, sender, recipient );
+void Wallet::onDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient ) {
+    emit sgnDecodeSlatepack( tag, error, slatepack, slateJSon, content, sender, recipient );
+}
+
+void Wallet::onFinalizeSlatepack( QString tagId, QString error, QString txUuid ) {
+    emit sgnFinalizeSlatepack( tagId, error, txUuid );
 }
 
 void Wallet::onRepost(int txIdx, QString err) {
@@ -421,10 +427,15 @@ void Wallet::renameAccount(QString oldName, QString newName) {
 }
 
 // Decode the slatepack data
-// Check Signal: sgnDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
-void Wallet::decodeSlatepack(QString slatepackContent) {
-    getWallet()->decodeSlatepack(slatepackContent);
+// Check Signal: sgnDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
+void Wallet::decodeSlatepack(QString slatepackContent, QString tag) {
+    getWallet()->decodeSlatepack(slatepackContent, tag);
 }
 
+// Finalize a slatepack.
+// Check Signal sgnFinalizeSlatepack
+void Wallet::finalizeSlatepack( QString slatepack, bool fluff, QString tag ) {
+    getWallet()->finalizeSlatepack( slatepack, fluff, tag );
+}
 
 }

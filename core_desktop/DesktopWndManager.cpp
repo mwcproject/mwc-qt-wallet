@@ -242,9 +242,14 @@ void DesktopWndManager::pageSendOnline( QString selectedAccount, int64_t amount 
                                      new wnd::SendOnline( windowManager->getInWndParent(), selectedAccount, amount ));
 }
 
-void DesktopWndManager::pageSendOffline( QString selectedAccount, int64_t amount ) {
+void DesktopWndManager::pageSendFile( QString selectedAccount, int64_t amount ) {
     windowManager->switchToWindowEx( mwc::PAGE_G_SEND_FILE,
-                                     new wnd::SendOffline( windowManager->getInWndParent(), selectedAccount, amount ));
+                                     new wnd::SendOffline( windowManager->getInWndParent(), selectedAccount, amount, false ));
+}
+
+void DesktopWndManager::pageSendSlatepack( QString selectedAccount, int64_t amount ) {
+    windowManager->switchToWindowEx( mwc::PAGE_G_SEND_SLATEPACK,
+                                     new wnd::SendOffline( windowManager->getInWndParent(), selectedAccount, amount, true ));
 }
 
 void DesktopWndManager::pageTransactions() {
@@ -254,9 +259,9 @@ void DesktopWndManager::pageTransactions() {
 
 // slatepack - slatepack string value to show.
 // backStateId - state ID of the caller. On 'back' will switch to this state Id
-void DesktopWndManager::pageShowSlatepack(QString slatepack, int backStateId, QString txExtension) {
+void DesktopWndManager::pageShowSlatepack(QString slatepack, int backStateId, QString txExtension, bool enableFinalize) {
     windowManager->switchToWindowEx( mwc::PAGE_G_SLATEPACK,
-                                     new wnd::ResultedSlatepack( windowManager->getInWndParent(), slatepack, backStateId, txExtension ));
+                                     new wnd::ResultedSlatepack( windowManager->getInWndParent(), slatepack, backStateId, txExtension, enableFinalize ));
 }
 
 void DesktopWndManager::pageAccounts() {

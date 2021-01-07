@@ -141,8 +141,13 @@ public:
     Q_INVOKABLE void renameAccount(QString oldName, QString newName);
 
     // Decode the slatepack data
-    // Check Signal: sgnDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
-    Q_INVOKABLE void decodeSlatepack(QString slatepackContent);
+    // Check Signal: sgnDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
+    Q_INVOKABLE void decodeSlatepack(QString slatepackContent, QString tag);
+
+    // Finalize a slatepack.
+    // Check Signal sgnFinalizeSlatepack
+    Q_INVOKABLE void finalizeSlatepack( QString slatepack, bool fluff, QString tag );
+
 signals:
     // Wallet notification about what is the command that is starting.
     // Note, on idle it sends "empty" String. Not all commands sending an update
@@ -208,7 +213,10 @@ signals:
     void sgnRepost(int txIdx, QString err);
 
     // response form DecodeSlatepack. Ok if error is empty
-    void sgnDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
+    void sgnDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
+
+    // response to FinalizeSlatepack
+    void sgnFinalizeSlatepack( QString tagId, QString error, QString txUuid );
 private slots:
     void onStartingCommand(QString actionName);
 
@@ -245,7 +253,9 @@ private slots:
 
     void onRepost(int txIdx, QString err);
 
-    void onDecodeSlatepack( QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
+    void onDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
+
+    void onFinalizeSlatepack( QString tagId, QString error, QString txUuid );
 };
 
 }

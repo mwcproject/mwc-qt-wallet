@@ -19,6 +19,7 @@
 #include "../wallet/wallet.h"
 #include "../core/appcontext.h"
 #include "../util/address.h"
+#include "../bridge/wnd/g_send_b.h"
 #include <QSet>
 
 namespace state {
@@ -38,7 +39,7 @@ public:
     //   0 - ok
     //   1 - account error
     //   2 - amount error
-    int initialSendSelection( bool isOnlineSelected, QString account, QString sendAmount );
+    int initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod, QString account, QString sendAmount );
 
     // Handle whole workflow to send offline
     // return true if some long process was started.

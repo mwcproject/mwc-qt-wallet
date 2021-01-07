@@ -279,23 +279,29 @@ void MobileWndManager::pageSendOnline( QString selectedAccount, int64_t amount )
     obj["amount"] = QString::number(amount);
     mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
-void MobileWndManager::pageSendOffline( QString selectedAccount, int64_t amount ) {
+void MobileWndManager::pageSendFile( QString selectedAccount, int64_t amount ) {
     QJsonObject obj;
     obj["isSendOnline"] = false;
     obj["selectedAccount"] = selectedAccount;
     obj["amount"] = QString::number(amount);
     mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
+
+void MobileWndManager::pageSendSlatepack( QString selectedAccount, int64_t amount ) {
+    Q_ASSERT(false); // implement me
+}
+
 void MobileWndManager::pageTransactions() {
     mainWindow->setProperty("currentState", state::STATE::TRANSACTIONS);
 }
 
 // slatepack - slatepack string value to show.
 // backStateId - state ID of the caller. On 'back' will switch to this state Id
-void MobileWndManager::pageShowSlatepack(QString slatepack, int backStateId, QString txExtension) {
+void MobileWndManager::pageShowSlatepack(QString slatepack, int backStateId, QString txExtension, bool enableFinalize) {
     Q_UNUSED(slatepack)
     Q_UNUSED(backStateId)
     Q_UNUSED(txExtension)
+    Q_UNUSED(enableFinalize)
     // This page should show the slatepack text so user can copy paste it. Also it will be noce to have a QR code
     // windows. It is usefull for some cases, Jon had some examples. Also other wallets have it.
     Q_ASSERT(false); // implement me

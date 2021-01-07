@@ -24,11 +24,12 @@
 
 namespace wnd {
 
-SendOffline::SendOffline(QWidget *parent, QString _selectedAccount, int64_t _amount) :
+SendOffline::SendOffline(QWidget *parent, QString _selectedAccount, int64_t _amount, bool _slatepacks) :
     core::NavWnd(parent),
     ui(new Ui::SendOffline),
     selectedAccount(_selectedAccount),
-    amount(_amount)
+    amount(_amount),
+    slatepacks(_slatepacks)
 {
     ui->setupUi(this);
 
@@ -44,10 +45,15 @@ SendOffline::SendOffline(QWidget *parent, QString _selectedAccount, int64_t _amo
     ui->fromAccount->setText("From account: " + selectedAccount );
     ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util->nano2one(QString::number(amount))) + " MWC" );
 
-    ui->slatepackCheck->setChecked( config->getSendSlatepack() );
-    ui->lockOutputsLater->setChecked(config->getSendLockOutput());
+    if (!slatepacks) {
+        ui->recipientAddress->hide();
+        ui->contactsButton->hide();
 
-    upadateSlatepackUI();
+        ui->sendTitleLabel->setText("Send to File");
+    }
+    else {
+        ui->sendTitleLabel->setText("Send to Slatepack");
+    }
 }
 
 SendOffline::~SendOffline()
@@ -69,13 +75,8 @@ void SendOffline::on_sendButton_clicked()
 {
     util::TimeoutLockObject to("SendOffline");
 
-    bool isSlatepack = ui->slatepackCheck->isChecked();
-    bool isLockLater = ui->lockOutputsLater->isChecked();
-
-    config->setSendLockOutput( isSlatepack );
-    config->setSendLockOutput( isLockLater );
     QString recipientWallet;
-    if (isSlatepack) {
+    if (slatepacks) {
         recipientWallet = ui->recipientAddress->text();
         if ( !recipientWallet.isEmpty() && util->verifyAddress(recipientWallet) != "tor") {
             control::MessageBox::messageText(this, "Unable to send", "Please specify valid recipient wallet address");
@@ -92,7 +93,7 @@ void SendOffline::on_sendButton_clicked()
 
     QString description = ui->descriptionEdit->toPlainText().trimmed().replace('\n', ' ');
 
-    if (isSlatepack && recipientWallet.isEmpty() && !description.isEmpty()) {
+    if (slatepacks && recipientWallet.isEmpty() && !description.isEmpty()) {
         control::MessageBox::messageText(this, "Unable to send", "Slate description is not supported for to non encrypted slatepack. Please specify Recipient wallet address to include description.");
         ui->descriptionEdit->setFocus();
         return;
@@ -107,19 +108,13 @@ void SendOffline::on_sendButton_clicked()
         }
     }
 
-    if ( send->sendMwcOffline( selectedAccount, QString::number(amount), description, isSlatepack, isLockLater, recipientWallet) )
+    if ( send->sendMwcOffline( selectedAccount, QString::number(amount), description, slatepacks, config->getSendLockOutput(), recipientWallet) )
         ui->progress->show();
 }
 
 void SendOffline::onSgnShowSendResult( bool success, QString message ) {
     ui->progress->hide();
     control::MessageBox::messageText(this, success ? "Success" : "Failure", message );
-}
-
-void SendOffline::on_slatepackCheck_stateChanged(int arg1)
-{
-    Q_UNUSED(arg1)
-    upadateSlatepackUI();
 }
 
 void SendOffline::on_contactsButton_clicked()
@@ -130,20 +125,6 @@ void SendOffline::on_contactsButton_clicked()
     if (dlg.exec() == QDialog::Accepted) {
         QString address = dlg.getSelectedContact().pub_key;
         ui->recipientAddress->setText(address);
-    }
-}
-
-void SendOffline::upadateSlatepackUI() {
-    bool slatepack = ui->slatepackCheck->isChecked();
-    if (slatepack) {
-        ui->lockOutputsLater->show();
-        ui->recipientAddress->show();
-        ui->contactsButton->show();
-    }
-    else {
-        ui->lockOutputsLater->hide();
-        ui->recipientAddress->hide();
-        ui->contactsButton->hide();
     }
 }
 
