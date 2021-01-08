@@ -449,16 +449,42 @@ static void parseMessages(const QVector<WEvent> & events, // in
                 continue;
 
             // We don't care about other fields, just messages
-            const QString & strMessage = values[1];
-
-            if (strMessage.isEmpty() || strMessage.compare("None", Qt::CaseInsensitive)==0)
+            int participant_id = values[0].toInt();
+            if (participant_id<0) {
+                Q_ASSERT(false);
                 continue;
+            }
+            Q_ASSERT(participant_id>=0 && participant_id<=1);
 
-            messages.push_back(strMessage);
+            QString strMessage = values[1];
+
+//            if (strMessage.isEmpty() || strMessage.compare("None", Qt::CaseInsensitive)==0)
+//                continue;
+
+            if (strMessage.compare("None", Qt::CaseInsensitive)==0)
+                strMessage = "";
+
+            messages.resize( std::max(messages.length(), participant_id+1) );
+            messages[participant_id] = strMessage;
         }
     }
 }
 
+QString TaskTransactionsById::buildCommandLine(QString txIdxOrUUID) const {
+    bool idxVal = false;
+    txIdxOrUUID.toInt(&idxVal);
+
+    QString cmd = "txs ";
+    if (idxVal) {
+        cmd += "--id " + txIdxOrUUID; // it is index
+    }
+    else {
+        cmd += "-t " + txIdxOrUUID;  // it is uuid
+    }
+
+    cmd += " --no-refresh";
+    return cmd;
+}
 
 bool TaskTransactionsById::processTask(const QVector<WEvent> & events) {
     // Parcing Transaction data. Expected 1 item into the list

@@ -84,14 +84,6 @@ void closeApplication() {
 
 static bool finalize = false;
 
-bool isFinalize() {
-    return finalize;
-}
-
-void setFinalize(bool finalizeValue) {
-    finalize = finalizeValue;
-}
-
 static bool walletLocked = false;
 
 void setWalletLocked(bool locked) {

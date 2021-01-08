@@ -28,7 +28,6 @@ Finalize::Finalize(QWidget *parent) :
     core::NavWnd(parent),
     ui(new Ui::FinalizeUpload)
 {
-    mwc::setFinalize(true);
     ui->setupUi(this);
 
     config = new bridge::Config(this);

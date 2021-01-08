@@ -76,14 +76,16 @@ public:
     const static int64_t TIMEOUT = 1000*60;
 
     // Transactions run with no-refresh because wallet responsible to call sync first
-    TaskTransactionsById( MWC713 * wallet713, int txId) :
-            Mwc713Task("Transactions", "Requesting transaction details...", "txs --id " + QString::number(txId) +" --no-refresh", wallet713, "")  {}
+    TaskTransactionsById( MWC713 * wallet713, QString txIdxOrUUID) :
+            Mwc713Task("Transactions", "Requesting transaction details...", buildCommandLine(txIdxOrUUID), wallet713, "")  {}
 
     virtual ~TaskTransactionsById() override {}
 
     virtual bool processTask(const QVector<WEvent> & events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+private:
+    QString buildCommandLine(QString txIdxOrUUID) const;
 };
 
 class TaskTransCancel : public Mwc713Task {

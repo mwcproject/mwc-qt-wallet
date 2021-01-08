@@ -31,6 +31,10 @@ Receive::~Receive() {
     getBridgeManager()->removeReceive(this);
 }
 
+void Receive::hideProgress() {
+    emit sgnHideProgress();
+}
+
 // Sign file transaction
 void Receive::signTransaction(QString fileName) {
     getState()->signTransaction(fileName);
@@ -43,6 +47,20 @@ void Receive::signSlatepackTransaction(QString slatepack, QString slateJson, QSt
 
 void Receive::onTransactionActionIsFinished( bool success, QString message ) {
     emit sgnTransactionActionIsFinished(success, message);
+}
+
+void Receive::cancelReceive() {
+    getState()->ftBack();
+}
+
+// Files transaction page, continue with a file
+void Receive::receiveFile(QString fileName, QString description ) {
+    getState()->receiveFile(fileName, description);
+}
+
+// Files transaction page, continue with a Slatepack
+void Receive::receiveSlatepack(QString slatepack, QString description) {
+    getState()->receiveSlatepack(slatepack, description);
 }
 
 

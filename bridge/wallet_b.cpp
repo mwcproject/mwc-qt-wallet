@@ -377,8 +377,8 @@ void Wallet::requestTransactions(QString account, bool enforceSync) {
 // get Extended info for specific transaction
 // Respond:  sgnTransactionById( bool success, QString account, QString height, QString transaction,
 //                            QVector<QString> outputs, QVector<QString> messages );
-void Wallet::requestTransactionById(QString account, QString txIdx ) {
-    getWallet()->getTransactionById(account, txIdx.toLongLong() );
+void Wallet::requestTransactionById(QString account, QString txIdxOrUUID ) {
+    getWallet()->getTransactionById(account, txIdxOrUUID );
 }
 
 // Cancel transaction by id

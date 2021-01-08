@@ -19,6 +19,7 @@
 
 namespace bridge {
 
+// Absolete class. Keepign it for mobali compartibility.
 class FileTransaction : public QObject {
 Q_OBJECT
 public:

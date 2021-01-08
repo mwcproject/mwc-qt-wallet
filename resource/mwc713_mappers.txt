@@ -135,3 +135,7 @@ The slate is from wrong network
 # LibWallet Error, Slatepack decode error, Bad armor header
 LibWallet Error, Slatepack decode error, (.*)
 Unable to decode the slatepack, $1
+
+# Slatepack decode error, Unable to decrypt a slatepack, I/O error, failed to fill whole buffer
+Slatepack decode error, Unable to decrypt a slatepack, I/O error, failed to fill whole buffer
+Unable to decode the slate data

@@ -107,7 +107,7 @@ public:
     // get Extended info for specific transaction
     // Respond:  sgnTransactionById( bool success, QString account, QString height, QString transaction,
     //                            QVector<QString> outputs, QVector<QString> messages );
-    Q_INVOKABLE void requestTransactionById(QString account, QString txIdx );
+    Q_INVOKABLE void requestTransactionById(QString account, QString txIdxOrUUID );
 
     // Cancel transaction by id
     // Respond: sgnCancelTransacton( bool success, QString trIdx, QString errMessage )

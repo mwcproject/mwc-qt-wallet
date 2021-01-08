@@ -69,10 +69,12 @@ public:
     virtual void pageNewSeedTest(int wordIndex) override;
     virtual void pageProgressWnd(QString pageTitle, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable ) override;
     virtual void pageOutputs() override;
-    virtual void pageFileTransaction(QString pageTitle, QString callerId,
+    virtual void pageFileTransactionReceive(QString pageTitle,
                                      const QString & fileName, const util::FileTransactionInfo & transInfo,
-                                     int nodeHeight,
-                                     QString transactionType, QString processButtonName) override;
+                                     int nodeHeight) override;
+    virtual void pageFileTransactionFinalize(QString pageTitle,
+                                     const QString & fileName, const util::FileTransactionInfo & transInfo,
+                                     int nodeHeight) override;
     virtual void pageRecieve() override;
     virtual void pageListening() override;
     virtual void pageFinalize() override;

@@ -22,8 +22,10 @@ namespace bridge {
 class Finalize : public QObject {
 Q_OBJECT
 public:
-    explicit Finalize(QObject * parent = nullptr) : QObject(parent) {}
-    ~Finalize() {};
+    explicit Finalize(QObject * parent = nullptr);
+    ~Finalize();
+
+    void hideProgress();
 
     // Finalize file slate.
     Q_INVOKABLE void uploadFileTransaction(QString fileName);
@@ -33,6 +35,18 @@ public:
 
     // Check if the node healthy enough to do finalization.
     Q_INVOKABLE bool isNodeHealthy();
+
+    Q_INVOKABLE bool needResultTxFileName();
+
+    Q_INVOKABLE void cancelFileFinalization();
+
+    // Files transaction page, continue with a file
+    Q_INVOKABLE void finalizeFile(QString fileName, QString resultTxFileName, bool fluff);
+    // Files transaction page, continue with a Slatepack
+    Q_INVOKABLE void finalizeSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff);
+signals:
+    void sgnHideProgress();
+
 };
 
 }

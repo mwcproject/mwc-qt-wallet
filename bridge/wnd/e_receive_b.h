@@ -25,6 +25,7 @@ public:
     explicit Receive(QObject * parent = nullptr);
     ~Receive();
 
+    void hideProgress();
     void onTransactionActionIsFinished( bool success, QString message );
 
     // Validate, ask for continue and then sign transaction.
@@ -35,10 +36,18 @@ public:
     // already have this info after verification.
     Q_INVOKABLE void signSlatepackTransaction(QString slatepack, QString slateJson, QString slateSenderAddress);
 
+    Q_INVOKABLE void cancelReceive();
+
+    // Files transaction page, continue with a file
+    Q_INVOKABLE void receiveFile(QString fileName, QString description );
+    // Files transaction page, continue with a Slatepack
+    Q_INVOKABLE void receiveSlatepack(QString slatepack, QString description);
+
 signals:
     // respond from signTransaction
     void sgnTransactionActionIsFinished( bool success, QString message );
 
+    void sgnHideProgress();
 };
 
 }

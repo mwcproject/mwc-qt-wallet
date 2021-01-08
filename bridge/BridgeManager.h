@@ -23,6 +23,7 @@ class ProgressWnd;
 class InputPassword;
 class Outputs;
 class Receive;
+class Finalize;
 class FileTransaction;
 class Listening;
 class Send;
@@ -57,6 +58,10 @@ public:
     void addReceive( bridge::Receive * b ) {receive += b;}
     void removeReceive( bridge::Receive * b ) {receive -= b;}
     const QSet<Receive*> & getReceive() const {return receive;}
+
+    void addFinalize( bridge::Finalize * b ) {finalize += b;}
+    void removeFinalize( bridge::Finalize * b ) {finalize -= b;}
+    const QSet<Finalize*> & getFinalize() const {return finalize;}
 
     void addFileTransaction( bridge::FileTransaction * b ) {fileTransaction += b;}
     void removeFileTransaction( bridge::FileTransaction * b ) {fileTransaction -= b;}
@@ -118,6 +123,7 @@ private:
     QSet<InputPassword*>    inputPassword;
     QSet<Outputs*>          outputs;
     QSet<Receive*>          receive;
+    QSet<Finalize*>         finalize;
     QSet<FileTransaction*>  fileTransaction;
     QSet<Listening*>        listening;
     QSet<Send*>             send;

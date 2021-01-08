@@ -744,7 +744,7 @@ void MWC713::sendFile( const QString &account, int64_t coinNano, QString message
 
 // Receive transaction. Will generate *.response file in the same dir
 // Check signal:  onReceiveFile
-void MWC713::receiveFile( QString fileTx, QString identifier)  {
+void MWC713::receiveFile( QString fileTx, QString description, QString identifier)  {
 #ifdef Q_OS_WIN
     fileTx.replace('\\', '/');
 #endif
@@ -754,7 +754,7 @@ void MWC713::receiveFile( QString fileTx, QString identifier)  {
         return;
     }
 
-    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, {TSK(new TaskReceiveFile(this, fileTx, identifier), TaskReceiveFile::TIMEOUT)} );
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, {TSK(new TaskReceiveFile(this, fileTx, description, identifier), TaskReceiveFile::TIMEOUT)} );
 }
 
 // finalize transaction and broadcast it
@@ -805,8 +805,8 @@ void MWC713::sendSlatepack( const QString &account, int64_t coinNano, QString me
 
 // Receive transaction. Will generate *.response file in the same dir
 // Check signal:  onReceiveSlatepack
-void MWC713::receiveSlatepack( QString slatepack, QString tag) {
-    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, {TSK(new TaskReceiveSlatepack(this, slatepack, tag), TaskReceiveSlatepack::TIMEOUT)} );
+void MWC713::receiveSlatepack( QString slatepack, QString description, QString tag) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, {TSK(new TaskReceiveSlatepack(this, slatepack, description, tag), TaskReceiveSlatepack::TIMEOUT)} );
 }
 
 // finalize transaction and broadcast it
@@ -842,10 +842,10 @@ void MWC713::getTransactions(QString account, bool enforceSync)  {
 
 // get Extended info for specific transaction
 // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
-void MWC713::getTransactionById(QString account, int64_t txIdx ) {
+void MWC713::getTransactionById(QString account, QString txIdxOrUUID ) {
     QVector<QPair<Mwc713Task*,int64_t>> taskGroup{
         TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
-        TSK(new TaskTransactionsById(this, txIdx), TaskTransactions::TIMEOUT)
+        TSK(new TaskTransactionsById(this, txIdxOrUUID), TaskTransactions::TIMEOUT)
     };
     if (account != currentAccount)
         taskGroup.push_back( TSK(new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT) );
@@ -1407,7 +1407,9 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
 
     updateWalletBalance(false,true);
 
-    if (!appContext->getNotificationWindowsEnabled()) {
+    //if (!appContext->getNotificationWindowsEnabled())
+    // From almost everybody get a feedback that Receive message does expected.
+    {
         // only display the message dialog if notification windows are not enabled
         core::getWndManager()->messageHtmlDlg("Congratulations!",
            "You received <b>" + mwc + "</b> MWC<br>" +

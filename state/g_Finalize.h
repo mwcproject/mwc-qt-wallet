@@ -41,8 +41,8 @@ public:
     // wnd::FileTransactionWndHandler
     void ftBack();
     // Expected that user already made all possible appruvals
-    void ftContinue(QString fileName, QString resultTxFileName, bool fluff);
-    void ftContinueSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff);
+    void finalizeFile(QString fileName, QString resultTxFileName, bool fluff);
+    void finalizeSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff);
 
     bool needResultTxFileName();
 

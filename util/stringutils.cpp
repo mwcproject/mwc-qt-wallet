@@ -322,6 +322,7 @@ QPair <bool, QString> validateMwc713Str(QString str, bool secureStr) {
 // str - string to process   as sdd  =>  "as sdd";    pa@"a\s => "pa@\"a\\s"
 // noSpecialCharacters - if true will clean up all characters like a new line
 QString toMwc713input(QString str, bool noSpecialCharacters ) {
+    str.replace('\n', ' ');
     QString res = "\"";
     for (QChar ch : str) {
         if (noSpecialCharacters && ch.unicode() < 32 ) // skipping all special chars

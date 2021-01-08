@@ -236,27 +236,50 @@ void MobileWndManager::pageProgressWnd(QString pageTitle, QString callerId, QStr
 void MobileWndManager::pageOutputs() {
     Q_ASSERT(false); // implement me
 }
-void MobileWndManager::pageFileTransaction(QString pageTitle, QString callerId,
+void MobileWndManager::pageFileTransactionReceive(QString pageTitle,
                                      const QString & fileName, const util::FileTransactionInfo & transInfo,
                                      int nodeHeight,
                                      QString transactionType, QString processButtonName) {
     Q_UNUSED(pageTitle)
 
     QJsonObject obj;
-    obj["callerId"] = callerId;
+    obj["callerId"] = "Receive";
     obj["fileName"] = fileName;
-    obj["transactionType"] = transactionType;
-    obj["processButtonName"] = processButtonName;
+    obj["transactionType"] = "Receive File Slate";
+    obj["processButtonName"] = "Generate Response";
     obj["amount"] = util::nano2one(transInfo.amount);
     obj["transactionId"] = transInfo.transactionId;
     obj["lockHeight"] = transInfo.lock_height > nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-";
     obj["receiverAddress"] = transInfo.fromAddress.isEmpty() ? "-" : transInfo.fromAddress;
     obj["message"] = transInfo.message;
-    obj["isFinalize"] = processButtonName == "Finalize";
+    obj["isFinalize"] = false;
 
     QVariant retValue;
     QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
+
+void MobileWndManager::pageFileTransactionFinalize(QString pageTitle,
+                                           const QString & fileName, const util::FileTransactionInfo & transInfo,
+                                           int nodeHeight,
+                                           QString transactionType, QString processButtonName) {
+    Q_UNUSED(pageTitle)
+
+    QJsonObject obj;
+    obj["callerId"] = "Finalize";
+    obj["fileName"] = fileName;
+    obj["transactionType"] = "Finalize Transaction";
+    obj["processButtonName"] = "Finalize";
+    obj["amount"] = util::nano2one(transInfo.amount);
+    obj["transactionId"] = transInfo.transactionId;
+    obj["lockHeight"] = transInfo.lock_height > nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-";
+    obj["receiverAddress"] = transInfo.fromAddress.isEmpty() ? "-" : transInfo.fromAddress;
+    obj["message"] = transInfo.message;
+    obj["isFinalize"] = true;
+
+    QVariant retValue;
+    QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
+}
+
 void MobileWndManager::pageRecieve() {
     mainWindow->setProperty("currentState", state::STATE::RECEIVE_COINS);
     mainWindow->setProperty("initParams", "");

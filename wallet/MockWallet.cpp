@@ -314,8 +314,9 @@ void MockWallet::sendFile(const QString &account, int64_t coinNano, QString mess
 
 // Receive transaction. Will generate *.response file in the same dir
 // Check signal:  onReceiveFile
-void MockWallet::receiveFile(QString fileTx, QString identifier) {
+void MockWallet::receiveFile(QString fileTx, QString description, QString identifier) {
     Q_UNUSED(identifier)
+    Q_UNUSED(description)
 
     emit onReceiveFile( true, {}, fileTx, fileTx+".respond" );
 }
@@ -325,6 +326,50 @@ void MockWallet::receiveFile(QString fileTx, QString identifier) {
 void MockWallet::finalizeFile(QString fileTxResponse, bool fluff) {
     Q_UNUSED(fluff)
     emit onFinalizeFile( true, {}, fileTxResponse );
+}
+
+// Init send transaction with file output
+// Check signal:  onSendSlatepack
+void MockWallet::sendSlatepack( const QString &account, int64_t coinNano, QString message,
+                            int inputConfirmationNumber, int changeOutputs, const QStringList & outputs,
+                            int ttl_blocks, bool generateProof,
+                            QString slatepackRecipientAddress, // optional. Encrypt SP if it is defined.
+                            bool isLockLater,
+                            QString tag ) {
+    Q_UNUSED(account)
+    Q_UNUSED(coinNano)
+    Q_UNUSED(message)
+    Q_UNUSED(inputConfirmationNumber)
+    Q_UNUSED(changeOutputs)
+    Q_UNUSED(outputs)
+    Q_UNUSED(ttl_blocks)
+    Q_UNUSED(generateProof)
+    Q_UNUSED(slatepackRecipientAddress)
+    Q_UNUSED(isLockLater)
+    emit onSendSlatepack( tag, "", "BEGINSLATE_BIN. PFhuXojFiTEBiLF NnpPMX7ocEBp7Ch NrKHGuW6aiQW6cn 77PSks4oLRfZLmu Qb2GhowApRjWDJi WGdPDF2EkikDpmh Z6GX3E4haRUqUwz hXQqHrMqeQNE6Mm 55B2eL9227VFgAd c5Gr5Gs. ENDSLATE_BIN." );
+}
+
+// Receive transaction. Will generate *.response file in the same dir
+// Check signal:  onReceiveSlatepack
+void MockWallet::receiveSlatepack( QString slatePack, QString description, QString tag) {
+    Q_UNUSED(slatePack)
+    Q_UNUSED(description)
+    emit onReceiveSlatepack( tag, "", "BEGINSLATE_BIN. 2RaFmV3oDFPThCu t3kFBTSSYRXwKY9 AhAXnbfiJmbxSbt d51GKkB5yN1VoMG oSWWQG8gsuahsj8 QrjTxd6TbTps5ZH vjHjpffBovxYgpP ZFMeUUWEzvfbLc2 x1EPdzLVBEvALih AsvEc5yoh3tcS91 nirzrkAzK3KkrXv PQkw71VndsNQbQR YGMipBUKyyLNxxp mX5wKayQAVMZbbw H8jR16dy3htGktg Hq3eKiJLqqqi8FM iyxTCQgj5y6dPju fUe6mw58zxjHD8P XRVG6faKDLtcBHg DpTVBZe3M4xSoWn HvFdHj1jzG8xAAd 2K4cxe854qN77aQ JzJCSRmLqfvmNd6 gkRUYh5h8WoyL5k ZyW6mgGMhqFQVuc QM6XKCKfvMJkdWw skqt68WpNzLp8UJ G7fiHD3Zc3wYFwP 6DRBV2cP5y47kRb 4pbTp4BuqgvdpTK 6sqb1YhYreWAe7j asc5gbB5mRvQhp5 GdDeSGjP6SoaaUp 8iHkQYbjPUfLMZL vW4S7a9Ffumw65K rJpNkdKe2wGrsAb 68KUc4WCPg37kyh 1Fc4t8KMSH1ntMp DbbYFKtNteX2Jmf 6mQdAziLP7Ck2uS NrhpGs6uQCe8mMy FTCfiYHS9HpZVaV 2i4Zykjtn16fGuy QM6EHEZhFNU1Gp8 GGNYWjruYhHF1Un JoSY6ZRWWeBV2Tm yGijqhm8X7LdWUK HbPP3h8NQULW1uh znkY32wYAwrq8dY VPp5TH8kn9pKGTs 4DcayGws8YspfLJ ombowt6QLgwsePY t7sXMpxbYunm1xb tAsAoC9Bne5p9Yd psqqHoBH8PZLaD4 WF3VodiKyYKGfoQ vNHmySFGu3ekXt3 V4PVbKNX1g4jJ5w hyoJrL9u8yuQnNL pLsBDALEv7REGqM qd8GFyryHTY1cAs jioFb8MpP3gGotK 1KJ3cqmn6b6NGaB m6QFFZMNei3WqKL PTv2fTWTQ22UUWF TEVzuEmbzhM9HCd R83MAk9VReusdvP RGDwYixKNgRFeNa ekgyzTk9XLCgQdo d8y9dwH9Cui5RdP RXLrVQqUM4euYd1 32fJSxZgpsj7L6Z yStjWEszSC1nZSx dHuZb5YEtr4TdUd GDUy7Hn8F8Ribp3 DeGCRoLYk3ac3Ax mxABwH1i5YpoFwr 9tHNTAMyXysmxgi xMMhjAUxPudx3UC xWJ4LL19iKCz7mF JwtgNq6DNuxH6a2 soowwhcUBi5KqiK 8PfroU79rNbykLv 2164E4yBXBtPTtC z4rXy5cA2X8zxRd uZxgHFzayaQ9UoV 2KP1YUja1LWYHp3 PwktUfFhFJaQHZp FvmyuTpZjgmwJ2S sTYcpufBrpHDts8 DYQX9eLRpScD2Kg FfbBSRqepinibAC gGAExNRLUmpc583 bc9WSm2ji9rCU1d 7wDxgyFbhqQLmhz n2PW1hMmYKPiHJf f6BsZPmHxWkyRLh M4Dn7BFfntLJUSy Ri7. ENDSLATE_BIN." );
+}
+
+// finalize transaction and broadcast it
+// Check signal:  onFinalizeSlatepack
+void MockWallet::finalizeSlatepack( QString slatepack, bool fluff, QString tag ) {
+    Q_UNUSED(slatepack)
+    Q_UNUSED(fluff)
+    emit onFinalizeSlatepack( tag, "", "12345-12345-12345-12345" );
+}
+
+// Decode the slatepack data (or validate slate json) are respond with Slate SJon that can be processed
+// Check Signal: onDecodeSlatepack( QString tag, QString error, QString slateJSon, QString content, QString sender, QString receiver )
+void MockWallet::decodeSlatepack(QString slatepackContent, QString tag) {
+    Q_UNUSED(slatepackContent)
+    emit onDecodeSlatepack( tag, "", slatepackContent, "{}", "SendInitial", "xxxxSenderxxxxx", "xxxxxRecipientxxxxxx" );
 }
 
 // submit finalized transaction. Make sense for cold storage => online node operation
@@ -419,8 +464,8 @@ void MockWallet::getTransactions(QString account, bool enforceSync) {
 
 // get Extended info for specific transaction
 // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
-void MockWallet::getTransactionById(QString account, int64_t txIdx) {
-    Q_UNUSED(txIdx)
+void MockWallet::getTransactionById(QString account, QString txIdxOrUUID) {
+    Q_UNUSED(txIdxOrUUID)
 
     WalletTransaction tx;
     tx.setData(2,

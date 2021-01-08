@@ -234,6 +234,9 @@ pageShowSlatepack  shows new ResultedSlatepack page.
 Change:   `const QString & fileName`  to `const QString & fileNameOrSlatepack`
 
 There are some logic change inside that window to handle files or slatepacks.
+
+NOTE!!! pageFileTransaction is gone now. There is another ticket about that.
+
 ```c++
     virtual void pageFileTransaction(QString pageTitle, QString callerId,
                                      const QString & fileNameOrSlatepack, const util::FileTransactionInfo & transInfo,

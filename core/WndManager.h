@@ -72,10 +72,12 @@ public:
     virtual void pageNewSeedTest(int wordIndex) = 0;
     virtual void pageProgressWnd(QString pageTitle, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable ) = 0;
     virtual void pageOutputs() = 0;
-    virtual void pageFileTransaction(QString pageTitle, QString callerId,
+    virtual void pageFileTransactionReceive(QString pageTitle,
                        const QString & fileNameOrSlatepack, const util::FileTransactionInfo & transInfo,
-                       int nodeHeight,
-                       QString transactionType, QString processButtonName) = 0;
+                       int nodeHeight) = 0;
+    virtual void pageFileTransactionFinalize(QString pageTitle,
+                                     const QString & fileNameOrSlatepack, const util::FileTransactionInfo & transInfo,
+                                     int nodeHeight) = 0;
     virtual void pageRecieve() = 0;
     virtual void pageListening() = 0;
     virtual void pageFinalize() = 0;

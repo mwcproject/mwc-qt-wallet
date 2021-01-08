@@ -67,8 +67,7 @@ void Receive::signSlatepackTransaction(QString slatepack, QString slateJson, QSt
     // We don't want to intercept the action from other windows like AirDrop...
     if ( isActive() ) {
         signingFile = false;
-        core::getWndManager()->pageFileTransaction(mwc::PAGE_G_RECEIVE_TRANS, RECEIVE_CALLER_ID, slatepack, flTrInfo, lastNodeHeight,
-                                                   "Receive Slatepack", "Generate Response");
+        core::getWndManager()->pageFileTransactionReceive(mwc::PAGE_G_RECEIVE_TRANS, slatepack, flTrInfo, lastNodeHeight);
     }
 }
 
@@ -88,8 +87,7 @@ void Receive::signTransaction( QString fileName ) {
     // We don't want to intercept the action from other windows like AirDrop...
     if ( isActive() ) {
         signingFile = true;
-        core::getWndManager()->pageFileTransaction(mwc::PAGE_G_RECEIVE_TRANS, RECEIVE_CALLER_ID, fileName, flTrInfo, lastNodeHeight,
-                    "Receive File Slate", "Generate Response");
+        core::getWndManager()->pageFileTransactionReceive(mwc::PAGE_G_RECEIVE_TRANS, fileName, flTrInfo, lastNodeHeight);
     }
 }
 
@@ -97,23 +95,18 @@ void Receive::ftBack() {
     core::getWndManager()->pageRecieve();
 }
 
-void Receive::ftContinue(QString fileNameOrSlatepack, QString resultTxFileName, bool fluff) {
-    Q_UNUSED(resultTxFileName)
-    Q_UNUSED(fluff)
-    logger::logInfo("Receive", "Receive " + fileNameOrSlatepack);
+void Receive::receiveFile(QString fileName, QString description) {
+    logger::logInfo("Receive", "receiveFile " + fileName);
     // It can be filename or slate
     Q_ASSERT(signingFile);
-    context->wallet->receiveFile(fileNameOrSlatepack);
+    context->wallet->receiveFile(fileName, description);
 }
 
-void Receive::ftContinueSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff) {
-    Q_UNUSED(resultTxFileName)
-    Q_UNUSED(fluff)
-    Q_UNUSED(txUuid)
+void Receive::receiveSlatepack(QString slatepack, QString description) {
     logger::logInfo("Receive", "Receive Slatepack " + slatepack);
     // It can be filename or slate
     Q_ASSERT(!signingFile);
-    context->wallet->receiveSlatepack(slatepack, "");
+    context->wallet->receiveSlatepack(slatepack, description, "");
 }
 
 
@@ -121,6 +114,8 @@ void Receive::onReceiveFile( bool success, QStringList errors, QString inFileNam
     // Checking if this state is really active on UI level
     if (isActive()) {
         for (auto p: bridge::getBridgeManager()->getFileTransaction())
+            p->hideProgress();
+        for (auto p: bridge::getBridgeManager()->getReceive())
             p->hideProgress();
 
         if (success) {
@@ -139,6 +134,8 @@ void Receive::onReceiveSlatepack( QString tagId, QString error, QString slatepac
     Q_UNUSED(tagId)
     if (isActive()) {
         for (auto p: bridge::getBridgeManager()->getFileTransaction())
+            p->hideProgress();
+        for (auto p: bridge::getBridgeManager()->getReceive())
             p->hideProgress();
 
         if (error.isEmpty()) {

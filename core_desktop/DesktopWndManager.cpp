@@ -27,7 +27,8 @@
 #include "../windows_desktop/e_outputs_w.h"
 #include "../windows_desktop/e_listening_w.h"
 #include "../windows_desktop/g_finalize_w.h"
-#include "../windows_desktop/g_filetransaction_w.h"
+#include "../windows_desktop/g_filetransaction_finalize_w.h"
+#include "../windows_desktop/g_filetransaction_receive_w.h"
 #include "../windows_desktop/g_sendStarting.h"
 #include "../windows_desktop/g_sendOnline.h"
 #include "../windows_desktop/g_sendOffline.h"
@@ -206,14 +207,22 @@ void DesktopWndManager::pageOutputs() {
                 new wnd::Outputs( windowManager->getInWndParent()));
 }
 
-void DesktopWndManager::pageFileTransaction(QString pageTitle, QString callerId,
+void DesktopWndManager::pageFileTransactionReceive(QString pageTitle,
                                             const QString & fileNameOrSlatepack,
                                             const util::FileTransactionInfo & transInfo,
-                                            int nodeHeight,
-                                            QString transactionType, QString processButtonName) {
+                                            int nodeHeight) {
     windowManager->switchToWindowEx( pageTitle,
-                        new wnd::FileTransaction( windowManager->getInWndParent(), callerId,
-                                                  fileNameOrSlatepack, transInfo, nodeHeight, transactionType, processButtonName) );
+                        new wnd::FileTransactionReceive( windowManager->getInWndParent(),
+                                                  fileNameOrSlatepack, transInfo, nodeHeight) );
+}
+
+void DesktopWndManager::pageFileTransactionFinalize(QString pageTitle,
+                                            const QString & fileNameOrSlatepack,
+                                            const util::FileTransactionInfo & transInfo,
+                                            int nodeHeight) {
+    windowManager->switchToWindowEx( pageTitle,
+                                     new wnd::FileTransactionFinalize( windowManager->getInWndParent(),
+                                                               fileNameOrSlatepack, transInfo, nodeHeight) );
 }
 
 void DesktopWndManager::pageRecieve() {

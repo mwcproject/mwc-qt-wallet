@@ -30,7 +30,6 @@ Receive::Receive(QWidget *parent) :
         core::NavWnd(parent),
         ui(new Ui::Receive)
 {
-    mwc::setFinalize(false);
     ui->setupUi(this);
 
     config  = new bridge::Config(this);

@@ -93,12 +93,6 @@ void SendOffline::on_sendButton_clicked()
 
     QString description = ui->descriptionEdit->toPlainText().trimmed().replace('\n', ' ');
 
-    if (slatepacks && recipientWallet.isEmpty() && !description.isEmpty()) {
-        control::MessageBox::messageText(this, "Unable to send", "Slate description is not supported for to non encrypted slatepack. Please specify Recipient wallet address to include description.");
-        ui->descriptionEdit->setFocus();
-        return;
-    }
-
     {
         QString valRes = util->validateMwc713Str(description);
         if (!valRes.isEmpty()) {

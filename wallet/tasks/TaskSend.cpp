@@ -247,9 +247,12 @@ bool TaskSendFile::processTask(const QVector<WEvent> &events) {
 
 // ------------------- TaskReceiveFile -----------------------------
 
-QString TaskReceiveFile::buildCommand(QString fileName, QString identifier) const {
+QString TaskReceiveFile::buildCommand(QString fileName, QString description, QString identifier) const {
     QString res("receive ");
     res += "--file " + util::toMwc713input(fileName);
+    if (!description.isEmpty()) {
+        res += " --message " + util::toMwc713input(description);
+    }
     if ( ! identifier.isEmpty() ) {
         res += " -k " + identifier;
     }
@@ -404,6 +407,15 @@ bool TaskSendSlatepack::processTask(const QVector<WEvent> &events) {
 }
 
 // ---------------------------- TaskReceiveSlatepack -----------------------------
+
+QString TaskReceiveSlatepack::buildCommand(QString slatepack, QString description) const {
+    QString cmd = "receive --content " + util::toMwc713input(slatepack);
+    if (!description.isEmpty()) {
+        cmd += " -m " + util::toMwc713input(description);
+    }
+    return cmd;
+}
+
 
 bool TaskReceiveSlatepack::processTask(const QVector<WEvent> &events) {
     QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );

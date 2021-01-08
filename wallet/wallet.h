@@ -588,7 +588,7 @@ public:
 
     // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
-    virtual void receiveFile( QString fileTx, QString identifier = "")  = 0;
+    virtual void receiveFile( QString fileTx, QString description, QString identifier = "")  = 0;
     // finalize transaction and broadcast it
     // Check signal:  onFinalizeFile
     virtual void finalizeFile( QString fileTxResponse, bool fluff )  = 0;
@@ -604,7 +604,7 @@ public:
 
     // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveSlatepack
-    virtual void receiveSlatepack( QString slatePack, QString tag)  = 0;
+    virtual void receiveSlatepack( QString slatePack, QString description, QString tag)  = 0;
 
     // finalize transaction and broadcast it
     // Check signal:  onFinalizeSlatepack
@@ -638,7 +638,7 @@ public:
 
     // get Extended info for specific transaction
     // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
-    virtual void getTransactionById(QString account, int64_t txIdx ) = 0;
+    virtual void getTransactionById(QString account, QString txIdxOrUUID ) = 0;
 
     // Get wallet balance
     // Cancel transaction

@@ -169,11 +169,21 @@ QPair<bool, QString> FileTransactionInfo::parseSlateContent( QString slateConten
     QJsonArray participant_data = readValueFromJson( json, "participant_data" ).toArray();
     int pdSz = participant_data.size();
     for (int i=0; i<pdSz; i++ ) {
-         QString m = readStringFromJson( participant_data[i].toObject(), "message" );
+         QJsonObject pdJson = participant_data[i].toObject();
+         int id = readValueFromJson( pdJson, "id" ).toString("-1").toInt();
+         if (id<0) // skipping noise
+             continue;
+
+         QString m = readStringFromJson( pdJson, "message" );
          if (! m.isEmpty()) {
-             if (!message.isEmpty())
-                 message += "; ";
-             message += m;
+             if (id==0)
+                 senderMessage = m;
+             else if (id==1) {
+                 receiverMessage = m;
+             }
+             else {
+                 Q_ASSERT(false);  // Expected only participants 0 & 1
+             }
          }
     }
 

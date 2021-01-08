@@ -215,7 +215,7 @@ public:
             const QStringList & outputs, int ttl_blocks, bool generateProof )  override;
     // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveFile
-    virtual void receiveFile( QString fileTx, QString identifier = "")  override;
+    virtual void receiveFile( QString fileTx, QString description, QString identifier = "")  override;
     // finalize transaction and broadcast it
     // Check signal:  onFinalizeFile
     virtual void finalizeFile( QString fileTxResponse, bool fluff )  override;
@@ -231,7 +231,7 @@ public:
 
     // Receive transaction. Will generate *.response file in the same dir
     // Check signal:  onReceiveSlatepack
-    virtual void receiveSlatepack( QString slatePack, QString tag) override;
+    virtual void receiveSlatepack( QString slatePack, QString description, QString tag) override;
 
     // finalize transaction and broadcast it
     // Check signal:  onFinalizeSlatepack
@@ -266,7 +266,7 @@ public:
 
     // get Extended info for specific transaction
     // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
-    virtual void getTransactionById(QString account, int64_t txIdx )  override;
+    virtual void getTransactionById(QString account, QString txIdxOrUUID )  override;
 
     // Get root public key with signed message. Message is optional, can be empty
     // Check Signal: onRootPublicKey( QString rootPubKey, QString message, QString signature )

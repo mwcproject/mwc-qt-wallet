@@ -24,6 +24,8 @@
 #include "../core/WndManager.h"
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/g_filetransaction_b.h"
+#include "../bridge/wnd/g_finalize_b.h"
+#include "../bridge/wnd/e_receive_b.h"
 
 namespace state {
 
@@ -85,9 +87,8 @@ void Finalize::uploadFileTransaction(QString fileName) {
 
     file2TransactionsInfo.insert(fileName, transInfo);
 
-    core::getWndManager()->pageFileTransaction(mwc::PAGE_G_FINALIZE_TRANS, FINALIZE_CALLER_ID,
-                                               fileName, transInfo, lastNodeHeight,
-                                               "Finalize Transaction", "Finalize");
+    core::getWndManager()->pageFileTransactionFinalize(mwc::PAGE_G_FINALIZE_TRANS,
+                                               fileName, transInfo, lastNodeHeight);
 }
 
 void Finalize::uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender ) {
@@ -101,14 +102,13 @@ void Finalize::uploadSlatepackTransaction( QString slatepack, QString slateJson,
 
     file2TransactionsInfo.insert(transInfo.transactionId, transInfo);
 
-    core::getWndManager()->pageFileTransaction(mwc::PAGE_G_FINALIZE_TRANS, FINALIZE_CALLER_ID,
-                                               slatepack, transInfo, lastNodeHeight,
-                                               "Finalize Transaction", "Finalize");
+    core::getWndManager()->pageFileTransactionFinalize(mwc::PAGE_G_FINALIZE_TRANS,
+                                               slatepack, transInfo, lastNodeHeight );
 }
 
 
 // Expected that user already made all possible appruvals
-void Finalize::ftContinue(QString fileName, QString resultTxFileName, bool fluff) {
+void Finalize::finalizeFile(QString fileName, QString resultTxFileName, bool fluff) {
     if (!file2TransactionsInfo.contains(fileName)) {
         Q_ASSERT(false);
         return;
@@ -122,7 +122,7 @@ void Finalize::ftContinue(QString fileName, QString resultTxFileName, bool fluff
 
 
 // Expected that user already made all possible appruvals
-void Finalize::ftContinueSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff) {
+void Finalize::finalizeSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff) {
     if (!file2TransactionsInfo.contains(txUuid)) {
         Q_ASSERT(false);
         return;
@@ -139,6 +139,8 @@ void Finalize::onFinalizeFile( bool success, QStringList errors, QString fileNam
                  errors.join(",") + " fileName=" + fileName );
 
     for (auto p : bridge::getBridgeManager()->getFileTransaction() )
+        p->hideProgress();
+    for (auto p : bridge::getBridgeManager()->getFinalize() )
         p->hideProgress();
 
     if (success) {
@@ -167,6 +169,8 @@ void Finalize::onFinalizeSlatepack( QString tagId, QString error, QString txUuid
     logger::logInfo("Finalize", "Get slatepack finalize results. tagId=" + tagId + ", error=" + error + " txUuid=" + txUuid );
 
     for (auto p : bridge::getBridgeManager()->getFileTransaction() )
+        p->hideProgress();
+    for (auto p : bridge::getBridgeManager()->getFinalize() )
         p->hideProgress();
 
     if (error.isEmpty()) {

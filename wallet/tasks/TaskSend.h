@@ -103,8 +103,8 @@ class TaskReceiveFile : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*20;
 
-    TaskReceiveFile( MWC713 *wallet713, QString fileName, QString identifier = "" ) :
-            Mwc713Task("TaskReceiveFile", "Recieving file transaction...", buildCommand(fileName, identifier), wallet713,""), inFileName(fileName) {}
+    TaskReceiveFile( MWC713 *wallet713, QString fileName, QString description, QString identifier = "" ) :
+            Mwc713Task("TaskReceiveFile", "Recieving file transaction...", buildCommand(fileName, description, identifier), wallet713,""), inFileName(fileName) {}
 
     virtual ~TaskReceiveFile() override {}
 
@@ -112,7 +112,7 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
-    QString buildCommand(QString fileName, QString identifier) const;
+    QString buildCommand(QString fileName, QString description, QString identifier) const;
     QString inFileName;
 };
 
@@ -160,8 +160,8 @@ class TaskReceiveSlatepack : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*20;
 
-    TaskReceiveSlatepack( MWC713 *wallet713, QString slatepack, QString _tag ) :
-            Mwc713Task("TaskReceiveFile", "Receiving slatepack transaction...", "receive --content \"" + slatepack + "\"", wallet713,""),
+    TaskReceiveSlatepack( MWC713 *wallet713, QString slatepack, QString description, QString _tag ) :
+            Mwc713Task("TaskReceiveFile", "Receiving slatepack transaction...", buildCommand(slatepack, description), wallet713,""),
             tag(_tag) {}
 
     virtual ~TaskReceiveSlatepack() override {}
@@ -170,6 +170,7 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
+    QString buildCommand(QString slatepack, QString description) const;
     QString tag;
 };
 
@@ -215,7 +216,7 @@ public:
     const static int64_t TIMEOUT = 1000*5; // Should be very quick operation
 
     TaskDecodeSlatepack( MWC713 *wallet713, QString _slatepack, QString _tag ) :
-            Mwc713Task("TaskDecodeSlatepack", "Decoding slatepack...", "decode_slatepack --slatepack \"" + _slatepack + "\"", wallet713, ""),
+            Mwc713Task("TaskDecodeSlatepack", "Decoding slatepack...", "decode_slatepack --slatepack " + util::toMwc713input(_slatepack), wallet713, ""),
             slatepack(_slatepack),
             tag(_tag) {}
 

@@ -40,7 +40,8 @@ struct FileTransactionInfo {
     int64_t fee;    // nanos
     bool amount_fee_not_defined = false; // Slatepack finalize doesn't have this info
     QString fromAddress;
-    QString message;
+    QString senderMessage;
+    QString receiverMessage;
     int     height;
     int     lock_height;
 

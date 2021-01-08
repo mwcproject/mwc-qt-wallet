@@ -135,9 +135,6 @@ QApplication* getApplication();
 bool isAppNonClosed();
 void closeApplication();
 
-void setFinalize(bool finalize);
-bool isFinalize();
-
 void setWalletLocked(bool locked);
 bool isWalletLocked();
 

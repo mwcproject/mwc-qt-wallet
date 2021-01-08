@@ -33,8 +33,8 @@ public:
 
 public:
     void ftBack();
-    void ftContinue(QString fileName, QString resultTxFileName, bool fluff);
-    void ftContinueSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff);
+    void receiveFile(QString fileName, QString description);
+    void receiveSlatepack(QString slatepack, QString description);
 
     bool needResultTxFileName() {return false;}
 

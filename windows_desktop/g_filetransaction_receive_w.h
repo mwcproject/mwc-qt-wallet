@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef FINALIZETRANSACTION_H
-#define FINALIZETRANSACTION_H
+#ifndef FINALIZETRANSACTIONR_H
+#define FINALIZETRANSACTIONR_H
 
 #include "../core_desktop/navwnd.h"
 #include "../util/Json.h"
 #include "../wallet/wallet.h"
 
 namespace Ui {
-class FileTransaction;
+class FileTransactionReceive;
 }
 
 namespace bridge {
-class FileTransaction;
+class Receive;
 class Wallet;
 class Config;
 class Util;
@@ -32,27 +32,24 @@ class Util;
 
 namespace wnd {
 
-class FileTransaction : public core::NavWnd {
+class FileTransactionReceive : public core::NavWnd {
 Q_OBJECT
 
 public:
-    explicit FileTransaction(QWidget *parent,
-             QString callerId,
+    explicit FileTransactionReceive(QWidget *parent,
              const QString & fileNameOrSlatepack, const util::FileTransactionInfo & transInfo,
-             int nodeHeight,
-             QString transactionType, QString processButtonName);
+             int nodeHeight);
 
-    ~FileTransaction();
+    ~FileTransactionReceive();
 
 private slots:
     void on_cancelButton_clicked();
     void on_processButton_clicked();
-    void on_resultTransFileNameSelect_clicked();
 
     void onSgnHideProgress();
 private:
-    Ui::FileTransaction *ui;
-    bridge::FileTransaction * fileTransaction = nullptr;
+    Ui::FileTransactionReceive *ui;
+    bridge::Receive * receive = nullptr;
     bridge::Wallet * wallet = nullptr;
     bridge::Config * config = nullptr;
     bridge::Util * util = nullptr;
@@ -63,4 +60,4 @@ private:
 
 }
 
-#endif // FINALIZETRANSACTION_H
+#endif // FINALIZETRANSACTIONR_H

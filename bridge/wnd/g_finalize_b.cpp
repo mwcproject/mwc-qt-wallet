@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "../BridgeManager.h"
 #include "g_finalize_b.h"
 #include "../../state/state.h"
 #include "../../state/g_Finalize.h"
@@ -19,6 +20,20 @@
 namespace bridge {
 
 static state::Finalize * getState() { return (state::Finalize *) state::getState(state::STATE::FINALIZE); }
+
+Finalize::Finalize(QObject * parent) :
+        QObject(parent)
+{
+    getBridgeManager()->addFinalize(this);
+}
+
+Finalize::~Finalize() {
+    getBridgeManager()->removeFinalize(this);
+}
+
+void Finalize::hideProgress() {
+    emit sgnHideProgress();
+}
 
 // Start Processing file slate.
 void Finalize::uploadFileTransaction(QString fileName) {
@@ -34,5 +49,21 @@ bool Finalize::isNodeHealthy() {
     return getState()->isNodeHealthy();
 }
 
+bool Finalize::needResultTxFileName() {
+    return getState()->needResultTxFileName();
+}
+
+// Files transaction page, continue with a file
+void Finalize::finalizeFile(QString fileName, QString resultTxFileName, bool fluff) {
+    getState()->finalizeFile(fileName, resultTxFileName, fluff);
+}
+// Files transaction page, continue with a Slatepack
+void Finalize::finalizeSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff) {
+    getState()->finalizeSlatepack(slatepack, txUuid, resultTxFileName, fluff);
+}
+
+void Finalize::cancelFileFinalization() {
+    getState()->ftBack();
+}
 
 }
