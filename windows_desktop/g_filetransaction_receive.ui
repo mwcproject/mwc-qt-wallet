@@ -117,6 +117,9 @@
         <property name="text">
          <string>3874868</string>
         </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+        </property>
        </widget>
        <widget class="control::MwcLabelNormal" name="mwcLabel">
         <property name="geometry">
@@ -129,6 +132,9 @@
         </property>
         <property name="text">
          <string>2355 MWC</string>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
         </property>
        </widget>
        <widget class="control::MwcLabelLarge" name="transactionType">
@@ -242,6 +248,9 @@
         <property name="text">
          <string>45983594</string>
         </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+        </property>
        </widget>
        <widget class="control::MwcPushButtonNormal" name="cancelButton">
         <property name="geometry">
@@ -352,6 +361,9 @@ p, li { white-space: pre-wrap; }
         <property name="text">
          <string>XXXXXXXXXX</string>
         </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+        </property>
        </widget>
        <widget class="control::MwcLabelNormal" name="senderMessage">
         <property name="geometry">
@@ -367,6 +379,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
         </property>
        </widget>
        <widget class="control::MwcLabelNormal" name="receiverDescLabel">

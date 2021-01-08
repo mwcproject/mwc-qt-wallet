@@ -117,6 +117,9 @@
         <property name="text">
          <string>3874868</string>
         </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+        </property>
        </widget>
        <widget class="control::MwcLabelNormal" name="mwcLabel">
         <property name="geometry">
@@ -129,6 +132,9 @@
         </property>
         <property name="text">
          <string>2355 MWC</string>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
         </property>
        </widget>
        <widget class="control::MwcLabelLarge" name="transactionType">
@@ -241,6 +247,9 @@
         </property>
         <property name="text">
          <string>45983594</string>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
         </property>
        </widget>
        <widget class="control::MwcPushButtonNormal" name="cancelButton">
@@ -418,6 +427,9 @@
         <property name="text">
          <string>XXXXXXXXXX</string>
         </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+        </property>
        </widget>
        <widget class="control::MwcLabelNormal" name="senderMessage">
         <property name="geometry">
@@ -436,6 +448,9 @@
         </property>
         <property name="wordWrap">
          <bool>true</bool>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
         </property>
        </widget>
        <widget class="control::MwcLabelNormal" name="receiverDescLabel">
@@ -471,6 +486,9 @@
         </property>
         <property name="wordWrap">
          <bool>true</bool>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
         </property>
        </widget>
       </widget>
