@@ -153,7 +153,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Upload response file to finalize</string>
+         <string>Paste response slatepack for finalization</string>
         </property>
         <property name="text">
          <string>Paste Slatepack</string>
