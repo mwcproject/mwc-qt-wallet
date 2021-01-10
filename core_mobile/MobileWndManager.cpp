@@ -147,6 +147,10 @@ QString MobileWndManager::getSaveFileName(const QString &caption, const QString 
 // QFileDialog::getLoadFileName call
 // Mobile migth never need that.
 QString MobileWndManager::getOpenFileName(const QString &caption, const QString &dir, const QString &filter) {
+    Q_UNUSED(caption)
+    Q_UNUSED(dir)
+    Q_UNUSED(filter)
+
     Q_ASSERT(false); // implement me
 }
 
@@ -238,8 +242,7 @@ void MobileWndManager::pageOutputs() {
 }
 void MobileWndManager::pageFileTransactionReceive(QString pageTitle,
                                      const QString & fileName, const util::FileTransactionInfo & transInfo,
-                                     int nodeHeight,
-                                     QString transactionType, QString processButtonName) {
+                                     int nodeHeight) {
     Q_UNUSED(pageTitle)
 
     QJsonObject obj;
@@ -251,7 +254,7 @@ void MobileWndManager::pageFileTransactionReceive(QString pageTitle,
     obj["transactionId"] = transInfo.transactionId;
     obj["lockHeight"] = transInfo.lock_height > nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-";
     obj["receiverAddress"] = transInfo.fromAddress.isEmpty() ? "-" : transInfo.fromAddress;
-    obj["message"] = transInfo.message;
+    obj["message"] = transInfo.senderMessage;
     obj["isFinalize"] = false;
 
     QVariant retValue;
@@ -260,9 +263,12 @@ void MobileWndManager::pageFileTransactionReceive(QString pageTitle,
 
 void MobileWndManager::pageFileTransactionFinalize(QString pageTitle,
                                            const QString & fileName, const util::FileTransactionInfo & transInfo,
-                                           int nodeHeight,
-                                           QString transactionType, QString processButtonName) {
+                                           int nodeHeight) {
     Q_UNUSED(pageTitle)
+
+    QString message = transInfo.receiverMessage;
+    if (message.isEmpty())
+        message = transInfo.senderMessage;
 
     QJsonObject obj;
     obj["callerId"] = "Finalize";
@@ -273,7 +279,7 @@ void MobileWndManager::pageFileTransactionFinalize(QString pageTitle,
     obj["transactionId"] = transInfo.transactionId;
     obj["lockHeight"] = transInfo.lock_height > nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-";
     obj["receiverAddress"] = transInfo.fromAddress.isEmpty() ? "-" : transInfo.fromAddress;
-    obj["message"] = transInfo.message;
+    obj["message"] = message;
     obj["isFinalize"] = true;
 
     QVariant retValue;
@@ -311,6 +317,8 @@ void MobileWndManager::pageSendFile( QString selectedAccount, int64_t amount ) {
 }
 
 void MobileWndManager::pageSendSlatepack( QString selectedAccount, int64_t amount ) {
+    Q_UNUSED(selectedAccount)
+    Q_UNUSED(amount)
     Q_ASSERT(false); // implement me
 }
 
