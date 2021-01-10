@@ -82,8 +82,6 @@ void closeApplication() {
 }
 #endif
 
-static bool finalize = false;
-
 static bool walletLocked = false;
 
 void setWalletLocked(bool locked) {
