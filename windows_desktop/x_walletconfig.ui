@@ -542,7 +542,7 @@
                <string>Enable the display of status messages using windows in the lower right of the wallet.</string>
               </property>
               <property name="text">
-               <string>Don't lock outputs until finalization</string>
+               <string>Lock outputs at finalization</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1010,11 +1010,6 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
@@ -1023,6 +1018,11 @@
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
