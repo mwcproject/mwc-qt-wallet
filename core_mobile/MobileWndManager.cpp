@@ -152,6 +152,7 @@ QString MobileWndManager::getOpenFileName(const QString &caption, const QString 
     Q_UNUSED(filter)
 
     Q_ASSERT(false); // implement me
+    return "";
 }
 
 
