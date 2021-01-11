@@ -191,7 +191,7 @@ void Finalize::onFinalizeSlatepack( QString tagId, QString error, QString txUuid
         ftBack();
     }
     else {
-        core::getWndManager()->messageTextDlg("Failure", "File Transaction failed to finalize.\n" + error);
+        core::getWndManager()->messageTextDlg("Failure", "Slatepack Transaction failed to finalize.\n" + error);
     }
 }
 

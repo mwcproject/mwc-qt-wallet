@@ -139,3 +139,7 @@ Unable to decode the slatepack, $1
 # Slatepack decode error, Unable to decrypt a slatepack, I/O error, failed to fill whole buffer
 Slatepack decode error, Unable to decrypt a slatepack, I/O error, failed to fill whole buffer
 Unable to decode the slate data
+
+# failed finalizing slate!, Wallet store error, DB Not Found Error: Slate id: [33, 35, 98, 2a, b2, 93, 49, 5b, 94, 24, dc, 9e, e7, 3d, 51, c1]
+failed finalizing slate!, Wallet store error, DB Not Found Error:(.*)
+This transaction is already finalized. If you need to repost it, please use 'Transaction' page.
