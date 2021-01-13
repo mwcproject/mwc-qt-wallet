@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>902</width>
-    <height>725</height>
+    <height>636</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,7 +39,7 @@
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>660</y>
+     <y>562</y>
      <width>676</width>
      <height>40</height>
     </rect>
@@ -173,77 +173,11 @@
     </item>
    </layout>
   </widget>
-  <widget class="QCheckBox" name="useBasicAutorization">
-   <property name="geometry">
-    <rect>
-     <x>45</x>
-     <y>340</y>
-     <width>296</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Foreign API Secret</string>
-   </property>
-  </widget>
-  <widget class="QWidget" name="layoutWidget1_5">
-   <property name="geometry">
-    <rect>
-     <x>365</x>
-     <y>315</y>
-     <width>311</width>
-     <height>63</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_6">
-    <property name="spacing">
-     <number>5</number>
-    </property>
-    <item>
-     <widget class="control::MwcLabelSmall" name="apiSecret_label">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>22</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>Basic authorization for user 'mwc'</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="control::MwcLineEditNormal" name="apiSecretEdit">
-      <property name="minimumSize">
-       <size>
-        <width>250</width>
-        <height>40</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>20000</width>
-        <height>40</height>
-       </size>
-      </property>
-      <property name="maxLength">
-       <number>128</number>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QCheckBox" name="useTlsCheck">
    <property name="geometry">
     <rect>
      <x>45</x>
-     <y>410</y>
+     <y>312</y>
      <width>446</width>
      <height>26</height>
     </rect>
@@ -298,7 +232,7 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>455</y>
+     <y>357</y>
      <width>626</width>
      <height>63</height>
     </rect>
@@ -354,7 +288,7 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
    <property name="geometry">
     <rect>
      <x>705</x>
-     <y>478</y>
+     <y>380</y>
      <width>150</width>
      <height>40</height>
     </rect>
@@ -379,7 +313,7 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
    <property name="geometry">
     <rect>
      <x>705</x>
-     <y>563</y>
+     <y>465</y>
      <width>150</width>
      <height>40</height>
     </rect>
@@ -404,7 +338,7 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>540</y>
+     <y>442</y>
      <width>626</width>
      <height>63</height>
     </rect>
@@ -456,47 +390,12 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcPushButtonNormal" name="generateSecretButton">
-   <property name="geometry">
-    <rect>
-     <x>705</x>
-     <y>338</y>
-     <width>150</width>
-     <height>40</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>150</width>
-     <height>40</height>
-    </size>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::StrongFocus</enum>
-   </property>
-   <property name="toolTip">
-    <string>Generate a new api secret for foreign API</string>
-   </property>
-   <property name="text">
-    <string>Generate</string>
-   </property>
-  </widget>
  </widget>
  <customwidgets>
   <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelNormal</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>
@@ -508,13 +407,20 @@ Note, improper HTTP configuration can make your computer vulnerable.</string>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>activateRestApi</tabstop>
   <tabstop>listeningAddressEdit</tabstop>
-  <tabstop>useBasicAutorization</tabstop>
-  <tabstop>apiSecretEdit</tabstop>
-  <tabstop>generateSecretButton</tabstop>
   <tabstop>useTlsCheck</tabstop>
   <tabstop>tlsPrivateKeyEdit</tabstop>
   <tabstop>selectPrivKeyButton</tabstop>

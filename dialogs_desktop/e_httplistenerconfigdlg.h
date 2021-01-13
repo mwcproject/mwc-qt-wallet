@@ -54,7 +54,6 @@ private slots:
     void on_activateRestApi_stateChanged(int check);
     void on_useBasicAutorization_stateChanged(int check);
     void on_useTlsCheck_stateChanged(int check);
-    void on_generateSecretButton_clicked();
     void on_listeningAddressEdit_textChanged(const QString &arg1);
 
 private:

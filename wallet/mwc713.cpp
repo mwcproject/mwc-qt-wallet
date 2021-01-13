@@ -1744,7 +1744,7 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
 
     // Checking if foreign API enable but it is not default fro the TOR
     if (config.hasForeignApi() && !(appContext->isAutoStartTorEnabled() && config.hasForeignApi() &&
-       config.foreignApiAddress == "127.0.0.1:3415" && config.foreignApiSecret.isEmpty() && !config.hasTls()))
+       config.foreignApiAddress == "127.0.0.1:3415" && !config.hasTls()))
     {
         errorMessage += "\n\nYou have activated foreign API and it might be a reason for this issue. Foreign API is deactivated, please try to restart the wallet";
         config.foreignApi = false;
@@ -1861,7 +1861,6 @@ WalletConfig MWC713::readWalletConfig(QString source) {
 
     bool foreignApi = mwc713config.getString("foreign_api") == "true";
     QString foreignApiAddress = mwc713config.getString("foreign_api_address");
-    QString foreignApiSecret = mwc713config.getString("foreign_api_secret");
     QString tlsCertificateFile = mwc713config.getString("tls_certificate_file");
     QString tlsCertificateKey = mwc713config.getString("tls_certificate_key");
 
@@ -1877,7 +1876,7 @@ WalletConfig MWC713::readWalletConfig(QString source) {
     QString nodeSecret  = mwc713config.getString("mwc_node_secret");
 
     return WalletConfig().setData( network, dataPath, mwcmqsDomain,
-            foreignApi, foreignApiAddress, foreignApiSecret, tlsCertificateFile, tlsCertificateKey );
+            foreignApi, foreignApiAddress, tlsCertificateFile, tlsCertificateKey );
 }
 
 
@@ -1914,7 +1913,7 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
     // First need to wait until mwc713 will stor to support keybase
     QStringList prefixesToCheck{"wallet713_data_path", "keybase_binary", "mwcmqs_domain",
                                 "chain", "grinbox_listener_auto_start", "keybase_listener_auto_start",
-                                "foreign_api", "foreign_api_address", "foreign_api_secret",
+                                "foreign_api", "foreign_api_address",
                                 "tls_certificate_file", "tls_certificate_key"};
 
     if ((appContext != nullptr)) {
@@ -1958,9 +1957,6 @@ bool MWC713::saveWalletConfig(const WalletConfig & config, core::AppContext * ap
     if (config.hasForeignApi() && !config.foreignApiAddress.isEmpty()) {
         newConfLines.insert(appentIdx,"foreign_api = true");
         newConfLines.insert(appentIdx,"foreign_api_address = \"" + config.foreignApiAddress + "\"");
-
-        if (!config.foreignApiSecret.isEmpty())
-            newConfLines.insert(appentIdx,"foreign_api_secret = \"" + config.foreignApiSecret + "\"");
 
         if (!config.tlsCertificateFile.isEmpty() && !config.tlsCertificateKey.isEmpty()) {
             newConfLines.insert(appentIdx,"tls_certificate_file = \"" + config.tlsCertificateFile + "\"");
@@ -2037,7 +2033,7 @@ bool MWC713::setWalletConfig( const WalletConfig & _config, bool canStartNode ) 
     if (appContext->isAutoStartTorEnabled()) {
         if (!config.hasForeignApi()) {
             // Expected to do that silently. It is a migration case
-            config.setForeignApi(true,"127.0.0.1:3415","", "","");
+            config.setForeignApi(true,"127.0.0.1:3415","", "");
         }
         else {
             // Check if Foreign API has HTTPS. Tor doesn't support it

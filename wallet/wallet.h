@@ -115,7 +115,6 @@ public:
     // Http listening params...
     bool foreignApi = false; // Is foreign API is enabled
     QString foreignApiAddress; // Example: 0.0.0.0:3416
-    QString foreignApiSecret;  // Secret value
     // For https configuration.
     QString tlsCertificateFile;
     QString tlsCertificateKey;
@@ -133,12 +132,11 @@ public:
                 QString mwcmqsDomain,
                 bool foreignApi,
                 QString foreignApiAddress,
-                QString foreignApiSecret,
                 QString tlsCertificateFile,
                 QString tlsCertificateKey);
 
     WalletConfig & setForeignApi(bool foreignApi,
-                       QString foreignApiAddress, QString foreignApiSecret,
+                       QString foreignApiAddress,
                        QString tlsCertificateFile, QString tlsCertificateKey);
 
     WalletConfig & setDataWalletCfg(QString mwcmqsDomain);

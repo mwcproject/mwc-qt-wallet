@@ -57,12 +57,12 @@ QString Config::getAppDataPath(QString localPath) {
 
 // Update config with foreign API settings.
 void Config::saveForeignApiConfig(bool foreignApi,
-                                      QString foreignApiAddress, QString foreignApiSecret,
+                                      QString foreignApiAddress,
                                       QString tlsCertificateFile, QString tlsCertificateKey) {
 
     wallet::WalletConfig config = getWallet()->getWalletConfig();
     config.setForeignApi(foreignApi,
-            foreignApiAddress, foreignApiSecret,
+            foreignApiAddress,
             tlsCertificateFile, tlsCertificateKey);
 
 
@@ -173,9 +173,6 @@ bool Config::hasForeignApi() {
 }
 QString Config::getForeignApiAddress() {
     return getWallet()->getWalletConfig().foreignApiAddress;
-}
-QString Config::getForeignApiSecret() {
-    return getWallet()->getWalletConfig().foreignApiSecret;
 }
 QString Config::getTlsCertificateKey() {
     return getWallet()->getWalletConfig().tlsCertificateKey;

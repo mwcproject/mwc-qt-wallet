@@ -40,7 +40,7 @@ public:
 
     // Update config with foreign API settings.
     Q_INVOKABLE void saveForeignApiConfig(bool foreignApi,
-                                          QString foreignApiAddress, QString foreignApiSecret,
+                                          QString foreignApiAddress,
                                           QString tlsCertificateFile, QString tlsCertificateKey);
 
     // Request wallet instances.
@@ -70,7 +70,6 @@ public:
     Q_INVOKABLE QString getDataPath();
     Q_INVOKABLE bool hasForeignApi();
     Q_INVOKABLE QString getForeignApiAddress();
-    Q_INVOKABLE QString getForeignApiSecret();
     Q_INVOKABLE QString getTlsCertificateKey();
     Q_INVOKABLE QString getTlsCertificateFile();
     // Get wallet network name

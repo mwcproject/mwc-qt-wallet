@@ -487,7 +487,7 @@ int main(int argc, char *argv[])
         if (appContext.isAutoStartTorEnabled()) {
             if (!walletConfig.hasForeignApi()) {
                 // Expected to do that silently. It is a migration case
-                walletConfig.setForeignApi(true,"127.0.0.1:3415","", "","");
+                walletConfig.setForeignApi(true,"127.0.0.1:3415","", "");
             }
             else {
                 // Check if foreign API has HTTPs. TOR doesn't support it

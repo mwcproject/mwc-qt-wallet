@@ -317,24 +317,11 @@ bool WalletConfig::applyChanges() {
                                 "Continue and change Foreign API settings. I want Tor to run",
                                 false, true);
         }
-        if (!resetForeignForTor && !config->getForeignApiSecret().isEmpty() ) {
-            resetForeignForTor =
-                    core::WndManager::RETURN_CODE::BTN1 == control::MessageBox::questionHTML(this, "Tor Configuration",
-                                "Tor requires Foreign API to be running. "
-                                "Please note that Foreign API secret is configured. Sender needs to be aware about that. "
-                                "Otherwise you will not be able to receive coins.",
-                                "Reset Secret",
-                                "Continue",
-                                "Don't use Foreign API secret, so I can acccept payments from anybody",
-                                "Continue with Foreign API secret. I am accepting coins only from people who know the secret",
-                                false, true);
-        }
         if (resetForeignForTor) {
             foreignIsOk = true;
             need2updateGuiSize = true;
             config->saveForeignApiConfig(true,
-                    "127.0.0.1:3415", "",
-                    "", "");
+                    "127.0.0.1:3415", "", "");
         }
         if (!foreignIsOk) {
             ui->start_tor->setCheckState(Qt::Unchecked);

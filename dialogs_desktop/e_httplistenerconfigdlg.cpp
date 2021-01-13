@@ -38,10 +38,6 @@ HttpListenerConfigDlg::HttpListenerConfigDlg(QWidget *parent) :
     QString foreignApiAddress = config->getForeignApiAddress();
     ui->listeningAddressEdit->setText(foreignApiAddress.isEmpty() ? "127.0.0.1:3415" : foreignApiAddress);
 
-    QString foreignApiSecret = config->getForeignApiSecret();
-    ui->useBasicAutorization->setChecked( !foreignApiSecret.isEmpty() );
-    ui->apiSecretEdit->setText( foreignApiSecret.isEmpty() ? util->generateApiSecret(20)  : foreignApiSecret );
-
     ui->useTlsCheck->setChecked( config->hasTls() );
     ui->tlsPrivateKeyEdit->setText( config->getTlsCertificateKey() );
     ui->tlsFullchainEdit->setText( config->getTlsCertificateFile() );
@@ -81,9 +77,6 @@ void HttpListenerConfigDlg::on_resetButton_clicked()
     ui->activateRestApi->setChecked(walletConfig->getAutoStartTorEnabled());
     ui->listeningAddressEdit->setText("127.0.0.1:3415");
 
-    ui->useBasicAutorization->setChecked( false );
-    ui->apiSecretEdit->setText(util->generateApiSecret(20) );
-
     ui->useTlsCheck->setChecked( false );
 
     updateControlState();
@@ -113,22 +106,12 @@ void HttpListenerConfigDlg::on_listeningAddressEdit_textChanged(const QString &a
     updateControlState();
 }
 
-void HttpListenerConfigDlg::on_generateSecretButton_clicked()
-{
-    ui->apiSecretEdit->setText( util->generateApiSecret(20) );
-}
-
 void HttpListenerConfigDlg::updateControlState() {
     bool api = ui->activateRestApi->isChecked();
-    bool auth = ui->useBasicAutorization->isChecked();
     bool tls = ui->useTlsCheck->isChecked();
 
     ui->listeningAddressEdit->setEnabled(api);
     ui->listeningAddress_label->setEnabled(api);
-    ui->useBasicAutorization->setEnabled(api);
-    ui->apiSecretEdit->setEnabled(api && auth);
-    ui->apiSecret_label->setEnabled(api && auth);
-    ui->generateSecretButton->setEnabled(api && auth);
 
     ui->useTlsCheck->setEnabled(api);
     ui->tlsPrivateKeyEdit->setEnabled(api && tls);
@@ -139,7 +122,7 @@ void HttpListenerConfigDlg::updateControlState() {
     ui->selectFullchainButton->setEnabled(api && tls);
 
     if (walletConfig->getAutoStartTorEnabled()) {
-        ui->resetButton->setEnabled(!(api && ui->listeningAddressEdit->text().startsWith("127.0.0.1:") && !auth && !tls));
+        ui->resetButton->setEnabled(!(api && ui->listeningAddressEdit->text().startsWith("127.0.0.1:") && !tls));
     }
     else {
         ui->resetButton->setEnabled(api);
@@ -157,7 +140,6 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
 {
     bool foreignApi = false;
     QString foreignApiAddress = "";
-    QString foreignApiSecret = "";
     QString tlsCertificateFile = "";
     QString tlsCertificateKey = "";
 
@@ -203,28 +185,6 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
         }
 
         foreignApiAddress = listenAddress;
-
-        if (ui->useBasicAutorization->isChecked() ) {
-            QString apiSecret = ui->apiSecretEdit->text();
-            if (apiSecret.isEmpty()) {
-                control::MessageBox::messageText(this, "Incorrect Input", "Please API secret value" );
-                ui->apiSecretEdit->setFocus();
-                return;
-            }
-
-            // Need to check the inputs
-            QPair <bool, QString> valRes = util::validateMwc713Str( apiSecret );
-            if (!valRes.first) {
-                control::MessageBox::messageText(this, "API Secret", valRes.second );
-                ui->apiSecretEdit->setFocus();
-                return;
-            }
-
-            foreignApiSecret = apiSecret;
-        }
-        else {
-            foreignApiSecret = "";
-        }
 
         if (ui->useTlsCheck->isChecked()) {
 
@@ -272,16 +232,12 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
     else {
         foreignApi = false;
         foreignApiAddress = "";
-        foreignApiSecret = "";
         tlsCertificateFile = "";
         tlsCertificateKey = "";
     }
 
     QString message;
     if (foreignApi) {
-        if (foreignApiSecret.isEmpty())
-            message += "without any authorization";
-
         if ((tlsCertificateFile.isEmpty() || tlsCertificateKey.isEmpty()) && !foreignApiAddress.startsWith("127.0.0.1:")  ) {
             if (!message.isEmpty())
                 message += " and ";
@@ -317,7 +273,7 @@ void HttpListenerConfigDlg::on_applyButton_clicked()
             false, true ) ) {
 
         // apply settings...
-        config->saveForeignApiConfig(foreignApi,foreignApiAddress, foreignApiSecret, tlsCertificateFile, tlsCertificateKey);
+        config->saveForeignApiConfig(foreignApi,foreignApiAddress, tlsCertificateFile, tlsCertificateKey);
         accept();
     }
 }

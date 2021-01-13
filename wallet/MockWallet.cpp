@@ -226,7 +226,6 @@ const WalletConfig & MockWallet::getWalletConfig() {
             false,
             "127.0.0.1",
             "",
-            "",
             "");
     return config;
 }

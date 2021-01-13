@@ -145,7 +145,7 @@ bool WalletConfig::operator == (const WalletConfig & other) const {
     if (!ok)
         return ok;
 
-    ok = foreignApiAddress == other.foreignApiAddress && foreignApiSecret == other.foreignApiSecret &&
+    ok = foreignApiAddress == other.foreignApiAddress &&
             tlsCertificateFile == other.tlsCertificateFile && tlsCertificateKey == other.tlsCertificateKey;
 
     return ok;
@@ -157,22 +157,20 @@ WalletConfig & WalletConfig::setData(QString _network,
                             QString _mwcmqsDomain,
                             bool    _foreignApi,
                             QString _foreignApiAddress,
-                            QString _foreignApiSecret,
                             QString _tlsCertificateFile,
                             QString _tlsCertificateKey) {
     updateNetwork(_network);
     updateDataPath(_dataPath);
     setDataWalletCfg(_mwcmqsDomain);
 
-    return setForeignApi(_foreignApi, _foreignApiAddress, _foreignApiSecret, _tlsCertificateFile, _tlsCertificateKey);
+    return setForeignApi(_foreignApi, _foreignApiAddress, _tlsCertificateFile, _tlsCertificateKey);
 }
 
 WalletConfig & WalletConfig::setForeignApi(bool _foreignApi,
-                             QString _foreignApiAddress, QString _foreignApiSecret,
+                             QString _foreignApiAddress,
                              QString _tlsCertificateFile, QString _tlsCertificateKey) {
     foreignApi = _foreignApi;
     foreignApiAddress = _foreignApiAddress;
-    foreignApiSecret = _foreignApiSecret;
     tlsCertificateFile = _tlsCertificateFile;
     tlsCertificateKey = _tlsCertificateKey;
 
