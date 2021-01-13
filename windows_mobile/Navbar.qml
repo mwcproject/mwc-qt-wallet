@@ -33,6 +33,9 @@ Item {
         case 9:
             text_title.text = qsTr("Wallet  >   Receive")
             break
+        case 10:
+            text_title.text = qsTr("Wallet Settings   >   Listeners")
+            break
         case 11:
             text_title.text = qsTr("Wallet  >   Transactions")
             break
@@ -376,7 +379,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    stateMachine.setActionWindow(6)
+                    stateMachine.setActionWindow(6) // Notifications Page
                 }
             }
         }
@@ -440,6 +443,13 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: dp(11)
             }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    stateMachine.setActionWindow(10)    // Listening Page
+                }
+            }
         }
 
         Rectangle {
@@ -473,6 +483,13 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: dp(11)
                 color: "white"
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    stateMachine.setActionWindow(17)    // NodeInfo Page
+                }
             }
         }
 
