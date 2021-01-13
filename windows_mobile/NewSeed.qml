@@ -9,7 +9,7 @@ Item {
 
     function init(seed, hideSubmitButton) {
         text_seed.text = seed.replace(/\s/g, "    ")
-//        testSeed = seed.split(" ")
+        testSeed = seed.split(" ")
         button_next.visible = !hideSubmitButton
     }
 
@@ -79,6 +79,7 @@ Item {
             color: "#ffffff"
             text: qsTr("Waiting for the mnemonic passphrase from mwc713...")
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            font.capitalization: Font.AllLowercase
             anchors.top: rect_splitter.bottom
             anchors.topMargin: dp(20)
             anchors.right: parent.right
@@ -138,3 +139,9 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

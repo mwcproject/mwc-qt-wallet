@@ -10,7 +10,7 @@ Item {
     function init(wordIndex) {
         textfield_word.placeholderText = "Please enter word number " + Number(wordIndex).toString()
         textfield_word.clear()
-//        newSeed.submitSeedWord(testSeed[wordIndex-1])
+        newSeed.submitSeedWord(testSeed[wordIndex-1])
     }
 
     NewSeedBridge {
