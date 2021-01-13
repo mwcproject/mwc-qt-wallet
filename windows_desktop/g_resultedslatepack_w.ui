@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1194</width>
-    <height>748</height>
+    <width>881</width>
+    <height>648</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0">
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="spacing">
     <number>3</number>
    </property>
@@ -69,10 +69,7 @@
       <attribute name="title">
        <string>String</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,0">
-       <property name="spacing">
-        <number>30</number>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1,0">
        <item>
         <widget class="QTextEdit" name="slatepackContent">
          <property name="sizePolicy">
@@ -113,6 +110,111 @@ p, li { white-space: pre-wrap; }
           <string/>
          </property>
         </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="bottomMargin">
+          <number>15</number>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer_8">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="control::MwcPushButtonNormal" name="copySlatepackToClipboardBtn">
+           <property name="minimumSize">
+            <size>
+             <width>210</width>
+             <height>38</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>38</height>
+            </size>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Copy slatepack into the clipboard.</string>
+           </property>
+           <property name="text">
+            <string>Copy to Clipboard</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_7">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>23</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="control::MwcPushButtonNormal" name="saveSlatepackBtn">
+           <property name="minimumSize">
+            <size>
+             <width>210</width>
+             <height>38</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>38</height>
+            </size>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Save the latepack in the file for your records</string>
+           </property>
+           <property name="text">
+            <string>Save Slatepack</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_9">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QTextEdit" name="finalizeSlatepack">
@@ -200,50 +302,6 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="control::MwcPushButtonNormal" name="saveSlatepackBtn">
-           <property name="minimumSize">
-            <size>
-             <width>210</width>
-             <height>38</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>38</height>
-            </size>
-           </property>
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::StrongFocus</enum>
-           </property>
-           <property name="toolTip">
-            <string>Save the latepack in the file for your records</string>
-           </property>
-           <property name="text">
-            <string>Save Slatepack</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_7">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -389,6 +447,34 @@ p, li { white-space: pre-wrap; }
             </spacer>
            </item>
            <item>
+            <widget class="control::MwcPushButtonNormal" name="copyImageToClipboardBtn">
+             <property name="minimumSize">
+              <size>
+               <width>210</width>
+               <height>38</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>38</height>
+              </size>
+             </property>
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
+             <property name="toolTip">
+              <string>Copy QR code into the clipboard.</string>
+             </property>
+             <property name="text">
+              <string>Copy to Clipboard</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="control::MwcPushButtonNormal" name="saveQrImageBtn">
              <property name="minimumSize">
               <size>
@@ -496,9 +582,10 @@ p, li { white-space: pre-wrap; }
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>slatepackContent</tabstop>
+  <tabstop>copySlatepackToClipboardBtn</tabstop>
+  <tabstop>saveSlatepackBtn</tabstop>
   <tabstop>finalizeSlatepack</tabstop>
   <tabstop>backButton</tabstop>
-  <tabstop>saveSlatepackBtn</tabstop>
   <tabstop>finalizeSlatepackBtn</tabstop>
   <tabstop>saveQrImageBtn</tabstop>
   <tabstop>backButton_2</tabstop>

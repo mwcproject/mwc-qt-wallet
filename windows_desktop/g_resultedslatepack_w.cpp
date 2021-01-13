@@ -21,6 +21,8 @@
 #include "../bridge/util_b.h"
 #include "../bridge/wallet_b.h"
 #include "../util/Json.h" // Just for a contant value
+#include <QClipboard>
+#include <QToolTip>
 
 namespace wnd {
 
@@ -28,7 +30,8 @@ const QString INIT_TAG = "InitialSP";
 const QString FINALIZE_TAG = "FinalizeSP";
 
 
-ResultedSlatepack::ResultedSlatepack(QWidget *parent, QString slatepack, int backStateId, QString txExtension, bool enableFinalize) :
+ResultedSlatepack::ResultedSlatepack(QWidget *parent, QString slatepack, int backStateId, QString txExtension,
+                                     bool enableFinalize) :
         core::NavWnd(parent),
         ui(new Ui::ResultedSlatepack) {
     ui->setupUi(this);
@@ -54,9 +57,8 @@ ResultedSlatepack::ResultedSlatepack(QWidget *parent, QString slatepack, int bac
         // No finalize, hiding the UI
         ui->finalizeSlatepack->hide();
         ui->finalizeSlatepackBtn->hide();
-        ui->horizontalSpacer_7->changeSize(1,1);
-    }
-    else {
+        ui->horizontalSpacer_3->changeSize(1, 1);
+    } else {
         ui->finalizeSlatepackBtn->setEnabled(false);
 
         // Requesting UUID for this transaction
@@ -115,7 +117,7 @@ void ResultedSlatepack::initiateSlateVerification(const QString &slate2check, QS
     wallet->decodeSlatepack(slate2check, tag);
 }
 
-void ResultedSlatepack::sgnFinalizeSlatepack( QString tagId, QString error, QString txUuid ) {
+void ResultedSlatepack::sgnFinalizeSlatepack(QString tagId, QString error, QString txUuid) {
     if (tagId != "ResultedSlatepack")
         return;
 
@@ -125,7 +127,8 @@ void ResultedSlatepack::sgnFinalizeSlatepack( QString tagId, QString error, QStr
     }
 
     Q_ASSERT(txUuid == transactionUUID);
-    control::MessageBox::messageText(this,"Finalize Transaction", "Transaction " + txUuid + " was finalized successfully.");
+    control::MessageBox::messageText(this, "Finalize Transaction",
+                                     "Transaction " + txUuid + " was finalized successfully.");
     // pressing back button. We are done here
     on_backButton_clicked();
 }
@@ -140,7 +143,8 @@ void ResultedSlatepack::on_finalizeSlatepackBtn_clicked() {
     wallet->finalizeSlatepack(slate2finalize, false, "ResultedSlatepack");
 }
 
-void ResultedSlatepack::onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJson, QString content, QString sender, QString recipient) {
+void ResultedSlatepack::onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJson,
+                                             QString content, QString sender, QString recipient) {
     Q_UNUSED(recipient)
     Q_UNUSED(sender)
 
@@ -152,7 +156,7 @@ void ResultedSlatepack::onSgnDecodeSlatepack(QString tag, QString error, QString
         return;
     }
 
-    if (tag==FINALIZE_TAG) {
+    if (tag == FINALIZE_TAG) {
         if (content != "SendResponse") {
             if (lastReportedError != 2) {
                 lastReportedError = 2;
@@ -167,36 +171,38 @@ void ResultedSlatepack::onSgnDecodeSlatepack(QString tag, QString error, QString
     if (slateJson.isEmpty())
         return;
 
-    int txType = int (util::FileTransactionType::RECEIVE);
-    if (tag==FINALIZE_TAG) {
-        txType = int (util::FileTransactionType::FINALIZE);
+    int txType = int(util::FileTransactionType::RECEIVE);
+    if (tag == FINALIZE_TAG) {
+        txType = int(util::FileTransactionType::FINALIZE);
     }
 
     // Normal case:
     // res[0] = transactionId
     // res[1] = amount
-    QVector<QString> parseResult = util->parseSlateContent(slateJson, txType, "" );
-    if (parseResult.size()==1) {
-        if (lastReportedError!=3) {
+    QVector<QString> parseResult = util->parseSlateContent(slateJson, txType, "");
+    if (parseResult.size() == 1) {
+        if (lastReportedError != 3) {
             lastReportedError = 3;
-            control::MessageBox::messageText(this, "Wrong Slatepack", "Unable to parse the decoded Slate.\n" + parseResult[0]);
+            control::MessageBox::messageText(this, "Wrong Slatepack",
+                                             "Unable to parse the decoded Slate.\n" + parseResult[0]);
             ui->finalizeSlatepack->setFocus();
         }
         return; // Some parsing error. We don't printing the error message
     }
-    Q_ASSERT( parseResult.size()>1 );
+    Q_ASSERT(parseResult.size() > 1);
 
     // From init slate we are storing transaction UUID
-    if ( tag == INIT_TAG) {
+    if (tag == INIT_TAG) {
         transactionUUID = parseResult[0];
         return;
     }
 
-    if ( parseResult[0] != transactionUUID ) {
+    if (parseResult[0] != transactionUUID) {
         // It is wrong transaction, let's report it.
-        if (lastReportedError!=1) {
+        if (lastReportedError != 1) {
             lastReportedError = 1;
-            control::MessageBox::messageText(this, "Wrong Slatepack", "Here you can finalize only the Slatepack from this transaction only. This slatepack from different transaction" );
+            control::MessageBox::messageText(this, "Wrong Slatepack",
+                                             "Here you can finalize only the Slatepack from this transaction only. This slatepack from different transaction");
             ui->finalizeSlatepack->setFocus();
         }
         return;
@@ -213,5 +219,25 @@ void ResultedSlatepack::onSgnDecodeSlatepack(QString tag, QString error, QString
     }
 }
 
+void wnd::ResultedSlatepack::on_copySlatepackToClipboardBtn_clicked() {
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    clipboard->setText(slatepack);
+
+    QRect btnPos = ui->copySlatepackToClipboardBtn->geometry();
+    QPoint tooltipPoint(btnPos.left()-10, btnPos.top()-45);
+    tooltipPoint = ui->tab_string->mapToGlobal(tooltipPoint);
+    QToolTip::showText( tooltipPoint,  "Slatepack is copied into the clipboard", this);
+}
+
+void wnd::ResultedSlatepack::on_copyImageToClipboardBtn_clicked() {
+    QImage image = ui->qr_code_window->generateQrImage();
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    clipboard->setImage(image);
+
+    QRect btnPos = ui->copyImageToClipboardBtn->geometry();
+    QPoint tooltipPoint(btnPos.left(), btnPos.top()-45);
+    tooltipPoint = ui->tab_qrcode->mapToGlobal(tooltipPoint);
+    QToolTip::showText( tooltipPoint,  "QR image is copied into the clipboard", this);
+}
 
 }

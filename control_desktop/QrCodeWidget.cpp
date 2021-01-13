@@ -58,10 +58,12 @@ void QrCodeWidget::setContent(QString text) {
     QWidget::repaint();
 }
 
-
-QString QrCodeWidget::generateQrImage(QString fileName) {
-    if (qrSize<1 || svgPath.isEmpty())
-        return "Doesn't have any data to build QR code";
+// Generate the image only.
+QImage QrCodeWidget::generateQrImage() {
+    if (qrSize<=0) {
+        Q_ASSERT(false);
+        return QImage(1, 1, QImage::Format_ARGB32);
+    }
 
     int k = 5;
     while (qrSize * k < 300 )
@@ -76,6 +78,12 @@ QString QrCodeWidget::generateQrImage(QString fileName) {
     // Get QPainter that paints to the image
     QPainter painter(&image);
     renderer.render(&painter);
+
+    return image;
+}
+
+QString QrCodeWidget::generateQrImage(QString fileName) {
+    QImage image = generateQrImage();
 
     // Save, image format based on file extension
     if (! image.save(fileName) )

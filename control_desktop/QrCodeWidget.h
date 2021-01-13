@@ -37,13 +37,17 @@ public:
     // generate image and save it into the path. Return empty String on success. Otherwise String has error message
     // Image fileName must have valid extention. Expected png.
     QString generateQrImage(QString fileName);
+
+    // Generate the image only.
+    QImage generateQrImage();
+
 protected:
     void paintEvent(QPaintEvent *event);
 
 private:
     bridge::Util * util;
     QString encodedData;
-    int     qrSize;
+    int     qrSize = 0;
     QString svgPath;
 };
 

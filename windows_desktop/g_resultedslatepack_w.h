@@ -57,6 +57,10 @@ private slots:
     void onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient);
 
     void sgnFinalizeSlatepack( QString tagId, QString error, QString txUuid );
+    void on_copySlatepackToClipboardBtn_clicked();
+
+    void on_copyImageToClipboardBtn_clicked();
+
 private:
     Ui::ResultedSlatepack *ui;
     bridge::StateMachine * stateMachine = nullptr;
