@@ -20,6 +20,7 @@
 #include <QDebug>
 #include "../util_desktop/timeoutlock.h"
 #include "../dialogs_desktop/e_httplistenerconfigdlg.h"
+#include "../dialogs_desktop/e_httplistenersimpleconfigdlg.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/config_b.h"
 
@@ -258,7 +259,8 @@ void Listening::on_httpConfigButton_clicked()
     util::TimeoutLockObject to("Listening");
 
     // Just start the config dialog. I will take case about itself
-    dlg::HttpListenerConfigDlg optionDlg(this);
+//    dlg::HttpListenerConfigDlg optionDlg(this);
+    dlg::HttpListenerSimpleConfigDlg optionDlg(this);
     optionDlg.exec();
 }
 

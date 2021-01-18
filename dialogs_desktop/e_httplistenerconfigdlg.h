@@ -39,12 +39,6 @@ public:
     explicit HttpListenerConfigDlg(QWidget *parent);
     ~HttpListenerConfigDlg();
 
-signals:
-    // this signal will be sent if user press OK
-    void HttpListenerConfigResult(bool foreignApi,
-        QString foreignApiAddress, QString foreignApiSecret,
-        QString tlsCertificateFile, QString tlsCertificateKey);
-
 private slots:
     void on_selectPrivKeyButton_clicked();
     void on_selectFullchainButton_clicked();
