@@ -5,16 +5,15 @@
 <p style="line-height:150%;">The outputs tab lists the outputs that are currently available to spend in this wallet instance.</p>
 <p style="line-height:150%;">Fields are as follows:</p>
 
-<ol style="-qt-list-indent: 1; margin: 10pt">
-    <li style="line-height:150%;"><b>TX#</b> - The transaction that this output was received by.</li>
-    <li style="line-height:150%;"><b>MWC</b> - The amount of MWC in this output.</li>
-    <li style="line-height:150%;"><b>Confirmed</b> - The number of confirmations this output has.</li>
-    <li style="line-height:150%;"><b>Coinbase</b> - Whether or not this output is a coinbase output (This will probably be NO all the time,
-        unless you are mining to this wallet address).</li>
-    <li style="line-height:150%;"><b>Commitment</b> - The commitment associated with this output.</li>
-    <li style="line-height:150%;"><b>Height</b> - Block Height of this output. This has to do with MWC internal information.</li>
-    <li style="line-height:150%;"><b>Lock height</b> - The height before which this output may be spent.</li>
-</ol>
+<ul style="-qt-list-indent: 1; margin: 10pt">
+    <li style="line-height:150%;">Status of the output: (Unspent, Spent, Locked, Unconfirmed)</li>
+    <li style="line-height:150%;">Block height that output belongs to.</li>
+    <li style="line-height:150%;">The amount of MWC in this output.</li>
+    <li style="line-height:150%;">The commitment associated with this output.</li>
+    <li style="line-height:150%;">Number of confirmations that commitment already get.</li>
+    <li style="line-height:150%;">The optional Lock height. The height after which this output may be spent.</li>
+    <li style="line-height:150%;">Optional output note.</li>
+</ul>
 
 <div align="center" style="font-size:small; font-weight:normal; font-style:normal; color:#9a55d9; background-color:transparent;">
     <p>Any Questions</p>
