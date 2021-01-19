@@ -163,6 +163,9 @@ protected:
                                        const QString & param2,
                                        const QString & param3,
                                        const QString & param4) override;
+
+    virtual QString getHelpDocName() override {return "swap.html";}
+
 private:
     void resetNewSwapData();
 

@@ -7,12 +7,14 @@
 <p style="line-height:150%;">Every transaction has:</p>
 
 <ul style="-qt-list-indent: 1; margin: 10pt">
-    <li style="line-height:150%;">Type - Receive, Send or Cancelled.</li>
-    <li style="line-height:150%;">ID - An identifier of the transaction.</li>
-    <li style="line-height:150%;">Address - The address of the other party to the transaction.</li>
-    <li style="line-height:150%;">Time - Time when the transaction was made.</li>
-    <li style="line-height:150%;">Amount - Amount in MWC.</li>
+    <li style="line-height:150%;">Type of the transaction (Receive, Send or Cancelled) and it status (Confirmed, Unconfirmed, Cancelled).</li>
+    <li style="line-height:150%;">Amount in MWC.</li>
+    <li style="line-height:150%;">UUID identifier of the transaction.</li>
+    <li style="line-height:150%;">The address of the other party to the transaction if it is known. Files and unencrypted Slatepacks transactions can be anonymous.</li>
+    <li style="line-height:150%;">Time when the transaction was made or confirmed.</li>
+    <li style="line-height:150%;">Number of confirmations for confirmed transactions.</li>
     <li style="line-height:150%;">Confrimation - whether or not the transaction has been confirmed to the blockchain.</li>
+    <li style="line-height:150%;">Optional transaction note.</li>
 </ul>
 
 <div align="center" style="font-size:small; font-weight:normal; font-style:normal; color:#9a55d9; background-color:transparent;">

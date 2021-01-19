@@ -98,5 +98,6 @@
         <file>resource/mwc713_mappers.txt</file>
         <file>img/swap_yellow@2x.svg</file>
         <file>help/finalize.html</file>
+        <file>help/swap.html</file>
     </qresource>
 </RCC>
