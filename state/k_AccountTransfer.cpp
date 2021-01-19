@@ -34,6 +34,7 @@ AccountTransfer::AccountTransfer( StateContext * context) :
     connect( context->wallet, &wallet::Wallet::onSetReceiveAccount, this, &AccountTransfer::onSetReceiveAccount, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onSend, this, &AccountTransfer::onSend, Qt::QueuedConnection );
     connect( context->wallet, &wallet::Wallet::onWalletBalanceUpdated, this, &AccountTransfer::onWalletBalanceUpdated, Qt::QueuedConnection );
+    connect( context->wallet, &wallet::Wallet::onNodeStatus, this, &AccountTransfer::onNodeStatus, Qt::QueuedConnection);
 }
 
 AccountTransfer::~AccountTransfer() {
@@ -57,6 +58,11 @@ bool AccountTransfer::transferFunds(const QString & from,
                    const QString & to,
                    const QString & sendAmount ) {
 
+    if ( !nodeIsHealthy ) {
+        core::getWndManager()->messageTextDlg("Unable to transfer", "Your MWC Node, that wallet is connected to, is not ready.\n"
+                                                                 "MWC Node needs to be connected to a few peers and finish block synchronization process");
+        return false;
+    }
 
     QPair<bool, int64_t> mwcAmount;
     if (sendAmount != "All") {
@@ -217,6 +223,11 @@ void AccountTransfer::onWalletBalanceUpdated() {
     transferState = -1;
 }
 
+void AccountTransfer::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
+    Q_UNUSED(errMsg)
+    nodeIsHealthy = online &&
+                    ((config::isColdWallet() || connections > 0) && totalDifficulty > 0 && nodeHeight > peerHeight - 5);
+}
 
 
 }

@@ -45,8 +45,11 @@ private slots:
     void onSend( bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc );
     void onWalletBalanceUpdated();
 
+    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
+
 private:
     int transferState = -1;
+    bool nodeIsHealthy = false;
 
     QString recieveAccount;
     // Single transfer context
