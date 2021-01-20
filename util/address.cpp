@@ -184,6 +184,10 @@ QPair<bool, ADDRESS_TYPE> verifyAddress(QString address) {
         return checkTorAddress(protAddr.second);
     }
 
+    QPair<bool, ADDRESS_TYPE> tor_res = checkTorAddress(protAddr.second);
+    if (tor_res.first)
+        return tor_res; // Tor address
+
     QString protocol = protAddr.first;
     address = protAddr.second;
 
