@@ -143,3 +143,19 @@ Unable to decode the slate data
 # failed finalizing slate!, Wallet store error, DB Not Found Error: Slate id: [33, 35, 98, 2a, b2, 93, 49, 5b, 94, 24, dc, 9e, e7, 3d, 51, c1]
 failed finalizing slate!, Wallet store error, DB Not Found Error:(.*)
 This transaction is already finalized. If you need to repost it, please use 'Transaction' page.
+
+# Adapter Callback Error, Posting transaction slate: Error: {"SlatepackDecodeError":"Unable to decrypt a slatepack, Slatepack decode error, Slate from wrong network"}
+Adapter Callback Error, Posting transaction slate: Error: {"SlatepackDecodeError":"Unable to decrypt a slatepack, Slatepack decode error, Slate from wrong network"}
+Receiver wallet belongs to the different floonet/maninnet network.
+
+# LibWallet Error, Slatepack decode error, Slate from wrong network
+LibWallet Error, Slatepack decode error, Slate from wrong network
+This Slatepack belongs to the different floonet/maninnet network.
+
+# Error: IO error, Unable to build slate from the content, Can't Deserialize slate, Json to SlateV3 conversion failed for {"version_inf....nature":null}}, Fail to parse provable address xmj6hTX7UKAKVfFMt3zgrQWr3At2jqWfGA6BPWr9BWMub4Ag1KVc, Base58 error, Address belong to another network at line 1 column 2590
+Error: IO error, Unable to build slate from the content, Can't Deserialize slate, (.*) Address belong to another network (.*)
+This transaction belongs to the different floonet/maninnet network.
+
+# IO error, Unable to build slate from the content, Can't Deserialize slate, slate from floonet network, expected mainnet network
+IO error, Unable to build slate from the content, Can't Deserialize slate, slate from (*.) network, expected (*.) network
+This transaction belongs to the $1 network, expected $2 network.
