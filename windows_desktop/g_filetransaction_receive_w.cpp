@@ -66,7 +66,7 @@ void FileTransactionReceive::on_processButton_clicked()
 {
     util::TimeoutLockObject to( "FileTransactionReceive" );
 
-    QString description = ui->receiverMessage->toPlainText();
+    QString description = ui->receiverMessage->toPlainText().trimmed().replace('\n', ' ');
 
     {
         QString valRes = util->validateMwc713Str(description);
