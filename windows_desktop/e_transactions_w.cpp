@@ -571,7 +571,8 @@ void Transactions::onSgnCancelTransacton(bool success, QString account, QString 
     util::TimeoutLockObject to("Transactions");
     if (success) {
         requestTransactions();
-        control::MessageBox::messageText(this, "Transaction was cancelled", "Transaction number " + QString::number(trIdx+1) + " was successfully cancelled");
+        // We don't need this confirmation, it makes UX worse
+        //control::MessageBox::messageText(this, "Transaction was cancelled", "Transaction number " + QString::number(trIdx+1) + " was successfully cancelled");
     }
     else {
         control::MessageBox::messageText(this, "Failed to cancel transaction", "Cancel request for transaction number " + QString::number(trIdx+1) + " has failed.\n\n");
