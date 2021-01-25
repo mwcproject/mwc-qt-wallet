@@ -10,9 +10,6 @@ Popup {
 
     closePolicy: Popup.NoAutoClose // To close click the notification or wait 3 seconds
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     Timer {
         id: timer
         interval: 2000 // milliseconds

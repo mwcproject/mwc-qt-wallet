@@ -4,9 +4,6 @@ import QtQuick.Window 2.0
 import ConfigBridge 1.0
 
 Item {
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     function isInteger(value) {
       return /^\d+$/.test(value)
     }

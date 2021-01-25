@@ -13,9 +13,6 @@ Item {
 
     property string docName
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     function updateTitle(state) {
         switch (state) {
         case 4:
@@ -227,7 +224,7 @@ Item {
 
     Rectangle {
         id: navbarTop
-        height: dp(140)
+        height: dp(100)
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -249,14 +246,14 @@ Item {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            height: dp(60)
+            height: dp(50)
             color: "#00000000"
 
             Rectangle {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
-                width: dp(70)
+                width: dp(60)
                 color: "#00000000"
 
                 Rectangle {
@@ -280,7 +277,7 @@ Item {
                 Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
-                    anchors.leftMargin: dp(49)
+                    anchors.leftMargin: dp(50)
                     width: dp(6)
                     height: dp(6)
                     radius: dp(3)
@@ -301,7 +298,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.bold: true
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: dp(17)
+                font.pixelSize: dp(16)
             }
         }
 
@@ -311,14 +308,13 @@ Item {
             height: dp(1)
             color: "#ffffff"
             anchors.top: menuRect.bottom
-            anchors.topMargin: 0
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
         Rectangle {
             id: rect_balance
             width: dp(72) + text_balance.width
-            height: dp(60)
+            height: dp(50)
             color: "#00000000"
             anchors.top: menuRect.bottom
             anchors.horizontalCenter: parent.horizontalCenter
@@ -756,11 +752,6 @@ Item {
             pageName: "Settings"
             imagePath: "../img/NavSettings@2x.svg"
         }
-    }
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
     }
 
     HelpDlg {

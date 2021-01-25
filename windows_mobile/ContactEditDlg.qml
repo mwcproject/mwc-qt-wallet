@@ -6,8 +6,6 @@ import UtilBridge 1.0
 Item {
     property var callback
     property var contactList: []
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     UtilBridge {
         id: util

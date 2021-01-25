@@ -8,9 +8,6 @@ import StartWalletBridge 1.0
 import ConfigBridge 1.0
 
 Item {
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     InputPasswordBridge {
         id: inputPassword
     }
@@ -105,7 +102,7 @@ Item {
         fillMode: Image.PreserveAspectFit
         source: "../img/TBLogo@2x.svg"
         anchors.top: parent.top
-        anchors.topMargin: dp(80)
+        anchors.topMargin: dp(50)
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
@@ -230,8 +227,8 @@ Item {
         model: ListModel {
             id: instanceItems
         }
-        anchors.bottom: text_login.top
-        anchors.bottomMargin: dp(15)
+        anchors.bottom: textfield_password.top
+        anchors.bottomMargin: dp(30)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
@@ -241,24 +238,13 @@ Item {
         font.pixelSize: dp(18)
     }
 
-    Text {
-        id: text_login
-        text: qsTr("Login")
-        color: "white"
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.bottom: textfield_password.top
-        anchors.bottomMargin: dp(10)
-        font.pixelSize: dp(14)
-    }
-
     TextField {
         id: textfield_password
         height: dp(50)
         padding: dp(10)
         leftPadding: dp(20)
-        font.pixelSize: dp(18)
-        placeholderText: qsTr("Type your password")
+        font.pixelSize: textfield_password.text ? dp(10) : dp(18)
+        placeholderText: qsTr("Password")
         echoMode: "Password"
         color: "white"
         text: ""
@@ -284,12 +270,13 @@ Item {
 
     Button {
         id: button_login
-        height: dp(70)
+        height: dp(50)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
         anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: dp(50)
         background: Rectangle {
             id: rectangle
             color: "#00000000"
@@ -333,7 +320,7 @@ Item {
         width: dp(60)
         height: dp(30)
         anchors.top: button_login.bottom
-        anchors.topMargin: dp(40)
+        anchors.topMargin: dp(20)
         anchors.horizontalCenter: parent.horizontalCenter
         color: "#00000000"
         visible: false
@@ -348,7 +335,7 @@ Item {
         anchors.top: rect_progress.bottom
         anchors.topMargin: dp(15)
         anchors.horizontalCenter: parent.horizontalCenter
-        font.pixelSize: dp(17)
+        font.pixelSize: dp(16)
         color: "white"
     }
 
@@ -356,12 +343,12 @@ Item {
         id: image_restore
         width: dp(30)
         height: dp(30)
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: dp(-40)
+        anchors.bottom: image_newinstance.top
         anchors.bottomMargin: dp(30)
         fillMode: Image.PreserveAspectFit
         source: "../img/RestoreBtn@2x.svg"
-        anchors.bottom: image_newinstance.top
-        anchors.horizontalCenter: parent.horizontalCenter
     }
 
     Text {
@@ -389,12 +376,12 @@ Item {
         id: image_newinstance
         width: dp(30)
         height: dp(30)
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: dp(-40)
-        anchors.bottomMargin: dp(30)
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: dp(90)
         fillMode: Image.PreserveAspectFit
         source: "../img/NewInstanceBtn@2x.svg"
-        anchors.bottom: image_help.top
-        anchors.horizontalCenter: parent.horizontalCenter
     }
 
     Text {
@@ -418,33 +405,27 @@ Item {
         }
     }
 
-    Image {
-        id: image_help
-        width: dp(30)
-        height: dp(30)
-        anchors.horizontalCenterOffset: dp(-40)
-        anchors.bottomMargin: dp(90)
-        fillMode: Image.PreserveAspectFit
-        source: "../img/HelpBtn@2x.svg"
-        anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-    }
+//    Image {
+//        id: image_help
+//        width: dp(30)
+//        height: dp(30)
+//        anchors.horizontalCenterOffset: dp(-40)
+//        anchors.bottomMargin: dp(90)
+//        fillMode: Image.PreserveAspectFit
+//        source: "../img/HelpBtn@2x.svg"
+//        anchors.bottom: parent.bottom
+//        anchors.horizontalCenter: parent.horizontalCenter
+//    }
 
-    Text {
-        id: text_help
-        text: qsTr("Help")
-        anchors.leftMargin: dp(20)
-        color: "white"
-        anchors.left: image_help.right
-        anchors.verticalCenter: image_help.verticalCenter
-        font.pixelSize: dp(18)
-    }
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
-    }
-
+//    Text {
+//        id: text_help
+//        text: qsTr("Help")
+//        anchors.leftMargin: dp(20)
+//        color: "white"
+//        anchors.left: image_help.right
+//        anchors.verticalCenter: image_help.verticalCenter
+//        font.pixelSize: dp(18)
+//    }
 }
 
 /*##^##

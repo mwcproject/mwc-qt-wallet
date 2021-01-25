@@ -4,8 +4,6 @@ import QtQuick.Window 2.0
 
 Item {
     property var callback
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     height: text_message.height + dp(300)
     id: messagebox

@@ -6,9 +6,6 @@ import QtWebView 1.1
 Item {
     id: helpDlg
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     function open(docName, html) {
         switch (docName) {
         case 'accounts.html':

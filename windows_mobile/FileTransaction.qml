@@ -9,8 +9,6 @@ Item {
     property string transactionFileName
     property string resTxFN
     property bool isFinalize
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     FileTransactionBridge {
         id: fileTransaction

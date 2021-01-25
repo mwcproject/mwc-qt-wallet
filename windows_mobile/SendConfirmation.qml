@@ -7,8 +7,6 @@ import UtilBridge 1.0
 Item {
     property var callback
     property string blockingPasswordHash
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     height: text_message.height + dp(450)
     id: messagebox

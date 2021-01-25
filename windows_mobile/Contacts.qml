@@ -7,8 +7,6 @@ Item {
     property var contactList: []
     property string prevCBName
     property string prevCBAddress
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     ConfigBridge {
         id: config

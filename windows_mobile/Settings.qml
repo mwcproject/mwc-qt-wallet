@@ -4,9 +4,6 @@ import QtQuick.Window 2.0
 import StateMachineBridge 1.0
 
 Item {
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     StateMachineBridge {
         id: stateMachine
     }
@@ -19,7 +16,7 @@ Item {
 
     Button {
         id: button_wallet_configuration
-        height: dp(72)
+        height: dp(60)
         anchors.bottom: button_listeners.top
         anchors.bottomMargin: dp(23)
         anchors.right: parent.right
@@ -46,9 +43,9 @@ Item {
 
     Button {
         id: button_listeners
-        height: dp(72)
+        height: dp(60)
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: dp(-48)
+        anchors.verticalCenterOffset: dp(-40)
         anchors.right: parent.right
         anchors.rightMargin: dp(75)
         anchors.left: parent.left
@@ -73,9 +70,9 @@ Item {
 
     Button {
         id: button_node_overview
-        height: dp(72)
+        height: dp(60)
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: dp(48)
+        anchors.verticalCenterOffset: dp(40)
         anchors.right: parent.right
         anchors.rightMargin: dp(75)
         anchors.left: parent.left
@@ -100,7 +97,7 @@ Item {
 
     Button {
         id: button_resync
-        height: dp(72)
+        height: dp(60)
         anchors.top: button_node_overview.bottom
         anchors.topMargin: dp(23)
         anchors.right: parent.right

@@ -12,8 +12,6 @@ Item {
     property bool walletLogsEnabled
     property bool autoStartMQSEnabled
     property bool autoStartTorEnabled
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     WalletConfigBridge {
         id: walletConfig

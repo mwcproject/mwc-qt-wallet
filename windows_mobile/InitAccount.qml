@@ -7,9 +7,6 @@ import InitAccountBridge 1.0
 Item {
     property bool isMainNet: true
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     UtilBridge {
         id: util
     }
@@ -35,17 +32,6 @@ Item {
         }
     }
 
-    Text {
-        id: label_instancename
-        text: qsTr("Instance Name")
-        color: "white"
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.bottom: textfield_instancename.top
-        anchors.bottomMargin: dp(10)
-        font.pixelSize: dp(14)
-    }
-
     TextField {
         id: textfield_instancename
         height: dp(50)
@@ -55,8 +41,8 @@ Item {
         placeholderText: qsTr("Name your instance")
         color: "white"
         text: ""
-        anchors.bottom: label_password.top
-        anchors.bottomMargin: dp(15)
+        anchors.bottom: textfield_password.top
+        anchors.bottomMargin: dp(25)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
@@ -75,28 +61,17 @@ Item {
         }
     }
 
-    Text {
-        id: label_password
-        text: qsTr("Password")
-        color: "white"
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.bottom: textfield_password.top
-        anchors.bottomMargin: dp(10)
-        font.pixelSize: dp(14)
-    }
-
     TextField {
         id: textfield_password
         height: dp(50)
         padding: dp(10)
         leftPadding: dp(20)
-        font.pixelSize: dp(18)
-        placeholderText: qsTr("Type your password")
+        font.pixelSize: textfield_password.text ? dp(10) : dp(18)
+        placeholderText: qsTr("Password")
         echoMode: "Password"
         color: "white"
         text: ""
-        anchors.bottom: rect_pwdcomment.visible ? rect_pwdcomment.top : label_confirm.top
+        anchors.bottom: rect_pwdcomment.visible ? rect_pwdcomment.top : textfield_confirm.top
         anchors.bottomMargin: rect_pwdcomment.visible ? dp(5) : dp(15)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
@@ -137,7 +112,7 @@ Item {
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        anchors.bottom: label_confirm.top
+        anchors.bottom: textfield_confirm.top
         anchors.bottomMargin: dp(15)
         visible: text_pwdcomment.text
 
@@ -154,29 +129,18 @@ Item {
         }
     }
 
-    Text {
-        id: label_confirm
-        text: qsTr("Confirm Password")
-        color: "white"
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.bottom: textfield_confirm.top
-        anchors.bottomMargin: dp(10)
-        font.pixelSize: dp(14)
-    }
-
     TextField {
         id: textfield_confirm
         height: dp(50)
         padding: dp(10)
         leftPadding: dp(20)
-        font.pixelSize: dp(18)
-        placeholderText: qsTr("Re-type your password")
+        font.pixelSize: textfield_confirm.text ? dp(10) : dp(18)
+        placeholderText: qsTr("Confirm password")
         echoMode: "Password"
         color: "white"
         text: ""
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: text_pwdcomment.height ? text_pwdcomment.height : text_pwdcomment.height
+        anchors.verticalCenterOffset: rect_pwdcomment.height ? rect_pwdcomment.height : 0
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
@@ -270,8 +234,8 @@ Item {
 
     Button {
         id: button_next
-        height: dp(70)
-        width: dp(180)
+        height: dp(50)
+        width: dp(150)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: rect_network.bottom
         anchors.topMargin: dp(50)
@@ -325,12 +289,6 @@ Item {
             initAccount.submitWalletCreateChoices(isMainNet ? 1 : 2, textfield_instancename.text) // first param: MWC_NETWORK, second param: New Instance Name
         }
     }
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
-    }
-
 }
 
 /*##^##

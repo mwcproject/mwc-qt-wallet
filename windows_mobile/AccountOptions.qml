@@ -6,8 +6,6 @@ import WalletBridge 1.0
 
 Item {
     property string passwordHash
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     StateMachineBridge {
         id: stateMachine
@@ -31,7 +29,7 @@ Item {
 
     Button {
         id: button_show_passphrase
-        height: dp(72)
+        height: dp(60)
         anchors.bottom: button_list_contacts.top
         anchors.bottomMargin: dp(23)
         anchors.right: parent.right
@@ -69,7 +67,7 @@ Item {
 
     Button {
         id: button_list_contacts
-        height: dp(72)
+        height: dp(60)
         anchors.right: parent.right
         anchors.rightMargin: dp(75)
         anchors.left: parent.left
@@ -95,7 +93,7 @@ Item {
 
     Button {
         id: button_log_out
-        height: dp(72)
+        height: dp(60)
         anchors.top: button_list_contacts.bottom
         anchors.topMargin: dp(23)
         anchors.right: parent.right

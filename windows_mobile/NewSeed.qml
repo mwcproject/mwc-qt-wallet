@@ -4,13 +4,25 @@ import QtQuick.Window 2.0
 import NewSeedBridge 1.0
 
 Item {
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     function init(seed, hideSubmitButton) {
-        text_seed.text = seed.replace(/\s/g, "    ")
-        testSeed = seed.split(" ")
+        const words = seed.split(" ")
+//        testSeed = words
+        setTextSeed(words.slice(0, 24))
         button_next.visible = !hideSubmitButton
+    }
+
+    function setTextSeed(words) {
+        text_seed.text = ""
+        for(let i = 0; i < words.length; i++) {
+            text_seed.text += words[i]
+            if (i === words.length - 1)
+                break
+            if (i % 6 === 5) {
+                text_seed.text += "\n"
+            } else {
+                text_seed.text += "    "
+            }
+        }
     }
 
     NewSeedBridge {
@@ -24,8 +36,7 @@ Item {
                 messagebox.open(qsTr("Getting Passphrase Failure"), qsTr("Unable to retrieve a passphrase from mwc713. " + (seed.length > 0 ? seed[0] : "")))
                 return;
             }
-            text_seed.text = ""
-            seed.forEach(word => text_seed.text += word + "    ")
+            setTextSeed(seed)
         }
     }
 
@@ -33,8 +44,8 @@ Item {
         id: rect_phrase
         height: text_seed.height + dp(90)
         color: "#33bf84ff"
-        anchors.verticalCenterOffset: -rect_phrase.height/2 - dp(20)
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.top: parent.top
+        anchors.topMargin: dp(20)
         anchors.right: parent.right
         anchors.rightMargin: dp(15)
         anchors.left: parent.left
@@ -86,7 +97,7 @@ Item {
             anchors.rightMargin: dp(35)
             anchors.left: parent.left
             anchors.leftMargin: dp(35)
-            font.pixelSize: dp(18)
+            font.pixelSize: dp(16)
             lineHeight: 2.0
         }
     }
@@ -107,8 +118,8 @@ Item {
 
     Button {
         id: button_next
-        height: dp(70)
-        width: dp(180)
+        height: dp(50)
+        width: dp(150)
         visible: false
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: label_description.bottom
@@ -132,11 +143,6 @@ Item {
         onClicked: {
             newSeed.doneWithNewSeed()
         }
-    }
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
     }
 }
 

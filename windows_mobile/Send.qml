@@ -7,8 +7,6 @@ import ConfigBridge 1.0
 
 Item {
     property bool showGenProofWarning: false
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     WalletBridge {
         id: wallet

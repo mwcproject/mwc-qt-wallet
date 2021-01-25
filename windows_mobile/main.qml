@@ -15,8 +15,10 @@ Window {
     property int questionTextDlgResponse
     property int sendConformationDlgResponse
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
+//    readonly property int dpi: Screen.pixelDensity * 25.4
+//    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
+    readonly property int dpi: Screen.pixelDensity / 7
+    function dp(x) { return x * dpi }
 
     CoreWindowBridge {
         id: coreWindow
@@ -67,8 +69,8 @@ Window {
             const params = JSON.parse(initParams)
             if (params.currentStep)
                 newInstanceItem.updateCurrentStep(params)
-            else if(params.msgProgress)
-                progressWndItem.init(params.callerId, params.msgProgress)
+            else
+                progressWndItem.init(params)
         }
     }
 

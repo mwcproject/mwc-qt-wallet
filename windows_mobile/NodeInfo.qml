@@ -7,9 +7,6 @@ Item {
     property string lastShownErrorMessage
     property int nodeHeightDiffLimit: 5
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     NodeInfoBridge {
         id: nodeInfo
     }

@@ -5,9 +5,6 @@ import WalletBridge 1.0
 import AccountTransferBridge 1.0
 
 Item {
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     WalletBridge {
         id: wallet
     }

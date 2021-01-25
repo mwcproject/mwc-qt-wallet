@@ -6,10 +6,8 @@ import UtilBridge 1.0
 Item {
     property var callback
     property string blockingPasswordHash
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
-    height: text_message.height + dp(250)
+    height: text_message.height + dp(220)
     id: messagebox
     visible: false
     anchors.left: parent.left
@@ -88,10 +86,10 @@ Item {
             id: text_title
             text: qsTr("Title")
             font.bold: true
-            anchors.bottom: text_message.top
-            anchors.bottomMargin: dp(30)
+            anchors.verticalCenter: image_close.verticalCenter
+            anchors.verticalCenterOffset: dp(5)
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(20)
+            font.pixelSize: dp(22)
             color: "#3600c9"
         }
 
@@ -106,7 +104,7 @@ Item {
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: dp(21)
+            font.pixelSize: dp(18)
             color: "#3600C9"
         }
 
