@@ -1,0 +1,65 @@
+# This Workflow Autogenerates a Changelog as Release_Notes.md
+# It has 2 collapsible sections with Issue and Commit based Changelogs
+# Sadly there is no way provided by the used Node Module to combine both of those natively
+# There would be an option to overwrite the release page's content directly, but then we can only use 1 or the other and this is not included in this action as of now.
+# Instead manually copy and pase the Release_Notes content as wanted. 
+
+name: AutoGen Changelog
+
+on:
+  # Only Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Install GREN Bot
+        run: sudo npm install github-release-notes -g
+
+       #  - name: Initialize GREN and set template structure
+       #    run: gren init
+
+      # Runs a set of commands using the runners shell
+      - name: Build Changelog based on Issues
+        run: |
+         gren changelog --generate --override --changelog-filename=RELEASE_NOTES_Features.md --repo=mwc-qt-wallet -T $GREN_TOKEN 
+        
+        env:
+          #This accesses a secret Env Variable stored for this Repo. Needs to contain a "Personal access token" for "Repo" Scope that has access. (A Dev can create this token himself - only works if he has access to the repo obviously) 
+          GREN_TOKEN: ${{ secrets.GREN_PAT }}
+
+      # Runs a set of commands using the runners shell
+      - name: Build Changelog based on Commits (and append below)
+        run: |
+         gren changelog --generate --override --changelog-filename=RELEASE_NOTES_Commits.md --repo=mwc-qt-wallet -T $GREN_TOKEN -D commits -c ./.github/workflows/.changelog_config.js -C "Autogenerate Changelog"
+         
+        env:
+          #This accesses a secret Env Variable stored for this Repo. Needs to contain a "Personal access token" for "Repo" Scope that has access. (A Dev can create this token himself - only works if he has access to the repo obviously) 
+          GREN_TOKEN: ${{ secrets.GREN_PAT }}
+          
+          
+      - name: Prepare Changelog (beautifying)
+        run: |
+          echo -e "There are 2 types of Release Notes availlable:\n<details>\n  <summary>Issue-based</summary>\n\n" > start.md
+          echo -e  "</details>\n<details>\n  <summary>Commit-based</summary>\n\n" > seperator.md
+          echo -e  "</details>\n" > end.md
+          ls
+      - name: Push updated Changelog to remote
+        run: |
+
+          cat start.md RELEASE_NOTES_Features.md seperator.md RELEASE_NOTES_Commits.md end.md > Release_notes.md
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          sudo rm start.md && sudo rm seperator.md && sudo rm end.md && sudo rm RELEASE_NOTES_Commits.md && sudo rm RELEASE_NOTES_Features.md
+          git add -A
+          git commit -m "Autogenerate Changelog"
+          git push
+ 
