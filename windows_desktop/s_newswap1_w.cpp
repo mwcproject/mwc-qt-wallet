@@ -198,13 +198,6 @@ void NewSwap1::updateSecCurrencyStatus() {
     ui->rateLabel->setText("MWC to " + selectedCur + " rate:");
     ui->secAddressEdit->setText("");
     QString addressPlaceholderText = selectedCur + " address to receive the coins";
-    if (selectedCur=="BTC") {
-        //
-        if (config->getNetwork().contains("main", Qt::CaseSensitivity::CaseInsensitive ))
-            addressPlaceholderText = "BTC Legacy address. Leading symbol '1'";
-        else
-            addressPlaceholderText = "BTC testnet Legacy address. Leading symbol 'm' or 'n'";
-    }
     ui->secAddressEdit->setPlaceholderText(addressPlaceholderText);
     ui->receiveLabel->setText(selectedCur + " receiving address:");
 

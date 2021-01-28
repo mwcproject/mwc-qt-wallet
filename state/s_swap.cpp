@@ -57,7 +57,7 @@ struct SecCurrencyInfo {
 //  https://b10c.me/blog/003-a-list-of-public-bitcoin-feerate-estimation-apis/
 // We selected this:  https://www.bitgo.com/api/v2/btc/tx/fee
 static QVector<SecCurrencyInfo> SWAP_CURRENCY_LIST = {
-        SecCurrencyInfo("BTC", 600, 6, "satoshi per byte", -1.0),
+        SecCurrencyInfo("BTC", 600, 3, "satoshi per byte", -1.0),
         SecCurrencyInfo("BCH", 600, 15, "satoshi per byte", 3.0 ),
 };
 

@@ -159,3 +159,7 @@ This transaction belongs to the different floonet/maninnet network.
 # IO error, Unable to build slate from the content, Can't Deserialize slate, slate from floonet network, expected mainnet network
 IO error, Unable to build slate from the content, Can't Deserialize slate, slate from (*.) network, expected (*.) network
 This transaction belongs to the $1 network, expected $2 network.
+
+#Swap Error , Electrum Node error, Received error: the transaction was rejected by network rules. dust [............]
+Swap Error , Electrum Node error, Received error: the transaction was rejected by network rules. dust(.*)
+Your BTC transaction can't be posted because fees are higher then amount. Please reduce the transaciton fee, so amount can cover them.

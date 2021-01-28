@@ -503,7 +503,7 @@
              <string notr="true">color: rgba(255,255,255, 0.7)</string>
             </property>
             <property name="text">
-             <string>FORMATS:    [mwcmqs://]&lt;mqs_address&gt;    http://&lt;tor_address&gt;.onion</string>
+             <string>FORMATS:    [mwcmqs://]&lt;mqs_address&gt;    [http://]&lt;tor_address&gt;[.onion]</string>
             </property>
             <property name="textFormat">
              <enum>Qt::PlainText</enum>
