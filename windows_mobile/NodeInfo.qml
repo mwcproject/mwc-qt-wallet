@@ -7,9 +7,6 @@ Item {
     property string lastShownErrorMessage
     property int nodeHeightDiffLimit: 5
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     NodeInfoBridge {
         id: nodeInfo
     }
@@ -56,14 +53,21 @@ Item {
         }
     }
 
+    onVisibleChanged: {
+        if (visible) {
+            if (parent.height > dp(470)) {
+                anchors.topMargin = (parent.height - dp(470)) / 2
+            }
+        }
+    }
+
     Rectangle {
         id: rect_status
-        width: dp(180)
-        height: dp(230)
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: dp(-150)
-        anchors.horizontalCenterOffset: dp(-120)
-        anchors.horizontalCenter: parent.horizontalCenter
+        width: dp(160)
+        height: dp(210)
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.leftMargin: (parent.width / 2 - dp(160)) / 2
         color: "#00000000"
         border.color: "white"
         border.width: dp(2)
@@ -71,8 +75,8 @@ Item {
 
         Image {
             id: image_status
-            width: dp(100)
-            height: dp(100)
+            width: dp(80)
+            height: dp(80)
             anchors.top: parent.top
             anchors.topMargin: dp(20)
             anchors.horizontalCenter: parent.horizontalCenter
@@ -113,12 +117,11 @@ Item {
 
     Rectangle {
         id: rect_connections
-        width: dp(180)
-        height: dp(230)
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: dp(-150)
-        anchors.horizontalCenterOffset: dp(120)
-        anchors.horizontalCenter: parent.horizontalCenter
+        width: dp(160)
+        height: dp(210)
+        anchors.verticalCenter: rect_status.verticalCenter
+        anchors.right: parent.right
+        anchors.rightMargin: (parent.width / 2 - dp(160)) / 2
         color: "#00000000"
         border.color: "white"
         border.width: dp(2)
@@ -126,8 +129,8 @@ Item {
 
         Image {
             id: image_connections
-            width: dp(100)
-            height: dp(100)
+            width: dp(80)
+            height: dp(80)
             anchors.top: parent.top
             anchors.topMargin: dp(20)
             anchors.horizontalCenter: parent.horizontalCenter
@@ -168,12 +171,11 @@ Item {
 
     Rectangle {
         id: rect_blocks
-        width: dp(180)
-        height: dp(230)
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: dp(150)
-        anchors.horizontalCenterOffset: dp(-120)
-        anchors.horizontalCenter: parent.horizontalCenter
+        width: dp(160)
+        height: dp(210)
+        anchors.top: rect_status.bottom
+        anchors.topMargin: dp(50)
+        anchors.horizontalCenter: rect_status.horizontalCenter
         color: "#00000000"
         border.color: "white"
         border.width: dp(2)
@@ -181,8 +183,8 @@ Item {
 
         Image {
             id: image_blocks
-            width: dp(100)
-            height: dp(100)
+            width: dp(80)
+            height: dp(80)
             anchors.top: parent.top
             anchors.topMargin: dp(20)
             anchors.horizontalCenter: parent.horizontalCenter
@@ -223,12 +225,10 @@ Item {
 
     Rectangle {
         id: rect_difficulty
-        width: dp(180)
-        height: dp(230)
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: dp(150)
-        anchors.horizontalCenterOffset: dp(120)
-        anchors.horizontalCenter: parent.horizontalCenter
+        width: dp(160)
+        height: dp(210)
+        anchors.verticalCenter: rect_blocks.verticalCenter
+        anchors.horizontalCenter: rect_connections.horizontalCenter
         color: "#00000000"
         border.color: "white"
         border.width: dp(2)
@@ -236,8 +236,8 @@ Item {
 
         Image {
             id: image_difficulty
-            width: dp(100)
-            height: dp(100)
+            width: dp(80)
+            height: dp(80)
             anchors.top: parent.top
             anchors.topMargin: dp(20)
             anchors.horizontalCenter: parent.horizontalCenter
@@ -274,10 +274,5 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             font.pixelSize: dp(17)
         }
-    }
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
     }
 }

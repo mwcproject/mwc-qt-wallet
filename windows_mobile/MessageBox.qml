@@ -6,10 +6,7 @@ import UtilBridge 1.0
 Item {
     property var callback
     property string blockingPasswordHash
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
-    height: text_message.height + dp(250)
     id: messagebox
     visible: false
     anchors.left: parent.left
@@ -23,18 +20,27 @@ Item {
         label_password.visible = false
         textfield_password.visible = false
         textfield_password.text = ""
+
+        // adjust messagebox height
+        messagebox.height = text_message.height + dp(200)
+        text_message.anchors.verticalCenterOffset = 0
+
         if (isTwoButtons) {
             text_yesbutton.text = yesBtnText
             text_nobutton.text = noBtnText
             button_ok.visible = false
             button_yes.visible = true
+            button_yes.enabled = true
             button_no.visible = true
+            button_no.enabled = true
             callback = _callback
             blockingPasswordHash = ""
 
             if (passwordHash !== "") {
-                messagebox.height = text_message.height + dp(350)
+                // adjust messagebox height
+                messagebox.height = text_message.height + dp(330)
                 text_message.anchors.verticalCenterOffset = dp(-50)
+
                 label_password.visible = true
                 textfield_password.visible = true
                 if (blockButton === 0) {
@@ -88,10 +94,10 @@ Item {
             id: text_title
             text: qsTr("Title")
             font.bold: true
-            anchors.bottom: text_message.top
-            anchors.bottomMargin: dp(30)
+            anchors.verticalCenter: image_close.verticalCenter
+            anchors.verticalCenterOffset: dp(5)
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(20)
+            font.pixelSize: dp(22)
             color: "#3600c9"
         }
 
@@ -106,7 +112,7 @@ Item {
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: dp(21)
+            font.pixelSize: dp(18)
             color: "#3600C9"
         }
 
@@ -122,7 +128,7 @@ Item {
             text: qsTr("Input your password to continue:")
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            font.pixelSize: dp(20)
+            font.pixelSize: dp(18)
             color: "#3600C9"
         }
 
@@ -132,7 +138,7 @@ Item {
             height: dp(50)
             padding: dp(10)
             leftPadding: dp(20)
-            font.pixelSize: dp(18)
+            font.pixelSize: textfield_password.text ? dp(10) : dp(18)
             placeholderText: qsTr("Password")
             echoMode: "Password"
             color: "#3600C9"
@@ -198,7 +204,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.right: parent.right
-            anchors.rightMargin: parent.width / 2 - dp(150)
+            anchors.rightMargin: parent.width / 2 - dp(170)
 
             background: Rectangle {
                 color: button_yes.enabled ? "#6F00D6" : "white"
@@ -228,7 +234,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.left: parent.left
-            anchors.leftMargin: parent.width / 2 - dp(150)
+            anchors.leftMargin: parent.width / 2 - dp(170)
 
             background: Rectangle {
                 color: "#ffffff"

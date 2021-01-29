@@ -4,9 +4,6 @@ import QtQuick.Window 2.0
 import NewSeedBridge 1.0
 
 Item {
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     function init(wordIndex) {
         textfield_word.placeholderText = "Please enter word number " + Number(wordIndex).toString()
         textfield_word.clear()
@@ -33,21 +30,9 @@ Item {
         anchors.rightMargin: dp(50)
         anchors.left: parent.left
         anchors.leftMargin: dp(50)
-        anchors.bottom: label_word.top
+        anchors.bottom: textfield_word.top
         anchors.bottomMargin: dp(50)
         font.pixelSize: dp(16)
-    }
-
-    Text {
-        id: label_word
-        text: qsTr("Verify Recovery Phrase")
-        color: "#ffffff"
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.bottom: textfield_word.top
-        anchors.bottomMargin: dp(10)
-        font.pixelSize: dp(16)
-
     }
 
     TextField {
@@ -81,8 +66,8 @@ Item {
 
     Button {
         id: button_back
-        height: dp(70)
-        width: parent.width / 2 - dp(60)
+        height: dp(50)
+        width: parent.width / 2 - dp(70)
         anchors.top: textfield_word.bottom
         anchors.topMargin: dp(40)
         anchors.left: parent.left
@@ -108,8 +93,8 @@ Item {
 
     Button {
         id: button_next
-        height: dp(70)
-        width: parent.width / 2 - dp(60)
+        height: dp(50)
+        width: parent.width / 2 - dp(70)
         anchors.top: textfield_word.bottom
         anchors.topMargin: dp(40)
         anchors.right: parent.right

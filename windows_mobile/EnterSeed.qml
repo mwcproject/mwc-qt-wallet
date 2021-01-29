@@ -5,9 +5,6 @@ import InitAccountBridge 1.0
 import UtilBridge 1.0
 
 Item {
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     InitAccountBridge {
         id: initAccount
     }
@@ -30,8 +27,8 @@ Item {
         height: dp(20)
         anchors.left: parent.left
         anchors.leftMargin: dp(50)
-        anchors.bottom: rect_splitter.top
-        anchors.bottomMargin: dp(15)
+        anchors.top: parent.top
+        anchors.topMargin: dp(40)
     }
 
     Text {
@@ -53,25 +50,25 @@ Item {
         anchors.leftMargin: dp(50)
         anchors.right: parent.right
         anchors.rightMargin: dp(50)
-        anchors.bottom: textfield_seed.top
-        anchors.bottomMargin: dp(25)
+        anchors.top: image_phrase.bottom
+        anchors.topMargin: dp(10)
     }
 
     TextField {
         id: textfield_seed
-        height: dp(300)
+        height: dp(200)
         padding: dp(20)
         anchors.left: parent.left
         anchors.leftMargin: dp(50)
         anchors.right: parent.right
         anchors.rightMargin: dp(50)
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: dp(-40)
+        anchors.top: rect_splitter.bottom
+        anchors.topMargin: dp(25)
         color: "#ffffff"
         text: ""
-        placeholderText: "Please enter your entire \nrecovery phrase here"
+        placeholderText: "Please enter your entire recovery phrase here"
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        font.pixelSize: dp(22)
+        font.pixelSize: dp(16)
         horizontalAlignment: Text.AlignLeft
         verticalAlignment: Text.AlignTop
 
@@ -90,11 +87,11 @@ Item {
 
     Button {
         id: button_next
-        height: dp(70)
-        width: dp(180)
+        height: dp(50)
+        width: dp(150)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: textfield_seed.bottom
-        anchors.topMargin: dp(80)
+        anchors.topMargin: dp(70)
         background: Rectangle {
             color: "#00000000"
             radius: dp(5)
@@ -137,10 +134,5 @@ Item {
 
             initAccount.createWalletWithSeed(seed)
         }
-    }
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
     }
 }

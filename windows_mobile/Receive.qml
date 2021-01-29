@@ -10,8 +10,6 @@ import Clipboard 1.0
 
 Item {
     property string proofAddr
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     ConfigBridge {
         id: config
@@ -67,6 +65,10 @@ Item {
 
     onVisibleChanged: {
         if (visible) {
+            if (parent.height > dp(460)) {
+                anchors.topMargin = (parent.height - dp(460)) / 2
+            }
+
             rect_progress.visible = false
             if (config.hasTls()) {
                 text_http.text = qsTr("Https")
@@ -104,9 +106,8 @@ Item {
     Rectangle {
         id: rect_mwcmq
         width: dp(150)
-        height: dp(40)
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: dp(-250)
+        height: dp(35)
+        anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: dp(-100)
         border.color: "white"
@@ -119,8 +120,8 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: dp(10)
             anchors.verticalCenter: parent.verticalCenter
-            width: dp(20)
-            height: dp(20)
+            width: dp(17)
+            height: dp(17)
         }
 
         Text {
@@ -137,7 +138,7 @@ Item {
     Rectangle {
         id: rect_tor
         width: dp(150)
-        height: dp(40)
+        height: dp(35)
         anchors.top: rect_mwcmq.bottom
         anchors.topMargin: dp(20)
         anchors.horizontalCenter: parent.horizontalCenter
@@ -152,8 +153,8 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: dp(10)
             anchors.verticalCenter: parent.verticalCenter
-            width: dp(20)
-            height: dp(20)
+            width: dp(17)
+            height: dp(17)
         }
 
         Text {
@@ -170,9 +171,8 @@ Item {
     Rectangle {
         id: rect_http
         width: dp(150)
-        height: dp(40)
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: dp(-250)
+        height: dp(35)
+        anchors.verticalCenter: rect_mwcmq.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: dp(100)
         border.color: "white"
@@ -185,8 +185,8 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: dp(10)
             anchors.verticalCenter: parent.verticalCenter
-            width: dp(20)
-            height: dp(20)
+            width: dp(17)
+            height: dp(17)
         }
 
         Text {
@@ -213,16 +213,16 @@ Item {
 
     ComboBox {
         id: accountComboBox
-        height: dp(72)
+        height: dp(60)
         anchors.right: parent.right
         anchors.rightMargin: dp(30)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         anchors.top: label_combobox.bottom
-        anchors.topMargin: dp(10)
+        anchors.topMargin: dp(15)
         leftPadding: dp(20)
         rightPadding: dp(40)
-        font.pixelSize: dp(14)
+        font.pixelSize: dp(15)
 
         onCurrentIndexChanged: {
             if (accountComboBox.currentIndex >= 0) {
@@ -233,7 +233,7 @@ Item {
 
         delegate: ItemDelegate {
             width: accountComboBox.width
-            height: dp(72)
+            height: dp(60)
             contentItem: Text {
                 text: info
                 color: "white"
@@ -291,7 +291,7 @@ Item {
         }
 
         background: Rectangle {
-            implicitHeight: dp(72)
+            implicitHeight: dp(60)
             radius: dp(4)
             color: "#8633E0"
         }
@@ -335,20 +335,21 @@ Item {
         id: label_online_methods
         color: "#ffffff"
         text: qsTr("Online Methods")
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.top: accountComboBox.bottom
+        anchors.topMargin: dp(30)
         anchors.left: parent.left
-        anchors.leftMargin: dp(36)
+        anchors.leftMargin: dp(30)
         font.pixelSize: dp(14)
     }
 
     Button {
         id: button_mwcmq
-        width: parent.width / 2 - dp(40)
-        height: dp(72)
+        width: parent.width / 2 - dp(50)
+        height: dp(50)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         anchors.top: label_online_methods.bottom
-        anchors.topMargin: dp(17)
+        anchors.topMargin: dp(15)
         background: Rectangle {
             color: "#00000000"
             radius: dp(5)
@@ -358,7 +359,7 @@ Item {
                 text: qsTr("MWCMQ")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
+                font.pixelSize: dp(17)
                 color: "white"
             }
         }
@@ -371,8 +372,8 @@ Item {
 
     Button {
         id: button_tor
-        width: parent.width / 2 - dp(40)
-        height: dp(72)
+        width: parent.width / 2 - dp(50)
+        height: dp(50)
         anchors.right: parent.right
         anchors.rightMargin: dp(30)
         anchors.verticalCenter: button_mwcmq.verticalCenter
@@ -382,38 +383,10 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("TOR")
+                text: qsTr("TOR & Proof")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
-                color: "white"
-            }
-        }
-        onClicked: {
-            clipboard.text = wallet.getTorAddress()
-            notification.text = "Address copied to the clipboard"
-            notification.open()
-        }
-    }
-
-    Button {
-        id: button_proof
-        width: parent.width / 2 - dp(40)
-        height: dp(72)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(30)
-        anchors.top: button_mwcmq.bottom
-        anchors.topMargin: dp(20)
-        background: Rectangle {
-            color: "#00000000"
-            radius: dp(5)
-            border.color: "white"
-            border.width: dp(2)
-            Text {
-                text: qsTr("Proof Address")
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
+                font.pixelSize: dp(17)
                 color: "white"
             }
         }
@@ -429,8 +402,9 @@ Item {
         color: "#BF84FF"
         text: "(Copies address to clipboard)"
         horizontalAlignment: Text.AlignHCenter
-        anchors.horizontalCenter: button_tor.horizontalCenter
-        anchors.verticalCenter: button_proof.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: button_mwcmq.bottom
+        anchors.topMargin: dp(20)
         font.pixelSize: dp(13)
     }
 
@@ -439,20 +413,20 @@ Item {
         color: "#ffffff"
         text: qsTr("Offline Method")
         anchors.left: parent.left
-        anchors.leftMargin: dp(36)
-        anchors.top: button_proof.bottom
-        anchors.topMargin: dp(35)
+        anchors.leftMargin: dp(30)
+        anchors.top: label_copy_clipboard.bottom
+        anchors.topMargin: dp(30)
         font.pixelSize: dp(14)
     }
 
     Button {
         id: button_file
         width: button_mwcmq.width
-        height: dp(72)
+        height: dp(50)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         anchors.top: label_offline_methods.bottom
-        anchors.topMargin: dp(17)
+        anchors.topMargin: dp(15)
         background: Rectangle {
             color: "#00000000"
             radius: dp(5)
@@ -462,7 +436,7 @@ Item {
                 text: qsTr("Receive by File")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
+                font.pixelSize: dp(17)
                 color: "white"
             }
         }
@@ -522,15 +496,10 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: -notification.width / 2
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(50)
+        anchors.bottomMargin: dp(20)
         Notification {
             id: notification
         }
-    }
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
     }
 }
 

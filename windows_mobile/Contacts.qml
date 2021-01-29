@@ -7,8 +7,6 @@ Item {
     property var contactList: []
     property string prevCBName
     property string prevCBAddress
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     ConfigBridge {
         id: config
@@ -17,6 +15,7 @@ Item {
     function updateContactsList() {
         const pairs = config.getContactsAsPairs()
         contactsModel.clear()
+        contactList = []
         for (let i = 0; i < pairs.length; i += 2) {
             contactList.push({
                  name: pairs[i],
@@ -72,7 +71,7 @@ Item {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.top: rect_buttons.bottom
-        anchors.topMargin: dp(15)
+        anchors.topMargin: dp(10)
         model: contactsModel
         delegate: contactsDelegate
         focus: true
@@ -81,16 +80,16 @@ Item {
     Component {
         id: contactsDelegate
         Rectangle {
-            height: dp(140)
+            height: dp(130)
             color: "#00000000"
             anchors.left: parent.left
             anchors.right: parent.right
 
             Rectangle {
-                height: dp(130)
+                height: dp(120)
                 color: "#33bf84ff"
                 anchors.top: parent.top
-                anchors.topMargin: dp(15)
+                anchors.topMargin: dp(10)
                 anchors.right: parent.right
                 anchors.rightMargin: dp(20)
                 anchors.left: parent.left
@@ -129,17 +128,17 @@ Item {
                     anchors.right: parent.right
                     anchors.rightMargin: dp(150)
                     wrapMode: Text.WrapAnywhere
-                    font.pixelSize: dp(15)
+                    font.pixelSize: dp(14)
                 }
 
                 Image {
                     id: image_edit
                     anchors.right: parent.right
-                    anchors.rightMargin: dp(85)
+                    anchors.rightMargin: dp(80)
                     anchors.top: parent.top
                     anchors.topMargin: dp(70)
-                    width: dp(40)
-                    height: dp(40)
+                    width: dp(35)
+                    height: dp(35)
                     fillMode: Image.PreserveAspectFit
                     source: "../img/Edit@2x.svg"
 
@@ -160,8 +159,8 @@ Item {
                     anchors.rightMargin: dp(35)
                     anchors.top: parent.top
                     anchors.topMargin: dp(70)
-                    width: dp(40)
-                    height: dp(40)
+                    width: dp(35)
+                    height: dp(35)
                     fillMode: Image.PreserveAspectFit
                     source: "../img/Delete@2x.svg"
 
@@ -183,7 +182,8 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        height: dp(55)
+        anchors.topMargin: dp(10)
+        height: dp(50)
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop {
@@ -199,7 +199,7 @@ Item {
 
         Rectangle {
             width: dp(250)
-            height: dp(45)
+            height: dp(40)
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
             color: "#00000000"
@@ -208,8 +208,8 @@ Item {
                 id: image_add
                 anchors.top: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: dp(45)
-                height: dp(45)
+                width: dp(40)
+                height: dp(40)
                 fillMode: Image.PreserveAspectFit
                 source: "../img/Add@2x.svg"
 

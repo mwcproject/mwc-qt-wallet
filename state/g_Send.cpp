@@ -341,7 +341,7 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
     QString hash = context->wallet->getPasswordHash();
     if ( core::getWndManager()->sendConfirmationDlg("Confirm Send Request",
                                         "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " MWC from account: " + account +
-                                        "\nTo: " + address +
+                                        "\n\nTo: " + address +
                                         (respProofAddress.isEmpty() ? "" : "\n\nReceiver wallet proof address:\n" + respProofAddress) +
                                         "\n\nTransaction fee: " + txnFeeStr,
                                         1.0, hash ) ) {

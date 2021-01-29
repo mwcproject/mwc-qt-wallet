@@ -15,8 +15,8 @@ Window {
     property int questionTextDlgResponse
     property int sendConformationDlgResponse
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
+    readonly property double dpi: 3.0 + (Screen.pixelDensity - 22.1) / 19
+    function dp(x) { return x * dpi }
 
     CoreWindowBridge {
         id: coreWindow
@@ -64,12 +64,11 @@ Window {
     function updateInitParams(newParams) {
         initParams = newParams
         if (currentState === 2 || currentState === 18) {
-            progressWndItem.visible = false
             const params = JSON.parse(initParams)
             if (params.currentStep)
                 newInstanceItem.updateCurrentStep(params)
             else
-                progressWndItem.init(params.callerId,params.msgProgress)
+                progressWndItem.init(params)
         }
     }
 
@@ -99,6 +98,12 @@ Window {
 
     function openSendConfirmationDlg(title, message, passwordHash) {
         sendConfirmationItem.open(title, message, passwordHash, sendConfirmationDlgCallback)
+    }
+
+    onVisibilityChanged: {
+        if (visible) {
+            console.log(123, Screen.pixelDensity, width, height)
+        }
     }
 
     Rectangle
@@ -134,6 +139,11 @@ Window {
         id: inputPasswordItem
         anchors.fill: parent
         visible: currentState === 3
+        onVisibleChanged: {
+            if(visible) {
+                console.log(234, width, height, parent.width, parent.height)
+            }
+        }
     }
 
     Rectangle {
@@ -145,7 +155,7 @@ Window {
         anchors.left: parent.left
         anchors.leftMargin: 0
         anchors.top: parent.top
-        anchors.topMargin: dp(140)
+        anchors.topMargin: dp(100)
 
         Wallet {
             id: walletItem
@@ -268,7 +278,7 @@ Window {
         ProgressWnd {
             id: progressWndItem
             anchors.fill: parent
-            visible: currentState === 2 || currentState === 18
+            visible: false
         }
 
         Contacts {

@@ -6,8 +6,6 @@ import UtilBridge 1.0
 Item {
     property var callback
     property var contactList: []
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     UtilBridge {
         id: util
@@ -147,7 +145,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.right: parent.right
-            anchors.rightMargin: parent.width / 2 - dp(200)
+            anchors.rightMargin: parent.width / 2 - dp(170)
 
             background: Rectangle {
                 color: "#6F00D6"
@@ -205,7 +203,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.left: parent.left
-            anchors.leftMargin: parent.width / 2 - dp(200)
+            anchors.leftMargin: parent.width / 2 - dp(170)
 
             background: Rectangle {
                 color: "#ffffff"

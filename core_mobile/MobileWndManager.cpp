@@ -228,13 +228,13 @@ void MobileWndManager::pageNewSeedTest(int wordIndex) {
 }
 void MobileWndManager::pageProgressWnd(QString pageTitle, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable ) {
     Q_UNUSED(pageTitle)
-    Q_UNUSED(header)
-    Q_UNUSED(msgPlus)
     Q_UNUSED(cancellable)
 
     QJsonObject obj;
     obj["callerId"] = callerId;
+    obj["header"] = header;
     obj["msgProgress"] = msgProgress;
+    obj["msgPlus"] = msgPlus;
     QVariant retValue;
     QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }

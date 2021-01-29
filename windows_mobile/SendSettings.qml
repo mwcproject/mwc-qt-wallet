@@ -4,9 +4,6 @@ import QtQuick.Window 2.0
 import ConfigBridge 1.0
 
 Item {
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     function isInteger(value) {
       return /^\d+$/.test(value)
     }
@@ -70,9 +67,9 @@ Item {
             text: qsTr("Send MWC parameters")
             font.bold: true
             anchors.top: parent.top
-            anchors.topMargin: dp(30)
+            anchors.topMargin: dp(31)
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(24)
+            font.pixelSize: dp(22)
             color: "#3600c9"
         }
 
@@ -87,7 +84,7 @@ Item {
             text: qsTr("Number of confirmations")
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            font.pixelSize: dp(20)
+            font.pixelSize: dp(18)
             color: "#3600C9"
         }
 
@@ -128,7 +125,7 @@ Item {
             anchors.right: parent.right
             anchors.rightMargin: dp(40)
             anchors.top: textfield_confirmation.bottom
-            anchors.topMargin: dp(20)
+            anchors.topMargin: dp(18)
             text: qsTr("Change outputs")
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -173,7 +170,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.right: parent.right
-            anchors.rightMargin: parent.width / 2 - dp(160)
+            anchors.rightMargin: parent.width / 2 - dp(170)
 
             background: Rectangle {
                 color: "white"
@@ -214,7 +211,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.left: parent.left
-            anchors.leftMargin: parent.width / 2 - dp(160)
+            anchors.leftMargin: parent.width / 2 - dp(170)
 
             background: Rectangle {
                 color: "#ffffff"
@@ -233,11 +230,6 @@ Item {
             onClicked: {
                 settingsItem.visible = false
             }
-        }
-
-        MessageBox {
-            id: messagebox
-            anchors.verticalCenter: parent.verticalCenter
         }
     }
 }

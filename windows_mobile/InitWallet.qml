@@ -4,8 +4,6 @@ import StartWalletBridge 1.0
 
 Item {
     id: element
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     StartWalletBridge {
         id: startWallet
@@ -18,7 +16,7 @@ Item {
         fillMode: Image.PreserveAspectFit
         source: "../img/TBLogo@2x.svg"
         anchors.top: parent.top
-        anchors.topMargin: dp(80)
+        anchors.topMargin: dp(50)
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
@@ -95,35 +93,35 @@ Item {
         }
     }
 
-    Image {
-        id: image_help
-        width: dp(30)
-        height: dp(30)
-        anchors.horizontalCenterOffset: dp(-40)
-        anchors.bottomMargin: dp(90)
-        fillMode: Image.PreserveAspectFit
-        source: "../img/HelpBtn@2x.svg"
-        anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-    }
+//    Image {
+//        id: image_help
+//        width: dp(30)
+//        height: dp(30)
+//        anchors.horizontalCenterOffset: dp(-40)
+//        anchors.bottomMargin: dp(90)
+//        fillMode: Image.PreserveAspectFit
+//        source: "../img/HelpBtn@2x.svg"
+//        anchors.bottom: parent.bottom
+//        anchors.horizontalCenter: parent.horizontalCenter
+//    }
 
-    Text {
-        id: text_help
-        text: qsTr("Help")
-        anchors.leftMargin: dp(20)
-        color: "white"
-        anchors.left: image_help.right
-        anchors.verticalCenter: image_help.verticalCenter
-        font.pixelSize: dp(18)
-    }
+//    Text {
+//        id: text_help
+//        text: qsTr("Help")
+//        anchors.leftMargin: dp(20)
+//        color: "white"
+//        anchors.left: image_help.right
+//        anchors.verticalCenter: image_help.verticalCenter
+//        font.pixelSize: dp(18)
+//    }
 
-    MouseArea {
-        anchors.left: image_help.left
-        anchors.top: image_help.top
-        height: dp(30)
-        width: text_help.width + dp(50)
-        onClicked: {
-            console.log("help instance clicked")
-        }
-    }
+//    MouseArea {
+//        anchors.left: image_help.left
+//        anchors.top: image_help.top
+//        height: dp(30)
+//        width: text_help.width + dp(50)
+//        onClicked: {
+//            console.log("help instance clicked")
+//        }
+//    }
 }

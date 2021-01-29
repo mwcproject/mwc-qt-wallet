@@ -4,9 +4,6 @@ import QtQuick.Window 2.0
 Rectangle {
     id: panel
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     property bool open: false
     property int position: Qt.LeftEdge
 
@@ -31,7 +28,7 @@ Rectangle {
     on_RightEdgeChanged: _setupAnchors()
     onOpenChanged: completeSlideDirection()
 
-    width: (Screen.width > Screen.height) ? dp(320) : Screen.width - dp(75)
+    width: (Screen.width > Screen.height) ? dp(320) : Screen.width - dp(100)
     height: parent.height
     x: _closeX
     z: 10

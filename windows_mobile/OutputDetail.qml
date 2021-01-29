@@ -9,9 +9,6 @@ Item {
     property string blockExplorerUrl
     property string outputCommitment
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     ConfigBridge {
         id: config
     }
@@ -20,7 +17,6 @@ Item {
         blockExplorerUrl = config.getBlockExplorerUrl(config.getNetwork());
         text_status.text = output.outputStatus
         image_status.source = getOutputTypeIcon(output.outputStatus, output.coinbase)
-        console.log(111, image_status.source)
         text_mwc.text = output.valueNano
         text_transaction_num.text = output.txIdx
         text_commitment.text = output.outputCommitment
@@ -30,6 +26,22 @@ Item {
         text_coinbase.text = output.coinbase
         outputCommitment = output.outputCommitment
         outputDetail.visible = true
+    }
+
+    function getOutputTypeIcon(outputStatus, coinbase) {
+        switch (outputStatus) {
+            case "Unconfirmed":
+                return "../img/Transactions_Unconfirmed_Blue@2x.svg"
+            case "Unspent":
+                if (coinbase) {
+                    return "../img/Transactions_CoinBase_Blue@2x.svg"
+                }
+                return "../img/Outputs_Unspent_Blue@2x.svg"
+            case "Locked":
+                return "../img/iconLock_Blue@2x.svg"
+            case "Spent":
+                return "../img/Outputs_Spent_Blue@2x.svg"
+        }
     }
 
     onVisibleChanged: {
@@ -44,7 +56,7 @@ Item {
 
         Rectangle {
             id: rect_header
-            height: dp(130)
+            height: dp(110)
             color: "#ffffff"
             anchors.top: parent.top
             anchors.topMargin: 0
@@ -75,9 +87,9 @@ Item {
                 id: text_status
                 color: "#3600c9"
                 text: qsTr("Unspent")
-                anchors.verticalCenterOffset: dp(-20)
+                anchors.top: parent.top
+                anchors.topMargin: dp(25)
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
                 font.bold: true
                 font.pixelSize: dp(20)
             }
@@ -89,7 +101,7 @@ Item {
                 anchors.top: text_status.bottom
                 anchors.topMargin: dp(10)
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(21)
+                font.pixelSize: dp(20)
             }
 
             Image {
@@ -116,7 +128,7 @@ Item {
             id: view_info
             clip: true
             ScrollBar.vertical.policy: ScrollBar.AlwaysOn
-            contentHeight: dp(300)
+            contentHeight: dp(540)
             anchors.top: rect_header.bottom
             anchors.right: parent.right
             anchors.bottom: parent.bottom
@@ -361,11 +373,11 @@ Item {
 
             Button {
                 id: button_ok
-                height: dp(50)
+                height: dp(40)
                 width: dp(135)
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: textfield_note.bottom
-                anchors.topMargin: dp(40)
+                anchors.topMargin: dp(30)
                 background: Rectangle {
                     color: "#6F00D6"
                     radius: dp(4)
@@ -373,7 +385,7 @@ Item {
                         text: qsTr("OK")
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: dp(18)
+                        font.pixelSize: dp(15)
                         color: "white"
                     }
                 }

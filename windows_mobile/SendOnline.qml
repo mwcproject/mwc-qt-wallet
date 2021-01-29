@@ -8,9 +8,6 @@ Item {
     property string account
     property double amount
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     function init(initParams) {
         account = initParams.selectedAccount
         amount = parseInt(initParams.amount)
@@ -51,6 +48,9 @@ Item {
 
     onVisibleChanged: {
         if (visible) {
+            if (parent.height > dp(500)) {
+                image_send_online.topMargin = (parent.height - dp(500)) / 2
+            }
             rect_progress.visible = false
             textfield_api_secret.visible = false
             text_contact_name.text = ""
@@ -70,8 +70,7 @@ Item {
         id: image_send_online
         width: dp(100)
         height: dp(100)
-        anchors.bottom: textfield_send_to.top
-        anchors.bottomMargin: dp(50)
+        anchors.top: parent.top
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         source: "../img/SendOnline@2x.svg"
@@ -116,13 +115,13 @@ Item {
         id: textfield_send_to
         height: dp(50)
         padding: dp(5)
-        leftPadding: dp(10)
+        leftPadding: dp(20)
         font.pixelSize: dp(18)
         placeholderText: qsTr("Send to")
         color: "white"
         text: ""
-        anchors.bottom: text_formats.top
-        anchors.bottomMargin: dp(20)
+        anchors.top: image_send_online.bottom
+        anchors.topMargin: dp(30)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         anchors.right: parent.right
@@ -152,30 +151,20 @@ Item {
         }
     }
 
-    Button {
-        id: button_contacts
-        width: dp(50)
-        height: dp(50)
+    Image {
+        width: dp(45)
+        height: dp(45)
         anchors.verticalCenter: textfield_send_to.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: dp(30)
-        background: Rectangle {
-            color: "#00000000"
-            radius: dp(4)
-            border.color: "white"
-            border.width: dp(2)
-        }
-        Image {
-            width: dp(30)
-            height: dp(30)
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenter: parent.horizontalCenter
-            fillMode: Image.PreserveAspectFit
-            source: "../img/Contact@2x.svg"
-        }
+        fillMode: Image.PreserveAspectFit
+        source: "../img/Contact@2x.svg"
 
-        onClicked: {
-            selectContactItem.open(onSelectContact)
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                selectContactItem.open(onSelectContact)
+            }
         }
     }
 
@@ -188,9 +177,9 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         anchors.right: parent.right
-        anchors.rightMargin: dp(90)
-        anchors.bottom: textfield_api_secret.visible ? textfield_api_secret.top : textarea_description.top
-        anchors.bottomMargin: dp(30)
+        anchors.rightMargin: dp(30)
+        anchors.top: textfield_send_to.bottom
+        anchors.topMargin: dp(20)
         font.pixelSize: dp(13)
     }
 
@@ -200,8 +189,8 @@ Item {
         text: ""
         anchors.left: parent.left
         anchors.leftMargin: dp(50)
-        anchors.bottom: textfield_api_secret.visible ? textfield_api_secret.top : textarea_description.top
-        anchors.bottomMargin: dp(30)
+        anchors.top: textfield_send_to.bottom
+        anchors.topMargin: dp(10)
         font.pixelSize: dp(13)
         visible: false
     }
@@ -211,7 +200,7 @@ Item {
         visible: false
         height: dp(50)
         padding: dp(5)
-        leftPadding: dp(10)
+        leftPadding: dp(20)
         font.pixelSize: dp(18)
         placeholderText: qsTr("Recipient HTTP Foreign API secret (optional)")
         color: "white"
@@ -219,9 +208,9 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         anchors.right: parent.right
-        anchors.rightMargin: dp(90)
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: textfield_api_secret.height / 2
+        anchors.rightMargin: dp(30)
+        anchors.top: textfield_send_to.bottom
+        anchors.topMargin: dp(55)
         horizontalAlignment: Text.AlignLeft
         background: Rectangle {
             color: "#8633E0"
@@ -237,14 +226,14 @@ Item {
 
     TextArea {
         id: textarea_description
-        height: textfield_api_secret.visible ? dp(120) : dp(200)
+        height: textfield_api_secret.visible ? dp(80) : dp(160)
         padding: dp(10)
-        font.pixelSize: dp(20)
+        font.pixelSize: dp(18)
         placeholderText: qsTr("Description")
         color: "white"
         text: ""
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: textfield_api_secret.visible ? textarea_description.height / 2 + textfield_api_secret.height + dp(30) : textarea_description.height / 2
+        anchors.top: textfield_send_to.bottom
+        anchors.topMargin: textfield_api_secret.visible ? dp(125) : dp(55)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         anchors.right: parent.right
@@ -295,7 +284,7 @@ Item {
         height: dp(50)
         anchors.verticalCenter: button_settings.verticalCenter
         anchors.right: parent.right
-        anchors.rightMargin: dp(30)
+        anchors.rightMargin: dp(20)
         background: Rectangle {
             color: "#00000000"
             radius: dp(4)
@@ -359,7 +348,7 @@ Item {
         width: dp(60)
         height: dp(30)
         anchors.top: button_send.bottom
-        anchors.topMargin: dp(50)
+        anchors.topMargin: dp(30)
         anchors.horizontalCenter: parent.horizontalCenter
         color: "#00000000"
         visible: false

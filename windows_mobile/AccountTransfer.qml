@@ -5,9 +5,6 @@ import WalletBridge 1.0
 import AccountTransferBridge 1.0
 
 Item {
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     WalletBridge {
         id: wallet
     }
@@ -66,8 +63,13 @@ Item {
     }
 
     onVisibleChanged: {
-        rect_progress.visible = false
-        updateAccounts()
+        if (visible) {
+            if (parent.height > dp(400)) {
+                anchors.topMargin = (parent.height - dp(400)) / 2
+            }
+            rect_progress.visible = false
+            updateAccounts()
+        }
     }
 
     MouseArea {
@@ -83,22 +85,21 @@ Item {
         color: "white"
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
-        anchors.bottom: combobox_account_from.top
-        anchors.bottomMargin: dp(10)
+        anchors.top: parent.top
         font.pixelSize: dp(14)
     }
 
     ComboBox {
         id: combobox_account_from
-        anchors.bottom: label_to_account.top
-        anchors.bottomMargin: dp(50)
+        anchors.top: label_from_account.bottom
+        anchors.topMargin: dp(10)
         anchors.right: parent.right
         anchors.rightMargin: dp(30)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         leftPadding: dp(20)
         rightPadding: dp(20)
-        font.pixelSize: dp(18)
+        font.pixelSize: dp(14)
 
         onCurrentIndexChanged: {
             const fromAcc = combobox_account_from.currentIndex >= 0 ? listmodel_account_from.get(combobox_account_from.currentIndex).account : ""
@@ -214,22 +215,22 @@ Item {
         color: "white"
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
-        anchors.bottom: combobox_account_to.top
-        anchors.bottomMargin: dp(10)
+        anchors.top: combobox_account_from.bottom
+        anchors.topMargin: dp(30)
         font.pixelSize: dp(14)
     }
 
     ComboBox {
         id: combobox_account_to
-        anchors.bottom: textfield_amount.top
-        anchors.bottomMargin: dp(50)
+        anchors.top: label_to_account.bottom
+        anchors.topMargin: dp(10)
         anchors.right: parent.right
         anchors.rightMargin: dp(30)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         leftPadding: dp(20)
         rightPadding: dp(20)
-        font.pixelSize: dp(18)
+        font.pixelSize: dp(14)
 
         onCurrentIndexChanged: {
             const fromAcc = combobox_account_from.currentIndex >= 0 ? listmodel_account_from.get(combobox_account_from.currentIndex).account : ""
@@ -349,7 +350,8 @@ Item {
         placeholderText: qsTr("Amount")
         color: "white"
         text: ""
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.top: combobox_account_to.bottom
+        anchors.topMargin: dp(30)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         horizontalAlignment: Text.AlignLeft
@@ -398,7 +400,7 @@ Item {
         width: dp(60)
         height: dp(30)
         anchors.top: button_all.bottom
-        anchors.topMargin: dp(35)
+        anchors.topMargin: dp(30)
         anchors.horizontalCenter: parent.horizontalCenter
         color: "#00000000"
         visible: false
@@ -410,10 +412,10 @@ Item {
 
     Button {
         id: button_back
-        width: dp(150)
+        width: dp(120)
         height: dp(50)
         anchors.top: button_all.bottom
-        anchors.topMargin: dp(100)
+        anchors.topMargin: dp(90)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         background: Rectangle {
@@ -437,10 +439,9 @@ Item {
 
     Button {
         id: button_settings
-        width: dp(150)
+        width: dp(120)
         height: dp(50)
-        anchors.top: button_all.bottom
-        anchors.topMargin: dp(100)
+        anchors.verticalCenter: button_back.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         background: Rectangle {
             color: "#00000000"
@@ -463,10 +464,9 @@ Item {
 
     Button {
         id: button_transfer
-        width: dp(150)
+        width: dp(120)
         height: dp(50)
-        anchors.top: button_all.bottom
-        anchors.topMargin: dp(100)
+        anchors.verticalCenter: button_back.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: dp(30)
         background: Rectangle {
@@ -515,10 +515,5 @@ Item {
         id: settingsItem
         anchors.verticalCenter: parent.verticalCenter
         visible: false
-    }
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
     }
 }

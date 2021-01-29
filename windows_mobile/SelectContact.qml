@@ -9,8 +9,6 @@ Item {
     property var contactList: []
     property string prevCBName
     property string prevCBAddress
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     function open(_callback) {
         callback = _callback
@@ -24,6 +22,7 @@ Item {
     function updateContactsList(searchStr) {
         const pairs = config.getContactsAsPairs()
         contactsModel.clear()
+        contactList = []
         for (let i = 0; i < pairs.length; i += 2) {
             if (searchStr === "" || pairs[i].includes(searchStr)) {
                 contactList.push({
@@ -103,24 +102,18 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: dp(90)
+            anchors.bottomMargin: dp(70)
             anchors.top: rect_topbar.bottom
-            anchors.topMargin: dp(15)
+            anchors.topMargin: dp(10)
             model: contactsModel
             delegate: contactsDelegate
             focus: true
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    textfield_searchbar.focus = false
-                }
-            }
         }
 
         Component {
             id: contactsDelegate
             Rectangle {
-                height: dp(140)
+                height: dp(130)
                 color: "#00000000"
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -128,15 +121,16 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
+                        textfield_searchbar.focus = false
                         contactsList.currentIndex = index
                     }
                 }
 
                 Rectangle {
-                    height: dp(130)
+                    height: dp(120)
                     color: "#33bf84ff"
                     anchors.top: parent.top
-                    anchors.topMargin: dp(15)
+                    anchors.topMargin: dp(10)
                     anchors.right: parent.right
                     anchors.rightMargin: dp(20)
                     anchors.left: parent.left
@@ -184,17 +178,17 @@ Item {
                         anchors.right: parent.right
                         anchors.rightMargin: dp(150)
                         wrapMode: Text.WrapAnywhere
-                        font.pixelSize: dp(15)
+                        font.pixelSize: dp(14)
                     }
 
                     Image {
                         id: image_edit
                         anchors.right: parent.right
-                        anchors.rightMargin: dp(85)
+                        anchors.rightMargin: dp(80)
                         anchors.top: parent.top
                         anchors.topMargin: dp(70)
-                        width: dp(40)
-                        height: dp(40)
+                        width: dp(35)
+                        height: dp(35)
                         fillMode: Image.PreserveAspectFit
                         source: "../img/Edit@2x.svg"
 
@@ -215,8 +209,8 @@ Item {
                         anchors.rightMargin: dp(35)
                         anchors.top: parent.top
                         anchors.topMargin: dp(70)
-                        width: dp(40)
-                        height: dp(40)
+                        width: dp(35)
+                        height: dp(35)
                         fillMode: Image.PreserveAspectFit
                         source: "../img/Delete@2x.svg"
 
@@ -309,69 +303,87 @@ Item {
             }
         }
 
-        Button {
-            id: button_select
-            width: dp(150)
-            height: dp(50)
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: dp(20)
-            anchors.right: parent.right
-            anchors.rightMargin: dp(100)
-
-            background: Rectangle {
-                color: "white"
-                radius: dp(5)
-                border.width: dp(2)
-                border.color: "white"
-                Text {
-                    text: qsTr("Select")
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: dp(18)
-                    color: "#6F00D6"
-                }
-            }
-
-            onClicked: {
-                if (contactsList.currentIndex >= 0) {
-                    selectContactItem.visible = false
-                    callback(true, contactList[contactsList.currentIndex])
-
-                } else {
-                    messagebox.open(qsTr("Error"), qsTr("Please select a contact!"))
-                }
-            }
-        }
-
-        Button {
-            id: button_cancel
-            width: dp(150)
-            height: dp(50)
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: dp(20)
+        Rectangle {
             anchors.left: parent.left
-            anchors.leftMargin: dp(100)
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            height: dp(70)
+            gradient: Gradient {
+                orientation: Gradient.Horizontal
+                GradientStop {
+                    position: 0
+                    color: "#9E00E7"
+                }
 
-            background: Rectangle {
-                color: "#00000000"
-                radius: dp(5)
-                border.width: dp(2)
-                border.color: "white"
-                Text {
-                    text: qsTr("Cancel")
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: dp(18)
-                    color: "white"
+                GradientStop {
+                    position: 1
+                    color: "#3600C9"
                 }
             }
 
-            onClicked: {
-                selectContactItem.visible = false
-                callback(false)
+            Button {
+                id: button_select
+                width: dp(150)
+                height: dp(50)
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: dp(10)
+                anchors.right: parent.right
+                anchors.rightMargin: parent.width /2 - dp(170)
+
+                background: Rectangle {
+                    color: "white"
+                    radius: dp(5)
+                    border.width: dp(2)
+                    border.color: "white"
+                    Text {
+                        text: qsTr("Select")
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: dp(18)
+                        color: "#6F00D6"
+                    }
+                }
+
+                onClicked: {
+                    if (contactsList.currentIndex >= 0) {
+                        selectContactItem.visible = false
+                        callback(true, contactList[contactsList.currentIndex])
+
+                    } else {
+                        messagebox.open(qsTr("Error"), qsTr("Please select a contact!"))
+                    }
+                }
+            }
+
+            Button {
+                id: button_cancel
+                width: dp(150)
+                height: dp(50)
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: dp(10)
+                anchors.left: parent.left
+                anchors.leftMargin: parent.width /2 - dp(170)
+
+                background: Rectangle {
+                    color: "#00000000"
+                    radius: dp(5)
+                    border.width: dp(2)
+                    border.color: "white"
+                    Text {
+                        text: qsTr("Cancel")
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: dp(18)
+                        color: "white"
+                    }
+                }
+
+                onClicked: {
+                    selectContactItem.visible = false
+                    callback(false)
+                }
             }
         }
-
 
         ContactEditDlg {
             id: editDlg

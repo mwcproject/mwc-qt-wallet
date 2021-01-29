@@ -8,9 +8,6 @@ Item {
     property string selectedAccount
     property double amount
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     function init(initParams) {
         selectedAccount = initParams.selectedAccount
         amount = parseInt(initParams.amount)
@@ -91,7 +88,7 @@ Item {
     TextArea {
         id: textarea_description
         height: dp(200)
-        padding: dp(10)
+        padding: dp(20)
         font.pixelSize: dp(20)
         placeholderText: qsTr("Description")
         color: "white"
@@ -188,7 +185,7 @@ Item {
         width: dp(60)
         height: dp(30)
         anchors.top: button_send.bottom
-        anchors.topMargin: dp(50)
+        anchors.topMargin: dp(30)
         anchors.horizontalCenter: parent.horizontalCenter
         color: "#00000000"
         visible: false
@@ -202,11 +199,5 @@ Item {
         id: settingsItem
         anchors.verticalCenter: parent.verticalCenter
         visible: false
-    }
-
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
     }
 }

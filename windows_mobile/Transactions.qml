@@ -17,9 +17,6 @@ Item {
     property var number_COIN_BASE_CONFIRM: 1440
     property var locale: Qt.locale()
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     WalletBridge {
         id: wallet
     }
@@ -212,16 +209,16 @@ Item {
     Component {
         id: transactionDelegate
         Rectangle {
-            height: dp(215)
+            height: dp(170)
             color: "#00000000"
             anchors.left: parent.left
             anchors.right: parent.right
 
             Rectangle {
-                height: dp(200)
+                height: dp(160)
                 color: "#33bf84ff"
                 anchors.top: parent.top
-                anchors.topMargin: dp(15)
+                anchors.topMargin: dp(10)
                 anchors.right: parent.right
                 anchors.rightMargin: dp(20)
                 anchors.left: parent.left
@@ -253,7 +250,7 @@ Item {
                     width: dp(17)
                     height: dp(17)
                     anchors.top: parent.top
-                    anchors.topMargin: dp(35)
+                    anchors.topMargin: dp(20)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
                     fillMode: Image.PreserveAspectFit
@@ -266,7 +263,7 @@ Item {
                     font.bold: true
                     font.pixelSize: dp(15)
                     anchors.top: parent.top
-                    anchors.topMargin: dp(37)
+                    anchors.topMargin: dp(22)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(71)
                 }
@@ -279,7 +276,7 @@ Item {
                     horizontalAlignment: Text.AlignRight
                     font.pixelSize: dp(15)
                     anchors.top: parent.top
-                    anchors.topMargin: dp(37)
+                    anchors.topMargin: dp(22)
                     anchors.right: parent.right
                     anchors.rightMargin: dp(35)
                 }
@@ -288,7 +285,7 @@ Item {
                     height: dp(1)
                     color: "#ffffff"
                     anchors.top: parent.top
-                    anchors.topMargin: dp(70)
+                    anchors.topMargin: dp(55)
                     anchors.right: parent.right
                     anchors.rightMargin: dp(35)
                     anchors.left: parent.left
@@ -300,7 +297,7 @@ Item {
                     text: txCoinNano
                     font.bold: true
                     anchors.top: parent.top
-                    anchors.topMargin: dp(90)
+                    anchors.topMargin: dp(70)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
                     font.pixelSize: dp(15)
@@ -310,7 +307,7 @@ Item {
                     color: "#ffffff"
                     text: txId
                     anchors.top: parent.top
-                    anchors.topMargin: dp(120)
+                    anchors.topMargin: dp(95)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
                     font.pixelSize: dp(15)
@@ -321,7 +318,7 @@ Item {
                     text: txAddress
                     elide: Text.ElideMiddle
                     anchors.top: parent.top
-                    anchors.topMargin: dp(150)
+                    anchors.topMargin: dp(120)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
                     anchors.right: parent.right
@@ -338,11 +335,6 @@ Item {
         anchors.fill: parent
         anchors.leftMargin: dp(30)
         anchors.rightMargin: dp(30)
-    }
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
     }
 
     Rectangle {

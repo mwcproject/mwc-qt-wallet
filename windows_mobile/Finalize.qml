@@ -7,9 +7,6 @@ import ConfigBridge 1.0
 import UtilBridge 1.0
 
 Item {
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-
     FinalizeBridge {
         id: finalize
     }
@@ -94,10 +91,5 @@ Item {
             const filepath = "/mnt/user/0/primary/" + cleanPath.substring(cleanPath.search("primary:") + 8, cleanPath.length)
             finalize.uploadFileTransaction(filepath);
         }
-    }
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
     }
 }

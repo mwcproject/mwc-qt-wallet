@@ -9,8 +9,6 @@ Item {
     property string transactionFileName
     property string resTxFN
     property bool isFinalize
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     FileTransactionBridge {
         id: fileTransaction
@@ -46,6 +44,10 @@ Item {
 
     onVisibleChanged: {
         if (visible) {
+            if (parent.height > dp(520)) {
+                anchors.topMargin = (parent.height - dp(520)) / 2
+            }
+
             const params = JSON.parse(initParams)
             transactionFileName = params.fileName
             fileTransaction.callerId = params.callerId
@@ -63,12 +65,11 @@ Item {
 
     Image {
         id: image_finalize
-        width: dp(80)
-        height: dp(80)
+        width: dp(70)
+        height: dp(70)
         anchors.top: parent.top
-        anchors.topMargin: dp(100)
         anchors.left: parent.left
-        anchors.leftMargin: dp(60)
+        anchors.leftMargin: dp(70)
         fillMode: Image.PreserveAspectFit
         source: "../img/FinalizeL@2x.svg"
     }
@@ -80,19 +81,19 @@ Item {
         anchors.verticalCenter: image_finalize.verticalCenter
         color: "#ffffff"
         text: qsTr("Receive File Transaction")
-        font.pixelSize: dp(25)
+        font.pixelSize: dp(24)
         font.bold: true
     }
 
     Text {
         id: label_amount
         anchors.left: parent.left
-        anchors.leftMargin: dp(150) - width
-        anchors.bottom: label_txid.top
-        anchors.bottomMargin: dp(30)
+        anchors.leftMargin: dp(160) - width
+        anchors.top: image_finalize.bottom
+        anchors.topMargin: dp(50)
         color: "#ffffff"
         text: qsTr("Amount:")
-        font.pixelSize: dp(20)
+        font.pixelSize: dp(18)
     }
 
     Text {
@@ -102,18 +103,18 @@ Item {
         anchors.verticalCenter: label_amount.verticalCenter
         color: "#ffffff"
         text: qsTr("1 MWC")
-        font.pixelSize: dp(20)
+        font.pixelSize: dp(18)
     }
 
     Text {
         id: label_txid
         anchors.left: parent.left
-        anchors.leftMargin: dp(150) - width
-        anchors.bottom: label_lockheight.top
-        anchors.bottomMargin: dp(30)
+        anchors.leftMargin: dp(160) - width
+        anchors.top: label_amount.bottom
+        anchors.topMargin: dp(30)
         color: "#ffffff"
         text: qsTr("Transaction ID:")
-        font.pixelSize: dp(20)
+        font.pixelSize: dp(18)
     }
 
     Text {
@@ -123,17 +124,18 @@ Item {
         anchors.verticalCenter: label_txid.verticalCenter
         color: "#ffffff"
         text: qsTr("11111111-1111-1111-1111-111111111111")
-        font.pixelSize: dp(18)
+        font.pixelSize: dp(15)
     }
 
     Text {
         id: label_lockheight
         anchors.left: parent.left
-        anchors.leftMargin: dp(150) - width
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.leftMargin: dp(160) - width
+        anchors.top: label_txid.bottom
+        anchors.topMargin: dp(30)
         color: "#ffffff"
         text: qsTr("Lock Height:")
-        font.pixelSize: dp(20)
+        font.pixelSize: dp(18)
     }
 
     Text {
@@ -143,18 +145,18 @@ Item {
         anchors.verticalCenter: label_lockheight.verticalCenter
         color: "#ffffff"
         text: qsTr("-")
-        font.pixelSize: dp(20)
+        font.pixelSize: dp(18)
     }
 
     Text {
         id: label_receiverAddress
         anchors.left: parent.left
-        anchors.leftMargin: dp(150) - width
+        anchors.leftMargin: dp(160) - width
         anchors.top: label_lockheight.bottom
         anchors.topMargin: dp(30)
         color: "#ffffff"
         text: qsTr("Receiver Address:")
-        font.pixelSize: dp(20)
+        font.pixelSize: dp(18)
     }
 
     Text {
@@ -164,23 +166,23 @@ Item {
         anchors.verticalCenter: label_receiverAddress.verticalCenter
         color: "#ffffff"
         text: qsTr("-")
-        font.pixelSize: dp(20)
+        font.pixelSize: dp(18)
     }
 
     Text {
         id: label_message
         anchors.left: parent.left
-        anchors.leftMargin: dp(150) - width
+        anchors.leftMargin: dp(160) - width
         anchors.top: label_receiverAddress.bottom
         anchors.topMargin: dp(30)
         color: "#ffffff"
         text: qsTr("Message:")
-        font.pixelSize: dp(20)
+        font.pixelSize: dp(18)
     }
 
     Rectangle {
         id: rect_message
-        height: text_message.text === "" ? dp(150) : text_message.height + dp(20)
+        height: text_message.text === "" ? dp(100) : text_message.height + dp(20)
         color: "#33bf84ff"
         anchors.left: label_message.right
         anchors.leftMargin: dp(20)
@@ -193,7 +195,7 @@ Item {
             id: text_message
             text: qsTr("")
             color: "#ffffff"
-            font.pixelSize: dp(20)
+            font.pixelSize: dp(18)
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             anchors.fill: parent
             anchors.margins: dp(10)
@@ -204,8 +206,8 @@ Item {
         id: button_ok
         width: dp(200)
         height: dp(50)
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(100)
+        anchors.top: rect_message.bottom
+        anchors.topMargin: dp(30)
         anchors.right: parent.right
         anchors.rightMargin: parent.width / 2 - dp(200)
 
@@ -244,8 +246,7 @@ Item {
         id: button_cancel
         width: dp(150)
         height: dp(50)
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(100)
+        anchors.verticalCenter: button_ok.verticalCenter
         anchors.left: parent.left
         anchors.leftMargin: parent.width / 2 - dp(200)
 
@@ -286,11 +287,6 @@ Item {
 
     SendConfirmation {
         id: sendConfirmationItem
-        anchors.verticalCenter: parent.verticalCenter
-    }
-
-    MessageBox {
-        id: messagebox
         anchors.verticalCenter: parent.verticalCenter
     }
 }

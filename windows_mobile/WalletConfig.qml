@@ -12,8 +12,6 @@ Item {
     property bool walletLogsEnabled
     property bool autoStartMQSEnabled
     property bool autoStartTorEnabled
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     WalletConfigBridge {
         id: walletConfig
@@ -56,6 +54,10 @@ Item {
 
     onVisibleChanged: {
         if (visible) {
+            if (parent.height > dp(520)) {
+                anchors.topMargin = (parent.height - dp(520)) / 2
+            }
+
             walletLogsEnabled = walletConfig.getWalletLogsEnabled()
             combobox_wallet_logs.currentIndex = walletLogsEnabled ? 0 : 1
             autoStartMQSEnabled = walletConfig.getAutoStartMQSEnabled()
@@ -88,8 +90,7 @@ Item {
         color: "white"
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        anchors.bottom: rect_auto_start.top
-        anchors.bottomMargin: dp(10)
+        anchors.top: parent.top
         font.pixelSize: dp(14)
     }
 
@@ -99,21 +100,20 @@ Item {
         anchors.leftMargin: dp(45)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
-        anchors.bottom: label_wallet_instance_name.top
-        anchors.bottomMargin: dp(15)
+        anchors.top: label_auto_start.bottom
+        anchors.topMargin: dp(10)
         border.width: dp(1)
         border.color: "white"
         color: "#00000000"
-        height: dp(140)
+        height: dp(70)
 
         CheckBox {
             id: checkbox_mqs
             text: qsTr("MWC MQS")
             font.pixelSize: dp(17)
-            anchors.left: parent.left
-            anchors.leftMargin: parent.width / 2 - dp(100)
-            anchors.top: parent.top
-            anchors.topMargin: dp(35)
+            anchors.right:  parent.horizontalCenter
+            anchors.rightMargin: dp(50)
+            anchors.verticalCenter: parent.verticalCenter
 
             indicator: Rectangle {
                 implicitWidth: dp(20)
@@ -136,7 +136,7 @@ Item {
                 color: "white"
                 verticalAlignment: Text.AlignVCenter
                 anchors.left: checkbox_mqs.indicator.right
-                anchors.leftMargin: dp(25)
+                anchors.leftMargin: dp(10)
             }
 
             onCheckStateChanged: {
@@ -148,10 +148,9 @@ Item {
             id: checkbox_tor
             text: qsTr("TOR")
             font.pixelSize: dp(17)
-            anchors.left: parent.left
-            anchors.leftMargin: parent.width / 2 - dp(100)
-            anchors.top: checkbox_mqs.bottom
-            anchors.topMargin: dp(15)
+            anchors.left:  parent.horizontalCenter
+            anchors.leftMargin: dp(50)
+            anchors.verticalCenter: parent.verticalCenter
 
             indicator: Rectangle {
                 implicitWidth: dp(20)
@@ -174,7 +173,7 @@ Item {
                 color: "white"
                 verticalAlignment: Text.AlignVCenter
                 anchors.left: checkbox_tor.indicator.right
-                anchors.leftMargin: dp(25)
+                anchors.leftMargin: dp(10)
             }
 
             onCheckStateChanged: {
@@ -189,8 +188,8 @@ Item {
         color: "white"
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        anchors.bottom: textfield_wallet_instance_name.top
-        anchors.bottomMargin: dp(10)
+        anchors.top: rect_auto_start.bottom
+        anchors.topMargin: dp(15)
         font.pixelSize: dp(14)
     }
 
@@ -202,8 +201,8 @@ Item {
         font.pixelSize: dp(18)
         color: "white"
         text: ""
-        anchors.bottom: label_send_num_confirmation.top
-        anchors.bottomMargin: dp(15)
+        anchors.top: label_wallet_instance_name.bottom
+        anchors.topMargin: dp(10)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
@@ -224,8 +223,8 @@ Item {
         color: "white"
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        anchors.bottom: textfield_send_num_confirmation.top
-        anchors.bottomMargin: dp(10)
+        anchors.top: textfield_wallet_instance_name.bottom
+        anchors.topMargin: dp(15)
         font.pixelSize: dp(14)
     }
 
@@ -237,7 +236,8 @@ Item {
         font.pixelSize: dp(18)
         color: "white"
         text: ""
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.top: label_send_num_confirmation.bottom
+        anchors.topMargin: dp(10)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
@@ -425,10 +425,10 @@ Item {
         id: button_apply
         width: dp(150)
         height: dp(50)
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(30)
+        anchors.top: combobox_wallet_logs.bottom
+        anchors.topMargin: dp(20)
         anchors.right: parent.right
-        anchors.rightMargin: dp(100)
+        anchors.rightMargin: parent.width / 2 - dp(170)
 
         background: Rectangle {
             color: button_apply.enabled ? "white" : "#00000000"
@@ -521,10 +521,9 @@ Item {
         id: button_reset
         width: dp(150)
         height: dp(50)
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(30)
+        anchors.verticalCenter: button_apply.verticalCenter
         anchors.left: parent.left
-        anchors.leftMargin: dp(100)
+        anchors.leftMargin: parent.width / 2 - dp(170)
 
         background: Rectangle {
             color: "#00000000"
@@ -549,10 +548,5 @@ Item {
 
             updateButtons()
         }
-    }
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
     }
 }

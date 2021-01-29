@@ -4,8 +4,6 @@ import QtQuick.Window 2.0
 
 Item {
     property var callback
-    readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
 
     height: text_message.height + dp(300)
     id: messagebox
@@ -65,9 +63,9 @@ Item {
             text: qsTr("Title")
             font.bold: true
             anchors.top: parent.top
-            anchors.topMargin: dp(30)
+            anchors.topMargin: dp(31)
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(24)
+            font.pixelSize: dp(22)
             color: "#3600c9"
         }
 
@@ -97,7 +95,7 @@ Item {
             color: "#3600C9"
             text: ""
             anchors.top: text_message.bottom
-            anchors.topMargin: dp(25)
+            anchors.topMargin: dp(20)
             anchors.right: parent.right
             anchors.rightMargin: dp(40)
             anchors.left: parent.left
@@ -125,7 +123,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.right: parent.right
-            anchors.rightMargin: parent.width / 2 - dp(200)
+            anchors.rightMargin: parent.width / 2 - dp(170)
 
             background: Rectangle {
                 color: button_ok.enabled ? "#6F00D6" : "white"
@@ -154,7 +152,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.left: parent.left
-            anchors.leftMargin: parent.width / 2 - dp(200)
+            anchors.leftMargin: parent.width / 2 - dp(170)
 
             background: Rectangle {
                 color: "#ffffff"
