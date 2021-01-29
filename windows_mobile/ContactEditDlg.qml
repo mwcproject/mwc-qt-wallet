@@ -145,7 +145,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.right: parent.right
-            anchors.rightMargin: parent.width / 2 - dp(200)
+            anchors.rightMargin: parent.width / 2 - dp(170)
 
             background: Rectangle {
                 color: "#6F00D6"
@@ -203,7 +203,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.left: parent.left
-            anchors.leftMargin: parent.width / 2 - dp(200)
+            anchors.leftMargin: parent.width / 2 - dp(170)
 
             background: Rectangle {
                 color: "#ffffff"

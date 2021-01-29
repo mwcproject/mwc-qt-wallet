@@ -15,9 +15,7 @@ Window {
     property int questionTextDlgResponse
     property int sendConformationDlgResponse
 
-//    readonly property int dpi: Screen.pixelDensity * 25.4
-//    function dp(x){ return (dpi < 120) ? x : x*(dpi/160) }
-    readonly property int dpi: Screen.pixelDensity / 7
+    readonly property double dpi: 3.0 + (Screen.pixelDensity - 22.1) / 19
     function dp(x) { return x * dpi }
 
     CoreWindowBridge {
@@ -102,6 +100,12 @@ Window {
         sendConfirmationItem.open(title, message, passwordHash, sendConfirmationDlgCallback)
     }
 
+    onVisibilityChanged: {
+        if (visible) {
+            console.log(123, Screen.pixelDensity, width, height)
+        }
+    }
+
     Rectangle
     {
         gradient: Gradient {
@@ -135,6 +139,11 @@ Window {
         id: inputPasswordItem
         anchors.fill: parent
         visible: currentState === 3
+        onVisibleChanged: {
+            if(visible) {
+                console.log(234, width, height, parent.width, parent.height)
+            }
+        }
     }
 
     Rectangle {
@@ -146,7 +155,7 @@ Window {
         anchors.left: parent.left
         anchors.leftMargin: 0
         anchors.top: parent.top
-        anchors.topMargin: dp(140)
+        anchors.topMargin: dp(100)
 
         Wallet {
             id: walletItem

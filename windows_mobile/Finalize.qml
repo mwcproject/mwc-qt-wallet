@@ -92,9 +92,4 @@ Item {
             finalize.uploadFileTransaction(filepath);
         }
     }
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
-    }
 }

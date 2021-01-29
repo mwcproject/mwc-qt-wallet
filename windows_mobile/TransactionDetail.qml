@@ -172,7 +172,7 @@ Item {
 
         Rectangle {
             id: rect_header
-            height: dp(130)
+            height: dp(110)
             color: "#ffffff"
             anchors.top: parent.top
             anchors.topMargin: 0
@@ -203,9 +203,9 @@ Item {
                 id: text_txtype_amount
                 color: "#3600c9"
                 text: qsTr("Sent 90 MWC")
-                anchors.verticalCenterOffset: dp(-20)
+                anchors.top: parent.top
+                anchors.topMargin: dp(25)
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
                 font.bold: true
                 font.pixelSize: dp(20)
             }
@@ -217,7 +217,7 @@ Item {
                 anchors.top: text_txtype_amount.bottom
                 anchors.topMargin: dp(10)
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(21)
+                font.pixelSize: dp(20)
             }
 
             Image {
@@ -244,7 +244,7 @@ Item {
             id: view_txinfo
             clip: true
             ScrollBar.vertical.policy: ScrollBar.AlwaysOn
-            contentHeight: combobox_commitments.currentIndex >= 0 ? dp(870) + text_message.height : dp(750) + text_message.height
+            contentHeight: dp(840) + text_message.height
             anchors.top: rect_header.bottom
             anchors.right: parent.right
             anchors.bottom: parent.bottom
@@ -490,7 +490,7 @@ Item {
                 color: "#3600c9"
                 text: qsTr("Debited")
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.horizontalCenterOffset: -1 * dp(label_debited.width / 2)
+                anchors.horizontalCenterOffset: -label_debited.width / 2
                 anchors.topMargin: dp(20)
                 font.bold: true
                 anchors.top: text_kernel.bottom
@@ -870,11 +870,11 @@ Item {
 
             Button {
                 id: button_ok
-                height: dp(50)
+                height: dp(40)
                 width: dp(135)
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: combobox_commitments.currentIndex >= 0 ? text_txnum.bottom : combobox_commitments.bottom
-                anchors.topMargin: dp(40)
+                anchors.top: text_txnum.bottom
+                anchors.topMargin: dp(30)
                 background: Rectangle {
                     color: "#6F00D6"
                     radius: dp(4)
@@ -882,7 +882,7 @@ Item {
                         text: qsTr("OK")
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: dp(18)
+                        font.pixelSize: dp(15)
                         color: "white"
                     }
                 }

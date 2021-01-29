@@ -163,16 +163,16 @@ Item {
     Component {
         id: outputsDelegate
         Rectangle {
-            height: dp(270)
+            height: dp(215)
             color: "#00000000"
             anchors.left: parent.left
             anchors.right: parent.right
 
             Rectangle {
-                height: dp(260)
+                height: dp(205)
                 color: "#33bf84ff"
                 anchors.top: parent.top
-                anchors.topMargin: dp(15)
+                anchors.topMargin: dp(10)
                 anchors.right: parent.right
                 anchors.rightMargin: dp(20)
                 anchors.left: parent.left
@@ -202,7 +202,7 @@ Item {
                     width: dp(17)
                     height: dp(17)
                     anchors.top: parent.top
-                    anchors.topMargin: dp(35)
+                    anchors.topMargin: dp(20)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
                     fillMode: Image.PreserveAspectFit
@@ -215,7 +215,7 @@ Item {
                     font.bold: true
                     font.pixelSize: dp(15)
                     anchors.top: parent.top
-                    anchors.topMargin: dp(37)
+                    anchors.topMargin: dp(22)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(71)
                 }
@@ -228,7 +228,7 @@ Item {
                     horizontalAlignment: Text.AlignRight
                     font.pixelSize: dp(15)
                     anchors.top: parent.top
-                    anchors.topMargin: dp(37)
+                    anchors.topMargin: dp(22)
                     anchors.right: parent.right
                     anchors.rightMargin: dp(35)
                 }
@@ -237,7 +237,7 @@ Item {
                     height: dp(1)
                     color: "#ffffff"
                     anchors.top: parent.top
-                    anchors.topMargin: dp(70)
+                    anchors.topMargin: dp(55)
                     anchors.right: parent.right
                     anchors.rightMargin: dp(35)
                     anchors.left: parent.left
@@ -249,7 +249,7 @@ Item {
                     text: valueNano
                     font.bold: true
                     anchors.top: parent.top
-                    anchors.topMargin: dp(90)
+                    anchors.topMargin: dp(70)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
                     font.pixelSize: dp(15)
@@ -259,7 +259,7 @@ Item {
                     color: "#ffffff"
                     text: "Confirmations: " + numOfConfirms
                     anchors.top: parent.top
-                    anchors.topMargin: dp(120)
+                    anchors.topMargin: dp(95)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
                     font.pixelSize: dp(15)
@@ -270,7 +270,7 @@ Item {
                     text: "Commitment: " + outputCommitment
                     elide: Text.ElideMiddle
                     anchors.top: parent.top
-                    anchors.topMargin: dp(150)
+                    anchors.topMargin: dp(120)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
                     anchors.right: parent.right
@@ -282,7 +282,7 @@ Item {
                     color: "#ffffff"
                     text: "Coinbase: " + coinbase
                     anchors.top: parent.top
-                    anchors.topMargin: dp(180)
+                    anchors.topMargin: dp(145)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
                     font.pixelSize: dp(15)
@@ -292,7 +292,7 @@ Item {
                     color: "#ffffff"
                     text: "Height: " + blockHeight
                     anchors.top: parent.top
-                    anchors.topMargin: dp(210)
+                    anchors.topMargin: dp(170)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
                     font.pixelSize: dp(15)
@@ -303,7 +303,7 @@ Item {
                     text: "Lock Height: " + lockedUntil
                     visible: lockedUntil !== ""
                     anchors.top: parent.top
-                    anchors.topMargin: dp(210)
+                    anchors.topMargin: dp(170)
                     anchors.left: parent.left
                     anchors.leftMargin: parent.width / 2
                     font.pixelSize: dp(15)
@@ -314,7 +314,7 @@ Item {
 
     Rectangle {
         id: rect_accounts
-        height: dp(225)
+        height: dp(200)
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -344,7 +344,7 @@ Item {
 
         ComboBox {
             id: accountComboBox
-            height: dp(72)
+            height: dp(60)
             anchors.right: parent.right
             anchors.rightMargin: dp(30)
             anchors.left: parent.left
@@ -353,7 +353,7 @@ Item {
             anchors.topMargin: dp(10)
             leftPadding: dp(20)
             rightPadding: dp(40)
-            font.pixelSize: dp(14)
+            font.pixelSize: dp(15)
 
             onCurrentIndexChanged: {
                 // Selecting the active account
@@ -366,7 +366,7 @@ Item {
 
             delegate: ItemDelegate {
                 width: accountComboBox.width
-                height: dp(72)
+                height: dp(60)
                 contentItem: Text {
                     text: info
                     color: "white"
@@ -424,7 +424,7 @@ Item {
             }
 
             background: Rectangle {
-                implicitHeight: dp(72)
+                implicitHeight: dp(60)
                 radius: dp(4)
                 color: "#8633E0"
             }
@@ -469,9 +469,9 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: dp(45)
             anchors.top: accountComboBox.bottom
-            anchors.topMargin: dp(35)
-            width: dp(45)
-            height: dp(45)
+            anchors.topMargin: dp(30)
+            width: dp(35)
+            height: dp(35)
             fillMode: Image.PreserveAspectFit
             source: "../img/Refresh@2x.svg"
 
@@ -486,50 +486,49 @@ Item {
         Button {
             id: button_output
             width: dp(220)
-            height: dp(48)
-            anchors.top: accountComboBox.bottom
-            anchors.topMargin: dp(35)
+            height: dp(40)
+            anchors.verticalCenter: image_refresh.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
             background: Rectangle {
                 color: "#00000000"
-                radius: dp(45)
+                radius: dp(37)
                 border.width: dp(2)
                 border.color: "white"
 
                 Rectangle {
                     color: showAll ? "white" : "#00000000"
-                    radius: dp(45)
+                    radius: dp(37)
                     anchors.top: parent.top
                     anchors.topMargin: dp(4)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(4)
                     width: dp(100)
-                    height: dp(40)
+                    height: dp(32)
 
                     Text {
                         text: qsTr("All")
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: dp(18)
+                        font.pixelSize: dp(15)
                         color: showAll ? "#6F00D6" : "white"
                     }
                 }
 
                 Rectangle {
                     color: showAll ? "#00000000" : "white"
-                    radius: dp(45)
+                    radius: dp(37)
                     anchors.top: parent.top
                     anchors.topMargin: dp(4)
                     anchors.right: parent.right
                     anchors.rightMargin: dp(4)
                     width: dp(120)
-                    height: dp(40)
+                    height: dp(32)
 
                     Text {
                         text: qsTr("Unspent")
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: dp(18)
+                        font.pixelSize: dp(15)
                         color: showAll ? "white" : "#6F00D6"
                     }
                 }
@@ -544,13 +543,10 @@ Item {
 
     OutputDetail {
         id: outputDetailItem
-        anchors.left: parent.left
+        anchors.fill: parent
         anchors.leftMargin: dp(30)
-        anchors.right: parent.right
         anchors.rightMargin: dp(30)
-        anchors.verticalCenter: parent.verticalCenter
         visible: false
-        height: dp(700)
     }
 
     Rectangle {

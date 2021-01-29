@@ -53,6 +53,9 @@ Item {
 
     onVisibleChanged: {
         if (visible) {
+            if (parent.height > dp(560)) {
+                anchors.topMargin = (parent.height - dp(560)) / 2
+            }
             rect_progress.visible = true
             wallet.requestWalletBalanceUpdate()
             rect_online.color = "#8633E0"
@@ -73,21 +76,20 @@ Item {
 
     Rectangle {
         id: rect_online
-        width: dp(150)
-        height: dp(210)
+        width: dp(140)
+        height: dp(180)
         color: "#00000000"
         radius: dp(10)
         anchors.left: parent.left
         anchors.leftMargin: (parent.width / 2 - rect_online.width) / 1.5
-        anchors.bottom: text_description1 .top
-        anchors.bottomMargin: dp(30)
+        anchors.top: parent.top
         border.color: "#ffffff"
         border.width: dp(2)
 
         Image {
             id: image_online
             width: dp(80)
-            height: dp(80)
+            height: dp(60)
             anchors.top: text_online_selected.bottom
             anchors.topMargin: dp(10)
             anchors.horizontalCenter: parent.horizontalCenter
@@ -100,9 +102,9 @@ Item {
             color: "#ffffff"
             text: qsTr("SELECTED")
             anchors.top: parent.top
-            anchors.topMargin: dp(20)
+            anchors.topMargin: dp(15)
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(15)
+            font.pixelSize: dp(14)
             visible: false
         }
 
@@ -114,7 +116,7 @@ Item {
             anchors.top: image_online.bottom
             anchors.topMargin: dp(10)
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(21)
+            font.pixelSize: dp(18)
         }
 
         Rectangle {
@@ -136,7 +138,7 @@ Item {
             anchors.top: rect_splitter1.bottom
             anchors.topMargin: dp(5)
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(15)
+            font.pixelSize: dp(14)
         }
 
         MouseArea {
@@ -152,8 +154,8 @@ Item {
 
     Rectangle {
         id: rect_file
-        width: dp(150)
-        height: dp(210)
+        width: dp(140)
+        height: dp(180)
         color: "#00000000"
         radius: dp(10)
         anchors.verticalCenter: rect_online.verticalCenter
@@ -165,7 +167,7 @@ Item {
         Image {
             id: image_file
             width: dp(80)
-            height: dp(80)
+            height: dp(60)
             anchors.topMargin: dp(10)
             fillMode: Image.PreserveAspectFit
             source: "../img/File@2x.svg"
@@ -177,8 +179,8 @@ Item {
             id: text_file_selected
             color: "#ffffff"
             text: qsTr("SELECTED")
-            anchors.topMargin: dp(20)
-            font.pixelSize: dp(15)
+            anchors.topMargin: dp(15)
+            font.pixelSize: dp(14)
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
             visible: false
@@ -190,7 +192,7 @@ Item {
             text: qsTr("File")
             anchors.topMargin: dp(10)
             font.bold: true
-            font.pixelSize: dp(21)
+            font.pixelSize: dp(18)
             anchors.top: image_file.bottom
             anchors.horizontalCenter: parent.horizontalCenter
         }
@@ -212,7 +214,7 @@ Item {
             color: "#ffffff"
             text: qsTr("Manual Process")
             anchors.topMargin: dp(5)
-            font.pixelSize: dp(15)
+            font.pixelSize: dp(14)
             anchors.top: rect_splitter2.bottom
             anchors.horizontalCenter: parent.horizontalCenter
         }
@@ -232,14 +234,14 @@ Item {
         id: text_description1
         color: "#ffffff"
         text: qsTr("- Transaction will not be finalized if the destination wallet is offline and not listening for the destination address.")
-        anchors.bottom: text_description2.top
-        anchors.bottomMargin: dp(5)
+        anchors.top: rect_online.bottom
+        anchors.topMargin: dp(20)
         anchors.right: parent.right
         anchors.rightMargin: dp(30)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        font.pixelSize: dp(15)
+        font.pixelSize: dp(14)
     }
 
     Text {
@@ -247,12 +249,13 @@ Item {
         color: "#ffffff"
         text: qsTr("- Your funds at that output will be blocked until your transaction is finalized")
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        font.pixelSize: dp(15)
+        font.pixelSize: dp(14)
         anchors.right: parent.right
         anchors.rightMargin: dp(30)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.top: text_description1.bottom
+        anchors.topMargin: dp(5)
     }
 
     Text {
@@ -260,7 +263,7 @@ Item {
         color: "#ffffff"
         text: qsTr("- You can cancel any non finalized transaction to unblock your funds at 'Transactions'")
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        font.pixelSize: dp(15)
+        font.pixelSize: dp(14)
         anchors.right: parent.right
         anchors.rightMargin: dp(30)
         anchors.left: parent.left
@@ -274,7 +277,7 @@ Item {
         width: parent.width - dp(180)
         height: dp(50)
         padding: dp(5)
-        leftPadding: dp(10)
+        leftPadding: dp(20)
         font.pixelSize: dp(18)
         placeholderText: qsTr("Amount")
         color: "white"
@@ -375,7 +378,7 @@ Item {
         width: dp(60)
         height: dp(30)
         anchors.top: checkbox_tx_proof.bottom
-        anchors.topMargin: dp(50)
+        anchors.topMargin: dp(30)
         anchors.horizontalCenter: parent.horizontalCenter
         color: "#00000000"
         visible: false
@@ -390,7 +393,7 @@ Item {
         width: dp(150)
         height: dp(50)
         anchors.top: checkbox_tx_proof.bottom
-        anchors.topMargin: dp(50)
+        anchors.topMargin: dp(20)
         anchors.horizontalCenter: parent.horizontalCenter
         visible: !rect_progress.visible
         background: Rectangle {
@@ -423,7 +426,7 @@ Item {
     ComboBox {
         id: accountComboBox
         anchors.top: text_description3.bottom
-        anchors.topMargin: dp(30)
+        anchors.topMargin: dp(20)
         anchors.right: parent.right
         anchors.rightMargin: dp(30)
         anchors.left: parent.left

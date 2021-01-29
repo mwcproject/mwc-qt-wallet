@@ -119,7 +119,7 @@ Item {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.top: rect_buttons.bottom
-        anchors.topMargin: dp(15)
+        anchors.topMargin: dp(10)
         model: accountsModel
         delegate: accountsDelegate
         focus: true
@@ -128,16 +128,16 @@ Item {
     Component {
         id: accountsDelegate
         Rectangle {
-            height: dp(180)
+            height: dp(170)
             color: "#00000000"
             anchors.left: parent.left
             anchors.right: parent.right
 
             Rectangle {
-                height: dp(170)
+                height: dp(160)
                 color: "#33bf84ff"
                 anchors.top: parent.top
-                anchors.topMargin: dp(15)
+                anchors.topMargin: dp(10)
                 anchors.right: parent.right
                 anchors.rightMargin: dp(20)
                 anchors.left: parent.left
@@ -193,7 +193,7 @@ Item {
                     color: "#ffffff"
                     text: "Awaiting: " + awaiting
                     anchors.top: parent.top
-                    anchors.topMargin: dp(100)
+                    anchors.topMargin: dp(95)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
                     font.pixelSize: dp(15)
@@ -203,7 +203,7 @@ Item {
                     color: "#ffffff"
                     text: "Locked: " + locked
                     anchors.top: parent.top
-                    anchors.topMargin: dp(130)
+                    anchors.topMargin: dp(120)
                     anchors.left: parent.left
                     anchors.leftMargin: dp(35)
                     font.pixelSize: dp(15)
@@ -212,11 +212,11 @@ Item {
                 Image {
                     id: image_rename
                     anchors.right: parent.right
-                    anchors.rightMargin: image_remove.visible ? dp(90) : dp(35)
+                    anchors.rightMargin: image_remove.visible ? dp(80) : dp(35)
                     anchors.top: parent.top
                     anchors.topMargin: dp(100)
-                    width: dp(45)
-                    height: dp(45)
+                    width: dp(35)
+                    height: dp(35)
                     fillMode: Image.PreserveAspectFit
                     source: "../img/Edit@2x.svg"
                     visible: index > 0
@@ -236,8 +236,8 @@ Item {
                     anchors.rightMargin: dp(35)
                     anchors.top: parent.top
                     anchors.topMargin: dp(100)
-                    width: dp(45)
-                    height: dp(45)
+                    width: dp(35)
+                    height: dp(35)
                     fillMode: Image.PreserveAspectFit
                     source: "../img/Delete@2x.svg"
                     visible: index > 0 && index < accountsModel.count && accState.canDeleteAccount(account)
@@ -259,7 +259,8 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        height: dp(55)
+        anchors.topMargin: dp(15)
+        height: dp(50)
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop {
@@ -275,7 +276,7 @@ Item {
 
         Rectangle {
             width: dp(250)
-            height: dp(45)
+            height: dp(40)
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
             color: "#00000000"
@@ -284,8 +285,8 @@ Item {
                 id: image_transfer
                 anchors.left: parent.left
                 anchors.top: parent.top
-                width: dp(45)
-                height: dp(45)
+                width: dp(40)
+                height: dp(40)
                 fillMode: Image.PreserveAspectFit
                 source: "../img/Transfer@2x.svg"
 
@@ -301,8 +302,8 @@ Item {
                 id: image_add
                 anchors.top: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: dp(45)
-                height: dp(45)
+                width: dp(40)
+                height: dp(40)
                 fillMode: Image.PreserveAspectFit
                 source: "../img/Add@2x.svg"
 
@@ -318,8 +319,8 @@ Item {
                 id: image_refresh
                 anchors.right: parent.right
                 anchors.top: parent.top
-                width: dp(45)
-                height: dp(45)
+                width: dp(40)
+                height: dp(40)
                 fillMode: Image.PreserveAspectFit
                 source: "../img/Refresh@2x.svg"
 
@@ -351,10 +352,5 @@ Item {
             id: animation
             source: "../img/loading.gif"
         }
-    }
-
-    MessageBox {
-        id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
     }
 }

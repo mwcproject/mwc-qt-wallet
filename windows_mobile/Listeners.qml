@@ -114,6 +114,10 @@ Item {
 
     onVisibleChanged: {
         if (visible) {
+            if (parent.height > dp(440)) {
+                anchors.topMargin = (parent.height - dp(440)) / 2
+            }
+
             updateStatuses()
             wallet.requestFileProofAddress()
             wallet.requestMqsAddress()
@@ -122,21 +126,19 @@ Item {
 
     Rectangle {
         id: rect_mqs_status
-        width: dp(170)
+        width: dp(150)
         height: dp(40)
         color: "#00000000"
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        anchors.bottom: rect_mqs_address.top
-        anchors.bottomMargin: dp(30)
+        anchors.top: parent.top
 
         Text {
             id: label_mqs
             text: qsTr("MWC MQS")
             anchors.left: parent.left
-            anchors.bottom: text_mqs_status.top
-            anchors.bottomMargin: dp(5)
-            font.pixelSize: dp(25)
+            anchors.top: parent.top
+            font.pixelSize: dp(20)
             font.bold: true
             color: "white"
         }
@@ -145,15 +147,16 @@ Item {
             id: text_mqs_status
             text: qsTr("(Online)")
             anchors.horizontalCenter: label_mqs.horizontalCenter
-            anchors.bottom: parent.bottom
+            anchors.top: label_mqs.bottom
+            anchors.topMargin: dp(5)
             font.pixelSize: dp(15)
             color: "white"
         }
 
         Image {
             id: image_mqs_status
-            width: dp(25)
-            height: dp(25)
+            width: dp(20)
+            height: dp(20)
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(15)
@@ -164,12 +167,11 @@ Item {
 
     Button {
         id: button_mqs
-        width: dp(150)
-        height: dp(50)
+        width: dp(100)
+        height: dp(40)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
-        anchors.bottom: rect_mqs_address.top
-        anchors.bottomMargin: dp(20)
+        anchors.bottom: rect_mqs_status.bottom
         background: Rectangle {
             color: "#00000000"
             radius: dp(5)
@@ -180,7 +182,7 @@ Item {
                 text: qsTr("Start")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
+                font.pixelSize: dp(15)
                 font.bold: true
                 color: "white"
             }
@@ -208,8 +210,8 @@ Item {
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        anchors.bottom: rect_tor_status.top
-        anchors.bottomMargin: dp(60)
+        anchors.top: button_mqs.bottom
+        anchors.topMargin: dp(20)
         color: "#8633E0"
         radius: dp(5)
         height: dp(30) + text_mqs_address.height
@@ -223,7 +225,7 @@ Item {
             anchors.right: parent.right
             anchors.rightMargin: dp(20)
             wrapMode: Text.WrapAnywhere
-            font.pixelSize: dp(18)
+            font.pixelSize: dp(15)
             color: "white"
             text: "xmgKiuQxaPLozdD59hfB1vES3aPBdnTD51oG2CbqGbNStN4kjm1k"
         }
@@ -242,20 +244,20 @@ Item {
 
     Rectangle {
         id: rect_tor_status
-        width: dp(170)
+        width: dp(150)
         height: dp(40)
         color: "#00000000"
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        anchors.bottom: rect_tor_address.top
-        anchors.bottomMargin: dp(30)
+        anchors.top: text_mqs_address_index.bottom
+        anchors.topMargin: dp(30)
 
         Text {
             id: label_tor
             text: qsTr("Tor")
             anchors.left: parent.left
             anchors.bottom: parent.bottom
-            font.pixelSize: dp(25)
+            font.pixelSize: dp(20)
             font.bold: true
             color: "white"
         }
@@ -272,8 +274,8 @@ Item {
 
         Image {
             id: image_tor_status
-            width: dp(25)
-            height: dp(25)
+            width: dp(20)
+            height: dp(20)
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             fillMode: Image.PreserveAspectFit
@@ -283,12 +285,11 @@ Item {
 
     Button {
         id: button_tor
-        width: dp(150)
-        height: dp(50)
+        width: dp(100)
+        height: dp(40)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
-        anchors.bottom: rect_tor_address.top
-        anchors.bottomMargin: dp(20)
+        anchors.bottom: rect_tor_status.bottom
         background: Rectangle {
             color: "#00000000"
             radius: dp(5)
@@ -299,7 +300,7 @@ Item {
                 text: qsTr("Start")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
+                font.pixelSize: dp(15)
                 font.bold: true
                 color: "white"
             }
@@ -327,7 +328,8 @@ Item {
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.top: rect_tor_status.bottom
+        anchors.topMargin: dp(20)
         color: "#8633E0"
         radius: dp(5)
         height: dp(30) + text_tor_address.height
@@ -341,7 +343,7 @@ Item {
             anchors.right: parent.right
             anchors.rightMargin: dp(20)
             wrapMode: Text.WrapAnywhere
-            font.pixelSize: dp(18)
+            font.pixelSize: dp(15)
             color: "white"
             text: ""
         }
@@ -361,12 +363,12 @@ Item {
     Text {
         id: label_next_address
         anchors.top: text_tor_address_index.bottom
-        anchors.topMargin: dp(40)
+        anchors.topMargin: dp(30)
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
-        font.pixelSize: dp(16)
+        font.pixelSize: dp(15)
         wrapMode: Text.WordWrap
         color: "white"
         text: qsTr("Please stop TOR and MWC MQS listeners in order to change the wallet address")
@@ -375,7 +377,7 @@ Item {
     Button {
         id: button_next_address
         width: dp(170)
-        height: dp(50)
+        height: dp(40)
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
         anchors.top: label_next_address.bottom
@@ -389,7 +391,7 @@ Item {
                 text: qsTr("Next Address")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
+                font.pixelSize: dp(15)
                 font.bold: true
                 color: button_next_address.enabled ? "white" : "#e2ccf7"
             }
@@ -407,11 +409,10 @@ Item {
     Button {
         id: button_to_index
         width: dp(150)
-        height: dp(50)
+        height: dp(40)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
-        anchors.top: label_next_address.bottom
-        anchors.topMargin: dp(15)
+        anchors.verticalCenter: button_next_address.verticalCenter
         background: Rectangle {
             color: "#00000000"
             radius: dp(5)
@@ -421,7 +422,7 @@ Item {
                 text: qsTr("To index")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
+                font.pixelSize: dp(15)
                 font.bold: true
                 color: button_to_index.enabled ? "white" : "#e2ccf7"
             }
