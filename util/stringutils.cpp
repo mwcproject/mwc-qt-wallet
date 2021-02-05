@@ -128,6 +128,9 @@ QString trimStrAsDouble(const QString & dblStr, int maxLen) {
         res = res.left( res.size()-1 );
     }
 
+    if (dblStr.length()>3 && res=="0" && maxLen<10)
+        return trimStrAsDouble(dblStr, maxLen+1);
+
     return res;
 }
 

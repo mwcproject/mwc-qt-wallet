@@ -101,7 +101,10 @@ void NewSwap2::on_reviewButton_clicked() {
 
     bool secTxFeeOk = false;
     double secTxFee = ui->secTransFeeEdit->text().toDouble(&secTxFeeOk);
-    if (!secTxFeeOk || secTxFee<0.01) {
+    double minTx = 0.01;
+    if (secCurrency=="ZCash")
+        minTx = 0.0001; // Zcash units are different.
+    if (!secTxFeeOk || secTxFee<minTx) {
         control::MessageBox::messageText(this, "Incorrect Input", "Please specify a correct "+secCurrency+" transaction fee.");
         ui->secTransFeeEdit->setFocus();
         return;

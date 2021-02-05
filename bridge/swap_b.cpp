@@ -701,7 +701,7 @@ QString Swap::getSecondaryFee(QString secCurrency) {
     return util::trimStrAsDouble(QString::number( fee, 'f' ), 5);
 }
 
-// Tweak the swap tarde state. ONLY for dev help usage.
+// Tweak the swap trade state. ONLY for dev help usage.
 void Swap::adjustTradeState(QString swapId, QString newState) {
     getWallet()->adjustTradeState(swapId, newState);
 }

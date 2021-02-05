@@ -99,7 +99,7 @@ public:
                             bool _dryRun,
                             QString _tag,
                             QVector<QString> _params ) :
-            Mwc713Task("TaskCreateNewSwapTrade", "Creaating new Swap tarde...",
+            Mwc713Task("TaskCreateNewSwapTrade", "Creaating new Swap trade...",
                        generateCommandLine(min_confirmations,mwcAmount, secAmount, secondary,
                                     redeemAddress, secTxFee, sellerLockFirst, messageExchangeTimeMinutes,
                                     redeemTimeMinutes, mwcConfirmationNumber, secondaryConfirmationNumber,

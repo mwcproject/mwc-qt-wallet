@@ -95,12 +95,16 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
     int sellIdx = swapInfo[1].indexOf("Selling"); // Text in HTML formal, "Start With" will not work
     bool seller = sellIdx > 200 && sellIdx < 300;
 
+    QString addressName = secCurrency;
+    if (addressName == "ZCash")
+        addressName = "Transparent ZCash";
+
     if (seller)
         ui->secondaryAddressLabel->setText(secCurrency + " address to receive the coins");
     else
         ui->secondaryAddressLabel->setText(secCurrency + " address for the refund in case of trade cancellation");
 
-    QString addressPlaceholderText = secCurrency + " address";
+    QString addressPlaceholderText = addressName + " address";
     ui->redeemAddressEdit->setPlaceholderText(addressPlaceholderText);
 
     ui->secTransFeeLabel->setText(secCurrency + " transaction fee");
