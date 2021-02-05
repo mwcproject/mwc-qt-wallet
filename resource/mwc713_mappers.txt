@@ -13,7 +13,7 @@ LibWallet Error, Swap Error , Electrum Node error, (.+)
 ElectrumX server error: $1
 
 # Swap Error , Swap generic error, Unable to parse secondary currency redeem address mzhdk3nzaQPx52LFL2P2oqWTsa6c9eo5, base58: base58ck checksum 0x745e7c87 does not match expected 0xf47d9508
-Swap Error , Swap generic error, Unable to parse secondary currency redeem address (.*), base58: (.*)
+Swap Error , Swap generic error, Unable to parse secondary currency redeem address (\w*), base58: (.*)
 Unable to parse the address $1, $2
 
 # LibWallet Error, Unable to adjust Swap c858d985-cd18-4c0e-9a4a-41ffbe2ee12b: Swap Error , Swap generic error, Unable to parse BCH address myPKtHbX9Kv1z3AAC69vdMoBqHMi5Hy13r, base58: base58ck checksum 0x255b5881 does not match expected 0x245b5881
@@ -163,3 +163,11 @@ This transaction belongs to the $1 network, expected $2 network.
 #Swap Error , Electrum Node error, Received error: the transaction was rejected by network rules. dust [............]
 Swap Error , Electrum Node error, Received error: the transaction was rejected by network rules. dust(.*)
 Your BTC transaction can't be posted because fees are higher then amount. Please reduce the transaciton fee, so amount can cover them.
+
+# Swap Error , Swap generic error, Unable to parse secondary currency redeem address tltc1q0gr4XXXXXXX, Swap generic error, Unable to parse LTC address tltc1qXXXXXXX, bech32: invalid character (code=b)
+Swap Error , Swap generic error, Unable to parse secondary currency redeem address (.*), Swap generic error, (.*)
+$2
+
+# Swap Error , Swap generic error, Unable to parse secondary currency redeem address ztestsaXXXXXXX, Swap generic error, Unable to parse ZCash transparent address ztestsaplinXXXXXX, base58: length 64 invalid for this base58 type
+Swap Error , Swap generic error, Unable to parse secondary currency redeem address (.*), Swap generic error, (.*)
+$2

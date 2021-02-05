@@ -155,7 +155,7 @@ public:
     // Request secondary fee for the currency
     Q_INVOKABLE QString getSecondaryFee(QString secCurrency);
 
-    // Tweak the swap tarde state. ONLY for dev help usage.
+    // Tweak the swap trade state. ONLY for dev help usage.
     Q_INVOKABLE void adjustTradeState(QString swapId, QString newState);
 signals:
     // Result of deleteSwapTrade call.

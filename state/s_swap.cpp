@@ -59,6 +59,10 @@ struct SecCurrencyInfo {
 static QVector<SecCurrencyInfo> SWAP_CURRENCY_LIST = {
         SecCurrencyInfo("BTC", 600, 3, "satoshi per byte", -1.0),
         SecCurrencyInfo("BCH", 600, 15, "satoshi per byte", 3.0 ),
+        SecCurrencyInfo("LTC", 60*2+30, 12, "litoshi per byte", 100.0 ),
+        SecCurrencyInfo("ZCash", 75, 24, "ZEC", 0.0001 ),
+        SecCurrencyInfo("Dash", 60 * 2 + 39, 6, "duff per byte", 26.0 ),
+        SecCurrencyInfo("Doge", 60, 20, "doge", 3.0 ),
 };
 
 static SecCurrencyInfo getCurrencyInfo(QString currency) {

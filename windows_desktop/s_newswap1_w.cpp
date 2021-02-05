@@ -197,7 +197,12 @@ void NewSwap1::updateSecCurrencyStatus() {
 
     ui->rateLabel->setText("MWC to " + selectedCur + " rate:");
     ui->secAddressEdit->setText("");
-    QString addressPlaceholderText = selectedCur + " address to receive the coins";
+    QString addressPlaceholderText;
+    if (selectedCur == "ZCash")
+        addressPlaceholderText = "Transparent ZCash address to receive the coins";
+    else
+        addressPlaceholderText = selectedCur + " address to receive the coins";
+
     ui->secAddressEdit->setPlaceholderText(addressPlaceholderText);
     ui->receiveLabel->setText(selectedCur + " receiving address:");
 
