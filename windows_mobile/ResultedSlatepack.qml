@@ -275,6 +275,7 @@ Item {
             font.pixelSize: dp(18)
             color: "white"
             text: ""
+            placeholderText: "Paste reply slatepack here to finalize transaction. Also you can always finalize it at Finalize page."
             horizontalAlignment: Text.AlignLeft
             wrapMode: TextArea.WrapAnywhere
             background: Rectangle {

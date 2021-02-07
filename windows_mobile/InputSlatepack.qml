@@ -29,6 +29,7 @@ Item {
         expectedContentDescription = _expectedContentDescription
         txType = _txType
         text_status.visible = false
+        textarea_content.text = ""
 
         updateButtons()
         dlgItem.visible = true

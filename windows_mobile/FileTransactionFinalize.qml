@@ -265,7 +265,7 @@ Item {
             border.color: "white"
             Text {
                 id: text_button_ok
-                text: qsTr("Generate Response")
+                text: qsTr("Finalize")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
