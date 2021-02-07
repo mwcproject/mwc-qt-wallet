@@ -1,17 +1,18 @@
 import QtQuick 2.0
 import QtQuick.Window 2.0
 import QtQuick.Controls 2.13
-import FileTransactionBridge 1.0
 import ConfigBridge 1.0
 import WalletBridge 1.0
+import UtilBridge 1.0
+import FinalizeBridge 1.0
 
 Item {
-    property string transactionFileName
+    property string fileNameOrSlatepack
+    property string txUuid
     property string resTxFN
-    property bool isFinalize
 
-    FileTransactionBridge {
-        id: fileTransaction
+    FinalizeBridge {
+        id: finalize
     }
 
     ConfigBridge {
@@ -22,22 +23,45 @@ Item {
         id: wallet
     }
 
+    UtilBridge {
+        id: util
+    }
+
     Connections {
-        target: fileTransaction
+        target: finalize
         onSgnHideProgress: {
             rect_progress.visible = false
         }
     }
 
-    function confirmationCallback(ret) {
-        if (ret) {
+    Connections {
+        target: wallet
+        onSgnTransactionById: {
+            rect_progress.visible = false
+
+            if(!success) return
+
+            const txDetails = JSON.parse(transaction)
+            text_amount.text = util.nano2one(Math.abs(txDetails.coinNano)) + " MWC"
+            if (messages.length > 0) { // my message need to read form the saved transaction data
+                const senderMsg = messages[0]
+                if (senderMsg === "")
+                    senderMsg = "None"
+                text_senderDescription.text = senderMsg
+            }
+        }
+    }
+
+    function confirmationCallback(ok) {
+        if (ok) {
             rect_progress.visible = true
-            if (isFinalize) {
-                fileTransaction.ftContinue( transactionFileName, resTxFN, config.isFluffSet() )
-            } else {
-                const filepath = decodeURIComponent(transactionFileName)
-                const path = "/mnt/user/0/primary/" + filepath.substring(filepath.search("primary:") + 8, filepath.length)
-                fileTransaction.ftContinue( path, resTxFN, config.isFluffSet() )
+
+            if (fileNameOrSlatepack.substring(0, 10) === ("BEGINSLATE")) {
+                finalize.finalizeSlatepack( fileNameOrSlatepack, txUuid, resTxFN, config.isFluffSet() );
+            }
+            else
+            { // file
+                finalize.finalizeFile( fileNameOrSlatepack, resTxFN, config.isFluffSet() );
             }
         }
     }
@@ -49,17 +73,31 @@ Item {
             }
 
             const params = JSON.parse(initParams)
-            transactionFileName = params.fileName
-            fileTransaction.callerId = params.callerId
             rect_progress.visible = false
-            text_title.text = params.transactionType
-            text_button_ok.text = params.processButtonName
-            text_amount.text = params.amount + " MWC"
-            text_txid.text = params.transactionId
+            fileNameOrSlatepack = params.fileNameOrSlatepack
+            txUuid = params.transactionId
+            if (params.amount_fee_not_defined) {
+                text_amount.text = "-"
+                // Requesting tranbsaction info form the wallet.
+                // It is a normal case, compact slate doesn;t have all info
+                wallet.requestTransactionById( wallet.getCurrentAccountName(), txUuid )
+                rect_progress.visible = true
+            }
+            else {
+                text_amount.text = params.amount + " MWC"
+            }
+            text_txid.text = txUuid
             text_lockheight.text = params.lockHeight
-            text_receiverAddress.text = params.receiverAddress
-            text_message.text = params.message
-            isFinalize = params.isFinalize
+            text_senderAddress.text = params.senderAddress
+            text_senderDescription.text = params.senderMessage
+            text_receiverDescription.text = params.receiverMessage
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            textarea_message.focus = false
         }
     }
 
@@ -80,7 +118,7 @@ Item {
         anchors.leftMargin: dp(20)
         anchors.verticalCenter: image_finalize.verticalCenter
         color: "#ffffff"
-        text: qsTr("Receive File Transaction")
+        text: qsTr("Finalize Transaction")
         font.pixelSize: dp(24)
         font.bold: true
     }
@@ -93,7 +131,7 @@ Item {
         anchors.topMargin: dp(50)
         color: "#ffffff"
         text: qsTr("Amount:")
-        font.pixelSize: dp(18)
+        font.pixelSize: dp(15)
     }
 
     Text {
@@ -103,7 +141,7 @@ Item {
         anchors.verticalCenter: label_amount.verticalCenter
         color: "#ffffff"
         text: qsTr("1 MWC")
-        font.pixelSize: dp(18)
+        font.pixelSize: dp(15)
     }
 
     Text {
@@ -111,10 +149,10 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: dp(160) - width
         anchors.top: label_amount.bottom
-        anchors.topMargin: dp(30)
+        anchors.topMargin: dp(20)
         color: "#ffffff"
         text: qsTr("Transaction ID:")
-        font.pixelSize: dp(18)
+        font.pixelSize: dp(15)
     }
 
     Text {
@@ -132,10 +170,10 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: dp(160) - width
         anchors.top: label_txid.bottom
-        anchors.topMargin: dp(30)
+        anchors.topMargin: dp(20)
         color: "#ffffff"
         text: qsTr("Lock Height:")
-        font.pixelSize: dp(18)
+        font.pixelSize: dp(15)
     }
 
     Text {
@@ -145,68 +183,77 @@ Item {
         anchors.verticalCenter: label_lockheight.verticalCenter
         color: "#ffffff"
         text: qsTr("-")
-        font.pixelSize: dp(18)
+        font.pixelSize: dp(15)
     }
 
     Text {
-        id: label_receiverAddress
+        id: label_senderAddress
         anchors.left: parent.left
         anchors.leftMargin: dp(160) - width
         anchors.top: label_lockheight.bottom
-        anchors.topMargin: dp(30)
+        anchors.topMargin: dp(20)
         color: "#ffffff"
-        text: qsTr("Receiver Address:")
-        font.pixelSize: dp(18)
+        text: qsTr("Sender Address:")
+        font.pixelSize: dp(15)
     }
 
     Text {
-        id: text_receiverAddress
-        anchors.left: label_receiverAddress.right
+        id: text_senderAddress
+        anchors.left: label_senderAddress.right
         anchors.leftMargin: dp(20)
-        anchors.verticalCenter: label_receiverAddress.verticalCenter
+        anchors.verticalCenter: label_senderAddress.verticalCenter
         color: "#ffffff"
         text: qsTr("-")
-        font.pixelSize: dp(18)
+        font.pixelSize: dp(15)
     }
 
     Text {
-        id: label_message
+        id: label_senderDescription
         anchors.left: parent.left
         anchors.leftMargin: dp(160) - width
-        anchors.top: label_receiverAddress.bottom
-        anchors.topMargin: dp(30)
+        anchors.top: label_senderAddress.bottom
+        anchors.topMargin: dp(20)
         color: "#ffffff"
-        text: qsTr("Message:")
-        font.pixelSize: dp(18)
+        text: qsTr("Sender Description:")
+        font.pixelSize: dp(15)
     }
 
-    Rectangle {
-        id: rect_message
-        height: text_message.text === "" ? dp(100) : text_message.height + dp(20)
-        color: "#33bf84ff"
-        anchors.left: label_message.right
+    Text {
+        id: text_senderDescription
+        anchors.left: label_senderDescription.right
         anchors.leftMargin: dp(20)
-        anchors.top: label_message.top
-        anchors.right: parent.right
-        anchors.rightMargin: dp(20)
-        radius: dp(5)
+        anchors.verticalCenter: label_senderDescription.verticalCenter
+        color: "#ffffff"
+        text: qsTr("")
+        font.pixelSize: dp(15)
+    }
 
-        Text {
-            id: text_message
-            text: qsTr("")
-            color: "#ffffff"
-            font.pixelSize: dp(18)
-            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            anchors.fill: parent
-            anchors.margins: dp(10)
-        }
+    Text {
+        id: label_receiverDescription
+        anchors.left: parent.left
+        anchors.leftMargin: dp(160) - width
+        anchors.top: label_senderDescription.bottom
+        anchors.topMargin: dp(20)
+        color: "#ffffff"
+        text: qsTr("My Description:")
+        font.pixelSize: dp(15)
+    }
+
+    Text {
+        id: text_receiverDescription
+        anchors.left: label_receiverDescription.right
+        anchors.leftMargin: dp(20)
+        anchors.verticalCenter: label_receiverDescription.verticalCenter
+        color: "#ffffff"
+        text: qsTr("")
+        font.pixelSize: dp(15)
     }
 
     Button {
         id: button_ok
         width: dp(200)
         height: dp(50)
-        anchors.top: rect_message.bottom
+        anchors.top: text_receiverDescription.bottom
         anchors.topMargin: dp(30)
         anchors.right: parent.right
         anchors.rightMargin: parent.width / 2 - dp(200)
@@ -227,16 +274,16 @@ Item {
         }
 
         onClicked: {
-            if (!fileTransaction.isNodeHealthy()) {
+            let resTxFN
+            if (!finalize.isNodeHealthy()) {
                 messagebox.open(qsTr("Unable to finalize"), qsTr("Your MWC Node, that wallet connected to, is not ready to finalize transactions.\nMWC Node need to be connected to few peers and finish blocks synchronization process"))
                 return
             }
+
             const walletPasswordHash = wallet.getPasswordHash()
             if (walletPasswordHash !== "") {
-                if (isFinalize) {
-                    sendConfirmationItem.open(qsTr("Confirm Finalize Request"), qsTr("You are finalizing transaction for " + text_amount.text), walletPasswordHash, confirmationCallback)
-                    return
-                }
+                sendConfirmationItem.open("Confirm Finalize Request", "You are finalizing transaction for " + text_amount.text, walletPasswordHash, confirmationCallback)
+                return
             }
             confirmationCallback(true)
         }
@@ -266,7 +313,7 @@ Item {
 
         onClicked: {
             initParams = ""
-            fileTransaction.ftBack()
+            finalize.cancelFileFinalization()
         }
     }
 

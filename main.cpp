@@ -83,7 +83,6 @@
 #include "bridge/wnd/x_events_b.h"
 #include "bridge/wnd/a_startwallet_b.h"
 #include "bridge/wnd/z_progresswnd_b.h"
-#include "bridge/wnd/g_filetransaction_b.h"
 #include "bridge/wnd/e_outputs_b.h"
 #include "bridge/wnd/x_walletconfig_b.h"
 #include "bridge/wnd/k_accounts_b.h"
@@ -295,7 +294,6 @@ int main(int argc, char *argv[])
     qmlRegisterType<bridge::Events>("EventsBridge", 1, 0, "EventsBridge");
     qmlRegisterType<bridge::StartWallet>("StartWalletBridge", 1, 0, "StartWalletBridge");
     qmlRegisterType<bridge::ProgressWnd>("ProgressWndBridge", 1, 0, "ProgressWndBridge");
-    qmlRegisterType<bridge::FileTransaction>("FileTransactionBridge", 1, 0, "FileTransactionBridge");
     qmlRegisterType<bridge::Outputs>("OutputsBridge", 1, 0, "OutputsBridge");
     qmlRegisterType<bridge::WalletConfig>("WalletConfigBridge", 1, 0, "WalletConfigBridge");
     qmlRegisterType<bridge::Accounts>("AccountsBridge", 1, 0, "AccountsBridge");

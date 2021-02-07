@@ -19,6 +19,12 @@ Item {
         id: util
     }
 
+    function slatepackCallback(ok, slatepack, slateJson, sender) {
+        if (ok) {
+            finalize.uploadSlatepackTransaction(slatepack, slateJson, sender)
+        }
+    }
+
     Image {
         id: image_finalize
         width: dp(80)
@@ -34,7 +40,7 @@ Item {
         id: text_finalize
         color: "#ffffff"
         text: qsTr("Finalize Transaction")
-        anchors.verticalCenterOffset: dp(-50)
+        anchors.verticalCenterOffset: dp(-100)
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         font.pixelSize: dp(25)
@@ -44,7 +50,6 @@ Item {
         id: button_upload
         width: dp(250)
         height: dp(50)
-        anchors.verticalCenterOffset: dp(50)
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         background: Rectangle {
@@ -70,6 +75,33 @@ Item {
         }
     }
 
+    Button {
+        id: button_slatepack
+        width: dp(250)
+        height: dp(50)
+        anchors.verticalCenterOffset: dp(100)
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        background: Rectangle {
+            color: "#00000000"
+            radius: dp(4)
+            border.color: "white"
+            border.width: dp(2)
+            Text {
+                text: qsTr("Paste Slatepack")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pixelSize: dp(18)
+                color: "white"
+            }
+        }
+
+        onClicked: {
+            inputSlatepack.open("SendResponse", "Send response slate", 2, slatepackCallback)
+        }
+    }
+
+
     FileDialog {
         id: fileDialog
         title: qsTr("Finalize transaction file")
@@ -91,5 +123,11 @@ Item {
             const filepath = "/mnt/user/0/primary/" + cleanPath.substring(cleanPath.search("primary:") + 8, cleanPath.length)
             finalize.uploadFileTransaction(filepath);
         }
+    }
+
+    InputSlatepack {
+        id: inputSlatepack
+        anchors.verticalCenter: parent.verticalCenter
+        visible: false
     }
 }

@@ -15,7 +15,7 @@ Window {
     property int questionTextDlgResponse
     property int sendConformationDlgResponse
 
-    readonly property double dpi: 3.0 + (Screen.pixelDensity - 22.1) / 19
+    readonly property double dpi: 3.0 + (Screen.pixelDensity - 22.1) / 10
     function dp(x) { return x * dpi }
 
     CoreWindowBridge {
@@ -100,12 +100,6 @@ Window {
         sendConfirmationItem.open(title, message, passwordHash, sendConfirmationDlgCallback)
     }
 
-    onVisibilityChanged: {
-        if (visible) {
-            console.log(123, Screen.pixelDensity, width, height)
-        }
-    }
-
     Rectangle
     {
         gradient: Gradient {
@@ -139,11 +133,6 @@ Window {
         id: inputPasswordItem
         anchors.fill: parent
         visible: currentState === 3
-        onVisibleChanged: {
-            if(visible) {
-                console.log(234, width, height, parent.width, parent.height)
-            }
-        }
     }
 
     Rectangle {
@@ -195,7 +184,7 @@ Window {
         SendOffline {
             id: sendOfflineItem
             anchors.fill: parent
-            visible: currentState === 8 && initParams.length !== 0 && !JSON.parse(initParams).isSendOnline
+            visible: currentState === 8 && initParams.length !== 0 && !JSON.parse(initParams).isSendOnline && !JSON.parse(initParams).backStateId
             onVisibleChanged: {
                 if (visible) {
                     sendOfflineItem.init(JSON.parse(initParams))
@@ -215,10 +204,27 @@ Window {
             visible: currentState === 19 && initParams.length === 0
         }
 
-        FileTransaction {
-            id: fileTransactionItem
+        FileTransactionReceive {
+            id: fileTransactionReceiveItem
             anchors.fill: parent
-            visible: (currentState === 9 || currentState === 19) && initParams.length !== 0
+            visible: currentState === 9 && initParams.length !== 0 && !JSON.parse(initParams).backStateId
+        }
+
+        FileTransactionFinalize {
+            id: fileTransactionFinalizeItem
+            anchors.fill: parent
+            visible: currentState === 19 && initParams.length !== 0
+        }
+
+        ResultedSlatepack {
+            id: resultedSlatepackItem
+            anchors.fill: parent
+            visible: (currentState === 8 || currentState === 9) && initParams.length !== 0 && JSON.parse(initParams).backStateId
+            onVisibleChanged: {
+                if (visible) {
+                    resultedSlatepackItem.init(JSON.parse(initParams))
+                }
+            }
         }
 
         Transactions {

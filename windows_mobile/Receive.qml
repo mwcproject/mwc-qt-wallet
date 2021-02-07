@@ -97,10 +97,16 @@ Item {
         accountComboBox.currentIndex = selectedAccIdx
     }
 
-    function updateStatus() {
+    function updateStatus() {      
         image_mwcmq.source = wallet.getMqsListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
-        image_http.source = wallet.getHttpListeningStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
+        image_http.source = wallet.getHttpListeningStatus() === "true" ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
         image_tor.source = wallet.getTorListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
+    }
+
+    function slatepackCallback(ok, slatepack, slateJson, sender) {
+        if (ok) {
+            receive.signSlatepackTransaction(slatepack, slateJson, sender)
+        }
     }
 
     Rectangle {
@@ -445,14 +451,28 @@ Item {
         }
     }
 
-    Text {
-        id: text_file
-        color: "#BF84FF"
-        text: qsTr("(sign transaction)")
+    Button {
+        id: button_slatepack
+        width: button_tor.width
+        height: dp(50)
         anchors.horizontalCenter: button_tor.horizontalCenter
         anchors.verticalCenter: button_file.verticalCenter
-        font.pixelSize: dp(13)
-        visible: !rect_progress.visible
+        background: Rectangle {
+            color: "#00000000"
+            radius: dp(5)
+            border.color: "white"
+            border.width: dp(2)
+            Text {
+                text: qsTr("Receive by Slatepack")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pixelSize: dp(17)
+                color: "white"
+            }
+        }
+        onClicked: {
+            inputSlatepack.open("SendInitial", "Initial Send Slate", 1, slatepackCallback)
+        }
     }
 
     Rectangle {
@@ -490,6 +510,12 @@ Item {
             rect_progress.visible = true
             receive.signTransaction(fileDialog.file.toString())
         }
+    }
+
+    InputSlatepack {
+        id: inputSlatepack
+        anchors.verticalCenter: parent.verticalCenter
+        visible: false
     }
 
     Rectangle {

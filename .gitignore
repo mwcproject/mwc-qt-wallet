@@ -14,6 +14,7 @@ QtCore
 QtGui
 QtNetwork
 QtWidgets
+QtSVG
 ui_*.h
 mwc
 mwczip

@@ -111,6 +111,12 @@ public:
     // Write some text into the file
     Q_INVOKABLE bool writeTextFile(QString fileName, QStringList lines );
 
+    // Extract PubKey from address
+    Q_INVOKABLE QString extractPubKeyFromAddress(QString address);
+
+    // convert nano items to dtirng that represent that fraction as a double
+    Q_INVOKABLE QString nano2one(int64_t nano);
+
 private:
     util::PasswordAnalyser * pa = nullptr;
     // PasswordAnalyser last respond values
