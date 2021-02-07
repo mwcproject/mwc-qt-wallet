@@ -208,4 +208,14 @@ bool Util::writeTextFile(QString fileName, QStringList lines ) {
     return util::writeTextFile(fileName, lines);
 }
 
+// Extract PubKey from address
+QString Util::extractPubKeyFromAddress(QString address) {
+    return util::extractPubKeyFromAddress(address);
+}
+
+// convert nano items to dtirng that represent that fraction as a double
+QString Util::nano2one(int64_t nano) {
+    return util::nano2one(nano);
+}
+
 }

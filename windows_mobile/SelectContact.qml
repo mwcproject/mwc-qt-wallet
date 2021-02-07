@@ -9,9 +9,15 @@ Item {
     property var contactList: []
     property string prevCBName
     property string prevCBAddress
+    property bool showTor
+    property bool showMQS
+    property bool showHttp
 
-    function open(_callback) {
+    function open(_showTor, _showMQS, _showHttp, _callback) {
         callback = _callback
+        showTor = _showTor
+        showMQS = _showMQS
+        showHttp = _showHttp
         selectContactItem.visible = true
     }
 
@@ -23,13 +29,19 @@ Item {
         const pairs = config.getContactsAsPairs()
         contactsModel.clear()
         contactList = []
-        for (let i = 0; i < pairs.length; i += 2) {
-            if (searchStr === "" || pairs[i].includes(searchStr)) {
-                contactList.push({
-                     name: pairs[i],
-                     address: pairs[i+1]
-                })
-                contactsModel.append(contactList[contactList.length - 1])
+        for (let i = 1; i < pairs.length; i += 2) {
+            const name = pairs[i-1]
+            const address = pairs[i]
+            const addressType = util.verifyAddress(address)
+
+            if((addressType==="tor" && showTor) || (addressType==="mwcmqs" && showMQS) || (addressType==="https" && showHttp)) {
+                if (searchStr === "" || name.includes(searchStr)) {
+                    contactList.push({
+                         name,
+                         address
+                    })
+                    contactsModel.append(contactList[contactList.length - 1])
+                }
             }
         }
     }
@@ -40,6 +52,7 @@ Item {
             if (res !== "") {
                 messagebox.open(qsTr("Error"), qsTr("Unable to add a new contact.\n" + res))
             }
+            textfield_searchbar.text = ""
             updateContactsList("")
         }
     }
@@ -50,6 +63,7 @@ Item {
             if (res !== "") {
                 messagebox.open(qsTr("Error"), qsTr("Unable to update the contact data. Error: " + res))
             }
+            textfield_searchbar.text = ""
             updateContactsList("")
         }
     }
@@ -60,6 +74,7 @@ Item {
             if (res !== "") {
                 messagebox.open(qsTr("Error"), qsTr("Unable to remove the contact '"+ prevCBName +"'.\nError: " + res))
             }
+            textfield_searchbar.text = ""
             updateContactsList("")
         }
     }

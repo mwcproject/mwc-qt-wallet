@@ -3,21 +3,44 @@ import QtQuick.Window 2.0
 import QtQuick.Controls 2.13
 import SendBridge 1.0
 import UtilBridge 1.0
+import ConfigBridge 1.0
 
 Item {
+    property bool isSlatepack
     property string selectedAccount
     property double amount
 
     function init(initParams) {
+        isSlatepack = initParams.isSlatepack
         selectedAccount = initParams.selectedAccount
         amount = parseInt(initParams.amount)
         text_from_account.text = qsTr("From account: " + selectedAccount)
         text_amount_to_send.text = qsTr("Amount to send: " + ( amount < 0 ? "All" : util.nano2one(Number(amount).toString())) + " MWC" )
         rect_progress.visible = false
+        if (!isSlatepack) {
+            textfield_address.visible = false
+            image_contacts.visible = false
+            text_send_to.text = "Send to File"
+        } else {
+            textfield_address.visible = true
+            image_contacts.visible = true
+            text_send_to.text = "Send to Slatepack"
+        }
+    }
+
+    function onSelectContact(ok, contact) {
+        if (ok) {
+            const address = contact.address
+            textfield_address.text = util.extractPubKeyFromAddress(address)
+        }
     }
 
     UtilBridge {
         id: util
+    }
+
+    ConfigBridge {
+        id: config
     }
 
     SendBridge {
@@ -36,11 +59,12 @@ Item {
         anchors.fill: parent
         onClicked: {
             textarea_description.focus = false
+            textfield_address.focus = false
         }
     }
 
     Image {
-        id: image_send_online
+        id: image_send_offline
         width: dp(100)
         height: dp(100)
         anchors.bottom: textarea_description.top
@@ -52,12 +76,12 @@ Item {
     }
 
     Text {
-        id: text_send_to_address
+        id: text_send_to
         color: "#ffffff"
         text: qsTr("Send to File")
-        anchors.left: image_send_online.right
+        anchors.left: image_send_offline.right
         anchors.leftMargin: dp(30)
-        anchors.top: image_send_online.top
+        anchors.top: image_send_offline.top
         anchors.topMargin: dp(10)
         font.bold: true
         font.pixelSize: dp(22)
@@ -69,7 +93,7 @@ Item {
         text: qsTr("From account:")
         anchors.bottom: text_amount_to_send.top
         anchors.bottomMargin: dp(5)
-        anchors.left: image_send_online.right
+        anchors.left: image_send_offline.right
         anchors.leftMargin: dp(30)
         font.pixelSize: dp(15)
     }
@@ -78,9 +102,9 @@ Item {
         id: text_amount_to_send
         color: "#ffffff"
         text: qsTr("Amount to send:")
-        anchors.left: image_send_online.right
+        anchors.left: image_send_offline.right
         anchors.leftMargin: dp(30)
-        anchors.bottom: image_send_online.bottom
+        anchors.bottom: image_send_offline.bottom
         anchors.bottomMargin: dp(5)
         font.pixelSize: dp(15)
     }
@@ -90,7 +114,7 @@ Item {
         height: dp(200)
         padding: dp(20)
         font.pixelSize: dp(20)
-        placeholderText: qsTr("Description")
+        placeholderText: qsTr("Description (optional)")
         color: "white"
         text: ""
         anchors.verticalCenter: parent.verticalCenter
@@ -111,14 +135,60 @@ Item {
         }
     }
 
+    TextField {
+        id: textfield_address
+        height: dp(50)
+        padding: dp(5)
+        leftPadding: dp(20)
+        font.pixelSize: dp(15)
+        placeholderText: qsTr("Recipient wallet address for encryption (optional)")
+        color: "white"
+        text: ""
+        anchors.top: textarea_description.bottom
+        anchors.topMargin: dp(20)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(30)
+        anchors.right: parent.right
+        anchors.rightMargin: dp(90)
+        horizontalAlignment: Text.AlignLeft
+        background: Rectangle {
+            color: "#8633E0"
+            radius: dp(5)
+        }
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                textfield_address.focus = true
+            }
+        }
+    }
+
+    Image {
+        id: image_contacts
+        width: dp(45)
+        height: dp(45)
+        anchors.verticalCenter: textfield_address.verticalCenter
+        anchors.right: parent.right
+        anchors.rightMargin: dp(30)
+        fillMode: Image.PreserveAspectFit
+        source: "../img/Contact@2x.svg"
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                selectContactItem.open(true, false, false, onSelectContact)
+            }
+        }
+    }
+
     Button {
         id: button_settings
         width: parent.width / 2 - dp(45)
         height: dp(50)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
-        anchors.top: textarea_description.bottom
-        anchors.topMargin: dp(50)
+        anchors.top: textfield_address.visible ? textfield_address.bottom : textarea_description.bottom
+        anchors.topMargin: dp(20)
         background: Rectangle {
             color: "#00000000"
             radius: dp(4)
@@ -151,7 +221,7 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("Send")
+                text: qsTr("Continue")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
@@ -160,12 +230,22 @@ Item {
         }
 
         onClicked: {
+            let recipientWallet
+            if (isSlatepack) {
+                recipientWallet = textfield_address.text
+                if (recipientWallet !== "" && util.verifyAddress(recipientWallet) !== "tor") {
+                    messagebox.open(qsTr("Unable to send"), qsTr("Please specify valid recipient wallet address"))
+                    textfield_address.focus = true
+                    return
+                }
+            }
+
             if ( !send.isNodeHealthy() ) {
                 messagebox.open(qsTr("Unable to send"), qsTr("Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process"))
                 return
             }
 
-            const description = textarea_description.text.trim();
+            const description = textarea_description.text.trim().replace('\n', ' ')
 
             const valRes = util.validateMwc713Str(description);
             if (valRes !== "") {
@@ -174,7 +254,7 @@ Item {
                 return
             }
 
-            if (send.sendMwcOffline(selectedAccount, Number(amount).toString(), description, false, false, "")) {
+            if (send.sendMwcOffline(selectedAccount, Number(amount).toString(), description, isSlatepack, config.getSendLockOutput(), recipientWallet)) {
                 rect_progress.visible = true
             }
         }
@@ -185,7 +265,7 @@ Item {
         width: dp(60)
         height: dp(30)
         anchors.top: button_send.bottom
-        anchors.topMargin: dp(30)
+        anchors.topMargin: dp(20)
         anchors.horizontalCenter: parent.horizontalCenter
         color: "#00000000"
         visible: false
@@ -198,6 +278,12 @@ Item {
     SendSettings {
         id: settingsItem
         anchors.verticalCenter: parent.verticalCenter
+        visible: false
+    }
+
+    SelectContact {
+        id: selectContactItem
+        anchors.fill: parent
         visible: false
     }
 }

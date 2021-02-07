@@ -163,7 +163,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                selectContactItem.open(onSelectContact)
+                selectContactItem.open(true, true, true, onSelectContact)
             }
         }
     }
@@ -229,7 +229,7 @@ Item {
         height: textfield_api_secret.visible ? dp(80) : dp(160)
         padding: dp(10)
         font.pixelSize: dp(18)
-        placeholderText: qsTr("Description")
+        placeholderText: qsTr("Description (optional)")
         color: "white"
         text: ""
         anchors.top: textfield_send_to.bottom

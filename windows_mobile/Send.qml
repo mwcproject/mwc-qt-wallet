@@ -7,6 +7,7 @@ import ConfigBridge 1.0
 
 Item {
     property bool showGenProofWarning: false
+    property int selectedSendMethod: 0
 
     WalletBridge {
         id: wallet
@@ -51,6 +52,36 @@ Item {
         }
     }
 
+    function selectSendMethod(sendMethod) {
+        selectedSendMethod = sendMethod
+        switch (sendMethod) {
+            case 1: // online_id
+                rect_online.color = "#8633E0"
+                text_online_selected.visible = true
+                rect_file.color = "#00000000"
+                text_file_selected.visible = false
+                rect_slatepack.color = "#00000000"
+                text_slatepack_selected.visible = false
+                break;
+            case 2: // file_id
+                rect_online.color = "#00000000"
+                text_online_selected.visible = false
+                rect_file.color = "#8633E0"
+                text_file_selected.visible = true
+                rect_slatepack.color = "#00000000"
+                text_slatepack_selected.visible = false
+                break;
+            case 3: // slatepack_id
+                rect_online.color = "#00000000"
+                text_online_selected.visible = false
+                rect_file.color = "#00000000"
+                text_file_selected.visible = false
+                rect_slatepack.color = "#8633E0"
+                text_slatepack_selected.visible = true
+                break;
+        }
+    }
+
     onVisibleChanged: {
         if (visible) {
             if (parent.height > dp(560)) {
@@ -58,10 +89,7 @@ Item {
             }
             rect_progress.visible = true
             wallet.requestWalletBalanceUpdate()
-            rect_online.color = "#8633E0"
-            text_online_selected.visible = true
-            rect_file.color = "#00000000"
-            text_file_selected.visible = false
+            selectSendMethod(config.getSendMethod())
             textfield_amount.text = ""
             checkbox_tx_proof.checked = config.getGenerateProof()
         }
@@ -76,12 +104,12 @@ Item {
 
     Rectangle {
         id: rect_online
-        width: dp(140)
+        width: dp(130)
         height: dp(180)
         color: "#00000000"
         radius: dp(10)
         anchors.left: parent.left
-        anchors.leftMargin: (parent.width / 2 - rect_online.width) / 1.5
+        anchors.leftMargin: dp(20)
         anchors.top: parent.top
         border.color: "#ffffff"
         border.width: dp(2)
@@ -144,23 +172,19 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                rect_online.color = "#8633E0"
-                rect_file.color = "#00000000"
-                text_online_selected.visible = true
-                text_file_selected.visible = false
+                selectSendMethod(1)
             }
         }
     }
 
     Rectangle {
         id: rect_file
-        width: dp(140)
+        width: dp(130)
         height: dp(180)
         color: "#00000000"
         radius: dp(10)
         anchors.verticalCenter: rect_online.verticalCenter
-        anchors.right: parent.right
-        anchors.rightMargin: (parent.width / 2 - rect_file.width) / 1.5
+        anchors.horizontalCenter: parent.horizontalCenter
         border.color: "#ffffff"
         border.width: dp(2)
 
@@ -222,10 +246,81 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                rect_online.color = "#00000000"
-                rect_file.color = "#8633E0"
-                text_online_selected.visible = false
-                text_file_selected.visible = true
+                selectSendMethod(2)
+            }
+        }
+    }
+
+    Rectangle {
+        id: rect_slatepack
+        width: dp(130)
+        height: dp(180)
+        color: "#00000000"
+        radius: dp(10)
+        anchors.verticalCenter: rect_online.verticalCenter
+        anchors.right: parent.right
+        anchors.rightMargin: dp(20)
+        border.color: "#ffffff"
+        border.width: dp(2)
+
+        Image {
+            id: image_slatepack
+            width: dp(80)
+            height: dp(60)
+            anchors.topMargin: dp(10)
+            fillMode: Image.PreserveAspectFit
+            source: "../img/File@2x.svg"
+            anchors.top: text_slatepack_selected.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        Text {
+            id: text_slatepack_selected
+            color: "#ffffff"
+            text: qsTr("SELECTED")
+            anchors.topMargin: dp(15)
+            font.pixelSize: dp(14)
+            anchors.top: parent.top
+            anchors.horizontalCenter: parent.horizontalCenter
+            visible: false
+        }
+
+        Text {
+            id: element5
+            color: "#ffffff"
+            text: qsTr("Slatepack")
+            anchors.topMargin: dp(10)
+            font.bold: true
+            font.pixelSize: dp(18)
+            anchors.top: image_slatepack.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        Rectangle {
+            id: rect_splitter3
+            height: 1
+            color: "#ffffff"
+            anchors.topMargin: dp(5)
+            anchors.rightMargin: dp(20)
+            anchors.leftMargin: dp(20)
+            anchors.right: parent.right
+            anchors.top: element5.bottom
+            anchors.left: parent.left
+        }
+
+        Text {
+            color: "#ffffff"
+            text: qsTr("Manual Process")
+            anchors.topMargin: dp(5)
+            font.pixelSize: dp(14)
+            anchors.top: rect_splitter3.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                selectSendMethod(3)
             }
         }
     }
@@ -237,9 +332,9 @@ Item {
         anchors.top: rect_online.bottom
         anchors.topMargin: dp(20)
         anchors.right: parent.right
-        anchors.rightMargin: dp(30)
+        anchors.rightMargin: dp(20)
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.leftMargin: dp(20)
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         font.pixelSize: dp(14)
     }
@@ -251,9 +346,9 @@ Item {
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         font.pixelSize: dp(14)
         anchors.right: parent.right
-        anchors.rightMargin: dp(30)
+        anchors.rightMargin: dp(20)
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.leftMargin: dp(20)
         anchors.top: text_description1.bottom
         anchors.topMargin: dp(5)
     }
@@ -265,9 +360,9 @@ Item {
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         font.pixelSize: dp(14)
         anchors.right: parent.right
-        anchors.rightMargin: dp(30)
+        anchors.rightMargin: dp(20)
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.leftMargin: dp(20)
         anchors.top: text_description2.bottom
         anchors.topMargin: dp(5)
     }
@@ -285,7 +380,7 @@ Item {
         anchors.top: accountComboBox.bottom
         anchors.topMargin: dp(20)
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.leftMargin: dp(20)
         horizontalAlignment: Text.AlignLeft
 
 
@@ -307,7 +402,7 @@ Item {
         height: dp(50)
         anchors.verticalCenter: textfield_amount.verticalCenter
         anchors.right: parent.right
-        anchors.rightMargin: dp(30)
+        anchors.rightMargin: dp(20)
         background: Rectangle {
             color: "#00000000"
             radius: dp(4)
@@ -336,7 +431,7 @@ Item {
         text: qsTr("Generate Transaction Proof")
         font.pixelSize: dp(17)
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.leftMargin: dp(20)
         anchors.top: textfield_amount.bottom
         anchors.topMargin: dp(20)
 
@@ -414,7 +509,8 @@ Item {
             if (accountComboBox.currentIndex >= 0) {
                 const account = accountItems.get(accountComboBox.currentIndex).account
                 const sendAmount = textfield_amount.text.trim()
-                const res = send.initialSendSelection( text_online_selected.visible ? 1 : 2, account, sendAmount );
+                config.setSendMethod(selectedSendMethod)
+                const res = send.initialSendSelection( selectedSendMethod, account, sendAmount );
                 if (res === 1)
                     accountComboBox.focus = true
                 else if (res === 2)
@@ -428,9 +524,9 @@ Item {
         anchors.top: text_description3.bottom
         anchors.topMargin: dp(20)
         anchors.right: parent.right
-        anchors.rightMargin: dp(30)
+        anchors.rightMargin: dp(20)
         anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.leftMargin: dp(20)
         leftPadding: dp(20)
         rightPadding: dp(20)
         font.pixelSize: dp(18)

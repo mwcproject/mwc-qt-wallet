@@ -242,49 +242,34 @@ void MobileWndManager::pageOutputs() {
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageFileTransactionReceive(QString pageTitle,
-                                     const QString & fileName, const util::FileTransactionInfo & transInfo,
+                                     const QString & fileNameOrSlatepack, const util::FileTransactionInfo & transInfo,
                                      int nodeHeight) {
     Q_UNUSED(pageTitle)
 
     QJsonObject obj;
-    obj["callerId"] = "Receive";
-    obj["fileName"] = fileName;
-    obj["transactionType"] = "Receive File Slate";
-    obj["processButtonName"] = "Generate Response";
+    obj["fileNameOrSlatepack"] = fileNameOrSlatepack;
     obj["amount"] = util::nano2one(transInfo.amount);
     obj["transactionId"] = transInfo.transactionId;
     obj["lockHeight"] = transInfo.lock_height > nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-";
-    obj["receiverAddress"] = transInfo.fromAddress.isEmpty() ? "-" : transInfo.fromAddress;
-    obj["message"] = transInfo.senderMessage;
-    obj["isFinalize"] = false;
-
-    QVariant retValue;
-    QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
+    obj["senderAddress"] = transInfo.fromAddress.isEmpty() ? "-" : transInfo.fromAddress;
+    obj["senderMessage"] = transInfo.senderMessage;
+    mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 
 void MobileWndManager::pageFileTransactionFinalize(QString pageTitle,
-                                           const QString & fileName, const util::FileTransactionInfo & transInfo,
+                                           const QString & fileNameOrSlatepack, const util::FileTransactionInfo & transInfo,
                                            int nodeHeight) {
     Q_UNUSED(pageTitle)
-
-    QString message = transInfo.receiverMessage;
-    if (message.isEmpty())
-        message = transInfo.senderMessage;
-
     QJsonObject obj;
-    obj["callerId"] = "Finalize";
-    obj["fileName"] = fileName;
-    obj["transactionType"] = "Finalize Transaction";
-    obj["processButtonName"] = "Finalize";
+    obj["fileNameOrSlatepack"] = fileNameOrSlatepack;
     obj["amount"] = util::nano2one(transInfo.amount);
     obj["transactionId"] = transInfo.transactionId;
     obj["lockHeight"] = transInfo.lock_height > nodeHeight ? util::longLong2Str(transInfo.lock_height) : "-";
-    obj["receiverAddress"] = transInfo.fromAddress.isEmpty() ? "-" : transInfo.fromAddress;
-    obj["message"] = message;
-    obj["isFinalize"] = true;
-
-    QVariant retValue;
-    QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
+    obj["senderAddress"] = transInfo.fromAddress.isEmpty() ? "-" : transInfo.fromAddress;
+    obj["senderMessage"] = transInfo.senderMessage;
+    obj["receiverMessage"] = transInfo.receiverMessage;
+    obj["amount_fee_not_defined"] = transInfo.amount_fee_not_defined;
+    mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 
 void MobileWndManager::pageRecieve() {
@@ -314,13 +299,17 @@ void MobileWndManager::pageSendFile( QString selectedAccount, int64_t amount ) {
     obj["isSendOnline"] = false;
     obj["selectedAccount"] = selectedAccount;
     obj["amount"] = QString::number(amount);
+    obj["isSlatepack"] = false;
     mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 
 void MobileWndManager::pageSendSlatepack( QString selectedAccount, int64_t amount ) {
-    Q_UNUSED(selectedAccount)
-    Q_UNUSED(amount)
-    Q_ASSERT(false); // implement me
+    QJsonObject obj;
+    obj["isSendOnline"] = false;
+    obj["selectedAccount"] = selectedAccount;
+    obj["amount"] = QString::number(amount);
+    obj["isSlatepack"] = true;
+    mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 
 void MobileWndManager::pageTransactions() {
@@ -330,13 +319,12 @@ void MobileWndManager::pageTransactions() {
 // slatepack - slatepack string value to show.
 // backStateId - state ID of the caller. On 'back' will switch to this state Id
 void MobileWndManager::pageShowSlatepack(QString slatepack, int backStateId, QString txExtension, bool enableFinalize) {
-    Q_UNUSED(slatepack)
-    Q_UNUSED(backStateId)
-    Q_UNUSED(txExtension)
-    Q_UNUSED(enableFinalize)
-    // This page should show the slatepack text so user can copy paste it. Also it will be noce to have a QR code
-    // windows. It is usefull for some cases, Jon had some examples. Also other wallets have it.
-    Q_ASSERT(false); // implement me
+    QJsonObject obj;
+    obj["slatepack"] = slatepack;
+    obj["backStateId"] = backStateId;
+    obj["txExtension"] = txExtension;
+    obj["enableFinalize"] = enableFinalize;
+    mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 
 
