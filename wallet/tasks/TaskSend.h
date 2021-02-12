@@ -139,7 +139,7 @@ public:
     // Most are optional (empty values - ignore)
     TaskSendSlatepack( MWC713 *wallet713, int64_t coinNano, QString message, int inputConfirmationNumber, int changeOutputs,
                   const QStringList & outputs, int ttl_blocks, bool generateProof, QString slatepackRecipientAddress, bool isLockLater, QString _tag ) :
-            Mwc713Task("TaskSendSlatepack", "Sending slatepack transaction...",
+            Mwc713Task("TaskSendSlatepack", "Creating Slatepack transaction...",
                        buildCommand(coinNano, message, inputConfirmationNumber, changeOutputs, outputs, ttl_blocks, generateProof, slatepackRecipientAddress, isLockLater),
                        wallet713, ""),
                        tag(_tag) {}
