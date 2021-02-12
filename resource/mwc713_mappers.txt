@@ -171,3 +171,11 @@ $2
 # Swap Error , Swap generic error, Unable to parse secondary currency redeem address ztestsaXXXXXXX, Swap generic error, Unable to parse ZCash transparent address ztestsaplinXXXXXX, base58: length 64 invalid for this base58 type
 Swap Error , Swap generic error, Unable to parse secondary currency redeem address (.*), Swap generic error, (.*)
 $2
+
+# Your send request has failed: Adapter Callback Error, Checking version: Error: null, Message: null
+Your send request has failed: Adapter Callback Error, Checking version: Error: null, Message: null
+Your peer wallet is offline or not reachable. Please check your network connection or contact the owner of that waalet.
+
+# Your send request has failed: Adapter Callback Error, Checking version: Error: null, Message: null
+Your send request has failed: Adapter Callback Error, Checking version: (.*)
+Your peer wallet responded with $1. Please check your network connection or contact the owner of that waalet.
