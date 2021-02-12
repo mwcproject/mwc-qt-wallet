@@ -101,11 +101,11 @@ void NewSwap2::on_reviewButton_clicked() {
 
     bool secTxFeeOk = false;
     double secTxFee = ui->secTransFeeEdit->text().toDouble(&secTxFeeOk);
-    double minTx = 0.01;
-    if (secCurrency=="ZCash")
-        minTx = 0.0001; // Zcash units are different.
-    if (!secTxFeeOk || secTxFee<minTx) {
-        control::MessageBox::messageText(this, "Incorrect Input", "Please specify a correct "+secCurrency+" transaction fee.");
+    double minTx = swap->getSecMinTransactionFee();
+    double maxTx = swap->getSecMaxTransactionFee();
+    if (!secTxFeeOk || secTxFee<minTx || secTxFee>maxTx ) {
+        control::MessageBox::messageText(this, "Incorrect Input", "Please specify a correct "+secCurrency+" transaction fee in the range from " +
+                util->trimStrAsDouble( QString::number( minTx, 'f'), 6 ) + " to " + util->trimStrAsDouble( QString::number( maxTx, 'f'), 6 ) + " " + swap->getCurrentSecCurrencyFeeUnits() );
         ui->secTransFeeEdit->setFocus();
         return;
     }

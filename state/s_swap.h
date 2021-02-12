@@ -128,6 +128,8 @@ public:
     int getOfferExpirationInterval() const {return newSwapOfferExpirationTime;}
     int getSecRedeemTime() const {return newSwapRedeemTime;}
     double getSecTransactionFee() const {return newSwapSecTxFee;}
+    double getSecMinTransactionFee() const {return newSwapMinSecTxFee;}
+    double getSecMaxTransactionFee() const {return newSwapMaxSecTxFee;}
     int getMwcConfNumber() const {return newSwapMwcConfNumber;}
     int getSecConfNumber() const {return newSwapSecConfNumber;}
     QString getElectrumXprivateUrl() const {return newSwapElectrumXUrl;}
@@ -229,6 +231,8 @@ private:
     int     newSwapOfferExpirationTime = -1;
     int     newSwapRedeemTime = -1;
     double  newSwapSecTxFee = 0.0;
+    double  newSwapMinSecTxFee = 0.0;
+    double  newSwapMaxSecTxFee = 0.0;
     int     newSwapMwcConfNumber = -1;
     int     newSwapSecConfNumber = -1;
     QString newSwapElectrumXUrl;
