@@ -131,6 +131,8 @@ public:
     Q_INVOKABLE int getOfferExpirationInterval();
     Q_INVOKABLE int getSecRedeemTime();
     Q_INVOKABLE double getSecTransactionFee();
+    Q_INVOKABLE double getSecMinTransactionFee();
+    Q_INVOKABLE double getSecMaxTransactionFee();
     Q_INVOKABLE int getMwcConfNumber();
     Q_INVOKABLE int getSecConfNumber();
     Q_INVOKABLE QString getElectrumXprivateUrl();

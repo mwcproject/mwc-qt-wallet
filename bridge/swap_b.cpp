@@ -590,6 +590,12 @@ int Swap::getSecRedeemTime() {
 double Swap::getSecTransactionFee() {
     return getSwap()->getSecTransactionFee();
 }
+double Swap::getSecMinTransactionFee() {
+    return getSwap()->getSecMinTransactionFee();
+}
+double Swap::getSecMaxTransactionFee() {
+    return getSwap()->getSecMaxTransactionFee();
+}
 
 int Swap::getMwcConfNumber() {
     return getSwap()->getMwcConfNumber();

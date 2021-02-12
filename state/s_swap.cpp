@@ -32,6 +32,8 @@ struct SecCurrencyInfo {
     int     confNumber;
     QString feeUnits;
     double  fxFee; // -1.0 - need to use API
+    double  fxFeeMin;
+    double  fxFeeMax;
     int64_t txFeeUpdateTime = 0;
 
     SecCurrencyInfo() = default;
@@ -42,12 +44,17 @@ struct SecCurrencyInfo {
         int     _blockIntervalSec,
         int _confNumber,
         const QString & _feeUnits,
-        const double & _fxFee ) :
+        const double & _fxFee,
+        const double & _fxFeeMin,
+        const double & _fxFeeMax
+    ) :
             currency(_currency),
             blockIntervalSec(_blockIntervalSec),
             confNumber(_confNumber),
             feeUnits(_feeUnits),
-            fxFee(_fxFee)
+            fxFee(_fxFee),
+            fxFeeMin(_fxFeeMin),
+            fxFeeMax(_fxFeeMax)
     {}
 };
 
@@ -57,12 +64,12 @@ struct SecCurrencyInfo {
 //  https://b10c.me/blog/003-a-list-of-public-bitcoin-feerate-estimation-apis/
 // We selected this:  https://www.bitgo.com/api/v2/btc/tx/fee
 static QVector<SecCurrencyInfo> SWAP_CURRENCY_LIST = {
-        SecCurrencyInfo("BTC", 600, 3, "satoshi per byte", -1.0),
-        SecCurrencyInfo("BCH", 600, 15, "satoshi per byte", 3.0 ),
-        SecCurrencyInfo("LTC", 60*2+30, 12, "litoshi per byte", 100.0 ),
-        SecCurrencyInfo("ZCash", 75, 24, "ZEC", 0.0001 ),
-        SecCurrencyInfo("Dash", 60 * 2 + 39, 6, "duff per byte", 26.0 ),
-        SecCurrencyInfo("Doge", 60, 20, "doge", 3.0 ),
+        SecCurrencyInfo("BTC", 600, 3, "satoshi per byte", -1.0, 1.0, 500.0 ),
+        SecCurrencyInfo("BCH", 600, 15, "satoshi per byte", 3.0, 1.0, 50.0 ),
+        SecCurrencyInfo("LTC", 60*2+30, 12, "litoshi per byte", 100.0, 1.0, 1000.0 ),
+        SecCurrencyInfo("ZCash", 75, 24, "ZEC", 0.0001, 0.00005, 0.001 ),
+        SecCurrencyInfo("Dash", 60 * 2 + 39, 6, "duff per byte", 26.0, 1.0, 1000.0 ),
+        SecCurrencyInfo("Doge", 60, 20, "doge", 3.0, 0.1, 20.0 ),
 };
 
 static SecCurrencyInfo getCurrencyInfo(QString currency) {
@@ -412,6 +419,8 @@ void Swap::applyNewTrade12Params(QString acccount, QString secCurrency, QString 
         SecCurrencyInfo sci = getCurrencyInfo(secCurrency);
         newSwapSecConfNumber = sci.confNumber;
         newSwapSecTxFee = sci.fxFee; // Expected that txFee is already request by API. If not, user will need to input it manually.
+        newSwapMinSecTxFee = sci.fxFeeMin;
+        newSwapMaxSecTxFee = sci.fxFeeMax;
         newSwapCurrency2recalc = secCurrency;
     }
 
@@ -426,7 +435,7 @@ void Swap::applyNewTrade21Params(QString secCurrency, int offerExpTime, int rede
     newSwapRedeemTime = redeemTime;
     newSwapMwcConfNumber = mwcBlocks;
     newSwapSecConfNumber = secBlocks;
-    newSwapSecTxFee = secTxFee;
+    newSwapSecTxFee = std::max( newSwapMinSecTxFee, std::min(secTxFee, newSwapMaxSecTxFee) );
 }
 
 // Apply [part2 params from trade2 panel and switch to the review (panel3).
@@ -666,6 +675,8 @@ void Swap::resetNewSwapData() {
     newSwapOfferExpirationTime = -1;
     newSwapRedeemTime = -1;
     newSwapSecTxFee = 0.0;
+    newSwapMinSecTxFee = 0.0;
+    newSwapMaxSecTxFee = 0.0;
     newSwapMwcConfNumber = -1;
     newSwapSecConfNumber = -1;
     newSwapElectrumXUrl = "";
