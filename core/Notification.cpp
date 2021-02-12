@@ -132,8 +132,9 @@ void appendNotificationMessage( MESSAGE_LEVEL level, QString message ) {
 
     logger::logInfo("Notification", toString(level) + "  " + message );
 
-    if (falseMessages.contains(message)) {
-        return;
+    for (const auto & fm : falseMessages) {
+        if ( message.startsWith(fm) )
+            return;
     }
 
     static MessageMapper msgMapper(":/resource/notification_mappers.txt");

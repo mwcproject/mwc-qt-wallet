@@ -17,6 +17,7 @@
 #include "../mwc713.h"
 #include "../../util/address.h"
 #include "utils.h"
+#include "../../core/Notification.h"
 
 namespace wallet {
 
@@ -481,6 +482,11 @@ bool TaskRequestRecieverWalletAddress::processTask(const QVector<WEvent> &events
 
 // ---------------------------------- TaskDecodeSlatepack -------------------------------
 
+void TaskDecodeSlatepack::onStarted() {
+    notify::addFalseMessage("Unable to decode the slatepack");
+}
+
+
 bool TaskDecodeSlatepack::processTask(const QVector<WEvent> &events) {
     // Normally we have 3 lines.
     // Slate: {"version_info":{"version":3, ...
@@ -510,6 +516,8 @@ bool TaskDecodeSlatepack::processTask(const QVector<WEvent> &events) {
         }
 
     }
+
+    notify::remeoveFalseMessage("Unable to decode the slatepack");
 
     if (slate.isEmpty() || content.isEmpty() || sender.isEmpty()) {
         wallet713->setDecodeSlatepack( tag, getErrorMessage(events, "Unable to decode a slatepack"), slatepack, "","","", "");
