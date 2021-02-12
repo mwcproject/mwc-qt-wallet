@@ -322,6 +322,17 @@ int64_t WalletTransaction::calculateTransactionAge( const QDateTime & current ) 
 QString WalletTransaction::toStringCSV() const {
     QString separator = ",";
     // always enclose the type string in quotes as it could contain a comma
+
+    // The non confirmed or cancelled transactions need to have balance 0.
+    int64_t tx_credited = credited;
+    int64_t tx_debited = debited;
+    int64_t tx_fee = fee;
+    int64_t tx_coinNano = coinNano;
+
+    if (!confirmed) {
+        tx_credited = tx_debited = tx_fee = tx_coinNano = 0;
+    }
+
     QString txTypeStr = "\"" + getTypeAsStr() + "\"";
     QString csvStr = QString::number(txIdx) + separator +       // Id
                       txTypeStr + separator +                   // Type
@@ -334,10 +345,10 @@ QString WalletTransaction::toStringCSV() const {
                       confirmationTime + separator +            // Confirmation Time
                       QString::number(numInputs) + separator +  // Num. Inputs
                       QString::number(numOutputs) + separator + // Num. Outputs
-                      util::nano2one(credited) + separator +    // Amount Credited
-                      util::nano2one(debited) + separator +     // Amount Debited
-                      util::nano2one(fee) + separator +         // Fee
-                      util::nano2one(coinNano) + separator +    // Net Difference
+                      util::nano2one(tx_credited) + separator +    // Amount Credited
+                      util::nano2one(tx_debited) + separator +     // Amount Debited
+                      util::nano2one(tx_fee) + separator +         // Fee
+                      util::nano2one(tx_coinNano) + separator +    // Net Difference
                       (proof ? "yes" : "no") + separator +      // Payment Proof
                       kernel;                                   // Kernel
     return csvStr;
