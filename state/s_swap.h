@@ -18,7 +18,7 @@
 #include "state.h"
 #include "../wallet/wallet.h"
 #include <QMap>
-#include <QSet>
+#include <QHash>
 #include "../util/httpclient.h"
 #include <QThread>
 
@@ -215,7 +215,8 @@ private:
     QMap<QString, AutoswapTask> runningSwaps;
     QString  runningTask;
 
-    QSet<QString> shownMessages;
+    // key: message.  value: time
+    QHash<QString, int64_t> shownMessages;
     QMap<QString, int> shownBackupMessages;
 
     long lastProcessedTimerData = 0;
