@@ -249,9 +249,15 @@ void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString curre
 
     // Checking if need to show deposit message for the buyer
     if (currentAction.contains("Please deposit exactly")) {
-        if (!shownMessages.contains(currentAction)) {
-            shownMessages.insert(currentAction);
+        // Let's  do reminder every 20 minutes.
+        int64_t curTime = QDateTime::currentSecsSinceEpoch();
+        int64_t timeLimit = curTime - 60*20;
+
+        if (shownMessages.value(currentAction) < timeLimit) {
+            shownMessages.insert( currentAction, curTime + 3600*24 );
             core::getWndManager()->messageTextDlg("Trade " + swapId, currentAction);
+            curTime = QDateTime::currentSecsSinceEpoch();
+            shownMessages.insert( currentAction, curTime );
         }
     }
 
