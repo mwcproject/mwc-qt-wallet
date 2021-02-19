@@ -197,6 +197,11 @@ bool AppContext::loadDataImpl() {
         activeWndState = state::STATE::NODE_INFO;
     }
 
+    // for the mobile wallet we always want to start from the home page.
+#ifdef WALLET_MOBILE
+    activeWndState = state::STATE::WALLET_HOME;
+#endif
+
     in >> pathStates;
     in >> intVectorStates;
 
