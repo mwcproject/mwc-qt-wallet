@@ -17,24 +17,13 @@ Item {
 
     Image {
         id: image_logo
-        width: dp(60)
+        width: dp(200)
         height: dp(30)
         fillMode: Image.PreserveAspectFit
-        source: "../img/TBLogo@2x.svg"
+        source: "../img/BigLogo@2x.svg"
         anchors.top: parent.top
-        anchors.topMargin: dp(50)
+        anchors.topMargin: dp(100)
         anchors.horizontalCenter: parent.horizontalCenter
-    }
-
-    Text {
-        id: label_mwc
-        color: "#ffffff"
-        text: qsTr("mwc")
-        font.bold: true
-        anchors.top: image_logo.bottom
-        anchors.topMargin: dp(14)
-        anchors.horizontalCenter: image_logo.horizontalCenter
-        font.pixelSize: dp(18)
     }
 
     Rectangle {

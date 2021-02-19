@@ -49,11 +49,11 @@ void MobileWndManager::messageTextDlg( QString title, QString message, double wi
 }
 
 void MobileWndManager::messageHtmlDlg( QString title, QString message, double widthScale)  {
-    Q_UNUSED(title)
-    Q_UNUSED(message)
     Q_UNUSED(widthScale)
 
-    Q_ASSERT(false); // implement me
+    QVariant retValue;
+    QString msg = message.replace("<b>", "").replace("</b>", "").replace("<br>", "\n");
+    QMetaObject::invokeMethod(mainWindow, "openMessageTextDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, msg));
 }
 
 // Two button box

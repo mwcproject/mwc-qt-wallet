@@ -24,6 +24,7 @@ Item {
         txExtension = params.txExtension
         enableFinalize = params.enableFinalize
         textarea_content.text = slatepack
+        textarea_finalize.text = ''
 
         if(!enableFinalize) {
             flickable_finalize.visible = false
@@ -85,7 +86,7 @@ Item {
 
             if (slateJson === "") return
 
-            const txType = 1    //util::FileTransactionType::RECEIVE
+            let txType = 1    //util::FileTransactionType::RECEIVE
             if (tag === finalizeTag) {
                 txType = 2      //util::FileTransactionType::FINALIZE
             }
@@ -124,7 +125,7 @@ Item {
             slate2finalize = slatepack
             button_finalize.enabled = true
 
-            const textSp = textarea_finalize.text.trim()
+            const textSp = textarea_finalize.text.replace("\n", "").trim()
 
             if (slatepack !== textSp) {
                 initiateSlateVerification(textSp, tag);
@@ -254,7 +255,9 @@ Item {
         onClicked: {
             const fileName = util.getSaveFileName(qsTr("Save Slatepack"), qsTr("ResultedSlatepack"), qsTr("Slatepack tramsaction (*" + txExtension + ")"), txExtension)
             if (fileName === "") return
-            util.writeTextFile(fileName, {slatepack})
+            if (util.writeTextFile(fileName, {slatepack})) {
+                messagebox.open("Success", "Slatepack file saved at " + fileName)
+            }
         }
     }
 
@@ -290,7 +293,7 @@ Item {
             }
             onTextChanged: {
                 if (spInProgress === "") {
-                    const sp = textarea_finalize.text.trim()
+                    const sp = textarea_finalize.text.replace("\n", "").trim()
                     initiateSlateVerification(sp, finalizeTag)
                 }
             }

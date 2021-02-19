@@ -320,7 +320,7 @@ Item {
                 return
             }
 
-            const description = textarea_description.text.trim();
+            const description = textarea_description.text.split('\n').join('')
 
             valRes = util.validateMwc713Str(description);
             if (valRes !== "") {

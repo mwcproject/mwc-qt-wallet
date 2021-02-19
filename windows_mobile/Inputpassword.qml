@@ -97,24 +97,23 @@ Item {
 
     Image {
         id: image_logo
-        width: dp(60)
+        width: dp(200)
         height: dp(30)
         fillMode: Image.PreserveAspectFit
-        source: "../img/TBLogo@2x.svg"
+        source: "../img/BigLogo@2x.svg"
         anchors.top: parent.top
-        anchors.topMargin: dp(50)
+        anchors.topMargin: dp(100)
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
     Text {
-        id: text_logo
-        text: qsTr("mwc")
-        color: "white"
+        id: text_version
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: image_logo.bottom
-        anchors.topMargin: dp(14)
-        font.bold: true
-        font.pixelSize: dp(18)
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: dp(20)
+        color: "white"
+        font.pixelSize: dp(14)
+        text: config.get_APP_NAME() + " v" + config.getBuildVersion()
     }
 
     Text {

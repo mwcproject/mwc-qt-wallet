@@ -46,24 +46,6 @@ Item {
             }
         }
 
-        Image {
-            id: image_close
-            source: "../img/MessageBox_Close@2x.svg"
-            width: dp(38)
-            height: dp(38)
-            anchors.top: parent.top
-            anchors.topMargin: dp(25)
-            anchors.right: parent.right
-            anchors.rightMargin: dp(25)
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    dialog.visible = false
-                }
-            }
-        }
-
         Text {
             id: text_title
             text: qsTr("Title")

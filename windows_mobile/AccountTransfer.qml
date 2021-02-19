@@ -160,7 +160,7 @@ Item {
         }
 
         contentItem: Text {
-            text: combobox_account_from.currentIndex >= 0 && listmodel_account_from.get(combobox_account_from.currentIndex).info
+            text: combobox_account_from.currentIndex >= 0 ? listmodel_account_from.get(combobox_account_from.currentIndex).info : ""
             font: combobox_account_from.font
             color: "white"
             verticalAlignment: Text.AlignVCenter
@@ -291,7 +291,7 @@ Item {
         }
 
         contentItem: Text {
-            text: combobox_account_to.currentIndex >= 0 && listmodel_account_to.get(combobox_account_to.currentIndex).info
+            text: combobox_account_to.currentIndex >= 0 ? listmodel_account_to.get(combobox_account_to.currentIndex).info : ""
             font: combobox_account_to.font
             color: "white"
             verticalAlignment: Text.AlignVCenter

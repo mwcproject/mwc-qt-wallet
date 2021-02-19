@@ -114,7 +114,7 @@ Item {
         }
 
         onClicked: {
-            newSeed.submitSeedWord(textfield_word.text.trim())
+            newSeed.submitSeedWord(textfield_word.text.toLowerCase().trim())
         }
     }
 }
