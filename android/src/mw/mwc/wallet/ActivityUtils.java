@@ -31,7 +31,7 @@ public class ActivityUtils {
         context.registerReceiver(serviceMessageReceiver, intentFilter);
         Log.i(TAG, "Registered broadcast receiver");
 
-        // Requesting permissions
+/*        // Requesting permissions
         Intent intent = new Intent();
         String packageName = context.getPackageName();
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
@@ -45,7 +45,7 @@ public class ActivityUtils {
 
         checkPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, 100);
 
-        Log.i(TAG, "ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS permissions are requested");
+        Log.i(TAG, "ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS permissions are requested");*/
     }
     
     // Function to check and request permission. 
