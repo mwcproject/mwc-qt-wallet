@@ -86,8 +86,10 @@ bool TaskAccountList::processTask(const QVector<WEvent> &events) {
     std::sort(accounts.begin(), accounts.end());
 
     QVector<QString> res;
-    for (auto ap : accounts)
-        res.push_back(ap.second);
+    for (auto ap : accounts) {
+        if (!ap.second.isEmpty())
+            res.push_back(ap.second);
+    }
 
     wallet713->updateAccountList( res );
     return true;

@@ -644,6 +644,8 @@ void MWC713::updateWalletBalance(bool enforceSync, bool showSyncProgress, bool s
 // Create another account, note no delete exist for accounts
 // Check Signal:  onAccountCreated
 void MWC713::createAccount( const QString & accountName )  {
+    if (accountName.isEmpty())
+        return;
 
     // First try to rename one of deleted accounts.
     int delAccIdx = -1;
@@ -665,6 +667,9 @@ void MWC713::createAccount( const QString & accountName )  {
 
 // Switch to different account
 void MWC713::switchAccount(const QString & accountName)  {
+    if (accountName.isEmpty())
+        return;
+
     // Expected that account is in the list
     // Allways do switch because double processing is fine, it is quick and it can eliminate possible issues
     currentAccount = accountName;
@@ -677,6 +682,9 @@ void MWC713::switchAccount(const QString & accountName)  {
 // Rename account
 // Check Signal: onAccountRenamed(bool success, QString errorMessage);
 void MWC713::renameAccount(const QString & oldName, const QString & newName)  {
+    if (oldName.isEmpty() || newName.isEmpty())
+        return;
+
     eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK(new TaskAccountRename(this, oldName, newName, false), TaskAccountRename::TIMEOUT)} );
     if (oldName == currentAccount) {
         switchAccount("default");
