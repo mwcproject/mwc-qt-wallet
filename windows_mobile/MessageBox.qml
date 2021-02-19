@@ -72,30 +72,12 @@ Item {
         border.width: dp(1)
         anchors.fill: parent
 
-        Image {
-            id: image_close
-            source: "../img/MessageBox_Close@2x.svg"
-            width: dp(38)
-            height: dp(38)
-            anchors.top: parent.top
-            anchors.topMargin: dp(25)
-            anchors.right: parent.right
-            anchors.rightMargin: dp(25)
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    messagebox.visible = false
-                }
-            }
-        }
-
         Text {
             id: text_title
             text: qsTr("Title")
             font.bold: true
-            anchors.verticalCenter: image_close.verticalCenter
-            anchors.verticalCenterOffset: dp(5)
+            anchors.top: parent.top
+            anchors.topMargin: dp(38)
             anchors.horizontalCenter: parent.horizontalCenter
             font.pixelSize: dp(22)
             color: "#3600c9"

@@ -398,11 +398,12 @@ Item {
         }
 
         onClicked: {
-            if (warnMsgShown)
+            if (!warnMsgShown) {
+                messagebox.open("Warning", "Please note that your wallet will only listen to one address at a time. You are now setting the wallet to listen to different address.\n\nDo you want to continue?",
+                                            true, "Cancel", "Continue", "", "", "", nextAddressCallback)
                 return;
-
-            messagebox.open("Warning", "Please note that your wallet will only listen to one address at a time. You are now setting the wallet to listen to different address.\n\nDo you want to continue?",
-                                        true, "Cancel", "Continue", "", "", "", nextAddressCallback)
+            }
+            nextAddressCallback(true)
         }
     }
 

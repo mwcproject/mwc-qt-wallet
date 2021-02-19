@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Window 2.0
 import StartWalletBridge 1.0
+import ConfigBridge 1.0
 
 Item {
     id: element
@@ -9,26 +10,19 @@ Item {
         id: startWallet
     }
 
-    Image {
-        id: image_logo
-        width: dp(60)
-        height: dp(30)
-        fillMode: Image.PreserveAspectFit
-        source: "../img/TBLogo@2x.svg"
-        anchors.top: parent.top
-        anchors.topMargin: dp(50)
-        anchors.horizontalCenter: parent.horizontalCenter
+    ConfigBridge {
+        id: config
     }
 
-    Text {
-        id: label_mwc
-        color: "#ffffff"
-        text: qsTr("mwc")
-        font.bold: true
-        anchors.top: image_logo.bottom
-        anchors.topMargin: dp(14)
-        anchors.horizontalCenter: image_logo.horizontalCenter
-        font.pixelSize: dp(18)
+    Image {
+        id: image_logo
+        width: dp(200)
+        height: dp(30)
+        fillMode: Image.PreserveAspectFit
+        source: "../img/BigLogo@2x.svg"
+        anchors.top: parent.top
+        anchors.topMargin: dp(100)
+        anchors.horizontalCenter: parent.horizontalCenter
     }
 
     Image {
@@ -91,6 +85,16 @@ Item {
         onClicked: {
             startWallet.createNewWalletInstance("", true);
         }
+    }
+
+    Text {
+        id: text_version
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: dp(20)
+        color: "white"
+        font.pixelSize: dp(14)
+        text: config.get_APP_NAME() + " v" + config.getBuildVersion()
     }
 
 //    Image {

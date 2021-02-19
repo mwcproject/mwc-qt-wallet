@@ -28,10 +28,37 @@ Item {
     }
 
     Button {
+        id: button_accounts
+        height: dp(60)
+        anchors.bottom: button_show_passphrase.top
+        anchors.bottomMargin: dp(23)
+        anchors.right: parent.right
+        anchors.rightMargin: dp(75)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(75)
+        background: Rectangle {
+            color: "#00000000"
+            radius: dp(4)
+            border.color: "white"
+            border.width: dp(2)
+            Text {
+                text: qsTr("Accounts")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pixelSize: dp(18)
+                color: "white"
+            }
+        }
+        onClicked: {
+            stateMachine.setActionWindow(4)    // Accounts Page
+        }
+    }
+
+    Button {
         id: button_show_passphrase
         height: dp(60)
-        anchors.bottom: button_list_contacts.top
-        anchors.bottomMargin: dp(23)
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: dp(-40)
         anchors.right: parent.right
         anchors.rightMargin: dp(75)
         anchors.left: parent.left
@@ -73,13 +100,14 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: dp(75)
         anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: dp(40)
         background: Rectangle {
             color: "#00000000"
             radius: dp(4)
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("List Contacts")
+                text: qsTr("Contacts")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
@@ -106,7 +134,7 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("Log Out")
+                text: qsTr("Logout / Change Wallet")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)

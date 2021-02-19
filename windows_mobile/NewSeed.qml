@@ -2,9 +2,11 @@ import QtQuick 2.0
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
 import NewSeedBridge 1.0
+import Clipboard 1.0
 
 Item {
     function init(seed, hideSubmitButton) {
+        seedText = seed
         const words = seed.split(" ")
 //        testSeed = words
         setTextSeed(words.slice(0, 24))
@@ -27,6 +29,10 @@ Item {
 
     NewSeedBridge {
         id: newSeed
+    }
+
+    Clipboard {
+        id: clipboard
     }
 
     Connections {
@@ -71,6 +77,25 @@ Item {
             font.bold: true
             font.pixelSize: dp(16)
             color: "white"
+        }
+
+        Image {
+            id: image_copy
+            source: "../img/iconCopy@2x.svg"
+            width: dp(20)
+            height: dp(20)
+            anchors.verticalCenter: image_phrase.verticalCenter
+            anchors.right: parent.right
+            anchors.rightMargin: dp(35)
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    clipboard.text = text_seed.text
+                    notification.text = "Seed words copied to the clipboard"
+                    notification.open()
+                }
+            }
         }
 
         Rectangle {
@@ -142,6 +167,16 @@ Item {
 
         onClicked: {
             newSeed.doneWithNewSeed()
+        }
+    }
+
+    Rectangle {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: -notification.width / 2
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: dp(20)
+        Notification {
+            id: notification
         }
     }
 }
