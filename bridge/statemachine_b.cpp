@@ -90,5 +90,10 @@ void StateMachine::unblockLogout(QString id) {
     getStateMachine()->unblockLogout(id);
 }
 
+// The back button is pressed. Switching to prev state.
+bool StateMachine::returnBack() {
+    return getStateMachine()->returnBack();
+}
+
 
 }

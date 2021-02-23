@@ -196,7 +196,32 @@ void StateMachine::executeFrom( STATE nextState ) {
         // Selecting the send page if nothing found
         getStateContext()->appContext->setActiveWndState( STATE::NODE_INFO );
         executeFrom(STATE::NONE);
+        return;
     }
+
+    if (actionHistory.isEmpty()) {
+        actionHistory.push_back(currentState);
+    }
+    else {
+        if (actionHistory.back()!=currentState)
+            actionHistory.push_back(currentState);
+    }
+    while(actionHistory.size()>100)
+        actionHistory.pop_front();
+}
+
+// Step back top the prev state if it wasn't a login
+// Return true is step back was done successfully
+bool StateMachine::returnBack() {
+    while( !actionHistory.isEmpty() && actionHistory.back() == currentState)
+        actionHistory.pop_back();
+
+    if ( !actionHistory.isEmpty() && actionHistory.back()>=STATE::ACCOUNTS ) {
+        setActionWindow( actionHistory.back() );
+        return true;
+    }
+
+    return false;
 }
 
 bool StateMachine::setActionWindow( STATE actionWindowState, bool enforce ) {

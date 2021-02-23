@@ -55,6 +55,9 @@ public:
     Q_INVOKABLE void blockLogout(QString id);
     // Unblock logout. Release all Q until this id. If id not found, nothing will be done
     Q_INVOKABLE void unblockLogout(QString id);
+
+    // The back button is pressed. Switching to prev state.
+    Q_INVOKABLE bool returnBack();
 };
 
 }

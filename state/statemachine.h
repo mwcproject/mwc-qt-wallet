@@ -67,6 +67,9 @@ public:
 
     STATE  getCurrentStateId() const {return currentState;}
 
+    // Step back top the prev state if it wasn't a login
+    // Return true is step back was done successfully
+    bool returnBack();
 private:
     // routine to process state into the loop
     bool processState(State* st);
@@ -83,6 +86,9 @@ private:
 
     int64_t logoutTime = 0; // 0 mean never logout...
     QVector<QString> blockLogoutStack;
+
+    // Call history
+    QVector<STATE> actionHistory;
 };
 
 StateMachine * getStateMachine();

@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <ctime>
+#include <cstdlib>
 #include "testseedtask.h"
 #include <QVector>
 #include <QSet>
-#include <ctime>
-#include <cstdlib>
 
 #ifdef Q_OS_WIN
 #include <time.h>

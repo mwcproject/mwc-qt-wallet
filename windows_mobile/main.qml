@@ -3,6 +3,7 @@ import QtQuick.Window 2.12
 import QtQuick.Controls 2.13
 import Qt.labs.platform 1.1
 import CoreWindowBridge 1.0
+import StateMachineBridge 1.0
 
 Window {
     id: window
@@ -20,6 +21,9 @@ Window {
 
     CoreWindowBridge {
         id: coreWindow
+    }
+    StateMachineBridge {
+        id: stateMachine
     }
 
 /*
@@ -59,6 +63,11 @@ Window {
             currentState = actionState
             navbarItem.updateTitle(currentState)
         }
+    }
+
+    onClosing: {
+        if (stateMachine.returnBack())
+            close.accepted = false
     }
 
     function updateInitParams(newParams) {
