@@ -33,15 +33,14 @@ public:
 
     // return true if test results are correct. So this test is passed
     bool applyInputResults(QString word);
-
-    bool isTestCompletelyFailed() const {return failures>=3;}
 private:
     int wordIndex;
     QString word;
-    int failures;  // not used, currently task is easy, so failure counter is global, not per word. This one kept in case if we will need to switch back
 };
 
-QVector<core::TestSeedTask> generateSeedTasks( const QVector<QString> & seed );
+// startIdx & N are applicable for mobile wallet only. For mobile wallet we are requesting the subset of the words
+// In case of error, all words are regenerated
+QVector<core::TestSeedTask> generateSeedTasks( const QVector<QString> & seed, int startIdx, int N );
 
 }
 

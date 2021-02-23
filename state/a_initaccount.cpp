@@ -135,11 +135,24 @@ void InitAccount::onNewSeed(QVector<QString> sd) {
         return; // Online seed - just ignore it
 
     seed = sd;
-    tasks = core::generateSeedTasks( seed ); // generate tasks
-    seedTestWrongAnswers = 0;
+
+    generateWordTasks();
 
     core::getWndManager()->pageNewSeed( mwc::PAGE_A_NEW_WALLET_PASSPHRASE, seed );
 }
+
+void InitAccount::generateWordTasks() {
+#ifdef WALLET_DESKTOP
+    tasks = core::generateSeedTasks( seed,0, seed.length() ); // generate tasks
+#endif
+#ifdef WALLET_MOBILE
+    tasks = core::generateSeedTasks( seed, 0, std::min(6, seed.length()) ); // generate tasks
+#endif
+    Q_ASSERT(tasks.size()>0);
+
+    seedTestWrongAnswers = 0;
+}
+
 
 // New seed was acknoleged...
 void InitAccount::doneWithNewSeed() {
@@ -163,12 +176,12 @@ void InitAccount::submitSeedWord(QString word) {
         return;
     }
 
-#ifdef QT_DEBUG
+/*#ifdef QT_DEBUG
     // Allways treat as correct answer and don't ask more...
     Q_UNUSED(word);
 //    tasks.remove(0);
     tasks.clear();
-#else
+#else*/
     // Release, the normal way
     if (tasks[0].applyInputResults(word)) {
         // ok case
@@ -189,30 +202,32 @@ void InitAccount::submitSeedWord(QString word) {
         //  Test on per word basis. Used for random words order.  if (tasks[0].isTestCompletelyFailed()) {
         if (restart) {
             // generate a new tasks for a wallet
-            tasks = core::generateSeedTasks(seed);
-            seedTestWrongAnswers = 0;
+            generateWordTasks();
         } else {
          /* In case of random order, put the failed order at the end of the Q.
             // add to the Q
             tasks.push_back( tasks[0] );
             tasks.remove(0);*/
 
-           // normal order - just do nothing. The same word will be requested.
+           // normal order - for desktop do nothing.
+           // For mobile wallet we need to change the tasks
+#ifdef WALLET_MOBILE
+            tasks = core::generateSeedTasks( seed, tasks[0].getWordIndex(), tasks.length()); // generate tasks
+#endif
         }
 
         // switch to 'show seed' window
         core::getWndManager()->pageNewSeed(mwc::PAGE_A_NEW_WALLET_PASSPHRASE, seed);
         return;
     }
-#endif
+//#endif
     doneWithNewSeed();
 }
 
 // Restart seed verification
 void InitAccount::restartSeedVerification() {
     // generate a new tasks for a wallet
-    tasks = core::generateSeedTasks(seed);
-    seedTestWrongAnswers = 0;
+    generateWordTasks();
 
     // switch to 'show seed' window
     core::getWndManager()->pageNewSeed(mwc::PAGE_A_NEW_WALLET_PASSPHRASE, seed);

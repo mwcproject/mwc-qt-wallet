@@ -74,6 +74,8 @@ protected:
 
     // return true if done
     bool finishSeedVerification();
+
+    void generateWordTasks();
 private:
     int progressMaxVal = 10;
 
