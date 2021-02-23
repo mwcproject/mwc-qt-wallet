@@ -6,7 +6,6 @@ import Clipboard 1.0
 
 Item {
     function init(seed, hideSubmitButton) {
-        seedText = seed
         const words = seed.split(" ")
 //        testSeed = words
         setTextSeed(words.slice(0, 24))
@@ -122,7 +121,7 @@ Item {
             anchors.rightMargin: dp(35)
             anchors.left: parent.left
             anchors.leftMargin: dp(35)
-            font.pixelSize: dp(16)
+            font.pixelSize: dp(15)
             lineHeight: 2.0
         }
     }
