@@ -369,7 +369,6 @@ Item {
         id: view_content
         clip: true
         ScrollBar.vertical.policy: ScrollBar.AlwaysOn
-        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
         anchors.top: rect_header.bottom
         anchors.right: parent.right
         anchors.left: parent.left

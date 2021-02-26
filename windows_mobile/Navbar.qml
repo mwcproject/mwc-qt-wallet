@@ -49,7 +49,7 @@ Item {
             text_title.text = qsTr("Account Options   >   Passphrase")
             break
         case 17:
-            text_title.text = qsTr("Wallet Settings   >   NodeInfo")
+            text_title.text = qsTr("Wallet Settings   >   MWC Node Status (Cloud)")
             break
         case 19:
             text_title.text = qsTr("Wallet  >   Finalize")
@@ -722,7 +722,7 @@ Item {
                     border.width: dp(2)
                     Text {
                         id: loginText
-                        text: qsTr("Change Instance")
+                        text: qsTr("Logout / Change Wallet")
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pixelSize: dp(18)
@@ -732,7 +732,7 @@ Item {
 
                 onClicked: {
                     nav.toggle()
-                    messagebox.open(qsTr("Change Instance"), qsTr("Change an instance will log you out of this current wallet instance. Are you sure want to logout?"), true, "No", "Yes", "", "", "", changeInstanceCallback)
+                    messagebox.open(qsTr("LOGOUT / CHANGE WALLET"), qsTr("Are you sure want to logout?"), true, "No", "Yes", "", "", "", changeInstanceCallback)
                 }
             }
         }

@@ -255,7 +255,7 @@ Item {
         onClicked: {
             const fileName = util.getSaveFileName(qsTr("Save Slatepack"), qsTr("ResultedSlatepack"), qsTr("Slatepack tramsaction (*" + txExtension + ")"), txExtension)
             if (fileName === "") return
-            if (util.writeTextFile(fileName, {slatepack})) {
+            if (util.writeTextFile(fileName, [slatepack])) {
                 messagebox.open("Success", "Slatepack file saved at " + fileName)
             }
         }
