@@ -46,6 +46,10 @@ Item {
         onSgnUpdateSyncProgress: (progressPercent) => {
             text_syncStatusMsg.text = "Wallet state update, " + util.trimStrAsDouble(Number(progressPercent).toString(), 4) + "% complete"
         }
+
+        onSgnStartingCommand: (actionName) => {
+            text_syncStatusMsg.text = actionName
+        }
     }
 
     onVisibleChanged: {

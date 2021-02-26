@@ -98,7 +98,7 @@ Item {
     }
 
     function updateStatus() {      
-        image_mwcmq.source = wallet.getMqsListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
+        image_mwcmqs.source = wallet.getMqsListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
         image_http.source = wallet.getHttpListeningStatus() === "true" ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
         image_tor.source = wallet.getTorListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
     }
@@ -110,7 +110,7 @@ Item {
     }
 
     Rectangle {
-        id: rect_mwcmq
+        id: rect_mwcmqs
         width: dp(150)
         height: dp(35)
         anchors.top: parent.top
@@ -122,7 +122,7 @@ Item {
         color: "#00000000"
 
         Image {
-            id: image_mwcmq
+            id: image_mwcmqs
             anchors.left: parent.left
             anchors.leftMargin: dp(10)
             anchors.verticalCenter: parent.verticalCenter
@@ -131,9 +131,9 @@ Item {
         }
 
         Text {
-            id: text_mwcmq
-            text: qsTr("MWCMQ")
-            anchors.left: image_mwcmq.right
+            id: text_mwcmqs
+            text: qsTr("MWCMQS")
+            anchors.left: image_mwcmqs.right
             anchors.leftMargin: dp(10)
             anchors.verticalCenter: parent.verticalCenter
             font.pixelSize: dp(17)
@@ -145,7 +145,7 @@ Item {
         id: rect_tor
         width: dp(150)
         height: dp(35)
-        anchors.top: rect_mwcmq.bottom
+        anchors.top: rect_mwcmqs.bottom
         anchors.topMargin: dp(20)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: dp(-100)
@@ -178,7 +178,7 @@ Item {
         id: rect_http
         width: dp(150)
         height: dp(35)
-        anchors.verticalCenter: rect_mwcmq.verticalCenter
+        anchors.verticalCenter: rect_mwcmqs.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: dp(100)
         border.color: "white"
@@ -349,7 +349,7 @@ Item {
     }
 
     Button {
-        id: button_mwcmq
+        id: button_mwcmqs
         width: parent.width / 2 - dp(50)
         height: dp(50)
         anchors.left: parent.left
@@ -362,7 +362,7 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("MWCMQ")
+                text: qsTr("MWCMQS")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(17)
@@ -382,7 +382,7 @@ Item {
         height: dp(50)
         anchors.right: parent.right
         anchors.rightMargin: dp(30)
-        anchors.verticalCenter: button_mwcmq.verticalCenter
+        anchors.verticalCenter: button_mwcmqs.verticalCenter
         background: Rectangle {
             color: "#00000000"
             radius: dp(5)
@@ -409,7 +409,7 @@ Item {
         text: "(Copies address to clipboard)"
         horizontalAlignment: Text.AlignHCenter
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: button_mwcmq.bottom
+        anchors.top: button_mwcmqs.bottom
         anchors.topMargin: dp(20)
         font.pixelSize: dp(13)
     }
@@ -427,7 +427,7 @@ Item {
 
     Button {
         id: button_file
-        width: button_mwcmq.width
+        width: button_mwcmqs.width
         height: dp(50)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)

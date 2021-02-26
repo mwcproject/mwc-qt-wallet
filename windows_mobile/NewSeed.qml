@@ -18,7 +18,7 @@ Item {
             text_seed.text += words[i]
             if (i === words.length - 1)
                 break
-            if (i % 6 === 5) {
+            if (i % 4 === 3) {
                 text_seed.text += "\n"
             } else {
                 text_seed.text += "    "
@@ -121,8 +121,8 @@ Item {
             anchors.rightMargin: dp(35)
             anchors.left: parent.left
             anchors.leftMargin: dp(35)
-            font.pixelSize: dp(15)
-            lineHeight: 2.0
+            font.pixelSize: dp(20)
+            lineHeight: 1.5
         }
     }
 
@@ -136,7 +136,7 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: dp(50)
         anchors.top: rect_phrase.bottom
-        anchors.topMargin: dp(30)
+        anchors.topMargin: dp(20)
         font.pixelSize: dp(14)
     }
 
@@ -147,7 +147,7 @@ Item {
         visible: false
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: label_description.bottom
-        anchors.topMargin: dp(50)
+        anchors.topMargin: dp(30)
         background: Rectangle {
             id: rectangle
             color: "#00000000"
