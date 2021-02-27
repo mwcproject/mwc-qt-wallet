@@ -213,6 +213,9 @@ void StateMachine::executeFrom( STATE nextState ) {
 // Step back top the prev state if it wasn't a login
 // Return true is step back was done successfully
 bool StateMachine::returnBack() {
+    if (currentState<STATE::ACCOUNTS)
+        return false; // Init, locking screens doesn't support back.
+
     while( !actionHistory.isEmpty() && actionHistory.back() == currentState)
         actionHistory.pop_back();
 

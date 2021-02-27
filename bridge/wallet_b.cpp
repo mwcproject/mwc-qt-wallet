@@ -387,7 +387,7 @@ void Wallet::requestCancelTransacton(QString account, QString txIdx) {
     getWallet()->cancelTransacton(account, txIdx.toLongLong());
 }
 
-// Set acount to receive the coins
+// Set account to receive the coins
 void Wallet::setReceiveAccount(QString account) {
     return getWallet()->setReceiveAccount(account);
 }
