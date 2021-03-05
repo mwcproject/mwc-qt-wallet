@@ -70,8 +70,8 @@ bool Util::isPublicKeyValid(QString str) {
 // Verify address and return the address type.
 // Return values: "unknown", "https", "tor", "mwcmqs"
 QString Util::verifyAddress(QString address) {
-    QPair<bool, util::ADDRESS_TYPE> res = util::verifyAddress(address);
-    if (!res.first)
+    QPair<QString, util::ADDRESS_TYPE> res = util::verifyAddress(address);
+    if (!res.first.isEmpty())
         return "unknown";
 
     switch (res.second) {

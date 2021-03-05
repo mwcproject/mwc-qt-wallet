@@ -24,7 +24,8 @@ namespace util {
 // KEYBASE=3,  - absolete value. Index is reserved because of that
 enum class ADDRESS_TYPE { UNKNOWN=1, MWC_MQ=2,  HTTPS=4, TOR=5 };
 
-QPair<bool, ADDRESS_TYPE> verifyAddress(QString address);
+// return: <ErrorMessage, ADDRESS_TYPE>
+QPair<QString, ADDRESS_TYPE> verifyAddress(QString address);
 
 // Make an address as a full format
 // type     - type og the address. Currently targeting mwc mq only

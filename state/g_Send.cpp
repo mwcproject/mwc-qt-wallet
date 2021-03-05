@@ -251,10 +251,10 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
         address = address.left(address.length()-1);
 
     // Let's  verify address first
-    QPair< bool, util::ADDRESS_TYPE > addressRes = util::verifyAddress(address);
-    if ( !addressRes.first ) {
+    QPair< QString, util::ADDRESS_TYPE > addressRes = util::verifyAddress(address);
+    if ( !addressRes.first.isEmpty() ) {
         core::getWndManager()->messageTextDlg("Incorrect Input",
-                                         "Please specify correct address to send your MWC" );
+                                         "Please specify correct address to send your MWC.\n" + addressRes.first );
         return false;
     }
 
@@ -285,7 +285,7 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
                 return false;
             }
 
-            // Let's convert tor address to the standard noration that mwc713 undertands
+            // Let's convert tor address to the standard notation that mwc713 understands
             QString tor_pk = util::extractPubKeyFromAddress(address);
             address = "http://" + tor_pk + ".onion";
 

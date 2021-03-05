@@ -459,9 +459,9 @@ void Swap::createStartSwap() {
 
     int minConf = context->appContext->getSendCoinsParams().inputConfirmationNumber;
 
-    QPair< bool, util::ADDRESS_TYPE > addressRes = util::verifyAddress(newSwapBuyerAddress);
-    if ( !addressRes.first ) {
-        emit onCreateStartSwap(false, "Unable to parse buyer address " + newSwapBuyerAddress);
+    QPair< QString, util::ADDRESS_TYPE > addressRes = util::verifyAddress(newSwapBuyerAddress);
+    if ( !addressRes.first.isEmpty() ) {
+        emit onCreateStartSwap(false, "Unable to parse buyer address " + newSwapBuyerAddress + ", " + addressRes.first);
         return;
     }
 

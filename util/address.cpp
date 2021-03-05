@@ -85,25 +85,25 @@ static bool decodeBase58( QString sz, QByteArray & vch)
 }
 
 // Check if it is tor address
-static QPair<bool, ADDRESS_TYPE> checkTorAddress( QString address ) {
+static QPair<QString, ADDRESS_TYPE> checkTorAddress( QString address ) {
     QString pk = extractPubKeyFromAddress(address);
     if (pk.length() != TOR_ADDR_LEN) {
-        return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
+        return QPair<QString, ADDRESS_TYPE>("Not a TOR address", ADDRESS_TYPE::UNKNOWN);
     }
 
     // Check optional suffix '.onion'
     int idx = address.lastIndexOf('.');
     if (idx>=0) {
         // Check for bad extention
-        if (!address.mid(idx).compare(".onion", Qt::CaseInsensitive))
-            return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
+        if (address.mid(idx).compare(".onion", Qt::CaseInsensitive) != 0)
+            return QPair<QString, ADDRESS_TYPE>("Expecting onion suffix for TOR address", ADDRESS_TYPE::UNKNOWN);
     }
 
-    return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::TOR);
+    return QPair<QString, ADDRESS_TYPE>("", ADDRESS_TYPE::TOR);
 }
 
 // mwc mq address might include the domain
-static QPair<bool, ADDRESS_TYPE> checkMwcMqAddress( QString address ) {
+static QPair<QString, ADDRESS_TYPE> checkMwcMqAddress( QString address ) {
 
     if (address.contains('@') ) {
         address = address.left( address.indexOf('@') );
@@ -111,22 +111,22 @@ static QPair<bool, ADDRESS_TYPE> checkMwcMqAddress( QString address ) {
     else {
         // Checking the prefix
         if (!( address[0] == 'q' || address[0] == 'x' ))
-            return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
+            return QPair<QString, ADDRESS_TYPE>("Not found expected prefix for MQS address", ADDRESS_TYPE::UNKNOWN);
     }
 
     if ( address.length() != MWC_MQ_ADDR_LEN )
-        return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
+        return QPair<QString, ADDRESS_TYPE>("Incorrect length for MQS address", ADDRESS_TYPE::UNKNOWN);
 
     // check alphabet
     for ( auto ch : address ) {
         if ( Base58Alphabet.indexOf(ch) < 0 ) // invalid symbol
-            return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
+            return QPair<QString, ADDRESS_TYPE>("MSQ address has invalid symbols", ADDRESS_TYPE::UNKNOWN);
     }
 
     // Let't validate the checksum
     QByteArray payload;
     if ( !decodeBase58( address, payload ) || payload.size()<5 )
-        return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
+        return QPair<QString, ADDRESS_TYPE>("Unable to decode MQS address", ADDRESS_TYPE::UNKNOWN);
 
     int checksum_index = payload.size() - 4;
     QByteArray provided_checksum = payload.mid(checksum_index);
@@ -138,10 +138,10 @@ static QPair<bool, ADDRESS_TYPE> checkMwcMqAddress( QString address ) {
 
     for (int u=0;u<4;u++) {
         if ( payload[u] != provided_checksum[u] )
-            return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
+            return QPair<QString, ADDRESS_TYPE>("MQS address has wrong checksum", ADDRESS_TYPE::UNKNOWN);
     }
 
-    return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::MWC_MQ);
+    return QPair<QString, ADDRESS_TYPE>("", ADDRESS_TYPE::MWC_MQ);
 }
 
 // return: protocol, address.
@@ -165,43 +165,43 @@ static QPair<QString, QString> split2ProtocolAddress(QString address) {
 
     Q_ASSERT(protSepIdx>0);
 
-    return  QPair<QString, QString>( address.left(protSepIdx), address.mid( protSepIdx + 3 ) );
+    return  QPair<QString, QString>( address.left(protSepIdx).toLower(), address.mid( protSepIdx + 3 ) );
 }
 
-
-QPair<bool, ADDRESS_TYPE> verifyAddress(QString address) {
-
+// return: <ErrorMessage, ADDRESS_TYPE>
+QPair<QString, ADDRESS_TYPE> verifyAddress(QString address) {
     // protocol, address
     QPair<QString, QString>  protAddr = split2ProtocolAddress(address);
     if (protAddr.second.isEmpty())
-        return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
+        return QPair<QString, ADDRESS_TYPE>("Address has incorrect syntax", ADDRESS_TYPE::UNKNOWN);
 
     if (protAddr.first.isEmpty()) {
-        QPair<bool, ADDRESS_TYPE> mqsRes = checkMwcMqAddress(protAddr.second);
-        if (mqsRes.first)
+        QPair<QString, ADDRESS_TYPE> mqsRes = checkMwcMqAddress(protAddr.second);
+        if (mqsRes.first.isEmpty())
             return mqsRes;
 
         return checkTorAddress(protAddr.second);
     }
 
-    QPair<bool, ADDRESS_TYPE> tor_res = checkTorAddress(protAddr.second);
-    if (tor_res.first)
-        return tor_res; // Tor address
-
     QString protocol = protAddr.first;
     address = protAddr.second;
 
+    QPair<QString, ADDRESS_TYPE> tor_res = checkTorAddress(protAddr.second);
+    if (tor_res.first.isEmpty()) {
+        if (protocol.isEmpty() || protocol=="http") {
+            return QPair<QString, ADDRESS_TYPE>("", ADDRESS_TYPE::TOR);
+        }
+        return QPair<QString, ADDRESS_TYPE>("TOR address support 'http' prefix only", ADDRESS_TYPE::UNKNOWN);
+    }
+
     // both http and https are required
     if ( protocol == "https" || protocol == "http" ) {
-        if (address.endsWith(".onion"))
-            return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::TOR);
-        else
-            return QPair<bool, ADDRESS_TYPE>(true, ADDRESS_TYPE::HTTPS);
+        return QPair<QString, ADDRESS_TYPE>("", ADDRESS_TYPE::HTTPS);
     }
     else if ( protocol == "mwcmq" || protocol == "mwcmqs" )
         return checkMwcMqAddress( address );
     else // Unknown protocol
-        return QPair<bool, ADDRESS_TYPE>(false, ADDRESS_TYPE::UNKNOWN);
+        return QPair<QString, ADDRESS_TYPE>("Address doesn't match any of expected patterns", ADDRESS_TYPE::UNKNOWN);
 }
 
 // Make an address as a full format

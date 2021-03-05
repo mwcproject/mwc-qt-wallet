@@ -130,14 +130,18 @@ void SendOnline::on_sendButton_clicked()
     }
 
     ui->progress->show();
-    if (!send->sendMwcOnline( account, QString::number(amount), sendTo, "", description))
+    ui->sendButton->setEnabled(false);
+    if (!send->sendMwcOnline( account, QString::number(amount), sendTo, "", description)) {
         ui->progress->hide();
+        ui->sendButton->setEnabled(true);
+    }
 }
 
 void SendOnline::onSgnShowSendResult( bool success, QString message ) {
     util::TimeoutLockObject to("SendOnline");
 
     ui->progress->hide();
+    ui->sendButton->setEnabled(true);
 
     if (success) {
         control::MessageBox::messageText(this, "Success", "Your MWC was successfully sent to recipient");
