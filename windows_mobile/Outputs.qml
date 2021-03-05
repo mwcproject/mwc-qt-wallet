@@ -107,11 +107,13 @@ Item {
     }
 
     function requestOutputs(account) {
-        allData = []
-        outputsModel.clear()
-        rect_progress.visible = true
-        updateShownData()
-        wallet.requestOutputs(account, config.isShowOutputAll(), true)
+        if (account) {
+            allData = []
+            outputsModel.clear()
+            rect_progress.visible = true
+            updateShownData()
+            wallet.requestOutputs(account, config.isShowOutputAll(), true)
+        }
     }
 
     function refreshOutputs() {

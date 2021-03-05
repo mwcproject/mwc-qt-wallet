@@ -31,6 +31,9 @@ public class ActivityUtils {
         context.registerReceiver(serviceMessageReceiver, intentFilter);
         Log.i(TAG, "Registered broadcast receiver");
 
+        checkPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, 100);
+        checkPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE, 100);
+
 /*        // Requesting permissions
         Intent intent = new Intent();
         String packageName = context.getPackageName();

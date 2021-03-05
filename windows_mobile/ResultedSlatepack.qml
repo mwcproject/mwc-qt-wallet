@@ -18,29 +18,6 @@ Item {
     property string transactionUUID
     property int lastReportedError: 0
 
-    function init(params) {
-        slatepack = params.slatepack
-        backStateId = params.backStateId
-        txExtension = params.txExtension
-        enableFinalize = params.enableFinalize
-        textarea_content.text = slatepack
-        textarea_finalize.text = ''
-
-        if(!enableFinalize) {
-            flickable_finalize.visible = false
-            button_finalize.visible = false
-        } else {
-            flickable_finalize.visible = true
-            button_finalize.visible = true
-            button_finalize.enabled = false
-
-            // Requesting UUID for this transaction
-            initiateSlateVerification(slatepack, initTag)
-        }
-        flickable_content.contentY = 0
-        flickable_finalize.contentY = 0
-    }
-
     StateMachineBridge {
         id: stateMachine
     }
@@ -158,6 +135,27 @@ Item {
             if (parent.height > dp(560)) {
                 anchors.topMargin = (parent.height - dp(560)) / 2
             }
+            const params = JSON.parse(initParams)
+            slatepack = params.slatepack
+            backStateId = params.backStateId
+            txExtension = params.txExtension
+            enableFinalize = params.enableFinalize
+            textarea_content.text = slatepack
+            textarea_finalize.text = ''
+
+            if(!enableFinalize) {
+                flickable_finalize.visible = false
+                button_finalize.visible = false
+            } else {
+                flickable_finalize.visible = true
+                button_finalize.visible = true
+                button_finalize.enabled = false
+
+                // Requesting UUID for this transaction
+                initiateSlateVerification(slatepack, initTag)
+            }
+            flickable_content.contentY = 0
+            flickable_finalize.contentY = 0
         }
     }
 
@@ -206,8 +204,9 @@ Item {
         id: button_copy
         width: parent.width / 2 - dp(45)
         height: dp(50)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(30)
+        anchors.horizontalCenter: parent.horizontalCenter
+//        anchors.left: parent.left
+//        anchors.leftMargin: dp(30)
         anchors.top: flickable_content.bottom
         anchors.topMargin: dp(20)
         background: Rectangle {
@@ -231,39 +230,39 @@ Item {
         }
     }
 
-    Button {
-        id: button_save
-        width: parent.width / 2 - dp(45)
-        height: dp(50)
-        anchors.verticalCenter: button_copy.verticalCenter
-        anchors.right: parent.right
-        anchors.rightMargin: dp(30)
-        background: Rectangle {
-            color: "#00000000"
-            radius: dp(4)
-            border.color: "white"
-            border.width: dp(2)
-            Text {
-                text: qsTr("Save Slatepack")
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
-                color: "white"
-            }
-        }
+//    Button {
+//        id: button_save
+//        width: parent.width / 2 - dp(45)
+//        height: dp(50)
+//        anchors.verticalCenter: button_copy.verticalCenter
+//        anchors.right: parent.right
+//        anchors.rightMargin: dp(30)
+//        background: Rectangle {
+//            color: "#00000000"
+//            radius: dp(4)
+//            border.color: "white"
+//            border.width: dp(2)
+//            Text {
+//                text: qsTr("Save Slatepack")
+//                anchors.verticalCenter: parent.verticalCenter
+//                anchors.horizontalCenter: parent.horizontalCenter
+//                font.pixelSize: dp(18)
+//                color: "white"
+//            }
+//        }
 
-        onClicked: {
-            const fileName = util.getSaveFileName(qsTr("Save Slatepack"), qsTr("ResultedSlatepack"), qsTr("Slatepack tramsaction (*" + txExtension + ")"), txExtension)
-            if (fileName === "") return
-            if (util.writeTextFile(fileName, [slatepack])) {
-                messagebox.open("Success", "Slatepack file saved at " + fileName)
-            }
-        }
-    }
+//        onClicked: {
+//            const fileName = util.getSaveFileName(qsTr("Save Slatepack"), qsTr("ResultedSlatepack"), qsTr("Slatepack tramsaction (*" + txExtension + ")"), txExtension)
+//            if (fileName === "") return
+//            if (util.writeTextFile(fileName, [slatepack])) {
+//                messagebox.open("Success", "Slatepack file saved at " + fileName)
+//            }
+//        }
+//    }
 
     Flickable {
         id: flickable_finalize
-        anchors.top: button_save.bottom
+        anchors.top: button_copy.bottom
         anchors.topMargin: dp(30)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
@@ -308,7 +307,7 @@ Item {
         height: dp(50)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: button_finalize.visible ? -button_back.width/2 - dp(15) : 0
-        anchors.top: flickable_finalize.visible ? flickable_finalize.bottom : button_save.bottom
+        anchors.top: flickable_finalize.visible ? flickable_finalize.bottom : button_copy.bottom
         anchors.topMargin: dp(20)
         background: Rectangle {
             color: "#00000000"
