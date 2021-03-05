@@ -48,8 +48,8 @@ Item {
 
     onVisibleChanged: {
         if (visible) {
-            if (parent.height > dp(500)) {
-                image_send_online.topMargin = (parent.height - dp(500)) / 2
+            if (parent.height > dp(520)) {
+                image_send_online.anchors.topMargin = (parent.height - dp(520)) / 2
             }
             rect_progress.visible = false
             textfield_api_secret.visible = false
@@ -233,7 +233,7 @@ Item {
         color: "white"
         text: ""
         anchors.top: textfield_send_to.bottom
-        anchors.topMargin: textfield_api_secret.visible ? dp(125) : dp(55)
+        anchors.topMargin: textfield_api_secret.visible ? dp(150) : dp(80)
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
         anchors.right: parent.right

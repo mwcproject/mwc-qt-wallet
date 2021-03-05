@@ -60,6 +60,18 @@ Item {
             button_login.enabled = true
             text_syncStatusMsg.text = ""
 
+            if (mousearea_newinstance.enabled === false) {
+                image_restore.visible = false
+                text_restore.visible = false
+                image_newinstance.visible = false
+                text_newinstance.visible = false
+            } else {
+                image_restore.visible = true
+                text_restore.visible = true
+                image_newinstance.visible = true
+                text_newinstance.visible = true
+            }
+
             instanceItems.clear()
             // <selected path_id>, < <path_id>, <instance name>, <network> >, ...  >
             const instanceData = config.getWalletInstances(true)
@@ -308,7 +320,8 @@ Item {
                 return
             }
 
-            const selectedPath = instanceItems.get(instanceComboBox.currentIndex).name
+            const selectedPath = instanceItems.get(instanceComboBox.currentIndex).pathId
+            console.log(123, selectedPath)
             config.setActiveInstance(selectedPath)
 
             rect_progress.visible = true

@@ -182,7 +182,7 @@ Window {
         SendOnline {
             id: sendOnlineItem
             anchors.fill: parent
-            visible: currentState === 8 && initParams.length !== 0 && JSON.parse(initParams).isSendOnline
+            visible: currentState === 8 && initParams.length !== 0 && initParams.search("isSendOnline") >= 0 && JSON.parse(initParams).isSendOnline
             onVisibleChanged: {
                 if (visible) {
                     sendOnlineItem.init(JSON.parse(initParams))
@@ -193,7 +193,7 @@ Window {
         SendOffline {
             id: sendOfflineItem
             anchors.fill: parent
-            visible: currentState === 8 && initParams.length !== 0 && !JSON.parse(initParams).isSendOnline && !JSON.parse(initParams).backStateId
+            visible: currentState === 8 && initParams.length !== 0 && initParams.search("isSendOnline") >= 0 && !JSON.parse(initParams).isSendOnline && initParams.search("backStateId") < 0
             onVisibleChanged: {
                 if (visible) {
                     sendOfflineItem.init(JSON.parse(initParams))
@@ -216,24 +216,19 @@ Window {
         FileTransactionReceive {
             id: fileTransactionReceiveItem
             anchors.fill: parent
-            visible: currentState === 9 && initParams.length !== 0 && !JSON.parse(initParams).backStateId
+            visible: currentState === 9 && initParams.length !== 0 && initParams.search("backStateId") < 0
         }
 
         FileTransactionFinalize {
             id: fileTransactionFinalizeItem
             anchors.fill: parent
-            visible: currentState === 19 && initParams.length !== 0
+            visible: currentState === 19 && initParams.length !== 0 && initParams.search("fileNameOrSlatepack") >= 0
         }
 
         ResultedSlatepack {
             id: resultedSlatepackItem
             anchors.fill: parent
-            visible: (currentState === 8 || currentState === 9) && initParams.length !== 0 && JSON.parse(initParams).backStateId
-            onVisibleChanged: {
-                if (visible) {
-                    resultedSlatepackItem.init(JSON.parse(initParams))
-                }
-            }
+            visible: (currentState === 8 || currentState === 9) && initParams.length !== 0 && initParams.search("backStateId") >= 0
         }
 
         Transactions {

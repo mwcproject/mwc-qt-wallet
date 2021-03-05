@@ -190,8 +190,10 @@ void MobileWndManager::pageInitFirstTime() {
 }
 void MobileWndManager::pageInputPassword(QString pageTitle, bool lockMode) {
     Q_UNUSED(pageTitle)
-    Q_UNUSED(lockMode)
 
+    QJsonObject obj;
+    obj["lockMode"] = lockMode;
+    mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
     mainWindow->setProperty("currentState", state::STATE::INPUT_PASSWORD);
 }
 void MobileWndManager::pageInitAccount(QString path, bool restoredFromSeed) {
@@ -227,8 +229,11 @@ void MobileWndManager::pageNewSeedTest(int wordIndex) {
     QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
 void MobileWndManager::pageProgressWnd(QString pageTitle, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable ) {
-    Q_UNUSED(pageTitle)
     Q_UNUSED(cancellable)
+
+    if (pageTitle.contains("Re-sync")) {
+        mainWindow->setProperty("currentState", state::STATE::RESYNC);
+    }
 
     QJsonObject obj;
     obj["callerId"] = callerId;
