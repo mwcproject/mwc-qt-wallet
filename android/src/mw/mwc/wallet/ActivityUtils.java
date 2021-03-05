@@ -49,6 +49,8 @@ public class ActivityUtils {
         checkPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, 100);
 
         Log.i(TAG, "ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS permissions are requested");*/
+
+        checkPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, 100);
     }
     
     // Function to check and request permission. 
