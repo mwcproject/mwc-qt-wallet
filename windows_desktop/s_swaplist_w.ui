@@ -236,14 +236,14 @@
         <property name="text">
          <string>
 
-Trades data contains refund slates and private keys for the redeem operation. In case of the hardware failure you might lost this data and, as a result, you might loose your funds. That is why we strongly recommend to keep the copy of your trade data on the separate drive like USB stick.
+Trades data contains refund slates and private keys for the redeem operation. In case of a hardware failure you might lose this data and, as a result, you might lose your funds. That is why we strongly recommend to keep the copy of your trade data on a separate drive like a USB stick.
 
-The first and the most important backup is done before initial lock of coins at multisig account. With this backup you will be able to continue locking or refund your funds.
-The second backup is initiated before redeem phase. With this data you will be able to finish redeem or do a refund.
+The first and the most important backup is done before initial lock of coins at multisig account. With this backup you will be able to continue locking or refunding your funds.
+The second backup is initiated before a redeem phase.  With this data you will be able to finish the redeem or make a refund.
 
-If you have your backup, in worst case scenario you will be able to restore your MWC wallet from the mnemonic phrase, restore your swap trades, and at least refund you locked coins. To finish redeem transaction, you need a second backup that is optional.
+If you have your backup, in worst case scenario you will be able to restore your MWC wallet from the mnemonic phrase, restore your swap trades, and at least refund your locked coins. To finish redeeming a transaction, you need a second backup which is optional.
 
-Please note, swap trade files are encrypted, so you can restore it into the wallet with the same seed.</string>
+Please note that swap trade files are encrypted so you can restore it into the wallet with the same seed.</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -284,7 +284,7 @@ Please note, swap trade files are encrypted, so you can restore it into the wall
         <item>
          <widget class="QCheckBox" name="checkEnforceBackup">
           <property name="text">
-           <string>Pause trade before lock step, until trade data will be backed up</string>
+           <string>Pause the trade before the lock step, until the trade data is backed up.</string>
           </property>
          </widget>
         </item>
@@ -608,14 +608,14 @@ Please note, swap trade files are encrypted, so you can restore it into the wall
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::RichVBox</class>

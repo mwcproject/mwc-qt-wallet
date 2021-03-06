@@ -171,7 +171,7 @@
         <widget class="control::MwcLabelSmall" name="onlineLabel">
          <property name="geometry">
           <rect>
-           <x>18</x>
+           <x>15</x>
            <y>12</y>
            <width>124</width>
            <height>22</height>
@@ -279,7 +279,7 @@
         <widget class="control::MwcLabelSmall" name="fileLabel">
          <property name="geometry">
           <rect>
-           <x>18</x>
+           <x>13</x>
            <y>12</y>
            <width>124</width>
            <height>22</height>
@@ -568,7 +568,7 @@ p, li { white-space: pre-wrap; }
         <widget class="control::MwcLabelSmall" name="slatepackLabel">
          <property name="geometry">
           <rect>
-           <x>18</x>
+           <x>13</x>
            <y>12</y>
            <width>124</width>
            <height>22</height>
