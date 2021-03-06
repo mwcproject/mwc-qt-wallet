@@ -54,6 +54,7 @@ public:
 
 protected:
     virtual NextStateRespond execute() override;
+    virtual bool mobileBack() override;
     virtual QString getHelpDocName() override {return "send.html";}
 
 private slots:
@@ -73,6 +74,7 @@ private:
 
     QString respProofAddress;
     QString restProofError;
+    bool atSendInitialPage = true;
 };
 
 }

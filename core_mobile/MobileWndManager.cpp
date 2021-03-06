@@ -177,16 +177,16 @@ bool MobileWndManager::sendConfirmationDlg( QString title, QString message, doub
 void MobileWndManager::showWalletStoppingMessage(int taskTimeout) {
     Q_UNUSED(taskTimeout)
 
-    Q_ASSERT(false); // implement me
+    //Q_ASSERT(false); // implement me
 }
 
 void MobileWndManager::hideWalletStoppingMessage() {
-    Q_ASSERT(false); // implement me
+  //  Q_ASSERT(false); // implement me
 }
 
 //---------------- Pages ------------------------
 void MobileWndManager::pageInitFirstTime() {
-    Q_ASSERT(false); // implement me
+    //Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageInputPassword(QString pageTitle, bool lockMode) {
     Q_UNUSED(pageTitle)
@@ -199,7 +199,7 @@ void MobileWndManager::pageInputPassword(QString pageTitle, bool lockMode) {
 void MobileWndManager::pageInitAccount(QString path, bool restoredFromSeed) {
     Q_UNUSED(path) // mobile doesn't need it
     Q_UNUSED(restoredFromSeed)  // mobile doesn't need it
-    Q_ASSERT(false); // implement me
+    //Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageEnterSeed() {
     QJsonObject obj;
@@ -282,7 +282,7 @@ void MobileWndManager::pageRecieve() {
     mainWindow->setProperty("initParams", "");
 }
 void MobileWndManager::pageListening() {
-    Q_ASSERT(false); // implement me
+//    Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageFinalize() {
     mainWindow->setProperty("currentState", state::STATE::FINALIZE);

@@ -53,6 +53,8 @@ InitAccount::~InitAccount() {
 NextStateRespond InitAccount::execute() {
     bool running = context->wallet->isRunning();
 
+    currentPage = InitAccountPage::None;
+
     // Need to provision the wallet. If it is not running, mean that we wasn't be able to login.
     // So we have to init the wallet
     if ( !running && context->appContext->pullCookie<QString>("checkWalletInitialized")=="FAILED" ) {
@@ -64,21 +66,7 @@ NextStateRespond InitAccount::execute() {
             return NextStateRespond( NextStateRespond::RESULT::DONE );
         }
         else {
-            QString walletPath = context->appContext->getCurrentWalletInstance(false);
-
-            QPair<bool,QString> res = ioutils::getAppDataPath("");
-
-            if (res.first) {
-                QDir baseDir(res.second);
-                walletPath = baseDir.absoluteFilePath(walletPath);
-                QDir wpath(walletPath);
-                walletPath = wpath.absolutePath();
-            }
-
-            core::getWndManager()->pageInitAccount(walletPath, context->appContext->getCookie<bool>("restoreWalletFromSeed") );
-
-            // Provision of new wallet, need to block locking
-            context->stateMachine->blockLogout("InitAccount");
+            showInitAccountPage();
 
             return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
         }
@@ -86,6 +74,25 @@ NextStateRespond InitAccount::execute() {
 
     // Just skip that step
     return NextStateRespond( NextStateRespond::RESULT::DONE );
+}
+
+void InitAccount::showInitAccountPage() {
+    QString walletPath = context->appContext->getCurrentWalletInstance(false);
+
+    QPair<bool,QString> res = ioutils::getAppDataPath("");
+
+    if (res.first) {
+        QDir baseDir(res.second);
+        walletPath = baseDir.absoluteFilePath(walletPath);
+        QDir wpath(walletPath);
+        walletPath = wpath.absolutePath();
+    }
+
+    core::getWndManager()->pageInitAccount(walletPath, context->appContext->getCookie<bool>("restoreWalletFromSeed") );
+    currentPage = InitAccountPage::PageInitAccount;
+
+    // Provision of new wallet, need to block locking
+    context->stateMachine->blockLogout("InitAccount");
 }
 
 // Restore form the seed is cancelled by user.
@@ -97,6 +104,32 @@ void InitAccount::cancel() {
 void InitAccount::exitingState() {
     context->stateMachine->unblockLogout("InitAccount");
 }
+
+bool InitAccount::mobileBack() {
+    switch (currentPage) {
+        case InitAccountPage::None: return false;
+        case InitAccountPage::PageInitAccount: return false;
+        case InitAccountPage::PageEnterSeed: {
+            //showInitAccountPage(); // mobile doesn't have this page
+            //return true;
+            return false;
+        }
+        case InitAccountPage::PageNewSeed: {
+            //showInitAccountPage(); // mobile doesn't have this page
+            //return true;
+            return false;
+        }
+        case InitAccountPage::PageNewSeedTest: {
+            // Regenerating everything as for failure and go back to passphrase
+            generateWordTasks();
+            core::getWndManager()->pageNewSeed(mwc::PAGE_A_NEW_WALLET_PASSPHRASE, seed);
+            currentPage = InitAccountPage::PageNewSeed;
+            return true;
+        }
+        case InitAccountPage::PageProgressWnd: return true; // Do nothing, not exiting. We are syncing.
+    }
+}
+
 
 // Get Password, Choose what to do
 void InitAccount::setPassword(const QString & password ) {
@@ -122,6 +155,7 @@ void InitAccount::submitWalletCreateChoices( MWC_NETWORK network, QString instan
     if (context->appContext->getCookie<bool>("restoreWalletFromSeed")) {
         // Enter seed to restore
         core::getWndManager()->pageEnterSeed();
+        currentPage = InitAccountPage::PageEnterSeed;
     }
     else {
         // generate a new seed for a new wallet
@@ -139,6 +173,7 @@ void InitAccount::onNewSeed(QVector<QString> sd) {
     generateWordTasks();
 
     core::getWndManager()->pageNewSeed( mwc::PAGE_A_NEW_WALLET_PASSPHRASE, seed );
+    currentPage = InitAccountPage::PageNewSeed;
 }
 
 void InitAccount::generateWordTasks() {
@@ -166,6 +201,7 @@ void InitAccount::doneWithNewSeed() {
 
     // Show verify dialog
     core::getWndManager()->pageNewSeedTest( tasks[0].getWordIndex() );
+    currentPage = InitAccountPage::PageNewSeedTest;
 }
 
 
@@ -218,6 +254,7 @@ void InitAccount::submitSeedWord(QString word) {
 
         // switch to 'show seed' window
         core::getWndManager()->pageNewSeed(mwc::PAGE_A_NEW_WALLET_PASSPHRASE, seed);
+        currentPage = InitAccountPage::PageNewSeed;
         return;
     }
 //#endif
@@ -231,6 +268,7 @@ void InitAccount::restartSeedVerification() {
 
     // switch to 'show seed' window
     core::getWndManager()->pageNewSeed(mwc::PAGE_A_NEW_WALLET_PASSPHRASE, seed);
+    currentPage = InitAccountPage::PageNewSeed;
 }
 
 bool InitAccount::finishSeedVerification() {
@@ -299,6 +337,7 @@ void InitAccount::createWalletWithSeed( QVector<QString> sd ) {
     // switching to a progress Wnd
     core::getWndManager()->pageProgressWnd(mwc::PAGE_A_RECOVERY_FROM_PASSPHRASE, INIT_ACCOUNT_CALLER_ID,
               "Recovering account from the passphrase", "", "", false);
+    currentPage = InitAccountPage::PageProgressWnd;
 
     // Stopping listeners first. Not checking if they are running.
     for (auto p :  bridge::getBridgeManager()->getProgressWnd())
@@ -360,6 +399,7 @@ void InitAccount::onRecoverResult(bool started, bool finishedWithSuccess, QStrin
     else {
         // switch back to the seed window
         core::getWndManager()->pageEnterSeed();
+        currentPage = InitAccountPage::PageEnterSeed;
         return;
     }
 }

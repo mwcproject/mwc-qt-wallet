@@ -44,7 +44,7 @@ NextStateRespond Resync::execute() {
     }
 
     prevState = context->appContext->pullCookie<int>("PrevState");
-    if (prevState<=0)
+    if (prevState<=0 || prevState==STATE::RESYNC)
         prevState = STATE::TRANSACTIONS;
 
     // Starting recovery process
@@ -130,6 +130,11 @@ void Resync::onCheckResult(bool ok, QString errors ) {
         context->stateMachine->setActionWindow( (STATE)prevState );
     }
 
+}
+
+bool Resync::mobileBack() {
+    // Blocking back while in sync
+    return inSyncProcess;
 }
 
 

@@ -33,6 +33,7 @@ public:
 
 protected:
     virtual NextStateRespond execute() override;
+    virtual bool mobileBack() override;
     virtual void exitingState() override;
     virtual bool canExitState(STATE nextWindowState) override;
 

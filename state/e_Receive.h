@@ -44,6 +44,7 @@ public:
     virtual bool isNodeHealthy() const {return true;}
 protected:
     virtual NextStateRespond execute() override;
+    virtual bool mobileBack() override;
     virtual QString getHelpDocName() override {return "receive.html";}
 
     bool isActive() const;
@@ -54,6 +55,7 @@ private slots:
 private:
     int lastNodeHeight = 0;
     bool signingFile = false; // what is signing now. File or Slatepack.
+    bool atInitialPage = true;
 };
 
 

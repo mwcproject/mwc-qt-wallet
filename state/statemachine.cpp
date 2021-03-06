@@ -213,8 +213,16 @@ void StateMachine::executeFrom( STATE nextState ) {
 // Step back top the prev state if it wasn't a login
 // Return true is step back was done successfully
 bool StateMachine::returnBack() {
+    // Let's states handle if they supporting back button
+    State* curState = StateMachine::getCurrentStateObj();
+    if (curState== nullptr)
+        return false;
+
+    if (curState->mobileBack())
+        return true; // State should update the UI, so we are done
+
     if (currentState<STATE::ACCOUNTS)
-        return false; // Init, locking screens doesn't support back.
+        return false; // Init, locking screens doesn't support back, just exit.
 
     while( !actionHistory.isEmpty() && actionHistory.back() == currentState)
         actionHistory.pop_back();

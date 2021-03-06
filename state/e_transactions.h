@@ -31,7 +31,7 @@ public:
 
 protected:
     virtual NextStateRespond execute() override;
-
+    virtual bool mobileBack() override {return false;}
     virtual QString getHelpDocName() override {return "transactions.html";}
 
 private:

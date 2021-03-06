@@ -35,6 +35,7 @@ public:
     void deleteAccount( QString accountName );
 protected:
     virtual NextStateRespond execute() override;
+    virtual bool mobileBack() override {return false;}
     virtual QString getHelpDocName() override {return "accounts.html";}
 private slots:
     void onLoginResult(bool ok);

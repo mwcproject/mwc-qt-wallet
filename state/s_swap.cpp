@@ -138,26 +138,30 @@ Swap::~Swap() {
 }
 
 NextStateRespond Swap::execute() {
+    selectedPage = SwapWnd::None;
     if (context->appContext->getActiveWndState() != STATE::SWAP)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    core::getWndManager()->pageSwapList();
+    pageTradeList();
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
 // Show first page with trade List
 void Swap::pageTradeList() {
+    selectedPage = SwapWnd::PageSwapList;
     core::getWndManager()->pageSwapList();
 }
 
 // Edit/View Trade Page
 void Swap::viewTrade(QString swapId, QString stateCmd) {
+    selectedPage = SwapWnd::PageSwapEdit;
     core::getWndManager()->pageSwapEdit(swapId, stateCmd);
 }
 
 // Show trade details page
 void Swap::showTradeDetails(QString swapId) {
+    selectedPage = SwapWnd::PageSwapTradeDetails;
     core::getWndManager()->pageSwapTradeDetails(swapId);
 }
 
@@ -376,10 +380,12 @@ void Swap::initiateNewTrade() {
 
 // Show the trade page 1
 void Swap::showNewTrade1() {
+    selectedPage = SwapWnd::PageSwapNew1;
     core::getWndManager()->pageSwapNew1();
 }
 // Show the trade page 2
 void Swap::showNewTrade2() {
+    selectedPage = SwapWnd::PageSwapNew2;
     core::getWndManager()->pageSwapNew2();
 }
 
@@ -429,7 +435,7 @@ void Swap::applyNewTrade12Params(QString acccount, QString secCurrency, QString 
         newSwapMaxSecTxFee = sci.fxFeeMax;
         newSwapCurrency2recalc = secCurrency;
     }
-
+    selectedPage = SwapWnd::PageSwapNew2;
     core::getWndManager()->pageSwapNew2();
 }
 
@@ -448,6 +454,7 @@ void Swap::applyNewTrade21Params(QString secCurrency, int offerExpTime, int rede
 // Expected that params are validated by the wallet(bridge)
 void Swap::applyNewTrade22Params(QString electrumXUrl) {
     newSwapElectrumXUrl = electrumXUrl;
+    selectedPage = SwapWnd::PageSwapNew3;
     core::getWndManager()->pageSwapNew3();
 }
 
@@ -746,6 +753,37 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
 
     for (const wallet::SwapInfo & sw : swapTrades) {
         runSwapIfNeed(sw);
+    }
+}
+
+bool Swap::mobileBack() {
+    switch (selectedPage) {
+        case SwapWnd::None :
+            return false;
+        case SwapWnd::PageSwapList:
+            return false;
+        case SwapWnd::PageSwapEdit: {
+            pageTradeList();
+            return true;
+        }
+        case SwapWnd::PageSwapTradeDetails: {
+            pageTradeList();
+            return true;
+        }
+        case SwapWnd::PageSwapNew1: {
+            pageTradeList();
+            return true;
+        }
+        case SwapWnd::PageSwapNew2: {
+            core::getWndManager()->pageSwapNew1();
+            selectedPage = SwapWnd::PageSwapNew1;
+            return true;
+        }
+        case SwapWnd::PageSwapNew3: {
+            core::getWndManager()->pageSwapNew2();
+            selectedPage = SwapWnd::PageSwapNew2;
+            return true;
+        }
     }
 }
 

@@ -44,6 +44,7 @@ Receive::Receive( StateContext * _context ) :
 Receive::~Receive() {}
 
 NextStateRespond Receive::execute() {
+    atInitialPage = true;
     if ( context->appContext->getActiveWndState() != STATE::RECEIVE_COINS  )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
@@ -68,6 +69,7 @@ void Receive::signSlatepackTransaction(QString slatepack, QString slateJson, QSt
     if ( isActive() ) {
         signingFile = false;
         core::getWndManager()->pageFileTransactionReceive(mwc::PAGE_G_RECEIVE_TRANS, slatepack, flTrInfo, lastNodeHeight);
+        atInitialPage = false;
     }
 }
 
@@ -88,11 +90,13 @@ void Receive::signTransaction( QString fileName ) {
     if ( isActive() ) {
         signingFile = true;
         core::getWndManager()->pageFileTransactionReceive(mwc::PAGE_G_RECEIVE_TRANS, fileName, flTrInfo, lastNodeHeight);
+        atInitialPage = false;
     }
 }
 
 void Receive::ftBack() {
     core::getWndManager()->pageRecieve();
+    atInitialPage = true;
 }
 
 void Receive::receiveFile(QString fileName, QString description) {
@@ -140,7 +144,7 @@ void Receive::onReceiveSlatepack( QString tagId, QString error, QString slatepac
 
         if (error.isEmpty()) {
             Q_ASSERT(!slatepack.isEmpty());
-
+            atInitialPage = false;
             core::getWndManager()->pageShowSlatepack(slatepack, STATE::RECEIVE_COINS, ".response", false );
         } else {
             core::getWndManager()->messageTextDlg("Failure",
@@ -162,6 +166,16 @@ void Receive::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pee
 
 bool Receive::isActive() const {
     return state::getStateMachine()->getCurrentStateId() == STATE::RECEIVE_COINS;
+}
+
+bool Receive::mobileBack() {
+    if (atInitialPage) {
+        return false;
+    }
+    else {
+        ftBack();
+        return true;
+    }
 }
 
 

@@ -76,6 +76,8 @@ Send::Send(StateContext * context) :
 Send::~Send() {}
 
 NextStateRespond Send::execute() {
+    atSendInitialPage = true;
+
     if ( context->appContext->getActiveWndState() != STATE::SEND )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
@@ -84,8 +86,20 @@ NextStateRespond Send::execute() {
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
+bool Send::mobileBack() {
+    if (atSendInitialPage) {
+        return false;
+    }
+    else {
+        switchToStartingWindow();
+        return true;
+    }
+}
+
+
 void Send::switchToStartingWindow() {
     core::getWndManager()->pageSendStarting();
+    atSendInitialPage = true;
     context->wallet->updateWalletBalance(true,true); // request update, respond at onWalletBalanceUpdated
 }
 
@@ -139,6 +153,8 @@ int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod,
         return 2;
     }
 
+    // Switching to some dependent windows.
+    atSendInitialPage = false;
     if (sendSelectedMethod == bridge::SEND_SELECTED_METHOD::ONLINE_ID ) {
         core::getWndManager()->pageSendOnline(selectedAccount.accountName, mwcAmount.second);
     }

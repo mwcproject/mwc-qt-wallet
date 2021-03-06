@@ -33,6 +33,7 @@ public:
 
 protected:
     virtual NextStateRespond execute() override;
+    virtual bool mobileBack() override {return false;}
 
 protected slots:
     // Result of the login

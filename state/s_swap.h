@@ -57,6 +57,8 @@ struct AutoswapTask {
     void setData(QString _swapId, QString _stateCmd, int64_t _lastUpdatedTime) { swapId = _swapId; stateCmd= _stateCmd; lastUpdatedTime = _lastUpdatedTime; }
 };
 
+enum class SwapWnd {None, PageSwapList, PageSwapEdit, PageSwapTradeDetails, PageSwapNew1, PageSwapNew2, PageSwapNew3 };
+
 class Swap : public util::HttpClient, public State {
 Q_OBJECT
 public:
@@ -158,7 +160,7 @@ signals:
 
 protected:
     virtual NextStateRespond execute() override;
-
+    virtual bool mobileBack() override;
 
     virtual void onProcessHttpResponse(bool requestOk, const QString & tag, QJsonObject & jsonRespond,
                                        const QString & param1,
@@ -240,6 +242,7 @@ private:
     QString newSwapNote;
 
     QString newSwapCurrency2recalc;
+    SwapWnd selectedPage = SwapWnd::None;
 };
 
 }

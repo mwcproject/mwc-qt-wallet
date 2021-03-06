@@ -124,6 +124,10 @@ public:
 
     // Empty string - default document name
     virtual QString getHelpDocName() {return "";}
+
+    // Process mobile back button.
+    // Return true if processing was made, so the sate still need to be active.
+    virtual bool mobileBack() = 0;
 };
 
 }

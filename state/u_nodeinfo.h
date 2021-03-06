@@ -64,6 +64,7 @@ public:
     void resetEmbeddedNodeData();
 protected:
     virtual NextStateRespond execute() override;
+    virtual bool mobileBack() override {return false;}
     virtual QString getHelpDocName() override {return "node_overview.html";}
 
 private slots:

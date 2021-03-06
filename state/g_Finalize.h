@@ -53,6 +53,7 @@ public:
 
 protected:
     virtual NextStateRespond execute() override;
+    virtual bool mobileBack() override;
     virtual QString getHelpDocName() override {return "finalize.html";}
 
     void finalizeForColdWallet(const util::FileTransactionInfo & trInfo);
@@ -70,6 +71,7 @@ private:
     QMap<QString, util::FileTransactionInfo> file2TransactionsInfo;
 
     bool nodeIsHealthy = false;
+    bool atInitialPage = true;
 };
 
 

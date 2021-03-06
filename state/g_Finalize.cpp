@@ -50,7 +50,7 @@ Finalize::Finalize( StateContext * _context) :
 Finalize::~Finalize() {}
 
 NextStateRespond Finalize::execute() {
-
+    atInitialPage = true;
     if (context->appContext->getActiveWndState() != STATE::FINALIZE)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
@@ -61,6 +61,7 @@ NextStateRespond Finalize::execute() {
 
 void Finalize::ftBack() {
     core::getWndManager()->pageFinalize();
+    atInitialPage = true;
 }
 
 
@@ -87,6 +88,7 @@ void Finalize::uploadFileTransaction(QString fileName) {
 
     file2TransactionsInfo.insert(fileName, transInfo);
 
+    atInitialPage = false;
     core::getWndManager()->pageFileTransactionFinalize(mwc::PAGE_G_FINALIZE_TRANS,
                                                fileName, transInfo, lastNodeHeight);
 }
@@ -102,6 +104,7 @@ void Finalize::uploadSlatepackTransaction( QString slatepack, QString slateJson,
 
     file2TransactionsInfo.insert(transInfo.transactionId, transInfo);
 
+    atInitialPage = false;
     core::getWndManager()->pageFileTransactionFinalize(mwc::PAGE_G_FINALIZE_TRANS,
                                                slatepack, transInfo, lastNodeHeight );
 }
@@ -237,6 +240,16 @@ void Finalize::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pe
 
     if (online)
         lastNodeHeight = nodeHeight;
+}
+
+bool Finalize::mobileBack() {
+    if (atInitialPage) {
+        return false;
+    }
+    else {
+        ftBack();
+        return true;
+    }
 }
 
 

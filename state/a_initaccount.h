@@ -32,6 +32,8 @@ namespace state {
 
 const QString INIT_ACCOUNT_CALLER_ID = "InitAccount";
 
+enum class InitAccountPage {None, PageInitAccount, PageEnterSeed, PageNewSeed, PageNewSeedTest, PageProgressWnd};
+
 class InitAccount : public QObject, public State
 {
     Q_OBJECT
@@ -71,11 +73,14 @@ private slots:
 protected:
     virtual NextStateRespond execute() override;
     virtual void exitingState() override;
+    virtual bool mobileBack() override;
 
     // return true if done
     bool finishSeedVerification();
 
     void generateWordTasks();
+
+    void showInitAccountPage();
 private:
     int progressMaxVal = 10;
 
@@ -83,6 +88,7 @@ private:
     QVector<QString> seed;
     QVector<core::TestSeedTask> tasks;
     int  seedTestWrongAnswers = 0;
+    InitAccountPage currentPage = InitAccountPage::None;
 };
 
 
