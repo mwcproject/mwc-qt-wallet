@@ -581,6 +581,10 @@ QVector<QString> Swap::getExpirationIntervals() {
     return getSwap()->getExpirationIntervals();
 }
 
+double Swap::getSecMinAmount(QString secCurrency) {
+    return getSwap()->getSecMinAmount(secCurrency);
+}
+
 int Swap::getOfferExpirationInterval() {
     return getSwap()->getOfferExpirationInterval();
 }

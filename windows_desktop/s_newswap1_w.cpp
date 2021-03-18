@@ -107,7 +107,7 @@ void NewSwap1::on_nextButton_clicked() {
     double sec = secAmount.toDouble(&secOk);
 
     double mwcLimit = 0.1;
-    double secCurrencyLimit = 0.001;
+    double secCurrencyLimit = swap->getSecMinAmount(secCurrency);
 
     if (!config->getNetwork().toLower().contains("main")) {
         mwcLimit /= 10.0;

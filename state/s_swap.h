@@ -123,6 +123,9 @@ public:
     bool isLockMwcFirst() const {return newSwapSellectLockFirst;}
     QString getBuyerAddress() const {return newSwapBuyerAddress;}
 
+    // Get minimal Amount for the secondary currency
+    double getSecMinAmount(QString secCurrency) const;
+
     // Return pairs of the expiration interval combo:
     // <Interval is string> <Value in minutes>
     QVector<QString> getExpirationIntervals() const;

@@ -35,6 +35,7 @@ struct SecCurrencyInfo {
     double  fxFeeMin;
     double  fxFeeMax;
     int64_t txFeeUpdateTime = 0;
+    double  minAmount; // Minimal amount for secondary currency. We don't want dust transaction
 
     SecCurrencyInfo() = default;
     SecCurrencyInfo(const SecCurrencyInfo & itm) = default;
@@ -43,6 +44,7 @@ struct SecCurrencyInfo {
     SecCurrencyInfo( const QString & _currency,
         int     _blockIntervalSec,
         int _confNumber,
+        const double & _minAmount,
         const QString & _feeUnits,
         const double & _fxFee,
         const double & _fxFeeMin,
@@ -54,7 +56,8 @@ struct SecCurrencyInfo {
             feeUnits(_feeUnits),
             fxFee(_fxFee),
             fxFeeMin(_fxFeeMin),
-            fxFeeMax(_fxFeeMax)
+            fxFeeMax(_fxFeeMax),
+            minAmount(_minAmount)
     {}
 };
 
@@ -64,12 +67,12 @@ struct SecCurrencyInfo {
 //  https://b10c.me/blog/003-a-list-of-public-bitcoin-feerate-estimation-apis/
 // We selected this:  https://www.bitgo.com/api/v2/btc/tx/fee
 static QVector<SecCurrencyInfo> SWAP_CURRENCY_LIST = {
-        SecCurrencyInfo("BTC", 600, 3, "satoshi per byte", -1.0, 1.0, 500.0 ),
-        SecCurrencyInfo("BCH", 600, 15, "satoshi per byte", 3.0, 1.0, 50.0 ),
-        SecCurrencyInfo("LTC", 60*2+30, 12, "litoshi per byte", 100.0, 1.0, 1000.0 ),
-        SecCurrencyInfo("ZCash", 75, 24, "ZEC", 0.0001, 0.00005, 0.001 ),
-        SecCurrencyInfo("Dash", 60 * 2 + 39, 6, "duff per byte", 26.0, 1.0, 1000.0 ),
-        SecCurrencyInfo("Doge", 60, 20, "doge", 3.0, 0.1, 20.0 ),
+        SecCurrencyInfo("BTC", 600, 3,  0.001, "satoshi per byte", -1.0, 1.0, 500.0 ),
+        SecCurrencyInfo("BCH", 600, 15,  0.001, "satoshi per byte", 3.0, 1.0, 50.0 ),
+        SecCurrencyInfo("LTC", 60*2+30, 12, 0.01, "litoshi per byte", 100.0, 1.0, 1000.0 ),
+        SecCurrencyInfo("ZCash", 75, 24, 0.01, "ZEC", 0.0001, 0.00005, 0.001 ),
+        SecCurrencyInfo("Dash", 60 * 2 + 39, 6, 0.01, "duff per byte", 26.0, 1.0, 1000.0 ),
+        SecCurrencyInfo("Doge", 60, 20, 100.0, "doge", 3.0, 0.1, 20.0 ),
 };
 
 static SecCurrencyInfo getCurrencyInfo(QString currency) {
@@ -787,5 +790,9 @@ bool Swap::mobileBack() {
     }
 }
 
+// Get minimal Amount for the secondary currency
+double Swap::getSecMinAmount(QString secCurrency) const {
+    return getCurrencyInfo(secCurrency).minAmount;
+}
 
 }

@@ -123,6 +123,7 @@ public:
     Q_INVOKABLE QString getSecAddress();
     Q_INVOKABLE bool isLockMwcFirst();
     Q_INVOKABLE QString getBuyerAddress();
+    Q_INVOKABLE double getSecMinAmount(QString secCurrency);
 
     // Return pairs of the expiration interval combo:
     // <Interval is string> <Value in minutes>
