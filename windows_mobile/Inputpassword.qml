@@ -136,8 +136,7 @@ Item {
         id: text_instances
         text: qsTr("Instances")
         color: "white"
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
+        anchors.left: instanceComboBox.left
         anchors.bottom: instanceComboBox.top
         anchors.bottomMargin: dp(10)
         font.pixelSize: dp(14)
@@ -242,12 +241,10 @@ Item {
         model: ListModel {
             id: instanceItems
         }
+        width: Math.min(parent.width - dp(90), dp(400))
         anchors.bottom: textfield_password.top
         anchors.bottomMargin: dp(30)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(45)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
+        anchors.horizontalCenter: parent.horizontalCenter
         leftPadding: dp(20)
         rightPadding: dp(20)
         font.pixelSize: dp(18)
@@ -256,6 +253,7 @@ Item {
     TextField {
         id: textfield_password
         height: dp(50)
+        width: instanceComboBox.width
         padding: dp(10)
         leftPadding: dp(20)
         font.pixelSize: textfield_password.text ? dp(10) : dp(18)
@@ -265,10 +263,7 @@ Item {
         text: ""
         anchors.bottom: button_login.top
         anchors.bottomMargin: dp(40)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(45)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
+        anchors.horizontalCenter: parent.horizontalCenter
         horizontalAlignment: Text.AlignLeft
         background: Rectangle {
             color: "#8633E0"
@@ -286,10 +281,8 @@ Item {
     Button {
         id: button_login
         height: dp(50)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(45)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
+        width: instanceComboBox.width
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: dp(50)
         background: Rectangle {
@@ -331,38 +324,14 @@ Item {
         }
     }
 
-    Rectangle {
-        id: rect_progress
-        width: dp(60)
-        height: dp(30)
-        anchors.top: button_login.bottom
-        anchors.topMargin: dp(20)
-        anchors.horizontalCenter: parent.horizontalCenter
-        color: "#00000000"
-        visible: false
-        AnimatedImage {
-            id: animation
-            source: "../img/loading.gif"
-        }
-    }
-
-    Text {
-        id: text_syncStatusMsg
-        anchors.top: rect_progress.bottom
-        anchors.topMargin: dp(15)
-        anchors.horizontalCenter: parent.horizontalCenter
-        font.pixelSize: dp(16)
-        color: "white"
-    }
-
     Image {
         id: image_restore
         width: dp(30)
         height: dp(30)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: dp(-40)
-        anchors.bottom: image_newinstance.top
-        anchors.bottomMargin: dp(30)
+        anchors.top: button_login.bottom
+        anchors.topMargin: dp(80)
         fillMode: Image.PreserveAspectFit
         source: "../img/RestoreBtn@2x.svg"
     }
@@ -394,8 +363,8 @@ Item {
         height: dp(30)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: dp(-40)
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(90)
+        anchors.top: image_restore.bottom
+        anchors.topMargin: dp(30)
         fillMode: Image.PreserveAspectFit
         source: "../img/NewInstanceBtn@2x.svg"
     }
@@ -418,6 +387,30 @@ Item {
         anchors.bottom: image_newinstance.bottom
         onClicked: {
             startWallet.createNewWalletInstance("", false);
+        }
+    }
+
+    Text {
+        id: text_syncStatusMsg
+        anchors.bottom: rect_progress.top
+        anchors.bottomMargin: dp(10)
+        anchors.horizontalCenter: parent.horizontalCenter
+        font.pixelSize: dp(16)
+        color: "white"
+    }
+
+    Rectangle {
+        id: rect_progress
+        width: dp(60)
+        height: dp(30)
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: dp(50)
+        anchors.horizontalCenter: parent.horizontalCenter
+        color: "#00000000"
+        visible: false
+        AnimatedImage {
+            id: animation
+            source: "../img/loading.gif"
         }
     }
 

@@ -252,7 +252,7 @@ Item {
                 receive.receiveSlatepack(fileNameOrSlatepack, description)
             } else {
                 const filepath = decodeURIComponent(fileNameOrSlatepack)
-                const path = "/mnt/user/0/primary/" + filepath.substring(filepath.search("primary:") + 8, filepath.length)
+                const path = "/storage/emulated/0/" + filepath.substring(filepath.search("primary:") + 8, filepath.length)
                 receive.receiveFile(path, description)
             }
         }

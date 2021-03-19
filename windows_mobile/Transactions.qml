@@ -329,14 +329,6 @@ Item {
         }
     }
 
-    TransactionDetail {
-        id: transactionDetail
-        visible: false
-        anchors.fill: parent
-        anchors.leftMargin: dp(30)
-        anchors.rightMargin: dp(30)
-    }
-
     Rectangle {
         id: rect_progress
         width: dp(60)

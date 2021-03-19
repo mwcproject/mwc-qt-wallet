@@ -275,12 +275,6 @@ Item {
         }
     }
 
-    SendSettings {
-        id: settingsItem
-        anchors.verticalCenter: parent.verticalCenter
-        visible: false
-    }
-
     SelectContact {
         id: selectContactItem
         anchors.fill: parent

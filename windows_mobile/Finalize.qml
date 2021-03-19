@@ -120,14 +120,8 @@ Item {
             // unescape html codes like '%23' for '#'
             const cleanPath = decodeURIComponent(path);
             config.updatePathFor("fileGen", cleanPath)
-            const filepath = "/mnt/user/0/primary/" + cleanPath.substring(cleanPath.search("primary:") + 8, cleanPath.length)
+            const filepath = "/storage/emulated/0/" + cleanPath.substring(cleanPath.search("primary:") + 8, cleanPath.length)
             finalize.uploadFileTransaction(filepath);
         }
-    }
-
-    InputSlatepack {
-        id: inputSlatepack
-        anchors.verticalCenter: parent.verticalCenter
-        visible: false
     }
 }

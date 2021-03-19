@@ -36,6 +36,7 @@ Item {
         target: send
         onSgnShowSendResult: (success, message) => {
             rect_progress.visible = false
+            button_send.enabled = true
             if (success) {
                 messagebox.open(qsTr("Success"), qsTr("Your MWC was successfully sent to recipient"))
                 textfield_send_to.text = ""
@@ -288,14 +289,14 @@ Item {
         background: Rectangle {
             color: "#00000000"
             radius: dp(4)
-            border.color: "white"
+            border.color: button_send.enabled ? "white" : "#e2ccf7"
             border.width: dp(2)
             Text {
                 text: qsTr("Send")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
-                color: "white"
+                color: button_send.enabled ? "white" : "#e2ccf7"
             }
         }
 
@@ -329,16 +330,11 @@ Item {
                 return;
             }
 
-            const apiSecret = textfield_api_secret.text;
-            valRes = util.validateMwc713Str(apiSecret);
-            if (valRes !== "") {
-                messagebox.open(qsTr("Incorrect Input"), qsTr(valRes))
-                textfield_api_secret.focus = true
-                return
-            }
-
-            if (send.sendMwcOnline(account, Number(amount).toString(), sendTo, apiSecret, description)) {
-                rect_progress.visible = true
+            rect_progress.visible = true
+            button_send.enabled = false
+            if (!send.sendMwcOnline(account, Number(amount).toString(), sendTo, "", description)) {
+                rect_progress.visible = false
+                button_send.enabled = true
             }
         }
     }
@@ -356,12 +352,6 @@ Item {
             id: animation
             source: "../img/loading.gif"
         }
-    }
-
-    SendSettings {
-        id: settingsItem
-        anchors.verticalCenter: parent.verticalCenter
-        visible: false
     }
 
     SelectContact {

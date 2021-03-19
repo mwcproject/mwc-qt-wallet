@@ -433,9 +433,4 @@ Item {
             inputDlg.open(qsTr("Select MQS address by index"), qsTr("Please specify index of MWC MQS address.\n\nPlease note that your wallet will only listen to one address at a time. You are now setting the wallet to listen to different address."), "integer from 0 to 65000", "", 5, toIndexCallback)
         }
     }
-
-    InputDlg {
-        id: inputDlg
-        anchors.verticalCenter: parent.verticalCenter
-    }
 }
