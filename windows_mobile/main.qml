@@ -109,6 +109,14 @@ Window {
         sendConfirmationItem.open(title, message, passwordHash, sendConfirmationDlgCallback)
     }
 
+    function openWalletStoppingMessageDlg(taskTimeout) {
+        walletStoppingMessageDlg.open(taskTimeout)
+    }
+
+    function closeWalletStoppingMessageDlg() {
+        walletStoppingMessageDlg.visible = false
+    }
+
     Rectangle
     {
         gradient: Gradient {
@@ -168,7 +176,7 @@ Window {
         }
 
         Settings {
-            id: settingsItem
+            id: walletSettingsItem
             anchors.fill: parent
             visible: currentState === 23
         }
@@ -309,9 +317,49 @@ Window {
         visible: currentState > 3
     }
 
+    InputSlatepack {
+        id: inputSlatepack
+        anchors.fill: parent
+    }
+
+    SendSettings {
+        id: settingsItem
+        anchors.fill: parent
+    }
+
+    InputDlg {
+        id: inputDlg
+        anchors.fill: parent
+    }
+
+    ContactEditDlg {
+        id: editDlg
+        anchors.fill: parent
+    }
+
+    TransactionDetail {
+        id: transactionDetail
+        anchors.fill: parent
+    }
+
+    OutputDetail {
+        id: outputDetailItem
+        anchors.fill: parent
+    }
+
+    WalletStoppingMessageDlg {
+        id: walletStoppingMessageDlg
+        anchors.fill: parent
+    }
+
     MessageBox {
         id: messagebox
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.fill: parent
+    }
+
+    HelpDlg {
+        id: helpDlg
+        anchors.fill: parent
     }
 }
 

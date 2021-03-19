@@ -140,7 +140,7 @@ QString MobileWndManager::getSaveFileName(const QString &caption, const QString 
     Q_UNUSED(filter)
 
     QDateTime now;
-    QString fileName = "/mnt/user/0/primary/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm");
+    QString fileName = "/storage/emulated/0/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm");
     return fileName;
 }
 
@@ -175,13 +175,13 @@ bool MobileWndManager::sendConfirmationDlg( QString title, QString message, doub
 
 // Stopping wallet message
 void MobileWndManager::showWalletStoppingMessage(int taskTimeout) {
-    Q_UNUSED(taskTimeout)
-
-    //Q_ASSERT(false); // implement me
+    QVariant retValue;
+    QMetaObject::invokeMethod(mainWindow, "openWalletStoppingMessageDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, taskTimeout));
 }
 
 void MobileWndManager::hideWalletStoppingMessage() {
-  //  Q_ASSERT(false); // implement me
+    QVariant retValue;
+    QMetaObject::invokeMethod(mainWindow, "closeWalletStoppingMessageDlg", Q_RETURN_ARG(QVariant, retValue));
 }
 
 //---------------- Pages ------------------------

@@ -17,11 +17,6 @@ Item {
 
     id: dlgItem
     visible: false
-    height: text_status.visible? dp(410) + text_status.height : dp(410)
-    anchors.left: parent.left
-    anchors.leftMargin: dp(25)
-    anchors.right: parent.right
-    anchors.rightMargin: dp(25)
 
     function open(_expectedContent, _expectedContentDescription, _txType, _callback) {
         callback = _callback
@@ -121,154 +116,171 @@ Item {
     }
 
     Rectangle {
-        id: rectangle
-        color: "#ffffff"
-        anchors.rightMargin: dp(1)
-        anchors.leftMargin: dp(1)
-        anchors.bottomMargin: dp(1)
-        anchors.topMargin: dp(1)
-        border.width: dp(1)
         anchors.fill: parent
+        color: "#00000000"
 
         MouseArea {
             anchors.fill: parent
-            onClicked: {
-                textarea_content.focus = false
-            }
-        }
-
-        Text {
-            id: text_title
-            text: qsTr("Slatepack")
-            font.bold: true
-            anchors.top: parent.top
-            anchors.topMargin: dp(38)
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(22)
-            color: "#3600c9"
-        }
-
-        Rectangle {
-            id: rect_content
-            anchors.top: text_title.bottom
-            anchors.topMargin: dp(30)
-            anchors.left: parent.left
-            anchors.leftMargin: dp(30)
-            anchors.right: parent.right
-            anchors.rightMargin: dp(30)
-            height: dp(200)
-
-                color: "white"
-                radius: dp(5)
-                border.color: "#3600c9"
-                border.width: dp(2)
-
-            Flickable {
-                id: flickable_content
-                anchors.fill: parent
-                clip: true
-
-                TextArea.flickable: TextArea {
-                    id: textarea_content
-                    padding: dp(10)
-                    font.pixelSize: dp(18)
-                    color: "#3600c9"
-                    text: ""
-                    placeholderText: qsTr("Please paste the slatepack content below")
-                    horizontalAlignment: Text.AlignLeft
-                    wrapMode: TextArea.WrapAnywhere
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            textarea_content.focus = true
-                        }
-                    }
-                    onTextChanged: {
-                        isSpValid = false
-                        updateButtons()
-
-                        if (spInProgress === "") {
-                            const sp = textarea_content.text.trim()
-                            initiateSlateVerification(sp)
-                        }
-                    }
-                }
-
-                ScrollBar.vertical: ScrollBar {}
-            }
-        }
-
-        Text {
-            id: text_status
-            text: ""
-            font.pixelSize: dp(14)
-            color: "#3600c9"
-            anchors.top: rect_content.bottom
-            anchors.topMargin: dp(10)
-            anchors.left: parent.left
-            anchors.leftMargin: dp(30)
-            anchors.right: parent.right
-            anchors.rightMargin: dp(30)
-            wrapMode: Text.WrapAnywhere
-        }
-
-        Button {
-            id: button_continue
-            width: dp(135)
-            height: dp(50)
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: dp(30)
-            anchors.right: parent.right
-            anchors.rightMargin: parent.width / 2 - dp(170)
-
-            background: Rectangle {
-                color: button_continue.enabled ? "#6F00D6" : "white"
-                radius: dp(5)
-                border.width: dp(2)
-                border.color: button_continue.enabled ? "#6F00D6" : "gray"
-                Text {
-                    text: qsTr("Continue")
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: dp(18)
-                    color: button_continue.enabled ? "white" : "gray"
-                }
-            }
-
-            onClicked: {
-                dlgItem.visible = false
-                callback(true, pSlatepack, pSlateJson, pSender)
-            }
-        }
-
-        Button {
-            id: button_cancel
-            width: dp(135)
-            height: dp(50)
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: dp(30)
-            anchors.left: parent.left
-            anchors.leftMargin: parent.width / 2 - dp(170)
-
-            background: Rectangle {
-                color: "#ffffff"
-                radius: dp(5)
-                border.width: dp(2)
-                border.color: "#3600C9"
-                Text {
-                    text: qsTr("Cancel")
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: dp(18)
-                    color: "#3600C9"
-                }
-            }
-
-            onClicked: {
-                dlgItem.visible = false
-                callback(false)
-            }
         }
     }
 
+    Rectangle {
+        height: text_status.visible? dp(410) + text_status.height : dp(410)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(25)
+        anchors.right: parent.right
+        anchors.rightMargin: dp(25)
+        anchors.verticalCenter: parent.verticalCenter
+
+        Rectangle {
+            id: rectangle
+            color: "#ffffff"
+            anchors.rightMargin: dp(1)
+            anchors.leftMargin: dp(1)
+            anchors.bottomMargin: dp(1)
+            anchors.topMargin: dp(1)
+            border.width: dp(1)
+            anchors.fill: parent
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    textarea_content.focus = false
+                }
+            }
+
+            Text {
+                id: text_title
+                text: qsTr("Slatepack")
+                font.bold: true
+                anchors.top: parent.top
+                anchors.topMargin: dp(38)
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pixelSize: dp(22)
+                color: "#3600c9"
+            }
+
+            Rectangle {
+                id: rect_content
+                anchors.top: text_title.bottom
+                anchors.topMargin: dp(30)
+                anchors.left: parent.left
+                anchors.leftMargin: dp(30)
+                anchors.right: parent.right
+                anchors.rightMargin: dp(30)
+                height: dp(200)
+
+                    color: "white"
+                    radius: dp(5)
+                    border.color: "#3600c9"
+                    border.width: dp(2)
+
+                Flickable {
+                    id: flickable_content
+                    anchors.fill: parent
+                    clip: true
+
+                    TextArea.flickable: TextArea {
+                        id: textarea_content
+                        padding: dp(10)
+                        font.pixelSize: dp(18)
+                        color: "#3600c9"
+                        text: ""
+                        placeholderText: qsTr("Please paste the slatepack content below")
+                        horizontalAlignment: Text.AlignLeft
+                        wrapMode: TextArea.WrapAnywhere
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                textarea_content.focus = true
+                            }
+                        }
+                        onTextChanged: {
+                            isSpValid = false
+                            updateButtons()
+
+                            if (spInProgress === "") {
+                                const sp = textarea_content.text.trim()
+                                initiateSlateVerification(sp)
+                            }
+                        }
+                    }
+
+                    ScrollBar.vertical: ScrollBar {}
+                }
+            }
+
+            Text {
+                id: text_status
+                text: ""
+                font.pixelSize: dp(14)
+                color: "#3600c9"
+                anchors.top: rect_content.bottom
+                anchors.topMargin: dp(10)
+                anchors.left: parent.left
+                anchors.leftMargin: dp(30)
+                anchors.right: parent.right
+                anchors.rightMargin: dp(30)
+                wrapMode: Text.WrapAnywhere
+            }
+
+            Button {
+                id: button_continue
+                width: dp(135)
+                height: dp(50)
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: dp(30)
+                anchors.right: parent.right
+                anchors.rightMargin: parent.width / 2 - dp(170)
+
+                background: Rectangle {
+                    color: button_continue.enabled ? "#6F00D6" : "white"
+                    radius: dp(5)
+                    border.width: dp(2)
+                    border.color: button_continue.enabled ? "#6F00D6" : "gray"
+                    Text {
+                        text: qsTr("Continue")
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: dp(18)
+                        color: button_continue.enabled ? "white" : "gray"
+                    }
+                }
+
+                onClicked: {
+                    dlgItem.visible = false
+                    callback(true, pSlatepack, pSlateJson, pSender)
+                }
+            }
+
+            Button {
+                id: button_cancel
+                width: dp(135)
+                height: dp(50)
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: dp(30)
+                anchors.left: parent.left
+                anchors.leftMargin: parent.width / 2 - dp(170)
+
+                background: Rectangle {
+                    color: "#ffffff"
+                    radius: dp(5)
+                    border.width: dp(2)
+                    border.color: "#3600C9"
+                    Text {
+                        text: qsTr("Cancel")
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: dp(18)
+                        color: "#3600C9"
+                    }
+                }
+
+                onClicked: {
+                    dlgItem.visible = false
+                    callback(false)
+                }
+            }
+        }
+    }
 }

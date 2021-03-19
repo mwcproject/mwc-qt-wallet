@@ -753,16 +753,6 @@ Item {
             imagePath: "../img/NavSettings@2x.svg"
         }
     }
-
-    HelpDlg {
-        id: helpDlg
-        visible: false
-        anchors.fill: parent
-        anchors.leftMargin: dp(30)
-        anchors.rightMargin: dp(30)
-        anchors.topMargin: dp(30)
-        anchors.bottomMargin: dp(40)
-    }
 }
 
 /*##^##

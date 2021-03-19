@@ -513,12 +513,6 @@ Item {
         }
     }
 
-    InputSlatepack {
-        id: inputSlatepack
-        anchors.verticalCenter: parent.verticalCenter
-        visible: false
-    }
-
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: -notification.width / 2

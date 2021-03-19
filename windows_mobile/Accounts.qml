@@ -335,11 +335,6 @@ Item {
         }
     }
 
-    InputDlg {
-        id: inputDlg
-        anchors.verticalCenter: parent.verticalCenter
-    }
-
     Rectangle {
         id: rect_progress
         width: dp(60)

@@ -543,14 +543,6 @@ Item {
         }
     }
 
-    OutputDetail {
-        id: outputDetailItem
-        anchors.fill: parent
-        anchors.leftMargin: dp(30)
-        anchors.rightMargin: dp(30)
-        visible: false
-    }
-
     Rectangle {
         id: rect_progress
         width: dp(60)

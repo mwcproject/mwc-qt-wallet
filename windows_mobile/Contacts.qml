@@ -222,9 +222,4 @@ Item {
             }
         }
     }
-
-    ContactEditDlg {
-        id: editDlg
-        anchors.verticalCenter: parent.verticalCenter
-    }
 }
