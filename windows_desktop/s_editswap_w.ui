@@ -301,7 +301,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>satoshi per byte</string>
+          <string>             </string>
          </property>
         </widget>
        </item>
@@ -702,11 +702,6 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
@@ -720,6 +715,11 @@
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLine</class>

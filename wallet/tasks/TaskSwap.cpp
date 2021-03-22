@@ -233,12 +233,14 @@ bool TaskTradeDetails::processTask(const QVector<WEvent> &events) {
 
             QJsonObject swapObj = jsonDoc.object();
 
+            QString feeUnits = swapObj["secondaryFeeUnits"].toArray().first().toString();
+
             swap.setData(swapObj["swapId"].toString(), swapObj["isSeller"].toBool(),
                          swapObj["mwcAmount"].toString().toDouble(),
                          swapObj["secondaryAmount"].toString().toDouble(),
                          swapObj["secondaryCurrency"].toString(), swapObj["secondaryAddress"].toString(),
                          swapObj["secondaryFee"].toString().toDouble(),
-                         swapObj["secondaryFeeUnits"].toString(), swapObj["mwcConfirmations"].toInt(),
+                         feeUnits, swapObj["mwcConfirmations"].toInt(),
                          swapObj["secondaryConfirmations"].toInt(),
                          swapObj["messageExchangeTimeLimit"].toInt(), swapObj["redeemTimeLimit"].toInt(),
                          swapObj["sellerLockingFirst"].toBool(),

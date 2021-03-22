@@ -45,6 +45,7 @@ EditSwap::EditSwap(QWidget *parent, QString _swapId, QString _stateCmd) :
     }
 
     ui->secondaryAddressLabel->setText("");
+    ui->secFeeUnitsLabel->hide();
 
     ui->progress->initLoader(true);
     swap->requestTradeDetails(swapId);
@@ -109,6 +110,7 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
 
     ui->secTransFeeLabel->setText(secCurrency + " transaction fee");
     ui->updateBtn->setText("Update " + secCurrency + " transaction details");
+    ui->secFeeUnitsLabel->show();
     ui->secFeeUnitsLabel->setText(secCurrencyFeeUnits);
 
     QString tradeDescription = swapInfo[1];
