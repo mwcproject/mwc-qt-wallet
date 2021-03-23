@@ -573,7 +573,7 @@ void Transactions::onSgnTransactionById(bool success, QString account, QString h
 
                     // retrieve the first transaction and get the CSV headers
                     const wallet::WalletTransaction & trans = allTrans[0].trans;
-                    QString csvHeaders = trans.getCSVHeaders({"Tx Note", "Slate Messages"});
+                    QString csvHeaders = trans.getCSVHeaders({"Tx Note", "Transaction Messages"});
                     exportRecords << csvHeaders;
 
                     // now retrieve the remaining transactions and add them to our list
