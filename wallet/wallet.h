@@ -305,12 +305,13 @@ struct WalletTransaction {
                 " " + creationTime;
     }
 
-    static QString getCSVHeaders() {
-        return csvHeaders;
+    static QString getCSVHeaders(const QStringList & extraHeaders) {
+        return csvHeaders + (extraHeaders.isEmpty() ? "" : "," + extraHeaders.join(","));
     }
 
     // return transactions values formatted into a CSV string
-    QString toStringCSV() const;
+    // Caller is responsible to make extraData to be CSV compatible
+    QString toStringCSV(const QStringList & extraData) const;
 
     QString toJson() const;
     static WalletTransaction fromJson(QString str);

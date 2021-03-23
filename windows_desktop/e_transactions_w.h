@@ -41,6 +41,8 @@ namespace wnd {
 
 struct TransactionData {
     wallet::WalletTransaction trans;
+    QString tx_note;
+    QStringList tx_messages;
 
     control::RichItem * ritem = nullptr;
     control::RichButton * cancelBtn = nullptr;
@@ -103,6 +105,7 @@ private:
     QVector<TransactionData> allTrans;
 
     int64_t nodeHeight    = 0;
+    QString exportingFileName;
 };
 
 }

@@ -24,6 +24,7 @@
 #include "../bridge/util_b.h"
 #include "../bridge/wnd/e_transactions_b.h"
 #include "../core/global.h"
+#include <QStringList>
 
 // It is exception for Mobile, CSV export not likely needed into mobile wallet
 #include "../util/Files.h"
@@ -420,56 +421,31 @@ void Transactions::on_validateProofButton_clicked()
     wallet->verifyTransactionProof(fileName);
 }
 
-void Transactions::on_exportButton_clicked()
-{
-    util::TimeoutLockObject to( "Transactions" );
+void Transactions::on_exportButton_clicked() {
+    util::TimeoutLockObject to("Transactions");
 
     if (allTrans.isEmpty()) {
         control::MessageBox::messageText(this, "Export Error", "You don't have any transactions to export.");
         return;
     }
 
-    QString fileName = util->getSaveFileName("Export Transactions",
-                                                    "TxExportCsv",
-                                                    "Export Options (*.csv)",
-                                                    ".csv");
+    exportingFileName = util->getSaveFileName("Export Transactions",
+                                             "TxExportCsv",
+                                             "Export Options (*.csv)",
+                                             ".csv");
 
-    if (fileName.isEmpty())
+    if (exportingFileName.isEmpty())
         return;
 
-    // qt-wallet displays the transactions last to first
-    // however when exporting the transactions, we want to export first to last
-    QStringList exportRecords;
+    // Starting request process...
+    ui->progressFrame->show();
+    ui->transactionTable->hide();
 
-    // retrieve the first transaction and get the CSV headers
-    const wallet::WalletTransaction & trans = allTrans[0].trans;
-    QString csvHeaders = trans.getCSVHeaders();
-    exportRecords << csvHeaders;
-    QString csvValues = trans.toStringCSV();
-    exportRecords << csvValues;
-
-    // now retrieve the remaining transactions and add them to our list
-    for ( int idx=1; idx < allTrans.size(); idx++) {
-        const wallet::WalletTransaction & trans = allTrans[idx].trans;
-        QString csvValues = trans.toStringCSV();
-        exportRecords << csvValues;
-    }
-    // Note: Mobile doesn't expect to export anything. That is why we are breaking bridge rule here and usung util::writeTextFile directly
-    // warning: When using a debug build, avoid testing with an existing file which has
-    //          read-only permissions. writeTextFile will hit a Q_ASSERT causing qt-wallet
-    //          to crash.
-    bool exportOk = util::writeTextFile(fileName, exportRecords);
-    if (!exportOk)
-    {
-        control::MessageBox::messageText(this, "Error", "Export unable to write to file: " + fileName);
-    }
-    else
-    {
-        // some users may have a large number of transactions which take time to write to the file
-        // so indicate when the file write has completed
-        control::MessageBox::messageText(this, "Success", "Exported transactions to file: " + fileName);
-    }
-    return;
+    TransactionData & td = allTrans[0];
+    Q_ASSERT(td.trans.isValid());
+    wallet->requestTransactionById(account, QString::number(td.trans.txIdx));
+    td.tx_note = config->getTxNote(td.trans.txid);
+    // Now waiting for transaction requests response at onSgnTransactionById
 }
 
 void Transactions::onItemActivated(QString itemId) {
@@ -499,53 +475,133 @@ void Transactions::onSgnNodeStatus( bool online, QString errMsg, int _nodeHeight
         nodeHeight = _nodeHeight;
 }
 
+static QString csvStr(QString str) {
+    str.replace("\"", "");
+    return "\""+str+"\"";
+}
+
 void Transactions::onSgnTransactionById(bool success, QString account, QString height, QString transactionJson,
                           QVector<QString> outputsJson, QVector<QString> messages) {
 
     Q_UNUSED(account)
     Q_UNUSED(height)
 
-    ui->progressFrame->hide();
-    ui->transactionTable->show();
+    // Asking for tx details
+    if (exportingFileName.isEmpty()) {
 
-    util::TimeoutLockObject to( "Transactions" );
+        ui->progressFrame->hide();
+        ui->transactionTable->show();
 
-    if (!success) {
-        control::MessageBox::messageText(this, "Transaction details",
-                                         "Internal error. Transaction details are not found.");
-        return;
-    }
+        util::TimeoutLockObject to("Transactions");
 
-    wallet::WalletTransaction transaction = wallet::WalletTransaction::fromJson(transactionJson);
+        if (!success) {
+            control::MessageBox::messageText(this, "Transaction details",
+                                             "Internal error. Transaction details are not found.");
+            return;
+        }
 
-    QVector<wallet::WalletOutput> outputs;
-    for (auto & json : outputsJson)
-        outputs.push_back( wallet::WalletOutput::fromJson(json));
+        wallet::WalletTransaction transaction = wallet::WalletTransaction::fromJson(transactionJson);
+
+        QVector<wallet::WalletOutput> outputs;
+        for (auto &json : outputsJson)
+            outputs.push_back(wallet::WalletOutput::fromJson(json));
 
 
-    QString txnNote = config->getTxNote(transaction.txid);
-    dlg::ShowTransactionDlg showTransDlg(this, account,  transaction, outputs, messages, txnNote);
-    if (  showTransDlg.exec() == QDialog::Accepted ) {
-        if (txnNote != showTransDlg.getTransactionNote() ) {
-            txnNote = showTransDlg.getTransactionNote();
-            if (txnNote.isEmpty()) {
-                config->deleteTxNote(transaction.txid);
-            } else {
-                // add new note or update existing note for this commitment
-                config->updateTxNote(transaction.txid, txnNote);
-            }
+        QString txnNote = config->getTxNote(transaction.txid);
+        dlg::ShowTransactionDlg showTransDlg(this, account, transaction, outputs, messages, txnNote);
+        if (showTransDlg.exec() == QDialog::Accepted) {
+            if (txnNote != showTransDlg.getTransactionNote()) {
+                txnNote = showTransDlg.getTransactionNote();
+                if (txnNote.isEmpty()) {
+                    config->deleteTxNote(transaction.txid);
+                } else {
+                    // add new note or update existing note for this commitment
+                    config->updateTxNote(transaction.txid, txnNote);
+                }
 
-            // Updating the UI
-            for (const auto & tx : allTrans) {
-                if (tx.trans.txid == transaction.txid) {
-                    tx.noteL->setText(txnNote);
-                    if (txnNote.isEmpty())
-                        tx.noteL->hide();
-                    else
-                        tx.noteL->show();
+                // Updating the UI
+                for (const auto &tx : allTrans) {
+                    if (tx.trans.txid == transaction.txid) {
+                        tx.noteL->setText(txnNote);
+                        if (txnNote.isEmpty())
+                            tx.noteL->hide();
+                        else
+                            tx.noteL->show();
+                    }
                 }
             }
         }
+    }
+    else {
+        // it is CSV export. Here are are enriching the data
+        if (!success) {
+            ui->progressFrame->hide();
+            ui->transactionTable->show();
+            exportingFileName = "";
+            control::MessageBox::messageText(this, "Transaction details",
+                                             "Internal error. Transaction details are not found.");
+            return;
+        }
+
+        wallet::WalletTransaction transaction = wallet::WalletTransaction::fromJson(transactionJson);
+        int64_t txIdx = transaction.txIdx;
+
+        for ( int i=0; i<allTrans.size(); i++ ) {
+            if (allTrans[i].trans.txIdx == txIdx) {
+                auto & t = allTrans[i];
+                t.tx_messages.clear();
+                for (auto & m : messages)
+                    t.tx_messages.push_back(m);
+
+                if ( i+1<allTrans.size() ) {
+                    // requesting the next
+                    TransactionData & td = allTrans[i+1];
+                    Q_ASSERT(td.trans.isValid());
+                    wallet->requestTransactionById(account, QString::number(td.trans.txIdx));
+                    td.tx_note = config->getTxNote(td.trans.txid);
+                }
+                else {
+                    // We are done, that was the last item, now we can export
+                    QString fileName = exportingFileName;
+                    ui->progressFrame->hide();
+                    ui->transactionTable->show();
+                    exportingFileName = "";
+
+                    // qt-wallet displays the transactions last to first
+                    // however when exporting the transactions, we want to export first to last
+                    QStringList exportRecords;
+
+                    // retrieve the first transaction and get the CSV headers
+                    const wallet::WalletTransaction & trans = allTrans[0].trans;
+                    QString csvHeaders = trans.getCSVHeaders({"Tx Note", "Slate Messages"});
+                    exportRecords << csvHeaders;
+
+                    // now retrieve the remaining transactions and add them to our list
+                    for ( int idx=0; idx < allTrans.size(); idx++) {
+                        const auto & tx = allTrans[idx];
+                        QString csvValues = tx.trans.toStringCSV( { csvStr(tx.tx_note), csvStr(tx.tx_messages.join(", ")) } );
+                        exportRecords << csvValues;
+                    }
+                    // Note: Mobile doesn't expect to export anything. That is why we are breaking bridge rule here and usung util::writeTextFile directly
+                    // warning: When using a debug build, avoid testing with an existing file which has
+                    //          read-only permissions. writeTextFile will hit a Q_ASSERT causing qt-wallet
+                    //          to crash.
+                    bool exportOk = util::writeTextFile(fileName, exportRecords);
+                    if (!exportOk)
+                    {
+                        control::MessageBox::messageText(this, "Error", "Export unable to write to file: " + fileName);
+                    }
+                    else
+                    {
+                        // some users may have a large number of transactions which take time to write to the file
+                        // so indicate when the file write has completed
+                        control::MessageBox::messageText(this, "Success", "Exported transactions to file: " + fileName);
+                    }
+
+                }
+            }
+        }
+
     }
 
 }

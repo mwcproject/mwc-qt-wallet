@@ -319,7 +319,7 @@ int64_t WalletTransaction::calculateTransactionAge( const QDateTime & current ) 
     return setTime.secsTo(current);
 }
 
-QString WalletTransaction::toStringCSV() const {
+QString WalletTransaction::toStringCSV(const QStringList & extraData) const {
     QString separator = ",";
     // always enclose the type string in quotes as it could contain a comma
 
@@ -351,6 +351,9 @@ QString WalletTransaction::toStringCSV() const {
                       util::nano2one(tx_coinNano) + separator +    // Net Difference
                       (proof ? "yes" : "no") + separator +      // Payment Proof
                       kernel;                                   // Kernel
+    for (const auto & dt : extraData)
+        csvStr += separator + dt;
+
     return csvStr;
 }
 
