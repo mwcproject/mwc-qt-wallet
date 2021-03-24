@@ -571,7 +571,7 @@ void MainWindow::on_actionShow_passphrase_triggered()
     if ( !passwordHash.isEmpty() ) {
         if (WndManager::RETURN_CODE::BTN2 !=
             control::MessageBox::questionText(this, "Wallet Password",
-                                              "You are going to view wallet mnemonic passphrase.\n\nPlease input your wallet password to continue",
+                                              "You are going to view wallet mnemonic passphrase.",
                                               "Cancel", "Confirm",
                                               "Cancel show mnemonic passphrase",
                                               "Verify the password and show the passphrase",

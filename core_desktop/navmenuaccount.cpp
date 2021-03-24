@@ -51,7 +51,7 @@ void NavMenuAccount::on_seedButton_clicked()
         if ( !passwordHash.isEmpty() ) {
             if (WndManager::RETURN_CODE::BTN2 !=
                 control::MessageBox::questionText(this, "Wallet Password",
-                                                  "You are going to view wallet mnemonic passphrase.\n\nPlease input your wallet password to continue", "Cancel", "Confirm",
+                                                  "You are going to view wallet mnemonic passphrase.", "Cancel", "Confirm",
                                                   "Cancel operation", "Verify password and show mnemonic passphrase",
                                                   false, true, 1.0,
                                                   passwordHash, WndManager::RETURN_CODE::BTN2))

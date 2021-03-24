@@ -82,7 +82,7 @@ Item {
                 passwordHash = wallet.getPasswordHash()
 
                 if (passwordHash !== "") {
-                    messagebox.open("Wallet Password", "You are going to view wallet mnemonic passphrase.\n\nPlease input your wallet password to continue",
+                    messagebox.open("Wallet Password", "You are going to view wallet mnemonic passphrase.",
                             true, "Cancel", "Confirm", passwordHash, 1, "", showPassphraseCallback)
                     return;
                 }

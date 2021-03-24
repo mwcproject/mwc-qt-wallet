@@ -732,7 +732,7 @@ Item {
 
                 onClicked: {
                     nav.toggle()
-                    messagebox.open(qsTr("LOGOUT / CHANGE WALLET"), qsTr("Are you sure want to logout?"), true, "No", "Yes", "", "", "", changeInstanceCallback)
+                    messagebox.open(qsTr("LOGOUT / CHANGE WALLET"), qsTr("Are you sure you want to logout?"), true, "No", "Yes", "", "", "", changeInstanceCallback)
                 }
             }
         }

@@ -149,7 +149,7 @@ int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod,
                        context->appContext, sendParams.changeOutputs,
                        txnOutputList);
     if (fee < mwc::BASE_TRANSACTION_FEE) {
-        core::getWndManager()->messageTextDlg("Incorrect Input", "Your account doesn't have enough MWC to send and cover this transaction fees." );
+        core::getWndManager()->messageTextDlg("Incorrect Input", "Your account doesn't have enough MWC to send and cover the transaction fees.");
         return 2;
     }
 

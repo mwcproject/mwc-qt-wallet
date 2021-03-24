@@ -199,7 +199,7 @@ public:
     const static int64_t TIMEOUT = 3600*1000*5; // long task, put 5 hours to be sure
 
     TaskSync( MWC713 * wallet713, bool _showProgress) :
-            Mwc713Task("TaskSync","Syncronizing data with blockchain...", "sync", wallet713, ""), showProgress(_showProgress) {}
+            Mwc713Task("TaskSync","Synchronizing data with blockchain...", "sync", wallet713, ""), showProgress(_showProgress) {}
 
     virtual ~TaskSync() override {}
 
