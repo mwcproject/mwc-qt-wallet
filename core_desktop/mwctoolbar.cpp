@@ -52,6 +52,8 @@ MwcToolbar::MwcToolbar(QWidget *parent) :
     QObject::connect( coreWindow, &CoreWindow::sgnUpdateActionStates,
                       this, &MwcToolbar::onUpdateButtonsState, Qt::QueuedConnection );
 
+    ui->mwcUnconfFrame->hide();
+
     startTimer(300);
 }
 
@@ -101,6 +103,15 @@ void MwcToolbar::on_transactionToolButton_clicked()
 void MwcToolbar::onWalletBalanceUpdated() {
     qDebug() << "get onWalletBalanceUpdated. Updating the balance";
     ui->totalMwc->setText( wallet->getTotalMwcAmount() + " MWC" );
+
+    QString unconfirmed = wallet->getUnconfirmedAmount();
+    if (unconfirmed.isEmpty()) {
+        ui->mwcUnconfFrame->hide();
+    }
+    else {
+        ui->mwcUnconfFrame->show();
+        ui->nonConfMwcValue->setText(unconfirmed + " MWC");
+    }
 }
 
 void MwcToolbar::onLoginResult(bool ok) {

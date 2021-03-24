@@ -294,6 +294,21 @@ QString Wallet::getTotalMwcAmount() {
     return util::trimStrAsDouble( util::nano2one(mwcSum), 5);
 }
 
+// return Total MWC amount as String
+QString Wallet::getUnconfirmedAmount() {
+    QVector<wallet::AccountInfo> balance = getWallet()->getWalletBalance();
+
+    int64_t mwcSum = 0;
+    for ( const auto & ai : balance ) {
+        mwcSum += ai.awaitingConfirmation;
+    }
+
+    if (mwcSum==0)
+        return "";
+
+    return util::trimStrAsDouble( util::nano2one(mwcSum), 5);
+}
+
 // Get MQS address and index
 // Return: signal  sgnMwcAddressWithIndex
 void Wallet::requestMqsAddress() {

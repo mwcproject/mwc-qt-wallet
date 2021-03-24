@@ -99,5 +99,6 @@
         <file>img/swap_yellow@2x.svg</file>
         <file>help/finalize.html</file>
         <file>help/swap.html</file>
+        <file>img/Transactions_Unconfirmed_Yellow@2x.svg</file>
     </qresource>
 </RCC>

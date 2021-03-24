@@ -64,6 +64,10 @@ public:
     // return Total MWC amount as String. Formatted for GUI
     Q_INVOKABLE QString getTotalMwcAmount();
 
+    // return Unconfirmed MWC amount as String. Formatted for GUI
+    // Empty string if there are no unconfirmed coins
+    Q_INVOKABLE QString getUnconfirmedAmount();
+
     // Get MQS address and index
     // Return: signal  sgnMwcAddressWithIndex
     Q_INVOKABLE void requestMqsAddress();
