@@ -222,14 +222,14 @@ QPair<bool, QString> readConfig(QApplication & app) {
     if (mwczip_path == "build in") {
         mwczip_path = QCoreApplication::applicationDirPath() + "/" + "mwczip";
 #ifdef Q_OS_WIN
-        mwc_path += ".exe";
+        mwczip_path += ".exe";
 #endif
     }
 
     if (tor_path == "build in") {
         tor_path = QCoreApplication::applicationDirPath() + "/" + "tor";
 #ifdef Q_OS_WIN
-        mwc_path += ".exe";
+        tor_path += ".exe";
 #endif
     }
 #endif
