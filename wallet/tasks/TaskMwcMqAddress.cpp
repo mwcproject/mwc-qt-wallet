@@ -27,7 +27,7 @@ bool TaskMwcMqAddress::processTask(const QVector<WEvent> & events) {
     QVector< WEvent > mwcMqAddrIdx = filterEvents(events, WALLET_EVENTS::S_MWC_ADDRESS_INDEX );
 
     if (mwcMqAddr.empty()) {
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL,
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL,
                                              "Unable to get the MWC MQS address");
         return true;
     }
@@ -84,7 +84,7 @@ bool TaskFileProofAddress::processTask(const QVector<WEvent> & events) {
     }
 
     if (address.isEmpty()) {
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL,
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL,
                                            "Unable to get the proof address from mwc713 wallet");
         return true;
     }

@@ -22,6 +22,7 @@
 #include "../core/Config.h"
 #include "../core/WndManager.h"
 #include "../bridge/BridgeManager.h"
+#include "../bridge/notification_b.h"
 
 namespace state {
 
@@ -100,7 +101,7 @@ void Listening::onListenerMqCollision() {
 }
 
 // Looking for "Failed to start mwcmqs subscriber. Error connecting to mqs.mwc.mw:443"
-void Listening::onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message) {
+void Listening::onNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message) {
     Q_UNUSED(level);
     // We are not relying to the window, but checking if it is active
     if ( message.contains("Failed to start mwcmqs subscriber") ) {

@@ -102,7 +102,7 @@ bool TaskUnlock::processTask(const QVector<WEvent> & events) {
         wallet713->setLoginResult(error.empty());
 
         if (error.empty())
-            notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, "Successfully logged into the wallet");
+            notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO, "Successfully logged into the wallet");
     }
     notify::remeoveFalseMessage("wallet already unlocked");
     return true;
@@ -124,7 +124,7 @@ bool TaskInitW::processTask(const QVector<WEvent> & events) {
         return true; // Expected respond
 
     // Not expected respond, treat it an internal fatal error
-    notify::appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "Internal error. Fail to init mwc713 wallet with a password" );
+    notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::FATAL_ERROR, "Internal error. Fail to init mwc713 wallet with a password" );
     return true;
 }
 
@@ -330,7 +330,7 @@ Scanning Complete
 
     if (!foundDone) {
         // Scan was failed, let emit the warning
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Wallet unable refresh the wallet state. Your balance might be out of sync." );
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::WARNING, "Wallet unable refresh the wallet state. Your balance might be out of sync." );
     }
 
     // restore back to 'true'
@@ -385,7 +385,7 @@ bool TaskSyncProgressListener::processTask(const QVector<WEvent> &events) {
 
     if (!TaskSyncShowProgress) {
         if (progressPercentage >= 0.0) {
-            notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, "Wallet synchronization is in progress: " + QString::number( progressPercentage ) + "%" );
+            notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO, "Wallet synchronization is in progress: " + QString::number( progressPercentage ) + "%" );
         }
     }
     else {

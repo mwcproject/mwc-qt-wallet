@@ -1,9 +1,11 @@
-import QtQuick 2.0
+import QtQuick 2.12
 import QtQuick.Window 2.12
+import Qt.labs.platform 1.1
 import WalletBridge 1.0
 import TransactionsBridge 1.0
 import ConfigBridge 1.0
 import UtilBridge 1.0
+import NotificationBridge 1.0
 
 Item {
     id: transactionsItem
@@ -14,8 +16,11 @@ Item {
     property var type_TRANSACTION_COIN_BASE: 4
     property var type_TRANSACTION_RECEIVE: 2
     property var type_TRANSACTION_SEND: 1
+    property var type_TRANSACTION_NONE: 0
     property var number_COIN_BASE_CONFIRM: 1440
     property var locale: Qt.locale()
+    property var message_LEVEL_INFO: 4
+    property var message_LEVEL_CRITICAL: 2
 
     WalletBridge {
         id: wallet
@@ -31,6 +36,10 @@ Item {
 
     UtilBridge {
         id: util
+    }
+
+    NotificationBridge {
+        id: notification
     }
 
     Connections {
@@ -76,6 +85,45 @@ Item {
                 requestTransactions()
             }
         }
+
+        onSgnRepost: (idx, err) => {
+            rect_progress.visible = false
+            transactionList.visible = true
+
+            if (err === "") {
+                notification.appendNotificationMessage(message_LEVEL_INFO, "Transaction #" + Number(idx+1).toString() + " was successfully reposted.")
+                messagebox.open("Repost", "Transaction #" + Number(idx + 1).toString() + " was successfully reposted.")
+            } else {
+                notification.appendNotificationMessage(message_LEVEL_CRITICAL, "Failed to repost transaction #" + Number(idx+1).toString() + ". " + err)
+                messagebox.open("Repost", "Failed to repost transaction #" + Number(idx+1).toString() + ".\n\n" + err)
+            }
+        }
+
+        onSgnCancelTransacton: (success, account, trIdxStr, errMessage) => {
+            rect_progress.visible = true
+            transactionList.visible = false
+            const trIdx = parseInt(trIdxStr)
+            if (success) {
+                requestTransactions()
+            } else {
+                messagebox.open("Failed to cancel transaction", "Cancel request for transaction number " + Number(trIdx + 1).toString() + " has failed.\n\n")
+            }
+        }
+
+        onSgnVerifyProofResult: (success, fn, msg) => {
+            if (success) {
+                const proof = showProofDlg.parseProofText(msg)
+                if (proof) {
+                    showProofDlg.open(fn, proof)
+                }
+                else {
+                    messagebox.open("Failure", "Internal error. Unable to decode the results of the proof located at  " + fn + "\n\n" + msg)
+                }
+            }
+            else {
+                messagebox.open("Failure", msg)
+            }
+        }
     }
 
     onVisibleChanged: {
@@ -84,6 +132,16 @@ Item {
            requestTransactions()
            updateData()
         }
+    }
+
+    function txRepost(txIdx) {
+        wallet.repost(wallet.getCurrentAccountName(), txIdx, config.isFluffSet())
+        rect_progress.visible = true
+        transactionList.visible = false
+    }
+
+    function txCancel(txIdx) {
+        wallet.requestCancelTransacton(wallet.getCurrentAccountName(), Number(txIdx).toString())
     }
 
     function requestTransactions() {
@@ -193,14 +251,20 @@ Item {
             return "../img/Transactions_CoinBase@2x.svg"
     }
 
+    function isTxValid(tx) {
+        return tx.txIdx >= 0 && tx.transactionType !== type_TRANSACTION_NONE
+    }
+
     ListModel {
         id: transactionModel
     }
 
     ListView {
         id: transactionList
-        anchors.fill: parent
-        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.top: rect_buttons.bottom
         model: transactionModel
         delegate: transactionDelegate
         focus: true
@@ -326,6 +390,123 @@ Item {
                     font.pixelSize: dp(15)
                 }
             }
+        }
+    }
+
+    Rectangle {
+        id: rect_buttons
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        height: dp(65)
+        gradient: Gradient {
+            orientation: Gradient.Horizontal
+            GradientStop {
+                position: 0
+                color: "#9E00E7"
+            }
+
+            GradientStop {
+                position: 1
+                color: "#3600C9"
+            }
+        }
+
+        Rectangle {
+            width: dp(250)
+            height: dp(40)
+            anchors.top: parent.top
+            anchors.topMargin: dp(15)
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: "#00000000"
+
+            Image {
+                id: image_validate
+                anchors.left: parent.left
+                anchors.top: parent.top
+                width: dp(40)
+                height: dp(40)
+                fillMode: Image.PreserveAspectFit
+                source: "../img/Validate@2x.svg"
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        fileDialog.open()
+                    }
+                }
+            }
+
+//            Image {
+//                id: image_export
+//                anchors.top: parent.top
+//                anchors.horizontalCenter: parent.horizontalCenter
+//                width: dp(40)
+//                height: dp(40)
+//                fillMode: Image.PreserveAspectFit
+//                source: "../img/Validate1@2x.svg"
+
+//                MouseArea {
+//                    anchors.fill: parent
+//                    onClicked: {
+//                        if (allTrans.length === 0) {
+//                            messagebox.open("Export Error", "You don't have any transactions to export.")
+//                            return
+//                        }
+//                        const exportingFileName = util.getSaveFileName("Export Transactions", "TxExportCsv", "Export Options (*.csv)", ".csv")
+//                        if (exportingFileName === "")
+//                            return
+
+//                        // Starting request process...
+//                        rect_progress.visible = true
+//                        transactionList.visible = false
+//                        const td = allTrans[0]
+//                        if(isTxValid(td.trans)) {
+//                            wallet.requestTransactionById(account, Number(td.trans.txIdx).toString())
+//                            td.tx_note = config.getTxNote(td.trans.txid);
+//                            // Now waiting for transaction requests response at onSgnTransactionById
+//                        } else {
+//                            messagebox.open("Export Error", "Invalid Wallet")
+//                        }
+//                    }
+//                }
+//            }
+
+            Image {
+                id: image_refresh
+                anchors.right: parent.right
+                anchors.top: parent.top
+                width: dp(40)
+                height: dp(40)
+                fillMode: Image.PreserveAspectFit
+                source: "../img/Refresh@2x.svg"
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        requestTransactions()
+                    }
+                }
+            }
+        }
+    }
+
+    FileDialog {
+        id: fileDialog
+        title: qsTr("Open proof file")
+        folder: config.getPathFor("fileGen")
+        nameFilters: ["transaction proof (*.proof);;All files (*.*)"]
+        onAccepted: {
+            var path = fileDialog.file.toString()
+
+            if (path === "") return
+
+            // remove prefixed "file:///"
+            path= path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/,"")
+            // unescape html codes like '%23' for '#'
+            const cleanPath = decodeURIComponent(path);
+            const filePath = "/storage/emulated/0/Android/data/mw.mwc.wallet/files/Download/" + cleanPath.substring(cleanPath.search("files/Download/") + 15, cleanPath.length)
+            wallet.verifyTransactionProof(filePath)
         }
     }
 

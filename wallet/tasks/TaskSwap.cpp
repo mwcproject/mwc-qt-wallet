@@ -435,7 +435,7 @@ bool TaskAdjustTradeState::processTask(const QVector<WEvent> &events) {
         if (l.message.contains("was successfully adjusted")) {
             // We are good.
             // Swap trade b87f00f4-381b-4f38-aec2-972871f47c76 was successfully adjusted. New state: Post Refund Transaction
-            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, l.message );
+            notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, l.message );
             return true;
         }
     }

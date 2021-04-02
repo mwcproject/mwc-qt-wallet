@@ -18,6 +18,7 @@
 #include "state.h"
 #include "../core/Notification.h"
 #include "../wallet/mwc713.h"
+#include "../bridge/notification_b.h"
 
 namespace wnd {
     class Listening;
@@ -50,7 +51,7 @@ private slots:
 
 
     // Looking for "Failed to start mwcmqs subscriber. Error connecting to ..."
-    void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
+    void onNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message);
 
 private:
     QString lastShownErrorMessage;

@@ -61,7 +61,7 @@ protected:
 private slots:
     // Update tb & menu actions
     void onSgnUpdateActionStates(int actionState); // state::STATE
-    void onSgnNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL
+    void onSgnNewNotificationMessage(int level, QString message); // level: bridge::MESSAGE_LEVEL
     void onSgnConfigUpdate();
     void onSgnLoginResult(bool ok);
     void onApplicationStateChange(Qt::ApplicationState state);

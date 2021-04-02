@@ -209,31 +209,31 @@ void MainWindow::statusDone(StatusWnd* swnd) {
     statusMgr->statusDone(swnd);
 }
 
-// level: notify::MESSAGE_LEVEL
+// level: bridge::MESSAGE_LEVEL
 void MainWindow::onSgnNewNotificationMessage(int level, QString message) {
 
     using namespace wallet;
 
     QString prefix;
     int timeout = 3000;
-    switch( notify::MESSAGE_LEVEL(level)) {
-        case notify::MESSAGE_LEVEL::FATAL_ERROR:
+    switch( bridge::MESSAGE_LEVEL(level)) {
+        case bridge::MESSAGE_LEVEL::FATAL_ERROR:
             prefix = "Error: ";
             timeout = 7000;
             break;
-        case notify::MESSAGE_LEVEL::CRITICAL:
+        case bridge::MESSAGE_LEVEL::CRITICAL:
             prefix = "Critical: ";
             timeout = 7000;
             break;
-        case notify::MESSAGE_LEVEL::WARNING:
+        case bridge::MESSAGE_LEVEL::WARNING:
             prefix = "Warning: ";
             timeout = 7000;
             break;
-        case notify::MESSAGE_LEVEL::INFO:
+        case bridge::MESSAGE_LEVEL::INFO:
             prefix = "Info: ";
             timeout = 4000;
             break;
-        case notify::MESSAGE_LEVEL::DEBUG:
+        case bridge::MESSAGE_LEVEL::DEBUG:
             prefix = "Debug: ";
             timeout = 2000;
             break;
@@ -331,7 +331,7 @@ void MainWindow::onSgnUpdateNodeStatus( bool online, QString errMsg, int nodeHei
 }
 
 void MainWindow::onSgnUpdateSyncProgress(double progressPercent) {
-    onSgnNewNotificationMessage( int(notify::MESSAGE_LEVEL::INFO),
+    onSgnNewNotificationMessage( int(bridge::MESSAGE_LEVEL::INFO),
                              "Wallet state update, " + util::trimStrAsDouble( QString::number(progressPercent), 4 ) + "% complete"  );
 }
 

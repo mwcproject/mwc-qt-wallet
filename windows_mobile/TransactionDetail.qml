@@ -9,6 +9,7 @@ Item {
     id: transactionDetail
     visible: false
 
+    property var tx2process
     property var outputs
     property string blockExplorerUrl
     property string originalTransactionNote
@@ -25,6 +26,28 @@ Item {
 
     UtilBridge {
         id: util
+    }
+
+    WalletBridge {
+        id: wallet
+    }
+
+    Connections {
+        target: wallet
+        onSgnExportProofResult: (success, fn, msg) => {
+            if (success) {
+                const proof = showProofDlg.parseProofText(msg)
+                if (proof) {
+                    showProofDlg.open(fn, proof)
+                }
+                else {
+                    messagebox.open("Failure", "Internal error. Unable to decode the results of the proof located at  " + fn + "\n\n" + msg)
+                }
+            }
+            else {
+                messagebox.open("Failure", msg)
+            }
+        }
     }
 
     function init(account, txinfo, _outputs, messages, txnNote) {
@@ -77,6 +100,32 @@ Item {
         } else {
             combobox_commitments.currentIndex = -1
         }
+
+        const amount = util.nano2one(txinfo.coinNano)
+
+        if (canBeCancelled(txinfo.transactionType, txinfo.confirmed)) {
+            button_tx_cancel.visible = true
+        } else {
+            button_tx_cancel.visible = false
+        }
+
+        if (txinfo.transactionType === type_TRANSACTION_SEND && !txinfo.confirmed) {
+            button_tx_repost.visible = true
+        } else {
+            button_tx_repost.visible = false
+        }
+
+        if (txinfo.proof) {
+            button_tx_proof.visible = true
+        } else {
+            button_tx_proof.visible = false
+        }
+
+        tx2process = txinfo
+    }
+
+    function canBeCancelled(transactionType, confirmed) {
+        return (transactionType & type_TRANSACTION_CANCELLED) === 0 && !confirmed
     }
 
     function getTxTypeIcon(transactionType, confirmed) {
@@ -159,6 +208,13 @@ Item {
         label_txnum.visible = true
         text_txnum.visible = true
         text_txnum.text = out.txIdx < 0 ? "None" : Number(out.txIdx+1).toString()
+    }
+
+    function txCancelCallback(ok) {
+        if(ok) {
+            transactionsItem.txCancel(tx2process.txIdx)
+            transactionDetail.visible = false
+        }
     }
 
     onVisibleChanged: {
@@ -295,6 +351,96 @@ Item {
                     anchors.top: label_confirmed.bottom
                     anchors.topMargin: dp(3)
                     font.pixelSize: dp(15)
+                }
+
+                Button {
+                    id: button_tx_cancel
+                    height: dp(35)
+                    width: dp(80)
+                    anchors.right: button_tx_repost.visible ? button_tx_repost.left : parent.right
+                    anchors.rightMargin: dp(20)
+                    anchors.bottom: text_confirmed.bottom
+                    visible: false
+                    background: Rectangle {
+                        color: "#00000000"
+                        radius: dp(4)
+                        border.color: "#3600C9"
+                        border.width: dp(2)
+                        Text {
+                            text: qsTr("Cancel")
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.pixelSize: dp(14)
+                            color: "#3600C9"
+                        }
+                    }
+
+                    onClicked: {
+                        messagebox.open("Transaction cancellation", "Are you sure you want to cancel transaction #" +
+                                        Number(tx2process.txIdx + 1).toString() +
+                                        ", TXID " + tx2process.txid, true, "No", "Yes", "", "", "", txCancelCallback)
+                    }
+                }
+
+                Button {
+                    id: button_tx_repost
+                    height: dp(35)
+                    width: dp(80)
+                    anchors.right: parent.right
+                    anchors.rightMargin: dp(20)
+                    anchors.bottom: text_confirmed.bottom
+                    visible: false
+                    background: Rectangle {
+                        color: "#00000000"
+                        radius: dp(4)
+                        border.color: "#3600C9"
+                        border.width: dp(2)
+                        Text {
+                            text: qsTr("Repost")
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.pixelSize: dp(14)
+                            color: "#3600C9"
+                        }
+                    }
+
+                    onClicked: {
+                        transactionsItem.txRepost(tx2process.txIdx)
+                        transactionDetail.visible = false
+                    }
+                }
+
+                Button {
+                    id: button_tx_proof
+                    height: dp(35)
+                    width: dp(80)
+                    anchors.right: parent.right
+                    anchors.rightMargin: dp(20)
+                    anchors.bottom: text_confirmed.bottom
+                    visible: false
+                    background: Rectangle {
+                        color: "#00000000"
+                        radius: dp(4)
+                        border.color: "#3600C9"
+                        border.width: dp(2)
+                        Text {
+                            text: qsTr("Proof")
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            font.pixelSize: dp(14)
+                            color: "#3600C9"
+                        }
+                    }
+
+                    onClicked: {
+                        if (!tx2process.proof) {
+                            messagebox.open("Need info", "Please select qualify transaction to generate a proof.")
+                        } else {
+                            const fileName = util.getSaveFileName("Create transaction proof file", "Transactions", "transaction proof (*.proof)", ".proof")
+                            if (fileName === "") return
+                            wallet.generateTransactionProof(Number(tx2process.txIdx).toString(), fileName)
+                        }
+                    }
                 }
 
                 Text {

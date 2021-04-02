@@ -63,7 +63,7 @@ bool TaskAccountList::processTask(const QVector<WEvent> &events) {
     idx++;
 
     if (idx>=lns.size()) {
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to get a list of accounts from mwc713" );
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Unable to get a list of accounts from mwc713" );
         return true; // No data to process.
     }
 
@@ -111,7 +111,7 @@ bool TaskAccountCreate::processTask(const QVector<WEvent> &events) {
 bool TaskAccountSwitch::processTask(const QVector<WEvent> &events) {
     QVector< WEvent > errors = filterEvents( events, WALLET_EVENTS::S_GENERIC_ERROR );
     for ( const auto & e : errors) {
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to switch account. " + e.message );
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Unable to switch account. " + e.message );
     }
     return true;
 }
@@ -166,7 +166,7 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
     QVector< WEvent > lns = filterEvents( events, WALLET_EVENTS::S_LINE );
 
     if ( infoEvts.size()!=1 ) {
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to mwc713 'info' about current account" );
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Unable to mwc713 'info' about current account" );
         return false;
     }
 
@@ -222,7 +222,7 @@ bool TaskAccountInfo::processTask( const QVector<WEvent> & events) {
     }
 
     if ( !ok || totalNano<0 || waitingConfNano<0 || lockedNano<0 || spendableNano<0 ) {
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to parse mwc713 'info' output" );
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Unable to parse mwc713 'info' output" );
         return false;
     }
 

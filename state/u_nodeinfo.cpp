@@ -162,32 +162,32 @@ void NodeInfo::onNodeStatus( bool online, QString errMsg, int nodeHeight, int pe
         // check if node state was changed. In this case let's emit a message
         if (online != lastNodeStatus.online) {
             if (online) {
-                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                         "Wallet restore connection to MWC Node");
             }
             else {
                 if ( ! notify::notificationStateCheck( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA) )
-                    notify::appendNotificationMessage(notify::MESSAGE_LEVEL::CRITICAL,
+                    notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::CRITICAL,
                                                            "Wallet lost connection to MWC Node");
             }
         }
         else if ( (connections==0) ^ (lastNodeStatus.connections==0) ) {
                 if (connections>0) {
-                    notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                    notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                                                                "MWC Node restored connection to MWC network");
                 }
                 else {
-                    notify::appendNotificationMessage(notify::MESSAGE_LEVEL::CRITICAL,
+                    notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::CRITICAL,
                                                                "MWC Node lost connection to MWC network");
                 }
         }
         else if ( (nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight) ^ (lastNodeStatus.nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < lastNodeStatus.peerHeight) ) {
             if (nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight) {
-                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::CRITICAL,
+                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::CRITICAL,
                                                            "MWC Node out of sync from mwc network");
             }
             else {
-                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                                                            "MWC Node finish syncing and runs well now");
             }
         }

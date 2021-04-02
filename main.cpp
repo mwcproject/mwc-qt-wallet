@@ -75,6 +75,7 @@
 #include "bridge/config_b.h"
 #include "bridge/clipboard_b.h"
 #include "bridge/statemachine_b.h"
+#include "bridge/notification_b.h"
 #include "bridge/wnd/g_send_b.h"
 #include "bridge/wnd/g_finalize_b.h"
 #include "bridge/wnd/e_transactions_b.h"
@@ -283,6 +284,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<bridge::Wallet>("WalletBridge", 1, 0, "WalletBridge");
     qmlRegisterType<bridge::Util>("UtilBridge", 1, 0, "UtilBridge");
     qmlRegisterType<bridge::Config>("ConfigBridge", 1, 0, "ConfigBridge");
+    qmlRegisterType<bridge::Notification>("NotificationBridge", 1, 0, "NotificationBridge");
     qmlRegisterType<bridge::InputPassword>("InputPasswordBridge", 1, 0, "InputPasswordBridge");
     qmlRegisterType<bridge::Receive>("ReceiveBridge", 1, 0, "ReceiveBridge");
     qmlRegisterType<ClipboardProxy>("Clipboard", 1, 0, "Clipboard");

@@ -281,7 +281,7 @@ Item {
     Button {
         id: button_login
         height: dp(50)
-        width: instanceComboBox.width
+        width: loginText.width + dp(150)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: dp(50)

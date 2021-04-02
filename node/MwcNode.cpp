@@ -156,7 +156,7 @@ void MwcNode::stop() {
         }
         qDebug() << "mwc-node is exited";
 
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node is stopped." );
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, "Embedded mwc-node is stopped." );
 
         nodeProcess->deleteLater();
         nodeProcess = nullptr;
@@ -349,7 +349,7 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
             // Last try. Let's clean the data
             QDir dir(nodeWorkDir);
             dir.removeRecursively();
-            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Embedded mwc-node data was cleaned, probably it was corrupted");
+            notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Embedded mwc-node data was cleaned, probably it was corrupted");
         }
         // restart the node in 20 seconds. Stopping takes time
         QTimer::singleShot(1000 * 20, this, &MwcNode::onRestartNode);
@@ -494,7 +494,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             nextTimeLimit += int64_t(MWC_NODE_STARTED_TIMEOUT * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
             lastProcessedEvent = event;
-            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Embedded mwc-node was started" );
+            notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, "Embedded mwc-node was started" );
             break;
         case tries::NODE_OUTPUT_EVENT::WAITING_FOR_PEERS:
             lastProcessedEvent = event;
@@ -519,7 +519,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
         case tries::NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_HEADER: {
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
-                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                                                   "Embedded mwc-node requesting headers to sync up");
             }
             nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
@@ -552,7 +552,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
         case tries::NODE_OUTPUT_EVENT::ASK_FOR_TXHASHSET_ARCHIVE: {
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
-                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                                                   "Embedded mwc-node requesting transaction archive");
             }
             // archive can be large, let's wait extra
@@ -598,7 +598,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
         case tries::NODE_OUTPUT_EVENT::HANDLE_TXHASHSET_ARCHIVE: {
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
-                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                                                   "Embedded mwc-node processing transaction archive");
             }
             // tx Hash really might take a while to process
@@ -615,7 +615,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
         case tries::NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET: {
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
-                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                                                   "Embedded mwc-node validating range proofs");
             }
 
@@ -633,7 +633,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
         case tries::NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES: {
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
-                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                                                   "Embedded mwc-node validating kernel signatures");
             }
 
@@ -650,7 +650,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
         case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_START: {
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
-                notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                                                   "Embedded mwc-node processing blocks to sync up");
             }
             // expected no break
@@ -722,7 +722,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             break;
         }
         case tries::NODE_OUTPUT_EVENT::NETWORK_ISSUES:
-            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Embedded mwc-node experiencing network issues" );
+            notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::WARNING, "Embedded mwc-node experiencing network issues" );
             nextTimeLimit += int64_t(NETWORK_ISSUES * config::getTimeoutMultiplier());
 
             nodeStatusString = "Waiting for peers";
