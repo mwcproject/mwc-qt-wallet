@@ -42,6 +42,7 @@
 #include <QCoreApplication>
 #include "../util/crypto.h"
 #include "../core/WndManager.h"
+#include "../bridge/notification_b.h"
 
 namespace wallet {
 
@@ -131,7 +132,7 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
         // file not found. Let's  report it clear way
         logger::logInfo("MWC713", "error. mwc713 canonical path is empty");
 
-        appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 executable is not found. Expected location at:\n\n" + mwc713Path );
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 executable is not found. Expected location at:\n\n" + mwc713Path );
         return nullptr;
 
     }
@@ -154,10 +155,10 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
         switch (process->error())
         {
             case QProcess::FailedToStart:
-                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start mwc713 located at " + mwc713Path + "\n\nCommand line:\n\n" + commandLine );
+                notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start mwc713 located at " + mwc713Path + "\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
             case QProcess::Crashed:
-                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 crashed during start\n\nCommand line:\n\n" + commandLine );
+                notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 crashed during start\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
             case QProcess::Timedout:
                 if (core::getWndManager()->questionTextDlg("Warning", QString("Starting for mwc713 process is taking longer than expected.\nContinue to wait?") +
@@ -169,10 +170,10 @@ QProcess * MWC713::initMwc713process(  const QStringList & envVariables, const Q
                     config::increaseTimeoutMultiplier();
                     continue; // retry with waiting
                 }
-                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 takes too much time to start. Something wrong with environment.\n\nCommand line:\n\n" + commandLine );
+                notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 takes too much time to start. Something wrong with environment.\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
             default:
-                appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start because of unknown error.\n\nCommand line:\n\n" + commandLine );
+                notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::FATAL_ERROR, "mwc713 failed to start because of unknown error.\n\nCommand line:\n\n" + commandLine );
                 return nullptr;
         }
     }
@@ -1203,7 +1204,7 @@ void MWC713::setMwcMqListeningStatus(bool online, QString tid, bool startStopEve
         activeMwcMqsTid = tid;
 
     if (mwcMqOnline != online) {
-        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString("listening on MWC MQS") );
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString("listening on MWC MQS") );
     }
     mwcMqOnline = online;
     logger::logEmit("MWC713", "onListenersStatus", QString(mwcMqOnline ? "true" : "false") + " " + QString(torOnline ? "true" : "false") );
@@ -1213,7 +1214,7 @@ void MWC713::setMwcMqListeningStatus(bool online, QString tid, bool startStopEve
 
 void MWC713::setTorListeningStatus(bool online) {
     if (torOnline != online) {
-        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString(" Tor listener"));
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, (online ? "Start " : "Stop ") + QString(" Tor listener"));
     }
     torOnline = online;
     logger::logEmit("MWC713", "onListenersStatus", QString(mwcMqOnline ? "true" : "false") + " " + QString(torOnline ? "true" : "false") );
@@ -1246,10 +1247,10 @@ void MWC713::setRecoveryResults( bool started, bool finishedWithSuccess, QString
     }
 
     if (finishedWithSuccess) {
-        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("MWC Wallet was successfully recovered from the mnemonic"));
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, QString("MWC Wallet was successfully recovered from the mnemonic"));
     }
     else {
-        appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, QString("Failed to recover from the mnemonic"));
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::WARNING, QString("Failed to recover from the mnemonic"));
     }
 }
 
@@ -1330,7 +1331,7 @@ void MWC713::createNewAccount( QString newAccountName ) {
     emit onAccountCreated(newAccountName);
     emit onWalletBalanceUpdated();
 
-    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("New account '" + newAccountName + "' was created" ));
+    notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, QString("New account '" + newAccountName + "' was created" ));
 }
 
 void MWC713::updateRenameAccount(const QString & oldName, const QString & newName, bool createSimulation,
@@ -1356,9 +1357,9 @@ void MWC713::updateRenameAccount(const QString & oldName, const QString & newNam
     }
 
     if (success)
-        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("Account '" + oldName + "' was renamed to '" + newName + "'" ));
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, QString("Account '" + oldName + "' was renamed to '" + newName + "'" ));
     else
-        appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, QString("Failed to rename account '" + oldName + "'" ));
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::WARNING, QString("Failed to rename account '" + oldName + "'" ));
 
     logger::logEmit( "MWC713", "onWalletBalanceUpdated","");
     emit onWalletBalanceUpdated();
@@ -1393,7 +1394,7 @@ void MWC713::infoResults( QString currentAccountName, int64_t height,
 
 void MWC713::setSendResults(bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc) {
     if (success) {
-        appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, QString("You successfully sent slate " + slate +
+        notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO, QString("You successfully sent slate " + slate +
                                                                        " with " + mwc + " MWC to " + address));
     }
 
@@ -1409,7 +1410,7 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
         msg += " with message " + message + ".";
     }
     msg +=  " Slate:" + slate;
-    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, msg );
+    notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, msg );
 
     emit onSlateReceivedFrom(slate, mwc, fromAddr, message );
 
@@ -1429,7 +1430,7 @@ void MWC713::reportSlateReceivedFrom( QString slate, QString mwc, QString fromAd
 
 void MWC713::setSendFileResult( bool success, QStringList errors, QString fileName ) {
 
-    appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, QString("File transaction was initiated for "+ fileName ));
+    notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, QString("File transaction was initiated for "+ fileName ));
 
     logger::logEmit( "MWC713", "onSendFile", "success="+QString::number(success) );
     emit onSendFile(success, errors, fileName);
@@ -1437,7 +1438,7 @@ void MWC713::setSendFileResult( bool success, QStringList errors, QString fileNa
 
 void MWC713::setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn ) {
     if (success) {
-        appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, QString("File receive transaction was processed for " + inFileName));
+        notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO, QString("File receive transaction was processed for " + inFileName));
     }
 
     logger::logEmit( "MWC713", "onReceiveFile", "success="+QString::number(success) );
@@ -1446,7 +1447,7 @@ void MWC713::setReceiveFile( bool success, QStringList errors, QString inFileNam
 
 void MWC713::setFinalizeFile( bool success, QStringList errors, QString fileName ) {
     if (success) {
-        appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, QString("File finalized for " + fileName));
+        notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO, QString("File finalized for " + fileName));
     }
 
     logger::logEmit( "MWC713", "onFinalizeFile", "success="+QString::number(success) );
@@ -1455,7 +1456,7 @@ void MWC713::setFinalizeFile( bool success, QStringList errors, QString fileName
 
 void MWC713::setSubmitFile(bool success, QString message, QString fileName) {
     if (success) {
-        appendNotificationMessage(notify::MESSAGE_LEVEL::INFO, QString("Published transaction for " + fileName));
+        notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO, QString("Published transaction for " + fileName));
     }
 
     logger::logEmit( "MWC713", "setSubmitFile", "success="+QString::number(success) );
@@ -1511,7 +1512,7 @@ void MWC713::setTransCancelResult( bool success, const QString & account, int64_
 
 void MWC713::setSetReceiveAccount( bool ok, QString accountOrMessage ) {
     if (ok) {
-        appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+        notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                                   QString("Set receive account: '" + accountOrMessage + "'"));
         recieveAccount = accountOrMessage;
         const WalletConfig & config = getWalletConfig();
@@ -1525,9 +1526,9 @@ void MWC713::setSetReceiveAccount( bool ok, QString accountOrMessage ) {
 void MWC713::setCheckResult(bool ok, QString errors) {
 
     if (ok)
-        appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Account re-sync was finished successfully.");
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, "Account re-sync was finished successfully.");
     else
-        appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING, "Account re-sync has failed.");
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::WARNING, "Account re-sync has failed.");
 
     logger::logEmit( "MWC713", "onCheckResult", "ok="+QString::number(ok) );
     emit onCheckResult(ok, errors );
@@ -1722,7 +1723,7 @@ void MWC713::mwc713errorOccurred(QProcess::ProcessError error) {
         mwc713process = nullptr;
     }
 
-    appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
+    notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::FATAL_ERROR,
                      "mwc713 process exited. Process error: "+ QString::number(error) +
                      + "\n\nCommand line:\n\n" + commandLine);
 
@@ -1794,7 +1795,7 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
         inputParser->processInput("\n" + mwc::PROMPTS_MWC713 + "\n");
     }
     else {
-        appendNotificationMessage(notify::MESSAGE_LEVEL::FATAL_ERROR,
+        notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::FATAL_ERROR,
                                   errorMessage);
     }
 }
@@ -1805,7 +1806,7 @@ void MWC713::mwc713readyReadStandardError() {
     if (mwc713process) {
         QString str( ioutils::FilterEscSymbols( mwc713process->readAllStandardError() ) );
 
-        appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL,
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL,
                                    "mwc713 process report error:\n" + str );
     }
 }

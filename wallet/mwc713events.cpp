@@ -276,7 +276,7 @@ void Mwc713EventManager::timerEvent(QTimerEvent *event) {
 
         // report timeout error. Do it once
         taskExecutionTimeLimit = 0;
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::FATAL_ERROR,
                 "mwc713 unable to process the task '" + taskName + "'" );
     }
 }

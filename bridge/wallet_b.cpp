@@ -100,7 +100,7 @@ void Wallet::onStartingCommand(QString actionName) {
     emit sgnStartingCommand(actionName);
 }
 
-void Wallet::onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message) {
+void Wallet::onNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message) {
     emit sgnNewNotificationMessage(int(level), message);
 }
 

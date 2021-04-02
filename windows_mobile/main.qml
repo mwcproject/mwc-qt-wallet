@@ -62,6 +62,7 @@ Window {
         onSgnUpdateActionStates: {
             currentState = actionState
             navbarItem.updateTitle(currentState)
+            progressWndItem.visible = false
         }
     }
 
@@ -72,6 +73,7 @@ Window {
 
     function updateInitParams(newParams) {
         initParams = newParams
+        progressWndItem.visible = false
         if (currentState === 2 || currentState === 18) {
             const params = JSON.parse(initParams)
             if (params.currentStep)
@@ -349,6 +351,11 @@ Window {
 
     WalletStoppingMessageDlg {
         id: walletStoppingMessageDlg
+        anchors.fill: parent
+    }
+
+    ShowProofDlg {
+        id: showProofDlg
         anchors.fill: parent
     }
 

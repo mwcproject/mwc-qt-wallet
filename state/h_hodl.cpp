@@ -239,7 +239,7 @@ void Hodl::retrieveHodlBalance(const QString & hash) {
 void Hodl::onRootPublicKey( bool success, QString errMsg, QString rootPubKey, QString message, QString signature ) {
     if (!success) {
         // Let's rise the error.
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, errMsg );
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, errMsg );
         hideWaitingStatus();
         resetClaimState();
         return;
@@ -516,13 +516,13 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                 }
                 else {
                     context->hodlStatus->setError( TAG_CHECK_OUTPUTS, tag + " " + errorMessage);
-                    notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to get HODL output list. " + errorMessage );
+                    notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Unable to get HODL output list. " + errorMessage );
                 }
             }
         } else {
             context->hodlStatus->setError( TAG_CHECK_OUTPUTS, "Unable to request the HODL output info from " + hodlUrl +
                                                                     ".\nGet communication error: " + requestErrorMessage);
-            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to get HODL output list. We can't manage your outputs for sending" );
+            notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Unable to get HODL output list. We can't manage your outputs for sending" );
         }
 
         return;
@@ -553,7 +553,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                     }
                     else {
                         context->hodlStatus->setError( TAG_GET_HODL_REWARD, "Unable to process HODL reward data. Not found expected data.");
-                        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to process Hodl reward data. Not found expected data." );
+                        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Unable to process Hodl reward data. Not found expected data." );
                         success = false;
                         break;
                     }
@@ -566,7 +566,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
                 if (!errMsg.contains("Not registered", Qt::CaseInsensitive)) {
                     QString error = "Unable to retrieve HODL reward data. Error Code: " + errorCode + "; " + errMsg;
                     context->hodlStatus->setError(TAG_GET_HODL_REWARD, error);
-                    notify::appendNotificationMessage(notify::MESSAGE_LEVEL::CRITICAL, error);
+                    notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::CRITICAL, error);
                 }
             }
 
@@ -576,7 +576,7 @@ void Hodl::replyFinished(QNetworkReply* reply) {
         } else {
             context->hodlStatus->setError( TAG_GET_HODL_REWARD, "Unable to request available to claim HODL amount info from " + hodlUrl +
                                                             ".\nGet communication error: " + requestErrorMessage);
-            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Unable to get available to claim HODL amount." );
+            notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Unable to get available to claim HODL amount." );
         }
     }
 

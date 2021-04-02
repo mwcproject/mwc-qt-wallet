@@ -151,5 +151,6 @@
         <file>windows_mobile/FileTransactionReceive.qml</file>
         <file>windows_mobile/FileTransactionFinalize.qml</file>
         <file>windows_mobile/WalletStoppingMessageDlg.qml</file>
+        <file>windows_mobile/ShowProofDlg.qml</file>
     </qresource>
 </RCC>

@@ -56,7 +56,7 @@ QVector<notify::NotificationMessage> Events::getWalletNotificationMessages() {
     return notify::getNotificationMessages();
 }
 
-void Events::onNewNotificationMessage(notify::MESSAGE_LEVEL  level, QString message) {
+void Events::onNewNotificationMessage(bridge::MESSAGE_LEVEL  level, QString message) {
     Q_UNUSED(message);
 
     for (auto b : bridge::getBridgeManager()->getEvents())

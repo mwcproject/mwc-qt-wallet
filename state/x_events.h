@@ -38,7 +38,7 @@ public:
 public:
 
 private slots:
-    void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
+    void onNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message);
 
 protected:
     virtual NextStateRespond execute() override;

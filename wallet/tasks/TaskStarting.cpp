@@ -53,7 +53,7 @@ bool TaskStarting::processTask(const QVector<WEvent> & events) {
 
         if ( !init.empty() ) {
             // wallet need to be provisioned
-            notify::appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
+            notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::FATAL_ERROR,
                                                  "Wallet mwc713 in non initialized state. Internal error.");
             return true; // Done. Now it is UI problem to provision the wallet
         }
@@ -61,7 +61,7 @@ bool TaskStarting::processTask(const QVector<WEvent> & events) {
         if (need2unlock.empty()) {
             // Allow all wallets to be no password
             /*if (!config::isOnlineNode())
-                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
+                notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::FATAL_ERROR,
                                                  "Wallet mwc713 has a seed without a password. Did you initialize it manually? "
                                                  "To fix this problem you will need to reinitialize your wallet with a passphrase and a password.");*/
             wallet713->setLoginResult(true);
@@ -73,7 +73,7 @@ bool TaskStarting::processTask(const QVector<WEvent> & events) {
     }
 
     // Failure path. Just report a error
-    notify::appendNotificationMessage( notify::MESSAGE_LEVEL::FATAL_ERROR,
+    notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::FATAL_ERROR,
             "Unable to start backed wallet713. Please reinstall this app or clean up its data");
     return true;
 }

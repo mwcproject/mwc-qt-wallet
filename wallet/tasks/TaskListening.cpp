@@ -32,7 +32,7 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
         case S_YOUR_MWC_ADDRESS: {
             QString address = evt.message;
             if (address.length()==0) {
-                notify::appendNotificationMessage( notify::MESSAGE_LEVEL::WARNING,
+                notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::WARNING,
                                                       "mwc713 responded with empty MWC address" );
             }
             wallet713->setMwcAddress(address);

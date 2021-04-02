@@ -20,6 +20,7 @@
 #include <QVector>
 #include "WndManager.h"
 #include "MessageMapper.h"
+#include "../bridge/notification_b.h"
 
 namespace notify {
 
@@ -51,17 +52,17 @@ const int MESSAGE_SIZE_LIMIT = 1000;
 static QVector<NotificationMessage> notificationMessages;
 
 // Enum to string
-QString toString(MESSAGE_LEVEL level) {
+QString toString(bridge::MESSAGE_LEVEL level) {
     switch (level) {
-        case MESSAGE_LEVEL::FATAL_ERROR:
+        case bridge::MESSAGE_LEVEL::FATAL_ERROR:
             return "FATAL ERROR";
-        case MESSAGE_LEVEL::CRITICAL:
+        case bridge::MESSAGE_LEVEL::CRITICAL:
             return "CRITICAL";
-        case MESSAGE_LEVEL::WARNING:
+        case bridge::MESSAGE_LEVEL::WARNING:
             return "WARNING";
-        case MESSAGE_LEVEL::INFO:
+        case bridge::MESSAGE_LEVEL::INFO:
             return "INFO";
-        case MESSAGE_LEVEL::DEBUG:
+        case bridge::MESSAGE_LEVEL::DEBUG:
             return "DEBUG";
     }
     return "UNKNOWN";
@@ -73,22 +74,22 @@ QString toString(MESSAGE_LEVEL level) {
 
 QString NotificationMessage::getLevelStr() const {
     switch (level) {
-        case MESSAGE_LEVEL::FATAL_ERROR: return "Err";
-        case MESSAGE_LEVEL::CRITICAL:  return "Crit";
-        case MESSAGE_LEVEL::WARNING:   return "Warn";
-        case MESSAGE_LEVEL::INFO:      return "info";
-        case MESSAGE_LEVEL::DEBUG:     return "dbg";
+        case bridge::MESSAGE_LEVEL::FATAL_ERROR: return "Err";
+        case bridge::MESSAGE_LEVEL::CRITICAL:  return "Crit";
+        case bridge::MESSAGE_LEVEL::WARNING:   return "Warn";
+        case bridge::MESSAGE_LEVEL::INFO:      return "info";
+        case bridge::MESSAGE_LEVEL::DEBUG:     return "dbg";
         default:   Q_ASSERT(false); return "???";
     }
 }
 
 QString NotificationMessage::getLevelLongStr() const {
     switch (level) {
-        case MESSAGE_LEVEL::FATAL_ERROR: return "Error";
-        case MESSAGE_LEVEL::CRITICAL:  return "Critical";
-        case MESSAGE_LEVEL::WARNING:   return "Warning";
-        case MESSAGE_LEVEL::INFO:      return "Info";
-        case MESSAGE_LEVEL::DEBUG:     return "Debug";
+        case bridge::MESSAGE_LEVEL::FATAL_ERROR: return "Error";
+        case bridge::MESSAGE_LEVEL::CRITICAL:  return "Critical";
+        case bridge::MESSAGE_LEVEL::WARNING:   return "Warning";
+        case bridge::MESSAGE_LEVEL::INFO:      return "Info";
+        case bridge::MESSAGE_LEVEL::DEBUG:     return "Debug";
         default:   Q_ASSERT(false); return "???";
     }
 }
@@ -112,7 +113,7 @@ Notification * Notification::getObject2Notify() {
     return singletineNotification;
 }
 
-void Notification::sendNewNotificationMessage(MESSAGE_LEVEL level, QString message) {
+void Notification::sendNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message) {
     emit onNewNotificationMessage(level, message);
 }
 
@@ -125,10 +126,10 @@ QVector<NotificationMessage> getNotificationMessages() {
 
 // Generic. Reporting fatal error that somebody will process and exit app
 void reportFatalError( QString message )  {
-    appendNotificationMessage( MESSAGE_LEVEL::FATAL_ERROR, message );
+    appendNotificationMessage( bridge::MESSAGE_LEVEL::FATAL_ERROR, message );
 }
 
-void appendNotificationMessage( MESSAGE_LEVEL level, QString message ) {
+void appendNotificationMessage( bridge::MESSAGE_LEVEL level, QString message ) {
 
     logger::logInfo("Notification", toString(level) + "  " + message );
 
@@ -145,7 +146,7 @@ void appendNotificationMessage( MESSAGE_LEVEL level, QString message ) {
         message = m;
     }
 
-    if (level == MESSAGE_LEVEL::FATAL_ERROR) {
+    if (level == bridge::MESSAGE_LEVEL::FATAL_ERROR) {
         // Fatal error. Display message box and exiting. We don't want to continue
         core::getWndManager()->messageTextDlg("Wallet Error", "Wallet got a critical error:\n" + message + "\n\nPress OK to exit the wallet" );
         mwc::closeApplication();
@@ -153,9 +154,9 @@ void appendNotificationMessage( MESSAGE_LEVEL level, QString message ) {
     }
 
     // Message is not fatal, adding it into the logs
-    if (level == MESSAGE_LEVEL::CRITICAL) {
+    if (level == bridge::MESSAGE_LEVEL::CRITICAL) {
         if ( falseCriticalMessages.contains(message) )
-            level = MESSAGE_LEVEL::INFO;
+            level = bridge::MESSAGE_LEVEL::INFO;
     }
 
     NotificationMessage msg(level, message);

@@ -112,6 +112,8 @@ it is separated to another bridge.
 **bridge::Node**   (/mwc-qt-wallet/bridge/node_b.h) - Embedded node interface. Mobile now doesn't need it. 
 May be in the far future it can be used.
 
+**bridge::Notification**   (/mwc-qt-wallet/bridge/notification_b.h) - notify related functionality
+
 ## Panel Bridges
 
 Panels normally using Core functionality bridges and it's own bridge, that is covered by state functionality

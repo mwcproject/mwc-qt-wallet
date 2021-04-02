@@ -158,7 +158,7 @@ signals:
     void sgnStartingCommand(QString actionName);
 
     // Updates from the wallet and notification system
-    void sgnNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL values
+    void sgnNewNotificationMessage(int level, QString message); // level: bridge::MESSAGE_LEVEL values
     void sgnConfigUpdate();
     // keybaseOnline  is absolete, always false
     void sgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
@@ -225,7 +225,7 @@ private slots:
     void onStartingCommand(QString actionName);
 
     // Signals that comes from wallet & notification system
-    void onNewNotificationMessage(notify::MESSAGE_LEVEL level, QString message);
+    void onNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message);
     void onConfigUpdate();
     void onListeningStartResults( bool mqTry, bool tor,
                                   QStringList errorMessages, bool initialStart ); // error messages, if get some

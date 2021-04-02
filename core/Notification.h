@@ -18,14 +18,12 @@
 
 #include <QObject>
 #include <QDateTime>
+#include "../bridge/notification_b.h"
 
 namespace notify {
 
-// Report Message to the wallet.
-enum class MESSAGE_LEVEL { FATAL_ERROR=1, CRITICAL=2, WARNING=3, INFO=4, DEBUG=5 };
-
 // Enum to string
-QString toString(MESSAGE_LEVEL level);
+QString toString(bridge::MESSAGE_LEVEL level);
 
 // Some notifications can have different meaning because of the state. For example when we stop/start node, mwc713 error connection messages are expected.
 enum NOTIFICATION_STATES { ONLINE_NODE_IMPORT_EXPORT_DATA = 0x0001 };
@@ -37,19 +35,19 @@ void addFalseMessage(const QString & msg);
 void remeoveFalseMessage(const QString & msg);
 
 struct NotificationMessage {
-    MESSAGE_LEVEL level = MESSAGE_LEVEL::DEBUG;
+    bridge::MESSAGE_LEVEL level = bridge::MESSAGE_LEVEL::DEBUG;
     QString message;
     QDateTime time;
 
     NotificationMessage() {time=QDateTime::currentDateTime();}
-    NotificationMessage(MESSAGE_LEVEL _level, QString _message) : level(_level), message(_message) { time = QDateTime::currentDateTime(); }
+    NotificationMessage(bridge::MESSAGE_LEVEL _level, QString _message) : level(_level), message(_message) { time = QDateTime::currentDateTime(); }
     NotificationMessage(const NotificationMessage&) = default;
     NotificationMessage &operator=(const NotificationMessage&) = default;
 
     QString getLevelStr() const;
     QString getLevelLongStr() const;
 
-    static bool isCritical(MESSAGE_LEVEL l) {return l<=MESSAGE_LEVEL::WARNING;}
+    static bool isCritical(bridge::MESSAGE_LEVEL l) {return l<=bridge::MESSAGE_LEVEL::WARNING;}
     bool isCritical() const {return isCritical(level);}
 
     // To debug string
@@ -64,7 +62,7 @@ public:
     // Needed to listen for notification, use this instance for that...
     static Notification * getObject2Notify();
 
-    void sendNewNotificationMessage(MESSAGE_LEVEL level, QString message);
+    void sendNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message);
 
 private:
     Notification();
@@ -72,7 +70,7 @@ private:
 private:
 signals:
     // Notification/error message
-    void onNewNotificationMessage(MESSAGE_LEVEL level, QString message);
+    void onNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message);
 
 };
 
@@ -84,13 +82,13 @@ void reportFatalError( QString message );
 QVector<NotificationMessage> getNotificationMessages();
 
 
-void appendNotificationMessage( MESSAGE_LEVEL level, QString message );
+void appendNotificationMessage( bridge::MESSAGE_LEVEL level, QString message );
 
 
 
 }
 
-Q_DECLARE_METATYPE(notify::MESSAGE_LEVEL );
+Q_DECLARE_METATYPE(bridge::MESSAGE_LEVEL );
 
 
 #endif //MWC_QT_WALLET_NOTIFICATION_H

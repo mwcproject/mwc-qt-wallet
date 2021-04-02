@@ -81,7 +81,7 @@ private slots:
     void onSgnVerifyProofResult(bool success, QString fn, QString msg );
 
     void onSgnNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, QString totalDifficulty, int connections );
-    void onSgnNewNotificationMessage(int level, QString message); // level: notify::MESSAGE_LEVEL values
+    void onSgnNewNotificationMessage(int level, QString message); // level: bridge::MESSAGE_LEVEL values
 
     void onSgnRepost( int idx, QString err );
 

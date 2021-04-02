@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include "../state/state.h"
 #include <QJsonDocument>
+#include <QStandardPaths>
 #include <QDebug>
 
 namespace core {
@@ -140,7 +141,7 @@ QString MobileWndManager::getSaveFileName(const QString &caption, const QString 
     Q_UNUSED(filter)
 
     QDateTime now;
-    QString fileName = "/storage/emulated/0/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm");
+    QString fileName = "/storage/emulated/0/Android/data/mw.mwc.wallet/files/Download/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm");
     return fileName;
 }
 

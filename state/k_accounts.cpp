@@ -93,7 +93,7 @@ void Accounts::timerEvent(QTimerEvent *event) {
 
     if ( isNodeHealthy() ) {
         if (!lastNodeIsHealty) {
-            notify::appendNotificationMessage(notify::MESSAGE_LEVEL::INFO,
+            notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                                               "MWC-Node that wallet connected to is healthy now. Wallet can validate stored data with blockchain.");
             lastNodeIsHealty = true;
         }
@@ -103,7 +103,7 @@ void Accounts::timerEvent(QTimerEvent *event) {
     }
     else {
         if (lastNodeIsHealty) {
-            notify::appendNotificationMessage(notify::MESSAGE_LEVEL::WARNING,
+            notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::WARNING,
                                               "Wallet connected to not healthy MWC-Node. Your balance, transactions and output status might be not accurate");
             lastNodeIsHealty = false;
         }

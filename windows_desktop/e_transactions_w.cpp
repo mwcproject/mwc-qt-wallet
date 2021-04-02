@@ -318,11 +318,11 @@ void Transactions::onSgnRepost( int idx, QString err ) {
     ui->transactionTable->show();
 
     if (err.isEmpty()) {
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::INFO, "Transaction #" + QString::number(idx+1) + " was successfully reposted." );
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, "Transaction #" + QString::number(idx+1) + " was successfully reposted." );
         core::getWndManager()->messageTextDlg("Repost", "Transaction #" + QString::number(idx+1) + " was successfully reposted." );
     }
     else {
-        notify::appendNotificationMessage( notify::MESSAGE_LEVEL::CRITICAL, "Failed to repost transaction #" + QString::number(idx+1) + ". " + err );
+        notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Failed to repost transaction #" + QString::number(idx+1) + ". " + err );
         core::getWndManager()->messageTextDlg("Repost", "Failed to repost transaction #" + QString::number(idx+1) + ".\n\n" + err );
     }
 }
@@ -655,7 +655,7 @@ void Transactions::onSgnWalletBalanceUpdated() {
     ui->accountComboBox->setCurrentIndex(selectedAccIdx);
 }
 
-void Transactions::onSgnNewNotificationMessage(int level, QString message) // level: notify::MESSAGE_LEVEL values
+void Transactions::onSgnNewNotificationMessage(int level, QString message) // level: bridge::MESSAGE_LEVEL values
 {
     Q_UNUSED(level)
     if (message.contains("Changing transaction")) {

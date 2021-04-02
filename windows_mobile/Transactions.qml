@@ -4,6 +4,7 @@ import WalletBridge 1.0
 import TransactionsBridge 1.0
 import ConfigBridge 1.0
 import UtilBridge 1.0
+import NotificationBridge 1.0
 
 Item {
     id: transactionsItem
@@ -16,6 +17,8 @@ Item {
     property var type_TRANSACTION_SEND: 1
     property var number_COIN_BASE_CONFIRM: 1440
     property var locale: Qt.locale()
+    property var message_LEVEL_INFO: 4
+    property var message_LEVEL_CRITICAL: 2
 
     WalletBridge {
         id: wallet
@@ -31,6 +34,10 @@ Item {
 
     UtilBridge {
         id: util
+    }
+
+    NotificationBridge {
+        id: notification
     }
 
     Connections {
@@ -76,6 +83,30 @@ Item {
                 requestTransactions()
             }
         }
+
+        onSgnRepost: (idx, err) => {
+            rect_progress.visible = false
+            transactionList.visible = true
+
+            if (err === "") {
+                notification.appendNotificationMessage(message_LEVEL_INFO, "Transaction #" + Number(idx+1).toString() + " was successfully reposted.")
+                messagebox.open("Repost", "Transaction #" + Number(idx + 1).toString() + " was successfully reposted.")
+            } else {
+                notification.appendNotificationMessage(message_LEVEL_CRITICAL, "Failed to repost transaction #" + Number(idx+1).toString() + ". " + err)
+                messagebox.open("Repost", "Failed to repost transaction #" + Number(idx+1).toString() + ".\n\n" + err)
+            }
+        }
+
+        onSgnCancelTransacton: (success, account, trIdxStr, errMessage) => {
+            rect_progress.visible = true
+            transactionList.visible = false
+            const trIdx = parseInt(trIdxStr)
+            if (success) {
+                requestTransactions()
+            } else {
+                messagebox.open("Failed to cancel transaction", "Cancel request for transaction number " + Number(trIdx + 1).toString() + " has failed.\n\n")
+            }
+        }
     }
 
     onVisibleChanged: {
@@ -84,6 +115,16 @@ Item {
            requestTransactions()
            updateData()
         }
+    }
+
+    function txRepost(txIdx) {
+        wallet.repost(wallet.getCurrentAccountName(), txIdx, config.isFluffSet())
+        rect_progress.visible = true
+        transactionList.visible = false
+    }
+
+    function txCancel(txIdx) {
+        wallet.requestCancelTransacton(wallet.getCurrentAccountName(), Number(txIdx).toString())
     }
 
     function requestTransactions() {
