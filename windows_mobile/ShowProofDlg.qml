@@ -5,6 +5,7 @@ import ConfigBridge 1.0
 Item {
     property string blockExplorerUrl
     property var proof
+    property bool isTxDetailView: false
 
     id: showProofDlg
     visible: false
@@ -72,7 +73,8 @@ Item {
         text_outputs.text = proofInfo.output
         text_kernel.text = proofInfo.kernel
         blockExplorerUrl = config.getBlockExplorerUrl(config.getNetwork())
-        rect_dialog.height = dp(535) + text_warning.height
+        rect_dialog.height = dp(520) + text_location.height + text_warning.height
+        isTxDetailView = transactionDetail.visible
         transactionDetail.visible = false
         showProofDlg.visible = true
     }
@@ -131,6 +133,9 @@ Item {
                 anchors.top: label_location.bottom
                 font.pixelSize: dp(15)
                 anchors.leftMargin: dp(20)
+                anchors.right: parent.right
+                anchors.rightMargin: dp(20)
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
 
             Rectangle {
@@ -312,7 +317,10 @@ Item {
 
                 onClicked: {
                     showProofDlg.visible = false
-                    transactionDetail.visible = true
+                    if (isTxDetailView) {
+                        isTxDetailView = false
+                        transactionDetail.visible = true
+                    }
                 }
             }
         }
