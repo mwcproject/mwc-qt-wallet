@@ -38,7 +38,7 @@ Item {
             if (success) {
                 const proof = showProofDlg.parseProofText(msg)
                 if (proof) {
-                    showProofDlg.open(fn, proof)
+                    showProofDlg.open(fn, proof, true)
                 }
                 else {
                     messagebox.open("Failure", "Internal error. Unable to decode the results of the proof located at  " + fn + "\n\n" + msg)
@@ -436,8 +436,9 @@ Item {
                         if (!tx2process.proof) {
                             messagebox.open("Need info", "Please select qualify transaction to generate a proof.")
                         } else {
-                            const fileName = util.getSaveFileName("Create transaction proof file", "Transactions", "transaction proof (*.proof)", ".proof")
-                            if (fileName === "") return
+//                            const fileName = util.getSaveFileName("Create transaction proof file", "Transactions", "transaction proof (*.proof)", ".proof")
+//                            if (fileName === "") return
+                            const fileName = "/storage/emulated/0/Android/data/mw.mwc.wallet/files/Download/" + tx2process.txid + ".proof"
                             wallet.generateTransactionProof(Number(tx2process.txIdx).toString(), fileName)
                         }
                     }

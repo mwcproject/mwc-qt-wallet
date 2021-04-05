@@ -66,7 +66,7 @@ Item {
         }
     }
 
-    function open(fileName, proofInfo) {
+    function open(fileName, proofInfo, isExport = false) {
         proof = proofInfo
         text_location.text = fileName
         text_info.text = 'this file proves that <b>'+ proofInfo.mwc + 'MWCs</b> was sent to<br /><b>' + proofInfo.toAddress + '</b><br/>from<br/><b>' + proofInfo.fromAddress
@@ -77,6 +77,11 @@ Item {
         isTxDetailView = transactionDetail.visible
         transactionDetail.visible = false
         showProofDlg.visible = true
+        if (isExport) {
+            text_title.text = "Proof Exported"
+        } else {
+            text_title.text = "Transaction Proof"
+        }
     }
 
     Rectangle {
