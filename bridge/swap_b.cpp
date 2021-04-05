@@ -393,30 +393,33 @@ void Swap::showNewTrade2() {
 void Swap::applyNewTrade1Params(QString account, QString secCurrency, QString mwcAmount, QString secAmount,
                                       QString secAddress, QString sendToAddress, bool lockMwcFirst ) {
 
-    while(sendToAddress.endsWith("/"))
-        sendToAddress = sendToAddress.left(sendToAddress.length()-1);
-
-    QPair< QString, util::ADDRESS_TYPE > addressRes = util::verifyAddress(sendToAddress);
-    if ( !addressRes.first.isEmpty() ) {
-        emit sgnApplyNewTrade1Params (false, "Unable to parse the other wallet address " + sendToAddress + ", " + addressRes.first );
-        return;
-    }
-
     QString addrType;
 
-    switch (addressRes.second) {
-        case util::ADDRESS_TYPE::MWC_MQ: {
-            addrType = "mwcmqs";
-            break;
-        }
-        case util::ADDRESS_TYPE::TOR: {
-            addrType = "tor";
-            break;
-        }
-        default: {
-            emit sgnApplyNewTrade1Params(false, "Automated swaps working only with MQS and TOR addresses.");
-            return;
+    if (!sendToAddress.isEmpty()) {
+        while (sendToAddress.endsWith("/"))
+            sendToAddress = sendToAddress.left(sendToAddress.length() - 1);
 
+        QPair<QString, util::ADDRESS_TYPE> addressRes = util::verifyAddress(sendToAddress);
+        if (!addressRes.first.isEmpty()) {
+            emit sgnApplyNewTrade1Params(false, "Unable to parse the other wallet address " + sendToAddress + ", " +
+                                                addressRes.first);
+            return;
+        }
+
+        switch (addressRes.second) {
+            case util::ADDRESS_TYPE::MWC_MQ: {
+                addrType = "mwcmqs";
+                break;
+            }
+            case util::ADDRESS_TYPE::TOR: {
+                addrType = "tor";
+                break;
+            }
+            default: {
+                emit sgnApplyNewTrade1Params(false, "Automated swaps working only with MQS and TOR addresses.");
+                return;
+
+            }
         }
     }
 
@@ -438,7 +441,7 @@ void Swap::applyNewTrade1Params(QString account, QString secCurrency, QString mw
                                     "",
                                     "",
                                     true,
-                                    "applyNewTrade1Params",
+                                    sendToAddress.isEmpty() ? "mktPlaceNewOffer" : "applyNewTrade1Params",
                                     {account, secCurrency, mwcAmount, secAmount, secAddress, sendToAddress} );
 
 
@@ -514,6 +517,13 @@ void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> param
         if (errMsg.isEmpty()) {
             getSwap()->applyNewTrade22Params( params[0] );
         }
+        return;
+    }
+    else if  (tag == "mktPlaceNewOffer") {
+        Q_ASSERT(dryRun);
+        Q_ASSERT(params.size()==6);
+        // Enough to report, callet will continue
+        emit sgnApplyNewTrade1Params(errMsg.isEmpty(), errMsg);
         return;
     }
     // Just a message from different request.
@@ -599,6 +609,23 @@ double Swap::getSecMinTransactionFee() {
 }
 double Swap::getSecMaxTransactionFee() {
     return getSwap()->getSecMaxTransactionFee();
+}
+
+double Swap::getSecTransactionFee(QString secCurrency) {
+    return getSwap()->getSecTransactionFee(secCurrency);
+}
+double Swap::getSecMinTransactionFee(QString secCurrency) {
+    return getSwap()->getSecMinTransactionFee(secCurrency);
+}
+double Swap::getSecMaxTransactionFee(QString secCurrency) {
+    return getSwap()->getSecMaxTransactionFee(secCurrency);
+}
+
+int Swap::getMwcConfNumber(double mwcAmount) {
+    return getSwap()->getMwcConfNumber(mwcAmount);
+}
+int Swap::getSecConfNumber(QString secCurrency) {
+    return getSwap()->getSecConfNumber(secCurrency);
 }
 
 int Swap::getMwcConfNumber() {

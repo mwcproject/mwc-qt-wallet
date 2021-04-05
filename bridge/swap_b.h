@@ -23,7 +23,7 @@ namespace bridge {
 class Swap : public QObject {
 Q_OBJECT
 public:
-    explicit Swap(QObject *parent = nullptr);
+    explicit Swap(QObject *parent);
     ~Swap();
 
     // Return back to the trade list page
@@ -134,9 +134,15 @@ public:
     Q_INVOKABLE double getSecTransactionFee();
     Q_INVOKABLE double getSecMinTransactionFee();
     Q_INVOKABLE double getSecMaxTransactionFee();
+    Q_INVOKABLE double getSecTransactionFee(QString secCurrency);
+    Q_INVOKABLE double getSecMinTransactionFee(QString secCurrency);
+    Q_INVOKABLE double getSecMaxTransactionFee(QString secCurrency);
     Q_INVOKABLE int getMwcConfNumber();
     Q_INVOKABLE int getSecConfNumber();
     Q_INVOKABLE QString getElectrumXprivateUrl();
+
+    Q_INVOKABLE int getMwcConfNumber(double mwcAmount);
+    Q_INVOKABLE int getSecConfNumber(QString secCurrency);
 
     Q_INVOKABLE QString getNote();
     Q_INVOKABLE void setNote(QString note);

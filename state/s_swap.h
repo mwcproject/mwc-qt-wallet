@@ -22,32 +22,11 @@
 #include "../util/httpclient.h"
 #include <QThread>
 
+namespace core {
+class TimerThread;
+}
+
 namespace state {
-
-//////////////////////////////////////////////////////////////
-// Timer thread.
-
-// Very specific class. Make it pulbilly available only because of QT magic.
-// QT magic works great only if class has both declaration and implementation in different files.
-class TimerThread : public QThread {
-Q_OBJECT
-public:
-    TimerThread(QObject * parent, long _interval);
-    virtual ~TimerThread();
-
-    void stop();
-protected:
-    void run();
-private:
-signals:
-    void onTimerEvent();
-
-private:
-    long interval = 1000;
-    bool alive = true;
-};
-/////////////////////////////////////////////////////////////
-
 
 struct AutoswapTask {
     QString swapId;
@@ -139,8 +118,15 @@ public:
     int getSecConfNumber() const {return newSwapSecConfNumber;}
     QString getElectrumXprivateUrl() const {return newSwapElectrumXUrl;}
 
+    double getSecTransactionFee(const QString & secCurrency) const;
+    double getSecMinTransactionFee(const QString & secCurrency) const;
+    double getSecMaxTransactionFee(const QString & secCurrency) const;
+
+    int getMwcConfNumber(double mwcAmount) const;
+    int getSecConfNumber(const QString & secCurrency) const;
+
     // Calculate the locking time for a NEW not yet created swap offer.
-    QVector<QString> getLockTime( QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks );
+    static QVector<QString> getLockTime( QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks );
 
     // Accept a new trade and start run it. By that moment the trade must abe reviews and all set
     void acceptTheTrade(QString swapId);
@@ -179,7 +165,7 @@ private:
     // Start trade to run
     void runTrade(QString swapId, QString statusCmd);
 
-    int calcConfirmationsForMwcAmount(double mwcAmount);
+    int calcConfirmationsForMwcAmount(double mwcAmount) const;
 
     // Request latest fees for the coins
     void updateFeesIsNeeded();
@@ -214,7 +200,7 @@ slots:
 
     void onTimerEvent();
 private:
-    TimerThread * timer = nullptr;
+    core::TimerThread * timer = nullptr;
 
     // Key: swapId,  Value: running Task
     QMap<QString, AutoswapTask> runningSwaps;

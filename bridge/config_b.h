@@ -178,6 +178,16 @@ public:
     // Lock outputs for slatepacks send
     Q_INVOKABLE bool getSendLockOutput();
     Q_INVOKABLE void setSendLockOutput(bool lock);
+
+    Q_INVOKABLE int getMktPlaceSelectedBtn();
+    Q_INVOKABLE void setMktPlaceSelectedBtn(int btn);
+
+    Q_INVOKABLE void setSwapMktFilter( double minFeeLevel, bool selling, const QString & currency, double minMwcAmount, double maxMwcAmount);
+    Q_INVOKABLE double getSwapMktMinFeeLevel();
+    Q_INVOKABLE bool getSwapMktSelling();
+    Q_INVOKABLE QString getSwapMktCurrency();
+    Q_INVOKABLE double getSwapMktMinMwcAmount();
+    Q_INVOKABLE double getSwapMktMaxMwcAmount();
 };
 
 }

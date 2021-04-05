@@ -409,6 +409,89 @@ struct ListenerStatus {
     ListenerStatus & operator = (const ListenerStatus & item) = default;
 };
 
+struct IntegrityFees {
+    bool confirmed = false;
+    int64_t expiration_height = -1;
+    int64_t ask_fee = -1;
+    int64_t fee = -1;
+    QString uuid;
+
+    IntegrityFees() = default;
+    IntegrityFees(const IntegrityFees & item) = default;
+    IntegrityFees & operator = (const IntegrityFees & item) = default;
+
+    IntegrityFees(bool _confirmed,
+        int64_t _expiration_height,
+        int64_t _ask_fee,
+        int64_t _fee,
+        QString _uuid) :
+            confirmed(_confirmed),
+            expiration_height(_expiration_height),
+            ask_fee(_ask_fee),
+            fee(_fee),
+            uuid(_uuid)
+        {}
+
+    IntegrityFees(QString jsonString);
+    IntegrityFees(QJsonObject json);
+
+    double toDblFee() const {return fee / 1000000000.0;}
+
+    QJsonObject toJSon() const;
+    QString toJSonStr() const;
+};
+
+struct BroadcastingMessage {
+    QString uuid;
+    int broadcasting_interval = -1;
+    int64_t fee = 0;
+    QString message;
+    int published_time;
+
+    // {"broadcasting_interval":60,"fee":"10000000","message":"{}","published_time":49,"uuid":"7f0a6a89-5ad5-40cb-b204-0805ffcd1903"}
+    BroadcastingMessage(const QJsonObject & json);
+    BroadcastingMessage() = default;
+    BroadcastingMessage(const BroadcastingMessage & item) = default;
+    BroadcastingMessage & operator = (const BroadcastingMessage & item) = default;
+};
+
+struct MessagingStatus {
+    QVector<BroadcastingMessage> broadcasting;
+    bool connected = false;
+    QStringList gossippub_peers;
+    int received_messages = 0;
+    QStringList topics;
+
+    // {"broadcasting":[{"broadcasting_interval":60,"fee":"10000000","message":"{}","published_time":49,"uuid":"7f0a6a89-5ad5-40cb-b204-0805ffcd1903"}],"gossippub_peers":null,"received_messages":0,"topics":["swapmarketplace","testing"]}
+    MessagingStatus(const QJsonObject & json);
+    MessagingStatus() = default;
+    MessagingStatus(const MessagingStatus & item) = default;
+    MessagingStatus & operator = (const MessagingStatus & item) = default;
+
+    // Status for logs
+    QString toString() const;
+};
+
+struct ReceivedMessages {
+    QString topic;   // Topic where we received the message
+    int64_t fee;     // fee that was paid
+    QString message; // message that received
+    QString wallet;  // wallet onion address
+
+    ReceivedMessages(QString _topic,
+            int64_t _fee,
+            QString _message,
+            QString _wallet) :
+            topic(_topic),
+            fee(_fee),
+            message(_message),
+            wallet(_wallet) {}
+
+    ReceivedMessages() = default;
+    ReceivedMessages(const ReceivedMessages & item) = default;
+    ReceivedMessages & operator = (const ReceivedMessages & item) = default;
+};
+
 // Interface to wallet functionality
 class Wallet : public QObject
 {
@@ -736,6 +819,46 @@ public:
     // Check Signal: onDecodeSlatepack( QString tag, QString error, QString slateJSon, QString content, QString sender, QString receiver )
     virtual void decodeSlatepack(QString slatepackContent, QString tag) = 0;
 
+    // Pay fees, validate fees.
+    // Check signal: onCreateIntegrityFee(QString err, QVector<IntegrityFees> result);
+    virtual void createIntegrityFee( const QString & account, double mwcReserve, const QVector<double> & fees ) = 0;
+
+    // Request info about paid integrity fees
+    // Check Signal: onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees)
+    virtual void requestIntegrityFees() = 0;
+
+    // Request withdraw for available deposit at integrity account.
+    // Check Signal: onWithdrawIntegrityFees(QString error)
+    virtual void withdrawIntegrityFees(const QString & account) = 0;
+
+    // Status of the messaging
+    // Check Signal: onRequestMessagingStatus(MessagingStatus status)
+    virtual void requestMessagingStatus() = 0;
+
+    // Publish new json message
+    // Check Signal: onMessagingPublish(QString id, QString uuid, QString error)
+    virtual void messagingPublish(QString messageJsonStr, QString feeTxUuid, QString id, int publishInterval) = 0;
+
+    // Check integrity of published messages.
+    // Check Signal:  onCheckIntegrity(QVector<QString> expiredMsgUuid)
+    virtual void checkIntegrity() = 0;
+
+    // Stop publishing the message
+    // Check Signal: onMessageWithdraw(QString uuid, QString error)
+    virtual void messageWithdraw(QString uuid) = 0;
+
+    // Request messages from the receive buffer
+    // Check Signal: onReceiveMessages(QString error, QVector<ReceivedMessages>)
+    virtual void requestReceiveMessages(bool cleanBuffer) = 0;
+
+    // Start listening on the libp2p topic
+    // Check Signal: onStartListenOnTopic(QString error);
+    virtual void startListenOnTopic(const QString & topic) = 0;
+
+    // Stop listening on the libp2p topic
+    // Check Signal: onStopListenOnTopic(QString error);
+    virtual void stopListenOnTopic(const QString & topic) = 0;
+
 private:
 signals:
     // Wallet doing something. This message is needed for the progress.
@@ -889,6 +1012,36 @@ signals:
 
     // Response to decodeSlatepack
     void onDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
+
+    // Response from createIntegrityFee
+    void onCreateIntegrityFee(QString err, QVector<IntegrityFees> result);
+
+    // Response from requestIntegrityFees
+    void onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees);
+
+    // Response from withdrawIntegrityFees
+    void onWithdrawIntegrityFees(QString error, double mwc, QString account);
+
+    // Response from requestMessagingStatus
+    void onRequestMessagingStatus(QString error, MessagingStatus status);
+
+    // Response from messagingPublish
+    void onMessagingPublish(QString id, QString uuid, QString error);
+
+    // Response from checkIntegrity
+    void onCheckIntegrity(QString error, QVector<QString> expiredMsgUuid);
+
+    // Response from messageWithdraw
+    void onMessageWithdraw(QString uuid, QString error);
+
+    // Response from requestReceiveMessages
+    void onReceiveMessages(QString error, QVector<ReceivedMessages>);
+
+    // Response from startListenOnTopic
+    void onStartListenOnTopic(QString error);
+
+    // Response from stopListenOnTopic
+    void onStopListenOnTopic(QString error);
 };
 
 }
@@ -899,5 +1052,9 @@ Q_DECLARE_METATYPE(wallet::SwapInfo);
 Q_DECLARE_METATYPE(wallet::SwapTradeInfo);
 Q_DECLARE_METATYPE(wallet::SwapExecutionPlanRecord);
 Q_DECLARE_METATYPE(wallet::SwapJournalMessage);
+Q_DECLARE_METATYPE(wallet::IntegrityFees);
+Q_DECLARE_METATYPE(wallet::BroadcastingMessage);
+Q_DECLARE_METATYPE(wallet::MessagingStatus);
+Q_DECLARE_METATYPE(wallet::ReceivedMessages);
 
 #endif // MWCWALLET_H

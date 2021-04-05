@@ -71,8 +71,6 @@ Outputs::Outputs(QWidget *parent) :
 
     QString accName = updateAccountsData();
 
-    canLockOutputs = config->isLockOutputEnabled();
-
     requestOutputs(accName);
 }
 
@@ -346,9 +344,6 @@ void Outputs::on_showUnspent_clicked() {
 
 // return "N/A, YES, "NO"
 QString Outputs::calcLockedState(const wallet::WalletOutput & output) {
-    if (!canLockOutputs)
-        return "N/A";
-
     QString lockState = "N/A";
     if (output.isUnspent()) {
             lockState = config->isLockedOutput(output.outputCommitment) ? "YES" : "NO";

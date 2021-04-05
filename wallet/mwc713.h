@@ -349,6 +349,47 @@ public:
     // Decode the slatepack data (or validate slate json) are respond with Slate SJon that can be processed
     // Check Signal: onDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient )
     virtual void decodeSlatepack(QString slatepackContent, QString tag) override;
+
+    // Pay fees, validate fees.
+    // Check signal: onCreateIntegrityFee(QString err, int64_t balance, QVector<IntegrityFees> result);
+    virtual void createIntegrityFee( const QString & account, double mwcReserve, const QVector<double> & fees ) override;
+
+    // Request info about paid integrity fees
+    // Check Signal: onRequestIntegrityFees()
+    virtual void requestIntegrityFees() override;
+
+    // Request withdraw for available deposit at integrity account.
+    // Check Signal: onWithdrawIntegrityFees(QString error)
+    virtual void withdrawIntegrityFees(const QString & account) override;
+
+    // Status of the messaging
+    // Check Signal: onRequestMessagingStatus(MessagingStatus status)
+    virtual void requestMessagingStatus() override;
+
+    // Publish new json message
+    // Check Signal: onMessagingPublish(QString id, QString uuid, QString error)
+    virtual void messagingPublish(QString messageJsonStr, QString feeTxUuid, QString id, int publishInterval) override;
+
+    // Check integrity of published messages.
+    // Check Signal:  onCheckIntegrity(QVector<QString> expiredMsgUuid)
+    virtual void checkIntegrity() override;
+
+    // Stop publishing the message
+    // Check Signal: onMessageWithdraw(QString uuid, QString error)
+    virtual void messageWithdraw(QString uuid) override;
+
+    // Request messages from the receive buffer
+    // Check Signal: onReceiveMessages(QString error, QVector<ReceivedMessages>)
+    virtual void requestReceiveMessages(bool cleanBuffer) override;
+
+    // Start listening on the libp2p topic
+    // Check Signal: onStartListenOnTopic(QString error);
+    virtual void startListenOnTopic(const QString & topic) override;
+
+    // Stop listening on the libp2p topic
+    // Check Signal: onStopListenOnTopic(QString error);
+    virtual void stopListenOnTopic(const QString & topic) override;
+
 public:
     // launch exit command.
     void launchExitCommand();
@@ -489,6 +530,27 @@ public:
     void setRepost(int txIdx, QString err);
 
     void setDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
+
+    void setCreateIntegrityFee(QString err, QVector<IntegrityFees> result);
+
+    void setRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees);
+
+    void setWithdrawIntegrityFees(QString error, double mwc, QString account );
+
+    void setRequestMessagingStatus(QString error, wallet::MessagingStatus status);
+
+    void setMessagingPublish(QString id, QString uuid, QString error);
+
+    void setCheckIntegrity(QString error, QVector<QString> expiredMsgUuid);
+
+    void setMessageWithdraw(QString uuid, QString error);
+
+    void setReceiveMessages(QString error, QVector<ReceivedMessages> msgs);
+
+    void setStartListenOnTopic(QString error);
+
+    void setStopListenOnTopic(QString error);
+
 private:
     // Request sync (update_wallet_state) if it is not at the task Q.
     QVector<QPair<Mwc713Task*,int64_t>> create_sync_if_need(bool showSyncProgress, bool enforce);

@@ -23,6 +23,7 @@
 #include <QDateTime>
 #include "../bridge/swap_b.h"
 #include <QThread>
+#include "../core/TimerThread.h"
 
 namespace state {
 
@@ -31,9 +32,9 @@ struct SecCurrencyInfo {
     int     blockIntervalSec;
     int     confNumber;
     QString feeUnits;
-    double  fxFee; // -1.0 - need to use API
-    double  fxFeeMin;
-    double  fxFeeMax;
+    double  txFee; // -1.0 - need to use API
+    double  txFeeMin;
+    double  txFeeMax;
     int64_t txFeeUpdateTime = 0;
     double  minAmount; // Minimal amount for secondary currency. We don't want dust transaction
 
@@ -46,17 +47,17 @@ struct SecCurrencyInfo {
         int _confNumber,
         const double & _minAmount,
         const QString & _feeUnits,
-        const double & _fxFee,
-        const double & _fxFeeMin,
-        const double & _fxFeeMax
+        const double & _txFee,
+        const double & _txFeeMin,
+        const double & _txFeeMax
     ) :
             currency(_currency),
             blockIntervalSec(_blockIntervalSec),
             confNumber(_confNumber),
             feeUnits(_feeUnits),
-            fxFee(_fxFee),
-            fxFeeMin(_fxFeeMin),
-            fxFeeMax(_fxFeeMax),
+            txFee(_txFee),
+            txFeeMin(_txFeeMin),
+            txFeeMax(_txFeeMax),
             minAmount(_minAmount)
     {}
 };
@@ -75,7 +76,7 @@ static QVector<SecCurrencyInfo> SWAP_CURRENCY_LIST = {
         SecCurrencyInfo("Doge", 60, 20, 100.0, "doge", 3.0, 0.1, 20.0 ),
 };
 
-static SecCurrencyInfo getCurrencyInfo(QString currency) {
+static SecCurrencyInfo getCurrencyInfo(const QString & currency) {
     for (const auto & wcl : SWAP_CURRENCY_LIST) {
         if (wcl.currency == currency)
             return wcl;
@@ -84,30 +85,6 @@ static SecCurrencyInfo getCurrencyInfo(QString currency) {
     return SWAP_CURRENCY_LIST[0];
 }
 
-//////////////////////////////////////////////////////////////
-// Timer thread.
-
-// We don't want it to be dependent. QT unable to delete it nicely.
-// Let QT handle that on connections level
-TimerThread::TimerThread(QObject * parent, long _interval) : QThread(parent), interval(_interval) {alive = true;}
-
-TimerThread::~TimerThread() {}
-
-void TimerThread::stop() {
-    alive=false;
-}
-
-void TimerThread::run() {
-    int k = 0;
-    while (alive) {
-        QThread::msleep(interval/10);
-        if (k>10) {
-            emit onTimerEvent();
-            k=0;
-        }
-        k++;
-    }
-}
 
 /////////////////////////////////////////////////////////////
 
@@ -126,8 +103,8 @@ Swap::Swap(StateContext * context) :
     // You get an offer to swap BCH to MWC. SwapID is ffa15dbd-85a9-4fc9-a3c0-4cfdb144862b
     // Listen to a new swaps...
 
-    timer = new TimerThread(this, 1000);
-    QObject::connect( timer, &TimerThread::onTimerEvent, this, &Swap::onTimerEvent, Qt::QueuedConnection );
+    timer = new core::TimerThread(this, 1000);
+    QObject::connect( timer, &core::TimerThread::onTimerEvent, this, &Swap::onTimerEvent, Qt::QueuedConnection );
     timer->start();
 
     updateFeesIsNeeded();
@@ -325,7 +302,7 @@ void Swap::updateFeesIsNeeded() {
     int64_t curTime = QDateTime::currentSecsSinceEpoch();
     int64_t timeLimit = curTime - 60*15; // doesn't make sense more than once on 15 minutes
     for (const auto & sc : SWAP_CURRENCY_LIST) {
-        if (sc.fxFee<=0.0 || sc.txFeeUpdateTime>0) {
+        if (sc.txFee<=0.0 || sc.txFeeUpdateTime>0) {
             if ( sc.txFeeUpdateTime < timeLimit ) {
                 // making request...
                 if (sc.currency == "BTC") {
@@ -360,7 +337,7 @@ void Swap::onProcessHttpResponse(bool requestOk, const QString & tag, QJsonObjec
                 for (auto & wcl : SWAP_CURRENCY_LIST) {
                     if (wcl.currency == "BTC") {
                         wcl.txFeeUpdateTime = QDateTime::currentSecsSinceEpoch();
-                        wcl.fxFee = double(feePerKb) / 1024.0;
+                        wcl.txFee = double(feePerKb) / 1024.0;
                         return;
                     }
                 }
@@ -433,14 +410,39 @@ void Swap::applyNewTrade12Params(QString acccount, QString secCurrency, QString 
     if (need2recalc2) {
         SecCurrencyInfo sci = getCurrencyInfo(secCurrency);
         newSwapSecConfNumber = sci.confNumber;
-        newSwapSecTxFee = sci.fxFee; // Expected that txFee is already request by API. If not, user will need to input it manually.
-        newSwapMinSecTxFee = sci.fxFeeMin;
-        newSwapMaxSecTxFee = sci.fxFeeMax;
+        newSwapSecTxFee = sci.txFee; // Expected that txFee is already request by API. If not, user will need to input it manually.
+        newSwapMinSecTxFee = sci.txFeeMin;
+        newSwapMaxSecTxFee = sci.txFeeMax;
         newSwapCurrency2recalc = secCurrency;
     }
     selectedPage = SwapWnd::PageSwapNew2;
     core::getWndManager()->pageSwapNew2();
 }
+
+double Swap::getSecTransactionFee(const QString & secCurrency) const {
+    SecCurrencyInfo sci = getCurrencyInfo(secCurrency);
+    return sci.txFee;
+}
+
+
+double Swap::getSecMinTransactionFee(const QString & secCurrency) const {
+    SecCurrencyInfo sci = getCurrencyInfo(secCurrency);
+    return sci.txFeeMin;
+}
+
+double Swap::getSecMaxTransactionFee(const QString & secCurrency) const {
+    SecCurrencyInfo sci = getCurrencyInfo(secCurrency);
+    return sci.txFeeMax;
+}
+
+int Swap::getMwcConfNumber(double mwcAmount) const {
+    return std::min(1000, calcConfirmationsForMwcAmount(mwcAmount));
+}
+int Swap::getSecConfNumber(const QString & secCurrency) const {
+    SecCurrencyInfo sci = getCurrencyInfo(secCurrency);
+    return sci.confNumber;
+}
+
 
 // Apply part1 params from trade2 panel. Expected that params are validated by the windows
 void Swap::applyNewTrade21Params(QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks,
@@ -622,7 +624,7 @@ void Swap::acceptTheTrade(QString swapId) {
 double Swap::getSecondaryFee(QString secCurrency) {
     for (const SecCurrencyInfo & ci : SWAP_CURRENCY_LIST ) {
         if (ci.currency == secCurrency)
-            return ci.fxFee;
+            return ci.txFee;
     }
 
     return -1.0;
@@ -630,7 +632,7 @@ double Swap::getSecondaryFee(QString secCurrency) {
 
 
 // Calculate recommended confirmations number for MWC.
-int Swap::calcConfirmationsForMwcAmount(double mwcAmount) {
+int Swap::calcConfirmationsForMwcAmount(double mwcAmount) const {
     int height = ((state::NodeInfo*)getState( STATE::NODE_INFO ))->getCurrentNodeHeight();
 
     if (height<=0)

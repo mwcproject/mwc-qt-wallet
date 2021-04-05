@@ -1,0 +1,769 @@
+// Copyright 2021 The MWC Developers
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "s_mktswap.h"
+#include "s_swap.h"
+#include "statemachine.h"
+#include "../core/TimerThread.h"
+#include "../core/appcontext.h"
+#include "../core/WndManager.h"
+#include "../wallet/wallet.h"
+#include <QTime>
+#include <QJsonDocument>
+#include "../util/Log.h"
+#include <QDateTime>
+
+namespace state {
+
+const int OFFER_PUBLISHING_INTERVAL_SEC = 120;
+const QString SWAP_TOPIC = "SwapMarketplace";
+
+
+////////////////////////////////////////////////////////////////////////////////
+//  MktSwapOffer
+////////////////////////////////////////////////////////////////////////////////
+
+static QJsonObject str2json(const QString & jsonStr) {
+    QJsonParseError error;
+    QJsonDocument   jsonDoc = QJsonDocument::fromJson(jsonStr.toUtf8(), &error);
+    // It is internal data, no errors expected
+    Q_ASSERT(error.error == QJsonParseError::NoError);
+    Q_ASSERT(jsonDoc.isObject());
+
+    return jsonDoc.object();
+}
+
+MktSwapOffer::MktSwapOffer( const QString & jsonStr ) : MktSwapOffer(str2json(jsonStr)) {
+}
+
+MktSwapOffer::MktSwapOffer( const QJsonObject & json ) {
+    int version = json["version"].toInt();
+    Q_ASSERT(version==1); // Currently no needs to handle versions, there is only one
+
+    id = json["id"].toString();
+    sell = json["sell"].toBool();
+    mwcAmount = json["mwcAmount"].toDouble();
+    secAmount = json["secAmount"].toDouble();
+    secondaryCurrency = json["secondaryCurrency"].toString();
+    mwcLockBlocks = json["mwcLockBlocks"].toInt();
+    secLockBlocks = json["secLockBlocks"].toInt();
+    mktFee = json["mktFee"].toDouble();
+    walletAddress = json["walletAddress"].toString();
+}
+
+
+QJsonObject MktSwapOffer::toJson() const {
+    QJsonObject object
+            {
+                    {"version",           1},
+                    {"id",                id},
+                    {"sell",              sell},
+                    {"mwcAmount",         mwcAmount},
+                    {"secAmount",         secAmount},
+                    {"secondaryCurrency", secondaryCurrency},
+                    {"mwcLockBlocks",     mwcLockBlocks},
+                    {"secLockBlocks",     secLockBlocks},
+                    {"mktFee",            mktFee},
+                    {"walletAddress",     walletAddress}
+            };
+    return object;
+}
+
+QString MktSwapOffer::toJsonStr() const {
+    QJsonDocument doc(toJson());
+    QString offerStrJson( doc.toJson(QJsonDocument::Compact));
+    return offerStrJson;
+}
+
+
+double MktSwapOffer::getFeeLevel() const {
+    return mktFee / mwcAmount;
+}
+
+QString MktSwapOffer::calcMwcLockTime() const {
+    QVector<QString> lockTime = Swap::getLockTime( secondaryCurrency, 60, 60, mwcLockBlocks, secLockBlocks );
+    Q_ASSERT(lockTime.size()==2);
+    return lockTime[0];
+}
+
+QString MktSwapOffer::calcSecLockTime() const {
+    QVector<QString> lockTime = Swap::getLockTime( secondaryCurrency, 60, 60, mwcLockBlocks, secLockBlocks );
+    Q_ASSERT(lockTime.size()==2);
+    return lockTime[1];
+}
+
+bool MktSwapOffer::isValid() const {
+    Swap * swap = (Swap*) getStateMachine()->getState(STATE::SWAP);
+    Q_ASSERT(swap!= nullptr);
+
+    if (!swap->secondaryCurrencyList().contains(secondaryCurrency))
+        return false;
+
+    return  !id.isEmpty() && mwcAmount>0.0 && secAmount>0.0 &&
+        mwcLockBlocks>0 && secLockBlocks>0;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+//  MySwapOffer
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+// build form Json string
+MySwapOffer::MySwapOffer(const QString jsonStr) : MySwapOffer(str2json(jsonStr)) {}
+
+MySwapOffer::MySwapOffer(const QJsonObject & json) {
+    msgUuid = json["msgUuid"].toString();
+    offer = MktSwapOffer( json["offer"].toObject() );
+    account = json["account"].toString();
+    secAddress = json["secAddress"].toString();
+    secFee = json["secFee"].toDouble();
+    note = json["note"].toString();
+    status = OFFER_STATUS(json["status"].toInt());
+    integrityFee = wallet::IntegrityFees(json["integrityFee"].toObject());
+}
+
+double MySwapOffer::calcFee(double feeLevel) const {
+    // 0.01  - minimal network fee for now.
+    return std::max( offer.mwcAmount * feeLevel, 0.01 ); // add some small extra for rounding issue
+}
+
+QJsonObject MySwapOffer::toJson() const {
+    QJsonObject res {
+            { "msgUuid", msgUuid },
+            { "offer", offer.toJson() },
+            { "account", account },
+            { "secAddress", secAddress },
+            { "secFee", secFee },
+            { "note", note },
+            { "status", int(status) },
+            { "integrityFee", integrityFee.toJSon() }
+    };
+    return res;
+}
+
+QString MySwapOffer::toJsonStr() const {
+    QJsonDocument doc( toJson() );
+    return doc.toJson(QJsonDocument::Compact);
+};
+
+QString MySwapOffer::getStatusStr() const {
+    switch (status) {
+        case OFFER_STATUS::PENDING: {
+            return "Preparing...";
+        }
+        case OFFER_STATUS::STARTING: {
+            return "Starting...";
+        }
+        case OFFER_STATUS::RUNNING: {
+            return "Broadcasting";
+        }
+        default:
+            Q_ASSERT(false);
+            return "";
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+//  SwapMarketplace
+////////////////////////////////////////////////////////////////////////////////
+
+SwapMarketplace::SwapMarketplace(StateContext * context) :
+        State(context, STATE::SWAP_MKT) {
+
+    timer = new core::TimerThread(this, 5000);
+    QObject::connect( timer, &core::TimerThread::onTimerEvent, this, &SwapMarketplace::onTimerEvent, Qt::QueuedConnection );
+    timer->start();
+
+    QObject::connect( context->wallet, &wallet::Wallet::onCreateIntegrityFee, this, &SwapMarketplace::respCreateIntegrityFee, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onRequestIntegrityFees, this, &SwapMarketplace::respRequestIntegrityFees, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onWithdrawIntegrityFees, this, &SwapMarketplace::respWithdrawIntegrityFees, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onRequestMessagingStatus, this, &SwapMarketplace::respRequestMessagingStatus, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onMessagingPublish, this, &SwapMarketplace::respMessagingPublish, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onCheckIntegrity, this, &SwapMarketplace::respCheckIntegrity, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onReceiveMessages, this, &SwapMarketplace::respReceiveMessages, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onStartListenOnTopic, this, &SwapMarketplace::onStartListenOnTopic, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onStopListenOnTopic, this, &SwapMarketplace::onStopListenOnTopic, Qt::QueuedConnection );
+
+    swap = (Swap*) context->stateMachine->getState(STATE::SWAP);
+}
+
+SwapMarketplace::~SwapMarketplace() {
+    timer->stop();
+    timer->wait();
+    delete timer;
+}
+
+
+NextStateRespond SwapMarketplace::execute() {
+    selectedPage = SwapMarketplaceWnd::None;
+    if (context->appContext->getActiveWndState() != STATE::SWAP_MKT)
+        return NextStateRespond(NextStateRespond::RESULT::DONE);
+
+    pageMktList(false);
+
+    return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
+}
+
+bool SwapMarketplace::mobileBack() {
+    switch (selectedPage) {
+        case SwapMarketplaceWnd::None :
+            return false;
+        case SwapMarketplaceWnd::Marketplace:
+            return false;
+        case SwapMarketplaceWnd::NewOffer: {
+            pageMktList(false);
+            return true;
+        }
+    }
+}
+
+// Return error message. Empty String on OK
+QString SwapMarketplace::createNewOffer( QString offerId, QString  account,
+                        bool sell, double  mwcAmount, double  secAmount,
+                        QString secondaryCurrency,  int mwcLockBlocks, int secLockBlocks,
+                        QString secAddress, double  secFee, QString note ) {
+
+    if (!swap->secondaryCurrencyList().contains(secondaryCurrency) || mwcAmount < 0.1 ||
+        secAmount < swap->getSecMinAmount(secondaryCurrency) ||
+        mwcLockBlocks <= 0 || secLockBlocks <= 0 || secFee < swap->getSecMinTransactionFee(secondaryCurrency) ||
+        secFee > swap->getSecMaxTransactionFee(secondaryCurrency)) {
+        return "Invalid offer parameters";
+    }
+
+    if (!offerId.isEmpty()) {
+        for (auto & mf : myOffers) {
+            if (mf.offer.id == offerId) {
+                // Updating the offer
+                mf.secAddress = secAddress;
+                mf.secFee = secFee;
+                mf.note = note;
+                return "";
+            }
+        }
+        return "Not found offer with Id " + offerId;
+    }
+
+    QString offerUuid = "SwapOffer_" + QString::number(currentOfferId++);
+
+    // Let's check if we have some funds and lock the funds.
+    if (sell) {
+        const QMap<QString, QVector<wallet::WalletOutput> > &outputs = context->wallet->getwalletOutputs();
+        QVector<wallet::WalletOutput> outs = outputs.value(account);
+
+        std::sort(outs.begin(), outs.end(), [](const wallet::WalletOutput &o1, const wallet::WalletOutput &o2) {
+            return o1.valueNano < o2.valueNano;
+        });
+        int64_t needAmount = int64_t((mwcAmount + 0.05) * 1000000000.0 + 0.5);
+        int64_t reservedAmounts = needAmount;
+        int64_t foundAmount = 0;
+        QStringList output2lock;
+        for (auto &o : outs) {
+            if (context->appContext->isLockedOutputs(o.outputCommitment).first)
+                continue;
+            foundAmount += o.valueNano;
+            reservedAmounts -= o.valueNano;
+            output2lock += o.outputCommitment;
+            if (reservedAmounts <= 0)
+                break;
+        }
+
+        if (reservedAmounts > 0) {
+            return "There is not enough funds at account " + account + ". You need " + util::nano2one(needAmount) +
+                   " MWC, but have available " + util::nano2one(foundAmount) + " MWC";
+        }
+
+        for (auto &s : output2lock)
+            context->appContext->setLockedOutput(s, true, offerUuid);
+    }
+
+    // Now we can create the offer and publish it...
+    MySwapOffer offer(MktSwapOffer(offerUuid,
+                                   sell,
+                                   mwcAmount,
+                                   secAmount,
+                                   secondaryCurrency,
+                                   mwcLockBlocks,
+                                   secLockBlocks),
+                      account,
+                      secAddress,
+                      secFee,
+                      note);
+
+    myOffers.push_back(offer);
+    emit onMyOffersChanged();
+    return "";
+}
+
+void SwapMarketplace::withdrawMyOffer(QString offerId) {
+    for ( int i=myOffers.length()-1; i>=0; i-- ) {
+        if (myOffers[i].offer.id == offerId) {
+            if ( !myOffers[i].msgUuid.isEmpty() ) {
+                qDebug() << "calling messageWithdraw for " << myOffers[i].msgUuid;
+                context->wallet->messageWithdraw(myOffers[i].msgUuid);
+            }
+            context->appContext->unlockOutputsById( myOffers[i].offer.id );
+            myOffers.remove(i);
+            break;
+        }
+    }
+
+    emit onMyOffersChanged();
+}
+
+
+// Request marketplace offers with filtering
+QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, bool selling, QString currency, double minMwcAmount, double maxMwcAmount ) {
+    cleanMarketOffers();
+
+    int64_t timeLimit = QDateTime::currentSecsSinceEpoch() - OFFER_PUBLISHING_INTERVAL_SEC*2;
+
+    QVector<MktSwapOffer> result;
+    for ( auto & ofr : marketOffers ) {
+        if (ofr.timestamp < timeLimit)
+            continue;
+
+        if ( ofr.sell == selling && ofr.getFeeLevel() >= minFeeLevel && currency==ofr.secondaryCurrency && ofr.mwcAmount >= minMwcAmount && ofr.mwcAmount <= maxMwcAmount )
+            result.push_back(ofr);
+    }
+    return result;
+}
+
+// Response at: onIntegrityFees(QVector<IntegrityFees> fees)
+void SwapMarketplace::requestIntegrityFees() {
+    context->wallet->requestIntegrityFees();
+}
+
+double SwapMarketplace::getFeeLevel() const {
+    return context->appContext->getMktFeeLevel();
+}
+
+double SwapMarketplace::getFeeReservedAmount() const {
+    return context->appContext->getMktFeeReservedAmount();
+}
+
+
+QString SwapMarketplace::getFeeDepositAccount() const {
+    QString account = context->appContext->getMktFeeDepositAccount();
+    for ( auto & acc : context->wallet->getWalletBalance() ) {
+        if (acc.accountName == account)
+            return account;
+    }
+    return "default";
+}
+
+void SwapMarketplace::setIntegritySettings(const double & feeLevel, QString feeDepositAccount, const double & feeReservedAmount) {
+    context->appContext->setMktFeeLevel(feeLevel);
+    context->appContext->setMktFeeDepositAccount(feeDepositAccount);
+    context->appContext->setMktFeeReserveAmount(feeReservedAmount);
+}
+
+// Response at: onWithdrawIntegrityFees(QString error)
+void SwapMarketplace::withdrawIntegrityFees() {
+    context->wallet->withdrawIntegrityFees( getFeeDepositAccount() );
+    // continue at respWithdrawIntegrityFees
+}
+
+void SwapMarketplace::onTimerEvent() {
+    int64_t curTime = QDateTime::currentSecsSinceEpoch();
+
+    // checking the libp2p status periodically
+    if (context->wallet->isWalletRunningAndLoggedIn()) {
+        if (lastMessagingStatusRequest + 60 < curTime ) {
+            context->wallet->requestMessagingStatus();
+        }
+    }
+
+    // It is a main timer that triggers whole workflow
+    if (startMktListening==0)
+        return;
+
+    // FIX ME!!!!   It is ok for initial testing while there are no peers!!!!
+/*    if (messagingStatus.gossippub_peers.size() < 3) {
+        startMktListening = QDateTime::currentSecsSinceEpoch();
+        return; // waiting for more connections
+    }*/
+
+    // Check if we need to start anything
+    bool hasPending = false;
+    bool hasStarting = false;
+    for (MySwapOffer ms : myOffers) {
+        switch (ms.status) {
+            case OFFER_STATUS::PENDING: {
+                hasPending = true;
+                break;
+            }
+            case OFFER_STATUS::STARTING: {
+                hasStarting = true;
+                break;
+            }
+            default: {}
+        }
+    }
+    if (hasStarting) {
+        context->wallet->requestIntegrityFees();
+    }
+    else if (hasPending) {
+        updateIntegrityFeesAndStart();
+    }
+
+    // Check if need to update
+    if (!myOffers.isEmpty() && lastCheckIntegrity + 60*5 < curTime ) {
+        lastCheckIntegrity = curTime;
+        context->wallet->checkIntegrity();
+        // continue at respCheckIntegrity...
+    }
+}
+
+void SwapMarketplace::updateIntegrityFeesAndStart() {
+    QVector<double> fees;
+    double feeLevel = getFeeLevel();
+    for (MySwapOffer ms : myOffers) {
+        fees.push_back( ms.calcFee( feeLevel ) + 0.0000001 ); // add some for rounding
+    }
+
+    context->wallet->createIntegrityFee( getFeeDepositAccount(), getFeeReservedAmount(), fees );
+    // continue at respCreateIntegrityFee
+}
+
+
+void SwapMarketplace::respCreateIntegrityFee(QString error, QVector<wallet::IntegrityFees> fees) {
+    if (!error.isEmpty()) {
+        logger::logInfo("SwapMarketplace", "Unable to create Integrity fees, " + error);
+
+        if (error.contains("Not enough funds")) {
+            // Not enough funds, deleting all pending my offers
+            int deletedOffers = 0;
+            for (int i=myOffers.size()-1; i>=0; i--) {
+                if (myOffers[i].status == OFFER_STATUS::PENDING) {
+                    context->appContext->unlockOutputsById( myOffers[i].offer.id );
+                    myOffers.remove(i);
+                    deletedOffers++;
+                }
+            }
+            if (deletedOffers>0) {
+                if (deletedOffers==1) {
+                    core::getWndManager()->messageTextDlg("Warning",
+                                                          "Your account doesn't have enough funds to pay integrity fees for your offer. This offers will be deleted");
+                }
+                else {
+                    core::getWndManager()->messageTextDlg("Warning",
+                                                          "Your account doesn't have enough funds to pay integrity fees for " +
+                                                          QString::number(deletedOffers) +
+                                                          " offers. Those offers will be deleted");
+                }
+                emit onMyOffersChanged();
+            }
+        }
+
+        return;
+    }
+
+    // Check if has any pending.
+    if (std::find_if( myOffers.begin(), myOffers.end(), []( const MySwapOffer & offer) { return offer.status == OFFER_STATUS::PENDING;} ) == myOffers.end()) {
+        // Not found any pending, nothing need to be done.
+        return;
+    }
+
+    {
+        double feeLevel = getFeeLevel();
+        std::sort(myOffers.begin(), myOffers.end(), [feeLevel](const MySwapOffer &o1, const MySwapOffer &o2) {
+            return o1.calcFee(feeLevel) < o2.calcFee(feeLevel);
+        });
+    }
+
+    std::sort( fees.begin(), fees.end(), [](const wallet::IntegrityFees & f1, const wallet::IntegrityFees & f2) {
+        return f1.fee < f2.fee;
+    } );
+
+
+    // Trying to satisfy the offers
+    double feeLevel = getFeeLevel();
+    for ( MySwapOffer & offer : myOffers ) {
+        double offerFee = offer.calcFee(feeLevel);
+        bool foundFee = false;
+        for ( int i=0; i<fees.size(); i++ ) {
+            wallet::IntegrityFees f = fees[i];
+            if ( offerFee <= f.toDblFee() ) {
+                // applying this fee
+                if (offer.status == OFFER_STATUS::RUNNING) {
+                    if (offer.integrityFee.uuid != f.uuid) {
+                        // Updating and restarting
+                        // Stopping first
+                        context->wallet->messageWithdraw( offer.msgUuid );
+                        offer.status = OFFER_STATUS::STARTING;
+                        offer.integrityFee = f;
+                        offer.msgUuid = "";
+                    }
+                }
+                else if (offer.status == OFFER_STATUS::PENDING) {
+                    // Assign fee and starting
+                    offer.integrityFee = f;
+                    offer.status = OFFER_STATUS::STARTING;
+                }
+
+                fees.remove(i);
+                foundFee =  true;
+                break;
+            }
+
+            if (!foundFee) {
+                if (offer.status == OFFER_STATUS::RUNNING) {
+                    // Stop it. It will wait for a new fee...
+                    logger::logInfo("SwapMarketplace", "Stopping My offer with ID " + offer.offer.id + ", Integration fee is not active any more" );
+                    context->wallet->messageWithdraw( offer.msgUuid );
+                    offer.status = OFFER_STATUS::PENDING;
+                    offer.integrityFee = wallet::IntegrityFees();
+                    offer.msgUuid = "";
+                }
+            }
+        }
+    }
+
+    emit onMyOffersChanged();
+}
+
+void SwapMarketplace::respRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees) {
+    //
+    emit onRequestIntegrityFees(error, balance, fees);
+
+    // Let's update offers that are ruuning without active fees..
+
+    for ( MySwapOffer & offer : myOffers ) {
+        if (offer.status!=OFFER_STATUS::RUNNING)
+            continue;
+
+        QString feeUuid = offer.integrityFee.uuid;
+        if ( std::find_if(fees.begin(),fees.end(), [feeUuid](const wallet::IntegrityFees & f) { return f.uuid==feeUuid; } ) == fees.end() ) {
+            // Not found the fee any more.
+            logger::logInfo("SwapMarketplace", "Stopping My offer with ID " + offer.offer.id + ", Integration fee is not active any more" );
+            context->wallet->messageWithdraw( offer.msgUuid );
+            offer.status = OFFER_STATUS::PENDING;
+            offer.integrityFee = wallet::IntegrityFees();
+            offer.msgUuid = "";
+        }
+    }
+
+    // Let's check if we need to broadcast something...
+    for (MySwapOffer & ms : myOffers) {
+        if (ms.status == OFFER_STATUS::STARTING ) {
+            bool isConfirmed = false;
+            for ( auto & f : fees ) {
+                if (f.uuid == ms.integrityFee.uuid) {
+                    isConfirmed = f.confirmed;
+                    break;
+                }
+            }
+
+            if (isConfirmed) {
+                // let's start the broadcasting...
+                context->wallet->messagingPublish( ms.offer.toJsonStr(), ms.integrityFee.uuid, ms.offer.id, OFFER_PUBLISHING_INTERVAL_SEC );
+            }
+        }
+    }
+}
+
+void SwapMarketplace::respWithdrawIntegrityFees(QString error, double mwc, QString account) {
+    emit onWithdrawIntegrityFees(error, mwc, account);
+
+    // triggering active fees request to refresh the state
+    requestIntegrityFees();
+}
+
+void SwapMarketplace::respRequestMessagingStatus(QString error, wallet::MessagingStatus status) {
+    if (error.isEmpty()) {
+        lastMessagingStatusRequest = QDateTime::currentSecsSinceEpoch();
+        messagingStatus = status;
+    }
+    else {
+        qDebug() << "respRequestMessagingStatus return error: " << error;
+        lastMessagingStatusRequest = 0;
+        messagingStatus = wallet::MessagingStatus();
+    }
+    emit onMessagingStatusChanged();
+}
+
+void SwapMarketplace::respMessagingPublish(QString id, QString uuid, QString error) {
+    if (error.isEmpty()) {
+        // success, can change the message status
+        for (auto & offer : myOffers) {
+            if (offer.offer.id == id) {
+                offer.msgUuid = uuid;
+                offer.status = OFFER_STATUS::RUNNING;
+                emit onMyOffersChanged();
+                logger::logInfo("SwapMarketplace", "Offer " + id + " is published. Assigned message ID " + uuid );
+                break;
+            }
+        }
+    }
+}
+
+void SwapMarketplace::respCheckIntegrity(QString error, QVector<QString> expiredMsgUuid) {
+    if (!error.isEmpty()) {
+        qDebug() << "respCheckIntegrity get error: " << error;
+        return;
+    }
+
+    if (expiredMsgUuid.isEmpty())
+        return;
+
+    logger::logInfo("SwapMarketplace", "Swap Offers has expired fees. We need to handle that: " + QStringList(expiredMsgUuid.toList()).join(", ") );
+
+    for (auto & offer : myOffers ) {
+        if (expiredMsgUuid.contains(offer.msgUuid)) {
+            // don't need response. In any case if ot fail, we can't do much
+            context->wallet->messageWithdraw(offer.msgUuid);
+            logger::logInfo("SwapMarketplace", "The fee is expired for "+offer.msgUuid+" or " + offer.offer.id + " changing status to Pending" );
+            offer.msgUuid = "";
+            offer.status = OFFER_STATUS::PENDING;
+            emit onMyOffersChanged();
+        }
+    }
+}
+
+
+/*void SwapMarketplace::startBroadcastMessages( QVector<wallet::IntegrityFees> fees ) {
+
+}*/
+
+// Request a new Marketplace offers from the wallet.
+// Respond: onMarketPlaceOffersChanged
+void SwapMarketplace::requestMktSwapOffers() {
+    context->wallet->requestReceiveMessages(true);
+}
+
+void SwapMarketplace::respReceiveMessages(QString error, QVector<wallet::ReceivedMessages> msgs) {
+    if (!error.isEmpty())
+        return; // Should have the message at notifications. But there is nothing what we can do at handler
+
+    // Updating  marketOffers
+    for ( const auto & m : msgs) {
+        if (m.message!=SWAP_TOPIC)
+            continue;
+
+        QJsonParseError error;
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(m.message.toUtf8(), &error);
+        if (error.error == QJsonParseError::NoError || !jsonDoc.isObject()) {
+            qDebug() << "Unable to process libp2p message " << m.message << "  wallet " << m.wallet;
+            continue;
+        }
+
+        QJsonObject swapMsgJson = jsonDoc.object();
+
+        MktSwapOffer offer(swapMsgJson);
+        if (!offer.isValid()) {
+            qDebug() << "Get invalid offer message " << m.message << "  wallet " << m.wallet;
+            continue;
+        }
+
+        offer.mktFee = m.fee;
+        offer.walletAddress = m.wallet;
+        offer.timestamp = QDateTime::currentSecsSinceEpoch();
+
+        // Updating this offer
+        QString key = offer.getKey();
+        marketOffers.insert(key, offer);
+    }
+    cleanMarketOffers();
+
+    emit onMarketPlaceOffersChanged();
+}
+
+
+QString SwapMarketplace::getOffersListeningStatus() const {
+    if (startMktListening==0 || !messagingStatus.connected || messagingStatus.topics.isEmpty())
+        return "not listening";
+
+    if (messagingStatus.gossippub_peers.isEmpty() )
+        return "connecting...";
+
+    if (messagingStatus.gossippub_peers.size() < 5)
+        return "waiting for peers";
+
+    int64_t collectingTime = QDateTime::currentSecsSinceEpoch() - startMktListening;
+    Q_ASSERT(collectingTime>=0);
+
+    if ( collectingTime < OFFER_PUBLISHING_INTERVAL_SEC ) {
+        return "Collecting marketplace offers, progress is " + QString::number( collectingTime * 100 / OFFER_PUBLISHING_INTERVAL_SEC ) + "%";
+    }
+
+    return "Listening";
+}
+// start/stop offers publishing
+void SwapMarketplace::setListeningForOffers(bool start) {
+    if (start) {
+        context->wallet->startListenOnTopic(SWAP_TOPIC);
+        // resp at onStartListenOnTopic
+    }
+    else {
+        startMktListening = 0;
+        context->wallet->stopListenOnTopic(SWAP_TOPIC);
+        // resp at onStopListenOnTopic
+    }
+    context->wallet->requestMessagingStatus();
+}
+
+void SwapMarketplace::onStartListenOnTopic(QString error) {
+    if (!error.isEmpty()) {
+        startMktListening = 0;
+        core::getWndManager()->messageTextDlg("Error", "Unable to start listening for atomic swap marketplace messages.");
+        return;
+    }
+
+    startMktListening = QDateTime::currentSecsSinceEpoch();
+}
+
+void SwapMarketplace::onStopListenOnTopic(QString error) {
+    Q_UNUSED(error);
+    startMktListening = 0;
+}
+
+
+// Switch to create a new offer page. For new offer myMsgId must be empty string.
+// Otherwise - exist offer id
+void SwapMarketplace::pageCreateUpdateOffer(QString myMsgId) {
+    selectedPage = SwapMarketplaceWnd::NewOffer;
+    core::getWndManager()->pageNewUpdateOffer(myMsgId);
+}
+
+// Switch to swap marketplace first page
+void SwapMarketplace::pageMktList(bool selectMyOffers) {
+    selectedPage = SwapMarketplaceWnd::Marketplace;
+    core::getWndManager()->pageMarketplace(selectMyOffers);
+
+}
+
+void SwapMarketplace::cleanMarketOffers() {
+    int64_t curTime = QDateTime::currentSecsSinceEpoch();
+    if (curTime - OFFER_PUBLISHING_INTERVAL_SEC < lastMarketOffersCleaning)
+        return;
+
+    lastMarketOffersCleaning = curTime;
+    // Removing all records with expired time
+    int64_t expiredTime = curTime - OFFER_PUBLISHING_INTERVAL_SEC * 2;
+
+    QMutableHashIterator<QString, MktSwapOffer> i(marketOffers);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value().timestamp < expiredTime)
+            i.remove();
+    }
+}
+
+
+
+}
+

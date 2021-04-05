@@ -49,8 +49,11 @@ QString nano2one( int64_t nano ) {
     if (nano == 0)
         return "0";
 
-    if (nano<0)
+    if (nano<0) {
+        if (-nano < 0)
+            return "ErrValue"; // it muct be a bug at mwc-wallet level, we can;t handle it here.
         return "-" + nano2one(-nano);
+    }
 
     QString myNumber = QString::number( std::abs(nano),10);
     while (myNumber.length()<9+1)

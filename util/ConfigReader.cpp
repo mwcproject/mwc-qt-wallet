@@ -89,7 +89,17 @@ bool ConfigReader::updateConfig( const QString & key, const QString & value ) {
         lines[ki.lineIdx] = configLine;
     }
     else {
-        lines.push_back( configLine );
+        // we have to push before the first mapping start [swap_electrumx_addr]
+        int insertIdx = lines.size();
+
+        for (int i=lines.size()-1; i>=0; i--) {
+            if (lines[i].startsWith("[swap_electrumx_addr]") ) {
+                insertIdx = i;
+                break;
+            }
+        }
+
+        lines.insert( insertIdx, configLine );
         config[key] = KeyInfo( key, value, lines.size()-1 );
     }
 

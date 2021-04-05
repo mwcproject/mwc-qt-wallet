@@ -50,6 +50,8 @@
 #include "../windows_desktop/s_newswap2_w.h"
 #include "../windows_desktop/s_newswap3_w.h"
 #include "../windows_desktop/s_tradedetails_w.h"
+#include "../windows_desktop/s_mrktswlist_w.h"
+#include "../windows_desktop/s_mrktswapnew_w.h"
 #include <QFileDialog>
 #include "../core/WalletApp.h"
 #include <QMessageBox>
@@ -376,6 +378,17 @@ void DesktopWndManager::showBackupDlg(QString swapId, int backupId) {
     util::TimeoutLockObject to( "SwapBackupDlg" );
     dlg::SwapBackupDlg  backup(nullptr, swapId, backupId);
     backup.exec();
+}
+
+// Swap marketplace
+void DesktopWndManager::pageMarketplace(bool selectMyOffers) {
+    windowManager->switchToWindowEx( mwc::PAGE_S_MKT_LIST,
+                                     new wnd::MrktSwList( windowManager->getInWndParent(), selectMyOffers));
+}
+
+void DesktopWndManager::pageNewUpdateOffer(QString myMsgId) {
+    windowManager->switchToWindowEx( mwc::PAGE_S_MKT_NEW_OFFER,
+                                     new wnd::MrktSwapNew( windowManager->getInWndParent(), myMsgId));
 }
 
 

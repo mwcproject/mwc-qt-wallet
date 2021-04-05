@@ -106,7 +106,7 @@ private:
 
     void clearSwapList();
 protected:
-    virtual void richButtonPressed(control::RichButton * button, QString coockie);
+    virtual void richButtonPressed(control::RichButton * button, QString coockie) override;
 
 private slots:
     void sgnSwapTradesResult( QString cookie, QVector<QString> trades, QString error );

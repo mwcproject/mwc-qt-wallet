@@ -182,7 +182,9 @@ QLineEdit[text=""] {
 }
 
 QLineEdit::disabled {
-    color: #E2CCF7;
+    color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background-color: transparent;
 }
 
 QLineEdit:enabled:!focus::hover
@@ -190,15 +192,15 @@ QLineEdit:enabled:!focus::hover
     background-color: rgba(255, 255, 255, 0.3);
 }
 
+QLineEdit:focus {
+    border: 2px solid #CCFF33;
+    background: rgba(255, 255, 255, 0.15);
+}
+
 control--MwcLineEditNormal {
     font-size: 15px;
     border-radius: 6px;
     padding: 8px;
-}
-
-QLineEdit:focus {
-    border: 2px solid #CCFF33;
-    background: rgba(255, 255, 255, 0.15);
 }
 
 /* ------------------------------ */
@@ -220,7 +222,9 @@ QTextEdit {
 }
 
 QTextEdit::disabled {
-    color: #E2CCF7;
+    color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background-color: transparent;
 }
 
 
@@ -262,6 +266,12 @@ QPlainTextEdit:enabled:!focus::hover
 QPlainTextEdit:focus {
     border: 2px solid #CCFF33;
     background: rgba(255, 255, 255, 0.15);
+}
+
+QPlainTextEdit::disabled {
+    color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background-color: transparent;
 }
 
 control--MwcPlainEditLogs {
@@ -518,6 +528,12 @@ control--MwcComboBox:item:selected
 control--MwcComboBox::down-arrow {
     image: url(:/img/ComboBoxArrow.svg);
     border: transparent;
+}
+
+control--MwcComboBox::disabled {
+    color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background-color: transparent;
 }
 
 /* ----------  QRadioButton  ------------*/

@@ -146,7 +146,6 @@ QString TaskCreateNewSwapTrade::generateCommandLine(int min_confirmations,
     Q_ASSERT(secondaryConfirmationNumber>0);
 
     QString cmdLine = "swap_start --message_exchange_time " + QString::number(messageExchangeTimeMinutes) +
-            " --mwc_amount " + mwcAmount +
             " --mwc_confirmations " + QString::number(mwcConfirmationNumber) +
             " --secondary_confirmations " + QString::number(secondaryConfirmationNumber) +
             " --redeem_time " + QString::number(redeemTimeMinutes) +
@@ -154,9 +153,22 @@ QString TaskCreateNewSwapTrade::generateCommandLine(int min_confirmations,
             " --secondary_fee " + QString::number(secTxFee) +
             " --secondary_amount " + secAmount +
             " --secondary_currency " + secondary +
-            " --method " + communicationMethod +
-            " --dest " + communicationAddress +
             " --who_lock_first " + (sellerLockFirst ? "seller" : "buyer");
+
+    if (mwcAmount.isEmpty())
+        cmdLine += " --mwc_amount 0.0";
+    else
+        cmdLine += " --mwc_amount " + mwcAmount;
+
+    if (!communicationMethod.isEmpty())
+        cmdLine += " --method " + communicationMethod;
+    else
+        cmdLine += " --method file";
+
+    if (!communicationAddress.isEmpty())
+        cmdLine += " --dest " + communicationAddress;
+    else
+        cmdLine += " --dest del.me";
 
     if (min_confirmations>0)
         cmdLine += " --min_conf " + QString::number(min_confirmations);

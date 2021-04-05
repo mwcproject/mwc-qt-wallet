@@ -255,11 +255,11 @@ bool Config::isLockOutputEnabled() {
 
 // Check if this output is locked
 bool Config::isLockedOutput(QString outputCommitment) {
-    return getAppContext()->isLockedOutputs(outputCommitment);
+    return getAppContext()->isLockedOutputs(outputCommitment).first;
 }
 // Check if this output is locked
 void Config::setLockedOutput(bool isLocked, QString outputCommitment) {
-    getAppContext()->setLockedOutput(outputCommitment, isLocked);
+    getAppContext()->setLockedOutput(outputCommitment, isLocked, "");
 }
 
 
@@ -387,6 +387,38 @@ bool Config::getSendLockOutput() {
 
 void Config::setSendLockOutput(bool lock) {
     getAppContext()->setSendLockOutput(lock);
+}
+
+int Config::getMktPlaceSelectedBtn() {
+    return getAppContext()->getMktPlaceSelectedBtn();
+}
+
+void Config::setMktPlaceSelectedBtn(int btn) {
+    getAppContext()->setMktPlaceSelectedBtn(btn);
+}
+
+void Config::setSwapMktFilter( double minFeeLevel, bool selling, const QString & currency, double minMwcAmount, double maxMwcAmount) {
+    getAppContext()->setSwapMktFilter( minFeeLevel, selling, currency, minMwcAmount, maxMwcAmount);
+}
+
+double Config::getSwapMktMinFeeLevel() {
+    return getAppContext()->getSwapMktMinFeeLevel();
+}
+
+bool Config::getSwapMktSelling() {
+    return getAppContext()->getSwapMktSelling();
+}
+
+QString Config::getSwapMktCurrency() {
+    return getAppContext()->getSwapMktCurrency();
+}
+
+double Config::getSwapMktMinMwcAmount() {
+    return getAppContext()->getSwapMktMinMwcAmount();
+}
+
+double Config::getSwapMktMaxMwcAmount() {
+    return getAppContext()->getSwapMktMaxMwcAmount();
 }
 
 

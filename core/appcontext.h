@@ -22,6 +22,7 @@
 #include "../core/Config.h"
 #include "../bridge/wnd/g_send_b.h"
 #include <QDebug>
+#include <QHash>
 
 class QAction;
 
@@ -161,9 +162,11 @@ public:
 
     // Outputs can be locked from spending.
     bool isLockOutputEnabled() const {return lockOutputEnabled;}
-    bool isLockedOutputs(const QString & output) const;
+    // Return lock flag and output ID
+    QPair<bool, QString> isLockedOutputs(const QString & output) const;
     void setLockOutputEnabled(bool enabled);
-    void setLockedOutput(const QString & output, bool lock);
+    void setLockedOutput(const QString & output, bool lock, QString Id);
+    void unlockOutputsById(QString id);
 
     // Fluff transactions
     bool isFluffSet() const { return fluffTransactions; }
@@ -195,8 +198,8 @@ public:
     void setNotficationWindowsEnabled(bool enable);
 
     // Index of the open tab at the swap page.
-    int getSwapTabSelection() const {return swapTabSselection;}
-    void setSwapTabSelection(int sel) {swapTabSselection=sel;}
+    int getSwapTabSelection() const {return swapTabSelection;}
+    void setSwapTabSelection(int sel) { swapTabSelection=sel;}
 
     bool getSwapEnforceBackup() const {return swapEnforceBackup;}
     void setSwapEnforceBackup(bool doBackup);
@@ -222,6 +225,25 @@ public:
 
     bool getSendLockOutput() const {return sendLockOutput; }
     void setSendLockOutput(bool lock);
+
+    double getMktFeeReservedAmount() const {return mktFeeReservedAmount;}
+    void setMktFeeReserveAmount(const double &reservedAmount);
+
+    QString getMktFeeDepositAccount() const {return mktFeeDepositAccount;}
+    void setMktFeeDepositAccount(QString accountName);
+
+    double getMktFeeLevel() const {return mktFeeLevel;}
+    void setMktFeeLevel(const double &feeLevel);
+
+    int getMktPlaceSelectedBtn() const {return mktPlaceSelectedBtn;}
+    void setMktPlaceSelectedBtn(int btn);
+
+    void setSwapMktFilter( double minFeeLevel, bool selling, const QString & currency, double minMwcAmount, double maxMwcAmount);
+    double getSwapMktMinFeeLevel() const {return mktPlaceMinFeeLevel;}
+    bool getSwapMktSelling() const {return mktPlaceSelling;}
+    QString getSwapMktCurrency() const {return mktPlaceCurrency;}
+    double getSwapMktMinMwcAmount() const {return mktPlaceMinMwcAmount;}
+    double getSwapMktMaxMwcAmount() const {return mktPlaceMaxMwcAmount;}
 
 private:
 signals:
@@ -291,7 +313,11 @@ private:
 
     // Outputs can be locked from spending.
     bool lockOutputEnabled = false; // By default it is false
-    QSet<QString> lockedOutputs; // Outputs that was locked (it is manual operation)
+    // Outputs that was locked (it is manual operation)
+    // Key: output commit.
+    // Value: id.  Empty string is for permanent manual ops.
+    //              Non empty ID - are temporary
+    QHash<QString, QString> lockedOutputs;
 
     // Allow users to by-pass the stem-phase of the dandelion protocol
     // and directly fluff their transactions.
@@ -318,7 +344,7 @@ private:
     bool notificationWindowsEnabled = true;
 
     // Selected tab at the swap list page
-    int swapTabSselection = 0;
+    int swapTabSelection = 0;
 
     // Enforce a backup for the swaps. Before lock stage user will be asked to save the trade file somewhere
     bool swapEnforceBackup = true;
@@ -340,6 +366,18 @@ private:
     // For offline send page, values for slatepack and lock after
     bridge::SEND_SELECTED_METHOD sendMethod = bridge::SEND_SELECTED_METHOD::ONLINE_ID;
     bool sendLockOutput = true;
+
+    double mktFeeReservedAmount = 1.0;
+    QString mktFeeDepositAccount = "default";
+    double mktFeeLevel = 0.001; // 0.1 %
+
+    int mktPlaceSelectedBtn = 0;
+
+    double mktPlaceMinFeeLevel = 0.0001;
+    bool mktPlaceSelling = true;
+    QString mktPlaceCurrency = "BTC";
+    double mktPlaceMinMwcAmount = 0.0;
+    double mktPlaceMaxMwcAmount = 0.0;
 };
 
 template <class T>

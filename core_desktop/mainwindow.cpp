@@ -549,6 +549,10 @@ void MainWindow::on_actionAtomicSwap_triggered()
     stateMachine->setActionWindow( state::STATE::SWAP );
 }
 
+void MainWindow::on_actionAtomicSwapMarketplace_triggered() {
+    stateMachine->setActionWindow( state::STATE::SWAP_MKT );
+}
+
 void MainWindow::on_actionWallet_accounts_triggered()
 {
     stateMachine->setActionWindow( state::STATE::ACCOUNTS );
