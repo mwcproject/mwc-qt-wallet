@@ -894,6 +894,7 @@ void MWC713::deleteSwapTrade(QString swapId) {
 // Create a new Swap trade deal.
 // Check Signal: void onCreateNewSwapTrade(tag, dryRun, QVector<QString> params, QString swapId, QString err);
 void MWC713::createNewSwapTrade(QString account,
+                                QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
                                 int min_confirmations, // minimum number of confimations
                                 QString mwcAmount, QString secAmount, QString secondary,
                                 QString redeemAddress,
@@ -913,7 +914,7 @@ void MWC713::createNewSwapTrade(QString account,
 
     QVector<QPair<Mwc713Task*,int64_t>> taskGroup {
             TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
-            TSK(new TaskCreateNewSwapTrade(this, min_confirmations, // minimum number of confimations
+            TSK(new TaskCreateNewSwapTrade(this, outputs, min_confirmations, // minimum number of confimations
                                            mwcAmount, secAmount, secondary.toLower(),
                                            redeemAddress,
                                            secTxFee,
@@ -1141,6 +1142,9 @@ void MWC713::stopListenOnTopic(const QString & topic) {
     eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskStopListenOnTopic(this, topic), TaskStopListenOnTopic::TIMEOUT)} );
 }
 
+void MWC713::sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TasksSendMarketplaceMessage(this, command, wallet_tor_address, offer_id), TasksSendMarketplaceMessage::TIMEOUT)} );
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1711,6 +1715,16 @@ void MWC713::setPerformAutoSwapStep(QString swapId, QString stateCmd, QString cu
 void MWC713::notifyAboutNewSwapTrade(QString currency, QString swapId) {
     logger::logEmit( "MWC713", "onNewSwapTrade", currency + ", " + swapId );
     emit onNewSwapTrade(currency, swapId);
+}
+
+void MWC713::notifyAboutNewMktMessage(int messageId, QString wallet_tor_address, QString offer_id) {
+    logger::logEmit( "MWC713", "onNewMktMessage", QString::number(messageId) + ", " + wallet_tor_address + ", " + offer_id );
+    emit onNewMktMessage(messageId, wallet_tor_address, offer_id);
+}
+
+void MWC713::setSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress) {
+    logger::logEmit( "MWC713", "onSendMarketplaceMessage", "error=" + error + " response=" + response + " offerId=" + offerId + " walletAddress=" + walletAddress );
+    emit onSendMarketplaceMessage(error, response, offerId, walletAddress);
 }
 
 void MWC713::setBackupSwapTradeData(QString swapId, QString backupFileName, QString errorMessage) {

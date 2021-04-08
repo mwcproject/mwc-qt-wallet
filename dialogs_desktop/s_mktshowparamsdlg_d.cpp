@@ -16,7 +16,7 @@
 #include "s_mktshowparamsdlg_d.h"
 #include "ui_s_mktshowparamsdlg_d.h"
 #include "../windows_desktop/s_mrktswlist_w.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include "../control_desktop/messagebox.h"
 
 namespace dlg {

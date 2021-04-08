@@ -13,13 +13,13 @@
 // limitations under the License.
 
 #include "swapmkt_b.h"
-#include "../wallet/wallet.h"
-#include "../state/state.h"
-#include "../state/s_mktswap.h"
-#include "../state/u_nodeinfo.h"
-#include "../core/appcontext.h"
-#include "../util/address.h"
-#include "../core/MessageMapper.h"
+#include "../../wallet/wallet.h"
+#include "../../state/state.h"
+#include "../../state/s_mktswap.h"
+#include "../../state/u_nodeinfo.h"
+#include "../../core/appcontext.h"
+#include "../../util/address.h"
+#include "../../core/MessageMapper.h"
 
 namespace bridge {
 
@@ -132,6 +132,11 @@ void SwapMarketplace::pageMktMyOffers() {
 
 void SwapMarketplace::requestMktSwapOffers() {
     getSwapMkt()->requestMktSwapOffers();
+}
+
+// Accept the offer from marketplace
+void SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddress) {
+    getSwapMkt()->acceptMarketplaceOffer(offerId, walletAddress);
 }
 
 void SwapMarketplace::onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees) {

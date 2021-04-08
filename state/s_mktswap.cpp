@@ -23,12 +23,17 @@
 #include <QJsonDocument>
 #include "../util/Log.h"
 #include <QDateTime>
+#include "s_swap.h"
 
 namespace state {
 
 const int OFFER_PUBLISHING_INTERVAL_SEC = 120;
 const QString SWAP_TOPIC = "SwapMarketplace";
 
+
+Swap * getSwap() {
+    return (Swap *)getState(STATE::SWAP);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //  MktSwapOffer
@@ -176,6 +181,12 @@ QString MySwapOffer::getStatusStr() const {
     }
 }
 
+// Offer description for user. Sell XX MWC for XX BTC
+QString MySwapOffer::getOfferDescription() const {
+    return (offer.sell ? "Selling " : "Buying ") + QString::number(offer.mwcAmount) +
+            " MWC for " + QString::number(offer.secAmount) + " " + offer.secondaryCurrency;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  SwapMarketplace
@@ -197,6 +208,8 @@ SwapMarketplace::SwapMarketplace(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onReceiveMessages, this, &SwapMarketplace::respReceiveMessages, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onStartListenOnTopic, this, &SwapMarketplace::onStartListenOnTopic, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onStopListenOnTopic, this, &SwapMarketplace::onStopListenOnTopic, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onNewMktMessage, this, &SwapMarketplace::onNewMktMessage, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onSendMarketplaceMessage, this, &SwapMarketplace::onSendMarketplaceMessage, Qt::QueuedConnection );
 
     swap = (Swap*) context->stateMachine->getState(STATE::SWAP);
 }
@@ -762,6 +775,96 @@ void SwapMarketplace::cleanMarketOffers() {
             i.remove();
     }
 }
+
+void SwapMarketplace::onNewMktMessage(int messageId, QString wallet_tor_address, QString offer_id) {
+    if (messageId == wallet::WALLET_EVENTS::S_MKT_ACCEPT_OFFER) {
+        // Our offer is accepted, let's check if it is running...
+        for (const auto & offer : myOffers) {
+            if (offer.offer.id == offer_id) {
+                // we get an offer, let's start trading and notify the user...
+                createNewSwapTrade(offer, wallet_tor_address);
+                core::getWndManager()->messageTextDlg("Offer is accepted", "Congratulations, you offer " + offer.getOfferDescription() +
+                    " is accepted, the swap trade is started. Please note, we will keep this offer active until some of your partners will lock the coins" );
+            }
+        }
+    }
+    else if (messageId == wallet::WALLET_EVENTS::S_MKT_FAIL_BIDDING) {
+        // The related trades should be cancelled automatically. We just need to show the message. So delegate that to the swaps
+        getSwap()->failBidding(wallet_tor_address, offer_id);
+    }
+    else {
+        Q_ASSERT(false);
+    }
+}
+
+void SwapMarketplace::createNewSwapTrade( MySwapOffer offer, QString wallet_tor_address) {
+    getSwap()->startTrading(offer, wallet_tor_address);
+}
+
+// Accept the offer from marketplace
+void SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddress) {
+    QString key = walletAddress + "_" + offerId;
+
+    MktSwapOffer mktOffer = marketOffers.value(key);
+    if (mktOffer.isEmpty()) {
+        core::getWndManager()->messageTextDlg("Error", "Unfortunately you can't accept offer from "+walletAddress+". It is not on the market any more.");
+        return;
+    }
+
+    // Let's send accept offer message to another wallet.
+    context->wallet->sendMarketplaceMessage("accept_offer", walletAddress, offerId);
+}
+
+// Response from sendMarketplaceMessage
+void SwapMarketplace::onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress) {
+
+    if (!error.isEmpty()) {
+        core::getWndManager()->messageTextDlg("Error", "Unable to accept offer from "+walletAddress+" because of the error:\n" + error);
+        return;
+    }
+
+    QString key = walletAddress + "_" + offerId;
+
+    MktSwapOffer mktOffer = marketOffers.value(key);
+    if (mktOffer.isEmpty()) {
+        core::getWndManager()->messageTextDlg("Error", "Unfortunately you can't accept offer from "+walletAddress+". It is not on the market any more.");
+        return;
+    }
+
+    // Check the response. It is a Json, but we can parse it manually. We need to find how many offers are in process.
+    // "{"running":2}"
+    int idx1 = response.indexOf(':');
+    int idx2 = response.indexOf('}', idx1+1);
+    int running_num = 100;
+    bool ok = false;
+    if (idx1<idx2 && idx1>0) {
+        running_num = response.mid(idx1+1, idx2-idx1).trimmed().toInt(&ok);
+    }
+
+    if (!ok || running_num<0) {
+        core::getWndManager()->messageTextDlg("Error", "Unable to accept offer from "+walletAddress+" because of unexpected response:\n" + response);
+        return;
+    }
+
+    if (running_num>0) {
+        // There are something already going, let's report it.
+        if ( core::WndManager::RETURN_CODE::BTN1 != core::getWndManager()->questionTextDlg("Warning", "Wallet "+walletAddress+" already has " + QString::number(running_num) + " accepted trades. Only one trade that lock "
+                           "coins first will continue, the rest will be cancelled. As a result your trade might be cancelled even you lock the coins.\n\n"
+                           "You can wait for some time, try to accept this offer later. Or you can continue, you trade might win.\n\n "
+                           "Do you want to continue and start trading?",
+        "Yes", "No",
+        "I understand the risk and I want to continue", "No, I will better wait",
+        false, true) )
+        {
+            getSwap()->rejectOffer(mktOffer, walletAddress);
+            return;
+        }
+    }
+
+    // Finally, we are good to accept the offer.
+    getSwap()->acceptOffer(mktOffer,  walletAddress);
+}
+
 
 
 

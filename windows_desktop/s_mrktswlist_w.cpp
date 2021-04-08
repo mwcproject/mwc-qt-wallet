@@ -14,7 +14,7 @@
 
 #include "s_mrktswlist_w.h"
 #include "ui_s_mrktswlist_w.h"
-#include "../bridge/swapmkt_b.h"
+#include "../bridge/wnd/swapmkt_b.h"
 #include "../bridge/config_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/util_b.h"
@@ -380,8 +380,8 @@ void MrktSwList::richButtonPressed(control::RichButton *button, QString cookie) 
         QString torAddress = ids[0];
         QString offerId = ids[1];
         qDebug() << "Accepting the offer from " << torAddress << " with id " << offerId;
-        control::MessageBox::messageText(this, "WARNING", "Not implemented yet.\n\nAccepting offer from " + torAddress +
-                                                          " with offer id " + offerId);
+        ui->progress->show();
+        swapMarketplace->acceptMarketplaceOffer(offerId, torAddress);
     } else {
         Q_ASSERT(false);
     }

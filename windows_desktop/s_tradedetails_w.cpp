@@ -14,7 +14,7 @@
 
 #include "s_tradedetails_w.h"
 #include "ui_s_tradedetails_w.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include "../control_desktop/messagebox.h"
 #include "../dialogs_desktop/s_adjuststatedlg.h"
 #include "../util_desktop/timeoutlock.h"

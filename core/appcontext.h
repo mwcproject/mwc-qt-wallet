@@ -167,6 +167,7 @@ public:
     void setLockOutputEnabled(bool enabled);
     void setLockedOutput(const QString & output, bool lock, QString Id);
     void unlockOutputsById(QString id);
+    QVector<QString> getLockedOutputsById(QString id) const;
 
     // Fluff transactions
     bool isFluffSet() const { return fluffTransactions; }

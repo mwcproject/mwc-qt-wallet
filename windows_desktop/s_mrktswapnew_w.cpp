@@ -14,11 +14,11 @@
 
 #include "s_mrktswapnew_w.h"
 #include "ui_s_mrktswapnew_w.h"
-#include "../bridge/swapmkt_b.h"
+#include "../bridge/wnd/swapmkt_b.h"
 #include "../bridge/config_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/util_b.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include <QDebug>
 #include "../control_desktop/messagebox.h"
 

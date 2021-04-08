@@ -945,6 +945,18 @@ void AppContext::unlockOutputsById(QString id) {
     }
 }
 
+QVector<QString> AppContext::getLockedOutputsById(QString id) const {
+    QVector<QString> result;
+
+    for ( auto i=lockedOutputs.begin(); i!=lockedOutputs.end(); i++ ) {
+        if (i.value() == id) {
+            result.push_back(i.key());
+        }
+    }
+
+    return result;
+}
+
 
 void AppContext::setFluff(bool fluffSetting) {
     if (fluffTransactions == fluffSetting)

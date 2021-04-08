@@ -21,6 +21,7 @@
 #include <QHash>
 #include "../util/httpclient.h"
 #include <QThread>
+#include "s_mktswap.h"
 
 namespace core {
 class TimerThread;
@@ -30,10 +31,12 @@ namespace state {
 
 struct AutoswapTask {
     QString swapId;
+    QString tag;
+    bool    isSeller;
     QString stateCmd;
     int64_t lastUpdatedTime = 0;
 
-    void setData(QString _swapId, QString _stateCmd, int64_t _lastUpdatedTime) { swapId = _swapId; stateCmd= _stateCmd; lastUpdatedTime = _lastUpdatedTime; }
+    void setData(QString _swapId, QString _tag, bool _isSeller, QString _stateCmd, int64_t _lastUpdatedTime) { swapId=_swapId; tag=_tag; isSeller=_isSeller; stateCmd=_stateCmd; lastUpdatedTime=_lastUpdatedTime; }
 };
 
 enum class SwapWnd {None, PageSwapList, PageSwapEdit, PageSwapTradeDetails, PageSwapNew1, PageSwapNew2, PageSwapNew3 };
@@ -137,6 +140,21 @@ public:
     QString getNote() const {return newSwapNote;}
     void setNote(QString note) {newSwapNote = note;}
 
+    // Notify about failed bidding. If it is true, we need to cancel and show the message about that
+    // Note, mwc-wallet does cancellation as well.
+    void failBidding(QString wallet_tor_address, QString offer_id);
+
+    // Start trading for my offer - automatic operation. For Sell the offer will be created.
+    // For Buy - offer will be accepted automatically.
+    void startTrading(const MySwapOffer & offer, QString wallet_tor_address);
+
+    // Start trading for Marketplace offer. It will start for sell only. For Buy the normal workflow should be fine, we will only press "Accept" automatically.
+    // For Buy - offer will be accepted automatically.
+    void acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address);
+
+    // Reject any offers from this address. We don't want them, we are likely too late
+    void rejectOffer(const MktSwapOffer & offer, QString wallet_tor_address);
+
 private:
 signals:
 
@@ -163,7 +181,7 @@ private:
     void resetNewSwapData();
 
     // Start trade to run
-    void runTrade(QString swapId, QString statusCmd);
+    void runTrade(QString swapId, QString tag, bool isSeller, QString statusCmd);
 
     int calcConfirmationsForMwcAmount(double mwcAmount) const;
 
@@ -232,6 +250,8 @@ private:
 
     QString newSwapCurrency2recalc;
     SwapWnd selectedPage = SwapWnd::None;
+
+    QHash< QString, QVector<MktSwapOffer> > acceptedOffers;
 };
 
 }

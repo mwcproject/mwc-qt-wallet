@@ -334,6 +334,7 @@ struct SwapInfo {
     QString secondaryAmount;
     QString secondaryCurrency;
     QString swapId;
+    QString tag;
     int64_t startTime = 0;
     QString stateCmd; // state as command
     QString state; // State as string description
@@ -344,12 +345,13 @@ struct SwapInfo {
     QString lastProcessError;
 
     void setData( QString mwcAmount, QString secondaryAmount, QString secondaryCurrency,
-                  QString swapId, int64_t startTime, QString stateCmd, QString state, QString action,
+                  QString swapId, QString tag, int64_t startTime, QString stateCmd, QString state, QString action,
                   int64_t expiration, bool isSeller, QString secondaryAddress, QString lastProcessError );
 };
 
 struct SwapTradeInfo {
     QString swapId;
+    QString tag;
     bool isSeller;
     double mwcAmount;
     double secondaryAmount;
@@ -374,7 +376,7 @@ struct SwapTradeInfo {
     QString electrumNodeUri; // Private electrumX URI
 
 
-    void setData( QString swapId, bool isSeller,  double mwcAmount, double secondaryAmount,
+    void setData( QString swapId, QString tag, bool isSeller,  double mwcAmount, double secondaryAmount,
                 QString secondaryCurrency,  QString secondaryAddress, double secondaryFee,
                 QString secondaryFeeUnits, int mwcConfirmations, int secondaryConfirmations,
                 int messageExchangeTimeLimit, int redeemTimeLimit, bool sellerLockingFirst,
@@ -756,6 +758,7 @@ public:
     // Create a new Swap trade deal.
     // Check Signal: void onCreateNewSwapTrade(tag, dryRun, QVector<QString> params, QString swapId, QString err);
     virtual void createNewSwapTrade(QString account,
+                                    QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
                                     int min_confirmations, // minimum number of confimations
                                     QString mwcAmount, QString secAmount, QString secondary,
                                     QString redeemAddress,
@@ -858,6 +861,11 @@ public:
     // Stop listening on the libp2p topic
     // Check Signal: onStopListenOnTopic(QString error);
     virtual void stopListenOnTopic(const QString & topic) = 0;
+
+    // Send marketplace message and get a response back
+    // command: "accept_offer" or "fail_bidding"
+    // Check Signal: onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress);
+    virtual void sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id) = 0;
 
 private:
 signals:
@@ -1042,6 +1050,15 @@ signals:
 
     // Response from stopListenOnTopic
     void onStopListenOnTopic(QString error);
+
+    // Notificaiton that nee Swap trade offer was recieved.
+    // messageId: S_MKT_ACCEPT_OFFER or S_MKT_FAIL_BIDDING
+    // wallet_tor_address: address from what we get a message
+    // offer_id: offer_i from the swap marketplace. It is expected to be known
+    void onNewMktMessage(int messageId, QString wallet_tor_address, QString offer_id);
+
+    // Response from sendMarketplaceMessage
+    void onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress);
 };
 
 }

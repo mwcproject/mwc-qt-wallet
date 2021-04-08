@@ -24,7 +24,7 @@
 #include "../bridge/wallet_b.h"
 #include "../bridge/statemachine_b.h"
 #include "../bridge/util_b.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include <QPushButton>
 #include <QApplication>
 #include <QDesktopWidget>

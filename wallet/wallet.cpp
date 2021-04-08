@@ -518,12 +518,13 @@ void WalletUtxoSignature::setData(int64_t _coinNano, // Output amount
 // SwapInfo
 
 void SwapInfo::setData( QString _mwcAmount, QString _secondaryAmount, QString _secondaryCurrency,
-              QString _swapId, int64_t _startTime, QString _stateCmd, QString _state, QString _action, int64_t _expiration,
+              QString _swapId, QString _tag, int64_t _startTime, QString _stateCmd, QString _state, QString _action, int64_t _expiration,
               bool _isSeller, QString _secondaryAddress, QString _lastProcessError ) {
     mwcAmount = _mwcAmount;
     secondaryAmount = _secondaryAmount;
     secondaryCurrency = _secondaryCurrency;
     swapId = _swapId;
+    tag = _tag;
     startTime = _startTime;
     stateCmd = _stateCmd;
     state = _state;
@@ -537,7 +538,7 @@ void SwapInfo::setData( QString _mwcAmount, QString _secondaryAmount, QString _s
 /////////////////////////////////////////////////////////////////////////////////
 // SwapTradeInfo
 
-void SwapTradeInfo::setData( QString _swapId, bool _isSeller, double _mwcAmount, double _secondaryAmount,
+void SwapTradeInfo::setData( QString _swapId, QString _tag, bool _isSeller, double _mwcAmount, double _secondaryAmount,
               QString _secondaryCurrency,  QString _secondaryAddress, double _secondaryFee,
               QString _secondaryFeeUnits, int _mwcConfirmations, int _secondaryConfirmations,
               int _messageExchangeTimeLimit, int _redeemTimeLimit, bool _sellerLockingFirst,
@@ -545,6 +546,7 @@ void SwapTradeInfo::setData( QString _swapId, bool _isSeller, double _mwcAmount,
               QString _communicationMethod, QString _communicationAddress, QString _electrumNodeUri ) {
 
     swapId = _swapId;
+    tag = _tag;
     isSeller = _isSeller;
     mwcAmount = _mwcAmount;
     secondaryAmount = _secondaryAmount;

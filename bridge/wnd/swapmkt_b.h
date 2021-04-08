@@ -17,7 +17,7 @@
 
 
 #include <QObject>
-#include "../wallet/wallet.h"
+#include "../../wallet/wallet.h"
 
 namespace bridge {
 
@@ -70,6 +70,10 @@ public:
 
     // Refresh mkt place offers. Response with sgnMarketPlaceOffersChanged.
     Q_INVOKABLE void requestMktSwapOffers();
+
+    // Accept the offer from marketplace
+    Q_INVOKABLE void acceptMarketplaceOffer(QString offerId, QString walletAddress);
+
 private:
 signals:
     void sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> IntegrityFeesJsonStr);

@@ -16,7 +16,7 @@
 #define MWC_QT_WALLET_SWAP_H
 
 #include <QObject>
-#include "../wallet/wallet.h"
+#include "../../wallet/wallet.h"
 
 namespace bridge {
 

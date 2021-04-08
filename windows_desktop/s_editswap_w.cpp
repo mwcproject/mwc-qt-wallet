@@ -14,7 +14,7 @@
 
 #include "s_editswap_w.h"
 #include "ui_s_editswap_w.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include "../bridge/config_b.h"
 #include "../control_desktop/messagebox.h"
 

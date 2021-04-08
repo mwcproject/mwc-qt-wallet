@@ -81,6 +81,7 @@ bool TaskGetSwapTrades::processTask(const QVector<WEvent> &events) {
                         swapInfoJson["secondary_amount"].toString(),
                         swapInfoJson["secondary_currency"].toString(),
                         swapInfoJson["swap_id"].toString(),
+                        swapInfoJson["tag"].toString(),
                         swapInfoJson["start_time"].toString().toLongLong(),
                         swapInfoJson["state_cmd"].toString(),
                         swapInfoJson["state"].toString(),
@@ -125,7 +126,9 @@ bool TaskDeleteSwapTrade::processTask(const QVector<WEvent> &events) {
 
 // ------------------------- TaskCreateNewSwapTrade ---------------------
 
-QString TaskCreateNewSwapTrade::generateCommandLine(int min_confirmations,
+QString TaskCreateNewSwapTrade::generateCommandLine(
+                            QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
+                            int min_confirmations,
                             QString mwcAmount, QString  secAmount, QString secondary,
                             QString redeemAddress,
                             double secTxFee,
@@ -154,6 +157,10 @@ QString TaskCreateNewSwapTrade::generateCommandLine(int min_confirmations,
             " --secondary_amount " + secAmount +
             " --secondary_currency " + secondary +
             " --who_lock_first " + (sellerLockFirst ? "seller" : "buyer");
+
+    if (!outputs.isEmpty()) {
+        cmdLine += " --outputs " + QStringList(outputs.toList()).join(",");
+    }
 
     if (mwcAmount.isEmpty())
         cmdLine += " --mwc_amount 0.0";
@@ -247,12 +254,15 @@ bool TaskTradeDetails::processTask(const QVector<WEvent> &events) {
 
             QString feeUnits = swapObj["secondaryFeeUnits"].toArray().first().toString();
 
-            swap.setData(swapObj["swapId"].toString(), swapObj["isSeller"].toBool(),
+            swap.setData(swapObj["swapId"].toString(),
+                         swapObj["tag"].toString(),
+                         swapObj["isSeller"].toBool(),
                          swapObj["mwcAmount"].toString().toDouble(),
                          swapObj["secondaryAmount"].toString().toDouble(),
                          swapObj["secondaryCurrency"].toString(), swapObj["secondaryAddress"].toString(),
                          swapObj["secondaryFee"].toString().toDouble(),
-                         feeUnits, swapObj["mwcConfirmations"].toInt(),
+                         feeUnits,
+                         swapObj["mwcConfirmations"].toInt(),
                          swapObj["secondaryConfirmations"].toInt(),
                          swapObj["messageExchangeTimeLimit"].toInt(), swapObj["redeemTimeLimit"].toInt(),
                          swapObj["sellerLockingFirst"].toBool(),

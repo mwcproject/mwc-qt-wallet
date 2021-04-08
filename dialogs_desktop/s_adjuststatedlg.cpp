@@ -14,7 +14,7 @@
 
 #include "s_adjuststatedlg.h"
 #include "ui_s_adjuststatedlg.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 
 namespace dlg {
 

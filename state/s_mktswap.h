@@ -67,6 +67,8 @@ struct MktSwapOffer {
     QJsonObject toJson() const;
     QString toJsonStr() const;
 
+    bool isEmpty() const {return id.isEmpty();}
+
     double getFeeLevel() const;
 
     QString calcMwcLockTime() const;
@@ -118,6 +120,9 @@ struct MySwapOffer {
     QString toJsonStr() const;
 
     QString getStatusStr() const;
+
+    // Offer description for user. Sell XX MWC for XX BTC
+    QString getOfferDescription() const;
 };
 
 class Swap;
@@ -171,6 +176,9 @@ public:
 
     // Switch to swap marketplace first page
     void pageMktList(bool selectMyOffers);
+
+    // Accept the offer from marketplace
+    void acceptMarketplaceOffer(QString offerId, QString walletAddress);
 protected:
     virtual NextStateRespond execute() override;
     virtual bool mobileBack() override;
@@ -179,6 +187,11 @@ protected:
     //void startBroadcastMessages( QVector<wallet::IntegrityFees> fees );
 
     void cleanMarketOffers();
+
+    // Creating and start the swap trade from this offer
+    // Node, several offers can be run in parallel until one of them will reach the locking stage.
+    // Then the rest will be cancelled.
+    void createNewSwapTrade( MySwapOffer offer, QString wallet_tor_address);
 private:
 signals:
     void onMarketPlaceOffersChanged();
@@ -202,6 +215,15 @@ slots:
 
     void onStartListenOnTopic(QString error);
     void onStopListenOnTopic(QString error);
+
+    // Notification that nee Swap trade offer was received.
+    // messageId: S_MKT_ACCEPT_OFFER or S_MKT_FAIL_BIDDING
+    // wallet_tor_address: address from what we get a message
+    // offer_id: offer_i from the swap marketplace. It is expected to be known
+    void onNewMktMessage(int messageId, QString wallet_tor_address, QString offer_id);
+
+    // Response from sendMarketplaceMessage
+    void onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress);
 private:
     core::TimerThread * timer = nullptr;
     Swap * swap = nullptr;

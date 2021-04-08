@@ -13,13 +13,13 @@
 // limitations under the License.
 
 #include "swap_b.h"
-#include "../wallet/wallet.h"
-#include "../state/state.h"
-#include "../state/s_swap.h"
-#include "../state/u_nodeinfo.h"
-#include "../core/appcontext.h"
-#include "../util/address.h"
-#include "../core/MessageMapper.h"
+#include "../../wallet/wallet.h"
+#include "../../state/state.h"
+#include "../../state/s_swap.h"
+#include "../../state/u_nodeinfo.h"
+#include "../../core/appcontext.h"
+#include "../../util/address.h"
+#include "../../core/MessageMapper.h"
 
 namespace bridge {
 
@@ -426,7 +426,7 @@ void Swap::applyNewTrade1Params(QString account, QString secCurrency, QString mw
     getSwap()->applyNewTrade11Params( lockMwcFirst );
 
     // We need to use wallet for verification. start new with a dry run will work great
-    getWallet()->createNewSwapTrade(account,
+    getWallet()->createNewSwapTrade(account, {},
                                     getAppContext()->getSendCoinsParams().inputConfirmationNumber,
                                     mwcAmount, secAmount, secCurrency,
                                     secAddress,
@@ -475,7 +475,7 @@ void Swap::applyNewTrade2Params(QString secCurrency, int offerExpTime, int redee
 
 
     // We need to use wallet for verification. start new with a dry run will work great
-    getWallet()->createNewSwapTrade( getSwap()->getAccount(),
+    getWallet()->createNewSwapTrade( getSwap()->getAccount(), {},
                                     getAppContext()->getSendCoinsParams().inputConfirmationNumber,
                                     getSwap()->getMwc2Trade(), getSwap()->getSec2Trade(), getSwap()->getCurrentSecCurrency(),
                                     getSwap()->getSecAddress(),

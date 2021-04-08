@@ -23,6 +23,30 @@
 
 namespace wallet {
 
+
+////////////////////////////////////////////////////////////////////////////////
+// TaskSwapMktNewMessage
+
+bool TaskSwapMktNewMessage::processTask(const QVector<WEvent> &events) {
+    // It is listener, one by one processing only
+    Q_ASSERT(events.size() == 1);
+
+    const WEvent &evt = events[0];
+
+    if (evt.event == S_MKT_ACCEPT_OFFER || evt.event == S_MKT_FAIL_BIDDING) {
+        QStringList prms = evt.message.split('|');
+        if (prms.size() != 2)
+            return false;
+
+        QString wallet_tor_address = prms[0];
+        QString offer_id = prms[1];
+
+        wallet713->notifyAboutNewMktMessage(evt.event, wallet_tor_address, offer_id);
+        return true;
+    }
+    return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // TaskCreateIntegrityFee
 
@@ -378,6 +402,26 @@ bool TaskStartListenOnTopic::processTask(const QVector<WEvent> &events) {
 bool TaskStopListenOnTopic::processTask(const QVector<WEvent> &events) {
     wallet713->setStopListenOnTopic(getErrorMessage(events, "") );
     return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+//  TasksSendMarketplaceMessage
+
+bool TasksSendMarketplaceMessage::processTask(const QVector<WEvent> &events) {
+    QVector<WEvent> lns = filterEvents(events, WALLET_EVENTS::S_LINE);
+
+    // JSON: {"receive_messages":[]}
+    for (auto &ln : lns) {
+        if (ln.message.startsWith("JSON: ")) {
+            QString jsonStr = ln.message.mid(strlen("JSON: ")).trimmed();
+            wallet713->setSendMarketplaceMessage("", jsonStr, offer_id, wallet_tor_address);
+            return true;
+        }
+    }
+
+    wallet713->setSendMarketplaceMessage(getErrorMessage(events, "Unable to process SendMarketplaceMessage response"), "", offer_id, wallet_tor_address );
+    return true;
+
 }
 
 

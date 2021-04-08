@@ -14,7 +14,7 @@
 
 #include "s_newswap3_w.h"
 #include "ui_s_newswap3_w.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include "../bridge/util_b.h"
 #include "../control_desktop/messagebox.h"
 

@@ -20,6 +20,23 @@
 
 namespace wallet {
 
+// It is listener task. No input can be defined.
+// Listening for a  accept_offer and fail_bidding messages
+class TaskSwapMktNewMessage : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 3600*1000*5; // NA in any case
+
+    TaskSwapMktNewMessage( MWC713 *wallet713 ) :
+            Mwc713Task("TaskSwapMktNewMessage", "", "", wallet713,"") {}
+
+    virtual ~TaskSwapMktNewMessage() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>();}
+};
+
+
 class TaskCreateIntegrityFee : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*120; // 120 seconds can be possible because of the status update and connection errors
@@ -205,6 +222,29 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
+};
+
+
+class TasksSendMarketplaceMessage : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000*60*3; // might take time because of connection timeouts
+
+    TasksSendMarketplaceMessage( MWC713 * wallet713, QString command, QString _wallet_tor_address, QString _offer_id) :
+            Mwc713Task("TasksSendMarketplaceMessage", "",
+                       "send_marketplace_message --command " + command + " --offer_id " + _offer_id + " --tor_address " + _wallet_tor_address,
+                       wallet713, ""),
+            wallet_tor_address(_wallet_tor_address),
+            offer_id(_offer_id)
+    {}
+
+    virtual ~TasksSendMarketplaceMessage() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    QString wallet_tor_address;
+    QString offer_id;
 };
 
 

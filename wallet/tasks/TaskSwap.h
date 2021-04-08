@@ -83,6 +83,7 @@ public:
     const static int64_t TIMEOUT = 1000*120; // In case of network issues, it will take time for retry
 
     TaskCreateNewSwapTrade( MWC713 *wallet713,
+                            QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
                             int min_confirmations,
                             QString mwcAmount, QString  secAmount, QString secondary,
                             QString redeemAddress,
@@ -100,7 +101,7 @@ public:
                             QString _tag,
                             QVector<QString> _params ) :
             Mwc713Task("TaskCreateNewSwapTrade", "Creaating new Swap trade...",
-                       generateCommandLine(min_confirmations,mwcAmount, secAmount, secondary,
+                       generateCommandLine(outputs, min_confirmations,mwcAmount, secAmount, secondary,
                                     redeemAddress, secTxFee, sellerLockFirst, messageExchangeTimeMinutes,
                                     redeemTimeMinutes, mwcConfirmationNumber, secondaryConfirmationNumber,
                                     communicationMethod, communicationAddress, electrum_uri1,
@@ -113,7 +114,9 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
-    QString generateCommandLine(int min_confirmations,
+    QString generateCommandLine(
+                                QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
+                                int min_confirmations,
                                 QString mwcAmount, QString  secAmount, QString secondary,
                                 QString redeemAddress,
                                 double secTxFee,

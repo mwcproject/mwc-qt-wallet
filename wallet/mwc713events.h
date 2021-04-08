@@ -91,6 +91,9 @@ enum WALLET_EVENTS {
     // Swaps
     S_SWAP_GET_OFFER = 90,
 
+    // Swap Marketplace
+    S_MKT_ACCEPT_OFFER = 95,
+    S_MKT_FAIL_BIDDING = 96,
 };
 QString toString(WALLET_EVENTS event);
 

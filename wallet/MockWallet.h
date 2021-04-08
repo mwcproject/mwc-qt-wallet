@@ -298,6 +298,7 @@ public:
     // Create a new Swap trade deal.
     // Check Signal: void onCreateNewSwapTrade(tag, dryRun, QVector<QString> params, QString swapId, QString err);
     virtual void createNewSwapTrade(QString account,
+                                    QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
                                     int min_confirmations, // minimum number of confimations
                                     QString mwcAmount, QString secAmount, QString secondary,
                                     QString redeemAddress,

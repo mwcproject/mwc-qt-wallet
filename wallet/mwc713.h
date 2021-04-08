@@ -289,6 +289,7 @@ public:
     // Create a new Swap trade deal.
     // Check Signal: void onCreateNewSwapTrade(tag, dryRun, QVector<QString> params, QString swapId, QString err);
     virtual void createNewSwapTrade(QString account,
+                                    QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
                                     int min_confirmations, // minimum number of confimations
                                     QString mwcAmount, QString secAmount, QString secondary,
                                     QString redeemAddress,
@@ -390,6 +391,10 @@ public:
     // Check Signal: onStopListenOnTopic(QString error);
     virtual void stopListenOnTopic(const QString & topic) override;
 
+    // Send marketplace message and get a response back
+    // command: "accept_offer" or "fail_bidding"
+    // Check Signal: onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress);
+    virtual void sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id) override;
 public:
     // launch exit command.
     void launchExitCommand();
@@ -551,6 +556,10 @@ public:
 
     void setStopListenOnTopic(QString error);
 
+    // Notify about new Marketplace message
+    void notifyAboutNewMktMessage(int messageId, QString wallet_tor_address, QString offer_id);
+
+    void setSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress);
 private:
     // Request sync (update_wallet_state) if it is not at the task Q.
     QVector<QPair<Mwc713Task*,int64_t>> create_sync_if_need(bool showSyncProgress, bool enforce);
