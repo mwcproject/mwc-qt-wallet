@@ -1108,8 +1108,8 @@ void MWC713::requestMessagingStatus() {
 
 // Publish new json message
 // Check Signal: onMessagingPublish(QString id, QString uuid, QString error)
-void MWC713::messagingPublish(QString messageJsonStr, QString feeTxUuid, QString id, int publishInterval) {
-    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskMessagingPublish(this, messageJsonStr, feeTxUuid, id, publishInterval, "swap_marketplace"), TaskMessagingPublish::TIMEOUT)} );
+void MWC713::messagingPublish(QString messageJsonStr, QString feeTxUuid, QString id, int publishInterval, QString topic) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskMessagingPublish(this, messageJsonStr, feeTxUuid, id, publishInterval, topic), TaskMessagingPublish::TIMEOUT)} );
 }
 
 // Check integrity of published messages.

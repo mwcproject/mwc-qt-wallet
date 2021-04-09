@@ -369,7 +369,7 @@ public:
 
     // Publish new json message
     // Check Signal: onMessagingPublish(QString id, QString uuid, QString error)
-    virtual void messagingPublish(QString messageJsonStr, QString feeTxUuid, QString id, int publishInterval) override;
+    virtual void messagingPublish(QString messageJsonStr, QString feeTxUuid, QString id, int publishInterval, QString topic) override;
 
     // Check integrity of published messages.
     // Check Signal:  onCheckIntegrity(QVector<QString> expiredMsgUuid)

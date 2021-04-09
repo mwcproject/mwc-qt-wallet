@@ -583,7 +583,7 @@ void SwapMarketplace::respRequestIntegrityFees(QString error, int64_t balance, Q
 
             if (isConfirmed) {
                 // let's start the broadcasting...
-                context->wallet->messagingPublish( ms.offer.toJsonStr(), ms.integrityFee.uuid, ms.offer.id, OFFER_PUBLISHING_INTERVAL_SEC );
+                context->wallet->messagingPublish( ms.offer.toJsonStr(), ms.integrityFee.uuid, ms.offer.id, OFFER_PUBLISHING_INTERVAL_SEC, SWAP_TOPIC );
             }
         }
     }
