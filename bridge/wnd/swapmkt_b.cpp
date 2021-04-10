@@ -80,6 +80,10 @@ QVector<QString> SwapMarketplace::getMarketOffers(double minFeeLevel, bool selli
     return res;
 }
 
+int  SwapMarketplace::getTotalOffers() {
+    return getSwapMkt()->getTotalOffers();
+}
+
 // Response at: sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> IntegrityFeesJsonStr);
 void SwapMarketplace::requestIntegrityFees() {
     getSwapMkt()->requestIntegrityFees();

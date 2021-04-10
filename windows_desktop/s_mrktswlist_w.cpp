@@ -147,6 +147,7 @@ void MrktSwList::updateMktFilter() {
     }
 
     status += "    Status: " + swapMarketplace->getOffersListeningStatus();
+    status += "    Found Offers: " + QString::number(swapMarketplace->getTotalOffers());
 
     ui->filterSettings->setText(status);
 }

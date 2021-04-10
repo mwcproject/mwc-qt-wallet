@@ -270,41 +270,19 @@ QString SwapMarketplace::createNewOffer( QString offerId, QString  account,
         return "Not found offer with Id " + offerId;
     }
 
-    QString offerUuid = "SwapOffer_" + QString::number(currentOfferId++);
+    QString offerKey = "SwapOffer_" + QString::number(currentOfferId++);
 
     // Let's check if we have some funds and lock the funds.
+    QPair<QString, QStringList> lockedOutputs;
     if (sell) {
-        const QMap<QString, QVector<wallet::WalletOutput> > &outputs = context->wallet->getwalletOutputs();
-        QVector<wallet::WalletOutput> outs = outputs.value(account);
-
-        std::sort(outs.begin(), outs.end(), [](const wallet::WalletOutput &o1, const wallet::WalletOutput &o2) {
-            return o1.valueNano < o2.valueNano;
-        });
-        int64_t needAmount = int64_t((mwcAmount + 0.05) * 1000000000.0 + 0.5);
-        int64_t reservedAmounts = needAmount;
-        int64_t foundAmount = 0;
-        QStringList output2lock;
-        for (auto &o : outs) {
-            if (context->appContext->isLockedOutputs(o.outputCommitment).first)
-                continue;
-            foundAmount += o.valueNano;
-            reservedAmounts -= o.valueNano;
-            output2lock += o.outputCommitment;
-            if (reservedAmounts <= 0)
-                break;
-        }
-
-        if (reservedAmounts > 0) {
-            return "There is not enough funds at account " + account + ". You need " + util::nano2one(needAmount) +
-                   " MWC, but have available " + util::nano2one(foundAmount) + " MWC";
-        }
-
-        for (auto &s : output2lock)
-            context->appContext->setLockedOutput(s, true, offerUuid);
+        lockedOutputs = lockOutputsForSellOffer(account, mwcAmount, offerKey);
     }
 
+    if (!lockedOutputs.first.isEmpty())
+        return lockedOutputs.first;
+
     // Now we can create the offer and publish it...
-    MySwapOffer offer(MktSwapOffer(offerUuid,
+    MySwapOffer offer(MktSwapOffer(offerKey,
                                    sell,
                                    mwcAmount,
                                    secAmount,
@@ -314,11 +292,46 @@ QString SwapMarketplace::createNewOffer( QString offerId, QString  account,
                       account,
                       secAddress,
                       secFee,
-                      note);
+                      note,
+                      lockedOutputs.second);
 
     myOffers.push_back(offer);
     emit onMyOffersChanged();
     return "";
+}
+
+QPair<QString, QStringList> SwapMarketplace::lockOutputsForSellOffer(const QString & account, double mwcAmount, QString offerId) {
+    const QMap<QString, QVector<wallet::WalletOutput> > &outputs = context->wallet->getwalletOutputs();
+    QVector<wallet::WalletOutput> outs = outputs.value(account);
+
+    std::sort(outs.begin(), outs.end(), [](const wallet::WalletOutput &o1, const wallet::WalletOutput &o2) {
+        return o1.valueNano < o2.valueNano;
+    });
+    int64_t needAmount = int64_t((mwcAmount + 0.05) * 1000000000.0 + 0.5);
+    int64_t reservedAmounts = needAmount;
+    int64_t foundAmount = 0;
+    QStringList output2lock;
+    for (auto &o : outs) {
+        if (!o.isUnspent())
+            continue;
+        if (context->appContext->isLockedOutputs(o.outputCommitment).first)
+            continue;
+        foundAmount += o.valueNano;
+        reservedAmounts -= o.valueNano;
+        output2lock += o.outputCommitment;
+        if (reservedAmounts <= 0)
+            break;
+    }
+
+    if (reservedAmounts > 0) {
+        return QPair<QString, QStringList>("There is not enough funds at account " + account + ". You need " + util::nano2one(needAmount) +
+               " MWC, but have available " + util::nano2one(foundAmount) + " MWC", {});
+    }
+
+    for (auto &s : output2lock)
+        context->appContext->setLockedOutput(s, true, offerId);
+
+    return QPair<QString, QStringList>("", output2lock);
 }
 
 void SwapMarketplace::withdrawMyOffer(QString offerId) {
@@ -349,11 +362,19 @@ QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, bool 
         if (ofr.timestamp < timeLimit)
             continue;
 
-        if ( ofr.sell == selling && ofr.getFeeLevel() >= minFeeLevel && currency==ofr.secondaryCurrency && ofr.mwcAmount >= minMwcAmount && ofr.mwcAmount <= maxMwcAmount )
+        if ( ofr.sell == selling && ofr.getFeeLevel() >= minFeeLevel && currency==ofr.secondaryCurrency &&
+             (minMwcAmount<=0.0 || ofr.mwcAmount >= minMwcAmount) &&
+             (maxMwcAmount<=0.0 || ofr.mwcAmount <= maxMwcAmount) )
             result.push_back(ofr);
     }
     return result;
 }
+
+// All marketplace offers that are published
+int SwapMarketplace::getTotalOffers() {
+    return marketOffers.size();
+}
+
 
 // Response at: onIntegrityFees(QVector<IntegrityFees> fees)
 void SwapMarketplace::requestIntegrityFees() {
@@ -395,7 +416,7 @@ void SwapMarketplace::onTimerEvent() {
 
     // checking the libp2p status periodically
     if (context->wallet->isWalletRunningAndLoggedIn()) {
-        if (lastMessagingStatusRequest + 60 < curTime ) {
+        if (lastMessagingStatusRequest + 20 < curTime ) {
             context->wallet->requestMessagingStatus();
         }
     }
@@ -409,6 +430,8 @@ void SwapMarketplace::onTimerEvent() {
         startMktListening = QDateTime::currentSecsSinceEpoch();
         return; // waiting for more connections
     }*/
+
+    requestMktSwapOffers();
 
     // Check if we need to start anything
     bool hasPending = false;
@@ -438,6 +461,42 @@ void SwapMarketplace::onTimerEvent() {
         lastCheckIntegrity = curTime;
         context->wallet->checkIntegrity();
         // continue at respCheckIntegrity...
+    }
+
+    // Validating locked output...
+    const QMap<QString, QVector<wallet::WalletOutput> > & outputs = context->wallet->getwalletOutputs();
+    QSet<QString> allOutputs;
+    for (auto oi = outputs.begin(); oi != outputs.end(); oi++ ) {
+        for (auto out : oi.value()) {
+            if (out.isUnspent()) {
+                allOutputs += out.outputCommitment;
+            }
+        }
+    }
+
+    for (int i=myOffers.size()-1; i>=0; i--) {
+        auto & mo = myOffers[i];
+        bool outputGone = false;
+        for (auto & o : mo.outputs) {
+            if (!allOutputs.contains(o)) {
+                outputGone = true;
+            }
+        }
+
+        if (outputGone) {
+            qDebug() << "Need to recalculate outputs for my offer " << mo.offer.id;
+            context->appContext->unlockOutputsById(mo.offer.id);
+
+            auto lockedOutputs = lockOutputsForSellOffer(mo.account, mo.offer.mwcAmount, mo.offer.id);
+            if (!lockedOutputs.first.isEmpty()) {
+                myOffers.remove(i);
+                core::getWndManager()->messageTextDlg("Warning", "You sell offer is rejected because outputs that it depend on are spent. It can happen because of integrity fee payment.\n\n" + lockedOutputs.first);
+                // return because of the message box delay. The data can be changed by that time.
+                return;
+            }
+
+            mo.outputs = lockedOutputs.second;
+        }
     }
 }
 
@@ -662,14 +721,21 @@ void SwapMarketplace::respReceiveMessages(QString error, QVector<wallet::Receive
     if (!error.isEmpty())
         return; // Should have the message at notifications. But there is nothing what we can do at handler
 
+    QVector<QString> startMsgIds;
+    for (auto & offer : marketOffers) {
+        startMsgIds.push_back(offer.walletAddress + "_" + offer.id);
+    }
+    std::sort(startMsgIds.begin(), startMsgIds.end());
+
+
     // Updating  marketOffers
     for ( const auto & m : msgs) {
-        if (m.message!=SWAP_TOPIC)
+        if (m.topic!=SWAP_TOPIC)
             continue;
 
         QJsonParseError error;
         QJsonDocument jsonDoc = QJsonDocument::fromJson(m.message.toUtf8(), &error);
-        if (error.error == QJsonParseError::NoError || !jsonDoc.isObject()) {
+        if (error.error != QJsonParseError::NoError || !jsonDoc.isObject()) {
             qDebug() << "Unable to process libp2p message " << m.message << "  wallet " << m.wallet;
             continue;
         }
@@ -682,7 +748,7 @@ void SwapMarketplace::respReceiveMessages(QString error, QVector<wallet::Receive
             continue;
         }
 
-        offer.mktFee = m.fee;
+        offer.mktFee = double(m.fee) / 1000000000.0;
         offer.walletAddress = m.wallet;
         offer.timestamp = QDateTime::currentSecsSinceEpoch();
 
@@ -692,7 +758,17 @@ void SwapMarketplace::respReceiveMessages(QString error, QVector<wallet::Receive
     }
     cleanMarketOffers();
 
-    emit onMarketPlaceOffersChanged();
+    QVector<QString> endMsgIds;
+    for (auto & offer : marketOffers) {
+        endMsgIds.push_back(offer.walletAddress + "_" + offer.id);
+    }
+    std::sort(endMsgIds.begin(), endMsgIds.end());
+
+    // Emit change only if datta was changed because of UI.
+    if (startMsgIds != endMsgIds) {
+        emit onMarketPlaceOffersChanged();
+    }
+
 }
 
 
@@ -704,7 +780,7 @@ QString SwapMarketplace::getOffersListeningStatus() const {
         return "connecting...";
 
     if (messagingStatus.gossippub_peers.size() < 5)
-        return "waiting for peers";
+        return "found " + QString::number(messagingStatus.gossippub_peers.size()) + " peers" ;
 
     int64_t collectingTime = QDateTime::currentSecsSinceEpoch() - startMktListening;
     Q_ASSERT(collectingTime>=0);

@@ -278,9 +278,6 @@ void MrktSwapNew::on_cancelButton_clicked() {
 }
 
 void MrktSwapNew::on_submitButton_clicked() {
-    ui->submitButton->setEnabled(false);
-    ui->progress->show();
-
     QString account = ui->accountComboBox->currentData().toString();
     QString secCurrency = ui->secCurrencyCombo->currentData().toString();
     if (secCurrency.isEmpty()) {
@@ -366,6 +363,9 @@ void MrktSwapNew::on_submitButton_clicked() {
     if (!offer.offer.sell) {
         mwcAmount = "";
     }
+
+    ui->submitButton->setEnabled(false);
+    ui->progress->show();
 
     swap->applyNewTrade1Params(account, secCurrency, mwcAmount, secAmount,
             secAddress, "", false );

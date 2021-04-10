@@ -89,6 +89,7 @@ struct MySwapOffer {
     double  secFee = 0.0;
     QString note;
     OFFER_STATUS status;
+    QStringList outputs; // Locked output. Need for verification and reevaluation.
 
     wallet::IntegrityFees integrityFee;
 
@@ -97,15 +98,17 @@ struct MySwapOffer {
     MySwapOffer & operator = (const MySwapOffer & itm) = default;
 
     MySwapOffer(MktSwapOffer _offer,
-        QString  _account,
-        QString _secAddress,
-        double  _secFee,
-        QString _note) :
+                QString  _account,
+                QString _secAddress,
+                double  _secFee,
+                QString _note,
+                QStringList _outputs) :
         offer(_offer),
         account(_account),
         secAddress(_secAddress),
         secFee(_secFee),
-        note(_note)
+        note(_note),
+        outputs(_outputs)
     {
         msgUuid = ""; // uuid will be assigned when wallet create it
         status = OFFER_STATUS::PENDING;
@@ -151,6 +154,8 @@ public:
     QVector<MySwapOffer> getMyOffers() const {return myOffers;}
     // Request marketplace offers with filtering
     QVector<MktSwapOffer> getMarketOffers(double minFeeLevel, bool selling, QString currency, double minMwcAmount, double maxMwcAmount );
+    // All marketplace offers that are published
+    int getTotalOffers();
 
     // Response at: onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees);
     void requestIntegrityFees();
@@ -192,6 +197,9 @@ protected:
     // Node, several offers can be run in parallel until one of them will reach the locking stage.
     // Then the rest will be cancelled.
     void createNewSwapTrade( MySwapOffer offer, QString wallet_tor_address);
+
+    // Lock outputs for my offer. Return Error or result
+    QPair<QString, QStringList> lockOutputsForSellOffer(const QString & account, double mwcAmount, QString offerId);
 private:
 signals:
     void onMarketPlaceOffersChanged();

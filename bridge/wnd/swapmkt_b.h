@@ -43,6 +43,8 @@ public:
     // JSon strings with MktSwapOffer. Requesting marketplace offers with filtering
     Q_INVOKABLE QVector<QString> getMarketOffers(double minFeeLevel, bool selling, QString currency, double minMwcAmount, double maxMwcAmount) const;
 
+    Q_INVOKABLE int  getTotalOffers();
+
     // Response at: sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> IntegrityFeesJsonStr);
     Q_INVOKABLE void requestIntegrityFees();
 
