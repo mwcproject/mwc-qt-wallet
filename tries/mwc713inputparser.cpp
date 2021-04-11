@@ -456,7 +456,7 @@ void Mwc713InputParser::initSwaps() {
 
     // Get accept_offer message from gxcnwi....4twad for off_223
     // Get fail_bidding message from gxcnwi....4twad for off_223
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SWAP_GET_OFFER,
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_MKT_ACCEPT_OFFER,
                                                 QVector<BaseTrieSection*>{
                                                         new TriePhraseSection("Get accept_offer message from "),
                                                         // Account name have extra character!
