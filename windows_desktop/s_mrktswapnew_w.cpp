@@ -298,7 +298,6 @@ void MrktSwapNew::on_submitButton_clicked() {
     double secCurrencyLimit = swap->getSecMinAmount(secCurrency);
 
     if (!config->getNetwork().toLower().contains("main")) {
-        mwcLimit /= 10.0;
         secCurrencyLimit /= 10.0;
     }
 
