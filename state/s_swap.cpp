@@ -512,9 +512,9 @@ void Swap::createStartSwap() {
             newSwapElectrumXUrl,
             "",
             false,
-            "",
+            "createNewSwap",
+            mktOfferId.isEmpty() ? "" : newSwapBuyerAddress + "_" + mktOfferId,
             {});
-
     // Continue at onCreateNewSwapTrade
 }
 
@@ -533,7 +533,7 @@ void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> param
                 context->appContext->updateNote("swap_" + swapId, newSwapNote);
 
             runTrade(swapId, tag, true, "SellerOfferCreated");
-            //showTradeDetails(swapId);
+            showTradeDetails(swapId);
             core::getWndManager()->messageTextDlg("Swap Trade", "Congratulation! Your swap trade with ID\n" + swapId +
                                                                 "\nwas successfully created.");
         }
@@ -686,6 +686,7 @@ int Swap::calcConfirmationsForMwcAmount(double mwcAmount) const {
 
 
 void Swap::resetNewSwapData() {
+    mktOfferId = "";
     newSwapAccount = context->wallet->getCurrentAccountName();
     newSwapCurrency = context->appContext->getLastUsedSwapCurrency();
     newSwapMwc2Trade = "";
@@ -847,6 +848,7 @@ void Swap::startTrading(const MySwapOffer & offer, QString wallet_tor_address) {
                                          "",
                                          "",
                                          false,
+                                         "", // we will start silently.
                                          offer.offer.id,
                                          {});
 
@@ -863,9 +865,10 @@ void Swap::acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address) {
 
     acceptedOffers.insert(wallet_tor_address, accepted);
 
-    if (offer.sell) {
-        // Let's create it manually
+    if (!offer.sell) {
+        // It is buy offer, so I am a seeler. Let's create it manually...
         resetNewSwapData();
+        mktOfferId = offer.id;
         newSwapCurrency = offer.secondaryCurrency;
         newSwapCurrency2recalc = newSwapCurrency;
         newSwapMwc2Trade = QString::number(offer.mwcAmount);
@@ -887,6 +890,9 @@ void Swap::acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address) {
 
     // For Buy let's check if there is already a request...
     // TODO Implement auto accept code, acceptedOffers  has all accepted
+    core::getWndManager()->messageTextDlg("Waiting for offer", "Wallet " + wallet_tor_address + " should initate atomic swap trade soon. "
+        "This trade will be accepted atomatically. Please be online to lock your " + offer.secondaryCurrency + " coins.\n\n"
+        "Please note, if several traders accept the same offers, trader who lock funds first will be able to finish the trade. You will be notified if your offer will be rejected because of that.");
 }
 
 // Reject any offers from this address. We don't want them, we are likely too late

@@ -112,6 +112,9 @@ public:
     // List of the secondary currencies that wallet support
     Q_INVOKABLE QVector<QString> secondaryCurrencyList();
 
+    // Check if this trade is created from accepted Marketplace offer
+    Q_INVOKABLE bool isMktTrade();
+
     // Current selected currency to trade
     Q_INVOKABLE QString getCurrentSecCurrency();
     Q_INVOKABLE QString getCurrentSecCurrencyFeeUnits();

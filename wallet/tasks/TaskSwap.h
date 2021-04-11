@@ -99,13 +99,14 @@ public:
                             QString electrum_uri2,
                             bool _dryRun,
                             QString _tag,
+                            QString mkt_trade_tag,
                             QVector<QString> _params ) :
             Mwc713Task("TaskCreateNewSwapTrade", "Creaating new Swap trade...",
                        generateCommandLine(outputs, min_confirmations,mwcAmount, secAmount, secondary,
                                     redeemAddress, secTxFee, sellerLockFirst, messageExchangeTimeMinutes,
                                     redeemTimeMinutes, mwcConfirmationNumber, secondaryConfirmationNumber,
                                     communicationMethod, communicationAddress, electrum_uri1,
-                                    electrum_uri2, _dryRun),
+                                    electrum_uri2, mkt_trade_tag, _dryRun),
                        wallet713, ""), tag(_tag), dryRun(_dryRun), params(_params) {}
 
     virtual ~TaskCreateNewSwapTrade() override {}
@@ -129,6 +130,7 @@ private:
                                 QString communicationAddress,
                                 QString electrum_uri1,
                                 QString electrum_uri2,
+                                QString mkt_trade_tag,
                                 bool dryRun) const;
 
     QString tag;

@@ -30,6 +30,7 @@ namespace state {
 const int OFFER_PUBLISHING_INTERVAL_SEC = 120;
 const QString SWAP_TOPIC = "SwapMarketplace";
 
+const int MIN_PEERS_NUMBER = 5;
 
 Swap * getSwap() {
     return (Swap *)getState(STATE::SWAP);
@@ -370,9 +371,22 @@ QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, bool 
     return result;
 }
 
-// All marketplace offers that are published
-int SwapMarketplace::getTotalOffers() {
-    return marketOffers.size();
+// All marketplace offers that are published buy currency. Sorted by largest number
+QVector<QPair<QString,int>> SwapMarketplace::getTotalOffers() {
+    QHash<QString, int> offers;
+    for ( auto & mo : marketOffers ) {
+        offers.insert( mo.secondaryCurrency, offers.value(mo.secondaryCurrency, 0) + 1);
+    }
+
+    QVector<QPair<QString,int>> result;
+    for (auto oi = offers.begin(); oi!=offers.end(); oi++)
+        result.push_back( QPair<QString,int>(oi.key(), oi.value()) );
+
+    std::sort( result.begin(), result.end(), [](const QPair<QString,int> &o1, const QPair<QString,int> &o2) {
+        return o1.second > o2.second;
+    } );
+
+    return result;
 }
 
 
@@ -659,6 +673,9 @@ void SwapMarketplace::respRequestMessagingStatus(QString error, wallet::Messagin
     if (error.isEmpty()) {
         lastMessagingStatusRequest = QDateTime::currentSecsSinceEpoch();
         messagingStatus = status;
+
+        if (!messagingStatus.connected || messagingStatus.gossippub_peers.size()<MIN_PEERS_NUMBER)
+            startMktListening = QDateTime::currentSecsSinceEpoch();
     }
     else {
         qDebug() << "respRequestMessagingStatus return error: " << error;
@@ -776,17 +793,19 @@ QString SwapMarketplace::getOffersListeningStatus() const {
     if (startMktListening==0 || !messagingStatus.connected || messagingStatus.topics.isEmpty())
         return "not listening";
 
-    if (messagingStatus.gossippub_peers.isEmpty() )
+    if (messagingStatus.gossippub_peers.isEmpty() ) {
         return "connecting...";
+    }
 
-    if (messagingStatus.gossippub_peers.size() < 5)
-        return "found " + QString::number(messagingStatus.gossippub_peers.size()) + " peers" ;
+    if (messagingStatus.gossippub_peers.size() < MIN_PEERS_NUMBER) {
+        return "found " + QString::number(messagingStatus.gossippub_peers.size()) + " peers";
+    }
 
     int64_t collectingTime = QDateTime::currentSecsSinceEpoch() - startMktListening;
     Q_ASSERT(collectingTime>=0);
 
     if ( collectingTime < OFFER_PUBLISHING_INTERVAL_SEC ) {
-        return "Collecting marketplace offers, progress is " + QString::number( collectingTime * 100 / OFFER_PUBLISHING_INTERVAL_SEC ) + "%";
+        return "Collecting marketplace offers... " + QString::number( collectingTime * 100 / OFFER_PUBLISHING_INTERVAL_SEC ) + "%";
     }
 
     return "Listening";
@@ -878,17 +897,18 @@ void SwapMarketplace::createNewSwapTrade( MySwapOffer offer, QString wallet_tor_
 }
 
 // Accept the offer from marketplace
-void SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddress) {
+bool SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddress) {
     QString key = walletAddress + "_" + offerId;
 
     MktSwapOffer mktOffer = marketOffers.value(key);
     if (mktOffer.isEmpty()) {
         core::getWndManager()->messageTextDlg("Error", "Unfortunately you can't accept offer from "+walletAddress+". It is not on the market any more.");
-        return;
+        return false;
     }
 
     // Let's send accept offer message to another wallet.
     context->wallet->sendMarketplaceMessage("accept_offer", walletAddress, offerId);
+    return true;
 }
 
 // Response from sendMarketplaceMessage
@@ -914,7 +934,7 @@ void SwapMarketplace::onSendMarketplaceMessage(QString error, QString response, 
     int running_num = 100;
     bool ok = false;
     if (idx1<idx2 && idx1>0) {
-        running_num = response.mid(idx1+1, idx2-idx1).trimmed().toInt(&ok);
+        running_num = response.mid(idx1+1, idx2-idx1-1).trimmed().toInt(&ok);
     }
 
     if (!ok || running_num<0) {

@@ -19,17 +19,18 @@
 
 namespace control {
 
+// Message box normally error and it should cancel the progress. It is a shortcut that help to avoid propagate back response signals
+void onMessageBoxShown();
+
 // Progress movie control
 class MwcLabelProgress : public QLabel {
 Q_OBJECT
 public:
-    explicit MwcLabelProgress(QWidget * parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags() );
-    explicit MwcLabelProgress(const QString &text, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    explicit MwcLabelProgress(QWidget * parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags(), bool hideWithMessageBox = true );
+    explicit MwcLabelProgress(const QString &text, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags(), bool hideWithMessageBox = true);
     virtual ~MwcLabelProgress() override;
 
     void initLoader(bool visible);
-
-private:
 };
 
 }

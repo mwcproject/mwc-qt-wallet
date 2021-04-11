@@ -141,6 +141,7 @@ QString TaskCreateNewSwapTrade::generateCommandLine(
                             QString communicationAddress,
                             QString electrum_uri1,
                             QString electrum_uri2,
+                            QString mkt_trade_tag,
                             bool dryRun) const
 {
     Q_ASSERT(messageExchangeTimeMinutes>0);
@@ -187,6 +188,9 @@ QString TaskCreateNewSwapTrade::generateCommandLine(
 
     if (dryRun)
         cmdLine += " --dry_run";
+
+    if (!mkt_trade_tag.isEmpty())
+        cmdLine += " --tag " + mkt_trade_tag;
 
     return cmdLine;
 }

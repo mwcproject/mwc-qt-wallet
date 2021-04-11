@@ -556,6 +556,7 @@ void MockWallet::createNewSwapTrade(QString account,
                                     QString electrum_uri2,
                                     bool dryRun,
                                     QString tag,
+                                    QString mkt_trade_tag,
                                     QVector<QString> params ) {
     Q_UNUSED(account)
     Q_UNUSED(outputs)
@@ -572,8 +573,9 @@ void MockWallet::createNewSwapTrade(QString account,
     Q_UNUSED(secondaryConfirmationNumber)
     Q_UNUSED(communicationMethod)
     Q_UNUSED(communicationAddress)
-    Q_UNUSED(electrum_uri1);
-    Q_UNUSED(electrum_uri2);
+    Q_UNUSED(electrum_uri1)
+    Q_UNUSED(electrum_uri2)
+    Q_UNUSED(mkt_trade_tag)
 
     emit onCreateNewSwapTrade(tag, dryRun, params, "XXXXX-new-trade-id-XXXXX", "");
 }

@@ -56,6 +56,15 @@ NewSwap1::NewSwap1(QWidget *parent) :
     ui->contactNameLable->hide();
 
     ui->progress->initLoader(false);
+
+    bool mktTrade = swap->isMktTrade();
+    ui->mwcAmountEdit->setEnabled(!mktTrade);
+    ui->secCurrencyCombo->setEnabled(!mktTrade);
+    ui->secAmountEdit->setEnabled(!mktTrade);
+    ui->swapRateEdit->setEnabled(!mktTrade);
+    ui->lockMwcFirstCheck->setEnabled(!mktTrade);
+    ui->sendAddressEdit->setEnabled(!mktTrade);
+    ui->contactsButton->setEnabled(!mktTrade);
 }
 
 NewSwap1::~NewSwap1() {

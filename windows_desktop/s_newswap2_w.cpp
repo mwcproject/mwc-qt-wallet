@@ -53,6 +53,13 @@ NewSwap2::NewSwap2(QWidget *parent) :
     updateFundsLockTime();
 
     ui->progress_2->initLoader(false);
+
+    bool mktTrade = swap->isMktTrade();
+    ui->offerExpirationCombo->setEnabled(!mktTrade);
+    ui->secRedeemCombo->setEnabled(!mktTrade);
+    ui->mwcBlocksEdit->setEnabled(!mktTrade);
+    ui->secBlocksEdit->setEnabled(!mktTrade);
+
 }
 
 NewSwap2::~NewSwap2() {

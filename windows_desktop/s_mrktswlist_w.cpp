@@ -119,8 +119,7 @@ void MrktSwList::updateModeButtons(int btnId) {
 
     ui->offersTable->setVisible( btnId==BTN_MKT_OFFERS || btnId==BTN_MY_OFFERS );
 
-    ui->refreshBtnsHolder->setVisible( btnId==BTN_MKT_OFFERS || btnId==BTN_MY_OFFERS );
-    ui->newOfferButton->setVisible(btnId==BTN_MY_OFFERS);
+    ui->refreshBtnsHolder->setVisible( btnId==BTN_MY_OFFERS );
 
     ui->progress->hide();
 
@@ -147,7 +146,20 @@ void MrktSwList::updateMktFilter() {
     }
 
     status += "    Status: " + swapMarketplace->getOffersListeningStatus();
-    status += "    Found Offers: " + QString::number(swapMarketplace->getTotalOffers());
+
+    QVector<QString> offers = swapMarketplace->getTotalOffers();
+    status += "    Found Offers: ";
+    if (offers.isEmpty()) {
+        status += "None";
+    }
+    else{
+        for (int i=1; i<offers.size(); i+=2) {
+            if (i>1)
+                status += ", ";
+
+            status += offers[i-1] + ": " + offers[i];
+        }
+    };
 
     ui->filterSettings->setText(status);
 }
@@ -381,8 +393,8 @@ void MrktSwList::richButtonPressed(control::RichButton *button, QString cookie) 
         QString torAddress = ids[0];
         QString offerId = ids[1];
         qDebug() << "Accepting the offer from " << torAddress << " with id " << offerId;
-        ui->progress->show();
-        swapMarketplace->acceptMarketplaceOffer(offerId, torAddress);
+        if (swapMarketplace->acceptMarketplaceOffer(offerId, torAddress))
+            ui->progress->show();
     } else {
         Q_ASSERT(false);
     }
@@ -480,13 +492,6 @@ void MrktSwList::on_newOfferButton_clicked() {
     swapMarketplace->pageCreateNewOffer("");
 }
 
-void MrktSwList::on_refreshButton_clicked() {
-    if (selectedTab == BTN_MKT_OFFERS) {
-        swapMarketplace->requestMktSwapOffers();
-        ui->progress->show();
-    }
-}
-
 void MrktSwList::on_offersListenSettingsBtn_clicked() {
     util::TimeoutLockObject to("SwapBackupDlg");
 
@@ -529,7 +534,7 @@ void MrktSwList::sgnRequestIntegrityFees(QString error, int64_t balance, QVector
         // get the data
         QString report = "Reserved " + util->nano2one(balance) + " MWC\n";
         if (integrityFeesJsonStr.isEmpty()) {
-            report += "No active fees are available";
+            report += "No paid integrity fees are available";
         }
         else {
             report += "Paid active fees:\n";

@@ -80,8 +80,16 @@ QVector<QString> SwapMarketplace::getMarketOffers(double minFeeLevel, bool selli
     return res;
 }
 
-int  SwapMarketplace::getTotalOffers() {
-    return getSwapMkt()->getTotalOffers();
+QVector<QString> SwapMarketplace::getTotalOffers() {
+    QVector<QString> res;
+
+    for (auto of : getSwapMkt()->getTotalOffers()) {
+        res.push_back(of.first);
+        Q_ASSERT(of.second>0);
+        res.push_back(QString::number(of.second));
+    }
+
+    return res;
 }
 
 // Response at: sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> IntegrityFeesJsonStr);
@@ -139,8 +147,8 @@ void SwapMarketplace::requestMktSwapOffers() {
 }
 
 // Accept the offer from marketplace
-void SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddress) {
-    getSwapMkt()->acceptMarketplaceOffer(offerId, walletAddress);
+bool SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddress) {
+    return getSwapMkt()->acceptMarketplaceOffer(offerId, walletAddress);
 }
 
 void SwapMarketplace::onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees) {

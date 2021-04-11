@@ -154,8 +154,8 @@ public:
     QVector<MySwapOffer> getMyOffers() const {return myOffers;}
     // Request marketplace offers with filtering
     QVector<MktSwapOffer> getMarketOffers(double minFeeLevel, bool selling, QString currency, double minMwcAmount, double maxMwcAmount );
-    // All marketplace offers that are published
-    int getTotalOffers();
+    // All marketplace offers that are published buy currency. Sorted by largest number
+    QVector<QPair<QString,int>> getTotalOffers();
 
     // Response at: onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees);
     void requestIntegrityFees();
@@ -183,7 +183,7 @@ public:
     void pageMktList(bool selectMyOffers);
 
     // Accept the offer from marketplace
-    void acceptMarketplaceOffer(QString offerId, QString walletAddress);
+    bool acceptMarketplaceOffer(QString offerId, QString walletAddress);
 protected:
     virtual NextStateRespond execute() override;
     virtual bool mobileBack() override;

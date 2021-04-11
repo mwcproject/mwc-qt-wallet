@@ -73,7 +73,6 @@ private slots:
     void on_activeFeesHelpBtn_clicked();
     void on_withdrawHelpBtn_clicked();
     void on_newOfferButton_clicked();
-    void on_refreshButton_clicked();
 
     void on_offersListenSettingsBtn_clicked();
 

@@ -442,6 +442,7 @@ void Swap::applyNewTrade1Params(QString account, QString secCurrency, QString mw
                                     "",
                                     true,
                                     sendToAddress.isEmpty() ? "mktPlaceNewOffer" : "applyNewTrade1Params",
+                                    "", // dry run doesn't care about mkt tag
                                     {account, secCurrency, mwcAmount, secAmount, secAddress, sendToAddress} );
 
 
@@ -491,6 +492,7 @@ void Swap::applyNewTrade2Params(QString secCurrency, int offerExpTime, int redee
                                     "",
                                     true,
                                     "applyNewTrade2Params",
+                                    "", // dry run doesn't care about mkt tag
                                     {electrumXUrl} );
 
     getSwap()->applyNewTrade21Params(secCurrency, offerExpTime, redeemTime, mwcBlocks, secBlocks,
@@ -551,6 +553,11 @@ void Swap::setAccount(QString accountName) {
 // List of the secondary currencies that wallet support
 QVector<QString> Swap::secondaryCurrencyList() {
     return getSwap()->secondaryCurrencyList();
+}
+
+// Check if this trade is created from accepted Marketplace offer
+bool Swap::isMktTrade() {
+    return getSwap()->isMktTrade();
 }
 
 QString Swap::getCurrentSecCurrency() {

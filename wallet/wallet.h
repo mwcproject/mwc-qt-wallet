@@ -774,6 +774,7 @@ public:
                                     QString electrum_uri2,
                                     bool dryRun,
                                     QString tag,
+                                    QString mkt_trade_tag,
                                     QVector<QString> params ) = 0;
 
     // Cancel the trade

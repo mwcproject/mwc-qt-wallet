@@ -910,6 +910,7 @@ void MWC713::createNewSwapTrade(QString account,
                                 QString electrum_uri2,
                                 bool dryRun,
                                 QString tag,
+                                QString mkt_trade_tag,
                                 QVector<QString> params ) {
 
     QVector<QPair<Mwc713Task*,int64_t>> taskGroup {
@@ -927,7 +928,7 @@ void MWC713::createNewSwapTrade(QString account,
                                            communicationAddress,
                                            electrum_uri1,
                                            electrum_uri2,
-                                           dryRun, tag, params), TaskCreateNewSwapTrade::TIMEOUT)
+                                           dryRun, tag, mkt_trade_tag, params), TaskCreateNewSwapTrade::TIMEOUT)
     };
 
     if (account!=currentAccount)

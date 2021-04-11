@@ -92,6 +92,9 @@ public:
     // List of the secondary currencies that wallet support
     QVector<QString> secondaryCurrencyList();
 
+    // Check if this trade is created from accepted Marketplace offer
+    bool isMktTrade() const {return !mktOfferId.isEmpty();}
+
     // Current selected currency to trade
     QString getCurrentSecCurrency() const {return newSwapCurrency;}
     void setCurrentSecCurrency(QString secCurrency);
@@ -231,6 +234,7 @@ private:
     long lastProcessedTimerData = 0;
 
     // New trade data.
+    QString mktOfferId; // true if it is marketplace. In this case most of those values we can't change
     QString newSwapAccount;
     QString newSwapCurrency;
     QString newSwapMwc2Trade;
