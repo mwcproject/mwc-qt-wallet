@@ -32,6 +32,8 @@ void MobileWndManager::init(QQmlApplicationEngine * _engine) {
     engine->load(QUrl(QStringLiteral("qrc:/windows_mobile/main.qml")));
     mainWindow = engine->rootObjects().first();
     mainWindow->setProperty("currentState", 0);
+    QString downloadPath = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+    mainWindow->setProperty("downloadPath", downloadPath);
 }
 
 
@@ -141,7 +143,8 @@ QString MobileWndManager::getSaveFileName(const QString &caption, const QString 
     Q_UNUSED(filter)
 
     QDateTime now;
-    QString fileName = "/storage/emulated/0/Android/data/mw.mwc.wallet/files/Download/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm");
+    QString downloadPath = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+    QString fileName = downloadPath + "/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm");
     return fileName;
 }
 
