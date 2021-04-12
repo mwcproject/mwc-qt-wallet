@@ -830,8 +830,6 @@ void SwapMarketplace::onStartListenOnTopic(QString error) {
         core::getWndManager()->messageTextDlg("Error", "Unable to start listening for atomic swap marketplace messages.");
         return;
     }
-
-    startMktListening = QDateTime::currentSecsSinceEpoch();
 }
 
 void SwapMarketplace::onStopListenOnTopic(QString error) {

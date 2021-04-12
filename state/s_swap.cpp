@@ -123,7 +123,10 @@ NextStateRespond Swap::execute() {
     if (context->appContext->getActiveWndState() != STATE::SWAP)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    pageTradeList();
+    if (!context->appContext->pullCookie<QString>("SwapShowNewTrade1").isEmpty())
+        showNewTrade1();
+    else
+        pageTradeList();
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
@@ -884,7 +887,12 @@ void Swap::acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address) {
         newSwapMwcConfNumber = offer.mwcLockBlocks;
         newSwapSecConfNumber = offer.secLockBlocks;
 
-        showNewTrade1();
+        // because it it different state and we don't want to switch it back,
+        // we need to chenge the satet to SWAP
+        context->appContext->pushCookie<QString>("SwapShowNewTrade1", "yes");
+        context->stateMachine->setActionWindow( state::STATE::SWAP );
+
+        //showNewTrade1();
         return;
     }
 
