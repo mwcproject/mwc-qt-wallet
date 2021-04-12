@@ -20,6 +20,7 @@
 #include "../state/state.h"
 #include <QJsonDocument>
 #include <QStandardPaths>
+#include <QDir>
 #include <QDebug>
 
 namespace core {
@@ -32,8 +33,15 @@ void MobileWndManager::init(QQmlApplicationEngine * _engine) {
     engine->load(QUrl(QStringLiteral("qrc:/windows_mobile/main.qml")));
     mainWindow = engine->rootObjects().first();
     mainWindow->setProperty("currentState", 0);
-    QString downloadPath = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
-    mainWindow->setProperty("downloadPath", downloadPath);
+    QStringList downloadPaths = QStandardPaths::standardLocations(QStandardPaths::DownloadLocation);
+    for (int i = 0; i < downloadPaths.length(); i++) {
+        QFileInfo fileInfo(downloadPaths[i]);
+        if (fileInfo.isWritable()) {
+            downloadPath = downloadPaths[i];
+            mainWindow->setProperty("downloadPath", downloadPath);
+            break;
+        }
+    }
 }
 
 
@@ -143,7 +151,6 @@ QString MobileWndManager::getSaveFileName(const QString &caption, const QString 
     Q_UNUSED(filter)
 
     QDateTime now;
-    QString downloadPath = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
     QString fileName = downloadPath + "/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm");
     return fileName;
 }
