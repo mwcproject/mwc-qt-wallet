@@ -415,7 +415,7 @@ Item {
                     height: dp(35)
                     width: dp(80)
                     anchors.right: parent.right
-                    anchors.rightMargin: dp(20)
+                    anchors.rightMargin: button_tx_cancel.visible && button_tx_repost.visible ? dp(220) : (button_tx_cancel.visible || button_tx_repost.visible ? dp(120) : dp(20))
                     anchors.bottom: text_confirmed.bottom
                     visible: false
                     background: Rectangle {
@@ -438,7 +438,7 @@ Item {
                         } else {
 //                            const fileName = util.getSaveFileName("Create transaction proof file", "Transactions", "transaction proof (*.proof)", ".proof")
 //                            if (fileName === "") return
-                            const fileName = "/storage/emulated/0/Android/data/mw.mwc.wallet/files/Download/" + tx2process.txid + ".proof"
+                            const fileName = downloadPath + "/" + tx2process.txid + ".proof"
                             wallet.generateTransactionProof(Number(tx2process.txIdx).toString(), fileName)
                         }
                     }

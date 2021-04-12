@@ -113,6 +113,7 @@ public:
 private:
     QQmlApplicationEngine * engine = nullptr;
     QObject * mainWindow = nullptr;
+    QString downloadPath = "";
 };
 
 }

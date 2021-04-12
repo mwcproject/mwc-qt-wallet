@@ -506,7 +506,7 @@ Item {
             path= path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/,"")
             // unescape html codes like '%23' for '#'
             const cleanPath = decodeURIComponent(path);
-            const filePath = "/storage/emulated/0/Android/data/mw.mwc.wallet/files/Download/" + cleanPath.substring(cleanPath.search("files/Download/") + 15, cleanPath.length)
+            const filePath = downloadPath + cleanPath.substring(cleanPath.search("/Download/") + 9, cleanPath.length)
             config.updatePathFor("fileGen", filePath)
             rect_progress.visible = true
             receive.signTransaction(filePath)

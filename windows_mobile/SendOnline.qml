@@ -38,7 +38,7 @@ Item {
             rect_progress.visible = false
             button_send.enabled = true
             if (success) {
-                messagebox.open(qsTr("Success"), qsTr("Your MWC was successfully sent to recipient"))
+                messagebox.open("Success", "Your MWC was successfully sent to recipient")
                 textfield_send_to.text = ""
                 textarea_description.text = ""
             } else {
