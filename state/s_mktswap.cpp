@@ -188,6 +188,16 @@ QString MySwapOffer::getOfferDescription() const {
             " MWC for " + QString::number(offer.secAmount) + " " + offer.secondaryCurrency;
 }
 
+bool MySwapOffer::equal( const wallet::SwapTradeInfo & swap ) const {
+    return  offer.sell == swap.isSeller &&
+            fabs( offer.mwcAmount - swap.mwcAmount) < 0.00001 &&
+            fabs( offer.secAmount - swap.secondaryAmount) < 0.00001 &&
+            offer.secondaryCurrency == swap.secondaryCurrency &&
+            offer.mwcLockBlocks == swap.mwcConfirmations &&
+            offer.secLockBlocks == swap.secondaryConfirmations &&
+            swap.redeemTimeLimit == 3600 && swap.messageExchangeTimeLimit == 3600;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  SwapMarketplace
@@ -195,6 +205,10 @@ QString MySwapOffer::getOfferDescription() const {
 
 SwapMarketplace::SwapMarketplace(StateContext * context) :
         State(context, STATE::SWAP_MKT) {
+
+    // Just need a new index for new offers after restart. User can restart and recreate the offers.
+    // If somebody accept the current offer, we don't want to print errors as forging. We better have 'not found' error.
+    currentOfferId = int(QDateTime::currentMSecsSinceEpoch() % 30000);
 
     timer = new core::TimerThread(this, 5000);
     QObject::connect( timer, &core::TimerThread::onTimerEvent, this, &SwapMarketplace::onTimerEvent, Qt::QueuedConnection );
@@ -876,8 +890,6 @@ void SwapMarketplace::onNewMktMessage(int messageId, QString wallet_tor_address,
             if (offer.offer.id == offer_id) {
                 // we get an offer, let's start trading and notify the user...
                 createNewSwapTrade(offer, wallet_tor_address);
-                core::getWndManager()->messageTextDlg("Offer is accepted", "Congratulations, you offer " + offer.getOfferDescription() +
-                    " is accepted, the swap trade is started. Please note, we will keep this offer active until some of your partners will lock the coins" );
             }
         }
     }

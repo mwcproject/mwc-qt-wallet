@@ -184,11 +184,16 @@ class TaskAdjustTrade : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*120;
 
-    TaskAdjustTrade( MWC713 *wallet713, const QString & _swapId, const QString &adjustCmd, const QString & param1, const QString & param2 ) :
+    TaskAdjustTrade( MWC713 *wallet713, const QString & _swapId, QString _call_tag,
+                     const QString &destinationMethod, const QString & destinationDest,
+                     const QString &secondaryAddress,
+                     const QString &secondaryFee,
+                     const QString &electrumUri1,
+                     const QString &tag) :
             Mwc713Task("TaskTradeDetails", "Checking Swap trade details...",
-                       generateCommandLine(_swapId, adjustCmd, param1, param2),
+                       generateCommandLine(_swapId, destinationMethod, destinationDest, secondaryAddress, secondaryFee, electrumUri1, tag),
                        wallet713, ""),
-            swapId(_swapId), adjustCommand(adjustCmd) {}
+            swapId(_swapId), call_tag(_call_tag) {}
 
     virtual ~TaskAdjustTrade() override {}
 
@@ -196,10 +201,15 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
-    QString generateCommandLine(const QString & swapId, const QString & adjustCmd, const QString & param1, const QString & param2) const;
+    QString generateCommandLine(const QString &swapId,
+                                const QString &destinationMethod, const QString & destinationDest,
+                                const QString &secondaryAddress,
+                                const QString &secondaryFee,
+                                const QString &electrumUri1,
+                                const QString &tag) const;
 private:
     QString swapId;
-    QString adjustCommand;
+    QString call_tag;
 };
 
 // Perform auto swap single step

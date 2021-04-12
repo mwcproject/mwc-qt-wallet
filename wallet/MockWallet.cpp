@@ -602,12 +602,22 @@ void MockWallet::requestTradeDetails(QString swapId, bool waitForBackup1 ) {
 
 // Adjust swap stade values. params are optional
 // Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
-void MockWallet::adjustSwapData( QString swapId, QString adjustCmd, QString param1, QString param2 ) {
+void MockWallet::adjustSwapData( const QString & swapId, QString call_tag,
+                                 const QString &destinationMethod, const QString & destinationDest,
+                                 const QString &secondaryAddress,
+                                 const QString &secondaryFee,
+                                 const QString &electrumUri1,
+                                 const QString &tag ) {
     Q_UNUSED(swapId)
-    Q_UNUSED(adjustCmd)
-    Q_UNUSED(param1)
-    Q_UNUSED(param2)
-    emit onAdjustSwapData(swapId, "adjust command", "");
+
+    Q_UNUSED(destinationMethod)
+    Q_UNUSED(destinationDest)
+    Q_UNUSED(secondaryAddress)
+    Q_UNUSED(secondaryFee)
+    Q_UNUSED(electrumUri1)
+    Q_UNUSED(tag)
+
+    emit onAdjustSwapData(swapId, call_tag, "");
 }
 
 // Perform a auto swap step for this trade.

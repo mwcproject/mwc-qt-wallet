@@ -40,8 +40,8 @@ private:
     void updateButtons(bool first_call = false);
     bool isCanUpdate() const;
 
-    // Validate the data and call for update. Return number of update calls.
-    int requestUpdateData();
+    // Validate the data and call for update. Return true if any data was updated
+    bool requestUpdateData();
 
 private slots:
     void sgnRequestTradeDetails(  QVector<QString> swapInfo,
@@ -49,7 +49,7 @@ private slots:
                                   QString currentAction,
                                   QVector<QString> tradeJournal,
                                   QString errMsg );
-    void sgnUpdateXXX(QString swapId, QString errorMsg);
+    void sgnAdjustSwapTrade(QString swapId, QString cmdTag, QString errorMsg);
 
     void on_redeemAddressEdit_textEdited(const QString &arg1);
     void on_secondaryFeeEdit_textEdited(const QString &arg1);
@@ -72,7 +72,6 @@ private:
     QString electrumX;
 
     bool    acceptanceMode = false;
-    int     requests2accept = -1;
 };
 
 }

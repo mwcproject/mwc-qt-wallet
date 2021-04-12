@@ -100,6 +100,8 @@ Swap::Swap(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onRequestSwapTrades, this, &Swap::onRequestSwapTrades, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onCancelSwapTrade, this, &Swap::onCancelSwapTrade, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onRestoreSwapTradeData, this, &Swap::onRestoreSwapTradeData, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onRequestTradeDetails, this, &Swap::onRequestTradeDetails, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onAdjustSwapData, this, &Swap::onAdjustSwapData, Qt::QueuedConnection );
 
     // You get an offer to swap BCH to MWC. SwapID is ffa15dbd-85a9-4fc9-a3c0-4cfdb144862b
     // Listen to a new swaps...
@@ -283,25 +285,90 @@ void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString curre
 }
 
 void Swap::onNewSwapTrade(QString currency, QString swapId) {
-    const QString title = "New Swap Offer";
-    const QString msg = "You have received a new Swap Offer to exchange MWC for your "+currency+".\n\nTrade SwapId: " + swapId +
-                        "\n\nPlease review this offer before you accept it. Check if the amounts, lock order, and confirmation number meet your expectations.\n\n"
-                        "Double check that the number of confirmations are match the amount.";
+    Q_UNUSED(currency)
+    // requesting swap details to view
+    context->wallet->requestTradeDetails(swapId, true );
+}
 
-    if (mwc::isWalletLocked()) {
-        core::getWndManager()->messageTextDlg(title, msg);
+// Response from requestTradeDetails
+void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
+                            QVector<wallet::SwapExecutionPlanRecord> executionPlan,
+                            QString currentAction,
+                            QVector<wallet::SwapJournalMessage> tradeJournal,
+                            QString error ) {
+    Q_UNUSED(executionPlan)
+    Q_UNUSED(currentAction)
+    Q_UNUSED(tradeJournal)
+
+    if (!error.isEmpty()) {
+        qDebug() << "onRequestTradeDetails get an error: " << error;
+        // In case of error not much what we want to do. The error will be shown in notifications logs
+        return;
     }
-    else {
-        if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg( title, msg,
-                "Check Later", "Review and Accept",
-                "Later I will switch to the swap page and check it", "Review and Accept the trade now",
-                false, true) ) {
-            // Switching to the review page...
-            viewTrade(swapId, "BuyerOfferCreated");
+
+    // Let's check if it is something what we want to process automatically.
+    if (!swap.isSeller) {
+        QVector<MySwapOffer> offers = expectedOffers.value(swap.communicationAddress);
+        MySwapOffer foundOffer;
+
+        for (const auto & o : offers) {
+            if (!o.offer.sell && o.equal(swap)) {
+                foundOffer = o;
+                break;
+            }
+        }
+
+        if (!foundOffer.offer.isEmpty()) {
+            // This offer looks good we can accept it and assign a tag...
+            context->wallet->adjustSwapData( swap.swapId, "marketplace_adjustment;" + foundOffer.offer.id,
+                    "", "",
+                    foundOffer.secAddress,
+                    QString::number(foundOffer.secFee),
+                    "",
+                    foundOffer.offer.id);
+
+            // Here we can say congrats. We are on the track to accept it. Unless no errors happens, we should be good.
+            core::getWndManager()->messageTextDlg("Offer is accepted", "Congratulations, you offer " + foundOffer.getOfferDescription() +
+                    " is accepted, the swap trade is started. Please note, we will keep this offer active until some of your partners will lock the coins" );
+        }
+        else {
+            // It is a regular swap offer
+            const QString title = "New Swap Offer";
+            const QString msg = "You have received a new Swap Offer to exchange MWC for your " + swap.secondaryCurrency + ".\n\nTrade SwapId: " + swap.swapId +
+                                "\n\nPlease review this offer before you accept it. Check if the amounts, lock order, and confirmation number meet your expectations.\n\n"
+                                "Double check that the number of confirmations are match the amount.";
+
+            if (mwc::isWalletLocked()) {
+                core::getWndManager()->messageTextDlg(title, msg);
+            }
+            else {
+                if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg( title, msg,
+                                                                                                   "Check Later", "Review and Accept",
+                                                                                                   "Later I will switch to the swap page and check it", "Review and Accept the trade now",
+                                                                                                   false, true) ) {
+                    // Switching to the review page...
+                    viewTrade(swap.swapId, "BuyerOfferCreated");
+                }
+            }
         }
     }
-
 }
+
+void Swap::onAdjustSwapData(QString swapId, QString call_tag, QString errMsg) {
+    if (!errMsg.isEmpty())
+        return; // will be printed ion notifocations.
+
+    if (call_tag.startsWith("marketplace_adjustment")) {
+        // Now accept the offer
+        context->appContext->setTradeAcceptedFlag(swapId, true);
+        // Start monitoring
+        int idx = call_tag.indexOf(';');
+        Q_ASSERT(idx>0);
+        runTrade(swapId, call_tag.mid(idx+1), false, "BuyerOfferCreated");
+    }
+}
+
+
 
 // Request latest fees for the coins
 void Swap::updateFeesIsNeeded() {
@@ -830,32 +897,42 @@ void Swap::startTrading(const MySwapOffer & offer, QString wallet_tor_address) {
 
     // Creating a new trade. My Swap offer should have all needed info...
     // Output are must be selected and locked when we created this trade
+    if (offer.offer.sell) {
+        QVector<QString> outputs = context->appContext->getLockedOutputsById( offer.offer.id );
+        Q_ASSERT(!outputs.isEmpty());
 
-    QVector<QString> outputs = context->appContext->getLockedOutputsById( offer.offer.id );
-    Q_ASSERT(!outputs.isEmpty());
+        newSwapNote = offer.note;
+        context->wallet->createNewSwapTrade( newSwapAccount, outputs , 1,
+                                             QString::number(offer.offer.mwcAmount),
+                                             QString::number(offer.offer.secAmount),
+                                             offer.offer.secondaryCurrency,
+                                             offer.secAddress,
+                                             offer.secFee,
+                                             !offer.offer.sell, // Lock must be done by another party
+                                             60,
+                                             60,
+                                             offer.offer.mwcLockBlocks,
+                                             offer.offer.secLockBlocks,
+                                             "tor",
+                                             wallet_tor_address,
+                                             "",
+                                             "",
+                                             false,
+                                             "", // we will start silently.
+                                             offer.offer.id,
+                                             {});
 
-    newSwapNote = offer.note;
-    context->wallet->createNewSwapTrade( newSwapAccount, outputs , 1,
-                                         QString::number(offer.offer.mwcAmount),
-                                         QString::number(offer.offer.secAmount),
-                                         offer.offer.secondaryCurrency,
-                                         offer.secAddress,
-                                         offer.secFee,
-                                         !offer.offer.sell, // Lock must be done by another party
-                                         60,
-                                         60,
-                                         offer.offer.mwcLockBlocks,
-                                         offer.offer.secLockBlocks,
-                                         "tor",
-                                         wallet_tor_address,
-                                         "",
-                                         "",
-                                         false,
-                                         "", // we will start silently.
-                                         offer.offer.id,
-                                         {});
+        // Continue at onCreateNewSwapTrade
+    }
+    else {
+        // If it is Buy, we are expecting other party to start
 
-    // Continue at onCreateNewSwapTrade
+        QVector<MySwapOffer> expected = expectedOffers.value(wallet_tor_address);
+        QString offerId = offer.offer.id;
+        std::remove_if( expected.begin(), expected.end(), [offerId](const MySwapOffer & off) {return off.offer.id == offerId;});
+        expected.push_back(offer);
+        expectedOffers.insert(wallet_tor_address, expected);
+    }
 }
 
 // Start trading for Marketplace offer. It will start for sell only. For Buy the normal workflow should be fine, we will only press "Accept" automatically.

@@ -321,8 +321,13 @@ public:
     virtual void requestTradeDetails(QString swapId, bool waitForBackup1) override;
 
     // Adjust swap stade values. params are optional
-    // Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
-    virtual void adjustSwapData( QString swapId, QString adjustCmd, QString param1 = "", QString param2 = "" ) override;
+    // Check Signal: onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);
+    virtual void adjustSwapData( const QString & swapId, QString call_tag,
+                                 const QString &destinationMethod, const QString & destinationDest,
+                                 const QString &secondaryAddress,
+                                 const QString &secondaryFee,
+                                 const QString &electrumUri1,
+                                 const QString &tag ) override;
 
     // Perform a auto swap step for this trade.
     // Check Signal: void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,

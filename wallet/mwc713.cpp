@@ -264,6 +264,7 @@ void MWC713::start()  {
     eventCollector->addListener( new TaskSlatesListener(this) );
     eventCollector->addListener( new TaskSyncProgressListener(this) );
     eventCollector->addListener( new TaskSwapNewTradeArrive(this) );
+    eventCollector->addListener( new TaskSwapMktNewMessage(this) );
 }
 
 // start to init. Expected that we will exit pretty quckly
@@ -951,8 +952,14 @@ void MWC713::requestTradeDetails(QString swapId, bool waitForBackup1) {
 
 // Adjust swap stade values. params are optional
 // Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
-void MWC713::adjustSwapData( QString swapId, QString adjustCmd, QString param1, QString param2 ) {
-    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, {TSK(new TaskAdjustTrade(this, swapId, adjustCmd, param1, param2), TaskAdjustTrade::TIMEOUT)} );
+void MWC713::adjustSwapData( const QString & swapId, QString call_tag,
+                             const QString &destinationMethod, const QString & destinationDest,
+                             const QString &secondaryAddress,
+                             const QString &secondaryFee,
+                             const QString &electrumUri1,
+                             const QString &tag ) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, {TSK(new TaskAdjustTrade(this, swapId, call_tag, destinationMethod, destinationDest,
+                          secondaryAddress, secondaryFee, electrumUri1, tag), TaskAdjustTrade::TIMEOUT)} );
 }
 
 // Perform a auto swap step for this trade.

@@ -220,6 +220,14 @@ slots:
     void onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
 
     void onTimerEvent();
+
+    void onRequestTradeDetails( wallet::SwapTradeInfo swap,
+                                      QVector<wallet::SwapExecutionPlanRecord> executionPlan,
+                                      QString currentAction,
+                                      QVector<wallet::SwapJournalMessage> tradeJournal,
+                                      QString error );
+
+    void onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);
 private:
     core::TimerThread * timer = nullptr;
 
@@ -256,6 +264,7 @@ private:
     SwapWnd selectedPage = SwapWnd::None;
 
     QHash< QString, QVector<MktSwapOffer> > acceptedOffers;
+    QHash< QString, QVector<MySwapOffer> >  expectedOffers;
 };
 
 }

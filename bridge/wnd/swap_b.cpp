@@ -290,43 +290,18 @@ QVector<QString> Swap::getRunningCriticalTrades() {
     return getSwap()->getRunningCriticalTrades();
 }
 
-// Update communication method.
-// Respond will be at sgnUpdateCommunication
-void Swap::updateCommunication(QString swapId, QString communicationMethod, QString communicationAddress) {
-    getWallet()->adjustSwapData(swapId, "destination", communicationMethod, communicationAddress);
+void Swap::adjustSwapData( QString swapId, QString call_tag,
+                                  QString destinationMethod, QString destinationDest,
+                                  QString secondaryAddress,
+                                  QString secondaryFee,
+                                  QString electrumUri1,
+                                  QString tag )
+{
+    getWallet()->adjustSwapData( swapId, call_tag, destinationMethod, destinationDest, secondaryAddress, secondaryFee, electrumUri1, tag );
 }
 
-// Update redeem adress.
-// Respond will be at sgnUpdateRedeemAddress
-void Swap::updateSecondaryAddress(QString swapId, QString secondaryAddress) {
-    getWallet()->adjustSwapData(swapId, "secondary_address", secondaryAddress );
-}
-
-// Update secondary fee value for the transaction.
-// Respond will come with sgnUpdateSecondaryFee
-void Swap::updateSecondaryFee(QString swapId, double fee) {
-    getWallet()->adjustSwapData(swapId, "secondary_fee", QString::number(fee) );
-}
-
-// Update electrumX private node URI
-// Respond will come with sgnUpdateElectrumX
-void Swap::updateElectrumX(QString swapId, QString electrumXnodeUri ) {
-    getWallet()->adjustSwapData(swapId, "electrumx_uri", electrumXnodeUri );
-}
-
-void Swap::onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg) {
-    if (adjustCmd == "destination") {
-        emit sgnUpdateCommunication(swapId, errMsg);
-    }
-    else if (adjustCmd=="secondary_address") {
-        emit sgnUpdateSecondaryAddress(swapId,errMsg);
-    }
-    else if (adjustCmd=="secondary_fee") {
-        emit sgnUpdateSecondaryFee(swapId,errMsg);
-    }
-    else if (adjustCmd=="electrumx_uri") {
-        emit sgnUpdateElectrumX(swapId,errMsg);
-    }
+void Swap::onAdjustSwapData(QString swapId, QString cmdTag, QString errMsg) {
+    emit sgnAdjustSwapTrade(swapId, cmdTag, errMsg);
 }
 
 void Swap::onSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,

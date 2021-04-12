@@ -61,20 +61,13 @@ public:
     Q_INVOKABLE QVector<QString> getRunningCriticalTrades();
 
     // Update communication method.
-    // Respond will be at sgnUpdateCommunication
-    Q_INVOKABLE void updateCommunication(QString swapId, QString communicationMethod, QString communicationAddress);
-
-    // Update secondary refund/redeem address.
-    // Respond will be at sgnUpdateSecondaryAddress
-    Q_INVOKABLE void updateSecondaryAddress(QString swapId, QString secondaryAddress);
-
-    // Update secondary fee value for the transaction.
-    // Respond will come with sgnUpdateSecondaryFee
-    Q_INVOKABLE void updateSecondaryFee(QString swapId, double fee);
-
-    // Update electrumX private node URI
-    // Respond will come with sgnUpdateElectrumX
-    Q_INVOKABLE void updateElectrumX(QString swapId, QString electrumXnodeUri );
+    // Respond will be at sgnAdjustSwapTrade(QString swapId, QString call_tag, QString errMsg)
+    Q_INVOKABLE void adjustSwapData( QString swapId, QString call_tag,
+            QString destinationMethod, QString destinationDest,
+            QString secondaryAddress,
+            QString secondaryFee,
+            QString electrumUri1,
+            QString tag );
 
     // Backup/export swap trade data into the file
     // Respond with sgnBackupSwapTradeData
@@ -206,14 +199,8 @@ signals:
                                  QVector<QString> tradeJournal,
                                  QString errMsg );
 
-    // Response from updateCommunication. OK - empty error message
-    void sgnUpdateCommunication(QString swapId, QString errorMsg);
-    // Response from updateSecondaryAddress
-    void sgnUpdateSecondaryAddress(QString swapId, QString errorMsg);
-    // Response from updateSecondaryFee
-    void sgnUpdateSecondaryFee(QString swapId, QString errorMsg);
-    // Response from updateElectrumX
-    void sgnUpdateElectrumX(QString swapId, QString errorMsg);
+    // Response from sgnAdjustSwapTrade. OK - empty error message
+    void sgnAdjustSwapTrade(QString swapId, QString call_tag, QString errMsg);
 
     // Notification about the update of swap trade. Normally it comes from the autoswap
     // executionPlan, array of triplets: <active: "true"|"false">, <end_time>, <Name> >, ....

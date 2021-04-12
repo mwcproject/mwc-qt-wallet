@@ -126,6 +126,8 @@ struct MySwapOffer {
 
     // Offer description for user. Sell XX MWC for XX BTC
     QString getOfferDescription() const;
+
+    bool equal( const wallet::SwapTradeInfo & swap ) const;
 };
 
 class Swap;

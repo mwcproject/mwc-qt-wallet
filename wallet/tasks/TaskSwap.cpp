@@ -313,31 +313,54 @@ bool TaskAdjustTrade::processTask(const QVector<WEvent> &events) {
 
     for (auto &ln : lns) {
         if (ln.message.contains("was successfully adjusted")) {
-            wallet713->setAdjustSwapData(swapId, adjustCommand, "");
+            wallet713->setAdjustSwapData(swapId, call_tag, "");
             return true;
         }
     }
 
-    wallet713->setAdjustSwapData(swapId, adjustCommand,
+    wallet713->setAdjustSwapData(swapId, call_tag,
                                  getErrorMessage(events, "Unable update the Swap Trade " + swapId));
     return true;
 }
 
-QString TaskAdjustTrade::generateCommandLine(const QString &swapId, const QString &adjustCmd, const QString &param1,
-                                             const QString &param2) const {
-    if (adjustCmd == "destination") {
-        return "swap --adjust destination  --method " + param1 + " --dest " + param2 + " -i " + swapId;
-    } else if (adjustCmd == "secondary_address") {
-        return "swap --adjust secondary_address --secondary_address " + param1 + " -i " + swapId;
-    } else if (adjustCmd == "secondary_fee") {
-        return "swap --adjust secondary_fee --secondary_fee " + param1 + " -i " + swapId;
-    } else if (adjustCmd == "electrumx_uri") {
-        return "swap --adjust electrumx_uri --electrum_uri1 \"" + param1 + "\" -i " + swapId;
-    } else {
-        Q_ASSERT(false);
-        return "";
+QString TaskAdjustTrade::generateCommandLine(const QString &swapId,
+                                             const QString &destinationMethod, const QString & destinationDest,
+                                             const QString &secondaryAddress,
+                                             const QString &secondaryFee,
+                                             const QString &electrumUri1,
+                                             const QString &tag) const {
+
+    QStringList adjustCmd;
+
+    QString params;
+
+    if (!destinationDest.isEmpty() && !destinationDest.isEmpty()) {
+        adjustCmd.push_back("destination");
+        params += " --method " + destinationMethod + " --dest " + destinationDest;
     }
 
+    if (!secondaryAddress.isEmpty()) {
+        adjustCmd.push_back("secondary_address");
+        params += " --secondary_address " + secondaryAddress;
+    }
+
+    if (!secondaryFee.isEmpty()) {
+        adjustCmd.push_back("secondary_fee");
+        params += " --secondary_fee " + secondaryFee;
+    }
+
+    if (!electrumUri1.isEmpty()) {
+        adjustCmd.push_back("electrumx_uri");
+        params += " --electrum_uri1 \"" + electrumUri1 + "\"";
+    }
+
+    if (!tag.isEmpty()) {
+        adjustCmd.push_back("tag");
+        params += " --tag \"" + tag + "\"";
+    }
+
+    Q_ASSERT(!adjustCmd.isEmpty());
+    return "swap --adjust " + adjustCmd.join(",") + params + " -i " + swapId;
 }
 
 // --------------- TaskPerformAutoSwapStep -----------------
