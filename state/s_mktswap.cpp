@@ -855,6 +855,9 @@ void SwapMarketplace::onStopListenOnTopic(QString error) {
 // Switch to create a new offer page. For new offer myMsgId must be empty string.
 // Otherwise - exist offer id
 void SwapMarketplace::pageCreateUpdateOffer(QString myMsgId) {
+    if ( !getSwap()->verifyBackupDir() )
+        return;
+
     selectedPage = SwapMarketplaceWnd::NewOffer;
     core::getWndManager()->pageNewUpdateOffer(myMsgId);
 }
@@ -909,6 +912,11 @@ void SwapMarketplace::createNewSwapTrade( MySwapOffer offer, QString wallet_tor_
 // Accept the offer from marketplace
 bool SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddress) {
     QString key = walletAddress + "_" + offerId;
+
+    if ( getSwap()->isSwapExist(key) ) {
+        core::getWndManager()->messageTextDlg("Already Exist", "You already accepted this offer and Atomic Swap Trade is already running.");
+        return false;
+    }
 
     MktSwapOffer mktOffer = marketOffers.value(key);
     if (mktOffer.isEmpty()) {

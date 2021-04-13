@@ -14,7 +14,7 @@
 
 #ifndef S_SWAPBACKUPDLG_H
 #define S_SWAPBACKUPDLG_H
-
+/*
 #include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
@@ -59,6 +59,6 @@ private:
     bridge::Util * util = nullptr;
 };
 
-}
+}*/
 
 #endif // S_SWAPBACKUPDLG_H

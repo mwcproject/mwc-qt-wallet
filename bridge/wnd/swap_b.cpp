@@ -74,7 +74,7 @@ Swap::~Swap() {}
 
 // Return back to the trade list page
 void Swap::pageTradeList() {
-    getSwap()->pageTradeList();
+    getSwap()->pageTradeList(false, false, false);
 }
 
 // request the list of swap trades
@@ -141,7 +141,7 @@ void Swap::onCancelSwapTrade(QString swapId, QString error) {
 // Respond will be with sent back with sgnRequestTradeDetails
 void Swap::requestTradeDetails(QString swapId) {
     int expBkId = getAppContext()->getSwapBackStatus(swapId);
-    bool waiting4backup = getAppContext()->getSwapEnforceBackup() && expBkId==0;
+    bool waiting4backup = /*getAppContext()->getSwapEnforceBackup() &&*/ expBkId==0;
 
     getWallet()->requestTradeDetails(swapId, waiting4backup);
 }

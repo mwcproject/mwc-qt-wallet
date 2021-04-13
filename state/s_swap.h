@@ -48,7 +48,7 @@ public:
     virtual ~Swap() override;
 
     // Show first page with trade List
-    void pageTradeList();
+    void pageTradeList(bool selectIncoming, bool selectOutgoing, bool selectBackup);
     // Edit/View Trade Page
     void viewTrade(QString swapId, QString stateCmd);
     // Show trade details page
@@ -158,6 +158,12 @@ public:
     // Reject any offers from this address. We don't want them, we are likely too late
     void rejectOffer(const MktSwapOffer & offer, QString wallet_tor_address);
 
+    // check if swap with this tag is exist
+    bool isSwapExist(QString tag) const;
+
+    // Verify if trade backup dir is valid. If not, then ask user to fix that
+    bool verifyBackupDir();
+
 private:
 signals:
 
@@ -228,6 +234,8 @@ slots:
                                       QString error );
 
     void onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);
+
+    void onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage);
 private:
     core::TimerThread * timer = nullptr;
 

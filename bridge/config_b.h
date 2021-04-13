@@ -154,9 +154,9 @@ public:
     // Update fluff flag value
     Q_INVOKABLE void setSwapTabSelection(int selection);
 
-    // Swap setting. Enforce will wait until user do the backup.
-    Q_INVOKABLE void setSwapEnforceBackup(bool doBackup);
-    Q_INVOKABLE bool getSwapEnforceBackup();
+    // Backup dir for swap trades.
+    Q_INVOKABLE QString getSwapBackupDir();
+    Q_INVOKABLE void setSwapBackupDir(QString backupDir);
 
     // Backup status. We will ask user to do a backup for this swap.
     Q_INVOKABLE int  getSwapBackStatus(QString swapId);

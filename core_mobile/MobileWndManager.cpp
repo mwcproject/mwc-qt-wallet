@@ -370,7 +370,10 @@ void MobileWndManager::pageAccountOptions() {
     mainWindow->setProperty("currentState", state::STATE::ACCOUNT_OPTIONS);
 }
 
-void MobileWndManager::pageSwapList() {
+void MobileWndManager::pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup) {
+    Q_UNUSED(selectIncoming)
+    Q_UNUSED(selectOutgoing)
+    Q_UNUSED(selectBackup)
     Q_ASSERT(false); // implement me
 }
 
@@ -395,12 +398,5 @@ void MobileWndManager::pageSwapTradeDetails(QString swapId) {
     Q_UNUSED(swapId)
     Q_ASSERT(false); // implement me
 }
-
-void MobileWndManager::showBackupDlg(QString swapId, int backupId) {
-    Q_UNUSED(swapId)
-    Q_UNUSED(backupId)
-    Q_ASSERT(false); // implement me
-}
-
 
 }

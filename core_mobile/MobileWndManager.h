@@ -102,14 +102,12 @@ public:
     virtual void pageAccountOptions() override;
 
     // Swap pages
-    virtual void pageSwapList() override;
+    virtual void pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup) override;
     virtual void pageSwapNew1() override;
     virtual void pageSwapNew2() override;
     virtual void pageSwapNew3() override;
     virtual void pageSwapEdit(QString swapId, QString stateCmd) override;
     virtual void pageSwapTradeDetails(QString swapId) override;
-
-    virtual void showBackupDlg(QString swapId, int backupId) override;
 private:
     QQmlApplicationEngine * engine = nullptr;
     QObject * mainWindow = nullptr;

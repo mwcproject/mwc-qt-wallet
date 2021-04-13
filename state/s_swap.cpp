@@ -25,6 +25,7 @@
 #include <QThread>
 #include "../core/TimerThread.h"
 #include "s_mktswap.h"
+#include <QDir>
 
 namespace state {
 
@@ -102,6 +103,7 @@ Swap::Swap(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onRestoreSwapTradeData, this, &Swap::onRestoreSwapTradeData, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onRequestTradeDetails, this, &Swap::onRequestTradeDetails, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onAdjustSwapData, this, &Swap::onAdjustSwapData, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onBackupSwapTradeData, this, &Swap::onBackupSwapTradeData, Qt::QueuedConnection );
 
     // You get an offer to swap BCH to MWC. SwapID is ffa15dbd-85a9-4fc9-a3c0-4cfdb144862b
     // Listen to a new swaps...
@@ -128,15 +130,15 @@ NextStateRespond Swap::execute() {
     if (!context->appContext->pullCookie<QString>("SwapShowNewTrade1").isEmpty())
         showNewTrade1();
     else
-        pageTradeList();
+        pageTradeList(false, false, false);
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
 // Show first page with trade List
-void Swap::pageTradeList() {
+void Swap::pageTradeList(bool selectIncoming, bool selectOutgoing, bool selectBackup) {
     selectedPage = SwapWnd::PageSwapList;
-    core::getWndManager()->pageSwapList();
+    core::getWndManager()->pageSwapList(selectIncoming, selectOutgoing, selectBackup);
 }
 
 // Edit/View Trade Page
@@ -217,21 +219,39 @@ void Swap::onTimerEvent() {
             if (shownBackupMessages.value(nextTask.swapId, 0) < taskBkId) {
                 shownBackupMessages.insert(nextTask.swapId, taskBkId);
                 // Note, we are in the eventing loop, so modal will create a new one and soon timer will be called!!!
-                core::getWndManager()->showBackupDlg(nextTask.swapId, taskBkId);
-                expBkId = context->appContext->getSwapBackStatus(nextTask.swapId);
-                if (runningSwaps.contains(nextTask.swapId))
-                    runningSwaps[nextTask.swapId].lastUpdatedTime = 0; // to trigger processing and update
+
+                QString backupDir = context->appContext->getSwapBackupDir();
+                // QDir::separator does return value that rust doesn't understand well. That will be corrected but still it looks bad.
+                QString backupFn = backupDir + "/trade_" + nextTask.swapId + "_" + QString::number(taskBkId) + ".trade";
+                context->wallet->backupSwapTradeData(nextTask.swapId, backupFn);
+
+                // continue on onBackupSwapTradeData
+                return;
             }
         }
 
         runningTask = nextTask.swapId;
 
-        bool waiting4backup = context->appContext->getSwapEnforceBackup() && expBkId==0;
+        bool waiting4backup = /*context->appContext->getSwapEnforceBackup() &&*/ expBkId==0;
         logger::logInfo( "SWAP", "Swap processing step for " + nextTask.swapId + ", " + nextTask.stateCmd + " ,waiting4backup=" + (waiting4backup?"true":"false") );
         context->wallet->performAutoSwapStep(nextTask.swapId, waiting4backup);
     }
     lastProcessedTimerData = QDateTime::currentMSecsSinceEpoch();
 }
+
+void Swap::onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage) {
+    // accepting in any case
+    if (runningSwaps.contains(swapId))
+        runningSwaps[swapId].lastUpdatedTime = 0; // to trigger processing and update
+
+    if (!errorMessage.isEmpty()) {
+        pageTradeList(false, false, true);
+        core::getWndManager()->messageTextDlg("Error", "Wallet is unable to backup atomic swap trade at\n\n" + exportedFileName +
+                "\n\n" + errorMessage +
+                "\n\nPlease setup your backup directory and backup this trade.");
+    }
+}
+
 
 void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
                            QString lastProcessError,
@@ -428,7 +448,23 @@ void Swap::onProcessHttpResponse(bool requestOk, const QString & tag, QJsonObjec
 void Swap::initiateNewTrade() {
     updateFeesIsNeeded();
     resetNewSwapData();
+
+    QDir("Folder").exists();
+    QString backupDir = context->appContext->getSwapBackupDir();
+    if (!verifyBackupDir())
+        return;
     showNewTrade1();
+}
+
+bool Swap::verifyBackupDir() {
+    QString backupDir = context->appContext->getSwapBackupDir();
+    if (backupDir.isEmpty() || !QDir(backupDir).exists()) {
+        pageTradeList(false, false, true);
+        core::getWndManager()->messageTextDlg("Warning", "Atomic swap trade backup directory is not properly set. Please set it up before start trading.");
+        return false;
+    }
+
+    return true;
 }
 
 // Show the trade page 1
@@ -680,17 +716,17 @@ QVector<QString> Swap::getLockTime( QString secCurrency, int offerExpTime, int r
 
 // Accept a new trade and start run it. By that moment the trade must abe reviews and all set
 void Swap::acceptTheTrade(QString swapId) {
+    if (!verifyBackupDir())
+        return;
+
     // Update config...
     context->appContext->setTradeAcceptedFlag(swapId, true);
-
-    // We want to show the incoming trades
-    context->appContext->setSwapTabSelection(0);
 
     // Start monitoring
     runTrade(swapId,"", false, "BuyerOfferCreated");
 
     // Switch to the trades lists
-    pageTradeList();
+    pageTradeList(true, false, false);
 }
 
 // Get Tx fee for secondary currency
@@ -838,19 +874,12 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
 bool Swap::mobileBack() {
     switch (selectedPage) {
         case SwapWnd::None :
-            return false;
         case SwapWnd::PageSwapList:
             return false;
-        case SwapWnd::PageSwapEdit: {
-            pageTradeList();
-            return true;
-        }
-        case SwapWnd::PageSwapTradeDetails: {
-            pageTradeList();
-            return true;
-        }
+        case SwapWnd::PageSwapEdit:
+        case SwapWnd::PageSwapTradeDetails:
         case SwapWnd::PageSwapNew1: {
-            pageTradeList();
+            pageTradeList(false,false,false);
             return true;
         }
         case SwapWnd::PageSwapNew2: {
@@ -984,6 +1013,15 @@ void Swap::acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address) {
 void Swap::rejectOffer(const MktSwapOffer & offer, QString wallet_tor_address) {
     Q_UNUSED(offer)
     acceptedOffers.remove(wallet_tor_address);
+}
+
+// check if swap with this tag is exist
+bool Swap::isSwapExist(QString tag) const {
+    for (const AutoswapTask & val : runningSwaps.values() ) {
+        if (val.tag == tag)
+            return true;
+    }
+    return false;
 }
 
 

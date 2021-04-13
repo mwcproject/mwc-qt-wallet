@@ -7,18 +7,18 @@
     <x>0</x>
     <y>0</y>
     <width>1055</width>
-    <height>716</height>
+    <height>731</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <property name="spacing">
     <number>15</number>
    </property>
    <property name="leftMargin">
-    <number>20</number>
+    <number>30</number>
    </property>
    <property name="topMargin">
     <number>90</number>
@@ -231,17 +231,29 @@
       </size>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>20</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="control::MwcLabelNormal" name="label">
         <property name="text">
          <string>
 
-Trades data contains refund slates and private keys for the redeem operation. In case of a hardware failure you might lose this data and, as a result, you might lose your funds. That is why we strongly recommend to keep the copy of your trade data on a separate drive like a USB stick.
+Trades data contains refund slates and private keys for the redeem operation. In case of a hardware failure you might lose this data and, as a result, you might lose your funds. That is why we strongly recommend to keep the copy of your trade data in a separate folder that point to the separate drive like a USB stick, NAS Storage, cloud synced directory like a Dropbox, One Cloud.
 
-The first and the most important backup is done before initial lock of coins at multisig account. With this backup you will be able to continue locking or refunding your funds.
-The second backup is initiated before a redeem phase.  With this data you will be able to finish the redeem or make a refund.
-
-If you have your backup, in worst case scenario you will be able to restore your MWC wallet from the mnemonic phrase, restore your swap trades, and at least refund your locked coins. To finish redeeming a transaction, you need a second backup which is optional.
+If you have your backup, in worst case scenario you will be able to restore your MWC wallet from the mnemonic phrase, restore your atomic swap trades and complete it.
 
 Please note that swap trade files are encrypted so you can restore it into the wallet with the same seed.</string>
         </property>
@@ -267,39 +279,73 @@ Please note that swap trade files are encrypted so you can restore it into the w
        </spacer>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>3</number>
+        </property>
         <item>
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
+         <widget class="control::MwcLabelSmall" name="label_10">
+          <property name="maximumSize">
            <size>
-            <width>40</width>
-            <height>20</height>
+            <width>16777215</width>
+            <height>22</height>
            </size>
           </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="checkEnforceBackup">
           <property name="text">
-           <string>Pause the trade before the lock step, until the trade data is backed up.</string>
+           <string>Swap trade backup directory</string>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_11">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="spacing">
+           <number>20</number>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
+          <item>
+           <widget class="control::MwcLineEditNormal" name="swapBackupDir">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Swap trades backup directory.</string>
+            </property>
+            <property name="maxLength">
+             <number>64</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="control::MwcPushButtonNormal" name="selectBackupDirBtn">
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Select directory to backup swap trades</string>
+            </property>
+            <property name="text">
+             <string>Select</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -608,14 +654,24 @@ Please note that swap trade files are encrypted so you can restore it into the w
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::RichVBox</class>

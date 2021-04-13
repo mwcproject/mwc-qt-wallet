@@ -181,7 +181,7 @@ bool AppContext::loadDataImpl() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x47A4)
+    if (id<0x4783 || id>0x47A5)
          return false;
 
     QString mockStr;
@@ -333,7 +333,8 @@ bool AppContext::loadDataImpl() {
     }
 
     if (id>=0x479D) {
-        in >> swapEnforceBackup;
+        bool b = true;
+        in >> b;
     }
 
     if (id>=0x479E) {
@@ -375,6 +376,10 @@ bool AppContext::loadDataImpl() {
         in >> mktPlaceMaxMwcAmount;
     }
 
+    if (id>=0x47A5) {
+        in >> swapBackupDir;
+    }
+
     return true;
 }
 
@@ -402,7 +407,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x47A4;
+    out << 0x47A5;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -475,7 +480,8 @@ void AppContext::saveData() const {
 
     out << swapTabSelection;
 
-    out << swapEnforceBackup;
+    b = true; // legacy swapEnforceBackup
+    out << b;
 
     out << lastUsedSwapCurrency;
 
@@ -500,6 +506,8 @@ void AppContext::saveData() const {
     out << mktPlaceCurrency;
     out << mktPlaceMinMwcAmount;
     out << mktPlaceMaxMwcAmount;
+
+    out << swapBackupDir;
 }
 
 void AppContext::loadNotesData() {
@@ -992,18 +1000,18 @@ void AppContext::deleteNote(const QString& key) {
     saveNotesData();
 }
 
-void AppContext::setNotficationWindowsEnabled(bool enable) {
+void AppContext::setNotificationWindowsEnabled(bool enable) {
     if (notificationWindowsEnabled == enable)
         return;
     notificationWindowsEnabled = enable;
     saveData();
 }
 
-void AppContext::setSwapEnforceBackup(bool doBackup) {
-    if (swapEnforceBackup == doBackup)
+void AppContext::setSwapBackupDir(QString backupDir) {
+    if (swapBackupDir == backupDir)
         return;
 
-    swapEnforceBackup = doBackup;
+    swapBackupDir = backupDir;
     saveData();
 }
 

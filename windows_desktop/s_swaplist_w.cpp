@@ -21,6 +21,7 @@
 #include "../control_desktop/richvbox.h"
 #include "../control_desktop/richitem.h"
 #include <QSet>
+#include <QFileDialog>
 
 namespace wnd {
 
@@ -135,7 +136,7 @@ void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, 
 ///////////////////////////////////////////////////////////////////////
 // SwapList
 
-SwapList::SwapList(QWidget *parent) :
+SwapList::SwapList(QWidget *parent, bool selectIncoming, bool selectOutgoing, bool selectBackup) :
         core::NavWnd(parent),
         ui(new Ui::SwapList) {
     ui->setupUi(this);
@@ -159,9 +160,18 @@ SwapList::SwapList(QWidget *parent) :
     connect(ui->swapsTable, &control::RichVBox::onItemActivated, this, &SwapList::onItemActivated,
             Qt::QueuedConnection);
 
-    ui->checkEnforceBackup->setChecked(config->getSwapEnforceBackup());
+    //ui->checkEnforceBackup->setChecked(config->getSwapEnforceBackup());
+    ui->swapBackupDir->setText( config->getSwapBackupDir() );
 
-    selectSwapTab(config->getSwapTabSelection());
+    int tabSelection = config->getSwapTabSelection();
+    if (selectIncoming)
+        tabSelection = 0;
+    else if (selectOutgoing)
+        tabSelection = 1;
+    else if (selectBackup)
+        tabSelection = 3;
+
+    selectSwapTab(tabSelection);
 }
 
 SwapList::~SwapList() {
@@ -577,8 +587,18 @@ void SwapList::on_restoreTradesTab_clicked() {
     selectSwapTab(3);
 }
 
-void SwapList::on_checkEnforceBackup_clicked() {
-    config->setSwapEnforceBackup(ui->checkEnforceBackup->isChecked());
+void SwapList::on_selectBackupDirBtn_clicked() {
+    QString dir = QFileDialog::getExistingDirectory(this,
+            "Select trade backup directory");
+    if (dir.isEmpty())
+        return;
+
+    ui->swapBackupDir->setText(dir);
+    config->setSwapBackupDir(dir);
+}
+
+void SwapList::on_swapBackupDir_textEdited(const QString &dir) {
+    config->setSwapBackupDir(dir);
 }
 
 }

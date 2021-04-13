@@ -165,7 +165,7 @@ bool WalletConfig::getNotificationWindowsEnabled() {
 }
 
 void WalletConfig::setNotificationWindowsEnabled(bool enabled) {
-    context->appContext->setNotficationWindowsEnabled(enabled);
+    context->appContext->setNotificationWindowsEnabled(enabled);
 }
 
 bool WalletConfig::updateTimeoutValue(int timeout) {

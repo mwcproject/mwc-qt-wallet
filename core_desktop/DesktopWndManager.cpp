@@ -346,9 +346,9 @@ void DesktopWndManager::pageAccountOptions() {
     Q_ASSERT(false);
 }
 
-void DesktopWndManager::pageSwapList() {
+void DesktopWndManager::pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup) {
     windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_LIST,
-        new wnd::SwapList( windowManager->getInWndParent()));
+        new wnd::SwapList( windowManager->getInWndParent(), selectIncoming, selectOutgoing, selectBackup));
 }
 
 void DesktopWndManager::pageSwapNew1() {
@@ -372,12 +372,6 @@ void DesktopWndManager::pageSwapEdit(QString swapId, QString stateCmd) {
 void DesktopWndManager::pageSwapTradeDetails(QString swapId) {
     windowManager->switchToWindowEx( "",
          new wnd::TradeDetails( windowManager->getInWndParent(), swapId));
-}
-
-void DesktopWndManager::showBackupDlg(QString swapId, int backupId) {
-    util::TimeoutLockObject to( "SwapBackupDlg" );
-    dlg::SwapBackupDlg  backup(nullptr, swapId, backupId);
-    backup.exec();
 }
 
 // Swap marketplace

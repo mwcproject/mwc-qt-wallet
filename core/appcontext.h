@@ -196,14 +196,15 @@ public:
 
     // Display of status messages using notification windows
     bool getNotificationWindowsEnabled() { return notificationWindowsEnabled; }
-    void setNotficationWindowsEnabled(bool enable);
+    void setNotificationWindowsEnabled(bool enable);
 
     // Index of the open tab at the swap page.
     int getSwapTabSelection() const {return swapTabSelection;}
     void setSwapTabSelection(int sel) { swapTabSelection=sel;}
 
-    bool getSwapEnforceBackup() const {return swapEnforceBackup;}
-    void setSwapEnforceBackup(bool doBackup);
+    // Backup dir for swap trades.
+    QString getSwapBackupDir() const {return swapBackupDir;}
+    void setSwapBackupDir(QString backupDir);
 
     QString getLastUsedSwapCurrency() const {return lastUsedSwapCurrency;}
     void    setLastUsedSwapCurrency(const QString & currency) {lastUsedSwapCurrency = currency;}
@@ -348,7 +349,10 @@ private:
     int swapTabSelection = 0;
 
     // Enforce a backup for the swaps. Before lock stage user will be asked to save the trade file somewhere
-    bool swapEnforceBackup = true;
+    //bool swapEnforceBackup = true;
+
+    // Backup dir for swap trades.
+    QString swapBackupDir;
 
     // Last used currency for swaps
     QString lastUsedSwapCurrency;
