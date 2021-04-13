@@ -819,7 +819,7 @@ QString SwapMarketplace::getOffersListeningStatus() const {
     Q_ASSERT(collectingTime>=0);
 
     if ( collectingTime < OFFER_PUBLISHING_INTERVAL_SEC ) {
-        return "Collecting marketplace offers... " + QString::number( collectingTime * 100 / OFFER_PUBLISHING_INTERVAL_SEC ) + "%";
+        return "Collecting offers... " + QString::number( collectingTime * 100 / OFFER_PUBLISHING_INTERVAL_SEC ) + "%";
     }
 
     return "Listening";
@@ -917,6 +917,9 @@ bool SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddr
         core::getWndManager()->messageTextDlg("Already Exist", "You already accepted this offer and Atomic Swap Trade is already running.");
         return false;
     }
+
+    if ( !getSwap()->verifyBackupDir() )
+        return false;
 
     MktSwapOffer mktOffer = marketOffers.value(key);
     if (mktOffer.isEmpty()) {

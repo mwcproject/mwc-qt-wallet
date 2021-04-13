@@ -32,6 +32,10 @@ NewSwap3::NewSwap3(QWidget *parent) :
 
     ui->progress->initLoader(false);
 
+    if (swap->isMktTrade()) {
+        ui->sendOfferButton->setText("Accept Offer");
+    }
+
     updateSwapReview();
 }
 

@@ -234,7 +234,6 @@ bool EditSwap::requestUpdateData() {
     }
 
     ui->progress->show();
-    int res = 0;
 
     QString secondaryAddress;
     QString secondaryFee;
