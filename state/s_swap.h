@@ -245,7 +245,6 @@ private:
 
     // key: message.  value: time
     QHash<QString, int64_t> shownMessages;
-    QMap<QString, int> shownBackupMessages;
 
     long lastProcessedTimerData = 0;
 

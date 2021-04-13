@@ -216,8 +216,6 @@ void Swap::onTimerEvent() {
         int taskBkId = bridge::getSwapBackup(nextTask.stateCmd);
         int expBkId = context->appContext->getSwapBackStatus(nextTask.swapId);
         if (taskBkId > expBkId) {
-            if (shownBackupMessages.value(nextTask.swapId, 0) < taskBkId) {
-                shownBackupMessages.insert(nextTask.swapId, taskBkId);
                 // Note, we are in the eventing loop, so modal will create a new one and soon timer will be called!!!
 
                 QString backupDir = context->appContext->getSwapBackupDir();
@@ -227,7 +225,6 @@ void Swap::onTimerEvent() {
 
                 // continue on onBackupSwapTradeData
                 return;
-            }
         }
 
         runningTask = nextTask.swapId;
@@ -249,6 +246,11 @@ void Swap::onBackupSwapTradeData(QString swapId, QString exportedFileName, QStri
         core::getWndManager()->messageTextDlg("Error", "Wallet is unable to backup atomic swap trade at\n\n" + exportedFileName +
                 "\n\n" + errorMessage +
                 "\n\nPlease setup your backup directory and backup this trade.");
+    }
+    else {
+        // Updating backup id that is done.
+        int taskBkId = bridge::getSwapBackup( runningSwaps[swapId].stateCmd );
+        context->appContext->setSwapBackStatus(swapId, taskBkId);
     }
 }
 

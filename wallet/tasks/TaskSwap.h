@@ -101,7 +101,7 @@ public:
                             QString _tag,
                             QString mkt_trade_tag,
                             QVector<QString> _params ) :
-            Mwc713Task("TaskCreateNewSwapTrade", "Creaating new Swap trade...",
+            Mwc713Task("TaskCreateNewSwapTrade", "Creating new Swap trade...",
                        generateCommandLine(outputs, min_confirmations,mwcAmount, secAmount, secondary,
                                     redeemAddress, secTxFee, sellerLockFirst, messageExchangeTimeMinutes,
                                     redeemTimeMinutes, mwcConfirmationNumber, secondaryConfirmationNumber,
