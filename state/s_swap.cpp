@@ -342,7 +342,7 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
         MySwapOffer foundOffer;
 
         for (const auto & o : offers) {
-            if (!o.offer.sell && o.equal(swap)) {
+            if (!o.offer.sell && o.offer.equal(swap)) {
                 foundOffer = o;
                 break;
             }
@@ -362,23 +362,54 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
                     " is accepted, the swap trade is started. Please note, we will keep this offer active until some of your partners will lock the coins" );
         }
         else {
+            QVector<MktSwapOffer> accOffers = acceptedOffers.value(swap.communicationAddress);
+            MktSwapOffer mktFoundOffer;
+            for (const auto & o : accOffers) {
+                if (!o.sell && o.equal(swap)) {
+                    mktFoundOffer = o;
+                    break;
+                }
+            }
+
             // It is a regular swap offer
             const QString title = "New Swap Offer";
-            const QString msg = "You have received a new Swap Offer to exchange MWC for your " + swap.secondaryCurrency + ".\n\nTrade SwapId: " + swap.swapId +
+            QString msg = "You have received a new Swap Offer to exchange MWC for your " + swap.secondaryCurrency + ".\n\nTrade SwapId: " + swap.swapId +
                                 "\n\nPlease review this offer before you accept it. Check if the amounts, lock order, and confirmation number meet your expectations.\n\n"
                                 "Double check that the number of confirmations are match the amount.";
 
+            if (!mktFoundOffer.isEmpty()) {
+                // Accepted Sell order (I am buyer)
+                // Don't need to ask for acceptance, just need go to review
+
+                // Adjusting tag and nothing else. We will review it...
+                swap.tag = swap.communicationAddress + "_" + mktFoundOffer.id;
+                context->wallet->adjustSwapData( swap.swapId, "XXX",
+                        "", "",
+                        "",
+                        "",
+                        "",
+                        swap.tag);
+
+                msg = "You have received a response from Swap Marketplace to exchange MWC for your " + swap.secondaryCurrency + ".\n\nTrade SwapId: " + swap.swapId +
+                                    "\n\nPlease review this offer before you accept it. Check if the amounts, lock order, and confirmation number meet your expectations.\n\n"
+                                    "Double check that the number of confirmations are match the amount.\n\n"
+                                    "Please note, that if several peers accetp the offer, whoever lock funds first will continue to atomic swap trade, the rest will get a message that offer will be dropped. "
+                                    "If you get such message, please don't deposit your coins to the lock account.";
+
+            }
+
+            // Normal P2P swap usecase.
             if (mwc::isWalletLocked()) {
                 core::getWndManager()->messageTextDlg(title, msg);
             }
             else {
-                if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg( title, msg,
-                                                                                                   "Check Later", "Review and Accept",
-                                                                                                   "Later I will switch to the swap page and check it", "Review and Accept the trade now",
-                                                                                                   false, true) ) {
-                    // Switching to the review page...
-                    viewTrade(swap.swapId, "BuyerOfferCreated");
-                }
+               if (core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg( title, msg,
+                                             "Check Later", "Review and Accept",
+                                             "Later I will switch to the swap page and check it", "Review and Accept the trade now",
+                                             false, true) ) {
+                        // Switching to the review page...
+                        viewTrade(swap.swapId, "BuyerOfferCreated");
+               }
             }
         }
     }
@@ -1094,9 +1125,9 @@ void Swap::acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address, i
 
     // For Buy let's check if there is already a request...
     // TODO Implement auto accept code, acceptedOffers  has all accepted
-    core::getWndManager()->messageTextDlg("Waiting for offer", "Wallet " + wallet_tor_address + " should initate atomic swap trade soon. "
-        "This trade will be accepted atomatically. Please be online to lock your " + offer.secondaryCurrency + " coins.\n\n"
-        "Please note, if several traders accept the same offers, trader who lock funds first will be able to finish the trade. You will be notified if your offer will be rejected because of that.");
+//    core::getWndManager()->messageTextDlg("Waiting for offer", "We notify Wallet " + wallet_tor_address + " should initate atomic swap trade soon. "
+//        "This trade will be accepted atomatically. Please be online to lock your " + offer.secondaryCurrency + " coins.\n\n"
+//        "Please note, if several traders accept the same offers, trader who lock funds first will be able to finish the trade. You will be notified if your offer will be rejected because of that.");
 }
 
 // Reject any offers from this address. We don't want them, we are likely too late

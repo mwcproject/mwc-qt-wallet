@@ -68,6 +68,7 @@ struct MktSwapOffer {
     QString toJsonStr() const;
 
     bool isEmpty() const {return id.isEmpty();}
+    bool equal( const wallet::SwapTradeInfo & swap ) const;
 
     double getFeeLevel() const;
 
@@ -126,8 +127,6 @@ struct MySwapOffer {
 
     // Offer description for user. Sell XX MWC for XX BTC
     QString getOfferDescription() const;
-
-    bool equal( const wallet::SwapTradeInfo & swap ) const;
 };
 
 class Swap;

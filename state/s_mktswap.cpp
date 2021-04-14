@@ -120,6 +120,18 @@ bool MktSwapOffer::isValid() const {
         mwcLockBlocks>0 && secLockBlocks>0;
 }
 
+bool MktSwapOffer::equal( const wallet::SwapTradeInfo & swap ) const {
+    return  sell == swap.isSeller &&
+            fabs( mwcAmount - swap.mwcAmount) < 0.00001 &&
+            fabs( secAmount - swap.secondaryAmount) < 0.00001 &&
+            secondaryCurrency == swap.secondaryCurrency &&
+            mwcLockBlocks == swap.mwcConfirmations &&
+            secLockBlocks == swap.secondaryConfirmations &&
+            swap.redeemTimeLimit == 3600 && swap.messageExchangeTimeLimit == 3600;
+}
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  MySwapOffer
@@ -187,17 +199,6 @@ QString MySwapOffer::getOfferDescription() const {
     return (offer.sell ? "Selling " : "Buying ") + QString::number(offer.mwcAmount) +
             " MWC for " + QString::number(offer.secAmount) + " " + offer.secondaryCurrency;
 }
-
-bool MySwapOffer::equal( const wallet::SwapTradeInfo & swap ) const {
-    return  offer.sell == swap.isSeller &&
-            fabs( offer.mwcAmount - swap.mwcAmount) < 0.00001 &&
-            fabs( offer.secAmount - swap.secondaryAmount) < 0.00001 &&
-            offer.secondaryCurrency == swap.secondaryCurrency &&
-            offer.mwcLockBlocks == swap.mwcConfirmations &&
-            offer.secLockBlocks == swap.secondaryConfirmations &&
-            swap.redeemTimeLimit == 3600 && swap.messageExchangeTimeLimit == 3600;
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //  SwapMarketplace
@@ -932,17 +933,18 @@ bool SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddr
     }
 
     // Let's send accept offer message to another wallet.
-    context->wallet->sendMarketplaceMessage("accept_offer", walletAddress, offerId, "SwapMarketplace");
+    context->wallet->sendMarketplaceMessage("check_offer", walletAddress, offerId, "SwapMarketplaceCheck");
     return true;
 }
 
 // Response from sendMarketplaceMessage
 void SwapMarketplace::onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie) {
-    if (cookie != "SwapMarketplace")
+    if ( !cookie.startsWith("SwapMarketplace") )
         return;
 
     if (!error.isEmpty()) {
-        core::getWndManager()->messageTextDlg("Error", "Unable to accept offer from "+walletAddress+" because of the error:\n" + error);
+        core::getWndManager()->messageTextDlg("Error", "Unable to accept offer from " + walletAddress +
+                                                       " because of the error:\n" + error);
         return;
     }
 
@@ -950,47 +952,63 @@ void SwapMarketplace::onSendMarketplaceMessage(QString error, QString response, 
 
     MktSwapOffer mktOffer = marketOffers.value(key);
     if (mktOffer.isEmpty()) {
-        core::getWndManager()->messageTextDlg("Error", "Unfortunately you can't accept offer from "+walletAddress+". It is not on the market any more.");
+        core::getWndManager()->messageTextDlg("Error",
+                                              "Unfortunately you can't accept offer from " + walletAddress +
+                                              ". It is not on the market any more.");
         return;
     }
 
     // Check the response. It is a Json, but we can parse it manually. We need to find how many offers are in process.
     // "{"running":2}"
     int idx1 = response.indexOf(':');
-    int idx2 = response.indexOf('}', idx1+1);
+    int idx2 = response.indexOf('}', idx1 + 1);
     int running_num = 100;
     bool ok = false;
-    if (idx1<idx2 && idx1>0) {
-        running_num = response.mid(idx1+1, idx2-idx1-1).trimmed().toInt(&ok);
+    if (idx1 < idx2 && idx1 > 0) {
+        running_num = response.mid(idx1 + 1, idx2 - idx1 - 1).trimmed().toInt(&ok);
     }
 
     if (!ok) {
-        core::getWndManager()->messageTextDlg("Error", "Unable to accept offer from "+walletAddress+" because of unexpected response:\n" + response);
+        core::getWndManager()->messageTextDlg("Error", "Unable to accept offer from " + walletAddress +
+                                                       " because of unexpected response:\n" + response);
         return;
     }
 
-    if (running_num<0) { // The offer is taken
-        core::getWndManager()->messageTextDlg("Not on the market", "Sorry, this offer is not on the market any more, recently it was fulfilled.");
+    if (running_num < 0) { // The offer is taken
+        core::getWndManager()->messageTextDlg("Not on the market",
+                                              "Sorry, this offer is not on the market any more, recently it was fulfilled.");
         return;
     }
 
-    if (running_num>0) {
-        // There are something already going, let's report it.
-        if ( core::WndManager::RETURN_CODE::BTN1 != core::getWndManager()->questionTextDlg("Warning", "Wallet "+walletAddress+" already has " + QString::number(running_num) + " accepted trades. Only one trade that lock "
-                           "coins first will continue, the rest will be cancelled. As a result your trade might be cancelled even you lock the coins.\n\n"
-                           "You can wait for some time, try to accept this offer later. Or you can continue, you trade might win.\n\n "
-                           "Do you want to continue and start trading?",
-        "Yes", "No",
-        "I understand the risk and I want to continue", "No, I will better wait",
-        false, true) )
-        {
-            getSwap()->rejectOffer(mktOffer, walletAddress);
-            return;
+
+    if (cookie == "SwapMarketplaceCheck") {
+        if (running_num > 0) {
+            // There are something already going, let's report it.
+            if (core::WndManager::RETURN_CODE::BTN1 != core::getWndManager()->questionTextDlg("Warning", "Wallet " +
+                                                                                                         walletAddress +
+                                                                                                         " already has " +
+                                                                                                         QString::number(
+                                                                                                                 running_num) +
+                                                                                                         " accepted trades. Only one trade that lock "
+                                                                                                         "coins first will continue, the rest will be cancelled. As a result your trade might be cancelled even you lock the coins.\n\n"
+                                                                                                         "You can wait for some time, try to accept this offer later. Or you can continue, you trade might win.\n\n "
+                                                                                                         "Do you want to continue and start trading?",
+                                                                                              "Yes", "No",
+                                                                                              "I understand the risk and I want to continue",
+                                                                                              "No, I will better wait",
+                                                                                              false, true)) {
+                getSwap()->rejectOffer(mktOffer, walletAddress);
+                return;
+            }
         }
+
+        context->wallet->sendMarketplaceMessage("accept_offer", walletAddress, offerId, "SwapMarketplaceAccept");
     }
 
-    // Finally, we are good to accept the offer.
-    getSwap()->acceptOffer(mktOffer,  walletAddress, running_num);
+    if (cookie == "SwapMarketplaceAccept") {
+        // Finally, we are good to accept the offer.
+        getSwap()->acceptOffer(mktOffer, walletAddress, running_num);
+    }
 }
 
 // Offer is fulfilled
