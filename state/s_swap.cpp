@@ -644,6 +644,9 @@ void Swap::createStartSwap() {
 
 // Response from sendMarketplaceMessage
 void Swap::onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie) {
+    if (cookie!="Swap")
+        return;
+
     if (!error.isEmpty()) {
         core::getWndManager()->messageTextDlg("Error", "Unable to accept offer from "+walletAddress+" because of the error:\n" + error);
         return;
