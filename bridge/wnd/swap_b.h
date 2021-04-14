@@ -150,7 +150,7 @@ public:
     // Bunch of swap utils. We want to mainatin swap Cmd mapping in a single place
     // See 'Methods for core callers' below
     Q_INVOKABLE bool isSwapDone(QString stateCmd);
-    Q_INVOKABLE bool isSwapCancellable(QString stateCmd);
+    Q_INVOKABLE bool isSwapCancellable(QString stateCmd, bool marketplaceTrade);
     Q_INVOKABLE int  getSwapBackup(QString stateCmd);
     Q_INVOKABLE bool isSwapWatingToAccept(QString stateCmd);
 
@@ -257,7 +257,7 @@ private slots:
 
 // Methods for core callers
 bool isSwapDone(const QString & stateCmd);
-bool isSwapCancellable(const QString & stateCmd);
+bool isSwapCancellable(const QString & stateCmd, bool marketplaceTrade);
 int  getSwapBackup(const QString & stateCmd);
 bool isSwapWatingToAccept(const QString & stateCmd);
 

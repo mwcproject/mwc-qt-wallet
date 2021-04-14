@@ -49,6 +49,7 @@ struct SwapTradeInfo {
     int64_t expirationTime; // timestamp in seconds
     QString secondary_address;
     QString lastProcessError;
+    QString tag;
 
     QWidget * markWnd = nullptr;
     QLabel * initTimeLable = nullptr;
@@ -75,10 +76,11 @@ struct SwapTradeInfo {
                    int64_t         _initiatedTime,
                    int64_t         _expirationTime,
                    const QString & _secondary_address,
-                   const QString & _lastProcessError) :
+                   const QString & _lastProcessError,
+                   const QString & _tag) :
             isSeller(_isSeller), mwcAmount(_mwcAmount), secondaryAmount(_secondaryAmount), secondaryCurrency(_secondaryCurrency),
             tradeId(_tradeId), stateCmd(_stateCmd), status(_status), initiatedTime(_initiatedTime), expirationTime(_expirationTime),
-            secondary_address(_secondary_address), lastProcessError(_lastProcessError) {}
+            secondary_address(_secondary_address), lastProcessError(_lastProcessError), tag(_tag) {}
 
     // Reset all UI related data
     void resetUI() {

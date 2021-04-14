@@ -870,8 +870,8 @@ public:
 
     // Send marketplace message and get a response back
     // command: "accept_offer" or "fail_bidding"
-    // Check Signal: onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress);
-    virtual void sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id) = 0;
+    // Check Signal: onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
+    virtual void sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id, QString cookie) = 0;
 
 private:
 signals:
@@ -1012,6 +1012,11 @@ signals:
     // Notificaiton that nee Swap trade offer was recieved.
     void onNewSwapTrade(QString currency, QString swapId);
 
+    // Notification about new received swap message
+    void onNewSwapMessage(QString swapId);
+    // Swap marketplace. We have a winner for the offer.
+    void onMktGroupWinner(QString swapId, QString tag);
+
     // Response from backupSwapTradeData
     void onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage);
 
@@ -1064,7 +1069,7 @@ signals:
     void onNewMktMessage(int messageId, QString wallet_tor_address, QString offer_id);
 
     // Response from sendMarketplaceMessage
-    void onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress);
+    void onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
 };
 
 }

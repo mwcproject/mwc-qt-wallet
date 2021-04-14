@@ -86,7 +86,7 @@ void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, 
     }
 
     Q_ASSERT(cancelBtn);
-    if ( swap->isSwapCancellable(stateCmd))
+    if ( swap->isSwapCancellable(stateCmd, !tag.isEmpty()))
         cancelBtn->show();
     else
         cancelBtn->hide();
@@ -234,9 +234,9 @@ void SwapList::sgnSwapTradesResult(QString cookie, QVector<QString> trades, QStr
 
     // Result comes in series of 11 item tuples:
     // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <State>, <initiate_time_interval>, <expire_time_interval>  <secondary_address> <last_process_error> >, ....
-    for (int i = 10; i < trades.size(); i += 11) {
-        SwapTradeInfo sti(trades[i - 10] == "true", trades[i - 9], trades[i - 8], trades[i - 7], trades[i - 6], trades[i - 5],
-                          trades[i - 4], trades[i - 3].toLongLong(), trades[i - 2].toLongLong(), trades[i-1], trades[i]);
+    for (int i = 11; i < trades.size(); i += 12) {
+        SwapTradeInfo sti(trades[i - 11] == "true", trades[i - 10], trades[i - 9], trades[i - 8], trades[i - 7], trades[i - 6],
+                          trades[i - 5], trades[i - 4].toLongLong(), trades[i - 3].toLongLong(), trades[i-2], trades[i-1], trades[i]);
         swapList.push_back(sti);
     }
 

@@ -1150,8 +1150,8 @@ void MWC713::stopListenOnTopic(const QString & topic) {
     eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskStopListenOnTopic(this, topic), TaskStopListenOnTopic::TIMEOUT)} );
 }
 
-void MWC713::sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id) {
-    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TasksSendMarketplaceMessage(this, command, wallet_tor_address, offer_id), TasksSendMarketplaceMessage::TIMEOUT)} );
+void MWC713::sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id, QString cookie) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TasksSendMarketplaceMessage(this, command, wallet_tor_address, offer_id, cookie), TasksSendMarketplaceMessage::TIMEOUT)} );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1725,14 +1725,30 @@ void MWC713::notifyAboutNewSwapTrade(QString currency, QString swapId) {
     emit onNewSwapTrade(currency, swapId);
 }
 
+void MWC713::notifyAboutSwapMessage(QString swapId) {
+    logger::logEmit( "MWC713", "onNewSwapMessage", "swapId=" + swapId );
+    emit onNewSwapMessage(swapId);
+}
+
+// The partner locked the funds at the trade with tag. We will to correct marketplace with that
+void MWC713::notifyAboutGroupWinner(QString swapId, QString tag) {
+    logger::logEmit( "MWC713", "onMktGroupWinner", "swapId=" + swapId + "  tag=" + tag );
+    emit onMktGroupWinner(swapId, tag);
+
+    // Note !!! Cookie is from swap List, so we will be able to update it. It is a hack.
+    // Normally we should send message to the window and window will request this data with this cookie value
+    requestSwapTrades("SwapListWnd");
+}
+
+
 void MWC713::notifyAboutNewMktMessage(int messageId, QString wallet_tor_address, QString offer_id) {
     logger::logEmit( "MWC713", "onNewMktMessage", QString::number(messageId) + ", " + wallet_tor_address + ", " + offer_id );
     emit onNewMktMessage(messageId, wallet_tor_address, offer_id);
 }
 
-void MWC713::setSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress) {
-    logger::logEmit( "MWC713", "onSendMarketplaceMessage", "error=" + error + " response=" + response + " offerId=" + offerId + " walletAddress=" + walletAddress );
-    emit onSendMarketplaceMessage(error, response, offerId, walletAddress);
+void MWC713::setSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie) {
+    logger::logEmit( "MWC713", "onSendMarketplaceMessage", "error=" + error + " response=" + response + " offerId=" + offerId + " walletAddress=" + walletAddress + " cookie=" + cookie );
+    emit onSendMarketplaceMessage(error, response, offerId, walletAddress, cookie);
 }
 
 void MWC713::setBackupSwapTradeData(QString swapId, QString backupFileName, QString errorMessage) {
@@ -1745,7 +1761,7 @@ void MWC713::setRestoreSwapTradeData(QString swapId, QString importedFilename, Q
     emit onRestoreSwapTradeData( swapId, importedFilename, errorMessage );
 }
 
-void MWC713::setRequestRecieverWalletAddress(QString url, QString address, QString error) {
+void MWC713::setRequestReceiverWalletAddress(QString url, QString address, QString error) {
     logger::logEmit( "MWC713", "onRequestRecieverWalletAddress", url + ", " + address + ", " + error );
     emit onRequestRecieverWalletAddress(url, address, error);
 }

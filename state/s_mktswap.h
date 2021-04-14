@@ -147,7 +147,8 @@ public:
             QString secAddress, double  secFee, QString note );
 
     // change response with onMyOffersChanged
-    void withdrawMyOffer(QString offerId);
+    // return Offer description if such offer was found. Otherwise - empty string
+    QString withdrawMyOffer(QString offerId);
 
     // Request a new Marketplace offers from the wallet.
     // Respond: onMarketPlaceOffersChanged
@@ -232,8 +233,11 @@ slots:
     // offer_id: offer_i from the swap marketplace. It is expected to be known
     void onNewMktMessage(int messageId, QString wallet_tor_address, QString offer_id);
 
+    // Offer is full filled
+    void onMktGroupWinner(QString swapId, QString tag);
+
     // Response from sendMarketplaceMessage
-    void onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress);
+    void onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
 private:
     core::TimerThread * timer = nullptr;
     Swap * swap = nullptr;

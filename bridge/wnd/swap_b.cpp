@@ -102,6 +102,7 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
         trades.push_back(QString::number(st.expiration));
         trades.push_back(st.secondaryAddress);
         trades.push_back( mapMwc713Message(st.lastProcessError) );
+        trades.push_back( st.tag );
     }
 
     emit sgnSwapTradesResult( cookie, trades, error );
@@ -640,11 +641,19 @@ static QSet<QString> nonCancelableStates{ "SellerSendingInitRedeemMessage", "Sel
                                           "BuyerRedeemMwc", "BuyerWaitForRedeemMwcConfirmations", "BuyerSwapComplete",
                                                 "BuyerWaitingForRefundTime", "BuyerPostingRefundForSecondary", "BuyerWaitingForRefundConfirmations", "BuyerCancelledRefunded", "BuyerCancelled" };
 
-bool isSwapCancellable(const QString & stateCmd) {
-    return !nonCancelableStates.contains(stateCmd);
+static QSet<QString> initialStates{
+    "SellerOfferCreated", "SellerSendingOffer", "SellerWaitingForAcceptanceMessage", "SellerWaitingForBuyerLock",
+    "BuyerOfferCreated", "BuyerSendingAcceptOfferMessage", "BuyerWaitingForSellerToLock"
+};
+
+bool isSwapCancellable(const QString & stateCmd, bool marketplaceTrade) {
+    if (marketplaceTrade)
+        return initialStates.contains(stateCmd);
+    else
+        return !nonCancelableStates.contains(stateCmd);
 }
-bool Swap::isSwapCancellable(QString stateCmd) {
-    return bridge::isSwapCancellable(stateCmd);
+bool Swap::isSwapCancellable(QString stateCmd, bool marketplaceTrade) {
+    return bridge::isSwapCancellable(stateCmd, marketplaceTrade);
 }
 
 static QMap<QString, int> buildBackupMapping() {

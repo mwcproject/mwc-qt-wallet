@@ -44,6 +44,19 @@ bool TaskSwapMktNewMessage::processTask(const QVector<WEvent> &events) {
         wallet713->notifyAboutNewMktMessage(evt.event, wallet_tor_address, offer_id);
         return true;
     }
+
+    if (evt.event == S_MKT_WINNINER) {
+        QStringList prms = evt.message.split('|');
+        if (prms.size() != 2)
+            return false;
+
+        QString swapId = prms[0];
+        QString tag = prms[1];
+
+        wallet713->notifyAboutGroupWinner(swapId, tag);
+        return true;
+    }
+
     return false;
 }
 
@@ -414,12 +427,12 @@ bool TasksSendMarketplaceMessage::processTask(const QVector<WEvent> &events) {
     for (auto &ln : lns) {
         if (ln.message.startsWith("JSON: ")) {
             QString jsonStr = ln.message.mid(strlen("JSON: ")).trimmed();
-            wallet713->setSendMarketplaceMessage("", jsonStr, offer_id, wallet_tor_address);
+            wallet713->setSendMarketplaceMessage("", jsonStr, offer_id, wallet_tor_address, cookie);
             return true;
         }
     }
 
-    wallet713->setSendMarketplaceMessage(getErrorMessage(events, "Unable to process SendMarketplaceMessage response"), "", offer_id, wallet_tor_address );
+    wallet713->setSendMarketplaceMessage(getErrorMessage(events, "Unable to process SendMarketplaceMessage response"), "", offer_id, wallet_tor_address, cookie );
     return true;
 
 }

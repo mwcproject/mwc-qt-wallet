@@ -90,10 +90,12 @@ enum WALLET_EVENTS {
 
     // Swaps
     S_SWAP_GET_OFFER = 90,
+    S_SWAP_GET_MESSAGE = 91,
 
     // Swap Marketplace
     S_MKT_ACCEPT_OFFER = 95,
     S_MKT_FAIL_BIDDING = 96,
+    S_MKT_WINNINER     = 97, // winner in the group. It is mean that offer is really taken and trade is started.
 };
 QString toString(WALLET_EVENTS event);
 

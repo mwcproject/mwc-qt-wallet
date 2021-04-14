@@ -229,12 +229,13 @@ class TasksSendMarketplaceMessage : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*60*3; // might take time because of connection timeouts
 
-    TasksSendMarketplaceMessage( MWC713 * wallet713, QString command, QString _wallet_tor_address, QString _offer_id) :
+    TasksSendMarketplaceMessage( MWC713 * wallet713, QString command, QString _wallet_tor_address, QString _offer_id, QString _cookie) :
             Mwc713Task("TasksSendMarketplaceMessage", "",
                        "send_marketplace_message --command " + command + " --offer_id " + _offer_id + " --tor_address " + _wallet_tor_address,
                        wallet713, ""),
             wallet_tor_address(_wallet_tor_address),
-            offer_id(_offer_id)
+            offer_id(_offer_id),
+            cookie(_cookie)
     {}
 
     virtual ~TasksSendMarketplaceMessage() override {}
@@ -245,6 +246,7 @@ public:
 private:
     QString wallet_tor_address;
     QString offer_id;
+    QString cookie;
 };
 
 

@@ -153,7 +153,7 @@ public:
 
     // Start trading for Marketplace offer. It will start for sell only. For Buy the normal workflow should be fine, we will only press "Accept" automatically.
     // For Buy - offer will be accepted automatically.
-    void acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address);
+    void acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address, int running_num);
 
     // Reject any offers from this address. We don't want them, we are likely too late
     void rejectOffer(const MktSwapOffer & offer, QString wallet_tor_address);
@@ -216,6 +216,7 @@ slots:
                                QString error );
 
     void onNewSwapTrade(QString currency, QString swapId);
+    void onNewSwapMessage(QString swapId);
 
     // Response from createNewSwapTrade, SwapId on OK,  errMsg on failure
     void onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> params, QString swapId, QString errMsg);
@@ -236,6 +237,8 @@ slots:
     void onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);
 
     void onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage);
+
+    void onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
 private:
     core::TimerThread * timer = nullptr;
 
@@ -250,6 +253,7 @@ private:
 
     // New trade data.
     QString mktOfferId; // true if it is marketplace. In this case most of those values we can't change
+    int     mktRunningNum = 0; // Number of running offers when we started and that we were agree on
     QString newSwapAccount;
     QString newSwapCurrency;
     QString newSwapMwc2Trade;

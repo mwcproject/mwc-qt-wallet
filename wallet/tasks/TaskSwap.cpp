@@ -42,6 +42,17 @@ bool TaskSwapNewTradeArrive::processTask(const QVector<WEvent> &events) {
         wallet713->notifyAboutNewSwapTrade(currency, swapId);
         return true;
     }
+
+    if (evt.event == S_SWAP_GET_MESSAGE) {
+        QStringList prms = evt.message.split('|');
+        if (prms.size() != 1)
+            return false;
+
+        QString swapId = prms[0];
+
+        wallet713->notifyAboutSwapMessage(swapId);
+        return true;
+    }
     return false;
 }
 

@@ -225,6 +225,7 @@ SwapMarketplace::SwapMarketplace(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onStopListenOnTopic, this, &SwapMarketplace::onStopListenOnTopic, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onNewMktMessage, this, &SwapMarketplace::onNewMktMessage, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onSendMarketplaceMessage, this, &SwapMarketplace::onSendMarketplaceMessage, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onMktGroupWinner, this, &SwapMarketplace::onMktGroupWinner, Qt::QueuedConnection );
 
     swap = (Swap*) context->stateMachine->getState(STATE::SWAP);
 }
@@ -349,7 +350,8 @@ QPair<QString, QStringList> SwapMarketplace::lockOutputsForSellOffer(const QStri
     return QPair<QString, QStringList>("", output2lock);
 }
 
-void SwapMarketplace::withdrawMyOffer(QString offerId) {
+QString SwapMarketplace::withdrawMyOffer(QString offerId) {
+
     for ( int i=myOffers.length()-1; i>=0; i-- ) {
         if (myOffers[i].offer.id == offerId) {
             if ( !myOffers[i].msgUuid.isEmpty() ) {
@@ -357,12 +359,14 @@ void SwapMarketplace::withdrawMyOffer(QString offerId) {
                 context->wallet->messageWithdraw(myOffers[i].msgUuid);
             }
             context->appContext->unlockOutputsById( myOffers[i].offer.id );
+            QString desc = myOffers[i].getOfferDescription();
             myOffers.remove(i);
-            break;
+            emit onMyOffersChanged();
+            return desc;
         }
     }
 
-    emit onMyOffersChanged();
+    return "";
 }
 
 
@@ -928,12 +932,14 @@ bool SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddr
     }
 
     // Let's send accept offer message to another wallet.
-    context->wallet->sendMarketplaceMessage("accept_offer", walletAddress, offerId);
+    context->wallet->sendMarketplaceMessage("accept_offer", walletAddress, offerId, "SwapMarketplace");
     return true;
 }
 
 // Response from sendMarketplaceMessage
-void SwapMarketplace::onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress) {
+void SwapMarketplace::onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie) {
+    if (cookie != "SwapMarketplace")
+        return;
 
     if (!error.isEmpty()) {
         core::getWndManager()->messageTextDlg("Error", "Unable to accept offer from "+walletAddress+" because of the error:\n" + error);
@@ -958,8 +964,13 @@ void SwapMarketplace::onSendMarketplaceMessage(QString error, QString response, 
         running_num = response.mid(idx1+1, idx2-idx1-1).trimmed().toInt(&ok);
     }
 
-    if (!ok || running_num<0) {
+    if (!ok) {
         core::getWndManager()->messageTextDlg("Error", "Unable to accept offer from "+walletAddress+" because of unexpected response:\n" + response);
+        return;
+    }
+
+    if (running_num<0) { // The offer is taken
+        core::getWndManager()->messageTextDlg("Not on the market", "Sorry, this offer is not on the market any more, recently it was fulfilled.");
         return;
     }
 
@@ -979,9 +990,16 @@ void SwapMarketplace::onSendMarketplaceMessage(QString error, QString response, 
     }
 
     // Finally, we are good to accept the offer.
-    getSwap()->acceptOffer(mktOffer,  walletAddress);
+    getSwap()->acceptOffer(mktOffer,  walletAddress, running_num);
 }
 
+// Offer is fulfilled
+void SwapMarketplace::onMktGroupWinner(QString swapId, QString tag) {
+    QString offerDesc = withdrawMyOffer(tag);
+    if (!offerDesc.isEmpty()) {
+        core::getWndManager()->messageTextDlg("Congratulations", "You offer " + offerDesc + " is accepted, your trade partner locked the funds. You can see your trade progress that the Swap page.");
+    }
+}
 
 
 

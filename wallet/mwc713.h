@@ -399,8 +399,8 @@ public:
 
     // Send marketplace message and get a response back
     // command: "accept_offer" or "fail_bidding"
-    // Check Signal: onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress);
-    virtual void sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id) override;
+    // Check Signal: onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
+    virtual void sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id, QString cookie) override;
 public:
     // launch exit command.
     void launchExitCommand();
@@ -531,12 +531,16 @@ public:
 
     // Notificaiton that nee Swap trade offer was recieved.
     void notifyAboutNewSwapTrade(QString currency, QString swapId);
+    // Wallet get a new message for the trade.
+    void notifyAboutSwapMessage(QString swapId);
+    // The partner locked the funds at the trade with tag. We will to correct marketplace with that
+    void notifyAboutGroupWinner(QString swapId, QString tag);
 
     void setBackupSwapTradeData(QString swapId, QString backupFileName, QString errorMessage);
 
     void setRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
 
-    void setRequestRecieverWalletAddress(QString url, QString address, QString error);
+    void setRequestReceiverWalletAddress(QString url, QString address, QString error);
 
     void setRepost(int txIdx, QString err);
 
@@ -565,7 +569,7 @@ public:
     // Notify about new Marketplace message
     void notifyAboutNewMktMessage(int messageId, QString wallet_tor_address, QString offer_id);
 
-    void setSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress);
+    void setSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
 private:
     // Request sync (update_wallet_state) if it is not at the task Q.
     QVector<QPair<Mwc713Task*,int64_t>> create_sync_if_need(bool showSyncProgress, bool enforce);
