@@ -714,7 +714,7 @@ void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> param
     Q_UNUSED(params)
     Q_UNUSED(dryRun)
 
-    if (tag=="createNewSwap") {
+    if (tag.startsWith("createNewSwap")) {
         Q_ASSERT(!dryRun);
         Q_ASSERT(params.isEmpty());
         emit onCreateStartSwap(errMsg.isEmpty(), errMsg);
@@ -725,9 +725,11 @@ void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> param
                 context->appContext->updateNote("swap_" + swapId, newSwapNote);
 
             runTrade(swapId, tag, true, "SellerOfferCreated");
-            showTradeDetails(swapId);
-            core::getWndManager()->messageTextDlg("Swap Trade", "Congratulation! Your swap trade with ID\n" + swapId +
+            if (tag == "createNewSwap") {
+                showTradeDetails(swapId);
+                core::getWndManager()->messageTextDlg("Swap Trade", "Congratulation! Your swap trade with ID\n" + swapId +
                                                                 "\nwas successfully created.");
+            }
         }
     }
 }
@@ -1018,7 +1020,7 @@ void Swap::startTrading(const MySwapOffer & offer, QString wallet_tor_address) {
         Q_ASSERT(!outputs.isEmpty());
 
         newSwapNote = offer.note;
-        context->wallet->createNewSwapTrade( newSwapAccount, outputs , 1,
+        context->wallet->createNewSwapTrade( offer.account, outputs , 1,
                                              QString::number(offer.offer.mwcAmount),
                                              QString::number(offer.offer.secAmount),
                                              offer.offer.secondaryCurrency,
@@ -1034,7 +1036,7 @@ void Swap::startTrading(const MySwapOffer & offer, QString wallet_tor_address) {
                                              "",
                                              "",
                                              false,
-                                             "", // we will start silently.
+                                             "createNewSwapMkt", // we will start silently.
                                              offer.offer.id,
                                              {});
 
