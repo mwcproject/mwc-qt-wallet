@@ -128,6 +128,8 @@ bool InitAccount::mobileBack() {
         }
         case InitAccountPage::PageProgressWnd: return true; // Do nothing, not exiting. We are syncing.
     }
+    Q_ASSERT(false);
+    return false;
 }
 
 

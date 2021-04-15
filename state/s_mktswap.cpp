@@ -260,6 +260,8 @@ bool SwapMarketplace::mobileBack() {
             return true;
         }
     }
+    Q_ASSERT(false);
+    return false;
 }
 
 // Return error message. Empty String on OK
@@ -1014,6 +1016,7 @@ void SwapMarketplace::onSendMarketplaceMessage(QString error, QString response, 
 
 // Offer is fulfilled
 void SwapMarketplace::onMktGroupWinner(QString swapId, QString tag) {
+    Q_UNUSED(swapId)
     QString offerDesc = withdrawMyOffer(tag);
     if (!offerDesc.isEmpty()) {
         core::getWndManager()->messageTextDlg("Congratulations", "You offer " + offerDesc + " is accepted, your trade partner locked the funds. You can see your trade progress that the Swap page.");

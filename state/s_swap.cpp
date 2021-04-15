@@ -679,6 +679,8 @@ void Swap::createStartSwap() {
 
 // Response from sendMarketplaceMessage
 void Swap::onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie) {
+    Q_UNUSED(offerId)
+
     if (cookie!="Swap")
         return;
 

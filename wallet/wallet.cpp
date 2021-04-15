@@ -601,7 +601,7 @@ IntegrityFees::IntegrityFees(QJsonObject json) {
 QJsonObject IntegrityFees::toJSon() const {
     QJsonObject res {
             {"confirmed" , confirmed },
-            {"expiration_height", expiration_height },
+            {"expiration_height", int(expiration_height) }, // int for height is fine
             {"ask_fee", QString::number(ask_fee) },
             {"fee", QString::number(fee) },
             {"uuid" , uuid },
