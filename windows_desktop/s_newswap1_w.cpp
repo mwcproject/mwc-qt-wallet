@@ -14,7 +14,7 @@
 
 #include "s_newswap1_w.h"
 #include "ui_s_newswap1_w.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/util_b.h"
 #include "../bridge/config_b.h"
@@ -56,6 +56,15 @@ NewSwap1::NewSwap1(QWidget *parent) :
     ui->contactNameLable->hide();
 
     ui->progress->initLoader(false);
+
+    bool mktTrade = swap->isMktTrade();
+    ui->mwcAmountEdit->setEnabled(!mktTrade);
+    ui->secCurrencyCombo->setEnabled(!mktTrade);
+    ui->secAmountEdit->setEnabled(!mktTrade);
+    ui->swapRateEdit->setEnabled(!mktTrade);
+    ui->lockMwcFirstCheck->setEnabled(!mktTrade);
+    ui->sendAddressEdit->setEnabled(!mktTrade);
+    ui->contactsButton->setEnabled(!mktTrade);
 }
 
 NewSwap1::~NewSwap1() {

@@ -106,14 +106,18 @@ public:
     virtual void pageAccountOptions() = 0;
 
     // Swap pages
-    virtual void pageSwapList() = 0;
+    virtual void pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup) = 0;
     virtual void pageSwapNew1() = 0;
     virtual void pageSwapNew2() = 0;
     virtual void pageSwapNew3() = 0;
     virtual void pageSwapEdit(QString swapId, QString stateCmd) = 0;
     virtual void pageSwapTradeDetails(QString swapId) = 0;
 
-    virtual void showBackupDlg(QString swapId, int backupId) = 0;
+    // Swap marketplace, if selectMyOffers==true,  my offers will be selected.
+    // Otherwise last known tab
+    virtual void pageMarketplace(bool selectMyOffers) = 0;
+    // new offer of myMsgId is empty. Otherwise it is running offer update
+    virtual void pageNewUpdateOffer(QString myMsgId) = 0;
 };
 
 void setWndManager(WndManager * mgr);

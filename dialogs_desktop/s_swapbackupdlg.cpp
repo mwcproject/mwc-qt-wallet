@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/*
 #include "s_swapbackupdlg.h"
 #include "ui_s_swapbackupdlg.h"
 #include "../bridge/config_b.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include "../bridge/util_b.h"
 #include "../core/WndManager.h"
 #include "../control_desktop/messagebox.h"
@@ -130,4 +131,4 @@ void SwapBackupDlg::sgnBackupSwapTradeData(QString _swapId, QString exportedFile
 
 
 }
-
+*/

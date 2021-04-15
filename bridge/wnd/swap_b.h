@@ -16,14 +16,14 @@
 #define MWC_QT_WALLET_SWAP_H
 
 #include <QObject>
-#include "../wallet/wallet.h"
+#include "../../wallet/wallet.h"
 
 namespace bridge {
 
 class Swap : public QObject {
 Q_OBJECT
 public:
-    explicit Swap(QObject *parent = nullptr);
+    explicit Swap(QObject *parent);
     ~Swap();
 
     // Return back to the trade list page
@@ -49,7 +49,7 @@ public:
 
     // Requesting all details about the single swap Trade
     // Respond will be with sent back with sgnRequestTradeDetails
-    Q_INVOKABLE void requestTradeDetails(QString swapId);
+    Q_INVOKABLE void requestTradeDetails(QString swapId, QString cookie);
 
     // Check if this Trade is running in auto mode now
     Q_INVOKABLE bool isRunning(QString swapId);
@@ -61,20 +61,13 @@ public:
     Q_INVOKABLE QVector<QString> getRunningCriticalTrades();
 
     // Update communication method.
-    // Respond will be at sgnUpdateCommunication
-    Q_INVOKABLE void updateCommunication(QString swapId, QString communicationMethod, QString communicationAddress);
-
-    // Update secondary refund/redeem address.
-    // Respond will be at sgnUpdateSecondaryAddress
-    Q_INVOKABLE void updateSecondaryAddress(QString swapId, QString secondaryAddress);
-
-    // Update secondary fee value for the transaction.
-    // Respond will come with sgnUpdateSecondaryFee
-    Q_INVOKABLE void updateSecondaryFee(QString swapId, double fee);
-
-    // Update electrumX private node URI
-    // Respond will come with sgnUpdateElectrumX
-    Q_INVOKABLE void updateElectrumX(QString swapId, QString electrumXnodeUri );
+    // Respond will be at sgnAdjustSwapTrade(QString swapId, QString call_tag, QString errMsg)
+    Q_INVOKABLE void adjustSwapData( QString swapId, QString call_tag,
+            QString destinationMethod, QString destinationDest,
+            QString secondaryAddress,
+            QString secondaryFee,
+            QString electrumUri1,
+            QString tag );
 
     // Backup/export swap trade data into the file
     // Respond with sgnBackupSwapTradeData
@@ -112,6 +105,9 @@ public:
     // List of the secondary currencies that wallet support
     Q_INVOKABLE QVector<QString> secondaryCurrencyList();
 
+    // Check if this trade is created from accepted Marketplace offer
+    Q_INVOKABLE bool isMktTrade();
+
     // Current selected currency to trade
     Q_INVOKABLE QString getCurrentSecCurrency();
     Q_INVOKABLE QString getCurrentSecCurrencyFeeUnits();
@@ -134,9 +130,15 @@ public:
     Q_INVOKABLE double getSecTransactionFee();
     Q_INVOKABLE double getSecMinTransactionFee();
     Q_INVOKABLE double getSecMaxTransactionFee();
+    Q_INVOKABLE double getSecTransactionFee(QString secCurrency);
+    Q_INVOKABLE double getSecMinTransactionFee(QString secCurrency);
+    Q_INVOKABLE double getSecMaxTransactionFee(QString secCurrency);
     Q_INVOKABLE int getMwcConfNumber();
     Q_INVOKABLE int getSecConfNumber();
     Q_INVOKABLE QString getElectrumXprivateUrl();
+
+    Q_INVOKABLE int getMwcConfNumber(double mwcAmount);
+    Q_INVOKABLE int getSecConfNumber(QString secCurrency);
 
     Q_INVOKABLE QString getNote();
     Q_INVOKABLE void setNote(QString note);
@@ -148,7 +150,7 @@ public:
     // Bunch of swap utils. We want to mainatin swap Cmd mapping in a single place
     // See 'Methods for core callers' below
     Q_INVOKABLE bool isSwapDone(QString stateCmd);
-    Q_INVOKABLE bool isSwapCancellable(QString stateCmd);
+    Q_INVOKABLE bool isSwapCancellable(QString stateCmd, bool marketplaceTrade);
     Q_INVOKABLE int  getSwapBackup(QString stateCmd);
     Q_INVOKABLE bool isSwapWatingToAccept(QString stateCmd);
 
@@ -195,16 +197,11 @@ signals:
                                  QVector<QString> executionPlan,
                                  QString currentAction,
                                  QVector<QString> tradeJournal,
-                                 QString errMsg );
+                                 QString errMsg,
+                                 QString cookie );
 
-    // Response from updateCommunication. OK - empty error message
-    void sgnUpdateCommunication(QString swapId, QString errorMsg);
-    // Response from updateSecondaryAddress
-    void sgnUpdateSecondaryAddress(QString swapId, QString errorMsg);
-    // Response from updateSecondaryFee
-    void sgnUpdateSecondaryFee(QString swapId, QString errorMsg);
-    // Response from updateElectrumX
-    void sgnUpdateElectrumX(QString swapId, QString errorMsg);
+    // Response from sgnAdjustSwapTrade. OK - empty error message
+    void sgnAdjustSwapTrade(QString swapId, QString call_tag, QString errMsg);
 
     // Notification about the update of swap trade. Normally it comes from the autoswap
     // executionPlan, array of triplets: <active: "true"|"false">, <end_time>, <Name> >, ....
@@ -243,7 +240,8 @@ private slots:
                                 QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                                 QString currentAction,
                                 QVector<wallet::SwapJournalMessage> tradeJournal,
-                                QString errMsg );
+                                QString errMsg,
+                                QString cookie );
     void onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
 
     void onSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,
@@ -261,7 +259,7 @@ private slots:
 
 // Methods for core callers
 bool isSwapDone(const QString & stateCmd);
-bool isSwapCancellable(const QString & stateCmd);
+bool isSwapCancellable(const QString & stateCmd, bool marketplaceTrade);
 int  getSwapBackup(const QString & stateCmd);
 bool isSwapWatingToAccept(const QString & stateCmd);
 

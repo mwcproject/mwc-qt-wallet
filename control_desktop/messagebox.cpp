@@ -23,6 +23,7 @@
 #include <QThread>
 #include "../util/crypto.h"
 #include "../util_desktop/widgetutils.h"
+#include "MwcLabelProgress.h"
 
 namespace control {
 
@@ -119,6 +120,8 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
     if (!blockingPasswordHash.isEmpty()) {
         ui->passwordEdit->setFocus();
     }
+
+    onMessageBoxShown();
 }
 
 MessageBox::~MessageBox()

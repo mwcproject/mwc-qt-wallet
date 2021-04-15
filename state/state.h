@@ -66,6 +66,7 @@ enum STATE {
 
     MIGRATION = 24,             // Data migration between wallet versions.
     SWAP = 25,                  // Atomic swaps
+    SWAP_MKT = 26,              // Atomic swaps marketplace
 };
 
 struct NextStateRespond {

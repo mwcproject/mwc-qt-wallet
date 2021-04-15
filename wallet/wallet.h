@@ -334,6 +334,7 @@ struct SwapInfo {
     QString secondaryAmount;
     QString secondaryCurrency;
     QString swapId;
+    QString tag;
     int64_t startTime = 0;
     QString stateCmd; // state as command
     QString state; // State as string description
@@ -344,12 +345,13 @@ struct SwapInfo {
     QString lastProcessError;
 
     void setData( QString mwcAmount, QString secondaryAmount, QString secondaryCurrency,
-                  QString swapId, int64_t startTime, QString stateCmd, QString state, QString action,
+                  QString swapId, QString tag, int64_t startTime, QString stateCmd, QString state, QString action,
                   int64_t expiration, bool isSeller, QString secondaryAddress, QString lastProcessError );
 };
 
 struct SwapTradeInfo {
     QString swapId;
+    QString tag;
     bool isSeller;
     double mwcAmount;
     double secondaryAmount;
@@ -374,7 +376,7 @@ struct SwapTradeInfo {
     QString electrumNodeUri; // Private electrumX URI
 
 
-    void setData( QString swapId, bool isSeller,  double mwcAmount, double secondaryAmount,
+    void setData( QString swapId, QString tag, bool isSeller,  double mwcAmount, double secondaryAmount,
                 QString secondaryCurrency,  QString secondaryAddress, double secondaryFee,
                 QString secondaryFeeUnits, int mwcConfirmations, int secondaryConfirmations,
                 int messageExchangeTimeLimit, int redeemTimeLimit, bool sellerLockingFirst,
@@ -407,6 +409,89 @@ struct ListenerStatus {
 
     ListenerStatus(const ListenerStatus & item) = default;
     ListenerStatus & operator = (const ListenerStatus & item) = default;
+};
+
+struct IntegrityFees {
+    bool confirmed = false;
+    int64_t expiration_height = -1;
+    int64_t ask_fee = -1;
+    int64_t fee = -1;
+    QString uuid;
+
+    IntegrityFees() = default;
+    IntegrityFees(const IntegrityFees & item) = default;
+    IntegrityFees & operator = (const IntegrityFees & item) = default;
+
+    IntegrityFees(bool _confirmed,
+        int64_t _expiration_height,
+        int64_t _ask_fee,
+        int64_t _fee,
+        QString _uuid) :
+            confirmed(_confirmed),
+            expiration_height(_expiration_height),
+            ask_fee(_ask_fee),
+            fee(_fee),
+            uuid(_uuid)
+        {}
+
+    IntegrityFees(QString jsonString);
+    IntegrityFees(QJsonObject json);
+
+    double toDblFee() const {return fee / 1000000000.0;}
+
+    QJsonObject toJSon() const;
+    QString toJSonStr() const;
+};
+
+struct BroadcastingMessage {
+    QString uuid;
+    int broadcasting_interval = -1;
+    int64_t fee = 0;
+    QString message;
+    int published_time;
+
+    // {"broadcasting_interval":60,"fee":"10000000","message":"{}","published_time":49,"uuid":"7f0a6a89-5ad5-40cb-b204-0805ffcd1903"}
+    BroadcastingMessage(const QJsonObject & json);
+    BroadcastingMessage() = default;
+    BroadcastingMessage(const BroadcastingMessage & item) = default;
+    BroadcastingMessage & operator = (const BroadcastingMessage & item) = default;
+};
+
+struct MessagingStatus {
+    QVector<BroadcastingMessage> broadcasting;
+    bool connected = false;
+    QStringList gossippub_peers;
+    int received_messages = 0;
+    QStringList topics;
+
+    // {"broadcasting":[{"broadcasting_interval":60,"fee":"10000000","message":"{}","published_time":49,"uuid":"7f0a6a89-5ad5-40cb-b204-0805ffcd1903"}],"gossippub_peers":null,"received_messages":0,"topics":["swapmarketplace","testing"]}
+    MessagingStatus(const QJsonObject & json);
+    MessagingStatus() = default;
+    MessagingStatus(const MessagingStatus & item) = default;
+    MessagingStatus & operator = (const MessagingStatus & item) = default;
+
+    // Status for logs
+    QString toString() const;
+};
+
+struct ReceivedMessages {
+    QString topic;   // Topic where we received the message
+    int64_t fee;     // fee that was paid
+    QString message; // message that received
+    QString wallet;  // wallet onion address
+
+    ReceivedMessages(QString _topic,
+            int64_t _fee,
+            QString _message,
+            QString _wallet) :
+            topic(_topic),
+            fee(_fee),
+            message(_message),
+            wallet(_wallet) {}
+
+    ReceivedMessages() = default;
+    ReceivedMessages(const ReceivedMessages & item) = default;
+    ReceivedMessages & operator = (const ReceivedMessages & item) = default;
 };
 
 // Interface to wallet functionality
@@ -673,6 +758,7 @@ public:
     // Create a new Swap trade deal.
     // Check Signal: void onCreateNewSwapTrade(tag, dryRun, QVector<QString> params, QString swapId, QString err);
     virtual void createNewSwapTrade(QString account,
+                                    QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
                                     int min_confirmations, // minimum number of confimations
                                     QString mwcAmount, QString secAmount, QString secondary,
                                     QString redeemAddress,
@@ -688,6 +774,7 @@ public:
                                     QString electrum_uri2,
                                     bool dryRun,
                                     QString tag,
+                                    QString mkt_trade_tag,
                                     QVector<QString> params ) = 0;
 
     // Cancel the trade
@@ -700,12 +787,18 @@ public:
     //                            QVector<SwapExecutionPlanRecord> executionPlan,
     //                            QString currentAction,
     //                            QVector<SwapJournalMessage> tradeJournal,
-    //                            QString error );
-    virtual void requestTradeDetails(QString swapId, bool waitForBackup1 ) = 0;
+    //                            QString error,
+    //                            QString cookie );
+    virtual void requestTradeDetails(QString swapId, bool waitForBackup1, QString cookie ) = 0;
 
     // Adjust swap stade values. params are optional
-    // Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
-    virtual void adjustSwapData( QString swapId, QString adjustCmd, QString param1 = "", QString param2 = "" ) = 0;
+    // Check Signal: onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);
+    virtual void adjustSwapData( const QString & swapId, QString call_tag,
+                                 const QString &destinationMethod, const QString & destinationDest,
+                                 const QString &secondaryAddress,
+                                 const QString &secondaryFee,
+                                 const QString &electrumUri1,
+                                 const QString &tag ) = 0;
 
     // Perform a auto swap step for this trade.
     // Check Signal: void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
@@ -735,6 +828,51 @@ public:
     // Decode the slatepack data (or validate slate json) are respond with Slate SJon that can be processed
     // Check Signal: onDecodeSlatepack( QString tag, QString error, QString slateJSon, QString content, QString sender, QString receiver )
     virtual void decodeSlatepack(QString slatepackContent, QString tag) = 0;
+
+    // Pay fees, validate fees.
+    // Check signal: onCreateIntegrityFee(QString err, QVector<IntegrityFees> result);
+    virtual void createIntegrityFee( const QString & account, double mwcReserve, const QVector<double> & fees ) = 0;
+
+    // Request info about paid integrity fees
+    // Check Signal: onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees)
+    virtual void requestIntegrityFees() = 0;
+
+    // Request withdraw for available deposit at integrity account.
+    // Check Signal: onWithdrawIntegrityFees(QString error)
+    virtual void withdrawIntegrityFees(const QString & account) = 0;
+
+    // Status of the messaging
+    // Check Signal: onRequestMessagingStatus(MessagingStatus status)
+    virtual void requestMessagingStatus() = 0;
+
+    // Publish new json message
+    // Check Signal: onMessagingPublish(QString id, QString uuid, QString error)
+    virtual void messagingPublish(QString messageJsonStr, QString feeTxUuid, QString id, int publishInterval, QString topic) = 0;
+
+    // Check integrity of published messages.
+    // Check Signal:  onCheckIntegrity(QVector<QString> expiredMsgUuid)
+    virtual void checkIntegrity() = 0;
+
+    // Stop publishing the message
+    // Check Signal: onMessageWithdraw(QString uuid, QString error)
+    virtual void messageWithdraw(QString uuid) = 0;
+
+    // Request messages from the receive buffer
+    // Check Signal: onReceiveMessages(QString error, QVector<ReceivedMessages>)
+    virtual void requestReceiveMessages(bool cleanBuffer) = 0;
+
+    // Start listening on the libp2p topic
+    // Check Signal: onStartListenOnTopic(QString error);
+    virtual void startListenOnTopic(const QString & topic) = 0;
+
+    // Stop listening on the libp2p topic
+    // Check Signal: onStopListenOnTopic(QString error);
+    virtual void stopListenOnTopic(const QString & topic) = 0;
+
+    // Send marketplace message and get a response back
+    // command: "accept_offer" or "fail_bidding"
+    // Check Signal: onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
+    virtual void sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id, QString cookie) = 0;
 
 private:
 signals:
@@ -860,10 +998,11 @@ signals:
                                 QVector<SwapExecutionPlanRecord> executionPlan,
                                 QString currentAction,
                                 QVector<SwapJournalMessage> tradeJournal,
-                                QString error );
+                                QString error,
+                                QString cookie );
 
     // Response from adjustSwapData
-    void onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
+    void onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);
 
     // Response from performAutoSwapStep
     void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,
@@ -874,6 +1013,11 @@ signals:
 
     // Notificaiton that nee Swap trade offer was recieved.
     void onNewSwapTrade(QString currency, QString swapId);
+
+    // Notification about new received swap message
+    void onNewSwapMessage(QString swapId);
+    // Swap marketplace. We have a winner for the offer.
+    void onMktGroupWinner(QString swapId, QString tag);
 
     // Response from backupSwapTradeData
     void onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage);
@@ -889,6 +1033,45 @@ signals:
 
     // Response to decodeSlatepack
     void onDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
+
+    // Response from createIntegrityFee
+    void onCreateIntegrityFee(QString err, QVector<IntegrityFees> result);
+
+    // Response from requestIntegrityFees
+    void onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees);
+
+    // Response from withdrawIntegrityFees
+    void onWithdrawIntegrityFees(QString error, double mwc, QString account);
+
+    // Response from requestMessagingStatus
+    void onRequestMessagingStatus(QString error, MessagingStatus status);
+
+    // Response from messagingPublish
+    void onMessagingPublish(QString id, QString uuid, QString error);
+
+    // Response from checkIntegrity
+    void onCheckIntegrity(QString error, QVector<QString> expiredMsgUuid);
+
+    // Response from messageWithdraw
+    void onMessageWithdraw(QString uuid, QString error);
+
+    // Response from requestReceiveMessages
+    void onReceiveMessages(QString error, QVector<ReceivedMessages>);
+
+    // Response from startListenOnTopic
+    void onStartListenOnTopic(QString error);
+
+    // Response from stopListenOnTopic
+    void onStopListenOnTopic(QString error);
+
+    // Notificaiton that nee Swap trade offer was recieved.
+    // messageId: S_MKT_ACCEPT_OFFER or S_MKT_FAIL_BIDDING
+    // wallet_tor_address: address from what we get a message
+    // offer_id: offer_i from the swap marketplace. It is expected to be known
+    void onNewMktMessage(int messageId, QString wallet_tor_address, QString offer_id);
+
+    // Response from sendMarketplaceMessage
+    void onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
 };
 
 }
@@ -899,5 +1082,9 @@ Q_DECLARE_METATYPE(wallet::SwapInfo);
 Q_DECLARE_METATYPE(wallet::SwapTradeInfo);
 Q_DECLARE_METATYPE(wallet::SwapExecutionPlanRecord);
 Q_DECLARE_METATYPE(wallet::SwapJournalMessage);
+Q_DECLARE_METATYPE(wallet::IntegrityFees);
+Q_DECLARE_METATYPE(wallet::BroadcastingMessage);
+Q_DECLARE_METATYPE(wallet::MessagingStatus);
+Q_DECLARE_METATYPE(wallet::ReceivedMessages);
 
 #endif // MWCWALLET_H

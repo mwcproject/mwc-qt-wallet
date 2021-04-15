@@ -101,6 +101,7 @@ private slots:
     void on_actionRoadmap_triggered();
     void on_actionMWC_website_triggered();
     void on_actionAtomicSwap_triggered();
+    void on_actionAtomicSwapMarketplace_triggered();
 
 private:
     void updateLeftBar(bool show);

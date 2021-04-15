@@ -24,8 +24,24 @@
 #include "../core/appcontext.h"
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QJsonArray>
 
 namespace wallet {
+
+
+static QJsonObject str2json(const QString & jsonStr) {
+    QJsonParseError error;
+    QJsonDocument   jsonDoc = QJsonDocument::fromJson(jsonStr.toUtf8(), &error);
+    // It is internal data, no errors expected
+    Q_ASSERT(error.error == QJsonParseError::NoError);
+    Q_ASSERT(jsonDoc.isObject());
+
+    return jsonDoc.object();
+}
+
+
+//////////////////////////////////////////////////////////
+//  AccountInfo
 
 void AccountInfo::setData(QString account,
                         int64_t _total,
@@ -73,6 +89,8 @@ QString AccountInfo::toString() const {
                " awaiting=" + util::nano2one(awaitingConfirmation) + ")";
 }
 
+/////////////////////////////////////////////////////////////////////
+//  MwcNodeConnection
 
 void MwcNodeConnection::saveData(QDataStream & out) const {
     int id = 0x4355a2;
@@ -136,6 +154,8 @@ void MwcNodeConnection::setData(NODE_CONNECTION_TYPE _connectionType, const QStr
     mwcNodeSecret = _mwcNodeSecret;
 }
 
+///////////////////////////////////////////////////////////////////////////
+//  WalletConfig
 
 bool WalletConfig::operator == (const WalletConfig & other) const {
     bool ok = dataPath==other.dataPath &&
@@ -266,6 +286,9 @@ void  WalletConfig::saveNetwork2DataPath(QString configPath, QString network, QS
     }
     util::writeTextFile(path.second + "/net.txt", {network, arch, instanceName} );
 }
+
+//////////////////////////////////////////////////////////////
+// WalletTransaction
 
 // initialize static csvHeaders
 // the CSV headers must match the output from mwc713 for 'txs --show-full'
@@ -495,12 +518,13 @@ void WalletUtxoSignature::setData(int64_t _coinNano, // Output amount
 // SwapInfo
 
 void SwapInfo::setData( QString _mwcAmount, QString _secondaryAmount, QString _secondaryCurrency,
-              QString _swapId, int64_t _startTime, QString _stateCmd, QString _state, QString _action, int64_t _expiration,
+              QString _swapId, QString _tag, int64_t _startTime, QString _stateCmd, QString _state, QString _action, int64_t _expiration,
               bool _isSeller, QString _secondaryAddress, QString _lastProcessError ) {
     mwcAmount = _mwcAmount;
     secondaryAmount = _secondaryAmount;
     secondaryCurrency = _secondaryCurrency;
     swapId = _swapId;
+    tag = _tag;
     startTime = _startTime;
     stateCmd = _stateCmd;
     state = _state;
@@ -514,7 +538,7 @@ void SwapInfo::setData( QString _mwcAmount, QString _secondaryAmount, QString _s
 /////////////////////////////////////////////////////////////////////////////////
 // SwapTradeInfo
 
-void SwapTradeInfo::setData( QString _swapId, bool _isSeller, double _mwcAmount, double _secondaryAmount,
+void SwapTradeInfo::setData( QString _swapId, QString _tag, bool _isSeller, double _mwcAmount, double _secondaryAmount,
               QString _secondaryCurrency,  QString _secondaryAddress, double _secondaryFee,
               QString _secondaryFeeUnits, int _mwcConfirmations, int _secondaryConfirmations,
               int _messageExchangeTimeLimit, int _redeemTimeLimit, bool _sellerLockingFirst,
@@ -522,6 +546,7 @@ void SwapTradeInfo::setData( QString _swapId, bool _isSeller, double _mwcAmount,
               QString _communicationMethod, QString _communicationAddress, QString _electrumNodeUri ) {
 
     swapId = _swapId;
+    tag = _tag;
     isSeller = _isSeller;
     mwcAmount = _mwcAmount;
     secondaryAmount = _secondaryAmount;
@@ -543,6 +568,7 @@ void SwapTradeInfo::setData( QString _swapId, bool _isSeller, double _mwcAmount,
 }
 
 ////////////////////////////////////////////////////////////////////
+// SwapExecutionPlanRecord
 
 void SwapExecutionPlanRecord::setData( bool _active, int64_t _end_time, QString _name ) {
     active = _active;
@@ -551,12 +577,92 @@ void SwapExecutionPlanRecord::setData( bool _active, int64_t _end_time, QString 
 }
 
 ///////////////////////////////////////////////////////////////////
+//  SwapJournalMessage
+
 void SwapJournalMessage::setData( QString _message, int64_t _time ) {
     message = _message;
     time = _time;
 }
 
+///////////////////////////////////////////////////////////////////
+// IntegrityFees
+
+IntegrityFees::IntegrityFees(QString jsonString) : IntegrityFees(str2json(jsonString)) {
+}
+
+IntegrityFees::IntegrityFees(QJsonObject json) {
+    confirmed = json["confirmed"].toBool();
+    expiration_height = json["expiration_height"].toInt();
+    ask_fee = json["ask_fee"].toString().toLongLong();
+    fee = json["fee"].toString().toLongLong();
+    uuid = json["uuid"].toString();
+}
+
+QJsonObject IntegrityFees::toJSon() const {
+    QJsonObject res {
+            {"confirmed" , confirmed },
+            {"expiration_height", expiration_height },
+            {"ask_fee", QString::number(ask_fee) },
+            {"fee", QString::number(fee) },
+            {"uuid" , uuid },
+    };
+    return res;
+}
+
+QString IntegrityFees::toJSonStr() const {
+    QJsonDocument doc(toJSon());
+    QString offerStrJson( doc.toJson(QJsonDocument::Compact));
+    return offerStrJson;
+}
+
 //////////////////////////////////////////////////////////////////
+//  BroadcastingMessage
+
+BroadcastingMessage::BroadcastingMessage(const QJsonObject & json) {
+    uuid = json["uuid"].toString();
+    broadcasting_interval = json["broadcasting_interval"].toInt();
+    fee = json["fee"].toString().toLongLong();
+    message = json["message"].toString();
+    published_time = json["published_time"].toInt();
+}
+
+//////////////////////////////////////////////////////////////////
+//  MessagingStatus
+
+MessagingStatus::MessagingStatus(const QJsonObject & json) {
+    if ( json["gossippub_peers"].isNull() ) {
+        connected = false;
+    }
+    else {
+        connected = true;
+        QJsonArray peers = json["gossippub_peers"].toArray();
+        for ( int i=0; i<peers.size(); i++ ) {
+            gossippub_peers.push_back( peers[i].toString() );
+        }
+    }
+
+    received_messages = json["received_messages"].toInt();
+    QJsonArray tps = json["topics"].toArray();
+    for (int i=0; i<tps.size(); i++) {
+        topics.push_back( tps[i].toString() );
+    }
+
+    QJsonArray myMsgs = json["broadcasting"].toArray();
+    for (int i=0; i<myMsgs.size(); i++) {
+        broadcasting.push_back( BroadcastingMessage(myMsgs[i].toObject()) );
+    }
+}
+
+// Status for logs
+QString MessagingStatus::toString() const {
+    return "MessagingStatus(gossippub_peers=" + gossippub_peers.join(", ") +
+        ", received_messages=" + QString::number(received_messages) +
+        " topics=" + topics.join(",") +
+        " broadcasting.size()=" + QString::number(broadcasting.size());
+}
+
+//////////////////////////////////////////////////////////////////
+//  Wallet
 Wallet::Wallet()
 {
 }

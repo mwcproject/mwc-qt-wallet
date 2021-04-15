@@ -32,6 +32,7 @@
 #include "tasks/TaskSend.h"
 #include "tasks/TaskTransaction.h"
 #include "tasks/TaskSwap.h"
+#include "tasks/TaskSwapMkt.h"
 #include "../util/Log.h"
 #include "../core/appcontext.h"
 #include "../util/ConfigReader.h"
@@ -264,6 +265,7 @@ void MWC713::start()  {
     eventCollector->addListener( new TaskSlatesListener(this) );
     eventCollector->addListener( new TaskSyncProgressListener(this) );
     eventCollector->addListener( new TaskSwapNewTradeArrive(this) );
+    eventCollector->addListener( new TaskSwapMktNewMessage(this) );
 }
 
 // start to init. Expected that we will exit pretty quckly
@@ -894,6 +896,7 @@ void MWC713::deleteSwapTrade(QString swapId) {
 // Create a new Swap trade deal.
 // Check Signal: void onCreateNewSwapTrade(tag, dryRun, QVector<QString> params, QString swapId, QString err);
 void MWC713::createNewSwapTrade(QString account,
+                                QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
                                 int min_confirmations, // minimum number of confimations
                                 QString mwcAmount, QString secAmount, QString secondary,
                                 QString redeemAddress,
@@ -909,11 +912,12 @@ void MWC713::createNewSwapTrade(QString account,
                                 QString electrum_uri2,
                                 bool dryRun,
                                 QString tag,
+                                QString mkt_trade_tag,
                                 QVector<QString> params ) {
 
     QVector<QPair<Mwc713Task*,int64_t>> taskGroup {
             TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
-            TSK(new TaskCreateNewSwapTrade(this, min_confirmations, // minimum number of confimations
+            TSK(new TaskCreateNewSwapTrade(this, outputs, min_confirmations, // minimum number of confimations
                                            mwcAmount, secAmount, secondary.toLower(),
                                            redeemAddress,
                                            secTxFee,
@@ -926,7 +930,7 @@ void MWC713::createNewSwapTrade(QString account,
                                            communicationAddress,
                                            electrum_uri1,
                                            electrum_uri2,
-                                           dryRun, tag, params), TaskCreateNewSwapTrade::TIMEOUT)
+                                           dryRun, tag, mkt_trade_tag, params), TaskCreateNewSwapTrade::TIMEOUT)
     };
 
     if (account!=currentAccount)
@@ -942,15 +946,26 @@ void MWC713::cancelSwapTrade(QString swapId) {
 }
 
 // Request details about this trade.
-// Check Signal: void onRequestTradeDetails( SwapTradeInfo swap )
-void MWC713::requestTradeDetails(QString swapId, bool waitForBackup1) {
-    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, {TSK(new TaskTradeDetails(this, swapId, waitForBackup1), TaskTradeDetails::TIMEOUT)} );
+// Check Signal: void onRequestTradeDetails( SwapTradeInfo swap,
+//                            QVector<SwapExecutionPlanRecord> executionPlan,
+//                            QString currentAction,
+//                            QVector<SwapJournalMessage> tradeJournal,
+//                            QString error,
+//                            QString cookie );
+void MWC713::requestTradeDetails(QString swapId, bool waitForBackup1, QString cookie) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, {TSK(new TaskTradeDetails(this, swapId, waitForBackup1, cookie), TaskTradeDetails::TIMEOUT)} );
 }
 
 // Adjust swap stade values. params are optional
 // Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
-void MWC713::adjustSwapData( QString swapId, QString adjustCmd, QString param1, QString param2 ) {
-    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, {TSK(new TaskAdjustTrade(this, swapId, adjustCmd, param1, param2), TaskAdjustTrade::TIMEOUT)} );
+void MWC713::adjustSwapData( const QString & swapId, QString call_tag,
+                             const QString &destinationMethod, const QString & destinationDest,
+                             const QString &secondaryAddress,
+                             const QString &secondaryFee,
+                             const QString &electrumUri1,
+                             const QString &tag ) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, {TSK(new TaskAdjustTrade(this, swapId, call_tag, destinationMethod, destinationDest,
+                          secondaryAddress, secondaryFee, electrumUri1, tag), TaskAdjustTrade::TIMEOUT)} );
 }
 
 // Perform a auto swap step for this trade.
@@ -1079,6 +1094,70 @@ bool MWC713::getNodeStatus() {
 // Check Signal: onGetNextKeyResult( bool success, QString identifier, QString publicKey, QString errorMessage, QString btcaddress, QString airDropAccPasswor);
 void MWC713::getNextKey( int64_t amountNano, QString btcaddress, QString airDropAccPassword ) {
     eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, {TSK( new TaskGetNextKey(this,amountNano, btcaddress, airDropAccPassword ), TaskGetNextKey::TIMEOUT)} );
+}
+
+// Pay fees, validate fees.
+// Check signal: onCreateIntegrityFee(QString err, QVector<IntegrityFees> result);
+void MWC713::createIntegrityFee( const QString & account, double mwcReserve, const QVector<double> & fees ) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskCreateIntegrityFee( this, account, mwcReserve, fees ), TaskCreateIntegrityFee::TIMEOUT)} );
+}
+
+// Request info about paid integrity fees
+// Check Signal: onRequestIntegrityFees()
+void MWC713::requestIntegrityFees() {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskRequestIntegrityFee(this), TaskRequestIntegrityFee::TIMEOUT)} );
+}
+
+// Request withdraw for available deposit at integrity account.
+// Check Signal: onWithdrawIntegrityFees(QString error)
+void MWC713::withdrawIntegrityFees(const QString & account) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskWithdrawIntegrityFees(this, account), TaskWithdrawIntegrityFees::TIMEOUT)} );
+}
+
+// Status of the messaging
+// Check Signal: onRequestMessagingStatus(MessagingStatus status)
+void MWC713::requestMessagingStatus() {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskRequestMessagingStatus(this), TaskRequestMessagingStatus::TIMEOUT)} );
+}
+
+// Publish new json message
+// Check Signal: onMessagingPublish(QString id, QString uuid, QString error)
+void MWC713::messagingPublish(QString messageJsonStr, QString feeTxUuid, QString id, int publishInterval, QString topic) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskMessagingPublish(this, messageJsonStr, feeTxUuid, id, publishInterval, topic), TaskMessagingPublish::TIMEOUT)} );
+}
+
+// Check integrity of published messages.
+// Check Signal:  onCheckIntegrity(QVector<QString> expiredMsgUuid)
+void MWC713::checkIntegrity() {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskCheckIntegrity(this), TaskCheckIntegrity::TIMEOUT)} );
+}
+
+// Stop publishing the message
+// Check Signal: onMessageWithdraw(QString uuid, QString error)
+void MWC713::messageWithdraw(QString uuid) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskMessageWithdraw(this, uuid), TaskMessageWithdraw::TIMEOUT)} );
+}
+
+// Request messages from the receive buffer
+// Check Signal: onReceiveMessages(QString error, QVector<ReceivedMessages>)
+void MWC713::requestReceiveMessages(bool cleanBuffer) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskRequestReceiveMessages(this, cleanBuffer), TaskRequestReceiveMessages::TIMEOUT)} );
+}
+
+// Start listening on the libp2p topic
+// Check Signal: onStartListenOnTopic(QString error);
+void MWC713::startListenOnTopic(const QString & topic) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskStartListenOnTopic(this, topic), TaskStartListenOnTopic::TIMEOUT)} );
+}
+
+// Stop listening on the libp2p topic
+// Check Signal: onStopListenOnTopic(QString error);
+void MWC713::stopListenOnTopic(const QString & topic) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskStopListenOnTopic(this, topic), TaskStopListenOnTopic::TIMEOUT)} );
+}
+
+void MWC713::sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id, QString cookie) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TasksSendMarketplaceMessage(this, command, wallet_tor_address, offer_id, cookie), TasksSendMarketplaceMessage::TIMEOUT)} );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1618,9 +1697,10 @@ void MWC713::setRequestTradeDetails( SwapTradeInfo swap,
                                      QVector<SwapExecutionPlanRecord> executionPlan,
                                      QString currentAction,
                                      QVector<SwapJournalMessage> tradeJournal,
-                                     QString error ) {
-    logger::logEmit("MWC713", "onRequestSwapDetails", swap.swapId + ", " + error );
-    emit onRequestTradeDetails( swap, executionPlan, currentAction, tradeJournal, error );
+                                     QString error,
+                                     QString cookie ) {
+    logger::logEmit("MWC713", "onRequestSwapDetails", swap.swapId + ", " + error + ", " + cookie );
+    emit onRequestTradeDetails( swap, executionPlan, currentAction, tradeJournal, error, cookie );
 }
 
 void MWC713::setAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg) {
@@ -1652,6 +1732,32 @@ void MWC713::notifyAboutNewSwapTrade(QString currency, QString swapId) {
     emit onNewSwapTrade(currency, swapId);
 }
 
+void MWC713::notifyAboutSwapMessage(QString swapId) {
+    logger::logEmit( "MWC713", "onNewSwapMessage", "swapId=" + swapId );
+    emit onNewSwapMessage(swapId);
+}
+
+// The partner locked the funds at the trade with tag. We will to correct marketplace with that
+void MWC713::notifyAboutGroupWinner(QString swapId, QString tag) {
+    logger::logEmit( "MWC713", "onMktGroupWinner", "swapId=" + swapId + "  tag=" + tag );
+    emit onMktGroupWinner(swapId, tag);
+
+    // Note !!! Cookie is from swap List, so we will be able to update it. It is a hack.
+    // Normally we should send message to the window and window will request this data with this cookie value
+    requestSwapTrades("SwapListWnd");
+}
+
+
+void MWC713::notifyAboutNewMktMessage(int messageId, QString wallet_tor_address, QString offer_id) {
+    logger::logEmit( "MWC713", "onNewMktMessage", QString::number(messageId) + ", " + wallet_tor_address + ", " + offer_id );
+    emit onNewMktMessage(messageId, wallet_tor_address, offer_id);
+}
+
+void MWC713::setSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie) {
+    logger::logEmit( "MWC713", "onSendMarketplaceMessage", "error=" + error + " response=" + response + " offerId=" + offerId + " walletAddress=" + walletAddress + " cookie=" + cookie );
+    emit onSendMarketplaceMessage(error, response, offerId, walletAddress, cookie);
+}
+
 void MWC713::setBackupSwapTradeData(QString swapId, QString backupFileName, QString errorMessage) {
     logger::logEmit( "MWC713", "onBackupSwapTradeData", swapId + ", " + backupFileName + ", " + errorMessage );
     emit onBackupSwapTradeData(swapId, backupFileName, errorMessage);
@@ -1662,7 +1768,7 @@ void MWC713::setRestoreSwapTradeData(QString swapId, QString importedFilename, Q
     emit onRestoreSwapTradeData( swapId, importedFilename, errorMessage );
 }
 
-void MWC713::setRequestRecieverWalletAddress(QString url, QString address, QString error) {
+void MWC713::setRequestReceiverWalletAddress(QString url, QString address, QString error) {
     logger::logEmit( "MWC713", "onRequestRecieverWalletAddress", url + ", " + address + ", " + error );
     emit onRequestRecieverWalletAddress(url, address, error);
 }
@@ -1674,8 +1780,60 @@ void MWC713::setRepost(int txIdx, QString err) {
 }
 
 void MWC713::setDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient ) {
+    logger::logEmit( "MWC713", "onDecodeSlatepack", "tag=" + tag + ", error=" + error + ", sender=" + sender + ", recipient=" + recipient );
     emit onDecodeSlatepack( tag, error, slatepack, slateJSon, content, sender, recipient );
 }
+
+void MWC713::setCreateIntegrityFee(QString err, QVector<IntegrityFees> result) {
+    logger::logEmit( "MWC713", "onCreateIntegrityFee", "err=" + err + " result.size()=" + QString::number(result.size()) );
+    emit onCreateIntegrityFee(err, result);
+}
+
+void MWC713::setRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees) {
+    logger::logEmit( "MWC713", "onRequestIntegrityFees",  "error=" + error + " balance=" + QString::number(balance) + " fees.size()=" + QString::number(fees.size()) );
+    emit onRequestIntegrityFees(error, balance, fees);
+}
+
+void MWC713::setWithdrawIntegrityFees(QString error, double mwc, QString account) {
+    logger::logEmit( "MWC713", "onWithdrawIntegrityFees",  " error=" + error + " mwc=" + QString::number(mwc) + " account=" + account );
+    emit onWithdrawIntegrityFees(error, mwc, account);
+}
+
+void MWC713::setRequestMessagingStatus(QString error, wallet::MessagingStatus status) {
+    logger::logEmit( "MWC713", "onRequestMessagingStatus",  " error=" + error + " status=" + status.toString() );
+    emit onRequestMessagingStatus(error, status);
+}
+
+void MWC713::setMessagingPublish(QString id, QString uuid, QString error) {
+    logger::logEmit( "MWC713", "onMessagingPublish",  "id=" + id + " uuid=" + uuid + " error=" + error );
+    emit onMessagingPublish(id, uuid, error);
+}
+
+void MWC713::setCheckIntegrity(QString error, QVector<QString> expiredMsgUuid) {
+    logger::logEmit( "MWC713", "onCheckIntegrity",  "error=" + error + " expiredMsgUuid=" + QStringList(expiredMsgUuid.toList()).join(", ") );
+    emit onCheckIntegrity(error, expiredMsgUuid);
+}
+
+void MWC713::setMessageWithdraw(QString uuid, QString error) {
+    logger::logEmit( "MWC713", "onMessageWithdraw",  "uuid=" + uuid + " error=" + error );
+    emit onMessageWithdraw(uuid, error);
+}
+
+void MWC713::setReceiveMessages(QString error, QVector<ReceivedMessages> msgs) {
+    logger::logEmit( "MWC713", "onReceiveMessages",  "error=" + error + " msgs.size()=" + QString::number(msgs.size()) );
+    emit onReceiveMessages( error, msgs);
+}
+
+void MWC713::setStartListenOnTopic(QString error) {
+    logger::logEmit( "MWC713", "onStartListenOnTopic",  "error=" + error );
+    emit onStartListenOnTopic(error);
+}
+
+void MWC713::setStopListenOnTopic(QString error) {
+    logger::logEmit( "MWC713", "onStopListenOnTopic",  "error=" + error );
+    emit onStopListenOnTopic(error);
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////
 //      mwc713  IOs
@@ -1884,6 +2042,12 @@ WalletConfig MWC713::readWalletConfig(QString source) {
     QString nodeURI     = mwc713config.getString("mwc_node_uri");
     QString nodeSecret  = mwc713config.getString("mwc_node_secret");
 
+    // Update libp2p port if it is not set (migration)
+    if (mwc713config.getString("libp2p_port").isEmpty()) {
+        // For qt wallet we have the same port for Main and floo because only one instance of the wallet is expected to run
+        mwc713config.updateConfig("libp2p_port", "3419");
+    }
+
     return WalletConfig().setData( network, dataPath, mwcmqsDomain,
             foreignApi, foreignApiAddress, tlsCertificateFile, tlsCertificateKey );
 }
@@ -2079,8 +2243,10 @@ void MWC713::onOutputLockChanged(QString commit) {
 
 // process accountInfoNoLocks, apply locked outputs
 QVector<AccountInfo> MWC713::applyOutputLocksToBalance() const {
-    if (!appContext->isLockOutputEnabled())
-        return accountInfoNoLocks;
+    // !!!! Commented because isLockOutputEnabled  is about permanent user defined settings
+    // For swap marketplace also there are temporary locks that we should process here
+    /*if (!appContext->isLockOutputEnabled())
+        return accountInfoNoLocks;*/
 
     // Locks are enabled, need to firter all outputs...
 
@@ -2096,7 +2262,7 @@ QVector<AccountInfo> MWC713::applyOutputLocksToBalance() const {
             if (dh < int64_t(confNumber) )
                 continue;
 
-            if (appContext->isLockedOutputs(out.outputCommitment)) {
+            if (appContext->isLockedOutputs(out.outputCommitment).first) {
                 ai.lockedByPrevTransaction += out.valueNano;
                 ai.currentlySpendable -= out.valueNano;
             }

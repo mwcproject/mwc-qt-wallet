@@ -21,40 +21,22 @@
 #include <QHash>
 #include "../util/httpclient.h"
 #include <QThread>
+#include "s_mktswap.h"
+
+namespace core {
+class TimerThread;
+}
 
 namespace state {
 
-//////////////////////////////////////////////////////////////
-// Timer thread.
-
-// Very specific class. Make it pulbilly available only because of QT magic.
-// QT magic works great only if class has both declaration and implementation in different files.
-class TimerThread : public QThread {
-Q_OBJECT
-public:
-    TimerThread(QObject * parent, long _interval);
-    virtual ~TimerThread();
-
-    void stop();
-protected:
-    void run();
-private:
-signals:
-    void onTimerEvent();
-
-private:
-    long interval = 1000;
-    bool alive = true;
-};
-/////////////////////////////////////////////////////////////
-
-
 struct AutoswapTask {
     QString swapId;
+    QString tag;
+    bool    isSeller;
     QString stateCmd;
     int64_t lastUpdatedTime = 0;
 
-    void setData(QString _swapId, QString _stateCmd, int64_t _lastUpdatedTime) { swapId = _swapId; stateCmd= _stateCmd; lastUpdatedTime = _lastUpdatedTime; }
+    void setData(QString _swapId, QString _tag, bool _isSeller, QString _stateCmd, int64_t _lastUpdatedTime) { swapId=_swapId; tag=_tag; isSeller=_isSeller; stateCmd=_stateCmd; lastUpdatedTime=_lastUpdatedTime; }
 };
 
 enum class SwapWnd {None, PageSwapList, PageSwapEdit, PageSwapTradeDetails, PageSwapNew1, PageSwapNew2, PageSwapNew3 };
@@ -66,7 +48,7 @@ public:
     virtual ~Swap() override;
 
     // Show first page with trade List
-    void pageTradeList();
+    void pageTradeList(bool selectIncoming, bool selectOutgoing, bool selectBackup);
     // Edit/View Trade Page
     void viewTrade(QString swapId, QString stateCmd);
     // Show trade details page
@@ -110,6 +92,9 @@ public:
     // List of the secondary currencies that wallet support
     QVector<QString> secondaryCurrencyList();
 
+    // Check if this trade is created from accepted Marketplace offer
+    bool isMktTrade() const {return !mktOfferId.isEmpty();}
+
     // Current selected currency to trade
     QString getCurrentSecCurrency() const {return newSwapCurrency;}
     void setCurrentSecCurrency(QString secCurrency);
@@ -139,8 +124,15 @@ public:
     int getSecConfNumber() const {return newSwapSecConfNumber;}
     QString getElectrumXprivateUrl() const {return newSwapElectrumXUrl;}
 
+    double getSecTransactionFee(const QString & secCurrency) const;
+    double getSecMinTransactionFee(const QString & secCurrency) const;
+    double getSecMaxTransactionFee(const QString & secCurrency) const;
+
+    int getMwcConfNumber(double mwcAmount) const;
+    int getSecConfNumber(const QString & secCurrency) const;
+
     // Calculate the locking time for a NEW not yet created swap offer.
-    QVector<QString> getLockTime( QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks );
+    static QVector<QString> getLockTime( QString secCurrency, int offerExpTime, int redeemTime, int mwcBlocks, int secBlocks );
 
     // Accept a new trade and start run it. By that moment the trade must abe reviews and all set
     void acceptTheTrade(QString swapId);
@@ -150,6 +142,27 @@ public:
 
     QString getNote() const {return newSwapNote;}
     void setNote(QString note) {newSwapNote = note;}
+
+    // Notify about failed bidding. If it is true, we need to cancel and show the message about that
+    // Note, mwc-wallet does cancellation as well.
+    void failBidding(QString wallet_tor_address, QString offer_id);
+
+    // Start trading for my offer - automatic operation. For Sell the offer will be created.
+    // For Buy - offer will be accepted automatically.
+    void startTrading(const MySwapOffer & offer, QString wallet_tor_address);
+
+    // Start trading for Marketplace offer. It will start for sell only. For Buy the normal workflow should be fine, we will only press "Accept" automatically.
+    // For Buy - offer will be accepted automatically.
+    void acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address, int running_num);
+
+    // Reject any offers from this address. We don't want them, we are likely too late
+    void rejectOffer(const MktSwapOffer & offer, QString wallet_tor_address);
+
+    // check if swap with this tag is exist
+    bool isSwapExist(QString tag) const;
+
+    // Verify if trade backup dir is valid. If not, then ask user to fix that
+    bool verifyBackupDir();
 
 private:
 signals:
@@ -177,9 +190,9 @@ private:
     void resetNewSwapData();
 
     // Start trade to run
-    void runTrade(QString swapId, QString statusCmd);
+    void runTrade(QString swapId, QString tag, bool isSeller, QString statusCmd);
 
-    int calcConfirmationsForMwcAmount(double mwcAmount);
+    int calcConfirmationsForMwcAmount(double mwcAmount) const;
 
     // Request latest fees for the coins
     void updateFeesIsNeeded();
@@ -203,6 +216,7 @@ slots:
                                QString error );
 
     void onNewSwapTrade(QString currency, QString swapId);
+    void onNewSwapMessage(QString swapId);
 
     // Response from createNewSwapTrade, SwapId on OK,  errMsg on failure
     void onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> params, QString swapId, QString errMsg);
@@ -213,8 +227,21 @@ slots:
     void onRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
 
     void onTimerEvent();
+
+    void onRequestTradeDetails( wallet::SwapTradeInfo swap,
+                                      QVector<wallet::SwapExecutionPlanRecord> executionPlan,
+                                      QString currentAction,
+                                      QVector<wallet::SwapJournalMessage> tradeJournal,
+                                      QString error,
+                                      QString cookie );
+
+    void onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);
+
+    void onBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage);
+
+    void onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
 private:
-    TimerThread * timer = nullptr;
+    core::TimerThread * timer = nullptr;
 
     // Key: swapId,  Value: running Task
     QMap<QString, AutoswapTask> runningSwaps;
@@ -222,11 +249,12 @@ private:
 
     // key: message.  value: time
     QHash<QString, int64_t> shownMessages;
-    QMap<QString, int> shownBackupMessages;
 
     long lastProcessedTimerData = 0;
 
     // New trade data.
+    QString mktOfferId; // true if it is marketplace. In this case most of those values we can't change
+    int     mktRunningNum = 0; // Number of running offers when we started and that we were agree on
     QString newSwapAccount;
     QString newSwapCurrency;
     QString newSwapMwc2Trade;
@@ -246,6 +274,9 @@ private:
 
     QString newSwapCurrency2recalc;
     SwapWnd selectedPage = SwapWnd::None;
+
+    QHash< QString, QVector<MktSwapOffer> > acceptedOffers;
+    QHash< QString, QVector<MySwapOffer> >  expectedOffers;
 };
 
 }

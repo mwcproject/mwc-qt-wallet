@@ -298,6 +298,7 @@ public:
     // Create a new Swap trade deal.
     // Check Signal: void onCreateNewSwapTrade(tag, dryRun, QVector<QString> params, QString swapId, QString err);
     virtual void createNewSwapTrade(QString account,
+                                    QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
                                     int min_confirmations, // minimum number of confimations
                                     QString mwcAmount, QString secAmount, QString secondary,
                                     QString redeemAddress,
@@ -313,6 +314,7 @@ public:
                                     QString electrum_uri2,
                                     bool dryRun,
                                     QString tag,
+                                    QString mkt_trade_tag,
                                     QVector<QString> params ) override;
 
     // Cancel the trade
@@ -325,12 +327,18 @@ public:
     //                            QVector<SwapExecutionPlanRecord> executionPlan,
     //                            QString currentAction,
     //                            QVector<SwapJournalMessage> tradeJournal,
-    //                            QString error );
-    virtual void requestTradeDetails(QString swapId, bool waitForBackup1 ) override;
+    //                            QString error,
+    //                            QString cookie );
+    virtual void requestTradeDetails(QString swapId, bool waitForBackup1, QString cookie ) override;
 
     // Adjust swap stade values. params are optional
     // Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
-    virtual void adjustSwapData( QString swapId, QString adjustCmd, QString param1 = "", QString param2 = "" ) override;
+    virtual void adjustSwapData( const QString & swapId, QString call_tag,
+                                 const QString &destinationMethod, const QString & destinationDest,
+                                 const QString &secondaryAddress,
+                                 const QString &secondaryFee,
+                                 const QString &electrumUri1,
+                                 const QString &tag ) override;
 
     // Perform a auto swap step for this trade.
     // Check Signal: void onPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,

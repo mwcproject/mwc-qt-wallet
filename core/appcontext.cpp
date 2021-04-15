@@ -181,7 +181,7 @@ bool AppContext::loadDataImpl() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x47A3)
+    if (id<0x4783 || id>0x47A5)
          return false;
 
     QString mockStr;
@@ -267,7 +267,13 @@ bool AppContext::loadDataImpl() {
 
     if (id>=0x4794) {
         in >> lockOutputEnabled;
-        in >> lockedOutputs;
+        QSet<QString> outs;
+        in >> outs;
+        // Reading only permanent locks without id
+        // Load expected to call only, so we can clean safely
+        lockedOutputs.clear();
+        for (const auto & o : outs)
+            lockedOutputs.insert(o, "");
     }
 
     if (id>=0x4795) {
@@ -323,11 +329,12 @@ bool AppContext::loadDataImpl() {
 #endif
 
     if (id>=0x479C) {
-        in >> swapTabSselection;
+        in >> swapTabSelection;
     }
 
     if (id>=0x479D) {
-        in >> swapEnforceBackup;
+        bool b = true;
+        in >> b;
     }
 
     if (id>=0x479E) {
@@ -354,6 +361,23 @@ bool AppContext::loadDataImpl() {
         in >> sm;
         sendMethod = bridge::SEND_SELECTED_METHOD(sm);
         in >> sendLockOutput;
+    }
+
+    if (id>=0x47A4) {
+        in >> mktFeeReservedAmount;
+        in >> mktFeeDepositAccount;
+        in >> mktFeeLevel;
+
+        in >> mktPlaceSelectedBtn;
+        in >> mktPlaceMinFeeLevel;
+        in >> mktPlaceSelling;
+        in >> mktPlaceCurrency;
+        in >> mktPlaceMinMwcAmount;
+        in >> mktPlaceMaxMwcAmount;
+    }
+
+    if (id>=0x47A5) {
+        in >> swapBackupDir;
     }
 
     return true;
@@ -383,7 +407,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x47A3;
+    out << 0x47A5;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -423,7 +447,14 @@ void AppContext::saveData() const {
     out << oldFormatTxnNotes;
 
     out << lockOutputEnabled;
-    out << lockedOutputs;
+
+    // Storing only a set of keys with empty values
+    QSet<QString> lockedOuts;
+    for ( auto io = lockedOutputs.begin(); io != lockedOutputs.end(); io++ ) {
+        if (io.value().isEmpty())
+            lockedOuts += io.key();
+    }
+    out << lockedOuts;
 
     out << fluffTransactions;
 
@@ -447,9 +478,10 @@ void AppContext::saveData() const {
 
     out << notificationWindowsEnabled;
 
-    out << swapTabSselection;
+    out << swapTabSelection;
 
-    out << swapEnforceBackup;
+    b = true; // legacy swapEnforceBackup
+    out << b;
 
     out << lastUsedSwapCurrency;
 
@@ -464,6 +496,18 @@ void AppContext::saveData() const {
     int sm = int(sendMethod);
     out << sm;
     out << sendLockOutput;
+
+    out << mktFeeReservedAmount;
+    out << mktFeeDepositAccount;
+    out << mktFeeLevel;
+    out << mktPlaceSelectedBtn;
+    out << mktPlaceMinFeeLevel;
+    out << mktPlaceSelling;
+    out << mktPlaceCurrency;
+    out << mktPlaceMinMwcAmount;
+    out << mktPlaceMaxMwcAmount;
+
+    out << swapBackupDir;
 }
 
 void AppContext::loadNotesData() {
@@ -843,11 +887,24 @@ void AppContext::setHodlRegistrationTime(const QString & hash, int64_t time) {
     hodlRegistrations.insert( hash, qlonglong(time) );
 }
 
-bool AppContext::isLockedOutputs(const QString & output) const {
-    if (!lockOutputEnabled)
-        return false;
+static QString imp_val("IMPOSSIBLE_VALUE");
 
-    return lockedOutputs.contains(output);
+QPair<bool, QString> AppContext::isLockedOutputs(const QString & output) const {
+    if (!lockOutputEnabled)
+        return QPair<bool, QString>(false, "");
+
+    if (!lockedOutputs.contains(output))
+        return QPair<bool, QString>(false, "");
+
+    QString val = lockedOutputs.value(output, imp_val);
+
+    if (val==imp_val)
+        return QPair<bool, QString>(false, "");
+
+    if (!lockOutputEnabled && val.isEmpty()) // manual locking is off, let's skip it
+        return QPair<bool, QString>(false, "");
+
+    return QPair<bool, QString>(true, val);
 }
 
 void AppContext::setLockOutputEnabled(bool enabled) {
@@ -858,10 +915,10 @@ void AppContext::setLockOutputEnabled(bool enabled) {
     saveData();
 }
 
-void AppContext::setLockedOutput(const QString & output, bool lock) {
+void AppContext::setLockedOutput(const QString & output, bool lock, QString id) {
     if (lock) {
         if ( !lockedOutputs.contains(output) ) {
-            lockedOutputs.insert(output);
+            lockedOutputs.insert(output, id);
             saveData();
             logger::logEmit("AppContext", "onOutputLockChanged", output + " locked" );
             emit onOutputLockChanged(output);
@@ -875,6 +932,39 @@ void AppContext::setLockedOutput(const QString & output, bool lock) {
         }
     }
 }
+
+void AppContext::unlockOutputsById(QString id) {
+    QMutableHashIterator<QString, QString> i(lockedOutputs);
+    QVector<QString> updatedOutputs;
+    while (i.hasNext()) {
+        i.next();
+        if (i.value()==id) {
+            updatedOutputs += i.key();
+            i.remove();
+        }
+    }
+
+    if (!updatedOutputs.isEmpty()) {
+        saveData();
+        for (auto & o : updatedOutputs) {
+            logger::logEmit("AppContext", "onOutputLockChanged", o + " unlocked");
+            emit onOutputLockChanged(o);
+        }
+    }
+}
+
+QVector<QString> AppContext::getLockedOutputsById(QString id) const {
+    QVector<QString> result;
+
+    for ( auto i=lockedOutputs.begin(); i!=lockedOutputs.end(); i++ ) {
+        if (i.value() == id) {
+            result.push_back(i.key());
+        }
+    }
+
+    return result;
+}
+
 
 void AppContext::setFluff(bool fluffSetting) {
     if (fluffTransactions == fluffSetting)
@@ -910,18 +1000,18 @@ void AppContext::deleteNote(const QString& key) {
     saveNotesData();
 }
 
-void AppContext::setNotficationWindowsEnabled(bool enable) {
+void AppContext::setNotificationWindowsEnabled(bool enable) {
     if (notificationWindowsEnabled == enable)
         return;
     notificationWindowsEnabled = enable;
     saveData();
 }
 
-void AppContext::setSwapEnforceBackup(bool doBackup) {
-    if (swapEnforceBackup == doBackup)
+void AppContext::setSwapBackupDir(QString backupDir) {
+    if (swapBackupDir == backupDir)
         return;
 
-    swapEnforceBackup = doBackup;
+    swapBackupDir = backupDir;
     saveData();
 }
 
@@ -950,5 +1040,28 @@ void AppContext::setTradeAcceptedFlag(const QString & swapId, bool accepted) {
     acceptedSwaps.insert(swapId, accepted);
 }
 
+void AppContext::setMktFeeLevel(const double &feeLevel) {
+    mktFeeLevel = feeLevel;
+}
+
+void AppContext::setMktFeeDepositAccount(QString accountName) {
+    mktFeeDepositAccount = accountName;
+}
+
+void AppContext::setMktFeeReserveAmount(const double &reservedAmount) {
+    mktFeeReservedAmount = reservedAmount;
+}
+
+void AppContext::setMktPlaceSelectedBtn(int btn) {
+    mktPlaceSelectedBtn = btn;
+}
+
+void AppContext::setSwapMktFilter( double minFeeLevel, bool selling, const QString & currency, double minMwcAmount, double maxMwcAmount) {
+    mktPlaceMinFeeLevel = minFeeLevel;
+    mktPlaceSelling = selling;
+    mktPlaceCurrency = currency;
+    mktPlaceMinMwcAmount = minMwcAmount;
+    mktPlaceMaxMwcAmount = maxMwcAmount;
+}
 
 }

@@ -100,5 +100,6 @@
         <file>help/finalize.html</file>
         <file>help/swap.html</file>
         <file>img/Transactions_Unconfirmed_Yellow@2x.svg</file>
+        <file>img/marketplace@2x.png</file>
     </qresource>
 </RCC>

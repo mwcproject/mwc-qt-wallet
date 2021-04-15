@@ -24,7 +24,7 @@
 #include "../bridge/wallet_b.h"
 #include "../bridge/statemachine_b.h"
 #include "../bridge/util_b.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include <QPushButton>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -547,6 +547,10 @@ void MainWindow::on_actionOutputs_triggered()
 void MainWindow::on_actionAtomicSwap_triggered()
 {
     stateMachine->setActionWindow( state::STATE::SWAP );
+}
+
+void MainWindow::on_actionAtomicSwapMarketplace_triggered() {
+    stateMachine->setActionWindow( state::STATE::SWAP_MKT );
 }
 
 void MainWindow::on_actionWallet_accounts_triggered()

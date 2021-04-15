@@ -43,6 +43,9 @@ bool TestSeedTask::applyInputResults(QString w) {
 }
 
 QVector<core::TestSeedTask> generateSeedTasks( const QVector<QString> & seed, int startIdx, int N ) {
+    Q_UNUSED(startIdx)
+    Q_UNUSED(N)
+
     // Generate tasks. Need to review the words one by one
     QVector<core::TestSeedTask> confirmTasks;
 #ifdef WALLET_DESKTOP

@@ -44,14 +44,14 @@ NextStateRespond InputPassword::execute() {
     QString lockStr = context->appContext->pullCookie<QString>("LockWallet");
     inLockMode = false;
 
-    // Allways try to start the wallet. State before is responsible for the first init
+    // Always try to start the wallet. State before is responsible for the first init
     if ( !running ) {
         // We are at the right place. Let's start the wallet
 
         // Processing all pending to clean up the processes
         QCoreApplication::processEvents();
 
-        // As a node we can exit becuase no password is expected
+        // As a node we can exit because no password is expected
         if (config::isOnlineNode()) {
             // Starting the wallet normally for the node
             context->wallet->start();

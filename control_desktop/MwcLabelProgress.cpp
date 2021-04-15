@@ -17,17 +17,31 @@
 
 namespace control {
 
-MwcLabelProgress::MwcLabelProgress(QWidget *parent, Qt::WindowFlags f) :
+static QVector<MwcLabelProgress*> processWndsToHide;
+
+// Message box normally error and it should cancel the progress. It is a shortcut that help to avoid propagate back response signals
+void onMessageBoxShown() {
+    for (auto wnd : processWndsToHide)
+        wnd->hide();
+}
+
+MwcLabelProgress::MwcLabelProgress(QWidget *parent, Qt::WindowFlags f, bool hideWithMessageBox) :
         QLabel(parent,f)
 {
+    if (hideWithMessageBox)
+    processWndsToHide.push_back(this);
 }
 
-MwcLabelProgress::MwcLabelProgress(const QString &text, QWidget *parent, Qt::WindowFlags f) :
+MwcLabelProgress::MwcLabelProgress(const QString &text, QWidget *parent, Qt::WindowFlags f, bool hideWithMessageBox) :
         QLabel(text,parent, f)
 {
+    if (hideWithMessageBox)
+        processWndsToHide.push_back(this);
 }
 
-MwcLabelProgress::~MwcLabelProgress() {}
+MwcLabelProgress::~MwcLabelProgress() {
+    processWndsToHide.removeAll(this);
+}
 
 void MwcLabelProgress::initLoader(bool visible) {
     QMovie *movie = new QMovie(":/img/loading.gif", QByteArray(), this);
@@ -40,5 +54,7 @@ void MwcLabelProgress::initLoader(bool visible) {
     else
         hide();
 }
+
+
 
 }

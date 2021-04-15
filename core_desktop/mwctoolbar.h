@@ -62,6 +62,8 @@ private slots:
     void on_swapToolButton_clicked();
     void on_finalizeToolButton_clicked();
 
+    void on_swapMarketplaceToolButton_clicked();
+
 private:
     Ui::MwcToolbar *ui;
     bridge::Config * config = nullptr;

@@ -525,7 +525,7 @@ void MockWallet::requestFileProofAddress() {
 void MockWallet::requestSwapTrades(QString cookie) {
     SwapInfo sw;
     sw.setData( "123.456", "0.00123", "BCH",
-                         "XXXXX-XXXXXXXXXX-XXXXXX", 1603424302, "SellerCancelled", "State for this trade", "Action fro this trade",
+                         "XXXXX-XXXXXXXXXX-XXXXXX", "", 1603424302, "SellerCancelled", "State for this trade", "Action fro this trade",
                           1603454302, true, "mmmGZgkyaVvYnvkp6b4EXgsgN2UubNNZ1s", "" );
 
     emit onRequestSwapTrades(cookie, {sw}, "");
@@ -540,6 +540,7 @@ void MockWallet::deleteSwapTrade(QString swapId) {
 // Create a new Swap trade deal.
 // Check Signal: void onCreateNewSwapTrade(tag, dryRun, QString swapId, QString err);
 void MockWallet::createNewSwapTrade(QString account,
+                                    QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
                                     int min_confirmations, // minimum number of confimations
                                     QString mwcAmount, QString secAmount, QString secondary,
                                     QString redeemAddress,
@@ -555,8 +556,10 @@ void MockWallet::createNewSwapTrade(QString account,
                                     QString electrum_uri2,
                                     bool dryRun,
                                     QString tag,
+                                    QString mkt_trade_tag,
                                     QVector<QString> params ) {
     Q_UNUSED(account)
+    Q_UNUSED(outputs)
     Q_UNUSED(min_confirmations)
     Q_UNUSED(mwcAmount)
     Q_UNUSED(secAmount)
@@ -570,8 +573,9 @@ void MockWallet::createNewSwapTrade(QString account,
     Q_UNUSED(secondaryConfirmationNumber)
     Q_UNUSED(communicationMethod)
     Q_UNUSED(communicationAddress)
-    Q_UNUSED(electrum_uri1);
-    Q_UNUSED(electrum_uri2);
+    Q_UNUSED(electrum_uri1)
+    Q_UNUSED(electrum_uri2)
+    Q_UNUSED(mkt_trade_tag)
 
     emit onCreateNewSwapTrade(tag, dryRun, params, "XXXXX-new-trade-id-XXXXX", "");
 }
@@ -588,22 +592,33 @@ void MockWallet::cancelSwapTrade(QString swapId) {
 //                            QVector<SwapExecutionPlanRecord> executionPlan,
 //                            QString currentAction,
 //                            QVector<SwapJournalMessage> tradeJournal,
-//                            QString error );
-void MockWallet::requestTradeDetails(QString swapId, bool waitForBackup1 ) {
+//                            QString error,
+//                            QString cookie );
+void MockWallet::requestTradeDetails(QString swapId, bool waitForBackup1, QString cookie ) {
     Q_UNUSED(swapId)
     Q_UNUSED(waitForBackup1)
     SwapTradeInfo sw;
-    emit onRequestTradeDetails( sw, {}, "current action", {}, "");
+    emit onRequestTradeDetails( sw, {}, "current action", {}, "", cookie );
 }
 
 // Adjust swap stade values. params are optional
 // Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
-void MockWallet::adjustSwapData( QString swapId, QString adjustCmd, QString param1, QString param2 ) {
+void MockWallet::adjustSwapData( const QString & swapId, QString call_tag,
+                                 const QString &destinationMethod, const QString & destinationDest,
+                                 const QString &secondaryAddress,
+                                 const QString &secondaryFee,
+                                 const QString &electrumUri1,
+                                 const QString &tag ) {
     Q_UNUSED(swapId)
-    Q_UNUSED(adjustCmd)
-    Q_UNUSED(param1)
-    Q_UNUSED(param2)
-    emit onAdjustSwapData(swapId, "adjust command", "");
+
+    Q_UNUSED(destinationMethod)
+    Q_UNUSED(destinationDest)
+    Q_UNUSED(secondaryAddress)
+    Q_UNUSED(secondaryFee)
+    Q_UNUSED(electrumUri1)
+    Q_UNUSED(tag)
+
+    emit onAdjustSwapData(swapId, call_tag, "");
 }
 
 // Perform a auto swap step for this trade.

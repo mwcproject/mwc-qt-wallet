@@ -14,7 +14,7 @@
 
 #include "s_editswap_w.h"
 #include "ui_s_editswap_w.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include "../bridge/config_b.h"
 #include "../control_desktop/messagebox.h"
 
@@ -30,9 +30,7 @@ EditSwap::EditSwap(QWidget *parent, QString _swapId, QString _stateCmd) :
     config = new bridge::Config(this);
 
     connect(swap, &bridge::Swap::sgnRequestTradeDetails, this, &EditSwap::sgnRequestTradeDetails, Qt::QueuedConnection);
-    connect(swap, &bridge::Swap::sgnUpdateSecondaryAddress, this, &EditSwap::sgnUpdateXXX, Qt::QueuedConnection);
-    connect(swap, &bridge::Swap::sgnUpdateSecondaryFee, this, &EditSwap::sgnUpdateXXX, Qt::QueuedConnection);
-    connect(swap, &bridge::Swap::sgnUpdateElectrumX, this, &EditSwap::sgnUpdateXXX, Qt::QueuedConnection);
+    connect(swap, &bridge::Swap::sgnAdjustSwapTrade, this, &EditSwap::sgnAdjustSwapTrade, Qt::QueuedConnection);
 
     setPageTitle("Trade: " + swapId);
 
@@ -48,7 +46,7 @@ EditSwap::EditSwap(QWidget *parent, QString _swapId, QString _stateCmd) :
     ui->secFeeUnitsLabel->hide();
 
     ui->progress->initLoader(true);
-    swap->requestTradeDetails(swapId);
+    swap->requestTradeDetails( swapId, "EditSwap" );
 
     ui->noteEdit->setText(config->getSwapNote(swapId));
 
@@ -64,10 +62,14 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
                                       QVector<QString> executionPlan,
                                       QString currentAction,
                                       QVector<QString> tradeJournal,
-                                      QString errMsg) {
+                                      QString errMsg,
+                                      QString cookie ) {
     Q_UNUSED(currentAction)
     Q_UNUSED(executionPlan)
     Q_UNUSED(tradeJournal)
+
+    if ( cookie != "EditSwap" )
+        return;
 
     Q_ASSERT(swapInfo.size() >= 1);
     QString reqSwapId = swapInfo[0];
@@ -192,7 +194,7 @@ void EditSwap::on_electrumXEdit_textEdited(const QString &str) {
 
 void EditSwap::on_updateBtn_clicked() {
     // Check what we need update...
-    if (requestUpdateData() < 0)
+    if (!requestUpdateData())
         return;
 
     updateButtons();
@@ -202,14 +204,8 @@ void EditSwap::on_tradeDetailsBtn_clicked() {
     if (acceptanceMode) {
         // Acceptance Mode
 
-        int request = requestUpdateData();
-
-        if (request < 0)
-            return;
-
-        Q_ASSERT(request >= 2);
-        requests2accept = request;
-        ui->tradeDetailsBtn->setEnabled(false);
+        if (requestUpdateData())
+            ui->tradeDetailsBtn->setEnabled(false);
     } else {
         // Normal usage, view and switch to the Details
         if (isCanUpdate()) {
@@ -226,11 +222,11 @@ void EditSwap::on_tradeDetailsBtn_clicked() {
 }
 
 // Validate the data and call for update. Return number of update calls.
-int EditSwap::requestUpdateData() {
+bool EditSwap::requestUpdateData() {
     if (ui->redeemAddressEdit->text().trimmed().isEmpty()) {
         control::MessageBox::messageText(this, "Input", QString("Please define the ") + secondaryCurrency +
                                                         " address to receive the coins.");
-        return -1;
+        return false;
     }
 
     QString fee = ui->secondaryFeeEdit->text().trimmed();
@@ -238,29 +234,41 @@ int EditSwap::requestUpdateData() {
     double feeDbl = fee.toDouble(&ok);
     if (fee.isEmpty() || !ok || feeDbl <= 0.0) {
         control::MessageBox::messageText(this, "Input", QString("Please define ") + secondaryCurrency + " fee value");
-        return -1;
+        return false;
     }
 
     ui->progress->show();
-    int res = 0;
+
+    QString secondaryAddress;
+    QString secondaryFee;
+    QString electrumUri1;
 
     if (redeemAddress != ui->redeemAddressEdit->text().trimmed()) {
-        swap->updateSecondaryAddress(swapId, ui->redeemAddressEdit->text().trimmed());
-        res++;
+        secondaryAddress = ui->redeemAddressEdit->text().trimmed();
     }
     if (secondaryFee != ui->secondaryFeeEdit->text().trimmed()) {
-        swap->updateSecondaryFee(swapId, feeDbl);
-        res++;
+        secondaryFee = QString::number(feeDbl);
     }
     if (electrumX != ui->electrumXEdit->text().trimmed()) {
-        swap->updateElectrumX(swapId, ui->electrumXEdit->text().trimmed());
-        res++;
+        electrumUri1 = ui->electrumXEdit->text().trimmed();
     }
-    return res;
+
+    if ( secondaryAddress.isEmpty() && secondaryFee.isEmpty() && electrumUri1.isEmpty() )
+        return false; // no changes are made
+
+    swap->adjustSwapData(swapId, "",
+            "", "",
+            secondaryAddress,
+            secondaryFee,
+            electrumUri1,
+            "" );
+    return true;
 }
 
 
-void EditSwap::sgnUpdateXXX(QString swId, QString errorMsg) {
+void EditSwap::sgnAdjustSwapTrade(QString swId, QString cmdTag, QString errorMsg) {
+    Q_UNUSED(cmdTag)
+
     if (swapId != swId)
         return;
 
@@ -272,15 +280,10 @@ void EditSwap::sgnUpdateXXX(QString swId, QString errorMsg) {
         }
     } else {
         if (acceptanceMode) {
-            requests2accept--;
-            if (requests2accept == 0) {
-                // We are good, we can accept the trade!!!
-
-                swap->acceptTheTrade(swapId);
-            }
+           swap->acceptTheTrade(swapId);
         } else {
             // OK, let's refresh...
-            swap->requestTradeDetails(swapId);
+            swap->requestTradeDetails(swapId, "EditSwap");
         }
     }
 

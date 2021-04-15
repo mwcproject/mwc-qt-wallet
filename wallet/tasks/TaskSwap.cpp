@@ -42,6 +42,17 @@ bool TaskSwapNewTradeArrive::processTask(const QVector<WEvent> &events) {
         wallet713->notifyAboutNewSwapTrade(currency, swapId);
         return true;
     }
+
+    if (evt.event == S_SWAP_GET_MESSAGE) {
+        QStringList prms = evt.message.split('|');
+        if (prms.size() != 1)
+            return false;
+
+        QString swapId = prms[0];
+
+        wallet713->notifyAboutSwapMessage(swapId);
+        return true;
+    }
     return false;
 }
 
@@ -81,6 +92,7 @@ bool TaskGetSwapTrades::processTask(const QVector<WEvent> &events) {
                         swapInfoJson["secondary_amount"].toString(),
                         swapInfoJson["secondary_currency"].toString(),
                         swapInfoJson["swap_id"].toString(),
+                        swapInfoJson["tag"].toString(),
                         swapInfoJson["start_time"].toString().toLongLong(),
                         swapInfoJson["state_cmd"].toString(),
                         swapInfoJson["state"].toString(),
@@ -125,7 +137,9 @@ bool TaskDeleteSwapTrade::processTask(const QVector<WEvent> &events) {
 
 // ------------------------- TaskCreateNewSwapTrade ---------------------
 
-QString TaskCreateNewSwapTrade::generateCommandLine(int min_confirmations,
+QString TaskCreateNewSwapTrade::generateCommandLine(
+                            QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
+                            int min_confirmations,
                             QString mwcAmount, QString  secAmount, QString secondary,
                             QString redeemAddress,
                             double secTxFee,
@@ -138,6 +152,7 @@ QString TaskCreateNewSwapTrade::generateCommandLine(int min_confirmations,
                             QString communicationAddress,
                             QString electrum_uri1,
                             QString electrum_uri2,
+                            QString mkt_trade_tag,
                             bool dryRun) const
 {
     Q_ASSERT(messageExchangeTimeMinutes>0);
@@ -146,7 +161,6 @@ QString TaskCreateNewSwapTrade::generateCommandLine(int min_confirmations,
     Q_ASSERT(secondaryConfirmationNumber>0);
 
     QString cmdLine = "swap_start --message_exchange_time " + QString::number(messageExchangeTimeMinutes) +
-            " --mwc_amount " + mwcAmount +
             " --mwc_confirmations " + QString::number(mwcConfirmationNumber) +
             " --secondary_confirmations " + QString::number(secondaryConfirmationNumber) +
             " --redeem_time " + QString::number(redeemTimeMinutes) +
@@ -154,9 +168,26 @@ QString TaskCreateNewSwapTrade::generateCommandLine(int min_confirmations,
             " --secondary_fee " + QString::number(secTxFee) +
             " --secondary_amount " + secAmount +
             " --secondary_currency " + secondary +
-            " --method " + communicationMethod +
-            " --dest " + communicationAddress +
             " --who_lock_first " + (sellerLockFirst ? "seller" : "buyer");
+
+    if (!outputs.isEmpty()) {
+        cmdLine += " --outputs " + QStringList(outputs.toList()).join(",");
+    }
+
+    if (mwcAmount.isEmpty())
+        cmdLine += " --mwc_amount 0.0";
+    else
+        cmdLine += " --mwc_amount " + mwcAmount;
+
+    if (!communicationMethod.isEmpty())
+        cmdLine += " --method " + communicationMethod;
+    else
+        cmdLine += " --method file";
+
+    if (!communicationAddress.isEmpty())
+        cmdLine += " --dest " + communicationAddress;
+    else
+        cmdLine += " --dest del.me";
 
     if (min_confirmations>0)
         cmdLine += " --min_conf " + QString::number(min_confirmations);
@@ -168,6 +199,9 @@ QString TaskCreateNewSwapTrade::generateCommandLine(int min_confirmations,
 
     if (dryRun)
         cmdLine += " --dry_run";
+
+    if (!mkt_trade_tag.isEmpty())
+        cmdLine += " --tag " + mkt_trade_tag;
 
     return cmdLine;
 }
@@ -223,7 +257,7 @@ bool TaskTradeDetails::processTask(const QVector<WEvent> &events) {
 
             if (error.error != QJsonParseError::NoError || !jsonDoc.isObject()) {
                 wallet713->setRequestTradeDetails(swap, executionPlan, "", tradeJournal,
-                                                  "Unable to parse mwc713 output");
+                                                  "Unable to parse mwc713 output", cookie);
                 return true;
             }
 
@@ -235,12 +269,15 @@ bool TaskTradeDetails::processTask(const QVector<WEvent> &events) {
 
             QString feeUnits = swapObj["secondaryFeeUnits"].toArray().first().toString();
 
-            swap.setData(swapObj["swapId"].toString(), swapObj["isSeller"].toBool(),
+            swap.setData(swapObj["swapId"].toString(),
+                         swapObj["tag"].toString(),
+                         swapObj["isSeller"].toBool(),
                          swapObj["mwcAmount"].toString().toDouble(),
                          swapObj["secondaryAmount"].toString().toDouble(),
                          swapObj["secondaryCurrency"].toString(), swapObj["secondaryAddress"].toString(),
                          swapObj["secondaryFee"].toString().toDouble(),
-                         feeUnits, swapObj["mwcConfirmations"].toInt(),
+                         feeUnits,
+                         swapObj["mwcConfirmations"].toInt(),
                          swapObj["secondaryConfirmations"].toInt(),
                          swapObj["messageExchangeTimeLimit"].toInt(), swapObj["redeemTimeLimit"].toInt(),
                          swapObj["sellerLockingFirst"].toBool(),
@@ -271,13 +308,13 @@ bool TaskTradeDetails::processTask(const QVector<WEvent> &events) {
             }
 
             // Success case
-            wallet713->setRequestTradeDetails(swap, executionPlan, currentAction, tradeJournal, "");
+            wallet713->setRequestTradeDetails(swap, executionPlan, currentAction, tradeJournal, "", cookie);
             return true;
         }
     }
 
     wallet713->setRequestTradeDetails(swap, executionPlan, "", tradeJournal,
-                                      getErrorMessage(events, "Unable to read swap list data"));
+                                      getErrorMessage(events, "Unable to read swap list data"), cookie);
     return true;
 }
 
@@ -287,31 +324,54 @@ bool TaskAdjustTrade::processTask(const QVector<WEvent> &events) {
 
     for (auto &ln : lns) {
         if (ln.message.contains("was successfully adjusted")) {
-            wallet713->setAdjustSwapData(swapId, adjustCommand, "");
+            wallet713->setAdjustSwapData(swapId, call_tag, "");
             return true;
         }
     }
 
-    wallet713->setAdjustSwapData(swapId, adjustCommand,
+    wallet713->setAdjustSwapData(swapId, call_tag,
                                  getErrorMessage(events, "Unable update the Swap Trade " + swapId));
     return true;
 }
 
-QString TaskAdjustTrade::generateCommandLine(const QString &swapId, const QString &adjustCmd, const QString &param1,
-                                             const QString &param2) const {
-    if (adjustCmd == "destination") {
-        return "swap --adjust destination  --method " + param1 + " --dest " + param2 + " -i " + swapId;
-    } else if (adjustCmd == "secondary_address") {
-        return "swap --adjust secondary_address --secondary_address " + param1 + " -i " + swapId;
-    } else if (adjustCmd == "secondary_fee") {
-        return "swap --adjust secondary_fee --secondary_fee " + param1 + " -i " + swapId;
-    } else if (adjustCmd == "electrumx_uri") {
-        return "swap --adjust electrumx_uri --electrum_uri1 \"" + param1 + "\" -i " + swapId;
-    } else {
-        Q_ASSERT(false);
-        return "";
+QString TaskAdjustTrade::generateCommandLine(const QString &swapId,
+                                             const QString &destinationMethod, const QString & destinationDest,
+                                             const QString &secondaryAddress,
+                                             const QString &secondaryFee,
+                                             const QString &electrumUri1,
+                                             const QString &tag) const {
+
+    QStringList adjustCmd;
+
+    QString params;
+
+    if (!destinationDest.isEmpty() && !destinationDest.isEmpty()) {
+        adjustCmd.push_back("destination");
+        params += " --method " + destinationMethod + " --dest " + destinationDest;
     }
 
+    if (!secondaryAddress.isEmpty()) {
+        adjustCmd.push_back("secondary_address");
+        params += " --secondary_address " + secondaryAddress;
+    }
+
+    if (!secondaryFee.isEmpty()) {
+        adjustCmd.push_back("secondary_fee");
+        params += " --secondary_fee " + secondaryFee;
+    }
+
+    if (!electrumUri1.isEmpty()) {
+        adjustCmd.push_back("electrumx_uri");
+        params += " --electrum_uri1 \"" + electrumUri1 + "\"";
+    }
+
+    if (!tag.isEmpty()) {
+        adjustCmd.push_back("tag");
+        params += " --tag \"" + tag + "\"";
+    }
+
+    Q_ASSERT(!adjustCmd.isEmpty());
+    return "swap --adjust " + adjustCmd.join(",") + params + " -i " + swapId;
 }
 
 // --------------- TaskPerformAutoSwapStep -----------------

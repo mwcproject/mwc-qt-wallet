@@ -68,6 +68,7 @@ void MwcToolbar::onUpdateButtonsState( int state ) {
     ui->receiveToolButton->setChecked( state==state::RECEIVE_COINS );
     ui->transactionToolButton->setChecked( state==state::TRANSACTIONS );
     ui->swapToolButton->setChecked( state==state::SWAP );
+    ui->swapMarketplaceToolButton->setChecked( state==state::SWAP_MKT );
     ui->finalizeToolButton->setChecked( state==state::FINALIZE );
 }
 
@@ -125,6 +126,11 @@ void MwcToolbar::onLogout() {
 void MwcToolbar::on_swapToolButton_clicked()
 {
     stateMachine->setActionWindow( state::STATE::SWAP );
+}
+
+void MwcToolbar::on_swapMarketplaceToolButton_clicked()
+{
+    stateMachine->setActionWindow( state::STATE::SWAP_MKT );
 }
 
 void MwcToolbar::timerEvent(QTimerEvent *event)

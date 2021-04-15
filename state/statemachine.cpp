@@ -43,6 +43,7 @@
 #include "z_walletsettings.h"
 #include "z_accountoptions.h"
 #include "s_swap.h"
+#include "s_mktswap.h"
 
 namespace state {
 
@@ -106,6 +107,7 @@ StateMachine::StateMachine()
     // versions that might need to be done
     states[ STATE::MIGRATION ] = new Migration(context);
     states[ STATE::SWAP ] = new Swap(context);
+    states[ STATE::SWAP_MKT ] = new SwapMarketplace(context);
 
     startTimer(1000);
 }

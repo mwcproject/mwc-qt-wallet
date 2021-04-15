@@ -163,6 +163,7 @@ void InputPassword::onSgnLoginResult(bool ok) {
     ui->submitButton->setEnabled(!ok);
     ui->restoreInstanceButton->setEnabled(!ok);
     ui->newInstanceButton->setEnabled(!ok);
+    ui->openWalletButton->setEnabled(!ok);
 }
 
 void InputPassword::updateMwcMqState(bool online) {

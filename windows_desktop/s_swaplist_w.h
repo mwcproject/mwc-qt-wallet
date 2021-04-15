@@ -49,6 +49,7 @@ struct SwapTradeInfo {
     int64_t expirationTime; // timestamp in seconds
     QString secondary_address;
     QString lastProcessError;
+    QString tag;
 
     QWidget * markWnd = nullptr;
     QLabel * initTimeLable = nullptr;
@@ -75,10 +76,11 @@ struct SwapTradeInfo {
                    int64_t         _initiatedTime,
                    int64_t         _expirationTime,
                    const QString & _secondary_address,
-                   const QString & _lastProcessError) :
+                   const QString & _lastProcessError,
+                   const QString & _tag) :
             isSeller(_isSeller), mwcAmount(_mwcAmount), secondaryAmount(_secondaryAmount), secondaryCurrency(_secondaryCurrency),
             tradeId(_tradeId), stateCmd(_stateCmd), status(_status), initiatedTime(_initiatedTime), expirationTime(_expirationTime),
-            secondary_address(_secondary_address), lastProcessError(_lastProcessError) {}
+            secondary_address(_secondary_address), lastProcessError(_lastProcessError), tag(_tag) {}
 
     // Reset all UI related data
     void resetUI() {
@@ -96,7 +98,7 @@ struct SwapTradeInfo {
 class SwapList : public core::NavWnd, control::RichButtonPressCallback {
 Q_OBJECT
 public:
-    explicit SwapList(QWidget *parent);
+    explicit SwapList(QWidget *parent, bool selectIncoming, bool selectOutgoing, bool selectBackup);
     ~SwapList();
 
 private:
@@ -106,7 +108,7 @@ private:
 
     void clearSwapList();
 protected:
-    virtual void richButtonPressed(control::RichButton * button, QString coockie);
+    virtual void richButtonPressed(control::RichButton * button, QString coockie) override;
 
 private slots:
     void sgnSwapTradesResult( QString cookie, QVector<QString> trades, QString error );
@@ -134,8 +136,9 @@ private slots:
     void on_restoreTradesTab_clicked();
 
     void on_restoreTradeBtn_clicked();
+    void on_selectBackupDirBtn_clicked();
 
-    void on_checkEnforceBackup_clicked();
+    void on_swapBackupDir_textEdited(const QString &arg1);
 
 private:
     Ui::SwapList *ui;

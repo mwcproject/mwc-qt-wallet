@@ -154,9 +154,9 @@ public:
     // Update fluff flag value
     Q_INVOKABLE void setSwapTabSelection(int selection);
 
-    // Swap setting. Enforce will wait until user do the backup.
-    Q_INVOKABLE void setSwapEnforceBackup(bool doBackup);
-    Q_INVOKABLE bool getSwapEnforceBackup();
+    // Backup dir for swap trades.
+    Q_INVOKABLE QString getSwapBackupDir();
+    Q_INVOKABLE void setSwapBackupDir(QString backupDir);
 
     // Backup status. We will ask user to do a backup for this swap.
     Q_INVOKABLE int  getSwapBackStatus(QString swapId);
@@ -178,6 +178,16 @@ public:
     // Lock outputs for slatepacks send
     Q_INVOKABLE bool getSendLockOutput();
     Q_INVOKABLE void setSendLockOutput(bool lock);
+
+    Q_INVOKABLE int getMktPlaceSelectedBtn();
+    Q_INVOKABLE void setMktPlaceSelectedBtn(int btn);
+
+    Q_INVOKABLE void setSwapMktFilter( double minFeeLevel, bool selling, const QString & currency, double minMwcAmount, double maxMwcAmount);
+    Q_INVOKABLE double getSwapMktMinFeeLevel();
+    Q_INVOKABLE bool getSwapMktSelling();
+    Q_INVOKABLE QString getSwapMktCurrency();
+    Q_INVOKABLE double getSwapMktMinMwcAmount();
+    Q_INVOKABLE double getSwapMktMaxMwcAmount();
 };
 
 }

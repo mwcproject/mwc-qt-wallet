@@ -83,6 +83,7 @@ public:
     const static int64_t TIMEOUT = 1000*120; // In case of network issues, it will take time for retry
 
     TaskCreateNewSwapTrade( MWC713 *wallet713,
+                            QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
                             int min_confirmations,
                             QString mwcAmount, QString  secAmount, QString secondary,
                             QString redeemAddress,
@@ -98,13 +99,14 @@ public:
                             QString electrum_uri2,
                             bool _dryRun,
                             QString _tag,
+                            QString mkt_trade_tag,
                             QVector<QString> _params ) :
-            Mwc713Task("TaskCreateNewSwapTrade", "Creaating new Swap trade...",
-                       generateCommandLine(min_confirmations,mwcAmount, secAmount, secondary,
+            Mwc713Task("TaskCreateNewSwapTrade", "Creating new Swap trade...",
+                       generateCommandLine(outputs, min_confirmations,mwcAmount, secAmount, secondary,
                                     redeemAddress, secTxFee, sellerLockFirst, messageExchangeTimeMinutes,
                                     redeemTimeMinutes, mwcConfirmationNumber, secondaryConfirmationNumber,
                                     communicationMethod, communicationAddress, electrum_uri1,
-                                    electrum_uri2, _dryRun),
+                                    electrum_uri2, mkt_trade_tag, _dryRun),
                        wallet713, ""), tag(_tag), dryRun(_dryRun), params(_params) {}
 
     virtual ~TaskCreateNewSwapTrade() override {}
@@ -113,7 +115,9 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
-    QString generateCommandLine(int min_confirmations,
+    QString generateCommandLine(
+                                QVector<QString> outputs, // If defined, those outputs will be used to trade. They might belong to another trade, that if be fine.
+                                int min_confirmations,
                                 QString mwcAmount, QString  secAmount, QString secondary,
                                 QString redeemAddress,
                                 double secTxFee,
@@ -126,6 +130,7 @@ private:
                                 QString communicationAddress,
                                 QString electrum_uri1,
                                 QString electrum_uri2,
+                                QString mkt_trade_tag,
                                 bool dryRun) const;
 
     QString tag;
@@ -158,12 +163,13 @@ class TaskTradeDetails : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*120;
 
-    TaskTradeDetails( MWC713 *wallet713, QString _swapId, bool waitForBackup1 ) :
+    TaskTradeDetails( MWC713 *wallet713, QString _swapId, bool waitForBackup1, QString _cookie ) :
             Mwc713Task("TaskTradeDetails", "Checking Swap trade status...",
                        "swap --check --json_format -i " + _swapId +
                                 (waitForBackup1 ? " --wait_for_backup1" : ""),
                        wallet713, ""),
-            swapId(_swapId) {}
+            swapId(_swapId),
+            cookie(_cookie) {}
 
     virtual ~TaskTradeDetails() override {}
 
@@ -172,6 +178,7 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
     QString swapId;
+    QString cookie;
 };
 
 // Adjust swap trade record.
@@ -179,11 +186,16 @@ class TaskAdjustTrade : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*120;
 
-    TaskAdjustTrade( MWC713 *wallet713, const QString & _swapId, const QString &adjustCmd, const QString & param1, const QString & param2 ) :
+    TaskAdjustTrade( MWC713 *wallet713, const QString & _swapId, QString _call_tag,
+                     const QString &destinationMethod, const QString & destinationDest,
+                     const QString &secondaryAddress,
+                     const QString &secondaryFee,
+                     const QString &electrumUri1,
+                     const QString &tag) :
             Mwc713Task("TaskTradeDetails", "Checking Swap trade details...",
-                       generateCommandLine(_swapId, adjustCmd, param1, param2),
+                       generateCommandLine(_swapId, destinationMethod, destinationDest, secondaryAddress, secondaryFee, electrumUri1, tag),
                        wallet713, ""),
-            swapId(_swapId), adjustCommand(adjustCmd) {}
+            swapId(_swapId), call_tag(_call_tag) {}
 
     virtual ~TaskAdjustTrade() override {}
 
@@ -191,10 +203,15 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
-    QString generateCommandLine(const QString & swapId, const QString & adjustCmd, const QString & param1, const QString & param2) const;
+    QString generateCommandLine(const QString &swapId,
+                                const QString &destinationMethod, const QString & destinationDest,
+                                const QString &secondaryAddress,
+                                const QString &secondaryFee,
+                                const QString &electrumUri1,
+                                const QString &tag) const;
 private:
     QString swapId;
-    QString adjustCommand;
+    QString call_tag;
 };
 
 // Perform auto swap single step

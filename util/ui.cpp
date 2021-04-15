@@ -195,8 +195,10 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
 
     // mwc713 doesn't know about HODL outputs or locked outputs
     // if we don't have HODL or locked outputs, let mwc713 select the outputs
-    if (!appContext->isLockOutputEnabled())
-        return true; // let mwc713 wallet handle it
+    // !!!! Commented because isLockOutputEnabled  is about permanent user defined settings
+    // For swap marketplace also there are temporary locks that we should process here
+    //if (!appContext->isLockOutputEnabled())
+    //    return true; // let mwc713 wallet handle it
 
     QVector<wallet::WalletOutput> outputs = wallet->getwalletOutputs().value(accountName);
 
@@ -218,7 +220,7 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
         if (!o.coinbase && o.numOfConfirms.toInt() < appContext->getSendCoinsParams().inputConfirmationNumber)
             continue;
         // Skip locked
-        if (appContext->isLockedOutputs(o.outputCommitment))
+        if (appContext->isLockedOutputs(o.outputCommitment).first)
             continue;
 
         allOutputs.push_back(o.outputCommitment);
@@ -251,7 +253,9 @@ findSpendableOutputs(const QString& accountName, const wallet::Wallet* wallet, c
         if (!o.coinbase && o.numOfConfirms.toInt() < appContext->getSendCoinsParams().inputConfirmationNumber)
             continue;
         // ensure outputs locked by Qt Wallet are not used
-        if (appContext->isLockOutputEnabled() && appContext->isLockedOutputs(o.outputCommitment))
+        // !!!! Commented because isLockOutputEnabled  is about permanent user defined settings
+        // For swap marketplace also there are temporary locks that we should process here
+        if ( /*appContext->isLockOutputEnabled() &&*/ appContext->isLockedOutputs(o.outputCommitment).first )
             continue;
         spendableOutputs.insert(o.valueNano, o);
     }

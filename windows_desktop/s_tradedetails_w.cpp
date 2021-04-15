@@ -14,7 +14,7 @@
 
 #include "s_tradedetails_w.h"
 #include "ui_s_tradedetails_w.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include "../control_desktop/messagebox.h"
 #include "../dialogs_desktop/s_adjuststatedlg.h"
 #include "../util_desktop/timeoutlock.h"
@@ -40,7 +40,7 @@ TradeDetails::TradeDetails(QWidget *parent, QString _swapId) :
     ui->executionPlan->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     ui->tradeJournal->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
-    swap->requestTradeDetails(swapId);
+    swap->requestTradeDetails(swapId, "TradeDetails");
 }
 
 TradeDetails::~TradeDetails() {
@@ -109,7 +109,12 @@ void TradeDetails::sgnRequestSwapDetails(QVector<QString> swapInfo,
                                          QVector<QString> executionPlan,
                                          QString currentAction,
                                          QVector<QString> tradeJournal,
-                                         QString errMsg) {
+                                         QString errMsg,
+                                         QString cookie) {
+
+    if (cookie!="TradeDetails")
+        return;
+
     Q_ASSERT(swapInfo.size()>=1);
     QString reqSwapId = swapInfo[0];
 
@@ -153,7 +158,7 @@ void TradeDetails::on_backButton_clicked() {
 
 void TradeDetails::on_refreshButton_clicked() {
     ui->progress->show();
-    swap->requestTradeDetails(swapId);
+    swap->requestTradeDetails(swapId, "TradeDetails");
 }
 
 void TradeDetails::mouseDoubleClickEvent(QMouseEvent *event) {

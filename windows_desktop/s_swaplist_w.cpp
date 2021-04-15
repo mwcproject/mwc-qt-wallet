@@ -14,13 +14,14 @@
 
 #include "s_swaplist_w.h"
 #include "ui_s_swaplist_w.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include "../bridge/config_b.h"
 #include "../bridge/util_b.h"
 #include "../control_desktop/messagebox.h"
 #include "../control_desktop/richvbox.h"
 #include "../control_desktop/richitem.h"
 #include <QSet>
+#include <QFileDialog>
 
 namespace wnd {
 
@@ -85,7 +86,7 @@ void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, 
     }
 
     Q_ASSERT(cancelBtn);
-    if ( swap->isSwapCancellable(stateCmd))
+    if ( swap->isSwapCancellable(stateCmd, !tag.isEmpty()))
         cancelBtn->show();
     else
         cancelBtn->hide();
@@ -135,7 +136,7 @@ void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, 
 ///////////////////////////////////////////////////////////////////////
 // SwapList
 
-SwapList::SwapList(QWidget *parent) :
+SwapList::SwapList(QWidget *parent, bool selectIncoming, bool selectOutgoing, bool selectBackup) :
         core::NavWnd(parent),
         ui(new Ui::SwapList) {
     ui->setupUi(this);
@@ -159,9 +160,18 @@ SwapList::SwapList(QWidget *parent) :
     connect(ui->swapsTable, &control::RichVBox::onItemActivated, this, &SwapList::onItemActivated,
             Qt::QueuedConnection);
 
-    ui->checkEnforceBackup->setChecked(config->getSwapEnforceBackup());
+    //ui->checkEnforceBackup->setChecked(config->getSwapEnforceBackup());
+    ui->swapBackupDir->setText( config->getSwapBackupDir() );
 
-    selectSwapTab(config->getSwapTabSelection());
+    int tabSelection = config->getSwapTabSelection();
+    if (selectIncoming)
+        tabSelection = 0;
+    else if (selectOutgoing)
+        tabSelection = 1;
+    else if (selectBackup)
+        tabSelection = 3;
+
+    selectSwapTab(tabSelection);
 }
 
 SwapList::~SwapList() {
@@ -224,9 +234,9 @@ void SwapList::sgnSwapTradesResult(QString cookie, QVector<QString> trades, QStr
 
     // Result comes in series of 11 item tuples:
     // < <bool is Seller>, <mwcAmount>, <sec+amount>, <sec_currency>, <Trade Id>, <State>, <initiate_time_interval>, <expire_time_interval>  <secondary_address> <last_process_error> >, ....
-    for (int i = 10; i < trades.size(); i += 11) {
-        SwapTradeInfo sti(trades[i - 10] == "true", trades[i - 9], trades[i - 8], trades[i - 7], trades[i - 6], trades[i - 5],
-                          trades[i - 4], trades[i - 3].toLongLong(), trades[i - 2].toLongLong(), trades[i-1], trades[i]);
+    for (int i = 11; i < trades.size(); i += 12) {
+        SwapTradeInfo sti(trades[i - 11] == "true", trades[i - 10], trades[i - 9], trades[i - 8], trades[i - 7], trades[i - 6],
+                          trades[i - 5], trades[i - 4].toLongLong(), trades[i - 3].toLongLong(), trades[i-2], trades[i-1], trades[i]);
         swapList.push_back(sti);
     }
 
@@ -577,8 +587,18 @@ void SwapList::on_restoreTradesTab_clicked() {
     selectSwapTab(3);
 }
 
-void SwapList::on_checkEnforceBackup_clicked() {
-    config->setSwapEnforceBackup(ui->checkEnforceBackup->isChecked());
+void SwapList::on_selectBackupDirBtn_clicked() {
+    QString dir = QFileDialog::getExistingDirectory(this,
+            "Select trade backup directory");
+    if (dir.isEmpty())
+        return;
+
+    ui->swapBackupDir->setText(dir);
+    config->setSwapBackupDir(dir);
+}
+
+void SwapList::on_swapBackupDir_textEdited(const QString &dir) {
+    config->setSwapBackupDir(dir);
 }
 
 }

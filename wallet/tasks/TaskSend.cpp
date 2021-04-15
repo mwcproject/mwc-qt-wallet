@@ -470,13 +470,15 @@ bool TaskRequestRecieverWalletAddress::processTask(const QVector<WEvent> &events
         const QString msg = ln.message;
         if (msg.startsWith("Proof pub key of the listening wallet:")) {
             QString addr = msg.mid( strlen("Proof pub key of the listening wallet:") ).trimmed();
-            wallet713->setRequestRecieverWalletAddress(url, addr, "");
+            wallet713->setRequestReceiverWalletAddress(url, addr, "");
             return true;
         }
     }
 
     // reporting error
-    wallet713->setRequestRecieverWalletAddress(url, "", getErrorMessage(events, "Unable to get a receiver wallet address for " + url));
+    wallet713->setRequestReceiverWalletAddress(url, "", getErrorMessage(events,
+                                                                        "Unable to get a receiver wallet address for " +
+                                                                        url));
     return true;
 }
 

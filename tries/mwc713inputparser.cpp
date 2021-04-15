@@ -453,6 +453,41 @@ void Mwc713InputParser::initSwaps() {
                                                         new TriePhraseSection(" to MWC. SwapID is "),
                                                         new TrieAnySection(50, TrieAnySection::NOT_NEW_LINE, "","", 2),
                                                 }));
+
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_SWAP_GET_MESSAGE,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("Processed income message for SwapId "),
+                                                        // Account name have extra character!
+                                                        new TrieAnySection(50, TrieAnySection::NOT_NEW_LINE, "","", 1),
+                                                }));
+
+    // Get accept_offer message from gxcnwi....4twad for off_223
+    // Get fail_bidding message from gxcnwi....4twad for off_223
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_MKT_ACCEPT_OFFER,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("Get accept_offer message from "),
+                                                        // Account name have extra character!
+                                                        new TrieAnySection(100, TrieAnySection::NOT_SPACES | TrieAnySection::START_NEXT_EVERY_TRY, "","", 1),
+                                                        new TriePhraseSection(" for "),
+                                                        new TrieAnySection(50, TrieAnySection::NOT_NEW_LINE, "","", 2),
+                                                }));
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_MKT_FAIL_BIDDING,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("Get fail_bidding message from "),
+                                                        // Account name have extra character!
+                                                        new TrieAnySection(100, TrieAnySection::NOT_SPACES | TrieAnySection::START_NEXT_EVERY_TRY, "","", 1),
+                                                        new TriePhraseSection(" for "),
+                                                        new TrieAnySection(50, TrieAnySection::NOT_NEW_LINE, "","", 2),
+                                                }));
+
+    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_MKT_WINNINER,
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("Winning Trade with SwapId "),
+                                                        // Account name have extra character!
+                                                        new TrieAnySection(50, TrieAnySection::NOT_SPACES | TrieAnySection::START_NEXT_EVERY_TRY, "","", 1),
+                                                        new TriePhraseSection(" and tag "),
+                                                        new TrieAnySection(50, TrieAnySection::NOT_NEW_LINE, "","", 2),
+                                                }));
 }
 
 

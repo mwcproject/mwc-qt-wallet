@@ -151,7 +151,7 @@ QString TaskListeningStart::calcCommand(bool startMq, bool startTor) const {
 
     // if tor, return listen -t
     if(startTor)
-        return QString("listen -t");
+        return QString("listen -t -p"); // always starting libp2p
 
     Q_ASSERT(startMq);
     return QString("listen -s");

@@ -14,7 +14,7 @@
 
 #include "s_newswap3_w.h"
 #include "ui_s_newswap3_w.h"
-#include "../bridge/swap_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include "../bridge/util_b.h"
 #include "../control_desktop/messagebox.h"
 
@@ -31,6 +31,10 @@ NewSwap3::NewSwap3(QWidget *parent) :
             Qt::QueuedConnection);
 
     ui->progress->initLoader(false);
+
+    if (swap->isMktTrade()) {
+        ui->sendOfferButton->setText("Accept Offer");
+    }
 
     updateSwapReview();
 }
