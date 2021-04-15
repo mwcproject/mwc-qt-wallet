@@ -1020,6 +1020,8 @@ bool Swap::mobileBack() {
             return true;
         }
     }
+    Q_ASSERT(false);
+    return false;
 }
 
 // Get minimal Amount for the secondary currency
