@@ -163,12 +163,13 @@ class TaskTradeDetails : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*120;
 
-    TaskTradeDetails( MWC713 *wallet713, QString _swapId, bool waitForBackup1 ) :
+    TaskTradeDetails( MWC713 *wallet713, QString _swapId, bool waitForBackup1, QString _cookie ) :
             Mwc713Task("TaskTradeDetails", "Checking Swap trade status...",
                        "swap --check --json_format -i " + _swapId +
                                 (waitForBackup1 ? " --wait_for_backup1" : ""),
                        wallet713, ""),
-            swapId(_swapId) {}
+            swapId(_swapId),
+            cookie(_cookie) {}
 
     virtual ~TaskTradeDetails() override {}
 
@@ -177,6 +178,7 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
     QString swapId;
+    QString cookie;
 };
 
 // Adjust swap trade record.

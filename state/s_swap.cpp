@@ -311,7 +311,7 @@ void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString curre
 void Swap::onNewSwapTrade(QString currency, QString swapId) {
     Q_UNUSED(currency)
     // requesting swap details to view
-    context->wallet->requestTradeDetails(swapId, true );
+    context->wallet->requestTradeDetails(swapId, true, "NewSwapTrade" );
 }
 
 void Swap::onNewSwapMessage(QString swapId) {
@@ -325,10 +325,14 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
                             QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                             QString currentAction,
                             QVector<wallet::SwapJournalMessage> tradeJournal,
-                            QString error ) {
+                            QString error,
+                            QString cookie ) {
     Q_UNUSED(executionPlan)
     Q_UNUSED(currentAction)
     Q_UNUSED(tradeJournal)
+
+    if (cookie != "NewSwapTrade" )
+        return;
 
     if (!error.isEmpty()) {
         qDebug() << "onRequestTradeDetails get an error: " << error;
@@ -845,7 +849,8 @@ void Swap::acceptTheTrade(QString swapId) {
     runTrade(swapId,"", false, "BuyerOfferCreated");
 
     // Switch to the trades lists
-    pageTradeList(true, false, false);
+    //pageTradeList(true, false, false);
+    showTradeDetails(swapId);
 }
 
 // Get Tx fee for secondary currency

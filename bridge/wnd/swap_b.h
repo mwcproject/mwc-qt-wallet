@@ -49,7 +49,7 @@ public:
 
     // Requesting all details about the single swap Trade
     // Respond will be with sent back with sgnRequestTradeDetails
-    Q_INVOKABLE void requestTradeDetails(QString swapId);
+    Q_INVOKABLE void requestTradeDetails(QString swapId, QString cookie);
 
     // Check if this Trade is running in auto mode now
     Q_INVOKABLE bool isRunning(QString swapId);
@@ -197,7 +197,8 @@ signals:
                                  QVector<QString> executionPlan,
                                  QString currentAction,
                                  QVector<QString> tradeJournal,
-                                 QString errMsg );
+                                 QString errMsg,
+                                 QString cookie );
 
     // Response from sgnAdjustSwapTrade. OK - empty error message
     void sgnAdjustSwapTrade(QString swapId, QString call_tag, QString errMsg);
@@ -239,7 +240,8 @@ private slots:
                                 QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                                 QString currentAction,
                                 QVector<wallet::SwapJournalMessage> tradeJournal,
-                                QString errMsg );
+                                QString errMsg,
+                                QString cookie );
     void onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
 
     void onSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,

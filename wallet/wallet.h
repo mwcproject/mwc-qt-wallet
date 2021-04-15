@@ -787,8 +787,9 @@ public:
     //                            QVector<SwapExecutionPlanRecord> executionPlan,
     //                            QString currentAction,
     //                            QVector<SwapJournalMessage> tradeJournal,
-    //                            QString error );
-    virtual void requestTradeDetails(QString swapId, bool waitForBackup1 ) = 0;
+    //                            QString error,
+    //                            QString cookie );
+    virtual void requestTradeDetails(QString swapId, bool waitForBackup1, QString cookie ) = 0;
 
     // Adjust swap stade values. params are optional
     // Check Signal: onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);
@@ -997,7 +998,8 @@ signals:
                                 QVector<SwapExecutionPlanRecord> executionPlan,
                                 QString currentAction,
                                 QVector<SwapJournalMessage> tradeJournal,
-                                QString error );
+                                QString error,
+                                QString cookie );
 
     // Response from adjustSwapData
     void onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);

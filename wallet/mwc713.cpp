@@ -945,9 +945,14 @@ void MWC713::cancelSwapTrade(QString swapId) {
 }
 
 // Request details about this trade.
-// Check Signal: void onRequestTradeDetails( SwapTradeInfo swap )
-void MWC713::requestTradeDetails(QString swapId, bool waitForBackup1) {
-    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, {TSK(new TaskTradeDetails(this, swapId, waitForBackup1), TaskTradeDetails::TIMEOUT)} );
+// Check Signal: void onRequestTradeDetails( SwapTradeInfo swap,
+//                            QVector<SwapExecutionPlanRecord> executionPlan,
+//                            QString currentAction,
+//                            QVector<SwapJournalMessage> tradeJournal,
+//                            QString error,
+//                            QString cookie );
+void MWC713::requestTradeDetails(QString swapId, bool waitForBackup1, QString cookie) {
+    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, {TSK(new TaskTradeDetails(this, swapId, waitForBackup1, cookie), TaskTradeDetails::TIMEOUT)} );
 }
 
 // Adjust swap stade values. params are optional
@@ -1691,9 +1696,10 @@ void MWC713::setRequestTradeDetails( SwapTradeInfo swap,
                                      QVector<SwapExecutionPlanRecord> executionPlan,
                                      QString currentAction,
                                      QVector<SwapJournalMessage> tradeJournal,
-                                     QString error ) {
-    logger::logEmit("MWC713", "onRequestSwapDetails", swap.swapId + ", " + error );
-    emit onRequestTradeDetails( swap, executionPlan, currentAction, tradeJournal, error );
+                                     QString error,
+                                     QString cookie ) {
+    logger::logEmit("MWC713", "onRequestSwapDetails", swap.swapId + ", " + error + ", " + cookie );
+    emit onRequestTradeDetails( swap, executionPlan, currentAction, tradeJournal, error, cookie );
 }
 
 void MWC713::setAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg) {

@@ -257,7 +257,7 @@ bool TaskTradeDetails::processTask(const QVector<WEvent> &events) {
 
             if (error.error != QJsonParseError::NoError || !jsonDoc.isObject()) {
                 wallet713->setRequestTradeDetails(swap, executionPlan, "", tradeJournal,
-                                                  "Unable to parse mwc713 output");
+                                                  "Unable to parse mwc713 output", cookie);
                 return true;
             }
 
@@ -308,13 +308,13 @@ bool TaskTradeDetails::processTask(const QVector<WEvent> &events) {
             }
 
             // Success case
-            wallet713->setRequestTradeDetails(swap, executionPlan, currentAction, tradeJournal, "");
+            wallet713->setRequestTradeDetails(swap, executionPlan, currentAction, tradeJournal, "", cookie);
             return true;
         }
     }
 
     wallet713->setRequestTradeDetails(swap, executionPlan, "", tradeJournal,
-                                      getErrorMessage(events, "Unable to read swap list data"));
+                                      getErrorMessage(events, "Unable to read swap list data"), cookie);
     return true;
 }
 

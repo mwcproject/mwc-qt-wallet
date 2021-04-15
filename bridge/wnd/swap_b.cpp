@@ -140,11 +140,11 @@ void Swap::onCancelSwapTrade(QString swapId, QString error) {
 
 // Requesting all details about the single swap Trade
 // Respond will be with sent back with sgnRequestTradeDetails
-void Swap::requestTradeDetails(QString swapId) {
+void Swap::requestTradeDetails(QString swapId, QString cookie) {
     int expBkId = getAppContext()->getSwapBackStatus(swapId);
     bool waiting4backup = /*getAppContext()->getSwapEnforceBackup() &&*/ expBkId==0;
 
-    getWallet()->requestTradeDetails(swapId, waiting4backup);
+    getWallet()->requestTradeDetails(swapId, waiting4backup, cookie);
 }
 
 QString calcTimeLeft(int64_t time) {
@@ -183,7 +183,7 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
                                    QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                                    QString currentAction,
                                    QVector<wallet::SwapJournalMessage> tradeJournal,
-                                   QString errMsg ) {
+                                   QString errMsg, QString cookie ) {
     QVector<QString> swapInfo;
 
     // Response from requestTradeDetails call
@@ -191,7 +191,7 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
     swapInfo.push_back(swap.swapId);
 
     if (!errMsg.isEmpty()) {
-        emit sgnRequestTradeDetails(swapInfo, {}, currentAction, {}, errMsg);
+        emit sgnRequestTradeDetails(swapInfo, {}, currentAction, {}, errMsg, cookie);
         return;
     }
 
@@ -273,7 +273,7 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
     // [10] - Secondary currency amount
     swapInfo.push_back( QString::number(swap.secondaryAmount) );
 
-    emit sgnRequestTradeDetails( swapInfo, convertExecutionPlan(executionPlan), currentAction, convertTradeJournal(tradeJournal), errMsg );
+    emit sgnRequestTradeDetails( swapInfo, convertExecutionPlan(executionPlan), currentAction, convertTradeJournal(tradeJournal), errMsg, cookie );
 }
 
 

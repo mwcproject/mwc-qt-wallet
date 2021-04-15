@@ -48,7 +48,8 @@ private slots:
                                   QVector<QString> executionPlan,
                                   QString currentAction,
                                   QVector<QString> tradeJournal,
-                                  QString errMsg );
+                                  QString errMsg,
+                                  QString cookie );
     void sgnAdjustSwapTrade(QString swapId, QString cmdTag, QString errorMsg);
 
     void on_redeemAddressEdit_textEdited(const QString &arg1);

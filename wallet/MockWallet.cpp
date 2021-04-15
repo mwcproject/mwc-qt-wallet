@@ -592,12 +592,13 @@ void MockWallet::cancelSwapTrade(QString swapId) {
 //                            QVector<SwapExecutionPlanRecord> executionPlan,
 //                            QString currentAction,
 //                            QVector<SwapJournalMessage> tradeJournal,
-//                            QString error );
-void MockWallet::requestTradeDetails(QString swapId, bool waitForBackup1 ) {
+//                            QString error,
+//                            QString cookie );
+void MockWallet::requestTradeDetails(QString swapId, bool waitForBackup1, QString cookie ) {
     Q_UNUSED(swapId)
     Q_UNUSED(waitForBackup1)
     SwapTradeInfo sw;
-    emit onRequestTradeDetails( sw, {}, "current action", {}, "");
+    emit onRequestTradeDetails( sw, {}, "current action", {}, "", cookie );
 }
 
 // Adjust swap stade values. params are optional

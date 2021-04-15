@@ -317,8 +317,9 @@ public:
     //                            QVector<SwapExecutionPlanRecord> executionPlan,
     //                            QString currentAction,
     //                            QVector<SwapJournalMessage> tradeJournal,
-    //                            QString error );
-    virtual void requestTradeDetails(QString swapId, bool waitForBackup1) override;
+    //                            QString error,
+    //                            QString cookie );
+    virtual void requestTradeDetails(QString swapId, bool waitForBackup1, QString cookie) override;
 
     // Adjust swap stade values. params are optional
     // Check Signal: onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);
@@ -520,7 +521,8 @@ public:
                                 QVector<SwapExecutionPlanRecord> executionPlan,
                                 QString currentAction,
                                 QVector<SwapJournalMessage> tradeJournal,
-                                QString error );
+                                QString error,
+                                QString cookie );
     void setAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
 
     void setPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,

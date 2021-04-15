@@ -232,7 +232,8 @@ slots:
                                       QVector<wallet::SwapExecutionPlanRecord> executionPlan,
                                       QString currentAction,
                                       QVector<wallet::SwapJournalMessage> tradeJournal,
-                                      QString error );
+                                      QString error,
+                                      QString cookie );
 
     void onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);
 

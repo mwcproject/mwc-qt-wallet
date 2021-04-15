@@ -46,7 +46,7 @@ EditSwap::EditSwap(QWidget *parent, QString _swapId, QString _stateCmd) :
     ui->secFeeUnitsLabel->hide();
 
     ui->progress->initLoader(true);
-    swap->requestTradeDetails(swapId);
+    swap->requestTradeDetails( swapId, "EditSwap" );
 
     ui->noteEdit->setText(config->getSwapNote(swapId));
 
@@ -62,10 +62,14 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
                                       QVector<QString> executionPlan,
                                       QString currentAction,
                                       QVector<QString> tradeJournal,
-                                      QString errMsg) {
+                                      QString errMsg,
+                                      QString cookie ) {
     Q_UNUSED(currentAction)
     Q_UNUSED(executionPlan)
     Q_UNUSED(tradeJournal)
+
+    if ( cookie != "EditSwap" )
+        return;
 
     Q_ASSERT(swapInfo.size() >= 1);
     QString reqSwapId = swapInfo[0];
@@ -279,7 +283,7 @@ void EditSwap::sgnAdjustSwapTrade(QString swId, QString cmdTag, QString errorMsg
            swap->acceptTheTrade(swapId);
         } else {
             // OK, let's refresh...
-            swap->requestTradeDetails(swapId);
+            swap->requestTradeDetails(swapId, "EditSwap");
         }
     }
 
