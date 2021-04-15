@@ -24,6 +24,7 @@
 #include "../util/Log.h"
 #include <QDateTime>
 #include "s_swap.h"
+#include <cmath>
 
 namespace state {
 
