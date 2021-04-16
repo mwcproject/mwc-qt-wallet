@@ -726,6 +726,8 @@ void Swap::onSendMarketplaceMessage(QString error, QString response, QString off
 
     int minConf = context->appContext->getSendCoinsParams().inputConfirmationNumber;
 
+    QString tradeTag = mktOfferId.isEmpty() ? "" : newSwapBuyerAddress + "_" + mktOfferId;
+
     context->wallet->createNewSwapTrade( newSwapAccount, {}, minConf,
                                          newSwapMwc2Trade, newSwapSec2Trade, newSwapCurrency,
                                          newSwapSecAddress,
@@ -740,8 +742,8 @@ void Swap::onSendMarketplaceMessage(QString error, QString response, QString off
                                          newSwapElectrumXUrl,
                                          "",
                                          false,
-                                         "createNewSwap",
-                                         mktOfferId.isEmpty() ? "" : newSwapBuyerAddress + "_" + mktOfferId,
+                                         "createNewSwap" + tradeTag,
+                                         tradeTag,
                                          {});
     // Continue at onCreateNewSwapTrade
 }
@@ -761,7 +763,7 @@ void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> param
             if (!newSwapNote.isEmpty())
                 context->appContext->updateNote("swap_" + swapId, newSwapNote);
 
-            runTrade(swapId, tag, true, "SellerOfferCreated");
+            runTrade(swapId, tag.right( tag.length() - strlen("createNewSwap") ) , true, "SellerOfferCreated");
             if (tag == "createNewSwap") {
                 showTradeDetails(swapId);
                 core::getWndManager()->messageTextDlg("Swap Trade", "Congratulation! Your swap trade with ID\n" + swapId +
