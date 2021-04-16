@@ -138,8 +138,7 @@ void StateMachine::start() {
             continue;
 
         currentState = it.key();
-        for (auto b : bridge::getBridgeManager()->getCoreWindow())
-            b->updateActionStates(currentState);
+        notifyAboutNewState(currentState);
 
         return;
     }
@@ -156,6 +155,14 @@ bool StateMachine::canSwitchState(STATE nextWindowState) {
     }
     return true;
 }
+
+
+// Can be used as a hack (shortcut for windows switch)
+void StateMachine::notifyAboutNewState( STATE state ) {
+    for (auto b : bridge::getBridgeManager()->getCoreWindow())
+        b->updateActionStates(state);
+}
+
 
 // Try to chnage the state.
 // return: true - if was changes
@@ -183,8 +190,7 @@ void StateMachine::executeFrom( STATE nextState ) {
                 continue;
 
             newState = it.key();
-            for (auto b : bridge::getBridgeManager()->getCoreWindow())
-                b->updateActionStates(newState);
+            notifyAboutNewState(newState);
             break;
         }
         currentState = newState;

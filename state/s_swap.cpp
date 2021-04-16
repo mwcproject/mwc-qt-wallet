@@ -141,18 +141,21 @@ NextStateRespond Swap::execute() {
 void Swap::pageTradeList(bool selectIncoming, bool selectOutgoing, bool selectBackup) {
     selectedPage = SwapWnd::PageSwapList;
     core::getWndManager()->pageSwapList(selectIncoming, selectOutgoing, selectBackup);
+    context->stateMachine->notifyAboutNewState(STATE::SWAP);
 }
 
 // Edit/View Trade Page
 void Swap::viewTrade(QString swapId, QString stateCmd) {
     selectedPage = SwapWnd::PageSwapEdit;
     core::getWndManager()->pageSwapEdit(swapId, stateCmd);
+    context->stateMachine->notifyAboutNewState(STATE::SWAP);
 }
 
 // Show trade details page
 void Swap::showTradeDetails(QString swapId) {
     selectedPage = SwapWnd::PageSwapTradeDetails;
     core::getWndManager()->pageSwapTradeDetails(swapId);
+    context->stateMachine->notifyAboutNewState(STATE::SWAP);
 }
 
 bool Swap::isTradeRunning(const QString & swapId) const {
@@ -527,11 +530,13 @@ void Swap::stopMktTrades(QString tag, QString winnerTradeUuid) {
 void Swap::showNewTrade1() {
     selectedPage = SwapWnd::PageSwapNew1;
     core::getWndManager()->pageSwapNew1();
+    context->stateMachine->notifyAboutNewState(STATE::SWAP);
 }
 // Show the trade page 2
 void Swap::showNewTrade2() {
     selectedPage = SwapWnd::PageSwapNew2;
     core::getWndManager()->pageSwapNew2();
+    context->stateMachine->notifyAboutNewState(STATE::SWAP);
 }
 
 // Apply params from trade1, not need to check
@@ -582,6 +587,7 @@ void Swap::applyNewTrade12Params(QString acccount, QString secCurrency, QString 
     }
     selectedPage = SwapWnd::PageSwapNew2;
     core::getWndManager()->pageSwapNew2();
+    context->stateMachine->notifyAboutNewState(STATE::SWAP);
 }
 
 double Swap::getSecTransactionFee(const QString & secCurrency) const {
@@ -626,6 +632,7 @@ void Swap::applyNewTrade22Params(QString electrumXUrl) {
     newSwapElectrumXUrl = electrumXUrl;
     selectedPage = SwapWnd::PageSwapNew3;
     core::getWndManager()->pageSwapNew3();
+    context->stateMachine->notifyAboutNewState(STATE::SWAP);
 }
 
 // Create and start a new swap. The data must be submitted by that moment
@@ -775,9 +782,11 @@ void Swap::onCreateNewSwapTrade(QString tag, bool dryRun, QVector<QString> param
                 context->appContext->updateNote("swap_" + swapId, newSwapNote);
 
             runTrade(swapId, tag.right( tag.length() - strlen("createNewSwap") ) , true, "SellerOfferCreated");
-            showTradeDetails(swapId);
-            core::getWndManager()->messageTextDlg("Swap Trade", "Congratulation! Your swap trade with ID\n" + swapId +
+            if (tag!="createNewSwapMkt") {
+                showTradeDetails(swapId);
+                core::getWndManager()->messageTextDlg("Swap Trade", "Congratulation! Your swap trade with ID\n" + swapId +
                                                                 "\nwas successfully created.");
+            }
         }
     }
 }
@@ -1023,11 +1032,13 @@ bool Swap::mobileBack() {
         case SwapWnd::PageSwapNew2: {
             core::getWndManager()->pageSwapNew1();
             selectedPage = SwapWnd::PageSwapNew1;
+            context->stateMachine->notifyAboutNewState(STATE::SWAP);
             return true;
         }
         case SwapWnd::PageSwapNew3: {
             core::getWndManager()->pageSwapNew2();
             selectedPage = SwapWnd::PageSwapNew2;
+            context->stateMachine->notifyAboutNewState(STATE::SWAP);
             return true;
         }
     }
@@ -1144,10 +1155,9 @@ void Swap::acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address, i
     }
 
     // For Buy let's check if there is already a request...
-    // TODO Implement auto accept code, acceptedOffers  has all accepted
-//    core::getWndManager()->messageTextDlg("Waiting for offer", "We notify Wallet " + wallet_tor_address + " should initate atomic swap trade soon. "
-//        "This trade will be accepted atomatically. Please be online to lock your " + offer.secondaryCurrency + " coins.\n\n"
-//        "Please note, if several traders accept the same offers, trader who lock funds first will be able to finish the trade. You will be notified if your offer will be rejected because of that.");
+    core::getWndManager()->messageTextDlg("Waiting for offer", "Your peer " + wallet_tor_address + " is notified about your acceptance. "
+        "Soon you should get a message about income atomic swap trade.\n\n"
+        "Please note, if several traders accept the same offers, trader who lock funds first will be able to finish the trade. You will be notified if your offer will be rejected because of that.");
 }
 
 // Reject any offers from this address. We don't want them, we are likely too late

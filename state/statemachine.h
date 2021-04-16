@@ -70,6 +70,9 @@ public:
     // Step back top the prev state if it wasn't a login
     // Return true is step back was done successfully
     bool returnBack();
+
+    // Can be used as a hack (shortcut for windows switch)
+    void notifyAboutNewState( STATE state );
 private:
     // routine to process state into the loop
     bool processState(State* st);

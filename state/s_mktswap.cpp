@@ -528,6 +528,7 @@ void SwapMarketplace::onTimerEvent() {
                 myOffers.remove(i);
                 core::getWndManager()->messageTextDlg("Warning", "You sell offer is rejected because outputs that it depend on are spent. It can happen because of integrity fee payment.\n\n" + lockedOutputs.first);
                 // return because of the message box delay. The data can be changed by that time.
+                emit onMyOffersChanged();
                 return;
             }
 
@@ -540,7 +541,7 @@ void SwapMarketplace::updateIntegrityFeesAndStart() {
     QVector<double> fees;
     double feeLevel = getFeeLevel();
     for (MySwapOffer ms : myOffers) {
-        fees.push_back( ms.calcFee( feeLevel ) + 0.0000001 ); // add some for rounding
+        fees.push_back( ms.calcFee( feeLevel ) ); // add some for rounding
     }
 
     context->wallet->createIntegrityFee( getFeeDepositAccount(), getFeeReservedAmount(), fees );
@@ -868,13 +869,14 @@ void SwapMarketplace::pageCreateUpdateOffer(QString myMsgId) {
 
     selectedPage = SwapMarketplaceWnd::NewOffer;
     core::getWndManager()->pageNewUpdateOffer(myMsgId);
+    context->stateMachine->notifyAboutNewState(STATE::SWAP_MKT);
 }
 
 // Switch to swap marketplace first page
 void SwapMarketplace::pageMktList(bool selectMyOffers) {
     selectedPage = SwapMarketplaceWnd::Marketplace;
     core::getWndManager()->pageMarketplace(selectMyOffers);
-
+    context->stateMachine->notifyAboutNewState(STATE::SWAP_MKT);
 }
 
 void SwapMarketplace::cleanMarketOffers() {
