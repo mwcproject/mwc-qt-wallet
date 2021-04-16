@@ -512,6 +512,17 @@ bool Swap::verifyBackupDir() {
     return true;
 }
 
+// Stop run Mkt Non winners
+void Swap::stopMktTrades(QString tag, QString winnerTradeUuid) {
+    QMutableMapIterator<QString, AutoswapTask> i(runningSwaps);
+    while (i.hasNext()) {
+        i.next();
+
+        if ( i.value().tag==tag && i.value().swapId!=winnerTradeUuid )
+            i.remove();
+    }
+}
+
 // Show the trade page 1
 void Swap::showNewTrade1() {
     selectedPage = SwapWnd::PageSwapNew1;

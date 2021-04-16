@@ -644,8 +644,13 @@ void Transactions::onSgnWalletBalanceUpdated() {
 
     ui->accountComboBox->clear();
 
+    bool hide_integrity_account = !QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+
     int idx=0;
     for ( int i=1; i<accounts.size(); i+=2) {
+        if ( hide_integrity_account && accounts[i-1] == "integrity")
+            continue;
+
         if (accounts[i-1] == selectedAccount)
             selectedAccIdx = idx;
 

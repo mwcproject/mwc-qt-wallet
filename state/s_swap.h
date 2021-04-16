@@ -164,6 +164,9 @@ public:
     // Verify if trade backup dir is valid. If not, then ask user to fix that
     bool verifyBackupDir();
 
+    // Stop run Mkt Non winners
+    void stopMktTrades(QString tag, QString winnerTradeUuid);
+
 private:
 signals:
 

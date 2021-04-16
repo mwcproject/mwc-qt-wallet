@@ -170,6 +170,8 @@ void MrktSwList::updateTradeListData() {
     if (selectedTab == BTN_FEES)
         return;
 
+    bool hasTor = wallet->getTorListenerStatus();
+
     if (selectedTab == BTN_MY_OFFERS) {
         QVector<QString> offersStr = swapMarketplace->getMyOffers();
         for (auto &s : offersStr) {
@@ -185,7 +187,7 @@ void MrktSwList::updateTradeListData() {
                 itm->addWidget(control::createLabel(itm, false, false,
                                                     QString::number(offer.offer.mwcAmount) + " MWC " + QChar(0x279E) +
                                                     " " + QString::number(offer.offer.secAmount) +
-                                                    " " + offer.offer.secondaryCurrency + " ;  " + offer.getStatusStr()));
+                                                    " " + offer.offer.secondaryCurrency + " ;  " + (hasTor ? offer.getStatusStr() : "Waiting for TOR...")   ));
             } else {
                 itm->addWidget(
                         control::createIcon(itm, ":/img/iconReceived@2x.svg", control::ROW_HEIGHT,
@@ -194,7 +196,7 @@ void MrktSwList::updateTradeListData() {
                                                     QString::number(offer.offer.secAmount) + " " +
                                                     offer.offer.secondaryCurrency + " " +
                                                     QChar(0x279E) + " " +
-                                                    QString::number(offer.offer.mwcAmount) + " MWC" + " ;  " + offer.getStatusStr()));
+                                                    QString::number(offer.offer.mwcAmount) + " MWC" + " ;  " + (hasTor ? offer.getStatusStr() : "Waiting for TOR...") ));
             }
 //            itm->setMinWidth(275);
 //            itm->addWidget(control::createLabel(itm, false, true, "Auto renew: Yes"));
@@ -489,6 +491,11 @@ void MrktSwList::on_withdrawHelpBtn_clicked() {
 }
 
 void MrktSwList::on_newOfferButton_clicked() {
+    if (!wallet->getTorListenerStatus()) {
+        control::MessageBox::messageText(this, "TOR is offline", "Atomic swap marketplace requires connection to the TOR network. Please tart TOR listener for the wallet.");
+        return;
+    }
+
     swapMarketplace->pageCreateNewOffer("");
 }
 
