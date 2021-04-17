@@ -108,6 +108,9 @@ public:
     virtual void pageSwapNew3() override;
     virtual void pageSwapEdit(QString swapId, QString stateCmd) override;
     virtual void pageSwapTradeDetails(QString swapId) override;
+
+    virtual void pageMarketplace(bool selectMyOffers) override;
+    virtual void pageNewUpdateOffer(QString myMsgId) override;
 private:
     QQmlApplicationEngine * engine = nullptr;
     QObject * mainWindow = nullptr;
