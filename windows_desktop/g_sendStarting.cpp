@@ -78,6 +78,9 @@ void SendStarting::onSgnWalletBalanceUpdated() {
     int idx = 0;
 
     for (int i=1; i<accountInfo.size(); i+=2) {
+        if ( accountInfo[i-1] == "integrity")
+            continue;
+
         if (accountInfo[i-1] == account)
             selectedAccIdx = idx;
 
