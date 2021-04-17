@@ -92,6 +92,11 @@ MrktSwapNew::MrktSwapNew(QWidget *parent, QString myMsgId) :
     updateRateValue();
 
     onSgnWalletBalanceUpdated();
+
+    // Fee need to be updated at the end becuase currency tab does reset to the default one.
+    if ( !offer.offer.id.isEmpty() ) {
+        ui->secTransFeeEdit->setText( QString::number(offer.secFee) );
+    }
 }
 
 MrktSwapNew::~MrktSwapNew() {

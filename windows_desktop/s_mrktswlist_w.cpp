@@ -78,6 +78,9 @@ MrktSwList::MrktSwList(QWidget *parent, bool selectMyOffers) :
     QString selectedAccount = swapMarketplace->getFeeDepositAccount();
     int selectedAcc = 0;
     for (int i = 0; i < accounts.size(); i++) {
+        if (accounts[i]=="integrity")
+            break; // It is the last account, we can exit
+
         if (accounts[i] == selectedAccount)
             selectedAcc = i;
 

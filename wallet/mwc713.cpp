@@ -1123,7 +1123,7 @@ void MWC713::requestMessagingStatus() {
 // Publish new json message
 // Check Signal: onMessagingPublish(QString id, QString uuid, QString error)
 void MWC713::messagingPublish(QString messageJsonStr, QString feeTxUuid, QString id, int publishInterval, QString topic) {
-    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskMessagingPublish(this, messageJsonStr, feeTxUuid, id, publishInterval, topic), TaskMessagingPublish::TIMEOUT)} );
+    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, { TSK( new TaskMessagingPublish(this, messageJsonStr, feeTxUuid, id, publishInterval, topic), TaskMessagingPublish::TIMEOUT)} );
 }
 
 // Check integrity of published messages.
@@ -1135,13 +1135,13 @@ void MWC713::checkIntegrity() {
 // Stop publishing the message
 // Check Signal: onMessageWithdraw(QString uuid, QString error)
 void MWC713::messageWithdraw(QString uuid) {
-    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskMessageWithdraw(this, uuid), TaskMessageWithdraw::TIMEOUT)} );
+    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, { TSK( new TaskMessageWithdraw(this, uuid), TaskMessageWithdraw::TIMEOUT)} );
 }
 
 // Request messages from the receive buffer
 // Check Signal: onReceiveMessages(QString error, QVector<ReceivedMessages>)
 void MWC713::requestReceiveMessages(bool cleanBuffer) {
-    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TaskRequestReceiveMessages(this, cleanBuffer), TaskRequestReceiveMessages::TIMEOUT)} );
+    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, { TSK( new TaskRequestReceiveMessages(this, cleanBuffer), TaskRequestReceiveMessages::TIMEOUT)} );
 }
 
 // Start listening on the libp2p topic
@@ -1157,7 +1157,7 @@ void MWC713::stopListenOnTopic(const QString & topic) {
 }
 
 void MWC713::sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id, QString cookie) {
-    eventCollector->addTask( TASK_PRIORITY::TASK_NORMAL, { TSK( new TasksSendMarketplaceMessage(this, command, wallet_tor_address, offer_id, cookie), TasksSendMarketplaceMessage::TIMEOUT)} );
+    eventCollector->addTask( TASK_PRIORITY::TASK_NOW, { TSK( new TasksSendMarketplaceMessage(this, command, wallet_tor_address, offer_id, cookie), TasksSendMarketplaceMessage::TIMEOUT)} );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

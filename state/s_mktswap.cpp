@@ -699,6 +699,38 @@ void SwapMarketplace::respRequestMessagingStatus(QString error, wallet::Messagin
 
         if (!messagingStatus.connected || messagingStatus.gossippub_peers.size()<MIN_PEERS_NUMBER)
             startMktListening = QDateTime::currentSecsSinceEpoch();
+
+        // validate publishing messages if they match our expectations.
+        QSet<QString> runningMsgUuid;
+        for (auto & pm : status.broadcasting )
+            runningMsgUuid += pm.uuid;
+
+        for (auto & mo : myOffers) {
+            if (mo.msgUuid.isEmpty()) {
+                if (mo.status == OFFER_STATUS::RUNNING) {
+                    mo.status = OFFER_STATUS::PENDING;
+                }
+                continue;
+            }
+            if ( runningMsgUuid.remove( mo.msgUuid ) ) {
+                if (mo.status != OFFER_STATUS::RUNNING) {
+                    // Let's stop the broadcasting, we are out of sync
+                    qDebug() << "Let's stop the broadcasting, we are out of sync " << mo.msgUuid;
+                    context->wallet->messageWithdraw(mo.msgUuid);
+                }
+            }
+            else {
+                if (mo.status == OFFER_STATUS::RUNNING) {
+                    qDebug() << "Not found expected broadcasted message";
+                    mo.status = OFFER_STATUS::PENDING;
+                }
+            }
+        }
+
+        for (auto uuid : runningMsgUuid) {
+            qDebug() << "Stopping the some unknown broadcasting " << uuid;
+            context->wallet->messageWithdraw(uuid);
+        }
     }
     else {
         qDebug() << "respRequestMessagingStatus return error: " << error;
