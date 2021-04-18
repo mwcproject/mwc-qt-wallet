@@ -163,19 +163,21 @@ void Outputs::updateShownData() {
             itm->addWidget( control::createLabel(itm, false, false, util::nano2one(out.valueNano) + " MWC", control::FONT_LARGE));
             itm->addHSpacer();
 
-            // Add lock button if it is applicable
-            if ( lockState == "YES" ) {
-                itm->addWidget(new control::RichButton(itm, "Unlock", 60, control::ROW_HEIGHT, "Unlock this output and make it spendable"));
-                lockBtn = (control::RichButton*) itm->getCurrentWidget();
-            }
-            else if (lockState == "NO") {
-                itm->addWidget(new control::RichButton(itm, "Lock", 60, control::ROW_HEIGHT, "Lock this output and make it non spendable"));
-                lockBtn = (control::RichButton*) itm->getCurrentWidget();
-            }
+            if (config->isLockOutputEnabled()) {
+                // Add lock button if it is applicable
+                if ( lockState == "YES" ) {
+                    itm->addWidget(new control::RichButton(itm, "Unlock", 60, control::ROW_HEIGHT, "Unlock this output and make it spendable"));
+                    lockBtn = (control::RichButton*) itm->getCurrentWidget();
+                }
+                else if (lockState == "NO") {
+                    itm->addWidget(new control::RichButton(itm, "Lock", 60, control::ROW_HEIGHT, "Lock this output and make it non spendable"));
+                    lockBtn = (control::RichButton*) itm->getCurrentWidget();
+                }
 
-            if (lockBtn) {
-                lockBtn->setCallback(this, QString::number(i) );
-                itm->addFixedHSpacer(control::ROW_HEIGHT);
+                if (lockBtn) {
+                    lockBtn->setCallback(this, QString::number(i) );
+                    itm->addFixedHSpacer(control::ROW_HEIGHT);
+                }
             }
 
             itm->addWidget( control::createLabel(itm, false, true, "Conf: " + out.numOfConfirms));
@@ -224,6 +226,8 @@ void Outputs::richButtonPressed(control::RichButton * button, QString coockie) {
         wallet::WalletOutput & selected = allData[idx].output;
         bool locked = !config->isLockedOutput(selected.outputCommitment);
         config->setLockedOutput(locked, selected.outputCommitment);
+
+        locked = config->isLockedOutput(selected.outputCommitment);
 
         updateOutputState( idx, locked );
     }

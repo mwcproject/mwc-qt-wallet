@@ -890,9 +890,6 @@ void AppContext::setHodlRegistrationTime(const QString & hash, int64_t time) {
 static QString imp_val("IMPOSSIBLE_VALUE");
 
 QPair<bool, QString> AppContext::isLockedOutputs(const QString & output) const {
-    if (!lockOutputEnabled)
-        return QPair<bool, QString>(false, "");
-
     if (!lockedOutputs.contains(output))
         return QPair<bool, QString>(false, "");
 
@@ -917,16 +914,21 @@ void AppContext::setLockOutputEnabled(bool enabled) {
 
 void AppContext::setLockedOutput(const QString & output, bool lock, QString id) {
     if (lock) {
-        if ( !lockedOutputs.contains(output) ) {
             lockedOutputs.insert(output, id);
-            saveData();
+            if (id.isEmpty())
+                saveData();
             logger::logEmit("AppContext", "onOutputLockChanged", output + " locked" );
             emit onOutputLockChanged(output);
-        }
     }
     else {
+        QString prevKey = lockedOutputs.value(output, "");
+        if (prevKey != id) {
+            core::getWndManager()->messageTextDlg("Warning", "You can't unlock this output, it is reserved by one of wallet running operation.");
+            return;
+        }
         if (lockedOutputs.remove(output)) {
-            saveData();
+            if (prevKey.isEmpty())
+                saveData();
             logger::logEmit("AppContext", "onOutputLockChanged", output + " unlocked" );
             emit onOutputLockChanged(output);
         }
