@@ -371,7 +371,8 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
         else {
             QVector<MktSwapOffer> accOffers = acceptedOffers.value(swap.communicationAddress);
             MktSwapOffer mktFoundOffer;
-            for (const auto & o : accOffers) {
+            for (auto o : accOffers) {
+                o.sell = !o.sell; // It is other peer, so sell is inversed
                 if (!o.sell && o.equal(swap)) {
                     mktFoundOffer = o;
                     break;
@@ -991,6 +992,29 @@ void Swap::runSwapIfNeed(const wallet::SwapInfo & sw) {
 
 // Response from requestSwapTrades
 void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTrades, QString error) {
+    if (cookie.startsWith("failBidding:")) {
+        QString tag = cookie.right(cookie.length() - strlen("failBidding:"));
+
+        for ( auto & swap : swapTrades ) {
+            if (swap.tag == tag) {
+                // Found the trade.
+                if ( bridge::isSwapCancellable( swap.stateCmd, true)) {
+                    // Can cancel - great..
+                    context->wallet->cancelSwapTrade( swap.swapId );
+                    QString message = "Trade " + swap.swapId + " is dropped by your peer because there was several trades and another one locked the coins first. This trade is cancelled.";
+                    core::getWndManager()->messageTextDlg("Warning", message);
+                }
+                else {
+                    QString message = "Trade " + swap.swapId + " is dropped by your peer because there was several trades and another one locked the coins first.\n\n"
+                                      "Please don't deposit any coins to Locking account. After expiration time that trade will be cancelled automatically.\n"
+                                      "If you already lock your coins, please wait until your payment will be refuned.";
+                    core::getWndManager()->messageTextDlg("Warning", message);
+                }
+                return;
+            }
+        }
+    }
+
     if (cookie!="SwapInitRequest") {
         // Watching case. Let's remove the finished trades and reviews if we are running non finished.
         for (const wallet::SwapInfo & sw : swapTrades) {
@@ -1056,19 +1080,8 @@ double Swap::getSecMinAmount(QString secCurrency) const {
 void Swap::failBidding(QString wallet_tor_address, QString offer_id) {
     QString tag = wallet_tor_address + "_" + offer_id;
 
-    for (const AutoswapTask & val : runningSwaps.values() ) {
-        if (val.tag == tag) {
-            QString message = "Trade " + val.swapId + " is dropped by your peer because there was several trades and another one locked the coins first.";
-            if (val.isSeller) {
-                message += " This trade is cancelled.";
-            }
-            else {
-                message += " Please don't deposit any coins to Locking account and cancel this trade manually.\n"
-                           "If you already lock you coins please wait when they will be mined and then cancel your trade";
-            };
-            core::getWndManager()->messageTextDlg("Warning", message);
-        }
-    }
+    context->wallet->requestSwapTrades("failBidding:" + tag);
+    // Continue at   onRequestSwapTrades
 }
 
 // Start trading for my offer - automatic operation. For Sell the offer will be created.
