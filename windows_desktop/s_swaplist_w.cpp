@@ -198,7 +198,7 @@ void SwapList::selectSwapTab(int selection) {
         ui->refreshBtnsHolder->show();
 
         clearSwapList();
-        ui->swapsTable->clearAll();
+        ui->swapsTable->clearAll(true);
 
     }
     // Requesting swap list in any case because that routing does counting and update the tabs with number of items.
@@ -264,7 +264,7 @@ void SwapList::clearSwapList() {
 
 
 void SwapList::updateTradeListData() {
-    ui->swapsTable->clearAll();
+    ui->swapsTable->clearAll(false);
     for (auto &sw : swapList)
         sw.resetUI();
 

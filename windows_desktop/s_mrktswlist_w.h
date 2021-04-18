@@ -57,7 +57,7 @@ protected:
 private:
     void updateModeButtons(int btnId);
     void updateMktFilter();
-    void updateTradeListData();
+    void updateTradeListData(bool resetScrollValue);
     void pushIntegritySettings();
 private slots:
     void on_marketOffers_clicked();
@@ -86,6 +86,7 @@ private slots:
 
     void onItemActivated(QString id);
 
+    void updateList();
 private:
     Ui::MrktSwList *ui;
     bridge::Config * config = nullptr;

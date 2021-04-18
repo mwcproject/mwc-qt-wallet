@@ -78,6 +78,9 @@ struct MktSwapOffer {
     bool isValid() const;
 
     QString getKey() const {return walletAddress + "_" + id;}
+
+    QString calcRateAsStr() const;
+    double  calcRate() const;
 };
 
 enum class OFFER_STATUS { PENDING=1, STARTING=2, RUNNING=3 };

@@ -52,7 +52,7 @@ void TradeDetails::updateData(const QVector<QString> & executionPlan,
                               const QVector<QString> & tradeJournal) {
 
     // Execution plan...
-    ui->executionPlan->clearAll();
+    ui->executionPlan->clearAll(false);
     Q_ASSERT(executionPlan.size()%3==0);
     bool past = true;
     for (int i=2; i<executionPlan.size(); i+=3) {
@@ -83,7 +83,7 @@ void TradeDetails::updateData(const QVector<QString> & executionPlan,
     ui->executionPlan->apply();
 
     // The trade journal
-    ui->tradeJournal->clearAll();
+    ui->tradeJournal->clearAll(false);
     Q_ASSERT(tradeJournal.size()%2==0);
     for (int i=1; i<tradeJournal.size(); i+=2) {
         QString message = tradeJournal[i-1];
@@ -123,8 +123,8 @@ void TradeDetails::sgnRequestSwapDetails(QVector<QString> swapInfo,
 
     ui->progress->hide();
 
-    ui->executionPlan->clearAll();
-    ui->tradeJournal->clearAll();
+    ui->executionPlan->clearAll(false);
+    ui->tradeJournal->clearAll(false);
 
     if (!errMsg.isEmpty()) {
         Q_ASSERT(swapInfo.size()>=1);

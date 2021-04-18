@@ -78,12 +78,12 @@ private:
 
     bool updateOutputState(int idx, bool lock);
 
-    void requestOutputs(QString account);
+    void requestOutputs(QString account, bool resetScrollPos);
 
     QString currentSelectedAccount();
 
     // return enable state for the buttons
-    void updateShownData();
+    void updateShownData(bool resetScrollData);
 
     // return selected account
     QString updateAccountsData();

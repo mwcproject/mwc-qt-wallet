@@ -22,6 +22,7 @@
 #include "../control_desktop/messagebox.h"
 #include "../dialogs_desktop/s_mktshowparamsdlg_d.h"
 #include "../util_desktop/timeoutlock.h"
+#include <QTimer>
 
 namespace wnd {
 
@@ -102,6 +103,10 @@ MrktSwList::MrktSwList(QWidget *parent, bool selectMyOffers) :
         btn = BTN_MY_OFFERS;
 
     updateModeButtons(btn);
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(updateList()));
+    timer->start(1000*60); // Every minute is fine. We want sometimes update expiration time
 }
 
 MrktSwList::~MrktSwList() {
@@ -126,7 +131,7 @@ void MrktSwList::updateModeButtons(int btnId) {
 
     ui->progress->hide();
 
-    updateTradeListData();
+    updateTradeListData(true);
 }
 
 void MrktSwList::updateMktFilter() {
@@ -167,8 +172,8 @@ void MrktSwList::updateMktFilter() {
     ui->filterSettings->setText(status);
 }
 
-void MrktSwList::updateTradeListData() {
-    ui->offersTable->clearAll();
+void MrktSwList::updateTradeListData(bool resetScrollValue) {
+    ui->offersTable->clearAll(resetScrollValue);
 
     if (selectedTab == BTN_FEES)
         return;
@@ -190,7 +195,7 @@ void MrktSwList::updateTradeListData() {
                 itm->addWidget(control::createLabel(itm, false, false,
                                                     QString::number(offer.offer.mwcAmount) + " MWC " + QChar(0x279E) +
                                                     " " + QString::number(offer.offer.secAmount) +
-                                                    " " + offer.offer.secondaryCurrency + " ;  " + (hasTor ? offer.getStatusStr() : "Waiting for TOR...")   ));
+                                                    " " + offer.offer.secondaryCurrency + " ;  "+ offer.offer.calcRateAsStr() + " ;  " + (hasTor ? offer.getStatusStr() : "Waiting for TOR...")   ));
             } else {
                 itm->addWidget(
                         control::createIcon(itm, ":/img/iconReceived@2x.svg", control::ROW_HEIGHT,
@@ -199,7 +204,7 @@ void MrktSwList::updateTradeListData() {
                                                     QString::number(offer.offer.secAmount) + " " +
                                                     offer.offer.secondaryCurrency + " " +
                                                     QChar(0x279E) + " " +
-                                                    QString::number(offer.offer.mwcAmount) + " MWC" + " ;  " + (hasTor ? offer.getStatusStr() : "Waiting for TOR...") ));
+                                                    QString::number(offer.offer.mwcAmount) + " MWC" + " ;  "+ offer.offer.calcRateAsStr() +" ;  " + (hasTor ? offer.getStatusStr() : "Waiting for TOR...") ));
             }
 //            itm->setMinWidth(275);
 //            itm->addWidget(control::createLabel(itm, false, true, "Auto renew: Yes"));
@@ -305,7 +310,7 @@ void MrktSwList::updateTradeListData() {
                 itm->addWidget(control::createLabel(itm, false, false,
                                                     QString::number(offer.mwcAmount) + " MWC " + QChar(0x279E) + " " +
                                                     QString::number(offer.secAmount) +
-                                                    " " + offer.secondaryCurrency));
+                                                    " " + offer.secondaryCurrency + " ;  " + offer.calcRateAsStr() ));
             } else {
                 itm->addWidget(
                         control::createIcon(itm, ":/img/iconReceived@2x.svg", control::ROW_HEIGHT,
@@ -314,7 +319,7 @@ void MrktSwList::updateTradeListData() {
                                                     QString::number(offer.secAmount) + " " + offer.secondaryCurrency +
                                                     " " +
                                                     QChar(0x279E) + " " +
-                                                    QString::number(offer.mwcAmount) + " MWC"));
+                                                    QString::number(offer.mwcAmount) + " MWC" + " ;  " + offer.calcRateAsStr() ));
             }
             itm->setMinWidth(250);
             itm->addWidget(control::createLabel(itm, false, true, "Fee : " + feeLevelValToStr(offer.mktFee / offer.mwcAmount ) + " (" +
@@ -518,26 +523,29 @@ void MrktSwList::on_offersListenSettingsBtn_clicked() {
 
         config->setSwapMktFilter(feeLevel, selling, secondaryCurrency, minMwcAmount, maxMwcAmount);
         updateMktFilter();
-        updateTradeListData();
+        updateTradeListData(true);
     }
 }
 
 void MrktSwList::sgnMarketPlaceOffersChanged() {
     ui->progress->hide();
     if (selectedTab == BTN_MKT_OFFERS)
-        updateTradeListData();
+        updateTradeListData(false);
 }
 
 void MrktSwList::sgnMyOffersChanged() {
     ui->progress->hide();
     if (selectedTab == BTN_MY_OFFERS)
-        updateTradeListData();
+        updateTradeListData(false);
 }
 
 void MrktSwList::sgnMessagingStatusChanged() {
     updateMktFilter();
 }
 
+void MrktSwList::updateList() {
+    updateTradeListData(false);
+}
 
 void MrktSwList::sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> integrityFeesJsonStr) {
     if (error.isEmpty()) {

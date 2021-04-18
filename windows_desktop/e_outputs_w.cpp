@@ -71,7 +71,7 @@ Outputs::Outputs(QWidget *parent) :
 
     QString accName = updateAccountsData();
 
-    requestOutputs(accName);
+    requestOutputs(accName, false);
 }
 
 void Outputs::panelWndStarted() {
@@ -88,8 +88,8 @@ bool Outputs::calcMarkFlag(const wallet::WalletOutput & out) {
     return out.status == "Unconfirmed" || out.status == "Locked" || lockState == "YES";
 }
 
-void Outputs::updateShownData() {
-    ui->outputsTable->clearAll();
+void Outputs::updateShownData(bool resetScrollData) {
+    ui->outputsTable->clearAll(resetScrollData);
 
     int total = allData.size();
 
@@ -283,21 +283,21 @@ void Outputs::onSgnOutputs( QString account, bool showSpent, QString height, QVe
         allData.push_back( out );
     }
 
-    updateShownData();
+    updateShownData(false);
 }
 
 void Outputs::on_refreshButton_clicked() {
-    requestOutputs(currentSelectedAccount());
+    requestOutputs(currentSelectedAccount(), false);
 }
 
 // Request and reset page counter
-void Outputs::requestOutputs(QString account) {
+void Outputs::requestOutputs(QString account, bool resetScrollPos) {
     allData.clear();
 
     ui->progressFrame->show();
     ui->tableFrame->hide();
 
-    updateShownData();
+    updateShownData(resetScrollPos);
 
     wallet->requestOutputs(account, config->isShowOutputAll(), true);
 }
@@ -308,7 +308,7 @@ void Outputs::on_accountComboBox_activated(int index) {
     QString selectedAccount = currentSelectedAccount();
     if (!selectedAccount.isEmpty()) {
         wallet->switchAccount(selectedAccount);
-        requestOutputs(selectedAccount);
+        requestOutputs(selectedAccount, true);
     }
 }
 

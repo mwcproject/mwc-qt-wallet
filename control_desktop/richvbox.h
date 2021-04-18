@@ -29,7 +29,7 @@ public:
     explicit RichVBox(QWidget *parent);
 
     // clear all the data
-    void clearAll();
+    void clearAll(bool resetScrollValue);
     // Add next item into the list
     RichVBox & addItem(RichItem * item);
     // Done with adding
@@ -39,6 +39,11 @@ public:
     void itemDblClicked(QString id, RichItem * item);
     void itemFocus(QString id, RichItem * item);
     void itemActivated(QString id, RichItem * item);
+
+private
+slots:
+    void onHorzValueChanged(int value);
+    void onHorzRangeChanged(int min, int max);
 
 signals:
     void onItemClicked(QString id);
@@ -50,6 +55,9 @@ private:
     QWidget * vlist = nullptr;
     QVBoxLayout * layout = nullptr;
     RichItem * focusItem = nullptr;
+
+    int scrollValue = 0;
+    int needSetValue = false;
 };
 
 }

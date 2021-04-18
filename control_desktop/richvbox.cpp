@@ -15,6 +15,7 @@
 #include "richvbox.h"
 #include <QVBoxLayout>
 #include <QScrollBar>
+#include <QTimer>
 
 namespace control {
 
@@ -40,9 +41,24 @@ RichVBox::RichVBox(QWidget *parent) : QScrollArea(parent)
 
     setWidget(vlist);
     setWidgetResizable(true);
+
+    Q_ASSERT(verticalScrollBar() != nullptr);
+    QObject::connect( verticalScrollBar(), &QAbstractSlider::valueChanged,
+                     this, &RichVBox::onHorzValueChanged);
+    QObject::connect( verticalScrollBar(), &QAbstractSlider::rangeChanged,
+                     this, &RichVBox::onHorzRangeChanged);
 }
 
-void RichVBox::clearAll() {
+void RichVBox::clearAll(bool resetScrollValue) {
+    if (resetScrollValue) {
+        scrollValue = 0;
+        needSetValue = false;
+    }
+    else {
+        needSetValue = true;
+    }
+
+
     int count = layout->count();
     focusItem = nullptr;
 
@@ -67,6 +83,7 @@ RichVBox & RichVBox::apply() {
     // It is a spacer that works as we need. Regular spacer works as regular Widget and it doesn't work for few items.
     // In order to make work, we need something with stretch non 0.
     layout->addStretch(1);
+
     return *this;
 }
 
@@ -92,6 +109,36 @@ void RichVBox::itemFocus(QString id, RichItem * item) {
 void RichVBox::itemActivated(QString id, RichItem * item) {
     Q_UNUSED(item);
     emit onItemActivated(id);
+}
+
+void RichVBox::onHorzValueChanged(int value) {
+    if (value == 0) {
+        QScrollBar * sb = verticalScrollBar();
+        if (sb != nullptr) {
+            int minV = sb->minimum();
+            int maxV = sb->maximum();
+            if (minV>=0 && minV<maxV)
+                scrollValue = value;
+        }
+    }
+    else {
+        scrollValue = value;
+    }
+}
+
+void RichVBox::onHorzRangeChanged(int min, int max) {
+    if (needSetValue) {
+        needSetValue = false;
+
+        QScrollBar * sb = verticalScrollBar();
+        if (sb != nullptr) {
+            int minV = sb->minimum();
+            int maxV = sb->maximum();
+            if (minV>=0 && minV<maxV && scrollValue>=minV && scrollValue<=maxV ) {
+                sb->setValue(scrollValue);
+            }
+        }
+    }
 }
 
 

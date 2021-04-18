@@ -91,8 +91,8 @@ protected:
     virtual void richButtonPressed(control::RichButton * button, QString coockie) override;
 
 private:
-    void requestTransactions();
-    void updateData();
+    void requestTransactions(bool resetScroller);
+    void updateData(bool resetScroller);
 
 private:
     Ui::Transactions *ui;

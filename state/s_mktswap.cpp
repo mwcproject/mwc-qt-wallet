@@ -131,6 +131,16 @@ bool MktSwapOffer::equal( const wallet::SwapTradeInfo & swap ) const {
             swap.redeemTimeLimit == 3600 && swap.messageExchangeTimeLimit == 3600;
 }
 
+QString MktSwapOffer::calcRateAsStr() const {
+    return  util::zeroDbl2Dbl( QString::number( calcRate(), 'f', 8 ) );
+}
+
+double  MktSwapOffer::calcRate() const {
+    if (mwcAmount>0.0)
+        return secAmount / mwcAmount;
+
+    return 0.0;
+}
 
 
 
@@ -390,6 +400,16 @@ QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, bool 
              (maxMwcAmount<=0.0 || ofr.mwcAmount <= maxMwcAmount) )
             result.push_back(ofr);
     }
+
+    if (selling)
+        std::sort( result.begin(), result.end(), []( const MktSwapOffer & o1, const MktSwapOffer & o2 ) {
+            return o1.calcRate() > o2.calcRate();
+        } );
+    else
+        std::sort( result.begin(), result.end(), []( const MktSwapOffer & o1, const MktSwapOffer & o2 ) {
+            return o1.calcRate() < o2.calcRate();
+        } );
+
     return result;
 }
 

@@ -80,9 +80,9 @@ Transactions::Transactions(QWidget *parent) :
     ui->progressFrame->hide();
 
     onSgnWalletBalanceUpdated();
-    requestTransactions();
+    requestTransactions(false);
 
-    updateData();
+    updateData(false);
 
 }
 
@@ -91,8 +91,8 @@ Transactions::~Transactions()
     delete ui;
 }
 
-void Transactions::updateData() {
-    ui->transactionTable->clearAll();
+void Transactions::updateData(bool resetScroller) {
+    ui->transactionTable->clearAll(resetScroller);
 
     QDateTime current = QDateTime::currentDateTime();
     int expectedConfirmNumber = config->getInputConfirmationNumber();
@@ -346,7 +346,7 @@ void Transactions::onSgnTransactions( QString acc, QString height, QVector<QStri
         allTrans.push_back( dt );
     }
 
-    updateData();
+    updateData(false);
 }
 
 void Transactions::onSgnExportProofResult(bool success, QString fn, QString msg ) {
@@ -385,7 +385,7 @@ void Transactions::onSgnVerifyProofResult(bool success, QString fn, QString msg 
 }
 
 
-void Transactions::requestTransactions() {
+void Transactions::requestTransactions(bool resetScroller) {
     allTrans.clear();
     nodeHeight = -1;
 
@@ -395,17 +395,17 @@ void Transactions::requestTransactions() {
 
     ui->progressFrame->show();
     ui->transactionTable->hide();
-    ui->transactionTable->clearAll();
+    ui->transactionTable->clearAll(resetScroller);
 
     // !!! Note, order is important even it is async. We want node status be processed first..
     wallet->requestNodeStatus(); // Need to know th height.
     wallet->requestTransactions(account, true);
-    updateData();
+    updateData(resetScroller);
 }
 
 void Transactions::on_refreshButton_clicked()
 {
-    requestTransactions();
+    requestTransactions(false);
 }
 
 void Transactions::on_validateProofButton_clicked()
@@ -612,7 +612,7 @@ void Transactions::on_accountComboBox_activated(int index)
     QString account = ui->accountComboBox->currentData().toString();
     if (!account.isEmpty())
         wallet->switchAccount(account);
-    requestTransactions();
+    requestTransactions(true);
 }
 
 void Transactions::onSgnCancelTransacton(bool success, QString account, QString trIdxStr, QString errMessage) {
@@ -626,7 +626,7 @@ void Transactions::onSgnCancelTransacton(bool success, QString account, QString 
 
     util::TimeoutLockObject to("Transactions");
     if (success) {
-        requestTransactions();
+        requestTransactions(false);
         // We don't need this confirmation, it makes UX worse
         //control::MessageBox::messageText(this, "Transaction was cancelled", "Transaction number " + QString::number(trIdx+1) + " was successfully cancelled");
     }
