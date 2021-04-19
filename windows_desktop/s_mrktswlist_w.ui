@@ -406,7 +406,7 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string/>
+            <string>How much fee you agree to pay for your offers.  Please press Help button for more details</string>
            </property>
           </widget>
           <widget class="QPushButton" name="depositAccountHelpBtn">
@@ -497,7 +497,7 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string/>
+            <string>Source account for paying the fees</string>
            </property>
           </widget>
           <widget class="QPushButton" name="reservedAmountHelpBtn">
@@ -566,7 +566,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string/>
+            <string>How much reserve for fee payments</string>
            </property>
            <property name="text">
             <string/>
@@ -686,7 +686,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string/>
+            <string>Information about paid fees</string>
            </property>
            <property name="undoRedoEnabled">
             <bool>false</bool>
@@ -852,6 +852,9 @@ p, li { white-space: pre-wrap; }
           <height>40</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Change filtering options for marketplace offers</string>
+        </property>
         <property name="text">
          <string>Filter</string>
         </property>
@@ -925,7 +928,7 @@ p, li { white-space: pre-wrap; }
          <enum>Qt::NoFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Start new Swap Trade</string>
+         <string>Create new offer</string>
         </property>
         <property name="styleSheet">
          <string notr="true">border:none</string>
@@ -1063,6 +1066,16 @@ p, li { white-space: pre-wrap; }
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcComboBox</class>
+   <extends>QComboBox</extends>
+   <header>control_desktop/MwcComboBox.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::RichVBox</class>
    <extends>QWidget</extends>
    <header>control_desktop/richvbox.h</header>
@@ -1077,16 +1090,6 @@ p, li { white-space: pre-wrap; }
    <class>control::MwcToolButtonUnderscore</class>
    <extends>QToolButton</extends>
    <header>control_desktop/MwcToolButton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control_desktop/MwcLineEdit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcComboBox</class>
-   <extends>QComboBox</extends>
-   <header>control_desktop/MwcComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>

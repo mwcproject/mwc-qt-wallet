@@ -196,7 +196,7 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Apply and continue</string>
+            <string>Create and start publishing this atomic swap offer</string>
            </property>
            <property name="text">
             <string>Submit</string>
@@ -914,7 +914,7 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Currency that you want to swap with</string>
+            <string>Buy or Sell trade</string>
            </property>
            <item>
             <property name="text">
