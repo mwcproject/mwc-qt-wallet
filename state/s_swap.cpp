@@ -972,9 +972,9 @@ void Swap::onLogout() {
     if (!runningSwaps.isEmpty()) {
         int sz = runningSwaps.size();
         runningSwaps.clear();
-        core::getWndManager()->messageTextDlg("WARNING", "Because of the logout, " + QString::number(sz) +
-                    " swap trade"+ (sz>1 ? "s":"") +" are stopped. Please login back into your wallet as soon as possible. "
-                    "The wallet need to be active until the swap trade is finished. Otherwise you can loose the monet involved in this trade");
+        core::getWndManager()->messageTextDlg("WARNING",
+                      QString::number(sz) + " swap trade(s) were cancelled because of a logout during the swap. Please log into your wallet as quickly as possible. "
+                      "If this wallet is not active when the swap trade finishes the cancellation process, you may lose all coins involved in this transaction.");
     }
 }
 
