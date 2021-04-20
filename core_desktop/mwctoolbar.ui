@@ -263,7 +263,7 @@ color: #FFFFFF;</string>
            </sizepolicy>
           </property>
           <property name="toolTip">
-           <string>This is the total MWC in all of your accounts, some might be locked or not confirmed</string>
+           <string>This is unconfirmed MWC in all of your accounts</string>
           </property>
           <property name="styleSheet">
            <string notr="true">font-family: Open Sans;

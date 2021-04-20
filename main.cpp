@@ -238,19 +238,19 @@ QPair<bool, QString> readConfig(QApplication & app) {
 #ifdef WALLET_MOBILE
     // At Binary our binary are part of the data.
     if (wallet713_path == "build in") {
-        wallet713_path = QCoreApplication::applicationDirPath() + "/mwc713.so";
+        wallet713_path = QCoreApplication::applicationDirPath() + "/libmwc713.so";
     }
 
     if (mwc_path == "build in") {
-        mwc_path = QCoreApplication::applicationDirPath() + "/mwc.so";
+        mwc_path = QCoreApplication::applicationDirPath() + "/libmwc.so";
     }
 
     if (mwczip_path == "build in") {
-        mwczip_path = QCoreApplication::applicationDirPath() + "/mwczip.so";
+        mwczip_path = QCoreApplication::applicationDirPath() + "/libmwczip.so";
     }
 
     if (tor_path == "build in") {
-        tor_path = QCoreApplication::applicationDirPath() + "/tor.so";
+        tor_path = QCoreApplication::applicationDirPath() + "/libtor.so";
     }
 #endif
 

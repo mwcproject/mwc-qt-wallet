@@ -73,4 +73,11 @@ DISTFILES += \
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
+ANDROID_EXTRA_LIBS = $$PWD/android_bin/x86/libmwc713.so $$PWD/android_bin/x86/libmwczip.so $$PWD/android_bin/x86/libtor.so \
+    $$PWD/android_bin/x86_64/libmwc713.so       $$PWD/android_bin/x86_64/libmwczip.so       $$PWD/android_bin/x86_64/libtor.so \
+    $$PWD/android_bin/armeabi-v7a/libmwc713.so  $$PWD/android_bin/armeabi-v7a/libmwczip.so  $$PWD/android_bin/armeabi-v7a/libtor.so \
+    $$PWD/android_bin/arm64-v8a/libmwc713.so    $$PWD/android_bin/arm64-v8a/libmwczip.so    $$PWD/android_bin/arm64-v8a/libtor.so
+
+
 ANDROID_ABIS = x86
+
