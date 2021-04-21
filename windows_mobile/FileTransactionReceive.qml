@@ -252,7 +252,10 @@ Item {
                 receive.receiveSlatepack(fileNameOrSlatepack, description)
             } else {
                 const filepath = decodeURIComponent(fileNameOrSlatepack)
-                const path = downloadPath + filepath.substring(filepath.search("/Download/") + 9, filepath.length)
+                let path = filepath
+                if (filepath.search("Download/") > 0) {
+                    path = downloadPath + filepath.substring(filepath.search("Download/") + 8, filepath.length)
+                }
                 receive.receiveFile(path, description)
             }
         }

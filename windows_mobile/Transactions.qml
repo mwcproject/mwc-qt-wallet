@@ -505,7 +505,10 @@ Item {
             path= path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/,"")
             // unescape html codes like '%23' for '#'
             const cleanPath = decodeURIComponent(path);
-            const filePath = downloadPath + cleanPath.substring(cleanPath.search("/Download/") + 9, cleanPath.length)
+            let filePath = cleanPath
+            if (cleanPath.search("Download/") > 0) {
+                filePath = downloadPath + cleanPath.substring(cleanPath.search("Download/") + 8, cleanPath.length)
+            }
             wallet.verifyTransactionProof(filePath)
         }
     }

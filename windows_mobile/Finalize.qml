@@ -119,9 +119,12 @@ Item {
             path= path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/,"")
             // unescape html codes like '%23' for '#'
             const cleanPath = decodeURIComponent(path);
-            const filepath = downloadPath + cleanPath.substring(cleanPath.search("/Download/") + 9, cleanPath.length)
-            config.updatePathFor("fileGen", filepath)
-            finalize.uploadFileTransaction(filepath);
+            let filePath = cleanPath
+            if(cleanPath.search("Download/") > 0) {
+                filePath = downloadPath + cleanPath.substring(cleanPath.search("Download/") + 8, cleanPath.length)
+            }
+            config.updatePathFor("fileGen", filePath)
+            finalize.uploadFileTransaction(filePath);
         }
     }
 }
