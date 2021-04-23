@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "s_newswap2_w.h"
+#include <cmath>
 #include "ui_s_newswap2_w.h"
 #include "../bridge/wnd/swap_b.h"
 #include "../bridge/util_b.h"
