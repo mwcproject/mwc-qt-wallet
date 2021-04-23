@@ -35,14 +35,16 @@ Item {
     Connections {
         target: send
         onSgnShowSendResult: (success, message) => {
-            rect_progress.visible = false
-            button_send.enabled = true
-            if (success) {
-                messagebox.open("Success", "Your MWC was successfully sent to recipient")
-                textfield_send_to.text = ""
-                textarea_description.text = ""
-            } else {
-                messagebox.open(qsTr("Send request failed"), qsTr(message))
+            if (rect_progress.visible) {
+                 rect_progress.visible = false
+                 button_send.enabled = true
+                 if (success) {
+                     messagebox.open("Success", "Your MWC was successfully sent to recipient")
+                     textfield_send_to.text = ""
+                     textarea_description.text = ""
+                 } else {
+                     messagebox.open(qsTr("Send request failed"), qsTr(message))
+                 }
             }
         }
     }

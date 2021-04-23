@@ -63,7 +63,8 @@ Window {
         onSgnUpdateActionStates: {
             currentState = actionState
             navbarItem.updateTitle(currentState)
-            progressWndItem.visible = false
+            if (currentState !== 2 && currentState !== 18)
+                progressWndItem.visible = false
         }
     }
 
