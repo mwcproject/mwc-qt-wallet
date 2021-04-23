@@ -26,6 +26,7 @@ class MrktSwList;
 namespace bridge {
 class Config;
 class SwapMarketplace;
+class Swap;
 class Wallet;
 class Util;
 }
@@ -36,10 +37,23 @@ const int BTN_MKT_OFFERS = 0;
 const int BTN_MY_OFFERS = 1;
 const int BTN_FEES = 2;
 
-const QVector<QPair<QString, double>> MKT_FEES{
-        QPair<QString, double>("High", 0.005),
-        QPair<QString, double>("Normal", 0.001),
-        QPair<QString, double>("Low", 0.0001)
+struct FeeInfo {
+    QString shortName;
+    QString longName;
+    double  fee = 0.0;
+
+    FeeInfo(QString _shortName, QString _longName, double _fee) :
+            shortName(_shortName), longName(_longName), fee(_fee) {}
+
+    FeeInfo() = default;
+    FeeInfo(const FeeInfo & other) = default;
+    FeeInfo & operator=(const FeeInfo & other) = default;
+};
+
+const QVector<FeeInfo> MKT_FEES{
+        FeeInfo("High","High: 50 bps or 0.5%", 0.005),
+        FeeInfo( "Normal", "Normal: 10 bps or 0.1%", 0.001),
+        FeeInfo( "Low", "Low: 1 bps or 0.01%", 0.0001)
 };
 QString feeLevelValToStr(double fee);
 
@@ -74,8 +88,6 @@ private slots:
     void on_withdrawHelpBtn_clicked();
     void on_newOfferButton_clicked();
 
-    void on_offersListenSettingsBtn_clicked();
-
     void sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> IntegrityFeesJsonStr);
     void sgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, double totalDifficulty, int connections );
     void sgnWithdrawIntegrityFees(QString error, double mwc, QString account);
@@ -87,15 +99,23 @@ private slots:
     void onItemActivated(QString id);
 
     void updateList();
+    void on_buySellCombo_currentIndexChanged(int index);
+
+    void on_secCurrencyCombo_currentIndexChanged(int index);
+
+    void on_filterFeeLevel_currentIndexChanged(int index);
+
 private:
     Ui::MrktSwList *ui;
     bridge::Config * config = nullptr;
     bridge::SwapMarketplace * swapMarketplace = nullptr;
+    bridge::Swap * swap = nullptr;
     bridge::Wallet * wallet = nullptr;
     bridge::Util * util = nullptr;
 
     int selectedTab = 0;
     int lastNodeHeight = 0;
+    bool controlsReady = false;
 };
 
 }

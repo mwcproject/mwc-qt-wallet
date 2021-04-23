@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>860</width>
-    <height>787</height>
+    <width>933</width>
+    <height>838</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -224,7 +224,7 @@
           <x>0</x>
           <y>130</y>
           <width>696</width>
-          <height>191</height>
+          <height>198</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0">
@@ -234,6 +234,66 @@
          <property name="spacing">
           <number>20</number>
          </property>
+         <item row="1" column="1" colspan="2">
+          <widget class="control::MwcLineEditNormal" name="secAddressEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Address to receive the coins</string>
+           </property>
+           <property name="placeholderText">
+            <string>XXXX</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="secondaryCurrencyLabel">
+           <property name="text">
+            <string>XXX address:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="control::MwcLineEditNormal" name="secTransFeeEdit">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>200000</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Secondary currency transaction fee</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="maxLength">
+            <number>512</number>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="3">
           <widget class="QPushButton" name="swapRateHelpBtn">
            <property name="sizePolicy">
@@ -269,125 +329,6 @@
            </property>
            <property name="flat">
             <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="control::MwcLabelNormal" name="secTransFeeLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>180</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>BTC transaction fee</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1" colspan="2">
-          <widget class="control::MwcLineEditNormal" name="secAddressEdit">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Address to receive the coins</string>
-           </property>
-           <property name="placeholderText">
-            <string>XXXX</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="control::MwcLineEditNormal" name="secTransFeeEdit">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>200000</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Secondary currency transaction fee</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="maxLength">
-            <number>512</number>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="control::MwcLabelNormal" name="rateLabel">
-           <property name="text">
-            <string>MWC to BTC rate:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1" colspan="2">
-          <widget class="control::MwcLineEditNormal" name="swapRateEdit">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>This trade exchange rate</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="maxLength">
-            <number>32</number>
-           </property>
-           <property name="placeholderText">
-            <string/>
            </property>
           </widget>
          </item>
@@ -467,10 +408,44 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="secondaryCurrencyLabel">
+         <item row="0" column="0">
+          <widget class="control::MwcLabelNormal" name="rateLabel">
            <property name="text">
-            <string>XXX address:</string>
+            <string>MWC to BTC rate:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" colspan="2">
+          <widget class="control::MwcLineEditNormal" name="swapRateEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>This trade exchange rate</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="maxLength">
+            <number>32</number>
+           </property>
+           <property name="placeholderText">
+            <string/>
            </property>
           </widget>
          </item>
@@ -480,6 +455,48 @@
             <string>satoshi per byte</string>
            </property>
           </widget>
+         </item>
+         <item row="2" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <item>
+            <widget class="control::MwcLabelNormal" name="secTransFeeLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>200</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>2200</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>BTC transaction fee</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="control::MwcLabelSmall" name="secTransFeeLabel2">
+             <property name="text">
+              <string>Recommended value</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
@@ -1107,9 +1124,14 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
@@ -1117,9 +1139,9 @@
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control_desktop/MwcLineEdit.h</header>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcComboBox</class>

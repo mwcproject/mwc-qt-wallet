@@ -182,12 +182,12 @@ public:
     Q_INVOKABLE int getMktPlaceSelectedBtn();
     Q_INVOKABLE void setMktPlaceSelectedBtn(int btn);
 
-    Q_INVOKABLE void setSwapMktFilter( double minFeeLevel, bool selling, const QString & currency, double minMwcAmount, double maxMwcAmount);
     Q_INVOKABLE double getSwapMktMinFeeLevel();
-    Q_INVOKABLE bool getSwapMktSelling();
+    Q_INVOKABLE int getSwapMktSelling();
     Q_INVOKABLE QString getSwapMktCurrency();
-    Q_INVOKABLE double getSwapMktMinMwcAmount();
-    Q_INVOKABLE double getSwapMktMaxMwcAmount();
+    Q_INVOKABLE void setSwapMktMinFeeLevel(double fee);
+    Q_INVOKABLE void setSwapMktSelling(int buySellBoth);
+    Q_INVOKABLE void setSwapMktCurrency(QString currency);
 };
 
 }

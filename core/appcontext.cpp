@@ -372,8 +372,9 @@ bool AppContext::loadDataImpl() {
         in >> mktPlaceMinFeeLevel;
         in >> mktPlaceSelling;
         in >> mktPlaceCurrency;
-        in >> mktPlaceMinMwcAmount;
-        in >> mktPlaceMaxMwcAmount;
+        double d;
+        in >> d;
+        in >> d;
     }
 
     if (id>=0x47A5) {
@@ -504,8 +505,9 @@ void AppContext::saveData() const {
     out << mktPlaceMinFeeLevel;
     out << mktPlaceSelling;
     out << mktPlaceCurrency;
-    out << mktPlaceMinMwcAmount;
-    out << mktPlaceMaxMwcAmount;
+    double d = 0.0;
+    out << d;
+    out << d;
 
     out << swapBackupDir;
 }
@@ -1058,12 +1060,14 @@ void AppContext::setMktPlaceSelectedBtn(int btn) {
     mktPlaceSelectedBtn = btn;
 }
 
-void AppContext::setSwapMktFilter( double minFeeLevel, bool selling, const QString & currency, double minMwcAmount, double maxMwcAmount) {
-    mktPlaceMinFeeLevel = minFeeLevel;
-    mktPlaceSelling = selling;
+void AppContext::setSwapMktMinFeeLevel(double fee) {
+    mktPlaceMinFeeLevel = fee;
+}
+void AppContext::setSwapMktSelling(int value) {
+    mktPlaceSelling = value;
+}
+void AppContext::setSwapMktCurrency(QString currency) {
     mktPlaceCurrency = currency;
-    mktPlaceMinMwcAmount = minMwcAmount;
-    mktPlaceMaxMwcAmount = maxMwcAmount;
 }
 
 }

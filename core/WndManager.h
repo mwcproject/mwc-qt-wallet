@@ -118,6 +118,9 @@ public:
     virtual void pageMarketplace(bool selectMyOffers) = 0;
     // new offer of myMsgId is empty. Otherwise it is running offer update
     virtual void pageNewUpdateOffer(QString myMsgId) = 0;
+
+    // Show dialog that enforce setup of backup directory
+    virtual void showSwapBackupDlg() = 0;
 };
 
 void setWndManager(WndManager * mgr);

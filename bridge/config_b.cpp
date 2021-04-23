@@ -397,15 +397,12 @@ void Config::setMktPlaceSelectedBtn(int btn) {
     getAppContext()->setMktPlaceSelectedBtn(btn);
 }
 
-void Config::setSwapMktFilter( double minFeeLevel, bool selling, const QString & currency, double minMwcAmount, double maxMwcAmount) {
-    getAppContext()->setSwapMktFilter( minFeeLevel, selling, currency, minMwcAmount, maxMwcAmount);
-}
 
 double Config::getSwapMktMinFeeLevel() {
     return getAppContext()->getSwapMktMinFeeLevel();
 }
 
-bool Config::getSwapMktSelling() {
+int Config::getSwapMktSelling() {
     return getAppContext()->getSwapMktSelling();
 }
 
@@ -413,12 +410,16 @@ QString Config::getSwapMktCurrency() {
     return getAppContext()->getSwapMktCurrency();
 }
 
-double Config::getSwapMktMinMwcAmount() {
-    return getAppContext()->getSwapMktMinMwcAmount();
+void Config::setSwapMktMinFeeLevel(double fee) {
+    getAppContext()->setSwapMktMinFeeLevel(fee);
 }
 
-double Config::getSwapMktMaxMwcAmount() {
-    return getAppContext()->getSwapMktMaxMwcAmount();
+void Config::setSwapMktSelling(int buySellBoth) {
+    getAppContext()->setSwapMktSelling(buySellBoth);
+}
+
+void Config::setSwapMktCurrency(QString currency) {
+    getAppContext()->setSwapMktCurrency(currency);
 }
 
 

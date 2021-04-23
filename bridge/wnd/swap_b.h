@@ -162,6 +162,10 @@ public:
 
     // Tweak the swap trade state. ONLY for dev help usage.
     Q_INVOKABLE void adjustTradeState(QString swapId, QString newState);
+
+    // Verify swap trades backup dir. In case of error, it shows the message.
+    // Return true if current backup dir is valid. Otherwise - false
+    Q_INVOKABLE bool verifyBackupDir(QString backupDir, bool showErrorMessage);
 signals:
     // Result of deleteSwapTrade call.
     void sgnDeleteSwapTrade(QString swapId, QString error);

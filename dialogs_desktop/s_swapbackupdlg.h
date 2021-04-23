@@ -14,7 +14,7 @@
 
 #ifndef S_SWAPBACKUPDLG_H
 #define S_SWAPBACKUPDLG_H
-/*
+
 #include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
@@ -24,7 +24,6 @@ class SwapBackupDlg;
 namespace bridge {
 class Config;
 class Swap;
-class Util;
 }
 
 namespace dlg {
@@ -36,29 +35,23 @@ class SwapBackupDlg : public control::MwcDialog
 public:
     // QString swapId - swap to backup
     // int backupId - id for this backup. On success it will be updated.
-    explicit SwapBackupDlg(QWidget *parent, QString swapId, int backupId);
+    explicit SwapBackupDlg(QWidget *parent );
     ~SwapBackupDlg();
 
+protected:
+    // Disabling close by rejection
+    virtual void reject() override {}
+
 private slots:
-    void sgnBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage);
-
-    void on_selectPath_clicked();
-    void on_skipButton_clicked();
-    void on_backupButton_clicked();
-    void on_backupDataPath_textEdited(const QString &str);
-
-private:
-    void updateButtons();
+    void on_selectBackupDirBtn_clicked();
+    void on_okBtn_clicked();
 
 private:
     Ui::SwapBackupDlg *ui;
-    QString swapId;
-    int     backupId = 0;
     bridge::Config * config = nullptr;
     bridge::Swap * swap = nullptr;
-    bridge::Util * util = nullptr;
 };
 
-}*/
+}
 
 #endif // S_SWAPBACKUPDLG_H

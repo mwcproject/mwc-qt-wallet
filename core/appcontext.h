@@ -240,12 +240,13 @@ public:
     int getMktPlaceSelectedBtn() const {return mktPlaceSelectedBtn;}
     void setMktPlaceSelectedBtn(int btn);
 
-    void setSwapMktFilter( double minFeeLevel, bool selling, const QString & currency, double minMwcAmount, double maxMwcAmount);
     double getSwapMktMinFeeLevel() const {return mktPlaceMinFeeLevel;}
-    bool getSwapMktSelling() const {return mktPlaceSelling;}
+    int getSwapMktSelling() const {return mktPlaceSelling;}
     QString getSwapMktCurrency() const {return mktPlaceCurrency;}
-    double getSwapMktMinMwcAmount() const {return mktPlaceMinMwcAmount;}
-    double getSwapMktMaxMwcAmount() const {return mktPlaceMaxMwcAmount;}
+
+    void setSwapMktMinFeeLevel(double fee);
+    void setSwapMktSelling(int value);
+    void setSwapMktCurrency(QString currency);
 
 private:
 signals:
@@ -379,10 +380,8 @@ private:
     int mktPlaceSelectedBtn = 0;
 
     double mktPlaceMinFeeLevel = 0.0001;
-    bool mktPlaceSelling = true;
+    qint8  mktPlaceSelling = 0; // 0 - buy, 1 - sell, 2 - all
     QString mktPlaceCurrency = "BTC";
-    double mktPlaceMinMwcAmount = 0.0;
-    double mktPlaceMaxMwcAmount = 0.0;
 };
 
 template <class T>

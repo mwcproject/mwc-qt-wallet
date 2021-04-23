@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>838</width>
-    <height>412</height>
+    <width>839</width>
+    <height>467</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,127 +40,17 @@
     </font>
    </property>
    <property name="text">
-    <string>Backup trade XXXXXX</string>
+    <string>Setup your backup directory</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="control::MwcLabelNormal" name="label1">
+  <widget class="control::MwcPushButtonNormal" name="okBtn">
    <property name="geometry">
     <rect>
-     <x>55</x>
-     <y>75</y>
-     <width>726</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Please backup the data for the Swap Trade XXXXXXX. </string>
-   </property>
-  </widget>
-  <widget class="control::MwcLabelNormal" name="mainTextLabel">
-   <property name="geometry">
-    <rect>
-     <x>55</x>
-     <y>120</y>
-     <width>736</width>
-     <height>96</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>We strongly recommend that you backup the trade data to a separate data storage device, like a USB Drive. In case of storage failure this backup will be the only way to restore the trade and get access to your locked funds.</string>
-   </property>
-   <property name="wordWrap">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="control::MwcLineEditNormal" name="backupDataPath">
-   <property name="geometry">
-    <rect>
-     <x>55</x>
-     <y>255</y>
-     <width>596</width>
-     <height>40</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>0</width>
-     <height>40</height>
-    </size>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>200000</width>
-     <height>40</height>
-    </size>
-   </property>
-  </widget>
-  <widget class="control::MwcLabelSmall" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>55</x>
-     <y>235</y>
-     <width>576</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>16777215</width>
-     <height>22</height>
-    </size>
-   </property>
-   <property name="text">
-    <string>Backup file path</string>
-   </property>
-  </widget>
-  <widget class="control::MwcPushButtonNormal" name="selectPath">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>255</y>
-     <width>140</width>
-     <height>40</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>140</width>
-     <height>40</height>
-    </size>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>14000</width>
-     <height>40</height>
-    </size>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::StrongFocus</enum>
-   </property>
-   <property name="toolTip">
-    <string>Select the filename for the backup.</string>
-   </property>
-   <property name="text">
-    <string>Select</string>
-   </property>
-   <property name="autoDefault">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="control::MwcPushButtonNormal" name="backupButton">
-   <property name="geometry">
-    <rect>
-     <x>470</x>
-     <y>340</y>
+     <x>340</x>
+     <y>405</y>
      <width>160</width>
      <height>40</height>
     </rect>
@@ -184,7 +74,7 @@
     <string>Backup the data</string>
    </property>
    <property name="text">
-    <string>Backup</string>
+    <string>OK</string>
    </property>
    <property name="autoDefault">
     <bool>true</bool>
@@ -193,12 +83,31 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="control::MwcPushButtonNormal" name="skipButton">
+  <widget class="control::MwcLabelSmall" name="label_10">
    <property name="geometry">
     <rect>
-     <x>215</x>
-     <y>340</y>
-     <width>160</width>
+     <x>60</x>
+     <y>310</y>
+     <width>691</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>22</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>Swap trade backup directory</string>
+   </property>
+  </widget>
+  <widget class="control::MwcPushButtonNormal" name="selectBackupDirBtn">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>330</y>
+     <width>140</width>
      <height>40</height>
     </rect>
    </property>
@@ -210,20 +119,67 @@
    </property>
    <property name="maximumSize">
     <size>
-     <width>14000</width>
+     <width>140</width>
      <height>40</height>
     </size>
    </property>
-   <property name="focusPolicy">
-    <enum>Qt::StrongFocus</enum>
-   </property>
    <property name="toolTip">
-    <string>Skip the backup. I understand that I can loose my funds.</string>
+    <string>Select directory to backup swap trades</string>
    </property>
    <property name="text">
-    <string>Skip</string>
+    <string>Select</string>
    </property>
-   <property name="autoDefault">
+  </widget>
+  <widget class="control::MwcLineEditNormal" name="swapBackupDir">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>330</y>
+     <width>571</width>
+     <height>40</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>40</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>40</height>
+    </size>
+   </property>
+   <property name="toolTip">
+    <string>Swap trades backup directory.</string>
+   </property>
+   <property name="maxLength">
+    <number>64</number>
+   </property>
+  </widget>
+  <widget class="control::MwcLabelNormal" name="label">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>70</y>
+     <width>741</width>
+     <height>221</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Atomic swap trade backup directory is not properly set.  Please set it up before start trading.
+
+Trades data contains refund slates and private keys for the redeem operation. In case of a hardware failure you might lose this data and, as a result, you might lose your funds. That is why we strongly recommend to keep the copy of your trade data in a separate folder that point to the separate drive like a USB stick, NAS Storage, cloud synced directory like a Dropbox, One Cloud.
+
+If you have your backup, in worst case scenario you will be able to restore your MWC wallet from the mnemonic phrase, restore your atomic swap trades and complete it.
+
+Please note that swap trade files are encrypted so you can restore it into the wallet with the same seed.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+   <property name="wordWrap">
     <bool>true</bool>
    </property>
   </widget>

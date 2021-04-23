@@ -110,6 +110,7 @@ public:
     // Swap marketplace
     virtual void pageMarketplace(bool selectMyOffers) override;
     virtual void pageNewUpdateOffer(QString myMsgId) override;
+    virtual void showSwapBackupDlg() override;
 private:
     WindowManager * windowManager = nullptr;
     MainWindow    * mainWindow = nullptr;

@@ -22,6 +22,10 @@
 #include "../util_desktop/timeoutlock.h"
 #include "../dialogs_desktop/w_selectcontact.h"
 
+const int UPDATE_MWC = 1;
+const int UPDATE_SEC = 2;
+const int UPDATE_RATE = 3;
+
 namespace wnd {
 
 NewSwap1::NewSwap1(QWidget *parent) :
@@ -46,7 +50,13 @@ NewSwap1::NewSwap1(QWidget *parent) :
 
     ui->mwcAmountEdit->setText(swap->getMwc2Trade());
     ui->secAmountEdit->setText(swap->getSec2Trade());
-    updateRateValue();
+
+    if (!ui->mwcAmountEdit->text().isEmpty())
+        thirdValueUpdate.push_back(UPDATE_MWC);
+    if (!ui->secAmountEdit->text().isEmpty())
+        thirdValueUpdate.push_back(UPDATE_SEC);
+
+    updateThirdValue();
 
     ui->secAddressEdit->setText(swap->getSecAddress());
     ui->lockMwcFirstCheck->setChecked( swap->isLockMwcFirst() );
@@ -286,52 +296,79 @@ void NewSwap1::on_secCurrencyCombo_currentIndexChanged(int index) {
     updateSecCurrencyStatus();
 }
 
+void NewSwap1::updateThirdValue() {
+
+    bool mwcOk = false;
+    bool secOk = false;
+    bool rateOk = false;
+
+    double mwc = ui->mwcAmountEdit->text().toDouble(&mwcOk);
+    double sec = ui->secAmountEdit->text().toDouble(&secOk);
+    double rate = ui->swapRateEdit->text().toDouble(&rateOk);
+
+    if (thirdValueUpdate.size()<2)
+        return; // Just do nothing, there is nothing to update
+
+    QVector<int> three {UPDATE_MWC, UPDATE_SEC, UPDATE_RATE};
+    three.removeAll( thirdValueUpdate[thirdValueUpdate.size()-1] );
+    three.removeAll( thirdValueUpdate[thirdValueUpdate.size()-2] );
+    Q_ASSERT(three.size()==1);
+
+    switch( three[0] ) {
+        case UPDATE_MWC: {
+            if (secOk && rateOk && sec>0.0 && rate>0.0) {
+                ui->mwcAmountEdit->setText( util->trimStrAsDouble( QString::number( sec / rate, 'f', 6 ), 13) );
+            }
+            else {
+                ui->mwcAmountEdit->setText("");
+            }
+            break;
+        }
+        case UPDATE_SEC: {
+            if (mwcOk && rateOk && mwc>0.0 && rate>0.0) {
+                ui->secAmountEdit->setText( util->trimStrAsDouble( QString::number( mwc * rate, 'f', 6 ), 13) );
+            }
+            else {
+                ui->secAmountEdit->setText("");
+            }
+            break;
+        }
+        case UPDATE_RATE: {
+            if (mwcOk && secOk && mwc>0.0 && sec>0.0) {
+                ui->swapRateEdit->setText( util->trimStrAsDouble( QString::number( sec/mwc, 'f', 9 ), 13) );
+            }
+            else {
+                ui->swapRateEdit->setText("");
+            }
+            break;
+        }
+        default:
+            Q_ASSERT(false);
+    }
+}
+
 void NewSwap1::on_swapRateEdit_textEdited(const QString &arg1)
 {
     Q_UNUSED(arg1)
-    updateSecValue();
+    thirdValueUpdate.removeAll(UPDATE_RATE);
+    thirdValueUpdate.push_back(UPDATE_RATE);
+    updateThirdValue();
 }
 
 void NewSwap1::on_mwcAmountEdit_textEdited(const QString &arg1)
 {
     Q_UNUSED(arg1)
-    updateRateValue();
+    thirdValueUpdate.removeAll(UPDATE_MWC);
+    thirdValueUpdate.push_back(UPDATE_MWC);
+    updateThirdValue();
 }
 
 void NewSwap1::on_secAmountEdit_textEdited(const QString &arg1)
 {
     Q_UNUSED(arg1)
-    updateRateValue();
-}
-
-void NewSwap1::updateRateValue() {
-    bool mwcOk = false;
-    bool secOk = false;
-
-    double mwc = ui->mwcAmountEdit->text().toDouble(&mwcOk);
-    double sec = ui->secAmountEdit->text().toDouble(&secOk);
-
-    if (mwcOk && secOk && mwc>0.0 && sec>0.0) {
-        ui->swapRateEdit->setText( util->trimStrAsDouble( QString::number( sec/mwc, 'f', 9 ), 13) );
-    }
-    else {
-        ui->swapRateEdit->setText("");
-    }
-}
-
-void NewSwap1::updateSecValue() {
-    bool mwcOk = false;
-    bool rateOk = false;
-
-    double mwc = ui->mwcAmountEdit->text().toDouble(&mwcOk);
-    double rate = ui->swapRateEdit->text().toDouble(&rateOk);
-
-    if (mwcOk && rateOk && mwc>0.0 && rate>0.0) {
-        ui->secAmountEdit->setText( util->trimStrAsDouble( QString::number( mwc * rate, 'f', 6 ), 13) );
-    }
-    else {
-        ui->secAmountEdit->setText("");
-    }
+    thirdValueUpdate.removeAll(UPDATE_SEC);
+    thirdValueUpdate.push_back(UPDATE_SEC);
+    updateThirdValue();
 }
 
 void NewSwap1::on_sendAddressEdit_textEdited(const QString & arg1)

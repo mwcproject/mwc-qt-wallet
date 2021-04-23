@@ -71,8 +71,10 @@ QVector<QString> SwapMarketplace::getMyOffers() {
 }
 
 // JSon strings with MktSwapOffer. Requesting marketplace offers with filtering
-QVector<QString> SwapMarketplace::getMarketOffers(double minFeeLevel, bool selling, QString currency, double minMwcAmount, double maxMwcAmount) const {
-    QVector<state::MktSwapOffer> offers = getSwapMkt()->getMarketOffers(minFeeLevel, selling, currency, minMwcAmount, maxMwcAmount);
+// selling: 0 - buy, 1-sell, 2 - all
+// currency: empty value for all
+QVector<QString> SwapMarketplace::getMarketOffers(double minFeeLevel, int selling, QString currency) const {
+    QVector<state::MktSwapOffer> offers = getSwapMkt()->getMarketOffers(minFeeLevel, selling, currency);
     QVector<QString> res;
     for (const auto & o : offers) {
         res.push_back(o.toJsonStr());

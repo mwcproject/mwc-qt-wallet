@@ -52,6 +52,7 @@
 #include "../windows_desktop/s_tradedetails_w.h"
 #include "../windows_desktop/s_mrktswlist_w.h"
 #include "../windows_desktop/s_mrktswapnew_w.h"
+#include "../dialogs_desktop/s_mktshowparamsdlg_d.h"
 #include <QFileDialog>
 #include "../core/WalletApp.h"
 #include <QMessageBox>
@@ -383,6 +384,11 @@ void DesktopWndManager::pageMarketplace(bool selectMyOffers) {
 void DesktopWndManager::pageNewUpdateOffer(QString myMsgId) {
     windowManager->switchToWindowEx( mwc::PAGE_S_MKT_NEW_OFFER,
                                      new wnd::MrktSwapNew( windowManager->getInWndParent(), myMsgId));
+}
+
+void DesktopWndManager::showSwapBackupDlg() {
+    dlg::SwapBackupDlg dlg(nullptr);
+    dlg.exec();
 }
 
 

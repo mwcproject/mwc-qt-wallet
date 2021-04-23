@@ -111,6 +111,8 @@ public:
 
     virtual void pageMarketplace(bool selectMyOffers) override;
     virtual void pageNewUpdateOffer(QString myMsgId) override;
+
+    virtual void showSwapBackupDlg() override;
 private:
     QQmlApplicationEngine * engine = nullptr;
     QObject * mainWindow = nullptr;

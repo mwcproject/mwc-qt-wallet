@@ -51,6 +51,7 @@ private slots:
     void on_offerExpirationCombo_currentIndexChanged(int index);
     void on_mwcBlocksEdit_textEdited(const QString &arg1);
     void on_secBlocksEdit_textEdited(const QString &arg1);
+    void on_secTransFeeEdit_textEdited(const QString &arg1);
 
 private:
     void initTimeIntervalCombo(control::MwcComboBox * timeIntervalCombo, int interval2select);

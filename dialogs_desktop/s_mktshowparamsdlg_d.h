@@ -17,6 +17,7 @@
 
 #include "../control_desktop/mwcdialog.h"
 
+/*
 namespace Ui {
 class MktShowParamsDlg;
 }
@@ -52,6 +53,6 @@ private:
     double maxMwcAmount;
 };
 
-}
+}*/
 
 #endif // S_MKTSHOWPARAMSDLG_D_H

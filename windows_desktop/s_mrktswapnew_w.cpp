@@ -22,6 +22,10 @@
 #include <QDebug>
 #include "../control_desktop/messagebox.h"
 
+const int UPDATE_MWC = 1;
+const int UPDATE_SEC = 2;
+const int UPDATE_RATE = 3;
+
 namespace wnd {
 
 MrktSwapNew::MrktSwapNew(QWidget *parent, QString myMsgId) :
@@ -81,21 +85,28 @@ MrktSwapNew::MrktSwapNew(QWidget *parent, QString myMsgId) :
 
         ui->mwcAmountEdit->setText(QString::number(offer.offer.mwcAmount));
         ui->secAmountEdit->setText(QString::number(offer.offer.secAmount));
+        thirdValueUpdate.push_back(UPDATE_MWC);
+        thirdValueUpdate.push_back(UPDATE_SEC);
         ui->secAddressEdit->setText( offer.secAddress );
         ui->noteEdit->setText(offer.note);
     }
 
-    if (!offer.offer.secondaryCurrency.isEmpty())
+    if (!offer.offer.secondaryCurrency.isEmpty()) {
         swap->setCurrentSecCurrency(offer.offer.secondaryCurrency);
+    }
 
     updateSecCurrencyData();
-    updateRateValue();
+    updateThirdValue();
 
     onSgnWalletBalanceUpdated();
 
     // Fee need to be updated at the end becuase currency tab does reset to the default one.
     if ( !offer.offer.id.isEmpty() ) {
-        ui->secTransFeeEdit->setText( QString::number(offer.secFee) );
+        QString feeStr = QString::number(offer.secFee);
+        if (ui->secTransFeeEdit->text() != feeStr) {
+            ui->secTransFeeEdit->setText(feeStr);
+            ui->secTransFeeLabel2->hide();
+        }
     }
 }
 
@@ -109,7 +120,7 @@ void MrktSwapNew::updateSecCurrencyData() {
 
     QVector<QString> curList = swap->secondaryCurrencyList();
     QString selectedCur = swap->getCurrentSecCurrency();
-    int selectedIdx = -1;
+    int selectedIdx = 0;
     for ( int i=0; i<curList.size(); i++) {
         const auto & c = curList[i];
         ui->secCurrencyCombo->addItem( c, QVariant(c));
@@ -140,42 +151,71 @@ void MrktSwapNew::updateSecCurrencyStatus() {
 
     ui->secTransFeeLabel->setText(selectedCur + " transaction fee:");
     ui->secFeeUnitsLabel->setText(swap->getCurrentSecCurrencyFeeUnits());
+    ui->secBlocksLabel->setText(selectedCur);
+
+    ui->secTransFeeLabel2->setText("(Recommended transaction fee)");
 
     double fee = swap->getSecTransactionFee(selectedCur);
-    if (fee>0)
-        ui->secTransFeeEdit->setText( util->trimStrAsDouble( QString::number( fee, 'f'), 5 ) );
+    if (fee>0) {
+        ui->secTransFeeEdit->setText(util->trimStrAsDouble(QString::number(fee, 'f'), 5));
+        ui->secTransFeeLabel2->show();
+    }
+    else {
+        ui->secTransFeeLabel2->hide();
+    }
 
     ui->secLockCurrencyLabel->setText(selectedCur);
     ui->secBlocksEdit->setText( QString::number(swap->getSecConfNumber(selectedCur)) );
 }
 
-void MrktSwapNew::updateRateValue() {
+void MrktSwapNew::updateThirdValue() {
+
     bool mwcOk = false;
     bool secOk = false;
-
-    double mwc = ui->mwcAmountEdit->text().toDouble(&mwcOk);
-    double sec = ui->secAmountEdit->text().toDouble(&secOk);
-
-    if (mwcOk && secOk && mwc>0.0 && sec>0.0) {
-        ui->swapRateEdit->setText( util->trimStrAsDouble( QString::number( sec/mwc, 'f', 9 ), 13) );
-    }
-    else {
-        ui->swapRateEdit->setText("");
-    }
-}
-
-void MrktSwapNew::updateSecValue() {
-    bool mwcOk = false;
     bool rateOk = false;
 
     double mwc = ui->mwcAmountEdit->text().toDouble(&mwcOk);
+    double sec = ui->secAmountEdit->text().toDouble(&secOk);
     double rate = ui->swapRateEdit->text().toDouble(&rateOk);
 
-    if (mwcOk && rateOk && mwc>0.0 && rate>0.0) {
-        ui->secAmountEdit->setText( util->trimStrAsDouble( QString::number( mwc * rate, 'f', 6 ), 13) );
-    }
-    else {
-        ui->secAmountEdit->setText("");
+    if (thirdValueUpdate.size()<2)
+        return; // Just do nothing, there is nothing to update
+
+    QVector<int> three {UPDATE_MWC, UPDATE_SEC, UPDATE_RATE};
+    three.removeAll( thirdValueUpdate[thirdValueUpdate.size()-1] );
+    three.removeAll( thirdValueUpdate[thirdValueUpdate.size()-2] );
+    Q_ASSERT(three.size()==1);
+
+    switch( three[0] ) {
+        case UPDATE_MWC: {
+            if (secOk && rateOk && sec>0.0 && rate>0.0) {
+                ui->mwcAmountEdit->setText( util->trimStrAsDouble( QString::number( sec / rate, 'f', 6 ), 13) );
+            }
+            else {
+                ui->mwcAmountEdit->setText("");
+            }
+            break;
+        }
+        case UPDATE_SEC: {
+            if (mwcOk && rateOk && mwc>0.0 && rate>0.0) {
+                ui->secAmountEdit->setText( util->trimStrAsDouble( QString::number( mwc * rate, 'f', 6 ), 13) );
+            }
+            else {
+                ui->secAmountEdit->setText("");
+            }
+            break;
+        }
+        case UPDATE_RATE: {
+            if (mwcOk && secOk && mwc>0.0 && sec>0.0) {
+                ui->swapRateEdit->setText( util->trimStrAsDouble( QString::number( sec/mwc, 'f', 9 ), 13) );
+            }
+            else {
+                ui->swapRateEdit->setText("");
+            }
+            break;
+        }
+        default:
+            Q_ASSERT(false);
     }
 }
 
@@ -228,8 +268,6 @@ void MrktSwapNew::on_buySellCombo_currentIndexChanged(int index) {
 }
 
 void MrktSwapNew::on_mwcAmountEdit_textChanged(const QString &mwcAmount) {
-    updateRateValue();
-
     bool ok = false;
     double mwc = mwcAmount.toDouble(&ok);
     if (ok) {
@@ -248,14 +286,25 @@ void MrktSwapNew::on_secCurrencyCombo_currentIndexChanged(int index) {
     updateSecCurrencyStatus();
 }
 
+void MrktSwapNew::on_mwcAmountEdit_textEdited(const QString &arg1) {
+    Q_UNUSED(arg1)
+    thirdValueUpdate.removeAll(UPDATE_MWC);
+    thirdValueUpdate.push_back(UPDATE_MWC);
+    updateThirdValue();
+}
+
 void MrktSwapNew::on_secAmountEdit_textEdited(const QString &arg1) {
     Q_UNUSED(arg1)
-    updateRateValue();
+    thirdValueUpdate.removeAll(UPDATE_SEC);
+    thirdValueUpdate.push_back(UPDATE_SEC);
+    updateThirdValue();
 }
 
 void MrktSwapNew::on_swapRateEdit_textEdited(const QString &arg1) {
     Q_UNUSED(arg1)
-    updateSecValue();
+    thirdValueUpdate.removeAll(UPDATE_RATE);
+    thirdValueUpdate.push_back(UPDATE_RATE);
+    updateThirdValue();
 }
 
 void MrktSwapNew::on_swapRateHelpBtn_clicked() {
@@ -403,5 +452,10 @@ void MrktSwapNew::onSgnApplyNewTrade1Params(bool ok, QString errorMessage) {
     control::MessageBox::messageText(this, "Incorrect Input", errorMessage);
 }
 
+void MrktSwapNew::on_secTransFeeEdit_textEdited(const QString &arg1)
+{
+    Q_UNUSED(arg1)
+    ui->secTransFeeLabel2->hide();
+}
 
 }

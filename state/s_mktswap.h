@@ -126,7 +126,7 @@ struct MySwapOffer {
     QJsonObject toJson() const;
     QString toJsonStr() const;
 
-    QString getStatusStr() const;
+    QString getStatusStr(int tipHeight) const;
 
     // Offer description for user. Sell XX MWC for XX BTC
     QString getOfferDescription() const;
@@ -158,7 +158,9 @@ public:
 
     QVector<MySwapOffer> getMyOffers() const {return myOffers;}
     // Request marketplace offers with filtering
-    QVector<MktSwapOffer> getMarketOffers(double minFeeLevel, bool selling, QString currency, double minMwcAmount, double maxMwcAmount );
+    // selling: 0 - buy, 1-sell, 2 - all
+    // currency: empty value for all
+    QVector<MktSwapOffer> getMarketOffers(double minFeeLevel, int selling, QString currency);
     // All marketplace offers that are published buy currency. Sorted by largest number
     QVector<QPair<QString,int>> getTotalOffers();
 

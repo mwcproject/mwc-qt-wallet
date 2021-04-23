@@ -815,48 +815,124 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <widget class="QWidget" name="filterPlaceholder" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="spacing">
-       <number>20</number>
-      </property>
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>15</number>
-      </property>
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,1">
       <item>
-       <widget class="control::MwcLabelNormal" name="filterSettings">
-        <property name="text">
-         <string>Currencies: BTC,  ZCash     Fees: Normal     Range : 1 - 1000 MWC</string>
+       <widget class="control::MwcComboBox" name="buySellCombo">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="control::MwcPushButtonNormal" name="offersListenSettingsBtn">
         <property name="minimumSize">
          <size>
-          <width>150</width>
+          <width>120</width>
           <height>40</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>150</width>
+          <width>120</width>
           <height>40</height>
          </size>
         </property>
-        <property name="toolTip">
-         <string>Change filtering options for marketplace offers</string>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
+        <property name="toolTip">
+         <string>Currency that you want to swap with</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Buy</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Sell</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Buy/Sell</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_7">
         <property name="text">
-         <string>Filter</string>
+         <string>MWC for </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="control::MwcComboBox" name="secCurrencyCombo">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>100</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Currency that you want to swap with</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Minimal fee:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="control::MwcComboBox" name="filterFeeLevel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>230</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>230</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Time reserved to redeem the coins</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="statusLabel">
+        <property name="text">
+         <string>Status: </string>
         </property>
        </widget>
       </item>
@@ -1056,9 +1132,14 @@ p, li { white-space: pre-wrap; }
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
@@ -1066,9 +1147,9 @@ p, li { white-space: pre-wrap; }
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control_desktop/MwcLineEdit.h</header>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcComboBox</class>
@@ -1091,11 +1172,6 @@ p, li { white-space: pre-wrap; }
    <extends>QToolButton</extends>
    <header>control_desktop/MwcToolButton.h</header>
   </customwidget>
-  <customwidget>
-   <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>marketOffers</tabstop>
@@ -1106,7 +1182,9 @@ p, li { white-space: pre-wrap; }
   <tabstop>mwcReservedFee</tabstop>
   <tabstop>activeFees</tabstop>
   <tabstop>withdrawFeesBtn</tabstop>
-  <tabstop>offersListenSettingsBtn</tabstop>
+  <tabstop>buySellCombo</tabstop>
+  <tabstop>secCurrencyCombo</tabstop>
+  <tabstop>filterFeeLevel</tabstop>
  </tabstops>
  <resources>
   <include location="../resources_desktop.qrc"/>

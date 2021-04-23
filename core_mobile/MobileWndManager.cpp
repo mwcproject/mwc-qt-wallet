@@ -419,5 +419,9 @@ void MobileWndManager::pageNewUpdateOffer(QString myMsgId) {
     Q_ASSERT(false); // implement me
 }
 
+void MobileWndManager::showSwapBackupDlg() {
+    Q_ASSERT(false); // implement me
+}
+
 
 }

@@ -505,11 +505,16 @@ void Swap::initiateNewTrade() {
     showNewTrade1();
 }
 
-bool Swap::verifyBackupDir() {
-    QString backupDir = context->appContext->getSwapBackupDir();
+bool Swap::verifyBackupDir(QString backupDir, bool showErrorMessage) {
+    if (backupDir.isEmpty())
+        backupDir = context->appContext->getSwapBackupDir();
+
     if (backupDir.isEmpty() || !QDir(backupDir).exists()) {
-        pageTradeList(false, false, true);
-        core::getWndManager()->messageTextDlg("Warning", "Atomic swap trade backup directory is not properly set. Please set it up before start trading.");
+        if (showErrorMessage) {
+            core::getWndManager()->showSwapBackupDlg();
+            // it is ok only dialog, so second call should pass
+            return verifyBackupDir();
+        }
         return false;
     }
 

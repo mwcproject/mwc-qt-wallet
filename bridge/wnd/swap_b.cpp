@@ -734,6 +734,13 @@ void Swap::adjustTradeState(QString swapId, QString newState) {
     getWallet()->adjustTradeState(swapId, newState);
 }
 
+// Verify swap trades backup dir. In case of error, it shows the message.
+// Return true if current backup dir is valid. Otherwise - false
+bool Swap::verifyBackupDir(QString backupDir, bool showErrorMessage) {
+    return getSwap()->verifyBackupDir(backupDir, showErrorMessage);
+}
+
+
 QString Swap::getNote() {
     return getSwap()->getNote();
 }

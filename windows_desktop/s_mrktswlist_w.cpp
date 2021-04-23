@@ -15,12 +15,12 @@
 #include "s_mrktswlist_w.h"
 #include "ui_s_mrktswlist_w.h"
 #include "../bridge/wnd/swapmkt_b.h"
+#include "../bridge/wnd/swap_b.h"
 #include "../bridge/config_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/util_b.h"
 #include <QDebug>
 #include "../control_desktop/messagebox.h"
-#include "../dialogs_desktop/s_mktshowparamsdlg_d.h"
 #include "../util_desktop/timeoutlock.h"
 #include <QTimer>
 
@@ -28,8 +28,8 @@ namespace wnd {
 
 QString feeLevelValToStr(double feeLevel) {
     for (const auto &f : MKT_FEES) {
-        if (feeLevel > f.second - 0.0001)
-            return f.first;
+        if (feeLevel > f.fee - 0.0001)
+            return f.shortName;
     }
     return "Dust";
 }
@@ -42,6 +42,7 @@ MrktSwList::MrktSwList(QWidget *parent, bool selectMyOffers) :
 
     config = new bridge::Config(this);
     swapMarketplace = new bridge::SwapMarketplace(this);
+    swap = new bridge::Swap(this);
     wallet = new bridge::Wallet(this);
     util = new bridge::Util(this);
 
@@ -65,10 +66,10 @@ MrktSwList::MrktSwList(QWidget *parent, bool selectMyOffers) :
     double currentFee = swapMarketplace->getFeeLevel();
     int selected = MKT_FEES.size() / 2;
     for (const auto &f : MKT_FEES) {
-        if (currentFee < f.second + 0.0001)
+        if (currentFee < f.fee + 0.0001)
             selected = ui->feeLevel->count();
 
-        ui->feeLevel->addItem(f.first, QVariant::fromValue(f.second));
+        ui->feeLevel->addItem(f.longName, QVariant::fromValue(f.fee));
     }
     ui->feeLevel->setCurrentIndex(selected);
 
@@ -90,6 +91,18 @@ MrktSwList::MrktSwList(QWidget *parent, bool selectMyOffers) :
     ui->depositAccountName->setCurrentIndex(selectedAcc);
 
     ui->mwcReservedFee->setText(QString::number(swapMarketplace->getFeeReservedAmount()));
+
+    QVector<QString> scList = swap->secondaryCurrencyList();
+    ui->secCurrencyCombo->addItem("All", "");
+    for (int i=0; i<scList.size(); i++) {
+        const auto & sc = scList[i];
+        ui->secCurrencyCombo->addItem(sc, sc);
+    }
+    for (const auto &f : wnd::MKT_FEES) {
+        ui->filterFeeLevel->addItem(f.longName, QVariant::fromValue(f.fee));
+    }
+
+    controlsReady = true;
 
     swapMarketplace->requestIntegrityFees();
 
@@ -135,28 +148,24 @@ void MrktSwList::updateModeButtons(int btnId) {
 }
 
 void MrktSwList::updateMktFilter() {
-    QString status = (config->getSwapMktSelling() ? "Sell MWC for " + config->getSwapMktCurrency() : "Buy MWC for " +
-                                                                                                     config->getSwapMktCurrency()) +
-                     "  Fee: " + feeLevelValToStr(config->getSwapMktMinFeeLevel());
+    int mktSelling = config->getSwapMktSelling();
+    QString currency = config->getSwapMktCurrency();
+    double fee = config->getSwapMktMinFeeLevel();
 
-    double mwcMin = config->getSwapMktMinMwcAmount();
-    double mwcMax = config->getSwapMktMaxMwcAmount();
-    if (mwcMin > 0.0) {
-        if (mwcMax > 0.0)
-            status += "   Range: " + QString::number(mwcMin) + " - " + QString::number(mwcMax) + " MWC";
-        else
-            status += "   Range: more than " + QString::number(mwcMin) + " MWC";
-    } else {
-        if (mwcMax > 0.0)
-            status += "   Range: less than " + QString::number(mwcMax) + " MWC";
-        else
-            status += "   Range: All";
+    ui->buySellCombo->setCurrentIndex(mktSelling);
+    ui->secCurrencyCombo->setCurrentIndex(ui->secCurrencyCombo->findData(currency));
+    int idx = wnd::MKT_FEES.size()-1;
+    for( ;idx>=0; idx--) {
+        if (fee < wnd::MKT_FEES[idx].fee + 0.0001) {
+            ui->filterFeeLevel->setCurrentIndex(idx);
+            break;
+        }
     }
 
-    status += "    Status: " + swapMarketplace->getOffersListeningStatus();
+    QString status = "  " + swapMarketplace->getOffersListeningStatus();
 
     QVector<QString> offers = swapMarketplace->getTotalOffers();
-    status += "    Found Offers: ";
+    status += "   Offers: ";
     if (offers.isEmpty()) {
         status += "None";
     }
@@ -169,7 +178,41 @@ void MrktSwList::updateMktFilter() {
         }
     };
 
-    ui->filterSettings->setText(status);
+    ui->statusLabel->setText(status);
+}
+
+void MrktSwList::on_buySellCombo_currentIndexChanged(int index)
+{
+    if (!controlsReady)
+        return;
+
+    if (index>=0) {
+        config->setSwapMktSelling(index);
+        updateTradeListData(true);
+    }
+}
+
+void MrktSwList::on_secCurrencyCombo_currentIndexChanged(int index)
+{
+    if (!controlsReady)
+        return;
+
+    if (index>=0) {
+        config->setSwapMktCurrency( ui->secCurrencyCombo->currentData().toString() );
+        updateTradeListData(true);
+    }
+}
+
+void MrktSwList::on_filterFeeLevel_currentIndexChanged(int index)
+{
+    if (!controlsReady)
+        return;
+
+    if (index>=0) {
+        double fee = ui->filterFeeLevel->currentData().toDouble();
+        config->setSwapMktMinFeeLevel( fee );
+        updateTradeListData(true);
+    }
 }
 
 void MrktSwList::updateTradeListData(bool resetScrollValue) {
@@ -195,7 +238,7 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
                 itm->addWidget(control::createLabel(itm, false, false,
                                                     QString::number(offer.offer.mwcAmount) + " MWC " + QChar(0x279E) +
                                                     " " + QString::number(offer.offer.secAmount) +
-                                                    " " + offer.offer.secondaryCurrency + " ;  "+ offer.offer.calcRateAsStr() + " ;  " + (hasTor ? offer.getStatusStr() : "Waiting for TOR...")   ));
+                                                    " " + offer.offer.secondaryCurrency + " ;  "+ offer.offer.calcRateAsStr() + " ;  " + (hasTor ? offer.getStatusStr(lastNodeHeight) : "Waiting for TOR...")   ));
             } else {
                 itm->addWidget(
                         control::createIcon(itm, ":/img/iconReceived@2x.svg", control::ROW_HEIGHT,
@@ -204,7 +247,7 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
                                                     QString::number(offer.offer.secAmount) + " " +
                                                     offer.offer.secondaryCurrency + " " +
                                                     QChar(0x279E) + " " +
-                                                    QString::number(offer.offer.mwcAmount) + " MWC" + " ;  "+ offer.offer.calcRateAsStr() +" ;  " + (hasTor ? offer.getStatusStr() : "Waiting for TOR...") ));
+                                                    QString::number(offer.offer.mwcAmount) + " MWC" + " ;  "+ offer.offer.calcRateAsStr() +" ;  " + (hasTor ? offer.getStatusStr(lastNodeHeight) : "Waiting for TOR...") ));
             }
 //            itm->setMinWidth(275);
 //            itm->addWidget(control::createLabel(itm, false, true, "Auto renew: Yes"));
@@ -291,9 +334,7 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
     if (selectedTab == BTN_MKT_OFFERS) {
         QVector<QString> offersStr = swapMarketplace->getMarketOffers(config->getSwapMktMinFeeLevel(),
                                                                       config->getSwapMktSelling(),
-                                                                      config->getSwapMktCurrency(),
-                                                                      config->getSwapMktMinMwcAmount(),
-                                                                      config->getSwapMktMaxMwcAmount());
+                                                                      config->getSwapMktCurrency());
 
         for (auto &s : offersStr) {
             state::MktSwapOffer offer(s);
@@ -436,7 +477,7 @@ void MrktSwList::pushIntegritySettings() {
     double mwcAmount = ui->mwcReservedFee->text().toDouble(&ok);
     int idx = ui->feeLevel->currentIndex();
     if (ok && idx >= 0 && idx < MKT_FEES.length()) {
-        swapMarketplace->setIntegritySettings(MKT_FEES[idx].second, ui->depositAccountName->currentText(), mwcAmount);
+        swapMarketplace->setIntegritySettings(MKT_FEES[idx].fee, ui->depositAccountName->currentText(), mwcAmount);
     }
 }
 
@@ -507,7 +548,7 @@ void MrktSwList::on_newOfferButton_clicked() {
     swapMarketplace->pageCreateNewOffer("");
 }
 
-void MrktSwList::on_offersListenSettingsBtn_clicked() {
+/*void MrktSwList::on_offersListenSettingsBtn_clicked() {
     util::TimeoutLockObject to("SwapBackupDlg");
 
     dlg::MktShowParamsDlg params(this, config->getSwapMktMinFeeLevel(), config->getSwapMktSelling(),
@@ -525,7 +566,7 @@ void MrktSwList::on_offersListenSettingsBtn_clicked() {
         updateMktFilter();
         updateTradeListData(true);
     }
-}
+}*/
 
 void MrktSwList::sgnMarketPlaceOffersChanged() {
     ui->progress->hide();
@@ -613,6 +654,5 @@ void MrktSwList::sgnWithdrawIntegrityFees(QString error, double mwc, QString acc
         control::MessageBox::messageText(this, "Withdraw error", error);
     }
 }
-
 
 }

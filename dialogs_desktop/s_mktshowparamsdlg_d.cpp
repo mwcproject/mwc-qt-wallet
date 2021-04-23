@@ -19,6 +19,7 @@
 #include "../bridge/wnd/swap_b.h"
 #include "../control_desktop/messagebox.h"
 
+/*
 namespace dlg {
 
 MktShowParamsDlg::MktShowParamsDlg(QWidget *parent, double _feeLevel, bool _selling, const QString & _secondaryCurrency, double _minMwcAmount, double _maxMwcAmount) :
@@ -36,10 +37,10 @@ MktShowParamsDlg::MktShowParamsDlg(QWidget *parent, double _feeLevel, bool _sell
 
     int selected = wnd::MKT_FEES.size() / 2;
     for (const auto &f : wnd::MKT_FEES) {
-        if (feeLevel < f.second + 0.0001)
+        if (feeLevel < f.fee + 0.0001)
             selected = ui->feeLevel->count();
 
-        ui->feeLevel->addItem(f.first, QVariant::fromValue(f.second));
+        ui->feeLevel->addItem(f.longName, QVariant::fromValue(f.fee));
     }
     ui->feeLevel->setCurrentIndex(selected);
 
@@ -127,4 +128,4 @@ void MktShowParamsDlg::on_applyButton_clicked() {
     accept();
 }
 
-}
+}*/

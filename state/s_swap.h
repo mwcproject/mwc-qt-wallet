@@ -162,7 +162,8 @@ public:
     bool isSwapExist(QString tag) const;
 
     // Verify if trade backup dir is valid. If not, then ask user to fix that
-    bool verifyBackupDir();
+    // if backupDir empty, will use config value
+    bool verifyBackupDir(QString backupDir="", bool showErrorMessage=true);
 
     // Stop run Mkt Non winners
     void stopMktTrades(QString tag, QString winnerTradeUuid);

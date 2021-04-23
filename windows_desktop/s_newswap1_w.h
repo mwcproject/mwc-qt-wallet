@@ -40,8 +40,8 @@ public:
 private:
     void updateSecCurrencyData();
     void updateSecCurrencyStatus();
-    void updateRateValue();
-    void updateSecValue();
+
+    void updateThirdValue();
 
     double getSelectedAccountBalance(QString account);
 private slots:
@@ -65,6 +65,8 @@ private:
     bridge::Wallet * wallet = nullptr;
     bridge::Util * util = nullptr;
     bridge::Config * config = nullptr;
+
+    QVector<int> thirdValueUpdate;
 };
 
 }

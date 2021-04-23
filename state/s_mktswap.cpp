@@ -188,13 +188,16 @@ QString MySwapOffer::toJsonStr() const {
     return doc.toJson(QJsonDocument::Compact);
 };
 
-QString MySwapOffer::getStatusStr() const {
+QString MySwapOffer::getStatusStr(int tipHeight) const {
     switch (status) {
         case OFFER_STATUS::PENDING: {
             return "Preparing...";
         }
         case OFFER_STATUS::STARTING: {
-            return "Starting...";
+            if (tipHeight>0 && integrityFee.expiration_height - tipHeight > 1440)
+                return "Starting, waiting for " + QString::number(integrityFee.expiration_height-tipHeight-1440) + " blocks";
+            else
+                return "Starting...";
         }
         case OFFER_STATUS::RUNNING: {
             return "Broadcasting";
@@ -385,7 +388,9 @@ QString SwapMarketplace::withdrawMyOffer(QString offerId) {
 
 
 // Request marketplace offers with filtering
-QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, bool selling, QString currency, double minMwcAmount, double maxMwcAmount ) {
+// selling: 0 - buy, 1-sell, 2 - all
+// currency: empty value for all
+QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, int selling, QString currency ) {
     cleanMarketOffers();
 
     int64_t timeLimit = QDateTime::currentSecsSinceEpoch() - OFFER_PUBLISHING_INTERVAL_SEC*2;
@@ -395,13 +400,16 @@ QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, bool 
         if (ofr.timestamp < timeLimit)
             continue;
 
-        if ( ofr.sell == selling && ofr.getFeeLevel() >= minFeeLevel && currency==ofr.secondaryCurrency &&
-             (minMwcAmount<=0.0 || ofr.mwcAmount >= minMwcAmount) &&
-             (maxMwcAmount<=0.0 || ofr.mwcAmount <= maxMwcAmount) )
+        if (ofr.sell && selling==0)
+            continue;
+        if (!ofr.sell && selling==1)
+            continue;
+
+        if ( ofr.getFeeLevel() >= minFeeLevel && (currency.isEmpty() || currency==ofr.secondaryCurrency) )
             result.push_back(ofr);
     }
 
-    if (selling)
+    if (selling == 1)
         std::sort( result.begin(), result.end(), []( const MktSwapOffer & o1, const MktSwapOffer & o2 ) {
             return o1.calcRate() > o2.calcRate();
         } );
@@ -866,21 +874,21 @@ void SwapMarketplace::respReceiveMessages(QString error, QVector<wallet::Receive
 
 QString SwapMarketplace::getOffersListeningStatus() const {
     if (startMktListening==0 || !messagingStatus.connected || messagingStatus.topics.isEmpty())
-        return "not listening";
+        return "Not listening";
 
     if (messagingStatus.gossippub_peers.isEmpty() ) {
-        return "connecting...";
+        return "Connecting...";
     }
 
     if (messagingStatus.gossippub_peers.size() < MIN_PEERS_NUMBER) {
-        return "found " + QString::number(messagingStatus.gossippub_peers.size()) + " peers";
+        return "Found " + QString::number(messagingStatus.gossippub_peers.size()) + " peers";
     }
 
     int64_t collectingTime = QDateTime::currentSecsSinceEpoch() - startMktListening;
     Q_ASSERT(collectingTime>=0);
 
     if ( collectingTime < OFFER_PUBLISHING_INTERVAL_SEC ) {
-        return "Collecting offers... " + QString::number( collectingTime * 100 / OFFER_PUBLISHING_INTERVAL_SEC ) + "%";
+        return "Collecting... " + QString::number( collectingTime * 100 / OFFER_PUBLISHING_INTERVAL_SEC ) + "%";
     }
 
     return "Listening";

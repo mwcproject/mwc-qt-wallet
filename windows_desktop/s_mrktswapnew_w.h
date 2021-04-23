@@ -43,14 +43,14 @@ private:
     void updateSecCurrencyData();
     void updateSecCurrencyStatus();
 
-    void updateRateValue();
-    void updateSecValue();
+    void updateThirdValue();
     void updateFundsLockTime();
 
 private slots:
     void on_buySellCombo_currentIndexChanged(int index);
     void on_mwcAmountEdit_textChanged(const QString &arg1);
     void on_secCurrencyCombo_currentIndexChanged(int index);
+    void on_mwcAmountEdit_textEdited(const QString &arg1);
     void on_secAmountEdit_textEdited(const QString &arg1);
     void on_swapRateEdit_textEdited(const QString &arg1);
     void on_swapRateHelpBtn_clicked();
@@ -64,6 +64,8 @@ private slots:
     void onSgnWalletBalanceUpdated();
     void onSgnApplyNewTrade1Params(bool ok, QString errorMessage);
 
+    void on_secTransFeeEdit_textEdited(const QString &arg1);
+
 private:
     Ui::MrktSwapNew *ui;
     bridge::Config * config = nullptr;
@@ -73,6 +75,8 @@ private:
     bridge::Util * util = nullptr;
 
     state::MySwapOffer offer;
+
+    QVector<int> thirdValueUpdate;
 };
 
 }
