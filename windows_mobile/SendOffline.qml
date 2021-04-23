@@ -50,8 +50,10 @@ Item {
     Connections {
         target: send
         onSgnShowSendResult: (success, message) => {
-            rect_progress.visible = false
-            messagebox.open(success ? "Success" : "Failure", message)
+            if (rect_progress.visible) {
+                 rect_progress.visible = false
+                 messagebox.open(success ? "Success" : "Failure", message)
+             }
         }
     }
 
