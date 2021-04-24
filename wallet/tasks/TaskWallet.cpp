@@ -452,6 +452,18 @@ bool TaskRepost::processTask(const QVector<WEvent> & events) {
     return true;
 }
 
+bool TaskCheckTorConnection::processTask(const QVector<WEvent> & events) {
+    QVector< WEvent > lines = filterEvents(events, WALLET_EVENTS::S_LINE );
+    for (const WEvent & ln : lines) {
+        if (ln.message.startsWith("Tor connection online")) {
+            wallet713->setTorConnectionStatus(true);
+            return true;
+        }
+    }
+    wallet713->setTorConnectionStatus(false);
+    return true;
+}
+
 
 }
 

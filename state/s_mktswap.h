@@ -228,6 +228,9 @@ slots:
 
     void onTimerEvent();
 
+    void onListeningStartResults( bool mqTry, bool tor, // what we try to start
+                                  QStringList errorMessages, bool initialStart ); // error messages, if get some
+
     void onStartListenOnTopic(QString error);
     void onStopListenOnTopic(QString error);
 
@@ -261,10 +264,11 @@ private:
     int64_t lastMessagingStatusRequest = 0;
     wallet::MessagingStatus messagingStatus;
     // Available fees
-    bool hasIntegrityFees = false;
     QVector<wallet::IntegrityFees> fees;
 
     int64_t lastCheckIntegrity = 0;
+
+    bool marketplaceActivated = false;
 };
 
 }

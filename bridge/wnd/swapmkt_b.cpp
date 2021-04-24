@@ -123,11 +123,6 @@ QString SwapMarketplace::getOffersListeningStatus() {
     return getSwapMkt()->getOffersListeningStatus();
 }
 
-// start/stop offers publishing
-void SwapMarketplace::setListeningForOffers(bool start) {
-    getSwapMkt()->setListeningForOffers(start);
-}
-
 // Switch to create a new offer page. For new offer myMsgId must be empty string.
 // Otherwise - exist offer id
 void SwapMarketplace::pageCreateNewOffer(QString myMsgId) {

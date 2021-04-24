@@ -62,8 +62,6 @@ public:
 
     // Return the listening status
     Q_INVOKABLE QString getOffersListeningStatus();
-    // start/stop offers publishing
-    Q_INVOKABLE void setListeningForOffers(bool start);
 
     // Switch to create a new offer page. For new offer myMsgId must be empty string.
     // Otherwise - exist offer id

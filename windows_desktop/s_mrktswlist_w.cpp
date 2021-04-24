@@ -106,9 +106,6 @@ MrktSwList::MrktSwList(QWidget *parent, bool selectMyOffers) :
 
     swapMarketplace->requestIntegrityFees();
 
-    // Start listening for the offers, Tor is expected to be running
-    swapMarketplace->setListeningForOffers(true);
-
     updateMktFilter();
 
     int btn = config->getMktPlaceSelectedBtn();

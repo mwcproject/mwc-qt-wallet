@@ -572,6 +572,11 @@ public:
     void notifyAboutNewMktMessage(int messageId, QString wallet_tor_address, QString offer_id);
 
     void setSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
+
+    void setTorConnectionStatus(bool online);
+protected:
+    virtual void timerEvent(QTimerEvent *event) override;
+
 private:
     // Request sync (update_wallet_state) if it is not at the task Q.
     QVector<QPair<Mwc713Task*,int64_t>> create_sync_if_need(bool showSyncProgress, bool enforce);
@@ -663,6 +668,9 @@ private:
 
     int64_t walletStartTime = 0;
     QString commandLine;
+
+    int torOfflineCounter = 0;
+    bool restartingTor = false;
 };
 
 }

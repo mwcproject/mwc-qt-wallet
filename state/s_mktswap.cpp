@@ -241,6 +241,7 @@ SwapMarketplace::SwapMarketplace(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onNewMktMessage, this, &SwapMarketplace::onNewMktMessage, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onSendMarketplaceMessage, this, &SwapMarketplace::onSendMarketplaceMessage, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onMktGroupWinner, this, &SwapMarketplace::onMktGroupWinner, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onListeningStartResults, this, &SwapMarketplace::onListeningStartResults, Qt::QueuedConnection );
 
     swap = (Swap*) context->stateMachine->getState(STATE::SWAP);
 }
@@ -256,6 +257,9 @@ NextStateRespond SwapMarketplace::execute() {
     selectedPage = SwapMarketplaceWnd::None;
     if (context->appContext->getActiveWndState() != STATE::SWAP_MKT)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
+
+    marketplaceActivated = true;
+    setListeningForOffers(true);
 
     pageMktList(false);
 
@@ -1085,7 +1089,17 @@ void SwapMarketplace::onMktGroupWinner(QString swapId, QString tag) {
     }
 }
 
+void SwapMarketplace::onListeningStartResults( bool mqTry, bool tor, // what we try to start
+                              QStringList errorMessages, bool initialStart ) // error messages, if get some
+{
+    Q_UNUSED(mqTry)
+    Q_UNUSED(errorMessages)
+    Q_UNUSED(initialStart)
 
+    if (tor && marketplaceActivated) {
+        setListeningForOffers(true);
+    }
+}
 
 }
 

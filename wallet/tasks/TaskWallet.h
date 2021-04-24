@@ -271,6 +271,21 @@ private:
 };
 
 
+class TaskCheckTorConnection: public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000 * 120; // timeout can be long. Will do retry to first 30 seconds
+
+    TaskCheckTorConnection( MWC713 * wallet713) :
+            Mwc713Task("TaskCheckTorConnection", "Checking TOR connection...", "check_tor_connection",
+                       wallet713, "")
+    {}
+
+    virtual ~TaskCheckTorConnection() override {}
+    virtual bool processTask(const QVector<WEvent> & events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
+};
+
 
 }
 

@@ -47,7 +47,7 @@ private:
 
     bool isNodeHealthy() const {return nodeIsHealthy;}
 private:
-    bool nodeIsHealthy = false;
+    bool nodeIsHealthy = true;
 
     bool lastNodeIsHealty = true;
 
