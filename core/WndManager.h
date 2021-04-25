@@ -115,12 +115,15 @@ public:
 
     // Swap marketplace, if selectMyOffers==true,  my offers will be selected.
     // Otherwise last known tab
-    virtual void pageMarketplace(bool selectMyOffers) = 0;
+    virtual void pageMarketplace(bool selectMyOffers, bool selectFee) = 0;
     // new offer of myMsgId is empty. Otherwise it is running offer update
     virtual void pageNewUpdateOffer(QString myMsgId) = 0;
 
     // Show dialog that enforce setup of backup directory
     virtual void showSwapBackupDlg() = 0;
+
+    // Show transaction for integrity fee page
+    virtual void pageTransactionFee() = 0;
 };
 
 void setWndManager(WndManager * mgr);

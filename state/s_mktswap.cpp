@@ -22,9 +22,11 @@
 #include <QTime>
 #include <QJsonDocument>
 #include "../util/Log.h"
+#include "../util/Files.h"
 #include <QDateTime>
 #include "s_swap.h"
 #include <cmath>
+#include <QFile>
 
 namespace state {
 
@@ -242,6 +244,7 @@ SwapMarketplace::SwapMarketplace(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onSendMarketplaceMessage, this, &SwapMarketplace::onSendMarketplaceMessage, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onMktGroupWinner, this, &SwapMarketplace::onMktGroupWinner, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onListeningStartResults, this, &SwapMarketplace::onListeningStartResults, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onNodeStatus, this, &SwapMarketplace::onNodeStatus, Qt::QueuedConnection );
 
     swap = (Swap*) context->stateMachine->getState(STATE::SWAP);
 }
@@ -261,7 +264,9 @@ NextStateRespond SwapMarketplace::execute() {
     marketplaceActivated = true;
     setListeningForOffers(true);
 
-    pageMktList(false);
+    pageMktList(false, false);
+
+    restoreMySwapTrades();
 
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
@@ -273,7 +278,11 @@ bool SwapMarketplace::mobileBack() {
         case SwapMarketplaceWnd::Marketplace:
             return false;
         case SwapMarketplaceWnd::NewOffer: {
-            pageMktList(false);
+            pageMktList(false, false);
+            return true;
+        }
+        case SwapMarketplaceWnd::TransactionFee: {
+            pageMktList(false, true);
             return true;
         }
     }
@@ -334,6 +343,7 @@ QString SwapMarketplace::createNewOffer( QString offerId, QString  account,
 
     myOffers.push_back(offer);
     emit onMyOffersChanged();
+    emit onMarketPlaceOffersChanged(); // Because we are listed them
     return "";
 }
 
@@ -383,6 +393,7 @@ QString SwapMarketplace::withdrawMyOffer(QString offerId) {
             QString desc = myOffers[i].getOfferDescription();
             myOffers.remove(i);
             emit onMyOffersChanged();
+            emit onMarketPlaceOffersChanged(); // Because we are listed them
             return desc;
         }
     }
@@ -411,6 +422,21 @@ QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, int s
 
         if ( ofr.getFeeLevel() >= minFeeLevel && (currency.isEmpty() || currency==ofr.secondaryCurrency) )
             result.push_back(ofr);
+    }
+
+    QString myTorAddress = context->wallet->getTorAddress();
+    int64_t curTime = QDateTime::currentSecsSinceEpoch();
+    if (!myTorAddress.isEmpty()) {
+        for (auto &mo : myOffers) {
+            QString key = myTorAddress + "_" + mo.offer.id;
+            if (!marketOffers.contains(key)) {
+                MktSwapOffer offer = mo.offer;
+                offer.walletAddress = myTorAddress;
+                offer.mktFee = mo.integrityFee.toDblFee();
+                offer.timestamp = curTime;
+                result.push_back(offer);
+            }
+        }
     }
 
     if (selling == 1)
@@ -561,6 +587,7 @@ void SwapMarketplace::onTimerEvent() {
                 core::getWndManager()->messageTextDlg("Warning", "You sell offer is rejected because outputs that it depend on are spent. It can happen because of integrity fee payment.\n\n" + lockedOutputs.first);
                 // return because of the message box delay. The data can be changed by that time.
                 emit onMyOffersChanged();
+                emit onMarketPlaceOffersChanged(); // Because we are listed them
                 return;
             }
 
@@ -607,6 +634,7 @@ void SwapMarketplace::respCreateIntegrityFee(QString error, QVector<wallet::Inte
                                                           " offers. Those offers will be deleted");
                 }
                 emit onMyOffersChanged();
+                emit onMarketPlaceOffersChanged(); // Because we are listed them
             }
         }
 
@@ -640,19 +668,18 @@ void SwapMarketplace::respCreateIntegrityFee(QString error, QVector<wallet::Inte
             wallet::IntegrityFees f = fees[i];
             if ( offerFee <= f.toDblFee() ) {
                 // applying this fee
+                offer.integrityFee = f;
                 if (offer.status == OFFER_STATUS::RUNNING) {
                     if (offer.integrityFee.uuid != f.uuid) {
                         // Updating and restarting
                         // Stopping first
                         context->wallet->messageWithdraw( offer.msgUuid );
                         offer.status = OFFER_STATUS::STARTING;
-                        offer.integrityFee = f;
                         offer.msgUuid = "";
                     }
                 }
                 else if (offer.status == OFFER_STATUS::PENDING) {
                     // Assign fee and starting
-                    offer.integrityFee = f;
                     offer.status = OFFER_STATUS::STARTING;
                 }
 
@@ -675,6 +702,7 @@ void SwapMarketplace::respCreateIntegrityFee(QString error, QVector<wallet::Inte
     }
 
     emit onMyOffersChanged();
+    emit onMarketPlaceOffersChanged(); // Because we are listed them
 }
 
 void SwapMarketplace::respRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees) {
@@ -704,6 +732,7 @@ void SwapMarketplace::respRequestIntegrityFees(QString error, int64_t balance, Q
             bool isConfirmed = false;
             for ( auto & f : fees ) {
                 if (f.uuid == ms.integrityFee.uuid) {
+                    ms.integrityFee = f;
                     isConfirmed = f.confirmed;
                     break;
                 }
@@ -780,6 +809,7 @@ void SwapMarketplace::respMessagingPublish(QString id, QString uuid, QString err
                 offer.msgUuid = uuid;
                 offer.status = OFFER_STATUS::RUNNING;
                 emit onMyOffersChanged();
+                emit onMarketPlaceOffersChanged(); // Because we are listed them
                 logger::logInfo("SwapMarketplace", "Offer " + id + " is published. Assigned message ID " + uuid );
                 break;
             }
@@ -806,6 +836,7 @@ void SwapMarketplace::respCheckIntegrity(QString error, QVector<QString> expired
             offer.msgUuid = "";
             offer.status = OFFER_STATUS::PENDING;
             emit onMyOffersChanged();
+            emit onMarketPlaceOffersChanged(); // Because we are listed them
         }
     }
 }
@@ -937,9 +968,16 @@ void SwapMarketplace::pageCreateUpdateOffer(QString myMsgId) {
 }
 
 // Switch to swap marketplace first page
-void SwapMarketplace::pageMktList(bool selectMyOffers) {
+void SwapMarketplace::pageMktList(bool selectMyOffers, bool selectFee) {
     selectedPage = SwapMarketplaceWnd::Marketplace;
-    core::getWndManager()->pageMarketplace(selectMyOffers);
+    core::getWndManager()->pageMarketplace(selectMyOffers, selectFee);
+    context->stateMachine->notifyAboutNewState(STATE::SWAP_MKT);
+}
+
+// Show integrity transaction fees
+void SwapMarketplace::pageFeeTransactions() {
+    selectedPage = SwapMarketplaceWnd::TransactionFee;
+    core::getWndManager()->pageTransactionFee();
     context->stateMachine->notifyAboutNewState(STATE::SWAP_MKT);
 }
 
@@ -988,7 +1026,7 @@ bool SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddr
     QString key = walletAddress + "_" + offerId;
 
     if ( getSwap()->isSwapExist(key) ) {
-        core::getWndManager()->messageTextDlg("Already Exist", "You already accepted this offer and Atomic Swap Trade is already running.");
+        core::getWndManager()->messageTextDlg("Already Accepted", "You already accepted this offer and Atomic Swap Trade is already running.");
         return false;
     }
 
@@ -999,6 +1037,15 @@ bool SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddr
     if (mktOffer.isEmpty()) {
         core::getWndManager()->messageTextDlg("Error", "Unfortunately you can't accept offer from "+walletAddress+". It is not on the market any more.");
         return false;
+    }
+
+    if (mktOffer.sell) {
+        if (acceptedOffers.contains(key)) {
+            core::getWndManager()->messageTextDlg("Already Accepted", "You already accepted this offer, please wait while your peer is processing it.");
+            return false;
+        }
+
+        acceptedOffers+=key;
     }
 
     // Let's send accept offer message to another wallet.
@@ -1100,6 +1147,87 @@ void SwapMarketplace::onListeningStartResults( bool mqTry, bool tor, // what we 
         setListeningForOffers(true);
     }
 }
+
+QString SwapMarketplace::getMyOfferStashFileName() const {
+    QPair<QVector<QString>, int> instances = context->appContext->getWalletInstances(true);
+    if (instances.first.isEmpty()) {
+        return "";
+    }
+    QString walletLocalPath = instances.first[instances.second];
+    QString fullPath = ioutils::getAppDataPath(walletLocalPath).second;
+    return fullPath + "/mySwaps.txt";
+}
+
+void SwapMarketplace::restoreMySwapTrades() {
+    QString mySwapsFn = getMyOfferStashFileName();
+    if (mySwapsFn.isEmpty())
+        return;
+
+    QStringList swapLns = util::readTextFile(mySwapsFn);
+    {
+        QFile file(mySwapsFn);
+        file.remove();
+    }
+
+    // Try convert first
+    QVector<MySwapOffer> myOffers;
+    for ( QString swapLn : swapLns ) {
+        MySwapOffer ofr(swapLn);
+        if (ofr.offer.isValid()) {
+            myOffers.push_back(ofr);
+        }
+    }
+
+    if (!myOffers.isEmpty()) {
+        if ( core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg("Marketplace Offers", "You have " + QString::number(myOffers.size()) + " swap marketplace offer" + (myOffers.size()>1 ? "s" : "") +
+                " that was active in your previous session. Do you want to restore them and put on the market?",
+                "No", "Yes",
+                "Don't restore my offers", "Yes, please restore my offers",
+                false, true) ) {
+
+            // Submitting offers one by one
+            for (auto & ofr : myOffers) {
+                createNewOffer( "", ofr.account,
+                        ofr.offer.sell, ofr.offer.mwcAmount, ofr.offer.secAmount,
+                        ofr.offer.secondaryCurrency, ofr.offer.mwcLockBlocks, ofr.offer.secLockBlocks,
+                        ofr.secAddress, ofr.secFee, ofr.note );
+            }
+        }
+    }
+}
+
+void SwapMarketplace::stashMyOffers() {
+    QString mySwapsFn = getMyOfferStashFileName();
+    if (mySwapsFn.isEmpty())
+        return;
+
+    if (myOffers.isEmpty())
+        return;
+
+    QStringList offersStr;
+    for (auto & mo : myOffers) {
+        offersStr.push_back(mo.toJsonStr());
+    }
+
+    util::writeTextFile(mySwapsFn, offersStr );
+}
+
+void SwapMarketplace::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
+    Q_UNUSED(peerHeight);
+    Q_UNUSED(totalDifficulty);
+    Q_UNUSED(connections);
+
+    if (!errMsg.isEmpty())
+        return;
+
+    if (online) {
+        lastNodeHeight = nodeHeight;
+    }
+    else {
+        lastNodeHeight = 0;
+    }
+}
+
 
 }
 

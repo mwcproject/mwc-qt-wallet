@@ -248,7 +248,7 @@
            </size>
           </property>
           <property name="text">
-           <string>In order to publish your Atomic Swap Offer,  you need to pay Integriuty fee.  Those fees are protecting from the spamming.  If currently at low fee there are many spammers, your offer might not be searchable. In this case it make sense to pay higher fee, so tradeers can see that you are serious about trading.</string>
+           <string>In order to publish your Atomic Swap Offer,  you need to pay Integrity fee.  Those fees are protecting from the spamming.  If currently at low fee there are many spammers, your offer might not be searchable. In this case it make sense to pay higher fee, so traders can see that you are serious about trading.</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -366,9 +366,9 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>14</y>
+             <y>20</y>
              <width>246</width>
-             <height>34</height>
+             <height>21</height>
             </rect>
            </property>
            <property name="text">
@@ -778,6 +778,47 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="flat">
             <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="control::MwcPushButtonNormal" name="viewIntegrityTransactionsBtn">
+           <property name="geometry">
+            <rect>
+             <x>105</x>
+             <y>360</y>
+             <width>236</width>
+             <height>40</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>160</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>250</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Move reserved MWC back to your account</string>
+           </property>
+           <property name="text">
+            <string>View Integrity Transactions</string>
+           </property>
+          </widget>
+          <widget class="control::MwcLabelSmall" name="label_9">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>40</y>
+             <width>216</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Note: minimal fee is 0.01 MWC</string>
            </property>
           </widget>
          </widget>

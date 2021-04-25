@@ -369,10 +369,12 @@ bool AppContext::loadDataImpl() {
         in >> mktFeeLevel;
 
         in >> mktPlaceSelectedBtn;
-        in >> mktPlaceMinFeeLevel;
-        in >> mktPlaceSelling;
-        in >> mktPlaceCurrency;
         double d;
+        in >> d;// mktPlaceMinFeeLevel;
+        qint8 i8;
+        in >> i8;//mktPlaceSelling;
+        QString s;
+        in >> s; //mktPlaceCurrency;
         in >> d;
         in >> d;
     }
@@ -502,10 +504,12 @@ void AppContext::saveData() const {
     out << mktFeeDepositAccount;
     out << mktFeeLevel;
     out << mktPlaceSelectedBtn;
-    out << mktPlaceMinFeeLevel;
-    out << mktPlaceSelling;
-    out << mktPlaceCurrency;
+    // Feedback,
     double d = 0.0;
+    out << d; // mktPlaceMinFeeLevel;
+    qint8 i8 = 0;
+    out << i8; // mktPlaceSelling;
+    out << s; // mktPlaceCurrency;
     out << d;
     out << d;
 

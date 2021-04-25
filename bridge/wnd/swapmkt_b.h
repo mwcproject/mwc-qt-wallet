@@ -70,6 +70,10 @@ public:
     Q_INVOKABLE void pageMktList();
     // Show my offers at marketplace page
     Q_INVOKABLE void pageMktMyOffers();
+    // Show fee page
+    Q_INVOKABLE void pageFee();
+    // Show integrity fee  transactions
+    Q_INVOKABLE void pageTransactionFee();
 
     // Refresh mkt place offers. Response with sgnMarketPlaceOffersChanged.
     Q_INVOKABLE void requestMktSwapOffers();
@@ -77,6 +81,13 @@ public:
     // Accept the offer from marketplace
     Q_INVOKABLE bool acceptMarketplaceOffer(QString offerId, QString walletAddress);
 
+    // Request number of running MyOffers
+    Q_INVOKABLE int getMyOffersNum();
+
+    Q_INVOKABLE void stashMyOffers();
+
+    // Request last known node height. 0 mean it is offline
+    Q_INVOKABLE int getLastNodeHeight();
 private:
 signals:
     void sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> IntegrityFeesJsonStr);

@@ -52,7 +52,7 @@
 #include "../windows_desktop/s_tradedetails_w.h"
 #include "../windows_desktop/s_mrktswlist_w.h"
 #include "../windows_desktop/s_mrktswapnew_w.h"
-#include "../dialogs_desktop/s_mktshowparamsdlg_d.h"
+#include "../windows_desktop/s_mktinttx_w.h"
 #include <QFileDialog>
 #include "../core/WalletApp.h"
 #include <QMessageBox>
@@ -376,9 +376,9 @@ void DesktopWndManager::pageSwapTradeDetails(QString swapId) {
 }
 
 // Swap marketplace
-void DesktopWndManager::pageMarketplace(bool selectMyOffers) {
+void DesktopWndManager::pageMarketplace(bool selectMyOffers, bool selectFee) {
     windowManager->switchToWindowEx( mwc::PAGE_S_MKT_LIST,
-                                     new wnd::MrktSwList( windowManager->getInWndParent(), selectMyOffers));
+                                     new wnd::MrktSwList( windowManager->getInWndParent(), selectMyOffers, selectFee));
 }
 
 void DesktopWndManager::pageNewUpdateOffer(QString myMsgId) {
@@ -389,6 +389,11 @@ void DesktopWndManager::pageNewUpdateOffer(QString myMsgId) {
 void DesktopWndManager::showSwapBackupDlg() {
     dlg::SwapBackupDlg dlg(nullptr);
     dlg.exec();
+}
+
+void DesktopWndManager::pageTransactionFee() {
+    windowManager->switchToWindowEx( mwc::PAGE_S_MKT_TX_FEE,
+                                     new wnd::IntegrityTransactions( windowManager->getInWndParent()));
 }
 
 

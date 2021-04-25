@@ -31,6 +31,7 @@ namespace bridge {
     class StateMachine;
     class Util;
     class Swap;
+    class SwapMarketplace;
 }
 
 class QPushButton;
@@ -125,6 +126,7 @@ private:
     bridge::StateMachine * stateMachine = nullptr;
     bridge::Util * util = nullptr;
     bridge::Swap * swap = nullptr;
+    bridge::SwapMarketplace * swapMarketplace = nullptr;
     bool leftBarShown = true;
     core::StatusWndMgr* statusMgr = nullptr;
 };

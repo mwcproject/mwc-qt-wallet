@@ -61,7 +61,7 @@ class MrktSwList : public core::NavWnd, control::RichButtonPressCallback {
 Q_OBJECT
 
 public:
-    explicit MrktSwList(QWidget *parent, bool selectMyOffers);
+    explicit MrktSwList(QWidget *parent, bool selectMyOffers, bool selectFee);
 
     ~MrktSwList();
 
@@ -89,7 +89,6 @@ private slots:
     void on_newOfferButton_clicked();
 
     void sgnRequestIntegrityFees(QString error, int64_t balance, QVector<QString> IntegrityFeesJsonStr);
-    void sgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, double totalDifficulty, int connections );
     void sgnWithdrawIntegrityFees(QString error, double mwc, QString account);
 
     void sgnMarketPlaceOffersChanged();
@@ -105,6 +104,8 @@ private slots:
 
     void on_filterFeeLevel_currentIndexChanged(int index);
 
+    void on_viewIntegrityTransactionsBtn_clicked();
+
 private:
     Ui::MrktSwList *ui;
     bridge::Config * config = nullptr;
@@ -114,7 +115,6 @@ private:
     bridge::Util * util = nullptr;
 
     int selectedTab = 0;
-    int lastNodeHeight = 0;
     bool controlsReady = false;
 };
 

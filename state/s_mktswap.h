@@ -19,6 +19,7 @@
 #include "../wallet/wallet.h"
 #include <QJsonObject>
 #include <QHash>
+#include <QSet>
 
 namespace core {
 class TimerThread;
@@ -26,7 +27,7 @@ class TimerThread;
 
 namespace state {
 
-enum class SwapMarketplaceWnd {None, Marketplace, NewOffer };
+enum class SwapMarketplaceWnd {None, Marketplace, NewOffer, TransactionFee };
 
 struct MktSwapOffer {
     QString id;
@@ -187,10 +188,19 @@ public:
     void pageCreateUpdateOffer(QString myMsgId);
 
     // Switch to swap marketplace first page
-    void pageMktList(bool selectMyOffers);
+    void pageMktList(bool selectMyOffers, bool selectFee);
+
+    // Show integrity transaction fees
+    void pageFeeTransactions();
 
     // Accept the offer from marketplace
     bool acceptMarketplaceOffer(QString offerId, QString walletAddress);
+
+    int getMyOffersNum() const {return myOffers.size();}
+
+    void stashMyOffers();
+
+    int getLastNodeHeight() const {return lastNodeHeight;}
 protected:
     virtual NextStateRespond execute() override;
     virtual bool mobileBack() override;
@@ -200,6 +210,9 @@ protected:
 
     void cleanMarketOffers();
 
+    // Restore my swap offers.
+    void restoreMySwapTrades();
+
     // Creating and start the swap trade from this offer
     // Node, several offers can be run in parallel until one of them will reach the locking stage.
     // Then the rest will be cancelled.
@@ -207,6 +220,8 @@ protected:
 
     // Lock outputs for my offer. Return Error or result
     QPair<QString, QStringList> lockOutputsForSellOffer(const QString & account, double mwcAmount, QString offerId);
+
+    QString getMyOfferStashFileName() const;
 private:
 signals:
     void onMarketPlaceOffersChanged();
@@ -227,6 +242,8 @@ slots:
     void respReceiveMessages(QString error, QVector<wallet::ReceivedMessages> msgs);
 
     void onTimerEvent();
+
+    void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 
     void onListeningStartResults( bool mqTry, bool tor, // what we try to start
                                   QStringList errorMessages, bool initialStart ); // error messages, if get some
@@ -254,6 +271,8 @@ private:
     int64_t lastMarketOffersCleaning = 0;
     QVector<MySwapOffer>    myOffers;
 
+    QSet<QString> acceptedOffers;
+
     // Integrity fees
     double integrityFeeLevel = 0.0001; // Fee in fraction of the trade. Min value still apply
 
@@ -267,8 +286,8 @@ private:
     QVector<wallet::IntegrityFees> fees;
 
     int64_t lastCheckIntegrity = 0;
-
     bool marketplaceActivated = false;
+    int lastNodeHeight = 0;
 };
 
 }

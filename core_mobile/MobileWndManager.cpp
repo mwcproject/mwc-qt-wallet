@@ -410,8 +410,9 @@ void MobileWndManager::pageSwapTradeDetails(QString swapId) {
     Q_ASSERT(false); // implement me
 }
 
-void MobileWndManager::pageMarketplace(bool selectMyOffers) {
+void MobileWndManager::pageMarketplace(bool selectMyOffers, bool selectFee) {
     Q_UNUSED(selectMyOffers)
+    Q_UNUSED(selectFee)
     Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageNewUpdateOffer(QString myMsgId) {
@@ -422,6 +423,11 @@ void MobileWndManager::pageNewUpdateOffer(QString myMsgId) {
 void MobileWndManager::showSwapBackupDlg() {
     Q_ASSERT(false); // implement me
 }
+
+void MobileWndManager::pageTransactionFee() {
+    Q_ASSERT(false); // implement me
+}
+
 
 
 }

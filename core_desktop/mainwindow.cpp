@@ -25,6 +25,7 @@
 #include "../bridge/statemachine_b.h"
 #include "../bridge/util_b.h"
 #include "../bridge/wnd/swap_b.h"
+#include "../bridge/wnd/swapmkt_b.h"
 #include <QPushButton>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -51,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
     stateMachine = new bridge::StateMachine(this);
     util = new bridge::Util(this);
     swap = new bridge::Swap(this);
+    swapMarketplace = new bridge::SwapMarketplace(this);
 
     QObject::connect( coreWindow, &CoreWindow::sgnUpdateActionStates,
                       this, &MainWindow::onSgnUpdateActionStates, Qt::QueuedConnection);
@@ -167,22 +169,36 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
         int swapsNumber = swap->getRunningTrades().size();
         if (swapsNumber > 0) {
-            if (core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg("Swap Trades",
-                                                                                              "You have " +
-                                                                                              QString::number(
-                                                                                                      swapsNumber) +
-                                                                                              " trade" +
-                                                                                              (swapsNumber > 1 ? "s"
-                                                                                                               : "") +
-                                                                                              " in progress. Wallet need to stay online to process the swaps.\n\n"
-                                                                                              "Are you sure you want to close the wallet even your trades are not finished?",
-                                                                                              "No", "Yes",
-                                                                                              "Keep my wallet running",
-                                                                                              "Close the wallet",
-                                                                                              true, false)) {
+            if (core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg(
+                    "Swap Trades",
+                    "You have " +
+                        QString::number(swapsNumber) + " trade" + (swapsNumber > 1 ? "s" : "") +
+                        " in progress. Wallet need to stay online to process the swaps.\n\n"
+                        "Are you sure you want to close the wallet even your trades are not finished?",
+                        "No", "Yes",
+                        "Keep my wallet running",
+                        "Close the wallet",
+                        true, false)) {
                 event->ignore();
                 return;
             }
+        }
+
+        int offers = swapMarketplace->getMyOffersNum();
+        if (offers>0) {
+            if (core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg(
+                    "Swap Offers",
+                    "You have " + QString::number(offers) + " active offers for atomic swap trade" + (offers > 1 ? "s" : "") +
+                         " broadcasting. If you close the wallet, your offers will be withdrawn from the marketplace.\n\n"
+                         "Are you sure you want to close the wallet int even withdraw your offers?",
+                         "No", "Yes",
+                         "Keep my wallet running",
+                         "Close the wallet",
+                         true, false)) {
+                event->ignore();
+                return;
+            }
+            swapMarketplace->stashMyOffers();
         }
     }
 

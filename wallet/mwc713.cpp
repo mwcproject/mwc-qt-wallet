@@ -1589,7 +1589,7 @@ MWC713::setSendResults(bool success, QStringList errors, QString address, int64_
 
 
 void MWC713::reportSlateReceivedFrom(QString slate, QString mwc, QString fromAddr, QString message) {
-    if (fromAddr == "Integrity fee")
+    if ( fromAddr.startsWith("Integrity fee") || fromAddr=="Withdraw Integrity funds" )
         return; // We don't want to show that.
 
     QString msg = "Congratulations! You received " + mwc + " MWC from " + fromAddr;

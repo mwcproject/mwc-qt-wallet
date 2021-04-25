@@ -380,8 +380,8 @@ private:
     int mktPlaceSelectedBtn = 0;
 
     double mktPlaceMinFeeLevel = 0.0001;
-    qint8  mktPlaceSelling = 0; // 0 - buy, 1 - sell, 2 - all
-    QString mktPlaceCurrency = "BTC";
+    qint8  mktPlaceSelling = 2; // 0 - buy, 1 - sell, 2 - all
+    QString mktPlaceCurrency = ""; // All
 };
 
 template <class T>

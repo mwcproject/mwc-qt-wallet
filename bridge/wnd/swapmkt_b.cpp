@@ -131,12 +131,21 @@ void SwapMarketplace::pageCreateNewOffer(QString myMsgId) {
 
 // Show marketplace page
 void SwapMarketplace::pageMktList() {
-    getSwapMkt()->pageMktList(false);
+    getSwapMkt()->pageMktList(false, false);
 }
 
 // Show my offers at marketplace page
 void SwapMarketplace::pageMktMyOffers() {
-    getSwapMkt()->pageMktList(false);
+    getSwapMkt()->pageMktList(true, false);
+}
+
+void SwapMarketplace::pageFee() {
+    return getSwapMkt()->pageMktList(false, true);
+}
+
+// Show integrity fee  transactions
+void SwapMarketplace::pageTransactionFee() {
+    getSwapMkt()->pageFeeTransactions();
 }
 
 void SwapMarketplace::requestMktSwapOffers() {
@@ -146,6 +155,19 @@ void SwapMarketplace::requestMktSwapOffers() {
 // Accept the offer from marketplace
 bool SwapMarketplace::acceptMarketplaceOffer(QString offerId, QString walletAddress) {
     return getSwapMkt()->acceptMarketplaceOffer(offerId, walletAddress);
+}
+
+// Request number of running MyOffers
+int SwapMarketplace::getMyOffersNum() {
+    return getSwapMkt()->getMyOffersNum();
+}
+
+void SwapMarketplace::stashMyOffers() {
+    getSwapMkt()->stashMyOffers();
+}
+
+int SwapMarketplace::getLastNodeHeight() {
+    return getSwapMkt()->getLastNodeHeight();
 }
 
 void SwapMarketplace::onRequestIntegrityFees(QString error, int64_t balance, QVector<wallet::IntegrityFees> fees) {

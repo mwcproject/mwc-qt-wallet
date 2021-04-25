@@ -34,7 +34,7 @@ QString feeLevelValToStr(double feeLevel) {
     return "Dust";
 }
 
-MrktSwList::MrktSwList(QWidget *parent, bool selectMyOffers) :
+MrktSwList::MrktSwList(QWidget *parent, bool selectMyOffers, bool selectFee) :
         core::NavWnd(parent, true),
         ui(new Ui::MrktSwList) {
     ui->setupUi(this);
@@ -55,9 +55,6 @@ MrktSwList::MrktSwList(QWidget *parent, bool selectMyOffers) :
     connect(swapMarketplace, &bridge::SwapMarketplace::sgnMessagingStatusChanged, this, &MrktSwList::sgnMessagingStatusChanged,
             Qt::QueuedConnection);
     connect(swapMarketplace, &bridge::SwapMarketplace::sgnWithdrawIntegrityFees, this, &MrktSwList::sgnWithdrawIntegrityFees,
-            Qt::QueuedConnection);
-
-    connect(wallet, &bridge::Wallet::sgnUpdateNodeStatus, this, &MrktSwList::sgnUpdateNodeStatus,
             Qt::QueuedConnection);
 
     connect(ui->offersTable, &control::RichVBox::onItemActivated, this, &MrktSwList::onItemActivated,
@@ -111,6 +108,9 @@ MrktSwList::MrktSwList(QWidget *parent, bool selectMyOffers) :
     int btn = config->getMktPlaceSelectedBtn();
     if (selectMyOffers)
         btn = BTN_MY_OFFERS;
+
+    if (selectFee)
+        btn = BTN_FEES;
 
     updateModeButtons(btn);
 
@@ -219,6 +219,7 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
         return;
 
     bool hasTor = wallet->getTorListenerStatus();
+    int lastNodeHeight = swapMarketplace->getLastNodeHeight();
 
     if (selectedTab == BTN_MY_OFFERS) {
         QVector<QString> offersStr = swapMarketplace->getMyOffers();
@@ -314,7 +315,7 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
                             setCallback(this, "Cancel:" + offer.offer.id));
 
             itm->addWidget(
-                    (new control::RichButton(itm, "Update", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
+                    (new control::RichButton(itm, "Edit", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
                                              "Update this offer", BTN_FONT_SIZE))->
                             setCallback(this, "Update:" + offer.offer.id));
 
@@ -332,13 +333,14 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
         QVector<QString> offersStr = swapMarketplace->getMarketOffers(config->getSwapMktMinFeeLevel(),
                                                                       config->getSwapMktSelling(),
                                                                       config->getSwapMktCurrency());
+        QString myTorAddress = wallet->getTorAddress();
 
         for (auto &s : offersStr) {
             state::MktSwapOffer offer(s);
 
             QString mktOfferId = offer.walletAddress + "," + offer.id;
-
-            control::RichItem *itm = control::createMarkedItem(mktOfferId, ui->offersTable, false);
+            bool ownOffer = offer.walletAddress==myTorAddress;
+            control::RichItem *itm = control::createMarkedItem(mktOfferId, ui->offersTable, ownOffer);
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
 
             // Line 1
@@ -360,8 +362,11 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
                                                     QString::number(offer.mwcAmount) + " MWC" + " ;  " + offer.calcRateAsStr() ));
             }
             itm->setMinWidth(250);
-            itm->addWidget(control::createLabel(itm, false, true, "Fee : " + feeLevelValToStr(offer.mktFee / offer.mwcAmount ) + " (" +
-                                                                  QString::number(offer.mktFee) + " MWC)"));
+            if (!ownOffer || offer.mktFee>0) {
+                itm->addWidget(control::createLabel(itm, false, true,
+                                                    "Fee : " + feeLevelValToStr(offer.mktFee / offer.mwcAmount) + " (" +
+                                                    QString::number(offer.mktFee) + " MWC)"));
+            }
             itm->pop();
 
             // Line 2
@@ -397,19 +402,20 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
 
             }
 
-            // Buttons need to go in full size.
-            // So we need to finish the main vertical layout
-            itm->pop();
-            itm->vbox().setContentsMargins(0, control::VBOX_MARGIN, 0, 0).setSpacing(control::VBOX_SPACING);
+            // Don't add button for self offers
+            if (offer.walletAddress!=myTorAddress) {
+                itm->pop();
+                itm->vbox().setContentsMargins(0, control::VBOX_MARGIN, 0, 0).setSpacing(control::VBOX_SPACING);
 
-            const int BTN_FONT_SIZE = 13;
-            const int BTN_WIDTH = 80;
+                const int BTN_FONT_SIZE = 13;
+                const int BTN_WIDTH = 80;
 
-            itm->addWidget(
-                    (new control::RichButton(itm, "Accept", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
-                                             "Cancel this offer", BTN_FONT_SIZE))->
-                            setCallback(this, "Accept:" + mktOfferId));
-            itm->addVSpacer();
+                itm->addWidget(
+                        (new control::RichButton(itm, "Accept", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
+                                                 "Cancel this offer", BTN_FONT_SIZE))->
+                                setCallback(this, "Accept:" + mktOfferId));
+                itm->addVSpacer();
+            }
 
             ui->offersTable->addItem(itm);
         }
@@ -506,6 +512,8 @@ void MrktSwList::on_withdrawFeesBtn_clicked() {
                                                                                  "Keep reserved balance to pay swap marketplace fees")) {
         ui->progress->show();
         swapMarketplace->withdrawIntegrityFees();
+        ui->withdrawFeesBtn->setText("Withdraw Fees");
+        ui->withdrawFeesBtn->setEnabled(false);
     }
 }
 
@@ -597,6 +605,7 @@ void MrktSwList::sgnRequestIntegrityFees(QString error, int64_t balance, QVector
             for (auto & s : integrityFeesJsonStr) {
                 // parsing Json to the fees
                 wallet::IntegrityFees feeInfo(s);
+                int lastNodeHeight = swapMarketplace->getLastNodeHeight();
 
                 if (lastNodeHeight>0 && lastNodeHeight >= feeInfo.expiration_height)
                     continue; // expired fee, don't show
@@ -626,22 +635,6 @@ void MrktSwList::sgnRequestIntegrityFees(QString error, int64_t balance, QVector
     }
 }
 
-void MrktSwList::sgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, double totalDifficulty, int connections ) {
-    Q_UNUSED(peerHeight);
-    Q_UNUSED(totalDifficulty);
-    Q_UNUSED(connections);
-
-    if (!errMsg.isEmpty())
-        return;
-
-    if (online) {
-        lastNodeHeight = nodeHeight;
-    }
-    else {
-        lastNodeHeight = 0;
-    }
-}
-
 void MrktSwList::sgnWithdrawIntegrityFees(QString error, double mwc, QString account) {
     Q_UNUSED(mwc)
     Q_UNUSED(account)
@@ -650,6 +643,11 @@ void MrktSwList::sgnWithdrawIntegrityFees(QString error, double mwc, QString acc
     if (!error.isEmpty()) {
         control::MessageBox::messageText(this, "Withdraw error", error);
     }
+    swapMarketplace->requestIntegrityFees();
+}
+
+void MrktSwList::on_viewIntegrityTransactionsBtn_clicked() {
+    swapMarketplace->pageTransactionFee();
 }
 
 }
