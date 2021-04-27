@@ -129,20 +129,26 @@ void MrktSwapNew::updateSecCurrencyData() {
     }
     ui->secCurrencyCombo->setCurrentIndex( selectedIdx );
 
-    updateSecCurrencyStatus();
+    updateSecCurrencyStatus( ui->buySellCombo->currentIndex()==1 );
 }
 
-void MrktSwapNew::updateSecCurrencyStatus() {
+void MrktSwapNew::updateSecCurrencyStatus(bool seller) {
     QString selectedCur = swap->getCurrentSecCurrency();
     if (selectedCur.isEmpty())
         selectedCur = "XXX";
 
+    QString addressPurpose;
+    if (seller)
+        addressPurpose = " address to receive the coins";
+    else
+        addressPurpose = " address for the refund in case of trade cancellation";
+
     ui->rateLabel->setText("MWC to " + selectedCur + " rate:");
     QString addressPlaceholderText;
     if (selectedCur == "ZCash")
-        addressPlaceholderText = "Transparent ZCash address to receive the coins";
+        addressPlaceholderText = "Transparent ZCash " + addressPurpose;
     else
-        addressPlaceholderText = selectedCur + " address to receive the coins";
+        addressPlaceholderText = selectedCur + addressPurpose;
 
     ui->secAddressEdit->setPlaceholderText(addressPlaceholderText);
     ui->secondaryCurrencyLabel->setText(selectedCur + " address:");
@@ -265,6 +271,7 @@ void MrktSwapNew::onSgnWalletBalanceUpdated() {
 
 void MrktSwapNew::on_buySellCombo_currentIndexChanged(int index) {
     Q_UNUSED(index)
+    updateSecCurrencyStatus( index == 1 );
 }
 
 void MrktSwapNew::on_mwcAmountEdit_textChanged(const QString &mwcAmount) {
@@ -283,7 +290,7 @@ void MrktSwapNew::on_secCurrencyCombo_currentIndexChanged(int index) {
     QString selectedCurrency = ui->secCurrencyCombo->currentData().toString();
     swap->setCurrentSecCurrency(selectedCurrency);
 
-    updateSecCurrencyStatus();
+    updateSecCurrencyStatus(ui->buySellCombo->currentIndex()==1);
 }
 
 void MrktSwapNew::on_mwcAmountEdit_textEdited(const QString &arg1) {

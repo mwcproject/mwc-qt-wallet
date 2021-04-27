@@ -389,7 +389,8 @@ bool TaskRequestReceiveMessages::processTask(const QVector<WEvent> &events) {
                 res.push_back(ReceivedMessages(msg["topic"].toString(),
                                  msg["fee"].toString().toLongLong(),
                                  msg["message"].toString(),
-                                 msg["wallet"].toString()));
+                                 msg["wallet"].toString(),
+                                 msg["timestamp"].toString().toLongLong()));
             }
 
             wallet713->setReceiveMessages( "", res );

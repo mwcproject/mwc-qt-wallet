@@ -73,6 +73,7 @@ private:
     void updateMktFilter();
     void updateTradeListData(bool resetScrollValue);
     void pushIntegritySettings();
+    void updateMwcReservedFeeValidity();
 private slots:
     void on_marketOffers_clicked();
     void on_myOffers_clicked();
@@ -95,7 +96,8 @@ private slots:
     void sgnMyOffersChanged();
     void sgnMessagingStatusChanged();
 
-    void onItemActivated(QString id);
+    void onBuyItemActivated(QString id);
+    void onSellItemActivated(QString id);
 
     void updateList();
     void on_buySellCombo_currentIndexChanged(int index);

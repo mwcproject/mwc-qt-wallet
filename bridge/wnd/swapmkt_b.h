@@ -43,7 +43,10 @@ public:
     // JSon strings with MktSwapOffer. Requesting marketplace offers with filtering
     // selling: 0 - buy, 1-sell, 2 - all
     // currency: empty value for all
-    Q_INVOKABLE QVector<QString> getMarketOffers(double minFeeLevel, int selling, QString currency) const;
+    Q_INVOKABLE QVector<QString> getMarketOffers(double minFeeLevel, int selling, QString currency);
+
+    // return JSon strings with MktSwapOffer value. Empty string if such offer is not found
+    Q_INVOKABLE QString getMarketOffer(QString offerId, QString walletAddress);
 
     // pair of Currency, number of offers
     Q_INVOKABLE QVector<QString> getTotalOffers();

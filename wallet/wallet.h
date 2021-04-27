@@ -479,15 +479,18 @@ struct ReceivedMessages {
     int64_t fee;     // fee that was paid
     QString message; // message that received
     QString wallet;  // wallet onion address
+    int64_t timestamp;
 
     ReceivedMessages(QString _topic,
             int64_t _fee,
             QString _message,
-            QString _wallet) :
+            QString _wallet,
+            int64_t _timestamp) :
             topic(_topic),
             fee(_fee),
             message(_message),
-            wallet(_wallet) {}
+            wallet(_wallet),
+            timestamp(_timestamp) {}
 
     ReceivedMessages() = default;
     ReceivedMessages(const ReceivedMessages & item) = default;

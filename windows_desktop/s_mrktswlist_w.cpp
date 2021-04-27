@@ -23,6 +23,11 @@
 #include "../control_desktop/messagebox.h"
 #include "../util_desktop/timeoutlock.h"
 #include <QTimer>
+#include "../dialogs_desktop/s_mktofferdetailsdlg.h"
+#include "../util/address.h"
+
+const int BTN_FONT_SIZE = 13;
+const int BTN_WIDTH = 80;
 
 namespace wnd {
 
@@ -57,7 +62,9 @@ MrktSwList::MrktSwList(QWidget *parent, bool selectMyOffers, bool selectFee) :
     connect(swapMarketplace, &bridge::SwapMarketplace::sgnWithdrawIntegrityFees, this, &MrktSwList::sgnWithdrawIntegrityFees,
             Qt::QueuedConnection);
 
-    connect(ui->offersTable, &control::RichVBox::onItemActivated, this, &MrktSwList::onItemActivated,
+    connect(ui->buyOffersTable, &control::RichVBox::onItemActivated, this, &MrktSwList::onBuyItemActivated,
+            Qt::QueuedConnection);
+    connect(ui->sellOffersTable, &control::RichVBox::onItemActivated, this, &MrktSwList::onSellItemActivated,
             Qt::QueuedConnection);
 
     double currentFee = swapMarketplace->getFeeLevel();
@@ -86,8 +93,6 @@ MrktSwList::MrktSwList(QWidget *parent, bool selectMyOffers, bool selectFee) :
         ui->depositAccountName->addItem(accounts[i]);
     }
     ui->depositAccountName->setCurrentIndex(selectedAcc);
-
-    ui->mwcReservedFee->setText(QString::number(swapMarketplace->getFeeReservedAmount()));
 
     QVector<QString> scList = swap->secondaryCurrencyList();
     ui->secCurrencyCombo->addItem("All", "");
@@ -135,11 +140,19 @@ void MrktSwList::updateModeButtons(int btnId) {
 
     ui->filterPlaceholder->setVisible( btnId==BTN_MKT_OFFERS );
 
-    ui->offersTable->setVisible( btnId==BTN_MKT_OFFERS || btnId==BTN_MY_OFFERS );
+    // 0 - buy, 1 - sell, 2 - all
+    int buySell = config->getSwapMktSelling();
+
+    ui->buyOffersTable->setVisible( btnId==BTN_MY_OFFERS || (btnId==BTN_MKT_OFFERS && (buySell==0 || buySell==2)) );
+    ui->sellOffersTable->setVisible( btnId==BTN_MKT_OFFERS && (buySell==1 || buySell==2) );
 
     ui->refreshBtnsHolder->setVisible( btnId==BTN_MY_OFFERS );
 
     ui->progress->hide();
+
+    // In case of incorrect input, we want to reset the data
+    ui->mwcReservedFee->setText(QString::number(swapMarketplace->getFeeReservedAmount()));
+    updateMwcReservedFeeValidity();
 
     updateTradeListData(true);
 }
@@ -185,6 +198,7 @@ void MrktSwList::on_buySellCombo_currentIndexChanged(int index)
 
     if (index>=0) {
         config->setSwapMktSelling(index);
+        updateModeButtons(BTN_MKT_OFFERS);
         updateTradeListData(true);
     }
 }
@@ -213,7 +227,8 @@ void MrktSwList::on_filterFeeLevel_currentIndexChanged(int index)
 }
 
 void MrktSwList::updateTradeListData(bool resetScrollValue) {
-    ui->offersTable->clearAll(resetScrollValue);
+    ui->buyOffersTable->clearAll(resetScrollValue);
+    ui->sellOffersTable->clearAll(resetScrollValue);
 
     if (selectedTab == BTN_FEES)
         return;
@@ -226,7 +241,7 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
         for (auto &s : offersStr) {
             state::MySwapOffer offer(s);
 
-            control::RichItem *itm = control::createMarkedItem(offer.offer.id, ui->offersTable, false);
+            control::RichItem *itm = control::createMarkedItem(offer.offer.id, ui->buyOffersTable, false);
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
 
             // Line 1
@@ -306,9 +321,6 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
             itm->pop();
             itm->vbox().setContentsMargins(0, control::VBOX_MARGIN, 0, 0).setSpacing(control::VBOX_SPACING);
 
-            const int BTN_FONT_SIZE = 13;
-            const int BTN_WIDTH = 80;
-
             itm->addWidget(
                     (new control::RichButton(itm, "Cancel", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
                                              "Cancel this offer", BTN_FONT_SIZE))->
@@ -321,26 +333,37 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
 
             itm->addVSpacer();
 
-            ui->offersTable->addItem(itm);
+            ui->buyOffersTable->addItem(itm);
         }
         // Done with "My Offers"
-        ui->offersTable->apply();
+        ui->buyOffersTable->apply();
 
         return;
     }
 
     if (selectedTab == BTN_MKT_OFFERS) {
+        int sellingFlag = config->getSwapMktSelling();
         QVector<QString> offersStr = swapMarketplace->getMarketOffers(config->getSwapMktMinFeeLevel(),
-                                                                      config->getSwapMktSelling(),
+                                                                      sellingFlag,
                                                                       config->getSwapMktCurrency());
-        QString myTorAddress = wallet->getTorAddress();
+        QString myTorAddress = util::extractPubKeyFromAddress(wallet->getTorAddress());
 
         for (auto &s : offersStr) {
             state::MktSwapOffer offer(s);
 
             QString mktOfferId = offer.walletAddress + "," + offer.id;
             bool ownOffer = offer.walletAddress==myTorAddress;
-            control::RichItem *itm = control::createMarkedItem(mktOfferId, ui->offersTable, ownOffer);
+
+            control::RichVBox * parent = nullptr;
+            if (offer.sell) {
+                parent = ui->sellOffersTable;
+            }
+            else {
+                parent = ui->buyOffersTable;
+            }
+            Q_ASSERT(parent);
+            control::RichItem * itm = control::createMarkedItem(mktOfferId, parent, ownOffer, 3, 10, 3, 10);
+
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
 
             // Line 1
@@ -361,16 +384,37 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
                                                     QChar(0x279E) + " " +
                                                     QString::number(offer.mwcAmount) + " MWC" + " ;  " + offer.calcRateAsStr() ));
             }
-            itm->setMinWidth(250);
-            if (!ownOffer || offer.mktFee>0) {
+            itm->setMinWidth(230);
+
+            if (sellingFlag!=2) {
+                QString text;
+                if (!ownOffer || offer.mktFee > 0) {
+                    text = "Fee : " + feeLevelValToStr(offer.mktFee / offer.mwcAmount) +
+                           " (" + QString::number(offer.mktFee) + " MWC)";
+                }
                 itm->addWidget(control::createLabel(itm, false, true,
-                                                    "Fee : " + feeLevelValToStr(offer.mktFee / offer.mwcAmount) + " (" +
-                                                    QString::number(offer.mktFee) + " MWC)"));
+                                                    text));
+                itm->setMinWidth(200);
+            }
+
+            itm->addWidget(
+                    control::createLabel(itm, false, true,
+                                         "Conf:  MWC " + QString::number(offer.mwcLockBlocks) +
+                                         ", " + offer.secondaryCurrency + " " +
+                                         QString::number(offer.secLockBlocks),
+                                         control::FONT_SMALL));
+            itm->addHSpacer();
+
+            if (offer.walletAddress!=myTorAddress) {
+                itm->addWidget(
+                        (new control::RichButton(itm, "Details", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
+                                                 "View details and accept this offer", BTN_FONT_SIZE))->
+                                setCallback(this, "Details:" + mktOfferId));
             }
             itm->pop();
 
             // Line 2
-            {
+/*            {
                 itm->addFixedVSpacer(control::VBOX_SPACING); // add extra spacing
                 itm->hbox().setContentsMargins(0, 0, 0, 0);
                 itm->addWidget(
@@ -407,19 +451,17 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
                 itm->pop();
                 itm->vbox().setContentsMargins(0, control::VBOX_MARGIN, 0, 0).setSpacing(control::VBOX_SPACING);
 
-                const int BTN_FONT_SIZE = 13;
-                const int BTN_WIDTH = 80;
-
                 itm->addWidget(
                         (new control::RichButton(itm, "Accept", BTN_WIDTH, control::ROW_HEIGHT * 3 / 2,
-                                                 "Cancel this offer", BTN_FONT_SIZE))->
+                                                 "Accept this offer", BTN_FONT_SIZE))->
                                 setCallback(this, "Accept:" + mktOfferId));
                 itm->addVSpacer();
-            }
+            }*/
 
-            ui->offersTable->addItem(itm);
+            parent->addItem(itm);
         }
-        ui->offersTable->apply();
+        ui->buyOffersTable->apply();
+        ui->sellOffersTable->apply();
     }
 }
 
@@ -449,14 +491,42 @@ void MrktSwList::richButtonPressed(control::RichButton *button, QString cookie) 
         qDebug() << "Accepting the offer from " << torAddress << " with id " << offerId;
         if (swapMarketplace->acceptMarketplaceOffer(offerId, torAddress))
             ui->progress->show();
-    } else {
-        Q_ASSERT(false);
+    } else if (cookie.startsWith("Details:")) {
+        util::TimeoutLockObject to("MktOfferDetails");
+
+        QString msgId = cookie.mid(qstrlen("Details:"));
+        auto ids = msgId.split(",");
+        Q_ASSERT(ids.length() == 2);
+        QString torAddress = ids[0];
+        QString offerId = ids[1];
+
+        QString offerJson = swapMarketplace->getMarketOffer(offerId, torAddress);
+        Q_ASSERT(!offerJson.isEmpty());
+        if (!offerJson.isEmpty()) {
+            dlg::MktOfferDetailsDlg dlg(this, state::MktSwapOffer(offerJson) );
+            if ( dlg.exec()  == QDialog::Accepted ) {
+                qDebug() << "Accepting the offer from " << torAddress << " with id " << offerId;
+                if (swapMarketplace->acceptMarketplaceOffer(offerId, torAddress))
+                    ui->progress->show();
+            }
+        }
     }
 }
 
-void MrktSwList::onItemActivated(QString id) {
+void MrktSwList::onBuyItemActivated(QString id) {
     if (selectedTab == BTN_MY_OFFERS) {
         swapMarketplace->pageCreateNewOffer(id);
+        return;
+    }
+    if (selectedTab == BTN_MKT_OFFERS) {
+        Q_ASSERT(false); // fix me
+    }
+
+}
+
+void MrktSwList::onSellItemActivated(QString id) {
+    if (selectedTab == BTN_MKT_OFFERS) {
+        Q_ASSERT(false); // fix me
     }
 }
 
@@ -475,13 +545,27 @@ void MrktSwList::on_feesBtn_clicked() {
     ui->activeFees->setText("Requesting integrity fee status...");
 }
 
+const double MIN_RESERVE_FEE = 1.0;
+
 void MrktSwList::pushIntegritySettings() {
     bool ok = false;
     double mwcAmount = ui->mwcReservedFee->text().toDouble(&ok);
     int idx = ui->feeLevel->currentIndex();
-    if (ok && idx >= 0 && idx < MKT_FEES.length()) {
+    if (ok && idx >= 0 && idx < MKT_FEES.length() && mwcAmount>=MIN_RESERVE_FEE ) {
         swapMarketplace->setIntegritySettings(MKT_FEES[idx].fee, ui->depositAccountName->currentText(), mwcAmount);
     }
+}
+
+
+void MrktSwList::updateMwcReservedFeeValidity() {
+    bool ok = false;
+    double mwcAmount = ui->mwcReservedFee->text().toDouble(&ok);
+
+    bool valid = ok && mwcAmount >= MIN_RESERVE_FEE;
+    if (valid)
+        ui->mwcReservedFee->setStyleSheet("color: white; font-weight: normal");
+    else
+        ui->mwcReservedFee->setStyleSheet("color: #FFBB2E; font-weight: bold");
 }
 
 
@@ -497,6 +581,7 @@ void MrktSwList::on_depositAccountName_currentIndexChanged(int index) {
 
 void MrktSwList::on_mwcReservedFee_textEdited(const QString &arg1) {
     Q_UNUSED(arg1);
+    updateMwcReservedFeeValidity();
     pushIntegritySettings();
 }
 
@@ -649,5 +734,6 @@ void MrktSwList::sgnWithdrawIntegrityFees(QString error, double mwc, QString acc
 void MrktSwList::on_viewIntegrityTransactionsBtn_clicked() {
     swapMarketplace->pageTransactionFee();
 }
+
 
 }

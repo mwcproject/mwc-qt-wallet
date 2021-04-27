@@ -41,7 +41,7 @@ public:
 
 private:
     void updateSecCurrencyData();
-    void updateSecCurrencyStatus();
+    void updateSecCurrencyStatus(bool seller);
 
     void updateThirdValue();
     void updateFundsLockTime();

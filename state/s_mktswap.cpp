@@ -27,6 +27,7 @@
 #include "s_swap.h"
 #include <cmath>
 #include <QFile>
+#include "../util/address.h"
 
 namespace state {
 
@@ -196,8 +197,12 @@ QString MySwapOffer::getStatusStr(int tipHeight) const {
             return "Preparing...";
         }
         case OFFER_STATUS::STARTING: {
-            if (tipHeight>0 && integrityFee.expiration_height - tipHeight > 1440)
-                return "Starting, waiting for " + QString::number(integrityFee.expiration_height-tipHeight-1440) + " blocks";
+            if (tipHeight>0 && integrityFee.expiration_height - tipHeight > 1440) {
+                int blocks2wait = integrityFee.expiration_height - tipHeight - 1440;
+                if (blocks2wait>3) // because tipHeight and transaction status updated async, value can be not accurate and it is fine
+                    blocks2wait = 3; // as workaround we will limit it. With next update that will be correct
+                return "Starting, waiting for " + QString::number(blocks2wait) + " blocks";
+            }
             else
                 return "Starting...";
         }
@@ -409,10 +414,15 @@ QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, int s
     cleanMarketOffers();
 
     int64_t timeLimit = QDateTime::currentSecsSinceEpoch() - OFFER_PUBLISHING_INTERVAL_SEC*2;
+    QString myTorAddress = util::extractPubKeyFromAddress(context->wallet->getTorAddress());
+    int64_t curTime = QDateTime::currentSecsSinceEpoch();
 
     QVector<MktSwapOffer> result;
     for ( auto & ofr : marketOffers ) {
         if (ofr.timestamp < timeLimit)
+            continue;
+
+        if (ofr.walletAddress==myTorAddress)
             continue;
 
         if (ofr.sell && selling==0)
@@ -424,18 +434,13 @@ QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, int s
             result.push_back(ofr);
     }
 
-    QString myTorAddress = context->wallet->getTorAddress();
-    int64_t curTime = QDateTime::currentSecsSinceEpoch();
     if (!myTorAddress.isEmpty()) {
         for (auto &mo : myOffers) {
-            QString key = myTorAddress + "_" + mo.offer.id;
-            if (!marketOffers.contains(key)) {
                 MktSwapOffer offer = mo.offer;
                 offer.walletAddress = myTorAddress;
                 offer.mktFee = mo.integrityFee.toDblFee();
                 offer.timestamp = curTime;
                 result.push_back(offer);
-            }
         }
     }
 
@@ -450,6 +455,12 @@ QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, int s
 
     return result;
 }
+
+MktSwapOffer SwapMarketplace::getMarketOffer(QString offerId, QString walletAddress) const {
+    QString key = walletAddress + "_" + offerId;
+    return marketOffers.value(key);
+}
+
 
 // All marketplace offers that are published buy currency. Sorted by largest number
 QVector<QPair<QString,int>> SwapMarketplace::getTotalOffers() {
@@ -856,12 +867,15 @@ void SwapMarketplace::respReceiveMessages(QString error, QVector<wallet::Receive
     if (!error.isEmpty())
         return; // Should have the message at notifications. But there is nothing what we can do at handler
 
+    QString myTorAddress = util::extractPubKeyFromAddress(context->wallet->getTorAddress());
+    if (myTorAddress.isEmpty())
+        return;
+
     QVector<QString> startMsgIds;
     for (auto & offer : marketOffers) {
         startMsgIds.push_back(offer.walletAddress + "_" + offer.id);
     }
     std::sort(startMsgIds.begin(), startMsgIds.end());
-
 
     // Updating  marketOffers
     for ( const auto & m : msgs) {
@@ -883,9 +897,12 @@ void SwapMarketplace::respReceiveMessages(QString error, QVector<wallet::Receive
             continue;
         }
 
+        if (offer.walletAddress == myTorAddress)
+            continue;
+
         offer.mktFee = double(m.fee) / 1000000000.0;
         offer.walletAddress = m.wallet;
-        offer.timestamp = QDateTime::currentSecsSinceEpoch();
+        offer.timestamp = m.timestamp;
 
         // Updating this offer
         QString key = offer.getKey();
@@ -1145,6 +1162,7 @@ void SwapMarketplace::onListeningStartResults( bool mqTry, bool tor, // what we 
 
     if (tor && marketplaceActivated) {
         setListeningForOffers(true);
+        requestMktSwapOffers();
     }
 }
 
@@ -1187,7 +1205,7 @@ void SwapMarketplace::restoreMySwapTrades() {
 
             // Submitting offers one by one
             for (auto & ofr : myOffers) {
-                createNewOffer( "", ofr.account,
+                createNewOffer( ofr.offer.id, ofr.account,
                         ofr.offer.sell, ofr.offer.mwcAmount, ofr.offer.secAmount,
                         ofr.offer.secondaryCurrency, ofr.offer.mwcLockBlocks, ofr.offer.secLockBlocks,
                         ofr.secAddress, ofr.secFee, ofr.note );

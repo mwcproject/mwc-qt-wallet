@@ -162,6 +162,7 @@ public:
     // selling: 0 - buy, 1-sell, 2 - all
     // currency: empty value for all
     QVector<MktSwapOffer> getMarketOffers(double minFeeLevel, int selling, QString currency);
+    MktSwapOffer getMarketOffer(QString offerId, QString walletAddress) const;
     // All marketplace offers that are published buy currency. Sorted by largest number
     QVector<QPair<QString,int>> getTotalOffers();
 
