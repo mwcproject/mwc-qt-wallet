@@ -190,7 +190,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
                     "Swap Offers",
                     "You have " + QString::number(offers) + " active offers for atomic swap trade" + (offers > 1 ? "s" : "") +
                          " broadcasting. If you close the wallet, your offers will be withdrawn from the marketplace.\n\n"
-                         "Are you sure you want to close the wallet int even withdraw your offers?",
+                         "Are you sure you want to close the wallet and withdraw your offers?",
                          "No", "Yes",
                          "Keep my wallet running",
                          "Close the wallet",

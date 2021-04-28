@@ -169,7 +169,7 @@ void RichItem::keyPressEvent(QKeyEvent *event) {
 //  Helpers
 
 // Create Mark + v layout that ready to accept the rows
-RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked, int leftMarkSize,
+RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked, QString markColor, int leftMarkSize,
                             int leftMarkSpacing,
                             int vboxSpacing,
                             int vboxMargin ) {
@@ -180,7 +180,7 @@ RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked, int le
             .setContentsMargins(0, 0, leftMarkSize + leftMarkSpacing, 0)
             .addWidget( new QWidget(itm) )
             .setFixedWidth( leftMarkSize )
-            .setWidgetStyleSheet(marked ? control::LEFT_MARK_ON : control::LEFT_MARK_OFF);
+            .setWidgetStyleSheet(marked ? control::LEFT_MARK_ON(markColor) : control::LEFT_MARK_OFF);
 
     itm->vbox().setSpacing(vboxSpacing)
             .setContentsMargins(0, vboxMargin, 0, vboxMargin);

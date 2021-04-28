@@ -246,6 +246,8 @@ bool MWC713::updateWalletConfig(const QString &path, bool canStartNode) {
 void MWC713::start() {
     resetData(STARTED_MODE::NORMAL);
 
+    QFile::remove(getTorLogFilename());
+
     QString path = appContext->getCurrentWalletInstance(true);
     qDebug() << "MWC713::start for path " << path;
     if (!updateWalletConfig(path, true))
@@ -2188,10 +2190,28 @@ WalletConfig MWC713::readWalletConfig(QString source) {
         mwc713config.updateConfig("libp2p_port", "3419");
     }
 
+    QString tor_log_file = mwc713config.getString("tor_log_file");
+
+    // Generating tor path
+    QString torLogPath = getTorLogFilename();
+    if (!source.startsWith(":") && tor_log_file != torLogPath) {
+        // we have to update the mwc713 wallet path
+        mwc713config.updateConfig( "tor_log_file", "\""+torLogPath+"\"");
+    }
+
     return WalletConfig().setData(network, dataPath, mwcmqsDomain,
                                   foreignApi, foreignApiAddress, tlsCertificateFile, tlsCertificateKey);
 }
 
+QString MWC713::getTorLogFilename() {
+    // Generating tor path
+    QPair<bool,QString> logPath = ioutils::getAppDataPath("logs");
+    if (!logPath.first) {
+        core::getWndManager()->messageTextDlg("Error", logPath.second);
+    }
+    QString torLogPath = logPath.second + "/tor.log";
+    return torLogPath;
+}
 
 // Get current configuration of the wallet. will read from wallet713.toml file
 const WalletConfig &MWC713::getWalletConfig() {
@@ -2419,6 +2439,7 @@ void MWC713::setWalletOutputs(const QString &account, const QVector<wallet::Wall
 }
 
 void MWC713::timerEvent(QTimerEvent *event) {
+    Q_UNUSED(event)
     if (isWalletRunningAndLoggedIn()) {
         if (torStarted) {
             // Checking tor connection

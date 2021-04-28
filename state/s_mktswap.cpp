@@ -318,22 +318,24 @@ QString SwapMarketplace::createNewOffer( QString offerId, QString  account,
                 return "";
             }
         }
-        return "Not found offer with Id " + offerId;
+        // If not found - it is fine, we are restoring the published offers. We want to keep offer Ids in order to eliminate duplications of the same offers
+        // with different Ids after wallet restart.
     }
 
-    QString offerKey = "SwapOffer_" + QString::number(currentOfferId++);
+    if (offerId.isEmpty())
+        offerId = "SwapOffer_" + QString::number(currentOfferId++);
 
     // Let's check if we have some funds and lock the funds.
     QPair<QString, QStringList> lockedOutputs;
     if (sell) {
-        lockedOutputs = lockOutputsForSellOffer(account, mwcAmount, offerKey);
+        lockedOutputs = lockOutputsForSellOffer(account, mwcAmount, offerId);
     }
 
     if (!lockedOutputs.first.isEmpty())
         return lockedOutputs.first;
 
     // Now we can create the offer and publish it...
-    MySwapOffer offer(MktSwapOffer(offerKey,
+    MySwapOffer offer(MktSwapOffer(offerId,
                                    sell,
                                    mwcAmount,
                                    secAmount,
@@ -741,13 +743,21 @@ void SwapMarketplace::respRequestIntegrityFees(QString error, int64_t balance, Q
     for (MySwapOffer & ms : myOffers) {
         if (ms.status == OFFER_STATUS::STARTING ) {
             bool isConfirmed = false;
+            bool found = false;
             for ( auto & f : fees ) {
                 if (f.uuid == ms.integrityFee.uuid) {
                     ms.integrityFee = f;
                     isConfirmed = f.confirmed;
+                    found = true;
                     break;
                 }
             }
+
+            if (!found) {
+                ms.status = OFFER_STATUS::PENDING;
+                emit onMessagingStatusChanged();
+            }
+
 
             if (isConfirmed) {
                 // let's start the broadcasting...
@@ -877,6 +887,9 @@ void SwapMarketplace::respReceiveMessages(QString error, QVector<wallet::Receive
     }
     std::sort(startMsgIds.begin(), startMsgIds.end());
 
+    int64_t curTime = QDateTime::currentSecsSinceEpoch();
+    int64_t expiredTime = curTime - OFFER_PUBLISHING_INTERVAL_SEC * 2;
+
     // Updating  marketOffers
     for ( const auto & m : msgs) {
         if (m.topic!=SWAP_TOPIC)
@@ -898,6 +911,9 @@ void SwapMarketplace::respReceiveMessages(QString error, QVector<wallet::Receive
         }
 
         if (offer.walletAddress == myTorAddress)
+            continue;
+
+        if (m.timestamp<expiredTime)
             continue;
 
         offer.mktFee = double(m.fee) / 1000000000.0;
@@ -1117,19 +1133,17 @@ void SwapMarketplace::onSendMarketplaceMessage(QString error, QString response, 
     if (cookie == "SwapMarketplaceCheck") {
         if (running_num > 0) {
             // There are something already going, let's report it.
-            if (core::WndManager::RETURN_CODE::BTN1 != core::getWndManager()->questionTextDlg("Warning", "Wallet " +
-                                                                                                         walletAddress +
-                                                                                                         " already has " +
-                                                                                                         QString::number(
-                                                                                                                 running_num) +
-                                                                                                         " accepted trades. Only one trade that lock "
-                                                                                                         "coins first will continue, the rest will be cancelled. As a result your trade might be cancelled even you lock the coins.\n\n"
-                                                                                                         "You can wait for some time, try to accept this offer later. Or you can continue, you trade might win.\n\n "
-                                                                                                         "Do you want to continue and start trading?",
-                                                                                              "Yes", "No",
-                                                                                              "I understand the risk and I want to continue",
-                                                                                              "No, I will better wait",
-                                                                                              false, true)) {
+            if (core::WndManager::RETURN_CODE::BTN1 !=
+                    core::getWndManager()->questionTextDlg(
+                        "Warning",
+                        "Wallet " + walletAddress + " already has " + QString::number(running_num) + " accepted trades. Only one trade that lock "
+                        "coins first will continue, the rest will be cancelled. As a result your trade might be cancelled even you lock the coins.\n\n"
+                        "You can wait for some time, try to accept this offer later. Or you can continue, you trade might win.\n\n "
+                        "Do you want to continue and start trading?",
+                        "Yes", "No",
+                        "I understand the risk and I want to continue",
+                        "No, I will better wait",
+                        false, true)) {
                 getSwap()->rejectOffer(mktOffer, walletAddress);
                 return;
             }

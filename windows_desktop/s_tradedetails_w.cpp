@@ -66,7 +66,7 @@ void TradeDetails::updateData(const QVector<QString> & executionPlan,
         if (active)
             past = false;
 
-        control::RichItem *itm = control::createMarkedItem(QString::number(i/3), ui->executionPlan, active,
+        control::RichItem *itm = control::createMarkedItem(QString::number(i/3), ui->executionPlan, active, "",
                     control::LEFT_MARK_SIZE, control::LEFT_MARK_SIZE,
                     6, 8);
 
@@ -89,7 +89,7 @@ void TradeDetails::updateData(const QVector<QString> & executionPlan,
         QString message = tradeJournal[i-1];
         QString data = tradeJournal[i];
 
-        control::RichItem *itm = control::createMarkedItem(QString::number(i/3), ui->executionPlan, false,
+        control::RichItem *itm = control::createMarkedItem(QString::number(i/3), ui->executionPlan, false, "",
                                                            control::LEFT_MARK_SIZE, control::LEFT_MARK_SIZE,
                                                            6, 8);
 

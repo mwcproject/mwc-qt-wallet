@@ -610,6 +610,7 @@ private:
     // process accountInfoNoLocks, apply locked outputs
     QVector<AccountInfo> applyOutputLocksToBalance() const;
 
+    static QString getTorLogFilename();
 private:
     core::AppContext * appContext = nullptr; // app context to store current account name
     node::MwcNode * mwcNode = nullptr;

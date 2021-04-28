@@ -125,7 +125,7 @@ void Transactions::updateData(bool resetScroller) {
         }
 
         control::RichItem *itm = control::createMarkedItem(QString::number(idx), ui->transactionTable,
-                                                           trans.canBeCancelled());
+                                                           trans.canBeCancelled(), "");
 
         { // First line
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);

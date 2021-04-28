@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -189,7 +189,7 @@
        <height>0</height>
       </size>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1,0,1">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1,0,2">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -248,7 +248,9 @@
            </size>
           </property>
           <property name="text">
-           <string>In order to publish your Atomic Swap Offer,  you need to pay Integrity fee.  Those fees are protecting from the spamming.  If currently at low fee there are many spammers, your offer might not be searchable. In this case it make sense to pay higher fee, so traders can see that you are serious about trading.</string>
+           <string>In order to publish your Atomic Swap Offer,  you need to pay Integrity fee.  Those fees are protecting from the spamming.  If currently at low fee there are many spammers, your offer might not be searchable. In this case it make sense to pay higher fee, so traders can see that you are serious about trading.
+
+Please note,  fees are renew automatically to keep your offer published until it will be accepted or canceled.</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

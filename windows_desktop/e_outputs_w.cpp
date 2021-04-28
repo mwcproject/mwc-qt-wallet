@@ -104,7 +104,7 @@ void Outputs::updateShownData(bool resetScrollData) {
         QString lockState = calcLockedState(out);
         bool mark = calcMarkFlag(out);
 
-        control::RichItem * itm = control::createMarkedItem(QString::number(i), ui->outputsTable, mark );
+        control::RichItem * itm = control::createMarkedItem(QString::number(i), ui->outputsTable, mark, "" );
 
         QWidget * markWnd = (QWidget *) itm->getCurrentWidget();
 
@@ -255,7 +255,7 @@ bool Outputs::updateOutputState(int idx, bool lock) {
         }
 
         bool mark = calcMarkFlag(selected);
-        allData[idx].markWnd->setStyleSheet( mark ? control::LEFT_MARK_ON : control::LEFT_MARK_OFF );
+        allData[idx].markWnd->setStyleSheet( mark ? control::LEFT_MARK_ON("") : control::LEFT_MARK_OFF );
 
         return true;
     }

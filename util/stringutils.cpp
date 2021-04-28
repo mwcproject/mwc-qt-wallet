@@ -45,14 +45,14 @@ QVector<QString> parsePhrase2Words( const QString & phrase ) {
 
 
 // convert nano items to dtirng that represent that fraction as a double
-QString nano2one( int64_t nano ) {
+QString nano2one( int64_t nano, bool firstcall ) {
     if (nano == 0)
         return "0";
 
     if (nano<0) {
-        if (-nano < 0)
+        if (-nano < 0 || !firstcall)
             return "ErrValue"; // it muct be a bug at mwc-wallet level, we can;t handle it here.
-        return "-" + nano2one(-nano);
+        return "-" + nano2one(-nano, false);
     }
 
     QString myNumber = QString::number( std::abs(nano),10);

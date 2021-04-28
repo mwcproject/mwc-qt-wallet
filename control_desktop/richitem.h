@@ -22,7 +22,12 @@ namespace control {
 
 class RichVBox;
 
-const QString LEFT_MARK_ON = "background: #BCF317; border: transparent;";
+inline QString LEFT_MARK_ON(QString color) {
+    if (color.isEmpty())
+        color = "#BCF317";
+    return "background: " + color + "; border: transparent;";
+}
+
 const QString LEFT_MARK_OFF = "background: transparent; border: transparent;";
 const QString HORZ_LINE = "background: rgba(255, 255, 255, 0.5); border: transparent;";  // Same as Resorces has
 const int     LEFT_MARK_SIZE = 3;
@@ -92,7 +97,7 @@ private:
 // Helpers, Control builder
 
 // Create Mark + v layout that ready to accept the rows
-RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked,
+RichItem * createMarkedItem(QString itemId, QWidget *parent, bool marked, QString markColor,
                             int leftMarkSize = LEFT_MARK_SIZE,
                             int leftMarkSpacing = LEFT_MARK_SPACING,
                             int vboxSpacing = VBOX_SPACING,

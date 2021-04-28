@@ -119,7 +119,7 @@ void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, 
 
     Q_ASSERT(markWnd);
     if ( config->getMaxBackupStatus(tradeId, swBackup) >=2 || !lastProcessError.isEmpty() )
-        markWnd->setStyleSheet(control::LEFT_MARK_ON);
+        markWnd->setStyleSheet(control::LEFT_MARK_ON(""));
     else
         markWnd->setStyleSheet(control::LEFT_MARK_OFF);
 
@@ -130,6 +130,21 @@ void SwapTradeInfo::applyState2Ui(bridge::Util * util, bridge::Config * config, 
         noteLabel->hide();
     else
         noteLabel->show();
+}
+
+QString SwapTradeInfo::calcRateAsStr() const {
+    return  util::zeroDbl2Dbl( QString::number( calcRate(), 'f', 8 ) );
+}
+
+double  SwapTradeInfo::calcRate() const {
+    bool okMwc = false;
+    bool okSec = false;
+    double mwc = mwcAmount.toDouble(&okMwc);
+    double sec = secondaryAmount.toDouble(&okSec);
+    if (okMwc && okSec && mwc>0.0)
+        return sec / mwc;
+
+    return 0.0;
 }
 
 
@@ -308,29 +323,20 @@ void SwapList::updateTradeListData() {
         const bool marked = false;
 
         // Here we have only Hirizontal layout. It is simple and swap related only.
-        control::RichItem *itm = control::createMarkedItem(sw.tradeId, ui->swapsTable, marked);
+        control::RichItem *itm = control::createMarkedItem(sw.tradeId, ui->swapsTable, marked, "");
 
         sw.markWnd = itm->getCurrentWidget();
 
         { // first line...
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
 
-            if (sw.isSeller) {
-                itm->addWidget(
-                        control::createIcon(itm, ":/img/iconSent@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
-                itm->addWidget(control::createLabel(itm, false, false,
-                                                    sw.mwcAmount + " MWC " + QChar(0x279E) + " " + sw.secondaryAmount +
-                                                    " " + sw.secondaryCurrency));
-            } else {
-                itm->addWidget(
-                        control::createIcon(itm, ":/img/iconReceived@2x.svg", control::ROW_HEIGHT,
-                                            control::ROW_HEIGHT));
-                itm->addWidget(control::createLabel(itm, false, false,
-                                                    sw.secondaryAmount + " " + sw.secondaryCurrency + " " +
-                                                    QChar(0x279E) + " " +
-                                                    sw.mwcAmount + " MWC"));
-            }
-            itm->setMinWidth(250);
+            itm->addWidget(
+                    control::createIcon(itm, sw.isSeller ? ":/img/iconSent@2x.svg" : ":/img/iconReceived@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+            itm->addWidget(control::createLabel(itm, false, false,
+                                                (sw.isSeller ? "Sell " : "Buy ") + sw.mwcAmount + " MWC for " +
+                                                sw.secondaryAmount + " " +  sw.secondaryCurrency +
+                                                " ; Price "+ sw.calcRateAsStr() + " (" + sw.secondaryCurrency + ")"));
+            itm->setMinWidth(400);
             sw.initTimeLable = (QLabel*) itm->addWidget(control::createLabel(itm, false, true, "")).setMinWidth(120).getCurrentWidget();
             itm->addHSpacer();
             sw.expirationLable = (QLabel*) itm->addWidget(control::createLabel(itm, false, true,"")).setMinWidth(120).getCurrentWidget();

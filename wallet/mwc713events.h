@@ -182,7 +182,7 @@ private:
     // Example: checking for wallet become online/offline
     QVector< Mwc713Task* > listeners; // Owner of the tasks
 
-    QMutex taskQMutex; // recursive
+    static QMutex taskQMutex; // recursive
     QVector< taskInfo > taskQ; // Owner of the tasks
     int groupId = 0;
 

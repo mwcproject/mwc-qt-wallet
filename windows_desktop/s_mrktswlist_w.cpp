@@ -241,27 +241,16 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
         for (auto &s : offersStr) {
             state::MySwapOffer offer(s);
 
-            control::RichItem *itm = control::createMarkedItem(offer.offer.id, ui->buyOffersTable, false);
+            control::RichItem *itm = control::createMarkedItem(offer.offer.id, ui->buyOffersTable, true, offer.offer.sell ? "#00c42e" : "#ff0000" );
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
 
             // Line 1
-            if (offer.offer.sell) {
-                itm->addWidget(
-                        control::createIcon(itm, ":/img/iconSent@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
-                itm->addWidget(control::createLabel(itm, false, false,
-                                                    QString::number(offer.offer.mwcAmount) + " MWC " + QChar(0x279E) +
-                                                    " " + QString::number(offer.offer.secAmount) +
-                                                    " " + offer.offer.secondaryCurrency + " ;  "+ offer.offer.calcRateAsStr() + " ;  " + (hasTor ? offer.getStatusStr(lastNodeHeight) : "Waiting for TOR...")   ));
-            } else {
-                itm->addWidget(
-                        control::createIcon(itm, ":/img/iconReceived@2x.svg", control::ROW_HEIGHT,
-                                            control::ROW_HEIGHT));
-                itm->addWidget(control::createLabel(itm, false, false,
-                                                    QString::number(offer.offer.secAmount) + " " +
-                                                    offer.offer.secondaryCurrency + " " +
-                                                    QChar(0x279E) + " " +
-                                                    QString::number(offer.offer.mwcAmount) + " MWC" + " ;  "+ offer.offer.calcRateAsStr() +" ;  " + (hasTor ? offer.getStatusStr(lastNodeHeight) : "Waiting for TOR...") ));
-            }
+            itm->addWidget(
+                        control::createIcon(itm, offer.offer.sell ? ":/img/iconSent@2x.svg" : ":/img/iconReceived@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+            itm->addWidget(control::createLabel(itm, false, false,
+                                                    (offer.offer.sell ? "Sell " : "Buy ") + QString::number(offer.offer.mwcAmount) + " MWC for " +
+                                                    QString::number(offer.offer.secAmount) + " " + offer.offer.secondaryCurrency +
+                                                    " ; Price "+ offer.offer.calcRateAsStr() + " (" + offer.offer.secondaryCurrency + "); " + (hasTor ? offer.getStatusStr(lastNodeHeight) : "Waiting for TOR...")   ));
 //            itm->setMinWidth(275);
 //            itm->addWidget(control::createLabel(itm, false, true, "Auto renew: Yes"));
             itm->addHSpacer().pop();
@@ -362,29 +351,19 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
                 parent = ui->buyOffersTable;
             }
             Q_ASSERT(parent);
-            control::RichItem * itm = control::createMarkedItem(mktOfferId, parent, ownOffer, 3, 10, 3, 10);
+            control::RichItem * itm = control::createMarkedItem(mktOfferId, parent, ownOffer, "", 3, 10, 3, 10);
 
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
 
             // Line 1
-            if (offer.sell) {
-                itm->addWidget(
-                        control::createIcon(itm, ":/img/iconSent@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
-                itm->addWidget(control::createLabel(itm, false, false,
-                                                    QString::number(offer.mwcAmount) + " MWC " + QChar(0x279E) + " " +
-                                                    QString::number(offer.secAmount) +
-                                                    " " + offer.secondaryCurrency + " ;  " + offer.calcRateAsStr() ));
-            } else {
-                itm->addWidget(
-                        control::createIcon(itm, ":/img/iconReceived@2x.svg", control::ROW_HEIGHT,
-                                            control::ROW_HEIGHT));
-                itm->addWidget(control::createLabel(itm, false, false,
-                                                    QString::number(offer.secAmount) + " " + offer.secondaryCurrency +
-                                                    " " +
-                                                    QChar(0x279E) + " " +
-                                                    QString::number(offer.mwcAmount) + " MWC" + " ;  " + offer.calcRateAsStr() ));
-            }
-            itm->setMinWidth(230);
+            itm->addWidget(
+                    control::createIcon(itm, offer.sell ? ":/img/iconSent@2x.svg" : ":/img/iconReceived@2x.svg", control::ROW_HEIGHT, control::ROW_HEIGHT));
+            itm->addWidget(control::createLabel(itm, false, false,
+                                                (offer.sell ? "Sell " : "Buy ") + QString::number(offer.mwcAmount) + " MWC for " +
+                                                QString::number(offer.secAmount) + " " + offer.secondaryCurrency +
+                                                " ; Price "+ offer.calcRateAsStr() + " (" + offer.secondaryCurrency + ")"));
+
+            itm->addFixedHSpacer(20);
 
             if (sellingFlag!=2) {
                 QString text;
@@ -394,7 +373,7 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
                 }
                 itm->addWidget(control::createLabel(itm, false, true,
                                                     text));
-                itm->setMinWidth(200);
+                itm->addFixedHSpacer(20);
             }
 
             itm->addWidget(

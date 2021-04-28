@@ -24,6 +24,8 @@
 
 namespace wallet {
 
+QMutex Mwc713EventManager::taskQMutex(QMutex::Recursive);
+
 
 QString toString(WALLET_EVENTS event) {
     switch (event) {
@@ -80,7 +82,7 @@ QString toString(WALLET_EVENTS event) {
 }
 
 
-Mwc713EventManager::Mwc713EventManager(MWC713 * _mwc713wallet) : mwc713wallet(_mwc713wallet) , taskQMutex(QMutex::Recursive)
+Mwc713EventManager::Mwc713EventManager(MWC713 * _mwc713wallet) : mwc713wallet(_mwc713wallet)
 {
 }
 
