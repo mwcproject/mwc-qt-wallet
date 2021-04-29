@@ -59,17 +59,19 @@ MktSwapOffer::MktSwapOffer( const QString & jsonStr ) : MktSwapOffer(str2json(js
 
 MktSwapOffer::MktSwapOffer( const QJsonObject & json ) {
     int version = json["version"].toInt();
-    Q_ASSERT(version==1); // Currently no needs to handle versions, there is only one
+    Q_ASSERT(version==0 || version==1); // Currently no needs to handle versions, there is only one
 
-    id = json["id"].toString();
-    sell = json["sell"].toBool();
-    mwcAmount = json["mwcAmount"].toDouble();
-    secAmount = json["secAmount"].toDouble();
-    secondaryCurrency = json["secondaryCurrency"].toString();
-    mwcLockBlocks = json["mwcLockBlocks"].toInt();
-    secLockBlocks = json["secLockBlocks"].toInt();
-    mktFee = json["mktFee"].toDouble();
-    walletAddress = json["walletAddress"].toString();
+    if (version==1) {
+        id = json["id"].toString();
+        sell = json["sell"].toBool();
+        mwcAmount = json["mwcAmount"].toDouble();
+        secAmount = json["secAmount"].toDouble();
+        secondaryCurrency = json["secondaryCurrency"].toString();
+        mwcLockBlocks = json["mwcLockBlocks"].toInt();
+        secLockBlocks = json["secLockBlocks"].toInt();
+        mktFee = json["mktFee"].toDouble();
+        walletAddress = json["walletAddress"].toString();
+    }
 }
 
 
@@ -442,7 +444,14 @@ QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, int s
                 offer.walletAddress = myTorAddress;
                 offer.mktFee = mo.integrityFee.toDblFee();
                 offer.timestamp = curTime;
-                result.push_back(offer);
+
+                if (offer.sell && selling==0)
+                    continue;
+                if (!offer.sell && selling==1)
+                    continue;
+
+                if ( offer.getFeeLevel() >= minFeeLevel && (currency.isEmpty() || currency==offer.secondaryCurrency) )
+                    result.push_back(offer);
         }
     }
 
@@ -522,10 +531,12 @@ void SwapMarketplace::onTimerEvent() {
     int64_t curTime = QDateTime::currentSecsSinceEpoch();
 
     // checking the libp2p status periodically
-    if (context->wallet->isWalletRunningAndLoggedIn()) {
-        if (lastMessagingStatusRequest + 20 < curTime ) {
-            context->wallet->requestMessagingStatus();
-        }
+    if (!context->wallet->isWalletRunningAndLoggedIn()) {
+        return;
+    }
+
+    if (lastMessagingStatusRequest + 20 < curTime ) {
+        context->wallet->requestMessagingStatus();
     }
 
     // It is a main timer that triggers whole workflow

@@ -89,6 +89,7 @@ MrktSwapNew::MrktSwapNew(QWidget *parent, QString myMsgId) :
         thirdValueUpdate.push_back(UPDATE_SEC);
         ui->secAddressEdit->setText( offer.secAddress );
         ui->noteEdit->setText(offer.note);
+        secAddressCoin = offer.offer.secondaryCurrency;
     }
 
     if (!offer.offer.secondaryCurrency.isEmpty()) {
@@ -100,7 +101,7 @@ MrktSwapNew::MrktSwapNew(QWidget *parent, QString myMsgId) :
 
     onSgnWalletBalanceUpdated();
 
-    // Fee need to be updated at the end becuase currency tab does reset to the default one.
+    // Fee need to be updated at the end because currency tab does reset to the default one.
     if ( !offer.offer.id.isEmpty() ) {
         QString feeStr = QString::number(offer.secFee);
         if (ui->secTransFeeEdit->text() != feeStr) {
@@ -152,6 +153,10 @@ void MrktSwapNew::updateSecCurrencyStatus(bool seller) {
 
     ui->secAddressEdit->setPlaceholderText(addressPlaceholderText);
     ui->secondaryCurrencyLabel->setText(selectedCur + " address:");
+
+    if (secAddressCoin!=selectedCur) {
+        ui->secAddressEdit->setText("");
+    }
 
     ui->secAmountEdit->setPlaceholderText(selectedCur + " amount");
 
@@ -463,6 +468,12 @@ void MrktSwapNew::on_secTransFeeEdit_textEdited(const QString &arg1)
 {
     Q_UNUSED(arg1)
     ui->secTransFeeLabel2->hide();
+}
+
+void MrktSwapNew::on_secAddressEdit_textEdited(const QString &arg1)
+{
+    Q_UNUSED(arg1)
+    secAddressCoin = ui->secCurrencyCombo->currentData().toString();
 }
 
 }

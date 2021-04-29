@@ -60,11 +60,11 @@ private slots:
     void on_secBlocksEdit_textEdited(const QString &arg1);
     void on_submitButton_clicked();
     void on_cancelButton_clicked();
+    void on_secTransFeeEdit_textEdited(const QString &arg1);
+    void on_secAddressEdit_textEdited(const QString &arg1);
 
     void onSgnWalletBalanceUpdated();
     void onSgnApplyNewTrade1Params(bool ok, QString errorMessage);
-
-    void on_secTransFeeEdit_textEdited(const QString &arg1);
 
 private:
     Ui::MrktSwapNew *ui;
@@ -75,8 +75,8 @@ private:
     bridge::Util * util = nullptr;
 
     state::MySwapOffer offer;
-
     QVector<int> thirdValueUpdate;
+    QString secAddressCoin; // For what coin we enter address
 };
 
 }

@@ -213,7 +213,7 @@ signals:
     // Account is renamed, renameAccount
     void sgnAccountRenamed(bool success, QString errorMessage);
 
-    // respobd from repost.  OK is err is empty
+    // respond from repost.  OK is err is empty
     void sgnRepost(int txIdx, QString err);
 
     // response form DecodeSlatepack. Ok if error is empty

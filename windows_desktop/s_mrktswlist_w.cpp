@@ -241,7 +241,7 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
         for (auto &s : offersStr) {
             state::MySwapOffer offer(s);
 
-            control::RichItem *itm = control::createMarkedItem(offer.offer.id, ui->buyOffersTable, true, offer.offer.sell ? "#00c42e" : "#ff0000" );
+            control::RichItem *itm = control::createMarkedItem(offer.offer.id, ui->buyOffersTable, true, offer.offer.sell ? "#ff0000" : "#009127" );
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
 
             // Line 1
