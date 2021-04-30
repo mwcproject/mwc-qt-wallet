@@ -472,6 +472,8 @@ struct MessagingStatus {
 
     // Status for logs
     QString toString() const;
+
+    bool isConnected() const {return connected && gossippub_peers.size()>=3; }
 };
 
 struct ReceivedMessages {

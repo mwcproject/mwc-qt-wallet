@@ -28,6 +28,7 @@
 #include <cmath>
 #include <QFile>
 #include "../util/address.h"
+#include "../core/Notification.h"
 
 namespace state {
 
@@ -195,6 +196,9 @@ QString MySwapOffer::toJsonStr() const {
 
 QString MySwapOffer::getStatusStr(int tipHeight) const {
     switch (status) {
+        case OFFER_STATUS::CONNECTING: {
+            return "Waiting for peers...";
+        }
         case OFFER_STATUS::PENDING: {
             return "Preparing...";
         }
@@ -349,6 +353,10 @@ QString SwapMarketplace::createNewOffer( QString offerId, QString  account,
                       secFee,
                       note,
                       lockedOutputs.second);
+
+    if (messagingStatus.isConnected()) {
+        offer.status = OFFER_STATUS::PENDING;
+    }
 
     myOffers.push_back(offer);
     emit onMyOffersChanged();
@@ -540,6 +548,12 @@ void SwapMarketplace::onTimerEvent() {
         if (context->wallet->getListenerStatus().tor) {
             context->wallet->requestMessagingStatus();
         }
+        else {
+            if (messagingStatus.connected) {
+                messagingStatus = wallet::MessagingStatus();
+                emit onMessagingStatusChanged();
+            }
+        }
     }
 
     // It is a main timer that triggers whole workflow
@@ -554,11 +568,38 @@ void SwapMarketplace::onTimerEvent() {
 
     requestMktSwapOffers();
 
+    if (!messagingStatus.isConnected()) {
+        // Stopping broadcasting...
+        int stoppedOffers = 0;
+        for (MySwapOffer & ms : myOffers) {
+            if (ms.status != OFFER_STATUS::CONNECTING) {
+                if (ms.status != OFFER_STATUS::RUNNING) {
+                    context->wallet->messageWithdraw( ms.msgUuid );
+                    stoppedOffers++;
+                }
+                ms.status = OFFER_STATUS::CONNECTING;
+            }
+        }
+        if (stoppedOffers>0) {
+            notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::WARNING, "Not enough libp2p peers, we pause broadcasting " + QString::number(stoppedOffers) + " Marketplace offers." );
+            emit onMyOffersChanged();
+        }
+
+        return;
+    }
+
     // Check if we need to start anything
     bool hasPending = false;
     bool hasStarting = false;
-    for (MySwapOffer ms : myOffers) {
+    for (MySwapOffer & ms : myOffers) {
         switch (ms.status) {
+            case OFFER_STATUS::CONNECTING: {
+                if (messagingStatus.isConnected()) {
+                    ms.status = OFFER_STATUS::PENDING;
+                    hasPending = true;
+                }
+                break;
+            }
             case OFFER_STATUS::PENDING: {
                 hasPending = true;
                 break;
@@ -570,6 +611,15 @@ void SwapMarketplace::onTimerEvent() {
             default: {}
         }
     }
+
+    // we want to process both, because both a need long waiting time
+    if (hasStarting && hasPending) {
+        if (opsCounter++ % 2 == 0)
+            hasStarting = false;
+        else
+            hasPending = false;
+    };
+
     if (hasStarting) {
         context->wallet->requestIntegrityFees();
     }
@@ -955,6 +1005,10 @@ void SwapMarketplace::respReceiveMessages(QString error, QVector<wallet::Receive
 
 
 QString SwapMarketplace::getOffersListeningStatus() const {
+    if ( !context->wallet->getListenerStatus().tor ) {
+        return "Waiting for TOR...";
+    }
+
     if (startMktListening==0 || !messagingStatus.connected || messagingStatus.topics.isEmpty())
         return "Not listening";
 
@@ -969,9 +1023,9 @@ QString SwapMarketplace::getOffersListeningStatus() const {
     int64_t collectingTime = QDateTime::currentSecsSinceEpoch() - startMktListening;
     Q_ASSERT(collectingTime>=0);
 
-    if ( collectingTime < OFFER_PUBLISHING_INTERVAL_SEC ) {
+/* No need    if ( collectingTime < OFFER_PUBLISHING_INTERVAL_SEC ) {
         return "Collecting... " + QString::number( collectingTime * 100 / OFFER_PUBLISHING_INTERVAL_SEC ) + "%";
-    }
+    }*/
 
     return "Listening";
 }

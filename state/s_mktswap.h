@@ -84,7 +84,7 @@ struct MktSwapOffer {
     double  calcRate() const;
 };
 
-enum class OFFER_STATUS { PENDING=1, STARTING=2, RUNNING=3 };
+enum class OFFER_STATUS { CONNECTING=0, PENDING=1, STARTING=2, RUNNING=3 };
 
 struct MySwapOffer {
     QString msgUuid;
@@ -116,7 +116,7 @@ struct MySwapOffer {
         outputs(_outputs)
     {
         msgUuid = ""; // uuid will be assigned when wallet create it
-        status = OFFER_STATUS::PENDING;
+        status = OFFER_STATUS::CONNECTING;
     }
     // build form Json string
     MySwapOffer(const QString jsonStr);
@@ -289,6 +289,8 @@ private:
     int64_t lastCheckIntegrity = 0;
     bool marketplaceActivated = false;
     int lastNodeHeight = 0;
+
+    int opsCounter = 0;
 };
 
 }
