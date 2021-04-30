@@ -1,11 +1,13 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
 import Qt.labs.platform 1.1
+import QtQuick.Controls 2.13
 import WalletBridge 1.0
 import TransactionsBridge 1.0
 import ConfigBridge 1.0
 import UtilBridge 1.0
 import NotificationBridge 1.0
+import QtAndroidService 1.0
 
 Item {
     id: transactionsItem
@@ -40,6 +42,10 @@ Item {
 
     NotificationBridge {
         id: notification
+    }
+
+    QtAndroidService {
+        id: qtAndroidService
     }
 
     Connections {
@@ -124,13 +130,9 @@ Item {
                 messagebox.open("Failure", msg)
             }
         }
-    }
 
-    onVisibleChanged: {
-        if (visible) {
-            rect_progress.visible = true
-           requestTransactions()
-           updateData()
+        onSgnWalletBalanceUpdated: {
+            updateAccountsData()
         }
     }
 
@@ -255,6 +257,39 @@ Item {
         return tx.txIdx >= 0 && tx.transactionType !== type_TRANSACTION_NONE
     }
 
+    function updateAccountsData() {
+        const accounts = wallet.getWalletBalance(true, false, true)
+        const selectedAccount = wallet.getCurrentAccountName()
+        let selectedAccIdx = 0
+
+        accountItems.clear()
+
+        let idx = 0
+        for (let i = 1; i < accounts.length; i += 2) {
+            if (accounts[i-1] === selectedAccount)
+                selectedAccIdx = idx
+
+            accountItems.append({ info: accounts[i], account: accounts[i-1]})
+            idx++
+        }
+        accountComboBox.currentIndex = selectedAccIdx
+    }
+
+    function currentSelectedAccount() {
+        if (accountComboBox.currentIndex >= 0)
+            return accountItems.get(accountComboBox.currentIndex).account
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            rect_progress.visible = true
+            updateAccountsData()
+            requestTransactions()
+            updateData()
+        }
+    }
+
+
     ListModel {
         id: transactionModel
     }
@@ -264,7 +299,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.top: rect_buttons.bottom
+        anchors.top: rect_accounts.bottom
         model: transactionModel
         delegate: transactionDelegate
         focus: true
@@ -394,11 +429,11 @@ Item {
     }
 
     Rectangle {
-        id: rect_buttons
+        id: rect_accounts
+        height: dp(170)
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        height: dp(65)
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop {
@@ -412,10 +447,143 @@ Item {
             }
         }
 
+        Text {
+            id: label_combobox
+            color: "#ffffff"
+            text: qsTr("Showing Transactions From This Account")
+            anchors.left: parent.left
+            anchors.leftMargin: dp(30)
+            anchors.top: parent.top
+            anchors.topMargin: dp(20)
+            font.pixelSize: dp(14)
+        }
+
+        ComboBox {
+            id: accountComboBox
+            height: dp(60)
+            anchors.right: parent.right
+            anchors.rightMargin: dp(30)
+            anchors.left: parent.left
+            anchors.leftMargin: dp(30)
+            anchors.top: label_combobox.bottom
+            anchors.topMargin: dp(10)
+            leftPadding: dp(20)
+            rightPadding: dp(40)
+            font.pixelSize: dp(15)
+
+            onCurrentIndexChanged: {
+                // Selecting the active account
+                const selectedAccount = currentSelectedAccount()
+                if (selectedAccount !== "") {
+                    wallet.switchAccount(selectedAccount)
+                    requestTransactions()
+                }
+            }
+
+            delegate: ItemDelegate {
+                width: accountComboBox.width
+                height: dp(60)
+                contentItem: Text {
+                    text: info
+                    color: "white"
+                    font: accountComboBox.font
+                    elide: Text.ElideRight
+                    verticalAlignment: Text.AlignVCenter
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                }
+                background: Rectangle {
+                    color: accountComboBox.highlightedIndex === index ? "#955BDD" : "#8633E0"
+                }
+                topPadding: dp(10)
+                bottomPadding: dp(10)
+                leftPadding: dp(20)
+                rightPadding: dp(20)
+            }
+
+            indicator: Canvas {
+                id: canvas
+                x: accountComboBox.width - width - accountComboBox.rightPadding / 2
+                y: accountComboBox.topPadding + (accountComboBox.availableHeight - height) / 2
+                width: dp(14)
+                height: dp(7)
+                contextType: "2d"
+
+                Connections {
+                    target: accountComboBox
+                    function onPressedChanged() { canvas.requestPaint() }
+                }
+
+                onPaint: {
+                    context.reset()
+                    if (accountComboBox.popup.visible) {
+                        context.moveTo(0, height)
+                        context.lineTo(width / 2, 0)
+                        context.lineTo(width, height)
+                    } else {
+                        context.moveTo(0, 0)
+                        context.lineTo(width / 2, height)
+                        context.lineTo(width, 0)
+                    }
+                    context.strokeStyle = "white"
+                    context.lineWidth = 2
+                    context.stroke()
+                }
+            }
+
+            contentItem: Text {
+                text: accountComboBox.currentIndex >= 0 && accountItems.get(accountComboBox.currentIndex).info
+                font: accountComboBox.font
+                color: "white"
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
+            }
+
+            background: Rectangle {
+                implicitHeight: dp(60)
+                radius: dp(4)
+                color: "#8633E0"
+            }
+
+            popup: Popup {
+                y: accountComboBox.height + dp(3)
+                width: accountComboBox.width
+                implicitHeight: contentItem.implicitHeight + dp(20)
+                topPadding: dp(10)
+                bottomPadding: dp(10)
+                leftPadding: dp(0)
+                rightPadding: dp(0)
+
+                contentItem: ListView {
+                    clip: true
+                    implicitHeight: contentHeight
+                    model: accountComboBox.popup.visible ? accountComboBox.delegateModel : null
+                    currentIndex: accountComboBox.highlightedIndex
+
+                    ScrollIndicator.vertical: ScrollIndicator { }
+                }
+
+                background: Rectangle {
+                    color: "#8633E0"
+                    radius: dp(5)
+                }
+
+                onVisibleChanged: {
+                    if (!accountComboBox.popup.visible) {
+                        canvas.requestPaint()
+                    }
+                }
+            }
+
+            model: ListModel {
+                id: accountItems
+            }
+        }
+
         Rectangle {
             width: dp(250)
             height: dp(40)
-            anchors.top: parent.top
+            anchors.top: accountComboBox.bottom
             anchors.topMargin: dp(15)
             anchors.horizontalCenter: parent.horizontalCenter
             color: "#00000000"
@@ -432,7 +600,11 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        fileDialog.open()
+                        if (qtAndroidService.requestPermissions()) {
+                            fileDialog.open()
+                        } else {
+                            messagebox.open("Failure", "Permission Denied")
+                        }
                     }
                 }
             }

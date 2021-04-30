@@ -16,6 +16,7 @@ Window {
     property int questionTextDlgResponse
     property int sendConformationDlgResponse
     property string downloadPath
+    property string versionName
 
     readonly property double dpi: 3.0 + (Screen.pixelDensity - 22.1) / 10
     function dp(x) { return x * dpi }
@@ -23,6 +24,7 @@ Window {
     CoreWindowBridge {
         id: coreWindow
     }
+
     StateMachineBridge {
         id: stateMachine
     }

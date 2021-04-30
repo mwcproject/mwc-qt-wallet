@@ -5,6 +5,7 @@ import QtQuick.Window 2.0
 import FinalizeBridge 1.0
 import ConfigBridge 1.0
 import UtilBridge 1.0
+import QtAndroidService 1.0
 
 Item {
     FinalizeBridge {
@@ -17,6 +18,10 @@ Item {
 
     UtilBridge {
         id: util
+    }
+
+    QtAndroidService {
+        id: qtAndroidService
     }
 
     function slatepackCallback(ok, slatepack, slateJson, sender) {
@@ -71,7 +76,11 @@ Item {
                 messagebox.open(qsTr("Unable to finalize"), qsTr("Your MWC Node, that wallet connected to, is not ready to finalize transactions.\nMWC Node need to be connected to few peers and finish blocks synchronization process"))
                 return
             }
-            fileDialog.open()
+            if (qtAndroidService.requestPermissions()) {
+                fileDialog.open()
+            } else {
+                messagebox.open("Failure", "Permission Denied")
+            }
         }
     }
 
