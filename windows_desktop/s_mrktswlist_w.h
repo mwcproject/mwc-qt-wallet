@@ -52,8 +52,8 @@ struct FeeInfo {
 
 const QVector<FeeInfo> MKT_FEES{
         FeeInfo("High","High: 50 bps or 0.5%", 0.005),
-        FeeInfo( "Normal", "Normal: 10 bps or 0.1%", 0.001),
-        FeeInfo( "Low", "Low: 1 bps or 0.01%", 0.0001)
+        FeeInfo( "Normal", "Normal: \u2A7E 10 bps or 0.1%", 0.001),
+        FeeInfo( "Low", "Low: \u2A7E 1 bps or 0.01%", 0.0001)
 };
 QString feeLevelValToStr(double fee);
 
