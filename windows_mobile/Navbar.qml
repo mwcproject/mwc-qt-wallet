@@ -126,7 +126,7 @@ Item {
             updateListenerBtn()
             updateNetworkName()
             updateInstanceAccountText()
-            updateAccountList()
+//            updateAccountList()
         }
     }
 
@@ -204,23 +204,23 @@ Item {
         text_instance_account.text = "INSTANCE:  " + config.getCurrentWalletInstance()[2] + "  //  ACCOUNT:  " + wallet.getCurrentAccountName()
     }
 
-    function updateAccountList() {
-        const accountInfo = wallet.getWalletBalance(true, true, false)
-        const selectedAccount = wallet.getCurrentAccountName()
-        let selectedAccIdx = 0
+//    function updateAccountList() {
+//        const accountInfo = wallet.getWalletBalance(true, true, false)
+//        const selectedAccount = wallet.getCurrentAccountName()
+//        let selectedAccIdx = 0
 
-        accountItems.clear()
+//        accountItems.clear()
 
-        let idx = 0
-        for (let i = 1; i < accountInfo.length; i += 2) {
-            if (accountInfo[i-1] === selectedAccount)
-                selectedAccIdx = idx
+//        let idx = 0
+//        for (let i = 1; i < accountInfo.length; i += 2) {
+//            if (accountInfo[i-1] === selectedAccount)
+//                selectedAccIdx = idx
 
-            accountItems.append({ info: accountInfo[i-1] + accountInfo[i].substring(27), account: accountInfo[i-1]})
-            idx++
-        }
-        accountComboBox.currentIndex = selectedAccIdx
-    }
+//            accountItems.append({ info: accountInfo[i-1] + accountInfo[i].substring(27), account: accountInfo[i-1]})
+//            idx++
+//        }
+//        accountComboBox.currentIndex = selectedAccIdx
+//    }
 
     Rectangle {
         id: navbarTop
@@ -576,134 +576,134 @@ Item {
                 model: navModel
             }
 
-            Text {
-                id: text_accounts
-                text: qsTr("Accounts")
-                color: "white"
-                anchors.left: parent.left
-                anchors.leftMargin: dp(35)
-                anchors.bottom: accountComboBox.top
-                anchors.bottomMargin: dp(10)
-                font.pixelSize: dp(12)
-            }
+//            Text {
+//                id: text_accounts
+//                text: qsTr("Accounts")
+//                color: "white"
+//                anchors.left: parent.left
+//                anchors.leftMargin: dp(35)
+//                anchors.bottom: accountComboBox.top
+//                anchors.bottomMargin: dp(10)
+//                font.pixelSize: dp(12)
+//            }
 
-            ComboBox {
-                id: accountComboBox
+//            ComboBox {
+//                id: accountComboBox
 
-                onCurrentIndexChanged: {
-                    if (accountComboBox.currentIndex >= 0) {
-                        const selectedAccount = accountItems.get(accountComboBox.currentIndex).account
-                        wallet.switchAccount(selectedAccount)
-                        updateInstanceAccountText()
-                    }
-                }
+//                onCurrentIndexChanged: {
+//                    if (accountComboBox.currentIndex >= 0) {
+//                        const selectedAccount = accountItems.get(accountComboBox.currentIndex).account
+//                        wallet.switchAccount(selectedAccount)
+//                        updateInstanceAccountText()
+//                    }
+//                }
 
-                delegate: ItemDelegate {
-                    width: accountComboBox.width
-                    contentItem: Text {
-                        text: info
-                        color: "white"
-                        font: accountComboBox.font
-                        elide: Text.ElideRight
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                    background: Rectangle {
-                        color: accountComboBox.highlightedIndex === index ? "#955BDD" : "#8633E0"
-                    }
-                    topPadding: dp(10)
-                    bottomPadding: dp(10)
-                    leftPadding: dp(20)
-                    rightPadding: dp(20)
-                }
+//                delegate: ItemDelegate {
+//                    width: accountComboBox.width
+//                    contentItem: Text {
+//                        text: info
+//                        color: "white"
+//                        font: accountComboBox.font
+//                        elide: Text.ElideRight
+//                        verticalAlignment: Text.AlignVCenter
+//                    }
+//                    background: Rectangle {
+//                        color: accountComboBox.highlightedIndex === index ? "#955BDD" : "#8633E0"
+//                    }
+//                    topPadding: dp(10)
+//                    bottomPadding: dp(10)
+//                    leftPadding: dp(20)
+//                    rightPadding: dp(20)
+//                }
 
-                indicator: Canvas {
-                    id: canvas
-                    x: accountComboBox.width - width - accountComboBox.rightPadding
-                    y: accountComboBox.topPadding + (accountComboBox.availableHeight - height) / 2
-                    width: dp(14)
-                    height: dp(7)
-                    contextType: "2d"
+//                indicator: Canvas {
+//                    id: canvas
+//                    x: accountComboBox.width - width - accountComboBox.rightPadding
+//                    y: accountComboBox.topPadding + (accountComboBox.availableHeight - height) / 2
+//                    width: dp(14)
+//                    height: dp(7)
+//                    contextType: "2d"
 
-                    Connections {
-                        target: accountComboBox
-                        function onPressedChanged() { canvas.requestPaint() }
-                    }
+//                    Connections {
+//                        target: accountComboBox
+//                        function onPressedChanged() { canvas.requestPaint() }
+//                    }
 
-                    onPaint: {
-                        context.reset()
-                        if (accountComboBox.popup.visible) {
-                            context.moveTo(0, height)
-                            context.lineTo(width / 2, 0)
-                            context.lineTo(width, height)
-                        } else {
-                            context.moveTo(0, 0)
-                            context.lineTo(width / 2, height)
-                            context.lineTo(width, 0)
-                        }
-                        context.strokeStyle = "white"
-                        context.lineWidth = 2
-                        context.stroke()
-                    }
-                }
+//                    onPaint: {
+//                        context.reset()
+//                        if (accountComboBox.popup.visible) {
+//                            context.moveTo(0, height)
+//                            context.lineTo(width / 2, 0)
+//                            context.lineTo(width, height)
+//                        } else {
+//                            context.moveTo(0, 0)
+//                            context.lineTo(width / 2, height)
+//                            context.lineTo(width, 0)
+//                        }
+//                        context.strokeStyle = "white"
+//                        context.lineWidth = 2
+//                        context.stroke()
+//                    }
+//                }
 
-                contentItem: Text {
-                    text: accountComboBox.currentIndex >= 0 && accountItems.get(accountComboBox.currentIndex).info
-                    font: accountComboBox.font
-                    color: "white"
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    elide: Text.ElideRight
-                }
+//                contentItem: Text {
+//                    text: accountComboBox.currentIndex >= 0 && accountItems.get(accountComboBox.currentIndex).info
+//                    font: accountComboBox.font
+//                    color: "white"
+//                    verticalAlignment: Text.AlignVCenter
+//                    horizontalAlignment: Text.AlignHCenter
+//                    elide: Text.ElideRight
+//                }
 
-                background: Rectangle {
-                    implicitHeight: dp(50)
-                    radius: dp(5)
-                    color: "#8633E0"
-                }
+//                background: Rectangle {
+//                    implicitHeight: dp(50)
+//                    radius: dp(5)
+//                    color: "#8633E0"
+//                }
 
-                popup: Popup {
-                    y: accountComboBox.height + dp(3)
-                    width: accountComboBox.width
-                    implicitHeight: contentItem.implicitHeight + dp(20)
-                    topPadding: dp(10)
-                    bottomPadding: dp(10)
-                    leftPadding: dp(0)
-                    rightPadding: dp(0)
+//                popup: Popup {
+//                    y: accountComboBox.height + dp(3)
+//                    width: accountComboBox.width
+//                    implicitHeight: contentItem.implicitHeight + dp(20)
+//                    topPadding: dp(10)
+//                    bottomPadding: dp(10)
+//                    leftPadding: dp(0)
+//                    rightPadding: dp(0)
 
-                    contentItem: ListView {
-                        clip: true
-                        implicitHeight: contentHeight
-                        model: accountComboBox.popup.visible ? accountComboBox.delegateModel : null
-                        currentIndex: accountComboBox.highlightedIndex
+//                    contentItem: ListView {
+//                        clip: true
+//                        implicitHeight: contentHeight
+//                        model: accountComboBox.popup.visible ? accountComboBox.delegateModel : null
+//                        currentIndex: accountComboBox.highlightedIndex
 
-                        ScrollIndicator.vertical: ScrollIndicator { }
-                    }
+//                        ScrollIndicator.vertical: ScrollIndicator { }
+//                    }
 
-                    background: Rectangle {
-                        color: "#8633E0"
-                        radius: dp(5)
-                    }
+//                    background: Rectangle {
+//                        color: "#8633E0"
+//                        radius: dp(5)
+//                    }
 
-                    onVisibleChanged: {
-                        if (!accountComboBox.popup.visible) {
-                            canvas.requestPaint()
-                        }
-                    }
-                }
+//                    onVisibleChanged: {
+//                        if (!accountComboBox.popup.visible) {
+//                            canvas.requestPaint()
+//                        }
+//                    }
+//                }
 
-                model: ListModel {
-                    id: accountItems
-                }
-                anchors.bottom: button_changeinstance.top
-                anchors.bottomMargin: dp(55)
-                anchors.right: parent.right
-                anchors.rightMargin: dp(35)
-                anchors.left: parent.left
-                anchors.leftMargin: dp(35)
-                leftPadding: dp(20)
-                rightPadding: dp(20)
-                font.pixelSize: dp(18)
-            }
+//                model: ListModel {
+//                    id: accountItems
+//                }
+//                anchors.bottom: button_changeinstance.top
+//                anchors.bottomMargin: dp(55)
+//                anchors.right: parent.right
+//                anchors.rightMargin: dp(35)
+//                anchors.left: parent.left
+//                anchors.leftMargin: dp(35)
+//                leftPadding: dp(20)
+//                rightPadding: dp(20)
+//                font.pixelSize: dp(18)
+//            }
 
             Button {
                 id: button_changeinstance

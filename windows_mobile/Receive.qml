@@ -7,6 +7,7 @@ import ReceiveBridge 1.0
 import WalletBridge 1.0
 import UtilBridge 1.0
 import Clipboard 1.0
+import QtAndroidService 1.0
 
 Item {
     property string proofAddr
@@ -29,6 +30,10 @@ Item {
 
     Clipboard {
         id: clipboard
+    }
+
+    QtAndroidService {
+        id: qtAndroidService
     }
 
     Connections {
@@ -447,7 +452,11 @@ Item {
             }
         }
         onClicked: {
-            fileDialog.open()
+            if (qtAndroidService.requestPermissions()) {
+                fileDialog.open()
+            } else {
+                messagebox.open("Failure", "Permission Denied")
+            }
         }
     }
 

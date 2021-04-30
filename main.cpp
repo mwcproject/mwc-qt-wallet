@@ -301,6 +301,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<bridge::Accounts>("AccountsBridge", 1, 0, "AccountsBridge");
     qmlRegisterType<bridge::AccountTransfer>("AccountTransferBridge", 1, 0, "AccountTransferBridge");
     qmlRegisterType<bridge::NodeInfo>("NodeInfoBridge", 1, 0, "NodeInfoBridge");
+    qmlRegisterType<QtAndroidService>("QtAndroidService", 1, 0, "QtAndroidService");
 
     core::MobileWndManager * wndManager = new core::MobileWndManager();
 #endif

@@ -14,6 +14,7 @@ public:
 
     static QtAndroidService *instance() { return m_instance; }
     Q_INVOKABLE void sendToService(const QString &message);
+    Q_INVOKABLE bool requestPermissions();
 
 signals:
     void messageFromService(const QString &message);

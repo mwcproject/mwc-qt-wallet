@@ -3,6 +3,7 @@ import QtQuick.Window 2.0
 import QtQuick.Controls 2.13
 import ReceiveBridge 1.0
 import UtilBridge 1.0
+import QtAndroidService 1.0
 
 Item {
     property string fileNameOrSlatepack
@@ -13,6 +14,10 @@ Item {
 
     UtilBridge {
         id: util
+    }
+
+    QtAndroidService {
+        id: qtAndroidService
     }
 
     Connections {
@@ -256,7 +261,11 @@ Item {
                 if (filepath.search("Download/") > 0) {
                     path = downloadPath + filepath.substring(filepath.search("Download/") + 8, filepath.length)
                 }
-                receive.receiveFile(path, description)
+                if (qtAndroidService.requestPermissions()) {
+                    receive.receiveFile(path, description)
+                } else {
+                    messagebox.open("Failure", "Permission Denied")
+                }
             }
         }
     }

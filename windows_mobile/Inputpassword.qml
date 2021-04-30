@@ -129,7 +129,7 @@ Item {
         anchors.bottomMargin: dp(20)
         color: "white"
         font.pixelSize: dp(14)
-        text: config.get_APP_NAME() + " v" + config.getBuildVersion()
+        text: config.get_APP_NAME() + " v" + versionName
     }
 
     Text {
