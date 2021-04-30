@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1014</width>
-    <height>854</height>
+    <width>1088</width>
+    <height>911</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -996,7 +996,7 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_7">
+    <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,1">
      <property name="spacing">
       <number>20</number>
      </property>

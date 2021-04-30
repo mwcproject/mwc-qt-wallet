@@ -535,8 +535,11 @@ void SwapMarketplace::onTimerEvent() {
         return;
     }
 
-    if (lastMessagingStatusRequest + 20 < curTime ) {
-        context->wallet->requestMessagingStatus();
+    if (lastMessagingStatusRequest + 30 < curTime ) {
+        lastMessagingStatusRequest = QDateTime::currentSecsSinceEpoch();
+        if (context->wallet->getListenerStatus().tor) {
+            context->wallet->requestMessagingStatus();
+        }
     }
 
     // It is a main timer that triggers whole workflow
