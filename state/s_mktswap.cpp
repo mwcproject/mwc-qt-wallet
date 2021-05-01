@@ -768,7 +768,6 @@ void SwapMarketplace::respCreateIntegrityFee(QString error, QVector<wallet::Inte
             wallet::IntegrityFees f = fees[i];
             if ( offerFee <= f.toDblFee() ) {
                 // applying this fee
-                offer.integrityFee = f;
                 if (offer.status == OFFER_STATUS::RUNNING) {
                     if (offer.integrityFee.uuid != f.uuid) {
                         // Updating and restarting
@@ -782,6 +781,8 @@ void SwapMarketplace::respCreateIntegrityFee(QString error, QVector<wallet::Inte
                     // Assign fee and starting
                     offer.status = OFFER_STATUS::STARTING;
                 }
+                // Need to cancel running first
+                offer.integrityFee = f;
 
                 fees.remove(i);
                 foundFee =  true;
