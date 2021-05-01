@@ -450,6 +450,7 @@ QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, int s
 
     if (!myTorAddress.isEmpty()) {
         for (auto &mo : myOffers) {
+            if (mo.status == OFFER_STATUS::RUNNING) {
                 MktSwapOffer offer = mo.offer;
                 offer.walletAddress = myTorAddress;
                 offer.mktFee = mo.integrityFee.toDblFee();
@@ -462,6 +463,7 @@ QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, int s
 
                 if ( offer.getFeeLevel() >= minFeeLevel && (currency.isEmpty() || currency==offer.secondaryCurrency) )
                     result.push_back(offer);
+            }
         }
     }
 
@@ -486,23 +488,24 @@ MktSwapOffer SwapMarketplace::getMarketOffer(QString offerId, QString walletAddr
 // All marketplace offers that are published buy currency. Sorted by largest number
 QVector<QPair<QString,int>> SwapMarketplace::getTotalOffers() {
     QHash<QString, int> offers;
-    QSet<QString> processed;
+
+    int64_t timeLimit = QDateTime::currentSecsSinceEpoch() - OFFER_PUBLISHING_INTERVAL_SEC*2;
+    QString myTorAddress = util::extractPubKeyFromAddress(context->wallet->getTorAddress());
+
     for ( const auto & mo : marketOffers ) {
-        QString key = mo.getKey();
-        if (!processed.contains(key)) {
-            processed+=key;
-            offers.insert(mo.secondaryCurrency, offers.value(mo.secondaryCurrency, 0) + 1);
-        }
+        if (mo.timestamp < timeLimit)
+            continue;
+
+        if (mo.walletAddress==myTorAddress)
+            continue;
+
+        offers.insert(mo.secondaryCurrency, offers.value(mo.secondaryCurrency, 0) + 1);
     }
 
-    QString myTorAddress = util::extractPubKeyFromAddress(context->wallet->getTorAddress());
     for ( const auto & my : myOffers ) {
-        if (my.integrityFee.toDblFee()>0.0 && my.offer.getFeeLevel()>0.0) {
+        if (my.status == OFFER_STATUS::RUNNING) {
             QString key = myTorAddress + my.offer.id;
-            if (!processed.contains(key)) {
-                processed += key;
-                offers.insert(my.offer.secondaryCurrency, offers.value(my.offer.secondaryCurrency, 0) + 1);
-            }
+            offers.insert(my.offer.secondaryCurrency, offers.value(my.offer.secondaryCurrency, 0) + 1);
         }
     }
 
