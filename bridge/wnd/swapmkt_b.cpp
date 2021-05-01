@@ -91,6 +91,25 @@ QString SwapMarketplace::getMarketOffer(QString offerId, QString walletAddress) 
     return "";
 }
 
+static QString getEstimatedNumber(int n) {
+    Q_ASSERT(n>0);
+    if (n>=10000)
+        return "10000+";
+    else if (n>=5000)
+        return "5000+";
+    else if (n>=1000)
+        return "1000+";
+    else if (n>=500)
+        return "500+";
+    else if (n>=100)
+        return "100+";
+    else if (n>=10)
+        return "10+";
+    else if (n>=5)
+        return "5+";
+    else
+        return "1+";
+}
 
 QVector<QString> SwapMarketplace::getTotalOffers() {
     QVector<QString> res;
@@ -98,7 +117,7 @@ QVector<QString> SwapMarketplace::getTotalOffers() {
     for (auto of : getSwapMkt()->getTotalOffers()) {
         res.push_back(of.first);
         Q_ASSERT(of.second>0);
-        res.push_back(QString::number(of.second));
+        res.push_back(getEstimatedNumber(of.second));
     }
 
     return res;

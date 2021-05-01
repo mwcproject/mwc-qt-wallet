@@ -1077,7 +1077,10 @@ bool Swap::mobileBack() {
 
 // Get minimal Amount for the secondary currency
 double Swap::getSecMinAmount(QString secCurrency) const {
-    return getCurrencyInfo(secCurrency).minAmount;
+    double minAmount = getCurrencyInfo(secCurrency).minAmount;
+    if (!context->wallet->getWalletConfig().getNetwork().contains("Main", Qt::CaseSensitivity::CaseInsensitive))
+        minAmount /= 10;
+    return minAmount;
 }
 
 // Notify about failed bidding. If it is true, we need to cancel and show the message about that

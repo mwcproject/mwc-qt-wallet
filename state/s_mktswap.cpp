@@ -361,6 +361,7 @@ QString SwapMarketplace::createNewOffer( QString offerId, QString  account,
     myOffers.push_back(offer);
     emit onMyOffersChanged();
     emit onMarketPlaceOffersChanged(); // Because we are listed them
+    emit onMessagingStatusChanged();
     return "";
 }
 
@@ -411,6 +412,7 @@ QString SwapMarketplace::withdrawMyOffer(QString offerId) {
             myOffers.remove(i);
             emit onMyOffersChanged();
             emit onMarketPlaceOffersChanged(); // Because we are listed them
+            emit onMessagingStatusChanged();
             return desc;
         }
     }
@@ -484,8 +486,24 @@ MktSwapOffer SwapMarketplace::getMarketOffer(QString offerId, QString walletAddr
 // All marketplace offers that are published buy currency. Sorted by largest number
 QVector<QPair<QString,int>> SwapMarketplace::getTotalOffers() {
     QHash<QString, int> offers;
-    for ( auto & mo : marketOffers ) {
-        offers.insert( mo.secondaryCurrency, offers.value(mo.secondaryCurrency, 0) + 1);
+    QSet<QString> processed;
+    for ( const auto & mo : marketOffers ) {
+        QString key = mo.getKey();
+        if (!processed.contains(key)) {
+            processed+=key;
+            offers.insert(mo.secondaryCurrency, offers.value(mo.secondaryCurrency, 0) + 1);
+        }
+    }
+
+    QString myTorAddress = util::extractPubKeyFromAddress(context->wallet->getTorAddress());
+    for ( const auto & my : myOffers ) {
+        if (my.integrityFee.toDblFee()>0.0 && my.offer.getFeeLevel()>0.0) {
+            QString key = myTorAddress + my.offer.id;
+            if (!processed.contains(key)) {
+                processed += key;
+                offers.insert(my.offer.secondaryCurrency, offers.value(my.offer.secondaryCurrency, 0) + 1);
+            }
+        }
     }
 
     QVector<QPair<QString,int>> result;
@@ -665,6 +683,7 @@ void SwapMarketplace::onTimerEvent() {
                 // return because of the message box delay. The data can be changed by that time.
                 emit onMyOffersChanged();
                 emit onMarketPlaceOffersChanged(); // Because we are listed them
+                emit onMessagingStatusChanged();
                 return;
             }
 
@@ -712,6 +731,7 @@ void SwapMarketplace::respCreateIntegrityFee(QString error, QVector<wallet::Inte
                 }
                 emit onMyOffersChanged();
                 emit onMarketPlaceOffersChanged(); // Because we are listed them
+                emit onMessagingStatusChanged();
             }
         }
 
@@ -996,9 +1016,10 @@ void SwapMarketplace::respReceiveMessages(QString error, QVector<wallet::Receive
     }
     std::sort(endMsgIds.begin(), endMsgIds.end());
 
-    // Emit change only if datta was changed because of UI.
+    // Emit change only if data was changed because of UI.
     if (startMsgIds != endMsgIds) {
         emit onMarketPlaceOffersChanged();
+        emit onMessagingStatusChanged();
     }
 
 }
