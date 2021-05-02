@@ -1359,15 +1359,8 @@ void SwapMarketplace::onNodeStatus( bool online, QString errMsg, int nodeHeight,
 
 // Logout event
 void SwapMarketplace::onLogout() {
-    if (!myOffers.isEmpty()) {
-        int offers = myOffers.size();
-
-        core::getWndManager()->messageTextDlg(
-                "WARNING",
-                "You have " + QString::number(offers) + " active offers for atomic swap trade" + (offers > 1 ? "s" : "") +
-                " broadcasting. We stop broadcast them because of a logout.");
-        stashMyOffers();
-    }
+    // It is too late to stash, only cleaning offers
+    myOffers.clear();
 }
 
 }
