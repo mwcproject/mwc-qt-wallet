@@ -256,6 +256,7 @@ SwapMarketplace::SwapMarketplace(StateContext * context) :
     QObject::connect( context->wallet, &wallet::Wallet::onMktGroupWinner, this, &SwapMarketplace::onMktGroupWinner, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onListeningStartResults, this, &SwapMarketplace::onListeningStartResults, Qt::QueuedConnection );
     QObject::connect( context->wallet, &wallet::Wallet::onNodeStatus, this, &SwapMarketplace::onNodeStatus, Qt::QueuedConnection );
+    QObject::connect( context->wallet, &wallet::Wallet::onLogout, this, &SwapMarketplace::onLogout, Qt::QueuedConnection );
 
     swap = (Swap*) context->stateMachine->getState(STATE::SWAP);
 }
@@ -1335,6 +1336,8 @@ void SwapMarketplace::stashMyOffers() {
     }
 
     util::writeTextFile(mySwapsFn, offersStr );
+
+    myOffers.clear();
 }
 
 void SwapMarketplace::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
@@ -1353,6 +1356,19 @@ void SwapMarketplace::onNodeStatus( bool online, QString errMsg, int nodeHeight,
     }
 }
 
+
+// Logout event
+void SwapMarketplace::onLogout() {
+    if (!myOffers.isEmpty()) {
+        int offers = myOffers.size();
+
+        core::getWndManager()->messageTextDlg(
+                "WARNING",
+                "You have " + QString::number(offers) + " active offers for atomic swap trade" + (offers > 1 ? "s" : "") +
+                " broadcasting. We stop broadcast them because of a logout.");
+        stashMyOffers();
+    }
+}
 
 }
 

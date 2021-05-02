@@ -363,9 +363,9 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
                                                 QString::number(offer.secAmount) + " " + offer.secondaryCurrency +
                                                 " ; Price "+ offer.calcRateAsStr() + " (" + offer.secondaryCurrency + ")"));
 
-            itm->addFixedHSpacer(20);
-
             if (sellingFlag!=2) {
+                itm->addFixedHSpacer(20);
+
                 QString text;
                 if (!ownOffer || offer.mktFee > 0) {
                     text = "Fee : " + feeLevelValToStr(offer.mktFee / offer.mwcAmount) +
@@ -374,14 +374,15 @@ void MrktSwList::updateTradeListData(bool resetScrollValue) {
                 itm->addWidget(control::createLabel(itm, false, true,
                                                     text));
                 itm->addFixedHSpacer(20);
+
+                itm->addWidget(
+                        control::createLabel(itm, false, true,
+                                             "Conf:  MWC " + QString::number(offer.mwcLockBlocks) +
+                                             ", " + offer.secondaryCurrency + " " +
+                                             QString::number(offer.secLockBlocks),
+                                             control::FONT_SMALL));
             }
 
-            itm->addWidget(
-                    control::createLabel(itm, false, true,
-                                         "Conf:  MWC " + QString::number(offer.mwcLockBlocks) +
-                                         ", " + offer.secondaryCurrency + " " +
-                                         QString::number(offer.secLockBlocks),
-                                         control::FONT_SMALL));
             itm->addHSpacer();
 
             if (offer.walletAddress!=myTorAddress) {

@@ -66,7 +66,7 @@
     <rect>
      <x>35</x>
      <y>185</y>
-     <width>156</width>
+     <width>166</width>
      <height>31</height>
     </rect>
    </property>
@@ -90,7 +90,7 @@
   <widget class="control::MwcLine" name="frame_4">
    <property name="geometry">
     <rect>
-     <x>205</x>
+     <x>210</x>
      <y>95</y>
      <width>2</width>
      <height>200</height>

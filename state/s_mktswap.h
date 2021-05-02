@@ -245,7 +245,6 @@ slots:
     void onTimerEvent();
 
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
-
     void onListeningStartResults( bool mqTry, bool tor, // what we try to start
                                   QStringList errorMessages, bool initialStart ); // error messages, if get some
 
@@ -263,6 +262,8 @@ slots:
 
     // Response from sendMarketplaceMessage
     void onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
+
+    void onLogout();
 private:
     core::TimerThread * timer = nullptr;
     Swap * swap = nullptr;
