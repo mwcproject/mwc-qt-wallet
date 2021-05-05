@@ -96,7 +96,7 @@ private:
 
 class TaskRequestMessagingStatus : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 1000*3; // Should be very fast operation
+    const static int64_t TIMEOUT = 1000*15; // There are locks, can take some time
 
     TaskRequestMessagingStatus( MWC713 * wallet713) :
             Mwc713Task("TaskRequestMessagingStatus", "",

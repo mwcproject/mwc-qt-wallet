@@ -38,7 +38,7 @@ Unable to publish MWC slate. Output $1 is already spent and stored on the blockc
 
 # LibWallet Error, Swap Error , Swap trade 576dda8b-baa3-42b6-a16c-4c91104b0ce7 not found
 LibWallet Error, Swap Error , Swap trade .* not found
-Swap trade $1 not found
+Swap trade not found
 
 # Unable to start Tor listener. Tor Process Error: Unable to start tor at /Users/bay/mwc-qt-wallet/gui_wallet713_data/tor/listener/torrc, Tor process error, TOR executable (`No such file or directory (os error 2)`) not found. Please ensure Tor is installed and on the path: "/Users/mw/build-mwc-wallet-desktop-Desktop_Qt_5_9_9_clang_64bit-Debug/mwc-qt-wallet.app/Contents/MacOS/tor"
 Unable to start Tor listener. Tor Process Error: Unable to start tor at (.*), Tor process error, (.*)

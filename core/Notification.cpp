@@ -130,6 +130,8 @@ void reportFatalError( QString message )  {
 }
 
 void appendNotificationMessage( bridge::MESSAGE_LEVEL level, QString message ) {
+    if (message.isEmpty())
+        return;
 
     logger::logInfo("Notification", toString(level) + "  " + message );
 
@@ -145,6 +147,9 @@ void appendNotificationMessage( bridge::MESSAGE_LEVEL level, QString message ) {
         logger::logInfo("Notification", "Message is updated: " + m );
         message = m;
     }
+
+    if (message.isEmpty() || message=="Swap trade not found")
+        return; // Ignoring
 
     if (level == bridge::MESSAGE_LEVEL::FATAL_ERROR) {
         // Fatal error. Display message box and exiting. We don't want to continue

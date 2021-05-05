@@ -132,10 +132,6 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
 
         double mwcLimit = 0.1;
         double secCurrencyLimit = 0.001;
-        if (!config->getNetwork().toLower().contains("main")) {
-            mwcLimit /= 10.0;
-            secCurrencyLimit /= 10.0;
-        }
 
         double mwcAmount = swapInfo[9].toDouble();
         double secAmount = swapInfo[10].toDouble();

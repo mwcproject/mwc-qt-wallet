@@ -128,13 +128,8 @@ void NewSwap1::on_nextButton_clicked() {
     double mwcLimit = 0.1;
     double secCurrencyLimit = swap->getSecMinAmount(secCurrency);
 
-    if (!config->getNetwork().toLower().contains("main")) {
-        mwcLimit /= 10.0;
-        secCurrencyLimit /= 10.0;
-    }
-
     if ( !mwcOk || mwc<mwcLimit ) {
-        control::MessageBox::messageText(this, "Incorrect Input", "Please specify at least " + QString::number(mwcLimit) + " MWC for swap");
+        control::MessageBox::messageText(this, "Incorrect Input", "Please specify at least " + util::zeroDbl2Dbl(QString::number(mwcLimit, 'f')) + " MWC for swap");
         ui->mwcAmountEdit->setFocus();
         return;
     }
@@ -146,7 +141,7 @@ void NewSwap1::on_nextButton_clicked() {
     }
 
     if (!secOk || sec<secCurrencyLimit) {
-        control::MessageBox::messageText(this, "Incorrect Input", "Please specify at least " + QString::number(secCurrencyLimit) + " " + secCurrency +" for swap");
+        control::MessageBox::messageText(this, "Incorrect Input", "Please specify at least " + util::zeroDbl2Dbl(QString::number(secCurrencyLimit, 'f')) + " " + secCurrency +" for swap");
         ui->secAmountEdit->setFocus();
         return;
     }

@@ -30,7 +30,7 @@ MktOfferDetailsDlg::MktOfferDetailsDlg(QWidget *parent, const state::MktSwapOffe
     else
         infoStr += "Buying ";
 
-    infoStr += QString::number( offer.mwcLockBlocks ) + " MWC for " + QString::number(offer.secLockBlocks) + " " + offer.secondaryCurrency + "\n\n";
+    infoStr += QString::number( offer.mwcAmount ) + " MWC for " + QString::number(offer.secAmount) + " " + offer.secondaryCurrency + "\n\n";
     infoStr += "Confirmations:    " + QString::number(offer.mwcLockBlocks) + " blocks for MWC, " +
                 QString::number(offer.secLockBlocks) + " blocks for " + offer.secondaryCurrency + "\n\n";
     infoStr += "Lock Time:          " + offer.calcMwcLockTime() + " for MWC, " + offer.calcSecLockTime() + " for " + offer.secondaryCurrency + "\n\n";
@@ -47,13 +47,13 @@ MktOfferDetailsDlg::MktOfferDetailsDlg(QWidget *parent, const state::MktSwapOffe
 
     QString warningStr;
     if (offer.mwcLockBlocks < mwcConf) {
-        warningStr += "MWC confirmation number " + QString::number(offer.mwcLockBlocks) + " is less than recommended value " + QString::number(mwcConf) + ".\n";
+        warningStr += "The number of MWC confirmations (" + QString::number(offer.mwcLockBlocks) + ") is less than the recommended number of confirmations (" + QString::number(mwcConf) + ").\n";
     }
     if (offer.secLockBlocks < secConf) {
-        warningStr += offer.secondaryCurrency + " confirmation number " + QString::number(offer.secLockBlocks) + " is less than recommended value " + QString::number(secConf) + ".\n";
+        warningStr += "The number of "+offer.secondaryCurrency+" confirmations (" + QString::number(offer.secLockBlocks) + ") is less than the recommended number of confirmations (" + QString::number(secConf) + ").\n";
     }
     if (!warningStr.isEmpty()) {
-        warningStr = warningStr + "Your trade can be vulnerable for reorg attack";
+        warningStr = warningStr + "This trade may be vulnerable to a reorg attack.";
     }
     ui->offerWarningLabel->setText(warningStr);
 

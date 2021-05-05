@@ -220,7 +220,8 @@ void Swap::onTimerEvent() {
         // Let's check if the backup is needed..
         int taskBkId = bridge::getSwapBackup(nextTask.stateCmd);
         int expBkId = context->appContext->getSwapBackStatus(nextTask.swapId);
-        if (taskBkId > expBkId) {
+        int expBkId2 = swapTradesBackupStatus.value(nextTask.swapId, 0);
+        if (taskBkId > std::max(expBkId,expBkId2) ) {
                 // Note, we are in the eventing loop, so modal will create a new one and soon timer will be called!!!
 
                 QString backupDir = context->appContext->getSwapBackupDir();
@@ -246,6 +247,10 @@ void Swap::onBackupSwapTradeData(QString swapId, QString exportedFileName, QStri
     if (runningSwaps.contains(swapId))
         runningSwaps[swapId].lastUpdatedTime = 0; // to trigger processing and update
 
+    // Updating backup id that is done in any case. And we need to do that before show the error message
+    int taskBkId = bridge::getSwapBackup( runningSwaps[swapId].stateCmd );
+    swapTradesBackupStatus.insert(swapId, taskBkId);
+
     if (!errorMessage.isEmpty()) {
         pageTradeList(false, false, true);
         core::getWndManager()->messageTextDlg("Error", "Wallet is unable to backup atomic swap trade at\n\n" + exportedFileName +
@@ -254,7 +259,6 @@ void Swap::onBackupSwapTradeData(QString swapId, QString exportedFileName, QStri
     }
     else {
         // Updating backup id that is done.
-        int taskBkId = bridge::getSwapBackup( runningSwaps[swapId].stateCmd );
         context->appContext->setSwapBackStatus(swapId, taskBkId);
     }
 }
@@ -287,8 +291,15 @@ void Swap::onPerformAutoSwapStep(QString swapId, QString stateCmd, QString curre
 
     // Running task is executed, let's update it
     if (!error.isEmpty()) {
-        //core::getWndManager()->messageTextDlg("Swap Processing Error", "Autoswap step is failed for swap " + swapId + "\n\n" + error );
-        emit onSwapTradeStatusUpdated( swapId, stateCmd, currentAction, currentState, error, executionPlan, tradeJournal);
+        if (error == "Swap trade not found") {
+            // Updating the list of running trades. Possible because of marketplace and race conditions.
+            runningSwaps.remove(swapId);
+        }
+        else {
+            //core::getWndManager()->messageTextDlg("Swap Processing Error", "Autoswap step is failed for swap " + swapId + "\n\n" + error );
+            emit onSwapTradeStatusUpdated(swapId, stateCmd, currentAction, currentState, error, executionPlan,
+                                          tradeJournal);
+        }
         return;
     }
 
@@ -381,9 +392,8 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
 
             // It is a regular swap offer
             const QString title = "New Swap Offer";
-            QString msg = "You have received a new Swap Offer to exchange MWC for your " + swap.secondaryCurrency + ".\n\nTrade SwapId: " + swap.swapId +
-                                "\n\nPlease review this offer before you accept it. Check if the amounts, lock order, and confirmation number meet your expectations.\n\n"
-                                "Double check that the number of confirmations are match the amount.";
+            QString msg = "You have received a new Swap Offer to exchange MWC for your " + swap.secondaryCurrency + ".\n\nTrade Swap ID: " + swap.swapId +
+                                "\n\nPlease review this offer before you accept it. Ensure that the amounts, lock order, and number of confirmations meet your expectations.";
 
             if (!mktFoundOffer.isEmpty()) {
                 // Accepted Sell order (I am buyer)
@@ -399,10 +409,11 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
                         swap.tag);
 
                 msg = "You have received a response from Swap Marketplace to exchange MWC for your " + swap.secondaryCurrency + ".\n\nTrade SwapId: " + swap.swapId +
-                                    "\n\nPlease review this offer before you accept it. Check if the amounts, lock order, and confirmation number meet your expectations.\n\n"
-                                    "Double check that the number of confirmations are match the amount.\n\n"
-                                    "Please note, that if several peers accetp the offer, whoever lock funds first will continue to atomic swap trade, the rest will get a message that offer will be dropped. "
-                                    "If you get such message, please don't deposit your coins to the lock account.";
+                                    "\n\nPlease review this offer before you accept it. Ensure that the amounts, lock order, and number of confirmations meet your expectations.\n\n"
+                                    "Please note:\n"
+                                    "There is a possibility that several peers may accept this offer at the same time. The offer will be awarded to whichever peer locks their funds first. "
+                                    "In this case, the winner will continue with the swap as usual; however, the other peers will receive a message stating that the offer has been dropped. "
+                                    "If you receive this message, do NOT deposit any coins to the lock account.";
 
             }
 
@@ -1078,8 +1089,6 @@ bool Swap::mobileBack() {
 // Get minimal Amount for the secondary currency
 double Swap::getSecMinAmount(QString secCurrency) const {
     double minAmount = getCurrencyInfo(secCurrency).minAmount;
-    if (!context->wallet->getWalletConfig().getNetwork().contains("Main", Qt::CaseSensitivity::CaseInsensitive))
-        minAmount /= 10;
     return minAmount;
 }
 
@@ -1176,9 +1185,9 @@ void Swap::acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address, i
     }
 
     // For Buy let's check if there is already a request...
-    core::getWndManager()->messageTextDlg("Waiting for offer", "Your peer " + wallet_tor_address + " is notified about your acceptance. "
-        "Soon you should get a message about income atomic swap trade.\n\n"
-        "Please note, if several traders accept the same offers, trader who lock funds first will be able to finish the trade. You will be notified if your offer will be rejected because of that.");
+    core::getWndManager()->messageTextDlg("Waiting for offer", "Your offer acceptance has been sent to the offer creator " + wallet_tor_address +
+            ". You should receive a confirmation soon.\n\n"
+            "Please Note: If several traders have accept this offer simultaneously, the offer will be rewarded to whomever locked funds first. All parties will be notified accordingly.");
 }
 
 // Reject any offers from this address. We don't want them, we are likely too late

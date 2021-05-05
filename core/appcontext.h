@@ -359,8 +359,7 @@ private:
     QString lastUsedSwapCurrency;
 
     // Backup status for the swaps
-    QMap<QString, int>
-    swapTradesBackupStatus;
+    QMap<QString, int> swapTradesBackupStatus;
     QMap<QString, int> swapMaxBackupStatus;
 
     // Accepted trades (we don't want ask to acceptance twice. The workflow can return back)

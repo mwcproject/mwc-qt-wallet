@@ -390,8 +390,8 @@ QPair<QString, QStringList> SwapMarketplace::lockOutputsForSellOffer(const QStri
     }
 
     if (reservedAmounts > 0) {
-        return QPair<QString, QStringList>("There is not enough funds at account " + account + ". You need " + util::nano2one(needAmount) +
-               " MWC, but have available " + util::nano2one(foundAmount) + " MWC", {});
+        return QPair<QString, QStringList>("You do not have enough funds in your account (" + account + "). You need at least " + util::nano2one(needAmount) +
+               " MWC, but have " + util::nano2one(foundAmount) + " MWC available", {});
     }
 
     for (auto &s : output2lock)
@@ -683,7 +683,9 @@ void SwapMarketplace::onTimerEvent() {
             auto lockedOutputs = lockOutputsForSellOffer(mo.account, mo.offer.mwcAmount, mo.offer.id);
             if (!lockedOutputs.first.isEmpty()) {
                 myOffers.remove(i);
-                core::getWndManager()->messageTextDlg("Warning", "You sell offer is rejected because outputs that it depend on are spent. It can happen because of integrity fee payment.\n\n" + lockedOutputs.first);
+                core::getWndManager()->messageTextDlg("Warning", "Your sell offer has been rejected because the outputs that it used have been spent. "
+                                                                 "This may have been caused by using the same outputs to make your integrity fee payment.\n\n" +
+                                                                 lockedOutputs.first);
                 // return because of the message box delay. The data can be changed by that time.
                 emit onMyOffersChanged();
                 emit onMarketPlaceOffersChanged(); // Because we are listed them
@@ -725,11 +727,11 @@ void SwapMarketplace::respCreateIntegrityFee(QString error, QVector<wallet::Inte
             if (deletedOffers>0) {
                 if (deletedOffers==1) {
                     core::getWndManager()->messageTextDlg("Warning",
-                                                          "Your account doesn't have enough funds to pay integrity fees for your offer. This offers will be deleted");
+                                                          "Your account doesn't have enough funds to cover the integrity fees for your offer. This offer will be deleted.");
                 }
                 else {
                     core::getWndManager()->messageTextDlg("Warning",
-                                                          "Your account doesn't have enough funds to pay integrity fees for " +
+                                                          "Your account doesn't have enough funds to cover the integrity fees for your " +
                                                           QString::number(deletedOffers) +
                                                           " offers. Those offers will be deleted");
                 }
@@ -1306,7 +1308,7 @@ void SwapMarketplace::restoreMySwapTrades() {
 
     if (!myOffers.isEmpty()) {
         if ( core::WndManager::RETURN_CODE::BTN2 == core::getWndManager()->questionTextDlg("Marketplace Offers", "You have " + QString::number(myOffers.size()) + " swap marketplace offer" + (myOffers.size()>1 ? "s" : "") +
-                " that was active in your previous session. Do you want to restore them and put on the market?",
+                " active from your previous session. Would you like to restore and put them on the market?",
                 "No", "Yes",
                 "Don't restore my offers", "Yes, please restore my offers",
                 false, true) ) {

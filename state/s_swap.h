@@ -281,6 +281,9 @@ private:
 
     QHash< QString, QVector<MktSwapOffer> > acceptedOffers;
     QHash< QString, QVector<MySwapOffer> >  expectedOffers;
+
+    // Requested Swap Backups.   Requested include failed backups
+    QMap<QString, int> swapTradesBackupStatus;
 };
 
 }

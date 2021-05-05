@@ -250,10 +250,7 @@
        <widget class="control::MwcLabelNormal" name="label">
         <property name="text">
          <string>
-
-Trades data contains refund slates and private keys for the redeem operation. In case of a hardware failure you might lose this data and, as a result, you might lose your funds. That is why we strongly recommend to keep the copy of your trade data in a separate folder that point to the separate drive like a USB stick, NAS Storage, cloud synced directory like a Dropbox, One Cloud.
-
-If you have your backup, in worst case scenario you will be able to restore your MWC wallet from the mnemonic phrase, restore your atomic swap trades and complete it.
+Critical hardware failures (such as a hard disk failure) during a trade could result in a loss of funds. We strongly suggest backing up your trades to a non local system drive (such as a usb drive or cloud storage). In the case of such a hardware failure, trades can be recovered by first recovering your wallet from seed, and then restoring your trade.
 
 Please note that swap trade files are encrypted so you can restore it into the wallet with the same seed.</string>
         </property>
