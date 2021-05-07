@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1088</width>
-    <height>911</height>
+    <width>1081</width>
+    <height>776</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -189,7 +189,7 @@
        <height>0</height>
       </size>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1,0,2">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,2">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -205,19 +205,6 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>21</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,4,1">
         <item>
@@ -237,7 +224,7 @@
          <widget class="control::MwcLabelNormal" name="label">
           <property name="minimumSize">
            <size>
-            <width>700</width>
+            <width>800</width>
             <height>0</height>
            </size>
           </property>
@@ -248,9 +235,11 @@
            </size>
           </property>
           <property name="text">
-           <string>In order to publish your Atomic Swap Offer,  you need to pay Integrity fee.  Those fees are protecting from the spamming.  If currently at low fee there are many spammers, your offer might not be searchable. In this case it make sense to pay higher fee, so traders can see that you are serious about trading.
-
-Please note,  fees are renew automatically to keep your offer published until it will be accepted or canceled.</string>
+           <string>&lt;b&gt;Integrity Fees:&lt;/b&gt;
+&lt;br&gt;Integrity fees are used to help prevent people from spamming the marketplace with offers they never intend to keep. You may set your integrity fees as low as 0.01 MWC or 0.1% of the transaction (whichever is higher); however, those searching offers can filter their searches by the amount of integrity fees paid. This allows them to seek out legitimate offers. 
+&lt;br&gt;&lt;br&gt;
+&lt;b&gt;Reserved Fee Amount:&lt;/b&gt;
+&lt;br&gt;Paying Integrity fees from a separate account increases privacy. Reserved fees will be placed in a special account, and will be used to pay Integrity Fees. You can control the amount of fees withdrawn from your designated accounts at a time, by adjusting the &amp;quot;Reserved Fee amount&amp;quot;.</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -310,20 +299,20 @@ Please note,  fees are renew automatically to keep your offer published until it
          <widget class="QWidget" name="feeFixedHolder" native="true">
           <property name="minimumSize">
            <size>
-            <width>700</width>
+            <width>800</width>
             <height>400</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>700</width>
+            <width>800</width>
             <height>400</height>
            </size>
           </property>
           <widget class="QPushButton" name="feeLevelHelpBtn">
            <property name="geometry">
             <rect>
-             <x>645</x>
+             <x>765</x>
              <y>20</y>
              <width>26</width>
              <height>22</height>
@@ -380,9 +369,9 @@ Please note,  fees are renew automatically to keep your offer published until it
           <widget class="control::MwcComboBox" name="feeLevel">
            <property name="geometry">
             <rect>
-             <x>285</x>
+             <x>310</x>
              <y>12</y>
-             <width>346</width>
+             <width>436</width>
              <height>40</height>
             </rect>
            </property>
@@ -414,7 +403,7 @@ Please note,  fees are renew automatically to keep your offer published until it
           <widget class="QPushButton" name="depositAccountHelpBtn">
            <property name="geometry">
             <rect>
-             <x>645</x>
+             <x>765</x>
              <y>85</y>
              <width>26</width>
              <height>22</height>
@@ -471,9 +460,9 @@ Please note,  fees are renew automatically to keep your offer published until it
           <widget class="control::MwcComboBox" name="depositAccountName">
            <property name="geometry">
             <rect>
-             <x>285</x>
+             <x>310</x>
              <y>77</y>
-             <width>346</width>
+             <width>431</width>
              <height>40</height>
             </rect>
            </property>
@@ -505,7 +494,7 @@ Please note,  fees are renew automatically to keep your offer published until it
           <widget class="QPushButton" name="reservedAmountHelpBtn">
            <property name="geometry">
             <rect>
-             <x>645</x>
+             <x>765</x>
              <y>150</y>
              <width>26</width>
              <height>22</height>
@@ -549,9 +538,9 @@ Please note,  fees are renew automatically to keep your offer published until it
           <widget class="control::MwcLineEditNormal" name="mwcReservedFee">
            <property name="geometry">
             <rect>
-             <x>285</x>
+             <x>310</x>
              <y>141</y>
-             <width>176</width>
+             <width>246</width>
              <height>40</height>
             </rect>
            </property>
@@ -582,7 +571,7 @@ Please note,  fees are renew automatically to keep your offer published until it
             <rect>
              <x>10</x>
              <y>145</y>
-             <width>261</width>
+             <width>281</width>
              <height>26</height>
             </rect>
            </property>
@@ -593,7 +582,7 @@ Please note,  fees are renew automatically to keep your offer published until it
           <widget class="control::MwcLabelNormal" name="label_5">
            <property name="geometry">
             <rect>
-             <x>495</x>
+             <x>640</x>
              <y>140</y>
              <width>66</width>
              <height>40</height>
@@ -606,7 +595,7 @@ Please note,  fees are renew automatically to keep your offer published until it
           <widget class="QPushButton" name="activeFeesHelpBtn">
            <property name="geometry">
             <rect>
-             <x>645</x>
+             <x>765</x>
              <y>220</y>
              <width>26</width>
              <height>22</height>
@@ -665,7 +654,7 @@ Please note,  fees are renew automatically to keep your offer published until it
             <rect>
              <x>10</x>
              <y>220</y>
-             <width>616</width>
+             <width>736</width>
              <height>120</height>
             </rect>
            </property>
@@ -713,7 +702,7 @@ p, li { white-space: pre-wrap; }
           <widget class="control::MwcPushButtonNormal" name="withdrawFeesBtn">
            <property name="geometry">
             <rect>
-             <x>380</x>
+             <x>500</x>
              <y>360</y>
              <width>250</width>
              <height>40</height>
@@ -741,7 +730,7 @@ p, li { white-space: pre-wrap; }
           <widget class="QPushButton" name="withdrawHelpBtn">
            <property name="geometry">
             <rect>
-             <x>645</x>
+             <x>765</x>
              <y>370</y>
              <width>26</width>
              <height>22</height>
@@ -785,7 +774,7 @@ p, li { white-space: pre-wrap; }
           <widget class="control::MwcPushButtonNormal" name="viewIntegrityTransactionsBtn">
            <property name="geometry">
             <rect>
-             <x>105</x>
+             <x>225</x>
              <y>360</y>
              <width>236</width>
              <height>40</height>
@@ -828,7 +817,7 @@ p, li { white-space: pre-wrap; }
             <rect>
              <x>10</x>
              <y>170</y>
-             <width>266</width>
+             <width>281</width>
              <height>16</height>
             </rect>
            </property>
@@ -861,7 +850,7 @@ p, li { white-space: pre-wrap; }
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>21</height>
+          <height>1</height>
          </size>
         </property>
        </spacer>
@@ -967,13 +956,13 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="minimumSize">
          <size>
-          <width>230</width>
+          <width>245</width>
           <height>40</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>230</width>
+          <width>245</width>
           <height>40</height>
          </size>
         </property>
@@ -1205,17 +1194,17 @@ p, li { white-space: pre-wrap; }
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>

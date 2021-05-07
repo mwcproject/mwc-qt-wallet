@@ -1259,7 +1259,9 @@ void SwapMarketplace::onMktGroupWinner(QString swapId, QString tag) {
     QString offerDesc = withdrawMyOffer(tag);
     getSwap()->stopMktTrades(tag, swapId);
     if (!offerDesc.isEmpty()) {
-        core::getWndManager()->messageTextDlg("Congratulations", "You offer " + offerDesc + " is accepted, your trade partner locked the funds. You can see your trade progress that the Swap page.");
+        core::getWndManager()->messageTextDlg("Congratulations",
+                                              "Another party has accepted your offer "+offerDesc+
+                                              ", and has locked the necessary funds. You can follow the progress of your trade\n"+swapId+"\non the Swap page.");
     }
 }
 
