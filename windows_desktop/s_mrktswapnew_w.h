@@ -66,6 +66,8 @@ private slots:
     void onSgnWalletBalanceUpdated();
     void onSgnApplyNewTrade1Params(bool ok, QString errorMessage);
 
+    void on_confNumberHelpButton_clicked();
+
 private:
     Ui::MrktSwapNew *ui;
     bridge::Config * config = nullptr;

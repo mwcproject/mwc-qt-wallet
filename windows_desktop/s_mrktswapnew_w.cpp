@@ -320,16 +320,21 @@ void MrktSwapNew::on_swapRateEdit_textEdited(const QString &arg1) {
 }
 
 void MrktSwapNew::on_swapRateHelpBtn_clicked() {
-    control::MessageBox::messageText(this, "Help", "MWC to " + ui->secCurrencyCombo->currentData().toString() + " exchange rate. Please note, this rate is calculated before transaction fees that needs to be paid.");
+    control::MessageBox::messageText(this, "Help", "MWC to " + ui->secCurrencyCombo->currentData().toString() + " exchange rate. Please note, this rate does not include transaction fees.");
 }
 
 void MrktSwapNew::on_secAddressHelpBtn_clicked() {
-    control::MessageBox::messageText( this, "Help", ui->secCurrencyCombo->currentData().toString() + " address to receive the " +
-            (ui->buySellCombo->currentIndex()==0 ? "refunded" : "traded") + " coins.");
+    control::MessageBox::messageText( this, "Help", "The " + ui->secCurrencyCombo->currentData().toString() + " address to which "  + (ui->buySellCombo->currentIndex()==0 ? "refunds" : "your coins") + " will be sent.");
 }
 
 void MrktSwapNew::on_secTransFeeHelpButton_clicked() {
-    control::MessageBox::messageText( this, "Help", "Please specify transaction fee enough to mine your transaction during 30 minutes. Timing restrictions are critical for atomic swap safety.");
+    control::MessageBox::messageText( this, "Help", "In order to improve swap security, please specify a transaction fee large enough to ensure your transaction will be mined within 30 minute.");
+}
+
+void MrktSwapNew::on_confNumberHelpButton_clicked()
+{
+    control::MessageBox::messageText(this, "Help",
+                                     "Please specify confirmation number large enough to make reorg attack to your swap trade non profitable. Larger number you put, more expensive it will be for attacker.");
 }
 
 void MrktSwapNew::on_mwcBlocksEdit_textEdited(const QString &arg1) {
