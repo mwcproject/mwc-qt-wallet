@@ -1232,10 +1232,11 @@ void SwapMarketplace::onSendMarketplaceMessage(QString error, QString response, 
             if (core::WndManager::RETURN_CODE::BTN1 !=
                     core::getWndManager()->questionTextDlg(
                         "Warning",
-                        "Wallet " + walletAddress + " already has " + QString::number(running_num) + " accepted trades. Only one trade that lock "
-                        "coins first will continue, the rest will be cancelled. As a result your trade might be cancelled even you lock the coins.\n\n"
-                        "You can wait for some time, try to accept this offer later. Or you can continue, you trade might win.\n\n "
-                        "Do you want to continue and start trading?",
+                        "There have been " + QString::number(running_num) + " acceptance" + (running_num>1 ? "s": "") + " to the offer from " + walletAddress +
+                        ". The offer will be rewarded to whichever wallet locks their funds first. As a result of this, "
+                        "your trade may be cancelled (if you did not lock first) even though you have already locked your coins.\n\n"
+                        "You can either wait and try to accept the offer later, or continue with this offer acceptance process in hope of winning.\n\n"
+                        "Do you want to continue with the acceptance process?",
                         "Yes", "No",
                         "I understand the risk and I want to continue",
                         "No, I will better wait",

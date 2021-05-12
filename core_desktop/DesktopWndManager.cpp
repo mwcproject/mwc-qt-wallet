@@ -382,7 +382,7 @@ void DesktopWndManager::pageMarketplace(bool selectMyOffers, bool selectFee) {
 }
 
 void DesktopWndManager::pageNewUpdateOffer(QString myMsgId) {
-    windowManager->switchToWindowEx( mwc::PAGE_S_MKT_NEW_OFFER,
+    windowManager->switchToWindowEx( myMsgId.isEmpty() ? mwc::PAGE_S_MKT_NEW_OFFER : mwc::PAGE_S_MKT_OFFER_UPDATE,
                                      new wnd::MrktSwapNew( windowManager->getInWndParent(), myMsgId));
 }
 

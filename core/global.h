@@ -116,6 +116,7 @@ const QString PAGE_S_SWAP_NEW       = "Create Swap Trade";
 
 const QString PAGE_S_MKT_LIST       = "MWC Swap Marketplace";
 const QString PAGE_S_MKT_NEW_OFFER  = "Create new offer";
+const QString PAGE_S_MKT_OFFER_UPDATE  = "Offer update";
 const QString PAGE_S_MKT_TX_FEE     = "Integrity fee transactions";
 
 const QString PAGE_U_NODE_STATUS    = "MWC Node Status";

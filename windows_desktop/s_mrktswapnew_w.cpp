@@ -90,6 +90,8 @@ MrktSwapNew::MrktSwapNew(QWidget *parent, QString myMsgId) :
         ui->secAddressEdit->setText( offer.secAddress );
         ui->noteEdit->setText(offer.note);
         secAddressCoin = offer.offer.secondaryCurrency;
+        ui->mwcBlocksEdit->setText(QString::number(offer.offer.mwcLockBlocks));
+        ui->secBlocksEdit->setText(QString::number(offer.offer.secLockBlocks));
     }
 
     if (!offer.offer.secondaryCurrency.isEmpty()) {
@@ -176,7 +178,9 @@ void MrktSwapNew::updateSecCurrencyStatus(bool seller) {
     }
 
     ui->secLockCurrencyLabel->setText(selectedCur);
-    ui->secBlocksEdit->setText( QString::number(swap->getSecConfNumber(selectedCur)) );
+    if ( offer.offer.id.isEmpty() ) {
+        ui->secBlocksEdit->setText( QString::number(swap->getSecConfNumber(selectedCur)) );
+    }
 }
 
 void MrktSwapNew::updateThirdValue() {

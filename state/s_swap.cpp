@@ -413,7 +413,7 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
                                     "Please note:\n"
                                     "There is a possibility that several peers may accept this offer at the same time. The offer will be awarded to whichever peer locks their funds first. "
                                     "In this case, the winner will continue with the swap as usual; however, the other peers will receive a message stating that the offer has been dropped. "
-                                    "If you receive this message, do NOT deposit any coins to the lock account.";
+                                    "If you are notified that you offer has been dropped, do NOT deposit any coins to the lock account.";
 
             }
 
@@ -747,13 +747,14 @@ void Swap::onSendMarketplaceMessage(QString error, QString response, QString off
     if (running_num> mktRunningNum) {
         // There are something already going, let's report it.
         if ( core::WndManager::RETURN_CODE::BTN1 != core::getWndManager()->questionTextDlg("Warning",
-                                       "Wallet "+walletAddress+" already has " + QString::number(running_num) + " accepted trades. Only one trade that lock "
-                                       "coins first will continue, the rest will be cancelled. As a result your trade might be cancelled even you lock the coins.\n\n"
-                                       "You can wait for some time, try to accept this offer later. Or you can continue, you trade might win.\n\n "
-                                       "Do you want to continue and start trading?",
-                                       "Yes", "No",
-                                       "I understand the risk and I want to continue", "No, I will better wait",
-                                       false, true) )
+                "There have been multiple acceptances to the offer from " + walletAddress +
+                ". The offer will be rewarded to whichever wallet locks their funds first. As a result of this, "
+                "your trade may be cancelled (if you did not lock first) even though you have already locked your coins.\n\n"
+                "You can either wait and try to accept the offer later, or continue with this offer acceptance process in hope of winning.\n\n"
+                "Do you want to continue with the acceptance process?",
+                "Yes", "No",
+                "I understand the risk and I want to continue", "No, I will better wait",
+                false, true) )
         {
             return;
         }
@@ -1021,9 +1022,9 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
                     core::getWndManager()->messageTextDlg("Warning", message);
                 }
                 else {
-                    QString message = "Trade " + swap.swapId + " is dropped by your peer because there was several trades and another one locked the coins first.\n\n"
-                                      "Please don't deposit any coins to Locking account. After expiration time that trade will be cancelled automatically.\n"
-                                      "If you already lock your coins, please wait until your payment will be refuned.";
+                    QString message = "Unfortunately someone else locked funds and accepted trade before you. Your trade " + swap.swapId + " will not go forward.\n\n"
+                    "Please don't deposit any coins to the lock account. After the trade expiration time has passed, the trade will be cancelled automatically.\n\n"
+                    "If you have already locked your coins, you will need to wait until your payment is refunded.";
                     core::getWndManager()->messageTextDlg("Warning", message);
                 }
                 return;
