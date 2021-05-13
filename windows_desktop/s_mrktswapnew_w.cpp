@@ -77,6 +77,9 @@ MrktSwapNew::MrktSwapNew(QWidget *parent, QString myMsgId) :
 
     Q_ASSERT(myMsgId.isEmpty() == offer.offer.id.isEmpty()); // Not found?
 
+    // Need to set currency data first, so reset logic will not clean the sec address data
+    updateSecCurrencyData();
+
     if ( !offer.offer.id.isEmpty() ) {
         if (offer.offer.sell)
             ui->buySellCombo->setCurrentIndex(1);  // Sell
@@ -98,7 +101,6 @@ MrktSwapNew::MrktSwapNew(QWidget *parent, QString myMsgId) :
         swap->setCurrentSecCurrency(offer.offer.secondaryCurrency);
     }
 
-    updateSecCurrencyData();
     updateThirdValue();
 
     onSgnWalletBalanceUpdated();
