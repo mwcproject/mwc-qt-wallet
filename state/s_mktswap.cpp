@@ -468,14 +468,17 @@ QVector<MktSwapOffer> SwapMarketplace::getMarketOffers(double minFeeLevel, int s
         }
     }
 
-    if (selling == 1)
-        std::sort( result.begin(), result.end(), []( const MktSwapOffer & o1, const MktSwapOffer & o2 ) {
-            return o1.calcRate() > o2.calcRate();
-        } );
-    else
-        std::sort( result.begin(), result.end(), []( const MktSwapOffer & o1, const MktSwapOffer & o2 ) {
+    // Sorting should be the same for all typy of deals
+    std::sort( result.begin(), result.end(), []( const MktSwapOffer & o1, const MktSwapOffer & o2 ) {
+        if (o1.sell != o2.sell)
+            return o1.sell;
+
+        Q_ASSERT(o1.sell == o2.sell);
+        if (o1.sell)
             return o1.calcRate() < o2.calcRate();
-        } );
+        else
+            return o1.calcRate() > o2.calcRate();
+    } );
 
     return result;
 }
