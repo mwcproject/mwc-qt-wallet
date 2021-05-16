@@ -77,9 +77,26 @@ Item {
                 return
             }
             if (qtAndroidService.requestPermissions()) {
-                fileDialog.open()
+                qtAndroidService.openFile( config.getPathFor("fileGen"), "*/*", 124 )
             } else {
                 messagebox.open("Failure", "Permission Denied")
+            }
+        }
+    }
+
+    Connections {
+        target: qtAndroidService
+        onSgnOnFileOpen: (eventCode, path ) => {
+            if (eventCode == 124 && path) {
+                        path = decodeURIComponent(path)
+                        console.log("Open finalize transaction file: " + path)
+                        const validation = util.validateMwc713Str(path)
+                        if (validation) {
+                            messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
+                            return
+                        }
+                        config.updatePathFor("fileGen", path)
+                        finalize.uploadFileTransaction(path);
             }
         }
     }
@@ -107,33 +124,6 @@ Item {
 
         onClicked: {
             inputSlatepack.open("SendResponse", "Send response slate", 2, slatepackCallback)
-        }
-    }
-
-
-    FileDialog {
-        id: fileDialog
-        title: qsTr("Finalize transaction file")
-        folder: config.getPathFor("fileGen")
-        nameFilters: ["MWC response transaction (*.tx.response *.response);;All files (*.*)"]
-        onAccepted: {
-            var path = fileDialog.file.toString()
-
-            const validation = util.validateMwc713Str(path)
-            if (validation) {
-                messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
-                return
-            }
-            // remove prefixed "file:///"
-            path= path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/,"")
-            // unescape html codes like '%23' for '#'
-            const cleanPath = decodeURIComponent(path);
-            let filePath = cleanPath
-            if(cleanPath.search("Download/") > 0) {
-                filePath = downloadPath + cleanPath.substring(cleanPath.search("Download/") + 8, cleanPath.length)
-            }
-            config.updatePathFor("fileGen", filePath)
-            finalize.uploadFileTransaction(filePath);
         }
     }
 }

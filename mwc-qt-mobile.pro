@@ -79,5 +79,5 @@ ANDROID_EXTRA_LIBS = $$PWD/android_bin/x86/libmwc713.so $$PWD/android_bin/x86/li
     $$PWD/android_bin/arm64-v8a/libmwc713.so    $$PWD/android_bin/arm64-v8a/libmwczip.so    $$PWD/android_bin/arm64-v8a/libtor.so
 
 
-ANDROID_ABIS = arm64-v8a
+ANDROID_ABIS = x86
 

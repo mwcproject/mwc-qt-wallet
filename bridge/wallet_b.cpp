@@ -16,7 +16,9 @@
 #include "../core/Notification.h"
 #include "../state/state.h"
 #include "../wallet/wallet.h"
-
+#include "../util/Files.h"
+#include <QDebug>
+#include <QFileInfo>
 
 namespace bridge {
 
@@ -420,6 +422,11 @@ void Wallet::generateTransactionProof( QString transactionId, QString resultingF
 // Verify the proof for transaction
 // Respond: sgnVerifyProofResult( bool success, QString msg );
 void Wallet::verifyTransactionProof( QString proofFileName ) {
+#ifdef WALLET_MOBILE
+    // convert to normal file name
+    // content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/proof.proof
+    proofFileName = proofFileName.mid( proofFileName.lastIndexOf(':') + 1 );
+#endif
     getWallet()->verifyMwcBoxTransactionProof(proofFileName);
 }
 

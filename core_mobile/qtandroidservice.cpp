@@ -5,6 +5,7 @@
 #include <QtDebug>
 
 QtAndroidService *QtAndroidService::m_instance = nullptr;
+const int RESULT_OK = -1;
 
 static void receivedFromAndroidService(JNIEnv *env, jobject /*thiz*/, jstring value)
 {
@@ -20,7 +21,7 @@ QtAndroidService::QtAndroidService(QObject *parent) : QObject(parent)
     registerBroadcastReceiver();
 }
 
-void QtAndroidService::sendToService(const QString &message)
+void QtAndroidService::sendToService(QString message)
 {
     QAndroidIntent serviceIntent(QtAndroid::androidActivity().object(),
                                 "mw/mwc/wallet/QtAndroidService");
@@ -69,4 +70,31 @@ void QtAndroidService::registerBroadcastReceiver()
     classObject.callMethod<void>("registerServiceBroadcastReceiver",
                                  "(Landroid/content/Context;)V",
                                  QtAndroid::androidContext().object());
+}
+
+// Type values:  .cfg -> text/plain  - doesn't work this way
+//  text/plain
+//  text/*
+void QtAndroidService::openFile( QString pickerInitialUri, QString type, int eventCode ) {
+    QAndroidJniObject jpickerInitialUri = QAndroidJniObject::fromString(pickerInitialUri);
+    QAndroidJniObject jtype = QAndroidJniObject::fromString(type);
+
+    QAndroidJniObject intent = QAndroidJniObject::callStaticObjectMethod("mw/mwc/wallet/QmlHelper",
+                                                                         "buildOpenFileIntent",
+                                                                         "(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;",
+                                                                         jpickerInitialUri.object<jstring>(),
+                                                                         jtype.object<jstring>());
+
+    QtAndroid::startActivity(intent, eventCode, this);
+}
+
+void QtAndroidService::handleActivityResult(int receiverRequestCode, int resultCode, const QAndroidJniObject &data) {
+    if ( resultCode == RESULT_OK ) {
+        QAndroidJniObject uri = data.callObjectMethod("getDataString","()Ljava/lang/String;");
+        emit sgnOnFileOpen( receiverRequestCode, uri.toString() );
+    }
+    else {
+        qDebug() << "QtAndroidService::handleActivityResult request " << receiverRequestCode << " failed with resultCode " << resultCode;
+        emit sgnOnFileOpen( receiverRequestCode, "" );
+    }
 }

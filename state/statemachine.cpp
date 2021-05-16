@@ -103,11 +103,15 @@ StateMachine::StateMachine()
     states[ STATE::WALLET_SETTINGS ] = new WalletSettings(context);
     states[ STATE::ACCOUNT_OPTIONS ] = new AccountOptions(context);
 
+#ifdef WALLET_DESKTOP
     // State for handling any data migration between wallet
     // versions that might need to be done
     states[ STATE::MIGRATION ] = new Migration(context);
+    // Swap and swap marketplace. There are some issues with HTTP calls.
+    // Since Mobile is not ready yet, we don't want that to be included
     states[ STATE::SWAP ] = new Swap(context);
     states[ STATE::SWAP_MKT ] = new SwapMarketplace(context);
+#endif
 
     startTimer(1000);
 }

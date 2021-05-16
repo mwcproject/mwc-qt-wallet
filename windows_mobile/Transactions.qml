@@ -117,6 +117,7 @@ Item {
         }
 
         onSgnVerifyProofResult: (success, fn, msg) => {
+            console.log("Get onSgnVerifyProofResult with " + success + " " + fn  + " msg")
             if (success) {
                 const proof = showProofDlg.parseProofText(msg)
                 if (proof) {
@@ -601,7 +602,7 @@ Item {
                     anchors.fill: parent
                     onClicked: {
                         if (qtAndroidService.requestPermissions()) {
-                            fileDialog.open()
+                            qtAndroidService.openFile( config.getPathFor("fileGen"), "*/*", 125 )
                         } else {
                             messagebox.open("Failure", "Permission Denied")
                         }
@@ -663,25 +664,20 @@ Item {
         }
     }
 
-    FileDialog {
-        id: fileDialog
-        title: qsTr("Open proof file")
-        folder: config.getPathFor("fileGen")
-        nameFilters: ["transaction proof (*.proof);;All files (*.*)"]
-        onAccepted: {
-            var path = fileDialog.file.toString()
-
-            if (path === "") return
-
-            // remove prefixed "file:///"
-            path= path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/,"")
-            // unescape html codes like '%23' for '#'
-            const cleanPath = decodeURIComponent(path);
-            let filePath = cleanPath
-            if (cleanPath.search("Download/") > 0) {
-                filePath = downloadPath + cleanPath.substring(cleanPath.search("Download/") + 8, cleanPath.length)
+    Connections {
+        target: qtAndroidService
+        onSgnOnFileOpen: (eventCode, path ) => {
+            if (eventCode == 125 && path) {
+                        path = decodeURIComponent(path)
+                        console.log("Open proof transaction file: " + path)
+                        const validation = util.validateMwc713Str(path)
+                        if (validation) {
+                            messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
+                            return
+                        }
+                        config.updatePathFor("fileGen", path)
+                        wallet.verifyTransactionProof(path)
             }
-            wallet.verifyTransactionProof(filePath)
         }
     }
 

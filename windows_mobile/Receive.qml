@@ -453,9 +453,27 @@ Item {
         }
         onClicked: {
             if (qtAndroidService.requestPermissions()) {
-                fileDialog.open()
+                qtAndroidService.openFile( config.getPathFor("fileGen"), "*/*", 123 )
             } else {
                 messagebox.open("Failure", "Permission Denied")
+            }
+        }
+    }
+
+    Connections {
+        target: qtAndroidService
+        onSgnOnFileOpen: (eventCode, path ) => {
+            if (eventCode == 123 && path) {
+                        path = decodeURIComponent(path)
+                        console.log("Open initial transaction file: " + path)
+                        const validation = util.validateMwc713Str(path)
+                        if (validation) {
+                            messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
+                            return
+                        }
+                        config.updatePathFor("fileGen", path)
+                        rect_progress.visible = true
+                        receive.signTransaction(path)
             }
         }
     }
@@ -495,33 +513,6 @@ Item {
         AnimatedImage {
             id: animation
             source: "../img/loading.gif"
-        }
-    }
-
-    FileDialog {
-        id: fileDialog
-        title: qsTr("Open initial transaction file")
-        folder: config.getPathFor("fileGen")
-        nameFilters: ["MWC transaction (*.tx *.input);;All files (*.*)"]
-        onAccepted: {
-            var path = fileDialog.file.toString()
-
-            const validation = util.validateMwc713Str(path)
-            if (validation) {
-                messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
-                return
-            }
-            // remove prefixed "file:///"
-            path= path.replace(/^(file:\/{3})|(qrc:\/{2})|(http:\/{2})/,"")
-            // unescape html codes like '%23' for '#'
-            const cleanPath = decodeURIComponent(path);
-            let filePath = cleanPath
-            if (cleanPath.search("Download/") > 0) {
-                filePath = downloadPath + cleanPath.substring(cleanPath.search("Download/") + 8, cleanPath.length)
-            }
-            config.updatePathFor("fileGen", filePath)
-            rect_progress.visible = true
-            receive.signTransaction(filePath)
         }
     }
 

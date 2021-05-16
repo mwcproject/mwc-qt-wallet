@@ -258,9 +258,6 @@ Item {
             } else {
                 const filepath = decodeURIComponent(fileNameOrSlatepack)
                 let path = filepath
-                if (filepath.search("Download/") > 0) {
-                    path = downloadPath + filepath.substring(filepath.search("Download/") + 8, filepath.length)
-                }
                 if (qtAndroidService.requestPermissions()) {
                     receive.receiveFile(path, description)
                 } else {
