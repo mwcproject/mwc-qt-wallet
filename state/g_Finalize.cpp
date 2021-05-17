@@ -18,6 +18,7 @@
 #include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../util/Log.h"
+#include "../util/Files.h"
 #include "../core/global.h"
 #include "../core/Config.h"
 #include <QCoreApplication>
@@ -77,12 +78,22 @@ void Finalize::updateResultTxPath(QString path) {
 }
 
 void Finalize::uploadFileTransaction(QString fileName) {
-
+#ifdef WALLET_MOBILE
+    // Copy to the temprary location so everybody will get an access to the data
+    QString tmpFile = util::genTempFileName(".tx.response");
+    bool ok = QFile::copy(fileName, tmpFile);
+    Q_ASSERT(ok);
+    if (!ok) {
+        core::getWndManager()->messageTextDlg( "File", "Unable to copy file to temporary location." );
+        return;
+    }
+    fileName = tmpFile;
+#endif
     util::FileTransactionInfo transInfo;
     QPair<bool, QString> perseResult = transInfo.parseSlateFile(fileName, util::FileTransactionType::FINALIZE );
 
     if (!perseResult.first) {
-        core::getWndManager()->messageTextDlg("Slate File", perseResult.second );
+        core::getWndManager()->messageTextDlg("File", perseResult.second );
         return;
     }
 

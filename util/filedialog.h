@@ -21,11 +21,15 @@ class QWidget;
 
 namespace util {
 
+#ifdef WALLET_DESKTOP
+
 // Call open save dialog with all checks
 QString getSaveFileName(QString title, QString callerId, QString extentionsDlg, QString extentionFile);
 
 // Call open file dialog with all checks
 QString getOpenFileName(QString title, QString callerId, QString extentionsDlg);
+
+#endif
 
 }
 

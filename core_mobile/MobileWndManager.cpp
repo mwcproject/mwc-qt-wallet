@@ -151,7 +151,7 @@ QString MobileWndManager::getSaveFileName(const QString &caption, const QString 
     Q_UNUSED(filter)
 
     QDateTime now;
-    QString fileName = downloadPath + "/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm");
+    QString fileName = downloadPath + "/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm-ss");
     return fileName;
 }
 

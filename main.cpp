@@ -31,6 +31,7 @@
 #include "state/statemachine.h"
 #include "core/appcontext.h"
 #include "util/ioutils.h"
+#include "util/Files.h"
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QFile>
@@ -304,6 +305,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<QtAndroidService>("QtAndroidService", 1, 0, "QtAndroidService");
 
     core::MobileWndManager * wndManager = new core::MobileWndManager();
+
+    util::clearTempDir();
 #endif
 
     core::setWndManager(wndManager);

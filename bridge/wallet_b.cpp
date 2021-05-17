@@ -193,6 +193,21 @@ void Wallet::onTransactionById( bool success, QString account, int64_t height, w
 }
 
 void Wallet::onExportProof( bool success, QString fn, QString msg ) {
+#ifdef WALLET_MOBILE
+    if (proofResultFineName.isEmpty())
+        return; // Wrong instance, not our message in any case
+
+    if (success) {
+        qDebug() << "Wallet::onExportProof copy from " << fn << "  to  " << proofResultFineName;
+        bool ok = util::copyFiles(fn, proofResultFineName);
+        fn = proofResultFineName;
+        if (!ok) {
+            success = false;
+            msg = "Unable extract proof data from temporary location";
+        }
+    }
+    proofResultFineName = "";
+#endif
     emit sgnExportProofResult(success, fn, msg);
 }
 void Wallet::onVerifyProof( bool success, QString fn, QString msg ) {
@@ -417,9 +432,8 @@ QString Wallet::getReceiveAccount() {
 // Respond: sgnExportProofResult( bool success, QString fn, QString msg );
 void Wallet::generateTransactionProof( QString transactionId, QString resultingFileName ) {
 #ifdef WALLET_MOBILE
-    // convert to normal file name
-    // content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/proof.proof
-    resultingFileName = resultingFileName.mid( resultingFileName.lastIndexOf(':') + 1 );
+    proofResultFineName = resultingFileName;
+    resultingFileName = util::genTempFileName(".proof");
 #endif
     getWallet()->generateMwcBoxTransactionProof( transactionId.toLongLong(), resultingFileName );
 }
@@ -428,9 +442,9 @@ void Wallet::generateTransactionProof( QString transactionId, QString resultingF
 // Respond: sgnVerifyProofResult( bool success, QString msg );
 void Wallet::verifyTransactionProof( QString proofFileName ) {
 #ifdef WALLET_MOBILE
-    // convert to normal file name
-    // content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/proof.proof
-    proofFileName = proofFileName.mid( proofFileName.lastIndexOf(':') + 1 );
+    QString tmpFN = util::genTempFileName(".proof");
+    QFile::copy(proofFileName, tmpFN);
+    proofFileName = tmpFN;
 #endif
     getWallet()->verifyMwcBoxTransactionProof(proofFileName);
 }

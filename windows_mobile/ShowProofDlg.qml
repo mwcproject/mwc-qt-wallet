@@ -68,12 +68,12 @@ Item {
 
     function open(fileName, proofInfo, isExport = false) {
         proof = proofInfo
-        text_location.text = fileName
+        //text_location.text = fileName
         text_info.text = 'this file proves that <b>'+ proofInfo.mwc + 'MWCs</b> was sent to<br /><b>' + proofInfo.toAddress + '</b><br/>from<br/><b>' + proofInfo.fromAddress
         text_outputs.text = proofInfo.output
         text_kernel.text = proofInfo.kernel
         blockExplorerUrl = config.getBlockExplorerUrl(config.getNetwork())
-        rect_dialog.height = dp(520) + text_location.height + text_warning.height
+        rect_dialog.height = dp(520) + /*text_location.height*/ + text_warning.height
         isTxDetailView = transactionDetail.visible
         transactionDetail.visible = false
         showProofDlg.visible = true
@@ -117,6 +117,7 @@ Item {
                 color: "#3600c9"
             }
 
+/*
             Text {
                 id: label_location
                 color: "#3600c9"
@@ -142,10 +143,12 @@ Item {
                 anchors.rightMargin: dp(20)
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
+*/
 
             Rectangle {
                 id: rect_info
-                anchors.top: text_location.bottom
+                //anchors.top: text_location.bottom
+                anchors.top: text_title.bottom
                 anchors.topMargin: dp(20)
                 anchors.left: parent.left
                 anchors.leftMargin: dp(20)
@@ -153,7 +156,7 @@ Item {
                 anchors.rightMargin: dp(20)
                 border.color: "#9E00E7"
                 border.width: dp(1)
-                height: dp(150)
+                height: dp(200)
 
                 Text {
                     id: text_info

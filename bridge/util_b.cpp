@@ -191,6 +191,8 @@ QVector<QString> Util::parseSlateContent( QString slateContent, int fileTransact
     return { fileInfo.transactionId, QString::number(fileInfo.amount) };
 }
 
+#ifdef WALLET_DESKTOP
+
 // Open QFileDialog::getSaveFileName with all standard verificaitons that we normally have
 // Return file name or empty value is request was cancelled or error happens
 QString Util::getSaveFileName(QString title, QString callerId, QString extentionsDlg, QString extentionFile) {
@@ -202,6 +204,8 @@ QString Util::getSaveFileName(QString title, QString callerId, QString extention
 QString Util::getOpenFileName(QString title, QString callerId, QString extentionsDlg) {
     return util::getOpenFileName(title, callerId, extentionsDlg);
 }
+
+#endif
 
 // Write some text into the file
 bool Util::writeTextFile(QString fileName, QStringList lines ) {

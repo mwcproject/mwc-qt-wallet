@@ -22,6 +22,8 @@
 #include "../bridge/wnd/g_send_b.h"
 #include <QSet>
 
+class QtAndroidService;
+
 namespace state {
 
 QString generateAmountErrorMsg(int64_t mwcAmount, const wallet::AccountInfo &acc, const core::SendCoinsParams &sendParams);
@@ -67,14 +69,24 @@ private slots:
 
     // Response from requestRecieverWalletAddress(url)
     void onRequestRecieverWalletAddress(QString url, QString proofAddress, QString error);
+
+#ifdef WALLET_MOBILE
+    void sgnOnFileReady( int eventCode, QString fileUri );
+#endif
 private:
     void switchToStartingWindow();
+
+    void implRespSendFile( bool success, QStringList errors, QString fileName );
 private:
     bool nodeIsHealthy = false;
 
     QString respProofAddress;
     QString restProofError;
     bool atSendInitialPage = true;
+#ifdef WALLET_MOBILE
+    QString scrFileName;
+    QtAndroidService * androidDevice = nullptr;
+#endif
 };
 
 }

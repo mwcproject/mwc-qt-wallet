@@ -60,7 +60,7 @@ Item {
             target: qtAndroidService
             onSgnOnFileReady: (eventCode, path ) => {
                 if (eventCode == 201 && path) {
-                      path = decodeURIComponent(path)
+                      // path = decodeURIComponent(path)
                       console.log("fileName to save proof: " + path)
                       const validation = util.validateMwc713Str(path)
                       if (validation) {

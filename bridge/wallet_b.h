@@ -260,6 +260,10 @@ private slots:
     void onDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
 
     void onFinalizeSlatepack( QString tagId, QString error, QString txUuid );
+private:
+#ifdef WALLET_MOBILE
+    QString proofResultFineName;
+#endif
 };
 
 }

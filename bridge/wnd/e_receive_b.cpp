@@ -39,11 +39,6 @@ void Receive::hideProgress() {
 
 // Sign file transaction
 void Receive::signTransaction(QString fileName) {
-#ifdef WALLET_MOBILE
-    // convert to normal file name
-    // content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/proof.proof
-    fileName = fileName.mid( fileName.lastIndexOf(':') + 1 );
-#endif
     // Let's try to read the file...
     getState()->signTransaction(fileName);
 }

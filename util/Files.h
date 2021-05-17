@@ -27,6 +27,19 @@ QStringList readTextFile(QString fileName, bool trimmed = true, bool cleanEMptyL
 // Write text lines into the file
 bool writeTextFile(QString fileName, const QStringList & lines );
 
+// QT copy doesn't support overwrite, but it is exactly what we need with Android.
+// This routine copy and overwrite the file
+bool copyFiles(QString srcFile, QString dstFile);
+
+#ifdef WALLET_MOBILE
+
+// Clear all files in temp directory
+void clearTempDir();
+
+// Return file name at tmp directory
+QString genTempFileName(QString extension);
+
+#endif
 
 }
 

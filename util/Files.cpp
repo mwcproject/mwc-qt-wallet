@@ -15,6 +15,10 @@
 #include "Files.h"
 #include <QFile>
 #include <QTextStream>
+#include <QStandardPaths>
+#include <QDir>
+#include <QDateTime>
+#include <QDebug>
 
 namespace util {
 
@@ -59,6 +63,62 @@ bool writeTextFile(QString fileName, const QStringList & lines ) {
     file.close();
     return true;
 }
+
+// QT copy doesn't support overwrite, but it is exactly what we need with Android.
+// This routine copy and overwrite the file
+bool copyFiles(QString srcFile, QString dstFile) {
+    QFile src(srcFile);
+    if (!src.open(QFile::ReadOnly)) {
+        Q_ASSERT(false);
+        return false;
+    }
+
+    QByteArray blob = src.readAll();
+    src.close();
+
+    if (blob.size()==0) {
+        qDebug() << "No data red from " << srcFile;
+        return false;
+    }
+
+    QFile dst(dstFile);
+    if (!dst.open(QFile::WriteOnly | QFile::Truncate)) {
+        Q_ASSERT(false);
+        return false;
+    }
+
+    if ( dst.write(blob) != blob.size()) {
+        qDebug() << "Unable to save all data to " << dstFile;
+        return false;
+    }
+
+    dst.close();
+    return true;
+}
+
+
+#ifdef WALLET_MOBILE
+
+// Clear all files in temp directory
+void clearTempDir() {
+    QString path = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+    QDir dir( path );
+
+    dir.setFilter( QDir::NoDotAndDotDot | QDir::Files );
+    foreach( QString dirItem, dir.entryList() )
+            dir.remove( dirItem );
+}
+
+// Return file name at tmp directory
+QString genTempFileName(QString extension) {
+    QString tmpPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+    QDateTime now;
+    QString fileName = tmpPath + "/" + now.currentDateTime().toString("MMMM-d-yyyy-hh-mm-ss") + extension;
+    return fileName;
+}
+
+#endif
+
 
 
 }

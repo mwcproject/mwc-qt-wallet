@@ -256,8 +256,9 @@ Item {
             if (fileNameOrSlatepack.substring(0, 10) === "BEGINSLATE") {
                 receive.receiveSlatepack(fileNameOrSlatepack, description)
             } else {
-                const filepath = decodeURIComponent(fileNameOrSlatepack)
-                let path = filepath
+                //const filepath = decodeURIComponent(fileNameOrSlatepack)
+                //let path = filepath
+                let path = fileNameOrSlatepack
                 if (qtAndroidService.requestPermissions()) {
                     receive.receiveFile(path, description)
                 } else {

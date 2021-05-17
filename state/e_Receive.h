@@ -18,6 +18,8 @@
 #include "state.h"
 #include "../wallet/wallet.h"
 
+class QtAndroidService;
+
 namespace state {
 
 const QString RECEIVE_CALLER_ID = "Receive";
@@ -52,10 +54,18 @@ private slots:
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
     void onReceiveFile( bool success, QStringList errors, QString inFileName );
     void onReceiveSlatepack( QString tagId, QString error, QString slatepack );
+
+#ifdef WALLET_MOBILE
+    void sgnOnFileReady( int eventCode, QString fileUri );
+#endif
 private:
     int lastNodeHeight = 0;
     bool signingFile = false; // what is signing now. File or Slatepack.
     bool atInitialPage = true;
+#ifdef WALLET_MOBILE
+    QString scrFileName;
+    QtAndroidService * androidDevice = nullptr;
+#endif
 };
 
 

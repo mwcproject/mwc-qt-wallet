@@ -100,6 +100,7 @@ public:
     // res[1] = amount
     Q_INVOKABLE QVector<QString> parseSlateContent( QString slateContent, int fileTransactionType, QString slateSenderAddress );
 
+#ifdef WALLET_DESKTOP
     // Open QFileDialog::getSaveFileName with all standard verificaitons that we normally have
     // Return file name or empty value is request was cancelled or error happens
     Q_INVOKABLE QString getSaveFileName(QString title, QString callerId, QString extentionsDlg, QString extentionFile);
@@ -107,6 +108,7 @@ public:
     // Open QFileDialog::getOpenFileName with all standard verificaitons that we normally have
     // Return file name or empty value is request was cancelled or error happens
     Q_INVOKABLE QString getOpenFileName(QString title, QString callerId, QString extentionsDlg);
+#endif
 
     // Write some text into the file
     Q_INVOKABLE bool writeTextFile(QString fileName, QStringList lines );

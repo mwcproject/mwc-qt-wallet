@@ -18,6 +18,7 @@
 #include "../state/statemachine.h"
 #include "../util/Log.h"
 #include "../util/Json.h"
+#include "../util/Files.h"
 //#include "../util_desktop/timeoutlock.h"
 #include "../core/global.h"
 #include "../core/WndManager.h"
@@ -25,6 +26,10 @@
 #include "../bridge/wnd/e_receive_b.h"
 #include "../bridge/wnd/g_filetransaction_b.h"
 #include "../core/WndManager.h"
+#ifdef WALLET_MOBILE
+#include "../core_mobile/qtandroidservice.h"
+#endif
+#include <QFile>
 
 namespace state {
 
@@ -39,6 +44,11 @@ Receive::Receive( StateContext * _context ) :
     QObject::connect(context->wallet, &wallet::Wallet::onNodeStatus,
                      this, &Receive::onNodeStatus, Qt::QueuedConnection);
 
+#ifdef WALLET_MOBILE
+    androidDevice = new QtAndroidService(this);
+    QObject::connect(androidDevice, &QtAndroidService::sgnOnFileReady,
+                     this, &Receive::sgnOnFileReady, Qt::QueuedConnection);
+#endif
 }
 
 Receive::~Receive() {}
@@ -101,6 +111,12 @@ void Receive::ftBack() {
 
 void Receive::receiveFile(QString fileName, QString description) {
     logger::logInfo("Receive", "receiveFile " + fileName);
+#ifdef WALLET_MOBILE
+    QString tmpFile = util::genTempFileName(".tx");
+    QFile::copy(fileName, tmpFile);
+    fileName = tmpFile;
+#endif
+
     // It can be filename or slate
     Q_ASSERT(signingFile);
     context->wallet->receiveFile(fileName, description);
@@ -123,16 +139,38 @@ void Receive::onReceiveFile( bool success, QStringList errors, QString inFileNam
             p->hideProgress();
 
         if (success) {
+#ifdef WALLET_MOBILE
+            // We got temp file, now we need to save the result. To save we need ask user for location
+            QString pickerInitialUri = context->appContext->getPathFor("fileGen");
+            scrFileName = inFileName + ".response";
+            QString dstFile = scrFileName.mid( scrFileName.lastIndexOf('/') );
+            androidDevice->createFile( pickerInitialUri, "*/*", dstFile, 300 );
+#else
             core::getWndManager()->messageTextDlg("Receive File Transaction",
                                          "Transaction file was successfully signed. Resulting transaction located at " +
                                          inFileName + ".response");
             ftBack();
+#endif
         } else {
             core::getWndManager()->messageTextDlg("Failure",
                                          "Unable to receive file transaction.\n\n" + util::formatErrorMessages(errors));
         }
     }
 }
+
+#ifdef WALLET_MOBILE
+void Receive::sgnOnFileReady( int eventCode, QString fileUri ) {
+    qDebug() << "Receive::sgnOnFileReady get " << eventCode << " " <<  fileUri;
+    if (eventCode == 300 && !fileUri.isEmpty() && !scrFileName.isEmpty()) {
+        context->appContext->updatePathFor("fileGen", fileUri);
+        bool ok = util::copyFiles(scrFileName, fileUri);
+        scrFileName = "";
+        if (ok) {
+            ftBack();
+        }
+    }
+}
+#endif
 
 void Receive::onReceiveSlatepack( QString tagId, QString error, QString slatepack ) {
     Q_UNUSED(tagId)

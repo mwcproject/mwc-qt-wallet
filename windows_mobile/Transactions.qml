@@ -668,7 +668,7 @@ Item {
         target: qtAndroidService
         onSgnOnFileReady: (eventCode, path ) => {
             if (eventCode == 125 && path) {
-                        path = decodeURIComponent(path)
+                        // path = decodeURIComponent(path)
                         console.log("Open proof transaction file: " + path)
                         const validation = util.validateMwc713Str(path)
                         if (validation) {

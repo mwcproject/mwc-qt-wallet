@@ -19,6 +19,7 @@
 #include "../util/Log.h"
 #include "../util/filedialog.h"
 #include "../util/ui.h"
+#include "../util/Files.h"
 #include "../core/global.h"
 #include "../core/Config.h"
 #include "../core/WndManager.h"
@@ -27,6 +28,9 @@
 #include <QFileInfo>
 #include <QCoreApplication>
 #include <QThread>
+#ifdef WALLET_MOBILE
+#include "../core_mobile/qtandroidservice.h"
+#endif
 
 namespace state {
 
@@ -71,6 +75,11 @@ Send::Send(StateContext * context) :
     QObject::connect(context->wallet, &wallet::Wallet::onRequestRecieverWalletAddress,
                      this, &Send::onRequestRecieverWalletAddress, Qt::QueuedConnection);
 
+#ifdef WALLET_MOBILE
+    androidDevice = new QtAndroidService(this);
+    QObject::connect(androidDevice, &QtAndroidService::sgnOnFileReady,
+                     this, &Send::sgnOnFileReady, Qt::QueuedConnection);
+#endif
 }
 
 Send::~Send() {}
@@ -216,12 +225,17 @@ bool Send::sendMwcOffline( QString account, int64_t amount, QString message, boo
                                         isLockLater, "");
     }
     else {
+#ifdef WALLET_DESKTOP
         // send as a file
         QString fileName = util::getSaveFileName("Create Initial Transaction Slate File", "fileGen",
                                                  "MWC init transaction (*.tx)", ".tx");
         if (fileName.isEmpty())
             return false;
-
+#endif
+#ifdef WALLET_MOBILE
+        // We need tp open the file with Android API. Then copy it to temp location.
+        QString fileName = util::genTempFileName(".tx");
+#endif
         context->wallet->sendFile(account, amount, message, fileName, prms.inputConfirmationNumber, prms.changeOutputs,
                                   outputs, ttl_blocks, context->appContext->getGenerateProof());
     }
@@ -230,9 +244,29 @@ bool Send::sendMwcOffline( QString account, int64_t amount, QString message, boo
 }
 
 void Send::respSendFile( bool success, QStringList errors, QString fileName ) {
+#ifdef WALLET_MOBILE
+    if (success) {
+        // requesting the file name for storage
+        scrFileName = fileName;
+        QString pickerInitialUri = context->appContext->getPathFor("fileGen");
+        QString dstFile = scrFileName.mid( scrFileName.lastIndexOf('/') );
+        androidDevice->createFile( pickerInitialUri, "*/*", dstFile, 301 );
+        return;
+    }
+#endif
+
+    implRespSendFile( success, errors, fileName );
+}
+
+void Send::implRespSendFile( bool success, QStringList errors, QString fileName ) {
     QString message;
-    if (success)
+    if (success) {
+#ifdef WALLET_MOBILE
+        message = "Transaction file was successfully generated";
+#else
         message = "Transaction file was successfully generated at " + fileName;
+#endif
+    }
     else
         message = "Unable to generate transaction file.\n" + util::formatErrorMessages(errors);
 
@@ -245,6 +279,23 @@ void Send::respSendFile( bool success, QStringList errors, QString fileName ) {
         }
     }
 }
+
+
+#ifdef WALLET_MOBILE
+void Send::sgnOnFileReady( int eventCode, QString fileUri ) {
+    qDebug() << "Receive::sgnOnFileReady get " << eventCode << " " <<  fileUri;
+    if (eventCode == 301 && !fileUri.isEmpty() && !scrFileName.isEmpty()) {
+        context->appContext->updatePathFor("fileGen", fileUri);
+        bool ok = util::copyFiles(scrFileName, fileUri);
+        qDebug() << "QFile::copy result is " << ok;
+        scrFileName = "";
+        if (ok) {
+            implRespSendFile( true, {}, fileUri);
+        }
+    }
+}
+#endif
+
 
 void Send::respSendSlatepack( QString tagId, QString error, QString slatepack ) {
     Q_UNUSED(tagId)

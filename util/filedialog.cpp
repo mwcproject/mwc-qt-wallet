@@ -20,6 +20,12 @@
 
 namespace util {
 
+// For mobile we can't request for files normally. There is different workflow.
+// We should use some temp files, then ask user for file location and copy file there.
+// To open we need request and wait for event.
+
+#ifdef WALLET_DESKTOP
+
 // Call open file dialog
 // Note parentWnd can be null, so clean up  the objects
 QString getSaveFileName(QString title, QString callerId, QString extentionsDlg, QString extentionFile) {
@@ -81,5 +87,6 @@ QString getOpenFileName(QString title, QString callerId, QString extentionsDlg) 
     return fileName;
 }
 
+#endif
 
 }
