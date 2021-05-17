@@ -4,11 +4,13 @@ import QtQuick.Window 2.0
 import WalletBridge 1.0
 import ConfigBridge 1.0
 import UtilBridge 1.0
+import QtAndroidService 1.0
 
 Item {
     id: transactionDetail
     visible: false
 
+    property var downloadPath
     property var tx2process
     property var outputs
     property string blockExplorerUrl
@@ -32,6 +34,10 @@ Item {
         id: wallet
     }
 
+    QtAndroidService {
+        id: qtAndroidService
+    }
+
     Connections {
         target: wallet
         onSgnExportProofResult: (success, fn, msg) => {
@@ -48,6 +54,22 @@ Item {
                 messagebox.open("Failure", msg)
             }
         }
+    }
+
+    Connections {
+            target: qtAndroidService
+            onSgnOnFileReady: (eventCode, path ) => {
+                if (eventCode == 201 && path) {
+                      path = decodeURIComponent(path)
+                      console.log("fileName to save proof: " + path)
+                      const validation = util.validateMwc713Str(path)
+                      if (validation) {
+                           messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
+                           return
+                      }
+                      wallet.generateTransactionProof(Number(tx2process.txIdx).toString(), path)
+                }
+            }
     }
 
     function init(account, txinfo, _outputs, messages, txnNote) {
@@ -433,13 +455,16 @@ Item {
                     }
 
                     onClicked: {
+                        console.log("Proof button is clicked")
                         if (!tx2process.proof) {
                             messagebox.open("Need info", "Please select qualify transaction to generate a proof.")
                         } else {
-//                            const fileName = util.getSaveFileName("Create transaction proof file", "Transactions", "transaction proof (*.proof)", ".proof")
-//                            if (fileName === "") return
-                            const fileName = downloadPath + "/" + tx2process.txid + ".proof"
-                            wallet.generateTransactionProof(Number(tx2process.txIdx).toString(), fileName)
+
+                            if (qtAndroidService.requestPermissions()) {
+                                 qtAndroidService.createFile( downloadPath, "*/*", tx2process.txid + ".proof", 201 );
+                            } else {
+                                 messagebox.open("Failure", "Permission Denied")
+                            }
                         }
                     }
                 }

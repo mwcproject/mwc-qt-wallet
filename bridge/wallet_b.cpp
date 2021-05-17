@@ -416,6 +416,11 @@ QString Wallet::getReceiveAccount() {
 // Generating transaction proof for transaction.
 // Respond: sgnExportProofResult( bool success, QString fn, QString msg );
 void Wallet::generateTransactionProof( QString transactionId, QString resultingFileName ) {
+#ifdef WALLET_MOBILE
+    // convert to normal file name
+    // content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/proof.proof
+    resultingFileName = resultingFileName.mid( resultingFileName.lastIndexOf(':') + 1 );
+#endif
     getWallet()->generateMwcBoxTransactionProof( transactionId.toLongLong(), resultingFileName );
 }
 

@@ -666,7 +666,7 @@ Item {
 
     Connections {
         target: qtAndroidService
-        onSgnOnFileOpen: (eventCode, path ) => {
+        onSgnOnFileReady: (eventCode, path ) => {
             if (eventCode == 125 && path) {
                         path = decodeURIComponent(path)
                         console.log("Open proof transaction file: " + path)

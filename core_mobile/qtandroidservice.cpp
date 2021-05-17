@@ -88,13 +88,62 @@ void QtAndroidService::openFile( QString pickerInitialUri, QString type, int eve
     QtAndroid::startActivity(intent, eventCode, this);
 }
 
+void QtAndroidService::createFile( QString pickerInitialUri, QString type, QString fileName, int eventCode ) {
+    QAndroidJniObject jpickerInitialUri = QAndroidJniObject::fromString(pickerInitialUri);
+    QAndroidJniObject jtype = QAndroidJniObject::fromString(type);
+    QAndroidJniObject jfileName = QAndroidJniObject::fromString(fileName);
+
+    // Intent buildCreateFileIntent(String pickerInitialUri, String type, String filename )
+    QAndroidJniObject intent = QAndroidJniObject::callStaticObjectMethod("mw/mwc/wallet/QmlHelper",
+                                                                         "buildCreateFileIntent",
+                                                                         "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;",
+                                                                         jpickerInitialUri.object<jstring>(),
+                                                                         jtype.object<jstring>(),
+                                                                         jfileName.object<jstring>());
+
+    QtAndroid::startActivity(intent, eventCode, this);
+}
+
+
 void QtAndroidService::handleActivityResult(int receiverRequestCode, int resultCode, const QAndroidJniObject &data) {
     if ( resultCode == RESULT_OK ) {
         QAndroidJniObject uri = data.callObjectMethod("getDataString","()Ljava/lang/String;");
-        emit sgnOnFileOpen( receiverRequestCode, uri.toString() );
+        emit sgnOnFileReady( receiverRequestCode, uri.toString() );
     }
     else {
         qDebug() << "QtAndroidService::handleActivityResult request " << receiverRequestCode << " failed with resultCode " << resultCode;
-        emit sgnOnFileOpen( receiverRequestCode, "" );
+        emit sgnOnFileReady( receiverRequestCode, "" );
     }
 }
+
+QString QtAndroidService::getApkVersion()
+{
+    QAndroidJniObject activity = QtAndroid::androidActivity();
+    QAndroidJniObject packageName, packageManager, packageInfo;
+    QAndroidJniEnvironment env;
+    QString info;
+
+    packageManager = activity.callObjectMethod("getPackageManager", "()Landroid/content/pm/PackageManager;");
+    packageName = activity.callObjectMethod("getPackageName", "()Ljava/lang/String;");
+
+    packageInfo = packageManager.callObjectMethod("getPackageInfo",
+                                                  "(Ljava/lang/String;I)Landroid/content/pm/PackageInfo;",
+                                                  packageName.object<jstring>(),
+                                                  0);
+
+    qDebug() << "Requesting Package info";
+
+    if (!env->ExceptionCheck())
+    {
+        info = packageInfo.getObjectField<jstring>("versionName").toString();
+        qDebug() << "info: " << info;
+    }
+    else
+    {
+        env->ExceptionClear();
+        qDebug() << "Got an error..." << info;
+    }
+
+    return info;
+}
+

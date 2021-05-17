@@ -15,7 +15,6 @@ Window {
     property int ttl_blocks
     property int questionTextDlgResponse
     property int sendConformationDlgResponse
-    property string versionName
 
     readonly property double dpi: 3.0 + (Screen.pixelDensity - 22.1) / 10
     function dp(x) { return x * dpi }

@@ -6,6 +6,7 @@ import WalletBridge 1.0
 import UtilBridge 1.0
 import StartWalletBridge 1.0
 import ConfigBridge 1.0
+import QtAndroidService 1.0
 
 Item {
     InputPasswordBridge {
@@ -26,6 +27,10 @@ Item {
 
     StartWalletBridge {
         id: startWallet
+    }
+
+    QtAndroidService {
+        id: qtAndroidService
     }
 
     Connections {
@@ -129,7 +134,7 @@ Item {
         anchors.bottomMargin: dp(20)
         color: "white"
         font.pixelSize: dp(14)
-        text: config.get_APP_NAME() + " v" + versionName
+        text: config.get_APP_NAME() + " v" + qtAndroidService.getApkVersion()
     }
 
     Text {

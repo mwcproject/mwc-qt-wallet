@@ -462,7 +462,7 @@ Item {
 
     Connections {
         target: qtAndroidService
-        onSgnOnFileOpen: (eventCode, path ) => {
+        onSgnOnFileReady: (eventCode, path ) => {
             if (eventCode == 123 && path) {
                         path = decodeURIComponent(path)
                         console.log("Open initial transaction file: " + path)

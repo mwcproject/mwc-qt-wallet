@@ -86,7 +86,7 @@ Item {
 
     Connections {
         target: qtAndroidService
-        onSgnOnFileOpen: (eventCode, path ) => {
+        onSgnOnFileReady: (eventCode, path ) => {
             if (eventCode == 124 && path) {
                         path = decodeURIComponent(path)
                         console.log("Open finalize transaction file: " + path)
