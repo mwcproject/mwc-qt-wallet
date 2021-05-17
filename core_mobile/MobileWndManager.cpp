@@ -255,7 +255,6 @@ void MobileWndManager::pageProgressWnd(QString pageTitle, QString callerId, QStr
     QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
 void MobileWndManager::pageOutputs() {
-    Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageFileTransactionReceive(QString pageTitle,
                                      const QString & fileNameOrSlatepack, const util::FileTransactionInfo & transInfo,
@@ -345,22 +344,16 @@ void MobileWndManager::pageShowSlatepack(QString slatepack, int backStateId, QSt
 
 
 void MobileWndManager::pageAccounts() {
-    Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageAccountTransfer() {
-    Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageNodeInfo() {
-    Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageContacts() {
-    Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageEvents() {
-    Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageWalletConfig() {
-    Q_ASSERT(false); // implement me
 }
 void MobileWndManager::pageNodeConfig() {
     Q_ASSERT(false); // implement me
