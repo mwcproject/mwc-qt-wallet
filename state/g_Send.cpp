@@ -287,7 +287,7 @@ void Send::sgnOnFileReady( int eventCode, QString fileUri ) {
     if (eventCode == 301 && !fileUri.isEmpty() && !scrFileName.isEmpty()) {
         context->appContext->updatePathFor("fileGen", fileUri);
         bool ok = util::copyFiles(scrFileName, fileUri);
-        qDebug() << "QFile::copy result is " << ok;
+        qDebug() << "util::copyFiles result is " << ok;
         scrFileName = "";
         if (ok) {
             implRespSendFile( true, {}, fileUri);

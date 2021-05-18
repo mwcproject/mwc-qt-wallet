@@ -67,14 +67,18 @@ bool writeTextFile(QString fileName, const QStringList & lines ) {
 // QT copy doesn't support overwrite, but it is exactly what we need with Android.
 // This routine copy and overwrite the file
 bool copyFiles(QString srcFile, QString dstFile) {
+    qDebug() << "calling copyFiles " << srcFile << " to " << dstFile;
     QFile src(srcFile);
     if (!src.open(QFile::ReadOnly)) {
+        qDebug() << "failed to open " << srcFile;
         Q_ASSERT(false);
         return false;
     }
 
     QByteArray blob = src.readAll();
     src.close();
+
+    qDebug() << "read bytes: " << blob.size();
 
     if (blob.size()==0) {
         qDebug() << "No data red from " << srcFile;
@@ -83,6 +87,7 @@ bool copyFiles(QString srcFile, QString dstFile) {
 
     QFile dst(dstFile);
     if (!dst.open(QFile::WriteOnly | QFile::Truncate)) {
+        qDebug() << "failed to open " << dstFile;
         Q_ASSERT(false);
         return false;
     }
@@ -91,6 +96,8 @@ bool copyFiles(QString srcFile, QString dstFile) {
         qDebug() << "Unable to save all data to " << dstFile;
         return false;
     }
+
+    qDebug() << "copyFiles done with success " << dstFile;
 
     dst.close();
     return true;
