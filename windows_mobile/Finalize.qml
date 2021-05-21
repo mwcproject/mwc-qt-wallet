@@ -88,15 +88,15 @@ Item {
         target: qtAndroidService
         onSgnOnFileReady: (eventCode, path ) => {
             if (eventCode == 124 && path) {
-                        //path = decodeURIComponent(path)
-                        console.log("Open finalize transaction file: " + path)
-                        const validation = util.validateMwc713Str(path)
+                        let uriDecodedPath = decodeURIComponent(path)
+                        console.log("Open finalize transaction file: " + uriDecodedPath)
+                        const validation = util.validateMwc713Str(uriDecodedPath)
                         if (validation) {
                             messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
                             return
                         }
                         config.updatePathFor("fileGen", path)
-                        finalize.uploadFileTransaction(path);
+                        finalize.uploadFileTransaction(path, uriDecodedPath);
             }
         }
     }

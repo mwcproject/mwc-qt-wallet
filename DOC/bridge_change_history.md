@@ -165,7 +165,7 @@ QML code is upadted with false values
 ##bridge::FileTransaction
 ```c++
     // Files transaction page, continue with a Slatepack
-    Q_INVOKABLE void ftContinueSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff);
+DELETED    Q_INVOKABLE void ftContinueSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff);
 ```
 
 ##bridge::Finalize

@@ -30,7 +30,7 @@ public:
 
     // Validate, ask for continue and then sign transaction.
     // sgnTransactionActionIsFinished will return some feedback if there are any.
-    Q_INVOKABLE void signTransaction(QString fileName);
+    Q_INVOKABLE void signTransaction(QString uriFileName, QString uriDecodedFileName);
 
     // Sign slatepack transaction. The primary data is a slatepack.  slateJson can be calculated, passed because we
     // already have this info after verification.
@@ -39,7 +39,7 @@ public:
     Q_INVOKABLE void cancelReceive();
 
     // Files transaction page, continue with a file
-    Q_INVOKABLE void receiveFile(QString fileName, QString description );
+    Q_INVOKABLE void receiveFile(QString uriFileName, QString uriDecodedFileName, QString description );
     // Files transaction page, continue with a Slatepack
     Q_INVOKABLE void receiveSlatepack(QString slatepack, QString description);
 

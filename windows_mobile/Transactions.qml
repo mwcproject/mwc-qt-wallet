@@ -117,7 +117,7 @@ Item {
         }
 
         onSgnVerifyProofResult: (success, fn, msg) => {
-            console.log("Get onSgnVerifyProofResult with " + success + " " + fn  + " msg")
+            console.log("Get onSgnVerifyProofResult with " + success + " " + fn  + " " + msg)
             if (success) {
                 const proof = showProofDlg.parseProofText(msg)
                 if (proof) {
@@ -668,15 +668,15 @@ Item {
         target: qtAndroidService
         onSgnOnFileReady: (eventCode, path ) => {
             if (eventCode == 125 && path) {
-                        // path = decodeURIComponent(path)
-                        console.log("Open proof transaction file: " + path)
-                        const validation = util.validateMwc713Str(path)
+                        let uriDecodePath = decodeURIComponent(path)
+                        console.log("Open proof transaction file: " + uriDecodePath)
+                        const validation = util.validateMwc713Str(uriDecodePath)
                         if (validation) {
                             messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
                             return
                         }
                         config.updatePathFor("fileGen", path)
-                        wallet.verifyTransactionProof(path)
+                        wallet.verifyTransactionProof(path, uriDecodePath)
             }
         }
     }

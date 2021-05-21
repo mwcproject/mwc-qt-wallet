@@ -124,6 +124,28 @@ QString genTempFileName(QString extension) {
     return fileName;
 }
 
+// mobile devices file names access is really wierd and depend on manufacturer.
+// Because of that we will try all possible cases.
+QStringList calculateAlternativeFileNames( QString uriFN, QString uriDecodedFn ) {
+    QStringList result;
+    result << uriFN;
+    if (!uriDecodedFn.isEmpty()) {
+        result << uriDecodedFn;
+        int idx = uriDecodedFn.indexOf("raw:/");
+        if (idx>0) {
+            result << uriDecodedFn.mid(idx+std::strlen("raw:"));
+        }
+    }
+
+    qDebug() << "calculateAlternativeFileNames result:";
+    for (auto & r : result ) {
+        qDebug() << r;
+    }
+
+    return result;
+}
+
+
 #endif
 
 

@@ -256,11 +256,10 @@ Item {
             if (fileNameOrSlatepack.substring(0, 10) === "BEGINSLATE") {
                 receive.receiveSlatepack(fileNameOrSlatepack, description)
             } else {
-                //const filepath = decodeURIComponent(fileNameOrSlatepack)
-                //let path = filepath
                 let path = fileNameOrSlatepack
+                let pathUriDecoded = decodeURIComponent(fileNameOrSlatepack)
                 if (qtAndroidService.requestPermissions()) {
-                    receive.receiveFile(path, description)
+                    receive.receiveFile(path, fileNameOrSlatepack,  description)
                 } else {
                     messagebox.open("Failure", "Permission Denied")
                 }

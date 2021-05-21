@@ -104,7 +104,7 @@ void Receive::on_recieveFileButton_clicked()
 
     ui->progress->show();
 
-    receive->signTransaction(fileName);
+    receive->signTransaction(fileName, "");
     // Expected respond from state with result
 }
 

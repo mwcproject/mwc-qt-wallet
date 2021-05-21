@@ -44,20 +44,6 @@ void FileTransaction::ftBack() {
     CALL_STATE_METHOD( ,ftBack())
 }
 
-void FileTransaction::ftContinue(QString fileName, QString resultTxFileName, bool fluff) {
-    if (callerId == state::RECEIVE_CALLER_ID)
-        ((state::Receive*) state::getState(state::STATE::RECEIVE_COINS))->receiveFile(fileName, "");
-    else
-        ((state::Finalize*) state::getState(state::STATE::FINALIZE))->finalizeFile(fileName, resultTxFileName, fluff);
-}
-
-void FileTransaction::ftContinueSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff) {
-    if (callerId == state::RECEIVE_CALLER_ID)
-        ((state::Receive*) state::getState(state::STATE::RECEIVE_COINS))->receiveSlatepack(slatepack, "");
-    else
-        ((state::Finalize*) state::getState(state::STATE::FINALIZE))->finalizeSlatepack(slatepack, txUuid, resultTxFileName, fluff);
-}
-
 bool FileTransaction::needResultTxFileName() {
     CALL_STATE_METHOD( return ,needResultTxFileName())
 }

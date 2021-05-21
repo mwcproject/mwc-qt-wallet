@@ -125,11 +125,11 @@ public:
 
     // Generating transaction proof for transaction.
     // Respond: sgnExportProofResult( bool success, QString fn, QString msg );
-    Q_INVOKABLE void generateTransactionProof( QString transactionId, QString resultingFileName );
+    Q_INVOKABLE void generateTransactionProof( QString transactionId, QString resultingFileNameURI, QString resultingFileNameUriDecoded );
 
     // Verify the proof for transaction
     // Respond: sgnVerifyProofResult( bool success, QString msg );
-    Q_INVOKABLE void verifyTransactionProof( QString proofFileName );
+    Q_INVOKABLE void verifyTransactionProof( QString uriProofFileName, QString uriDecodeProofFileName );
 
     // Request Node status
     // Return true if task was scheduled (wallet is unlocked)
@@ -262,7 +262,7 @@ private slots:
     void onFinalizeSlatepack( QString tagId, QString error, QString txUuid );
 private:
 #ifdef WALLET_MOBILE
-    QString proofResultFineName;
+    QStringList proofResultFileName;
 #endif
 };
 

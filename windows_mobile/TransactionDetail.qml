@@ -41,6 +41,7 @@ Item {
     Connections {
         target: wallet
         onSgnExportProofResult: (success, fn, msg) => {
+            console.log("Get onSgnVerifyProofResult with " + success + " " + fn  + " " + msg)
             if (success) {
                 const proof = showProofDlg.parseProofText(msg)
                 if (proof) {
@@ -60,14 +61,14 @@ Item {
             target: qtAndroidService
             onSgnOnFileReady: (eventCode, path ) => {
                 if (eventCode == 201 && path) {
-                      path = decodeURIComponent(path)
+                      let decodedPath = decodeURIComponent(path)
                       console.log("fileName to save proof: " + path)
-                      const validation = util.validateMwc713Str(path)
+                      const validation = util.validateMwc713Str(decodedPath)
                       if (validation) {
                            messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
                            return
                       }
-                      wallet.generateTransactionProof(Number(tx2process.txIdx).toString(), path)
+                      wallet.generateTransactionProof(Number(tx2process.txIdx).toString(), path, decodedPath)
                 }
             }
     }

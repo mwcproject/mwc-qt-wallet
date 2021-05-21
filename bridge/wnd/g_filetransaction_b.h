@@ -35,10 +35,6 @@ public:
     void hideProgress();
 
     Q_INVOKABLE void ftBack();
-    // Files transaction page, continue with a file
-    Q_INVOKABLE void ftContinue(QString fileName, QString resultTxFileName, bool fluff);
-    // Files transaction page, continue with a Slatepack
-    Q_INVOKABLE void ftContinueSlatepack(QString slatepack, QString txUuid, QString resultTxFileName, bool fluff);
 
     Q_INVOKABLE bool needResultTxFileName();
 

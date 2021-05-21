@@ -30,6 +30,7 @@
 #include "../core_mobile/qtandroidservice.h"
 #endif
 #include <QFile>
+#include <QUrl>
 
 namespace state {
 
@@ -84,14 +85,26 @@ void Receive::signSlatepackTransaction(QString slatepack, QString slateJson, QSt
 }
 
 
-void Receive::signTransaction( QString fileName ) {
+void Receive::signTransaction( QString uriFileName, QString uriDecodedFileName ) {
+    QStringList fileNames{uriFileName};
+    Q_UNUSED(uriDecodedFileName)
+#ifdef WALLET_MOBILE
+    QStringList fns = util::calculateAlternativeFileNames( uriFileName, uriDecodedFileName );
+#endif
+
     // Let's parse transaction first
     util::FileTransactionInfo flTrInfo;
-    QPair<bool, QString> perseResult = flTrInfo.parseSlateFile( fileName, util::FileTransactionType::RECEIVE );
+    QPair<bool, QString> parseResult = QPair<bool, QString>(false, "Internal error");
 
-    if (!perseResult.first) {
+    for ( auto & fn : fileNames ) {
+        parseResult = flTrInfo.parseSlateFile( fn, util::FileTransactionType::RECEIVE );
+        if (parseResult.first)
+            break;
+    }
+
+    if (!parseResult.first) {
         for (auto p : bridge::getBridgeManager()->getReceive() )
-            p->onTransactionActionIsFinished( false, perseResult.second );
+            p->onTransactionActionIsFinished( false, parseResult.second );
 
         return;
     }
@@ -99,7 +112,7 @@ void Receive::signTransaction( QString fileName ) {
     // We don't want to intercept the action from other windows like AirDrop...
     if ( isActive() ) {
         signingFile = true;
-        core::getWndManager()->pageFileTransactionReceive(mwc::PAGE_G_RECEIVE_TRANS, fileName, flTrInfo, lastNodeHeight);
+        core::getWndManager()->pageFileTransactionReceive(mwc::PAGE_G_RECEIVE_TRANS, uriFileName, flTrInfo, lastNodeHeight);
         atInitialPage = false;
     }
 }
@@ -109,11 +122,27 @@ void Receive::ftBack() {
     atInitialPage = true;
 }
 
-void Receive::receiveFile(QString fileName, QString description) {
-    logger::logInfo("Receive", "receiveFile " + fileName);
+void Receive::receiveFile(QString uriFileName, QString uriDecodedFileName, QString description) {
+    logger::logInfo("Receive", "receiveFile " + uriFileName);
+    Q_UNUSED(uriDecodedFileName)
+    QString fileName = uriFileName;
 #ifdef WALLET_MOBILE
     QString tmpFile = util::genTempFileName(".tx");
-    QFile::copy(fileName, tmpFile);
+    QStringList fns = util::calculateAlternativeFileNames( uriFileName, uriDecodedFileName );
+    bool copyOk = false;
+    for (const auto & f : fns) {
+        if (util::copyFiles(f, tmpFile)) {
+            copyOk = true;
+            break;
+        }
+    }
+
+    if (!copyOk) {
+        core::getWndManager()->messageTextDlg( "Data access",
+                    "Unable to copy data from the file " + ( uriDecodedFileName.isEmpty() ? uriFileName : uriDecodedFileName ) );
+        return;
+    }
+
     fileName = tmpFile;
 #endif
 
@@ -163,10 +192,23 @@ void Receive::sgnOnFileReady( int eventCode, QString fileUri ) {
     qDebug() << "Receive::sgnOnFileReady get " << eventCode << " " <<  fileUri;
     if (eventCode == 300 && !fileUri.isEmpty() && !scrFileName.isEmpty()) {
         context->appContext->updatePathFor("fileGen", fileUri);
-        bool ok = util::copyFiles(scrFileName, fileUri);
+
+        QString fileUriDecoded = QUrl::fromPercentEncoding(fileUri.toUtf8());
+        QStringList fns = util::calculateAlternativeFileNames( fileUri, fileUriDecoded );
+        bool ok = false;
+        for ( const auto & f : fns ) {
+            if (util::copyFiles(scrFileName, f)) {
+                ok = true;
+                break;
+            }
+        }
         scrFileName = "";
         if (ok) {
             ftBack();
+        }
+        else {
+            core::getWndManager()->messageTextDlg("Access Error",
+                                         "Unable to save result to " + fileUri);
         }
     }
 }

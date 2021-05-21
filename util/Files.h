@@ -39,6 +39,10 @@ void clearTempDir();
 // Return file name at tmp directory
 QString genTempFileName(QString extension);
 
+// mobile devices file names access is really wierd and depend on manufacturer.
+// Because of that we will try all possible cases.
+QStringList calculateAlternativeFileNames( QString uriFN, QString uriDecodedFn );
+
 #endif
 
 }

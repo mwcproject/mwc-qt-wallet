@@ -31,6 +31,7 @@
 #ifdef WALLET_MOBILE
 #include "../core_mobile/qtandroidservice.h"
 #endif
+#include <QUrl>
 
 namespace state {
 
@@ -260,6 +261,7 @@ void Send::respSendFile( bool success, QStringList errors, QString fileName ) {
 
 void Send::implRespSendFile( bool success, QStringList errors, QString fileName ) {
     QString message;
+    Q_UNUSED(fileName)
     if (success) {
 #ifdef WALLET_MOBILE
         message = "Transaction file was successfully generated";
@@ -286,11 +288,23 @@ void Send::sgnOnFileReady( int eventCode, QString fileUri ) {
     qDebug() << "Receive::sgnOnFileReady get " << eventCode << " " <<  fileUri;
     if (eventCode == 301 && !fileUri.isEmpty() && !scrFileName.isEmpty()) {
         context->appContext->updatePathFor("fileGen", fileUri);
-        bool ok = util::copyFiles(scrFileName, fileUri);
-        qDebug() << "util::copyFiles result is " << ok;
+
+        QString fileUriDecoded = QUrl::fromPercentEncoding(fileUri.toUtf8());
+        QStringList fns = util::calculateAlternativeFileNames( fileUri, fileUriDecoded );
+        bool ok = false;
+        for ( const auto & f : fns ) {
+            if (util::copyFiles(scrFileName, f)) {
+                ok = true;
+                break;
+            }
+        }
         scrFileName = "";
         if (ok) {
             implRespSendFile( true, {}, fileUri);
+        }
+        else {
+            core::getWndManager()->messageTextDlg("Access Error",
+                 "Unable to save result to " + fileUri);
         }
     }
 }
