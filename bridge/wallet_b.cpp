@@ -195,28 +195,21 @@ void Wallet::onTransactionById( bool success, QString account, int64_t height, w
 
 void Wallet::onExportProof( bool success, QString fn, QString msg ) {
 #ifdef WALLET_MOBILE
-    if (proofResultFileName.isEmpty())
+    if (proofResultURI.isEmpty())
         return; // Wrong instance, not our message in any case
 
     if (success) {
-        QString proofMsg = msg;
-        for (const auto & resFn : proofResultFileName ) {
-            qDebug() << "Wallet::onExportProof copy from " << fn << "  to  " << resFn;
-            bool ok = util::copyFiles(fn, resFn);
+            qDebug() << "Wallet::onExportProof copy from " << fn << "  to  " << proofResultURI;
+            bool ok = util::copyFileToUri(fn, proofResultURI);
             if (!ok) {
                 success = false;
                 msg = "Unable extract proof data from temporary location";
-                continue;
             }
             else {
-                fn = resFn;
-                success = true;
-                msg = proofMsg;
-                break;
+                fn = proofResultURI;
             }
-        }
     }
-    proofResultFileName.clear();
+    proofResultURI = "";
 #endif
     emit sgnExportProofResult(success, fn, msg);
 }
@@ -440,11 +433,10 @@ QString Wallet::getReceiveAccount() {
 
 // Generating transaction proof for transaction.
 // Respond: sgnExportProofResult( bool success, QString fn, QString msg );
-void Wallet::generateTransactionProof( QString transactionId, QString resultingFileNameURI, QString resultingFileNameUriDecoded ) {
+void Wallet::generateTransactionProof( QString transactionId, QString resultingFileNameURI ) {
     QString resultingFileName = resultingFileNameURI;
-    Q_UNUSED(resultingFileNameUriDecoded)
 #ifdef WALLET_MOBILE
-    proofResultFileName = util::calculateAlternativeFileNames( resultingFileNameURI, resultingFileNameUriDecoded );
+    proofResultURI = resultingFileNameURI;
     resultingFileName = util::genTempFileName(".proof");
 #endif
     getWallet()->generateMwcBoxTransactionProof( transactionId.toLongLong(), resultingFileName );
@@ -452,22 +444,13 @@ void Wallet::generateTransactionProof( QString transactionId, QString resultingF
 
 // Verify the proof for transaction
 // Respond: sgnVerifyProofResult( bool success, QString msg );
-void Wallet::verifyTransactionProof( QString uriProofFileName, QString uriDecodeProofFileName  ) {
+void Wallet::verifyTransactionProof( QString uriProofFileName  ) {
     QString proofFileName = uriProofFileName;
-    Q_UNUSED(uriDecodeProofFileName)
 #ifdef WALLET_MOBILE
     QString tmpFN = util::genTempFileName(".proof");
-    QStringList fns = util::calculateAlternativeFileNames( uriProofFileName, uriDecodeProofFileName );
-    bool copyOK = false;
-    for ( const auto & fn : fns ) {
-        if (util::copyFiles( fn, tmpFN )) {
-            copyOK = true;
-            break;
-        }
-    }
-    if (!copyOK) {
+    if (!util::copyUriToFile( uriProofFileName, tmpFN )) {
         core::getWndManager()->messageTextDlg( "Data access",
-                   "Unable to copy data from the file " + ( uriDecodeProofFileName.isEmpty() ? uriProofFileName : uriDecodeProofFileName ) );
+                   "Unable to copy data from the URI " + uriProofFileName );
         return;
     }
     proofFileName = tmpFN;

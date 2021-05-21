@@ -304,7 +304,7 @@ void Transactions::richButtonPressed(control::RichButton * button, QString coock
         if (fileName.isEmpty())
             return;
 
-        wallet->generateTransactionProof(QString::number(tx2process.txIdx), fileName, "");
+        wallet->generateTransactionProof(QString::number(tx2process.txIdx), fileName);
     }
     else {
         // Unexpected id
@@ -418,7 +418,7 @@ void Transactions::on_validateProofButton_clicked()
     if (fileName.isEmpty())
         return;
 
-    wallet->verifyTransactionProof(fileName, "");
+    wallet->verifyTransactionProof(fileName);
 }
 
 void Transactions::on_exportButton_clicked() {

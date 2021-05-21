@@ -9,7 +9,7 @@ import android.content.IntentFilter;
 
 public class QtAndroidService extends QtService
 {
-    private static final String TAG = "QtAndroidService";
+    private static final String TAG = "mwc-qt-wallet";
 
     @Override
     public void onCreate() {

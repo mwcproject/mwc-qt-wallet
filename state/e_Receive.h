@@ -30,12 +30,12 @@ public:
     Receive( StateContext * context );
     virtual ~Receive() override;
 
-    void signTransaction( QString uriFileName, QString uriDecodedFileName );
+    void signTransaction( QString uriFileName );
     void signSlatepackTransaction(QString slatepack, QString slateJson, QString slateSenderAddress);
 
 public:
     void ftBack();
-    void receiveFile(QString uriFileName, QString uriDecodedFileName, QString description);
+    void receiveFile(QString uriFileName, QString description);
     void receiveSlatepack(QString slatepack, QString description);
 
     bool needResultTxFileName() {return false;}

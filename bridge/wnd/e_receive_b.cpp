@@ -38,9 +38,9 @@ void Receive::hideProgress() {
 }
 
 // Sign file transaction
-void Receive::signTransaction(QString uriFileName, QString uriDecodedFileName) {
+void Receive::signTransaction(QString uriFileName) {
     // Let's try to read the file...
-    getState()->signTransaction( uriFileName, uriDecodedFileName );
+    getState()->signTransaction( uriFileName );
 }
 
 // Sign slatepack transaction. The primary data is slatepack.  slateJson can be calculated, passed becuase we already have after verification
@@ -57,8 +57,8 @@ void Receive::cancelReceive() {
 }
 
 // Files transaction page, continue with a file
-void Receive::receiveFile(QString uriFileName, QString uriDecodedFileName, QString description ) {
-    getState()->receiveFile(uriFileName, uriDecodedFileName, description);
+void Receive::receiveFile(QString uriFileName, QString description ) {
+    getState()->receiveFile(uriFileName, description);
 }
 
 // Files transaction page, continue with a Slatepack

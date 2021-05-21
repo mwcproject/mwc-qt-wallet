@@ -77,21 +77,12 @@ void Finalize::updateResultTxPath(QString path) {
     context->appContext->updatePathFor("resultTx", path);
 }
 
-void Finalize::uploadFileTransaction(QString uriFileName, QString uriDecodedFileName) {
+void Finalize::uploadFileTransaction(QString uriFileName) {
     QString fileName = uriFileName;
-    Q_UNUSED(uriDecodedFileName)
 #ifdef WALLET_MOBILE
     // Copy to the temprary location so everybody will get an access to the data
     QString tmpFile = util::genTempFileName(".tx.response");
-    QStringList fns = util::calculateAlternativeFileNames( uriFileName, uriDecodedFileName );
-    bool copyOk = false;
-    for (const auto & fn : fns ) {
-        if ( util::copyFiles( fn, tmpFile) ) {
-            copyOk = true;
-            break;
-        }
-    }
-    if (!copyOk) {
+    if (! util::copyUriToFile(uriFileName, tmpFile) ) {
         core::getWndManager()->messageTextDlg( "File", "Unable to copy file to temporary location." );
         return;
     }

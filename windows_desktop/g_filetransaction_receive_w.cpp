@@ -84,7 +84,7 @@ void FileTransactionReceive::on_processButton_clicked()
     }
     else
     { // file
-        receive->receiveFile( fileNameOrSlatepack, "", description );
+        receive->receiveFile( fileNameOrSlatepack, description );
     }
 }
 

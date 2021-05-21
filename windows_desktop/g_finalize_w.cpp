@@ -58,7 +58,7 @@ void Finalize::on_uploadFileBtn_clicked() {
     if (fileName.isEmpty())
         return;
 
-    finalize->uploadFileTransaction(fileName, "");
+    finalize->uploadFileTransaction(fileName);
 }
 
 void Finalize::on_pasteSlatepackBtn_clicked()

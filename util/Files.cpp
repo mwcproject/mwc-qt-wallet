@@ -20,6 +20,12 @@
 #include <QDateTime>
 #include <QDebug>
 
+#ifdef WALLET_MOBILE
+#include <QtAndroid>
+#include <QAndroidJniEnvironment>
+#include <QAndroidIntent>
+#endif
+
 namespace util {
 
 QStringList readTextFile( QString fileName, bool trimmed, bool cleanEMptyLines, std::function<void()> openOpenErrorCallback ) {
@@ -64,46 +70,6 @@ bool writeTextFile(QString fileName, const QStringList & lines ) {
     return true;
 }
 
-// QT copy doesn't support overwrite, but it is exactly what we need with Android.
-// This routine copy and overwrite the file
-bool copyFiles(QString srcFile, QString dstFile) {
-    qDebug() << "calling copyFiles " << srcFile << " to " << dstFile;
-    QFile src(srcFile);
-    if (!src.open(QFile::ReadOnly)) {
-        qDebug() << "failed to open " << srcFile;
-        Q_ASSERT(false);
-        return false;
-    }
-
-    QByteArray blob = src.readAll();
-    src.close();
-
-    qDebug() << "read bytes: " << blob.size();
-
-    if (blob.size()==0) {
-        qDebug() << "No data red from " << srcFile;
-        return false;
-    }
-
-    QFile dst(dstFile);
-    if (!dst.open(QFile::WriteOnly | QFile::Truncate)) {
-        qDebug() << "failed to open " << dstFile;
-        Q_ASSERT(false);
-        return false;
-    }
-
-    if ( dst.write(blob) != blob.size()) {
-        qDebug() << "Unable to save all data to " << dstFile;
-        return false;
-    }
-
-    qDebug() << "copyFiles done with success " << dstFile;
-
-    dst.close();
-    return true;
-}
-
-
 #ifdef WALLET_MOBILE
 
 // Clear all files in temp directory
@@ -124,27 +90,37 @@ QString genTempFileName(QString extension) {
     return fileName;
 }
 
-// mobile devices file names access is really wierd and depend on manufacturer.
-// Because of that we will try all possible cases.
-QStringList calculateAlternativeFileNames( QString uriFN, QString uriDecodedFn ) {
-    QStringList result;
-    result << uriFN;
-    if (!uriDecodedFn.isEmpty()) {
-        result << uriDecodedFn;
-        int idx = uriDecodedFn.indexOf("raw:/");
-        if (idx>0) {
-            result << uriDecodedFn.mid(idx+std::strlen("raw:"));
-        }
-    }
+bool copyUriToFile(QString uriFN, QString fsFN) {
+    QAndroidJniObject activity = QtAndroid::androidActivity();
+    QAndroidJniObject juriFN = QAndroidJniObject::fromString(uriFN);
+    QAndroidJniObject jfsFN = QAndroidJniObject::fromString(fsFN);
 
-    qDebug() << "calculateAlternativeFileNames result:";
-    for (auto & r : result ) {
-        qDebug() << r;
-    }
+    bool result = QAndroidJniObject::callStaticMethod<jboolean>("mw/mwc/wallet/QmlHelper",
+                                                                         "copyUriToFile",
+                                                                         "(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)Z",
+                                                                         activity.object(),
+                                                                         juriFN.object<jstring>(),
+                                                                         jfsFN.object<jstring>());
 
+    qDebug() << "copyUriToFile with " + uriFN + ", " + fsFN + " return " << result;
     return result;
 }
 
+bool copyFileToUri(QString fsFN, QString uriFN) {
+    QAndroidJniObject activity = QtAndroid::androidActivity();
+    QAndroidJniObject jfsFN = QAndroidJniObject::fromString(fsFN);
+    QAndroidJniObject juriFN = QAndroidJniObject::fromString(uriFN);
+
+    bool result = QAndroidJniObject::callStaticMethod<jboolean>("mw/mwc/wallet/QmlHelper",
+                                                                         "copyFileToUri",
+                                                                         "(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)Z",
+                                                                         activity.object(),
+                                                                         jfsFN.object<jstring>(),
+                                                                         juriFN.object<jstring>());
+
+    qDebug() << "copyFileToUri with " + fsFN + ", " + uriFN + " return " << result;
+    return result;
+}
 
 #endif
 

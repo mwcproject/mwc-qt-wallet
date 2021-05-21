@@ -22,7 +22,7 @@ public class ActivityUtils {
 
     private static native void sendToQt(String message);
 
-    private static final String TAG = "ActivityUtils";
+    private static final String TAG = "mwc-qt-wallet";
     public static final String BROADCAST_ACTION = "mw.mwc.wallet.broadcast";
 
     public void registerServiceBroadcastReceiver(Context context) {

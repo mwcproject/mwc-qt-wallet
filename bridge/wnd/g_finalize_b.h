@@ -28,7 +28,7 @@ public:
     void hideProgress();
 
     // Finalize file slate.
-    Q_INVOKABLE void uploadFileTransaction(QString uriFileName, QString uriDecodedFileName);
+    Q_INVOKABLE void uploadFileTransaction(QString uriFileName);
 
     // Finalize slatepack slate.
     Q_INVOKABLE void uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender );

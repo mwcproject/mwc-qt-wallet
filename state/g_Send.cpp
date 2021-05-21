@@ -288,24 +288,14 @@ void Send::sgnOnFileReady( int eventCode, QString fileUri ) {
     qDebug() << "Receive::sgnOnFileReady get " << eventCode << " " <<  fileUri;
     if (eventCode == 301 && !fileUri.isEmpty() && !scrFileName.isEmpty()) {
         context->appContext->updatePathFor("fileGen", fileUri);
-
-        QString fileUriDecoded = QUrl::fromPercentEncoding(fileUri.toUtf8());
-        QStringList fns = util::calculateAlternativeFileNames( fileUri, fileUriDecoded );
-        bool ok = false;
-        for ( const auto & f : fns ) {
-            if (util::copyFiles(scrFileName, f)) {
-                ok = true;
-                break;
-            }
-        }
-        scrFileName = "";
-        if (ok) {
+        if (util::copyFileToUri(scrFileName, fileUri)) {
             implRespSendFile( true, {}, fileUri);
         }
         else {
             core::getWndManager()->messageTextDlg("Access Error",
                  "Unable to save result to " + fileUri);
         }
+        scrFileName = "";
     }
 }
 #endif

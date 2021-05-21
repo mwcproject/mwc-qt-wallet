@@ -33,7 +33,7 @@ public:
     Finalize( StateContext * context);
     virtual ~Finalize() override;
 
-    void uploadFileTransaction(QString uriFileName, QString uriDecodedFileName);
+    void uploadFileTransaction(QString uriFileName);
 
     void uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender );
 

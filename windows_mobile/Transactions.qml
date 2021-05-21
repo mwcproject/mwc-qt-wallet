@@ -668,15 +668,14 @@ Item {
         target: qtAndroidService
         onSgnOnFileReady: (eventCode, path ) => {
             if (eventCode == 125 && path) {
-                        let uriDecodePath = decodeURIComponent(path)
-                        console.log("Open proof transaction file: " + uriDecodePath)
-                        const validation = util.validateMwc713Str(uriDecodePath)
+                        console.log("Open proof transaction file: " + path)
+                        const validation = util.validateMwc713Str(path)
                         if (validation) {
                             messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
                             return
                         }
                         config.updatePathFor("fileGen", path)
-                        wallet.verifyTransactionProof(path, uriDecodePath)
+                        wallet.verifyTransactionProof(path)
             }
         }
     }

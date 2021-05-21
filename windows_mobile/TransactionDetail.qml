@@ -61,14 +61,13 @@ Item {
             target: qtAndroidService
             onSgnOnFileReady: (eventCode, path ) => {
                 if (eventCode == 201 && path) {
-                      let decodedPath = decodeURIComponent(path)
                       console.log("fileName to save proof: " + path)
-                      const validation = util.validateMwc713Str(decodedPath)
+                      const validation = util.validateMwc713Str(path)
                       if (validation) {
                            messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
                            return
                       }
-                      wallet.generateTransactionProof(Number(tx2process.txIdx).toString(), path, decodedPath)
+                      wallet.generateTransactionProof(Number(tx2process.txIdx).toString(), path)
                 }
             }
     }

@@ -85,22 +85,23 @@ void Receive::signSlatepackTransaction(QString slatepack, QString slateJson, QSt
 }
 
 
-void Receive::signTransaction( QString uriFileName, QString uriDecodedFileName ) {
-    QStringList fileNames{uriFileName};
-    Q_UNUSED(uriDecodedFileName)
+void Receive::signTransaction( QString uriFileName ) {
+    QString fileName = uriFileName;
 #ifdef WALLET_MOBILE
-    QStringList fns = util::calculateAlternativeFileNames( uriFileName, uriDecodedFileName );
+    QString tmpFile = util::genTempFileName(".tmp");
+    
+    if (!util::copyUriToFile(uriFileName, tmpFile)) {
+        core::getWndManager()->messageTextDlg( "Data access",
+                    "Unable to copy data from the file " + uriFileName );
+        return;
+    }
+
+    fileName = tmpFile;
 #endif
 
     // Let's parse transaction first
     util::FileTransactionInfo flTrInfo;
-    QPair<bool, QString> parseResult = QPair<bool, QString>(false, "Internal error");
-
-    for ( auto & fn : fileNames ) {
-        parseResult = flTrInfo.parseSlateFile( fn, util::FileTransactionType::RECEIVE );
-        if (parseResult.first)
-            break;
-    }
+    QPair<bool, QString> parseResult = flTrInfo.parseSlateFile( fileName, util::FileTransactionType::RECEIVE );
 
     if (!parseResult.first) {
         for (auto p : bridge::getBridgeManager()->getReceive() )
@@ -122,27 +123,16 @@ void Receive::ftBack() {
     atInitialPage = true;
 }
 
-void Receive::receiveFile(QString uriFileName, QString uriDecodedFileName, QString description) {
+void Receive::receiveFile(QString uriFileName, QString description) {
     logger::logInfo("Receive", "receiveFile " + uriFileName);
-    Q_UNUSED(uriDecodedFileName)
     QString fileName = uriFileName;
 #ifdef WALLET_MOBILE
     QString tmpFile = util::genTempFileName(".tx");
-    QStringList fns = util::calculateAlternativeFileNames( uriFileName, uriDecodedFileName );
-    bool copyOk = false;
-    for (const auto & f : fns) {
-        if (util::copyFiles(f, tmpFile)) {
-            copyOk = true;
-            break;
-        }
-    }
-
-    if (!copyOk) {
+    if (!util::copyUriToFile(uriFileName, tmpFile)) {
         core::getWndManager()->messageTextDlg( "Data access",
-                    "Unable to copy data from the file " + ( uriDecodedFileName.isEmpty() ? uriFileName : uriDecodedFileName ) );
+                    "Unable to copy data from the file " + uriFileName );
         return;
     }
-
     fileName = tmpFile;
 #endif
 
@@ -192,24 +182,14 @@ void Receive::sgnOnFileReady( int eventCode, QString fileUri ) {
     qDebug() << "Receive::sgnOnFileReady get " << eventCode << " " <<  fileUri;
     if (eventCode == 300 && !fileUri.isEmpty() && !scrFileName.isEmpty()) {
         context->appContext->updatePathFor("fileGen", fileUri);
-
-        QString fileUriDecoded = QUrl::fromPercentEncoding(fileUri.toUtf8());
-        QStringList fns = util::calculateAlternativeFileNames( fileUri, fileUriDecoded );
-        bool ok = false;
-        for ( const auto & f : fns ) {
-            if (util::copyFiles(scrFileName, f)) {
-                ok = true;
-                break;
-            }
-        }
-        scrFileName = "";
-        if (ok) {
+        if (util::copyFileToUri(scrFileName, fileUri)) {
             ftBack();
         }
         else {
             core::getWndManager()->messageTextDlg("Access Error",
                                          "Unable to save result to " + fileUri);
         }
+        scrFileName = "";
     }
 }
 #endif

@@ -36,8 +36,8 @@ void Finalize::hideProgress() {
 }
 
 // Start Processing file slate.
-void Finalize::uploadFileTransaction(QString uriFileName, QString uriDecodedFileName) {
-    getState()->uploadFileTransaction(uriFileName, uriDecodedFileName);
+void Finalize::uploadFileTransaction(QString uriFileName) {
+    getState()->uploadFileTransaction(uriFileName);
 }
 
 void Finalize::uploadSlatepackTransaction( QString slatepack, QString slateJson, QString sender ) {
