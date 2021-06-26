@@ -60,7 +60,7 @@ public:
 
 protected:
     QString taskName;
-    QString taskProgressName; // EMpty - don't update the status
+    QString taskProgressName; // Empty - don't update the status
     // wallet to call back regarding the state change
     MWC713 * wallet713;
     QString inputStr; // string (command) to feed to a wallet

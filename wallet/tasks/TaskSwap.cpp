@@ -504,5 +504,58 @@ bool TaskAdjustTradeState::processTask(const QVector<WEvent> &events) {
     return true;
 }
 
+// ------------------ TaskEthInfo -------------------
+bool TaskEthInfo::processTask(const QVector<WEvent> &events) {
+    QVector<WEvent> lns = filterEvents(events, WALLET_EVENTS::S_LINE);
+
+    //____ Ethereum Wallet Summary Info - Account '0x8495384DC4F852E9298F94875A40E97026F79577' as of height 10484684 ____
+    //Ether Balance | 0.0000
+    QString ethAddr;
+    QString currency;
+    QString balance;
+
+    for (const auto& l : lns) {
+        const QString& msg = l.message;
+        if (msg.contains("Error")) {
+            return true;
+        } else if (msg.contains("Ethereum Wallet Summary Info")) {
+            int idx1 = strlen("____ Ethereum Wallet Summary Info - Account '"); 
+            int idx2 = msg.indexOf('\'', idx1 + 1);
+            if (idx1 < idx2) {
+                ethAddr = msg.mid(idx1, idx2 - idx1).trimmed();
+            }
+        } else if (msg.contains("Balance")) {
+            QStringList msgList = msg.split(" ");
+            currency = msgList.at(1);
+            balance  = msgList.at(4);
+        }
+    }
+
+    wallet713->setRequestEthInfo(ethAddr, currency, balance);
+    return true;
+}
+
+// ------------------ TaskEthSend -------------------
+bool TaskEthSend::processTask(const QVector<WEvent> &events) {
+    QVector<WEvent> lns = filterEvents(events, WALLET_EVENTS::S_LINE);
+
+    // "Transfer Ether 0.01 to 0xC8C52374289E743CAA8fc6ACdf40c6E0b810261E done!!!"
+    QString dest = "";
+    QString currency = "";
+    QString amount = "";
+
+    for (const auto& l : lns) {
+        const QString& msg = l.message;
+        if (msg.contains("done")) {
+            QStringList msgList = msg.split(" ");
+            dest = msgList.at(4);
+            currency = msgList.at(2);
+            amount = msgList.at(1);
+        }
+    }
+
+    wallet713->setRequestEthSend(dest, currency, amount);
+    return true;
+}
 
 }

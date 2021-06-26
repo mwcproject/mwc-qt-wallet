@@ -40,7 +40,8 @@ public:
 // Get list of the trades
 class TaskGetSwapTrades : public Mwc713Task {
 public:
-    const static int64_t TIMEOUT = 1000*120; // 120 seconds can be possible because of the status update and connection errors
+    const static int64_t TIMEOUT =
+            1000 * 120; // 120 seconds can be possible because of the status update and connection errors
 
     TaskGetSwapTrades( MWC713 *wallet713, QString _cookie ) :
                 Mwc713Task("TaskSwapTrades", "Collecting swap trades...",
@@ -193,7 +194,8 @@ public:
                      const QString &electrumUri1,
                      const QString &tag) :
             Mwc713Task("TaskTradeDetails", "Checking Swap trade details...",
-                       generateCommandLine(_swapId, destinationMethod, destinationDest, secondaryAddress, secondaryFee, electrumUri1, tag),
+                       generateCommandLine(_swapId, destinationMethod, destinationDest, secondaryAddress, secondaryFee,
+                                           electrumUri1, tag),
                        wallet713, ""),
             swapId(_swapId), call_tag(_call_tag) {}
 
@@ -290,6 +292,43 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 };
 
+// Request Eth Info
+class TaskEthInfo : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000 * 120;
+
+    TaskEthInfo(MWC713 *wallet713, QString currency) :
+        Mwc713Task("TaskEthInfo", "Retrieve Internal Ethereum Wallet Info...",
+                   "eth_info --currency " + currency, wallet713, "") {}
+
+    virtual ~TaskEthInfo() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override { return QSet<WALLET_EVENTS>{WALLET_EVENTS::S_READY}; }
+};
+
+// Request Eth Send
+class TaskEthSend : public Mwc713Task {
+public:
+    const static int64_t TIMEOUT = 1000 * 120;
+
+    TaskEthSend(MWC713 *wallet713,
+                QString dest,
+                QString currency,
+                QString amount) :
+        Mwc713Task("TaskEthSend", "Send Ether/ERC20 Token out...",
+                   "eth_send --dest " + dest +
+                   " --currency " + currency +
+                   " --amount " + amount, wallet713,
+                   "") {}
+
+    virtual ~TaskEthSend() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override { return QSet<WALLET_EVENTS>{WALLET_EVENTS::S_READY}; }
+};
 
 }
 

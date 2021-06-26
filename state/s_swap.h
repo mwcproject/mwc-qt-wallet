@@ -28,6 +28,82 @@ class TimerThread;
 }
 
 namespace state {
+struct SecCurrencyInfo {
+     QString currency;
+     int     blockIntervalSec;
+     int     confNumber;
+     QString feeUnits;
+     double  txFee; // -1.0 - need to use API
+     double  txFeeMin;
+     double  txFeeMax;
+     int64_t txFeeUpdateTime = 0;
+     double  minAmount; // Minimal amount for secondary currency. We don't want dust transaction
+     bool    is_btc_family;
+
+     SecCurrencyInfo() = default;
+     SecCurrencyInfo(const SecCurrencyInfo& itm) = default;
+     SecCurrencyInfo& operator = (const SecCurrencyInfo& itm) = default;
+
+     SecCurrencyInfo(const QString& _currency,
+         int     _blockIntervalSec,
+         int _confNumber,
+         const double& _minAmount,
+         const QString& _feeUnits,
+         const double& _txFee,
+         const double& _txFeeMin,
+         const double& _txFeeMax,
+         const bool& _is_btc_family
+     ) :
+         currency(_currency),
+         blockIntervalSec(_blockIntervalSec),
+         confNumber(_confNumber),
+         feeUnits(_feeUnits),
+         txFee(_txFee),
+         txFeeMin(_txFeeMin),
+         txFeeMax(_txFeeMax),
+         minAmount(_minAmount),
+         is_btc_family(_is_btc_family)
+     {}
+ };
+
+// Confirmations number
+//  https://support.kraken.com/hc/en-us/articles/203325283-Cryptocurrency-deposit-processing-times
+// Available BTC fees API
+//  https://b10c.me/blog/003-a-list-of-public-bitcoin-feerate-estimation-apis/
+// We selected this:  https://www.bitgo.com/api/v2/btc/tx/fee
+static QVector<SecCurrencyInfo> SWAP_CURRENCY_LIST = {
+    SecCurrencyInfo("BTC", 600, 3,  0.001, "satoshi per byte", -1.0, 1.0, 500.0, true),
+    SecCurrencyInfo("BCH", 600, 15,  0.001, "satoshi per byte", 3.0, 1.0, 50.0, true),
+    SecCurrencyInfo("LTC", 60 * 2 + 30, 12, 0.01, "litoshi per byte", 100.0, 1.0, 1000.0, true),
+    SecCurrencyInfo("ZCash", 75, 24, 0.01, "ZEC", 0.0001, 0.00005, 0.001, true),
+    SecCurrencyInfo("Dash", 60 * 2 + 39, 6, 0.01, "duff per byte", 26.0, 1.0, 1000.0, true),
+    SecCurrencyInfo("Doge", 60, 20, 100.0, "doge", 3.0, 0.1, 20.0, true),
+    SecCurrencyInfo("Ether", 15, 20, 0.001, "gwei", 5500000, 1100000, 11000000, false),
+    SecCurrencyInfo("Usdt", 15, 20, 0.001, "gwei", 5500000, 1100000, 11000000, false),
+    SecCurrencyInfo("Busd", 15, 20, 0.001, "gwei", 5500000, 1100000, 11000000, false),
+    SecCurrencyInfo("Bnb", 15, 20, 0.001, "gwei", 5500000, 1100000, 11000000, false),
+    SecCurrencyInfo("Usdc", 15, 20, 0.001, "gwei", 5500000, 1100000, 11000000, false),
+    SecCurrencyInfo("Link", 15, 20, 0.001, "gwei", 5500000, 1100000, 11000000, false),
+    SecCurrencyInfo("Trx", 15, 20, 0.001, "gwei", 5500000, 1100000, 11000000, false),
+    SecCurrencyInfo("Dai", 15, 20, 0.001, "gwei", 5500000, 1100000, 11000000, false),
+    SecCurrencyInfo("Tusd", 15, 20, 0.001, "gwei", 5500000, 1100000, 11000000, false),
+    SecCurrencyInfo("Pax", 15, 20, 0.001, "gwei", 5500000, 1100000, 11000000, false),
+    SecCurrencyInfo("Wbtc", 15, 20, 0.001, "gwei", 5500000, 1100000, 11000000, false),
+    SecCurrencyInfo("Tst", 15, 20, 0.001, "gwei", 5500000, 1100000, 11000000, false),
+};
+
+static SecCurrencyInfo getCurrencyInfo(const QString& currency) {
+    for (const auto& wcl : SWAP_CURRENCY_LIST) {
+        if (wcl.currency == currency)
+            return wcl;
+    }
+    Q_ASSERT(false); // NOT FOUND!!!
+    return SWAP_CURRENCY_LIST[0];
+}
+
+
+/////////////////////////////////////////////////////////////
+
 
 struct AutoswapTask {
     QString swapId;
@@ -48,7 +124,7 @@ public:
     virtual ~Swap() override;
 
     // Show first page with trade List
-    void pageTradeList(bool selectIncoming, bool selectOutgoing, bool selectBackup);
+    void pageTradeList(bool selectIncoming, bool selectOutgoing, bool selectBackup, bool selectEthWallet);
     // Edit/View Trade Page
     void viewTrade(QString swapId, QString stateCmd);
     // Show trade details page

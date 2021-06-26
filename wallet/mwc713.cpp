@@ -1011,6 +1011,39 @@ void MWC713::requestTradeDetails(QString swapId, bool waitForBackup1, QString co
                                                           TaskTradeDetails::TIMEOUT)});
 }
 
+// Request Eth Info.
+// Check Signal: void onRequestEthInfo();
+void MWC713::requestEthInfo() {
+    eventCollector->addTask(TASK_PRIORITY::TASK_NOW, {TSK(new TaskEthInfo(this, "ether"),
+                                                              TaskEthInfo::TIMEOUT)});
+    QVector<QString> erc20_tokens;
+    erc20_tokens.push_back("usdt");
+    erc20_tokens.push_back("busd");
+    erc20_tokens.push_back("bnb");
+    erc20_tokens.push_back("link");
+    erc20_tokens.push_back("trx");
+    erc20_tokens.push_back("dai");
+    erc20_tokens.push_back("tusd");
+    erc20_tokens.push_back("pax");
+    erc20_tokens.push_back("wbtc");
+    erc20_tokens.push_back("tst");
+
+    for (int i = 0; i < erc20_tokens.size(); ++i) {
+        eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, { TSK(new TaskEthInfo(this, erc20_tokens[i]),
+                                                              TaskEthInfo::TIMEOUT) });
+    }
+}
+
+// Request Eth Send.
+// Check Signal: void onRequestEthSend();
+void MWC713::requestEthSend(QString dest,
+                            QString currency,
+                            QString amount) {
+
+    eventCollector->addTask(TASK_PRIORITY::TASK_NOW, {TSK(new TaskEthSend(this, dest, currency, amount),
+                                                              TaskEthInfo::TIMEOUT)});
+}
+
 // Adjust swap stade values. params are optional
 // Check Signal: onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
 void MWC713::adjustSwapData(const QString &swapId, QString call_tag,
@@ -1826,6 +1859,16 @@ void MWC713::setRequestTradeDetails(SwapTradeInfo swap,
                                     QString cookie) {
     logger::logEmit("MWC713", "onRequestSwapDetails", swap.swapId + ", " + error + ", " + cookie);
     emit onRequestTradeDetails(swap, executionPlan, currentAction, tradeJournal, error, cookie);
+}
+
+void MWC713::setRequestEthInfo(QString ethAddr, QString currency, QString balance) {
+    logger::logEmit("MWC713", "onRequestEthInfo", "");
+    emit onRequestEthInfo(ethAddr, currency, balance);
+}
+
+void MWC713::setRequestEthSend(QString dest, QString currency, QString amount) {
+    logger::logEmit("MWC713", "onRequestEthSend", "");
+    emit onRequestEthSend(dest, currency, amount);
 }
 
 void MWC713::setAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg) {

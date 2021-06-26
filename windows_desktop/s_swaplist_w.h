@@ -17,6 +17,7 @@
 
 #include "../core_desktop/navwnd.h"
 #include "../control_desktop/richbutton.h"
+#include <QMap>;
 
 class QLabel;
 class QWidget;
@@ -101,7 +102,7 @@ struct SwapTradeInfo {
 class SwapList : public core::NavWnd, control::RichButtonPressCallback {
 Q_OBJECT
 public:
-    explicit SwapList(QWidget *parent, bool selectIncoming, bool selectOutgoing, bool selectBackup);
+    explicit SwapList(QWidget *parent, bool selectIncoming, bool selectOutgoing, bool selectBackup, bool selectEthWallet);
     ~SwapList();
 
 private:
@@ -126,22 +127,25 @@ private slots:
 
     void sgnBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage);
     void sgnRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
+    void sgnRequestEthInfo(QString ethAddr, QString currency, QString balance);
+    void sgnRequestEthSend(QString dest, QString currency, QString amount);
 
     void onItemActivated(QString id);
 
     void on_outgoingSwaps_clicked();
     void on_incomingSwaps_clicked();
     void on_completedSwaps_clicked();
+    void on_restoreTradesTab_clicked();
+    void on_ethWalletTab_clicked();
+
+
     void on_newTradeButton_clicked();
     void on_refreshButton_clicked();
 
-
-    void on_restoreTradesTab_clicked();
-
     void on_restoreTradeBtn_clicked();
     void on_selectBackupDirBtn_clicked();
-
     void on_swapBackupDir_textEdited(const QString &arg1);
+    void on_ethSendBtn_clicked();
 
 private:
     Ui::SwapList *ui;
@@ -153,6 +157,8 @@ private:
     int swapTabSelection = 0; // 0 - 2 as shown in UI: incoming, outgoing, complete
 
     bool swapBackupInProgress = false;
+    QMap<QString, QString> ethBalances;
+    QString ethAddress;
 };
 
 }

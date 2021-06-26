@@ -45,7 +45,7 @@ enum WALLET_EVENTS {
     S_GENERIC_ERROR=7, // error printed by wallet           Message: error
     S_GENERIC_WARNING=8, // warning printed by wallet           Message: error
     S_GENERIC_INFO=9, // info printed by wallet           Message: error
-    S_YOUR_MWC_ADDRESS=11, // Your mwc address/Your mwcmq address:...  Message: address
+    S_YOUR_MWC_ADDRESS=11, // Your mwc address/Your mwcmqs address:...  Message: address
     S_MWC_ADDRESS_INDEX = 12, // Derived with index [7]     Message: index
     S_NODE_API_ERROR = 13, // NODE api returns error
 
@@ -129,7 +129,7 @@ struct taskInfo {
 };
 
 // Aggregator for Wallet events. Expected that there are not many events are aggregating.
-// That is whay we are not maintaining any indexes.
+// That is why we are not maintaining any indexes.
 class Mwc713EventManager : public QObject
 {
     Q_OBJECT
@@ -177,7 +177,7 @@ private:
     // Wallet
     MWC713 * mwc713wallet = nullptr;
 
-    // permanent tasks that allways active. They will process events one by one.
+    // permanent tasks that always active. They will process events one by one.
     // All input will come to them.
     // Example: checking for wallet become online/offline
     QVector< Mwc713Task* > listeners; // Owner of the tasks

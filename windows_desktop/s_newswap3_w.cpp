@@ -122,7 +122,11 @@ void NewSwap3::updateSwapReview() {
     reportStr += "&emsp; &#9702; Other party's <b style=\"color:yellow;\">"+secCur+"</b> will be locked for <b style=\"color:yellow;\">" + lockTime[1] + "</b>.</p>";
 
     reportStr += "<p>";
-    reportStr += secCur + " redeem address: <b style=\"color:yellow;\">" + swap->getSecAddress() + "</b></p>";
+    if (swap->getSecAddress() == "0x0000000000000000000000000000000000000000") {
+        reportStr += secCur + " redeem address: <b style=\"color:yellow;\"> Internal Eth Wallet Address </b></p>";
+    } else {
+        reportStr += secCur + " redeem address: <b style=\"color:yellow;\">" + swap->getSecAddress() + "</b></p>";
+    }
     reportStr += "<p>";
     reportStr += "My "+secCur+" redeem transaction fee is <b style=\"color:yellow;\">" + util->trimStrAsDouble( QString::number(swap->getSecTransactionFee(), 'f'), 10) + " " + swap->getCurrentSecCurrencyFeeUnits() + "</b></p>";
     reportStr += "<p>";

@@ -347,9 +347,9 @@ void DesktopWndManager::pageAccountOptions() {
     Q_ASSERT(false);
 }
 
-void DesktopWndManager::pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup) {
+void DesktopWndManager::pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup, bool selectEthWallet) {
     windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_LIST,
-        new wnd::SwapList( windowManager->getInWndParent(), selectIncoming, selectOutgoing, selectBackup));
+        new wnd::SwapList( windowManager->getInWndParent(), selectIncoming, selectOutgoing, selectBackup, selectEthWallet));
 }
 
 void DesktopWndManager::pageSwapNew1() {

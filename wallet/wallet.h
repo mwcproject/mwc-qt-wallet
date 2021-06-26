@@ -796,6 +796,16 @@ public:
     //                            QString cookie );
     virtual void requestTradeDetails(QString swapId, bool waitForBackup1, QString cookie ) = 0;
 
+    // Request Eth Info.
+    // Check Signal: void onRequestEthInfo();
+    virtual void requestEthInfo() = 0;
+
+    // Request Eth Info.
+    // Check Signal: void onRequestEthSend();
+    virtual void requestEthSend(QString dest,
+                                QString currency,
+                                QString amount) = 0;
+
     // Adjust swap stade values. params are optional
     // Check Signal: onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);
     virtual void adjustSwapData( const QString & swapId, QString call_tag,
@@ -1005,6 +1015,12 @@ signals:
                                 QVector<SwapJournalMessage> tradeJournal,
                                 QString error,
                                 QString cookie );
+
+    // Response from requestEthInfo
+    void onRequestEthInfo(QString ethAddr, QString currency, QString balance);
+
+    // Response from requestEthSend
+    void onRequestEthSend(QString dest, QString currency, QString amount);
 
     // Response from adjustSwapData
     void onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);

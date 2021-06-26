@@ -17,6 +17,7 @@
 #include "../bridge/wnd/swap_b.h"
 #include "../bridge/config_b.h"
 #include "../control_desktop/messagebox.h"
+#include "../state/s_swap.h"
 
 namespace wnd {
 
@@ -114,6 +115,8 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
     ui->updateBtn->setText("Update " + secCurrency + " transaction details");
     ui->secFeeUnitsLabel->show();
     ui->secFeeUnitsLabel->setText(secCurrencyFeeUnits);
+    if (!state::getCurrencyInfo(secCurrency).is_btc_family)
+        ui->redeemAddressEdit->setDisabled(true);
 
     QString tradeDescription = swapInfo[1];
     ui->tradeDesriptionLabel->setText(tradeDescription);
@@ -219,7 +222,10 @@ void EditSwap::on_tradeDetailsBtn_clicked() {
 
 // Validate the data and call for update. Return number of update calls.
 bool EditSwap::requestUpdateData() {
-    if (ui->redeemAddressEdit->text().trimmed().isEmpty()) {
+    bool is_btc_family = state::getCurrencyInfo(secondaryCurrency).is_btc_family;
+
+    if (ui->redeemAddressEdit->text().trimmed().isEmpty() && is_btc_family) {
+        
         control::MessageBox::messageText(this, "Input", QString("Please define the ") + secondaryCurrency +
                                                         " address to receive the coins.");
         return false;
@@ -248,6 +254,9 @@ bool EditSwap::requestUpdateData() {
     if (electrumX != ui->electrumXEdit->text().trimmed()) {
         electrumUri1 = ui->electrumXEdit->text().trimmed();
     }
+
+    if (!is_btc_family) 
+        secondaryAddress = "0x0000000000000000000000000000000000000000";
 
     if ( secondaryAddress.isEmpty() && secondaryFee.isEmpty() && electrumUri1.isEmpty() )
         return false; // no changes are made

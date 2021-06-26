@@ -21,6 +21,7 @@
 #include "../control_desktop/messagebox.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../dialogs_desktop/w_selectcontact.h"
+#include "../state/s_swap.h"
 
 const int UPDATE_MWC = 1;
 const int UPDATE_SEC = 2;
@@ -58,7 +59,11 @@ NewSwap1::NewSwap1(QWidget *parent) :
 
     updateThirdValue();
 
-    ui->secAddressEdit->setText(swap->getSecAddress());
+    if (swap->getSecAddress() == "0x0000000000000000000000000000000000000000") {
+        ui->secAddressEdit->setText("Internal Eth Wallet Address");
+    } else {
+        ui->secAddressEdit->setText(swap->getSecAddress());
+    }
     ui->lockMwcFirstCheck->setChecked( swap->isLockMwcFirst() );
 
     ui->sendAddressEdit->setText( swap->getBuyerAddress() );
@@ -147,12 +152,16 @@ void NewSwap1::on_nextButton_clicked() {
     }
 
     QString secAddress = ui->secAddressEdit->text().trimmed();
-    if (secAddress.isEmpty()) {
-        control::MessageBox::messageText(this, "Incorrect Input", "Please specify a "+ secCurrency +" address to redeem the coins");
-        ui->secAddressEdit->setFocus();
-        return;
+    if (state::getCurrencyInfo(secCurrency).is_btc_family) {
+        if (secAddress.isEmpty()) {
+            control::MessageBox::messageText(this, "Incorrect Input", "Please specify a " + secCurrency + " address to redeem the coins");
+            ui->secAddressEdit->setFocus();
+            return;
+        }
+    } else {
+        secAddress = "0x0000000000000000000000000000000000000000";
     }
-
+    
     QString sendTo = ui->sendAddressEdit->text().trimmed();
     {
         QString valRes = util->validateMwc713Str(sendTo);
@@ -202,6 +211,10 @@ void NewSwap1::updateSecCurrencyData() {
     ui->secCurrencyCombo->setCurrentIndex( selectedIdx );
 
     updateSecCurrencyStatus();
+
+    if (!state::getCurrencyInfo(selectedCur).is_btc_family) {
+        ui->secAddressEdit->setDisabled(true);
+    }
 }
 
 void NewSwap1::updateSecCurrencyStatus() {

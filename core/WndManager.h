@@ -106,7 +106,7 @@ public:
     virtual void pageAccountOptions() = 0;
 
     // Swap pages
-    virtual void pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup) = 0;
+    virtual void pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup, bool selectEthWallet) = 0;
     virtual void pageSwapNew1() = 0;
     virtual void pageSwapNew2() = 0;
     virtual void pageSwapNew3() = 0;

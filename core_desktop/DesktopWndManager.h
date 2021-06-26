@@ -100,7 +100,7 @@ public:
     virtual void pageAccountOptions() override;
 
     // Swap pages
-    virtual void pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup) override;
+    virtual void pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup, bool selectEthWallet) override;
     virtual void pageSwapNew1() override;
     virtual void pageSwapNew2() override;
     virtual void pageSwapNew3() override;

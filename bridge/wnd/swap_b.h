@@ -51,6 +51,14 @@ public:
     // Respond will be with sent back with sgnRequestTradeDetails
     Q_INVOKABLE void requestTradeDetails(QString swapId, QString cookie);
 
+    // Requesting Eth Info
+    // Respond will be with sent back with sgnRequestEthInfo
+    Q_INVOKABLE void requestEthInfo();
+
+    // Requesting Eth Send
+    // Respond will be with sent back with sgnRequestEthSend
+    Q_INVOKABLE void requestEthSend(QString dest, QString currency, QString amount);
+
     // Check if this Trade is running in auto mode now
     Q_INVOKABLE bool isRunning(QString swapId);
 
@@ -204,6 +212,16 @@ signals:
                                  QString errMsg,
                                  QString cookie );
 
+    // Response from requestEthInfo call
+    // ethAddr, ethereum wallet address
+    // currency, Ether or Erc20 token 
+    // balance,
+    void sgnRequestEthInfo(QString ethAddr, QString currency, QString balance);
+
+    // Response from requestEthSend call
+    // status, result status
+    void sgnRequestEthSend(QString dest, QString currency, QString amount);
+
     // Response from sgnAdjustSwapTrade. OK - empty error message
     void sgnAdjustSwapTrade(QString swapId, QString call_tag, QString errMsg);
 
@@ -246,6 +264,8 @@ private slots:
                                 QVector<wallet::SwapJournalMessage> tradeJournal,
                                 QString errMsg,
                                 QString cookie );
+    void onRequestEthInfo(QString ethAddr, QString currency, QString balance);
+    void onRequestEthSend(QString dest, QString currency, QString amount);
     void onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
 
     void onSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,

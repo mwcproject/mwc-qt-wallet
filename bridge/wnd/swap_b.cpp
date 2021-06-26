@@ -48,6 +48,12 @@ Swap::Swap(QObject *parent) : QObject(parent) {
     QObject::connect(wallet, &wallet::Wallet::onRequestTradeDetails,
                      this, &Swap::onRequestTradeDetails, Qt::QueuedConnection);
 
+    QObject::connect(wallet, &wallet::Wallet::onRequestEthInfo,
+                     this, &Swap::onRequestEthInfo, Qt::QueuedConnection);
+
+    QObject::connect(wallet, &wallet::Wallet::onRequestEthSend,
+                     this, &Swap::onRequestEthSend, Qt::QueuedConnection);
+
     QObject::connect(wallet, &wallet::Wallet::onAdjustSwapData,
                      this, &Swap::onAdjustSwapData, Qt::QueuedConnection);
 
@@ -74,7 +80,7 @@ Swap::~Swap() {}
 
 // Return back to the trade list page
 void Swap::pageTradeList() {
-    getSwap()->pageTradeList(false, false, false);
+    getSwap()->pageTradeList(false, false, false, false);
 }
 
 // request the list of swap trades
@@ -145,6 +151,18 @@ void Swap::requestTradeDetails(QString swapId, QString cookie) {
     bool waiting4backup = /*getAppContext()->getSwapEnforceBackup() &&*/ expBkId==0;
 
     getWallet()->requestTradeDetails(swapId, waiting4backup, cookie);
+}
+
+// Requesting Eth Info
+// Respond will be with sent back with sgnRequestEthInfo
+void Swap::requestEthInfo() {
+    getWallet()->requestEthInfo();
+}
+
+// Requesting Eth Send
+// Respond will be with sent back with sgnRequestEthInfo
+void Swap::requestEthSend(QString dest, QString currency, QString amount) {
+    getWallet()->requestEthSend(dest, currency, amount);
 }
 
 QString calcTimeLeft(int64_t time) {
@@ -276,6 +294,15 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
     emit sgnRequestTradeDetails( swapInfo, convertExecutionPlan(executionPlan), currentAction, convertTradeJournal(tradeJournal), errMsg, cookie );
 }
 
+void Swap::onRequestEthInfo(QString ethAddr, QString currency, QString balance) {
+    
+    emit sgnRequestEthInfo(ethAddr, currency, balance);
+}
+
+void Swap::onRequestEthSend(QString dest, QString currency, QString amount) {
+
+    emit sgnRequestEthSend(dest, currency, amount);
+}
 
 // Check if this Trade is running in auto mode now
 bool Swap::isRunning(QString swapId) {

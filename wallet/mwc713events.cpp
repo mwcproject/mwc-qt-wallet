@@ -137,7 +137,7 @@ bool Mwc713EventManager::hasTask(Mwc713Task * task) {
 void Mwc713EventManager::addTask( TASK_PRIORITY priority, QVector< QPair<Mwc713Task*, int64_t>> tasks, int idx ) {
     QMutexLocker l( &taskQMutex );
 
-    // timeout multiplier will be applyed to the task because we want apply this value as late as posiible.
+    // timeout multiplier will be applied to the task because we want apply this value as late as possible.
     // User might change it at any moment.
     if (idx<0) {
         // search for position to insert
