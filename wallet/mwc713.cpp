@@ -1017,16 +1017,20 @@ void MWC713::requestEthInfo() {
     eventCollector->addTask(TASK_PRIORITY::TASK_NOW, {TSK(new TaskEthInfo(this, "ether"),
                                                               TaskEthInfo::TIMEOUT)});
     QVector<QString> erc20_tokens;
-    erc20_tokens.push_back("usdt");
-    erc20_tokens.push_back("busd");
-    erc20_tokens.push_back("bnb");
-    erc20_tokens.push_back("link");
-    erc20_tokens.push_back("trx");
-    erc20_tokens.push_back("dai");
-    erc20_tokens.push_back("tusd");
-    erc20_tokens.push_back("pax");
-    erc20_tokens.push_back("wbtc");
-    erc20_tokens.push_back("tst");
+
+    if (currentConfig.getNetwork() == "Floonet") {
+        erc20_tokens.push_back("tst");
+    } else {
+        erc20_tokens.push_back("usdt");
+        erc20_tokens.push_back("busd");
+        erc20_tokens.push_back("bnb");
+        erc20_tokens.push_back("link");
+        erc20_tokens.push_back("trx");
+        erc20_tokens.push_back("dai");
+        erc20_tokens.push_back("tusd");
+        erc20_tokens.push_back("pax");
+        erc20_tokens.push_back("wbtc");
+    }
 
     for (int i = 0; i < erc20_tokens.size(); ++i) {
         eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, { TSK(new TaskEthInfo(this, erc20_tokens[i]),
