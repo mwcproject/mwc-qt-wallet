@@ -29,6 +29,8 @@ NewSwap3::NewSwap3(QWidget *parent) :
 
     connect(swap, &bridge::Swap::sgnApplyNewTrade2Params, this, &NewSwap3::onSgnCreateStartSwap,
             Qt::QueuedConnection);
+    connect(swap, &bridge::Swap::sgnCreateStartSwap, this, &NewSwap3::onSgnCreateStartSwap,
+            Qt::QueuedConnection);
 
     ui->progress->initLoader(false);
 
