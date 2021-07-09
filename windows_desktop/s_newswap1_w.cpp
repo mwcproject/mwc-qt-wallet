@@ -213,7 +213,8 @@ void NewSwap1::updateSecCurrencyData() {
     updateSecCurrencyStatus();
 
     if (!state::getCurrencyInfo(selectedCur).is_btc_family) {
-        ui->secAddressEdit->setDisabled(true);
+        ui->receiveLabel->setVisible(false);
+        ui->secAddressEdit->setVisible(false);
     }
 }
 

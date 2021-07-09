@@ -115,8 +115,12 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
     ui->updateBtn->setText("Update " + secCurrency + " transaction details");
     ui->secFeeUnitsLabel->show();
     ui->secFeeUnitsLabel->setText(secCurrencyFeeUnits);
-    if (!state::getCurrencyInfo(secCurrency).is_btc_family)
-        ui->redeemAddressEdit->setDisabled(true);
+    if (!state::getCurrencyInfo(secCurrency).is_btc_family) {
+        ui->secondaryAddressLabel->setVisible(false);
+        ui->redeemAddressEdit->setVisible(false);
+        ui->label_19->setVisible(false);
+        ui->electrumXEdit->setVisible(false);
+    }
 
     QString tradeDescription = swapInfo[1];
     ui->tradeDesriptionLabel->setText(tradeDescription);
