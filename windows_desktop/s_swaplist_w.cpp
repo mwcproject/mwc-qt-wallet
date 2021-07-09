@@ -639,13 +639,11 @@ void SwapList::sgnRequestEthInfo(QString ethAddr, QString currency, QString bala
     
 }
 
-void SwapList::sgnRequestEthSend(QString dest, QString currency, QString amount) {
-    if (dest.isEmpty()) {
-        control::MessageBox::messageText(this, "Send Error",
-                                         "Send coins failed\n");
+void SwapList::sgnRequestEthSend(bool result, QString errMsg) {
+    if (!result) {
+        control::MessageBox::messageText(this, "Send Error", errMsg);
     } else {
-        control::MessageBox::messageText(this, "Send Done",
-                                         "Send " + currency + ": " + amount + " to " + dest + " done!");
+        control::MessageBox::messageText(this, "Send Done", errMsg);
     }
 
     ui->addrSendtoLineEdit->clear();

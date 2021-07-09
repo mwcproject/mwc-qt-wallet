@@ -128,7 +128,7 @@ private slots:
     void sgnBackupSwapTradeData(QString swapId, QString exportedFileName, QString errorMessage);
     void sgnRestoreSwapTradeData(QString swapId, QString importedFilename, QString errorMessage);
     void sgnRequestEthInfo(QString ethAddr, QString currency, QString balance);
-    void sgnRequestEthSend(QString dest, QString currency, QString amount);
+    void sgnRequestEthSend(bool result, QString errMsg);
 
     void onItemActivated(QString id);
 

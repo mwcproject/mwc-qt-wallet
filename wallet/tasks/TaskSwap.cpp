@@ -540,21 +540,25 @@ bool TaskEthSend::processTask(const QVector<WEvent> &events) {
     QVector<WEvent> lns = filterEvents(events, WALLET_EVENTS::S_LINE);
 
     // "Transfer Ether 0.01 to 0xC8C52374289E743CAA8fc6ACdf40c6E0b810261E done!!!"
-    QString dest = "";
-    QString currency = "";
-    QString amount = "";
+    QString errMsg = "";
+    bool result = false;
 
     for (const auto& l : lns) {
         const QString& msg = l.message;
         if (msg.contains("done")) {
             QStringList msgList = msg.split(" ");
-            dest = msgList.at(4);
-            currency = msgList.at(2);
-            amount = msgList.at(1);
+            errMsg = QString("dest: %1,    currency: %2,    amount: %3").arg(msgList.at(4), msgList.at(1), msgList.at(2));
+
+            result = true;
+        }
+
+        if (msg.contains("Not Enough") || msg.contains("Unknown")) {
+           errMsg = msg;
+           result = false;
         }
     }
 
-    wallet713->setRequestEthSend(dest, currency, amount);
+    wallet713->setRequestEthSend(result, errMsg);
     return true;
 }
 

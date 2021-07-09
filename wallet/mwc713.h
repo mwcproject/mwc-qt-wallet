@@ -534,7 +534,7 @@ public:
                                 QString error,
                                 QString cookie );
     void setRequestEthInfo(QString ethAddr, QString currency, QString balance);
-    void setRequestEthSend(QString dest, QString currency, QString amount);
+    void setRequestEthSend(bool result, QString errMsg);
     void setAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
 
     void setPerformAutoSwapStep(QString swapId, QString stateCmd, QString currentAction, QString currentState,

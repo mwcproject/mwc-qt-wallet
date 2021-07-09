@@ -1020,7 +1020,7 @@ signals:
     void onRequestEthInfo(QString ethAddr, QString currency, QString balance);
 
     // Response from requestEthSend
-    void onRequestEthSend(QString dest, QString currency, QString amount);
+    void onRequestEthSend(bool result, QString errMsg);
 
     // Response from adjustSwapData
     void onAdjustSwapData(QString swapId, QString call_tag, QString errMsg);

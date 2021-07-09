@@ -1870,9 +1870,9 @@ void MWC713::setRequestEthInfo(QString ethAddr, QString currency, QString balanc
     emit onRequestEthInfo(ethAddr, currency, balance);
 }
 
-void MWC713::setRequestEthSend(QString dest, QString currency, QString amount) {
+void MWC713::setRequestEthSend(bool result, QString errMsg) {
     logger::logEmit("MWC713", "onRequestEthSend", "");
-    emit onRequestEthSend(dest, currency, amount);
+    emit onRequestEthSend(result, errMsg);
 }
 
 void MWC713::setAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg) {

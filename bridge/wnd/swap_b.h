@@ -220,7 +220,7 @@ signals:
 
     // Response from requestEthSend call
     // status, result status
-    void sgnRequestEthSend(QString dest, QString currency, QString amount);
+    void sgnRequestEthSend(bool result, QString errMsg);
 
     // Response from sgnAdjustSwapTrade. OK - empty error message
     void sgnAdjustSwapTrade(QString swapId, QString call_tag, QString errMsg);
@@ -265,7 +265,7 @@ private slots:
                                 QString errMsg,
                                 QString cookie );
     void onRequestEthInfo(QString ethAddr, QString currency, QString balance);
-    void onRequestEthSend(QString dest, QString currency, QString amount);
+    void onRequestEthSend(bool result, QString errMsg);
     void onAdjustSwapData(QString swapId, QString adjustCmd, QString errMsg);
 
     void onSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString currentAction, QString currentState,

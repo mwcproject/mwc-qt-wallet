@@ -299,9 +299,9 @@ void Swap::onRequestEthInfo(QString ethAddr, QString currency, QString balance) 
     emit sgnRequestEthInfo(ethAddr, currency, balance);
 }
 
-void Swap::onRequestEthSend(QString dest, QString currency, QString amount) {
+void Swap::onRequestEthSend(bool result, QString errMsg) {
 
-    emit sgnRequestEthSend(dest, currency, amount);
+    emit sgnRequestEthSend(result, errMsg);
 }
 
 // Check if this Trade is running in auto mode now

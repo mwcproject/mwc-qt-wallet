@@ -172,6 +172,10 @@ $2
 Swap Error , Swap generic error, Unable to parse secondary currency redeem address (.*), Swap generic error, (.*)
 $2
 
+# Swap Error , Eth Wallet Balance is not enough
+Swap Error , Eth Wallet Balance is not enough
+Your Internal Ethereum Wallet hasn't enough funds for swap. Please deposit Ether/Erc-20 Tokens to your internal wallet.
+
 # Your send request has failed: Adapter Callback Error, Checking version: Error: null, Message: null
 Your send request has failed: Adapter Callback Error, Checking version: Error: null, Message: null
 Your peer wallet is offline or not reachable. Please check your network connection or contact the owner of that waalet.
