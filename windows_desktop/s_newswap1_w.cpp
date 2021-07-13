@@ -211,11 +211,6 @@ void NewSwap1::updateSecCurrencyData() {
     ui->secCurrencyCombo->setCurrentIndex( selectedIdx );
 
     updateSecCurrencyStatus();
-
-    if (!state::getCurrencyInfo(selectedCur).is_btc_family) {
-        ui->receiveLabel->setVisible(false);
-        ui->secAddressEdit->setVisible(false);
-    }
 }
 
 void NewSwap1::updateSecCurrencyStatus() {
@@ -235,6 +230,14 @@ void NewSwap1::updateSecCurrencyStatus() {
     ui->receiveLabel->setText(selectedCur + " receiving address:");
 
     ui->secAmountEdit->setPlaceholderText(selectedCur + " amount");
+
+    if (!state::getCurrencyInfo(selectedCur).is_btc_family) {
+        ui->receiveLabel->setVisible(false);
+        ui->secAddressEdit->setVisible(false);
+    } else {
+        ui->receiveLabel->setVisible(true);
+        ui->secAddressEdit->setVisible(true);
+    }
 }
 
 

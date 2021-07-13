@@ -18,6 +18,7 @@
 #include "../bridge/wnd/swap_b.h"
 #include "../bridge/util_b.h"
 #include "../control_desktop/messagebox.h"
+#include "../state/s_swap.h"
 
 namespace wnd {
 
@@ -67,6 +68,11 @@ NewSwap2::NewSwap2(QWidget *parent) :
     ui->mwcBlocksEdit->setEnabled(!mktTrade);
     ui->secBlocksEdit->setEnabled(!mktTrade);
 
+    if (!state::getCurrencyInfo(secCurrency).is_btc_family) {
+        ui->label_19->setVisible(false);
+        ui->electrumXEdit->setVisible(false);
+        ui->electrumXHelpButton->setVisible(false);
+    }
 }
 
 NewSwap2::~NewSwap2() {

@@ -176,6 +176,10 @@ $2
 Swap Error , Eth Wallet Balance is not enough
 Your Internal Ethereum Wallet hasn't enough funds for swap. Please deposit Ether/Erc-20 Tokens to your internal wallet.
 
+# Swap Error , Refund Time Not Arrived
+Swap Error , Refund Time Not Arrived
+Refund Time Not Arrived, Please Wait...
+
 # Your send request has failed: Adapter Callback Error, Checking version: Error: null, Message: null
 Your send request has failed: Adapter Callback Error, Checking version: Error: null, Message: null
 Your peer wallet is offline or not reachable. Please check your network connection or contact the owner of that waalet.
