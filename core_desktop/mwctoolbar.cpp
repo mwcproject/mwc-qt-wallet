@@ -22,6 +22,7 @@
 #include "../bridge/statemachine_b.h"
 #include "../bridge/corewindow_b.h"
 #include "../core/global.h"
+#include "../control_desktop/messagebox.h"
 
 using namespace bridge;
 
@@ -136,6 +137,7 @@ void MwcToolbar::on_swapMarketplaceToolButton_clicked()
 void MwcToolbar::timerEvent(QTimerEvent *event)
 {
     static int counter = 0;
+    static int64_t lastNoGasErrorEvent = 0;
 
     Q_UNUSED(event);
     if (mwc::hasSwapErrors(30000)) {
@@ -143,6 +145,13 @@ void MwcToolbar::timerEvent(QTimerEvent *event)
     }
     else {
         ui->swapToolButton->setIcon( QIcon( QPixmap( ":/img/swap@2x.svg" )));
+    }
+
+    if (mwc::hasNoGasError()) {
+        if (lastNoGasErrorEvent < QDateTime::currentMSecsSinceEpoch() - 15*60*1000) {
+            control::MessageBox::messageText(this, "No Ethers", "Please deposit some Ethers for funds or gas. Otherwise, it's possible to lose money!!!");
+            lastNoGasErrorEvent = QDateTime::currentMSecsSinceEpoch();
+        }
     }
 }
 

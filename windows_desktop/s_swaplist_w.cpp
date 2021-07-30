@@ -512,7 +512,7 @@ void SwapList::on_ethSendBtn_clicked() {
     bool ethOK = false;
     QString sendAmount = ui->amountEdit->text().trimmed();
     double dAmount = sendAmount.toDouble(&ethOK);
-    double ethLimit = 0.001;
+    double ethLimit = 0.0001;
     if (!ethOK || dAmount < ethLimit) {
         control::MessageBox::messageText(this, "Incorrect Input", "Please specify at least " + util::zeroDbl2Dbl(QString::number(ethLimit, 'f')));
         ui->amountEdit->setFocus();

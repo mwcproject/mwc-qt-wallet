@@ -174,7 +174,7 @@ $2
 
 # Swap Error , Eth Wallet Balance is not enough
 Swap Error , Eth Wallet Balance is not enough
-Your Internal Ethereum Wallet hasn't enough funds for swap. Please deposit Ether/Erc-20 Tokens to your internal wallet.
+Your Internal Ethereum Wallet hasn't enough ether/gas for swap. Please deposit Ether to your internal wallet.
 
 # Swap Error , Refund Time Not Arrived
 Swap Error , Refund Time Not Arrived

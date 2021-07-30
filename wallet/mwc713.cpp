@@ -1890,7 +1890,7 @@ void MWC713::setPerformAutoSwapStep(QString swapId, QString stateCmd, QString cu
                     ", " + error);
 
     if (!lastProcessError.isEmpty() || !error.isEmpty()) {
-        mwc::reportSwapError();
+        mwc::reportSwapError(error, lastProcessError);
     }
 
     emit onPerformAutoSwapStep(swapId, stateCmd, currentAction, currentState,
