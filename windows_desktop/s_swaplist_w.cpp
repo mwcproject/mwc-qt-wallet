@@ -215,12 +215,17 @@ void SwapList::selectSwapTab(int selection) {
         ui->swapsTable->hide();
         ui->refreshBtnsHolder->hide();
         ui->ethWalletHolder->hide();
+        if (timerId != 0) {
+            killTimer(timerId);
+            timerId = 0;
+        }
     } else if (selection == 4) { //ethereum wallet Tab
         swap->requestEthInfo();
         ui->restoreTradeHolder->hide();
         ui->swapsTable->hide();
         ui->refreshBtnsHolder->hide();
         ui->ethWalletHolder->show();
+        timerId = startTimer(15*1000);
     }else {
         ui->restoreTradeHolder->hide();
         ui->ethWalletHolder->hide();
@@ -229,6 +234,10 @@ void SwapList::selectSwapTab(int selection) {
 
         clearSwapList();
         ui->swapsTable->clearAll(true);
+        if (timerId != 0) {
+            killTimer(timerId);
+            timerId = 0;
+        }
 
     }
     // Requesting swap list in any case because that routing does counting and update the tabs with number of items.
@@ -643,7 +652,8 @@ void SwapList::sgnRequestEthSend(bool result, QString errMsg) {
     if (!result) {
         control::MessageBox::messageText(this, "Send Error", errMsg);
     } else {
-        control::MessageBox::messageText(this, "Send Done", errMsg);
+        QString retMsg = errMsg + "\n\n Please check it later!!!";
+        control::MessageBox::messageText(this, "Sending", retMsg);
     }
 
     ui->addrSendtoLineEdit->clear();
@@ -687,6 +697,11 @@ void SwapList::on_selectBackupDirBtn_clicked() {
 
 void SwapList::on_swapBackupDir_textEdited(const QString &dir) {
     config->setSwapBackupDir(dir);
+}
+
+void SwapList::timerEvent(QTimerEvent *event)
+{
+    swap->requestEthInfo();
 }
 
 }

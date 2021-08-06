@@ -113,6 +113,8 @@ private:
     void clearSwapList();
 protected:
     virtual void richButtonPressed(control::RichButton * button, QString coockie) override;
+    virtual void timerEvent(QTimerEvent *event) override;
+
 
 private slots:
     void sgnSwapTradesResult( QString cookie, QVector<QString> trades, QString error );
@@ -159,6 +161,7 @@ private:
     bool swapBackupInProgress = false;
     QMap<QString, QString> ethBalances;
     QString ethAddress;
+    int timerId = 0;
 };
 
 }

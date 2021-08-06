@@ -520,7 +520,7 @@ Please note that swap trade files are encrypted so you can restore it into the w
                <bool>true</bool>
               </property>
               <property name="text">
-               <string>Address: </string>
+               <string>Address:     </string>
               </property>
               <property name="textInteractionFlags">
                <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextEditable|Qt::TextEditorInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -557,7 +557,7 @@ Please note that swap trade files are encrypted so you can restore it into the w
             <item>
              <widget class="control::MwcLabelNormal" name="label_3">
               <property name="text">
-               <string>Tokens:   </string>
+               <string>Tokens:      </string>
               </property>
              </widget>
             </item>

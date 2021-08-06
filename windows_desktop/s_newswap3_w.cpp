@@ -61,7 +61,7 @@ void NewSwap3::onSgnCreateStartSwap(bool ok, QString errorMessage) {
         return;
 
     Q_ASSERT(!errorMessage.isEmpty());
-    control::MessageBox::messageText(this, "Swap Creating Error", errorMessage);
+    control::MessageBox::messageText(this, "Swap Initiate Error", "Your Internal Ethereum Wallet hasn't enough ether/gas for swap. Please deposit Ether to your internal wallet.");
 }
 
 static QString findInterval( const QVector<QString> & intervals, int interval ) {
