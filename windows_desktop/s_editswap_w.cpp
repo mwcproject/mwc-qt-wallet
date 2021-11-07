@@ -129,13 +129,21 @@ void EditSwap::sgnRequestTradeDetails(QVector<QString> swapInfo,
     secondaryFee = swapInfo[4];
     electrumX = swapInfo[8];
 
+    bool is_btc_family = state::getCurrencyInfo(secondaryCurrency).is_btc_family;
+
     if (acceptanceMode) {
         redeemAddress = "";
         secondaryFee = "";
         electrumX = "";
         ui->secondaryFeeEdit->setText(swap->getSecondaryFee(secondaryCurrency));
-        QString comment = ui->accept_note->text();
-        ui->accept_note->setText( secondaryCurrency + comment.mid(3) );
+
+        // hide accept_note while swap non btc-family coins
+        if (!is_btc_family) {
+            ui->accept_note->hide();
+        } else {
+            QString comment = ui->accept_note->text();
+            ui->accept_note->setText( secondaryCurrency + comment.mid(3) );
+        }
 
         double mwcLimit = 0.1;
         double secCurrencyLimit = 0.001;
