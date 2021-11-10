@@ -1028,7 +1028,7 @@ void MWC713::requestEthInfo() {
         erc20_tokens.push_back("trx");
         erc20_tokens.push_back("dai");
         erc20_tokens.push_back("tusd");
-        erc20_tokens.push_back("pax");
+        erc20_tokens.push_back("usdp");
         erc20_tokens.push_back("wbtc");
     }
 

@@ -87,7 +87,7 @@ static QVector<SecCurrencyInfo> SWAP_CURRENCY_LIST = {
     SecCurrencyInfo("Trx", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
     SecCurrencyInfo("Dai", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
     SecCurrencyInfo("Tusd", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
-    SecCurrencyInfo("Pax", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
+    SecCurrencyInfo("Usdp", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
     SecCurrencyInfo("Wbtc", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
     SecCurrencyInfo("Tst", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
 };
