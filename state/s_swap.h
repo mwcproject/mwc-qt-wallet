@@ -79,17 +79,6 @@ static QVector<SecCurrencyInfo> SWAP_CURRENCY_LIST = {
     SecCurrencyInfo("Dash", 60 * 2 + 39, 6, 0.01, "duff per byte", 26.0, 1.0, 1000.0, true),
     SecCurrencyInfo("Doge", 60, 20, 100.0, "doge", 3.0, 0.1, 20.0, true),
     SecCurrencyInfo("Ether", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
-    SecCurrencyInfo("Usdt", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
-    SecCurrencyInfo("Busd", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
-    SecCurrencyInfo("Bnb", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
-    SecCurrencyInfo("Usdc", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
-    SecCurrencyInfo("Link", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
-    SecCurrencyInfo("Trx", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
-    SecCurrencyInfo("Dai", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
-    SecCurrencyInfo("Tusd", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
-    SecCurrencyInfo("Usdp", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
-    SecCurrencyInfo("Wbtc", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
-    SecCurrencyInfo("Tst", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
 };
 
 static SecCurrencyInfo getCurrencyInfo(const QString& currency) {

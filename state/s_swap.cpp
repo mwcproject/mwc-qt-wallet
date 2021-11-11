@@ -56,6 +56,22 @@ Swap::Swap(StateContext * context) :
     QObject::connect( timer, &core::TimerThread::onTimerEvent, this, &Swap::onTimerEvent, Qt::QueuedConnection );
     timer->start();
 
+    QString network = context->wallet->getWalletConfig().getNetwork();
+    if (network == "Floonet") {
+        SWAP_CURRENCY_LIST.push_back(SecCurrencyInfo("Tst", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+    } else {
+        SWAP_CURRENCY_LIST.push_back(SecCurrencyInfo("Usdt", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        SWAP_CURRENCY_LIST.push_back(SecCurrencyInfo("Busd", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        SWAP_CURRENCY_LIST.push_back(SecCurrencyInfo("Bnb", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        SWAP_CURRENCY_LIST.push_back(SecCurrencyInfo("Usdc", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        SWAP_CURRENCY_LIST.push_back(SecCurrencyInfo("Link", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        SWAP_CURRENCY_LIST.push_back(SecCurrencyInfo("Trx", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        SWAP_CURRENCY_LIST.push_back(SecCurrencyInfo("Dai", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        SWAP_CURRENCY_LIST.push_back(SecCurrencyInfo("Tusd", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        SWAP_CURRENCY_LIST.push_back(SecCurrencyInfo("Usdp", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        SWAP_CURRENCY_LIST.push_back(SecCurrencyInfo("Wbtc", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+    }
+
     updateFeesIsNeeded();
 }
 
