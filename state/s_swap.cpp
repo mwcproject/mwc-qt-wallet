@@ -396,7 +396,7 @@ void Swap::onAdjustSwapData(QString swapId, QString call_tag, QString errMsg) {
 void Swap::updateFeesIsNeeded() {
     int64_t curTime = QDateTime::currentSecsSinceEpoch();
     int64_t timeLimit = curTime - 60*15; // doesn't make sense more than once on 15 minutes
-    for (const auto & sc : SWAP_CURRENCY_LIST) {
+    for (const auto & sc : SwapCurrencyList()) {
         if (sc.txFee<=0.0 || sc.txFeeUpdateTime>0) {
             if ( sc.txFeeUpdateTime < timeLimit ) {
                 // making request...
@@ -429,7 +429,7 @@ void Swap::onProcessHttpResponse(bool requestOk, const QString & tag, QJsonObjec
             int feePerKb = jsonRespond["cpfpFeePerKb"].toInt();
             Q_ASSERT(feePerKb>0);
             if (feePerKb>0) {
-                for (auto & wcl : SWAP_CURRENCY_LIST) {
+                for (auto & wcl : SwapCurrencyList()) {
                     if (wcl.currency == "BTC") {
                         wcl.txFeeUpdateTime = QDateTime::currentSecsSinceEpoch();
                         wcl.txFee = double(feePerKb) / 1024.0;
@@ -771,7 +771,7 @@ void Swap::onRestoreSwapTradeData(QString swapId, QString importedFilename, QStr
 // List of the secondary currencies that wallet support
 QVector<QString> Swap::secondaryCurrencyList() {
     QVector<QString> res;
-    for (const auto & scl : SWAP_CURRENCY_LIST ) {
+    for (const auto & scl : SwapCurrencyList() ) {
         res.push_back(scl.currency);
     }
     return res;
@@ -837,7 +837,7 @@ void Swap::acceptTheTrade(QString swapId) {
 
 // Get Tx fee for secondary currency
 double Swap::getSecondaryFee(QString secCurrency) {
-    for (const SecCurrencyInfo & ci : SWAP_CURRENCY_LIST ) {
+    for (const SecCurrencyInfo & ci : SwapCurrencyList() ) {
         if (ci.currency == secCurrency)
             return ci.txFee;
     }
