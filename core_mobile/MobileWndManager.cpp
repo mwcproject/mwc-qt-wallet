@@ -374,10 +374,11 @@ void MobileWndManager::pageAccountOptions() {
     mainWindow->setProperty("currentState", state::STATE::ACCOUNT_OPTIONS);
 }
 
-void MobileWndManager::pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup) {
+void MobileWndManager::pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup, bool selectEthWallet) {
     Q_UNUSED(selectIncoming)
     Q_UNUSED(selectOutgoing)
     Q_UNUSED(selectBackup)
+    Q_UNUSED(selectEthWallet)
     Q_ASSERT(false); // implement me
 }
 
