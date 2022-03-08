@@ -9,7 +9,7 @@ Window {
     id: window
     visible: true
     title: qsTr("MWC-Mobile-Wallet")
-    
+
     property int currentState
     property string initParams
     property int ttl_blocks
@@ -123,7 +123,7 @@ Window {
 
     Rectangle
     {
-        gradient: Gradient {
+        /*gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop {
                 position: 0
@@ -134,7 +134,8 @@ Window {
                 position: 1
                 color: "#3600C9"
             }
-        }
+        }*/
+        color: "#181a20"
         anchors.fill: parent
     }
 
