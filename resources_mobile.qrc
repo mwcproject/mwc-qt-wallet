@@ -154,5 +154,6 @@
         <file>windows_mobile/FileTransactionFinalize.qml</file>
         <file>windows_mobile/WalletStoppingMessageDlg.qml</file>
         <file>windows_mobile/ShowProofDlg.qml</file>
+        <file>windows_mobile/TextFieldCursor.qml</file>
     </qresource>
 </RCC>

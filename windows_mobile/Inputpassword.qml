@@ -255,7 +255,7 @@ Item {
         font.pixelSize: dp(18)
     }
 
-    TextField {
+    TextFieldCursor {
         id: textfield_password
         height: dp(50)
         width: instanceComboBox.width
@@ -270,10 +270,6 @@ Item {
         anchors.bottomMargin: dp(40)
         anchors.horizontalCenter: parent.horizontalCenter
         horizontalAlignment: Text.AlignLeft
-        background: Rectangle {
-            color: "#8633E0"
-            radius: dp(5)
-        }
 
         MouseArea {
             anchors.fill: parent

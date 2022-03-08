@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.12
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
 import UtilBridge 1.0
@@ -60,30 +60,59 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: "#00000000"
+        color: "#000000"
+        opacity: 0.5
 
         MouseArea {
             anchors.fill: parent
+            onClicked: {
+                messagebox.visible = false
+            }
+
         }
+
     }
 
     Rectangle {
         id: rect_messagebox
+        radius: dp(25)
+        color: "#262933"
         anchors.left: parent.left
         anchors.leftMargin: dp(25)
         anchors.right: parent.right
         anchors.rightMargin: dp(25)
         anchors.verticalCenter: parent.verticalCenter
 
-        Rectangle {
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                messagebox.visible = true
+            }
+
+        }
+
+        /*Rectangle {
             id: rectangle
-            color: "#ffffff"
+            color: "#ffffff"*/
+            /*gradient: Gradient {
+                orientation: Gradient.Vertical
+                GradientStop {
+                    position: 0
+                    color: "#5b1d5d"
+                }
+
+                GradientStop {
+                    position: 1
+                    color: "#1d1d1f"
+                }
+            }*/
+            /*radius: dp(25)
             anchors.rightMargin: dp(1)
             anchors.leftMargin: dp(1)
             anchors.bottomMargin: dp(1)
             anchors.topMargin: dp(1)
-            border.width: dp(1)
-            anchors.fill: parent
+            //border.width: dp(1)
+            anchors.fill: parent*/
 
             Text {
                 id: text_title
@@ -93,7 +122,7 @@ Item {
                 anchors.topMargin: dp(38)
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(22)
-                color: "#3600c9"
+                color: "#ffffff"
             }
 
             Text {
@@ -108,7 +137,7 @@ Item {
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: dp(18)
-                color: "#3600C9"
+                color: "#cccccc"
             }
 
             Text {
@@ -124,7 +153,7 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 font.pixelSize: dp(18)
-                color: "#3600C9"
+                color: "#cccccc"
             }
 
             TextField {
@@ -136,7 +165,7 @@ Item {
                 font.pixelSize: textfield_password.text ? dp(10) : dp(18)
                 placeholderText: qsTr("Password")
                 echoMode: "Password"
-                color: "#3600C9"
+                color: "#cccccc"
                 text: ""
                 anchors.top: label_password.bottom
                 anchors.topMargin: dp(10)
@@ -172,7 +201,7 @@ Item {
                 width: dp(135)
                 height: dp(50)
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: dp(30)
+                anchors.bottomMargin: dp(20)
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 background: Rectangle {
@@ -183,7 +212,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pixelSize: dp(18)
-                        color: "white"
+                        color: "#00000000"
                     }
                 }
 
@@ -251,6 +280,6 @@ Item {
                     callback(false)
                 }
             }
-        }
+        //}
     }
 }

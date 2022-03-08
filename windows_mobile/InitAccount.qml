@@ -6,6 +6,7 @@ import InitAccountBridge 1.0
 
 Item {
     property bool isMainNet: true
+    //property bool isPassHidden: true
 
     UtilBridge {
         id: util
@@ -32,7 +33,7 @@ Item {
         }
     }
 
-    TextField {
+    TextFieldCursor {
         id: textfield_instancename
         height: dp(50)
         padding: dp(10)
@@ -48,10 +49,6 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
         horizontalAlignment: Text.AlignLeft
-        background: Rectangle {
-            color: "#8633E0"
-            radius: dp(5)
-        }
 
         MouseArea {
             anchors.fill: parent
@@ -61,7 +58,7 @@ Item {
         }
     }
 
-    TextField {
+    TextFieldCursor {
         id: textfield_password
         height: dp(50)
         padding: dp(10)
@@ -78,11 +75,6 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
         horizontalAlignment: Text.AlignLeft
-        background: Rectangle {
-            color: "#8633E0"
-            radius: dp(5)
-        }
-
         onTextChanged: {
             const validation = util.validateMwc713Str(textfield_password.text)
             if (validation) {
@@ -107,7 +99,8 @@ Item {
     Rectangle {
         id: rect_pwdcomment
         height: text_pwdcomment.height + dp(24)
-        color: "#CCFF33"
+        color: "#bf002d"
+        radius: dp(4)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
@@ -118,7 +111,7 @@ Item {
 
         Text {
             id: text_pwdcomment
-            color: "#3600C9"
+            color: "#ffffff"
             text: ""
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
@@ -129,14 +122,14 @@ Item {
         }
     }
 
-    TextField {
+    TextFieldCursor {
         id: textfield_confirm
         height: dp(50)
         padding: dp(10)
         leftPadding: dp(20)
         font.pixelSize: textfield_confirm.text ? dp(10) : dp(18)
         placeholderText: qsTr("Confirm password")
-        echoMode: "Password"
+        echoMode: TextInput.Normal
         color: "white"
         text: ""
         anchors.verticalCenter: parent.verticalCenter
@@ -146,11 +139,6 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
         horizontalAlignment: Text.AlignLeft
-
-        background: Rectangle {
-            color: "#8633E0"
-            radius: dp(5)
-        }
         MouseArea {
             anchors.fill: parent
             onClicked: {
@@ -201,7 +189,7 @@ Item {
 
         Text {
             id: label_testnet
-            text: qsTr("FlooNet")
+            text: qsTr("Testnet")
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: image_mainnet.right
             anchors.leftMargin: dp(40)
