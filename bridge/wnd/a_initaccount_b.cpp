@@ -46,8 +46,8 @@ void InitAccount::createWalletWithSeed(QVector<QString> seed) {
 
 // newWalletChoice: see values at state::InitAccount::NEW_WALLET_CHOICE
 // network: see values at state::InitAccount::MWC_NETWORK
-void InitAccount::submitWalletCreateChoices(int network, QString newInstanceName) {
-    getState()->submitWalletCreateChoices( state::InitAccount::MWC_NETWORK(network), newInstanceName);
+void InitAccount::submitWalletCreateChoices(int network, QString newInstanceName, int lenghtSeed) {
+    getState()->submitWalletCreateChoices( state::InitAccount::MWC_NETWORK(network), newInstanceName, state::InitAccount::SEED_LENGHT(lenghtSeed));
 }
 
 

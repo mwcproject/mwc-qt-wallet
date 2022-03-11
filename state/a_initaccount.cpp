@@ -60,7 +60,7 @@ NextStateRespond InitAccount::execute() {
     if ( !running && context->appContext->pullCookie<QString>("checkWalletInitialized")=="FAILED" ) {
         if (config::isOnlineNode()) {
             // Very first run. Need to create the wallet without any passwords
-            context->wallet->start2init("");
+            context->wallet->start2init("", true);
             context->wallet->confirmNewSeed();
             context->wallet->logout(true); // Stop will wait enough time
             return NextStateRespond( NextStateRespond::RESULT::DONE );
@@ -139,7 +139,7 @@ void InitAccount::setPassword(const QString & password ) {
 }
 
 // How to provision the wallet
-void InitAccount::submitWalletCreateChoices( MWC_NETWORK network, QString instanceName) {
+void InitAccount::submitWalletCreateChoices( MWC_NETWORK network, QString instanceName, SEED_LENGHT seedLenght) {
     // Apply network first
     Q_ASSERT( !context->wallet->isRunning() );
     QString path = context->appContext->getCurrentWalletInstance(false);
@@ -149,10 +149,12 @@ void InitAccount::submitWalletCreateChoices( MWC_NETWORK network, QString instan
     walletCfg.updateNetwork(nwName);
     walletCfg.updateDataPath(path);
 
+    bool isShortSeed = seedLenght == SEED_LENGHT::SHORT? true : false;
+
     // Store the nw name with architecture at the data folder.
     walletCfg.saveNetwork2DataPath(walletCfg.getDataPath(), nwName, util::getBuildArch(), instanceName );
 
-    context->wallet->setWalletConfig(walletCfg, false );
+    context->wallet->setWalletConfig(walletCfg, false);
 
     if (context->appContext->getCookie<bool>("restoreWalletFromSeed")) {
         // Enter seed to restore
@@ -161,7 +163,7 @@ void InitAccount::submitWalletCreateChoices( MWC_NETWORK network, QString instan
     }
     else {
         // generate a new seed for a new wallet
-        context->wallet->start2init(pass);
+        context->wallet->start2init(pass, isShortSeed);
     }
 }
 

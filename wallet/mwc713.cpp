@@ -287,7 +287,7 @@ void MWC713::start() {
 
 // start to init. Expected that we will exit pretty quckly
 // Check signal: onNewSeed( seed [] )
-void MWC713::start2init(QString password) {
+void MWC713::start2init(QString password, bool isShortSeed) {
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
@@ -300,9 +300,15 @@ void MWC713::start2init(QString password) {
 
     qDebug() << "Starting MWC713 as init at " << mwc713Path << " for config " << mwc713configPath;
 
+    QStringList paramsPlus {"init"};
+
+    if (isShortSeed){
+        paramsPlus.append("--short");
+    }
+
     // Creating process and starting
 
-    mwc713process = initMwc713process({"TOR_EXE_NAME", config::getTorPath(), "MWC_PASSWORD", password}, {"init"});
+    mwc713process = initMwc713process({"TOR_EXE_NAME", config::getTorPath(), "MWC_PASSWORD", password}, paramsPlus);
     if (mwc713process == nullptr)
         return;
 
