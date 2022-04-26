@@ -35,6 +35,7 @@ public class ActivityUtils {
 
     private static final String TAG = "mwc-qt-wallet";
     public static final String BROADCAST_ACTION = "mw.mwc.wallet.broadcast";
+    private static int IMPORTANCE_FOREGROUND = 0x00000064;
 
     public void registerServiceBroadcastReceiver(Context context) {
         IntentFilter intentFilter = new IntentFilter();
@@ -73,6 +74,13 @@ public class ActivityUtils {
 
     public void notify(Context context, String message) {
         try {
+            ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
+            ActivityManager.getMyMemoryState(appProcessInfo);
+            if (appProcessInfo.importance == IMPORTANCE_FOREGROUND)  {
+                Log.i(TAG, "Wallet in Foreground, not sending notification");
+                return;
+            }
+                
             NotificationManager m_notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
             Notification.Builder m_builder;
