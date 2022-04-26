@@ -1,12 +1,16 @@
-import QtQuick 2.4
+import QtQuick 2.15
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
+import QtGraphicalEffects 1.15
 import UtilBridge 1.0
 import InitAccountBridge 1.0
+import "./models"
 
 Item {
-    property bool isMainNet: true
-    //property bool isPassHidden: true
+
+    property int tap: 0
+    property bool testnet: false
+
 
     UtilBridge {
         id: util
@@ -24,13 +28,97 @@ Item {
         }
     }
 
+    function strenghtPassword(pass) {
+        if (pass) {
+            var weak = new RegExp("(?=.{1,})")
+            var medium = new RegExp("((?=.{6,})(?=.*[A-Z])(?=.*[a-z]))|((?=.{6,})(?=.*[0-9])(?=.*[a-z]))|((?=.{16,}))")
+            var strong = new RegExp("(?=.{10,})(?=.*[!@#\$%\^&\*])(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])")
+            if (strong.test(pass)) {
+                strenght_indicator.text = "Strong"
+                strenght_indicator.color = "green"
+            } else if (medium.test(pass)) {
+                strenght_indicator.text = "Medium"
+                strenght_indicator.color = "orange"
+            } else {
+                strenght_indicator.text = "Weak"
+                strenght_indicator.color = "red"
+            }
+            return true
+        }
+        return false
+    }
+
     MouseArea {
         anchors.fill: parent
         onClicked: {
             textfield_instancename.focus = false
-            textfield_password.focus = false
-            textfield_confirm.focus = false
+            textfield_password.field_focus = false
+            textfield_confirm.field_focus = false
         }
+    }
+    Text {
+        id: title
+        anchors.top: parent.top
+        anchors.topMargin: dp(30)
+        text: "Create Wallet"
+        font.pixelSize: dp(22)
+        font.bold: true
+        color: "white"
+        width: parent.width
+        elide: Text.ElideMiddle
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.WrapAnywhere
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                if (network_indicator.text != "Mainnet")
+                    timer.start()
+                tap += 1
+                if (tap >= 5) {
+                    testnet = !testnet
+                    tap = 0
+                    timer.stop()
+                }
+            }
+        }
+    }
+
+    Text {
+        id: network_indicator
+        text: testnet? "⛔ Testnet ⛔" : "Mainnet"
+        anchors.top: title.bottom
+        font.capitalization : Font.AllUppercase
+        anchors.topMargin: dp(5)
+        font.pixelSize: dp(14)
+        color: testnet? "orange" : "white"
+        font.italic: true
+        width: parent.width
+        elide: Text.ElideMiddle
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.WrapAnywhere
+    }
+
+    Timer {
+        id: timer
+        interval: 5000; running: false; repeat: false
+        onTriggered: {
+            tap = 0
+            if (tap >= 5)
+                stop()
+        }
+    }
+    Text {
+        id: desc
+        width: parent.width
+        anchors.top: title.bottom
+        padding: dp(25)
+        text: "Define the number of word composing your wallet seed, the instance name along the password that will encrypt your wallet"
+        font.pixelSize: dp(15)
+        color: "#c2c2c2"
+        elide: Text.ElideLeft
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.WordWrap
+
     }
 
     TextFieldCursor {
@@ -42,8 +130,7 @@ Item {
         placeholderText: qsTr("Name your instance")
         color: "white"
         text: ""
-        anchors.bottom: textfield_password.top
-        anchors.bottomMargin: dp(25)
+        anchors.top: desc.bottom
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
@@ -54,194 +141,148 @@ Item {
             anchors.fill: parent
             onClicked: {
                 textfield_instancename.focus = true
+                textfield_password.field_focus = false
+                textfield_confirm.field_focus = false
             }
         }
     }
+    RectangularGlow {
+           id: effect_password
+           anchors.fill: textfield_password
+           glowRadius: -5
+           spread: 0
+           color: "#00000000"
+           cornerRadius: textfield_password.radius + glowRadius
+       }
 
-    TextFieldCursor {
+    PasswordField {
         id: textfield_password
         height: dp(50)
-        padding: dp(10)
-        leftPadding: dp(20)
-        font.pixelSize: textfield_password.text ? dp(10) : dp(18)
-        placeholderText: qsTr("Password")
-        echoMode: "Password"
+        anchors.top: textfield_instancename.bottom
+        anchors.topMargin: dp(30)
+        anchors.right: parent.right
+        anchors.rightMargin: dp(45)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(45)
+        textField.onTextChanged: {
+            let pass = textfield_password.text
+            if (strenghtPassword(pass)) {
+                password_strenght.visible = true
+                strenght_indicator.visible = true
+            } else {
+                password_strenght.visible = false
+                strenght_indicator.visible = false
+            }
+        }
+        mouse.onClicked: {
+            textfield_password.field_focus = true
+            textfield_confirm.field_focus = false
+        }
+    }
+
+    Text {
+        id: password_strenght
+        anchors.top: textfield_password.bottom
+        anchors.left: textfield_password.left
+        anchors.leftMargin: dp(10)
+        anchors.topMargin: dp(10)
+        font.pixelSize: dp(12)
+        visible: false
+        text: "Password Strenght:"
         color: "white"
+
+    }
+
+    Text {
+        id: strenght_indicator
+        anchors.top: password_strenght.top
+        anchors.left: password_strenght.right
+        anchors.leftMargin: dp(10)
+        font.pixelSize: dp(12)
+        font.bold: true
+        visible: false
         text: ""
-        anchors.bottom: rect_pwdcomment.visible ? rect_pwdcomment.top : textfield_confirm.top
-        anchors.bottomMargin: rect_pwdcomment.visible ? dp(5) : dp(15)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(45)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        horizontalAlignment: Text.AlignLeft
-        onTextChanged: {
-            const validation = util.validateMwc713Str(textfield_password.text)
-            if (validation) {
-                text_pwdcomment.text = validation
-            }
-            util.passwordQualitySet(textfield_password.text)
-            text_pwdcomment.text = util.passwordQualityComment()
-            if (util.passwordQualityIsAcceptable()) {
-                rect_pwdcomment.color = "#00000000"
-                text_pwdcomment.color = "white"
-            }
-        }
+        color: "white"
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                textfield_password.focus = true
-            }
-        }
     }
 
-    Rectangle {
-        id: rect_pwdcomment
-        height: text_pwdcomment.height + dp(24)
-        color: "#bf002d"
-        radius: dp(4)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(45)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.bottom: textfield_confirm.top
-        anchors.bottomMargin: dp(15)
-        visible: text_pwdcomment.text
+    RectangularGlow {
+           id: effect_confirm
+           anchors.fill: textfield_confirm
+           glowRadius: -5
+           spread: 0
+           color: "#00000000"
+           cornerRadius: textfield_password.radius + glowRadius
+       }
 
-        Text {
-            id: text_pwdcomment
-            color: "#ffffff"
-            text: ""
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            font.pixelSize: dp(14)
-        }
-    }
-
-    TextFieldCursor {
+    PasswordField {
         id: textfield_confirm
         height: dp(50)
-        padding: dp(10)
-        leftPadding: dp(20)
-        font.pixelSize: textfield_confirm.text ? dp(10) : dp(18)
-        placeholderText: qsTr("Confirm password")
-        echoMode: TextInput.Normal
-        color: "white"
-        text: ""
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: rect_pwdcomment.height ? rect_pwdcomment.height : 0
+        placeHolder: qsTr("Confirm Password")
+        anchors.top: password_strenght.bottom
+        anchors.topMargin: dp(10)
         anchors.right: parent.right
         anchors.rightMargin: dp(45)
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        horizontalAlignment: Text.AlignLeft
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                textfield_confirm.focus = true
+        border.width: dp(0)
+        border.color: "#00000000"
+        textField.onTextChanged: {
+            if (!textfield_confirm.text) {
+                effect_password.color = "#00000000"
+                effect_confirm.color = "#00000000"
+                confirm_indicator.visible = false
+            } else if (textfield_confirm.text === textfield_password.text) {
+                effect_confirm.color = "#1afe49"
+                effect_password.color = "#1afe49"
+                confirm_indicator.text = "Password match!"
+
+                confirm_indicator.color = "#1afe49"
+                confirm_indicator.visible = true
+            } else {
+                effect_confirm.color  = "#fd124f"
+                effect_password.color = "#fd124f"
+                confirm_indicator.text = "Password does not match!"
+                confirm_indicator.color = "#fd124f"
+                confirm_indicator.visible = true
             }
+        }
+        mouse.onClicked: {
+            textfield_password.field_focus = false
+            textfield_confirm.field_focus = true
         }
     }
 
-    Rectangle {
-        id: rect_network
+    Text {
+        id: confirm_indicator
         anchors.top: textfield_confirm.bottom
-        anchors.topMargin: dp(50)
-        anchors.left: parent.left
-        anchors.right: parent.right
-        color: "#00000000"
+        anchors.left: textfield_confirm.left
+        anchors.leftMargin: dp(10)
+        anchors.topMargin: dp(10)
+        font.pixelSize: dp(12)
+        visible: false
+        text: ""
+        color: "white"
 
-        Text {
-            id: label_mainnet
-            text: qsTr("Mainnet")
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: image_mainnet.left
-            anchors.rightMargin: dp(15)
-            horizontalAlignment: Text.AlignRight
-            font.pixelSize: dp(17)
-            color: "white"
-        }
-
-        Image {
-            id: image_mainnet
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.horizontalCenterOffset: dp(-30)
-            anchors.verticalCenter: parent.verticalCenter
-            width: dp(20)
-            height: dp(20)
-            source: isMainNet ? "../img/StatusOk@2x.svg" : "../img/StatusEmpty@2x.svg"
-        }
-
-        MouseArea {
-            anchors.left: label_mainnet.left
-            anchors.top: image_mainnet.top
-            anchors.right: image_mainnet.right
-            anchors.bottom: image_mainnet.bottom
-
-            onClicked: {
-                isMainNet = true
-            }
-        }
-
-        Text {
-            id: label_testnet
-            text: qsTr("Testnet")
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: image_mainnet.right
-            anchors.leftMargin: dp(40)
-            horizontalAlignment: Text.AlignRight
-            font.pixelSize: dp(17)
-            color: "white"
-        }
-
-        Image {
-            id: image_testnet
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: label_testnet.right
-            anchors.leftMargin: dp(15)
-            width: dp(20)
-            height: dp(20)
-            source: isMainNet ? "../img/StatusEmpty@2x.svg" : "../img/StatusOk@2x.svg"
-        }
-
-        MouseArea {
-            anchors.left: label_testnet.left
-            anchors.top: image_testnet.top
-            anchors.right: image_testnet.right
-            anchors.bottom: image_testnet.bottom
-
-            onClicked: {
-                isMainNet = false
-            }
-        }
     }
 
-    Button {
-        id: button_next
-        height: dp(50)
-        width: dp(150)
+    ToggleSwitch {
+        id: toggle_seed
+        height: dp(40)
+        width: parent.width/2
+        text_1: "12 words"
+        text_2: "24 words"
+        anchors.top: textfield_confirm.bottom
+        anchors.topMargin: dp(30)
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: rect_network.bottom
-        anchors.topMargin: dp(50)
-        background: Rectangle {
-            id: rectangle
-            color: "#00000000"
-            radius: dp(5)
-            border.color: "white"
-            border.width: dp(2)
-            Text {
-                id: loginText
-                text: qsTr("Next")
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
-                color: "white"
-            }
-        }
+    }
+
+    ConfirmButton {
+        id: button_next
+        title: "Next"
+        anchors.top: toggle_seed.bottom
+        anchors.topMargin: dp(40)
+        anchors.horizontalCenter: parent.horizontalCenter
 
         onClicked: {
             if (!textfield_instancename.text) {
@@ -260,12 +301,6 @@ Item {
                 return
             }
 
-            util.passwordQualitySet(textfield_password.text)
-
-            if (!util.passwordQualityIsAcceptable()) {
-                return
-            }
-
             if (textfield_password.text !== textfield_confirm.text) {
                 messagebox.open(qsTr("Password"), qsTr("Password doesn't match confirm string. Please retype the password correctly"))
                 return
@@ -274,7 +309,7 @@ Item {
             util.releasePasswordAnalyser()
 
             initAccount.setPassword(textfield_password.text)
-            initAccount.submitWalletCreateChoices(isMainNet ? 1 : 2, textfield_instancename.text) // first param: MWC_NETWORK, second param: New Instance Name
+            initAccount.submitWalletCreateChoices(testnet? 2 : 1, textfield_instancename.text, toggle_seed.state == toggle_seed.text_1 ? 1 : 2) // first param: MWC_NETWORK, second param: New Instance Name, third: SeedLenght: 1 == 12 : 2 == 24
         }
     }
 }

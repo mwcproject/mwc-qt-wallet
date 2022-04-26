@@ -1,20 +1,46 @@
-import QtQuick 2.12
+import QtQuick 2.15
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.13
 import Qt.labs.platform 1.1
 import CoreWindowBridge 1.0
 import StateMachineBridge 1.0
+import QtQml 2.15
+import "./models"
+
+
+
 
 Window {
     id: window
     visible: true
     title: qsTr("MWC-Mobile-Wallet")
 
+
     property int currentState
     property string initParams
     property int ttl_blocks
     property int questionTextDlgResponse
-    property int sendConformationDlgResponse
+    property int sendConfirmationDlgResponse
+    property bool onLoadTxs
+    property bool onLoadAccount
+    property double price: 586590.26
+
+    property bool darkTheme: true
+
+    property bool hiddenAmount: false
+    property string hidden: "🌒" //"💰💰💰💰"//"▒▒▒"
+
+
+    property var txsList: []
+    property var txsListCache: []
+
+    property double totalAmount: 0
+
+    property double spendableBalance: 0
+    property double awaitBalance: 0
+    property double lockedBalance: 0
+
+    property string selectedAccount
 
     readonly property double dpi: 3.0 + (Screen.pixelDensity - 22.1) / 10
     function dp(x) { return x * dpi }
@@ -26,6 +52,11 @@ Window {
     StateMachineBridge {
         id: stateMachine
     }
+    /*Text {
+        font.pixelSize: Style.textSize
+        color: Style.textColor
+        text: "Hello World"
+    }*/
 
 /*
     NONE = 0,
@@ -62,15 +93,32 @@ Window {
         target: coreWindow
         onSgnUpdateActionStates: {
             currentState = actionState
-            navbarItem.updateTitle(currentState)
+            navbarTop.updateTitle(currentState)
             if (currentState !== 2 && currentState !== 18)
                 progressWndItem.visible = false
         }
     }
 
     onClosing: {
-        if (stateMachine.returnBack())
+        const windowDialog = (navbarTop.open || inputDlg.visible || editDlg.visible  || messagebox.visible || transactionDetail.visible)
+        if (windowDialog) {
+            if (inputDlg.visible)
+                inputDlg.visible = false
+            if (editDlg.visible)
+                editDlg.visible = false
+            if (messagebox.visible)
+                messagebox.visible  = false
+            if (transactionDetail.visible)
+                transactionDetail.visible  = false
+            if (navbarTop.open)
+                navbarTop.open = false
             close.accepted = false
+            return
+        }
+        if (stateMachine.returnBack()) {
+            close.accepted = false
+            return
+        }
     }
 
     function updateInitParams(newParams) {
@@ -103,14 +151,14 @@ Window {
 
     function sendConfirmationDlgCallback(ret) {
         if (ret) {
-            sendConformationDlgResponse = 1
+            sendConfirmationDlgResponse = 1
         } else {
-            sendConformationDlgResponse = 0
+            sendConfirmationDlgResponse = 0
         }
     }
 
-    function openSendConfirmationDlg(title, message, passwordHash) {
-        sendConfirmationItem.open(title, message, passwordHash, sendConfirmationDlgCallback)
+    function openSendConfirmationDlg(title, info, passwordHash) {
+        sendConfirmationItem.open(title, info, passwordHash, sendConfirmationDlgCallback)
     }
 
     function openWalletStoppingMessageDlg(taskTimeout) {
@@ -121,22 +169,32 @@ Window {
         walletStoppingMessageDlg.visible = false
     }
 
-    Rectangle
-    {
-        /*gradient: Gradient {
-            orientation: Gradient.Horizontal
+    Dark {
+        id: dark
+    }
+
+    Light {
+        id: light
+    }
+
+    MyFont {
+        id: barlow
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        gradient: Gradient {
+            orientation: Gradient.Vertical
             GradientStop {
                 position: 0
-                color: "#9E00E7"
+                color: darkTheme? dark.bgGradientTop : light.bgGradientTop
             }
 
             GradientStop {
-                position: 1
-                color: "#3600C9"
+                position: 0.2
+                color: darkTheme? dark.bgGradientBottom : light.bgGradientBottom
             }
-        }*/
-        color: "#181a20"
-        anchors.fill: parent
+        }
     }
 
     InitWallet {
@@ -157,22 +215,25 @@ Window {
         visible: currentState === 3
     }
 
+
+
     Rectangle {
         color: "#00000000"
+        anchors.top: parent.top
+        anchors.topMargin: parent.height/14
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(90)
+        anchors.bottomMargin: parent.height/14
         anchors.right: parent.right
         anchors.rightMargin: 0
         anchors.left: parent.left
         anchors.leftMargin: 0
-        anchors.top: parent.top
-        anchors.topMargin: dp(100)
 
         Wallet {
             id: walletItem
             anchors.fill: parent
             visible: currentState === 21
         }
+
 
         AccountOptions {
             id: accountOptionsItem
@@ -184,46 +245,6 @@ Window {
             id: walletSettingsItem
             anchors.fill: parent
             visible: currentState === 23
-        }
-
-        Send {
-            id: sendItem
-            anchors.fill: parent
-            visible: currentState === 8 && initParams.length === 0
-        }
-
-        SendOnline {
-            id: sendOnlineItem
-            anchors.fill: parent
-            visible: currentState === 8 && initParams.length !== 0 && initParams.search("isSendOnline") >= 0 && JSON.parse(initParams).isSendOnline
-            onVisibleChanged: {
-                if (visible) {
-                    sendOnlineItem.init(JSON.parse(initParams))
-                }
-            }
-        }
-
-        SendOffline {
-            id: sendOfflineItem
-            anchors.fill: parent
-            visible: currentState === 8 && initParams.length !== 0 && initParams.search("isSendOnline") >= 0 && !JSON.parse(initParams).isSendOnline && initParams.search("backStateId") < 0
-            onVisibleChanged: {
-                if (visible) {
-                    sendOfflineItem.init(JSON.parse(initParams))
-                }
-            }
-        }
-
-        Receive {
-            id: receiveItem
-            anchors.fill: parent
-            visible: currentState === 9 && initParams.length === 0
-        }
-
-        Finalize {
-            id: finalizeItem
-            anchors.fill: parent
-            visible: currentState === 19 && initParams.length === 0
         }
 
         FileTransactionReceive {
@@ -241,7 +262,7 @@ Window {
         ResultedSlatepack {
             id: resultedSlatepackItem
             anchors.fill: parent
-            visible: (currentState === 8 || currentState === 9) && initParams.length !== 0 && initParams.search("backStateId") >= 0
+            visible: (currentState === 8 || currentState === 9) && initParams.length !== 0 && initParams.search("backStateId") >= 0 && initParams.search("svg") < 0
         }
 
         Transactions {
@@ -256,11 +277,16 @@ Window {
             visible: currentState === 12
         }
 
-        Accounts {
+        /*
+        SelectContact {
+            id: selectContactItem
+        }*/
+
+        /*Accounts {
             id: accountsItem
             anchors.fill: parent
             visible: currentState === 4
-        }
+        }*/
 
         AccountTransfer {
             id: accountTransferItem
@@ -309,23 +335,97 @@ Window {
             anchors.fill: parent
             visible: currentState === 13
         }
+    }
 
-        SendConfirmation {
-            id: sendConfirmationItem
-            anchors.verticalCenter: parent.verticalCenter
+    Send {
+        id: sendItem
+        anchors.fill: parent
+        visible: currentState === 8 && initParams.length === 0
+    }
+
+    SendOnline {
+        id: sendOnlineItem
+        anchors.fill: parent
+        visible: currentState === 8 && initParams.length !== 0 && initParams.search("isSendOnline") >= 0 && JSON.parse(initParams).isSendOnline
+        onVisibleChanged: {
+            if (visible) {
+                sendOnlineItem.init(JSON.parse(initParams))
+
+            }
         }
     }
 
-    Navbar {
-        id: navbarItem
+    SendOffline {
+        id: sendOfflineItem
+        anchors.fill: parent
+        visible: currentState === 8 && initParams.length !== 0 && initParams.search("isSendOnline") >= 0 && !JSON.parse(initParams).isSendOnline && initParams.search("backStateId") < 0
+        onVisibleChanged: {
+            if (visible) {
+                sendOfflineItem.init(JSON.parse(initParams))
+            }
+        }
+    }
+
+    SendConfirmation {
+        id: sendConfirmationItem
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: parent.height/14
+    }
+
+    Receive {
+        id: receiveItem
+        anchors.fill: parent
+        visible: (currentState === 9 && initParams.length === 0)
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: parent.height/14
+    }
+
+    QrCode {
+        id: qrCode
+        anchors.fill: parent
+        visible: currentState === 9 && initParams.length !== 0 && (initParams.search("svg") >= 0)
+        onVisibleChanged: {
+            if (visible) {
+                qrCode.init(JSON.parse(initParams))
+            }
+        }
+    }
+
+    Finalize {
+        id: finalizeItem
+        anchors.fill: parent
+        visible: currentState === 19 && initParams.length === 0
+    }
+
+    TransactionDetail {
+        id: transactionDetail
+        anchors.fill: parent
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: parent.height/14
+    }
+
+
+
+    NavbarBottom {
+        id: navbarBottom
         anchors.fill: parent
         visible: currentState > 3
     }
 
-    InputSlatepack {
+    NavbarTop {
+        id: navbarTop
+        anchors.fill: parent
+        visible: currentState > 3 && (currentState != 8 && currentState != 9 && currentState != 9 && !transactionDetail.visible)
+        //anchors.bottom: parent.bottom
+        //anchors.bottomMargin: parent.height/14
+    }
+
+
+    /*InputSlatepack {
         id: inputSlatepack
         anchors.fill: parent
-    }
+    }*/
 
     SendSettings {
         id: settingsItem
@@ -342,10 +442,7 @@ Window {
         anchors.fill: parent
     }
 
-    TransactionDetail {
-        id: transactionDetail
-        anchors.fill: parent
-    }
+
 
     OutputDetail {
         id: outputDetailItem
@@ -371,6 +468,16 @@ Window {
         id: helpDlg
         anchors.fill: parent
     }
+
+    Rectangle {
+        x: (parent.width - notification.width)/2
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: (parent.height/14)*2
+        Notification {
+            id: notification
+        }
+    }
+
 }
 
 /*##^##

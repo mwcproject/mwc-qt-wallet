@@ -7,16 +7,19 @@ import UtilBridge 1.0
 Item {
     property var callback
     property string blockingPasswordHash
+    anchors.fill: parent
 
-    height: text_message.height + dp(420)
+    //height: text_message.height + dp(420)
     id: sendConfirmation
     visible: false
-    anchors.left: parent.left
+    //anchors.fill:parent
+    /*anchors.left: parent.left
     anchors.leftMargin: dp(25)
     anchors.right: parent.right
-    anchors.rightMargin: dp(25)
+    anchors.rightMargin: dp(25)*/
 
     function open(title, message, passwordHash, _callback) {
+        console.log("mes_ :" + message)
         text_title.text = title
         text_message.text = message
         blockingPasswordHash = passwordHash

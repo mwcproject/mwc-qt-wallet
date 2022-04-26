@@ -12,6 +12,7 @@ Item {
     property bool walletLogsEnabled
     property bool autoStartMQSEnabled
     property bool autoStartTorEnabled
+    property int  currencyPrice
 
     WalletConfigBridge {
         id: walletConfig
@@ -32,7 +33,8 @@ Item {
             autoStartTorEnabled === checkbox_tor.checked
 
         walletConfig.canApplySettings(!sameWithCurrent);
-
+        //walletConfig.getPriceCurrency()
+        //textfield_currency.text =
         const sameWithDefault =
             true === currentWalletLogsEnabled &&
             textfield_send_num_confirmation.text.trim() === Number(walletConfig.getDefaultInputConfirmationsNumber()).toString() &&
@@ -69,6 +71,8 @@ Item {
             textfield_wallet_instance_name.text = walletInstanceName
             inputConfirmationsNumber = walletConfig.getInputConfirmationsNumber()
             textfield_send_num_confirmation.text = inputConfirmationsNumber
+            currencyPrice = walletConfig.getPriceCurrency()
+            textfield_currency.text = currencyPrice
             changeOutputs = walletConfig.getChangeOutputs()
             textfield_change_outputs.text = changeOutputs
             updateButtons()
@@ -80,6 +84,7 @@ Item {
         onClicked: {
             textfield_wallet_instance_name.focus = false
             textfield_send_num_confirmation.focus = false
+            textfield_currency.focus = false
             textfield_change_outputs.focus = false
         }
     }
@@ -253,12 +258,47 @@ Item {
     }
 
     Text {
+        id: label_currency
+        text: qsTr("Currency")
+        color: "white"
+        anchors.left: parent.left
+        anchors.leftMargin: dp(45)
+        anchors.top: textfield_send_num_confirmation.bottom
+        anchors.topMargin: dp(15)
+        font.pixelSize: dp(14)
+    }
+
+    TextField {
+        id: textfield_currency
+        height: dp(50)
+        padding: dp(10)
+        leftPadding: dp(20)
+        font.pixelSize: dp(18)
+        color: "white"
+        text: ""
+        anchors.top: label_currency.bottom
+        anchors.topMargin: dp(10)
+        anchors.right: parent.right
+        anchors.rightMargin: dp(45)
+        anchors.left: parent.left
+        anchors.leftMargin: dp(45)
+        horizontalAlignment: Text.AlignLeft
+        background: Rectangle {
+            color: "#8633E0"
+            radius: dp(5)
+        }
+        onTextChanged: {
+            updateButtons()
+        }
+    }
+
+    Text {
         id: label_change_outputs
         text: qsTr("Change Outputs")
         color: "white"
         anchors.left: parent.left
         anchors.leftMargin: dp(45)
-        anchors.top: textfield_send_num_confirmation.bottom
+        anchors.top: textfield_currency.bottom
         anchors.topMargin: dp(15)
         font.pixelSize: dp(14)
     }
@@ -452,7 +492,16 @@ Item {
                 return;
             }
 
-            let ok = isInteger(textfield_send_num_confirmation.text.trim())
+            const newPriceCurrency = textfield_currency.text.trim()
+            let ok = isInteger(newPriceCurrency)
+            if (!ok) {
+                messagebox.open(qsTr("Input"), qsTr("Please specify non empty wallet insatance name"))
+                textfield_wallet_instance_name.focus = true
+                return;
+            }
+            walletConfig.setPriceCurrency(newPriceCurrency)
+
+            ok = isInteger(textfield_send_num_confirmation.text.trim())
             let confirmations
             if (ok) {
                 confirmations = parseInt(textfield_send_num_confirmation.text.trim())

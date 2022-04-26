@@ -28,7 +28,7 @@ Rectangle {
     on_RightEdgeChanged: _setupAnchors()
     onOpenChanged: completeSlideDirection()
 
-    width: (Screen.width > Screen.height) ? dp(320) : Screen.width - dp(100)
+    width: (3*parent.width)/4
     height: parent.height
     x: _closeX
     z: 10
@@ -148,7 +148,7 @@ Rectangle {
         id: backgroundBlackout
         parent: _rootItem
         anchors.fill: parent
-        opacity: 0.5 * Math.min(1, Math.abs(panel.x - _closeX) / _rootItem.width/2)
+        opacity: 0.8 * Math.min(1, Math.abs(panel.x - _closeX) / _rootItem.width/2)
         color: "black"
     }
 

@@ -38,7 +38,7 @@ Item {
 
     Text {
         id: label_new
-        color: "#ffffff"
+        color: Style.titleColor
         text: qsTr("New Instance")
         anchors.top: image_new.bottom
         anchors.topMargin: dp(15)
@@ -91,41 +91,10 @@ Item {
         id: text_version
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(20)
-        color: "white"
+        anchors.bottomMargin: dp(15)
+        color: "grey"
         font.pixelSize: dp(14)
         text: config.get_APP_NAME() + " v" + config.getBuildVersion()
     }
 
-//    Image {
-//        id: image_help
-//        width: dp(30)
-//        height: dp(30)
-//        anchors.horizontalCenterOffset: dp(-40)
-//        anchors.bottomMargin: dp(90)
-//        fillMode: Image.PreserveAspectFit
-//        source: "../img/HelpBtn@2x.svg"
-//        anchors.bottom: parent.bottom
-//        anchors.horizontalCenter: parent.horizontalCenter
-//    }
-
-//    Text {
-//        id: text_help
-//        text: qsTr("Help")
-//        anchors.leftMargin: dp(20)
-//        color: "white"
-//        anchors.left: image_help.right
-//        anchors.verticalCenter: image_help.verticalCenter
-//        font.pixelSize: dp(18)
-//    }
-
-//    MouseArea {
-//        anchors.left: image_help.left
-//        anchors.top: image_help.top
-//        height: dp(30)
-//        width: text_help.width + dp(50)
-//        onClicked: {
-//            console.log("help instance clicked")
-//        }
-//    }
 }

@@ -11,6 +11,7 @@ import UtilBridge 1.0
 import "./models"
 
 Item {
+    id: control
     readonly property int status_ignore: 0
     readonly property int status_red: 1
     readonly property int status_yellow: 2
@@ -20,15 +21,12 @@ Item {
     property bool initAccount: false
     // --
 
-    property double spendableBalance: 0
-    property double awaitBalance: 0
-    property double lockedBalance: 0
-
     property alias topVisible: navbarTop.visible
 
-    property string selectedAccount
+
     property bool isEdit: false
     property string docName
+    property alias open: nav.open
 
     function updateTitle(state) {
         switch (state) {
@@ -78,7 +76,7 @@ Item {
                 text_title.text = qsTr("Account Options")
                 break
             case 23:
-                text_title.text = qsTr("Wallet Settings")
+                text_title.text = qsTr("Settings")
                 break
         }
     }
@@ -107,8 +105,8 @@ Item {
         target: wallet
 
         onSgnWalletBalanceUpdated: {
-            text_spend_balance.text = wallet.getTotalMwcAmount() + " MWC"
             updateAccountsList()
+            totalAmount = wallet.getTotalMwcAmount()
         }
 
         onSgnConfigUpdate: {
@@ -122,6 +120,7 @@ Item {
             updateListenerBtn()
             updateNetworkName()
             updateInstanceAccountText()
+            totalAmount = wallet.getTotalMwcAmount()
             //updateAccountList()
         }
     }
@@ -197,7 +196,7 @@ Item {
         wallet.renameAccount(selectedAccount, newAccountName)
         startWaiting()
     }
-
+width:
     function onDeleteAccount(ok) {
         if (ok) {
             accState.deleteAccount(selectedAccount)
@@ -218,8 +217,7 @@ Item {
         id: util
     }
 
-    Rectangle
-    {
+    Rectangle {
         id: navbarTop
         height: parent.height/14
         width: parent.width
@@ -232,31 +230,42 @@ Item {
             id: layout
             spacing: 0
             Rectangle {
+                id: rec_account
                 Layout.fillHeight: true
-                Layout.minimumHeight: parent.parent.height
-                Layout.minimumWidth: parent.parent.width*(1/5)
+                Layout.minimumHeight:navbarTop.height
+                Layout.minimumWidth: navbarTop.width/5
                 color: "#00000000"
-                Image {
-                    id: notification
-                    height: parent.height* 0.4
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    source: "../img/menu.svg"
-                    fillMode: Image.PreserveAspectFit
+                Rectangle {
+                    id: rec_acc
+                    //color: "#181818"
+                    height: (4*parent.height)/5
+                    width: control.width
+                    radius: dp(50)
+                    anchors.left: parent.left
+                    anchors.leftMargin: (-4*control.width)/5
+                    color: "#181818"
 
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        nav.toggle()
-                        //stateMachine.setActionWindow(6)
+                    ImageColor {
+                        id: img_account
+                        img_height: parent.height* 0.6
+                        img_source: "../../img/account.svg"
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                        anchors.rightMargin: dp(20)
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            nav.toggle()
+                        }
                     }
                 }
             }
+
             Rectangle {
                 Layout.fillHeight: true
-                Layout.minimumHeight: parent.parent.height
-                Layout.minimumWidth: parent.parent.width*(3/5)
+                Layout.minimumHeight: navbarTop.height
+                Layout.minimumWidth: navbarTop.width*(3/5)
                 color: "#00000000"
                 Text {
                     id: text_title
@@ -265,59 +274,75 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     font.bold: true
-                    font.pixelSize: dp(16)
+                    font.pixelSize: dp(18)
+                    font.letterSpacing: dp(0.5)
+                    font.capitalization:Font.AllUppercase
+                    font.family: barlow.medium
                 }
             }
 
             Rectangle {
                 Layout.fillHeight: true
-                Layout.minimumHeight: parent.parent.height
-                Layout.minimumWidth: parent.parent.width/5
+                Layout.minimumHeight: navbarTop.height
+                Layout.minimumWidth: navbarTop.width/5
                 color: "#00000000"
-                Image {
-                    id: logout
-                    height: parent.height* 0.4
+                Rectangle {
+                    height: parent.height*0.8
+                    width: height
+                    color: "#181818"
+                    radius: dp(150)
                     anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    source: "../img/logout.svg"
-                    fillMode: Image.PreserveAspectFit
-
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-
-                        messagebox.open(qsTr("LOGOUT / CHANGE WALLET"), qsTr("Are you sure you want to logout?"), true, "No", "Yes", "", "", "", changeInstanceCallback)
+                    ImageColor {
+                        id: logout
+                        img_source: "../../img/eye.svg"
+                        img_height: parent.height* 0.6
+                        img_color: "gray"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            darkTheme = !darkTheme
+                            /*if (darkTheme)
+                                util.setBarAndroid(4294967040,4294967040, 16)
+                            if (!darkTheme)
+                                util.setBarAndroid(4294967040,4294967040, 8)*/
+                            console.log("dark Theme ", darkTheme)
+                            hiddenAmount = !hiddenAmount
+                        }
                     }
                 }
+
             }
 
 
         }
 
     }
+
     NavigationDrawer {
         id: nav
+        visible: true
         //property type name: value
-        Rectangle
-        {
+        Rectangle {
+            id: drawer
             anchors.fill: parent
             color: "#181818"
         }
+
         Rectangle {
             anchors.fill: parent
             color: "#00000000"
 
-            Image {
+            ImageColor {
                 id: image_logo
-                width: dp(58)
-                height: dp(29)
+                img_height: dp(29)
+                img_source: "../../img/mwc-logo.svg"
+                img_color: "#ffffff"
                 anchors.top: parent.top
                 anchors.topMargin: dp(70)
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: "../img/mwc-logo.svg"
-                fillMode: Image.PreserveAspectFit
             }
 
             Text {
@@ -333,18 +358,19 @@ Item {
 
             Text {
                 id: text_spend_balance
-                text: ""
+                text: (hiddenAmount? hidden : totalAmount ) + " MWC"
                 font.weight: Font.Light
                 color: "white"
-                font.pixelSize: dp(17)
+                font.pixelSize: dp(20)
                 //font.letterSpacing: dp(1)
                 anchors.top: text_account.bottom
                 anchors.topMargin: dp(3)
                 anchors.horizontalCenter: parent.horizontalCenter
             }
+
             Text {
                 id: text_secondary_currency
-                text: qsTr("58 000.18 USD")
+                text: (hiddenAmount? hidden : price) + " USD"
                 color: "#c4c4c4"
                 font.pixelSize: dp(12)
                 font.letterSpacing: dp(1)
@@ -362,32 +388,36 @@ Item {
                 font.italic: true
                 anchors.left: rect_phrase.left
                 anchors.leftMargin: dp(15)
-                anchors.bottom: rect_phrase.top
-                anchors.bottomMargin: dp(8)
+                anchors.verticalCenter: rect_edit.verticalCenter
             }
 
-            ImageColor {
-                id: img_editList
-                img_height: dp(20)
-                img_source: "../../img/edit.svg"
-                img_color: isEdit? "white" : "grey"
+            Rectangle {
+                id: rect_edit
+                height: text_acc_list.height*2
+                width: height
+                color: "#353237"
+                radius: dp(50)
                 anchors.right: rect_phrase.right
                 anchors.rightMargin: dp(25)
                 anchors.bottom: rect_phrase.top
                 anchors.bottomMargin: dp(8)
                 visible: true
+                ImageColor {
+                    id: img_editButton
+                    img_height: rect_edit.height/1.7
+                    img_source: "../../img/edit.svg"
+                    img_color: "#ffffff"
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
                         isEdit = !isEdit
-
                     }
-
                 }
-
-
-
             }
+
 
             Rectangle {
                 id: rect_phrase
@@ -402,35 +432,21 @@ Item {
                     width: parent.width
                     height: parent.height
                     contentHeight: grid_seed.Layout.minimumHeight
-                    boundsMovement: Flickable.StopAtBounds
-                    //flickableDirection: Flickable.VerticalFlick
-                    //ScrollBar.vertical.policy: ScrollBar.AlwaysOn
-                    //Flickable.flickableDirection: Flickable.VerticalFlick
                     clip: true
-                    //flickableItem.atYEnd: true
-                    //anchors.horizontalCenter: parent.horizontalCenter
-
                     ScrollBar.vertical: ScrollBar {
                         policy: Qt.ScrollBarAlwaysOn
-                        //parent: flickable.parent
-                        //anchors.top: flickable.top
-                        //anchors.left: flickable.right
-                        //anchors.bottom: flickable.bottom
                     }
-
 
                     ColumnLayout {
                         id: grid_seed
                         spacing: 0
-                        //width: rect_phrase.width
-                        //height: rect_phrase.height
-                        //Layout.margins: dp(25)
+                        width: rect_phrase.width
 
                         Repeater {
                             id: rep
                             model: accountsModel
                             Rectangle {
-                                id: rec_acc
+                                id: rec_acc_balance
                                 height: dp(60)
                                 width: nav.width
                                 color: selectedAccount === account? "#363636" : "#00000000"
@@ -438,10 +454,9 @@ Item {
                                 ImageColor {
                                     id: img_check
                                     img_height: parent.height/2.5
-                                    img_source: isEdit? "../../img/remove.svg"  : "../../img/check.svg"
-                                    //img_visible: true
-                                    img_color: isEdit? "#00000000" : "white"
-                                    visible: isEdit? (account !== "default" && selectedAccount !== account ? true : false) : (selectedAccount === account? true : false)
+                                    img_source: isEdit && nav.open? "../../img/remove.svg"  : "../../img/check.svg"
+                                    img_color: isEdit && nav.open? "#00000000" : "white"
+                                    visible: (isEdit && nav.open)? (account !== "default" && selectedAccount !== account ? true : false) : (selectedAccount === account? true : false)
                                     anchors.left: parent.left
                                     anchors.leftMargin: dp(25)
                                     anchors.verticalCenter: parent.verticalCenter
@@ -449,7 +464,7 @@ Item {
 
                                 Text {
                                     id: acc_name
-                                    text: qsTr("%1\n%2" + " MWC").arg(account).arg(spendable)
+                                    text: "%1\n".arg(account) + (hiddenAmount? hidden : spendable) + " MWC"
                                     color: "white"
                                     font.pixelSize: dp(15)
                                     font.italic: true
@@ -462,9 +477,8 @@ Item {
                                     id: img_edit
                                     img_height: parent.height/2.5
                                     img_source: "../../img/check.svg"
-                                    //img_visible: true
                                     img_color: "white"
-                                    visible: isEdit? (account !== "default" && selectedAccount !== account ? true : false) : false
+                                    visible: (isEdit && nav.open)? (account !== "default" && selectedAccount !== account ? true : false) : false
                                     anchors.right: parent.right
                                     anchors.rightMargin: dp(25)
                                     anchors.verticalCenter: parent.verticalCenter
@@ -479,12 +493,10 @@ Item {
                                             spendableBalance = spendable
                                             awaitBalance = awaiting
                                             lockedBalance = locked
+                                            transactionsItem.requestTransactions()
 
                                         }
-
-
                                     }
-
                                 }
                                 MouseArea {
                                     anchors.fill: img_check
@@ -493,37 +505,27 @@ Item {
                                         messagebox.open("Delete account", "Are you sure that you want to delete this account?", true, "No", "Yes", "", "", "", onDeleteAccount)
                                     }
                                 }
-
                             }
-
                         }
 
                         Rectangle {
                             id: rec_new_acc
                             height: dp(60)
                             width: nav.width
-                            color: "#00000000"
-                            visible: isEdit? false : true
-                            //anchors.top: grid_seed.bottom
-                            Image {
+                            color: "gray"
+                            visible: !isEdit? true : false
+                            ImageColor {
                                 id: img_new_acc
-                                height: rec_new_acc.height/2.5
-                                source:"../img/plus.svg"
-                                fillMode: Image.PreserveAspectFit
+                                img_height: rec_new_acc.height/2.5
+                                img_source: "../../img/plus.svg"
+                                img_color: "white"
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: rec_new_acc.left
                                 anchors.leftMargin: dp(25)
-                                //paddingLeft: dp(25)
-                            }
-                            ColorOverlay {
-                                id: over_new_acc
-                                anchors.fill: img_new_acc
-                                source: img_new_acc
-                                color: "#ffffff"
                             }
                             Text {
                                 id: name_new_acc
-                                text: qsTr("Add New Account")
+                                text: qsTr("Add new account")
                                 color: "white"
                                 font.pixelSize: dp(15)
                                 font.italic: true
@@ -535,190 +537,142 @@ Item {
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-
                                     inputDlg.open(qsTr("Add account"), qsTr("Please specify the name of a new account in your wallet"), "account name", "", 32, onAddAccount)
                                 }
-
                             }
                         }
                     }
-
-
                 }
             }
 
-            Button {
-                id: button_changeinstance
-                height: dp(50)
-                anchors.right: parent.right
-                anchors.rightMargin: dp(35)
-                anchors.left: parent.left
-                anchors.leftMargin: dp(35)
-                anchors.top: parent.bottom
-                anchors.topMargin: dp(-100)
-                background: Rectangle {
-                    id: rectangle
-                    color: "#00000000"
-                    radius: dp(4)
-                    border.color: "white"
-                    border.width: dp(2)
-                    Text {
-                        id: loginText
-                        text: qsTr("Logout / Change Wallet")
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: dp(18)
-                        color: "white"
-                    }
-                }
-
-                onClicked: {
-                    //nav.toggle()
-                    messagebox.open(qsTr("LOGOUT / CHANGE WALLET"), qsTr("Are you sure you want to logout?"), true, "No", "Yes", "", "", "", changeInstanceCallback)
-                }
-            }
-        }
-    }
-
-
-    Rectangle {
-        id: navbarBottom
-        height: parent.height/14
-        width: parent.width
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        color: "#15171c"
-
-        RowLayout {
-            id: layoutNavBottom
-            spacing: 0
             Rectangle {
+                id: navbarButton
+                height: dp(65)
+                width: parent.width
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: dp(20)
+                anchors.horizontalCenter: parent.horizontalCenter
                 color: "#00000000"
-                Layout.fillHeight: true
-                Layout.minimumHeight: parent.parent.height
-                Layout.minimumWidth: parent.parent.width/5
-                Layout.preferredWidth: 100
-                Layout.maximumWidth: 300
-                ImageColor {
-                    id: image_wallet
-                    img_height: parent.height* 0.5
-                    anchors.bottom: text_wallet.top
-                    anchors.bottomMargin: dp(2)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    img_source: "../../img/wallet.svg"
-                    img_color: currentState === 21 ? "white" : "grey"
 
-
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        stateMachine.setActionWindow(21)
+                RowLayout {
+                    id: layoutNavBottom
+                    spacing: 0
+                    Rectangle {
+                        color: "#00000000"
+                        Layout.fillHeight: true
+                        Layout.minimumHeight: parent.parent.height
+                        Layout.minimumWidth: parent.parent.width/3
+                        Rectangle {
+                            id: rec_refresh
+                            height: parent.height/1.4
+                            width: height
+                            color: "#353237"
+                            radius: dp(50)
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            ImageColor {
+                                id: img_refresh
+                                img_height: rec_refresh.height/1.7
+                                img_source:"../../img/arrow.svg"
+                                img_color: "#ffffff"
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    stateMachine.setActionWindow(8)
+                                }
+                            }
+                        }
+                        Text {
+                            id: text_refresh
+                            text: qsTr("Refresh")
+                            color: "#ffffff"
+                            font.pixelSize: dp(12)
+                            font.letterSpacing: dp(0.5)
+                            anchors.top: rec_refresh.bottom
+                            anchors.topMargin: dp(5)
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
                     }
-                }
-            }
-            Rectangle {
-                color: "#00000000"
-                Layout.fillHeight: true
-                Layout.minimumHeight: parent.parent.height
-                Layout.minimumWidth: parent.parent.width/5
-                Layout.preferredWidth: 100
-                Layout.maximumWidth: 300
-                ImageColor {
-                    id: image_txs
-                    img_height: parent.height* 0.5
-                    anchors.bottom: text_txs.top
-                    anchors.bottomMargin: dp(2)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    img_source: "../../img/list.svg"
-                    img_color: currentState === 11 ? "white" : "grey"
 
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        stateMachine.setActionWindow(11)
+                    Rectangle {
+                        color: "#00000000"
+                        Layout.fillHeight: true
+                        Layout.minimumHeight: parent.parent.height
+                        Layout.minimumWidth: parent.parent.width/3
+                        Rectangle {
+                            id: rec_transfer
+                            height: parent.height/1.3
+                            width: height
+                            color: "#353237"
+                            radius: dp(50)
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            ImageColor {
+                                id: img_transfer
+                                img_height: rec_transfer.height/1.7
+                                img_source:"../../img/swap.svg"
+                                img_color: "#ffffff"
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    stateMachine.setActionWindow(5)
+                                    nav.toggle()
+                                }
+                            }
+                        }
+                        Text {
+                            id: text_transfer
+                            text: qsTr("Transfer")
+                            color: "#ffffff"
+                            font.pixelSize: dp(12)
+                            font.letterSpacing: dp(0.5)
+                            anchors.top: rec_transfer.bottom
+                            anchors.topMargin: dp(5)
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
                     }
-                }
-            }
-            Rectangle {
-                color: "#00000000"
-                Layout.fillHeight: true
-                Layout.minimumHeight: parent.parent.height
-                Layout.minimumWidth: parent.parent.width/5
-                Layout.preferredWidth: 100
-                Layout.maximumWidth: 300
-                ImageColor {
-                    id: image_listeners
-                    img_height: parent.height* 0.5
-                    anchors.bottom: text_listeners.top
-                    anchors.bottomMargin: dp(2)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    img_source: "../../img/listener.svg"
-                    img_color: currentState === 10 ? "white" : "grey"
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        stateMachine.setActionWindow(10)
-                    }
-                }
-            }
-            Rectangle {
-                color: "#00000000"
-                Layout.fillHeight: true
-                Layout.minimumHeight: parent.parent.height
-                Layout.minimumWidth: parent.parent.width/5
-                Layout.preferredWidth: 100
-                Layout.maximumWidth: 300
 
-                ImageColor {
-                    id: image_account
-                    img_height: parent.height* 0.5
-                    anchors.bottom: text_account.top
-                    anchors.bottomMargin: dp(2)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    img_source: "../../img/notification.svg"
-                    img_color: currentState === 6 ? "white" : "grey"
-
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        stateMachine.setActionWindow(6)
-                    }
-                }
-            }
-            Rectangle {
-                color: "#00000000"
-                Layout.fillHeight: true
-                Layout.minimumHeight: parent.parent.height
-                Layout.minimumWidth: parent.parent.width/5
-                Layout.preferredWidth: 100
-                Layout.maximumWidth: 300
-                ImageColor {
-                    id: image_settings
-                    img_height: parent.height* 0.5
-                    anchors.bottom: text_settings.top
-                    anchors.bottomMargin: dp(2)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    img_source: "../../img/setting.svg"
-                    img_color: currentState === 23 ? "white" : "grey"
-
-
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        stateMachine.setActionWindow(23)
+                    Rectangle {
+                        color: "#00000000"
+                        Layout.fillHeight: true
+                        Layout.minimumHeight: parent.parent.height
+                        Layout.minimumWidth: parent.parent.width/3
+                        Rectangle {
+                            id: rect_logout
+                            height: parent.height/1.3
+                            width: height
+                            color: "#ad000c"
+                            radius: dp(50)
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            ImageColor {
+                                id: img_logout
+                                img_height: rect_logout.height/1.7
+                                img_source:"../../img/logout.svg"
+                                img_color: "#ffffff"
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    messagebox.open(qsTr("Logout"), qsTr("Are you sure you want to logout?"), true, "No", "Yes", "", "", "", changeInstanceCallback)
+                                }
+                            }
+                        }
+                        Text {
+                            id: text_logout
+                            text: qsTr("Logout")
+                            color: "#ffffff"
+                            font.pixelSize: dp(12)
+                            font.letterSpacing: dp(0.5)
+                            anchors.top: rect_logout.bottom
+                            anchors.topMargin: dp(5)
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
                     }
                 }
             }

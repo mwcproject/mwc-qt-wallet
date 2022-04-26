@@ -13,17 +13,18 @@ Item {
         id: accountTransfer
     }
 
+
     Connections {
         target: accountTransfer
         onSgnShowTransferResults: (ok, errMsg) => {
             rect_progress.visible = false
             if (ok) {
-                messagebox.open(qsTr("Success"), qsTr("Your funds were successfully transferred"))
+                messagebox.open(qsTr("id-success") ,qsTr("id-success-transfer"))
                 // reset state
                 textfield_amount.text = ""
                 updateAccounts()
             } else {
-                messagebox.open(qsTr("Transfer failure"), qsTr("Funds transfer request has failed.\n" + errMsg))
+                messagebox.open(qsTr("id-failure"), qsTr("id-failure-transfer") + errMsg)
             }
         }
 
@@ -81,7 +82,7 @@ Item {
 
     Text {
         id: label_from_account
-        text: qsTr("Transfer MWC from account:")
+        text: qsTr("id-transfer-from-account")
         color: "white"
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
@@ -211,7 +212,7 @@ Item {
 
     Text {
         id: label_to_account
-        text: qsTr("To account:")
+        text: qsTr("id-transfer-to-account")
         color: "white"
         anchors.left: parent.left
         anchors.leftMargin: dp(30)
@@ -347,7 +348,7 @@ Item {
         padding: dp(5)
         leftPadding: dp(10)
         font.pixelSize: dp(18)
-        placeholderText: qsTr("Amount")
+        placeholderText: qsTr("id-amount")
         color: "white"
         text: ""
         anchors.top: combobox_account_to.bottom
@@ -424,7 +425,7 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("Back")
+                text: qsTr("id-back")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
@@ -449,7 +450,7 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("Settings")
+                text: qsTr("id-settings")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
@@ -475,7 +476,7 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("Transfer")
+                text: qsTr("id-transfer")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
@@ -488,19 +489,19 @@ Item {
             const toAcc   = combobox_account_to.currentIndex >= 0 ? listmodel_account_to.get(combobox_account_to.currentIndex).account : ""
 
             if (fromAcc === "") {
-                messagebox.open(qsTr("Incorrect Input"), qsTr("Please select pair of accounts to transfer coins."))
+                messagebox.open(qsTr("id-incorrect-input"), qsTr("id-select-from-account"))
                 combobox_account_from.focus = true
                 return;
             }
 
             if (toAcc === "") {
-                messagebox.open(qsTr("Incorrect Input"), qsTr("Please select pair of accounts to transfer coins."))
+                messagebox.open(qsTr("id-incorrect-input"), qsTr("id-select-to-account"))
                 combobox_account_to.focus = true
                 return;
             }
 
             if (fromAcc === toAcc) {
-                messagebox.open(qsTr("Incorrect Input"), qsTr("Please select pair of different accounts to transfer coins."))
+                messagebox.open(qsTr("id-incorrect-input"), qsTr("id-different-account"))
                 return;
             }
 

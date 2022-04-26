@@ -6,14 +6,16 @@ import UtilBridge 1.0
 
 
 TextField {
+    property alias colorbg: backgroundTextField.color
+    property alias radius: backgroundTextField.radius
+
     id: control
     background: Rectangle {
         id: backgroundTextField
-        color: "#0d0f12"
+        color: "#242424"
         radius: dp(15)
-        //border.color: "#262933"
-        //border.width: dp(1)
     }
+
     cursorDelegate: Rectangle {
         id: cursor
         visible: false

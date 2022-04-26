@@ -1,30 +1,26 @@
-import QtQuick 2.0
-import QtQuick.Controls 2.13
-import QtQuick.Window 2.0
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Window 2.15
+import QtQuick.Layouts 1.15
 import NewSeedBridge 1.0
 import Clipboard 1.0
+import "./models"
 
 Item {
+    id: control
+
+    property bool isLongSeed: true
+    property var seedWords: undefined
+    //property int seedLenght: undefined
+    //property string seedWords: ""
+
     function init(seed, hideSubmitButton) {
         const words = seed.split(" ")
-//        testSeed = words
-        setTextSeed(words.slice(0, 24))
+        seedWords = words.slice(0, words.length-1)
         button_next.visible = !hideSubmitButton
     }
 
-    function setTextSeed(words) {
-        text_seed.text = ""
-        for(let i = 0; i < words.length; i++) {
-            text_seed.text += words[i]
-            if (i === words.length - 1)
-                break
-            if (i % 4 === 3) {
-                text_seed.text += "\n"
-            } else {
-                text_seed.text += "    "
-            }
-        }
-    }
+
 
     NewSeedBridge {
         id: newSeed
@@ -45,129 +41,141 @@ Item {
         }
     }
 
-    Rectangle {
-        id: rect_phrase
-        height: text_seed.height + dp(90)
-        color: "#33bf84ff"
+    Text {
+        id: title
         anchors.top: parent.top
-        anchors.topMargin: dp(20)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(15)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(15)
+        anchors.topMargin: dp(30)
+        text: "Seed Words"
+        font.pixelSize: dp(22)
+        font.bold: true
+        color: "white"
+        width: parent.width
+        //elide: Text.ElideMiddle
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.WrapAnywhere
 
-        Image {
-            id: image_phrase
-            source: "../img/RecoveryPhrase@2x.svg"
-            width: dp(20)
-            height: dp(20)
-            anchors.left: parent.left
-            anchors.leftMargin: dp(35)
-            anchors.top: parent.top
-            anchors.topMargin: dp(30)
-        }
-
-        Text {
-            id: label_phrase
-            text: qsTr("Recovery Phrase")
-            anchors.verticalCenter: image_phrase.verticalCenter
-            anchors.left: image_phrase.right
-            anchors.leftMargin: dp(10)
-            font.bold: true
-            font.pixelSize: dp(16)
-            color: "white"
-        }
-
-        Image {
-            id: image_copy
-            source: "../img/iconCopy@2x.svg"
-            width: dp(20)
-            height: dp(20)
-            anchors.verticalCenter: image_phrase.verticalCenter
-            anchors.right: parent.right
-            anchors.rightMargin: dp(35)
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    clipboard.text = text_seed.text
-                    notification.text = "Seed words copied to the clipboard"
-                    notification.open()
-                }
-            }
-        }
-
-        Rectangle {
-            id: rect_splitter
-            height: dp(1)
-            color: "white"
-            anchors.left: parent.left
-            anchors.leftMargin: dp(35)
-            anchors.right: parent.right
-            anchors.rightMargin: dp(35)
-            anchors.top: image_phrase.bottom
-            anchors.topMargin: dp(15)
-        }
-
-        Text {
-            id: text_seed
-            color: "#ffffff"
-            text: qsTr("Waiting for the mnemonic passphrase from mwc713...")
-            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            font.capitalization: Font.AllLowercase
-            anchors.top: rect_splitter.bottom
-            anchors.topMargin: dp(20)
-            anchors.right: parent.right
-            anchors.rightMargin: dp(35)
-            anchors.left: parent.left
-            anchors.leftMargin: dp(35)
-            font.pixelSize: dp(20)
-            lineHeight: 1.5
-        }
     }
 
     Text {
-        id: label_description
-        color: "#ffffff"
-        text: qsTr("Please save these words on paper (order is important). This passphrase will allow you to recover your wallet in case of computer failure.\n\nWARNING\n- Never disclose your passphrase.\n- Never type it on a website.\n- Do not store it electronically")
-        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        anchors.right: parent.right
-        anchors.rightMargin: dp(50)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(50)
-        anchors.top: rect_phrase.bottom
-        anchors.topMargin: dp(20)
-        font.pixelSize: dp(14)
+        id: desc
+        width: parent.width
+        anchors.top: title.bottom
+        padding: dp(25)
+        text: qsTr("Please save these words on paper (order is important). This passphrase will allow you to recover your wallet in case of computer failure.")
+        font.pixelSize: dp(15)
+        color: "#c2c2c2"
+        elide: Text.ElideLeft
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.WordWrap
+
     }
 
-    Button {
-        id: button_next
-        height: dp(50)
-        width: dp(150)
-        visible: false
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: label_description.bottom
-        anchors.topMargin: dp(30)
-        background: Rectangle {
-            id: rectangle
-            color: "#00000000"
-            radius: dp(5)
-            border.color: "white"
-            border.width: dp(2)
-            Text {
-                id: loginText
-                text: qsTr("Next")
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
-                color: "white"
+
+    Rectangle {
+        id: rect_phrase
+        height: parent.height/1.5
+        width: parent.width
+        color: grid_seed.Layout.minimumHeight <= height ? "#00000000" :"#0f0f0f"
+        anchors.top: desc.bottom
+
+
+
+        Flickable {
+            id: scroll
+            width: parent.width
+            height: parent.height
+            contentHeight: grid_seed.Layout.minimumHeight
+            boundsMovement: Flickable.StopAtBounds
+            clip: true
+
+            ScrollBar.vertical: ScrollBar {
+                policy: grid_seed.Layout.minimumHeight <= rect_phrase.height ? Qt.ScrollBarAlwaysOff : Qt.ScrollBarAlwaysOn
+             }
+
+
+            GridLayout {
+                id: grid_seed
+                columns: 2
+                columnSpacing: 0
+                rowSpacing: dp(5)
+                width: rect_phrase.width
+                height: rect_phrase.height
+
+                Repeater {
+                    id: rep
+                    model: seedWords //control.nbwords
+                    Rectangle {
+                        id: rec_seed
+                        height: dp(40)
+                        width: parent.width/2.5
+                        radius: dp(25)
+                        color: "#202020"
+                        Layout.topMargin: dp(10)
+                        Layout.bottomMargin: dp(10)
+                        Layout.alignment: Qt.AlignHCenter
+                        Rectangle {
+                            id: circle_index
+                            height: parent.height - dp(15)
+                            width: circle_index.height
+                            color: "#cccccc"
+                            radius: dp(50)
+                            anchors.left: parent.left
+                            anchors.leftMargin: dp(10)
+                            anchors.verticalCenter: parent.verticalCenter
+                            Text {
+                                id: index_word
+                                color: "#000000"
+                                text: index + 1
+                                font.bold: true
+                                font.pixelSize: parent.height*0.55
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+                        }
+                        Text {
+                            id: word
+                            color: "#ffffff"
+                            verticalAlignment: Text.AlignVCenter
+                            horizontalAlignment: Text.AlignHCenter
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            font.capitalization: Font.AllLowercase
+                            font.pixelSize: parent.height*0.4
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: modelData
+                        }
+                    }
+                 }
             }
         }
+    }
 
+    ConfirmButton {
+        id: button_next
+        title: "Next"
+        anchors.top: rect_phrase.bottom
+        anchors.topMargin: dp(30)
+        anchors.horizontalCenter: parent.horizontalCenter
         onClicked: {
             newSeed.doneWithNewSeed()
         }
     }
+
+    /*ConfirmButton {
+        id: button_skip
+        title: "Skip"
+        anchors.top: button_next.bottom
+        anchors.topMargin: dp(20)
+        anchors.horizontalCenter: parent.horizontalCenter
+        onClicked: {
+            // make a better way to skip seed
+            let x = Array("","","","","","")
+            newSeed.submitSeedWord(x, true)
+        }
+    }*/
+
+
+
 
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter

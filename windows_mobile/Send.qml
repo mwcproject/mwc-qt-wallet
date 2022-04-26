@@ -1,13 +1,17 @@
-import QtQuick 2.0
+import QtQuick 2.15
 import QtQuick.Window 2.0
 import QtQuick.Controls 2.13
 import WalletBridge 1.0
 import SendBridge 1.0
 import ConfigBridge 1.0
+import UtilBridge 1.0
+
+import "./models"
 
 Item {
+
     property bool showGenProofWarning: false
-    property int selectedSendMethod: 0
+    property int selectedSendMethod: 1
 
     WalletBridge {
         id: wallet
@@ -17,29 +21,31 @@ Item {
         id: send
     }
 
+    Connections {
+        target: send
+        onSgnShowSendResult: (success, message) => {
+                                 if (success) {
+                                     messagebox.open("Success", "Your MWC was successfully sent to recipient")
+                                 } else {
+                                     messagebox.open(qsTr("Send request failed"), qsTr(message))
+                                 }
+                             }
+
+    }
+
+    UtilBridge {
+        id: util
+    }
+
     ConfigBridge {
         id: config
     }
 
-    Connections {
-        target: wallet
-        onSgnWalletBalanceUpdated: {
-            const accountInfo = wallet.getWalletBalance(true, true, false)
-            const selectedAccount = wallet.getReceiveAccount()
-            let selectedAccIdx = 0
-
-            accountItems.clear()
-
-            let idx = 0
-            for (let i = 1; i < accountInfo.length; i += 2) {
-                if (accountInfo[i-1] === selectedAccount)
-                    selectedAccIdx = idx
-
-                accountItems.append({ info: accountInfo[i], account: accountInfo[i-1]})
-                idx++
-            }
-            accountComboBox.currentIndex = selectedAccIdx
-            rect_progress.visible = false
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            field_address.field_focus = false
+            field_amount.field_focus = false
         }
     }
 
@@ -53,400 +59,334 @@ Item {
     }
 
     function selectSendMethod(sendMethod) {
+        field_address.field_focus = false
+        field_amount.field_focus = false
         selectedSendMethod = sendMethod
         switch (sendMethod) {
             case 1: // online_id
-                rect_online.color = "#8633E0"
-                text_online_selected.visible = true
-                rect_file.color = "#00000000"
-                text_file_selected.visible = false
-                rect_slatepack.color = "#00000000"
-                text_slatepack_selected.visible = false
+                rec_address.color = "#252525"
+                rec_file.color = "#00000000"
+                rec_slate.color = "#00000000"
+
                 break;
             case 2: // file_id
-                rect_online.color = "#00000000"
-                text_online_selected.visible = false
-                rect_file.color = "#8633E0"
-                text_file_selected.visible = true
-                rect_slatepack.color = "#00000000"
-                text_slatepack_selected.visible = false
+                rec_address.color = "#00000000"
+                rec_file.color = "#252525"
+                rec_slate.color = "#00000000"
                 break;
             case 3: // slatepack_id
-                rect_online.color = "#00000000"
-                text_online_selected.visible = false
-                rect_file.color = "#00000000"
-                text_file_selected.visible = false
-                rect_slatepack.color = "#8633E0"
-                text_slatepack_selected.visible = true
+                rec_address.color = "#00000000"
+                rec_file.color = "#00000000"
+                rec_slate.color = "#252525"
                 break;
         }
     }
 
+    function one2nano(str) {
+        let amountFloat = parseFloat(str).toFixed(9)
+        amountFloat = Math.abs(Math.pow(10, 9) * amountFloat)
+        return parseInt(amountFloat)
+    }
+
+    function roundN(value) {
+       var tenToN = 10 ** 9;
+       return Math.round(value * tenToN) / tenToN;
+    }
+
     onVisibleChanged: {
         if (visible) {
-            if (parent.height > dp(560)) {
-                anchors.topMargin = (parent.height - dp(560)) / 2
-            }
-            rect_progress.visible = true
-            wallet.requestWalletBalanceUpdate()
             selectSendMethod(config.getSendMethod())
-            textfield_amount.text = ""
+            field_address.text = ""
+            field_amount.text = ""
             checkbox_tx_proof.checked = config.getGenerateProof()
+        }
+    }
+    Rectangle {
+        anchors.fill: parent
+        gradient: Gradient {
+            orientation: Gradient.Vertical
+            GradientStop {
+                position: 0
+                color: "#4d1d4f"
+            }
+
+            GradientStop {
+                position: 0.3
+                color: "#181818"
+            }
         }
     }
 
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            textfield_amount.focus = false
+            field_amount.field_focus = false
+            field_address.field_focus = false
         }
     }
 
     Rectangle {
-        id: rect_online
-        width: dp(130)
-        height: dp(180)
-        color: "#00000000"
-        radius: dp(10)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(20)
+        id: rect_sendType
         anchors.top: parent.top
-        border.color: "#ffffff"
-        border.width: dp(2)
-
-        Image {
-            id: image_online
-            width: dp(80)
-            height: dp(60)
-            anchors.top: text_online_selected.bottom
-            anchors.topMargin: dp(10)
-            anchors.horizontalCenter: parent.horizontalCenter
-            fillMode: Image.PreserveAspectFit
-            source: "../img/SendOnline@2x.svg"
-        }
-
-        Text {
-            id: text_online_selected
-            color: "#ffffff"
-            text: qsTr("SELECTED")
-            anchors.top: parent.top
-            anchors.topMargin: dp(15)
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(14)
-            visible: false
-        }
-
-        Text {
-            id: element1
-            color: "#ffffff"
-            text: qsTr("Address")
-            font.bold: true
-            anchors.top: image_online.bottom
-            anchors.topMargin: dp(10)
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(18)
-        }
-
-        Rectangle {
-            id: rect_splitter1
-            height: 1
-            color: "#ffffff"
-            anchors.top: element1.bottom
-            anchors.topMargin: dp(5)
-            anchors.right: parent.right
-            anchors.rightMargin: dp(20)
-            anchors.left: parent.left
-            anchors.leftMargin: dp(20)
-        }
-
-        Text {
-            id: element2
-            color: "#ffffff"
-            text: qsTr("Confirmed Online")
-            anchors.top: rect_splitter1.bottom
-            anchors.topMargin: dp(5)
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(14)
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                selectSendMethod(1)
-            }
-        }
-    }
-
-    Rectangle {
-        id: rect_file
-        width: dp(130)
-        height: dp(180)
-        color: "#00000000"
-        radius: dp(10)
-        anchors.verticalCenter: rect_online.verticalCenter
+        anchors.topMargin: parent.height/14
         anchors.horizontalCenter: parent.horizontalCenter
-        border.color: "#ffffff"
-        border.width: dp(2)
-
-        Image {
-            id: image_file
-            width: dp(80)
-            height: dp(60)
-            anchors.topMargin: dp(10)
-            fillMode: Image.PreserveAspectFit
-            source: "../img/File@2x.svg"
-            anchors.top: text_file_selected.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        Text {
-            id: text_file_selected
-            color: "#ffffff"
-            text: qsTr("SELECTED")
-            anchors.topMargin: dp(15)
-            font.pixelSize: dp(14)
-            anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            visible: false
-        }
-
-        Text {
-            id: element3
-            color: "#ffffff"
-            text: qsTr("File")
-            anchors.topMargin: dp(10)
-            font.bold: true
-            font.pixelSize: dp(18)
-            anchors.top: image_file.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
+        radius: dp(25)
+        color: "#191919"
+        height: parent.height/6
+        width: parent.width/1.15
 
         Rectangle {
-            id: rect_splitter2
-            height: 1
-            color: "#ffffff"
-            anchors.topMargin: dp(5)
-            anchors.rightMargin: dp(20)
-            anchors.leftMargin: dp(20)
-            anchors.right: parent.right
-            anchors.top: element3.bottom
+            id: rec_address
+            height: parent.height - dp(16)
+            width: parent.width/3 - dp(16)
+            anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
-        }
-
-        Text {
-            id: element4
-            color: "#ffffff"
-            text: qsTr("Manual Process")
-            anchors.topMargin: dp(5)
-            font.pixelSize: dp(14)
-            anchors.top: rect_splitter2.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                selectSendMethod(2)
+            anchors.leftMargin: dp(8)
+            color: "#252525"
+            radius: dp(25)
+            SendType {
+                id: address
+                height: parent.height/1.7
+                width: parent.width/1.7
+                img_height: address.height/2
+                img_source: "../../img/online.svg"
+                mainText: qsTr("Address")
+                secondaryText: qsTr("Automatic")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                img_color: "#ffffff"
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    selectSendMethod(1)
+                }
             }
         }
-    }
 
-    Rectangle {
-        id: rect_slatepack
-        width: dp(130)
-        height: dp(180)
-        color: "#00000000"
-        radius: dp(10)
-        anchors.verticalCenter: rect_online.verticalCenter
-        anchors.right: parent.right
-        anchors.rightMargin: dp(20)
-        border.color: "#ffffff"
-        border.width: dp(2)
-
-        Image {
-            id: image_slatepack
-            width: dp(80)
-            height: dp(60)
-            anchors.topMargin: dp(10)
-            fillMode: Image.PreserveAspectFit
-            source: "../img/File@2x.svg"
-            anchors.top: text_slatepack_selected.bottom
+        Rectangle {
+            id: rec_file
+            height: parent.height - dp(16)
+            width: parent.width/3 - dp(16)
+            anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        Text {
-            id: text_slatepack_selected
-            color: "#ffffff"
-            text: qsTr("SELECTED")
-            anchors.topMargin: dp(15)
-            font.pixelSize: dp(14)
-            anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            visible: false
-        }
-
-        Text {
-            id: element5
-            color: "#ffffff"
-            text: qsTr("Slatepack")
-            anchors.topMargin: dp(10)
-            font.bold: true
-            font.pixelSize: dp(18)
-            anchors.top: image_slatepack.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
+            color: "#00000000"
+            radius: dp(25)
+            SendType {
+                id: file
+                height: parent.height/1.7
+                width: parent.width/1.7
+                img_height: file.height/2
+                img_source: "../../img/file.svg"
+                mainText: qsTr("File")
+                secondaryText: qsTr("Manual")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                img_color: "#ffffff"
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    selectSendMethod(2)
+                }
+            }
         }
 
         Rectangle {
-            id: rect_splitter3
-            height: 1
-            color: "#ffffff"
-            anchors.topMargin: dp(5)
-            anchors.rightMargin: dp(20)
-            anchors.leftMargin: dp(20)
+            id: rec_slate
+            height: parent.height - dp(16)
+            width: parent.width/3 - dp(16)
+            anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
-            anchors.top: element5.bottom
-            anchors.left: parent.left
-        }
-
-        Text {
-            color: "#ffffff"
-            text: qsTr("Manual Process")
-            anchors.topMargin: dp(5)
-            font.pixelSize: dp(14)
-            anchors.top: rect_splitter3.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                selectSendMethod(3)
+            anchors.rightMargin: dp(8)
+            color: "#00000000"
+            radius: dp(25)
+            SendType {
+                id: slate
+                height: parent.height/1.7
+                width: parent.width/1.7
+                img_height: slate.height/2
+                img_source: "../../img/slate.svg"
+                mainText: qsTr("Slatepack")
+                secondaryText: qsTr("Manual")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                img_color: "#ffffff"
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    selectSendMethod(3)
+                }
             }
         }
     }
 
     Text {
-        id: text_description1
-        color: "#ffffff"
-        text: qsTr("- Transaction will not be finalized if the destination wallet is offline and not listening for the destination address.")
-        anchors.top: rect_online.bottom
-        anchors.topMargin: dp(20)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(20)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(20)
-        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        font.pixelSize: dp(14)
-    }
-
-    Text {
-        id: text_description2
-        color: "#ffffff"
-        text: qsTr("- Your funds at that output will be blocked until your transaction is finalized")
-        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        font.pixelSize: dp(14)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(20)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(20)
-        anchors.top: text_description1.bottom
-        anchors.topMargin: dp(5)
-    }
-
-    Text {
-        id: text_description3
-        color: "#ffffff"
-        text: qsTr("- You can cancel any non finalized transaction to unblock your funds at 'Transactions'")
-        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        font.pixelSize: dp(14)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(20)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(20)
-        anchors.top: text_description2.bottom
-        anchors.topMargin: dp(5)
-    }
-
-    TextField {
-        id: textfield_amount
-        width: parent.width - dp(180)
-        height: dp(50)
-        padding: dp(5)
-        leftPadding: dp(20)
-        font.pixelSize: dp(18)
-        placeholderText: qsTr("Amount")
+        id: text_address
+        text: selectedSendMethod !== 2? (selectedSendMethod === 1? qsTr("Address") :  qsTr("Address (Optionnal)")) : ""
         color: "white"
-        text: ""
-        anchors.top: accountComboBox.bottom
-        anchors.topMargin: dp(20)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(20)
-        horizontalAlignment: Text.AlignLeft
+        font.pixelSize: dp(17)
+        font.letterSpacing: dp(0.5)
+        anchors.top: rect_sendType.bottom
+        anchors.topMargin: dp(40)
+        anchors.left: field_address.left
+        anchors.leftMargin: dp(10)
+        visible: selectedSendMethod !== 2? true: false
+        //anchors.horizontalCenter: parent.horizontalCenter
+    }
 
+    AddressField {
+        id: field_address
+        height: dp(50)
+        width: rect_sendType.width
+        anchors.top: text_address.bottom
+        anchors.topMargin: dp(10)
+        anchors.horizontalCenter: parent.horizontalCenter
+        focus: false
+        visible: selectedSendMethod !== 2? true: false
+        onTextChanged: {
 
-        background: Rectangle {
-            color: "#8633E0"
-            radius: dp(5)
-        }
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                textfield_amount.focus = true
+            field_amount.field_focus = false
+            let recipientWallet = field_address.text.trim()
+            if (!recipientWallet) {
+                field_address.border.color = "#00000000"
+                field_address.border.width = dp(0)
+                return
+            }
+            let verifyAddress = util.verifyAddress(recipientWallet)
+            if (verifyAddress === "unknown") {
+                field_address.border.color = "red"
+                field_address.border.width = dp(1)
+            } else {
+                field_address.border.color = "#00000000"
+                field_address.border.width = dp(0)
             }
         }
+    }
+
+    Text {
+        id: text_amount
+        text: qsTr("Amount")
+        color: "white"
+        font.pixelSize: dp(17)
+        font.letterSpacing: dp(0.5)
+        anchors.top: selectedSendMethod !== 2? field_address.bottom : rect_sendType.bottom
+        anchors.topMargin: dp(40)
+        anchors.left: field_address.left
+        anchors.leftMargin: dp(10)
+        //anchors.horizontalCenter: parent.horizontalCenter
+    }
+
+    AmountField {
+        id: field_amount
+        height: dp(50)
+        width: (3*rect_sendType.width)/4
+        anchors.top: text_amount.bottom
+        anchors.topMargin: dp(10)
+        anchors.left: field_address.left
+        focus: false
+        onTextChanged: {
+            field_address.field_focus = false
+
+            // Probably parse better amount input
+            if (!field_amount.text) {
+                field_amount.border.color = "#00000000"
+                field_amount.border.width = dp(0)
+                return
+            }
+            let amount = field_amount.text.replace("-", "").replace(",",".").trim()
+            let tmp = amount.split(".").length -1
+            if ( tmp > 1) {
+                let idx = amount.lastIndexOf(".")
+                amount.substr(idx, amount.length)
+                console.log("idx: ",  amount)
+            }
+            amount = field_amount.text = amount
+            if (parseFloat(amount) >= spendableBalance) {
+                field_amount.border.color = "red"
+                field_amount.border.width = dp(1)
+                return
+            } else {
+                field_amount.border.color = "#00000000"
+                field_amount.border.width = dp(0)
+            }
+
+        }
+    }
+
+    Text {
+        id: text_available
+        text: qsTr("Available: %1 MWC").arg(spendableBalance)
+        color: "grey"
+        font.pixelSize: dp(12)
+        font.letterSpacing: dp(0.5)
+        anchors.top: field_amount.bottom
+        anchors.topMargin: dp(10)
+        anchors.right: field_amount.right
+        anchors.rightMargin: dp(10)
+        //anchors.horizontalCenter: parent.horizontalCenter
     }
 
     Button {
-        id: button_all
-        width: dp(100)
-        height: dp(50)
-        anchors.verticalCenter: textfield_amount.verticalCenter
-        anchors.right: parent.right
-        anchors.rightMargin: dp(20)
+        id: button_max
+        height: field_amount.height
+        width: rect_sendType.width/5
+        anchors.right: rect_sendType.right
+        anchors.leftMargin: dp(10)
+        anchors.verticalCenter: field_amount.verticalCenter
         background: Rectangle {
-            color: "#00000000"
-            radius: dp(4)
-            border.color: "white"
-            border.width: dp(2)
+            id: rectangle
+            radius: dp(25)
+            gradient: Gradient {
+                //orientation: Gradient.Horizontal
+                GradientStop {
+                    position: 0
+                    color: "#531d55"
+                }
+                GradientStop {
+                    position: 1
+                    color: "#202020"
+                }
+            }
             Text {
-                text: qsTr("All")
+                id: loginText
+                text: qsTr("Max")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
                 color: "white"
             }
         }
-
-        onClicked: {
-            if (accountComboBox.currentIndex >= 0) {
-                const account = accountItems.get(accountComboBox.currentIndex).account
-                const amount = send.getSpendAllAmount(account)
-                textfield_amount.text = amount
-            }
+        onClicked:  {
+            field_address.field_focus = false
+            field_amount.field_focus = false
+            const amount = parseFloat(send.getSpendAllAmount(selectedAccount))
+            field_amount.text = amount
         }
     }
 
     CheckBox {
         id: checkbox_tx_proof
         text: qsTr("Generate Transaction Proof")
-        font.pixelSize: dp(17)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(20)
-        anchors.top: textfield_amount.bottom
-        anchors.topMargin: dp(20)
+        font.pixelSize: dp(15)
+        anchors.left: field_amount.left
+        anchors.top: field_amount.bottom
+        anchors.topMargin: dp(40)
 
         indicator: Rectangle {
             implicitWidth: dp(20)
             implicitHeight: dp(20)
             x: checkbox_tx_proof.leftPadding
             y: parent.height / 2 - height / 2
+            radius: dp(5)
+            color: "#242424"
 
-            Image {
-                width: dp(20)
-                height: dp(20)
+            ImageColor {
+                img_height: dp(17)
                 anchors.fill: parent
-                fillMode: Image.PreserveAspectFit
-                source: checkbox_tx_proof.checked ? "../img/CheckOn@2x.svg" : "../img/CheckOff@2x.svg"
+                img_source: checkbox_tx_proof.checked ?  "../../img/check.svg" : ""
+                img_color: "white"
             }
         }
 
@@ -456,8 +396,15 @@ Item {
             color: "white"
             verticalAlignment: Text.AlignVCenter
             anchors.left: checkbox_tx_proof.indicator.right
-            anchors.leftMargin: dp(25)
+            anchors.leftMargin: dp(15)
         }
+
+        nextCheckState: function() {
+                if (checkState === Qt.Checked)
+                    return Qt.Unchecked
+                else
+                    return Qt.Checked
+            }
 
         onCheckStateChanged: {
              if (checkbox_tx_proof.checked && !showGenProofWarning) {
@@ -468,172 +415,153 @@ Item {
         }
     }
 
-    Rectangle {
-        id: rect_progress
-        width: dp(60)
-        height: dp(30)
-        anchors.top: checkbox_tx_proof.bottom
-        anchors.topMargin: dp(30)
-        anchors.horizontalCenter: parent.horizontalCenter
-        color: "#00000000"
-        visible: false
-        AnimatedImage {
-            id: animation
-            source: "../img/loading.gif"
-        }
-    }
-
-    Button {
-        id: button_next
-        width: dp(150)
-        height: dp(50)
+    CheckBox {
+        id: checkbox_message
+        text: qsTr("Include a message for the receiver")
+        font.pixelSize: dp(15)
+        anchors.left: field_amount.left
         anchors.top: checkbox_tx_proof.bottom
         anchors.topMargin: dp(20)
-        anchors.horizontalCenter: parent.horizontalCenter
-        visible: !rect_progress.visible
-        background: Rectangle {
-            color: "#00000000"
-            radius: dp(4)
-            border.color: "white"
-            border.width: dp(2)
-            Text {
-                text: qsTr("Next")
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
-                color: "white"
-            }
-        }
 
-        onClicked: {
-            if (accountComboBox.currentIndex >= 0) {
-                const account = accountItems.get(accountComboBox.currentIndex).account
-                const sendAmount = textfield_amount.text.trim()
-                config.setSendMethod(selectedSendMethod)
-                const res = send.initialSendSelection( selectedSendMethod, account, sendAmount );
-                if (res === 1)
-                    accountComboBox.focus = true
-                else if (res === 2)
-                    textfield_amount.focus = true
-            }
-        }
-    }
+        indicator: Rectangle {
+            implicitWidth: dp(20)
+            implicitHeight: dp(20)
+            x: checkbox_message.leftPadding
+            y: parent.height / 2 - height / 2
+            radius: dp(5)
+            color: "#242424"
 
-    ComboBox {
-        id: accountComboBox
-        anchors.top: text_description3.bottom
-        anchors.topMargin: dp(20)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(20)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(20)
-        leftPadding: dp(20)
-        rightPadding: dp(20)
-        font.pixelSize: dp(18)
-
-        onCurrentIndexChanged: {
-            if (accountComboBox.currentIndex >= 0) {
-                const account = accountItems.get(accountComboBox.currentIndex).account
-                wallet.switchAccount(account)
-            }
-        }
-
-        delegate: ItemDelegate {
-            width: accountComboBox.width
-            height: dp(40)
-            contentItem: Text {
-                text: info
-                color: "white"
-                font: accountComboBox.font
-                elide: Text.ElideRight
-                verticalAlignment: Text.AlignVCenter
-            }
-            background: Rectangle {
-                color: accountComboBox.highlightedIndex === index ? "#955BDD" : "#8633E0"
-            }
-            topPadding: dp(10)
-            bottomPadding: dp(10)
-            leftPadding: dp(20)
-            rightPadding: dp(20)
-        }
-
-        indicator: Canvas {
-            id: canvas
-            x: accountComboBox.width - width - accountComboBox.rightPadding
-            y: accountComboBox.topPadding + (accountComboBox.availableHeight - height) / 2
-            width: dp(14)
-            height: dp(7)
-            contextType: "2d"
-
-            Connections {
-                target: accountComboBox
-                function onPressedChanged() { canvas.requestPaint() }
-            }
-
-            onPaint: {
-                context.reset()
-                if (accountComboBox.popup.visible) {
-                    context.moveTo(0, height)
-                    context.lineTo(width / 2, 0)
-                    context.lineTo(width, height)
-                } else {
-                    context.moveTo(0, 0)
-                    context.lineTo(width / 2, height)
-                    context.lineTo(width, 0)
-                }
-                context.strokeStyle = "white"
-                context.lineWidth = 2
-                context.stroke()
+            ImageColor {
+                img_height: dp(17)
+                anchors.fill: parent
+                img_source: checkbox_message.checked ?  "../../img/check.svg" : ""
+                img_color: "white"
             }
         }
 
         contentItem: Text {
-            text: accountComboBox.currentIndex >= 0 && accountItems.get(accountComboBox.currentIndex).info
-            font: accountComboBox.font
+            text: checkbox_message.text
+            font: checkbox_message.font
             color: "white"
             verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignLeft
-            elide: Text.ElideRight
+            anchors.left: checkbox_message.indicator.right
+            anchors.leftMargin: dp(15)
         }
 
-        background: Rectangle {
-            implicitHeight: dp(50)
-            radius: dp(4)
-            color: "#8633E0"
-        }
-
-        popup: Popup {
-            y: accountComboBox.height + dp(3)
-            width: accountComboBox.width
-            implicitHeight: contentItem.implicitHeight + dp(20)
-            topPadding: dp(10)
-            bottomPadding: dp(10)
-            leftPadding: dp(0)
-            rightPadding: dp(0)
-
-            contentItem: ListView {
-                clip: true
-                implicitHeight: contentHeight
-                model: accountComboBox.popup.visible ? accountComboBox.delegateModel : null
-                currentIndex: accountComboBox.highlightedIndex
-
-                ScrollIndicator.vertical: ScrollIndicator { }
+        nextCheckState: function() {
+                if (checkState === Qt.Checked)
+                    return Qt.Unchecked
+                else
+                    return Qt.Checked
             }
 
-            background: Rectangle {
-                color: "#8633E0"
-                radius: dp(4)
+        onCheckStateChanged: {
+            if (checkbox_message.checked) {
+                textfield_message.visible = true
+            } else {
+                textfield_message.visible = false
             }
-
-            onVisibleChanged: {
-                if (!accountComboBox.popup.visible) {
-                    canvas.requestPaint()
-                }
-            }
-        }
-
-        model: ListModel {
-            id: accountItems
         }
     }
+
+    TextFieldCursor {
+        id: textfield_message
+        height: dp(40)
+        width: rect_sendType.width
+        leftPadding: dp(20)
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: checkbox_message.bottom
+        anchors.topMargin: dp(20)
+        placeholderText: qsTr("Message")
+        visible: false
+        color: "grey"
+    }
+
+    ConfirmButton {
+        id: button_next
+        title: "Send"
+        anchors.top: textfield_message.visible === true? textfield_message.bottom : checkbox_message.bottom
+        anchors.topMargin: dp(40)
+        anchors.horizontalCenter: parent.horizontalCenter
+        onClicked: {
+            field_address.field_focus = false
+            field_amount.field_focus = false
+
+
+            const sendAmount = field_amount.text
+            config.setSendMethod(selectedSendMethod)
+            const res = send.initialSendSelection(selectedSendMethod, selectedAccount, sendAmount);
+            let amount = one2nano((sendAmount))
+            console.log("amt_ : " +  amount)
+            if (res !== 0) {
+                console.log("error broh")
+                return
+            }
+            if ( !send.isNodeHealthy() ) {
+                messagebox.open(qsTr("Unable to send"), qsTr("Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process"))
+                return
+            }
+
+            const sendTo = field_address.text
+
+            const isValidAddress = util.verifyAddress(sendTo)
+            if (isValidAddress === "unknow") {
+                messagebox.open(qsTr("Invalid Address"), qsTr("Please specify a valid address."))
+                return
+            }
+
+            let valRes = util.validateMwc713Str(sendTo)
+            if (valRes !== "") {
+                messagebox.open(qsTr("Incorrect Input"), qsTr(valRes))
+                textfield_send_to.focus = true
+                return
+            }
+
+            const description = textfield_message.text.split('\n').join('')
+            valRes = util.validateMwc713Str(description);
+            if (valRes !== "") {
+                messagebox.open(qsTr("Incorrect Input"), qsTr(valRes))
+                textarea_description.focus = true
+                return;
+            }
+
+            if (!send.sendMwcOnline(selectedAccount, amount, sendTo, "", description)) {
+                //rect_progress.visible = false
+                //button_send.enabled = true
+                return
+            }
+            config.setFluff(true)
+            //sendConfirmation.visible = false
+            callback(true)
+        }
+   }
 }
+/*
+let recipientWallet
+let isSlatepack = false
+if (selectedSendMethod === 3) {
+    isSlatepack = true
+    recipientWallet = field_address.text
+    if (recipientWallet !== "" && util.verifyAddress(recipientWallet) !== "tor") {
+        messagebox.open(qsTr("Unable to send"), qsTr("Please specify valid recipient wallet address"))
+        return
+    }
+}
+
+if ( !send.isNodeHealthy() ) {
+    messagebox.open(qsTr("Unable to send"), qsTr("Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process"))
+    return
+}
+
+const description = textfield_message.text.trim().replace('\n', ' ')
+
+const valRes = util.validateMwc713Str(description);
+if (valRes !== "") {
+    messagebox.open("Incorrect Input", valRes)
+    return
+}
+
+if (send.sendMwcOffline(selectedAccount, Number(field_amount.text).toString(), description, isSlatepack, config.getSendLockOutput(), recipientWallet)) {
+    //rect_progress.visible = true
+}
+*/

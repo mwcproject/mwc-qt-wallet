@@ -20,7 +20,7 @@ Item {
     anchors.rightMargin: dp(25)
 
     function open(name, address, contacts, editMode, _callback) {
-        text_title.text = editMode ? "Edit Contact" : "New Contact"
+        text_title.text = editMode ?qsTr("id-edit-contact") :qsTr("id-new-contact")
         textfield_name.text = name
         textfield_address.text = address
         contactList = contacts
@@ -65,7 +65,7 @@ Item {
 
             Text {
                 id: text_title
-                text: qsTr("Title")
+                text: qsTrqsTr("id-title")
                 font.bold: true
                 anchors.top: parent.top
                 anchors.topMargin: dp(30)
@@ -80,7 +80,7 @@ Item {
                 padding: dp(10)
                 leftPadding: dp(20)
                 font.pixelSize: dp(18)
-                placeholderText: qsTr("Name")
+                placeholderText: qsTrqsTr("id-name")
                 color: "#3600C9"
                 text: ""
                 anchors.top: text_title.bottom
@@ -111,7 +111,7 @@ Item {
                 padding: dp(10)
                 leftPadding: dp(20)
                 font.pixelSize: dp(18)
-                placeholderText: qsTr("Address")
+                placeholderText: qsTrqsTr("id-address")
                 color: "#3600C9"
                 text: ""
                 anchors.top: textfield_name.bottom
@@ -152,7 +152,7 @@ Item {
                     border.width: dp(2)
                     border.color: "#6F00D6"
                     Text {
-                        text: qsTr("Apply")
+                        text: qsTrqsTr("id-apply")
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pixelSize: dp(18)
@@ -169,24 +169,24 @@ Item {
 
                     if (name === "")
                     {
-                        messagebox.open(qsTr("Need Info"), qsTr("Please specify a name for your contact"))
+                        messagebox.open(qsTrqsTr("id-need-info"), qsTrqsTr("id-specify-name-contact"))
                         return;
                     }
 
                     if (address === "")
                     {
-                        messagebox.open(qsTr("Need Info"), qsTr("Please specify an address for your contact"))
+                        messagebox.open(qsTrqsTr("id-need-info"), qsTrqsTr("id-specify-address-contact"))
                         return;
                     }
 
                     if (util.verifyAddress(address) === "unknown")
                     {
-                        messagebox.open(qsTr("Incorrect Input"), qsTr( "Please specify correct address for your contact"))
+                        messagebox.open(qsTrqsTr("id-incorrect-input"), qsTrqsTr("id-specify-correct-address-contact"))
                         return;
                     }
 
                     if(contactList.find(contact => contact.name === name)) {
-                        messagebox.open(qsTr("Names collision"), qsTr("Contact with a name " + name + " already exist. Please specify unique name for your contact"))
+                        messagebox.open(qsTrqsTr("id-name-collision"), qsTrqsTr("id-contact-with-name") + name + qsTrqsTr("id-exist-specify-unique-name"))
                         return;
                     }
 
@@ -210,7 +210,7 @@ Item {
                     border.width: dp(2)
                     border.color: "#3600C9"
                     Text {
-                        text: qsTr("Cancel")
+                        text: qsTrqsTr("Cancel")
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pixelSize: dp(18)

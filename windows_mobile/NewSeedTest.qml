@@ -1,13 +1,17 @@
-import QtQuick 2.0
+import QtQuick 2.15
 import QtQuick.Controls 2.13
+import QtQuick.Layouts 1.15
 import QtQuick.Window 2.0
 import NewSeedBridge 1.0
+import "./models"
 
 Item {
+    property bool isLongSeed: true
+    property var seedWordsIndex: undefined
+
     function init(wordIndex) {
-        textfield_word.placeholderText = "Please enter word number " + Number(wordIndex).toString()
-        textfield_word.clear()
-//        newSeed.submitSeedWord(testSeed[wordIndex-1])
+        console.log("log_: " + wordIndex)
+        seedWordsIndex = wordIndex//.slice(0, wordIndex.length)
     }
 
     NewSeedBridge {
@@ -17,104 +21,104 @@ Item {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            textfield_word.focus = false
+            console.log("index_: "+ seedWordsIndex.length)
+            for (let i = 0; i<= seedWordsIndex.length; i++) {
+                console.log("iteamAt: "+ rep.itemAt(i).text)
+                console.log("iteamAt: "+ rep.itemAt(i).field_focus)
+            }
+            rep.itemAt(rep.index).field_focus = false
+
         }
     }
 
     Text {
-        id: label_description
-        color: "#ffffff"
-        text: qsTr("Your passphrase is important! If you lose your passphrase, your money will be permanently lost. To make sure that you have properly saved your passphrase, please retype it here:")
-        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-        anchors.right: parent.right
-        anchors.rightMargin: dp(50)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(50)
-        anchors.bottom: textfield_word.top
-        anchors.bottomMargin: dp(50)
-        font.pixelSize: dp(16)
-    }
-
-    TextField {
-        id: textfield_word
-        height: dp(50)
-        padding: dp(10)
-        leftPadding: dp(20)
-        font.pixelSize: dp(18)
-        placeholderText: qsTr("Please enter word number 1")
+        id: title
+        anchors.top: parent.top
+        anchors.topMargin: dp(30)
+        text: "Confirm Seed Words"
+        font.pixelSize: dp(22)
+        font.bold: true
         color: "white"
-        text: ""
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: dp(25)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(45)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        horizontalAlignment: Text.AlignLeft
-        background: Rectangle {
-            color: "#8633E0"
-            radius: dp(5)
+        width: parent.width
+        elide: Text.ElideMiddle
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.WrapAnywhere
+
+    }
+
+    Text {
+        id: desc
+        width: parent.width
+        anchors.top: title.bottom
+        padding: dp(25)
+        text: qsTr("Please save these words on paper (order is important). This passphrase will allow you to recover your wallet in case of computer failure.")
+        font.pixelSize: dp(15)
+        color: "#c2c2c2"
+        elide: Text.ElideLeft
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.WordWrap
+
+    }
+
+    Rectangle {
+        id: rect_phrase
+        height: parent.height/1.5
+        width: parent.width
+        color: grid_seed.Layout.minimumHeight <= height ? "#00000000" :"#0f0f0f"
+        anchors.top: desc.bottom
+
+        Flickable {
+            id: scroll
+            height: parent.height
+            width: parent.width
+            contentHeight: grid_seed.Layout.minimumHeight
+            boundsMovement: Flickable.StopAtBounds
+            clip: true
+            ScrollBar.vertical: ScrollBar {
+                policy: grid_seed.Layout.minimumHeight <= rect_phrase.height ? Qt.ScrollBarAlwaysOff : Qt.ScrollBarAlwaysOn
+            }
+
+
+            GridLayout {
+                id: grid_seed
+                columns: 2
+                columnSpacing: 0
+                rowSpacing: dp(5)
+                width: rect_phrase.width
+
+                Repeater {
+                    id: rep
+                    model: seedWordsIndex
+                    SeedInput {
+                        id: seed_input
+                        height: dp(40)
+                        width: parent.width/2.5
+                        radius: dp(25)
+                        text_index: modelData
+                        Layout.topMargin: dp(10)
+                        Layout.bottomMargin: dp(10)
+                        Layout.alignment: Qt.AlignHCenter
+
+                    }
+                }
+            }
         }
 
-        MouseArea {
-            anchors.fill: parent
+        ConfirmButton {
+            id: button_next
+            title: "Next"
+            anchors.top: rect_phrase.bottom
+            anchors.topMargin: dp(30)
+            anchors.horizontalCenter: parent.horizontalCenter
             onClicked: {
-                textfield_word.focus = true
+                let x = Array()
+                for (let i = 0; i<= seedWordsIndex.length -1 ; i++) {
+                    let word = rep.itemAt(i).text.toLowerCase()
+                    let filter = word.trim()
+                    x.push(filter)
+                }
+                newSeed.submitSeedWord(x, false)
             }
-        }
-    }
-
-    Button {
-        id: button_back
-        height: dp(50)
-        width: parent.width / 2 - dp(70)
-        anchors.top: textfield_word.bottom
-        anchors.topMargin: dp(40)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(50)
-        background: Rectangle {
-            color: "#00000000"
-            radius: dp(5)
-            border.color: "white"
-            border.width: dp(2)
-            Text {
-                text: qsTr("Back")
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
-                color: "white"
-            }
-        }
-
-        onClicked: {
-            newSeed.restartSeedVerification()
-        }
-    }
-
-    Button {
-        id: button_next
-        height: dp(50)
-        width: parent.width / 2 - dp(70)
-        anchors.top: textfield_word.bottom
-        anchors.topMargin: dp(40)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(50)
-        background: Rectangle {
-            color: "#00000000"
-            radius: dp(5)
-            border.color: "white"
-            border.width: dp(2)
-            Text {
-                text: qsTr("Next")
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
-                color: "white"
-            }
-        }
-
-        onClicked: {
-            newSeed.submitSeedWord(textfield_word.text.toLowerCase().trim())
         }
     }
 }

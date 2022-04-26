@@ -1,5 +1,5 @@
-import QtQuick 2.0
-import QtQuick.Controls 2.13
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Window 2.0
 import WalletBridge 1.0
 import ConfigBridge 1.0
@@ -46,30 +46,28 @@ Item {
                 const proof = showProofDlg.parseProofText(msg)
                 if (proof) {
                     showProofDlg.open(fn, proof, true)
-                }
-                else {
+                } else {
                     messagebox.open("Failure", "Internal error. Unable to decode the results of the proof located at  " + fn + "\n\n" + msg)
                 }
-            }
-            else {
+            } else {
                 messagebox.open("Failure", msg)
             }
         }
     }
 
     Connections {
-            target: qtAndroidService
-            onSgnOnFileReady: (eventCode, path ) => {
-                if (eventCode == 201 && path) {
-                      console.log("fileName to save proof: " + path)
-                      const validation = util.validateMwc713Str(path)
-                      if (validation) {
-                           messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
-                           return
-                      }
-                      wallet.generateTransactionProof(Number(tx2process.txIdx).toString(), path)
+        target: qtAndroidService
+        onSgnOnFileReady: (eventCode, path) => {
+            if (eventCode === 201 && path) {
+                console.log("fileName to save proof: " + path)
+                const validation = util.validateMwc713Str(path)
+                if (validation) {
+                    messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
+                    return
                 }
+                wallet.generateTransactionProof(Number(tx2process.txIdx).toString(), path)
             }
+        }
     }
 
     function init(account, txinfo, _outputs, messages, txnNote) {
@@ -79,7 +77,8 @@ Item {
         image_txtype.source = getTxTypeIcon(txinfo.transactionType, txinfo.confirmed)
         text_txtype_amount.text = getTypeAsStr(txinfo.transactionType) + " " + util.nano2one(txinfo.coinNano) + " MWC"
         text_txdate.text = getTxTime(txinfo.creationTime)
-        text_confirmed.text = txinfo.confirmed ? "Yes" : "No"
+        text_account.text = selectedAccount
+        //text_confirmed.text = txinfo.confirmed ? "Yes" : "0"
         text_txid.text = txinfo.txid
         text_address.text = txinfo.address
 
@@ -107,12 +106,13 @@ Item {
             let commitType = ""
             if (i < txinfo.numInputs) {
                 commitType = "Input " + Number(i+1).toString() + ": ";
-            }
-            else {
+            } else {
                 commitType = "Output " + Number(i-txinfo.numInputs+1) + ": ";
             }
 
-            list_commitments.append({ value: commitType + JSON.parse(outputs[i]).outputCommitment });
+            list_commitments.append({
+                value: commitType + JSON.parse(outputs[i]).outputCommitment
+            });
         }
 
         // Selecting first output
@@ -151,36 +151,36 @@ Item {
     }
 
     function getTxTypeIcon(transactionType, confirmed) {
-        if ( transactionType & type_TRANSACTION_CANCELLED )
+        if (transactionType & type_TRANSACTION_CANCELLED)
             return "../img/Transactions_Cancelled_Blue@2x.svg"
 
-        if ( !confirmed )
+        if (!confirmed)
             return "../img/Transactions_Unconfirmed_Blue@2x.svg"
 
-        if ( transactionType & type_TRANSACTION_SEND )
+        if (transactionType & type_TRANSACTION_SEND)
             return "../img/Transactions_Sent_Blue@2x.svg"
 
-        if ( transactionType & type_TRANSACTION_RECEIVE )
+        if (transactionType & type_TRANSACTION_RECEIVE)
             return "../img/Transactions_Received_Blue@2x.svg"
 
-        if ( transactionType & type_TRANSACTION_COIN_BASE )
+        if (transactionType & type_TRANSACTION_COIN_BASE)
             return "../img/Transactions_CoinBase_Blue@2x.svg"
     }
 
     function getTypeAsStr(transactionType) {
-        if ( transactionType & type_TRANSACTION_SEND )
-            return "Sent"
+        if (transactionType & type_TRANSACTION_SEND)
+            return "+"
 
-        if ( transactionType & type_TRANSACTION_RECEIVE )
-            return "Received"
+        if (transactionType & type_TRANSACTION_RECEIVE)
+            return "-"
 
-        if ( transactionType & type_TRANSACTION_COIN_BASE )
-            return "CoinBase"
+        if (transactionType & type_TRANSACTION_COIN_BASE)
+            return "+"
     }
 
     function getTxTime(creationTime) {
         const date = Date.fromLocaleString(locale, creationTime, "hh:mm:ss dd-MM-yyyy")
-        return date.toLocaleString(locale, "MMM dd, yyyy")
+        return date.toLocaleString(locale, "MM/dd/yyyy, hh:mm")
     }
 
     function saveTransactionNote(newNote) {
@@ -233,7 +233,7 @@ Item {
     }
 
     function txCancelCallback(ok) {
-        if(ok) {
+        if (ok) {
             transactionsItem.txCancel(tx2process.txIdx)
             transactionDetail.visible = false
         }
@@ -245,849 +245,878 @@ Item {
         }
     }
 
+
     Rectangle {
         anchors.fill: parent
-        color: "#00000000"
+        gradient: Gradient {
+            orientation: Gradient.Vertical
+            GradientStop {
+                position: 0
+                color: "#4d1d4f"
+            }
 
-        MouseArea {
-            anchors.fill: parent
+            GradientStop {
+                position: 0.3
+                color: "#181818"
+            }
         }
     }
 
     Rectangle {
-        anchors.fill: parent
-        anchors.topMargin: dp(100)
-        anchors.leftMargin: dp(30)
-        anchors.rightMargin: dp(30)
-        anchors.bottomMargin: dp(90)
+        id: container
+        height: parent.height
+        width: parent.width
+        anchors.bottom: parent.bottom
+        anchors.top: parent.top
+        anchors.topMargin: parent.height/14
+
+        color: dark.bgGradientBottom
 
         Rectangle {
-            anchors.fill: parent
-            color: "white"
+            id: rect_header
+            height: dp(110)
+            color: "#00000000"
+            anchors.top: parent.top
+            anchors.topMargin: 0
+            anchors.right: parent.right
+            anchors.rightMargin: 0
+            anchors.left: parent.left
+            anchors.leftMargin: 0
 
-            Rectangle {
-                id: rect_header
-                height: dp(110)
-                color: "#ffffff"
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    textfield_note.focus = false
+                }
+            }
+
+            Image {
+                id: image_txtype
+                width: dp(20)
+                height: dp(20)
+                anchors.verticalCenter: text_txtype_amount.verticalCenter
+                source: "../img/Transactions_Sent_Blue@2x.svg"
                 anchors.top: parent.top
-                anchors.topMargin: 0
+                anchors.topMargin: dp(25)
+                fillMode: Image.PreserveAspectFit
+            }
+
+            Text {
+                id: text_txtype_amount
+                color: "#ffffff"
+                text: qsTr("Sent 90 MWC")
+                anchors.top: image_txtype.top
+                anchors.topMargin: dp(25)
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.bold: true
+                font.pixelSize: dp(17)
+            }
+
+            /*Text {
+                id: text_txdate
+                color: "#ffffff"
+                text: qsTr("Jun 25, 2020")
+                anchors.top: text_txtype_amount.bottom
+                anchors.topMargin: dp(10)
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pixelSize: dp(20)
+            }*/
+
+            Image {
+                id: image_close
+                width: dp(38)
+                height: dp(38)
+                anchors.top: parent.top
+                anchors.topMargin: dp(25)
                 anchors.right: parent.right
-                anchors.rightMargin: 0
-                anchors.left: parent.left
-                anchors.leftMargin: 0
+                anchors.rightMargin: dp(25)
+                source: "../img/MessageBox_Close@2x.svg"
+                fillMode: Image.PreserveAspectFit
 
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        textfield_note.focus = false
+                        transactionDetail.visible = false
+                    }
+                }
+            }
+        }
+
+        ScrollView {
+            id: view_txinfo
+            clip: true
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+            contentHeight: rect_output.visible ? dp(830) + text_message.height : dp(720) + text_message.height
+            anchors.top: rect_header.bottom
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    textfield_note.focus = false
+                }
+            }
+
+            Text {
+                id: label_account
+                color: "gray"
+                text: qsTr("Account")
+                anchors.left: parent.left
+                anchors.leftMargin: dp(20)
+                anchors.top: parent.top
+                anchors.topMargin: 0
+                font.pixelSize: dp(15)
+            }
+
+            Text {
+                id: text_account
+                color: "#ffffff"
+                text: "default"
+                anchors.left: parent.left
+                anchors.leftMargin: dp(20)
+                anchors.top: label_account.bottom
+                anchors.topMargin: dp(3)
+                font.pixelSize: dp(15)
+            }
+
+            Button {
+                id: button_tx_cancel
+                height: dp(35)
+                width: dp(80)
+                anchors.right: button_tx_repost.visible ? button_tx_repost.left : parent.right
+                anchors.rightMargin: dp(20)
+                anchors.bottom: text_account.bottom
+                visible: false
+                background: Rectangle {
+                    color: "#00000000"
+                    radius: dp(4)
+                    border.color: "#ffffff"
+                    border.width: dp(2)
+                    Text {
+                        text: qsTr("Cancel")
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: dp(14)
+                        color: "#ffffff"
                     }
                 }
 
-                Image {
-                    id: image_txtype
-                    width: dp(20)
-                    height: dp(20)
-                    anchors.verticalCenter: text_txtype_amount.verticalCenter
-                    anchors.right: text_txtype_amount.left
-                    anchors.rightMargin: dp(5)
-                    source: "../img/Transactions_Sent_Blue@2x.svg"
-                    fillMode: Image.PreserveAspectFit
+                onClicked: {
+                    messagebox.open("Transaction cancellation", "Are you sure you want to cancel transaction #" +
+                        Number(tx2process.txIdx + 1).toString() +
+                        ", TXID " + tx2process.txid, true, "No", "Yes", "", "", "", txCancelCallback)
+                }
+            }
+
+            Button {
+                id: button_tx_repost
+                height: dp(35)
+                width: dp(80)
+                anchors.right: parent.right
+                anchors.rightMargin: dp(20)
+                anchors.bottom: text_account.bottom
+                visible: false
+                background: Rectangle {
+                    color: "#00000000"
+                    radius: dp(4)
+                    border.color: "#ffffff"
+                    border.width: dp(2)
+                    Text {
+                        text: qsTr("Repost")
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: dp(14)
+                        color: "#ffffff"
+                    }
                 }
 
-                Text {
-                    id: text_txtype_amount
-                    color: "#3600c9"
-                    text: qsTr("Sent 90 MWC")
-                    anchors.top: parent.top
-                    anchors.topMargin: dp(25)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.bold: true
-                    font.pixelSize: dp(20)
+                onClicked: {
+                    transactionsItem.txRepost(tx2process.txIdx)
+                    transactionDetail.visible = false
+                }
+            }
+
+            Button {
+                id: button_tx_proof
+                height: dp(35)
+                width: dp(80)
+                anchors.right: parent.right
+                anchors.rightMargin: button_tx_cancel.visible && button_tx_repost.visible ? dp(220) : (button_tx_cancel.visible || button_tx_repost.visible ? dp(120) : dp(20))
+                anchors.bottom: text_account.bottom
+                visible: false
+                background: Rectangle {
+                    color: "#00000000"
+                    radius: dp(4)
+                    border.color: "#ffffff"
+                    border.width: dp(2)
+                    Text {
+                        text: qsTr("Proof")
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: dp(14)
+                        color: "#ffffff"
+                    }
                 }
 
-                Text {
-                    id: text_txdate
-                    color: "#3600c9"
-                    text: qsTr("Jun 25, 2020")
-                    anchors.top: text_txtype_amount.bottom
-                    anchors.topMargin: dp(10)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: dp(20)
-                }
+                onClicked: {
+                    console.log("Proof button is clicked")
+                    if (!tx2process.proof) {
+                        messagebox.open("Need info", "Please select qualify transaction to generate a proof.")
+                    } else {
 
-                Image {
-                    id: image_close
-                    width: dp(38)
-                    height: dp(38)
-                    anchors.top: parent.top
-                    anchors.topMargin: dp(25)
-                    anchors.right: parent.right
-                    anchors.rightMargin: dp(25)
-                    source: "../img/MessageBox_Close@2x.svg"
-                    fillMode: Image.PreserveAspectFit
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            transactionDetail.visible = false
+                        if (qtAndroidService.requestPermissions()) {
+                            qtAndroidService.createFile(downloadPath, "*/*", tx2process.txid + ".proof", 201);
+                        } else {
+                            messagebox.open("Failure", "Permission Denied")
                         }
                     }
                 }
             }
 
-            ScrollView {
-                id: view_txinfo
-                clip: true
-                ScrollBar.vertical.policy: ScrollBar.AlwaysOn
-                contentHeight: rect_output.visible ? dp(830) + text_message.height : dp(720) + text_message.height
-                anchors.top: rect_header.bottom
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
+            Text {
+                id: label_txdate
+                color: "gray"
+                text: qsTr("Date")
                 anchors.left: parent.left
+                anchors.topMargin: dp(20)
+                anchors.top: text_account.bottom
+                font.pixelSize: dp(15)
+                anchors.leftMargin: dp(20)
+            }
 
+            Text {
+                id: text_txdate
+                color: "#ffffff"
+                text: ""
+                anchors.left: parent.left
+                anchors.topMargin: dp(3)
+                anchors.top: label_txdate.bottom
+                font.pixelSize: dp(15)
+                anchors.leftMargin: dp(20)
+            }
+
+            Text {
+                id: label_txid
+                color: "gray"
+                text: qsTr("Transaction ID")
+                anchors.left: parent.left
+                anchors.topMargin: dp(20)
+                anchors.top: text_txdate.bottom
+                font.pixelSize: dp(15)
+                anchors.leftMargin: dp(20)
+            }
+
+            Text {
+                id: text_txid
+                color: "#ffffff"
+                text: qsTr("49570294750498750249875049875")
+                anchors.left: parent.left
+                anchors.topMargin: dp(3)
+                anchors.top: label_txid.bottom
+                font.pixelSize: dp(15)
+                anchors.leftMargin: dp(20)
+            }
+
+            Text {
+                id: label_address
+                color: "gray"
+                text: qsTr("id-address")
+                anchors.left: parent.left
+                anchors.topMargin: dp(20)
+                anchors.top: text_txid.bottom
+                anchors.leftMargin: dp(20)
+                font.pixelSize: dp(15)
+            }
+
+            Text {
+                id: text_address
+                color: "#ffffff"
+                text: "address"
+                elide: Text.ElideMiddle
+                anchors.left: parent.left
+                anchors.topMargin: dp(3)
+                anchors.top: label_address.bottom
+                anchors.leftMargin: dp(20)
+                anchors.right: parent.right
+                anchors.rightMargin: dp(20)
+                font.pixelSize: dp(15)
+            }
+
+
+
+            Text {
+                id: label_message
+                color: "#ffffff"
+                text: qsTr("id-message")
+                anchors.left: parent.left
+                anchors.topMargin: dp(20)
+                font.bold: true
+                anchors.top: text_address.bottom
+                font.pixelSize: dp(15)
+                anchors.leftMargin: dp(20)
+            }
+
+            Text {
+                id: text_message
+                color: "gray"
+                text: qsTr("This is a longer message that goes onto multiple lines...")
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                anchors.right: parent.right
+                anchors.rightMargin: dp(30)
+                anchors.left: parent.left
+                anchors.topMargin: dp(3)
+                anchors.top: label_message.bottom
+                font.pixelSize: dp(15)
+                anchors.leftMargin: dp(20)
+            }
+
+            Text {
+                id: label_note
+                color: "#ffffff"
+                text: qsTr("Transaction Note")
+                anchors.left: parent.left
+                anchors.topMargin: dp(20)
+                font.bold: true
+                anchors.top: text_message.bottom
+                anchors.leftMargin: dp(20)
+                font.pixelSize: dp(15)
+            }
+
+            Text {
+                id: label_note_addition
+                color: "#ffffff"
+                text: qsTr("Notes are private and saved locally, only visible to you.")
+                anchors.left: parent.left
+                anchors.topMargin: dp(3)
+                anchors.top: label_note.bottom
+                font.pixelSize: dp(15)
+                anchors.leftMargin: dp(20)
+            }
+
+            TextField {
+                id: textfield_note
+                height: dp(44)
+                padding: dp(10)
+                leftPadding: dp(20)
+                font.pixelSize: dp(15)
+                placeholderText: qsTr("note")
+                color: "#252525"
+                text: ""
+                anchors.right: parent.right
+                anchors.rightMargin: dp(20)
+                anchors.left: parent.left
+                anchors.leftMargin: dp(20)
+                anchors.top: label_note_addition.bottom
+                anchors.topMargin: dp(10)
+                horizontalAlignment: Text.AlignLeft
+
+
+                background: Rectangle {
+                    color: "white"
+                    border.color: "#E2CCF7"
+                    border.width: dp(2)
+                    radius: dp(4)
+                }
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        textfield_note.focus = false
+                        textfield_note.forceActiveFocus()
+                    }
+                }
+            }
+
+            Text {
+                id: label_kernel
+                color: "#ffffff"
+                text: qsTr("Transaction Kernel")
+                anchors.left: parent.left
+                anchors.topMargin: dp(20)
+                font.bold: true
+                anchors.top: textfield_note.bottom
+                font.pixelSize: dp(15)
+                anchors.leftMargin: dp(20)
+            }
+
+            Text {
+                id: text_kernel
+                color: "#ffffff"
+                text: qsTr("dlfladfladufladnfladnfalfnaldfkdjshfkna3...")
+                elide: Text.ElideRight
+                anchors.right: parent.right
+                anchors.rightMargin: dp(110)
+                anchors.left: parent.left
+                anchors.topMargin: dp(3)
+                anchors.top: label_kernel.bottom
+                anchors.leftMargin: dp(20)
+                font.pixelSize: dp(15)
+            }
+
+            Button {
+                id: button_kernel_view
+                height: dp(35)
+                width: dp(80)
+                anchors.right: parent.right
+                anchors.rightMargin: dp(20)
+                anchors.bottom: text_kernel.bottom
+                background: Rectangle {
+                    color: "#00000000"
+                    radius: dp(4)
+                    border.color: "#ffffff"
+                    border.width: dp(2)
+                    Text {
+                        text: qsTr("View")
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: dp(14)
+                        color: "#ffffff"
                     }
                 }
 
-                Text {
-                    id: label_confirmed
-                    color: "#3600c9"
-                    text: qsTr("Confirmed")
-                    font.bold: true
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(20)
-                    anchors.top: parent.top
-                    anchors.topMargin: 0
-                    font.pixelSize: dp(15)
+                onClicked: {
+                    Qt.openUrlExternally("https://" + blockExplorerUrl + "/#k" + text_kernel.text)
                 }
+            }
 
-                Text {
-                    id: text_confirmed
-                    color: "#3600c9"
-                    text: qsTr("Yes")
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(20)
-                    anchors.top: label_confirmed.bottom
-                    anchors.topMargin: dp(3)
-                    font.pixelSize: dp(15)
-                }
+            Text {
+                id: label_inputs
+                color: "#ffffff"
+                text: qsTr("Inputs")
+                anchors.left: parent.left
+                anchors.topMargin: dp(20)
+                font.bold: true
+                anchors.top: text_kernel.bottom
+                anchors.leftMargin: dp(20)
+                font.pixelSize: dp(15)
+            }
 
-                Button {
-                    id: button_tx_cancel
-                    height: dp(35)
-                    width: dp(80)
-                    anchors.right: button_tx_repost.visible ? button_tx_repost.left : parent.right
-                    anchors.rightMargin: dp(20)
-                    anchors.bottom: text_confirmed.bottom
-                    visible: false
-                    background: Rectangle {
-                        color: "#00000000"
-                        radius: dp(4)
-                        border.color: "#3600C9"
-                        border.width: dp(2)
-                        Text {
-                            text: qsTr("Cancel")
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            font.pixelSize: dp(14)
-                            color: "#3600C9"
-                        }
+            Text {
+                id: text_inputs
+                color: "#ffffff"
+                text: qsTr("2")
+                anchors.left: parent.left
+                anchors.topMargin: dp(3)
+                anchors.top: label_inputs.bottom
+                font.pixelSize: dp(15)
+                anchors.leftMargin: dp(20)
+            }
+
+            Text {
+                id: label_debited
+                color: "#ffffff"
+                text: qsTr("Debited")
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.horizontalCenterOffset: -label_debited.width / 2
+                anchors.topMargin: dp(20)
+                font.bold: true
+                anchors.top: text_kernel.bottom
+                font.pixelSize: dp(15)
+            }
+
+            Text {
+                id: text_debited
+                color: "#ffffff"
+                text: qsTr("190 MWC")
+                anchors.left: label_debited.left
+                anchors.topMargin: dp(3)
+                anchors.top: label_debited.bottom
+                font.pixelSize: dp(15)
+            }
+
+            Text {
+                id: label_outputs
+                color: "#ffffff"
+                text: qsTr("Change Outputs")
+                anchors.right: parent.right
+                anchors.rightMargin: dp(40)
+                anchors.topMargin: dp(20)
+                font.bold: true
+                anchors.top: text_kernel.bottom
+                font.pixelSize: dp(15)
+            }
+
+            Text {
+                id: text_outputs
+                color: "#ffffff"
+                text: qsTr("1")
+                anchors.left: label_outputs.left
+                anchors.topMargin: dp(3)
+                anchors.top: label_outputs.bottom
+                font.pixelSize: dp(15)
+            }
+
+            Text {
+                id: label_credited
+                color: "#ffffff"
+                text: qsTr("Credited")
+                anchors.left: parent.left
+                anchors.topMargin: dp(20)
+                font.bold: true
+                anchors.top: text_inputs.bottom
+                font.pixelSize: dp(15)
+                anchors.leftMargin: dp(20)
+            }
+
+            Text {
+                id: text_credited
+                color: "#ffffff"
+                text: qsTr("100 MWC")
+                anchors.left: parent.left
+                anchors.topMargin: dp(3)
+                anchors.top: label_credited.bottom
+                anchors.leftMargin: dp(20)
+                font.pixelSize: dp(15)
+            }
+
+            Text {
+                id: label_txfee
+                color: "#ffffff"
+                text: qsTr("Tx Fee")
+                anchors.left: label_debited.left
+                anchors.topMargin: dp(20)
+                font.bold: true
+                anchors.top: text_inputs.bottom
+                font.pixelSize: dp(15)
+            }
+
+            Text {
+                id: text_txfee
+                color: "#ffffff"
+                text: qsTr(".005 MWC")
+                anchors.left: label_txfee.left
+                anchors.topMargin: dp(3)
+                anchors.top: label_txfee.bottom
+                font.pixelSize: dp(15)
+            }
+
+            Rectangle {
+                id: rect_splitter
+                height: dp(2)
+                color: "#e2ccf7"
+                anchors.top: text_txfee.bottom
+                anchors.topMargin: dp(30)
+                anchors.right: parent.right
+                anchors.rightMargin: dp(50)
+                anchors.left: parent.left
+                anchors.leftMargin: dp(50)
+            }
+
+            Text {
+                id: label_commitments
+                color: "#ffffff"
+                text: qsTr("Input/Output Commitments")
+                anchors.left: parent.left
+                anchors.topMargin: dp(30)
+                font.bold: true
+                anchors.top: rect_splitter.bottom
+                anchors.leftMargin: dp(20)
+                font.pixelSize: dp(15)
+            }
+
+            ComboBox {
+                id: combobox_commitments
+
+                onCurrentIndexChanged: {
+                    if (combobox_commitments.currentIndex >= 0) {
+                        updateOutputData()
                     }
+                }
 
-                    onClicked: {
-                        messagebox.open("Transaction cancellation", "Are you sure you want to cancel transaction #" +
-                                        Number(tx2process.txIdx + 1).toString() +
-                                        ", TXID " + tx2process.txid, true, "No", "Yes", "", "", "", txCancelCallback)
+                delegate: ItemDelegate {
+                    width: combobox_commitments.width
+                    contentItem: Text {
+                        text: value
+                        color: "#ffffff"
+                        font: combobox_commitments.font
+                        elide: Text.ElideRight
+                        verticalAlignment: Text.AlignVCenter
                     }
-                }
-
-                Button {
-                    id: button_tx_repost
-                    height: dp(35)
-                    width: dp(80)
-                    anchors.right: parent.right
-                    anchors.rightMargin: dp(20)
-                    anchors.bottom: text_confirmed.bottom
-                    visible: false
-                    background: Rectangle {
-                        color: "#00000000"
-                        radius: dp(4)
-                        border.color: "#3600C9"
-                        border.width: dp(2)
-                        Text {
-                            text: qsTr("Repost")
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            font.pixelSize: dp(14)
-                            color: "#3600C9"
-                        }
-                    }
-
-                    onClicked: {
-                        transactionsItem.txRepost(tx2process.txIdx)
-                        transactionDetail.visible = false
-                    }
-                }
-
-                Button {
-                    id: button_tx_proof
-                    height: dp(35)
-                    width: dp(80)
-                    anchors.right: parent.right
-                    anchors.rightMargin: button_tx_cancel.visible && button_tx_repost.visible ? dp(220) : (button_tx_cancel.visible || button_tx_repost.visible ? dp(120) : dp(20))
-                    anchors.bottom: text_confirmed.bottom
-                    visible: false
-                    background: Rectangle {
-                        color: "#00000000"
-                        radius: dp(4)
-                        border.color: "#3600C9"
-                        border.width: dp(2)
-                        Text {
-                            text: qsTr("Proof")
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            font.pixelSize: dp(14)
-                            color: "#3600C9"
-                        }
-                    }
-
-                    onClicked: {
-                        console.log("Proof button is clicked")
-                        if (!tx2process.proof) {
-                            messagebox.open("Need info", "Please select qualify transaction to generate a proof.")
-                        } else {
-
-                            if (qtAndroidService.requestPermissions()) {
-                                 qtAndroidService.createFile( downloadPath, "*/*", tx2process.txid + ".proof", 201 );
-                            } else {
-                                 messagebox.open("Failure", "Permission Denied")
-                            }
-                        }
-                    }
-                }
-
-                Text {
-                    id: label_txid
-                    color: "#3600c9"
-                    text: qsTr("tx ID")
-                    anchors.left: parent.left
-                    anchors.topMargin: dp(20)
-                    font.bold: true
-                    anchors.top: text_confirmed.bottom
-                    font.pixelSize: dp(15)
-                    anchors.leftMargin: dp(20)
-                }
-
-                Text {
-                    id: text_txid
-                    color: "#3600c9"
-                    text: qsTr("49570294750498750249875049875")
-                    anchors.left: parent.left
-                    anchors.topMargin: dp(3)
-                    anchors.top: label_txid.bottom
-                    font.pixelSize: dp(15)
-                    anchors.leftMargin: dp(20)
-                }
-
-                Text {
-                    id: label_address
-                    color: "#3600c9"
-                    text: qsTr("address")
-                    anchors.left: parent.left
-                    anchors.topMargin: dp(20)
-                    font.bold: true
-                    anchors.top: text_txid.bottom
-                    anchors.leftMargin: dp(20)
-                    font.pixelSize: dp(15)
-                }
-
-                Text {
-                    id: text_address
-                    color: "#3600c9"
-                    text: qsTr("https://tokok.co/coin/mwc/7295hghhgh4bdfb65")
-                    elide: Text.ElideMiddle
-                    anchors.left: parent.left
-                    anchors.topMargin: dp(3)
-                    anchors.top: label_address.bottom
-                    anchors.leftMargin: dp(20)
-                    anchors.right: parent.right
-                    anchors.rightMargin: dp(20)
-                    font.pixelSize: dp(15)
-                }
-
-                Text {
-                    id: text_message
-                    color: "#3600c9"
-                    text: qsTr("This is a longer message that goes onto multiple lines...")
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    anchors.right: parent.right
-                    anchors.rightMargin: dp(30)
-                    anchors.left: parent.left
-                    anchors.topMargin: dp(3)
-                    anchors.top: label_message.bottom
-                    font.pixelSize: dp(15)
-                    anchors.leftMargin: dp(20)
-                }
-
-                Text {
-                    id: label_message
-                    color: "#3600c9"
-                    text: qsTr("message")
-                    anchors.left: parent.left
-                    anchors.topMargin: dp(20)
-                    font.bold: true
-                    anchors.top: text_address.bottom
-                    font.pixelSize: dp(15)
-                    anchors.leftMargin: dp(20)
-                }
-
-                Text {
-                    id: label_note
-                    color: "#3600c9"
-                    text: qsTr("Transaction Note")
-                    anchors.left: parent.left
-                    anchors.topMargin: dp(20)
-                    font.bold: true
-                    anchors.top: text_message.bottom
-                    anchors.leftMargin: dp(20)
-                    font.pixelSize: dp(15)
-                }
-
-                Text {
-                    id: label_note_addition
-                    color: "#3600c9"
-                    text: qsTr("Notes are private and saved locally, only visible to you.")
-                    anchors.left: parent.left
-                    anchors.topMargin: dp(3)
-                    anchors.top: label_note.bottom
-                    font.pixelSize: dp(15)
-                    anchors.leftMargin: dp(20)
-                }
-
-                TextField {
-                    id: textfield_note
-                    height: dp(44)
-                    padding: dp(10)
+                    highlighted: combobox_commitments.highlightedIndex === index
+                    topPadding: dp(10)
+                    bottomPadding: dp(10)
                     leftPadding: dp(20)
-                    font.pixelSize: dp(15)
-                    placeholderText: qsTr("note")
-                    color: "#3600C9"
-                    text: ""
-                    anchors.right: parent.right
-                    anchors.rightMargin: dp(20)
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(20)
-                    anchors.top: label_note_addition.bottom
-                    anchors.topMargin: dp(10)
-                    horizontalAlignment: Text.AlignLeft
+                    rightPadding: dp(30)
+                }
 
+                indicator: Canvas {
+                    id: canvas
+                    x: combobox_commitments.width - width - dp(10)
+                    y: combobox_commitments.topPadding + (combobox_commitments.availableHeight - height) / 2
+                    width: dp(14)
+                    height: dp(7)
+                    contextType: "2d"
+
+                    Connections {
+                        target: combobox_commitments
+                        function onPressedChanged() {
+                            canvas.requestPaint()
+                        }
+                    }
+
+                    onPaint: {
+                        context.reset()
+                        if (combobox_commitments.popup.visible) {
+                            context.moveTo(0, height)
+                            context.lineTo(width / 2, 0)
+                            context.lineTo(width, height)
+                        } else {
+                            context.moveTo(0, 0)
+                            context.lineTo(width / 2, height)
+                            context.lineTo(width, 0)
+                        }
+                        context.fillStyle = "#ffffff"
+                        context.fill()
+                    }
+                }
+
+                contentItem: Text {
+                    text: combobox_commitments.currentIndex >= 0 ? list_commitments.get(combobox_commitments.currentIndex).value : ""
+                    font: combobox_commitments.font
+                    color: "#ffffff"
+                    verticalAlignment: Text.AlignVCenter
+                    elide: Text.ElideRight
+                }
+
+                background: Rectangle {
+                    implicitHeight: dp(40)
+                    radius: dp(4)
+                    border.color: "#E2CCF7"
+                    border.width: dp(2)
+                    color: "white"
+                }
+
+                popup: Popup {
+                    y: combobox_commitments.height - 1
+                    width: combobox_commitments.width
+                    implicitHeight: contentItem.implicitHeight
+                    padding: dp(1)
+
+                    contentItem: ListView {
+                        clip: true
+                        implicitHeight: contentHeight
+                        model: combobox_commitments.popup.visible ? combobox_commitments.delegateModel : null
+                        currentIndex: combobox_commitments.highlightedIndex
+
+                        ScrollIndicator.vertical: ScrollIndicator {}
+                    }
 
                     background: Rectangle {
                         color: "white"
-                        border.color: "#E2CCF7"
+                        border.color: "#ffffff"
                         border.width: dp(2)
-                        radius: dp(4)
                     }
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            textfield_note.forceActiveFocus()
+
+                    onVisibleChanged: {
+                        if (!combobox_commitments.popup.visible) {
+                            canvas.requestPaint()
                         }
                     }
                 }
 
-                Text {
-                    id: label_kernel
-                    color: "#3600c9"
-                    text: qsTr("Transaction Kernel")
-                    anchors.left: parent.left
-                    anchors.topMargin: dp(20)
-                    font.bold: true
-                    anchors.top: textfield_note.bottom
-                    font.pixelSize: dp(15)
-                    anchors.leftMargin: dp(20)
+                model: ListModel {
+                    id: list_commitments
                 }
+                anchors.top: label_commitments.bottom
+                anchors.topMargin: dp(10)
+                anchors.right: parent.right
+                anchors.rightMargin: dp(110)
+                anchors.left: parent.left
+                anchors.leftMargin: dp(20)
+                leftPadding: dp(20)
+                rightPadding: dp(20)
+                font.pixelSize: dp(15)
+            }
 
-                Text {
-                    id: text_kernel
-                    color: "#3600c9"
-                    text: qsTr("dlfladfladufladnfladnfalfnaldfkdjshfkna3...")
-                    elide: Text.ElideRight
-                    anchors.right: parent.right
-                    anchors.rightMargin: dp(110)
-                    anchors.left: parent.left
-                    anchors.topMargin: dp(3)
-                    anchors.top: label_kernel.bottom
-                    anchors.leftMargin: dp(20)
-                    font.pixelSize: dp(15)
-                }
-
-                Button {
-                    id: button_kernel_view
-                    height: dp(35)
-                    width: dp(80)
-                    anchors.right: parent.right
-                    anchors.rightMargin: dp(20)
-                    anchors.bottom: text_kernel.bottom
-                    background: Rectangle {
-                        color: "#00000000"
-                        radius: dp(4)
-                        border.color: "#3600C9"
-                        border.width: dp(2)
-                        Text {
-                            text: qsTr("View")
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            font.pixelSize: dp(14)
-                            color: "#3600C9"
-                        }
-                    }
-
-                    onClicked: {
-                        Qt.openUrlExternally("https://" + blockExplorerUrl + "/#k" + text_kernel.text)
+            Button {
+                id: button_commitments_view
+                height: dp(35)
+                width: dp(80)
+                anchors.right: parent.right
+                anchors.rightMargin: dp(20)
+                anchors.verticalCenter: combobox_commitments.verticalCenter
+                background: Rectangle {
+                    color: "#00000000"
+                    radius: dp(4)
+                    border.color: "#ffffff"
+                    border.width: dp(2)
+                    Text {
+                        text: qsTr("View")
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: dp(14)
+                        color: "#ffffff"
                     }
                 }
 
+                onClicked: {
+                    if (combobox_commitments.currentIndex >= 0) {
+                        Qt.openUrlExternally("https://" + blockExplorerUrl + "/#o" + JSON.parse(outputs[combobox_commitments.currentIndex]).outputCommitment)
+                    }
+                }
+            }
+
+            Rectangle {
+                id: rect_output
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: combobox_commitments.bottom
+                anchors.topMargin: dp(30)
+                height: dp(90)
+                visible: combobox_commitments.currentIndex >= 0
+
                 Text {
-                    id: label_inputs
-                    color: "#3600c9"
-                    text: qsTr("Inputs")
+                    id: label_status
+                    color: "#ffffff"
+                    text: qsTr("Status")
                     anchors.left: parent.left
-                    anchors.topMargin: dp(20)
                     font.bold: true
-                    anchors.top: text_kernel.bottom
+                    anchors.top: parent.top
                     anchors.leftMargin: dp(20)
                     font.pixelSize: dp(15)
                 }
 
                 Text {
-                    id: text_inputs
-                    color: "#3600c9"
-                    text: qsTr("2")
+                    id: text_status
+                    color: "#ffffff"
+                    text: qsTr("Unspent")
                     anchors.left: parent.left
                     anchors.topMargin: dp(3)
-                    anchors.top: label_inputs.bottom
+                    anchors.top: label_status.bottom
                     font.pixelSize: dp(15)
                     anchors.leftMargin: dp(20)
                 }
 
                 Text {
-                    id: label_debited
-                    color: "#3600c9"
-                    text: qsTr("Debited")
+                    id: label_mwc
+                    color: "#ffffff"
+                    text: qsTr("MWC")
+                    font.bold: true
+                    anchors.top: parent.top
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.horizontalCenterOffset: -label_debited.width / 2
-                    anchors.topMargin: dp(20)
-                    font.bold: true
-                    anchors.top: text_kernel.bottom
                     font.pixelSize: dp(15)
                 }
 
                 Text {
-                    id: text_debited
-                    color: "#3600c9"
-                    text: qsTr("190 MWC")
-                    anchors.left: label_debited.left
+                    id: text_mwc
+                    color: "#ffffff"
+                    text: qsTr("858.4443333332")
+                    anchors.left: label_mwc.left
                     anchors.topMargin: dp(3)
-                    anchors.top: label_debited.bottom
+                    anchors.top: label_mwc.bottom
                     font.pixelSize: dp(15)
                 }
 
                 Text {
-                    id: label_outputs
-                    color: "#3600c9"
-                    text: qsTr("Change Outputs")
+                    id: label_height
+                    color: "#ffffff"
+                    text: qsTr("Height")
                     anchors.right: parent.right
-                    anchors.rightMargin: dp(40)
-                    anchors.topMargin: dp(20)
+                    anchors.rightMargin: dp(70)
                     font.bold: true
-                    anchors.top: text_kernel.bottom
+                    anchors.top: parent.top
                     font.pixelSize: dp(15)
                 }
 
                 Text {
-                    id: text_outputs
-                    color: "#3600c9"
-                    text: qsTr("1")
-                    anchors.left: label_outputs.left
+                    id: text_height
+                    color: "#ffffff"
+                    text: qsTr("345345")
+                    anchors.left: label_height.left
                     anchors.topMargin: dp(3)
-                    anchors.top: label_outputs.bottom
+                    anchors.top: label_height.bottom
                     font.pixelSize: dp(15)
                 }
 
                 Text {
-                    id: label_credited
-                    color: "#3600c9"
-                    text: qsTr("Credited")
+                    id: label_confirms
+                    color: "#ffffff"
+                    text: qsTr("Confirms")
                     anchors.left: parent.left
                     anchors.topMargin: dp(20)
                     font.bold: true
-                    anchors.top: text_inputs.bottom
+                    anchors.top: text_status.bottom
                     font.pixelSize: dp(15)
                     anchors.leftMargin: dp(20)
                 }
 
                 Text {
-                    id: text_credited
-                    color: "#3600c9"
-                    text: qsTr("100 MWC")
+                    id: text_confirms
+                    color: "#ffffff"
+                    text: qsTr("1235")
                     anchors.left: parent.left
                     anchors.topMargin: dp(3)
-                    anchors.top: label_credited.bottom
+                    anchors.top: label_confirms.bottom
                     anchors.leftMargin: dp(20)
                     font.pixelSize: dp(15)
                 }
 
                 Text {
-                    id: label_txfee
-                    color: "#3600c9"
-                    text: qsTr("Tx Fee")
-                    anchors.left: label_debited.left
+                    id: label_coinbase
+                    color: "#ffffff"
+                    text: qsTr("Coinbase")
+                    anchors.left: label_mwc.left
                     anchors.topMargin: dp(20)
                     font.bold: true
-                    anchors.top: text_inputs.bottom
+                    anchors.top: text_status.bottom
                     font.pixelSize: dp(15)
                 }
 
                 Text {
-                    id: text_txfee
-                    color: "#3600c9"
-                    text: qsTr(".005 MWC")
-                    anchors.left: label_txfee.left
+                    id: text_coinbase
+                    color: "#ffffff"
+                    text: qsTr("No")
+                    anchors.left: label_coinbase.left
                     anchors.topMargin: dp(3)
-                    anchors.top: label_txfee.bottom
+                    anchors.top: label_coinbase.bottom
                     font.pixelSize: dp(15)
-                }
-
-                Rectangle {
-                    id: rect_splitter
-                    height: dp(2)
-                    color: "#e2ccf7"
-                    anchors.top: text_txfee.bottom
-                    anchors.topMargin: dp(30)
-                    anchors.right: parent.right
-                    anchors.rightMargin: dp(50)
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(50)
                 }
 
                 Text {
-                    id: label_commitments
-                    color: "#3600c9"
-                    text: qsTr("Input/Output Commitments")
-                    anchors.left: parent.left
-                    anchors.topMargin: dp(30)
+                    id: label_txnum
+                    color: "#ffffff"
+                    text: qsTr("Tx#")
+                    anchors.left: label_height.left
+                    anchors.topMargin: dp(20)
                     font.bold: true
-                    anchors.top: rect_splitter.bottom
-                    anchors.leftMargin: dp(20)
+                    anchors.top: text_status.bottom
                     font.pixelSize: dp(15)
                 }
 
-                ComboBox {
-                    id: combobox_commitments
+                Text {
+                    id: text_txnum
+                    color: "#ffffff"
+                    text: qsTr("14")
+                    anchors.left: label_txnum.left
+                    anchors.topMargin: dp(3)
+                    anchors.top: label_txnum.bottom
+                    font.pixelSize: dp(15)
+                }
+            }
 
-                    onCurrentIndexChanged: {
-                        if (combobox_commitments.currentIndex >= 0) {
-                            updateOutputData()
-                        }
-                    }
-
-                    delegate: ItemDelegate {
-                        width: combobox_commitments.width
-                        contentItem: Text {
-                            text: value
-                            color: "#3600C9"
-                            font: combobox_commitments.font
-                            elide: Text.ElideRight
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        highlighted: combobox_commitments.highlightedIndex === index
-                        topPadding: dp(10)
-                        bottomPadding: dp(10)
-                        leftPadding: dp(20)
-                        rightPadding: dp(30)
-                    }
-
-                    indicator: Canvas {
-                        id: canvas
-                        x: combobox_commitments.width - width - dp(10)
-                        y: combobox_commitments.topPadding + (combobox_commitments.availableHeight - height) / 2
-                        width: dp(14)
-                        height: dp(7)
-                        contextType: "2d"
-
-                        Connections {
-                            target: combobox_commitments
-                            function onPressedChanged() { canvas.requestPaint() }
-                        }
-
-                        onPaint: {
-                            context.reset()
-                            if (combobox_commitments.popup.visible) {
-                                context.moveTo(0, height)
-                                context.lineTo(width / 2, 0)
-                                context.lineTo(width, height)
-                            } else {
-                                context.moveTo(0, 0)
-                                context.lineTo(width / 2, height)
-                                context.lineTo(width, 0)
-                            }
-                            context.fillStyle = "#3600C9"
-                            context.fill()
-                        }
-                    }
-
-                    contentItem: Text {
-                        text: combobox_commitments.currentIndex >= 0 ? list_commitments.get(combobox_commitments.currentIndex).value : ""
-                        font: combobox_commitments.font
-                        color: "#3600C9"
-                        verticalAlignment: Text.AlignVCenter
-                        elide: Text.ElideRight
-                    }
-
-                    background: Rectangle {
-                        implicitHeight: dp(40)
-                        radius: dp(4)
-                        border.color: "#E2CCF7"
-                        border.width: dp(2)
+            Button {
+                id: button_ok
+                height: dp(40)
+                width: dp(135)
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: rect_output.visible ? rect_output.bottom : combobox_commitments.bottom
+                anchors.topMargin: dp(30)
+                background: Rectangle {
+                    color: "#6F00D6"
+                    radius: dp(4)
+                    Text {
+                        text: qsTr("OK")
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: dp(15)
                         color: "white"
                     }
-
-                    popup: Popup {
-                        y: combobox_commitments.height - 1
-                        width: combobox_commitments.width
-                        implicitHeight: contentItem.implicitHeight
-                        padding: dp(1)
-
-                        contentItem: ListView {
-                            clip: true
-                            implicitHeight: contentHeight
-                            model: combobox_commitments.popup.visible ? combobox_commitments.delegateModel : null
-                            currentIndex: combobox_commitments.highlightedIndex
-
-                            ScrollIndicator.vertical: ScrollIndicator { }
-                        }
-
-                        background: Rectangle {
-                            color: "white"
-                            border.color: "#3600C9"
-                            border.width: dp(2)
-                        }
-
-                        onVisibleChanged: {
-                            if (!combobox_commitments.popup.visible) {
-                                canvas.requestPaint()
-                            }
-                        }
-                    }
-
-                    model: ListModel {
-                        id: list_commitments
-                    }
-                    anchors.top: label_commitments.bottom
-                    anchors.topMargin: dp(10)
-                    anchors.right: parent.right
-                    anchors.rightMargin: dp(110)
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(20)
-                    leftPadding: dp(20)
-                    rightPadding: dp(20)
-                    font.pixelSize: dp(15)
                 }
 
-                Button {
-                    id: button_commitments_view
-                    height: dp(35)
-                    width: dp(80)
-                    anchors.right: parent.right
-                    anchors.rightMargin: dp(20)
-                    anchors.verticalCenter: combobox_commitments.verticalCenter
-                    background: Rectangle {
-                        color: "#00000000"
-                        radius: dp(4)
-                        border.color: "#3600C9"
-                        border.width: dp(2)
-                        Text {
-                            text: qsTr("View")
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            font.pixelSize: dp(14)
-                            color: "#3600C9"
-                        }
-                    }
-
-                    onClicked: {
-                        if (combobox_commitments.currentIndex >= 0) {
-                            Qt.openUrlExternally("https://" + blockExplorerUrl + "/#o" + JSON.parse(outputs[combobox_commitments.currentIndex]).outputCommitment )
-                        }
-                    }
-                }
-
-                Rectangle {
-                    id: rect_output
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.top: combobox_commitments.bottom
-                    anchors.topMargin: dp(30)
-                    height: dp(90)
-                    visible: combobox_commitments.currentIndex >= 0
-
-                    Text {
-                        id: label_status
-                        color: "#3600c9"
-                        text: qsTr("Status")
-                        anchors.left: parent.left
-                        font.bold: true
-                        anchors.top: parent.top
-                        anchors.leftMargin: dp(20)
-                        font.pixelSize: dp(15)
-                    }
-
-                    Text {
-                        id: text_status
-                        color: "#3600c9"
-                        text: qsTr("Unspent")
-                        anchors.left: parent.left
-                        anchors.topMargin: dp(3)
-                        anchors.top: label_status.bottom
-                        font.pixelSize: dp(15)
-                        anchors.leftMargin: dp(20)
-                    }
-
-                    Text {
-                        id: label_mwc
-                        color: "#3600c9"
-                        text: qsTr("MWC")
-                        font.bold: true
-                        anchors.top: parent.top
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.horizontalCenterOffset: -label_debited.width / 2
-                        font.pixelSize: dp(15)
-                    }
-
-                    Text {
-                        id: text_mwc
-                        color: "#3600c9"
-                        text: qsTr("858.4443333332")
-                        anchors.left: label_mwc.left
-                        anchors.topMargin: dp(3)
-                        anchors.top: label_mwc.bottom
-                        font.pixelSize: dp(15)
-                    }
-
-                    Text {
-                        id: label_height
-                        color: "#3600c9"
-                        text: qsTr("Height")
-                        anchors.right: parent.right
-                        anchors.rightMargin: dp(70)
-                        font.bold: true
-                        anchors.top: parent.top
-                        font.pixelSize: dp(15)
-                    }
-
-                    Text {
-                        id: text_height
-                        color: "#3600c9"
-                        text: qsTr("345345")
-                        anchors.left: label_height.left
-                        anchors.topMargin: dp(3)
-                        anchors.top: label_height.bottom
-                        font.pixelSize: dp(15)
-                    }
-
-                    Text {
-                        id: label_confirms
-                        color: "#3600c9"
-                        text: qsTr("Confirms")
-                        anchors.left: parent.left
-                        anchors.topMargin: dp(20)
-                        font.bold: true
-                        anchors.top: text_status.bottom
-                        font.pixelSize: dp(15)
-                        anchors.leftMargin: dp(20)
-                    }
-
-                    Text {
-                        id: text_confirms
-                        color: "#3600c9"
-                        text: qsTr("1235")
-                        anchors.left: parent.left
-                        anchors.topMargin: dp(3)
-                        anchors.top: label_confirms.bottom
-                        anchors.leftMargin: dp(20)
-                        font.pixelSize: dp(15)
-                    }
-
-                    Text {
-                        id: label_coinbase
-                        color: "#3600c9"
-                        text: qsTr("Coinbase")
-                        anchors.left: label_mwc.left
-                        anchors.topMargin: dp(20)
-                        font.bold: true
-                        anchors.top: text_status.bottom
-                        font.pixelSize: dp(15)
-                    }
-
-                    Text {
-                        id: text_coinbase
-                        color: "#3600c9"
-                        text: qsTr("No")
-                        anchors.left: label_coinbase.left
-                        anchors.topMargin: dp(3)
-                        anchors.top: label_coinbase.bottom
-                        font.pixelSize: dp(15)
-                    }
-
-                    Text {
-                        id: label_txnum
-                        color: "#3600c9"
-                        text: qsTr("Tx#")
-                        anchors.left: label_height.left
-                        anchors.topMargin: dp(20)
-                        font.bold: true
-                        anchors.top: text_status.bottom
-                        font.pixelSize: dp(15)
-                    }
-
-                    Text {
-                        id: text_txnum
-                        color: "#3600c9"
-                        text: qsTr("14")
-                        anchors.left: label_txnum.left
-                        anchors.topMargin: dp(3)
-                        anchors.top: label_txnum.bottom
-                        font.pixelSize: dp(15)
-                    }
-                }
-
-                Button {
-                    id: button_ok
-                    height: dp(40)
-                    width: dp(135)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: rect_output.visible ? rect_output.bottom : combobox_commitments.bottom
-                    anchors.topMargin: dp(30)
-                    background: Rectangle {
-                        color: "#6F00D6"
-                        radius: dp(4)
-                        Text {
-                            text: qsTr("OK")
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            font.pixelSize: dp(15)
-                            color: "white"
-                        }
-                    }
-
-                    onClicked: {
-                        saveTransactionNote(textfield_note.text)
-                        transactionDetail.visible = false
-                    }
+                onClicked: {
+                    saveTransactionNote(textfield_note.text)
+                    transactionDetail.visible = false
                 }
             }
         }

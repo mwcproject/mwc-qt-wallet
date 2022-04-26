@@ -1,5 +1,5 @@
 import QtQuick 2.4
-import QtQuick.Controls 2.13
+import QtQuick.Controls 2.4
 import QtQuick.Window 2.0
 
 Item {
@@ -17,12 +17,11 @@ Item {
 
     Image {
         id: image_logo
-        width: dp(200)
-        height: dp(30)
+        width: dp(105)
         fillMode: Image.PreserveAspectFit
-        source: "../img/BigLogo@2x.svg"
+        source: "../img/mwc-logo.svg"
         anchors.top: parent.top
-        anchors.topMargin: dp(100)
+        anchors.topMargin: dp(50)
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
@@ -33,7 +32,7 @@ Item {
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.top: parent.top
-        anchors.topMargin: dp(140)
+        anchors.topMargin: dp(110)
 
         InitAccount {
             id: initAccountItem
