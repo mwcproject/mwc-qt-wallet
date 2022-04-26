@@ -39,6 +39,7 @@
         <file>img/iconLock@2x.svg</file>
         <file>img/iconLock_Blue@2x.svg</file>
         <file>img/Left@2x.svg</file>
+        <file>img/logout.svg</file>
         <file>img/loading.gif</file>
         <file>img/MessageBox_Close@2x.svg</file>
         <file>img/NavAccount@2x.svg</file>
@@ -107,7 +108,6 @@
         <file>help_mobile/transactions.html</file>
         <file>help_mobile/select_mode.html</file>
         <file>windows_mobile/NavigationDrawer.qml</file>
-        <file>windows_mobile/Navbar.qml</file>
         <file>windows_mobile/MessageBox.qml</file>
         <file>windows_mobile/Receive.qml</file>
         <file>windows_mobile/Notification.qml</file>
@@ -140,7 +140,6 @@
         <file>windows_mobile/Outputs.qml</file>
         <file>windows_mobile/OutputDetail.qml</file>
         <file>windows_mobile/WalletConfig.qml</file>
-        <file>windows_mobile/Accounts.qml</file>
         <file>windows_mobile/InputDlg.qml</file>
         <file>windows_mobile/AccountTransfer.qml</file>
         <file>windows_mobile/NodeInfo.qml</file>
@@ -154,6 +153,91 @@
         <file>windows_mobile/FileTransactionFinalize.qml</file>
         <file>windows_mobile/WalletStoppingMessageDlg.qml</file>
         <file>windows_mobile/ShowProofDlg.qml</file>
-        <file>windows_mobile/TextFieldCursor.qml</file>
+        <file>windows_mobile/Style.qml</file>
+        <file>img/wallet.svg</file>
+        <file>img/list.svg</file>
+        <file>img/setting.svg</file>
+        <file>img/account.svg</file>
+        <file>img/notification.svg</file>
+        <file>img/mwc-logo.svg</file>
+        <file>img/eye.svg</file>
+        <file>windows_mobile/models/TextFieldCursor.qml</file>
+        <file>windows_mobile/models/PasswordField.qml</file>
+        <file>windows_mobile/models/RowButton.qml</file>
+        <file>windows_mobile/models/ConfirmButton.qml</file>
+        <file>windows_mobile/models/SeedInput.qml</file>
+        <file>img/hourglass.svg</file>
+        <file>img/lock.svg</file>
+        <file>img/arrow.svg</file>
+        <file>img/menu.svg</file>
+        <file>img/check.svg</file>
+        <file>img/plus.svg</file>
+        <file>img/remove.svg</file>
+        <file>windows_mobile/models/ImageColor.qml</file>
+        <file>img/edit.svg</file>
+        <file>img/listener.svg</file>
+        <file>windows_mobile/models/SendType.qml</file>
+        <file>windows_mobile/models/AddressField.qml</file>
+        <file>img/contact.svg</file>
+        <file>img/qrcode.svg</file>
+        <file>windows_mobile/models/AmountField.qml</file>
+        <file>windows_mobile/NavbarTop.qml</file>
+        <file>windows_mobile/NavbarBottom.qml</file>
+        <file>img/online.svg</file>
+        <file>img/file.svg</file>
+        <file>img/slate.svg</file>
+        <file>img/list-contact.svg</file>
+        <file>img/copy.svg</file>
+        <file>img/qr.svg</file>
+        <file>windows_mobile/QrCode.qml</file>
+        <file>windows_mobile/models/ImageQrCode.qml</file>
+        <file>img/swap.svg</file>
+        <file>windows_mobile/models/SearchField.qml</file>
+        <file>font/Barlow-Black.ttf</file>
+        <file>font/Barlow-BlackItalic.ttf</file>
+        <file>font/Barlow-Bold.ttf</file>
+        <file>font/Barlow-BoldItalic.ttf</file>
+        <file>font/Barlow-ExtraBold.ttf</file>
+        <file>font/Barlow-ExtraBoldItalic.ttf</file>
+        <file>font/Barlow-ExtraLight.ttf</file>
+        <file>font/Barlow-ExtraLightItalic.ttf</file>
+        <file>font/Barlow-Italic.ttf</file>
+        <file>font/Barlow-Light.ttf</file>
+        <file>font/Barlow-LightItalic.ttf</file>
+        <file>font/Barlow-Medium.ttf</file>
+        <file>font/Barlow-MediumItalic.ttf</file>
+        <file>font/Barlow-Regular.ttf</file>
+        <file>font/Barlow-SemiBold.ttf</file>
+        <file>font/Barlow-SemiBoldItalic.ttf</file>
+        <file>font/Barlow-Thin.ttf</file>
+        <file>font/Barlow-ThinItalic.ttf</file>
+        <file>font/OFL.txt</file>
+        <file>windows_mobile/MyFont.qml</file>
+        <file>windows_mobile/models/Dark.qml</file>
+        <file>windows_mobile/models/Light.qml</file>
+        <file>windows_mobile/models/PopupCustom.qml</file>
+        <file>windows_mobile/models/ToggleButton.qml</file>
+        <file>windows_mobile/models/ToggleSwitch.qml</file>
+        <file>i18n/mwc_base.qm</file>
+        <file>i18n/mwc_base.ts</file>
+        <file>i18n/mwc_en.qm</file>
+        <file>i18n/mwc_en.ts</file>
+        <file>i18n/mwc_fr.qm</file>
+        <file>i18n/mwc_fr.ts</file>
+        <file>i18n/mwc_ar.ts</file>
+        <file>i18n/mwc_bn.ts</file>
+        <file>i18n/mwc_cs.ts</file>
+        <file>i18n/mwc_de.ts</file>
+        <file>i18n/mwc_es.ts</file>
+        <file>i18n/mwc_fa.ts</file>
+        <file>i18n/mwc_he.ts</file>
+        <file>i18n/mwc_id.ts</file>
+        <file>i18n/mwc_it.ts</file>
+        <file>i18n/mwc_ja.ts</file>
+        <file>i18n/mwc_ko.ts</file>
+        <file>i18n/mwc_pt.ts</file>
+        <file>i18n/mwc_ru.ts</file>
+        <file>i18n/mwc_vi.ts</file>
+        <file>i18n/mwc_zh.ts</file>
     </qresource>
 </RCC>
