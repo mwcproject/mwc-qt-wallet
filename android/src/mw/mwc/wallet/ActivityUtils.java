@@ -10,9 +10,20 @@ import android.content.IntentFilter;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.net.Uri;
-import android.support.v4.content.ContextCompat; 
+import android.support.v4.content.ContextCompat;
 import android.widget.Toast; 
 import android.content.pm.PackageManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.graphics.Color;
+import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
+import android.app.Service;
+
+
+
 // import java.util.Timer;
 // import java.util.TimerTask;
 
@@ -33,7 +44,7 @@ public class ActivityUtils {
 
         checkPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, 100);
         checkPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE, 100);
-
+        
 /*        // Requesting permissions
         Intent intent = new Intent();
         String packageName = context.getPackageName();
@@ -59,6 +70,39 @@ public class ActivityUtils {
             ((Activity)context).requestPermissions(new String[] { permission }, requestCode); 
         } 
     } 
+
+    public void notify(Context context, String message) {
+        try {
+            NotificationManager m_notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+            Notification.Builder m_builder;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                int importance = NotificationManager.IMPORTANCE_HIGH;
+                NotificationChannel notificationChannel = new NotificationChannel("MWC", "MWC Notifier", importance);
+                m_notificationManager.createNotificationChannel(notificationChannel);
+                m_builder = new Notification.Builder(context, notificationChannel.getId());
+            } else {
+                m_builder = new Notification.Builder(context);
+            }
+            m_builder.setSmallIcon(R.drawable.icon)
+                    //.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.icon))
+                    .setContentTitle("MWC Wallet")
+                    .setContentText(message)
+                    .setDefaults(Notification.DEFAULT_SOUND)
+                    .setColor(Color.BLUE)
+                    .setAutoCancel(true)
+                    .setContentIntent(PendingIntent.getActivity(
+                        context,
+                        0,
+                        context.getPackageManager().getLaunchIntentForPackage("mw.mwc.wallet"),
+                        PendingIntent.FLAG_MUTABLE));
+
+            m_notificationManager.notify(0, m_builder.build());
+            Log.i(TAG, "Notification sent");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private BroadcastReceiver serviceMessageReceiver = new BroadcastReceiver() {
         @Override

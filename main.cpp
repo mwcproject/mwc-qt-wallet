@@ -94,6 +94,7 @@
 
 #ifdef WALLET_MOBILE
 #include <QQmlApplicationEngine>
+#include <QTranslator>
 #endif
 
 #ifdef Q_OS_DARWIN
@@ -416,6 +417,10 @@ int main(int argc, char *argv[])
 #endif
 
         core::WalletApp app(argc, argv);
+        QTranslator translator;
+        if (translator.load(QLocale(), QLatin1String("mwc"), QLatin1String("_"), QLatin1String(":/i18n"))) {
+                app.installTranslator(&translator);
+        }
 
         if (!deployWalletFilesFromResources() ) {
             QMessageBox::critical(nullptr, "Error", "Unable to provision or verify resource files during the first run");
@@ -514,7 +519,8 @@ int main(int argc, char *argv[])
         // wallet::MockWallet * wallet = new wallet::MockWallet(&appContext);
         wallet::MWC713 * wallet = new wallet::MWC713( config::getWallet713path(), config::getMwc713conf(), &appContext, mwcNode );
         QtAndroidService *qtAndroidService = new QtAndroidService(&app);
-        qtAndroidService->sendToService("Start Service");
+        qtAndroidService->setBarAndroid(0xff4d1d4f, 0xff181818, false);
+        qtAndroidService->sendToService("Start Service Test");
 #endif
 
         state::StateContext context( &appContext, wallet, mwcNode );
