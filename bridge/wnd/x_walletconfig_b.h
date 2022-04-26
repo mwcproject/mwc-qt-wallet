@@ -55,6 +55,12 @@ public:
     Q_INVOKABLE int getDefaultInputConfirmationsNumber();
     Q_INVOKABLE int getDefaultChangeOutputs();
 
+    Q_INVOKABLE int getPriceCurrency();
+    Q_INVOKABLE void setPriceCurrency(int language);
+
+    Q_INVOKABLE int getLanguage();
+    Q_INVOKABLE void setLanguage(int language);
+
     // Update settings
     Q_INVOKABLE void setSendCoinsParams(int inputConfirmationsNumber, int changeOutputs);
     Q_INVOKABLE void updateWalletLogsEnabled(bool logsEnabled, bool needCleanupLogs);

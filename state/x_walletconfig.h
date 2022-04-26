@@ -55,6 +55,12 @@ public:
     bool getNotificationWindowsEnabled();
     void setNotificationWindowsEnabled(bool enabled);
 
+    int getPriceCurrency();
+    void setPriceCurrency(int currency);
+
+    int getLanguage();
+    void setLanguage(int language);
+
     bool updateTimeoutValue(int timeout);
 
     // Locked if currently some settigns are waiting for applying

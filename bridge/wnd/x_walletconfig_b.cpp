@@ -82,6 +82,23 @@ bool WalletConfig::isOutputLockingEnabled() {
     return getState()->isOutputLockingEnabled();
 }
 
+int WalletConfig::getPriceCurrency() {
+    return getState()->getPriceCurrency();
+}
+
+void WalletConfig::setPriceCurrency(int currency) {
+    return getState()->setPriceCurrency(currency);
+}
+
+int WalletConfig::getLanguage() {
+    return getState()->getLanguage();
+}
+
+void WalletConfig::setLanguage(int language) {
+    return getState()->setLanguage(language);
+}
+
+
 bool WalletConfig::getNotificationWindowsEnabled() {
     return getState()->getNotificationWindowsEnabled();
 }
@@ -163,6 +180,11 @@ bool WalletConfig::updateWalletConfig( QString mwcmqsDomain, QString _keyBasePat
     config.setDataWalletCfg(mwcmqsDomain);
     return getState()->setWalletConfig(config, need2updateGuiSize);
 }
+
+/*
+int WalletConfig::getPriceCurrency() {
+    return getWallet()->getP
+}*/
 
 
 }
