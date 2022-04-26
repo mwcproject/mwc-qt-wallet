@@ -37,6 +37,7 @@ public:
     void ftBack();
     void receiveFile(QString uriFileName, QString description);
     void receiveSlatepack(QString slatepack, QString description);
+    void showQrCode( QString typeAddress, QString address);
 
     bool needResultTxFileName() {return false;}
 

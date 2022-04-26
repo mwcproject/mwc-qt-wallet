@@ -52,7 +52,7 @@ public:
     void doneWithNewSeed();
 
     // Single Word verification
-    void submitSeedWord(QString word);
+    void submitSeedWord(QVector<QString> testSeedInput, bool skip);
 
     // Restart seed verification
     void restartSeedVerification();

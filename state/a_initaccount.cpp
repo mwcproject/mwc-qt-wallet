@@ -27,6 +27,7 @@
 #include "../core/WndManager.h"
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/z_progresswnd_b.h"
+#include "../core/notificationclient.h"
 #include <QDir>
 
 namespace state {
@@ -143,7 +144,6 @@ void InitAccount::submitWalletCreateChoices( MWC_NETWORK network, QString instan
     // Apply network first
     Q_ASSERT( !context->wallet->isRunning() );
     QString path = context->appContext->getCurrentWalletInstance(false);
-
     wallet::WalletConfig walletCfg = context->wallet->getWalletConfig();
     QString nwName = network == MWC_NETWORK::MWC_MAIN_NET ? "Mainnet" : "Floonet";
     walletCfg.updateNetwork(nwName);
@@ -185,7 +185,7 @@ void InitAccount::generateWordTasks() {
     tasks = core::generateSeedTasks( seed,0, seed.length() ); // generate tasks
 #endif
 #ifdef WALLET_MOBILE
-    tasks = core::generateSeedTasks( seed, 0, std::min(6, seed.length()) ); // generate tasks
+    tasks = core::generateSeedTasks( seed, 0, seed.length()/2 ); // generate tasks
 #endif
     Q_ASSERT(tasks.size()>0);
 
@@ -203,18 +203,35 @@ void InitAccount::doneWithNewSeed() {
     if (tasks.size()==0)
         return;
 
+    QVector<int> testWordsIndex;
+    for ( int i=0; i<tasks.size(); i++) {
+        int wordsIndex= tasks[i].getWordIndex();
+        testWordsIndex.append(wordsIndex);
+    }
+
     // Show verify dialog
-    core::getWndManager()->pageNewSeedTest( tasks[0].getWordIndex() );
+    core::getWndManager()->pageNewSeedTest(testWordsIndex);
     currentPage = InitAccountPage::PageNewSeedTest;
 }
 
 
 // Verify Dialog respond...
-void InitAccount::submitSeedWord(QString word) {
-    if (tasks.size()==0) {
+void InitAccount::submitSeedWord(QVector<QString> testSeedInput, bool skip=false) {
+    qDebug() << "testSeedInput: " << testSeedInput;
+    QVector<int> invalidWords;
+
+    for ( int i=0; i<tasks.size(); i++) {
+        QString testWord = testSeedInput[i].toLower();
+        qDebug() << "testSeedInput: " << testSeedInput;
+        if (!tasks[i].applyInputResults(testWord)) {
+            int invalidWordIndex = tasks[i].getWordIndex();
+            invalidWords.append(invalidWordIndex);
+         }
+    }
+    /*if (==0) {
         Q_ASSERT(false);
         return;
-    }
+    }*/
 
 /*#ifdef QT_DEBUG
     // Allways treat as correct answer and don't ask more...
@@ -222,46 +239,24 @@ void InitAccount::submitSeedWord(QString word) {
 //    tasks.remove(0);
     tasks.clear();
 #else*/
-    // Release, the normal way
-    if (tasks[0].applyInputResults(word)) {
-        // ok case
-        tasks.remove(0);
-        // retry with submit call
-    }
-    else {
-        seedTestWrongAnswers++;
-        bool restart = seedTestWrongAnswers>=3;
-
-        core::getWndManager()->messageTextDlg("Wrong word",
-                                     "The word number " + QString::number(tasks[0].getWordIndex()) +
-                                     " was typed incorrectly. " +
-                                     "Please review your passphrase and we will try again starting " +
-                                     (restart ? "from the beginning." : "where we left off.") );
-
-        // regenerate if totally failed
-        //  Test on per word basis. Used for random words order.  if (tasks[0].isTestCompletelyFailed()) {
-        if (restart) {
-            // generate a new tasks for a wallet
-            generateWordTasks();
-        } else {
-         /* In case of random order, put the failed order at the end of the Q.
-            // add to the Q
-            tasks.push_back( tasks[0] );
-            tasks.remove(0);*/
-
-           // normal order - for desktop do nothing.
-           // For mobile wallet we need to change the tasks
-#ifdef WALLET_MOBILE
-            tasks = core::generateSeedTasks( seed, tasks[0].getWordIndex(), tasks.length()); // generate tasks
-#endif
+    if (!invalidWords.empty() && !skip){
+        bool plural = invalidWords.size() != 1;
+        QString idx = "";
+        for (int i = 0; i < invalidWords.size(); i++) {
+            idx += " " + QString::number(invalidWords[i]);
         }
 
-        // switch to 'show seed' window
+        core::getWndManager()->messageTextDlg("Wrong word",
+                                     "The " + QString(plural? "words":"word") + " number " + idx + QString(plural? " were":" was") +
+                                     " typed incorrectly. " +
+                                     "Please review your passphrase and we will try again starting from the beginning.");
+        generateWordTasks();
         core::getWndManager()->pageNewSeed(mwc::PAGE_A_NEW_WALLET_PASSPHRASE, seed);
         currentPage = InitAccountPage::PageNewSeed;
         return;
+    } else {
+        tasks.clear();
     }
-//#endif
     doneWithNewSeed();
 }
 

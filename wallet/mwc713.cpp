@@ -302,9 +302,8 @@ void MWC713::start2init(QString password, bool isShortSeed) {
 
     QStringList paramsPlus {"init"};
 
-    if (isShortSeed){
+    if (isShortSeed)
         paramsPlus.append("--short");
-    }
 
     // Creating process and starting
 
