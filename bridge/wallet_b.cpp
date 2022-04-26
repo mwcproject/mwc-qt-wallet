@@ -308,13 +308,24 @@ QString Wallet::getTotalMwcAmount() {
 
     int64_t mwcSum = 0;
     for ( const auto & ai : balance ) {
-        mwcSum += ai.total;
+        mwcSum += ai.currentlySpendable;
     }
 
     return util::trimStrAsDouble( util::nano2one(mwcSum), 5);
 }
 
-// return Total MWC amount as String
+QString Wallet::getSpendableMwcAmount() {
+    QVector<wallet::AccountInfo> balance = getWallet()->getWalletBalance();
+
+    int64_t mwcSum = 0;
+    for ( const auto & ai : balance ) {
+        mwcSum += ai.currentlySpendable;
+    }
+
+    return util::trimStrAsDouble( util::nano2one(mwcSum), 5);
+}
+
+// return Unconfirmed MWC amount as String
 QString Wallet::getUnconfirmedAmount() {
     QVector<wallet::AccountInfo> balance = getWallet()->getWalletBalance();
 
@@ -325,6 +336,17 @@ QString Wallet::getUnconfirmedAmount() {
 
     if (mwcSum==0)
         return "";
+
+    return util::trimStrAsDouble( util::nano2one(mwcSum), 5);
+}
+
+QString Wallet::getLockedMwcAmount() {
+    QVector<wallet::AccountInfo> balance = getWallet()->getWalletBalance();
+
+    int64_t mwcSum = 0;
+    for ( const auto & ai : balance ) {
+        mwcSum += ai.lockedByPrevTransaction;
+    }
 
     return util::trimStrAsDouble( util::nano2one(mwcSum), 5);
 }
