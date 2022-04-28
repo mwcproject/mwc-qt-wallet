@@ -154,11 +154,19 @@ public:
 
     // ----- Price Currency
     int getPriceCurrency() const {return priceCurrency;}
-    void setPriceCurrency(int currency);//{ priceCurrency=currency; }
+    void setPriceCurrency(int currency);
 
-    // ----- Price Currency
+    // ----- Wallet Language
     int getLanguage() const {return walletLanguage;}
-    void setLanguage(int language);//{ priceCurrency=currency; }
+    void setLanguage(int language);
+
+    // ----- Dark Mode
+    bool getDarkModeEnabled() const {return walletDarkModeEnabled;}
+    void setDarkModeEnabled(bool enable);
+
+    // ----- Android Notification
+    bool getNotificationAndroidEnabled() const {return walletNotificationAndroidEnabled;}
+    void setNotificationAndroidEnabled(bool enable);
 
     // HODL registration time.
     int64_t getHodlRegistrationTime(const QString & hash) const;
@@ -393,6 +401,10 @@ private:
     int priceCurrency = 0; // 0 - usd, 1 - eur, 2 - gbp, 3 - aud, 4 - yen, 5 - cny, 6 - rub, 7 - btc, 8 - eth, 9 - ltc, 10 - xmr
 
     int walletLanguage = 0; // 0 - en, 1 - es, 2 - cn, 3 - ru, 4 - kr, 5 - cny, 6 - rub, 7 - btc, 8 - eth, 9 - ltc, 10 - xmr
+
+    bool walletDarkModeEnabled = true;
+
+    bool walletNotificationAndroidEnabled = true;
 
 };
 

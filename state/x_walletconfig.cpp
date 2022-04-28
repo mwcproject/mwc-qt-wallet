@@ -184,6 +184,22 @@ void WalletConfig::setLanguage(int language) {
     context->appContext->setLanguage(language);
 }
 
+bool  WalletConfig::getDarkModeEnabled() {
+    return context->appContext->getDarkModeEnabled();
+}
+
+void WalletConfig::setDarkModeEnabled(bool enable) {
+    context->appContext->setDarkModeEnabled(enable);
+}
+
+bool  WalletConfig::getNotificationAndroidEnabled() {
+    return context->appContext->getNotificationAndroidEnabled();
+}
+
+void WalletConfig::setNotificationAndroidEnabled(bool enable) {
+    context->appContext->setNotificationAndroidEnabled(enable);
+}
+
 bool WalletConfig::updateTimeoutValue(int timeout) {
     util::ConfigReader reader;
     QString configFN = config::getMwcGuiWalletConf();

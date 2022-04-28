@@ -181,7 +181,7 @@ bool AppContext::loadDataImpl() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x47A7)
+    if (id<0x4783 || id>0x47A9)
          return false;
 
     QString mockStr;
@@ -391,6 +391,15 @@ bool AppContext::loadDataImpl() {
         in >> walletLanguage;
     }
 
+    if (id>=0x47A8) {
+        in >> walletDarkModeEnabled;
+    }
+
+    if (id>=0x47A9) {
+        in >> walletNotificationAndroidEnabled;
+    }
+
+
     return true;
 }
 
@@ -418,7 +427,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x47A7;
+    out << 0x47A9;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -526,6 +535,11 @@ void AppContext::saveData() const {
     out << priceCurrency; // Price currency (usd, btc, etc...)
 
     out << walletLanguage; // Price currency (usd, btc, etc...)
+
+    out << walletDarkModeEnabled; // Dark mode enabled
+
+    out << walletNotificationAndroidEnabled; // Send Android notification enabled
+
 
 }
 
@@ -731,6 +745,21 @@ void AppContext::setLanguage(int language) {
     if (language == walletLanguage)
         return;
     walletLanguage = language;
+    saveData();
+}
+
+
+void AppContext::setDarkModeEnabled(bool enable) {
+    if (enable == walletDarkModeEnabled)
+        return;
+     walletDarkModeEnabled = enable;
+    saveData();
+}
+
+void AppContext::setNotificationAndroidEnabled(bool enable) {
+    if (enable == walletNotificationAndroidEnabled)
+        return;
+    walletNotificationAndroidEnabled = enable;
     saveData();
 }
 
