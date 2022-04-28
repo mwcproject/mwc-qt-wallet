@@ -239,5 +239,16 @@
         <file>i18n/mwc_ru.ts</file>
         <file>i18n/mwc_vi.ts</file>
         <file>i18n/mwc_zh.ts</file>
+        <file>img/option.svg</file>
+        <file>windows_mobile/Theme.qml</file>
+        <file>windows_mobile/qmldir</file>
+        <file>windows_mobile/models/ProgressCircle.qml</file>
+        <file>windows_mobile/models/SecondaryButton.qml</file>
+        <file>img/invisible.svg</file>
+        <file>img/visibility.svg</file>
+        <file>img/key.svg</file>
+        <file>img/language.svg</file>
+        <file>img/node.svg</file>
+        <file>img/dark.svg</file>
     </qresource>
 </RCC>
