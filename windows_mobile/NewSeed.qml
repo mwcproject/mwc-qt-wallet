@@ -11,16 +11,14 @@ Item {
 
     property bool isLongSeed: true
     property var seedWords: undefined
-    //property int seedLenght: undefined
-    //property string seedWords: ""
+    property bool isInit: false
 
     function init(seed, hideSubmitButton) {
+        isInit = true
         const words = seed.split(" ")
         seedWords = words.slice(0, words.length-1)
         button_next.visible = !hideSubmitButton
     }
-
-
 
     NewSeedBridge {
         id: newSeed
@@ -33,27 +31,69 @@ Item {
     Connections {
         target: newSeed
         onSgnShowSeedData: (seed) => {
+            isInit = false
             if (seed.length < 2) {
                 messagebox.open(qsTr("Getting Passphrase Failure"), qsTr("Unable to retrieve a passphrase from mwc713. " + (seed.length > 0 ? seed[0] : "")))
                 return;
             }
-            setTextSeed(seed)
+            seedWords = seed.slice(0, seed.length)
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        gradient: Gradient {
+            orientation: Gradient.Vertical
+            GradientStop {
+                position: 0
+                color: isDarkMode? Theme.gradientTop : Theme.red
+            }
+
+            GradientStop {
+                position: 0.2
+                color: Theme.gradientBottom
+            }
         }
     }
 
     Text {
         id: title
+        color: "#ffffff"
+        text: qsTr("Seed Words")
         anchors.top: parent.top
-        anchors.topMargin: dp(30)
-        text: "Seed Words"
-        font.pixelSize: dp(22)
+        anchors.topMargin: dp(15)
+        anchors.horizontalCenter: parent.horizontalCenter
         font.bold: true
-        color: "white"
-        width: parent.width
-        //elide: Text.ElideMiddle
-        horizontalAlignment: Text.AlignHCenter
-        wrapMode: Text.WrapAnywhere
+        font.pixelSize: dp(18)
+        font.letterSpacing: dp(0.5)
+        font.capitalization:Font.AllUppercase
+        font.family: barlow.medium
+    }
 
+    Rectangle {
+        height: parent.height/28
+        width: height
+        anchors.left: parent.left
+        anchors.leftMargin:  dp(15)
+        anchors.verticalCenter: title.verticalCenter
+        visible: isInit? false: true
+        color: "#00000000"
+
+        ImageColor {
+            img_source: "../img/arrow.svg"
+            img_height: parent.height
+            img_color: "white"
+            img_rotation: 180
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
+
+        }
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                stateMachine.returnBack()
+            }
+        }
     }
 
     Text {
@@ -61,7 +101,7 @@ Item {
         width: parent.width
         anchors.top: title.bottom
         padding: dp(25)
-        text: qsTr("Please save these words on paper (order is important). This passphrase will allow you to recover your wallet in case of computer failure.")
+        text: qsTr("Please save these words on paper in the good order.\n This passphrase will allow you to recover your wallet in case of computer failure.")
         font.pixelSize: dp(15)
         color: "#c2c2c2"
         elide: Text.ElideLeft
@@ -99,11 +139,11 @@ Item {
                 columnSpacing: 0
                 rowSpacing: dp(5)
                 width: rect_phrase.width
-                height: rect_phrase.height
+                //height: rect_phrase.height
 
                 Repeater {
                     id: rep
-                    model: seedWords //control.nbwords
+                    model: seedWords
                     Rectangle {
                         id: rec_seed
                         height: dp(40)
@@ -153,37 +193,12 @@ Item {
     ConfirmButton {
         id: button_next
         title: "Next"
+        visible: isInit? true : false
         anchors.top: rect_phrase.bottom
         anchors.topMargin: dp(30)
         anchors.horizontalCenter: parent.horizontalCenter
         onClicked: {
             newSeed.doneWithNewSeed()
-        }
-    }
-
-    /*ConfirmButton {
-        id: button_skip
-        title: "Skip"
-        anchors.top: button_next.bottom
-        anchors.topMargin: dp(20)
-        anchors.horizontalCenter: parent.horizontalCenter
-        onClicked: {
-            // make a better way to skip seed
-            let x = Array("","","","","","")
-            newSeed.submitSeedWord(x, true)
-        }
-    }*/
-
-
-
-
-    Rectangle {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: -notification.width / 2
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: dp(20)
-        Notification {
-            id: notification
         }
     }
 }

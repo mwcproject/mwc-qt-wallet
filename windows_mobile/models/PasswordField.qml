@@ -73,9 +73,10 @@ Rectangle {
         height: dp(30)
         anchors.left: field_password.right
         anchors.verticalCenter: parent.verticalCenter
-        source: show_pass? "../../img/eye.svg" : "../../img/eye.svg"
+        source: show_pass? "../../img/visibility.svg" : "../../img/invisible.svg"
         fillMode: Image.PreserveAspectFit
         MouseArea {
+            id: visible
             anchors.fill: parent
             onClicked: {
                 show_pass = !show_pass
@@ -85,10 +86,19 @@ Rectangle {
 
    }
     ColorOverlay {
+        id: overlay
            anchors.fill: image
            source: image
            color: "#5c5c5c"
        }
+    states: State {
+        name: "pressed"; when: visible.pressed
+        PropertyChanges { target: overlay; opacity: 0.5 }
+    }
+
+    transitions: Transition {
+        NumberAnimation { properties: "opacity"; duration: 250; easing.type: Easing.InOutQuad }
+    }
 }
 
 

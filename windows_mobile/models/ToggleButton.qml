@@ -1,29 +1,31 @@
 import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Window 2.15
+import "../."
 
 Item {
     id: root
-    anchors.fill: parent
-    state: "left"
+    state: "disabled"
 
     Rectangle {
         id: skype
-        height: 50
-        width: 125
-        color: root.state == "left" ? "green" : "red"
-        radius: 50
+        height: parent.height
+        width: parent.width
+        color: root.state == "disabled" ? Theme.green : Theme.red
+        radius: dp(50)
 
         Rectangle {
             id: rect
             height: parent.height*1.2
             width: height
-            radius: 50
+            radius: dp(50)
             anchors.verticalCenter: parent.verticalCenter
             color: "gray"
         }
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.state = root.state === "left" ? "right" : "left"
+
             }
         }
     }
@@ -31,31 +33,31 @@ Item {
     states: [
 
         State {
-            name: "left"
+            name: "disabled"
             AnchorChanges {
                 target: rect; anchors.left: parent.left
             }
             PropertyChanges {
-                target: skype; color: "red"
+                target: skype; color: Theme.red
             }
         },
         State {
-            name: "right"
+            name: "enabled"
             AnchorChanges {
                 target: rect; anchors.right: parent.right
             }
             PropertyChanges {
-                target: skype; color: "green"
+                target: skype; color: Theme.green
             }
         }]
 
     transitions: Transition {
         AnchorAnimation {
-            duration: 500
+            duration: 250
         }
         PropertyAnimation {
             properties: "color";
-            duration: 500
+            duration: 250
         }
     }
 }

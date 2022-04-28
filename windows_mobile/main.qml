@@ -4,8 +4,11 @@ import QtQuick.Controls 2.13
 import Qt.labs.platform 1.1
 import CoreWindowBridge 1.0
 import StateMachineBridge 1.0
+import WalletConfigBridge 1.0
 import QtQml 2.15
 import "./models"
+import '.'
+
 
 
 
@@ -25,10 +28,10 @@ Window {
     property bool onLoadAccount
     property double price: 586590.26
 
-    property bool darkTheme: true
+    property bool isDarkMode
 
     property bool hiddenAmount: false
-    property string hidden: "🌒" //"💰💰💰💰"//"▒▒▒"
+    property string hidden: "▒▒▒"
 
 
     property var txsList: []
@@ -52,11 +55,10 @@ Window {
     StateMachineBridge {
         id: stateMachine
     }
-    /*Text {
-        font.pixelSize: Style.textSize
-        color: Style.textColor
-        text: "Hello World"
-    }*/
+
+    WalletConfigBridge {
+        id: walletConfig
+    }
 
 /*
     NONE = 0,
@@ -187,12 +189,12 @@ Window {
             orientation: Gradient.Vertical
             GradientStop {
                 position: 0
-                color: darkTheme? dark.bgGradientTop : light.bgGradientTop
+                color: isDarkMode? Theme.gradientTop : Theme.red
             }
 
             GradientStop {
                 position: 0.2
-                color: darkTheme? dark.bgGradientBottom : light.bgGradientBottom
+                color: Theme.gradientBottom
             }
         }
     }
@@ -306,11 +308,6 @@ Window {
             visible: currentState === 14
         }
 
-        NewSeed {
-            id: newSeedItem
-            anchors.fill: parent
-            visible: currentState === 16
-        }
 
         NodeInfo {
             id: nodeInfoItem
@@ -426,6 +423,13 @@ Window {
         id: inputSlatepack
         anchors.fill: parent
     }*/
+
+    NewSeed {
+        id: newSeedItem
+        anchors.fill: parent
+        visible: currentState === 16
+    }
+
 
     SendSettings {
         id: settingsItem

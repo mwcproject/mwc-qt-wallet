@@ -250,17 +250,14 @@ Item {
             field_amount.field_focus = false
             let recipientWallet = field_address.text.trim()
             if (!recipientWallet) {
-                field_address.border.color = "#00000000"
-                field_address.border.width = dp(0)
+                field_address.mainColor = Theme.field
                 return
             }
             let verifyAddress = util.verifyAddress(recipientWallet)
             if (verifyAddress === "unknown") {
-                field_address.border.color = "red"
-                field_address.border.width = dp(1)
+                field_address.mainColor = Theme.inputError
             } else {
-                field_address.border.color = "#00000000"
-                field_address.border.width = dp(0)
+                field_address.mainColor = Theme.field
             }
         }
     }
@@ -286,13 +283,13 @@ Item {
         anchors.topMargin: dp(10)
         anchors.left: field_address.left
         focus: false
+        mainColor: Theme.field
         onTextChanged: {
             field_address.field_focus = false
 
             // Probably parse better amount input
             if (!field_amount.text) {
-                field_amount.border.color = "#00000000"
-                field_amount.border.width = dp(0)
+                field_amount.mainColor = Theme.field
                 return
             }
             let amount = field_amount.text.replace("-", "").replace(",",".").trim()
@@ -300,16 +297,13 @@ Item {
             if ( tmp > 1) {
                 let idx = amount.lastIndexOf(".")
                 amount.substr(idx, amount.length)
-                console.log("idx: ",  amount)
             }
             amount = field_amount.text = amount
-            if (parseFloat(amount) >= spendableBalance) {
-                field_amount.border.color = "red"
-                field_amount.border.width = dp(1)
+            if (parseFloat(amount) >= spendableBalance || isLetters.test(amount)) {
+                field_amount.mainColor = Theme.inputError
                 return
             } else {
-                field_amount.border.color = "#00000000"
-                field_amount.border.width = dp(0)
+                field_amount.mainColor = Theme.field
             }
 
         }

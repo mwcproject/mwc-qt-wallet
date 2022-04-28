@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
 import UtilBridge 1.0
+import "./models"
 
 Item {
     property var callback
@@ -22,8 +23,8 @@ Item {
         text_message.anchors.verticalCenterOffset = 0
 
         if (isTwoButtons) {
-            text_yesbutton.text = yesBtnText
-            text_nobutton.text = noBtnText
+            button_yes.title = yesBtnText
+            button_no.title = noBtnText
             button_ok.visible = false
             button_yes.visible = true
             button_yes.enabled = true
@@ -196,32 +197,19 @@ Item {
                 }
             }
 
-            Button {
+            SecondaryButton {
                 id: button_ok
                 width: dp(135)
                 height: dp(50)
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: dp(20)
                 anchors.horizontalCenter: parent.horizontalCenter
-
-                background: Rectangle {
-                    color: "#6F00D6"
-                    radius: dp(5)
-                    Text {
-                        text: qsTr("OK")
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: dp(18)
-                        color: "#00000000"
-                    }
-                }
-
                 onClicked: {
                     messagebox.visible = false
                 }
             }
 
-            Button {
+            ConfirmButton {
                 id: button_yes
                 width: dp(135)
                 height: dp(50)
@@ -229,29 +217,14 @@ Item {
                 anchors.bottomMargin: dp(30)
                 anchors.right: parent.right
                 anchors.rightMargin: parent.width / 2 - dp(170)
-
-                background: Rectangle {
-                    color: button_yes.enabled ? "#6F00D6" : "white"
-                    radius: dp(5)
-                    border.width: dp(2)
-                    border.color: button_yes.enabled ? "#6F00D6" : "gray"
-                    Text {
-                        id: text_yesbutton
-                        text: qsTr("Yes")
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: dp(18)
-                        color: button_yes.enabled ? "white" : "gray"
-                    }
-                }
-
+                color: button_yes.enabled ? "#6F00D6" : "white"
                 onClicked: {
                     messagebox.visible = false
                     callback(true, textfield_password.text)
                 }
             }
 
-            Button {
+            SecondaryButton {
                 id: button_no
                 width: dp(135)
                 height: dp(50)
@@ -259,27 +232,10 @@ Item {
                 anchors.bottomMargin: dp(30)
                 anchors.left: parent.left
                 anchors.leftMargin: parent.width / 2 - dp(170)
-
-                background: Rectangle {
-                    color: "#ffffff"
-                    radius: dp(5)
-                    border.width: dp(2)
-                    border.color: "#3600C9"
-                    Text {
-                        id: text_nobutton
-                        text: qsTr("No")
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: dp(18)
-                        color: "#3600C9"
-                    }
-                }
-
                 onClicked: {
                     messagebox.visible = false
                     callback(false)
                 }
             }
-        //}
     }
 }

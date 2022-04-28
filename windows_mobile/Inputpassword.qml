@@ -9,9 +9,8 @@ import StartWalletBridge 1.0
 import ConfigBridge 1.0
 import QtAndroidService 1.0
 import QtQuick.Layouts 1.15
-
-
 import "./models"
+
 
 Item {
     id: control
@@ -68,12 +67,12 @@ Item {
 
     onVisibleChanged: {
         if (visible) {
+            isDarkMode = walletConfig.getDarkModeEnabled()
             rect_progress.visible = false
             textfield_password.text = ""
             textfield_password.enabled = true
             button_login.enabled = true
             text_syncStatusMsg.text = ""
-
             instanceItems.clear()
             // <selected path_id>, < <path_id>, <instance name>, <network> >, ...  >
             const instanceData = config.getWalletInstances(true)
@@ -107,9 +106,6 @@ Item {
         }
     }
 
-    ListModel {
-        id: instanceItems
-    }
 
     MouseArea {
         id: mouseArea
@@ -147,25 +143,26 @@ Item {
         height: dp(55)
         width: parent.width/1.3
         radius: dp(20)
+        color: "#242424"
         anchors.bottom: textfield_password.top
         anchors.bottomMargin: dp(20)
         anchors.horizontalCenter: parent.horizontalCenter
-        color: "#111111"
+        //color: "#111111"
         Rectangle {
             id: visualImageRectangle
-
             height: parent.height*0.8
             width: height
-            color: "#2a122c"
+            color: "#00000000"
             radius: dp(50)
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: dp(10)
-            //opacity: 0.5
+
             ImageColor {
                 id: visualImage
-                img_source: "../../img/eye.svg"
+                img_source: "../../img/wallet.svg"
                 img_height: visualImageRectangle.height*0.8
+                img_color: "#181818"
                 anchors.centerIn: visualImageRectangle
             }
         }
@@ -183,23 +180,17 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                nav.open()
+                if (instanceItems.count > 1)
+                    nav.open()
             }
         }
     }
-
-
-
-
-
-
 
     PasswordField {
         id: textfield_password
         height: dp(55)
         width: rec_wallet_account.width
-        anchors.topMargin: dp(80)
-        anchors.bottomMargin: dp(40)
+        mainColor: "#242424"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         focus: false
@@ -208,6 +199,8 @@ Item {
 
     ConfirmButton {
         id: button_login
+        height: dp(50)
+        width: rec_wallet_account.width
         anchors.top: textfield_password.bottom
         anchors.topMargin: dp(80)
         anchors.horizontalCenter: parent.horizontalCenter
@@ -286,70 +279,54 @@ Item {
     }
 
 
-    Rectangle {
+
+
+    /*Rectangle {
         id: rect_network
         anchors.top: button_login.bottom
         anchors.topMargin: dp(80)
         anchors.horizontalCenter: parent.horizontalCenter
         radius: dp(50)
         color: "#00000000"
-        height: dp(40)
-        width: parent.width/1.5
-
-        Button {
-            id: mainnetButton
-            height: parent.height - dp(10)
-            width: parent.width/2 - dp(15)
+        height: dp(35)
+        width: parent.width - dp(40)
+        SecondaryButton {
+            id: create_button
+            title: "Create"
+            color: "#000000"
+            height: parent.height
+            width: parent.width/2 - dp(20)
             anchors.rightMargin: dp(20)
-            anchors.verticalCenter: parent.verticalCenter
+            //anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
-
-            background: Rectangle {
-                id: mainnetRectangle
-                color: "#343b47"
-                radius: dp(10)
-                Text {
-                    id: mainnetText
-                    //% "Password"
-                    text: qsTr("id-password")
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.letterSpacing: dp(2)
-                    font.pixelSize: dp(16)
-                    color: "white"
-                }
-            }
             onClicked: {
                 startWallet.createNewWalletInstance("", false);
             }
         }
 
-        Button {
-            id: testnetButton
-            height: parent.height -dp(10)
-            width: parent.width/2 - dp(15)
+        SecondaryButton {
+            id: restore_button
+            title: "Restore"
+            height: parent.height
+            width: parent.width/2  - dp(20)
+            color: "#000000"
             anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            background: Rectangle {
-                id: testnetRectangle
-                color: "#111111"
-                radius: dp(10)
-                Text {
-                    id: testnetText
-                    text: qsTr("Restore")
-                    font.letterSpacing: dp(2)
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: dp(16)
-                    color: "white"
-                }
-            }
+            //anchors.verticalCenter: parent.verticalCenter
             onClicked: {
                 qtAndroidService.setNotification("Reki")
                 startWallet.createNewWalletInstance("", true);
             }
         }
+
+
+
+
+    }*/
+
+    ListModel {
+        id: instanceItems
     }
+
 
     Drawer {
         id: nav
@@ -373,14 +350,14 @@ Item {
             }
 
         }
-        height: grid_seed.Layout.minimumHeight + dp(50)
+        height: Math.min(control.height/2 + dp(50), grid_seed.Layout.minimumHeight+ dp(50))
         width: parent.width
         edge: Qt.BottomEdge
         interactive: position == 1.0? true : false
         Rectangle {
             anchors.top: parent.top
             anchors.topMargin: dp(50)
-            height: Math.min(grid_seed.Layout.minimumHeight, control.height/2)
+            height: control.height/2
             width: parent.width
             color: "#00000000"
             Flickable {
@@ -390,7 +367,7 @@ Item {
                 contentHeight: grid_seed.Layout.minimumHeight
                 clip: true
                 ScrollBar.vertical: ScrollBar {
-                    policy: Qt.ScrollBarAlwaysOn
+                    policy: Qt.ScrollBarAsNeeded
                 }
                 ColumnLayout {
                     id: grid_seed
@@ -428,6 +405,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                             MouseArea {
+                                id: mouse
                                 anchors.fill: parent
                                 onClicked: {
                                     selectedInstance = instanceName

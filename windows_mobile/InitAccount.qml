@@ -35,13 +35,13 @@ Item {
             var strong = new RegExp("(?=.{10,})(?=.*[!@#\$%\^&\*])(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])")
             if (strong.test(pass)) {
                 strenght_indicator.text = "Strong"
-                strenght_indicator.color = "green"
+                strenght_indicator.color = Theme.green
             } else if (medium.test(pass)) {
                 strenght_indicator.text = "Medium"
                 strenght_indicator.color = "orange"
             } else {
                 strenght_indicator.text = "Weak"
-                strenght_indicator.color = "red"
+                strenght_indicator.color = Theme.red
             }
             return true
         }
@@ -146,14 +146,6 @@ Item {
             }
         }
     }
-    RectangularGlow {
-           id: effect_password
-           anchors.fill: textfield_password
-           glowRadius: -5
-           spread: 0
-           color: "#00000000"
-           cornerRadius: textfield_password.radius + glowRadius
-       }
 
     PasswordField {
         id: textfield_password
@@ -173,6 +165,9 @@ Item {
                 password_strenght.visible = false
                 strenght_indicator.visible = false
             }
+
+            if (!textfield_password.text || !textfield_confirm.text)
+                confirm_indicator.visible = false
         }
         mouse.onClicked: {
             textfield_password.field_focus = true
@@ -206,15 +201,6 @@ Item {
 
     }
 
-    RectangularGlow {
-           id: effect_confirm
-           anchors.fill: textfield_confirm
-           glowRadius: -5
-           spread: 0
-           color: "#00000000"
-           cornerRadius: textfield_password.radius + glowRadius
-       }
-
     PasswordField {
         id: textfield_confirm
         height: dp(50)
@@ -228,20 +214,13 @@ Item {
         border.width: dp(0)
         border.color: "#00000000"
         textField.onTextChanged: {
-            if (!textfield_confirm.text) {
-                effect_password.color = "#00000000"
-                effect_confirm.color = "#00000000"
+            if (!textfield_password.text || !textfield_confirm.text) {
                 confirm_indicator.visible = false
             } else if (textfield_confirm.text === textfield_password.text) {
-                effect_confirm.color = "#1afe49"
-                effect_password.color = "#1afe49"
                 confirm_indicator.text = "Password match!"
-
                 confirm_indicator.color = "#1afe49"
                 confirm_indicator.visible = true
             } else {
-                effect_confirm.color  = "#fd124f"
-                effect_password.color = "#fd124f"
                 confirm_indicator.text = "Password does not match!"
                 confirm_indicator.color = "#fd124f"
                 confirm_indicator.visible = true
@@ -273,7 +252,7 @@ Item {
         text_1: "12 words"
         text_2: "24 words"
         anchors.top: textfield_confirm.bottom
-        anchors.topMargin: dp(30)
+        anchors.topMargin: dp(50)
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
@@ -281,7 +260,7 @@ Item {
         id: button_next
         title: "Next"
         anchors.top: toggle_seed.bottom
-        anchors.topMargin: dp(40)
+        anchors.topMargin: dp(50)
         anchors.horizontalCenter: parent.horizontalCenter
 
         onClicked: {

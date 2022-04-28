@@ -121,7 +121,7 @@ Item {
             updateNetworkName()
             updateInstanceAccountText()
             totalAmount = wallet.getTotalMwcAmount()
-            //updateAccountList()
+            updateAccountList()
         }
     }
 
@@ -270,7 +270,7 @@ width:
                 Text {
                     id: text_title
                     color: "#ffffff"
-                    text: "Wallet Dashboard"
+                    text: "Dashboard"
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     font.bold: true
@@ -423,7 +423,7 @@ width:
                 id: rect_phrase
                 height: parent.height/2.5
                 width: parent.width
-                color: "#0f0f0f"
+                color: grid_seed.Layout.minimumHeight > parent.height/2.5? "#141414" : "#00000000"
                 anchors.top: text_secondary_currency.bottom
                 anchors.topMargin: dp(80)
 
@@ -434,7 +434,7 @@ width:
                     contentHeight: grid_seed.Layout.minimumHeight
                     clip: true
                     ScrollBar.vertical: ScrollBar {
-                        policy: Qt.ScrollBarAlwaysOn
+                        policy: Qt.ScrollBarAsNeeded
                     }
 
                     ColumnLayout {
@@ -449,13 +449,13 @@ width:
                                 id: rec_acc_balance
                                 height: dp(60)
                                 width: nav.width
-                                color: selectedAccount === account? "#363636" : "#00000000"
+                                color: selectedAccount === account? "#252525" : "#00000000"
 
                                 ImageColor {
                                     id: img_check
                                     img_height: parent.height/2.5
                                     img_source: isEdit && nav.open? "../../img/remove.svg"  : "../../img/check.svg"
-                                    img_color: isEdit && nav.open? "#00000000" : "white"
+                                    img_color: isEdit && nav.open? "#00000000" : "gray"
                                     visible: (isEdit && nav.open)? (account !== "default" && selectedAccount !== account ? true : false) : (selectedAccount === account? true : false)
                                     anchors.left: parent.left
                                     anchors.leftMargin: dp(25)
@@ -465,7 +465,7 @@ width:
                                 Text {
                                     id: acc_name
                                     text: "%1\n".arg(account) + (hiddenAmount? hidden : spendable) + " MWC"
-                                    color: "white"
+                                    color: "gray"
                                     font.pixelSize: dp(15)
                                     font.italic: true
                                     font.weight: Font.Light
@@ -477,7 +477,7 @@ width:
                                     id: img_edit
                                     img_height: parent.height/2.5
                                     img_source: "../../img/check.svg"
-                                    img_color: "white"
+                                    img_color: "gray"
                                     visible: (isEdit && nav.open)? (account !== "default" && selectedAccount !== account ? true : false) : false
                                     anchors.right: parent.right
                                     anchors.rightMargin: dp(25)
@@ -511,14 +511,14 @@ width:
                         Rectangle {
                             id: rec_new_acc
                             height: dp(60)
-                            width: nav.width
-                            color: "gray"
-                            visible: !isEdit? true : false
+                            width: parent.width
+                            //color: "gray"
+                            //visible: !isEdit? true : false
                             ImageColor {
                                 id: img_new_acc
                                 img_height: rec_new_acc.height/2.5
                                 img_source: "../../img/plus.svg"
-                                img_color: "white"
+                                img_color: "gray"
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: rec_new_acc.left
                                 anchors.leftMargin: dp(25)
@@ -526,7 +526,7 @@ width:
                             Text {
                                 id: name_new_acc
                                 text: qsTr("Add new account")
-                                color: "white"
+                                color: "gray"
                                 font.pixelSize: dp(15)
                                 font.italic: true
                                 font.weight: Font.Light
@@ -645,7 +645,7 @@ width:
                             id: rect_logout
                             height: parent.height/1.3
                             width: height
-                            color: "#ad000c"
+                            color: Theme.inputError
                             radius: dp(50)
                             anchors.horizontalCenter: parent.horizontalCenter
                             ImageColor {

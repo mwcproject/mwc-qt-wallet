@@ -10,26 +10,13 @@ Button {
     property alias color: rectangle.color
 
     id: button_login
-    height: dp(45)
-    width: parent.width/1.5
-    //anchors.horizontalCenter: parent.horizontalCenter
     background: Rectangle {
         id: rectangle
         radius: dp(25)
-        gradient: Gradient {
-            orientation: Gradient.Horizontal
-            GradientStop {
-                position: 0
-                color: "#531d55"
-            }
-            GradientStop {
-                position: 1
-                color: "#202020"
-            }
-        }
+        color: "#252525"
         Text {
             id: loginText
-            text: qsTr(title)
+            text: title
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
             font.pixelSize: dp(18)
@@ -51,9 +38,10 @@ Button {
             name: "unpressed"; when: !pressed
             PropertyChanges { target: overlay; color: "black"; opacity: 0 }
         }]
+
     
     transitions: Transition {
-        NumberAnimation { properties: "opacity"; duration: 100; easing.type: Easing.InOutQuad }
+        NumberAnimation { properties: "opacity"; duration: 250; easing.type: Easing.InOutQuad }
     }
 }
 

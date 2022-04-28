@@ -197,13 +197,34 @@ Item {
                 txConfirmedStr: transConfirmedStr,
             })
         }
-        /*if (txsListCache != cache) {
-            txsListCache = cache
-            console.log("cache: ", cache, "\n txsListCache: ", txsListCache)
-            txsModal.clear()
-            cache.forEach(tx => txsModal.append(tx))
+
+        /*listModelsNB = txsModal.count
+        cacheModelNB = cache.length()
+
+        let txs = []
+        for (let i=cacheModelNB; i >= 0; i--) {
+                // check the date
+                let txs = txsModal.get(i).tx
+                let ctxs = cache[i].tx
+                if (txs == ctxs) {
+                    let date = txsModal.get(i).txDate
+                    let cdate = cache[i].txDate
+                    if (date != cdate) {
+                        txs.push(cache[i])
+                    }
+                }
+
+                let txId = txsModal.get(i).txId
+                let ctxId = cache[i].txId
+                //check the txs
+                if (txId  == ctxId)
+                
+                let type = txsModal.get(i).type
+                
+                
+                let ctype = cache[i].ctype
         }*/
-        //txsModal.clear()
+
         cache.forEach(tx => txsModal.append(tx))
 
     }

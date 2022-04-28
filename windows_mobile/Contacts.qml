@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
 import ConfigBridge 1.0
+import QtQuick.Layouts 1.15
 import "./models"
 
 Item {
@@ -20,8 +21,8 @@ Item {
         contactList = []
         for (let i = 0; i < pairs.length; i += 2) {
             contactList.push({
-                 name: pairs[i],
-                 address: pairs[i+1]
+                name: pairs[i],
+                address: pairs[i+1]
             })
             contactsModel.append(contactList[contactList.length - 1])
         }
@@ -109,6 +110,10 @@ Item {
             font.pixelSize: dp(13)
             color: "white"
         }
+        MouseArea {
+            anchors.fill: parent
+            onClicked: editDlg.open("", "", contactList, false, onAddContact)
+        }
     }
 
     ListModel {
@@ -139,18 +144,17 @@ Item {
     Component {
         id: contactsDelegate
         Rectangle {
-            height: rectangle.height + dp(10)
+            height: rectangle.height + dp(20)
             color: "#00000000"
             width: control.width
-            anchors.verticalCenter: parent.verticalCenter
 
             Rectangle {
                 id: rectangle
-                height: text_address.height + text_name.height + dp(18) + dp(20)
-                width: parent.width*0.93
+                height: text_address.height + text_name.height + dp(25)
+                width: parent.width*0.9
                 color: "#33bf84ff"
                 radius: dp(15)
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.bottom: parent.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 Rectangle {
@@ -178,52 +182,80 @@ Item {
                     id: text_name
                     color: "#ffffff"
                     text: name
-                    font.pixelSize: parent.height*0.20
+                    font.pixelSize: dp(18)
                     font.bold: true
+                    anchors.top: parent.top
+                    anchors.topMargin: dp(10)
                     anchors.left: initial_logo.right
                     anchors.leftMargin: dp(20)
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.verticalCenterOffset: - height/2
+
 
                 }
                 TextEdit {
                     id: text_address
                     readOnly: true
+                    font.pixelSize: dp(15)
+                    anchors.top: text_name.bottom
+                    anchors.topMargin: dp(2)
                     anchors.left: initial_logo.right
                     anchors.leftMargin: dp(20)
                     anchors.right: parent.right
                     anchors.rightMargin: parent.width*0.15
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.verticalCenterOffset: height/2
                     wrapMode: Text.WrapAnywhere
-                    font.pixelSize: dp(14)
                     color: "white"
                     text: address
                 }
-                /*Text {
-                    id: text_status
-                    color: "gray"
-                    font.pixelSize: parent.height*0.25
-                    text: address
-                    anchors.left: initial_logo.right
-                    anchors.leftMargin: dp(10)
-                    anchors.top: text_name.bottom
-                }*/
 
-
-                /*Text {
-                    color: "#ffffff"
-                    text: address
-                    anchors.top: parent.top
-                    anchors.topMargin: dp(70)
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(35)
+                Rectangle {
+                    id: icon_layout
+                    height: parent.height*0.8
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: rectangle.width/7
                     anchors.right: parent.right
-                    anchors.rightMargin: dp(150)
-                    wrapMode: Text.WrapAnywhere
-                    font.pixelSize: dp(14)
+                    color: "#00000000"
+
+                    ColumnLayout {
+                        Layout.topMargin: dp(10)
+                        Layout.bottomMargin: dp(10)
+                        height: parent.height
+                        width: parent.width
+
+                        ImageColor {
+                            id: img_qr
+                            img_width: icon_layout.height/4
+                            img_source: "../../img/qr.svg"
+                            img_color: "white"
+                            Layout.preferredHeight: icon_layout.height/4
+                            Layout.preferredWidth: icon_layout.width
+                            Layout.alignment: Qt.AlignCenter
+                        }
+
+                        ImageColor {
+                            id: img_edit
+                            img_width: icon_layout.height/4
+                            img_source: "../../img/edit.svg"
+                            img_color: "white"
+                            Layout.preferredHeight: icon_layout.height/4
+                            Layout.preferredWidth: icon_layout.width
+                            Layout.alignment: Qt.AlignCenter
+                        }
+
+                        ImageColor {
+                            id: img_delete
+                            img_width: icon_layout.height/4
+                            img_source: "../../img/edit.svg"
+                            img_color: "white"
+                            Layout.preferredHeight: icon_layout.height/4
+                            Layout.preferredWidth: icon_layout.width
+                            Layout.alignment: Qt.AlignCenter
+                        }
+                    }
+
                 }
 
+
+
+                /*T
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
@@ -234,17 +266,6 @@ Item {
                         }
                     }
                 }
-
-                Image {
-                    id: image_remove
-                    anchors.right: parent.right
-                    anchors.rightMargin: dp(35)
-                    anchors.top: parent.top
-                    anchors.topMargin: dp(70)
-                    width: dp(35)
-                    height: dp(35)
-                    fillMode: Image.PreserveAspectFit
-                    source: "../img/Delete@2x.svg"
 
                     MouseArea {
                         anchors.fill: parent
