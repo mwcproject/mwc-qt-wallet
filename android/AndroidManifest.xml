@@ -16,7 +16,7 @@
 
     <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="true"/>
 
-    <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="MWC Mobile" android:extractNativeLibs="true" android:roundIcon="@mipmap/ic_launcher_round">
+    <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="MWC Mobile" android:extractNativeLibs="true" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round">
         <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" android:name="org.qtproject.qt5.android.bindings.QtActivity" android:exported="true" android:label="MWC Mobile" android:screenOrientation="portrait" android:launchMode="singleTop" android:textAllCaps="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
