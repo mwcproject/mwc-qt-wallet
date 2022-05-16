@@ -1,9 +1,14 @@
 import QtQuick 2.12
 import QtQuick.Window 2.0
 import QtQuick.Controls 2.13
+import QtQuick.Layouts 1.3
+import QtGraphicalEffects 1.15
 import WalletBridge 1.0
 import StateMachineBridge 1.0
 import ConfigBridge 1.0
+import AccountsBridge 1.0
+import UtilBridge 1.0
+import "./models"
 
 Item {
     readonly property int status_ignore: 0
@@ -11,58 +16,70 @@ Item {
     readonly property int status_yellow: 2
     readonly property int status_green: 3
 
+    // temporary fix for a bug related to init account switch --
+    property bool initAccount: false
+    // --
+
+    property double spendableBalance: 0
+    property double awaitBalance: 0
+    property double lockedBalance: 0
+
+    property alias topVisible: navbarTop.visible
+
+    property string selectedAccount
+    property bool isEdit: false
     property string docName
 
     function updateTitle(state) {
         switch (state) {
-        case 4:
-            text_title.text = qsTr("Wallet  >   Accounts")
-            break
-        case 5:
-            text_title.text = qsTr("Wallet  >   Accounts  >   AccountTransfer")
-            break
-        case 6:
-            text_title.text = qsTr("Notifications")
-            break
-        case 8:
-            text_title.text = qsTr("Wallet  >   Send")
-            break
-        case 9:
-            text_title.text = qsTr("Wallet  >   Receive")
-            break
-        case 10:
-            text_title.text = qsTr("Wallet Settings   >   Listeners")
-            break
-        case 11:
-            text_title.text = qsTr("Wallet  >   Transactions")
-            break
-        case 12:
-            text_title.text = qsTr("Wallet  >   Outputs")
-            break
-        case 13:
-            text_title.text = qsTr("Account Options   >   Contacts")
-            break
-        case 14:
-            text_title.text = qsTr("Wallet Settings   >   Config")
-            break
-        case 16:
-            text_title.text = qsTr("Account Options   >   Passphrase")
-            break
-        case 17:
-            text_title.text = qsTr("Wallet Settings   >   MWC Node Status (Cloud)")
-            break
-        case 19:
-            text_title.text = qsTr("Wallet  >   Finalize")
-            break
-        case 21:
-            text_title.text = qsTr("Wallet")
-            break
-        case 22:
-            text_title.text = qsTr("Account Options")
-            break
-        case 23:
-            text_title.text = qsTr("Wallet Settings")
-            break
+            case 4:
+                text_title.text = qsTr("Accounts")
+                break
+            case 5:
+                text_title.text = qsTr("AccountTransfer")
+                break
+            case 6:
+                text_title.text = qsTr("Notifications")
+                break
+            case 8:
+                text_title.text = qsTr("Send")
+                break
+            case 9:
+                text_title.text = qsTr("Receive")
+                break
+            case 10:
+                text_title.text = qsTr("Listeners")
+                break
+            case 11:
+                text_title.text = qsTr("Transactions")
+                break
+            case 12:
+                text_title.text = qsTr("Outputs")
+                break
+            case 13:
+                text_title.text = qsTr("Contacts")
+                break
+            case 14:
+                text_title.text = qsTr("Config")
+                break
+            case 16:
+                text_title.text = qsTr("Passphrase")
+                break
+            case 17:
+                text_title.text = qsTr("MWC Node Status (Cloud)")
+                break
+            case 19:
+                text_title.text = qsTr("Finalize")
+                break
+            case 21:
+                text_title.text = qsTr("Wallet")
+                break
+            case 22:
+                text_title.text = qsTr("Account Options")
+                break
+            case 23:
+                text_title.text = qsTr("Wallet Settings")
+                break
         }
     }
 
@@ -72,9 +89,7 @@ Item {
         }
     }
 
-    WalletBridge {
-        id: wallet
-    }
+
 
     StateMachineBridge {
         id: stateMachine
@@ -84,40 +99,21 @@ Item {
         id: config
     }
 
+    WalletBridge {
+        id: wallet
+    }
+
     Connections {
         target: wallet
 
         onSgnWalletBalanceUpdated: {
-            text_balance.text = wallet.getTotalMwcAmount() + " MWC"
-        }
-
-        onSgnUpdateNodeStatus: (online, errMsg, nodeHeight, peerHeight, totalDifficulty, connections) => {
-           if ( !online ) {
-               setStatusButtonState(true, status_red, "")
-           }
-           else if (connections === 0 || nodeHeight === 0 || ( peerHeight > 0 && peerHeight - nodeHeight > 5 )) {
-               setStatusButtonState(true, status_yellow, "")
-           }
-           else {
-               setStatusButtonState(true, status_green, "")
-           }
+            text_spend_balance.text = wallet.getTotalMwcAmount() + " MWC"
+            updateAccountsList()
         }
 
         onSgnConfigUpdate: {
             updateNetworkName()
             updateInstanceAccountText()
-        }
-
-        onSgnLoginResult: {
-            updateNetworkName()
-        }
-
-        onSgnUpdateListenerStatus: {
-            updateListenerBtn()
-        }
-
-        onSgnHttpListeningStatus: {
-            updateListenerBtn()
         }
     }
 
@@ -126,386 +122,188 @@ Item {
             updateListenerBtn()
             updateNetworkName()
             updateInstanceAccountText()
-//            updateAccountList()
+            //updateAccountList()
         }
     }
 
-    function updateNetworkName() {
-        setStatusButtonState(true, status_ignore, config.getNetwork())
-    }
 
-    function updateListenerBtn() {
-        const mqsStatus = wallet.getMqsListenerStatus()
-        const torStatus = wallet.getTorListenerStatus()
-        const httpListenerStatus = wallet.getHttpListeningStatus()
+    function updateAccountsList() {
+        //rect_progress.visible = false
+        const data2show = accState.getAccountsBalancesToShow()
 
-        let listening = mqsStatus | torStatus
-        let listenerNames = ""
-        if (mqsStatus)
-            listenerNames +=  "MWC MQS"
-
-        if (torStatus) {
-            if (listenerNames !== "")
-                listenerNames += ", "
-            listenerNames += "TOR"
+        if (!initAccount) {
+            initAccount = true
+            wallet.switchAccount("default")
         }
+        selectedAccount = wallet.getCurrentAccountName()
+        //console.log("select: " + selectedAccount)
+        accountsModel.clear()
+        const rowSz = 5;
+        for (let r = 0; r < data2show.length - rowSz + 1; r += rowSz) {
+            console.log("name_ :" + selectedAccount + " " + data2show[r])
+            if (String(data2show[r]) == String(selectedAccount)) {
 
-        if (httpListenerStatus === "true") {
-            listening = true
-            if (listenerNames !== "")
-                listenerNames += ", "
-            listenerNames += "Http"
-            if (config.hasTls())
-                listenerNames += "s"
-        }
-
-        setStatusButtonState(false, listening ? status_green : status_red, listening ? listenerNames : "Listeners")
-    }
-
-    function setStatusButtonState(isNetwork, status, text) {
-        if (isNetwork) {
-            switch (status) {
-                case status_green:
-                    image_network.source = "../img/CircGreen@2x.svg"
-                    break;
-                case status_red:
-                    image_network.source = "../img/CircRed@2x.svg"
-                    break;
-                case status_yellow:
-                    image_network.source = "../img/CircYellow@2x.svg"
-                    break;
-                default: // Ingnore suppose to be here
-                    break;
+                spendableBalance = data2show[r+1]
+                awaitBalance = data2show[r+2]
+                lockedBalance = data2show[r+3]
+                console.log("locked_ :" + data2show[r+3] + "  " + data2show[r+2])
             }
+            accountsModel.append({
+                account: data2show[r],
+                spendable: data2show[r+1],
+                awaiting: data2show[r+2],
+                locked: data2show[r+3],
+                total: data2show[r+4]
+            })
+        }
 
-            if (text !== "")
-                text_network.text = text
-        } else {
-            switch (status) {
-                case status_green:
-                    image_listener.source = "../img/CircGreen@2x.svg"
-                    break;
-                case status_red:
-                    image_listener.source = "../img/CircRed@2x.svg"
-                    break;
-                case status_yellow:
-                    image_listener.source = "../img/CircYellow@2x.svg"
-                    break;
-                default: // Ingnore suppose to be here
-                    break;
-            }
 
-            if (text !== "")
-                text_listener.text = text
+
+
+
+
+        //image_transfer.enabled = accountsModel.count > 1
+    }
+
+    function startWaiting() {
+        accountsModel.clear()
+        //rect_progress.visible = true
+    }
+
+    function onAddAccount(ok, newAccountName) {
+        if (!ok || newAccountName === "")
+            return;
+
+        const err = accState.validateNewAccountName(newAccountName)
+        if (err !== "") {
+            messagebox.open("Wrong account name", err)
+            return;
+        }
+
+        startWaiting()
+        wallet.createAccount(newAccountName)
+    }
+
+    function onRenameAccount(ok, newAccountName) {
+        if (!ok || newAccountName === "" || newAccountName === selectedAccount)
+            return;
+
+        const err = accState.validateNewAccountName(newAccountName)
+        if (err !== "") {
+            messagebox.open("Wrong account name", err)
+            return;
+        }
+
+        wallet.renameAccount(selectedAccount, newAccountName)
+        startWaiting()
+    }
+
+    function onDeleteAccount(ok) {
+        if (ok) {
+            accState.deleteAccount(selectedAccount)
+            startWaiting()
         }
     }
 
-    function updateInstanceAccountText() {
-        text_instance_account.text = "INSTANCE:  " + config.getCurrentWalletInstance()[2] + "  //  ACCOUNT:  " + wallet.getCurrentAccountName()
+    ListModel {
+        id: accountsModel
     }
 
-//    function updateAccountList() {
-//        const accountInfo = wallet.getWalletBalance(true, true, false)
-//        const selectedAccount = wallet.getCurrentAccountName()
-//        let selectedAccIdx = 0
 
-//        accountItems.clear()
+    AccountsBridge {
+        id: accState
+    }
 
-//        let idx = 0
-//        for (let i = 1; i < accountInfo.length; i += 2) {
-//            if (accountInfo[i-1] === selectedAccount)
-//                selectedAccIdx = idx
+    UtilBridge {
+        id: util
+    }
 
-//            accountItems.append({ info: accountInfo[i-1] + accountInfo[i].substring(27), account: accountInfo[i-1]})
-//            idx++
-//        }
-//        accountComboBox.currentIndex = selectedAccIdx
-//    }
-
-    Rectangle {
+    Rectangle
+    {
         id: navbarTop
-        height: dp(100)
+        height: parent.height/14
+        width: parent.width
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        gradient: Gradient {
-            orientation: Gradient.Horizontal
-            GradientStop {
-                position: 0
-                color: "#9E00E7"
-            }
+        color: "#00000000"
 
-            GradientStop {
-                position: 1
-                color: "#3600C9"
-            }
-        }
+        RowLayout {
+            id: layout
+            spacing: 0
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.minimumHeight: parent.parent.height
+                Layout.minimumWidth: parent.parent.width*(1/5)
+                color: "#00000000"
+                Image {
+                    id: notification
+                    height: parent.height* 0.4
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: "../img/menu.svg"
+                    fillMode: Image.PreserveAspectFit
 
-        Rectangle {
-            id: menuRect
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: dp(50)
-            color: "#00000000"
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        nav.toggle()
+                        //stateMachine.setActionWindow(6)
+                    }
+                }
+            }
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.minimumHeight: parent.parent.height
+                Layout.minimumWidth: parent.parent.width*(3/5)
+                color: "#00000000"
+                Text {
+                    id: text_title
+                    color: "#ffffff"
+                    text: "Wallet Dashboard"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.bold: true
+                    font.pixelSize: dp(16)
+                }
+            }
 
             Rectangle {
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                width: dp(60)
+                Layout.fillHeight: true
+                Layout.minimumHeight: parent.parent.height
+                Layout.minimumWidth: parent.parent.width/5
                 color: "#00000000"
-
-                Rectangle {
+                Image {
+                    id: logout
+                    height: parent.height* 0.4
+                    anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(28)
-                    width: dp(6)
-                    height: dp(6)
-                    radius: dp(3)
-                }
+                    source: "../img/logout.svg"
+                    fillMode: Image.PreserveAspectFit
 
-                Rectangle {
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(39)
-                    width: dp(6)
-                    height: dp(6)
-                    radius: dp(3)
-                }
-
-                Rectangle {
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(50)
-                    width: dp(6)
-                    height: dp(6)
-                    radius: dp(3)
                 }
 
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        nav.toggle()
+
+                        messagebox.open(qsTr("LOGOUT / CHANGE WALLET"), qsTr("Are you sure you want to logout?"), true, "No", "Yes", "", "", "", changeInstanceCallback)
                     }
                 }
             }
 
-            Text {
-                id: text_title
-                color: "#ffffff"
-                text: "Wallet"
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.bold: true
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: dp(16)
-            }
+
         }
 
-        Rectangle {
-            id: rect_splitter
-            width: dp(250)
-            height: dp(1)
-            color: "#ffffff"
-            anchors.top: menuRect.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        Rectangle {
-            id: rect_balance
-            width: dp(72) + text_balance.width
-            height: dp(50)
-            color: "#00000000"
-            anchors.top: menuRect.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            Image {
-                id: image_logo1
-                width: dp(58)
-                height: dp(29)
-                anchors.verticalCenter: parent.verticalCenter
-                fillMode: Image.PreserveAspectFit
-                source: "../img/TBLogo@2x.svg"
-            }
-
-            Text {
-                id: text_balance
-                text: ""
-                anchors.left: image_logo1.right
-                anchors.leftMargin: dp(14)
-                font.pixelSize: dp(20)
-                font.bold: true
-                color: "white"
-                anchors.verticalCenter: image_logo1.verticalCenter
-            }
-        }
     }
-
-    Rectangle
-    {
-        id: navbarBottom
-        height: dp(90)
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        gradient: Gradient {
-            orientation: Gradient.Horizontal
-            GradientStop {
-                position: 0
-                color: "#9E00E7"
-            }
-
-            GradientStop {
-                position: 1
-                color: "#3600C9"
-            }
-        }
-
-        Image {
-            id: image_notifications
-            width: dp(28)
-            height: dp(28)
-            anchors.bottom: text_instance_account.top
-            anchors.bottomMargin: dp(13)
-            anchors.left: parent.left
-            anchors.leftMargin: dp(28)
-            fillMode: Image.PreserveAspectFit
-            source: "../img/NavNotificationNormal@2x.svg"
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    stateMachine.setActionWindow(6) // Notifications Page
-                }
-            }
-        }
-
-        Image {
-            id: image_help
-            width: dp(28)
-            height: dp(28)
-            anchors.left: image_notifications.right
-            anchors.leftMargin: dp(17)
-            anchors.verticalCenter: image_notifications.verticalCenter
-            fillMode: Image.PreserveAspectFit
-            source: "../img/HelpBtn@2x.svg"
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    docName = stateMachine.getCurrentHelpDocName()
-                    var xhr = new XMLHttpRequest
-                    xhr.open('GET', "qrc:/help_mobile/" + docName)
-                    xhr.onreadystatechange = function() {
-                        if (xhr.readyState === XMLHttpRequest.DONE) {
-                            var response = xhr.responseText
-                            helpDlg.open(docName, response)
-                        }
-                    }
-                    xhr.send()
-                }
-            }
-        }
-
-        Rectangle {
-            id: rect_listener
-            width: text_listener.width + dp(40)
-            height: dp(25)
-            color: "#00000000"
-            radius: dp(12.5)
-            border.width: dp(1)
-            border.color: "#ffffff"
-            anchors.right: parent.right
-            anchors.rightMargin: dp(28)
-            anchors.verticalCenter: image_help.verticalCenter
-
-            Image {
-                id: image_listener
-                width: dp(12)
-                height: dp(12)
-                anchors.left: parent.left
-                anchors.leftMargin: dp(10)
-                anchors.verticalCenter: parent.verticalCenter
-                fillMode: Image.PreserveAspectFit
-                source: "../img/CircGreen@2x.svg"
-            }
-
-            Text {
-                id: text_listener
-                color: "#ffffff"
-                text: qsTr("MWC MQS")
-                anchors.left: image_listener.right
-                anchors.leftMargin: dp(8)
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: dp(11)
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    stateMachine.setActionWindow(10)    // Listening Page
-                }
-            }
-        }
-
-        Rectangle {
-            id: rect_network
-            width: text_network.width + dp(40)
-            height: dp(25)
-            color: "#00000000"
-            radius: dp(12.5)
-            anchors.rightMargin: dp(12)
-            anchors.verticalCenter: image_help.verticalCenter
-            border.width: dp(1)
-            border.color: "#ffffff"
-            anchors.right: rect_listener.left
-
-            Image {
-                id: image_network
-                width: dp(12)
-                height: dp(12)
-                anchors.left: parent.left
-                anchors.leftMargin: dp(10)
-                anchors.verticalCenter: parent.verticalCenter
-                fillMode: Image.PreserveAspectFit
-                source: "../img/CircGreen@2x.svg"
-            }
-
-            Text {
-                id: text_network
-                text: qsTr("Floonet")
-                anchors.left: image_network.right
-                anchors.leftMargin: dp(8)
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: dp(11)
-                color: "white"
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    stateMachine.setActionWindow(17)    // NodeInfo Page
-                }
-            }
-        }
-
-        Text {
-            id: text_instance_account
-            color: "white"
-            text: qsTr("INSTANCE:  Default  //  ACCOUNT:  SatoshisDream")
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: dp(14)
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: dp(13)
-        }
-    }
-
     NavigationDrawer {
         id: nav
+        //property type name: value
         Rectangle
         {
             anchors.fill: parent
-            color: "#3600C9"
+            color: "#181818"
         }
         Rectangle {
             anchors.fill: parent
@@ -518,192 +316,236 @@ Item {
                 anchors.top: parent.top
                 anchors.topMargin: dp(70)
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: "../img/TBLogo@2x.svg"
+                source: "../img/mwc-logo.svg"
                 fillMode: Image.PreserveAspectFit
             }
 
-            ListView {
-                anchors.topMargin: dp(240)
-                anchors.fill: parent
+            Text {
+                id: text_account
+                text: qsTr("TOTAL WORTH")
+                color: "#c4c4c4"
+                font.pixelSize: dp(12)
+                font.letterSpacing: dp(0.5)
+                anchors.top: image_logo.bottom
+                anchors.topMargin: dp(40)
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
 
-                delegate: Item {
-                    height: dp(60)
-                    anchors.left: parent.left
-                    anchors.right: parent.right
+            Text {
+                id: text_spend_balance
+                text: ""
+                font.weight: Font.Light
+                color: "white"
+                font.pixelSize: dp(17)
+                //font.letterSpacing: dp(1)
+                anchors.top: text_account.bottom
+                anchors.topMargin: dp(3)
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+            Text {
+                id: text_secondary_currency
+                text: qsTr("58 000.18 USD")
+                color: "#c4c4c4"
+                font.pixelSize: dp(12)
+                font.letterSpacing: dp(1)
+                anchors.top: text_spend_balance.bottom
+                anchors.topMargin: dp(2)
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
 
-                    Rectangle {
-                        anchors.fill: parent
-                        color: "#00000000"
+            Text {
+                id: text_acc_list
+                text: qsTr("MY ACCOUNTS")
+                color: "#c2c2c2"
+                font.pixelSize: dp(15)
+                font.letterSpacing: dp(1)
+                font.italic: true
+                anchors.left: rect_phrase.left
+                anchors.leftMargin: dp(15)
+                anchors.bottom: rect_phrase.top
+                anchors.bottomMargin: dp(8)
+            }
 
-                        Image {
-                            width: dp(32)
-                            height: dp(32)
-                            anchors.left: parent.left
-                            anchors.leftMargin: dp(60)
-                            anchors.verticalCenter: parent.verticalCenter
-                            source: imagePath
-                            fillMode: Image.PreserveAspectFit
-                        }
+            ImageColor {
+                id: img_editList
+                img_height: dp(20)
+                img_source: "../../img/edit.svg"
+                img_color: isEdit? "white" : "grey"
+                anchors.right: rect_phrase.right
+                anchors.rightMargin: dp(25)
+                anchors.bottom: rect_phrase.top
+                anchors.bottomMargin: dp(8)
+                visible: true
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        isEdit = !isEdit
 
-                        Text {
-                            text: pageName
-                            anchors.left: parent.left
-                            anchors.leftMargin: dp(120)
-                            anchors.verticalCenter: parent.verticalCenter
-                            font.pixelSize: dp(18)
-                            color: "white"
-                        }
+                    }
 
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                switch (index) {
-                                case 0:
-                                    stateMachine.setActionWindow(21)    // Wallet Page
-                                    break
-                                case 1:
-                                    stateMachine.setActionWindow(22)    // Account Options Page
-                                    break
-                                case 2:
-                                    stateMachine.setActionWindow(23)    // Settings Page
-                                    break
+                }
+
+
+
+            }
+
+            Rectangle {
+                id: rect_phrase
+                height: parent.height/2.5
+                width: parent.width
+                color: "#0f0f0f"
+                anchors.top: text_secondary_currency.bottom
+                anchors.topMargin: dp(80)
+
+                Flickable {
+                    id: scroll
+                    width: parent.width
+                    height: parent.height
+                    contentHeight: grid_seed.Layout.minimumHeight
+                    boundsMovement: Flickable.StopAtBounds
+                    //flickableDirection: Flickable.VerticalFlick
+                    //ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+                    //Flickable.flickableDirection: Flickable.VerticalFlick
+                    clip: true
+                    //flickableItem.atYEnd: true
+                    //anchors.horizontalCenter: parent.horizontalCenter
+
+                    ScrollBar.vertical: ScrollBar {
+                        policy: Qt.ScrollBarAlwaysOn
+                        //parent: flickable.parent
+                        //anchors.top: flickable.top
+                        //anchors.left: flickable.right
+                        //anchors.bottom: flickable.bottom
+                    }
+
+
+                    ColumnLayout {
+                        id: grid_seed
+                        spacing: 0
+                        //width: rect_phrase.width
+                        //height: rect_phrase.height
+                        //Layout.margins: dp(25)
+
+                        Repeater {
+                            id: rep
+                            model: accountsModel
+                            Rectangle {
+                                id: rec_acc
+                                height: dp(60)
+                                width: nav.width
+                                color: selectedAccount === account? "#363636" : "#00000000"
+
+                                ImageColor {
+                                    id: img_check
+                                    img_height: parent.height/2.5
+                                    img_source: isEdit? "../../img/remove.svg"  : "../../img/check.svg"
+                                    //img_visible: true
+                                    img_color: isEdit? "#00000000" : "white"
+                                    visible: isEdit? (account !== "default" && selectedAccount !== account ? true : false) : (selectedAccount === account? true : false)
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: dp(25)
+                                    anchors.verticalCenter: parent.verticalCenter
                                 }
-                                nav.toggle()
+
+                                Text {
+                                    id: acc_name
+                                    text: qsTr("%1\n%2" + " MWC").arg(account).arg(spendable)
+                                    color: "white"
+                                    font.pixelSize: dp(15)
+                                    font.italic: true
+                                    font.weight: Font.Light
+                                    anchors.left: img_check.right
+                                    anchors.leftMargin: dp(25)
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                ImageColor {
+                                    id: img_edit
+                                    img_height: parent.height/2.5
+                                    img_source: "../../img/check.svg"
+                                    //img_visible: true
+                                    img_color: "white"
+                                    visible: isEdit? (account !== "default" && selectedAccount !== account ? true : false) : false
+                                    anchors.right: parent.right
+                                    anchors.rightMargin: dp(25)
+                                    anchors.verticalCenter: parent.verticalCenter
+
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        if (selectedAccount !== account && !isEdit) {
+                                            selectedAccount = account
+                                            wallet.switchAccount(account)
+                                            spendableBalance = spendable
+                                            awaitBalance = awaiting
+                                            lockedBalance = locked
+
+                                        }
+
+
+                                    }
+
+                                }
+                                MouseArea {
+                                    anchors.fill: img_check
+                                    onClicked: {
+                                        selectedAccount = account
+                                        messagebox.open("Delete account", "Are you sure that you want to delete this account?", true, "No", "Yes", "", "", "", onDeleteAccount)
+                                    }
+                                }
+
+                            }
+
+                        }
+
+                        Rectangle {
+                            id: rec_new_acc
+                            height: dp(60)
+                            width: nav.width
+                            color: "#00000000"
+                            visible: isEdit? false : true
+                            //anchors.top: grid_seed.bottom
+                            Image {
+                                id: img_new_acc
+                                height: rec_new_acc.height/2.5
+                                source:"../img/plus.svg"
+                                fillMode: Image.PreserveAspectFit
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: rec_new_acc.left
+                                anchors.leftMargin: dp(25)
+                                //paddingLeft: dp(25)
+                            }
+                            ColorOverlay {
+                                id: over_new_acc
+                                anchors.fill: img_new_acc
+                                source: img_new_acc
+                                color: "#ffffff"
+                            }
+                            Text {
+                                id: name_new_acc
+                                text: qsTr("Add New Account")
+                                color: "white"
+                                font.pixelSize: dp(15)
+                                font.italic: true
+                                font.weight: Font.Light
+                                anchors.left: img_new_acc.right
+                                anchors.leftMargin: dp(25)
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+
+                                    inputDlg.open(qsTr("Add account"), qsTr("Please specify the name of a new account in your wallet"), "account name", "", 32, onAddAccount)
+                                }
+
                             }
                         }
                     }
+
+
                 }
-                model: navModel
             }
-
-//            Text {
-//                id: text_accounts
-//                text: qsTr("Accounts")
-//                color: "white"
-//                anchors.left: parent.left
-//                anchors.leftMargin: dp(35)
-//                anchors.bottom: accountComboBox.top
-//                anchors.bottomMargin: dp(10)
-//                font.pixelSize: dp(12)
-//            }
-
-//            ComboBox {
-//                id: accountComboBox
-
-//                onCurrentIndexChanged: {
-//                    if (accountComboBox.currentIndex >= 0) {
-//                        const selectedAccount = accountItems.get(accountComboBox.currentIndex).account
-//                        wallet.switchAccount(selectedAccount)
-//                        updateInstanceAccountText()
-//                    }
-//                }
-
-//                delegate: ItemDelegate {
-//                    width: accountComboBox.width
-//                    contentItem: Text {
-//                        text: info
-//                        color: "white"
-//                        font: accountComboBox.font
-//                        elide: Text.ElideRight
-//                        verticalAlignment: Text.AlignVCenter
-//                    }
-//                    background: Rectangle {
-//                        color: accountComboBox.highlightedIndex === index ? "#955BDD" : "#8633E0"
-//                    }
-//                    topPadding: dp(10)
-//                    bottomPadding: dp(10)
-//                    leftPadding: dp(20)
-//                    rightPadding: dp(20)
-//                }
-
-//                indicator: Canvas {
-//                    id: canvas
-//                    x: accountComboBox.width - width - accountComboBox.rightPadding
-//                    y: accountComboBox.topPadding + (accountComboBox.availableHeight - height) / 2
-//                    width: dp(14)
-//                    height: dp(7)
-//                    contextType: "2d"
-
-//                    Connections {
-//                        target: accountComboBox
-//                        function onPressedChanged() { canvas.requestPaint() }
-//                    }
-
-//                    onPaint: {
-//                        context.reset()
-//                        if (accountComboBox.popup.visible) {
-//                            context.moveTo(0, height)
-//                            context.lineTo(width / 2, 0)
-//                            context.lineTo(width, height)
-//                        } else {
-//                            context.moveTo(0, 0)
-//                            context.lineTo(width / 2, height)
-//                            context.lineTo(width, 0)
-//                        }
-//                        context.strokeStyle = "white"
-//                        context.lineWidth = 2
-//                        context.stroke()
-//                    }
-//                }
-
-//                contentItem: Text {
-//                    text: accountComboBox.currentIndex >= 0 && accountItems.get(accountComboBox.currentIndex).info
-//                    font: accountComboBox.font
-//                    color: "white"
-//                    verticalAlignment: Text.AlignVCenter
-//                    horizontalAlignment: Text.AlignHCenter
-//                    elide: Text.ElideRight
-//                }
-
-//                background: Rectangle {
-//                    implicitHeight: dp(50)
-//                    radius: dp(5)
-//                    color: "#8633E0"
-//                }
-
-//                popup: Popup {
-//                    y: accountComboBox.height + dp(3)
-//                    width: accountComboBox.width
-//                    implicitHeight: contentItem.implicitHeight + dp(20)
-//                    topPadding: dp(10)
-//                    bottomPadding: dp(10)
-//                    leftPadding: dp(0)
-//                    rightPadding: dp(0)
-
-//                    contentItem: ListView {
-//                        clip: true
-//                        implicitHeight: contentHeight
-//                        model: accountComboBox.popup.visible ? accountComboBox.delegateModel : null
-//                        currentIndex: accountComboBox.highlightedIndex
-
-//                        ScrollIndicator.vertical: ScrollIndicator { }
-//                    }
-
-//                    background: Rectangle {
-//                        color: "#8633E0"
-//                        radius: dp(5)
-//                    }
-
-//                    onVisibleChanged: {
-//                        if (!accountComboBox.popup.visible) {
-//                            canvas.requestPaint()
-//                        }
-//                    }
-//                }
-
-//                model: ListModel {
-//                    id: accountItems
-//                }
-//                anchors.bottom: button_changeinstance.top
-//                anchors.bottomMargin: dp(55)
-//                anchors.right: parent.right
-//                anchors.rightMargin: dp(35)
-//                anchors.left: parent.left
-//                anchors.leftMargin: dp(35)
-//                leftPadding: dp(20)
-//                rightPadding: dp(20)
-//                font.pixelSize: dp(18)
-//            }
 
             Button {
                 id: button_changeinstance
@@ -731,26 +573,155 @@ Item {
                 }
 
                 onClicked: {
-                    nav.toggle()
+                    //nav.toggle()
                     messagebox.open(qsTr("LOGOUT / CHANGE WALLET"), qsTr("Are you sure you want to logout?"), true, "No", "Yes", "", "", "", changeInstanceCallback)
                 }
             }
         }
     }
 
-    ListModel {
-        id: navModel
-        ListElement {
-            pageName: "Wallet"
-            imagePath: "../img/NavWallet@2x.svg"
-        }
-        ListElement {
-            pageName: "Account Options"
-            imagePath: "../img/NavAccount@2x.svg"
-        }
-        ListElement {
-            pageName: "Settings"
-            imagePath: "../img/NavSettings@2x.svg"
+
+    Rectangle {
+        id: navbarBottom
+        height: parent.height/14
+        width: parent.width
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        color: "#15171c"
+
+        RowLayout {
+            id: layoutNavBottom
+            spacing: 0
+            Rectangle {
+                color: "#00000000"
+                Layout.fillHeight: true
+                Layout.minimumHeight: parent.parent.height
+                Layout.minimumWidth: parent.parent.width/5
+                Layout.preferredWidth: 100
+                Layout.maximumWidth: 300
+                ImageColor {
+                    id: image_wallet
+                    img_height: parent.height* 0.5
+                    anchors.bottom: text_wallet.top
+                    anchors.bottomMargin: dp(2)
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    img_source: "../../img/wallet.svg"
+                    img_color: currentState === 21 ? "white" : "grey"
+
+
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        stateMachine.setActionWindow(21)
+                    }
+                }
+            }
+            Rectangle {
+                color: "#00000000"
+                Layout.fillHeight: true
+                Layout.minimumHeight: parent.parent.height
+                Layout.minimumWidth: parent.parent.width/5
+                Layout.preferredWidth: 100
+                Layout.maximumWidth: 300
+                ImageColor {
+                    id: image_txs
+                    img_height: parent.height* 0.5
+                    anchors.bottom: text_txs.top
+                    anchors.bottomMargin: dp(2)
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    img_source: "../../img/list.svg"
+                    img_color: currentState === 11 ? "white" : "grey"
+
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        stateMachine.setActionWindow(11)
+                    }
+                }
+            }
+            Rectangle {
+                color: "#00000000"
+                Layout.fillHeight: true
+                Layout.minimumHeight: parent.parent.height
+                Layout.minimumWidth: parent.parent.width/5
+                Layout.preferredWidth: 100
+                Layout.maximumWidth: 300
+                ImageColor {
+                    id: image_listeners
+                    img_height: parent.height* 0.5
+                    anchors.bottom: text_listeners.top
+                    anchors.bottomMargin: dp(2)
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    img_source: "../../img/listener.svg"
+                    img_color: currentState === 10 ? "white" : "grey"
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        stateMachine.setActionWindow(10)
+                    }
+                }
+            }
+            Rectangle {
+                color: "#00000000"
+                Layout.fillHeight: true
+                Layout.minimumHeight: parent.parent.height
+                Layout.minimumWidth: parent.parent.width/5
+                Layout.preferredWidth: 100
+                Layout.maximumWidth: 300
+
+                ImageColor {
+                    id: image_account
+                    img_height: parent.height* 0.5
+                    anchors.bottom: text_account.top
+                    anchors.bottomMargin: dp(2)
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    img_source: "../../img/notification.svg"
+                    img_color: currentState === 6 ? "white" : "grey"
+
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        stateMachine.setActionWindow(6)
+                    }
+                }
+            }
+            Rectangle {
+                color: "#00000000"
+                Layout.fillHeight: true
+                Layout.minimumHeight: parent.parent.height
+                Layout.minimumWidth: parent.parent.width/5
+                Layout.preferredWidth: 100
+                Layout.maximumWidth: 300
+                ImageColor {
+                    id: image_settings
+                    img_height: parent.height* 0.5
+                    anchors.bottom: text_settings.top
+                    anchors.bottomMargin: dp(2)
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    img_source: "../../img/setting.svg"
+                    img_color: currentState === 23 ? "white" : "grey"
+
+
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        stateMachine.setActionWindow(23)
+                    }
+                }
+            }
         }
     }
 }

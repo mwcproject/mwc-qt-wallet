@@ -7,7 +7,7 @@ Item {
     id: outputDetail
     visible: false
 
-    property string blockExplorerUrl
+    /*property string blockExplorerUrl
     property string outputCommitment
 
     ConfigBridge {
@@ -418,7 +418,7 @@ Item {
                 }
             }
         }
-    }
+    }*/
 }
 
 /*##^##

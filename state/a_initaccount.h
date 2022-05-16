@@ -45,13 +45,14 @@ public:
     void setPassword(const QString & password);
     // Step 2
     enum MWC_NETWORK { MWC_MAIN_NET = 1, MWC_FLOO_NET=2 };
-    void submitWalletCreateChoices(MWC_NETWORK network, QString instanceName);
+    enum SEED_LENGHT { SHORT = 1, LONG=2 };
+    void submitWalletCreateChoices(MWC_NETWORK network, QString instanceName, SEED_LENGHT lenghtSeed);
 
     // Step 3  New seed
     void doneWithNewSeed();
 
     // Single Word verification
-    void submitSeedWord(QString word);
+    void submitSeedWord(QVector<QString> testSeedInput, bool skip);
 
     // Restart seed verification
     void restartSeedVerification();

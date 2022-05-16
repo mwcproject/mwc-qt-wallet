@@ -40,8 +40,8 @@ void NewSeed::doneWithNewSeed() {
 }
 
 // Submit a new word from the user input
-Q_INVOKABLE void NewSeed::submitSeedWord(QString word) {
-    getState()->submitSeedWord(word);
+Q_INVOKABLE void NewSeed::submitSeedWord(QVector<QString> testSeedInput, bool skip) {
+    getState()->submitSeedWord(testSeedInput, skip);
 }
 
 // Restart seed verification

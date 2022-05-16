@@ -57,7 +57,7 @@ public:
     virtual QString getOpenFileName(const QString &caption, const QString &dir, const QString &filter) = 0;
 
     // Ask for confirmation
-    virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) = 0;
+    virtual bool sendConfirmationDlg( QString title, QVector<QString> message, double widthScale, QString passwordHash ) = 0;
 
     // Stopping wallet message
     virtual void showWalletStoppingMessage(int taskTimeout) = 0;
@@ -69,7 +69,7 @@ public:
     virtual void pageInitAccount(QString path, bool restoredFromSeed) = 0;
     virtual void pageEnterSeed() = 0;
     virtual void pageNewSeed(QString pageTitle, QVector<QString> seed, bool hideSubmitButton = false) = 0;
-    virtual void pageNewSeedTest(int wordIndex) = 0;
+    virtual void pageNewSeedTest(QVector<int> testWordsIndex) = 0;
     virtual void pageProgressWnd(QString pageTitle, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable ) = 0;
     virtual void pageOutputs() = 0;
     virtual void pageFileTransactionReceive(QString pageTitle,
@@ -89,6 +89,8 @@ public:
     // slatepack - slatepack string value to show.
     // backStateId - state ID of the caller. On 'back' will switch to this state Id
     virtual void pageShowSlatepack(QString slatepack, int backStateId, QString txExtension, bool enableFinalize) = 0;
+
+    virtual void pageShowQr(QString typeAddress, QString address,  QString svgQr, int backStateId) = 0;
 
     virtual void pageAccounts() = 0;
     virtual void pageAccountTransfer() = 0;

@@ -334,6 +334,8 @@ Item {
 
             rect_progress.visible = true
             button_send.enabled = false
+            console.log("amt_- : " + typeof amount)
+            console.log("amt_- : " + typeof Number(amount).toString())
             if (!send.sendMwcOnline(account, Number(amount).toString(), sendTo, "", description)) {
                 rect_progress.visible = false
                 button_send.enabled = true

@@ -3,6 +3,7 @@ QT += svg
 QT += androidextras
 
 CONFIG += c++11
+CONFIG += lrelease embed_translations
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -67,9 +68,45 @@ DISTFILES += \
     android/gradle/wrapper/gradle-wrapper.properties \
     android/gradlew \
     android/gradlew.bat \
+    android/local.properties \
+    android/res/drawable-anydpi/ic_action_name.xml \
+    android/res/drawable-hdpi/ic_action_name.png \
+    android/res/drawable-mdpi/ic_action_name.png \
+    android/res/drawable-v24/ic_launcher_background.xml \
+    android/res/drawable-xhdpi/ic_action_name.png \
+    android/res/drawable-xxhdpi/ic_action_name.png \
+    android/res/drawable/ic_launcher_foreground.xml \
+    android/res/drawable/ic_mwc_logo.xml \
+    android/res/mipmap-anydpi-v26/ic_launcher.xml \
+    android/res/mipmap-anydpi-v26/ic_launcher_round.xml \
+    android/res/mipmap-hdpi/ic_launcher.png \
+    android/res/mipmap-hdpi/ic_launcher_round.png \
+    android/res/mipmap-mdpi/ic_launcher.png \
+    android/res/mipmap-mdpi/ic_launcher_round.png \
+    android/res/mipmap-xhdpi/ic_launcher.png \
+    android/res/mipmap-xhdpi/ic_launcher_round.png \
+    android/res/mipmap-xxhdpi/ic_launcher.png \
+    android/res/mipmap-xxhdpi/ic_launcher_round.png \
+    android/res/mipmap-xxxhdpi/ic_launcher.png \
+    android/res/mipmap-xxxhdpi/ic_launcher_round.png \
     android/res/values/libs.xml \
     android/src/com/mwc/mobile/ActivityUtils.java \
-    android/src/com/mwc/mobile/QtAndroidService.java
+    android/src/com/mwc/mobile/QtAndroidService.java \
+    android/src/mw/mwc/wallet/QmlHelper.java \
+
+TRANSLATIONS += \
+    i18n/mwc_base.ts \
+    i18n/mwc_en.ts \
+    i18n/mwc_fr.ts \
+    i18n/mwc_he.ts \
+    i18n/mwc_id.ts \
+    i18n/mwc_it.ts \
+    i18n/mwc_ja.ts \
+    i18n/mwc_ko.ts \
+    i18n/mwc_pt.ts \
+    i18n/mwc_ru.ts \
+    i18n/mwc_vi.ts \
+    i18n/mwc_zh.ts
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
@@ -78,6 +115,5 @@ ANDROID_EXTRA_LIBS = $$PWD/android_bin/x86/libmwc713.so $$PWD/android_bin/x86/li
     $$PWD/android_bin/armeabi-v7a/libmwc713.so  $$PWD/android_bin/armeabi-v7a/libmwczip.so  $$PWD/android_bin/armeabi-v7a/libtor.so \
     $$PWD/android_bin/arm64-v8a/libmwc713.so    $$PWD/android_bin/arm64-v8a/libmwczip.so    $$PWD/android_bin/arm64-v8a/libtor.so
 
-
-ANDROID_ABIS = x86_64
+ANDROID_ABIS = armeabi-v7a arm64-v8a x86 x86_64
 

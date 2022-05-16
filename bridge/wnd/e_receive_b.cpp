@@ -67,4 +67,9 @@ void Receive::receiveSlatepack(QString slatepack, QString description) {
 }
 
 
+// Files transaction page, continue with a Slatepack
+void Receive::showQrCode(QString typeAddress, QString address) {
+    getState()->showQrCode(typeAddress, address);
+}
+
 }

@@ -31,7 +31,7 @@ public:
     Q_INVOKABLE void doneWithNewSeed();
 
     // Submit a new word from the user input
-    Q_INVOKABLE void submitSeedWord(QString word);
+    Q_INVOKABLE void submitSeedWord(QVector<QString> testWordsInput, bool skip);
 
     // Restart seed verification
     Q_INVOKABLE void restartSeedVerification();

@@ -82,6 +82,39 @@ bool WalletConfig::isOutputLockingEnabled() {
     return getState()->isOutputLockingEnabled();
 }
 
+int WalletConfig::getPriceCurrency() {
+    return getState()->getPriceCurrency();
+}
+
+void WalletConfig::setPriceCurrency(int currency) {
+    return getState()->setPriceCurrency(currency);
+}
+
+int WalletConfig::getLanguage() {
+    return getState()->getLanguage();
+}
+
+void WalletConfig::setLanguage(int language) {
+    return getState()->setLanguage(language);
+}
+
+bool WalletConfig::getDarkModeEnabled() {
+    return getState()->getDarkModeEnabled();
+}
+
+void WalletConfig::setDarkModeEnabled(bool enable) {
+    return getState()->setDarkModeEnabled(enable);
+}
+
+bool WalletConfig::getNotificationAndroidEnabled() {
+    return getState()->getNotificationAndroidEnabled();
+}
+
+void WalletConfig::setNotificationAndroidEnabled(bool enable) {
+    return getState()->setNotificationAndroidEnabled(enable);
+}
+
+
 bool WalletConfig::getNotificationWindowsEnabled() {
     return getState()->getNotificationWindowsEnabled();
 }
@@ -163,6 +196,5 @@ bool WalletConfig::updateWalletConfig( QString mwcmqsDomain, QString _keyBasePat
     config.setDataWalletCfg(mwcmqsDomain);
     return getState()->setWalletConfig(config, need2updateGuiSize);
 }
-
 
 }

@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include "../state/state.h"
 #include <QJsonDocument>
+#include <QJsonArray>
 #include <QStandardPaths>
 #include <QDir>
 #include <QDebug>
@@ -168,18 +169,22 @@ QString MobileWndManager::getOpenFileName(const QString &caption, const QString 
 
 
 // Ask for confirmation
-bool MobileWndManager::sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) {
+bool MobileWndManager::sendConfirmationDlg( QString title, QVector<QString> message, double widthScale, QString passwordHash ) {
     Q_UNUSED(widthScale)
 
     if(mainWindow) {
-        mainWindow->setProperty("sendConformationDlgResponse", -1);
+        mainWindow->setProperty("sendConfirmationDlgResponse", -1);
         QVariant retValue;
-        QMetaObject::invokeMethod(mainWindow, "openSendConfirmationDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant, message), Q_ARG(QVariant, passwordHash));
-        while(mainWindow->property("sendConformationDlgResponse") == -1) {
+        QJsonArray info;
+        for (int i=0; i<message.size(); i++){
+            info.append(message[i]);
+        }
+        QMetaObject::invokeMethod(mainWindow, "openSendConfirmationDlg", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, title), Q_ARG(QVariant,  QJsonDocument(info).toJson(QJsonDocument::Compact)), Q_ARG(QVariant, passwordHash));
+        while(mainWindow->property("sendConfirmationDlgResponse") == -1) {
             QCoreApplication::processEvents();
             QThread::usleep(50);
         }
-        return mainWindow->property("sendConformationDlgResponse") == 1;
+        return mainWindow->property("sendConfirmationDlgResponse") == 1;
     }
     return false;
 }
@@ -232,10 +237,18 @@ void MobileWndManager::pageNewSeed(QString pageTitle, QVector<QString> seed, boo
     QVariant retValue;
     QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
-void MobileWndManager::pageNewSeedTest(int wordIndex) {
+
+void MobileWndManager::pageNewSeedTest(QVector<int> testWordsIndex) {
     QJsonObject obj;
+    QJsonArray wordsIndexArray;
+
+    for (int i=0; i<testWordsIndex.size(); i++){
+        wordsIndexArray.append(testWordsIndex[i]);
+    }
+    qDebug() << "Get a passphrase, it has words: " << wordsIndexArray;
     obj["currentStep"] = 2;
-    obj["wordIndex"] = wordIndex;
+    obj["wordIndex"] = wordsIndexArray;
+    qDebug() << "testWordIndex: " << obj;
     QVariant retValue;
     QMetaObject::invokeMethod(mainWindow, "updateInitParams", Q_RETURN_ARG(QVariant, retValue), Q_ARG(QVariant, QJsonDocument(obj).toJson(QJsonDocument::Compact)));
 }
@@ -339,6 +352,15 @@ void MobileWndManager::pageShowSlatepack(QString slatepack, int backStateId, QSt
     obj["backStateId"] = backStateId;
     obj["txExtension"] = txExtension;
     obj["enableFinalize"] = enableFinalize;
+    mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
+}
+
+void MobileWndManager::pageShowQr(QString typeAdress, QString address, QString svgQr, int backStateId) {
+    QJsonObject obj;
+    obj["typeAddress"] = typeAdress;
+    obj["address"] = address;
+    obj["svg"] =  svgQr;
+    obj["backStateId"] = backStateId;
     mainWindow->setProperty("initParams", QJsonDocument(obj).toJson(QJsonDocument::Compact));
 }
 

@@ -19,6 +19,7 @@
 #include "../util/Log.h"
 #include "../util/Json.h"
 #include "../util/Files.h"
+#include "../util/QrCode.h"
 //#include "../util_desktop/timeoutlock.h"
 #include "../core/global.h"
 #include "../core/WndManager.h"
@@ -213,6 +214,15 @@ void Receive::onReceiveSlatepack( QString tagId, QString error, QString slatepac
     }
 }
 
+using namespace qrcodegen;
+
+void Receive::showQrCode( QString typeAddress, QString address) {
+    const QrCode qrCodeResult =  QrCode::encodeText(address.toStdString().c_str(), QrCode::Ecc::HIGH);
+    QString svgQr = QString::fromStdString( qrCodeResult.toSvgString(1) );
+    atInitialPage = false;
+    core::getWndManager()->pageShowQr(typeAddress, address, svgQr, STATE::RECEIVE_COINS);
+
+}
 
 void Receive::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
     Q_UNUSED(errMsg)

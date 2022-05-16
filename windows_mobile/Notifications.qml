@@ -57,6 +57,7 @@ Item {
                 id: rect_notification
                 height: dp(50) + text_message.height
                 color: "#33bf84ff"
+                radius: dp(25)
                 anchors.top: parent.top
                 anchors.topMargin: dp(15)
                 anchors.right: parent.right

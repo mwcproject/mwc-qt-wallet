@@ -64,6 +64,13 @@ public:
     // return Total MWC amount as String. Formatted for GUI
     Q_INVOKABLE QString getTotalMwcAmount();
 
+    // return Spendable MWC amount as String. Formatted for GUI
+    Q_INVOKABLE QString getSpendableMwcAmount();
+
+    // return Locked MWC amount as String. Formatted for GUI
+    Q_INVOKABLE QString getLockedMwcAmount();
+
+
     // return Unconfirmed MWC amount as String. Formatted for GUI
     // Empty string if there are no unconfirmed coins
     Q_INVOKABLE QString getUnconfirmedAmount();

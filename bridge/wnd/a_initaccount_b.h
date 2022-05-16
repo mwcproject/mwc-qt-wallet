@@ -36,7 +36,7 @@ public:
 
     // network: see values at state::InitAccount::MWC_NETWORK
     // newInstanceName: Name of the new wallet instance
-    Q_INVOKABLE void submitWalletCreateChoices(int network, QString newInstanceName);
+    Q_INVOKABLE void submitWalletCreateChoices(int network, QString newInstanceName, int lenghtSeed);
 
 };
 
