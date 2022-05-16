@@ -7,7 +7,7 @@ import OutputsBridge 1.0
 import UtilBridge 1.0
 
 Item {
-    property bool canLockOutputs
+    /*property bool canLockOutputs
     property bool showAll
     property var allData: []
 
@@ -555,5 +555,5 @@ Item {
             id: animation
             source: "../img/loading.gif"
         }
-    }
+    }*/
 }

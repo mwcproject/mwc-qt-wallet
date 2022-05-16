@@ -22,9 +22,12 @@ Item {
     property var type_TRANSACTION_SEND: 1
     property var type_TRANSACTION_NONE: 0
     property var number_COIN_BASE_CONFIRM: 1440
-    property var locale: Qt.locale()
     property var message_LEVEL_INFO: 4
     property var message_LEVEL_CRITICAL: 2
+
+    property alias txsModal: txsModal
+
+
 
 
     WalletBridge {
@@ -62,10 +65,8 @@ Item {
         onSgnTransactions: {
             if (account !== wallet.getCurrentAccountName() )
                 return
-            console.log("onSgnTransactions: ",txsList)
             allTrans = []
             transactions.forEach(tx => allTrans.push(tx))
-            console.log("onSgnTransactions AllTrans: ", allTrans)
             updateData()
         }
 
@@ -144,6 +145,7 @@ Item {
         wallet.requestNodeStatus()
         wallet.requestTransactions(account, true)
         updateData()
+
     }
 
     function updateData() {
@@ -167,66 +169,77 @@ Item {
                 }
             }
 
-            let txDate = getTxTime(trans.creationTime, true)
-
-            if (currentDate !== txDate) {
-                currentDate = txDate
-                cache.push({
-                    tx: false,
-                    txDate: txDate,
-
-                 })
-            }
-
             let type = getTypeAsStr(trans.transactionType, trans.confirmed)
             let txAddr = trans.address === "file" ? "File Transfer" : trans.address
-            let txTime = getTxTime(trans.creationTime, false)
-            let txCoinNano = util.nano2one(trans.coinNano) + " MWC"
+            let date  = getTxTime(trans.creationTime)
+            let txCoinNano = util.nano2one(trans.coinNano)
             let txHeight = trans.height <= 0 ? "" : Number(trans.height).toString()
-            let txUUID = shortUUID(trans.txid)
 
 
+            let timestamp = getTimestamp(trans.creationTime)
             cache.push({
                 tx: true,
                 txIdx: trans.txIdx,
                 txType: type,
-                txId: txUUID,
-                txDate: txDate,
-                txTime: txTime,
+                txId: trans.txid,
+                txDate: date[0],
+                txTime: date[1],
                 txCoinNano: txCoinNano,
                 txConfirmedStr: transConfirmedStr,
+                timestamp: timestamp,
+                isConf: trans.confirmed
             })
         }
+        if (isInit) {
+            cache.forEach(tx => txsModal.append(tx))
+            isInit = false
+            return
+        }
 
-        /*listModelsNB = txsModal.count
-        cacheModelNB = cache.length()
+        let listModelsNB = txsModal.count -1
+        let cacheModelNB = cache.length -1
 
-        let txs = []
+        let dist = cacheModelNB - listModelsNB
         for (let i=cacheModelNB; i >= 0; i--) {
-                // check the date
-                let txs = txsModal.get(i).tx
-                let ctxs = cache[i].tx
-                if (txs == ctxs) {
-                    let date = txsModal.get(i).txDate
-                    let cdate = cache[i].txDate
-                    if (date != cdate) {
-                        txs.push(cache[i])
-                    }
-                }
+                let idx = i-dist
+                if (idx < 0){
+                    txsModal.insert(0, cache[i])
+                } else {
+                    let txs = txsModal.get(idx).tx
+                    let ctxs = cache[i].txs
+                    if (ctxs) {
+                        if (txs === ctxs) {
+                            let date = txsModal.get(idx).txDate
+                            let cdate = cache[i].txDate
+                            if (date !== cdate)
+                                txsmodals.set(idx, cache[i])
+                        } else {
+                            txsmodals.set(idx, cache[i])
+                        }
+                   } else {
+                        let txId = txsModal.get(idx).txId
+                        let ctxId = cache[i].txId
+                        if (txId  === ctxId) {
+                            let type = txsModal.get(idx).txType
+                            let ctype = cache[i].txType
+                            if (type !== ctype)
+                                txsModal.set(idx, cache[i])
+                        } else {
+                            txsModal.set(idx, cache[i])
+                        }
+                   }
+              }
+          }
+        walletItem.setChart()
 
-                let txId = txsModal.get(i).txId
-                let ctxId = cache[i].txId
-                //check the txs
-                if (txId  == ctxId)
-                
-                let type = txsModal.get(i).type
-                
-                
-                let ctype = cache[i].ctype
-        }*/
 
-        cache.forEach(tx => txsModal.append(tx))
 
+        
+
+    }
+    function getTimestamp(creationTime){
+        const date = Date.fromLocaleString(locale, creationTime, "hh:mm:ss dd-MM-yyyy")
+        return date.getTime()
     }
 
     function canBeCancelled(transactionType, confirmed) {
@@ -260,27 +273,21 @@ Item {
             return "CoinBase"
     }
 
-    function getTxTime(creationTime, isDate) {
+    function getTxTime(creationTime) {
         const date = Date.fromLocaleString(locale, creationTime, "hh:mm:ss dd-MM-yyyy")
-        if (isDate) {
-            return date.toLocaleString(locale, "M/d/yy")
-        }
-        return date.toLocaleString(locale, "hh:mm ap")
+        return [date.toLocaleString(locale, "M/d/yy"), date.toLocaleString(locale, "hh:mm ap")]
 
     }
 
     function getTxTypeIcon(txType) {
         if (txType === "Cancelled")
-            return "../img/Transactions_Cancelled@2x.svg"
+            return "../img/close.svg"
 
         if (txType === "Unconfirmed")
-            return "../img/Transactions_Unconfirmed@2x.svg"
+            return "../img/hourglass.svg"
 
-        if (txType === "Sent")
-            return "../img/Transactions_Sent@2x.svg"
-
-        if (txType === "Received")
-            return "../img/Transactions_Received@2x.svg"
+        if (txType === "Sent" || txType === "Received")
+            return "../img/export.svg"
 
         if (txType === "CoinBase")
             return "../img/Transactions_CoinBase@2x.svg"
@@ -290,10 +297,6 @@ Item {
         return tx.txIdx >= 0 && tx.transactionType !== type_TRANSACTION_NONE
     }
 
-    function shortUUID(uuid) {
-        let tx = uuid.slice(0, 8) + "..." + uuid.slice(uuid.length-8, uuid.length)
-        return tx
-    }
 
     onVisibleChanged: {
         if (visible) {
@@ -309,22 +312,71 @@ Item {
     }
 
     Rectangle {
+        anchors.fill: container
+        color: Theme.bg
+        opacity: 0.5
+    }
+
+
+
+    Rectangle {
         id: container
         anchors.fill: parent
-        color: dark.bgGradientBottom
+        color: "#00000000"
+
         //radius: dp(25)
         ListView {
             id: transactionList
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            anchors.top: parent.top
+            width: parent.width
+            height: parent.height
             ScrollBar.vertical: ScrollBar {
                 policy: Qt.ScrollBarAsNeeded
             }
-            clip: true
+            header: Rectangle {
+                height: dp(40)
+                width: container.width*0.9
+                color: "#00000000"
+                radius: dp(25)
+            }
+
+            footer: Rectangle {
+                height: dp(40)
+                width: container.width*0.9
+                color: "#00000000"
+                radius: dp(25)
+            }
+            /*ListView.view.delegate: Rectangle {
+                color: "pink"
+            }*/
+            section.property: "txDate"
+            section.criteria: ViewSection.FullString
+            section.delegate: ToolBar {
+                height: dp(40)
+                width: container.width*0.9
+                //color: "#00000000"
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                background: Rectangle {
+                    anchors.fill: parent
+                    color: Theme.card
+                    radius: dp(25)
+                }
+
+                Label {
+                    id: label
+                    text: section
+                    anchors.left: parent.left
+                    anchors.leftMargin: dp(15)
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: dp(18)
+                    font.italic: true
+                    color: Theme.textPrimary
+                }
+            }
             model: txsModal
             delegate: transactionDelegate
+            clip: true
+
             focus: true
         }
     }
@@ -334,104 +386,101 @@ Item {
     }
 
 
-
-
-
-
     Component {
         id: transactionDelegate
         Rectangle {
-            height: tx? dp(72) : dp(40)
+            height: dp(72)
             width: container.width
             color: "#00000000"
 
-            Text {
-                text: txDate
-                visible: tx? false : true
-                font.pixelSize: parent.height*0.4
-                font.family: barlow.medium
-                color: "gray"
-                anchors.left: parent.left
-                anchors.leftMargin: dp(20)
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
             Rectangle {
                 height: dp(70)
-                color: "#252525"
-                visible: tx? true : false
-                width: container.width
+                color: "#00000000"
+                width: container.width *0.9
                 anchors.verticalCenter: parent.verticalCenter
-                //anchors.top: parent.top
-                //anchors.topMargin: dp(20)
+                anchors.horizontalCenter: parent.horizontalCenter
 
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                         console.log("local: ", locale.uiLanguages )
                         const account = wallet.getCurrentAccountName()
                         if (account === "") //==|| index < 0 || index >= allTrans.length)
                             return
                         // respond will come at updateTransactionById
                         wallet.requestTransactionById(account, Number(txIdx).toString());
+                        console.log("contx : ", txConfirmedStr)
+                        transactionDetail.confirmation = txConfirmedStr
+                        transactionDetail.state = "Visible"
+
                     }
                 }
 
-                Image {
-                    id: img_status
-                    width: dp(17)
-                    height: dp(17)
+                Rectangle {
+                    id: rec_img
+                    height: parent.height*0.5
+                    width: height
+                    radius: dp(50)
+                    color: txType === "Cancelled"? Theme.red : txType === "Unconfirmed"? Theme.awaiting : txCoinNano.includes("-")? Theme.textSecondary : Theme.confirmed
+                    opacity: 0.3
                     anchors.left: parent.left
-                    anchors.leftMargin: dp(35)
-                    fillMode: Image.PreserveAspectFit
+                    anchors.leftMargin: dp(20)
                     anchors.verticalCenter: parent.verticalCenter
-                    source: tx?getTxTypeIcon(txType): ""
-                    visible: tx? true : false
+
                 }
+
+                ImageColor {
+                    id: img_status
+                    img_height: txType === "Cancelled"? rec_img.height * 0.3 : rec_img.height * 0.5
+                    img_color: txType === "Cancelled"? "red" : txType === "Unconfirmed"? Theme.awaiting : txCoinNano.includes("-")? Theme.textSecondary : Theme.confirmed
+                    img_source: getTxTypeIcon(txType)
+                    img_rotation: txType === "Received"? 180 : 0
+                    anchors.verticalCenter: rec_img.verticalCenter
+                    anchors.horizontalCenter: rec_img.horizontalCenter
+                }
+
 
                 Text {
                     id: text_uuid
-                    color: "#ffffff"
-                    text: tx? txId : ""
-                    font.pixelSize: parent.height*0.25
-                    anchors.left: img_status.right
-                    anchors.leftMargin: dp(10)
+                    color: Theme.textPrimary
+                    text: txId
+                    font.pixelSize: dp(16)
+                    anchors.left: rec_img.right
+                    anchors.leftMargin: dp(20)
+                    anchors.right: text_amountmwc.left
+                    anchors.rightMargin: dp(40)
+                    elide: Text.ElideMiddle
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.verticalCenterOffset: -dp(10)
-                    visible: tx? true : false
 
                 }
                 Text {
                     id: text_status
-                    color: "gray"
-                    font.pixelSize: parent.height*0.25
+                    color: Theme.textSecondary
+                    font.pixelSize:  dp(14)
                     text: txType + " "  + txTime
-                    anchors.left: img_status.right
-                    anchors.leftMargin: dp(10)
+                    anchors.left: text_uuid.left
                     anchors.top: text_uuid.bottom
-                    visible: tx? true : false
                 }
 
                 Text {
                     id: text_amountmwc
-                    color: "gray"
-                    text: tx? txCoinNano : ""
-                     font.pixelSize: parent.height*0.25
+                    color: txType === "Cancelled"? Theme.textSecondary : txType === "Unconfirmed"? Theme.awaiting : txCoinNano.includes("-")? Theme.textSecondary : Theme.confirmed
+                    text: "%1 MWC".arg(hiddenAmount? hidden : txCoinNano)
+                    font.pixelSize:  dp(16)
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.verticalCenterOffset: -dp(10)
                     anchors.rightMargin: dp(10)
-                    visible: tx? true : false
                 }
                 Text {
                     id: text_amountprice
-                    color: "gray"
-                    font.pixelSize: parent.height*0.25
-                    text: txCoinNano *2.6
+                    color: Theme.textSecondary
+                    font.pixelSize:  dp(14)
+                    text: "%1 %2".arg(hiddenAmount? hidden : (Number(txCoinNano)* currencyPrice).toFixed(currencyPriceRound)).arg(currencyTicker)
+                    font.capitalization: Font.AllUppercase
                     anchors.right: parent.right
                     anchors.top: text_amountmwc.bottom
                     anchors.rightMargin: dp(10)
-                    visible: tx? true : false
                 }
 
 

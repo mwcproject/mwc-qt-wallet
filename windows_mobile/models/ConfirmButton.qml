@@ -8,6 +8,7 @@ Button {
     property string title: "Open"
     property alias overlay: overlay
     property alias color: rectangle.color
+    property alias pixelSize: loginText.font.pixelSize
 
     id: button_login
     height: dp(45)
@@ -16,16 +17,24 @@ Button {
     background: Rectangle {
         id: rectangle
         radius: dp(25)
-        gradient: Gradient {
-            orientation: Gradient.Horizontal
-            GradientStop {
-                position: 0
-                color: "#531d55"
+        LinearGradient {
+            start:Qt.point(0,0)
+            end:Qt.point(rectangle.width, rectangle.height)
+            gradient: Gradient {
+                orientation: Gradient.Vertical
+                GradientStop {
+                    position: 1
+                    color: "#3700c9"
+                }
+                GradientStop {
+                    position: 0
+                    color: "#c300ff"
+                }
+
+
             }
-            GradientStop {
-                position: 1
-                color: "#202020"
-            }
+            anchors.fill: rectangle
+            source: rectangle
         }
         Text {
             id: loginText

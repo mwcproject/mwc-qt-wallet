@@ -86,41 +86,11 @@ Item {
             }
         }
     }
-    Timer {
+    /*Timer {
             running: true; repeat: true; interval: 1000
              onTriggered: {
                  arcBegin+= 270
                  arcEnd += 270
-                 //root.state = root.state === "start" ? "end": "start"
              }
-            //onTriggered: root.state = root.state === "start" ? "end": "start"
-        }
-
-    /*states: [
-        State {
-            name: "start"
-            PropertyChanges {
-                target: root; arcBegin: arcBegin +270; arcEnd: arcEnd +270
-            }
-        },
-        State {
-            name: "end"
-            PropertyChanges {
-                target: root; arcBegin: arcBegin +270; arcEnd: arcEnd +270
-            }
-        }]
-
-    transitions:
-    Transition {
-        PropertyAnimation {
-            properties: "arcBegin";
-            easing.type: Easing.InQuad
-            duration: animationDuration
-        }
-        PropertyAnimation {
-            properties: "arcEnd";
-            //easing.type: Easing.InQuad
-            duration: 1000
-        }
-    }*/
+        }*/
 }

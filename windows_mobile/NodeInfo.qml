@@ -6,6 +6,7 @@ import UtilBridge 1.0
 Item {
     property string lastShownErrorMessage
     property int nodeHeightDiffLimit: 5
+    property int heightBlock
 
     NodeInfoBridge {
         id: nodeInfo
@@ -15,43 +16,7 @@ Item {
         id: util
     }
 
-    Connections {
-        target: nodeInfo
-        onSgnSetNodeStatus: (localNodeStatus, online, errMsg, nodeHeight, peerHeight, totalDifficulty2show, connections) => {
-            if (!online) {
-                text_status.text = "Offline"
-                text_status.color = "#CCFF33"
-                text_connections.text = "-"
-                text_blocks.text = "-"
-                text_difficulty.text = "-"
-                if (lastShownErrorMessage !== errMsg) {
-                    messagebox.open(qsTr("MWC Node connection error"), qsTr("Unable to retrieve MWC Node status.\n" + errMsg))
-                    lastShownErrorMessage = errMsg
-                }
-            } else {
-                if (nodeHeight + nodeHeightDiffLimit < peerHeight) {
-                    text_status.text = "Syncing"
-                    text_status.color = "#CCFF33"
-                }
-                else {
-                    text_status.text = "Online"
-                    text_status.color = "white"
-                }
 
-                if (connections <= 0) {
-                    text_connections.text = "None"
-                    text_connections.color = "#CCFF33"
-                }
-                else {
-                    text_connections.text = Number(connections).toString()
-                    text_connections.color = "white"
-                }
-
-                text_blocks.text = util.longLong2Str(nodeHeight)
-                text_difficulty.text = totalDifficulty2show
-            }
-        }
-    }
 
     onVisibleChanged: {
         if (visible) {

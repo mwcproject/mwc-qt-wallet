@@ -8,6 +8,7 @@ Button {
     property string title: "Open"
     property alias overlay: overlay
     property alias color: rectangle.color
+    property alias pixelSize: loginText.font.pixelSize
 
     id: button_login
     background: Rectangle {

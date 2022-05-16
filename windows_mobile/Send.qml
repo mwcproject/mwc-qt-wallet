@@ -9,9 +9,14 @@ import UtilBridge 1.0
 import "./models"
 
 Item {
+    id: root
 
     property bool showGenProofWarning: false
     property int selectedSendMethod: 1
+    property var contactList
+    property bool isSlatepack: false
+    property string recipientWallet: ""
+
 
     WalletBridge {
         id: wallet
@@ -58,26 +63,39 @@ Item {
         }
     }
 
+    function updateContactsList() {
+        const pairs = config.getContactsAsPairs()
+        contactsModel.clear()
+        contactList = []
+        for (let i = 0; i < pairs.length; i += 2) {
+            contactList.push({
+                name: pairs[i],
+                address: pairs[i+1]
+            })
+            contactsModel.append(contactList[contactList.length - 1])
+        }
+    }
+
     function selectSendMethod(sendMethod) {
         field_address.field_focus = false
         field_amount.field_focus = false
         selectedSendMethod = sendMethod
         switch (sendMethod) {
             case 1: // online_id
-                rec_address.color = "#252525"
+                rec_address.color = Theme.field
                 rec_file.color = "#00000000"
                 rec_slate.color = "#00000000"
 
                 break;
             case 2: // file_id
                 rec_address.color = "#00000000"
-                rec_file.color = "#252525"
+                rec_file.color = Theme.field
                 rec_slate.color = "#00000000"
                 break;
             case 3: // slatepack_id
                 rec_address.color = "#00000000"
                 rec_file.color = "#00000000"
-                rec_slate.color = "#252525"
+                rec_slate.color = Theme.field
                 break;
         }
     }
@@ -95,6 +113,7 @@ Item {
 
     onVisibleChanged: {
         if (visible) {
+            updateContactsList()
             selectSendMethod(config.getSendMethod())
             field_address.text = ""
             field_amount.text = ""
@@ -103,18 +122,7 @@ Item {
     }
     Rectangle {
         anchors.fill: parent
-        gradient: Gradient {
-            orientation: Gradient.Vertical
-            GradientStop {
-                position: 0
-                color: "#4d1d4f"
-            }
-
-            GradientStop {
-                position: 0.3
-                color: "#181818"
-            }
-        }
+        color: Theme.bg
     }
 
     MouseArea {
@@ -125,13 +133,15 @@ Item {
         }
     }
 
+
+
     Rectangle {
         id: rect_sendType
         anchors.top: parent.top
         anchors.topMargin: parent.height/14
         anchors.horizontalCenter: parent.horizontalCenter
         radius: dp(25)
-        color: "#191919"
+        color: Theme.card
         height: parent.height/6
         width: parent.width/1.15
 
@@ -142,7 +152,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: dp(8)
-            color: "#252525"
+            color: Theme.field
             radius: dp(25)
             SendType {
                 id: address
@@ -154,7 +164,7 @@ Item {
                 secondaryText: qsTr("Automatic")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                img_color: "#ffffff"
+                img_color: Theme.textPrimary
             }
             MouseArea {
                 anchors.fill: parent
@@ -182,7 +192,7 @@ Item {
                 secondaryText: qsTr("Manual")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                img_color: "#ffffff"
+                img_color: Theme.textPrimary
             }
             MouseArea {
                 anchors.fill: parent
@@ -211,7 +221,7 @@ Item {
                 secondaryText: qsTr("Manual")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                img_color: "#ffffff"
+                img_color: Theme.textPrimary
             }
             MouseArea {
                 anchors.fill: parent
@@ -224,8 +234,8 @@ Item {
 
     Text {
         id: text_address
-        text: selectedSendMethod !== 2? (selectedSendMethod === 1? qsTr("Address") :  qsTr("Address (Optionnal)")) : ""
-        color: "white"
+        text: selectedSendMethod !== 2? (selectedSendMethod === 1? qsTr("Address") :  qsTr("Address (Optional)")) : ""
+        color: Theme.textPrimary
         font.pixelSize: dp(17)
         font.letterSpacing: dp(0.5)
         anchors.top: rect_sendType.bottom
@@ -235,6 +245,8 @@ Item {
         visible: selectedSendMethod !== 2? true: false
         //anchors.horizontalCenter: parent.horizontalCenter
     }
+
+
 
     AddressField {
         id: field_address
@@ -246,7 +258,6 @@ Item {
         focus: false
         visible: selectedSendMethod !== 2? true: false
         onTextChanged: {
-
             field_amount.field_focus = false
             let recipientWallet = field_address.text.trim()
             if (!recipientWallet) {
@@ -260,12 +271,118 @@ Item {
                 field_address.mainColor = Theme.field
             }
         }
+        mouseContact.onClicked: {
+            if (contactsModel.count === 0) {
+                notification.text = qsTr("No contacts saved")
+                notification.open()
+            }
+
+            contactNav.open()
+        }
     }
+
+    ListModel {
+        id: contactsModel
+    }
+
+    DrawerList {
+        id: contactNav
+        repeater.model: contactsModel
+        repeater.delegate: contactsDelegate
+    }
+
+    Component {
+        id: contactsDelegate
+        Rectangle {
+            height: rectangle.height + dp(5)
+            color: Theme.field
+            width: root.width
+
+            Rectangle {
+                id: rectangle
+                height: text_address.height + text_name.height + dp(12)
+                width: parent.width
+                color: "#181818"
+                //radius: dp(15)
+                anchors.bottom: parent.bottom
+                //anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+
+                Rectangle {
+                    id: initial_logo
+                    height: parent.height*0.5
+                    width: height
+                    radius: dp(150)
+                    color: contactsItem.colorProfil(address, true)
+                    anchors.left: parent.left
+                    anchors.leftMargin: dp(20)
+                    anchors.verticalCenter: parent.verticalCenter
+                    Text {
+                        color: contactsItem.colorProfil(address, false)
+                        text: name.charAt(0)
+                        //font.bold: true
+                        font.family: barlow.light
+                        font.pixelSize: initial_logo.height*0.6
+                        font.capitalization: Font.AllUppercase
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+
+                Text {
+                    id: text_name
+                    color: Theme.textPrimary
+                    text: name
+                    font.pixelSize: dp(16)
+                    font.bold: true
+                    anchors.top: parent.top
+                    anchors.topMargin: dp(10)
+                    anchors.left: initial_logo.right
+                    anchors.leftMargin: dp(20)
+
+
+                }
+                TextEdit {
+                    id: text_address
+                    readOnly: true
+                    font.pixelSize: dp(13)
+                    anchors.top: text_name.bottom
+                    anchors.topMargin: dp(2)
+                    anchors.left: initial_logo.right
+                    anchors.leftMargin: dp(20)
+                    anchors.right: parent.right
+                    anchors.rightMargin: parent.width*0.15
+                    wrapMode: Text.WrapAnywhere
+                    color: Theme.textPrimary
+                    text: address
+                }
+
+                Rectangle {
+                    id: icon_layout
+                    height: parent.height*0.8
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: rectangle.width/7
+                    anchors.right: parent.right
+                    color: "#00000000"
+
+                }
+                MouseArea {
+                    id: m
+                    anchors.fill: parent
+                    onClicked: {
+                        field_address.text = address
+                    }
+                }
+           }
+        }
+    }
+
 
     Text {
         id: text_amount
         text: qsTr("Amount")
-        color: "white"
+        color: Theme.textPrimary
         font.pixelSize: dp(17)
         font.letterSpacing: dp(0.5)
         anchors.top: selectedSendMethod !== 2? field_address.bottom : rect_sendType.bottom
@@ -277,8 +394,8 @@ Item {
 
     AmountField {
         id: field_amount
-        height: dp(50)
-        width: (3*rect_sendType.width)/4
+        height: dp(90)
+        width: rect_sendType.width
         anchors.top: text_amount.bottom
         anchors.topMargin: dp(10)
         anchors.left: field_address.left
@@ -286,20 +403,11 @@ Item {
         mainColor: Theme.field
         onTextChanged: {
             field_address.field_focus = false
-
-            // Probably parse better amount input
-            if (!field_amount.text) {
+            if (!amountSend) {
                 field_amount.mainColor = Theme.field
                 return
             }
-            let amount = field_amount.text.replace("-", "").replace(",",".").trim()
-            let tmp = amount.split(".").length -1
-            if ( tmp > 1) {
-                let idx = amount.lastIndexOf(".")
-                amount.substr(idx, amount.length)
-            }
-            amount = field_amount.text = amount
-            if (parseFloat(amount) >= spendableBalance || isLetters.test(amount)) {
+            if (amountSend > spendableBalance) {
                 field_amount.mainColor = Theme.inputError
                 return
             } else {
@@ -312,7 +420,7 @@ Item {
     Text {
         id: text_available
         text: qsTr("Available: %1 MWC").arg(spendableBalance)
-        color: "grey"
+        color: Theme.textSecondary
         font.pixelSize: dp(12)
         font.letterSpacing: dp(0.5)
         anchors.top: field_amount.bottom
@@ -322,7 +430,7 @@ Item {
         //anchors.horizontalCenter: parent.horizontalCenter
     }
 
-    Button {
+    /*Button {
         id: button_max
         height: field_amount.height
         width: rect_sendType.width/5
@@ -349,7 +457,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
-                color: "white"
+                color: Theme.textPrimary
             }
         }
         onClicked:  {
@@ -358,7 +466,7 @@ Item {
             const amount = parseFloat(send.getSpendAllAmount(selectedAccount))
             field_amount.text = amount
         }
-    }
+    }*/
 
     CheckBox {
         id: checkbox_tx_proof
@@ -380,14 +488,14 @@ Item {
                 img_height: dp(17)
                 anchors.fill: parent
                 img_source: checkbox_tx_proof.checked ?  "../../img/check.svg" : ""
-                img_color: "white"
+                img_color: Theme.textPrimary
             }
         }
 
         contentItem: Text {
             text: checkbox_tx_proof.text
             font: checkbox_tx_proof.font
-            color: "white"
+            color: Theme.textPrimary
             verticalAlignment: Text.AlignVCenter
             anchors.left: checkbox_tx_proof.indicator.right
             anchors.leftMargin: dp(15)
@@ -429,14 +537,14 @@ Item {
                 img_height: dp(17)
                 anchors.fill: parent
                 img_source: checkbox_message.checked ?  "../../img/check.svg" : ""
-                img_color: "white"
+                img_color: Theme.textPrimary
             }
         }
 
         contentItem: Text {
             text: checkbox_message.text
             font: checkbox_message.font
-            color: "white"
+            color: Theme.textPrimary
             verticalAlignment: Text.AlignVCenter
             anchors.left: checkbox_message.indicator.right
             anchors.leftMargin: dp(15)
@@ -463,12 +571,13 @@ Item {
         height: dp(40)
         width: rect_sendType.width
         leftPadding: dp(20)
+        font.pixelSize: dp(16)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: checkbox_message.bottom
         anchors.topMargin: dp(20)
         placeholderText: qsTr("Message")
         visible: false
-        color: "grey"
+        color: Theme.textSecondary
     }
 
     ConfirmButton {
@@ -480,49 +589,78 @@ Item {
         onClicked: {
             field_address.field_focus = false
             field_amount.field_focus = false
-
-
-            const sendAmount = field_amount.text
             config.setSendMethod(selectedSendMethod)
+            const sendAmount = field_amount.amountSend
             const res = send.initialSendSelection(selectedSendMethod, selectedAccount, sendAmount);
-            let amount = one2nano((sendAmount))
-            console.log("amt_ : " +  amount)
-            if (res !== 0) {
-                console.log("error broh")
-                return
-            }
-            if ( !send.isNodeHealthy() ) {
-                messagebox.open(qsTr("Unable to send"), qsTr("Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process"))
-                return
-            }
+            const amount = one2nano((sendAmount))
 
-            const sendTo = field_address.text
+            if (selectedSendMethod == 1) {
+                if (res !== 0) {
+                    return
+                }
+                if ( !send.isNodeHealthy() ) {
+                    messagebox.open(qsTr("Unable to send"), qsTr("Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process"))
+                    return
+                }
 
-            const isValidAddress = util.verifyAddress(sendTo)
-            if (isValidAddress === "unknow") {
-                messagebox.open(qsTr("Invalid Address"), qsTr("Please specify a valid address."))
-                return
-            }
 
-            let valRes = util.validateMwc713Str(sendTo)
-            if (valRes !== "") {
-                messagebox.open(qsTr("Incorrect Input"), qsTr(valRes))
-                textfield_send_to.focus = true
-                return
-            }
 
-            const description = textfield_message.text.split('\n').join('')
-            valRes = util.validateMwc713Str(description);
-            if (valRes !== "") {
-                messagebox.open(qsTr("Incorrect Input"), qsTr(valRes))
-                textarea_description.focus = true
-                return;
-            }
+                const sendTo = field_address.text
 
-            if (!send.sendMwcOnline(selectedAccount, amount, sendTo, "", description)) {
-                //rect_progress.visible = false
-                //button_send.enabled = true
-                return
+                const isValidAddress = util.verifyAddress(sendTo)
+                if (isValidAddress === "unknow") {
+                    messagebox.open(qsTr("Invalid Address"), qsTr("Please specify a valid address."))
+                    return
+                }
+
+                let valRes = util.validateMwc713Str(sendTo)
+                if (valRes !== "") {
+                    messagebox.open(qsTr("Incorrect Input"), qsTr(valRes))
+                    textfield_send_to.focus = true
+                    return
+                }
+
+                const description = textfield_message.text.split('\n').join('')
+
+
+                if (!send.sendMwcOnline(selectedAccount, amount, sendTo, "", description)) {
+                    //rect_progress.visible = false
+                    //button_send.enabled = true
+                    return
+                }
+
+
+            } else {
+                let isSlatepack = false
+                if (selectedSendMethod === 3)
+                    isSlatepack = true
+                let recipientWallet
+                if (isSlatepack) {
+                    recipientWallet = field_address.text
+                    if (recipientWallet !== "" && util.verifyAddress(recipientWallet) !== "tor") {
+                        messagebox.open(qsTr("Unable to send"), qsTr("Please specify valid recipient wallet address"))
+                        field_address.focus = true
+                        return
+                    }
+                }
+
+                if ( !send.isNodeHealthy() ) {
+                    messagebox.open(qsTr("Unable to send"), qsTr("Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process"))
+                    return
+                }
+
+                const description = textfield_message.text.trim().replace('\n', ' ')
+
+                const valRes = util.validateMwc713Str(description);
+                if (valRes !== "") {
+                    messagebox.open("Incorrect Input", valRes)
+                    textfield_message.focus = true
+                    return
+                }
+
+                if (send.sendMwcOffline(selectedAccount, Number(amount).toString(), description, isSlatepack, config.getSendLockOutput(), recipientWallet)) {
+                    rect_progress.visible = true
+                }
             }
             config.setFluff(true)
             //sendConfirmation.visible = false
@@ -533,29 +671,5 @@ Item {
 /*
 let recipientWallet
 let isSlatepack = false
-if (selectedSendMethod === 3) {
-    isSlatepack = true
-    recipientWallet = field_address.text
-    if (recipientWallet !== "" && util.verifyAddress(recipientWallet) !== "tor") {
-        messagebox.open(qsTr("Unable to send"), qsTr("Please specify valid recipient wallet address"))
-        return
-    }
-}
 
-if ( !send.isNodeHealthy() ) {
-    messagebox.open(qsTr("Unable to send"), qsTr("Your MWC Node, that wallet connected to, is not ready.\nMWC Node needs to be connected to a few peers and finish block synchronization process"))
-    return
-}
-
-const description = textfield_message.text.trim().replace('\n', ' ')
-
-const valRes = util.validateMwc713Str(description);
-if (valRes !== "") {
-    messagebox.open("Incorrect Input", valRes)
-    return
-}
-
-if (send.sendMwcOffline(selectedAccount, Number(field_amount.text).toString(), description, isSlatepack, config.getSendLockOutput(), recipientWallet)) {
-    //rect_progress.visible = true
-}
 */

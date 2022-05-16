@@ -204,6 +204,7 @@ Item {
         title: "Next"
         anchors.top: rect_content.bottom
         anchors.topMargin: dp(40)
+        anchors.horizontalCenter: parent.horizontalCenter
         onClicked: {
             open("SendInitial", "Initial Send Slate", 1, slatepackCallback)
             callback(true, pSlatepack, pSlateJson, pSender)

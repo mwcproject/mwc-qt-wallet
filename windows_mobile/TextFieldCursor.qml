@@ -7,9 +7,10 @@ import UtilBridge 1.0
 
 TextField {
     id: control
+    property string colorbg:  "#0d0f12"
     background: Rectangle {
         id: backgroundTextField
-        color: "#0d0f12"
+        color: colorbg
         radius: dp(15)
         //border.color: "#262933"
         //border.width: dp(1)

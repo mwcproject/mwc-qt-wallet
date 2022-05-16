@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Window 2.0
 import ProgressWndBridge 1.0
+import "./models"
 
 Item {
     id: element
@@ -59,7 +60,8 @@ Item {
     }
 
     function updateProgress(pos, msgProgress) {
-        rect_progress.width = rect_bar.width * (pos - progress_min) / (progress_max - progress_min)
+        progress_circle.arcEnd = 360 * (pos - progress_min) / (progress_max - progress_min)
+        text_perc.text = String(Math.ceil((progress_circle.arcEnd / 3.6))) + "%"
         if (msgProgress !== "") {
             text_progress.text = msgProgress
             text_progress.visible = true
@@ -70,18 +72,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        gradient: Gradient {
-            orientation: Gradient.Horizontal
-            GradientStop {
-                position: 0
-                color: "#9E00E7"
-            }
-
-            GradientStop {
-                position: 1
-                color: "#3600C9"
-            }
-        }
+        color: Theme.bg
 
         Text {
             id: text_header
@@ -102,31 +93,32 @@ Item {
             font.pixelSize: dp(18)
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.bottom: rect_progress.top
+            anchors.bottom: progress_circle.top
             anchors.bottomMargin: dp(25)
             horizontalAlignment: Text.AlignHCenter
         }
 
-        Rectangle {
-            id: rect_bar
-            anchors.left: parent.left
-            anchors.leftMargin: dp(50)
-            anchors.right: parent.right
-            anchors.rightMargin: dp(50)
-            anchors.verticalCenter: parent.verticalCenter
-            height: dp(10)
-            color: "#4cffffff"
-        }
-
-        Rectangle {
-            id: rect_progress
-            anchors.left: parent.left
-            anchors.leftMargin: dp(50)
-            anchors.verticalCenter: parent.verticalCenter
-            height: dp(10)
-            width: 0
-            color: "#ffffff"
-        }
+        ProgressCircle {
+            id: progress_circle
+                size: parent.width/3
+                colorCircle: "#FF3333"
+                colorBackground: "gray"
+                showBackground: true
+                arcBegin: 0
+                arcEnd: 0
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                lineWidth: dp(10)
+                Text {
+                    id: text_perc
+                    text: ""
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.pixelSize: dp(30)
+                    font.family: barlow.bold
+                    color: "white"
+                }
+            }
 
         Text {
             id: text_progress
@@ -135,7 +127,7 @@ Item {
             font.pixelSize: dp(18)
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.top: rect_progress.bottom
+            anchors.top: progress_circle.bottom
             anchors.topMargin: dp(25)
             horizontalAlignment: Text.AlignHCenter
         }

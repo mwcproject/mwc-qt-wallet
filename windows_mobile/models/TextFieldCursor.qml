@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
 import UtilBridge 1.0
+import "../."
 
 
 
@@ -12,14 +13,14 @@ TextField {
     id: control
     background: Rectangle {
         id: backgroundTextField
-        color: "#242424"
+        color: Theme.field
         radius: dp(15)
     }
 
     cursorDelegate: Rectangle {
         id: cursor
         visible: false
-        color: "salmon"
+        color: Theme.cursor
         width: dp(1.5)
 
         SequentialAnimation {

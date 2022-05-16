@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Window 2.15
 import UtilBridge 1.0
 import QtGraphicalEffects 1.0
+import "../."
 
 
 
@@ -18,6 +19,7 @@ Rectangle {
     property string mainColor: "#242424"
     property alias text: field_password.text
     property alias textField: field_password
+    property alias mouseContact: mouseContact
 
     property alias mouse: mouse
 
@@ -72,10 +74,8 @@ Rectangle {
         anchors.rightMargin: dp(10)
         anchors.verticalCenter: parent.verticalCenter
         MouseArea {
+            id: mouseContact
             anchors.fill: parent
-            onClicked: {
-                selectContactItem.open(true, true, true, onSelectContact)
-            }
         }
 
 

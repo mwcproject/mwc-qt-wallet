@@ -42,18 +42,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        gradient: Gradient {
-            orientation: Gradient.Vertical
-            GradientStop {
-                position: 0
-                color: isDarkMode? Theme.gradientTop : Theme.red
-            }
-
-            GradientStop {
-                position: 0.2
-                color: Theme.gradientBottom
-            }
-        }
+        color: Theme.bg
     }
 
     Text {

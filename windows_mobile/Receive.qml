@@ -14,6 +14,11 @@ Item {
     property string mwcmqAddr
     property string torAddr
     property string proofAddr
+
+    property bool mqsInProgress
+    property bool torInProgress
+    property bool warnMsgShown: false
+
     property int selectedReceiveMethod: 1
 
 
@@ -65,7 +70,6 @@ Item {
                             return
                         }
                         config.updatePathFor("fileGen", path)
-                        rect_progress.visible = true
                         receive.signTransaction(path)
             }
         }
@@ -86,6 +90,15 @@ Item {
 
         onSgnUpdateListenerStatus: {
             updateStatus()
+        }
+
+        onSgnListenerStartStop: (mqs, tor) => {
+            if (mqs)
+                mqsInProgress = false
+            if (tor)
+                torInProgress = false
+
+            updateStatuses()
         }
 
         onSgnFileProofAddress: (proofAddress) => {
@@ -118,12 +131,51 @@ Item {
 
     function updateStatus() {
         indicator_mwcmq.color = wallet.getMqsListenerStatus() ? "green" : "red"
-        indicator_tor.color= wallet.getTorListenerStatus() ? "green" : "red"
+        indicator_tor.color = wallet.getTorListenerStatus() ? "green" : "red"
     }
+
 
     function slatepackCallback(ok, slatepack, slateJson, sender) {
         if (ok) {
             receive.signSlatepackTransaction(slatepack, slateJson, sender)
+        }
+    }
+
+    function updateStatuses() {
+        const mqsStatus = wallet.getMqsListenerStatus()
+        const torStatus = wallet.getTorListenerStatus()
+        const mqsStarted = wallet.isMqsListenerStarted()
+        const torStarted = wallet.isTorListenerStarted()
+
+        // MWC MQ
+        indicator_mwcmq.color = wallet.getMqsListenerStatus() ? "green" : "red"
+
+
+        if (mqsStarted) {
+            if (mqsStatus) {
+                button_mqs.title = mqsInProgress ? "Stopping..." : "Stop"
+            } else {
+                button_mqs.title= "Stop to retry"
+            }
+        } else {
+            button_mqs.title = mqsInProgress ? "Starting..." : "Start"
+        }
+        //button_next_address.enabled = !mqsStarted && !torStarted
+       //button_to_index.enabled = !mqsStarted && !torStarted
+
+
+
+        // TOR
+        indicator_tor.color = wallet.getTorListenerStatus() ? "green" : "red"
+
+        if (torStarted) {
+            if (torStatus) {
+                button_tor.title = torInProgress ? "Stopping..." : "Stop"
+            } else {
+                button_tor.title = "Stop to retry"
+            }
+        } else {
+            button_tor.title = torInProgress ? "Starting" : "Start"
         }
     }
 
@@ -153,21 +205,6 @@ Item {
 
     }
 
-    Rectangle {
-        anchors.fill: parent
-        gradient: Gradient {
-            orientation: Gradient.Vertical
-            GradientStop {
-                position: 0
-                color: "#4d1d4f"
-            }
-
-            GradientStop {
-                position: 0.3
-                color: "#181818"
-            }
-        }
-    }
     MouseArea{
         anchors.fill: parent
         onClicked: {
@@ -297,7 +334,7 @@ Item {
             anchors.topMargin: dp(40)
             anchors.left: rect_mqs_address.left
             anchors.leftMargin: dp(10)
-            visible: selectedSendMethod !== 2? true: false
+            visible: selectedReceiveMethod !== 2? true: false
             //anchors.horizontalCenter: parent.horizontalCenter
         }
 
@@ -359,7 +396,6 @@ Item {
 
             TextEdit {
                 id: text_mqs_address
-                selectByMouse: true
                 readOnly: true
                 anchors.top: parent.top
                 anchors.topMargin: dp(8)
@@ -374,6 +410,32 @@ Item {
             }
         }
 
+        SecondaryButton {
+            id: button_mqs
+            width: rect_mqs_address.width/3
+            height: dp(30)
+            anchors.right: rect_mqs_address.right
+            anchors.topMargin: dp(10)
+            anchors.top: rect_mqs_address.bottom
+            title: qsTr("Start")
+
+            onClicked: {
+                if (mqsInProgress)
+                    return;
+                mqsInProgress = true
+
+                if (wallet.isMqsListenerStarted()) {
+                    button_mqs.title = "Stopping..."
+                    wallet.requestStopMqsListener()
+                }
+                else {
+                    button_mqs.title = "Starting..."
+                    wallet.requestStartMqsListener()
+                }
+            }
+        }
+
+
 
         Text {
             id: text_tor
@@ -382,10 +444,10 @@ Item {
             font.pixelSize: dp(17)
             font.letterSpacing: dp(0.5)
             anchors.top: rect_mqs_address.bottom
-            anchors.topMargin: dp(40)
+            anchors.topMargin: dp(70)
             anchors.left: rect_mqs_address.left
             anchors.leftMargin: dp(10)
-            visible: selectedSendMethod !== 2? true: false
+            visible: selectedReceiveMethod  !== 2? true: false
             //anchors.horizontalCenter: parent.horizontalCenter
         }
 
@@ -450,7 +512,6 @@ Item {
 
             TextEdit {
                 id: text_tor_address
-                selectByMouse: true
                 readOnly: true
                 anchors.top: parent.top
                 anchors.topMargin: dp(8)
@@ -473,9 +534,33 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
 
         }
+        SecondaryButton {
+            id: button_tor
+            width: rect_tor_address.width/3
+            height: dp(30)
+            anchors.right: rect_tor_address.right
+            anchors.top: rect_tor_address.bottom
+            anchors.topMargin: dp(10)
+            title: qsTr("Start")
 
+            onClicked: {
+                if (torInProgress)
+                    return;
+                torInProgress = true;
 
+                if (wallet.isTorListenerStarted()) {
+                    button_tor.title = "Stopping..."
+                    wallet.requestStopTorListener()
+                }
+                else {
+                    button_tor.title = "Starting..."
+                    wallet.requestStartTorListener()
+                }
+            }
+        }
     }
+
+
 
 
 
@@ -500,7 +585,7 @@ Item {
             anchors.topMargin: dp(40)
             anchors.left: rect_slate_address.left
             anchors.leftMargin: dp(10)
-            visible: selectedSendMethod !== 2? true: false
+            visible: selectedReceiveMethod  !== 2? true: false
             //anchors.horizontalCenter: parent.horizontalCenter
         }
         ImageColor {
@@ -516,8 +601,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    /*show_pass = !show_pass
-                    text_pass(show_pass)*/
+                    receive.showQrCode("Slatepack", proofAddr)
                 }
             }
         }

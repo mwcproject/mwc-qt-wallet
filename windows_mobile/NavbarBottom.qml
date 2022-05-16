@@ -22,27 +22,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        color: "#15171c"
-        Rectangle {
-            id: rect
-            height: navbarBottom.height/14
-            width: parent.width/8
-            radius: dp(50)
-            anchors.left: parent.left
-            anchors.bottom: parent.bottom
-            gradient: Gradient {
-                orientation: Gradient.Horizontal
-                GradientStop {
-                    position: 0
-                    color: "#9d00e7"
-                }
-
-                GradientStop {
-                    position: 1
-                    color: "#3700c9"
-                }
-            }
-        }
+        color: Theme.card
 
         RowLayout {
             id: layoutNavBottom
@@ -58,8 +38,6 @@ Item {
                 ImageColor {
                     id: image_wallet
                     img_height: parent.height* 0.5
-                    anchors.bottom: text_wallet.top
-                    anchors.bottomMargin: dp(2)
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     img_source: "../../img/wallet.svg"
@@ -90,8 +68,6 @@ Item {
                 ImageColor {
                     id: image_txs
                     img_height: parent.height* 0.5
-                    anchors.bottom: text_txs.top
-                    anchors.bottomMargin: dp(2)
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     img_source: "../../img/list.svg"
@@ -118,8 +94,6 @@ Item {
                 ImageColor {
                     id: image_account
                     img_height: parent.height* 0.5
-                    anchors.bottom: text_account.top
-                    anchors.bottomMargin: dp(2)
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     img_source: "../../img/list-contact.svg"
@@ -145,8 +119,6 @@ Item {
                 ImageColor {
                     id: image_settings
                     img_height: parent.height* 0.5
-                    anchors.bottom: text_settings.top
-                    anchors.bottomMargin: dp(2)
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     img_source: "../../img/setting.svg"
@@ -165,47 +137,6 @@ Item {
             }
         }
     }
-
-
-    states: [
-
-            State {
-                name: "wallet_state"
-                PropertyChanges {
-                    target: rect; anchors.leftMargin: (wallet.width - width)/2
-                }
-            },
-            State {
-                name: "txs_state"
-                PropertyChanges {
-                    target: rect; anchors.leftMargin:  wallet.width + (wallet.width - width)/2
-                }
-            },
-            State {
-                name: "contact_state"
-                PropertyChanges {
-                    target: rect; anchors.leftMargin:  wallet.width*2 + (wallet.width - width)/2
-                }
-            },
-            State {
-                name: "setting_state"
-                PropertyChanges {
-                    target: rect; anchors.leftMargin:  wallet.width*3 + (wallet.width - width)/2
-                }
-            }]
-
-        transitions: Transition {
-            PropertyAnimation {
-                properties: "anchors.leftMargin";
-                duration: 250
-            }
-        }
-
-
-
-
-
-
 }
 
 /*##^##

@@ -6,9 +6,9 @@ import CoreWindowBridge 1.0
 import StateMachineBridge 1.0
 import WalletConfigBridge 1.0
 import QtQml 2.15
+import "./utils.js" as Util
 import "./models"
 import '.'
-
 
 
 
@@ -28,14 +28,39 @@ Window {
     property bool onLoadAccount
     property double price: 586590.26
 
-    property bool isDarkMode
+    property bool isDarkMode: false
 
-    property bool hiddenAmount: false
-    property string hidden: "▒▒▒"
+    property bool hiddenAmount
+    property string hidden: "****"
+
+    property string currencyTicker: "usd"
+    property double currencyPrice
+    property int currencyPriceRound: 0
+
+    property double hashrate
+    property double block_reward
+    property double ghs_reward_mwc: ((block_reward*1440)/hashrate).toFixed(5)
+    property double ghs_reward_currency: (ghs_reward_mwc*currencyPrice).toFixed(currencyPriceRound)
+
+
+    property double circu_supply
+    property var h_change
+    property var d_change
+    property var d7_change
+    property var d14_change
+    property var d30_change
+    property var d60_change
+    property var d200_change
+    property var y_change
+
+
+    property var locale: Qt.locale()
 
 
     property var txsList: []
     property var txsListCache: []
+
+    property var dataMarketChart
 
     property double totalAmount: 0
 
@@ -44,6 +69,8 @@ Window {
     property double lockedBalance: 0
 
     property string selectedAccount
+
+    property bool isInit: true
 
     readonly property double dpi: 3.0 + (Screen.pixelDensity - 22.1) / 10
     function dp(x) { return x * dpi }
@@ -100,9 +127,13 @@ Window {
                 progressWndItem.visible = false
         }
     }
-
     onClosing: {
+            /*       if (Qt.inputMethod.visible) {
+            close.accepted = false
+            return
+        }*/
         const windowDialog = (navbarTop.open || inputDlg.visible || editDlg.visible  || messagebox.visible || transactionDetail.visible)
+        console.log("isClosing ", windowDialog )
         if (windowDialog) {
             if (inputDlg.visible)
                 inputDlg.visible = false
@@ -111,12 +142,18 @@ Window {
             if (messagebox.visible)
                 messagebox.visible  = false
             if (transactionDetail.visible)
-                transactionDetail.visible  = false
-            if (navbarTop.open)
-                navbarTop.open = false
+                transactionDetail.visible = false
+
             close.accepted = false
             return
         }
+
+        if (navbarTop.open) {
+            navbarTop.open = false
+            close.accepted = false
+            return
+        }
+
         if (stateMachine.returnBack()) {
             close.accepted = false
             return
@@ -171,6 +208,14 @@ Window {
         walletStoppingMessageDlg.visible = false
     }
 
+    function currencyIndex(index) {
+        currencyTicker =  Util.json_currency[index].ticker
+        currencyPriceRound =  Util.json_currency[index].round
+    }
+
+    function secondaryPrice(amount) {
+    }
+
     Dark {
         id: dark
     }
@@ -183,20 +228,11 @@ Window {
         id: barlow
     }
 
+
+
     Rectangle {
         anchors.fill: parent
-        gradient: Gradient {
-            orientation: Gradient.Vertical
-            GradientStop {
-                position: 0
-                color: isDarkMode? Theme.gradientTop : Theme.red
-            }
-
-            GradientStop {
-                position: 0.2
-                color: Theme.gradientBottom
-            }
-        }
+        color: Theme.bg
     }
 
     InitWallet {
@@ -279,17 +315,6 @@ Window {
             visible: currentState === 12
         }
 
-        /*
-        SelectContact {
-            id: selectContactItem
-        }*/
-
-        /*Accounts {
-            id: accountsItem
-            anchors.fill: parent
-            visible: currentState === 4
-        }*/
-
         AccountTransfer {
             id: accountTransferItem
             anchors.fill: parent
@@ -321,17 +346,9 @@ Window {
             visible: currentState === 10
         }
 
-        ProgressWnd {
-            id: progressWndItem
-            anchors.fill: parent
-            visible: false
-        }
 
-        Contacts {
-            id: contactsItem
-            anchors.fill: parent
-            visible: currentState === 13
-        }
+
+
     }
 
     Send {
@@ -363,12 +380,7 @@ Window {
         }
     }
 
-    SendConfirmation {
-        id: sendConfirmationItem
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: parent.height/14
-    }
+
 
     Receive {
         id: receiveItem
@@ -395,13 +407,13 @@ Window {
         visible: currentState === 19 && initParams.length === 0
     }
 
-    TransactionDetail {
-        id: transactionDetail
+    Contacts {
+        id: contactsItem
         anchors.fill: parent
+        visible: currentState === 13
         anchors.bottom: parent.bottom
         anchors.bottomMargin: parent.height/14
     }
-
 
 
     NavbarBottom {
@@ -413,16 +425,34 @@ Window {
     NavbarTop {
         id: navbarTop
         anchors.fill: parent
-        visible: currentState > 3 && (currentState != 8 && currentState != 9 && currentState != 9 && !transactionDetail.visible)
+        visible: currentState > 3 //&& currentState !==13)
         //anchors.bottom: parent.bottom
         //anchors.bottomMargin: parent.height/14
     }
+
+    SendConfirmation {
+        id: sendConfirmationItem
+        anchors.fill: parent
+        anchors.verticalCenter: parent.verticalCenter
+    }
+
 
 
     /*InputSlatepack {
         id: inputSlatepack
         anchors.fill: parent
     }*/
+
+    ProgressWnd {
+        id: progressWndItem
+        anchors.fill: parent
+        visible: false
+    }
+    TransactionDetail {
+        id: transactionDetail
+        anchors.fill: parent
+    }
+
 
     NewSeed {
         id: newSeedItem

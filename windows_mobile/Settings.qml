@@ -5,7 +5,7 @@ import QtGraphicalEffects 1.0
 import StateMachineBridge 1.0
 import WalletConfigBridge 1.0
 import WalletBridge 1.0
-
+import "utils.js" as Util
 import "./models"
 
 Item {
@@ -37,32 +37,128 @@ Item {
         }
     }
 
+
+
     function path_icon(index){
         switch (index) {
+            case 0:
             case 1:
-                return "../../img/language.svg"
+                return "../../img/dollar.svg"
             case 2:
                 return "../../img/dark.svg"
             case 3:
                 return "../../img/notification.svg"
             case 4:
-                return "../../img/key.svg"
-            case 5:
                 return "../../img/wallet.svg"
+            case 5:
+                return "../../img/key.svg"
             case 6:
                 return "../../img/listener.svg"
-            case 7:
-                return "../../img/node.svg"
-            case 8:
-                return "../../img/node.svg"
+
+        }
+    }
+
+    function setCurrencyList(){
+        const currencyList = Util.json_currency
+        for (let i=0; i <= currencyList.length - 1; i++) {
+            let name = currencyList[i].name
+            let ticker = currencyList[i].ticker
+           currency_list.append({ticker, name})
+        }
+    }
+
+    property bool isInitWallet: true
+
+    onVisibleChanged: {
+        if (visible && isInitWallet) {
+            setCurrencyList()
+            isInitWallet = false
 
         }
     }
 
     ListModel {
+        id: currency_list
+    }
+
+    DrawerList {
+        id: language
+        repeater.model: currency_list
+        repeater.delegate: instanceItems
+    }
+
+    DrawerList {
+        id: currency
+        repeater.model: currency_list
+        repeater.delegate: instanceItems
+    }
+
+
+
+    Component {
+        id: instanceItems
+        Rectangle {
+            id: rec_acc_balance
+            height: dp(60)
+            width: root.width
+            color: currencyTicker === ticker? "#252525" : "#00000000"
+
+            ImageColor {
+                id: img_check
+                img_height: parent.height/2.5
+                img_source: "../../img/check.svg"
+                img_color: currencyTicker === ticker? Theme.textPrimary : "#151515"
+                anchors.left: parent.left
+                anchors.leftMargin: dp(25)
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Text {
+                id: acc_ticker
+                text: ticker
+                color: Theme.textPrimary
+                font.pixelSize: rec_acc_balance.height/4
+                font.bold: true
+                font.capitalization: Font.AllUppercase
+                anchors.left: img_check.right
+                anchors.leftMargin: dp(25)
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: -font.pixelSize/2
+            }
+            Text {
+                id: acc_name
+                text: name
+                color: Theme.textSecondary
+                font.pixelSize: rec_acc_balance.height/4
+                font.italic: true
+                font.weight: Font.Light
+                anchors.left: img_check.right
+                anchors.leftMargin: dp(25)
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: font.pixelSize/1.5
+            }
+            MouseArea {
+                id: mouse
+                anchors.fill: parent
+                onClicked: {
+                    currencyTicker = ticker.toLowerCase()
+                    currencyIndex(index)
+                    walletConfig.setPriceCurrency(index)
+                    Util.getPrice()
+                    walletItem.setChart()
+
+                }
+            }
+        }
+    }
+
+
+
+    ListModel {
         id: settingModal
+
         ListElement {
-            name: "Language"
+            name: "Currency"
             index: 1
         }
         ListElement {
@@ -74,33 +170,24 @@ Item {
             index: 3
         }
         ListElement {
-            name: "Show mnemonic"
+            name: "Wallet"
             index: 4
         }
         ListElement {
-            name: "Wallet"
+            name: "Show mnemonic"
             index: 5
         }
         ListElement {
-            name: "Listeners"
-            index: 6
-        }
-        ListElement {
-            name: "Network"
-            index: 7
-        }
-        ListElement {
             name: "Resync"
-            index: 8
+            index: 6
         }
     }
 
     Rectangle {
-           height: dp(62) * settingModal.count
+           height: dp(67) * settingModal.count
            width: root.width
-           color: "#252525"
+           color: "#7D252525"
            anchors.top: parent.top
-           anchors.topMargin: dp(25)
            anchors.horizontalCenter: parent.horizontalCenter
            ListView {
                id: contactsList
@@ -114,17 +201,19 @@ Item {
            }
        }
 
+
+
        Component {
            id: settingDelegate
            Rectangle {
-               height: dp(62)
+               height: dp(67)
                color: "#00000000"
                width: root.width
                Rectangle {
                    id: rectangle
-                   height: dp(60)
+                   height: dp(65)
                    width: parent.width
-                   color: "#181818"
+                   color: Theme.card
                    anchors.top: parent.top
                    anchors.horizontalCenter: parent.horizontalCenter
 
@@ -132,7 +221,7 @@ Item {
                        id: icon
                        img_source: path_icon(index)
                        img_height: parent.height*0.4
-                       img_color: "gray"
+                       img_color: Theme.textSecondary
                        anchors.left: parent.left
                        anchors.leftMargin: dp(15)
                        anchors.verticalCenter: parent.verticalCenter
@@ -149,30 +238,39 @@ Item {
                        anchors.verticalCenter: parent.verticalCenter
                    }
 
+                   Text {
+                       color: "#ffffff"
+                       text: index === 0? "Francais": currencyTicker.toUpperCase()
+                       font.bold: true
+                       font.pixelSize: dp(15)
+                       anchors.right: parent.right
+                       anchors.rightMargin: dp(15)
+                       //anchors.horizontalCenter: parent.horizontalCenter
+                       anchors.verticalCenter: parent.verticalCenter
+                       visible: index === 0 || index === 1? true: false
+                   }
+
+
+
 
                    // Dark mode and notification
                    ToggleButton {
                        id: toggle
-                       height: parent.height*0.3
+                       height: parent.height*0.5
                        width: height*2
                        anchors.right: parent.right
                        anchors.rightMargin: dp(15)
                        anchors.verticalCenter: parent.verticalCenter
                        state: index === 2? (isDarkMode? "enabled" : "disabled") : "disabled"
                        visible: (index === 2 || index === 3)? true : false
-                       MouseArea {
-                           anchors.fill: parent
-                           onClicked: {
-                               toggle.state = toggle.state === "disabled" ? "enabled" : "disabled"
-                               let enable = toggle.state === "disabled" ? false : true
-
-                               if (index === 2) {
-                                   isDarkMode = enable
-                                   console.log("isDarkMode ", isDarkMode)
-                                   walletConfig.setDarkModeEnabled(enable)
-                               } else {
-                                   walletConfig.setNotificationAndroidEnabled(enable)
-                               }
+                       mouse.onClicked: {
+                           toggle.state = toggle.state === "disabled" ? "enabled" : "disabled"
+                           let enable = toggle.state === "disabled" ? false : true
+                           if (index === 2) {
+                               isDarkMode = enable
+                               walletConfig.setDarkModeEnabled(enable)
+                           } else {
+                               walletConfig.setNotificationAndroidEnabled(enable)
                            }
                        }
                    }
@@ -182,11 +280,19 @@ Item {
                        visible: (index !==2 && index !==3)? true: false
                        onClicked: {
                            switch (index) {
+                               case 0:
+                                   language.open()
+                                   break;
                                case 1:
+                                   currency.open()
+                                   break;
                                case 2:
                                case 3:
                                    break;
                                case 4:
+                                   stateMachine.setActionWindow(14)
+                                   break;
+                               case 5:
                                    if (stateMachine.canSwitchState(16)) {
                                        passwordHash = wallet.getPasswordHash()
 
@@ -199,16 +305,7 @@ Item {
                                        stateMachine.activateShowSeed(passwordHash)
                                    }
                                    break;
-                               case 5:
-                                   stateMachine.setActionWindow(14)
-                                   break;
                                case 6:
-                                   stateMachine.setActionWindow(10)
-                                   break;
-                               case 7:
-                                   stateMachine.setActionWindow(17)
-                                   break;
-                               case 8:
                                    messagebox.open("Re-sync account with a node", "Account re-sync will validate transactions and outputs for your accounts. Re-sync can take several minutes.\nWould you like to continue?",true, "No", "Yes", "", "", "", resyncCallback)
                                    break;
                            }

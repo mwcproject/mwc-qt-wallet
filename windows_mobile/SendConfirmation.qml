@@ -1,13 +1,19 @@
-import QtQuick 2.0
+import QtQuick 2.15
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
 import ConfigBridge 1.0
 import UtilBridge 1.0
+import "./models"
+
 
 Item {
     property var callback
     property string blockingPasswordHash
     anchors.fill: parent
+
+    property string address
+    property double amountSpend
+    property double txFees
 
     //height: text_message.height + dp(420)
     id: sendConfirmation
@@ -18,10 +24,14 @@ Item {
     anchors.right: parent.right
     anchors.rightMargin: dp(25)*/
 
-    function open(title, message, passwordHash, _callback) {
-        console.log("mes_ :" + message)
+    function open(title, info, passwordHash, _callback) {
         text_title.text = title
-        text_message.text = message
+        console.log(info)
+        const txInfo = JSON.parse(info)
+        address = txInfo[1]
+        amountSpend = txInfo[2]
+        txFees = txInfo[3]
+        console.log(address, " ", amountSpend, " ", txFees, " ", )
         blockingPasswordHash = passwordHash
         callback = _callback
         sendConfirmation.visible = true
@@ -44,13 +54,24 @@ Item {
     }
 
     Rectangle {
+        anchors.fill: parent
+        gradient: Gradient {
+            orientation: Gradient.Vertical
+            GradientStop {
+                position: 0
+                color: Theme.gradientTop
+            }
+
+            GradientStop {
+                position: 0.3
+                color: Theme.gradientBottom
+            }
+        }
+    }
+
+    Rectangle {
         id: rectangle
-        color: "#ffffff"
-        anchors.rightMargin: dp(1)
-        anchors.leftMargin: dp(1)
-        anchors.bottomMargin: dp(1)
-        anchors.topMargin: dp(1)
-        border.width: dp(1)
+        color: "#00000000"
         anchors.fill: parent
 
         MouseArea {
@@ -68,7 +89,23 @@ Item {
             anchors.topMargin: dp(31)
             anchors.horizontalCenter: parent.horizontalCenter
             font.pixelSize: dp(22)
-            color: "#3600c9"
+            color: "white"
+        }
+
+        Text {
+            id: text_address
+            anchors.left: parent.left
+            anchors.leftMargin: dp(40)
+            anchors.right: parent.right
+            anchors.rightMargin: dp(40)
+            anchors.top: text_title.bottom
+            anchors.topMargin: dp(40)
+            text: qsTr("Content")
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            font.pixelSize: dp(18)
+            color: "#3600C9"
         }
 
         Text {
@@ -100,6 +137,7 @@ Item {
 
             indicator: Rectangle {
                 implicitWidth: dp(20)
+                border.width: dp(1)
                 implicitHeight: dp(20)
                 x: checkbox_fluff.leftPadding
                 y: parent.height / 2 - height / 2
@@ -193,29 +231,15 @@ Item {
             }
         }
 
-        Button {
+        ConfirmButton {
             id: button_confirm
+            title: "Confirm"
             width: dp(135)
             height: dp(50)
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.right: parent.right
             anchors.rightMargin: parent.width / 2 - dp(170)
-
-            background: Rectangle {
-                color: button_confirm.enabled ? "#6F00D6" : "white"
-                radius: dp(5)
-                border.width: dp(2)
-                border.color: button_confirm.enabled ? "#6F00D6" : "gray"
-                Text {
-                    text: qsTr("Confirm")
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: dp(18)
-                    color: button_confirm.enabled ? "white" : "gray"
-                }
-            }
-
             onClicked: {
                 config.setFluff(checkbox_fluff.checked)
                 sendConfirmation.visible = false
@@ -223,29 +247,15 @@ Item {
             }
         }
 
-        Button {
+        SecondaryButton {
             id: button_decline
+            title: "Cancel"
             width: dp(135)
             height: dp(50)
             anchors.bottom: parent.bottom
             anchors.bottomMargin: dp(30)
             anchors.left: parent.left
             anchors.leftMargin: parent.width / 2 - dp(170)
-
-            background: Rectangle {
-                color: "#ffffff"
-                radius: dp(5)
-                border.width: dp(2)
-                border.color: "#3600C9"
-                Text {
-                    text: qsTr("Decline")
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: dp(18)
-                    color: "#3600C9"
-                }
-            }
-
             onClicked: {
                 sendConfirmation.visible = false
                 callback(false)

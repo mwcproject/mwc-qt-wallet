@@ -13,7 +13,7 @@ import "./models"
 
 
 Item {
-    id: control
+    id: root
     state: "close"
     property string selectedInstance
     property string selectedPathId
@@ -73,7 +73,7 @@ Item {
             textfield_password.enabled = true
             button_login.enabled = true
             text_syncStatusMsg.text = ""
-            instanceItems.clear()
+            instanceList.clear()
             // <selected path_id>, < <path_id>, <instance name>, <network> >, ...  >
             const instanceData = config.getWalletInstances(true)
             // expecting at least 1 instance value
@@ -94,14 +94,14 @@ Item {
                     if (pathId === instanceData[0]) {
                         selectedIdx = j/3
                     }
-                    instanceItems.append({
+                    instanceList.append({
                         instanceName: networkSet.length > 1 ? name + (nw === "Mainnet"? "" : " - "+ nw) : name,
                         name,
                         pathId
                     })
                 }
-                selectedInstance = instanceItems.get(0).instanceName
-                selectedPathId = instanceItems.get(0).pathId
+                selectedInstance = instanceList.get(0).instanceName
+                selectedPathId = instanceList.get(0).pathId
             }
         }
     }
@@ -125,6 +125,20 @@ Item {
         anchors.topMargin: dp(50)
         anchors.horizontalCenter: parent.horizontalCenter
     }
+
+   /* Rectangle {
+        height: 150
+        width: 50
+        anchors.top: parent.top
+        color: "red"
+        MouseArea {
+            id: mo
+            anchors.fill: parent
+            onClicked: {
+                walletConfig.setLanguage("fr")
+            }
+        }
+    }*/
 
 
 
@@ -180,7 +194,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                if (instanceItems.count > 1)
+                //if (instanceList.count > 1)
                     nav.open()
             }
         }
@@ -190,6 +204,7 @@ Item {
         id: textfield_password
         height: dp(55)
         width: rec_wallet_account.width
+        placeHolder: qsTr("Password")
         mainColor: "#242424"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
@@ -278,164 +293,60 @@ Item {
         }
     }
 
-
-
-
-    /*Rectangle {
-        id: rect_network
-        anchors.top: button_login.bottom
-        anchors.topMargin: dp(80)
-        anchors.horizontalCenter: parent.horizontalCenter
-        radius: dp(50)
-        color: "#00000000"
-        height: dp(35)
-        width: parent.width - dp(40)
-        SecondaryButton {
-            id: create_button
-            title: "Create"
-            color: "#000000"
-            height: parent.height
-            width: parent.width/2 - dp(20)
-            anchors.rightMargin: dp(20)
-            //anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-            onClicked: {
-                startWallet.createNewWalletInstance("", false);
-            }
-        }
-
-        SecondaryButton {
-            id: restore_button
-            title: "Restore"
-            height: parent.height
-            width: parent.width/2  - dp(20)
-            color: "#000000"
-            anchors.right: parent.right
-            //anchors.verticalCenter: parent.verticalCenter
-            onClicked: {
-                qtAndroidService.setNotification("Reki")
-                startWallet.createNewWalletInstance("", true);
-            }
-        }
-
-
-
-
-    }*/
-
     ListModel {
-        id: instanceItems
+        id: instanceList
     }
 
 
-    Drawer {
+
+
+    DrawerList {
         id: nav
-        enter: Transition {
-            SmoothedAnimation {
-                velocity: -1
-                duration: 750
-                easing.type: Easing.OutCirc
-                easing.amplitude: 2.0
-                easing.period: 1.5
-            }
-        }
-        exit: Transition {
-            SmoothedAnimation {
-                velocity: -1
-                duration: 500
-                easing.type: Easing.OutCirc
-                easing.amplitude: 2.0
-                easing.period: 1.5
+        repeater.model: instanceList
+        repeater.delegate: instanceItems
+    }
 
-            }
 
-        }
-        height: Math.min(control.height/2 + dp(50), grid_seed.Layout.minimumHeight+ dp(50))
-        width: parent.width
-        edge: Qt.BottomEdge
-        interactive: position == 1.0? true : false
+    Component {
+        id: instanceItems
         Rectangle {
-            anchors.top: parent.top
-            anchors.topMargin: dp(50)
-            height: control.height/2
-            width: parent.width
-            color: "#00000000"
-            Flickable {
-                id: scroll
-                width: parent.width
-                height: parent.height
-                contentHeight: grid_seed.Layout.minimumHeight
-                clip: true
-                ScrollBar.vertical: ScrollBar {
-                    policy: Qt.ScrollBarAsNeeded
-                }
-                ColumnLayout {
-                    id: grid_seed
-                    spacing: 0
-                    width: rect_phrase.width
-                    Repeater {
-                        id: rep
-                        model: instanceItems
+            id: rec_acc_balance
+            height: dp(60)
+            width: root.width
+            color: root.selectedPathId === pathId? "#252525" : "#00000000"
 
-                        Rectangle {
-                            id: rec_acc_balance
-                            height: dp(60)
-                            width: nav.width
-                            color: selectedPathId === pathId? "#252525" : "#00000000"
-
-                            ImageColor {
-                                id: img_check
-                                img_height: parent.height/2.5
-                                img_source: "../../img/check.svg"
-                                img_color: selectedPathId === pathId? "white" : "#151515"
-                                anchors.left: parent.left
-                                anchors.leftMargin: dp(25)
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Text {
-                                id: acc_name
-                                text: instanceName
-                                color: "white"
-                                font.pixelSize: dp(18)
-                                font.italic: true
-                                font.weight: Font.Light
-                                anchors.left: img_check.right
-                                anchors.leftMargin: dp(25)
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                            MouseArea {
-                                id: mouse
-                                anchors.fill: parent
-                                onClicked: {
-                                    selectedInstance = instanceName
-                                    selectedPathId = pathId
-                                }
-                            }
-                        }
-                    }
-
-                }
+            ImageColor {
+                id: img_check
+                img_height: parent.height/2.5
+                img_source: "../../img/check.svg"
+                img_color: root.selectedPathId === pathId? "white" : "#151515"
+                anchors.left: parent.left
+                anchors.leftMargin: dp(25)
+                anchors.verticalCenter: parent.verticalCenter
             }
-        }
 
-        background: Rectangle {
-            radius: 50
-            height: grid_seed.Layout.minimumHeight+ dp(50) + parent.height/5
-            width: parent.width
-            //y: -parent.height/5
-            color: "#151515"
-        }
-
-        T.Overlay.modal: Rectangle {
-            color: "#80000000"
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 150
+            Text {
+                id: acc_name
+                text: instanceName
+                color: "white"
+                font.pixelSize: dp(18)
+                font.italic: true
+                font.weight: Font.Light
+                anchors.left: img_check.right
+                anchors.leftMargin: dp(25)
+                anchors.verticalCenter: parent.verticalCenter
+            }
+            MouseArea {
+                id: mouse
+                anchors.fill: parent
+                onClicked: {
+                    root.selectedInstance = instanceName
+                    root.selectedPathId = pathId
                 }
             }
         }
     }
+
 }
 
 /*##^##

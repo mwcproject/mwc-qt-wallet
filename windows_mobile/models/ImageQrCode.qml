@@ -7,7 +7,6 @@ import QtGraphicalEffects 1.0
 
 Item {
     property alias qr: img
-    //property alias address: address
 
     Rectangle {
         id: rect_qrcode
@@ -21,7 +20,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             sourceSize.width: parent.width/1.10
             sourceSize.height: parent.width/1.10
-            source: image
+            source: ""//img
             fillMode: Image.PreserveAspectFit
 
         }
