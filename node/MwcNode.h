@@ -44,6 +44,7 @@ const int64_t START_TOR_TIMEOUT = 60*10*1000; // Tor can start for a very long t
 // messages from NodeOutputParser
 const int64_t MWC_NODE_STARTED_TIMEOUT = 180*1000; // It can take some time to find peers
 const int64_t MWC_NODE_SYNC_MESSAGES = 60*1000; // Sync supposed to be agile
+const int64_t PIBD_IS_DONE = 10*60*1000; // That might take a while
 const int64_t RECEIVE_BLOCK_LISTEN = 10*60*1000; // 10 minutes can be delay due non consistancy. API call expected to catch non sync cases
 const int64_t NETWORK_ISSUES = 0; // Let's not consider network issues. API call will restart the node
 

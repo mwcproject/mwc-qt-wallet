@@ -17,7 +17,7 @@
 
 #include "../core_desktop/navwnd.h"
 #include "../control_desktop/richbutton.h"
-#include <QMap>;
+#include <QMap>
 
 class QLabel;
 class QWidget;

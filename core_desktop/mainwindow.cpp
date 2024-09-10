@@ -51,8 +51,10 @@ MainWindow::MainWindow(QWidget *parent) :
     wallet = new bridge::Wallet(this);
     stateMachine = new bridge::StateMachine(this);
     util = new bridge::Util(this);
-    swap = new bridge::Swap(this);
-    swapMarketplace = new bridge::SwapMarketplace(this);
+    if (mwc::isSwapActive()) {
+        swap = new bridge::Swap(this);
+        swapMarketplace = new bridge::SwapMarketplace(this);
+    }
 
     QObject::connect( coreWindow, &CoreWindow::sgnUpdateActionStates,
                       this, &MainWindow::onSgnUpdateActionStates, Qt::QueuedConnection);
@@ -148,30 +150,31 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
     // Check if any swaps are running
     if (mwc::isAppNonClosed()) {
-        QVector<QString> critSwaps = swap->getRunningCriticalTrades();
-        if (!critSwaps.isEmpty()) {
-            // We can't exit, it is not safe. Not allowed.
+        if (swap) {
+            QVector<QString> critSwaps = swap->getRunningCriticalTrades();
+            if (!critSwaps.isEmpty()) {
+                // We can't exit, it is not safe. Not allowed.
 
-            QString swaps;
-            for (auto &s : critSwaps) {
-                if (!swaps.isEmpty())
-                    swaps += ", ";
-                swaps += s;
+                QString swaps;
+                for (auto &s: critSwaps) {
+                    if (!swaps.isEmpty())
+                        swaps += ", ";
+                    swaps += s;
+                }
+
+                core::getWndManager()->messageTextDlg("Swap Trades in critical stage",
+                                                      "You have swap trades " + swaps +
+                                                      " in critical stage. The wallet must be online to monitor the trades status, otherwise you might loose your funds."
+                                                      " You can't close your wallet until they will be finished.");
+                event->ignore();
+                return;
             }
 
-            core::getWndManager()->messageTextDlg("Swap Trades in critical stage",
-                                                  "You have swap trades " + swaps +
-                                                  " in critical stage. The wallet must be online to monitor the trades status, otherwise you might loose your funds."
-                                                  " You can't close your wallet until they will be finished.");
-            event->ignore();
-            return;
-        }
-
-        int swapsNumber = swap->getRunningTrades().size();
-        if (swapsNumber > 0) {
-            if (core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg(
-                    "Swap Trades",
-                    "You have " +
+            int swapsNumber = swap->getRunningTrades().size();
+            if (swapsNumber > 0) {
+                if (core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg(
+                        "Swap Trades",
+                        "You have " +
                         QString::number(swapsNumber) + " trade" + (swapsNumber > 1 ? "s" : "") +
                         " in progress. Wallet need to stay online to process the swaps.\n\n"
                         "Are you sure you want to close the wallet even your trades are not finished?",
@@ -179,26 +182,30 @@ void MainWindow::closeEvent(QCloseEvent *event) {
                         "Keep my wallet running",
                         "Close the wallet",
                         true, false)) {
-                event->ignore();
-                return;
+                    event->ignore();
+                    return;
+                }
             }
         }
 
-        int offers = swapMarketplace->getMyOffersNum();
-        if (offers>0) {
-            if (core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg(
-                    "Swap Offers",
-                    "You have " + QString::number(offers) + " active offers for atomic swap trade" + (offers > 1 ? "s" : "") +
-                         " broadcasting. If you close the wallet, your offers will be withdrawn from the marketplace.\n\n"
-                         "Are you sure you want to close the wallet and withdraw your offers?",
-                         "No", "Yes",
-                         "Keep my wallet running",
-                         "Close the wallet",
-                         true, false)) {
-                event->ignore();
-                return;
+        if (swapMarketplace) {
+            int offers = swapMarketplace->getMyOffersNum();
+            if (offers > 0) {
+                if (core::WndManager::RETURN_CODE::BTN1 == core::getWndManager()->questionTextDlg(
+                        "Swap Offers",
+                        "You have " + QString::number(offers) + " active offers for atomic swap trade" +
+                        (offers > 1 ? "s" : "") +
+                        " broadcasting. If you close the wallet, your offers will be withdrawn from the marketplace.\n\n"
+                        "Are you sure you want to close the wallet and withdraw your offers?",
+                        "No", "Yes",
+                        "Keep my wallet running",
+                        "Close the wallet",
+                        true, false)) {
+                    event->ignore();
+                    return;
+                }
+                swapMarketplace->stashMyOffers();
             }
-            swapMarketplace->stashMyOffers();
         }
     }
 
@@ -504,6 +511,26 @@ void MainWindow::updateMenu() {
     ui->actionExchanges->setEnabled(!isColdWallet);
 
     ui->actionAtomicSwap->setEnabled(canSwitchState && isOnlineWallet);
+
+    if (!mwc::isSwapActive()) {
+        // we need to delete the menu items...
+        ui->menuWallet->removeAction( ui->actionAtomicSwap );
+        ui->menuWallet->removeAction( ui->actionAtomicSwapMarketplace );
+        // remove doudle separators
+        QList<QAction*> actions = ui->menuWallet->actions();
+        bool prevIsSep = false;
+        for (QAction *action : actions) {
+            if (action->isSeparator()) {
+                if (prevIsSep) {
+                    ui->menuWallet->removeAction(action);
+                }
+                prevIsSep = true;
+            }
+            else {
+                prevIsSep = false;
+            }
+        }
+    }
 }
 
 
@@ -562,11 +589,15 @@ void MainWindow::on_actionOutputs_triggered()
 
 void MainWindow::on_actionAtomicSwap_triggered()
 {
-    stateMachine->setActionWindow( state::STATE::SWAP );
+    if (mwc::isSwapActive()) {
+        stateMachine->setActionWindow(state::STATE::SWAP);
+    }
 }
 
 void MainWindow::on_actionAtomicSwapMarketplace_triggered() {
-    stateMachine->setActionWindow( state::STATE::SWAP_MKT );
+    if (mwc::isSwapActive()) {
+        stateMachine->setActionWindow(state::STATE::SWAP_MKT);
+    }
 }
 
 void MainWindow::on_actionWallet_accounts_triggered()

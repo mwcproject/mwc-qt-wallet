@@ -39,8 +39,9 @@ MwcToolbar::MwcToolbar(QWidget *parent) :
     stateMachine = new StateMachine(this);
     coreWindow = new CoreWindow(this);
 
-    if (config->isColdWallet()) {
+    if (config->isColdWallet() || !mwc::isSwapActive()) {
         ui->swapToolButton->hide();
+        ui->swapMarketplaceToolButton->hide();
     }
 
     QObject::connect( wallet, &Wallet::sgnWalletBalanceUpdated,
@@ -126,12 +127,16 @@ void MwcToolbar::onLogout() {
 
 void MwcToolbar::on_swapToolButton_clicked()
 {
-    stateMachine->setActionWindow( state::STATE::SWAP );
+    if (mwc::isSwapActive()) {
+        stateMachine->setActionWindow(state::STATE::SWAP);
+    }
 }
 
 void MwcToolbar::on_swapMarketplaceToolButton_clicked()
 {
-    stateMachine->setActionWindow( state::STATE::SWAP_MKT );
+    if (mwc::isSwapActive()) {
+        stateMachine->setActionWindow(state::STATE::SWAP_MKT);
+    }
 }
 
 void MwcToolbar::timerEvent(QTimerEvent *event)

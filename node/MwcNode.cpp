@@ -414,7 +414,7 @@ void MwcNode::mwcNodeReadyReadStandardOutput() {
     }
 }
 
-enum class SYNC_STATE {GETTING_HEADERS, TXHASHSET_REQUEST, TXHASHSET_IN_PROGRESS, TXHASHSET_GET, VERIFY_RANGEPROOFS_FOR_TXHASHSET, VERIFY_KERNEL_SIGNATURES, GETTING_BLOCKS };
+enum class SYNC_STATE {GETTING_HEADERS, TXHASHSET_REQUEST, TXHASHSET_IN_PROGRESS, TXHASHSET_GET, GETTING_PIBD, VERIFY_RANGEPROOFS_FOR_TXHASHSET, VERIFY_KERNEL_SIGNATURES, GETTING_BLOCKS };
 // return progress in the range [0-1.0]
 static QString calcProgressStr( int initChainHeight , int txhashsetHeight, int peersMaxHeight, SYNC_STATE syncState, int value ) {
     // timing:
@@ -427,8 +427,8 @@ static QString calcProgressStr( int initChainHeight , int txhashsetHeight, int p
     const double getHeadersShare = 0.6;
     // Calculating shares for operations. Note, txHash stage is optional.
     double getTxHashShare, verifyRangeProofsShare, verifyKernelSignaturesShare;
-    if (txhashsetHeight>0) {
-        getTxHashShare = 0.15;
+    if (txhashsetHeight>0 || syncState==SYNC_STATE::GETTING_PIBD) {
+        getTxHashShare = 0.25;
         double hashSetW = (txhashsetHeight - initChainHeight);
         double blocksSet = (peersMaxHeight - txhashsetHeight) * 100.0;
         double txShare = hashSetW / ( hashSetW + blocksSet );
@@ -461,6 +461,9 @@ static QString calcProgressStr( int initChainHeight , int txhashsetHeight, int p
             break;
         case SYNC_STATE::TXHASHSET_GET:
             progressRes = getHeadersShare + getTxHashShare;
+            break;
+        case SYNC_STATE::GETTING_PIBD:
+            progressRes = getHeadersShare + getTxHashShare * (value/1000.0);
             break;
         case SYNC_STATE::VERIFY_RANGEPROOFS_FOR_TXHASHSET:
             progressRes = getHeadersShare + getTxHashShare +
@@ -611,7 +614,40 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             }
             break;
         }
-            // expected no break
+        case tries::NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_PIBD_BLOCK: {
+            if (lastProcessedEvent < event) {
+                lastProcessedEvent = event;
+                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
+                                                  "Embedded mwc-node requesting PIBD blocks to sync up");
+            }
+            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
+            nodeOutOfSyncCounter = 0;
+
+            // We are getting headers during all stages. But we want to display progress only for the step 1.
+            if (lastProcessedEvent <= event) {
+                // for progress need to parse the second element
+                QStringList params = message.split('|');
+                if (params.size() >= 2) {
+                    int64_t received = params[0].toInt();
+                    int64_t total = params[1].toInt();
+
+                    nodeStatusString = "Getting PIBD blocks";
+                    if (received > 0 && total > 0 && received<total) {
+                        nodeStatusString = calcProgressStr(initChainHeight, txhashsetHeight, peersMaxHeight,
+                                                           SYNC_STATE::GETTING_PIBD, int(received * 1000 / total));
+                    }
+                    else if (received==total) {
+                        nodeStatusString = calcProgressStr(initChainHeight, txhashsetHeight, peersMaxHeight,
+                                                           SYNC_STATE::GETTING_PIBD, 1000); // done with pibd, processing might take longer then usual
+                        nextTimeLimit += int64_t(PIBD_IS_DONE * config::getTimeoutMultiplier());
+                    }
+                    emit onMwcStatusUpdate(nodeStatusString);
+                }
+            }
+            break;
+        }
+
+        // expected no break
         case tries::NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET: {
             if (lastProcessedEvent < event) {
                 lastProcessedEvent = event;
