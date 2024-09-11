@@ -117,29 +117,33 @@ NodeOutputParser::NodeOutputParser() {
                                                  }));
 
 
-    // 20191011 18:05:07.045 INFO grin_chain::txhashset::txhashset - txhashset: verify_rangeproofs: verified 72000 rangeproofs
+    // 20240910 17:07:25.609 INFO grin_chain::txhashset::txhashset - txhashset: verify_rangeproofs: verified 29000 rangeproofs from 8734534576
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET,
                                                  QVector<BaseTrieSection *>{
                                                          new TriePhraseSection("txhashset::txhashset - txhashset: verify_rangeproofs: verified "),
                                                          new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 1),
-                                                         new TriePhraseSection(" rangeproofs")
+                                                         new TriePhraseSection(" rangeproofs from "),
+                                                         new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 2),
                                                  }));
 
-    // 20191011 18:07:37.377 INFO grin_chain::txhashset::txhashset - txhashset: verify_kernel_signatures: verified 61000 signatures
+    // 20191011 18:07:37.377 INFO grin_chain::txhashset::txhashset - txhashset: verify_kernel_signatures: verified 61000 signatures from 9483754384
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES,
                                                  QVector<BaseTrieSection *>{
                                                          new TriePhraseSection("txhashset::txhashset - txhashset: verify_kernel_signatures: verified "),
                                                          new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 1),
-                                                         new TriePhraseSection(" signatures")
+                                                         new TriePhraseSection(" signatures from "),
+                                                         new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 2)
                                                  }));
 
     // THose blocks come after archive
-    // 20191011 18:09:52.536 INFO grin_servers::common::adapters - Received block 140e019e22d0 at 114601 from 52.13.204.202:13414 [in/out/kern: 0/1/1] going to process.
+    // 20191011 18:09:52.536 INFO grin_servers::common::adapters - Received block 114601 of 45343587 hash 140e019e22d0 from 52.13.204.202:13414 [in/out/kern: 0/1/1] going to process.
     // Really don't case about details. Just need to be aware that block was received
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::RECEIVE_BLOCK_START,
                                                  QVector<BaseTrieSection *>{
                                                          new TriePhraseSection("common::adapters - Received block "),
-                                                         new TrieAnySection(200, TrieAnySection::NOT_NEW_LINE, "","", 2),
+                                                         new TrieAnySection(200, TrieAnySection::NUMBERS, "","", 1),
+                                                         new TriePhraseSection(" of "),
+                                                         new TrieAnySection(200, TrieAnySection::NUMBERS, "","", 2),
                                                  }));
 
     // Sync is done

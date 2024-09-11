@@ -94,7 +94,8 @@ void MwcNode::start(const QString & dataPath, const QString & network, bool tor 
     nodeOutOfSyncCounter = 0;
     nodeHeight = 0;
     peersMaxHeight = 0;
-    txhashsetHeight = 0;
+    syncedBeforeHorizon = false;
+    firstRecievedBlockIdx = -1;
     syncIsDone = false;
     maxBlockHeight = 0;
     initChainHeight = 0;
@@ -416,7 +417,7 @@ void MwcNode::mwcNodeReadyReadStandardOutput() {
 
 enum class SYNC_STATE {GETTING_HEADERS, TXHASHSET_REQUEST, TXHASHSET_IN_PROGRESS, TXHASHSET_GET, GETTING_PIBD, VERIFY_RANGEPROOFS_FOR_TXHASHSET, VERIFY_KERNEL_SIGNATURES, GETTING_BLOCKS };
 // return progress in the range [0-1.0]
-static QString calcProgressStr( int initChainHeight , int txhashsetHeight, int peersMaxHeight, SYNC_STATE syncState, int value ) {
+static QString calcProgressStr( int initChainHeight , bool syncedBeforeHorizon, int peersMaxHeight, SYNC_STATE syncState, int value ) {
     // timing:
     // Headers: 11:00
     // range proofs download & anpack: 0:34
@@ -427,14 +428,12 @@ static QString calcProgressStr( int initChainHeight , int txhashsetHeight, int p
     const double getHeadersShare = 0.6;
     // Calculating shares for operations. Note, txHash stage is optional.
     double getTxHashShare, verifyRangeProofsShare, verifyKernelSignaturesShare;
-    if (txhashsetHeight>0 || syncState==SYNC_STATE::GETTING_PIBD) {
+    if (syncedBeforeHorizon) {
         getTxHashShare = 0.25;
-        double hashSetW = (txhashsetHeight - initChainHeight);
-        double blocksSet = (peersMaxHeight - txhashsetHeight) * 100.0;
-        double txShare = hashSetW / ( hashSetW + blocksSet );
-        double totalShare = (1.0 - getHeadersShare-getTxHashShare);
-        verifyRangeProofsShare = 0.6 * totalShare * txShare;
-        verifyKernelSignaturesShare = 0.4 * totalShare * txShare;
+        double totalShare = (1.0 - getHeadersShare-getTxHashShare - 0.05); // 0.05 for getting blocks
+        Q_ASSERT(totalShare>0.0);
+        verifyRangeProofsShare = 0.6 * totalShare;
+        verifyKernelSignaturesShare = 0.4 * totalShare;
     }
     else {
         getTxHashShare = 0.0;
@@ -467,15 +466,15 @@ static QString calcProgressStr( int initChainHeight , int txhashsetHeight, int p
             break;
         case SYNC_STATE::VERIFY_RANGEPROOFS_FOR_TXHASHSET:
             progressRes = getHeadersShare + getTxHashShare +
-                          double( std::max(0, value-initChainHeight) ) / double( std::max(1, txhashsetHeight-initChainHeight) ) * verifyRangeProofsShare;
+                    (value/1000.0) * verifyRangeProofsShare;
             break;
         case SYNC_STATE::VERIFY_KERNEL_SIGNATURES:
             progressRes = getHeadersShare + getTxHashShare + verifyRangeProofsShare +
-                          double( std::max(0, value-initChainHeight) ) / double( std::max(1, txhashsetHeight-initChainHeight) ) * verifyKernelSignaturesShare;
+                    (value/1000.0) * verifyKernelSignaturesShare;
             break;
         case SYNC_STATE::GETTING_BLOCKS:
             progressRes = getHeadersShare + getTxHashShare + verifyRangeProofsShare + verifyKernelSignaturesShare +
-                    double( std::max(0, value - std::max(initChainHeight, txhashsetHeight) )) / double( std::max(1, peersMaxHeight - std::max(initChainHeight, txhashsetHeight)) ) * gettingBlocksShare;
+                    (value/1000.0) * gettingBlocksShare;
             break;
     }
 
@@ -546,7 +545,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
 
                 nodeStatusString = "Getting headers";
                 if (height > 0 && peersMaxHeight > 0)
-                    nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::GETTING_HEADERS, height );
+                    nodeStatusString = calcProgressStr( initChainHeight , syncedBeforeHorizon, peersMaxHeight, SYNC_STATE::GETTING_HEADERS, height );
 
                 emit onMwcStatusUpdate(nodeStatusString);
             }
@@ -561,19 +560,9 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             // archive can be large, let's wait extra
             nextTimeLimit += int64_t( 3 * MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
+            syncedBeforeHorizon = true;
 
-            // for progress need to parse the second element
-            QStringList params = message.split('|');
-            if (params.size() >= 2) {
-                // 114586 0a78e3f9d6c5.
-                QString heightInfo = params[1].trimmed();
-                int pos = heightInfo.indexOf(' ');
-                if (pos > 0) {
-                    txhashsetHeight = heightInfo.left(pos).toInt();
-                }
-            }
-
-            nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::TXHASHSET_REQUEST, 0 );
+            nodeStatusString = calcProgressStr( initChainHeight , syncedBeforeHorizon, peersMaxHeight, SYNC_STATE::TXHASHSET_REQUEST, 0 );
             emit onMwcStatusUpdate(nodeStatusString);
             break;
         }
@@ -581,6 +570,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             // archive can be large, let's wait extra
             nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
+            syncedBeforeHorizon = true;
 
             // for progress need to parse the second element
             QStringList params = message.split('|');
@@ -591,7 +581,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
                 int total = params[0].toInt();
                 int done = params[1].toInt();
                 if (total>0 && done<total) {
-                    nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::TXHASHSET_IN_PROGRESS, done * 100 / total );
+                    nodeStatusString = calcProgressStr( initChainHeight , syncedBeforeHorizon, peersMaxHeight, SYNC_STATE::TXHASHSET_IN_PROGRESS, done * 100 / total );
                     emit onMwcStatusUpdate(nodeStatusString);
                 }
             }
@@ -607,9 +597,10 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             // tx Hash really might take a while to process
             nextTimeLimit += int64_t( 10 * MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
+            syncedBeforeHorizon = true;
 
             if (! message.contains("DONE") ) {
-                nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::TXHASHSET_GET, 0 );
+                nodeStatusString = calcProgressStr( initChainHeight , syncedBeforeHorizon, peersMaxHeight, SYNC_STATE::TXHASHSET_GET, 0 );
                 emit onMwcStatusUpdate(nodeStatusString);
             }
             break;
@@ -622,6 +613,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             }
             nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
+            syncedBeforeHorizon = true;
 
             // We are getting headers during all stages. But we want to display progress only for the step 1.
             if (lastProcessedEvent <= event) {
@@ -633,13 +625,14 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
 
                     nodeStatusString = "Getting PIBD blocks";
                     if (received > 0 && total > 0 && received<total) {
-                        nodeStatusString = calcProgressStr(initChainHeight, txhashsetHeight, peersMaxHeight,
+                        nodeStatusString = calcProgressStr(initChainHeight, syncedBeforeHorizon, peersMaxHeight,
                                                            SYNC_STATE::GETTING_PIBD, int(received * 1000 / total));
                     }
                     else if (received==total) {
-                        nodeStatusString = calcProgressStr(initChainHeight, txhashsetHeight, peersMaxHeight,
-                                                           SYNC_STATE::GETTING_PIBD, 1000); // done with pibd, processing might take longer then usual
+                        nodeStatusString = "Processing";  // calcProgressStr(initChainHeight, txhashsetHeight, peersMaxHeight, SYNC_STATE::GETTING_PIBD, 1000); // done with pibd, processing might take longer then usual
                         nextTimeLimit += int64_t(PIBD_IS_DONE * config::getTimeoutMultiplier());
+                        // Me might wait for a while, nodeOutOfSyncCounter needs to be negative for that
+                        nodeOutOfSyncCounter = -NODE_OUT_OF_SYNC_FAILURE_LIMIT*5;
                     }
                     emit onMwcStatusUpdate(nodeStatusString);
                 }
@@ -658,11 +651,17 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             // tx Hash really might take a while to process
             nextTimeLimit += int64_t( 10 * MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
+            syncedBeforeHorizon = true;
 
-            int handledH = message.trimmed().toInt();
-            if (handledH>0 && handledH<txhashsetHeight) {
-                nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::VERIFY_RANGEPROOFS_FOR_TXHASHSET, handledH );
-                emit onMwcStatusUpdate(nodeStatusString);
+            QStringList params = message.split('|');
+            if (params.size() >= 2) {
+                int64_t received = params[0].toInt();
+                int64_t total = params[1].toInt();
+
+                if (received>0 && received<=total) {
+                    nodeStatusString = calcProgressStr( initChainHeight , syncedBeforeHorizon, peersMaxHeight, SYNC_STATE::VERIFY_RANGEPROOFS_FOR_TXHASHSET, received*1000/total );
+                    emit onMwcStatusUpdate(nodeStatusString);
+                }
             }
             break;
         }
@@ -675,11 +674,18 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
 
             nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
+            syncedBeforeHorizon = true;
 
-            int handledH = message.trimmed().toInt();
-            if (handledH>0 && handledH<txhashsetHeight) {
-                nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::VERIFY_KERNEL_SIGNATURES, handledH );
-                emit onMwcStatusUpdate(nodeStatusString);
+            QStringList params = message.split('|');
+            if (params.size() >= 2) {
+                int64_t received = params[0].toInt();
+                int64_t total = params[1].toInt();
+
+                if (received>0 && received<=total) {
+                    nodeStatusString = calcProgressStr(initChainHeight, syncedBeforeHorizon, peersMaxHeight,
+                                                       SYNC_STATE::VERIFY_KERNEL_SIGNATURES, received*1000/total);
+                    emit onMwcStatusUpdate(nodeStatusString);
+                }
             }
             break;
         }
@@ -694,22 +700,22 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             nodeOutOfSyncCounter = 0;
 
             if (!syncIsDone) { // Async process, order is not guaranteed
+                QStringList params = message.split('|');
+                if (params.size() >= 2) {
+                    int64_t received = params[0].toInt();
+                    int64_t total = params[1].toInt();
 
-                // Message: 140e019e22d0 at 114601 from 52.13.204.202:13414 [in/out/kern: 0/1/1] going to process.
-                int idx1 = message.indexOf("at ");
-                int idx2 = message.indexOf(" from ");
-                if (idx1 > 0 && idx2 > 0) {
-                    idx1 += strlen("at ");
-                    int handledH = message.mid(idx1, idx2 - idx1).toInt();
+                    if (received>=firstRecievedBlockIdx && received<=total) {
+                        if (firstRecievedBlockIdx<0)
+                            firstRecievedBlockIdx = received;
 
-                    initChainHeight = std::min(initChainHeight, handledH);
+                        if (received>maxBlockHeight)
+                            maxBlockHeight = received;
 
-                    if (handledH>maxBlockHeight) {
-                        maxBlockHeight = handledH;
-
-                        if (handledH > 0 && handledH >= txhashsetHeight && handledH < peersMaxHeight) {
-                                nodeStatusString = calcProgressStr( initChainHeight , txhashsetHeight, peersMaxHeight, SYNC_STATE::GETTING_BLOCKS, handledH );
-                                emit onMwcStatusUpdate(nodeStatusString);
+                        if (total>firstRecievedBlockIdx) {
+                            nodeStatusString = calcProgressStr(initChainHeight, syncedBeforeHorizon, peersMaxHeight,
+                                                               SYNC_STATE::GETTING_BLOCKS, (received-firstRecievedBlockIdx)*1000 / (total-firstRecievedBlockIdx) );
+                            emit onMwcStatusUpdate(nodeStatusString);
                         }
                     }
                 }
@@ -828,7 +834,6 @@ void MwcNode::timerEvent(QTimerEvent *event) {
         logger::logInfo("MwcNode", "Restarting node because no ONLINE activity was detected");
         need2restart = true;
     }
-
     if ( nodeNoPeersFailCounter > NODE_NO_PEERS_FAILURE_LIMITS || nodeOutOfSyncCounter > NODE_OUT_OF_SYNC_FAILURE_LIMIT ) {
         // need to restart
         logger::logInfo("MwcNode", "Restarting node because API didn't get expected info from the node during long time period");
