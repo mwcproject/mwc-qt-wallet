@@ -109,8 +109,11 @@ StateMachine::StateMachine()
     states[ STATE::MIGRATION ] = new Migration(context);
     // Swap and swap marketplace. There are some issues with HTTP calls.
     // Since Mobile is not ready yet, we don't want that to be included
-    states[ STATE::SWAP ] = new Swap(context);
-    states[ STATE::SWAP_MKT ] = new SwapMarketplace(context);
+
+    if (mwc::isSwapActive()) {
+        states[STATE::SWAP] = new Swap(context);
+        states[STATE::SWAP_MKT] = new SwapMarketplace(context);
+    }
 #endif
 
     startTimer(1000);

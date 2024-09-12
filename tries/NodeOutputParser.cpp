@@ -30,6 +30,7 @@ QString toString(NODE_OUTPUT_EVENT event) {
         case NODE_OUTPUT_EVENT::ASK_FOR_TXHASHSET_ARCHIVE:  return "ASK_FOR_TXHASHSET_ARCHIVE";
         case NODE_OUTPUT_EVENT::TXHASHSET_ARCHIVE_IN_PROGRESS:  return "TXHASHSET_ARCHIVE_IN_PROGRESS";
         case NODE_OUTPUT_EVENT::HANDLE_TXHASHSET_ARCHIVE:  return "HANDLE_TXHASHSET_ARCHIVE";
+        case NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_PIBD_BLOCK: return "MWC_NODE_RECEIVE_PIBD_BLOCK";
         case NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET:  return "VERIFY_RANGEPROOFS_FOR_TXHASHSET";
         case NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES:  return "VERIFY_KERNEL_SIGNATURES";
         // End of sync up (no archive)
@@ -60,7 +61,7 @@ NodeOutputParser::NodeOutputParser() {
                                                          new TriePhraseSection("sync::syncer - Waiting for the peers")
                                                  }));
 
-    // 20191011 22:43:38.969 DEBUG grin_chain::chain - init: sync_head: 365479725 @ 117749 [0099c40fb902]
+    // 20191011 22:43:38.969 INFO grin_chain::chain - init: sync_head: 365479725 @ 117749 [0099c40fb902]
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::INITIAL_CHAIN_HEIGHT,
                                                  QVector<BaseTrieSection *>{
                                                          new TriePhraseSection("grin_chain::chain - init: sync_head: "),
@@ -99,36 +100,50 @@ NodeOutputParser::NodeOutputParser() {
 
     // 20191011 17:59:14.101 INFO grin_p2p::protocol - handle_payload: txhashset archive for 0a78e3f9d6c5 at 114586. size=128918334
     // 20191012 10:27:49.337 INFO grin_p2p::protocol - handle_payload: txhashset archive for 0ec5c34c7784 at 115577, DONE. Data Ok: true
-    // Note: this event for Start and And of transactions handling
+    // Note: this event for Start and End of transactions handling
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::HANDLE_TXHASHSET_ARCHIVE,
                                                  QVector<BaseTrieSection *>{
                                                          new TriePhraseSection("handle_payload: txhashset archive for "),
                                                          new TrieAnySection(70, TrieAnySection::NOT_NEW_LINE, "","", 2),
                                                  }));
 
-    // 20191011 18:05:07.045 INFO grin_chain::txhashset::txhashset - txhashset: verify_rangeproofs: verified 72000 rangeproofs
+    // 20240909 20:36:09.141 INFO grin_chain::types - PIBD sync progress: 65536 from 4069364
+    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_PIBD_BLOCK,
+                                                 QVector<BaseTrieSection *>{
+                                                         new TriePhraseSection("chain::types - PIBD sync progress: "),
+                                                         new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 1),
+                                                         new TriePhraseSection(" from "),
+                                                         new TrieAnySection(50, TrieAnySection::NUMBERS, "","", 2)
+                                                 }));
+
+
+    // 20240910 17:07:25.609 INFO grin_chain::txhashset::txhashset - txhashset: verify_rangeproofs: verified 29000 rangeproofs from 8734534576
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET,
                                                  QVector<BaseTrieSection *>{
                                                          new TriePhraseSection("txhashset::txhashset - txhashset: verify_rangeproofs: verified "),
                                                          new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 1),
-                                                         new TriePhraseSection(" rangeproofs")
+                                                         new TriePhraseSection(" rangeproofs from "),
+                                                         new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 2),
                                                  }));
 
-    // 20191011 18:07:37.377 INFO grin_chain::txhashset::txhashset - txhashset: verify_kernel_signatures: verified 61000 signatures
+    // 20191011 18:07:37.377 INFO grin_chain::txhashset::txhashset - txhashset: verify_kernel_signatures: verified 61000 signatures from 9483754384
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES,
                                                  QVector<BaseTrieSection *>{
                                                          new TriePhraseSection("txhashset::txhashset - txhashset: verify_kernel_signatures: verified "),
                                                          new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 1),
-                                                         new TriePhraseSection(" signatures")
+                                                         new TriePhraseSection(" signatures from "),
+                                                         new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 2)
                                                  }));
 
     // THose blocks come after archive
-    // 20191011 18:09:52.536 INFO grin_servers::common::adapters - Received block 140e019e22d0 at 114601 from 52.13.204.202:13414 [in/out/kern: 0/1/1] going to process.
+    // 20191011 18:09:52.536 INFO grin_servers::common::adapters - Received block 114601 of 45343587 hash 140e019e22d0 from 52.13.204.202:13414 [in/out/kern: 0/1/1] going to process.
     // Really don't case about details. Just need to be aware that block was received
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::RECEIVE_BLOCK_START,
                                                  QVector<BaseTrieSection *>{
                                                          new TriePhraseSection("common::adapters - Received block "),
-                                                         new TrieAnySection(200, TrieAnySection::NOT_NEW_LINE, "","", 2),
+                                                         new TrieAnySection(200, TrieAnySection::NUMBERS, "","", 1),
+                                                         new TriePhraseSection(" of "),
+                                                         new TrieAnySection(200, TrieAnySection::NUMBERS, "","", 2),
                                                  }));
 
     // Sync is done

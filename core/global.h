@@ -148,6 +148,9 @@ void reportSwapError(QString err, QString lastProcessError);
 bool hasSwapErrors(int timeIntervalMSec); // Check if error recently was reported
 bool hasNoGasError();
 
+bool isSwapActive();
+void setSwapActive(bool active);
+
 }
 
 #endif // GLOBALMWC_H

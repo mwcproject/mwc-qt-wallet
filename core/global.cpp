@@ -110,4 +110,15 @@ bool hasNoGasError() {
     return last_no_gas_error;
 }
 
+bool swapActive = false;
+
+bool isSwapActive() {
+    return swapActive;
+}
+
+void setSwapActive(bool active) {
+    swapActive = active;
+}
+
+
 }

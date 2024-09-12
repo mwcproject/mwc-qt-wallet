@@ -681,10 +681,11 @@ void AppContext::setAutoStartTorEnabled(bool enabled) {
 }
 
 bool AppContext::useTorForNode() const {
-    bool tor = isAutoStartTorEnabled();
+/*    bool tor = isAutoStartTorEnabled();
     if (config::isOnlineNode())
         tor = true;
-    return tor && (!noTorForEmbeddedNode);
+    return tor && (!noTorForEmbeddedNode);*/
+    return !noTorForEmbeddedNode;
 }
 
 void AppContext::setShowOutputAll(bool all) {

@@ -61,6 +61,8 @@ run_tui = false
 #real mining should use the standalone grin-miner
 run_test_miner = false
 
+libp2p_enabled = false
+
 #test miner wallet URL (burns if this doesn't exist)
 #test_miner_wallet_url = "http://127.0.0.1:3415"
 

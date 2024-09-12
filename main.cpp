@@ -417,6 +417,15 @@ int main(int argc, char *argv[])
 
         core::WalletApp app(argc, argv);
 
+        // Check if swaps we want to enable
+        {
+            Qt::KeyboardModifiers modifiers = QGuiApplication::queryKeyboardModifiers();
+            if (modifiers & Qt::ControlModifier && modifiers & Qt::ShiftModifier) {
+                mwc::setSwapActive(true);
+            }
+        }
+
+
         if (!deployWalletFilesFromResources() ) {
             QMessageBox::critical(nullptr, "Error", "Unable to provision or verify resource files during the first run");
             return 1;
