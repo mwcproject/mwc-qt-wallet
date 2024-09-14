@@ -150,8 +150,14 @@ QString TaskListeningStart::calcCommand(bool startMq, bool startTor) const {
     Q_ASSERT(startMq | startTor);
 
     // if tor, return listen -t
-    if(startTor)
-        return QString("listen -t -p"); // always starting libp2p
+    if(startTor) {
+        if (mwc::isSwapActive()) {
+            return QString("listen -t -p"); // always starting libp2p
+        }
+        else {
+            return QString("listen -t"); // non libp2p if no swaps
+        }
+    }
 
     Q_ASSERT(startMq);
     return QString("listen -s");
