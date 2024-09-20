@@ -1,5 +1,6 @@
-import QtQuick 2.4
-import QtQuick.Controls 2.13
+import QtQuick 2.15
+import QtQuick.Controls 2.3
+import QtQuick.Templates 2.15 as T
 import QtQuick.Window 2.0
 import InputPasswordBridge 1.0
 import WalletBridge 1.0
@@ -7,8 +8,15 @@ import UtilBridge 1.0
 import StartWalletBridge 1.0
 import ConfigBridge 1.0
 import QtAndroidService 1.0
+import QtQuick.Layouts 1.15
+import "./models"
+
 
 Item {
+    id: root
+    state: "close"
+    property string selectedInstance
+    property string selectedPathId
     InputPasswordBridge {
         id: inputPassword
     }
@@ -58,28 +66,17 @@ Item {
 
     onVisibleChanged: {
         if (visible) {
+            isDarkMode = walletConfig.getDarkModeEnabled()
             rect_progress.visible = false
             textfield_password.text = ""
             textfield_password.enabled = true
             button_login.enabled = true
             text_syncStatusMsg.text = ""
-
-            if (mousearea_newinstance.enabled === false) {
-                image_restore.visible = false
-                text_restore.visible = false
-                image_newinstance.visible = false
-                text_newinstance.visible = false
-            } else {
-                image_restore.visible = true
-                text_restore.visible = true
-                image_newinstance.visible = true
-                text_newinstance.visible = true
-            }
-
-            instanceItems.clear()
+            instanceList.clear()
             // <selected path_id>, < <path_id>, <instance name>, <network> >, ...  >
             const instanceData = config.getWalletInstances(true)
             // expecting at least 1 instance value
+            let singleInstance = (instanceData.length <= 4) ? true : false
             if (instanceData.length >= 4) {
                 // scanning for networks first
                 const networkSet = [];
@@ -96,35 +93,53 @@ Item {
                     if (pathId === instanceData[0]) {
                         selectedIdx = j/3
                     }
-                    instanceItems.append({
-                        instanceName: networkSet.length > 1 ? name + "; " + nw : name,
+                    instanceList.append({
+                        instanceName: networkSet.length > 1 ? name + (nw === "Mainnet"? "" : " - "+ nw) : name,
                         name,
                         pathId
                     })
                 }
-                instanceComboBox.currentIndex = selectedIdx
+                selectedInstance = instanceList.get(0).instanceName
+                selectedPathId = instanceList.get(0).pathId
             }
         }
     }
+
 
     MouseArea {
         id: mouseArea
         anchors.fill: parent
         onClicked: {
-            textfield_password.focus = false
+            textfield_password.field_focus = false
         }
     }
 
     Image {
         id: image_logo
-        width: dp(200)
-        height: dp(30)
+        width: dp(105)
+        //height: dp(30)
         fillMode: Image.PreserveAspectFit
-        source: "../img/BigLogo@2x.svg"
+        source: "../img/mwc-logo.svg"
         anchors.top: parent.top
-        anchors.topMargin: dp(100)
+        anchors.topMargin: dp(50)
         anchors.horizontalCenter: parent.horizontalCenter
     }
+
+   /* Rectangle {
+        height: 150
+        width: 50
+        anchors.top: parent.top
+        color: "red"
+        MouseArea {
+            id: mo
+            anchors.fill: parent
+            onClicked: {
+                walletConfig.setLanguage("fr")
+            }
+        }
+    }*/
+
+
 
     Text {
         id: text_version
@@ -136,190 +151,90 @@ Item {
         text: config.get_APP_NAME() + " v" + qtAndroidService.getApkVersion()
     }
 
-    Text {
-        id: text_instances
-        text: qsTr("Instances")
-        color: "white"
-        anchors.left: instanceComboBox.left
-        anchors.bottom: instanceComboBox.top
-        anchors.bottomMargin: dp(10)
-        font.pixelSize: dp(14)
-    }
-
-    ComboBox {
-        id: instanceComboBox
-
-        delegate: ItemDelegate {
-            width: instanceComboBox.width
-            contentItem: Text {
-                text: instanceName
-                color: "white"
-                font: instanceComboBox.font
-                elide: Text.ElideRight
-                verticalAlignment: Text.AlignVCenter
-            }
-            background: Rectangle {
-                color: instanceComboBox.highlightedIndex === index ? "#955BDD" : "#8633E0"
-            }
-            topPadding: dp(10)
-            bottomPadding: dp(10)
-            leftPadding: dp(20)
-            rightPadding: dp(20)
-        }
-
-        indicator: Canvas {
-            id: canvas
-            x: instanceComboBox.width - width - instanceComboBox.rightPadding
-            y: instanceComboBox.topPadding + (instanceComboBox.availableHeight - height) / 2
-            width: dp(14)
-            height: dp(7)
-            contextType: "2d"
-
-            Connections {
-                target: instanceComboBox
-                function onPressedChanged() { canvas.requestPaint() }
-            }
-
-            onPaint: {
-                context.reset()
-                if (instanceComboBox.popup.visible) {
-                    context.moveTo(0, height)
-                    context.lineTo(width / 2, 0)
-                    context.lineTo(width, height)
-                } else {
-                    context.moveTo(0, 0)
-                    context.lineTo(width / 2, height)
-                    context.lineTo(width, 0)
-                }
-                context.strokeStyle = "white"
-                context.lineWidth = 2
-                context.stroke()
-            }
-        }
-
-        contentItem: Text {
-            text: instanceComboBox.currentIndex >= 0 && instanceItems.get(instanceComboBox.currentIndex).instanceName
-            font: instanceComboBox.font
-            color: "white"
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignLeft
-            elide: Text.ElideRight
-        }
-
-        background: Rectangle {
-            implicitHeight: dp(50)
-            radius: dp(5)
-            color: "#8633E0"
-        }
-
-        popup: Popup {
-            y: instanceComboBox.height + dp(3)
-            width: instanceComboBox.width
-            implicitHeight: contentItem.implicitHeight + dp(20)
-            topPadding: dp(10)
-            bottomPadding: dp(10)
-            leftPadding: dp(0)
-            rightPadding: dp(0)
-
-            contentItem: ListView {
-                clip: true
-                implicitHeight: contentHeight
-                model: instanceComboBox.popup.visible ? instanceComboBox.delegateModel : null
-                currentIndex: instanceComboBox.highlightedIndex
-
-                ScrollIndicator.vertical: ScrollIndicator { }
-            }
-
-            background: Rectangle {
-                color: "#8633E0"
-                radius: dp(5)
-            }
-
-            onVisibleChanged: {
-                if (!instanceComboBox.popup.visible) {
-                    canvas.requestPaint()
-                }
-            }
-        }
-
-        model: ListModel {
-            id: instanceItems
-        }
-        width: Math.min(parent.width - dp(90), dp(400))
+    Rectangle {
+        id: rec_wallet_account
+        height: dp(55)
+        width: parent.width/1.3
+        radius: dp(20)
+        color: "#242424"
         anchors.bottom: textfield_password.top
-        anchors.bottomMargin: dp(30)
+        anchors.bottomMargin: dp(20)
         anchors.horizontalCenter: parent.horizontalCenter
-        leftPadding: dp(20)
-        rightPadding: dp(20)
-        font.pixelSize: dp(18)
-    }
+        //color: "#111111"
+        Rectangle {
+            id: visualImageRectangle
+            height: parent.height*0.8
+            width: height
+            color: "#00000000"
+            radius: dp(50)
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+            anchors.leftMargin: dp(10)
 
-    TextField {
-        id: textfield_password
-        height: dp(50)
-        width: instanceComboBox.width
-        padding: dp(10)
-        leftPadding: dp(20)
-        font.pixelSize: textfield_password.text ? dp(10) : dp(18)
-        placeholderText: qsTr("Password")
-        echoMode: "Password"
-        color: "white"
-        text: ""
-        anchors.bottom: button_login.top
-        anchors.bottomMargin: dp(40)
-        anchors.horizontalCenter: parent.horizontalCenter
-        horizontalAlignment: Text.AlignLeft
-        background: Rectangle {
-            color: "#8633E0"
-            radius: dp(5)
+            ImageColor {
+                id: visualImage
+                img_source: "../../img/wallet.svg"
+                img_height: visualImageRectangle.height*0.8
+                img_color: "#181818"
+                anchors.centerIn: visualImageRectangle
+            }
         }
-
+        Text {
+            id: buttontext
+            font.pixelSize: dp(17)
+            text: selectedInstance
+            color: "#ffffff"
+            font.family: barlow.medium
+            font.letterSpacing: dp(1)
+            anchors.left: visualImageRectangle.right
+            anchors.leftMargin: dp(20)
+            anchors.verticalCenter: parent.verticalCenter
+        }
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                textfield_password.focus = true
+                //if (instanceList.count > 1)
+                    nav.open()
             }
         }
     }
 
-    Button {
-        id: button_login
-        height: dp(50)
-        width: loginText.width + dp(150)
+    PasswordField {
+        id: textfield_password
+        height: dp(55)
+        width: rec_wallet_account.width
+        placeHolder: qsTr("Password")
+        mainColor: "#242424"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: dp(50)
-        background: Rectangle {
-            id: rectangle
-            color: "#00000000"
-            radius: dp(5)
-            border.color: "white"
-            border.width: dp(2)
-            Text {
-                id: loginText
-                text: qsTr("Open Wallet")
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
-                color: "white"
-            }
-        }
+        focus: false
+    }
+
+
+    ConfirmButton {
+        id: button_login
+        height: dp(50)
+        width: rec_wallet_account.width
+        anchors.top: textfield_password.bottom
+        anchors.topMargin: dp(80)
+        anchors.horizontalCenter: parent.horizontalCenter
+
 
         onClicked: {
+            textfield_password.field_focus = false
             if (!textfield_password.text) {
-                messagebox.open(qsTr("Password"), qsTr("Please input your wallet password"))
+                messagebox.open(qsTr("id-password"), qsTr("Please input your wallet password"))
                 return
             }
 
             const validation = util.validateMwc713Str(textfield_password.text)
             if (validation) {
-                messagebox.open(qsTr("Password"), qsTr(validation))
+                messagebox.open(qsTr("id-password"), qsTr(validation))
                 return
             }
 
-            const selectedPath = instanceItems.get(instanceComboBox.currentIndex).pathId
-            console.log(123, selectedPath)
-            config.setActiveInstance(selectedPath)
+            console.log(123, selectedPathId)
+            config.setActiveInstance(selectedPathId)
 
             rect_progress.visible = true
 
@@ -328,67 +243,26 @@ Item {
         }
     }
 
-    Image {
-        id: image_restore
-        width: dp(30)
-        height: dp(30)
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: dp(-40)
-        anchors.top: button_login.bottom
-        anchors.topMargin: dp(80)
-        fillMode: Image.PreserveAspectFit
-        source: "../img/RestoreBtn@2x.svg"
-    }
-
-    Text {
-        id: text_restore
-        text: qsTr("Restore")
-        anchors.leftMargin: dp(20)
-        color: "white"
-        anchors.left: image_restore.right
-        anchors.verticalCenter: image_restore.verticalCenter
-        font.pixelSize: dp(18)
-    }
-
     MouseArea {
         id: mousearea_restore
-        anchors.left: image_restore.left
-        anchors.top: image_restore.top
         anchors.right: text_restore.right
-        anchors.bottom: image_restore.bottom
         onClicked: {
             startWallet.createNewWalletInstance("", true);
         }
     }
 
-    Image {
-        id: image_newinstance
-        width: dp(30)
-        height: dp(30)
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: dp(-40)
-        anchors.top: image_restore.bottom
-        anchors.topMargin: dp(30)
-        fillMode: Image.PreserveAspectFit
-        source: "../img/NewInstanceBtn@2x.svg"
-    }
 
     Text {
         id: text_newinstance
-        text: qsTr("New Instance")
-        anchors.leftMargin: dp(20)
+        text: qsTr(" ")
+        //anchors.leftMargin: dp(20)
         color: "white"
-        anchors.left: image_newinstance.right
-        anchors.verticalCenter: image_newinstance.verticalCenter
         font.pixelSize: dp(18)
     }
 
     MouseArea {
         id: mousearea_newinstance
-        anchors.left: image_newinstance.left
-        anchors.top: image_newinstance.top
         anchors.right: text_newinstance.right
-        anchors.bottom: image_newinstance.bottom
         onClicked: {
             startWallet.createNewWalletInstance("", false);
         }
@@ -418,27 +292,60 @@ Item {
         }
     }
 
-//    Image {
-//        id: image_help
-//        width: dp(30)
-//        height: dp(30)
-//        anchors.horizontalCenterOffset: dp(-40)
-//        anchors.bottomMargin: dp(90)
-//        fillMode: Image.PreserveAspectFit
-//        source: "../img/HelpBtn@2x.svg"
-//        anchors.bottom: parent.bottom
-//        anchors.horizontalCenter: parent.horizontalCenter
-//    }
+    ListModel {
+        id: instanceList
+    }
 
-//    Text {
-//        id: text_help
-//        text: qsTr("Help")
-//        anchors.leftMargin: dp(20)
-//        color: "white"
-//        anchors.left: image_help.right
-//        anchors.verticalCenter: image_help.verticalCenter
-//        font.pixelSize: dp(18)
-//    }
+
+
+
+    DrawerList {
+        id: nav
+        repeater.model: instanceList
+        repeater.delegate: instanceItems
+    }
+
+
+    Component {
+        id: instanceItems
+        Rectangle {
+            id: rec_acc_balance
+            height: dp(60)
+            width: root.width
+            color: root.selectedPathId === pathId? "#252525" : "#00000000"
+
+            ImageColor {
+                id: img_check
+                img_height: parent.height/2.5
+                img_source: "../../img/check.svg"
+                img_color: root.selectedPathId === pathId? "white" : "#151515"
+                anchors.left: parent.left
+                anchors.leftMargin: dp(25)
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Text {
+                id: acc_name
+                text: instanceName
+                color: "white"
+                font.pixelSize: dp(18)
+                font.italic: true
+                font.weight: Font.Light
+                anchors.left: img_check.right
+                anchors.leftMargin: dp(25)
+                anchors.verticalCenter: parent.verticalCenter
+            }
+            MouseArea {
+                id: mouse
+                anchors.fill: parent
+                onClicked: {
+                    root.selectedInstance = instanceName
+                    root.selectedPathId = pathId
+                }
+            }
+        }
+    }
+
 }
 
 /*##^##

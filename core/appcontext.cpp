@@ -181,7 +181,7 @@ bool AppContext::loadDataImpl() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x47A5)
+    if (id<0x4783 || id>0x47A9)
          return false;
 
     QString mockStr;
@@ -383,6 +383,23 @@ bool AppContext::loadDataImpl() {
         in >> swapBackupDir;
     }
 
+    if (id>=0x47A6) {
+        in >> priceCurrency;
+    }
+
+    if (id>=0x47A7) {
+        in >> walletLanguage;
+    }
+
+    if (id>=0x47A8) {
+        in >> walletDarkModeEnabled;
+    }
+
+    if (id>=0x47A9) {
+        in >> walletNotificationAndroidEnabled;
+    }
+
+
     return true;
 }
 
@@ -410,7 +427,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x47A5;
+    out << 0x47A9;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -514,6 +531,16 @@ void AppContext::saveData() const {
     out << d;
 
     out << swapBackupDir;
+
+    out << priceCurrency; // Price currency (usd, btc, etc...)
+
+    out << walletLanguage; // Price currency (usd, btc, etc...)
+
+    out << walletDarkModeEnabled; // Dark mode enabled
+
+    out << walletNotificationAndroidEnabled; // Send Android notification enabled
+
+
 }
 
 void AppContext::loadNotesData() {
@@ -706,6 +733,35 @@ void AppContext::setSendMethod(bridge::SEND_SELECTED_METHOD _sendMethod) {
 
 void AppContext::setSendLockOutput(bool lock)  {
     sendLockOutput = lock;
+}
+
+void AppContext::setPriceCurrency(int currency) {
+    if (currency == priceCurrency)
+        return;
+    priceCurrency = currency;
+    saveData();
+}
+
+void AppContext::setLanguage(int language) {
+    if (language == walletLanguage)
+        return;
+    walletLanguage = language;
+    saveData();
+}
+
+
+void AppContext::setDarkModeEnabled(bool enable) {
+    if (enable == walletDarkModeEnabled)
+        return;
+     walletDarkModeEnabled = enable;
+    saveData();
+}
+
+void AppContext::setNotificationAndroidEnabled(bool enable) {
+    if (enable == walletNotificationAndroidEnabled)
+        return;
+    walletNotificationAndroidEnabled = enable;
+    saveData();
 }
 
 // -------------- Contacts

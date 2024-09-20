@@ -152,6 +152,22 @@ public:
     wallet::MwcNodeConnection getNodeConnection( const QString & network );
     void updateMwcNodeConnection( const QString & network, const wallet::MwcNodeConnection & connection );
 
+    // ----- Price Currency
+    int getPriceCurrency() const {return priceCurrency;}
+    void setPriceCurrency(int currency);
+
+    // ----- Wallet Language
+    int getLanguage() const {return walletLanguage;}
+    void setLanguage(int language);
+
+    // ----- Dark Mode
+    bool getDarkModeEnabled() const {return walletDarkModeEnabled;}
+    void setDarkModeEnabled(bool enable);
+
+    // ----- Android Notification
+    bool getNotificationAndroidEnabled() const {return walletNotificationAndroidEnabled;}
+    void setNotificationAndroidEnabled(bool enable);
+
     // HODL registration time.
     int64_t getHodlRegistrationTime(const QString & hash) const;
     void    setHodlRegistrationTime(const QString & hash, int64_t time);
@@ -381,6 +397,15 @@ private:
     double mktPlaceMinFeeLevel = 0.0001;
     qint8  mktPlaceSelling = 2; // 0 - buy, 1 - sell, 2 - all
     QString mktPlaceCurrency = ""; // All
+
+    int priceCurrency = 0; // 0 - usd, 1 - eur, 2 - gbp, 3 - aud, 4 - yen, 5 - cny, 6 - rub, 7 - btc, 8 - eth, 9 - ltc, 10 - xmr
+
+    int walletLanguage = 0; // 0 - en, 1 - es, 2 - cn, 3 - ru, 4 - kr, 5 - cny, 6 - rub, 7 - btc, 8 - eth, 9 - ltc, 10 - xmr
+
+    bool walletDarkModeEnabled = true;
+
+    bool walletNotificationAndroidEnabled = true;
+
 };
 
 template <class T>

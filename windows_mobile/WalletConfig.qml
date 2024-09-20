@@ -1,17 +1,16 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
+import QtGraphicalEffects 1.0
 import ConfigBridge 1.0
 import WalletConfigBridge 1.0
 import UtilBridge 1.0
+import "./models"
 
 Item {
-    property string walletInstanceName
-    property int inputConfirmationsNumber
-    property int changeOutputs
-    property bool walletLogsEnabled
-    property bool autoStartMQSEnabled
-    property bool autoStartTorEnabled
+    id: root
+
+    property bool isInitWalletConfig:true
 
     WalletConfigBridge {
         id: walletConfig
@@ -21,532 +20,290 @@ Item {
         id: config
     }
 
-    function updateButtons() {
-        const currentWalletLogsEnabled = combobox_wallet_logs.currentIndex === 0 ? true: false
-        const sameWithCurrent =
-            textfield_wallet_instance_name.text.trim() === walletInstanceName &&
-            walletLogsEnabled === currentWalletLogsEnabled &&
-            textfield_send_num_confirmation.text.trim() == Number(inputConfirmationsNumber).toString() &&
-            textfield_change_outputs.text.trim() === Number(changeOutputs).toString() &&
-            autoStartMQSEnabled === checkbox_mqs.checked &&
-            autoStartTorEnabled === checkbox_tor.checked
-
-        walletConfig.canApplySettings(!sameWithCurrent);
-
-        const sameWithDefault =
-            true === currentWalletLogsEnabled &&
-            textfield_send_num_confirmation.text.trim() === Number(walletConfig.getDefaultInputConfirmationsNumber()).toString() &&
-            textfield_change_outputs.text.trim() === Number(walletConfig.getDefaultChangeOutputs()).toString() &&
-            checkbox_mqs.checked === true &&
-            checkbox_tor.checked === true
-
-        button_reset.enabled = !sameWithDefault
-        button_apply.enabled = !sameWithCurrent
-    }
-
-    function isInteger(value) {
-      return /^\d+$/.test(value)
-    }
-
-    function logEnableUpdateCallback(needCleanupLogs) {
+    function logEnableUpdate(needCleanupLogs) {
         walletConfig.updateWalletLogsEnabled(false, needCleanupLogs)
+
+    }
+
+    function _callbackInstanceName(action, name) {
+        if (action) {
+            walletInstanceName = name
+            config.updateActiveInstanceName(name)
+            configModal.setProperty(2, "value", name)
+        }
+    }
+
+
+
+    function path_icon(index){
+        switch (index) {
+            case 0:
+                return "../../img/mwc-logo.svg"
+            case 1:
+                return "../../img/dark.svg"
+            case 2:
+                return "../../img/notification.svg"
+            case 3:
+                return "../../img/key.svg"
+            case 4:
+                return "../../img/wallet.svg"
+            case 5:
+                return "../../img/listener.svg"
+
+        }
+    }
+    property string walletInstanceName
+    property bool isOutputs
+    property bool walletLogsEnabled : walletConfig.getWalletLogsEnabled()
+    property bool autoStartMQSEnabled :  walletConfig.getAutoStartMQSEnabled()
+    property bool autoStartTOREnabled : walletConfig.getAutoStartTorEnabled()
+    property int confirmationsNumber : walletConfig.getInputConfirmationsNumber()
+    property int changeOutputs : walletConfig.getChangeOutputs()
+
+
+
+    function updateButton(){
+        const instanceInfo = config.getCurrentWalletInstance()
+        walletInstanceName = instanceInfo[2]
     }
 
     onVisibleChanged: {
-        if (visible) {
-            if (parent.height > dp(520)) {
-                anchors.topMargin = (parent.height - dp(520)) / 2
-            }
-
-            walletLogsEnabled = walletConfig.getWalletLogsEnabled()
-            combobox_wallet_logs.currentIndex = walletLogsEnabled ? 0 : 1
-            autoStartMQSEnabled = walletConfig.getAutoStartMQSEnabled()
-            checkbox_mqs.checked = autoStartMQSEnabled
-            autoStartTorEnabled = walletConfig.getAutoStartTorEnabled()
-            checkbox_tor.checked = autoStartTorEnabled
-            const instanceInfo = config.getCurrentWalletInstance()
-            walletInstanceName = instanceInfo[2]
-            textfield_wallet_instance_name.text = walletInstanceName
-            inputConfirmationsNumber = walletConfig.getInputConfirmationsNumber()
-            textfield_send_num_confirmation.text = inputConfirmationsNumber
-            changeOutputs = walletConfig.getChangeOutputs()
-            textfield_change_outputs.text = changeOutputs
-            updateButtons()
+        if (visible && isInitWalletConfig) {
+            walletConfig.canApplySettings(false)
+            isInitWalletConfig = false
+            updateButton()
         }
-    }
+        if (!visible) {
 
-    MouseArea {
-        anchors.fill: parent
-        onClicked: {
-            textfield_wallet_instance_name.focus = false
-            textfield_send_num_confirmation.focus = false
-            textfield_change_outputs.focus = false
         }
-    }
-
-    Text {
-        id: label_auto_start
-        text: qsTr("Auto Start")
-        color: "white"
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.top: parent.top
-        font.pixelSize: dp(14)
     }
 
     Rectangle {
-        id: rect_auto_start
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(45)
-        anchors.top: label_auto_start.bottom
-        anchors.topMargin: dp(10)
-        border.width: dp(1)
-        border.color: "white"
-        color: "#00000000"
-        height: dp(70)
-
-        CheckBox {
-            id: checkbox_mqs
-            text: qsTr("MWC MQS")
-            font.pixelSize: dp(17)
-            anchors.right:  parent.horizontalCenter
-            anchors.rightMargin: dp(50)
-            anchors.verticalCenter: parent.verticalCenter
-
-            indicator: Rectangle {
-                implicitWidth: dp(20)
-                implicitHeight: dp(20)
-                x: checkbox_mqs.leftPadding
-                y: parent.height / 2 - height / 2
-
-                Image {
-                    width: dp(20)
-                    height: dp(20)
-                    anchors.fill: parent
-                    fillMode: Image.PreserveAspectFit
-                    source: checkbox_mqs.checked ? "../img/CheckOn@2x.svg" : "../img/CheckOff@2x.svg"
-                }
-            }
-
-            contentItem: Text {
-                text: checkbox_mqs.text
-                font: checkbox_mqs.font
-                color: "white"
-                verticalAlignment: Text.AlignVCenter
-                anchors.left: checkbox_mqs.indicator.right
-                anchors.leftMargin: dp(10)
-            }
-
-            onCheckStateChanged: {
-                updateButtons()
-            }
+        id: container
+        height: dp(67) * configModal.count
+        width: root.width
+        color: Theme.field
+        anchors.horizontalCenter: parent.horizontalCenter
+        ListView {
+            id: contactsList
+            //flicking: false
+            interactive: false
+            anchors.fill: parent
+            model: configModal
+            delegate: configDelegate
+            clip: true
+            focus: true
         }
-
-        CheckBox {
-            id: checkbox_tor
-            text: qsTr("TOR")
-            font.pixelSize: dp(17)
-            anchors.left:  parent.horizontalCenter
-            anchors.leftMargin: dp(50)
-            anchors.verticalCenter: parent.verticalCenter
-
-            indicator: Rectangle {
-                implicitWidth: dp(20)
-                implicitHeight: dp(20)
-                x: checkbox_tor.leftPadding
-                y: parent.height / 2 - height / 2
-
-                Image {
-                    width: dp(20)
-                    height: dp(20)
-                    anchors.fill: parent
-                    fillMode: Image.PreserveAspectFit
-                    source: checkbox_tor.checked ? "../img/CheckOn@2x.svg" : "../img/CheckOff@2x.svg"
-                }
-            }
-
-            contentItem: Text {
-                text: checkbox_tor.text
-                font: checkbox_tor.font
-                color: "white"
-                verticalAlignment: Text.AlignVCenter
-                anchors.left: checkbox_tor.indicator.right
-                anchors.leftMargin: dp(10)
-            }
-
-            onCheckStateChanged: {
-                updateButtons()
-            }
+    }
+    ListModel {
+        id: configModal
+        ListElement {
+            name: "MQS Auto Start"
+        }
+        ListElement {
+            name: "TOR Auto Start"
+        }
+        ListElement {
+            name: "Instance Name"
+        }
+        ListElement {
+            name: "Confirmation Number"
+        }
+        ListElement {
+            name: "Change Outputs"
+        }
+        ListElement {
+            name: "Logs"
         }
     }
 
-    Text {
-        id: label_wallet_instance_name
-        text: qsTr("Wallet instance name")
-        color: "white"
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.top: rect_auto_start.bottom
-        anchors.topMargin: dp(15)
-        font.pixelSize: dp(14)
-    }
-
-    TextField {
-        id: textfield_wallet_instance_name
-        height: dp(50)
-        padding: dp(10)
-        leftPadding: dp(20)
-        font.pixelSize: dp(18)
-        color: "white"
-        text: ""
-        anchors.top: label_wallet_instance_name.bottom
-        anchors.topMargin: dp(10)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(45)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        horizontalAlignment: Text.AlignLeft
-        background: Rectangle {
-            color: "#8633E0"
-            radius: dp(5)
-        }
-        onTextChanged: {
-            updateButtons()
-        }
-    }
-
-    Text {
-        id: label_send_num_confirmation
-        text: qsTr("Number of Confirmations (for send)")
-        color: "white"
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.top: textfield_wallet_instance_name.bottom
-        anchors.topMargin: dp(15)
-        font.pixelSize: dp(14)
-    }
-
-    TextField {
-        id: textfield_send_num_confirmation
-        height: dp(50)
-        padding: dp(10)
-        leftPadding: dp(20)
-        font.pixelSize: dp(18)
-        color: "white"
-        text: ""
-        anchors.top: label_send_num_confirmation.bottom
-        anchors.topMargin: dp(10)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(45)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        horizontalAlignment: Text.AlignLeft
-        background: Rectangle {
-            color: "#8633E0"
-            radius: dp(5)
-        }
-        onTextChanged: {
-            updateButtons()
-        }
-    }
-
-    Text {
-        id: label_change_outputs
-        text: qsTr("Change Outputs")
-        color: "white"
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.top: textfield_send_num_confirmation.bottom
-        anchors.topMargin: dp(15)
-        font.pixelSize: dp(14)
-    }
-
-    TextField {
-        id: textfield_change_outputs
-        height: dp(50)
-        padding: dp(10)
-        leftPadding: dp(20)
-        font.pixelSize: dp(18)
-        color: "white"
-        text: ""
-        anchors.top: label_change_outputs.bottom
-        anchors.topMargin: dp(10)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(45)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        horizontalAlignment: Text.AlignLeft
-        background: Rectangle {
-            color: "#8633E0"
-            radius: dp(5)
-        }
-        onTextChanged: {
-            updateButtons()
-        }
-    }
-
-    Text {
-        id: label_wallet_logs
-        text: qsTr("Wallet Logs")
-        color: "white"
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        anchors.top: textfield_change_outputs.bottom
-        anchors.topMargin: dp(15)
-        font.pixelSize: dp(14)
-    }
-
-    ComboBox {
-        id: combobox_wallet_logs
-
-        onCurrentIndexChanged: {
-            if (combobox_wallet_logs.currentIndex >= 0) {
-                updateButtons()
-            }
-        }
-
-        delegate: ItemDelegate {
-            width: combobox_wallet_logs.width
-            contentItem: Text {
-                text: status
-                color: "white"
-                font: combobox_wallet_logs.font
-                elide: Text.ElideRight
-                verticalAlignment: Text.AlignVCenter
-            }
-            background: Rectangle {
-                color: combobox_wallet_logs.highlightedIndex === index ? "#955BDD" : "#8633E0"
-            }
-            topPadding: dp(10)
-            bottomPadding: dp(10)
-            leftPadding: dp(20)
-            rightPadding: dp(20)
-        }
-
-        indicator: Canvas {
-            id: canvas
-            x: combobox_wallet_logs.width - width - combobox_wallet_logs.rightPadding
-            y: combobox_wallet_logs.topPadding + (combobox_wallet_logs.availableHeight - height) / 2
-            width: dp(14)
-            height: dp(7)
-            contextType: "2d"
-
-            Connections {
-                target: combobox_wallet_logs
-                function onPressedChanged() { canvas.requestPaint() }
-            }
-
-            onPaint: {
-                context.reset()
-                if (combobox_wallet_logs.popup.visible) {
-                    context.moveTo(0, height)
-                    context.lineTo(width / 2, 0)
-                    context.lineTo(width, height)
-                } else {
-                    context.moveTo(0, 0)
-                    context.lineTo(width / 2, height)
-                    context.lineTo(width, 0)
-                }
-                context.strokeStyle = "white"
-                context.lineWidth = 2
-                context.stroke()
-            }
-        }
-
-        contentItem: Text {
-            text: combobox_wallet_logs.currentIndex >= 0 && listmodel_wallet_logs.get(combobox_wallet_logs.currentIndex).status
-            font: combobox_wallet_logs.font
-            color: "white"
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignLeft
-            elide: Text.ElideRight
-        }
-
-        background: Rectangle {
-            implicitHeight: dp(50)
-            radius: dp(5)
-            color: "#8633E0"
-        }
-
-        popup: Popup {
-            y: combobox_wallet_logs.height + dp(3)
-            width: combobox_wallet_logs.width
-            implicitHeight: contentItem.implicitHeight + dp(20)
-            topPadding: dp(10)
-            bottomPadding: dp(10)
-            leftPadding: dp(0)
-            rightPadding: dp(0)
-
-            contentItem: ListView {
-                clip: true
-                implicitHeight: contentHeight
-                model: combobox_wallet_logs.popup.visible ? combobox_wallet_logs.delegateModel : null
-                currentIndex: combobox_wallet_logs.highlightedIndex
-
-                ScrollIndicator.vertical: ScrollIndicator { }
-            }
-
-            background: Rectangle {
-                color: "#8633E0"
-                radius: dp(5)
-            }
-
-            onVisibleChanged: {
-                if (!combobox_wallet_logs.popup.visible) {
-                    canvas.requestPaint()
-                }
-            }
-        }
-
-        model: ListModel {
-            id: listmodel_wallet_logs
-
-            ListElement {
-                status: "Enabled"
-            }
-            ListElement {
-                status: "Disabled"
-            }
-        }
-        anchors.top: label_wallet_logs.bottom
-        anchors.topMargin: dp(10)
-        anchors.right: parent.right
-        anchors.rightMargin: dp(45)
-        anchors.left: parent.left
-        anchors.leftMargin: dp(45)
-        leftPadding: dp(20)
-        rightPadding: dp(20)
-        font.pixelSize: dp(18)
-    }
-
-    Button {
-        id: button_apply
-        width: dp(150)
-        height: dp(50)
-        anchors.top: combobox_wallet_logs.bottom
-        anchors.topMargin: dp(20)
-        anchors.right: parent.right
-        anchors.rightMargin: parent.width / 2 - dp(170)
-
-        background: Rectangle {
-            color: button_apply.enabled ? "white" : "#00000000"
-            radius: dp(5)
-            border.width: dp(2)
-            border.color: button_apply.enabled ? "white" : "gray"
-            Text {
-                text: qsTr("Apply")
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
-                color: button_apply.enabled ? "#6F00D6" : "gray"
-            }
-        }
-
-        onClicked: {
-            const newWalletInstanceName = textfield_wallet_instance_name.text.trim()
-            if (newWalletInstanceName === "") {
-                messagebox.open(qsTr("Input"), qsTr("Please specify non empty wallet insatance name"))
-                textfield_wallet_instance_name.focus = true
-                return;
-            }
-
-            let ok = isInteger(textfield_send_num_confirmation.text.trim())
-            let confirmations
-            if (ok) {
-                confirmations = parseInt(textfield_send_num_confirmation.text.trim())
-            }
-            if (!ok || confirmations <= 0 || confirmations > 10) {
-                messagebox.open(qsTr("Input"), qsTr("Please input the number of confirmations in the range from 1 to 10"))
-                textfield_send_num_confirmation.focus = true
-                return;
-            }
-
-            ok = isInteger(textfield_change_outputs.text.trim())
-            let outputs
-            if (ok) {
-                outputs = parseInt(textfield_change_outputs.text.trim())
-            }
-            if (!ok || outputs <= 0 || outputs >= 100) {
-                messagebox.open(qsTr("Input"), qsTr("Please input the change output number in the range from 1 to 100"))
-                textfield_change_outputs.focus = true
-                return
-            }
-
-            if (!(confirmations === inputConfirmationsNumber && outputs === changeOutputs)) {
-                walletConfig.setSendCoinsParams(confirmations, outputs)
-                inputConfirmationsNumber = confirmations
-                changeOutputs = outputs
-            }
-
-            const currentWalletLogsEnabled = combobox_wallet_logs.currentIndex === 0 ? true : false
-            const need2updateLogEnabled = walletLogsEnabled !== currentWalletLogsEnabled
-            if (need2updateLogEnabled) {
-                if (!currentWalletLogsEnabled) {
-                    messagebox.open("Wallet Logs",
-                           "You just disabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n
-                            Please note, the logs can contain private information about your transactions and accounts.\n
-                            Do you want to clean up existing logs from your wallet?",
-                            true, "Keep the logs", "Clean up", "", "", "", logEnableUpdateCallback)
-                } else {
-                    messagebox.open(qsTr("Wallet Logs"), qsTr("You just enabled the logs. Log files location:\n~/mwc-qt-wallet/logs\nPlease note, the logs can contain private infromation about your transactions and accounts."))
-                }
-            }
-
-            walletLogsEnabled = currentWalletLogsEnabled
-
-            const need2updateAutoStartMQSEnabled = autoStartMQSEnabled !== checkbox_mqs.checked
-            if (need2updateAutoStartMQSEnabled) {
-                walletConfig.updateAutoStartMQSEnabled(checkbox_mqs.checked)
-            }
-            autoStartMQSEnabled = checkbox_mqs.checked
-
-            const need2updateAutoStartTorEnabled = autoStartTorEnabled !== checkbox_tor.checked
-            if (need2updateAutoStartTorEnabled) {
-                walletConfig.updateAutoStartTorEnabled(checkbox_tor.checked)
-            }
-            autoStartTorEnabled = checkbox_tor.checked
-
-            if (newWalletInstanceName !== walletInstanceName) {
-                config.updateActiveInstanceName(newWalletInstanceName)
-                walletInstanceName = newWalletInstanceName
-            }
-
-            updateButtons()
-        }
-    }
-
-    Button {
-        id: button_reset
-        width: dp(150)
-        height: dp(50)
-        anchors.verticalCenter: button_apply.verticalCenter
-        anchors.left: parent.left
-        anchors.leftMargin: parent.width / 2 - dp(170)
-
-        background: Rectangle {
+    Component {
+        id: configDelegate
+        Rectangle {
+            id: rec
+            height: dp(67)
             color: "#00000000"
-            radius: dp(5)
-            border.width: dp(2)
-            border.color: button_reset.enabled ? "white" : "grey"
-            Text {
-                text: qsTr("Reset")
-                anchors.verticalCenter: parent.verticalCenter
+            width: root.width
+            Rectangle {
+                id: rectangle
+                height: dp(65)
+                width: parent.width
+                color: Theme.card
+                anchors.top: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: dp(18)
-                color: button_reset.enabled ? "white" : "grey"
+
+                ImageColor {
+                    id: icon
+                    img_source: path_icon(index)
+                    img_height: index === 0? parent.height*0.2 : parent.height*0.4
+                    img_color: Theme.icon
+                    anchors.left: parent.left
+                    anchors.leftMargin: dp(15)
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Text {
+                    color: Theme.textPrimary
+                    text: name
+                    font.bold: true
+                    font.pixelSize: dp(15)
+                    anchors.left: icon.right
+                    anchors.leftMargin: dp(15)
+                    //anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Text {
+                    color: Theme.textPrimary
+                    text: index === 2? walletInstanceName : (index === 3? confirmationsNumber : (index === 4? changeOutputs : ""))
+                    font.bold: true
+                    font.pixelSize: dp(15)
+                    anchors.right: parent.right
+                    anchors.rightMargin: dp(15)
+                    //anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: (index >1 && index !== 6)? true : false
+                }
+
+
+
+
+                // Dark mode and notification
+                ToggleButton {
+                    id: toggle
+                    height: parent.height*0.5
+                    width: height*2
+                    anchors.right: parent.right
+                    anchors.rightMargin: dp(15)
+                    anchors.verticalCenter: parent.verticalCenter
+                    state: index === 0? (autoStartMQSEnabled? "enabled" : "disabled") : (index === 1? (autoStartTOREnabled? "enabled" : "disabled") : (index === 6? (autoStartTOREnabled? "enabled" : "disabled") : "disabled"))
+                    visible: (index === 0 || index === 1 || index === 5)? true : false
+                    mouse.onClicked: {
+                        toggle.state = toggle.state === "disabled" ? "enabled" : "disabled"
+                        let enable = toggle.state === "disabled" ? false : true
+                        if (index === 0) {
+                            walletConfig.updateAutoStartMQSEnabled(enable)
+                        } else if (index === 1) {
+                            walletConfig.updateAutoStartTorEnabled(enable)
+                        } else {
+                            if (enable) {
+                                messagebox.open(qsTr("Wallet Logs"), qsTr("You just enabled the logs. Log files location:\n~/mwc-qt-wallet/logs\n\nPlease note, the logs can contain private infromation about your transactions and accounts."))
+                                walletConfig.updateWalletLogsEnabled(enable, false)
+                            } else {
+                                messagebox.open("Wallet Logs",
+                                    "You just disabled the logs. Log files location: ~/mwc-qt-wallet/logs\n\nPlease note, the logs can contain private information about your transactions and accounts.\n\nDo you want to clean up existing logs from your wallet?",
+                                    true, "Keep", "Clean up", "", "", "", logEnableUpdate)
+                            }
+                        }
+                    }
+                }
+
+                MouseArea {
+                    id: mouse
+                    anchors.fill: parent
+                    visible: (index>1 && index<5)? true: false
+                    onClicked: {
+                        switch (index) {
+                            case 0:
+                            case 1:
+                                break;
+                            case 2:
+                                inputDlg.open("Wallet Instance Name", "Change the wallet Instance Name", "Instance Name", "", 13, _callbackInstanceName)
+                                break;
+                            case 3:
+                                isOutputs = false
+                                numberList.open()
+                                break;
+                            case 4:
+                                isOutputs = true
+                                numberList.open()
+                                break;
+                            case 5:
+                                break;
+                        }
+                    }
+                }
+
+                ColorOverlay {
+
+                    id: overlay
+                    anchors.fill: rectangle
+                    source: rectangle
+                    opacity: 0
+                }
+                states: [
+                    State {
+                        name: "pressed"; when: mouse.pressed && index !==2 && index !==3
+                        PropertyChanges {
+                            target: overlay; color: "black"; opacity: 0.5
+                        }
+                    },
+                    State {
+                        name: "unpressed"; when: !mouse.pressed
+                        PropertyChanges {
+                            target: overlay; color: "black"; opacity: 0
+                        }
+                    }]
+
+                transitions: Transition {
+                    NumberAnimation {
+                        properties: "opacity"; duration: 250; easing.type: Easing.InOutQuad
+                    }
+                }
             }
         }
+    }
 
-        onClicked: {
-            textfield_send_num_confirmation.text = walletConfig.getDefaultInputConfirmationsNumber()
-            textfield_change_outputs.text = walletConfig.getDefaultChangeOutputs()
-            combobox_wallet_logs.currentIndex = 0
-            checkbox_mqs.checked = true
-            checkbox_tor.checked = true
+    DrawerList {
+        id: numberList
+        repeater.model: 10
+        repeater.delegate: numberModal
+    }
 
-            updateButtons()
+    Component {
+        id: numberModal
+        Rectangle {
+            id: rec_number
+            height: dp(60)
+            width: dp(180)
+            color: (isOutputs? changeOutputs : confirmationsNumber) === index +1? Theme.field : "#00000000"
+
+            ImageColor {
+                id: img_check_number
+                img_height: parent.height/2.5
+                img_source: "../../img/check.svg"
+                img_color: (isOutputs? changeOutputs : confirmationsNumber) === index +1 ? Theme.iconSelected : Theme.icon
+                anchors.left: parent.left
+                anchors.leftMargin: dp(25)
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Text {
+                id: number
+                text: index +1
+                color: Theme.textPrimary
+                font.pixelSize: rec_number.height/4
+                font.bold: true
+                font.capitalization: Font.AllUppercase
+                anchors.left: img_check_number.right
+                anchors.leftMargin: dp(25)
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            MouseArea {
+                id: mouse_number
+                anchors.fill: parent
+                onClicked: {
+                    if (isOutputs) {
+                        changeOutputs = index + 1
+                    } else {
+                        confirmationsNumber = index + 1
+                    }
+                    walletConfig.canApplySettings(true);
+                    walletConfig.setSendCoinsParams(confirmationsNumber, changeOutputs)
+                    walletConfig.canApplySettings(false);
+                }
+            }
         }
     }
-}
+   }

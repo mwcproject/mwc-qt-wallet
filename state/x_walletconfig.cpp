@@ -168,6 +168,38 @@ void WalletConfig::setNotificationWindowsEnabled(bool enabled) {
     context->appContext->setNotificationWindowsEnabled(enabled);
 }
 
+int WalletConfig::getPriceCurrency() {
+    return context->appContext->getPriceCurrency();
+}
+
+void WalletConfig::setPriceCurrency(int currency) {
+    context->appContext->setPriceCurrency(currency);
+}
+
+int WalletConfig::getLanguage() {
+    return context->appContext->getLanguage();
+}
+
+void WalletConfig::setLanguage(int language) {
+    context->appContext->setLanguage(language);
+}
+
+bool  WalletConfig::getDarkModeEnabled() {
+    return context->appContext->getDarkModeEnabled();
+}
+
+void WalletConfig::setDarkModeEnabled(bool enable) {
+    context->appContext->setDarkModeEnabled(enable);
+}
+
+bool  WalletConfig::getNotificationAndroidEnabled() {
+    return context->appContext->getNotificationAndroidEnabled();
+}
+
+void WalletConfig::setNotificationAndroidEnabled(bool enable) {
+    context->appContext->setNotificationAndroidEnabled(enable);
+}
+
 bool WalletConfig::updateTimeoutValue(int timeout) {
     util::ConfigReader reader;
     QString configFN = config::getMwcGuiWalletConf();

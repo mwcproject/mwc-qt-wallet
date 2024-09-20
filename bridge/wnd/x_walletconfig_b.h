@@ -55,6 +55,18 @@ public:
     Q_INVOKABLE int getDefaultInputConfirmationsNumber();
     Q_INVOKABLE int getDefaultChangeOutputs();
 
+    Q_INVOKABLE int getPriceCurrency();
+    Q_INVOKABLE void setPriceCurrency(int currency);
+
+    Q_INVOKABLE int getLanguage();
+    Q_INVOKABLE void setLanguage(int language);
+
+    Q_INVOKABLE bool getDarkModeEnabled();
+    Q_INVOKABLE void setDarkModeEnabled(bool enable);
+
+    Q_INVOKABLE bool getNotificationAndroidEnabled();
+    Q_INVOKABLE void setNotificationAndroidEnabled(bool enable);
+
     // Update settings
     Q_INVOKABLE void setSendCoinsParams(int inputConfirmationsNumber, int changeOutputs);
     Q_INVOKABLE void updateWalletLogsEnabled(bool logsEnabled, bool needCleanupLogs);

@@ -42,7 +42,7 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("Accounts")
+                text: qsTr("id-account")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
@@ -69,7 +69,7 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("Show Passphrase")
+                text: qsTr("id-show-passphrase")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
@@ -82,8 +82,8 @@ Item {
                 passwordHash = wallet.getPasswordHash()
 
                 if (passwordHash !== "") {
-                    messagebox.open("Wallet Password", "You are going to view wallet mnemonic passphrase.",
-                            true, "Cancel", "Confirm", passwordHash, 1, "", showPassphraseCallback)
+                    messagebox.open(qsTr("id-wallet-password"), qsTr("id-mnemonic-warning"),
+                            true, qsTr("id-cancel"), qsTr("id-confirm"), passwordHash, 1, "", showPassphraseCallback)
                     return;
                 }
                 // passwordHash should contain raw password value form the messgage box
@@ -107,7 +107,7 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("Contacts")
+                text: qsTr("id-contacts")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
@@ -134,7 +134,7 @@ Item {
             border.color: "white"
             border.width: dp(2)
             Text {
-                text: qsTr("Logout / Change Wallet")
+                text: qsTr("id-logout")
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: dp(18)
@@ -142,7 +142,7 @@ Item {
             }
         }
         onClicked: {
-            messagebox.open(qsTr("Change Instance"), qsTr("Changing an instance will log you out of this current wallet instance. Are you sure you want to log out?"), true, "No", "Yes", "", "", "", changeInstanceCallback)
+            messagebox.open(qsTr("id-change-wallet"), qsTr("id-change-wallet-warning"), true, qsTr("id-no"), qsTr("id-yes"), "", "", "", changeInstanceCallback)
         }
     }
 }

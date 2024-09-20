@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.13
 import QtQuick.Window 2.0
 import ConfigBridge 1.0
+import UtilBridge 1.0
 
 Item {
     id: selectContactItem
@@ -12,6 +13,8 @@ Item {
     property bool showTor
     property bool showMQS
     property bool showHttp
+
+
 
     function open(_showTor, _showMQS, _showHttp, _callback) {
         callback = _callback
@@ -84,22 +87,21 @@ Item {
             updateContactsList("")
         }
     }
+    Rectangle {
+        anchors.fill: parent
+        color: "black"
+        opacity: 0.5
+    }
 
     Rectangle {
         id: rect_background
+        height: parent.height*0.8
+        width: parent.width*0.8
         anchors.fill: parent
-        gradient: Gradient {
-            orientation: Gradient.Horizontal
-            GradientStop {
-                position: 0
-                color: "#9E00E7"
-            }
-
-            GradientStop {
-                position: 1
-                color: "#3600C9"
-            }
-        }
+        color: "#181818"
+        radius: dp(25)
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
 
         MouseArea {
             anchors.fill: parent

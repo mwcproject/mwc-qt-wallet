@@ -25,6 +25,9 @@
 #include "../util/Json.h"
 #include "../util/filedialog.h"
 #include "../util/Files.h"
+#ifdef WALLET_MOBILE
+#include "../core_mobile/qtandroidservice.h"
+#endif
 
 namespace bridge {
 
@@ -164,13 +167,18 @@ using namespace qrcodegen;
 // res[0]  - size of the QR code
 // res[1]  - SVG string that can draw the QR code. Seems like both Desctop and QML can draw the SVG path.
 QVector<QString> Util::generateQrCode(QString content) {
-    const QrCode qrCodeResult = QrCode::encodeText(content.toStdString().c_str(), QrCode::Ecc::MEDIUM);
+    const QrCode qrCodeResult = QrCode::encodeText(content.toStdString().c_str(), QrCode::Ecc::HIGH);
 
     int size = qrCodeResult.getSize();
     QString svgContent = QString::fromStdString( qrCodeResult.toSvgString(1) );
     return { QString::number(size), svgContent };
 }
+#ifdef WALLET_MOBILE
 
+void Util::setBarAndroid(int statusBarColor, int navigationBarColor, int statusBarWindows ) {
+    androidDevice->setBarAndroid(statusBarColor, navigationBarColor, statusBarWindows);
+}
+#endif
 // Parsing slate as a Json. Respond back with error or with Slate details
 // slateContent  - slate sjon string to parse.
 // fileTransactionType  - value of FileTransactionType

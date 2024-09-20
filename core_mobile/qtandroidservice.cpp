@@ -1,7 +1,9 @@
 #include "qtandroidservice.h"
 
-#include <QAndroidJniEnvironment>
+#include <QtAndroid>
 #include <QAndroidIntent>
+#include <QAndroidJniEnvironment>
+#include <QAndroidJniObject>
 #include <QtDebug>
 
 QtAndroidService *QtAndroidService::m_instance = nullptr;
@@ -19,6 +21,7 @@ QtAndroidService::QtAndroidService(QObject *parent) : QObject(parent)
 
     registerNatives();
     registerBroadcastReceiver();
+    connect(this, SIGNAL(notificationChanged()), this, SLOT(updateAndroidNotification()));
 }
 
 void QtAndroidService::sendToService(QString message)
@@ -26,6 +29,7 @@ void QtAndroidService::sendToService(QString message)
     QAndroidIntent serviceIntent(QtAndroid::androidActivity().object(),
                                 "mw/mwc/wallet/QtAndroidService");
     serviceIntent.putExtra("message", message.toUtf8());
+
     QAndroidJniObject result = QtAndroid::androidActivity().callObjectMethod(
                 "startService",
                 "(Landroid/content/Intent;)Landroid/content/ComponentName;",
@@ -47,8 +51,22 @@ bool QtAndroidService::requestPermissions()
     return true;
 }
 
-void QtAndroidService::registerNatives()
-{
+void QtAndroidService::setBarAndroid(int statusBarColor, int navigationBarColor, int statusBarWindows) {
+    QtAndroid::runOnAndroidThread([=]() {
+        QAndroidJniObject window = QtAndroid::androidActivity().callObjectMethod("getWindow", "()Landroid/view/Window;");
+        window.callMethod<void>("addFlags", "(I)V", 0x80000000);
+        window.callMethod<void>("clearFlags", "(I)V", 0x04000000);
+        window.callMethod<void>("setStatusBarColor", "(I)V", statusBarColor); // Desired statusbar color
+        window.callMethod<void>("setNavigationBarColor", "(I)V", navigationBarColor); // Desired statusbar color
+
+        //QAndroidJniObject decorView = window.callObjectMethod("getDecorView", "()Landroid/view/View;");
+        //int flags = 0x00000010 | 0x00002000;
+        //decorView.callMethod<void>("setSystemUiVisibility", "(I)V", flags);
+    });
+
+}
+
+void QtAndroidService::registerNatives(){
     JNINativeMethod methods[] {
         {"sendToQt", "(Ljava/lang/String;)V", reinterpret_cast<void *>(receivedFromAndroidService)}};
     QAndroidJniObject javaClass("mw/mwc/wallet/ActivityUtils");
@@ -146,4 +164,32 @@ QString QtAndroidService::getApkVersion()
 
     return info;
 }
+
+void QtAndroidService::setNotification(const QString &notification)
+{
+    if (m_notification == notification)
+        return;
+
+    m_notification = notification;
+    emit notificationChanged();
+}
+
+QString QtAndroidService::notification() const
+{
+    return m_notification;
+}
+
+void QtAndroidService::updateAndroidNotification()
+{
+
+    QAndroidJniObject javaNotification = QAndroidJniObject::fromString(m_notification);
+    QAndroidJniObject javaClass("mw/mwc/wallet/ActivityUtils");
+    QAndroidJniObject classObject(javaClass);
+    classObject.callMethod<void>("notify",
+                                 "(Landroid/content/Context;Ljava/lang/String;)V",
+                                 QtAndroid::androidContext().object(),
+                                 javaNotification.object<jstring>());
+}
+
+
 

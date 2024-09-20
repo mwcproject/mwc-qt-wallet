@@ -44,6 +44,8 @@ public:
     // Files transaction page, continue with a Slatepack
     Q_INVOKABLE void receiveSlatepack(QString slatepack, QString description);
 
+    Q_INVOKABLE void showQrCode(QString type, QString address);
+
 signals:
     // respond from signTransaction
     void sgnTransactionActionIsFinished( bool success, QString message );

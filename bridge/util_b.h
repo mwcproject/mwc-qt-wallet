@@ -19,6 +19,10 @@
 #include <QVector>
 #include <QStringList>
 
+#ifdef WALLET_MOBILE
+class QtAndroidService;
+#endif
+
 namespace util {
 class PasswordAnalyser;
 }
@@ -116,6 +120,8 @@ public:
     // Extract PubKey from address
     Q_INVOKABLE QString extractPubKeyFromAddress(QString address);
 
+    Q_INVOKABLE void setBarAndroid(int statusBarColor, int navigationBarColor, int statusBarWindows );
+
     // convert nano items to dtirng that represent that fraction as a double
     Q_INVOKABLE QString nano2one(int64_t nano);
 
@@ -126,6 +132,9 @@ private:
     QVector<double> passwordAnalyserWeight;
     QStringList passwordAnalyserSeqWords;
     QStringList passwordAnalyserDictWords;
+#ifdef WALLET_MOBILE
+    QtAndroidService * androidDevice = nullptr;
+#endif
 };
 
 }

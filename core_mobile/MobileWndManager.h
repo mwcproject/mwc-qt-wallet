@@ -54,7 +54,7 @@ public:
     virtual QString getOpenFileName(const QString &caption, const QString &dir, const QString &filter) override;
 
     // Ask for confirmation
-    virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) override;
+    virtual bool sendConfirmationDlg( QString title, QVector<QString> message, double widthScale, QString passwordHash ) override;
 
     // Stopping wallet message
     virtual void showWalletStoppingMessage(int taskTimeout) override;
@@ -66,7 +66,7 @@ public:
     virtual void pageInitAccount(QString path, bool restoredFromSeed) override;
     virtual void pageEnterSeed() override;
     virtual void pageNewSeed(QString pageTitle, QVector<QString> seed, bool hideSubmitButton = false) override;
-    virtual void pageNewSeedTest(int wordIndex) override;
+    virtual void pageNewSeedTest(QVector<int> testWordsIndex) override;
     virtual void pageProgressWnd(QString pageTitle, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable ) override;
     virtual void pageOutputs() override;
     virtual void pageFileTransactionReceive(QString pageTitle,
@@ -86,6 +86,8 @@ public:
     // slatepack - slatepack string value to show.
     // backStateId - state ID of the caller. On 'back' will switch to this state Id
     virtual void pageShowSlatepack(QString slatepack, int backStateId, QString txExtension, bool enableFinalize) override;
+
+    virtual void pageShowQr(QString typeAddress, QString address, QString svgQr, int backStateId) override;
 
     virtual void pageAccounts() override;
     virtual void pageAccountTransfer() override;

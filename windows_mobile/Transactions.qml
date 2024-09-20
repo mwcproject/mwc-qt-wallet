@@ -8,6 +8,8 @@ import ConfigBridge 1.0
 import UtilBridge 1.0
 import NotificationBridge 1.0
 import QtAndroidService 1.0
+import QtQuick.Layouts 1.3
+import "./models"
 
 Item {
     id: transactionsItem
@@ -20,9 +22,13 @@ Item {
     property var type_TRANSACTION_SEND: 1
     property var type_TRANSACTION_NONE: 0
     property var number_COIN_BASE_CONFIRM: 1440
-    property var locale: Qt.locale()
     property var message_LEVEL_INFO: 4
     property var message_LEVEL_CRITICAL: 2
+
+    property alias txsModal: txsModal
+
+
+
 
     WalletBridge {
         id: wallet
@@ -59,19 +65,12 @@ Item {
         onSgnTransactions: {
             if (account !== wallet.getCurrentAccountName() )
                 return
-
-            rect_progress.visible = false
-            transactionList.visible = true
-
             allTrans = []
             transactions.forEach(tx => allTrans.push(tx))
             updateData()
         }
 
         onSgnTransactionById: {
-            rect_progress.visible = false
-            transactionList.visible = true
-
             if (!success) {
                 messagebox.open(qsTr("Transaction details"), qsTr("Internal error. Transaction details are not found."))
                 return
@@ -93,9 +92,6 @@ Item {
         }
 
         onSgnRepost: (idx, err) => {
-            rect_progress.visible = false
-            transactionList.visible = true
-
             if (err === "") {
                 notification.appendNotificationMessage(message_LEVEL_INFO, "Transaction #" + Number(idx+1).toString() + " was successfully reposted.")
                 messagebox.open("Repost", "Transaction #" + Number(idx + 1).toString() + " was successfully reposted.")
@@ -106,8 +102,6 @@ Item {
         }
 
         onSgnCancelTransacton: (success, account, trIdxStr, errMessage) => {
-            rect_progress.visible = true
-            transactionList.visible = false
             const trIdx = parseInt(trIdxStr)
             if (success) {
                 requestTransactions()
@@ -131,16 +125,10 @@ Item {
                 messagebox.open("Failure", msg)
             }
         }
-
-        onSgnWalletBalanceUpdated: {
-            updateAccountsData()
-        }
     }
 
     function txRepost(txIdx) {
         wallet.repost(wallet.getCurrentAccountName(), txIdx, config.isFluffSet())
-        rect_progress.visible = true
-        transactionList.visible = false
     }
 
     function txCancel(txIdx) {
@@ -148,33 +136,27 @@ Item {
     }
 
     function requestTransactions() {
-        transactionModel.clear()
+
         allTrans = []
         const account = wallet.getCurrentAccountName()
         if (account === "") {
             return
         }
-        rect_progress.visible = true
-        transactionList.visible = false
         wallet.requestNodeStatus()
         wallet.requestTransactions(account, true)
         updateData()
+
     }
 
     function updateData() {
-        transactionModel.clear()
+        let cache =  []
         const expectedConfirmNumber = config.getInputConfirmationNumber()
-        for ( let idx = allTrans.length - 1; idx >= 0; idx--) {
+        let currentDate = 0
+        for (let idx = allTrans.length - 1; idx >= 0; idx--) {
             const trans = JSON.parse(allTrans[idx])
             const selection = 0.0
-
-//            if (canBeCancelled(trans.transactionType, trans.confirmed)) {
-//                const age = calculateTransactionAge(trans.creationTime)
-//                // 1 hours is a 1.0
-//                selection = age > 60 * 60 ? 1.0 : (Number(age) / Number(60 * 60))
-//            }
-
             let transConfirmedStr = trans.confirmed ? "YES" : "NO"
+
             // if the node is online and in sync, display the number of confirmations instead
             // node_height will be 0 if the node is offline or out of sync
             if (node_height > 0 && trans.height > 0) {
@@ -187,18 +169,77 @@ Item {
                 }
             }
 
-            transactionModel.append({
+            let type = getTypeAsStr(trans.transactionType, trans.confirmed)
+            let txAddr = trans.address === "file" ? "File Transfer" : trans.address
+            let date  = getTxTime(trans.creationTime)
+            let txCoinNano = util.nano2one(trans.coinNano)
+            let txHeight = trans.height <= 0 ? "" : Number(trans.height).toString()
+
+
+            let timestamp = getTimestamp(trans.creationTime)
+            cache.push({
+                tx: true,
                 txIdx: trans.txIdx,
-                txType: getTypeAsStr(trans.transactionType, trans.confirmed),
-                txId: "ID: " + trans.txid,
-                txAddress: trans.address === "file" ? "File Transfer" : trans.address,
-                txTime: getTxTime(trans.creationTime),
-                txCoinNano: util.nano2one(trans.coinNano) + " MWC",
+                txType: type,
+                txId: trans.txid,
+                txDate: date[0],
+                txTime: date[1],
+                txCoinNano: txCoinNano,
                 txConfirmedStr: transConfirmedStr,
-                txHeight: trans.height <= 0 ? "" : Number(trans.height).toString(),
-//                selection: selection
+                timestamp: timestamp,
+                isConf: trans.confirmed
             })
         }
+        if (isInit) {
+            cache.forEach(tx => txsModal.append(tx))
+            isInit = false
+            return
+        }
+
+        let listModelsNB = txsModal.count -1
+        let cacheModelNB = cache.length -1
+
+        let dist = cacheModelNB - listModelsNB
+        for (let i=cacheModelNB; i >= 0; i--) {
+                let idx = i-dist
+                if (idx < 0){
+                    txsModal.insert(0, cache[i])
+                } else {
+                    let txs = txsModal.get(idx).tx
+                    let ctxs = cache[i].txs
+                    if (ctxs) {
+                        if (txs === ctxs) {
+                            let date = txsModal.get(idx).txDate
+                            let cdate = cache[i].txDate
+                            if (date !== cdate)
+                                txsmodals.set(idx, cache[i])
+                        } else {
+                            txsmodals.set(idx, cache[i])
+                        }
+                   } else {
+                        let txId = txsModal.get(idx).txId
+                        let ctxId = cache[i].txId
+                        if (txId  === ctxId) {
+                            let type = txsModal.get(idx).txType
+                            let ctype = cache[i].txType
+                            if (type !== ctype)
+                                txsModal.set(idx, cache[i])
+                        } else {
+                            txsModal.set(idx, cache[i])
+                        }
+                   }
+              }
+          }
+        walletItem.setChart()
+
+
+
+        
+
+    }
+    function getTimestamp(creationTime){
+        const date = Date.fromLocaleString(locale, creationTime, "hh:mm:ss dd-MM-yyyy")
+        return date.getTime()
     }
 
     function canBeCancelled(transactionType, confirmed) {
@@ -234,21 +275,19 @@ Item {
 
     function getTxTime(creationTime) {
         const date = Date.fromLocaleString(locale, creationTime, "hh:mm:ss dd-MM-yyyy")
-        return date.toLocaleString(locale, "MMM dd, yyyy / hh:mm ap")
+        return [date.toLocaleString(locale, "M/d/yy"), date.toLocaleString(locale, "hh:mm ap")]
+
     }
 
     function getTxTypeIcon(txType) {
         if (txType === "Cancelled")
-            return "../img/Transactions_Cancelled@2x.svg"
+            return "../img/close.svg"
 
         if (txType === "Unconfirmed")
-            return "../img/Transactions_Unconfirmed@2x.svg"
+            return "../img/hourglass.svg"
 
-        if (txType === "Sent")
-            return "../img/Transactions_Sent@2x.svg"
-
-        if (txType === "Received")
-            return "../img/Transactions_Received@2x.svg"
+        if (txType === "Sent" || txType === "Received")
+            return "../img/export.svg"
 
         if (txType === "CoinBase")
             return "../img/Transactions_CoinBase@2x.svg"
@@ -258,439 +297,195 @@ Item {
         return tx.txIdx >= 0 && tx.transactionType !== type_TRANSACTION_NONE
     }
 
-    function updateAccountsData() {
-        const accounts = wallet.getWalletBalance(true, false, true)
-        const selectedAccount = wallet.getCurrentAccountName()
-        let selectedAccIdx = 0
-
-        accountItems.clear()
-
-        let idx = 0
-        for (let i = 1; i < accounts.length; i += 2) {
-            if (accounts[i-1] === selectedAccount)
-                selectedAccIdx = idx
-
-            accountItems.append({ info: accounts[i], account: accounts[i-1]})
-            idx++
-        }
-        accountComboBox.currentIndex = selectedAccIdx
-    }
-
-    function currentSelectedAccount() {
-        if (accountComboBox.currentIndex >= 0)
-            return accountItems.get(accountComboBox.currentIndex).account
-    }
 
     onVisibleChanged: {
         if (visible) {
-            rect_progress.visible = true
-            updateAccountsData()
             requestTransactions()
-            updateData()
         }
     }
 
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            search.field_focus = false
+        }
+    }
+
+    Rectangle {
+        anchors.fill: container
+        color: Theme.bg
+        opacity: 0.5
+    }
+
+
+
+    Rectangle {
+        id: container
+        anchors.fill: parent
+        color: "#00000000"
+
+        //radius: dp(25)
+        ListView {
+            id: transactionList
+            width: parent.width
+            height: parent.height
+            ScrollBar.vertical: ScrollBar {
+                policy: Qt.ScrollBarAsNeeded
+            }
+            header: Rectangle {
+                height: dp(40)
+                width: container.width*0.9
+                color: "#00000000"
+                radius: dp(25)
+            }
+
+            footer: Rectangle {
+                height: dp(40)
+                width: container.width*0.9
+                color: "#00000000"
+                radius: dp(25)
+            }
+            /*ListView.view.delegate: Rectangle {
+                color: "pink"
+            }*/
+            section.property: "txDate"
+            section.criteria: ViewSection.FullString
+            section.delegate: ToolBar {
+                height: dp(40)
+                width: container.width*0.9
+                //color: "#00000000"
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                background: Rectangle {
+                    anchors.fill: parent
+                    color: Theme.card
+                    radius: dp(25)
+                }
+
+                Label {
+                    id: label
+                    text: section
+                    anchors.left: parent.left
+                    anchors.leftMargin: dp(15)
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: dp(18)
+                    font.italic: true
+                    color: Theme.textPrimary
+                }
+            }
+            model: txsModal
+            delegate: transactionDelegate
+            clip: true
+
+            focus: true
+        }
+    }
 
     ListModel {
-        id: transactionModel
+        id: txsModal
     }
 
-    ListView {
-        id: transactionList
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.top: rect_accounts.bottom
-        model: transactionModel
-        delegate: transactionDelegate
-        focus: true
-    }
 
     Component {
         id: transactionDelegate
         Rectangle {
-            height: dp(170)
+            height: dp(72)
+            width: container.width
             color: "#00000000"
-            anchors.left: parent.left
-            anchors.right: parent.right
 
             Rectangle {
-                height: dp(160)
-                color: "#33bf84ff"
-                anchors.top: parent.top
-                anchors.topMargin: dp(10)
-                anchors.right: parent.right
-                anchors.rightMargin: dp(20)
-                anchors.left: parent.left
-                anchors.leftMargin: dp(20)
+                height: dp(70)
+                color: "#00000000"
+                width: container.width *0.9
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
 
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
                         const account = wallet.getCurrentAccountName()
-                        if (account === "" || index < 0 || index >= allTrans.length)
+                        if (account === "") //==|| index < 0 || index >= allTrans.length)
                             return
                         // respond will come at updateTransactionById
                         wallet.requestTransactionById(account, Number(txIdx).toString());
-                        rect_progress.visible = true
-                        transactionList.visible = false
+                        console.log("contx : ", txConfirmedStr)
+                        transactionDetail.confirmation = txConfirmedStr
+                        transactionDetail.state = "Visible"
+
                     }
                 }
 
                 Rectangle {
-                    width: dp(10)
-                    height: parent.height
-                    anchors.top: parent.top
+                    id: rec_img
+                    height: parent.height*0.5
+                    width: height
+                    radius: dp(50)
+                    color: txType === "Cancelled"? Theme.red : txType === "Unconfirmed"? Theme.awaiting : txCoinNano.includes("-")? Theme.textSecondary : Theme.confirmed
+                    opacity: 0.3
                     anchors.left: parent.left
-                    color: "#BCF317"
-                    visible: txType === "Unconfirmed"
+                    anchors.leftMargin: dp(20)
+                    anchors.verticalCenter: parent.verticalCenter
+
                 }
 
-                Image {
-                    width: dp(17)
-                    height: dp(17)
-                    anchors.top: parent.top
-                    anchors.topMargin: dp(20)
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(35)
-                    fillMode: Image.PreserveAspectFit
-                    source: getTxTypeIcon(txType)
+                ImageColor {
+                    id: img_status
+                    img_height: txType === "Cancelled"? rec_img.height * 0.3 : rec_img.height * 0.5
+                    img_color: txType === "Cancelled"? "red" : txType === "Unconfirmed"? Theme.awaiting : txCoinNano.includes("-")? Theme.textSecondary : Theme.confirmed
+                    img_source: getTxTypeIcon(txType)
+                    img_rotation: txType === "Received"? 180 : 0
+                    anchors.verticalCenter: rec_img.verticalCenter
+                    anchors.horizontalCenter: rec_img.horizontalCenter
                 }
+
 
                 Text {
-                    color: "#ffffff"
-                    text: txType
-                    font.bold: true
-                    font.pixelSize: dp(15)
-                    anchors.top: parent.top
-                    anchors.topMargin: dp(22)
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(71)
-                }
-
-                Text {
-                    width: dp(200)
-                    height: dp(15)
-                    color: "#bf84ff"
-                    text: txTime
-                    horizontalAlignment: Text.AlignRight
-                    font.pixelSize: dp(15)
-                    anchors.top: parent.top
-                    anchors.topMargin: dp(22)
-                    anchors.right: parent.right
-                    anchors.rightMargin: dp(35)
-                }
-
-                Rectangle {
-                    height: dp(1)
-                    color: "#ffffff"
-                    anchors.top: parent.top
-                    anchors.topMargin: dp(55)
-                    anchors.right: parent.right
-                    anchors.rightMargin: dp(35)
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(35)
-                }
-
-                Text {
-                    color: "#ffffff"
-                    text: txCoinNano
-                    font.bold: true
-                    anchors.top: parent.top
-                    anchors.topMargin: dp(70)
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(35)
-                    font.pixelSize: dp(15)
-                }
-
-                Text {
-                    color: "#ffffff"
+                    id: text_uuid
+                    color: Theme.textPrimary
                     text: txId
-                    anchors.top: parent.top
-                    anchors.topMargin: dp(95)
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(35)
-                    font.pixelSize: dp(15)
+                    font.pixelSize: dp(16)
+                    anchors.left: rec_img.right
+                    anchors.leftMargin: dp(20)
+                    anchors.right: text_amountmwc.left
+                    anchors.rightMargin: dp(40)
+                    elide: Text.ElideMiddle
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: -dp(10)
+
+                }
+                Text {
+                    id: text_status
+                    color: Theme.textSecondary
+                    font.pixelSize:  dp(14)
+                    text: txType + " "  + txTime
+                    anchors.left: text_uuid.left
+                    anchors.top: text_uuid.bottom
                 }
 
                 Text {
-                    color: "#ffffff"
-                    text: txAddress
-                    elide: Text.ElideMiddle
-                    anchors.top: parent.top
-                    anchors.topMargin: dp(120)
-                    anchors.left: parent.left
-                    anchors.leftMargin: dp(35)
+                    id: text_amountmwc
+                    color: txType === "Cancelled"? Theme.textSecondary : txType === "Unconfirmed"? Theme.awaiting : txCoinNano.includes("-")? Theme.textSecondary : Theme.confirmed
+                    text: "%1 MWC".arg(hiddenAmount? hidden : txCoinNano)
+                    font.pixelSize:  dp(16)
                     anchors.right: parent.right
-                    anchors.rightMargin: dp(35)
-                    font.pixelSize: dp(15)
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: -dp(10)
+                    anchors.rightMargin: dp(10)
                 }
-            }
-        }
-    }
-
-    Rectangle {
-        id: rect_accounts
-        height: dp(170)
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        gradient: Gradient {
-            orientation: Gradient.Horizontal
-            GradientStop {
-                position: 0
-                color: "#9E00E7"
-            }
-
-            GradientStop {
-                position: 1
-                color: "#3600C9"
-            }
-        }
-
-        Text {
-            id: label_combobox
-            color: "#ffffff"
-            text: qsTr("Showing Transactions From This Account")
-            anchors.left: parent.left
-            anchors.leftMargin: dp(30)
-            anchors.top: parent.top
-            anchors.topMargin: dp(20)
-            font.pixelSize: dp(14)
-        }
-
-        ComboBox {
-            id: accountComboBox
-            height: dp(60)
-            anchors.right: parent.right
-            anchors.rightMargin: dp(30)
-            anchors.left: parent.left
-            anchors.leftMargin: dp(30)
-            anchors.top: label_combobox.bottom
-            anchors.topMargin: dp(10)
-            leftPadding: dp(20)
-            rightPadding: dp(40)
-            font.pixelSize: dp(15)
-
-            onCurrentIndexChanged: {
-                // Selecting the active account
-                const selectedAccount = currentSelectedAccount()
-                if (selectedAccount !== "") {
-                    wallet.switchAccount(selectedAccount)
-                    requestTransactions()
-                }
-            }
-
-            delegate: ItemDelegate {
-                width: accountComboBox.width
-                height: dp(60)
-                contentItem: Text {
-                    text: info
-                    color: "white"
-                    font: accountComboBox.font
-                    elide: Text.ElideRight
-                    verticalAlignment: Text.AlignVCenter
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                }
-                background: Rectangle {
-                    color: accountComboBox.highlightedIndex === index ? "#955BDD" : "#8633E0"
-                }
-                topPadding: dp(10)
-                bottomPadding: dp(10)
-                leftPadding: dp(20)
-                rightPadding: dp(20)
-            }
-
-            indicator: Canvas {
-                id: canvas
-                x: accountComboBox.width - width - accountComboBox.rightPadding / 2
-                y: accountComboBox.topPadding + (accountComboBox.availableHeight - height) / 2
-                width: dp(14)
-                height: dp(7)
-                contextType: "2d"
-
-                Connections {
-                    target: accountComboBox
-                    function onPressedChanged() { canvas.requestPaint() }
+                Text {
+                    id: text_amountprice
+                    color: Theme.textSecondary
+                    font.pixelSize:  dp(14)
+                    text: "%1 %2".arg(hiddenAmount? hidden : (Number(txCoinNano)* currencyPrice).toFixed(currencyPriceRound)).arg(currencyTicker)
+                    font.capitalization: Font.AllUppercase
+                    anchors.right: parent.right
+                    anchors.top: text_amountmwc.bottom
+                    anchors.rightMargin: dp(10)
                 }
 
-                onPaint: {
-                    context.reset()
-                    if (accountComboBox.popup.visible) {
-                        context.moveTo(0, height)
-                        context.lineTo(width / 2, 0)
-                        context.lineTo(width, height)
-                    } else {
-                        context.moveTo(0, 0)
-                        context.lineTo(width / 2, height)
-                        context.lineTo(width, 0)
-                    }
-                    context.strokeStyle = "white"
-                    context.lineWidth = 2
-                    context.stroke()
-                }
+
+
             }
-
-            contentItem: Text {
-                text: accountComboBox.currentIndex >= 0 && accountItems.get(accountComboBox.currentIndex).info
-                font: accountComboBox.font
-                color: "white"
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                verticalAlignment: Text.AlignVCenter
-                elide: Text.ElideRight
-            }
-
-            background: Rectangle {
-                implicitHeight: dp(60)
-                radius: dp(4)
-                color: "#8633E0"
-            }
-
-            popup: Popup {
-                y: accountComboBox.height + dp(3)
-                width: accountComboBox.width
-                implicitHeight: contentItem.implicitHeight + dp(20)
-                topPadding: dp(10)
-                bottomPadding: dp(10)
-                leftPadding: dp(0)
-                rightPadding: dp(0)
-
-                contentItem: ListView {
-                    clip: true
-                    implicitHeight: contentHeight
-                    model: accountComboBox.popup.visible ? accountComboBox.delegateModel : null
-                    currentIndex: accountComboBox.highlightedIndex
-
-                    ScrollIndicator.vertical: ScrollIndicator { }
-                }
-
-                background: Rectangle {
-                    color: "#8633E0"
-                    radius: dp(5)
-                }
-
-                onVisibleChanged: {
-                    if (!accountComboBox.popup.visible) {
-                        canvas.requestPaint()
-                    }
-                }
-            }
-
-            model: ListModel {
-                id: accountItems
-            }
-        }
-
-        Rectangle {
-            width: dp(250)
-            height: dp(40)
-            anchors.top: accountComboBox.bottom
-            anchors.topMargin: dp(15)
-            anchors.horizontalCenter: parent.horizontalCenter
-            color: "#00000000"
-
-            Image {
-                id: image_validate
-                anchors.left: parent.left
-                anchors.top: parent.top
-                width: dp(40)
-                height: dp(40)
-                fillMode: Image.PreserveAspectFit
-                source: "../img/Validate@2x.svg"
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        if (qtAndroidService.requestPermissions()) {
-                            qtAndroidService.openFile( config.getPathFor("fileGen"), "*/*", 125 )
-                        } else {
-                            messagebox.open("Failure", "Permission Denied")
-                        }
-                    }
-                }
-            }
-
-//            Image {
-//                id: image_export
-//                anchors.top: parent.top
-//                anchors.horizontalCenter: parent.horizontalCenter
-//                width: dp(40)
-//                height: dp(40)
-//                fillMode: Image.PreserveAspectFit
-//                source: "../img/Validate1@2x.svg"
-
-//                MouseArea {
-//                    anchors.fill: parent
-//                    onClicked: {
-//                        if (allTrans.length === 0) {
-//                            messagebox.open("Export Error", "You don't have any transactions to export.")
-//                            return
-//                        }
-//                        const exportingFileName = util.getSaveFileName("Export Transactions", "TxExportCsv", "Export Options (*.csv)", ".csv")
-//                        if (exportingFileName === "")
-//                            return
-
-//                        // Starting request process...
-//                        rect_progress.visible = true
-//                        transactionList.visible = false
-//                        const td = allTrans[0]
-//                        if(isTxValid(td.trans)) {
-//                            wallet.requestTransactionById(account, Number(td.trans.txIdx).toString())
-//                            td.tx_note = config.getTxNote(td.trans.txid);
-//                            // Now waiting for transaction requests response at onSgnTransactionById
-//                        } else {
-//                            messagebox.open("Export Error", "Invalid Wallet")
-//                        }
-//                    }
-//                }
-//            }
-
-            Image {
-                id: image_refresh
-                anchors.right: parent.right
-                anchors.top: parent.top
-                width: dp(40)
-                height: dp(40)
-                fillMode: Image.PreserveAspectFit
-                source: "../img/Refresh@2x.svg"
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        requestTransactions()
-                    }
-                }
-            }
-        }
-    }
-
-    Connections {
-        target: qtAndroidService
-        onSgnOnFileReady: (eventCode, path ) => {
-            if (eventCode == 125 && path) {
-                        console.log("Open proof transaction file: " + path)
-                        const validation = util.validateMwc713Str(path)
-                        if (validation) {
-                            messagebox.open(qsTr("File Path"), qsTr("This file path is not acceptable.\n" + validation))
-                            return
-                        }
-                        config.updatePathFor("fileGen", path)
-                        wallet.verifyTransactionProof(path)
-            }
-        }
-    }
-
-    Rectangle {
-        id: rect_progress
-        width: dp(60)
-        height: dp(30)
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.horizontalCenter: parent.horizontalCenter
-        color: "#00000000"
-        visible: false
-        AnimatedImage {
-            id: animation
-            source: "../img/loading.gif"
         }
     }
 }
