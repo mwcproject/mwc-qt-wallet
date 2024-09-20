@@ -146,17 +146,12 @@ void InputPassword::on_submitButton_clicked() {
 void InputPassword::onSgnLoginResult(bool ok) {
     if (!ok) {
         ui->progress->hide();
-
-        util::TimeoutLockObject to("InputPassword");
-        control::MessageBox::messageText(this, "Password",
-                                         "Password supplied was incorrect. Please input correct password.");
+        ui->passwordEdit->setText("");
+        ui->passwordEdit->setFocus(Qt::OtherFocusReason);
 
         QThread::sleep(1); // sleep to prevent brute force attack.
         // Note, we are using small hash, so the brute force attach will likely
         // found wong password with similar hash.
-
-        ui->passwordEdit->setText("");
-        ui->passwordEdit->setFocus(Qt::OtherFocusReason);
     }
 
     ui->passwordEdit->setEnabled(!ok);
