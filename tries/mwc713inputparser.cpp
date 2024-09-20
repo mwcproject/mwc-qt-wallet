@@ -108,9 +108,10 @@ void Mwc713InputParser::initInit() {
 void Mwc713InputParser::initPasswordError()  // notification about the wrong password.
 {
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_PASSWORD_ERROR,
-          QVector<BaseTrieSection*>{
-                new TriePhraseSection("could not unlock wallet! are you using the correct passphrase?"),
-                new TrieNewLineSection()} ));
+                                                QVector<BaseTrieSection*>{
+                                                        new TriePhraseSection("could not unlock wallet! "),
+                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE, "","", 1),
+                                                        new TrieNewLineSection()} ));
 }
 
 void Mwc713InputParser::initGenericError() {

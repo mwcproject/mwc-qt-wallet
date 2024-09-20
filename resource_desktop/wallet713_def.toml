@@ -106,7 +106,6 @@
 
 chain = "Mainnet"
 wallet713_data_path = "xxxxx"
-default_keybase_ttl = "24h"
 libp2p_port = 3419
 
 [swap_electrumx_addr]

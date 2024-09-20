@@ -16,6 +16,7 @@
 #include <QDebug>
 #include "../mwc713.h"
 #include "../../core/Notification.h"
+#include "../../core/WndManager.h"
 
 namespace wallet {
 

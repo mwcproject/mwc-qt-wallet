@@ -149,8 +149,8 @@ void ChangeNode::on_applyButton_clicked() {
         QString mwcNodeUri = ui->mwcNodeUriEdit->text();
         QString mwcNodeSecret = ui->mwcNodeSecretEdit->text();
 
-        // Validate the input data
-        if ( !mwcNodeUri.isEmpty() || !mwcNodeSecret.isEmpty()) {
+        // Validate the input data, both url & secret must be not empty
+        // if ( !mwcNodeUri.isEmpty() || !mwcNodeSecret.isEmpty()) {
             if ( mwcNodeUri.isEmpty() ) {
                 control::MessageBox::messageText(this, "Input", "Please specify custom mwc-node URI." );
                 ui->mwcNodeUriEdit->setFocus();
@@ -202,7 +202,7 @@ void ChangeNode::on_applyButton_clicked() {
                 ui->mwcNodeUriEdit->setFocus();
                 return;
             }
-        }
+       // }
         resCon.setAsCustom( mwcNodeUri, mwcNodeSecret );
     }
 

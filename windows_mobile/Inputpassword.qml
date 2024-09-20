@@ -38,7 +38,6 @@ Item {
         onSgnLoginResult: (ok) => {
             if (!ok) {
                 rect_progress.visible = false
-                messagebox.open(qsTr("Password"), qsTr("Password supplied was incorrect. Please input correct password."))
                 textfield_password.text = ""
             }
 

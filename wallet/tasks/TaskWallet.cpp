@@ -17,7 +17,12 @@
 #include "../mwc713.h"
 #include "../../util/Log.h"
 #include "../../core/Notification.h"
+#include "../../core/WndManager.h"
 #include "utils.h"
+
+#ifdef WALLET_DESKTOP
+#include "util_desktop/timeoutlock.h"
+#endif
 
 namespace wallet {
 
@@ -103,6 +108,19 @@ bool TaskUnlock::processTask(const QVector<WEvent> & events) {
 
         if (error.empty())
             notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO, "Successfully logged into the wallet");
+        else {
+            QString message = error[0].message;
+#ifdef WALLET_DESKTOP
+            util::TimeoutLockObject to("InputPassword");
+#endif
+            if ( message != "are you using the correct passphrase?") {
+                 core::getWndManager()->messageTextDlg("Unable to login", "Login attempts is failed because of error:\n\n" + message  );
+            }
+            else {
+                core::getWndManager()->messageTextDlg("Password",
+                                                 "Incorrect password. Please enter the correct password to proceed.");
+            }
+        }
     }
     notify::remeoveFalseMessage("wallet already unlocked");
     return true;

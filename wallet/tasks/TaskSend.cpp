@@ -58,7 +58,7 @@ bool TaskSetReceiveAccount::processTask(const QVector<WEvent> &events) {
 
     QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     if (errs.size()>0) {
-        wallet713->setSetReceiveAccount( false, okresp[0].message );
+        wallet713->setSetReceiveAccount( false, errs[0].message );
     }
     else {
         wallet713->setSetReceiveAccount( false, "Unknown error, didn't get expected respond from mwc713" );
