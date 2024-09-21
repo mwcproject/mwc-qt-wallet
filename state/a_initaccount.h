@@ -32,7 +32,7 @@ namespace state {
 
 const QString INIT_ACCOUNT_CALLER_ID = "InitAccount";
 
-enum class InitAccountPage {None, PageInitAccount, PageEnterSeed, PageNewSeed, PageNewSeedTest, PageProgressWnd};
+enum class InitAccountPage {None, PageInitAccount, PageSeedLength, PageEnterSeed, PageNewSeed, PageNewSeedTest, PageProgressWnd};
 
 class InitAccount : public QObject, public State
 {
@@ -46,6 +46,8 @@ public:
     // Step 2
     enum MWC_NETWORK { MWC_MAIN_NET = 1, MWC_FLOO_NET=2 };
     void submitWalletCreateChoices(MWC_NETWORK network, QString instanceName);
+
+    void submitSeedLength(int words);
 
     // Step 3  New seed
     void doneWithNewSeed();
@@ -83,6 +85,8 @@ protected:
     void showInitAccountPage();
 private:
     int progressMaxVal = 10;
+
+    int seedLength = 24;
 
     QString pass;
     QVector<QString> seed;

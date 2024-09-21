@@ -38,6 +38,9 @@ public:
     // newInstanceName: Name of the new wallet instance
     Q_INVOKABLE void submitWalletCreateChoices(int network, QString newInstanceName);
 
+    // wordsNum: words number to create
+    Q_INVOKABLE void submitSeedLength(int wordsNum);
+
 };
 
 }

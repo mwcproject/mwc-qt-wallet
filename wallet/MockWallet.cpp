@@ -58,8 +58,9 @@ MockWallet::~MockWallet() {}
 
 // Create new wallet and generate a seed for it
 // Check signal: onNewSeed( seed [] )
-void MockWallet::start2init(QString pass) {
+void MockWallet::start2init(QString pass, int seedLength) {
     passwordHash = crypto::calcHSA256Hash(pass);
+    Q_ASSERT(TEST_SEED.length() == seedLength);
     emit onNewSeed( TEST_SEED);
 }
 

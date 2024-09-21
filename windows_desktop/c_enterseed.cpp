@@ -80,9 +80,9 @@ void EnterSeed::on_continueButton_clicked()
 
     QVector<QString> seed = util->parsePhrase2Words( seedStr );
 
-    if (seed.size()!=24) {
+    if ( seed.size()!=12 && seed.size()!=15 && seed.size()!=18 && seed.size()!=21 && seed.size()!=24 ) {
         control::MessageBox::messageText(this, "Verification error",
-                             "Your phrase should contain 24 words. You entered " + QString::number(seed.size()) +  " words." );
+                             "Your phrase should contain 12, 15, 18, 21 or 24 words. You entered " + QString::number(seed.size()) +  " words." );
         return;
     }
 

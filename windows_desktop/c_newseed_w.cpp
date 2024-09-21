@@ -82,9 +82,27 @@ void NewSeed::updateSeedData( const QString & name, const QVector<QString> & see
 
     QString thePhrase = "";
 
+    int rowLen = 5;
+
+    switch (seed.size()) {
+        case 12:
+            rowLen = 4;
+            break;
+        case 15:
+        case 20:
+            rowLen = 5;
+            break;
+        case 21:
+            rowLen = 7;
+            break;
+        default:
+            rowLen = 6;
+            break;
+    }
+
     for (int i=0;i<seed.size();i++) {
         thePhrase += util::expandStrR(seed[i], maxWrdLen);
-        if (i % 6==5)
+        if (i % rowLen==rowLen-1)
             thePhrase += "\n";
     }
 

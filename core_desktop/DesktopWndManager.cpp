@@ -19,6 +19,7 @@
 #include "../core/global.h"
 #include "../windows_desktop/a_initfirsttime_w.h"
 #include "../windows_desktop/a_initaccount_w.h"
+#include "../windows_desktop/a_seedlength.h"
 #include "../windows_desktop/a_inputpassword_w.h"
 #include "../windows_desktop/c_newseed_w.h"
 #include "../windows_desktop/c_newseedtest_w.h"
@@ -183,6 +184,12 @@ void DesktopWndManager::pageInitAccount(QString path, bool restoredFromSeed) {
     windowManager->switchToWindowEx( mwc::PAGE_A_INIT_ACCOUNT,
                 new wnd::InitAccount( windowManager->getInWndParent(), path, restoredFromSeed ));
 }
+
+void DesktopWndManager::pageSeedLength() {
+    windowManager->switchToWindowEx( mwc::PAGE_A_SEED_LENGTH,
+                                     new wnd::SeedLength( windowManager->getInWndParent()));
+}
+
 
 void DesktopWndManager::pageEnterSeed() {
     windowManager->switchToWindowEx( mwc::PAGE_A_ENTER_SEED,

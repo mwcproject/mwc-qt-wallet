@@ -60,7 +60,7 @@ NextStateRespond InitAccount::execute() {
     if ( !running && context->appContext->pullCookie<QString>("checkWalletInitialized")=="FAILED" ) {
         if (config::isOnlineNode()) {
             // Very first run. Need to create the wallet without any passwords
-            context->wallet->start2init("");
+            context->wallet->start2init("", 24);
             context->wallet->confirmNewSeed();
             context->wallet->logout(true); // Stop will wait enough time
             return NextStateRespond( NextStateRespond::RESULT::DONE );
@@ -160,10 +160,21 @@ void InitAccount::submitWalletCreateChoices( MWC_NETWORK network, QString instan
         currentPage = InitAccountPage::PageEnterSeed;
     }
     else {
+#ifdef WALLET_MOBILE
         // generate a new seed for a new wallet
-        context->wallet->start2init(pass);
+        context->wallet->start2init(pass, seedLength);
+#else
+        core::getWndManager()->pageSeedLength();
+        currentPage = InitAccountPage::PageSeedLength;
+#endif
     }
 }
+
+void InitAccount::submitSeedLength(int words) {
+    seedLength = words;
+    context->wallet->start2init(pass, seedLength);
+}
+
 
 // New see was created....
 void InitAccount::onNewSeed(QVector<QString> sd) {

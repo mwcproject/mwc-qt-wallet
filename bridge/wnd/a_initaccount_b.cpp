@@ -50,5 +50,10 @@ void InitAccount::submitWalletCreateChoices(int network, QString newInstanceName
     getState()->submitWalletCreateChoices( state::InitAccount::MWC_NETWORK(network), newInstanceName);
 }
 
+// wordsNum: words number to create
+void InitAccount::submitSeedLength(int wordsNum) {
+    getState()->submitSeedLength(wordsNum);
+}
+
 
 }

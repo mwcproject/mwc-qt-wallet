@@ -287,7 +287,7 @@ void MWC713::start() {
 
 // start to init. Expected that we will exit pretty quckly
 // Check signal: onNewSeed( seed [] )
-void MWC713::start2init(QString password) {
+void MWC713::start2init(QString password, int seedLength) {
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
@@ -302,7 +302,7 @@ void MWC713::start2init(QString password) {
 
     // Creating process and starting
 
-    mwc713process = initMwc713process({"TOR_EXE_NAME", config::getTorPath(), "MWC_PASSWORD", password}, {"init"});
+    mwc713process = initMwc713process({"TOR_EXE_NAME", config::getTorPath(), "MWC_PASSWORD", password}, {"init", "--seed_length", QString::number(seedLength)});
     if (mwc713process == nullptr)
         return;
 

@@ -525,7 +525,7 @@ public:
     virtual void start()   = 0;
     // Create new wallet and generate a seed for it
     // Check signal: onNewSeed( seed [] )
-    virtual void start2init(QString password) = 0;
+    virtual void start2init(QString password, int seedLength) = 0;
     // Recover the wallet with a mnemonic phrase
     // recover wallet with a passphrase:
     // Check Signals: onRecoverProgress( int progress, int maxVal );
