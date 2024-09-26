@@ -113,6 +113,11 @@ public:
     virtual void pageNewUpdateOffer(QString myMsgId) override;
     virtual void showSwapBackupDlg() override;
     virtual void pageTransactionFee() override;
+
+    // Show Keys view pages
+    virtual void pageViewHash()  override;
+    virtual void pageViewAccounts() override;
+
 private:
     WindowManager * windowManager = nullptr;
     MainWindow    * mainWindow = nullptr;

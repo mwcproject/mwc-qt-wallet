@@ -67,6 +67,8 @@ enum STATE {
     MIGRATION = 24,             // Data migration between wallet versions.
     SWAP = 25,                  // Atomic swaps
     SWAP_MKT = 26,              // Atomic swaps marketplace
+
+    VIEW_ACCOUNTS = 27,          // View account with rewind hash
 };
 
 struct NextStateRespond {

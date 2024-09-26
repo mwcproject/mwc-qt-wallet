@@ -1,4 +1,4 @@
-// Copyright 2019 The MWC Developers
+// Copyright 2024 The MWC Developers
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,45 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NAVMENYACCOUNT_H
-#define NAVMENYACCOUNT_H
+#ifndef V_VIEWHASH_W_H
+#define V_VIEWHASH_W_H
 
-#include <QWidget>
-#include "navmenu.h"
+#include "../core_desktop/navwnd.h"
+
 
 namespace Ui {
-class NavMenuAccount;
+class ViewHash;
 }
 
 namespace bridge {
-class StateMachine;
 class Wallet;
+class ViewOutputs;
 }
 
-namespace core {
 
-class NavMenuAccount : public NavMenu
+namespace wnd {
+
+class ViewHash : public core::NavWnd
 {
     Q_OBJECT
-
 public:
-    explicit NavMenuAccount(QWidget *parent);
-    ~NavMenuAccount();
+    explicit ViewHash(QWidget *parent = nullptr);
+    ~ViewHash();
 
 private slots:
-    void on_accountsButton_clicked();
-    void on_seedButton_clicked();
-    void on_contactsButton_clicked();
-    void on_logoutButton_clicked();
+    void onSgnGetViewingKey(QString viewingKey, QString error);
 
-    void on_viewingKeyButton_clicked();
+    void on_showWalletKeyButton_clicked();
+    void on_startScanning_clicked();
+    void on_viewingKey_textChanged(const QString &arg1);
 
 private:
-    Ui::NavMenuAccount *ui;
-    bridge::StateMachine * stateMachine = nullptr;
+    Ui::ViewHash *ui;
+
     bridge::Wallet * wallet = nullptr;
+    bridge::ViewOutputs * viewAcounts = nullptr;
 };
 
 }
 
-#endif // NAVMENYACCOUNT_H
+#endif // V_VIEWHASH_W_H

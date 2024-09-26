@@ -44,7 +44,7 @@ QVector<QString> parsePhrase2Words( const QString & phrase ) {
 }
 
 
-// convert nano items to dtirng that represent that fraction as a double
+// convert nano items to String that represent that fraction as a double
 QString nano2one( int64_t nano, bool firstcall ) {
     if (nano == 0)
         return "0";

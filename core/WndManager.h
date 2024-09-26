@@ -125,6 +125,11 @@ public:
 
     // Show transaction for integrity fee page
     virtual void pageTransactionFee() = 0;
+
+    // Show Keys view page, show my key, input Viewing key
+    virtual void pageViewHash() = 0;
+    // Show Keys view, resulting outputs page
+    virtual void pageViewAccounts() = 0;
 };
 
 void setWndManager(WndManager * mgr);

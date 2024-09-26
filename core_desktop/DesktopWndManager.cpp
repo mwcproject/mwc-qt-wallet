@@ -54,6 +54,8 @@
 #include "../windows_desktop/s_mrktswlist_w.h"
 #include "../windows_desktop/s_mrktswapnew_w.h"
 #include "../windows_desktop/s_mktinttx_w.h"
+#include "../windows_desktop/v_viewhash_w.h"
+#include "../windows_desktop/v_viewoutputs_w.h"
 #include <QFileDialog>
 #include "../core/WalletApp.h"
 #include <QMessageBox>
@@ -401,6 +403,16 @@ void DesktopWndManager::showSwapBackupDlg() {
 void DesktopWndManager::pageTransactionFee() {
     windowManager->switchToWindowEx( mwc::PAGE_S_MKT_TX_FEE,
                                      new wnd::IntegrityTransactions( windowManager->getInWndParent()));
+}
+
+void DesktopWndManager::pageViewHash()  {
+    windowManager->switchToWindowEx( mwc::PAGE_V_VIEW_HASH,
+                                     new wnd::ViewHash( windowManager->getInWndParent()));
+}
+
+void  DesktopWndManager::pageViewAccounts() {
+    windowManager->switchToWindowEx( mwc::PAGE_V_VIEW_OUTPUTS,
+                                     new wnd::ViewOutputs(windowManager->getInWndParent()));
 }
 
 

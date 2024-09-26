@@ -114,6 +114,10 @@ bool InitAccount::mobileBack() {
             //return true;
             return false;
         }
+        case InitAccountPage::PageSeedLength: {
+            // Mobile should never be here, it is not supported so far.
+            return false;
+        }
         case InitAccountPage::PageNewSeed: {
             //showInitAccountPage(); // mobile doesn't have this page
             //return true;

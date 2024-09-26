@@ -44,6 +44,7 @@
 #include "z_accountoptions.h"
 #include "s_swap.h"
 #include "s_mktswap.h"
+#include "v_ViewOutputs.h"
 
 namespace state {
 
@@ -114,6 +115,8 @@ StateMachine::StateMachine()
         states[STATE::SWAP] = new Swap(context);
         states[STATE::SWAP_MKT] = new SwapMarketplace(context);
     }
+
+    states[ STATE::VIEW_ACCOUNTS ] = new ViewOutputs(context);
 #endif
 
     startTimer(1000);

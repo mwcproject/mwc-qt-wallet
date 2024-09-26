@@ -21,7 +21,6 @@
 #include "../bridge/config_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/wnd/e_outputs_b.h"
-#include "../control_desktop/richbutton.h"
 
 namespace wnd {
 

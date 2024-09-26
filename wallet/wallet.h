@@ -889,6 +889,14 @@ public:
     // Check Signal: onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
     virtual void sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id, QString cookie) = 0;
 
+    // Request rewind hash
+    // Check signal: onViewRewindHash(QString rewindHash, QString error);
+    virtual void viewRewindHash() = 0;
+
+    // Scan with revind hash. That will generate bunch or messages similar to scan
+    // Check Signal: onUpdateSyncProgress ??
+    // Check Signal: onScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors )
+    virtual void scanRewindHash( const QString & rewindHash ) = 0;
 private:
 signals:
     // Wallet doing something. This message is needed for the progress.
@@ -1093,6 +1101,12 @@ signals:
 
     // Response from sendMarketplaceMessage
     void onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
+
+    // response from viewRewindHash
+    void onViewRewindHash(QString rewindHash, QString error);
+
+    // response from scanRewindHash
+    void onScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors );
 };
 
 }

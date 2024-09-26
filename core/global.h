@@ -122,6 +122,10 @@ const QString PAGE_S_MKT_TX_FEE     = "Integrity fee transactions";
 
 const QString PAGE_U_NODE_STATUS    = "MWC Node Status";
 
+const QString PAGE_V_VIEW_HASH      = "Viewing Key";
+const QString PAGE_V_VIEW_SCANNING  = "Scanning with Viewing Key";
+const QString PAGE_V_VIEW_OUTPUTS   = "View outputs";
+
 const QString PAGE_W_CONTACTS       = "Contacts";
 
 const QString PAGE_X_EVENTS         = "Notifications";

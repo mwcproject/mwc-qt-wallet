@@ -286,6 +286,7 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
 };
 
+void taskSyncShowProgress(bool showProgress);
 
 }
 

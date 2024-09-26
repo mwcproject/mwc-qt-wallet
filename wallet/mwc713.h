@@ -412,6 +412,15 @@ public:
     // command: "accept_offer" or "fail_bidding"
     // Check Signal: onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
     virtual void sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id, QString cookie) override;
+
+    // Request rewind hash
+    // Check signal: onViewRewindHash(QString rewindHash, QString error);
+    virtual void viewRewindHash() override;
+
+    // Scan with revind hash. That will generate bunch or messages similar to scan
+    // Check Signal: onUpdateSyncProgress ??
+    // Check Signal: onScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors )
+    virtual void scanRewindHash( const QString & rewindHash ) override;
 public:
     // launch exit command.
     void launchExitCommand();
@@ -586,6 +595,10 @@ public:
     void setSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
 
     void setTorConnectionStatus(bool online);
+
+    void setViewRewindHash( QString rewindHash, QString error );
+
+    void setScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors );
 protected:
     virtual void timerEvent(QTimerEvent *event) override;
 

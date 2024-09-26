@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>189</width>
-    <height>197</height>
+    <height>246</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -100,11 +100,40 @@
     <enum>QFrame::Raised</enum>
    </property>
   </widget>
-  <widget class="control::NavMenuButton" name="logoutButton">
+  <widget class="control::NavMenuButton" name="viewingKeyButton">
    <property name="geometry">
     <rect>
      <x>9</x>
      <y>150</y>
+     <width>170</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>View Accounts</string>
+   </property>
+  </widget>
+  <widget class="control::MwcFrameWithBorder" name="frame_5">
+   <property name="geometry">
+    <rect>
+     <x>19</x>
+     <y>194</y>
+     <width>154</width>
+     <height>2</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="control::NavMenuButton" name="logoutButton">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>200</y>
      <width>170</width>
      <height>38</height>
     </rect>
@@ -127,6 +156,13 @@
    <header>control_desktop/NavControls.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>accountsButton</tabstop>
+  <tabstop>seedButton</tabstop>
+  <tabstop>contactsButton</tabstop>
+  <tabstop>viewingKeyButton</tabstop>
+  <tabstop>logoutButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

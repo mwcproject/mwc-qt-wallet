@@ -95,6 +95,8 @@ Wallet::Wallet(QObject *parent) : QObject(parent) {
                      this, &Wallet::onDecodeSlatepack, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onFinalizeSlatepack,
                      this, &Wallet::onFinalizeSlatepack, Qt::QueuedConnection);
+    QObject::connect(wallet, &wallet::Wallet::onViewRewindHash,
+                     this, &Wallet::onViewRewindHash, Qt::QueuedConnection);
 }
 
 Wallet::~Wallet() {}
@@ -234,6 +236,10 @@ void Wallet::onDecodeSlatepack( QString tag, QString error, QString slatepack, Q
 
 void Wallet::onFinalizeSlatepack( QString tagId, QString error, QString txUuid ) {
     emit sgnFinalizeSlatepack( tagId, error, txUuid );
+}
+
+void Wallet::onViewRewindHash(QString rewindHash, QString error) {
+    emit sgnGetViewingKey(rewindHash, error);
 }
 
 void Wallet::onRepost(int txIdx, QString err) {
@@ -487,5 +493,12 @@ void Wallet::decodeSlatepack(QString slatepackContent, QString tag) {
 void Wallet::finalizeSlatepack( QString slatepack, bool fluff, QString tag ) {
     getWallet()->finalizeSlatepack( slatepack, fluff, tag );
 }
+
+// Request Vieing Key (rewind_hash)
+// Check Signal: sgnGetViewingKey
+void Wallet::getViewingKey() {
+    getWallet()->viewRewindHash();
+}
+
 
 }

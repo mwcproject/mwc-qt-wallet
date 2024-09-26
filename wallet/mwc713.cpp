@@ -33,6 +33,7 @@
 #include "tasks/TaskTransaction.h"
 #include "tasks/TaskSwap.h"
 #include "tasks/TaskSwapMkt.h"
+#include "tasks/TaskRewindHash.h"
 #include "../util/Log.h"
 #include "../core/appcontext.h"
 #include "../util/ConfigReader.h"
@@ -1282,6 +1283,21 @@ void MWC713::sendMarketplaceMessage(QString command, QString wallet_tor_address,
                                  TasksSendMarketplaceMessage::TIMEOUT)});
 }
 
+// Request rewind hash
+// Check Signal: ??
+void MWC713::viewRewindHash() {
+    eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
+                            {TSK(new TasksViewRewindHash(this),
+                                 TasksViewRewindHash::TIMEOUT)});
+}
+
+// Scan with revind hash. That will generate bunch or messages similar to scan
+void MWC713::scanRewindHash( const QString & rewindHash ) {
+    eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
+                            {TSK(new TasksScanRewindHash(this, rewindHash),
+                                 TasksScanRewindHash::TIMEOUT)});
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2517,5 +2533,14 @@ void MWC713::setTorConnectionStatus(bool online) {
         }
     }
 }
+
+void MWC713::setViewRewindHash( QString rewindHash, QString error ) {
+    emit onViewRewindHash(rewindHash, error);
+}
+
+void MWC713::setScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors ) {
+    emit onScanRewindHash( outputResult, total, errors );
+}
+
 
 }
