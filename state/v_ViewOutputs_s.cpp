@@ -16,7 +16,7 @@
 // Created by Konstantin Bay on 9/22/24.
 //
 
-#include "v_ViewOutputs.h"
+#include "v_ViewOutputs_s.h"
 #include "../core/WndManager.h"
 #include "../state/statemachine.h"
 #include "../core/global.h"
@@ -33,6 +33,8 @@ ViewOutputs::ViewOutputs(StateContext * context) :
                      this, &ViewOutputs::onRecoverProgress, Qt::QueuedConnection);
     QObject::connect(context->wallet, &wallet::Wallet::onScanRewindHash,
                      this, &ViewOutputs::onScanRewindHash, Qt::QueuedConnection);
+    QObject::connect(context->wallet, &wallet::Wallet::onValidateOwnershipProof,
+                     this, &ViewOutputs::onValidateOwnershipProof, Qt::QueuedConnection);
 
     inScanProcess = false;
 }
@@ -85,7 +87,7 @@ void ViewOutputs::onRecoverProgress(int progress, int maxVal ) {
             b->initProgress(VIEW_ACCOUNTS_CALLER_ID, 0, maxVal);
 
             progress = std::min(maxVal, std::max(0, progress));
-            QString msgProgress = "Blockchain scanning is in progress...  " + QString::number(progress * 100.0 / maxVal, 'f',0) + "%";
+            QString msgProgress = "Blockchain scan is in progress...  " + QString::number(progress * 100.0 / maxVal, 'f',0) + "%";
             b->updateProgress(VIEW_ACCOUNTS_CALLER_ID, progress, msgProgress);
             b->setMsgPlus(VIEW_ACCOUNTS_CALLER_ID, "");
         }
@@ -121,6 +123,34 @@ void ViewOutputs::startScanning(QString hashKey) {
 
 void ViewOutputs::backFromOutputsView() {
     core::getWndManager()->pageViewHash();
+}
+
+void ViewOutputs::back() {
+    core::getWndManager()->pageViewHash();
+}
+
+void ViewOutputs::generateOwnershipProofStart() {
+    core::getWndManager()->pageGenerateOwnershipInput();
+}
+
+void ViewOutputs::generate_proof(QString message, bool viewingKey, bool torAddress, bool mqsAddress) {
+    core::getWndManager()->pageGenerateOwnershipResult();
+    context->wallet->generateOwnershipProof(message, viewingKey, torAddress, mqsAddress);
+}
+
+void ViewOutputs::validateOwnershipProofStart() {
+    core::getWndManager()->pageValidateOwnershipInput();
+}
+
+void ViewOutputs::validate_proof(QString proof) {
+    core::getWndManager()->pageValidateOwnershipResult();
+    context->wallet->validateOwnershipProof(proof);
+}
+
+void ViewOutputs::onValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error) {
+    if (!viewingKey.isEmpty() && viewingKey!="Not provided") {
+        lastViewedViewingKey = viewingKey;
+    }
 }
 
 } // state

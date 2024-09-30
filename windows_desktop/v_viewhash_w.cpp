@@ -38,6 +38,8 @@ ViewHash::ViewHash(QWidget *parent) :
     ui->showWalletKeyButton->show();
 
     ui->startScanning->setEnabled(false);
+
+    ui->viewingKey->setText( viewAcounts->getLastViewViewingKey() );
 }
 
 ViewHash::~ViewHash()
@@ -97,6 +99,18 @@ void ViewHash::on_startScanning_clicked()
 void ViewHash::on_viewingKey_textChanged(const QString &hash)
 {
     ui->startScanning->setEnabled(!hash.isEmpty());
+}
+
+
+void ViewHash::on_generateOwnershipProof_clicked()
+{
+    viewAcounts->generateOwnershipProofStart();
+}
+
+
+void ViewHash::on_viewOwnershipProof_clicked()
+{
+    viewAcounts->validateOwnershipProofStart();
 }
 
 }

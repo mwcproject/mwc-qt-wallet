@@ -117,6 +117,10 @@ public:
     // Show Keys view pages
     virtual void pageViewHash()  override;
     virtual void pageViewAccounts() override;
+    virtual void pageGenerateOwnershipInput() override;
+    virtual void pageGenerateOwnershipResult() override;
+    virtual void pageValidateOwnershipInput() override;
+    virtual void pageValidateOwnershipResult() override;
 
 private:
     WindowManager * windowManager = nullptr;

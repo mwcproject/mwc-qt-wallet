@@ -34,6 +34,7 @@
 #include "tasks/TaskSwap.h"
 #include "tasks/TaskSwapMkt.h"
 #include "tasks/TaskRewindHash.h"
+#include "tasks/TasksOwnership.h"
 #include "../util/Log.h"
 #include "../core/appcontext.h"
 #include "../util/ConfigReader.h"
@@ -1286,7 +1287,7 @@ void MWC713::sendMarketplaceMessage(QString command, QString wallet_tor_address,
 // Request rewind hash
 // Check Signal: ??
 void MWC713::viewRewindHash() {
-    eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
+    eventCollector->addTask(TASK_PRIORITY::TASK_NOW,
                             {TSK(new TasksViewRewindHash(this),
                                  TasksViewRewindHash::TIMEOUT)});
 }
@@ -1297,6 +1298,21 @@ void MWC713::scanRewindHash( const QString & rewindHash ) {
                             {TSK(new TasksScanRewindHash(this, rewindHash),
                                  TasksScanRewindHash::TIMEOUT)});
 }
+
+// Generate ownership proof
+void MWC713::generateOwnershipProof(const QString & message, bool includePublicRootKey, bool includeTorAddress, bool includeMqsAddress ) {
+    eventCollector->addTask(TASK_PRIORITY::TASK_NOW,
+                            {TSK(new TasksGenerateOwnership(this, message, includePublicRootKey, includeTorAddress, includeMqsAddress),
+                                 TasksGenerateOwnership::TIMEOUT)});
+}
+
+// Validate ownership proof
+void MWC713::validateOwnershipProof(const QString & proof) {
+    eventCollector->addTask(TASK_PRIORITY::TASK_NOW,
+                            {TSK(new TasksValidateOwnership(this, proof),
+                                 TasksGenerateOwnership::TIMEOUT)});
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2540,6 +2556,14 @@ void MWC713::setViewRewindHash( QString rewindHash, QString error ) {
 
 void MWC713::setScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors ) {
     emit onScanRewindHash( outputResult, total, errors );
+}
+
+void MWC713::setGenerateOwnershipProof(QString proof, QString error) {
+    emit onGenerateOwnershipProof(proof, error);
+}
+
+void MWC713::setValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error) {
+    emit onValidateOwnershipProof(network, message, viewingKey, torAddress, mqsAddress, error);
 }
 
 

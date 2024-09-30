@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>876</width>
-    <height>573</height>
+    <height>673</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,7 +53,7 @@
        <property name="minimumSize">
         <size>
          <width>631</width>
-         <height>371</height>
+         <height>470</height>
         </size>
        </property>
        <property name="frameShape">
@@ -65,8 +65,8 @@
        <widget class="control::MwcLabelNormal" name="mwcMQlable_2">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>240</y>
+          <x>10</x>
+          <y>320</y>
           <width>311</width>
           <height>31</height>
          </rect>
@@ -126,10 +126,7 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:138%;&quot;&gt;
-A viewing key allows others to scan the blockchain and view your wallet's outputs.  Sharing this key makes your MWC wallet’s transactions visible,  compromising the privacy of your funds.
-&lt;br /&gt;
-Be cautious when sharing your viewing key - once it’s shared,  your wallet loses its privacy, and all your transactions become transparent to anyone with the key.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:138%;&quot;&gt;A viewing key allows others to scan the blockchain and view your wallet's outputs.  Sharing this key makes your MWC wallet’s transactions visible,  compromising the privacy of your funds.&lt;br /&gt;&lt;b&gt;Be cautious when sharing your viewing key - once it’s shared,  your wallet loses its privacy, and all your transactions become transparent to anyone with the key.&lt;/b&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -138,9 +135,9 @@ Be cautious when sharing your viewing key - once it’s shared,  your wallet los
        <widget class="control::MwcLine" name="frame_4">
         <property name="geometry">
          <rect>
-          <x>220</x>
+          <x>170</x>
           <y>220</y>
-          <width>201</width>
+          <width>300</width>
           <height>2</height>
          </rect>
         </property>
@@ -188,8 +185,8 @@ Be cautious when sharing your viewing key - once it’s shared,  your wallet los
        <widget class="control::MwcLineEditNormal" name="viewingKey">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>280</y>
+          <x>10</x>
+          <y>360</y>
           <width>621</width>
           <height>40</height>
          </rect>
@@ -236,7 +233,7 @@ Be cautious when sharing your viewing key - once it’s shared,  your wallet los
         <property name="geometry">
          <rect>
           <x>210</x>
-          <y>330</y>
+          <y>430</y>
           <width>221</width>
           <height>40</height>
          </rect>
@@ -264,6 +261,90 @@ Be cautious when sharing your viewing key - once it’s shared,  your wallet los
         </property>
         <property name="text">
          <string>Start scanning</string>
+        </property>
+       </widget>
+       <widget class="control::MwcLine" name="frame_5">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>300</y>
+          <width>300</width>
+          <height>2</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+       <widget class="control::MwcPushButtonNormal" name="generateOwnershipProof">
+        <property name="geometry">
+         <rect>
+          <x>60</x>
+          <y>240</y>
+          <width>221</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Start skanning for outputs based on viewing key</string>
+        </property>
+        <property name="text">
+         <string>Generate ownership proof</string>
+        </property>
+       </widget>
+       <widget class="control::MwcPushButtonNormal" name="viewOwnershipProof">
+        <property name="geometry">
+         <rect>
+          <x>340</x>
+          <y>240</y>
+          <width>221</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Start skanning for outputs based on viewing key</string>
+        </property>
+        <property name="text">
+         <string>View ownership proof</string>
         </property>
        </widget>
       </widget>

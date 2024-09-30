@@ -421,6 +421,14 @@ public:
     // Check Signal: onUpdateSyncProgress ??
     // Check Signal: onScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors )
     virtual void scanRewindHash( const QString & rewindHash ) override;
+
+    // Generate ownership proof
+    // Check signal: onGenerateOwnershipProof(QString proof, QString error)
+    virtual void generateOwnershipProof(const QString & message, bool includePublicRootKey, bool includeTorAddress, bool includeMqsAddress ) override;
+
+    // Validate ownership proof
+    // Check signal: onValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error)
+    virtual void validateOwnershipProof(const QString & proof) override;
 public:
     // launch exit command.
     void launchExitCommand();
@@ -599,6 +607,10 @@ public:
     void setViewRewindHash( QString rewindHash, QString error );
 
     void setScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors );
+
+    void setGenerateOwnershipProof(QString proof, QString error);
+
+    void setValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error);
 protected:
     virtual void timerEvent(QTimerEvent *event) override;
 

@@ -56,6 +56,10 @@
 #include "../windows_desktop/s_mktinttx_w.h"
 #include "../windows_desktop/v_viewhash_w.h"
 #include "../windows_desktop/v_viewoutputs_w.h"
+#include "../windows_desktop/v_generateownershipproofinput_w.h"
+#include "../windows_desktop/v_generateownershipproofresult_w.h"
+#include "../windows_desktop/v_validateownershipproofinput_w.h"
+#include "../windows_desktop/v_validateownershipproofresult_w.h"
 #include <QFileDialog>
 #include "../core/WalletApp.h"
 #include <QMessageBox>
@@ -410,11 +414,30 @@ void DesktopWndManager::pageViewHash()  {
                                      new wnd::ViewHash( windowManager->getInWndParent()));
 }
 
-void  DesktopWndManager::pageViewAccounts() {
+void DesktopWndManager::pageViewAccounts() {
     windowManager->switchToWindowEx( mwc::PAGE_V_VIEW_OUTPUTS,
                                      new wnd::ViewOutputs(windowManager->getInWndParent()));
 }
 
+void DesktopWndManager::pageGenerateOwnershipInput() {
+    windowManager->switchToWindowEx( mwc::PAGE_V_GEN_OWNERSHIP_PROOF,
+                                     new wnd::GenerateOwnershipProofInput(windowManager->getInWndParent()));
+}
+
+void DesktopWndManager::pageGenerateOwnershipResult() {
+    windowManager->switchToWindowEx( mwc::PAGE_V_GEN_OWNERSHIP_PROOF,
+                                     new wnd::GenerateOwnershipProofResult(windowManager->getInWndParent()));
+}
+
+void DesktopWndManager::pageValidateOwnershipInput() {
+    windowManager->switchToWindowEx( mwc::PAGE_V_VALID_OWNERSHIP_PROOF,
+                                     new wnd::ValidateOwnershipProofInput(windowManager->getInWndParent()));
+}
+
+void DesktopWndManager::pageValidateOwnershipResult() {
+    windowManager->switchToWindowEx( mwc::PAGE_V_VALID_OWNERSHIP_PROOF,
+                                     new wnd::ValidateOwnershipProofResult(windowManager->getInWndParent()));
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -44,7 +44,7 @@
 #include "z_accountoptions.h"
 #include "s_swap.h"
 #include "s_mktswap.h"
-#include "v_ViewOutputs.h"
+#include "v_ViewOutputs_s.h"
 
 namespace state {
 

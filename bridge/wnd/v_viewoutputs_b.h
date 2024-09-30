@@ -34,8 +34,17 @@ public:
 
     // Switching to the progress window
     Q_INVOKABLE void startScanning(QString hashKey);
-
     Q_INVOKABLE void backFromOutputsView();
+
+    Q_INVOKABLE void generateOwnershipProofStart();
+    Q_INVOKABLE void generate_proof(QString message, bool viewingKey, bool torAddress, bool mqsAddress);
+
+    Q_INVOKABLE void validateOwnershipProofStart();
+    Q_INVOKABLE void validate_proof(QString proof);
+
+    Q_INVOKABLE void back();
+
+    Q_INVOKABLE QString getLastViewViewingKey();
 private:
 signals:
     void onSgnViewOutputs( QString viewingKey, QVector<QString> outputs, QString totalAmount);

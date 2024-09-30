@@ -12,45 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef V_VIEWHASH_W_H
-#define V_VIEWHASH_W_H
+#ifndef V_GENERATEOWNERSHIPPROOFINPUT_W_H
+#define V_GENERATEOWNERSHIPPROOFINPUT_W_H
 
 #include "../core_desktop/navwnd.h"
 
 namespace Ui {
-class ViewHash;
+class GenerateOwnershipProofInput;
 }
 
 namespace bridge {
-class Wallet;
 class ViewOutputs;
 }
 
-
 namespace wnd {
 
-class ViewHash : public core::NavWnd
+class GenerateOwnershipProofInput : public core::NavWnd
 {
     Q_OBJECT
 public:
-    explicit ViewHash(QWidget *parent = nullptr);
-    ~ViewHash();
+    explicit GenerateOwnershipProofInput(QWidget *parent = nullptr);
+    ~GenerateOwnershipProofInput();
+
+protected:
+    void updateGenerateBtn();
 
 private slots:
-    void onSgnGetViewingKey(QString viewingKey, QString error);
-
-    void on_showWalletKeyButton_clicked();
-    void on_startScanning_clicked();
-    void on_viewingKey_textChanged(const QString &arg1);
-    void on_generateOwnershipProof_clicked();
-    void on_viewOwnershipProof_clicked();
+    void on_back_clicked();
+    void on_generate_clicked();
+    void on_message2sign_textChanged();
+    void on_select_viewing_key_stateChanged(int arg1);
+    void on_select_tor_stateChanged(int arg1);
+    void on_select_mqs_stateChanged(int arg1);
 private:
-    Ui::ViewHash *ui;
+    Ui::GenerateOwnershipProofInput *ui;
 
-    bridge::Wallet * wallet = nullptr;
     bridge::ViewOutputs * viewAcounts = nullptr;
+
 };
 
 }
 
-#endif // V_VIEWHASH_W_H
+#endif // V_GENERATEOWNERSHIPPROOFINPUT_W_H

@@ -18,7 +18,7 @@
 
 #include "v_viewoutputs_b.h"
 #include "../BridgeManager.h"
-#include "../../state/v_ViewOutputs.h"
+#include "../../state/v_ViewOutputs_s.h"
 #include "../../util/stringutils.h"
 
 namespace bridge {
@@ -56,5 +56,29 @@ void ViewOutputs::setSgnViewOutputs(const QVector<wallet::WalletOutput> & output
     emit onSgnViewOutputs( lastViewingKey, outputs, util::zeroDbl2Dbl(util::nano2one(total)));
 }
 
+void ViewOutputs::generateOwnershipProofStart() {
+    getState()->generateOwnershipProofStart();
+}
+
+void ViewOutputs::validateOwnershipProofStart() {
+    getState()->validateOwnershipProofStart();
+}
+
+
+void ViewOutputs::back() {
+    getState()->back();
+}
+
+void ViewOutputs::generate_proof(QString message, bool viewingKey, bool torAddress, bool mqsAddress) {
+    getState()->generate_proof(message, viewingKey, torAddress, mqsAddress);
+}
+
+void ViewOutputs::validate_proof(QString proof) {
+    getState()->validate_proof(proof);
+}
+
+QString ViewOutputs::getLastViewViewingKey() {
+    return getState()->getLastViewViewingKey();
+}
 
 }

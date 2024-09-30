@@ -227,6 +227,13 @@ signals:
 
     // response to getViewingKey
     void sgnGetViewingKey(QString viewingKey, QString error);
+
+    // response from generateOwnershipProof
+    void sgnGenerateOwnershipProof(QString proof, QString error);
+
+    // response from validateOwnershipProof
+    void sgnValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error);
+
 private slots:
     void onStartingCommand(QString actionName);
 
@@ -268,6 +275,11 @@ private slots:
     void onFinalizeSlatepack( QString tagId, QString error, QString txUuid );
 
     void onViewRewindHash(QString rewindHash, QString error);
+
+    void onGenerateOwnershipProof(QString proof, QString error);
+
+    void onValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error);
+
 private:
 #ifdef WALLET_MOBILE
     QString proofResultURI;

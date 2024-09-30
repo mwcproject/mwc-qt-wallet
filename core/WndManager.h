@@ -130,6 +130,11 @@ public:
     virtual void pageViewHash() = 0;
     // Show Keys view, resulting outputs page
     virtual void pageViewAccounts() = 0;
+
+    virtual void pageGenerateOwnershipInput() = 0;
+    virtual void pageGenerateOwnershipResult() = 0;
+    virtual void pageValidateOwnershipInput() = 0;
+    virtual void pageValidateOwnershipResult() = 0;
 };
 
 void setWndManager(WndManager * mgr);

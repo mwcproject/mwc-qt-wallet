@@ -35,6 +35,20 @@ public:
     void startScanning(QString hashKey);
     void backFromOutputsView();
 
+    void generateOwnershipProofStart();
+    void generate_proof(QString message, bool viewingKey, bool torAddress, bool mqsAddress);
+
+    void validateOwnershipProofStart();
+    void validate_proof(QString proof);
+
+    void back();
+
+    QString getLastViewViewingKey() {
+        QString res = lastViewedViewingKey;
+        lastViewedViewingKey = "";
+        return res;
+    }
+
 protected:
     virtual NextStateRespond execute() override;
 
@@ -47,12 +61,16 @@ protected:
 private slots:
     void onRecoverProgress( int progress, int maxVal );
     void onScanRewindHash( QVector< wallet::WalletOutput > outputResult, int64_t total, QString errors );
+    void onValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error);
+
 private:
     int respondCounter = 0;
     int respondZeroLevel = 0;
     int progressBase = 0;
 
     bool inScanProcess = false;
+
+    QString lastViewedViewingKey;
 };
 
 } // state

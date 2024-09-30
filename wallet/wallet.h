@@ -897,6 +897,14 @@ public:
     // Check Signal: onUpdateSyncProgress ??
     // Check Signal: onScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors )
     virtual void scanRewindHash( const QString & rewindHash ) = 0;
+
+    // Generate ownership proof
+    // Check signal: onGenerateOwnershipProof(QString proof, QString error)
+    virtual void generateOwnershipProof(const QString & message, bool includePublicRootKey, bool includeTorAddress, bool includeMqsAddress ) = 0;
+
+    // Validate ownership proof
+    // Check signal: onValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error)
+    virtual void validateOwnershipProof(const QString & prrof) = 0;
 private:
 signals:
     // Wallet doing something. This message is needed for the progress.
@@ -1107,6 +1115,12 @@ signals:
 
     // response from scanRewindHash
     void onScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors );
+
+    // response from generateOwnershipProof
+    void onGenerateOwnershipProof(QString proof, QString error);
+
+    // response from validateOwnershipProof
+    void onValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error);
 };
 
 }

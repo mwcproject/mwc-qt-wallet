@@ -125,6 +125,8 @@ const QString PAGE_U_NODE_STATUS    = "MWC Node Status";
 const QString PAGE_V_VIEW_HASH      = "Viewing Key";
 const QString PAGE_V_VIEW_SCANNING  = "Scanning with Viewing Key";
 const QString PAGE_V_VIEW_OUTPUTS   = "View outputs";
+const QString PAGE_V_GEN_OWNERSHIP_PROOF = "Generate Ownership proof";
+const QString PAGE_V_VALID_OWNERSHIP_PROOF = "Validate Ownership proof";
 
 const QString PAGE_W_CONTACTS       = "Contacts";
 
