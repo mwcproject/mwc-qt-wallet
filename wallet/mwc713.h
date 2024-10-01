@@ -256,6 +256,10 @@ public:
                          QString message, int inputConfirmationNumber, int changeOutputs,
                          const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof, QString expectedproofAddress )  override;
 
+    // Self seld for accounts transfres
+    // Check signal:  onSend
+    virtual void selfSend( const QString &accountFrom, const QString &accountTo, int64_t coinNano, const QStringList & outputs, bool fluff ) override;
+
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
     virtual void getOutputs(QString account, bool show_spent, bool enforceSync)  override;

@@ -79,6 +79,26 @@ private:
     int64_t sendMwcNano;
 };
 
+class TaskSelfSendMwc : public QObject, public Mwc713Task {
+Q_OBJECT
+public:
+    const static int64_t TIMEOUT = 1000*30; // No transports are involved, might take longer because fo bad node connection
+
+    // coinNano == -1  - mean All
+    TaskSelfSendMwc( MWC713 *wallet713, const QString & accountTo, int64_t coinNano, const QStringList & outputs, bool fluff ) :
+            Mwc713Task("TaskSendMwc", "Sending coins to self...",
+                       buildCommand( accountTo, coinNano, outputs, fluff), wallet713, "") {}
+
+    virtual ~TaskSelfSendMwc() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    // coinNano == -1  - mean All
+    QString buildCommand(const QString & accountTo, int64_t coinNano, const QStringList & outputs, bool fluff) const;
+};
+
 
 class TaskSendFile : public Mwc713Task {
 public:

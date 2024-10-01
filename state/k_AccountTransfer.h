@@ -42,7 +42,6 @@ protected:
 
 private slots:
     // set receive account name results
-    void onSetReceiveAccount( bool ok, QString AccountOrMessage );
     void onSend( bool success, QStringList errors, QString address, int64_t txid, QString slate, QString mwc );
     void onWalletBalanceUpdated();
 
@@ -52,9 +51,7 @@ private:
     int transferState = -1;
     bool nodeIsHealthy = false;
 
-    QString recieveAccount;
     // Single transfer context
-    QString myAddress;
     QString trAccountFrom;
     QString trAccountTo;
     int64_t trNanoCoins = 0;

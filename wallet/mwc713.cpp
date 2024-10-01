@@ -764,6 +764,19 @@ void MWC713::sendTo(const QString &account, int64_t coinNano, const QString &add
     eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, taskGroup);
 }
 
+// Self seld for accounts transfres
+// Check signal:  onSend
+void MWC713::selfSend( const QString &accountFrom, const QString &accountTo, int64_t coinNano, const QStringList & outputs, bool fluff ) {
+    QVector<QPair<Mwc713Task *, int64_t>> taskGroup{
+            TSK(new TaskAccountSwitch(this, accountFrom), TaskAccountSwitch::TIMEOUT),
+            TSK(new TaskSelfSendMwc( this, accountTo, coinNano, outputs,fluff ), TaskSelfSendMwc::TIMEOUT)
+    };
+    if (accountFrom != currentAccount)
+        taskGroup.push_back(TSK(new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT));
+
+    eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, taskGroup);
+}
+
 
 // Init send transaction with file output
 // Check signal:  onSendFile
@@ -2520,7 +2533,7 @@ void MWC713::setWalletOutputs(const QString &account, const QVector<wallet::Wall
 void MWC713::timerEvent(QTimerEvent *event) {
     Q_UNUSED(event)
     if (isWalletRunningAndLoggedIn()) {
-        if (torStarted) {
+        if (torStarted && torOnline) {
             // Checking tor connection
             eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
                                     {TSK(new TaskCheckTorConnection(this), TaskCheckTorConnection::TIMEOUT)});

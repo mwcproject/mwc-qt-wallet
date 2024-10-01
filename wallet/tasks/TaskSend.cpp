@@ -188,6 +188,84 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, co
     return cmd;
 }
 
+// ------------------------ TaskSelfSendMwc --------------------------------
+
+bool TaskSelfSendMwc::processTask(const QVector<WEvent> &events) {
+
+    // slate [b9c559a8-e134-4af4-a77a-a2118ed74a90] received from [http listener] for [0.012345000] MWCs.
+
+    QString slate;
+    QString mwc;
+
+    {
+        QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
+        // Parsing for txId  - index of transaction that was created
+        for (auto &ln : lns) {
+
+            if (ln.message.startsWith("slate") && ln.message.contains("received from") ) {
+                int idx1 = ln.message.indexOf('[');
+                int idx2 = ln.message.indexOf(']', idx1+1);
+                if (idx1>0 && idx2>0)
+                    slate = ln.message.mid(idx1+1, idx2-idx1-1);
+
+                idx1 = ln.message.indexOf("for [");
+                idx2 = ln.message.indexOf(']', idx1+1);
+                if (idx1>0 && idx2>0) {
+                    idx1 += int(strlen("for ["));
+                    mwc = ln.message.mid(idx1, idx2 - idx1);
+                    mwc = util::zeroDbl2Dbl(mwc);
+                }
+            }
+        }
+    }
+
+    if ( !slate.isEmpty() && !mwc.isEmpty() ) {
+        wallet713->setSendResults(true, QStringList(), "", -1, slate, mwc);
+        return true;
+    }
+
+    QStringList errMsgs;
+    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
+
+    for (WEvent & evt : errs) {
+        errMsgs.push_back(evt.message);
+    }
+
+    if (errMsgs.isEmpty())
+        errMsgs.push_back("Not found expected output from mwc713");
+
+    wallet713->setSendResults( false, errMsgs, "", -1, "", "" );
+    return true;
+}
+
+QString TaskSelfSendMwc::buildCommand(const QString & accountTo, int64_t coinNano, const QStringList & outputs, bool fluff) const {
+
+    QString cmd = "send --self ";// + util::nano2one(coinNano);
+    if (coinNano>0)
+        cmd += util::nano2one(coinNano);
+
+    if (!outputs.isEmpty()) {
+        cmd += " --confirmations 1 --strategy custom --outputs " + outputs.join(",");
+    }
+    else {
+        cmd += " --confirmations 1";
+    }
+
+    // So far documentation doesn't specify difference between protocols
+    cmd += " --to " + util::toMwc713input(accountTo);
+
+    if (fluff) {
+        cmd += " --fluff";
+    }
+
+    if (coinNano<0)
+        cmd += " ALL";
+
+    qDebug() << "sendCommand: '" << cmd << "'";
+
+    return cmd;
+}
+
 // ----------------------- TaskSendFile --------------------------
 
 QString TaskSendFile::buildCommand( int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, int ttl_blocks, bool generateProof) const {
