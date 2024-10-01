@@ -51,6 +51,12 @@ Listening::Listening(QWidget *parent) :
     wallet->requestMqsAddress();
 
     ui->mwcMQlable->setText("MWC MQS");
+
+    ui->torBridgeConection->setText(config->getTorBridgeConection());
+    ui->torBridgeConection->setCursorPosition(0);
+
+    ui->torClientOptions->setText(config->getTorClientOptions());
+    ui->torClientOptions->setCursorPosition(0);
 }
 
 Listening::~Listening()
@@ -145,6 +151,9 @@ void Listening::updateStatuses() {
         ui->torTriggerButton->setText( torInProgress ? "Starting" : "Start");
         ui->torTriggerButton->setToolTip("Start the Tor Listener");
     }
+
+    ui->torBridgeConection->setEnabled(!torStarted);
+    ui->torClientOptions->setEnabled(!torStarted);
 
     // "true"  - listening
     // ""  - not listening, no errors
@@ -248,6 +257,11 @@ void Listening::on_torTriggerButton_clicked()
         wallet->requestStopTorListener();
     }
     else {
+        ui->torBridgeConection->setEnabled(false);
+        ui->torClientOptions->setEnabled(false);
+
+        config->setTorBridgeConectionClientOptions(ui->torBridgeConection->text(), ui->torClientOptions->text());
+
         ui->torTriggerButton->setText("Starting...");
         wallet->requestStartTorListener();
     }

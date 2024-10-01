@@ -41,8 +41,8 @@ public:
     const static int64_t TIMEOUT = 30000; // Tor can be slow and it is sync now
 
     // Start one listen per request. mwc713 doesn't support both
-    TaskListeningStart(MWC713 *wallet713, bool startMq, bool startTor, bool _initialStart ) :
-            Mwc713Task("TaskListeningStart", calcProgressStr(startMq, startTor), calcCommand(startMq, startTor), wallet713,""),
+    TaskListeningStart(MWC713 *wallet713, bool startMq, bool startTor, bool _initialStart, QString torBridgeLine, QString torClientOption ) :
+            Mwc713Task("TaskListeningStart", calcProgressStr(startMq, startTor), calcCommand(startMq, startTor, torBridgeLine, torClientOption), wallet713,""),
             initialStart(_initialStart)
     {}
 
@@ -52,7 +52,7 @@ public:
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
-    QString calcCommand(bool startMq, bool startTor) const;
+    QString calcCommand(bool startMq, bool startTor, QString torBridgeLine, QString torClientOption) const;
     QString calcProgressStr(bool startMq, bool startTor) const;
 
     bool initialStart;

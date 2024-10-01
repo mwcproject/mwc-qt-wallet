@@ -422,5 +422,16 @@ void Config::setSwapMktCurrency(QString currency) {
     getAppContext()->setSwapMktCurrency(currency);
 }
 
+QString Config::getTorBridgeConection() {
+    return getAppContext()->getTorBridgeLine();
+}
+
+QString Config::getTorClientOptions() {
+    return getAppContext()->getTorClientOption();
+}
+
+void Config::setTorBridgeConectionClientOptions(QString bridge, QString client) {
+    getAppContext()->setTorBridgeLineClientOption(bridge, client);
+}
 
 }

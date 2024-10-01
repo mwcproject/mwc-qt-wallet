@@ -139,6 +139,11 @@ public:
     bool isAutoStartMQSEnabled() const {return autoStartMQSEnabled;}
     void setAutoStartMQSEnabled(bool enabled);
 
+    //  Tor bridge configs
+    QString getTorBridgeLine() const {return torBridgeLine;}
+    QString getTorClientOption() const {return torClientOption;}
+    void setTorBridgeLineClientOption(const QString & line, const QString & client);
+
     // ----- Auto Start Tor ------
     bool isAutoStartTorEnabled() const {return autoStartTorEnabled;}
     void setAutoStartTorEnabled(bool enabled);
@@ -287,6 +292,9 @@ private:
 
     bool autoStartMQSEnabled = true;
     bool autoStartTorEnabled = true;
+
+    QString torBridgeLine;
+    QString torClientOption;
 
     // Because of Custom node logic, we have to track config changes
     QMap<QString, wallet::MwcNodeConnection> nodeConnection;

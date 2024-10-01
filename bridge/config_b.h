@@ -188,6 +188,11 @@ public:
     Q_INVOKABLE void setSwapMktMinFeeLevel(double fee);
     Q_INVOKABLE void setSwapMktSelling(int buySellBoth);
     Q_INVOKABLE void setSwapMktCurrency(QString currency);
+
+    Q_INVOKABLE QString getTorBridgeConection();
+    Q_INVOKABLE QString getTorClientOptions();
+
+    Q_INVOKABLE void setTorBridgeConectionClientOptions(QString bridge, QString client);
 };
 
 }

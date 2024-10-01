@@ -530,11 +530,11 @@ void MWC713::listeningStart(bool startMq, bool startTor, bool initialStart) {
 
     if (startMq)
         eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
-                                {TSK(new TaskListeningStart(this, startMq, false, initialStart),
+                                {TSK(new TaskListeningStart(this, startMq, false, initialStart, "", ""),
                                      TaskListeningStart::TIMEOUT)});
     if (startTor)
         eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
-                                {TSK(new TaskListeningStart(this, false, startTor, initialStart),
+                                {TSK(new TaskListeningStart(this, false, startTor, initialStart, appContext->getTorBridgeLine(), appContext->getTorClientOption() ),
                                      TaskListeningStart::TIMEOUT)});
 
     if (startMq)
@@ -1429,7 +1429,7 @@ void MWC713::setListeningStopResult(bool mqTry, bool torTry, // what we try to s
         restartingTor = false;
         torOfflineCounter = 0;
         eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
-                                {TSK(new TaskListeningStart(this, false, true, false), TaskListeningStart::TIMEOUT)});
+                                {TSK(new TaskListeningStart(this, false, true, false, appContext->getTorBridgeLine(), appContext->getTorClientOption()), TaskListeningStart::TIMEOUT)});
     }
 }
 
@@ -1850,7 +1850,7 @@ void MWC713::restartMQsListener() {
     if (mwcMqStartRequested && !mwcMqStarted) {
         qDebug() << "Try to restart MQs Listener after failure";
         eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
-                                {TSK(new TaskListeningStart(this, true, false, false), TaskListeningStart::TIMEOUT)});
+                                {TSK(new TaskListeningStart(this, true, false, false, "",""), TaskListeningStart::TIMEOUT)});
     }
 }
 
