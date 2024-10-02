@@ -68,6 +68,18 @@ struct AccountInfo {
     bool balancesAreEquals(const AccountInfo & accInfo) const;
 };
 
+struct AccountsInfo {
+    QString tag;
+    QStringList accounts;
+    QString activeAccount;
+
+    AccountsInfo() = default;
+    AccountsInfo(const AccountsInfo &) = default;
+    AccountsInfo(AccountsInfo &&) = default;
+
+    AccountsInfo(QString tag, QString activeAccount, const QVector<AccountInfo> & accountInfo);
+};
+
 struct MwcNodeConnection {
     enum class NODE_CONNECTION_TYPE { CLOUD = 0, LOCAL = 1, CUSTOM = 2 }; //
 

@@ -33,6 +33,7 @@ namespace wallet {
 
 class Mwc713EventManager;
 class Mwc713Task;
+struct AccountsInfo;
 
 class MWC713 : public Wallet
 {
@@ -502,17 +503,18 @@ public:
 
     void setSendFileResult( bool success, QStringList errors, QString fileName );
     void setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
-    void setFinalizeFile( bool success, QStringList errors, QString fileName );
+    void setFinalizeFile( bool success, bool txNotFoundError, QStringList errors, QString fileName, const AccountsInfo & accInfo, QString fileTxResponse, bool fluff );
     void setSubmitFile(bool success, QString message, QString fileName);
 
     void setSendSlatepack( QString error, QString slatepack, QString tag );
     void setReceiveSlatepack( QString error, QString slatepack, QString tag );
-    void setFinalizedSlatepack( QString error, QString txUuid, QString tag );
+    void setFinalizedSlatepack( bool txNotFoundError, QString error, QString txUuid, const AccountsInfo & accInfo, QString slatepack, bool fluff );
 
     // Transactions
     void setTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
 
-    void setTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages );
+    void setTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages,
+                             const QString & txIdxOrUUID, bool sendOnly, const AccountsInfo & accInfo );
 
     // Outputs results
     void setOutputs( QString account, bool show_spent, int64_t height, QVector<WalletOutput> outputs);

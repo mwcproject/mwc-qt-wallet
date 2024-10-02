@@ -297,7 +297,18 @@ static void parseTransactions(const QVector<WEvent> & events, // in
     account = "";
     height = -1;
 
+    bool transactionNotFound = false;
+
     for ( ; curEvt < events.size(); curEvt++ ) {
+        if (events[curEvt].event == WALLET_EVENTS::S_LINE ) {
+            auto & str = events[curEvt].message;
+
+            if (str.startsWith("Could not find a transaction matching given tx Uuid")) {
+                transactionNotFound = true;
+                break;
+            }
+        }
+
         if (events[curEvt].event == WALLET_EVENTS::S_TRANSACTION_LOG ) {
             QStringList l = events[curEvt].message.split('|');
             Q_ASSERT(l.size()==2);
@@ -307,73 +318,82 @@ static void parseTransactions(const QVector<WEvent> & events, // in
         }
     }
 
-    // positions for the columns. Note, the columns and the order are hardcoded and come from mwc713 data!!!
+    trVector.clear();
 
-    QVector<int> txLayout;
+    if (!transactionNotFound) {
+        // positions for the columns. Note, the columns and the order are hardcoded and come from mwc713 data!!!
 
-    // Continue with transaction output
-    // Search for Header first
-    for ( ; curEvt < events.size(); curEvt++ ) {
-        if (events[curEvt].event == WALLET_EVENTS::S_LINE ) {
-            auto & str = events[curEvt].message;
-            if ( str.contains("Creation Time") && str.contains("Confirmed?") ) {
+        QVector<int> txLayout;
 
-                txLayout = parseHeadersLine( str, {"Id", "Type", "Shared Transaction Id", "Address", "Creation Time",
-                               "TTL Cutoff Height", "Confirmed?", "Height", "Confirmation Time",  "Num.",  "Num.", "Amount", "Amount", "Fee", "Net", "Payment", "Kernel", "Tx"} );
+        // Continue with transaction output
+        // Search for Header first
+        for ( ; curEvt < events.size(); curEvt++ ) {
+            if (events[curEvt].event == WALLET_EVENTS::S_LINE ) {
+                auto & str = events[curEvt].message;
 
-                if ( txLayout.size()>0 ) {
-                    curEvt++;
+                if (str.startsWith("Could not find a transaction matching given tx Uuid")) {
+                    transactionNotFound = true;
                     break;
                 }
-                Q_ASSERT(false); // There is a small chance, but it is really not likely it is ok
+
+                if ( str.contains("Creation Time") && str.contains("Confirmed?") ) {
+
+                    txLayout = parseHeadersLine( str, {"Id", "Type", "Shared Transaction Id", "Address", "Creation Time",
+                                   "TTL Cutoff Height", "Confirmed?", "Height", "Confirmation Time",  "Num.",  "Num.", "Amount", "Amount", "Fee", "Net", "Payment", "Kernel", "Tx"} );
+
+                    if ( txLayout.size()>0 ) {
+                        curEvt++;
+                        break;
+                    }
+                    Q_ASSERT(false); // There is a small chance, but it is really not likely it is ok
+                }
             }
         }
-    }
 
-    // Skip header
-    for ( ; curEvt < events.size(); curEvt++ ) {
-        if (events[curEvt].event == WALLET_EVENTS::S_LINE) {
-            auto &str = events[curEvt].message;
-            if (str.startsWith("==============")) {
-                curEvt++; // skipping this
-                break;
+        // Skip header
+        for ( ; curEvt < events.size(); curEvt++ ) {
+            if (events[curEvt].event == WALLET_EVENTS::S_LINE) {
+                auto &str = events[curEvt].message;
+                if (str.startsWith("==============")) {
+                    curEvt++; // skipping this
+                    break;
+                }
             }
         }
-    }
 
-    QMap<int64_t, WalletTransaction > transactions;
+        QMap<int64_t, WalletTransaction > transactions;
 
-    // Processing transactions
-    int64_t lastTransId = -1;
-    for ( ; curEvt < events.size(); curEvt++ ) {
-        if (events[curEvt].event == WALLET_EVENTS::S_LINE ) {
-            auto &str = events[curEvt].message;
+        // Processing transactions
+        int64_t lastTransId = -1;
+        for ( ; curEvt < events.size(); curEvt++ ) {
+            if (events[curEvt].event == WALLET_EVENTS::S_LINE ) {
+                auto &str = events[curEvt].message;
 
-            if (str.startsWith("--------------------"))
-                continue;
+                if (str.startsWith("--------------------"))
+                    continue;
 
-            if (str.startsWith("=============="))
-                break; // multiple data types case, nned to handle without surprises
+                if (str.startsWith("=============="))
+                    break; // multiple data types case, nned to handle without surprises
 
 
-            // mwc713 has a special line for 'cancelled'
-            if (str.contains("- Cancelled")) {
-                transactions[lastTransId].cancelled();
-                continue;
-            }
+                // mwc713 has a special line for 'cancelled'
+                if (str.contains("- Cancelled")) {
+                    transactions[lastTransId].cancelled();
+                    continue;
+                }
 
-            // Expected to be a normal line
-            WalletTransaction trans = parseTransactionLine(str, txLayout);
-            if ( trans.isValid() ) {
-                lastTransId = trans.txIdx;
-                transactions[trans.txIdx] = trans;
+                // Expected to be a normal line
+                WalletTransaction trans = parseTransactionLine(str, txLayout);
+                if ( trans.isValid() ) {
+                    lastTransId = trans.txIdx;
+                    transactions[trans.txIdx] = trans;
+                }
             }
         }
-    }
 
-    trVector.clear();
-    for ( WalletTransaction & trItem : transactions )
-        trVector.push_back( trItem );
+        for ( WalletTransaction & trItem : transactions )
+            trVector.push_back( trItem );
+    }
 }
 
 bool TaskTransactions::processTask(const QVector<WEvent> & events) {
@@ -498,7 +518,7 @@ bool TaskTransactionsById::processTask(const QVector<WEvent> & events) {
          account, height, trVector); // out
 
     if ( trVector.size()!=1 ) {
-        wallet713->setTransactionById(false,  account, height, WalletTransaction(), {}, {} );
+        wallet713->setTransactionById(false,  account, height, WalletTransaction(), {}, {}, txIdxOrUUID, sendOnly, accInfo );
         return true;
     }
 
@@ -513,7 +533,7 @@ bool TaskTransactionsById::processTask(const QVector<WEvent> & events) {
     QVector<QString> messages;
     parseMessages(events, messages);
 
-    wallet713->setTransactionById( true,  account, height, tx, outputResult, messages );
+    wallet713->setTransactionById( true,  account, height, tx, outputResult, messages, txIdxOrUUID, sendOnly, accInfo );
 
     return true;
 }

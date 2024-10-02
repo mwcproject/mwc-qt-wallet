@@ -833,14 +833,29 @@ void MWC713::finalizeFile(QString fileTxResponse, bool fluff) {
 #endif
 
     if (!util::validateMwc713Str(fileTxResponse, false).first) {
-        setFinalizeFile(false, QStringList{"Unable to process file with name '" + fileTxResponse +
+        setFinalizeFile(false, false, QStringList{"Unable to process file with name '" + fileTxResponse +
                                            "' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."},
-                        fileTxResponse);
+                        fileTxResponse, AccountsInfo(), fileTxResponse,  fluff);
         return;
     }
 
-    eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
-                            {TSK(new TaskFinalizeFile(this, fileTxResponse, fluff), TaskFinalizeFile::TIMEOUT)});
+    AccountsInfo accInfo("", currentAccount, accountInfoNoLocks);
+
+    if (accInfo.accounts.size()<2) {
+        // for single account - there is no problems
+        eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
+                                {TSK(new TaskFinalizeFile(this, fileTxResponse, fluff, accInfo), TaskFinalizeFile::TIMEOUT)});
+    }
+    else {
+        QString account = accInfo.accounts.last();
+        accInfo.accounts.pop_back();
+
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup {
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskFinalizeFile(this, fileTxResponse, fluff, accInfo), TaskFinalizeFile::TIMEOUT)
+        };
+        eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, taskGroup);
+    }
 }
 
 // submit finalized transaction. Make sense for cold storage => online node operation
@@ -887,8 +902,23 @@ void MWC713::receiveSlatepack(QString slatepack, QString description, QString ta
 // finalize transaction and broadcast it
 // Check signal:  onFinalizeSlatepack
 void MWC713::finalizeSlatepack(QString slatepack, bool fluff, QString tag) {
-    eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, {TSK(new TaskFinalizeSlatepack(this, slatepack, fluff, tag),
-                                                             TaskFinalizeSlatepack::TIMEOUT)});
+    AccountsInfo accInfo(tag, currentAccount, accountInfoNoLocks);
+
+    if (accInfo.accounts.size()<2) {
+        // for single account - there is no problems
+        eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, {TSK(new TaskFinalizeSlatepack(this, slatepack, fluff,accInfo),
+                                                                 TaskFinalizeSlatepack::TIMEOUT)});
+    }
+    else {
+        QString account = accInfo.accounts.last();
+        accInfo.accounts.pop_back();
+
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup {
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskFinalizeSlatepack(this, slatepack, fluff,accInfo), TaskFinalizeSlatepack::TIMEOUT)
+        };
+        eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, taskGroup);
+    }
 }
 
 // Show outputs for the wallet
@@ -919,14 +949,35 @@ void MWC713::getTransactions(QString account, bool enforceSync) {
 // get Extended info for specific transaction
 // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
 void MWC713::getTransactionById(QString account, QString txIdxOrUUID) {
-    QVector<QPair<Mwc713Task *, int64_t>> taskGroup{
-            TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
-            TSK(new TaskTransactionsById(this, txIdxOrUUID), TaskTransactions::TIMEOUT)
-    };
-    if (account != currentAccount)
-        taskGroup.push_back(TSK(new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT));
+    // account can be empty, it is mean that we need to do search in all accounts for Send transaciton
 
-    eventCollector->addTask(TASK_PRIORITY::TASK_NOW, taskGroup);
+    AccountsInfo accInfo("", currentAccount, accountInfoNoLocks);
+    if (account.isEmpty() && accInfo.accounts.size()<2)
+        account = currentAccount;
+
+    if (!account.isEmpty()) {
+        // Normal usage, acount is known for sure
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup{
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskTransactionsById(this, txIdxOrUUID, false, AccountsInfo()), TaskTransactions::TIMEOUT)
+        };
+        if (account != currentAccount)
+            taskGroup.push_back(TSK(new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT));
+
+        eventCollector->addTask(TASK_PRIORITY::TASK_NOW, taskGroup);
+    }
+    else {
+        // need to search
+        QString account = accInfo.accounts.last();
+        accInfo.accounts.pop_back();
+
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup {
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskTransactionsById(this, txIdxOrUUID, true, accInfo), TaskTransactions::TIMEOUT)
+        };
+        eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, taskGroup);
+
+    }
 }
 
 // Get root public key with signed message. Message is optional, can be empty
@@ -1718,13 +1769,39 @@ void MWC713::setReceiveFile(bool success, QStringList errors, QString inFileName
     emit onReceiveFile(success, errors, inFileName, outFn);
 }
 
-void MWC713::setFinalizeFile(bool success, QStringList errors, QString fileName) {
-    if (success) {
-        notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO, QString("File finalized for " + fileName));
-    }
+void MWC713::setFinalizeFile(bool success, bool txNotFoundError, QStringList errors, QString fileName, const AccountsInfo & accInfo, QString fileTxResponse, bool fluff) {
 
-    logger::logEmit("MWC713", "onFinalizeFile", "success=" + QString::number(success));
-    emit onFinalizeFile(success, errors, fileName);
+    if (!txNotFoundError) {
+        if (success) {
+            notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO, QString("File finalized for " + fileName));
+        }
+
+        if (!accInfo.activeAccount.isEmpty()) {
+            eventCollector->addTask(TASK_PRIORITY::TASK_NOW,
+                                    {TSK(new TaskAccountSwitch(this, accInfo.activeAccount),
+                                         TaskAccountSwitch::TIMEOUT)});
+        }
+
+        logger::logEmit("MWC713", "onFinalizeFile", "success=" + QString::number(success));
+        emit onFinalizeFile(success, errors, fileName);
+    }
+    else {
+        // retry for another account
+        Q_ASSERT(accInfo.accounts.size()>0);
+        Q_ASSERT(!success);
+        // retry with another account...
+
+        AccountsInfo nextAccInfo(accInfo);
+
+        QString account = nextAccInfo.accounts.last();
+        nextAccInfo.accounts.pop_back();
+
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup {
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskFinalizeFile(this, fileTxResponse, fluff, accInfo), TaskFinalizeFile::TIMEOUT)
+        };
+        eventCollector->addTask(TASK_PRIORITY::TASK_NOW, taskGroup);
+    }
 }
 
 void MWC713::setSubmitFile(bool success, QString message, QString fileName) {
@@ -1748,9 +1825,37 @@ void MWC713::setReceiveSlatepack(QString error, QString slatepack, QString tag) 
     emit onReceiveSlatepack(tag, error, slatepack);
 }
 
-void MWC713::setFinalizedSlatepack(QString error, QString txUuid, QString tag) {
-    logger::logEmit("MWC713", "setFinalizedSlatepack", +" tag=" + tag + " error=" + error + " txUuid: " + txUuid);
-    emit onFinalizeSlatepack(tag, error, txUuid);
+void MWC713::setFinalizedSlatepack(bool txNotFoundError, QString error, QString txUuid, const AccountsInfo & accInfo, QString slatepack, bool fluff ) {
+    if (!txNotFoundError) {
+        // We are done
+        if (!accInfo.activeAccount.isEmpty()) {
+            eventCollector->addTask(TASK_PRIORITY::TASK_NOW,
+                                    {TSK(new TaskAccountSwitch(this, accInfo.activeAccount),
+                                         TaskAccountSwitch::TIMEOUT)});
+        }
+
+        logger::logEmit("MWC713", "setFinalizedSlatepack", +" tag=" + accInfo.tag + " error=" + error + " txUuid: " + txUuid);
+        emit onFinalizeSlatepack(accInfo.tag, error, txUuid);
+    }
+    else {
+        Q_ASSERT(accInfo.accounts.size()>0);
+        Q_ASSERT(!error.isEmpty());
+        // retry with another account...
+
+        AccountsInfo nextAccInfo(accInfo);
+
+        QString account = nextAccInfo.accounts.last();
+        nextAccInfo.accounts.pop_back();
+
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup {
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskFinalizeSlatepack(this, slatepack, fluff, nextAccInfo), TaskFinalizeSlatepack::TIMEOUT)
+        };
+        eventCollector->addTask(TASK_PRIORITY::TASK_NOW, taskGroup);
+    }
+
+
+
 }
 
 void MWC713::setTransactions(QString account, int64_t height, QVector<WalletTransaction> Transactions) {
@@ -1759,11 +1864,41 @@ void MWC713::setTransactions(QString account, int64_t height, QVector<WalletTran
 }
 
 void MWC713::setTransactionById(bool success, QString account, int64_t height, WalletTransaction transaction,
-                                QVector<WalletOutput> outputs, QVector<QString> messages) {
-    logger::logEmit("MWC713", "onTransactionById",
-                    QString("success=") + (success ? "true" : "false") + " transaction=" + transaction.toStringShort() +
-                    " outputs: " + QString::number(outputs.size()) + " messages: " + QString::number(messages.size()));
-    emit onTransactionById(success, account, height, transaction, outputs, messages);
+                                QVector<WalletOutput> outputs, QVector<QString> messages,
+                                const QString & txIdxOrUUID, bool sendOnly, const AccountsInfo & accInfo ) {
+
+    if (sendOnly && transaction.transactionType!= WalletTransaction::TRANSACTION_TYPE::SEND )
+        success=false;
+
+    if (success || accInfo.accounts.isEmpty()) {
+        if (!accInfo.activeAccount.isEmpty()) {
+            eventCollector->addTask(TASK_PRIORITY::TASK_NOW,
+                                    {TSK(new TaskAccountSwitch(this, accInfo.activeAccount),
+                                         TaskAccountSwitch::TIMEOUT)});
+        }
+
+        logger::logEmit("MWC713", "onTransactionById",
+                        QString("success=") + (success ? "true" : "false") + " transaction=" +
+                        transaction.toStringShort() +
+                        " outputs: " + QString::number(outputs.size()) + " messages: " +
+                        QString::number(messages.size()));
+        emit onTransactionById(success, account, height, transaction, outputs, messages);
+    }
+    else {
+        Q_ASSERT(accInfo.accounts.size()>0);
+        Q_ASSERT(!success);
+
+        AccountsInfo nextAccInfo(accInfo);
+
+        QString account = nextAccInfo.accounts.last();
+        nextAccInfo.accounts.pop_back();
+
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup {
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskTransactionsById(this, txIdxOrUUID, true, nextAccInfo), TaskTransactions::TIMEOUT)
+        };
+        eventCollector->addTask(TASK_PRIORITY::TASK_NOW, taskGroup);
+    }
 }
 
 

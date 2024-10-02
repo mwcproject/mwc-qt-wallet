@@ -21,6 +21,15 @@
 
 namespace wallet {
 
+// ------------------- AccountsInfo --------------------------
+
+AccountsInfo::AccountsInfo(QString _tag, QString _activeAccount, const QVector<AccountInfo> & accountInfo) :
+    tag(_tag), activeAccount(_activeAccount)
+{
+    for (const auto & a : accountInfo)
+        accounts.push_back(a.accountName);
+}
+
 // ---------------- TaskSlatesListener -----------------------
 
 bool TaskSlatesListener::processTask(const QVector<WEvent> & events) {
@@ -402,7 +411,7 @@ bool TaskFinalizeFile::processTask(const QVector<WEvent> &events) {
         int idx = ln.message.indexOf(" finalized ");
         if (idx>0) {
             QString fileName = ln.message.left(idx).trimmed();
-            wallet713->setFinalizeFile(true, QStringList(), fileName );
+            wallet713->setFinalizeFile(true, false, QStringList(), fileName, accounts, fileTxResponse, fluff );
             return true;
         }
     }
@@ -410,6 +419,9 @@ bool TaskFinalizeFile::processTask(const QVector<WEvent> &events) {
     QVector< WEvent > apiErrs = filterEvents(events, WALLET_EVENTS::S_NODE_API_ERROR);
     QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     QStringList errMsg;
+
+    bool transactionNotFound = false;
+
     // We prefer API messages from the node. Wallet doesn't provide details
     for (auto & er:apiErrs) {
         QStringList prms = er.message.split('|');
@@ -417,11 +429,14 @@ bool TaskFinalizeFile::processTask(const QVector<WEvent> &events) {
             errMsg.push_back("MWC-NODE failed to publish the slate. " + prms[1]);
     }
     if (errMsg.isEmpty()) {
-        for (auto &er:errs)
+        for (auto &er:errs) {
+            if (er.message.contains("not found"))
+                transactionNotFound = true;
             errMsg.push_back(er.message);
+        }
     }
 
-    wallet713->setFinalizeFile(false, errMsg, "");
+    wallet713->setFinalizeFile(false, transactionNotFound, errMsg, "", accounts, fileTxResponse, fluff);
     return true;
 
 }
@@ -525,17 +540,22 @@ QString TaskFinalizeSlatepack::buildCommand(QString slatepack, bool fluff) const
 bool TaskFinalizeSlatepack::processTask(const QVector<WEvent> &events) {
     QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
 
+    bool transactionNotFound = false;
+
     for ( auto & ln : lns ) {
+        if (ln.message.contains("not found"))
+            transactionNotFound = true;
+
         int idx = ln.message.indexOf(" finalized transaction ");
         if (idx>=0) {
             idx += strlen(" finalized transaction ");
             QString txId = ln.message.mid(idx).trimmed();
-            wallet713->setFinalizedSlatepack("", txId, tag);
+            wallet713->setFinalizedSlatepack(false, "", txId, accounts, slatepack, fluff);
             return true;
         }
     }
 
-    wallet713->setFinalizedSlatepack(getErrorMessage(events, "Unable to finalize slatepack"), "", tag);
+    wallet713->setFinalizedSlatepack( transactionNotFound, getErrorMessage(events, "Unable to finalize slatepack"), "", accounts, slatepack, fluff);
     return true;
 }
 
