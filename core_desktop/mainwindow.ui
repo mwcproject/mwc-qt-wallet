@@ -338,6 +338,7 @@
     <addaction name="actionWallet_accounts"/>
     <addaction name="actionContacts"/>
     <addaction name="actionShow_passphrase"/>
+    <addaction name="actionViewing_Key"/>
     <addaction name="separator"/>
     <addaction name="actionLogout"/>
    </widget>
@@ -426,6 +427,11 @@
   <action name="actionShow_passphrase">
    <property name="text">
     <string>Show passphrase</string>
+   </property>
+  </action>
+  <action name="actionViewing_Key">
+   <property name="text">
+    <string>Viewing Key</string>
    </property>
   </action>
   <action name="actionEvent_log">

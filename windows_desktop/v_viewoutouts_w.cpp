@@ -17,6 +17,7 @@
 #include "../bridge/wnd/v_viewoutputs_b.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../dialogs_desktop/v_showviewoutputdlg.h"
+#include "../util_desktop/widgetutils.h"
 #include <QDebug>
 
 namespace wnd {
@@ -33,6 +34,9 @@ ViewOutputs::ViewOutputs(QWidget *parent) :
 
     QObject::connect(ui->outputsTable, &control::RichVBox::onItemActivated,
                      this, &ViewOutputs::onItemActivated, Qt::QueuedConnection);
+
+
+    utils::defineDefaultButtonSlot(this, SLOT(on_backButton_clicked()) );
 
 }
 
@@ -56,6 +60,7 @@ void ViewOutputs::onSgnViewOutputs(QString viewingKey, QVector<QString> outputs,
     }
 
     ui->viewingKey->setText( "Total: " + totalAmount + " MWC  " + viewingKey );
+    ui->viewingKey->setCursorPosition(0);
 
     updateShownData(false);
 }

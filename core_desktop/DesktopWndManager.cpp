@@ -177,48 +177,63 @@ void DesktopWndManager::hideWalletStoppingMessage() {
 
 
 void DesktopWndManager::pageInitFirstTime() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_A_FIRST_TIME,
                                      new wnd::InitFirstTime( windowManager->getInWndParent() ) );
 }
 
 void DesktopWndManager::pageInputPassword(QString pageTitle, bool lockMode) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( pageTitle,
                 new wnd::InputPassword( windowManager->getInWndParent(), lockMode ) );
 }
 
 void DesktopWndManager::pageInitAccount(QString path, bool restoredFromSeed) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_A_INIT_ACCOUNT,
                 new wnd::InitAccount( windowManager->getInWndParent(), path, restoredFromSeed ));
 }
 
 void DesktopWndManager::pageSeedLength() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_A_SEED_LENGTH,
                                      new wnd::SeedLength( windowManager->getInWndParent()));
 }
 
 
 void DesktopWndManager::pageEnterSeed() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_A_ENTER_SEED,
                                      new wnd::EnterSeed( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageNewSeed(QString pageTitle, QVector<QString> seed, bool hideSubmitButton) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( pageTitle,
                                     new wnd::NewSeed( windowManager->getInWndParent(),
                                                       seed, hideSubmitButton ) );
 }
 
 void DesktopWndManager::pageNewSeedTest(int wordIndex) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_A_PASSPHRASE_TEST,
             new wnd::NewSeedTest( windowManager->getInWndParent(), wordIndex ));
 }
 
 void DesktopWndManager::pageProgressWnd(QString pageTitle, QString callerId, QString header, QString msgProgress, QString msgPlus, bool cancellable ) {
+    restoreLeftBarShownStatus();
+
+    if (mainWindow->isLeftBarShown()) {
+        isLeftBarShownStatus = 2;
+        mainWindow->updateLeftBar(false);
+    }
+
     windowManager->switchToWindowEx( pageTitle,
              new wnd::ProgressWnd(windowManager->getInWndParent(), callerId, header, msgProgress, msgPlus, cancellable));
 }
 
 void DesktopWndManager::pageOutputs() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx(mwc::PAGE_E_OUTPUTS,
                 new wnd::Outputs( windowManager->getInWndParent()));
 }
@@ -227,6 +242,7 @@ void DesktopWndManager::pageFileTransactionReceive(QString pageTitle,
                                             const QString & fileNameOrSlatepack,
                                             const util::FileTransactionInfo & transInfo,
                                             int nodeHeight) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( pageTitle,
                         new wnd::FileTransactionReceive( windowManager->getInWndParent(),
                                                   fileNameOrSlatepack, transInfo, nodeHeight) );
@@ -236,48 +252,56 @@ void DesktopWndManager::pageFileTransactionFinalize(QString pageTitle,
                                             const QString & fileNameOrSlatepack,
                                             const util::FileTransactionInfo & transInfo,
                                             int nodeHeight) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( pageTitle,
                                      new wnd::FileTransactionFinalize( windowManager->getInWndParent(),
                                                                fileNameOrSlatepack, transInfo, nodeHeight) );
 }
 
 void DesktopWndManager::pageRecieve() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_E_RECEIVE,
                new wnd::Receive( windowManager->getInWndParent() ) );
 }
 
 void DesktopWndManager::pageListening() {
-
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_E_LISTENING,
                  new wnd::Listening( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageFinalize() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_G_FINALIZE_UPLOAD,
               new wnd::Finalize( windowManager->getInWndParent() ) );
 }
 
 void DesktopWndManager::pageSendStarting() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_G_SEND,
               new wnd::SendStarting( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageSendOnline( QString selectedAccount, int64_t amount ) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_G_SEND_ONLINE,
                                      new wnd::SendOnline( windowManager->getInWndParent(), selectedAccount, amount ));
 }
 
 void DesktopWndManager::pageSendFile( QString selectedAccount, int64_t amount ) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_G_SEND_FILE,
                                      new wnd::SendOffline( windowManager->getInWndParent(), selectedAccount, amount, false ));
 }
 
 void DesktopWndManager::pageSendSlatepack( QString selectedAccount, int64_t amount ) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_G_SEND_SLATEPACK,
                                      new wnd::SendOffline( windowManager->getInWndParent(), selectedAccount, amount, true ));
 }
 
 void DesktopWndManager::pageTransactions() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_E_TRANSACTION,
                       new wnd::Transactions( windowManager->getInWndParent()));
 }
@@ -285,21 +309,25 @@ void DesktopWndManager::pageTransactions() {
 // slatepack - slatepack string value to show.
 // backStateId - state ID of the caller. On 'back' will switch to this state Id
 void DesktopWndManager::pageShowSlatepack(QString slatepack, int backStateId, QString txExtension, bool enableFinalize) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_G_SLATEPACK,
                                      new wnd::ResultedSlatepack( windowManager->getInWndParent(), slatepack, backStateId, txExtension, enableFinalize ));
 }
 
 void DesktopWndManager::pageAccounts() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_K_ACCOUNTS,
                new wnd::Accounts( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageAccountTransfer() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_K_ACCOUNT_TRANSFER,
                new wnd::AccountTransfer( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageNodeInfo() {
+    restoreLeftBarShownStatus();
     state::NodeInfo * ni =  (state::NodeInfo *)state::getState(state::STATE::NODE_INFO);
     Q_ASSERT(ni);
 
@@ -324,26 +352,31 @@ void DesktopWndManager::pageNodeInfo() {
 }
 
 void DesktopWndManager::pageContacts() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_W_CONTACTS,
               new wnd::Contacts( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageEvents() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_X_EVENTS,
               new wnd::Events( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageWalletConfig() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_X_WALLET_CONFIG,
               new wnd::WalletConfig( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageNodeConfig() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_X_NODE_CONFIG,
              new wnd::NodeConfig( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageSelectMode() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_Y_SELECT_RUNNING_MODE,
               new wnd::SelectMode( windowManager->getInWndParent()));
 }
@@ -361,40 +394,48 @@ void DesktopWndManager::pageAccountOptions() {
 }
 
 void DesktopWndManager::pageSwapList(bool selectIncoming, bool selectOutgoing, bool selectBackup, bool selectEthWallet) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_LIST,
         new wnd::SwapList( windowManager->getInWndParent(), selectIncoming, selectOutgoing, selectBackup, selectEthWallet));
 }
 
 void DesktopWndManager::pageSwapNew1() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_NEW + " 1/3",
                                      new wnd::NewSwap1( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageSwapNew2() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_NEW + " 2/3",
                                      new wnd::NewSwap2( windowManager->getInWndParent()));
 }
 void DesktopWndManager::pageSwapNew3() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_S_SWAP_NEW + " 3/3",
                                      new wnd::NewSwap3( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageSwapEdit(QString swapId, QString stateCmd) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( "",
          new wnd::EditSwap( windowManager->getInWndParent(), swapId, stateCmd));
 }
 void DesktopWndManager::pageSwapTradeDetails(QString swapId) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( "",
          new wnd::TradeDetails( windowManager->getInWndParent(), swapId));
 }
 
 // Swap marketplace
 void DesktopWndManager::pageMarketplace(bool selectMyOffers, bool selectFee) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_S_MKT_LIST,
                                      new wnd::MrktSwList( windowManager->getInWndParent(), selectMyOffers, selectFee));
 }
 
 void DesktopWndManager::pageNewUpdateOffer(QString myMsgId) {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( myMsgId.isEmpty() ? mwc::PAGE_S_MKT_NEW_OFFER : mwc::PAGE_S_MKT_OFFER_UPDATE,
                                      new wnd::MrktSwapNew( windowManager->getInWndParent(), myMsgId));
 }
@@ -405,39 +446,61 @@ void DesktopWndManager::showSwapBackupDlg() {
 }
 
 void DesktopWndManager::pageTransactionFee() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_S_MKT_TX_FEE,
                                      new wnd::IntegrityTransactions( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageViewHash()  {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_V_VIEW_HASH,
                                      new wnd::ViewHash( windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageViewAccounts() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_V_VIEW_OUTPUTS,
                                      new wnd::ViewOutputs(windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageGenerateOwnershipInput() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_V_GEN_OWNERSHIP_PROOF,
                                      new wnd::GenerateOwnershipProofInput(windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageGenerateOwnershipResult() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_V_GEN_OWNERSHIP_PROOF,
                                      new wnd::GenerateOwnershipProofResult(windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageValidateOwnershipInput() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_V_VALID_OWNERSHIP_PROOF,
                                      new wnd::ValidateOwnershipProofInput(windowManager->getInWndParent()));
 }
 
 void DesktopWndManager::pageValidateOwnershipResult() {
+    restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_V_VALID_OWNERSHIP_PROOF,
                                      new wnd::ValidateOwnershipProofResult(windowManager->getInWndParent()));
 }
+
+void DesktopWndManager::restoreLeftBarShownStatus() {
+    if (isLeftBarShownStatus==0)
+        return;
+
+    if (isLeftBarShownStatus==1 && mainWindow)
+        mainWindow->updateLeftBar(false);
+
+    if (isLeftBarShownStatus==2 && mainWindow)
+        mainWindow->updateLeftBar(true);
+
+    isLeftBarShownStatus = 0;
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

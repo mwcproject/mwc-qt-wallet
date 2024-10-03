@@ -20,6 +20,7 @@
 #include "../util_desktop/timeoutlock.h"
 #include "../util/filedialog.h"
 #include "../control_desktop/messagebox.h"
+#include "../util_desktop/widgetutils.h"
 
 namespace wnd {
 
@@ -31,6 +32,8 @@ ValidateOwnershipProofInput::ValidateOwnershipProofInput(QWidget *parent) :
     wallet = new bridge::Wallet(this);
     viewAcounts = new bridge::ViewOutputs(this);
     util = new bridge::Util(this);
+
+    utils::defineDefaultButtonSlot(this, SLOT(on_validate_clicked()) );
 
     updateButtons();
 }

@@ -17,6 +17,7 @@
 #include "../bridge/wnd/v_viewoutputs_b.h"
 #include "../bridge/wallet_b.h"
 #include "../control_desktop/messagebox.h"
+#include "../util_desktop/widgetutils.h"
 
 namespace wnd {
 
@@ -31,6 +32,8 @@ ValidateOwnershipProofResult::ValidateOwnershipProofResult(QWidget *parent) :
 
     QObject::connect(wallet, &bridge::Wallet::sgnValidateOwnershipProof,
                              this, &ValidateOwnershipProofResult::sgnValidateOwnershipProof, Qt::QueuedConnection);
+
+    utils::defineDefaultButtonSlot(this, SLOT(on_back_clicked()) );
 }
 
 ValidateOwnershipProofResult::~ValidateOwnershipProofResult() {

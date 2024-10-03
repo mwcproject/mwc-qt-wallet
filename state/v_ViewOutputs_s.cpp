@@ -49,6 +49,7 @@ NextStateRespond ViewOutputs::execute() {
     }
 
     core::getWndManager()->pageViewHash();
+    helpDocName = "viewing_key_start.html";
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
@@ -59,6 +60,7 @@ bool ViewOutputs::canExitState(STATE nextWindowState) {
 
 void ViewOutputs::exitingState() {
     context->stateMachine->unblockLogout("ViewOutputs");
+    helpDocName = "viewing_key_start.html";
 }
 
 // Return true if processing was made, so the sate still need to be active.
@@ -101,7 +103,7 @@ void ViewOutputs::onScanRewindHash(QVector< wallet::WalletOutput > outputResult,
     if ( context->appContext->getActiveWndState() == STATE::VIEW_ACCOUNTS ) {
         if (errors.isEmpty()) {
             core::getWndManager()->pageViewAccounts();
-
+            helpDocName = "viewing_key_outputs.html";
             for (auto b: bridge::getBridgeManager()->getViewAccounts()) {
                 b->setSgnViewOutputs(outputResult, total);
             }
@@ -115,6 +117,8 @@ void ViewOutputs::onScanRewindHash(QVector< wallet::WalletOutput > outputResult,
 
 void ViewOutputs::startScanning(QString hashKey) {
     context->stateMachine->blockLogout("ViewOutputs");
+    helpDocName = "viewing_key_outputs.html";
+
     core::getWndManager()->pageProgressWnd(mwc::PAGE_V_VIEW_SCANNING, VIEW_ACCOUNTS_CALLER_ID,
                                            "Scanning blockchain with Viewing Key", "Reading outputs from the node...", "", false);
     inScanProcess = true;
@@ -123,26 +127,32 @@ void ViewOutputs::startScanning(QString hashKey) {
 
 void ViewOutputs::backFromOutputsView() {
     core::getWndManager()->pageViewHash();
+    helpDocName = "viewing_key_start.html";
 }
 
 void ViewOutputs::back() {
     core::getWndManager()->pageViewHash();
+    helpDocName = "viewing_key_start.html";
 }
 
 void ViewOutputs::generateOwnershipProofStart() {
+    helpDocName = "viewing_key_gen_in.html";
     core::getWndManager()->pageGenerateOwnershipInput();
 }
 
 void ViewOutputs::generate_proof(QString message, bool viewingKey, bool torAddress, bool mqsAddress) {
+    helpDocName = "viewing_key_gen_res.html";
     core::getWndManager()->pageGenerateOwnershipResult();
     context->wallet->generateOwnershipProof(message, viewingKey, torAddress, mqsAddress);
 }
 
 void ViewOutputs::validateOwnershipProofStart() {
+    helpDocName = "viewing_key_val.html";
     core::getWndManager()->pageValidateOwnershipInput();
 }
 
 void ViewOutputs::validate_proof(QString proof) {
+    helpDocName = "viewing_key_val.html";
     core::getWndManager()->pageValidateOwnershipResult();
     context->wallet->validateOwnershipProof(proof);
 }

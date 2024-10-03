@@ -110,7 +110,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>View Accounts</string>
+    <string>Viewing Key</string>
    </property>
   </widget>
   <widget class="control::MwcFrameWithBorder" name="frame_5">

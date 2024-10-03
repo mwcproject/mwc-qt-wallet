@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="3,0,2">
    <item>
     <spacer name="verticalSpacer_2">
      <property name="orientation">
@@ -65,14 +65,14 @@
        <widget class="control::MwcLabelNormal" name="mwcMQlable_2">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>200</x>
           <y>320</y>
-          <width>311</width>
+          <width>261</width>
           <height>31</height>
          </rect>
         </property>
         <property name="text">
-         <string>Scan blockchain with Viewing Key:</string>
+         <string>Scan blockchain with Viewing Key</string>
         </property>
        </widget>
        <widget class="control::MwcLineEditNormal" name="walletViewingKey">
@@ -125,8 +125,8 @@
          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:138%;&quot;&gt;A viewing key allows others to scan the blockchain and view your wallet's outputs.  Sharing this key makes your MWC wallet’s transactions visible,  compromising the privacy of your funds.&lt;br /&gt;&lt;b&gt;Be cautious when sharing your viewing key - once it’s shared,  your wallet loses its privacy, and all your transactions become transparent to anyone with the key.&lt;/b&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot;line-height:138%;&quot;&gt;
+&lt;p&gt;A viewing key allows others to scan the blockchain and view your wallet's outputs.  Sharing this key makes your MWC wallet’s transactions visible,  compromising the privacy of your funds.&lt;br /&gt;&lt;b&gt;Be cautious when sharing your viewing key - once it’s shared,  your wallet loses its privacy, and all your transactions become transparent to anyone with the key.&lt;/b&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -307,7 +307,7 @@ p, li { white-space: pre-wrap; }
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Start skanning for outputs based on viewing key</string>
+         <string>Generate ownership proof for this wallet Viewing Key, Tor and MWCMQS addresses</string>
         </property>
         <property name="text">
          <string>Generate ownership proof</string>
@@ -341,7 +341,7 @@ p, li { white-space: pre-wrap; }
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Start skanning for outputs based on viewing key</string>
+         <string>View and validate other wallets ownership proof</string>
         </property>
         <property name="text">
          <string>View ownership proof</string>
@@ -386,11 +386,6 @@ p, li { white-space: pre-wrap; }
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control_desktop/MwcLineEdit.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
@@ -402,16 +397,23 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>walletViewingKey</tabstop>
   <tabstop>showWalletKeyButton</tabstop>
+  <tabstop>generateOwnershipProof</tabstop>
+  <tabstop>viewOwnershipProof</tabstop>
   <tabstop>viewingKey</tabstop>
   <tabstop>startScanning</tabstop>
+  <tabstop>walletViewingKey</tabstop>
  </tabstops>
  <resources/>
  <connections/>

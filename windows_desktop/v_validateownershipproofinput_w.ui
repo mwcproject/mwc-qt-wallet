@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,1">
    <item>
     <spacer name="verticalSpacer_3">
      <property name="orientation">
@@ -29,6 +29,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="topMargin">
+      <number>40</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -243,6 +246,12 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>proof_text</tabstop>
+  <tabstop>back</tabstop>
+  <tabstop>load_from_file</tabstop>
+  <tabstop>validate</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

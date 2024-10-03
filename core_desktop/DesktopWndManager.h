@@ -121,10 +121,13 @@ public:
     virtual void pageGenerateOwnershipResult() override;
     virtual void pageValidateOwnershipInput() override;
     virtual void pageValidateOwnershipResult() override;
-
+private:
+    void restoreLeftBarShownStatus();
 private:
     WindowManager * windowManager = nullptr;
     MainWindow    * mainWindow = nullptr;
+
+    int isLeftBarShownStatus = 0;
 };
 
 // Select a directory that has a wallet data. Returns a 'wallet dir' as Intance manager expect it

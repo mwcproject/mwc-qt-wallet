@@ -23,8 +23,7 @@ public:
     ~SeedLength();
 
 private slots:
-    void on_continueButton_pressed();
-
+    void on_continueButton_clicked();
 private:
     Ui::SeedLength *ui;
     bridge::InitAccount * initAccount = nullptr;

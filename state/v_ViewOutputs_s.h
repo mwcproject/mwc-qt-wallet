@@ -57,7 +57,7 @@ protected:
     virtual void exitingState() override;
     virtual bool mobileBack() override;
 
-    virtual QString getHelpDocName() override {return "view_accounts.html";}
+    virtual QString getHelpDocName() override {return helpDocName;}
 private slots:
     void onRecoverProgress( int progress, int maxVal );
     void onScanRewindHash( QVector< wallet::WalletOutput > outputResult, int64_t total, QString errors );
@@ -71,6 +71,8 @@ private:
     bool inScanProcess = false;
 
     QString lastViewedViewingKey;
+
+    QString helpDocName = "viewing_key_start.html";
 };
 
 } // state

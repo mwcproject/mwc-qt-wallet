@@ -16,6 +16,7 @@
 #include "ui_v_generateownershipproofinput_w.h"
 #include "../bridge/wnd/v_viewoutputs_b.h"
 #include "../bridge/wallet_b.h"
+#include "../util_desktop/widgetutils.h"
 
 namespace wnd {
 
@@ -25,6 +26,7 @@ GenerateOwnershipProofInput::GenerateOwnershipProofInput(QWidget *parent) :
     ui->setupUi(this);
 
     viewAcounts = new bridge::ViewOutputs(this);
+    utils::defineDefaultButtonSlot(this, SLOT(on_generate_clicked()) );
 
     updateGenerateBtn();
 }
@@ -46,7 +48,10 @@ void GenerateOwnershipProofInput::on_generate_clicked()
     bool isViewingKey = ui->select_viewing_key->isChecked();
     bool isTorAddress = ui->select_tor->isChecked();
     bool isMqsAddress = ui->select_mqs->isChecked();
-    viewAcounts->generate_proof(message, isViewingKey, isTorAddress, isMqsAddress);
+
+    if (!message.isEmpty() && (isViewingKey || isTorAddress || isMqsAddress)) {
+        viewAcounts->generate_proof(message, isViewingKey, isTorAddress, isMqsAddress);
+    }
 }
 
 
