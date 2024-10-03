@@ -152,6 +152,9 @@ public:
     // Check Signal sgnFinalizeSlatepack
     Q_INVOKABLE void finalizeSlatepack( QString slatepack, bool fluff, QString tag );
 
+    // Request Vieing Key (rewind_hash)
+    // Check Signal: sgnGetViewingKey
+    Q_INVOKABLE void getViewingKey();
 signals:
     // Wallet notification about what is the command that is starting.
     // Note, on idle it sends "empty" String. Not all commands sending an update
@@ -221,6 +224,16 @@ signals:
 
     // response to FinalizeSlatepack
     void sgnFinalizeSlatepack( QString tagId, QString error, QString txUuid );
+
+    // response to getViewingKey
+    void sgnGetViewingKey(QString viewingKey, QString error);
+
+    // response from generateOwnershipProof
+    void sgnGenerateOwnershipProof(QString proof, QString error);
+
+    // response from validateOwnershipProof
+    void sgnValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error);
+
 private slots:
     void onStartingCommand(QString actionName);
 
@@ -260,6 +273,13 @@ private slots:
     void onDecodeSlatepack( QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient );
 
     void onFinalizeSlatepack( QString tagId, QString error, QString txUuid );
+
+    void onViewRewindHash(QString rewindHash, QString error);
+
+    void onGenerateOwnershipProof(QString proof, QString error);
+
+    void onValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error);
+
 private:
 #ifdef WALLET_MOBILE
     QString proofResultURI;

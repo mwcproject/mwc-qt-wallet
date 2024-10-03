@@ -212,6 +212,11 @@ bool Util::writeTextFile(QString fileName, QStringList lines ) {
     return util::writeTextFile(fileName, lines);
 }
 
+QStringList Util::readTextFile(QString fileName) {
+    return util::readTextFile(fileName, true, true, [](){});
+}
+
+
 // Extract PubKey from address
 QString Util::extractPubKeyFromAddress(QString address) {
     return util::extractPubKeyFromAddress(address);

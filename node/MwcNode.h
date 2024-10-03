@@ -64,6 +64,8 @@ struct NodeStatus {
     int64_t updateTime  = 0;
 };
 
+enum class SYNC_STATE {GETTING_HEADERS, TXHASHSET_REQUEST, TXHASHSET_IN_PROGRESS, TXHASHSET_GET, GETTING_PIBD, VERIFY_RANGEPROOFS_FOR_TXHASHSET, VERIFY_KERNEL_SIGNATURES, GETTING_BLOCKS };
+
 // mwc-node lifecycle management
 class MwcNode : public QObject {
 Q_OBJECT
@@ -104,6 +106,8 @@ private:
     bool isFinalRun() {return restartCounter>2;}
 private:
     virtual void timerEvent(QTimerEvent *event) override;
+
+    QString calcProgressStr( int initChainHeight , bool syncedBeforeHorizon, int peersMaxHeight, SYNC_STATE syncState, int value );
 
 private: signals:
     void onMwcOutputLine(QString line);
@@ -166,8 +170,9 @@ private:
     QString lastDataPath;
     bool lastTor = false;
 
-    int64_t nodeStartTime = 0;
     QString commandLine;
+
+    double lastProgressRes = -100.0;
 };
 
 }

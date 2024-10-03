@@ -499,6 +499,7 @@ void MainWindow::updateMenu() {
     ui->actionAccounts->setEnabled(canSwitchState && !isOnlineNode);
     ui->actionContacts->setEnabled(canSwitchState && !isOnlineNode);
     ui->actionShow_passphrase->setEnabled(canSwitchState && !isOnlineNode);
+    ui->actionViewing_Key->setEnabled(canSwitchState && !isOnlineNode);
     ui->actionEvent_log->setEnabled(canSwitchState);
     ui->actionLogout->setEnabled(canSwitchState && !isOnlineNode);
     ui->actionConfig->setEnabled(canSwitchState);
@@ -633,6 +634,11 @@ void MainWindow::on_actionShow_passphrase_triggered()
 
     // passwordHash should contain raw password value form the messgage box
     stateMachine->activateShowSeed( passwordHash );
+}
+
+void MainWindow::on_actionViewing_Key_triggered()
+{
+    stateMachine->setActionWindow( state::STATE::VIEW_ACCOUNTS );
 }
 
 void MainWindow::on_actionEvent_log_triggered()

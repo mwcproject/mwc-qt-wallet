@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include "x_Resync.h"
-#include "../core/appcontext.h"
 #include "../state/statemachine.h"
 #include "../core/global.h"
 #include "../core/WndManager.h"

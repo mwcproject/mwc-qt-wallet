@@ -62,6 +62,7 @@ public:
     virtual void pageInitFirstTime() override;
     virtual void pageInputPassword(QString pageTitle, bool lockMode) override;
     virtual void pageInitAccount(QString path, bool restoredFromSeed) override;
+    virtual void pageSeedLength() override;
     virtual void pageEnterSeed() override;
     virtual void pageNewSeed(QString pageTitle, QVector<QString> seed, bool hideSubmitButton = false) override;
     virtual void pageNewSeedTest(int wordIndex) override;
@@ -112,9 +113,21 @@ public:
     virtual void pageNewUpdateOffer(QString myMsgId) override;
     virtual void showSwapBackupDlg() override;
     virtual void pageTransactionFee() override;
+
+    // Show Keys view pages
+    virtual void pageViewHash()  override;
+    virtual void pageViewAccounts() override;
+    virtual void pageGenerateOwnershipInput() override;
+    virtual void pageGenerateOwnershipResult() override;
+    virtual void pageValidateOwnershipInput() override;
+    virtual void pageValidateOwnershipResult() override;
+private:
+    void restoreLeftBarShownStatus();
 private:
     WindowManager * windowManager = nullptr;
     MainWindow    * mainWindow = nullptr;
+
+    int isLeftBarShownStatus = 0;
 };
 
 // Select a directory that has a wallet data. Returns a 'wallet dir' as Intance manager expect it

@@ -222,8 +222,6 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
     params.push_back("--allow_to_stop");
     params.push_back("run");
 
-    nodeStartTime = QDateTime::currentMSecsSinceEpoch();
-
     commandLine = nodeExecutablePath;
     for (auto & p : params) {
         commandLine += " '" + p + "'";
@@ -415,9 +413,8 @@ void MwcNode::mwcNodeReadyReadStandardOutput() {
     }
 }
 
-enum class SYNC_STATE {GETTING_HEADERS, TXHASHSET_REQUEST, TXHASHSET_IN_PROGRESS, TXHASHSET_GET, GETTING_PIBD, VERIFY_RANGEPROOFS_FOR_TXHASHSET, VERIFY_KERNEL_SIGNATURES, GETTING_BLOCKS };
 // return progress in the range [0-1.0]
-static QString calcProgressStr( int initChainHeight , bool syncedBeforeHorizon, int peersMaxHeight, SYNC_STATE syncState, int value ) {
+QString MwcNode::calcProgressStr( int initChainHeight , bool syncedBeforeHorizon, int peersMaxHeight, SYNC_STATE syncState, int value ) {
     // timing:
     // Headers: 11:00
     // range proofs download & anpack: 0:34
@@ -483,6 +480,12 @@ static QString calcProgressStr( int initChainHeight , bool syncedBeforeHorizon, 
     if (progressRes>1.0)
         progressRes = 1.0;
 
+    // During some processes like block dounloads, the progress can jutter becasue of the nature of Node sync process.
+    // We better to compensate it at this step.
+    if (progressRes<lastProgressRes && lastProgressRes-progressRes<0.005) {
+        progressRes = lastProgressRes;
+    }
+    lastProgressRes = progressRes;
 
     return "Syncing " + QString::number( progressRes * 100.0, 'f', 1 ) + "%";
 }

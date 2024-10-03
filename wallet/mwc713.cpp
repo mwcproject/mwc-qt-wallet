@@ -33,6 +33,8 @@
 #include "tasks/TaskTransaction.h"
 #include "tasks/TaskSwap.h"
 #include "tasks/TaskSwapMkt.h"
+#include "tasks/TaskRewindHash.h"
+#include "tasks/TasksOwnership.h"
 #include "../util/Log.h"
 #include "../core/appcontext.h"
 #include "../util/ConfigReader.h"
@@ -287,7 +289,7 @@ void MWC713::start() {
 
 // start to init. Expected that we will exit pretty quckly
 // Check signal: onNewSeed( seed [] )
-void MWC713::start2init(QString password) {
+void MWC713::start2init(QString password, int seedLength) {
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
     Q_ASSERT(inputParser == nullptr);
@@ -302,7 +304,7 @@ void MWC713::start2init(QString password) {
 
     // Creating process and starting
 
-    mwc713process = initMwc713process({"TOR_EXE_NAME", config::getTorPath(), "MWC_PASSWORD", password}, {"init"});
+    mwc713process = initMwc713process({"TOR_EXE_NAME", config::getTorPath(), "MWC_PASSWORD", password}, {"init", "--seed_length", QString::number(seedLength)});
     if (mwc713process == nullptr)
         return;
 
@@ -528,11 +530,11 @@ void MWC713::listeningStart(bool startMq, bool startTor, bool initialStart) {
 
     if (startMq)
         eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
-                                {TSK(new TaskListeningStart(this, startMq, false, initialStart),
+                                {TSK(new TaskListeningStart(this, startMq, false, initialStart, "", ""),
                                      TaskListeningStart::TIMEOUT)});
     if (startTor)
         eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
-                                {TSK(new TaskListeningStart(this, false, startTor, initialStart),
+                                {TSK(new TaskListeningStart(this, false, startTor, initialStart, appContext->getTorBridgeLine(), appContext->getTorClientOption() ),
                                      TaskListeningStart::TIMEOUT)});
 
     if (startMq)
@@ -762,6 +764,19 @@ void MWC713::sendTo(const QString &account, int64_t coinNano, const QString &add
     eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, taskGroup);
 }
 
+// Self seld for accounts transfres
+// Check signal:  onSend
+void MWC713::selfSend( const QString &accountFrom, const QString &accountTo, int64_t coinNano, const QStringList & outputs, bool fluff ) {
+    QVector<QPair<Mwc713Task *, int64_t>> taskGroup{
+            TSK(new TaskAccountSwitch(this, accountFrom), TaskAccountSwitch::TIMEOUT),
+            TSK(new TaskSelfSendMwc( this, accountTo, coinNano, outputs,fluff ), TaskSelfSendMwc::TIMEOUT)
+    };
+    if (accountFrom != currentAccount)
+        taskGroup.push_back(TSK(new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT));
+
+    eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, taskGroup);
+}
+
 
 // Init send transaction with file output
 // Check signal:  onSendFile
@@ -818,14 +833,29 @@ void MWC713::finalizeFile(QString fileTxResponse, bool fluff) {
 #endif
 
     if (!util::validateMwc713Str(fileTxResponse, false).first) {
-        setFinalizeFile(false, QStringList{"Unable to process file with name '" + fileTxResponse +
+        setFinalizeFile(false, false, QStringList{"Unable to process file with name '" + fileTxResponse +
                                            "' because it has non ASCII (Latin1) symbols. Please use different file path with basic symbols only."},
-                        fileTxResponse);
+                        fileTxResponse, AccountsInfo(), fileTxResponse,  fluff);
         return;
     }
 
-    eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
-                            {TSK(new TaskFinalizeFile(this, fileTxResponse, fluff), TaskFinalizeFile::TIMEOUT)});
+    AccountsInfo accInfo("", currentAccount, accountInfoNoLocks);
+
+    if (accInfo.accounts.size()<2) {
+        // for single account - there is no problems
+        eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
+                                {TSK(new TaskFinalizeFile(this, fileTxResponse, fluff, accInfo), TaskFinalizeFile::TIMEOUT)});
+    }
+    else {
+        QString account = accInfo.accounts.last();
+        accInfo.accounts.pop_back();
+
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup {
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskFinalizeFile(this, fileTxResponse, fluff, accInfo), TaskFinalizeFile::TIMEOUT)
+        };
+        eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, taskGroup);
+    }
 }
 
 // submit finalized transaction. Make sense for cold storage => online node operation
@@ -872,8 +902,23 @@ void MWC713::receiveSlatepack(QString slatepack, QString description, QString ta
 // finalize transaction and broadcast it
 // Check signal:  onFinalizeSlatepack
 void MWC713::finalizeSlatepack(QString slatepack, bool fluff, QString tag) {
-    eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, {TSK(new TaskFinalizeSlatepack(this, slatepack, fluff, tag),
-                                                             TaskFinalizeSlatepack::TIMEOUT)});
+    AccountsInfo accInfo(tag, currentAccount, accountInfoNoLocks);
+
+    if (accInfo.accounts.size()<2) {
+        // for single account - there is no problems
+        eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, {TSK(new TaskFinalizeSlatepack(this, slatepack, fluff,accInfo),
+                                                                 TaskFinalizeSlatepack::TIMEOUT)});
+    }
+    else {
+        QString account = accInfo.accounts.last();
+        accInfo.accounts.pop_back();
+
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup {
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskFinalizeSlatepack(this, slatepack, fluff,accInfo), TaskFinalizeSlatepack::TIMEOUT)
+        };
+        eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, taskGroup);
+    }
 }
 
 // Show outputs for the wallet
@@ -904,14 +949,35 @@ void MWC713::getTransactions(QString account, bool enforceSync) {
 // get Extended info for specific transaction
 // Check Signal: onTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages )
 void MWC713::getTransactionById(QString account, QString txIdxOrUUID) {
-    QVector<QPair<Mwc713Task *, int64_t>> taskGroup{
-            TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
-            TSK(new TaskTransactionsById(this, txIdxOrUUID), TaskTransactions::TIMEOUT)
-    };
-    if (account != currentAccount)
-        taskGroup.push_back(TSK(new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT));
+    // account can be empty, it is mean that we need to do search in all accounts for Send transaciton
 
-    eventCollector->addTask(TASK_PRIORITY::TASK_NOW, taskGroup);
+    AccountsInfo accInfo("", currentAccount, accountInfoNoLocks);
+    if (account.isEmpty() && accInfo.accounts.size()<2)
+        account = currentAccount;
+
+    if (!account.isEmpty()) {
+        // Normal usage, acount is known for sure
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup{
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskTransactionsById(this, txIdxOrUUID, false, AccountsInfo()), TaskTransactions::TIMEOUT)
+        };
+        if (account != currentAccount)
+            taskGroup.push_back(TSK(new TaskAccountSwitch(this, currentAccount), TaskAccountSwitch::TIMEOUT));
+
+        eventCollector->addTask(TASK_PRIORITY::TASK_NOW, taskGroup);
+    }
+    else {
+        // need to search
+        QString account = accInfo.accounts.last();
+        accInfo.accounts.pop_back();
+
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup {
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskTransactionsById(this, txIdxOrUUID, true, accInfo), TaskTransactions::TIMEOUT)
+        };
+        eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL, taskGroup);
+
+    }
 }
 
 // Get root public key with signed message. Message is optional, can be empty
@@ -1282,6 +1348,36 @@ void MWC713::sendMarketplaceMessage(QString command, QString wallet_tor_address,
                                  TasksSendMarketplaceMessage::TIMEOUT)});
 }
 
+// Request rewind hash
+// Check Signal: ??
+void MWC713::viewRewindHash() {
+    eventCollector->addTask(TASK_PRIORITY::TASK_NOW,
+                            {TSK(new TasksViewRewindHash(this),
+                                 TasksViewRewindHash::TIMEOUT)});
+}
+
+// Scan with revind hash. That will generate bunch or messages similar to scan
+void MWC713::scanRewindHash( const QString & rewindHash ) {
+    eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
+                            {TSK(new TasksScanRewindHash(this, rewindHash),
+                                 TasksScanRewindHash::TIMEOUT)});
+}
+
+// Generate ownership proof
+void MWC713::generateOwnershipProof(const QString & message, bool includePublicRootKey, bool includeTorAddress, bool includeMqsAddress ) {
+    eventCollector->addTask(TASK_PRIORITY::TASK_NOW,
+                            {TSK(new TasksGenerateOwnership(this, message, includePublicRootKey, includeTorAddress, includeMqsAddress),
+                                 TasksGenerateOwnership::TIMEOUT)});
+}
+
+// Validate ownership proof
+void MWC713::validateOwnershipProof(const QString & proof) {
+    eventCollector->addTask(TASK_PRIORITY::TASK_NOW,
+                            {TSK(new TasksValidateOwnership(this, proof),
+                                 TasksGenerateOwnership::TIMEOUT)});
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1397,7 +1493,7 @@ void MWC713::setListeningStopResult(bool mqTry, bool torTry, // what we try to s
         restartingTor = false;
         torOfflineCounter = 0;
         eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
-                                {TSK(new TaskListeningStart(this, false, true, false), TaskListeningStart::TIMEOUT)});
+                                {TSK(new TaskListeningStart(this, false, true, false, appContext->getTorBridgeLine(), appContext->getTorClientOption()), TaskListeningStart::TIMEOUT)});
     }
 }
 
@@ -1673,13 +1769,39 @@ void MWC713::setReceiveFile(bool success, QStringList errors, QString inFileName
     emit onReceiveFile(success, errors, inFileName, outFn);
 }
 
-void MWC713::setFinalizeFile(bool success, QStringList errors, QString fileName) {
-    if (success) {
-        notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO, QString("File finalized for " + fileName));
-    }
+void MWC713::setFinalizeFile(bool success, bool txNotFoundError, QStringList errors, QString fileName, const AccountsInfo & accInfo, QString fileTxResponse, bool fluff) {
 
-    logger::logEmit("MWC713", "onFinalizeFile", "success=" + QString::number(success));
-    emit onFinalizeFile(success, errors, fileName);
+    if (!txNotFoundError) {
+        if (success) {
+            notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO, QString("File finalized for " + fileName));
+        }
+
+        if (!accInfo.activeAccount.isEmpty()) {
+            eventCollector->addTask(TASK_PRIORITY::TASK_NOW,
+                                    {TSK(new TaskAccountSwitch(this, accInfo.activeAccount),
+                                         TaskAccountSwitch::TIMEOUT)});
+        }
+
+        logger::logEmit("MWC713", "onFinalizeFile", "success=" + QString::number(success));
+        emit onFinalizeFile(success, errors, fileName);
+    }
+    else {
+        // retry for another account
+        Q_ASSERT(accInfo.accounts.size()>0);
+        Q_ASSERT(!success);
+        // retry with another account...
+
+        AccountsInfo nextAccInfo(accInfo);
+
+        QString account = nextAccInfo.accounts.last();
+        nextAccInfo.accounts.pop_back();
+
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup {
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskFinalizeFile(this, fileTxResponse, fluff, accInfo), TaskFinalizeFile::TIMEOUT)
+        };
+        eventCollector->addTask(TASK_PRIORITY::TASK_NOW, taskGroup);
+    }
 }
 
 void MWC713::setSubmitFile(bool success, QString message, QString fileName) {
@@ -1703,9 +1825,37 @@ void MWC713::setReceiveSlatepack(QString error, QString slatepack, QString tag) 
     emit onReceiveSlatepack(tag, error, slatepack);
 }
 
-void MWC713::setFinalizedSlatepack(QString error, QString txUuid, QString tag) {
-    logger::logEmit("MWC713", "setFinalizedSlatepack", +" tag=" + tag + " error=" + error + " txUuid: " + txUuid);
-    emit onFinalizeSlatepack(tag, error, txUuid);
+void MWC713::setFinalizedSlatepack(bool txNotFoundError, QString error, QString txUuid, const AccountsInfo & accInfo, QString slatepack, bool fluff ) {
+    if (!txNotFoundError) {
+        // We are done
+        if (!accInfo.activeAccount.isEmpty()) {
+            eventCollector->addTask(TASK_PRIORITY::TASK_NOW,
+                                    {TSK(new TaskAccountSwitch(this, accInfo.activeAccount),
+                                         TaskAccountSwitch::TIMEOUT)});
+        }
+
+        logger::logEmit("MWC713", "setFinalizedSlatepack", +" tag=" + accInfo.tag + " error=" + error + " txUuid: " + txUuid);
+        emit onFinalizeSlatepack(accInfo.tag, error, txUuid);
+    }
+    else {
+        Q_ASSERT(accInfo.accounts.size()>0);
+        Q_ASSERT(!error.isEmpty());
+        // retry with another account...
+
+        AccountsInfo nextAccInfo(accInfo);
+
+        QString account = nextAccInfo.accounts.last();
+        nextAccInfo.accounts.pop_back();
+
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup {
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskFinalizeSlatepack(this, slatepack, fluff, nextAccInfo), TaskFinalizeSlatepack::TIMEOUT)
+        };
+        eventCollector->addTask(TASK_PRIORITY::TASK_NOW, taskGroup);
+    }
+
+
+
 }
 
 void MWC713::setTransactions(QString account, int64_t height, QVector<WalletTransaction> Transactions) {
@@ -1714,11 +1864,41 @@ void MWC713::setTransactions(QString account, int64_t height, QVector<WalletTran
 }
 
 void MWC713::setTransactionById(bool success, QString account, int64_t height, WalletTransaction transaction,
-                                QVector<WalletOutput> outputs, QVector<QString> messages) {
-    logger::logEmit("MWC713", "onTransactionById",
-                    QString("success=") + (success ? "true" : "false") + " transaction=" + transaction.toStringShort() +
-                    " outputs: " + QString::number(outputs.size()) + " messages: " + QString::number(messages.size()));
-    emit onTransactionById(success, account, height, transaction, outputs, messages);
+                                QVector<WalletOutput> outputs, QVector<QString> messages,
+                                const QString & txIdxOrUUID, bool sendOnly, const AccountsInfo & accInfo ) {
+
+    if (sendOnly && transaction.transactionType!= WalletTransaction::TRANSACTION_TYPE::SEND )
+        success=false;
+
+    if (success || accInfo.accounts.isEmpty()) {
+        if (!accInfo.activeAccount.isEmpty()) {
+            eventCollector->addTask(TASK_PRIORITY::TASK_NOW,
+                                    {TSK(new TaskAccountSwitch(this, accInfo.activeAccount),
+                                         TaskAccountSwitch::TIMEOUT)});
+        }
+
+        logger::logEmit("MWC713", "onTransactionById",
+                        QString("success=") + (success ? "true" : "false") + " transaction=" +
+                        transaction.toStringShort() +
+                        " outputs: " + QString::number(outputs.size()) + " messages: " +
+                        QString::number(messages.size()));
+        emit onTransactionById(success, account, height, transaction, outputs, messages);
+    }
+    else {
+        Q_ASSERT(accInfo.accounts.size()>0);
+        Q_ASSERT(!success);
+
+        AccountsInfo nextAccInfo(accInfo);
+
+        QString account = nextAccInfo.accounts.last();
+        nextAccInfo.accounts.pop_back();
+
+        QVector<QPair<Mwc713Task *, int64_t>> taskGroup {
+                TSK(new TaskAccountSwitch(this, account), TaskAccountSwitch::TIMEOUT),
+                TSK(new TaskTransactionsById(this, txIdxOrUUID, true, nextAccInfo), TaskTransactions::TIMEOUT)
+        };
+        eventCollector->addTask(TASK_PRIORITY::TASK_NOW, taskGroup);
+    }
 }
 
 
@@ -1818,7 +1998,7 @@ void MWC713::restartMQsListener() {
     if (mwcMqStartRequested && !mwcMqStarted) {
         qDebug() << "Try to restart MQs Listener after failure";
         eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
-                                {TSK(new TaskListeningStart(this, true, false, false), TaskListeningStart::TIMEOUT)});
+                                {TSK(new TaskListeningStart(this, true, false, false, "",""), TaskListeningStart::TIMEOUT)});
     }
 }
 
@@ -2488,7 +2668,7 @@ void MWC713::setWalletOutputs(const QString &account, const QVector<wallet::Wall
 void MWC713::timerEvent(QTimerEvent *event) {
     Q_UNUSED(event)
     if (isWalletRunningAndLoggedIn()) {
-        if (torStarted) {
+        if (torStarted && torOnline) {
             // Checking tor connection
             eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
                                     {TSK(new TaskCheckTorConnection(this), TaskCheckTorConnection::TIMEOUT)});
@@ -2517,5 +2697,22 @@ void MWC713::setTorConnectionStatus(bool online) {
         }
     }
 }
+
+void MWC713::setViewRewindHash( QString rewindHash, QString error ) {
+    emit onViewRewindHash(rewindHash, error);
+}
+
+void MWC713::setScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors ) {
+    emit onScanRewindHash( outputResult, total, errors );
+}
+
+void MWC713::setGenerateOwnershipProof(QString proof, QString error) {
+    emit onGenerateOwnershipProof(proof, error);
+}
+
+void MWC713::setValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error) {
+    emit onValidateOwnershipProof(network, message, viewingKey, torAddress, mqsAddress, error);
+}
+
 
 }

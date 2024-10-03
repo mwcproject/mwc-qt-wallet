@@ -21,6 +21,15 @@
 
 namespace wallet {
 
+// ------------------- AccountsInfo --------------------------
+
+AccountsInfo::AccountsInfo(QString _tag, QString _activeAccount, const QVector<AccountInfo> & accountInfo) :
+    tag(_tag), activeAccount(_activeAccount)
+{
+    for (const auto & a : accountInfo)
+        accounts.push_back(a.accountName);
+}
+
 // ---------------- TaskSlatesListener -----------------------
 
 bool TaskSlatesListener::processTask(const QVector<WEvent> & events) {
@@ -188,6 +197,84 @@ QString TaskSendMwc::buildCommand( int64_t coinNano, const QString & address, co
     return cmd;
 }
 
+// ------------------------ TaskSelfSendMwc --------------------------------
+
+bool TaskSelfSendMwc::processTask(const QVector<WEvent> &events) {
+
+    // slate [b9c559a8-e134-4af4-a77a-a2118ed74a90] received from [http listener] for [0.012345000] MWCs.
+
+    QString slate;
+    QString mwc;
+
+    {
+        QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
+        // Parsing for txId  - index of transaction that was created
+        for (auto &ln : lns) {
+
+            if (ln.message.startsWith("slate") && ln.message.contains("received from") ) {
+                int idx1 = ln.message.indexOf('[');
+                int idx2 = ln.message.indexOf(']', idx1+1);
+                if (idx1>0 && idx2>0)
+                    slate = ln.message.mid(idx1+1, idx2-idx1-1);
+
+                idx1 = ln.message.indexOf("for [");
+                idx2 = ln.message.indexOf(']', idx1+1);
+                if (idx1>0 && idx2>0) {
+                    idx1 += int(strlen("for ["));
+                    mwc = ln.message.mid(idx1, idx2 - idx1);
+                    mwc = util::zeroDbl2Dbl(mwc);
+                }
+            }
+        }
+    }
+
+    if ( !slate.isEmpty() && !mwc.isEmpty() ) {
+        wallet713->setSendResults(true, QStringList(), "", -1, slate, mwc);
+        return true;
+    }
+
+    QStringList errMsgs;
+    QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
+
+    for (WEvent & evt : errs) {
+        errMsgs.push_back(evt.message);
+    }
+
+    if (errMsgs.isEmpty())
+        errMsgs.push_back("Not found expected output from mwc713");
+
+    wallet713->setSendResults( false, errMsgs, "", -1, "", "" );
+    return true;
+}
+
+QString TaskSelfSendMwc::buildCommand(const QString & accountTo, int64_t coinNano, const QStringList & outputs, bool fluff) const {
+
+    QString cmd = "send --self ";// + util::nano2one(coinNano);
+    if (coinNano>0)
+        cmd += util::nano2one(coinNano);
+
+    if (!outputs.isEmpty()) {
+        cmd += " --confirmations 1 --strategy custom --outputs " + outputs.join(",");
+    }
+    else {
+        cmd += " --confirmations 1";
+    }
+
+    // So far documentation doesn't specify difference between protocols
+    cmd += " --to " + util::toMwc713input(accountTo);
+
+    if (fluff) {
+        cmd += " --fluff";
+    }
+
+    if (coinNano<0)
+        cmd += " ALL";
+
+    qDebug() << "sendCommand: '" << cmd << "'";
+
+    return cmd;
+}
+
 // ----------------------- TaskSendFile --------------------------
 
 QString TaskSendFile::buildCommand( int64_t coinNano, QString message, QString fileTx, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, int ttl_blocks, bool generateProof) const {
@@ -324,7 +411,7 @@ bool TaskFinalizeFile::processTask(const QVector<WEvent> &events) {
         int idx = ln.message.indexOf(" finalized ");
         if (idx>0) {
             QString fileName = ln.message.left(idx).trimmed();
-            wallet713->setFinalizeFile(true, QStringList(), fileName );
+            wallet713->setFinalizeFile(true, false, QStringList(), fileName, accounts, fileTxResponse, fluff );
             return true;
         }
     }
@@ -332,6 +419,9 @@ bool TaskFinalizeFile::processTask(const QVector<WEvent> &events) {
     QVector< WEvent > apiErrs = filterEvents(events, WALLET_EVENTS::S_NODE_API_ERROR);
     QVector< WEvent > errs = filterEvents(events, WALLET_EVENTS::S_GENERIC_ERROR );
     QStringList errMsg;
+
+    bool transactionNotFound = false;
+
     // We prefer API messages from the node. Wallet doesn't provide details
     for (auto & er:apiErrs) {
         QStringList prms = er.message.split('|');
@@ -339,11 +429,14 @@ bool TaskFinalizeFile::processTask(const QVector<WEvent> &events) {
             errMsg.push_back("MWC-NODE failed to publish the slate. " + prms[1]);
     }
     if (errMsg.isEmpty()) {
-        for (auto &er:errs)
+        for (auto &er:errs) {
+            if (er.message.contains("not found"))
+                transactionNotFound = true;
             errMsg.push_back(er.message);
+        }
     }
 
-    wallet713->setFinalizeFile(false, errMsg, "");
+    wallet713->setFinalizeFile(false, transactionNotFound, errMsg, "", accounts, fileTxResponse, fluff);
     return true;
 
 }
@@ -447,17 +540,22 @@ QString TaskFinalizeSlatepack::buildCommand(QString slatepack, bool fluff) const
 bool TaskFinalizeSlatepack::processTask(const QVector<WEvent> &events) {
     QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
 
+    bool transactionNotFound = false;
+
     for ( auto & ln : lns ) {
+        if (ln.message.contains("not found"))
+            transactionNotFound = true;
+
         int idx = ln.message.indexOf(" finalized transaction ");
         if (idx>=0) {
             idx += strlen(" finalized transaction ");
             QString txId = ln.message.mid(idx).trimmed();
-            wallet713->setFinalizedSlatepack("", txId, tag);
+            wallet713->setFinalizedSlatepack(false, "", txId, accounts, slatepack, fluff);
             return true;
         }
     }
 
-    wallet713->setFinalizedSlatepack(getErrorMessage(events, "Unable to finalize slatepack"), "", tag);
+    wallet713->setFinalizedSlatepack( transactionNotFound, getErrorMessage(events, "Unable to finalize slatepack"), "", accounts, slatepack, fluff);
     return true;
 }
 

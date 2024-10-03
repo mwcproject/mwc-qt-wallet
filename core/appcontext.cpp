@@ -181,7 +181,7 @@ bool AppContext::loadDataImpl() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x47A5)
+    if (id<0x4783 || id>0x47A6)
          return false;
 
     QString mockStr;
@@ -383,6 +383,11 @@ bool AppContext::loadDataImpl() {
         in >> swapBackupDir;
     }
 
+    if (id>=0x47A6) {
+        in >> torBridgeLine;
+        in >> torClientOption;
+    }
+
     return true;
 }
 
@@ -410,7 +415,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x47A5;
+    out << 0x47A6;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -514,6 +519,9 @@ void AppContext::saveData() const {
     out << d;
 
     out << swapBackupDir;
+
+    out << torBridgeLine;
+    out << torClientOption;
 }
 
 void AppContext::loadNotesData() {
@@ -677,6 +685,14 @@ void AppContext::setAutoStartTorEnabled(bool enabled) {
     if (enabled == autoStartTorEnabled)
         return;
     autoStartTorEnabled = enabled;
+    saveData();
+}
+
+void AppContext::setTorBridgeLineClientOption(const QString & line, const QString & client) {
+    if (line == torBridgeLine && client == torClientOption)
+        return;
+    torBridgeLine = line;
+    torClientOption = client;
     saveData();
 }
 

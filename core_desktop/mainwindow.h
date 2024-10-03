@@ -56,6 +56,8 @@ public:
     void hideWindow(StatusWnd* swnd);
     void statusDone(StatusWnd* swnd);
 
+    bool isLeftBarShown() const {return leftBarShown;}
+    void updateLeftBar(bool show);
 protected:
     virtual void closeEvent(QCloseEvent *event) override;
 
@@ -92,6 +94,7 @@ private slots:
     void on_actionAccounts_triggered();
     void on_actionContacts_triggered();
     void on_actionShow_passphrase_triggered();
+    void on_actionViewing_Key_triggered();
     void on_actionEvent_log_triggered();
     void on_actionLogout_triggered();
     void on_actionConfig_triggered();
@@ -105,7 +108,6 @@ private slots:
     void on_actionAtomicSwapMarketplace_triggered();
 
 private:
-    void updateLeftBar(bool show);
     void updateListenerBtn();
     void updateNetworkName();
 

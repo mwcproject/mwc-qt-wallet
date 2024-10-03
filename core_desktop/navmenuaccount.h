@@ -43,6 +43,8 @@ private slots:
     void on_contactsButton_clicked();
     void on_logoutButton_clicked();
 
+    void on_viewingKeyButton_clicked();
+
 private:
     Ui::NavMenuAccount *ui;
     bridge::StateMachine * stateMachine = nullptr;

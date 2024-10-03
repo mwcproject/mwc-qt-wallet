@@ -65,7 +65,7 @@ public:
 
     // Create new wallet and generate a seed for it
     // Check signal: onNewSeed( seed [] )
-    virtual void start2init(QString password)  override;
+    virtual void start2init(QString password, int seedLength)  override;
 
     // Recover the wallet with a mnemonic phrase
     // recover wallet with a passphrase:

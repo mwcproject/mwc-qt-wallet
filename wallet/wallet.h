@@ -68,6 +68,18 @@ struct AccountInfo {
     bool balancesAreEquals(const AccountInfo & accInfo) const;
 };
 
+struct AccountsInfo {
+    QString tag;
+    QStringList accounts;
+    QString activeAccount;
+
+    AccountsInfo() = default;
+    AccountsInfo(const AccountsInfo &) = default;
+    AccountsInfo(AccountsInfo &&) = default;
+
+    AccountsInfo(QString tag, QString activeAccount, const QVector<AccountInfo> & accountInfo);
+};
+
 struct MwcNodeConnection {
     enum class NODE_CONNECTION_TYPE { CLOUD = 0, LOCAL = 1, CUSTOM = 2 }; //
 
@@ -525,7 +537,7 @@ public:
     virtual void start()   = 0;
     // Create new wallet and generate a seed for it
     // Check signal: onNewSeed( seed [] )
-    virtual void start2init(QString password) = 0;
+    virtual void start2init(QString password, int seedLength) = 0;
     // Recover the wallet with a mnemonic phrase
     // recover wallet with a passphrase:
     // Check Signals: onRecoverProgress( int progress, int maxVal );
@@ -710,6 +722,11 @@ public:
     virtual void sendTo( const QString &account, int64_t coinNano, const QString & address, const QString & apiSecret,
                          QString message, int inputConfirmationNumber, int changeOutputs, const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof, QString expectedproofAddress )  = 0;
 
+    // Self seld for accounts transfres
+    // Check signal:  onSend
+    virtual void selfSend( const QString &accountFrom, const QString &accountTo, int64_t coinNano, const QStringList & outputs, bool fluff )  = 0;
+
+
     // Airdrop special. Generating the next Public key for transaction
     // wallet713> getnextkey --amount 1000000
     // "Identifier(0300000000000000000000000600000000), PublicKey(38abad70a72fba1fab4b4d72061f220c0d2b4dafcc8144e778376098575c965f5526b57e1c34624da2dc20dde2312696e7cf8da676e33376aefcc4742ed9cb79)"
@@ -889,6 +906,22 @@ public:
     // Check Signal: onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
     virtual void sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id, QString cookie) = 0;
 
+    // Request rewind hash
+    // Check signal: onViewRewindHash(QString rewindHash, QString error);
+    virtual void viewRewindHash() = 0;
+
+    // Scan with revind hash. That will generate bunch or messages similar to scan
+    // Check Signal: onUpdateSyncProgress ??
+    // Check Signal: onScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors )
+    virtual void scanRewindHash( const QString & rewindHash ) = 0;
+
+    // Generate ownership proof
+    // Check signal: onGenerateOwnershipProof(QString proof, QString error)
+    virtual void generateOwnershipProof(const QString & message, bool includePublicRootKey, bool includeTorAddress, bool includeMqsAddress ) = 0;
+
+    // Validate ownership proof
+    // Check signal: onValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error)
+    virtual void validateOwnershipProof(const QString & prrof) = 0;
 private:
 signals:
     // Wallet doing something. This message is needed for the progress.
@@ -1093,6 +1126,18 @@ signals:
 
     // Response from sendMarketplaceMessage
     void onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
+
+    // response from viewRewindHash
+    void onViewRewindHash(QString rewindHash, QString error);
+
+    // response from scanRewindHash
+    void onScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors );
+
+    // response from generateOwnershipProof
+    void onGenerateOwnershipProof(QString proof, QString error);
+
+    // response from validateOwnershipProof
+    void onValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error);
 };
 
 }

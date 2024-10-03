@@ -67,6 +67,7 @@ public:
     virtual void pageInitFirstTime() = 0;
     virtual void pageInputPassword(QString pageTitle, bool lockMode) = 0;
     virtual void pageInitAccount(QString path, bool restoredFromSeed) = 0;
+    virtual void pageSeedLength() = 0;
     virtual void pageEnterSeed() = 0;
     virtual void pageNewSeed(QString pageTitle, QVector<QString> seed, bool hideSubmitButton = false) = 0;
     virtual void pageNewSeedTest(int wordIndex) = 0;
@@ -124,6 +125,16 @@ public:
 
     // Show transaction for integrity fee page
     virtual void pageTransactionFee() = 0;
+
+    // Show Keys view page, show my key, input Viewing key
+    virtual void pageViewHash() = 0;
+    // Show Keys view, resulting outputs page
+    virtual void pageViewAccounts() = 0;
+
+    virtual void pageGenerateOwnershipInput() = 0;
+    virtual void pageGenerateOwnershipResult() = 0;
+    virtual void pageValidateOwnershipInput() = 0;
+    virtual void pageValidateOwnershipResult() = 0;
 };
 
 void setWndManager(WndManager * mgr);

@@ -74,4 +74,10 @@ void NavMenuAccount::on_logoutButton_clicked()
     stateMachine->logout();
 }
 
+
+void NavMenuAccount::on_viewingKeyButton_clicked()
+{
+    stateMachine->setActionWindow( state::STATE::VIEW_ACCOUNTS );
+}
+
 }

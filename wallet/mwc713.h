@@ -33,6 +33,7 @@ namespace wallet {
 
 class Mwc713EventManager;
 class Mwc713Task;
+struct AccountsInfo;
 
 class MWC713 : public Wallet
 {
@@ -63,7 +64,7 @@ public:
     virtual void start()  override;
     // Create new wallet and generate a seed for it
     // Check signal: onNewSeed( seed [] )
-    virtual void start2init(QString password)  override;
+    virtual void start2init(QString password, int seedLength)  override;
 
     // Recover the wallet with a mnemonic phrase
     // recover wallet with a passphrase:
@@ -256,6 +257,10 @@ public:
                          QString message, int inputConfirmationNumber, int changeOutputs,
                          const QStringList & outputs, bool fluff, int ttl_blocks, bool generateProof, QString expectedproofAddress )  override;
 
+    // Self seld for accounts transfres
+    // Check signal:  onSend
+    virtual void selfSend( const QString &accountFrom, const QString &accountTo, int64_t coinNano, const QStringList & outputs, bool fluff ) override;
+
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
     virtual void getOutputs(QString account, bool show_spent, bool enforceSync)  override;
@@ -412,6 +417,23 @@ public:
     // command: "accept_offer" or "fail_bidding"
     // Check Signal: onSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
     virtual void sendMarketplaceMessage(QString command, QString wallet_tor_address, QString offer_id, QString cookie) override;
+
+    // Request rewind hash
+    // Check signal: onViewRewindHash(QString rewindHash, QString error);
+    virtual void viewRewindHash() override;
+
+    // Scan with revind hash. That will generate bunch or messages similar to scan
+    // Check Signal: onUpdateSyncProgress ??
+    // Check Signal: onScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors )
+    virtual void scanRewindHash( const QString & rewindHash ) override;
+
+    // Generate ownership proof
+    // Check signal: onGenerateOwnershipProof(QString proof, QString error)
+    virtual void generateOwnershipProof(const QString & message, bool includePublicRootKey, bool includeTorAddress, bool includeMqsAddress ) override;
+
+    // Validate ownership proof
+    // Check signal: onValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error)
+    virtual void validateOwnershipProof(const QString & proof) override;
 public:
     // launch exit command.
     void launchExitCommand();
@@ -481,17 +503,18 @@ public:
 
     void setSendFileResult( bool success, QStringList errors, QString fileName );
     void setReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
-    void setFinalizeFile( bool success, QStringList errors, QString fileName );
+    void setFinalizeFile( bool success, bool txNotFoundError, QStringList errors, QString fileName, const AccountsInfo & accInfo, QString fileTxResponse, bool fluff );
     void setSubmitFile(bool success, QString message, QString fileName);
 
     void setSendSlatepack( QString error, QString slatepack, QString tag );
     void setReceiveSlatepack( QString error, QString slatepack, QString tag );
-    void setFinalizedSlatepack( QString error, QString txUuid, QString tag );
+    void setFinalizedSlatepack( bool txNotFoundError, QString error, QString txUuid, const AccountsInfo & accInfo, QString slatepack, bool fluff );
 
     // Transactions
     void setTransactions( QString account, int64_t height, QVector<WalletTransaction> Transactions);
 
-    void setTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages );
+    void setTransactionById( bool success, QString account, int64_t height, WalletTransaction transaction, QVector<WalletOutput> outputs, QVector<QString> messages,
+                             const QString & txIdxOrUUID, bool sendOnly, const AccountsInfo & accInfo );
 
     // Outputs results
     void setOutputs( QString account, bool show_spent, int64_t height, QVector<WalletOutput> outputs);
@@ -586,6 +609,14 @@ public:
     void setSendMarketplaceMessage(QString error, QString response, QString offerId, QString walletAddress, QString cookie);
 
     void setTorConnectionStatus(bool online);
+
+    void setViewRewindHash( QString rewindHash, QString error );
+
+    void setScanRewindHash( QVector< WalletOutput > outputResult, int64_t total, QString errors );
+
+    void setGenerateOwnershipProof(QString proof, QString error);
+
+    void setValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error);
 protected:
     virtual void timerEvent(QTimerEvent *event) override;
 

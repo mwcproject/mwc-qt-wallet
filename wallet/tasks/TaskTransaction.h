@@ -17,6 +17,7 @@
 
 #include "../mwc713task.h"
 #include "../../util/stringutils.h"
+#include "../wallet.h"
 
 namespace wallet {
 
@@ -76,8 +77,9 @@ public:
     const static int64_t TIMEOUT = 1000*60;
 
     // Transactions run with no-refresh because wallet responsible to call sync first
-    TaskTransactionsById( MWC713 * wallet713, QString txIdxOrUUID) :
-            Mwc713Task("Transactions", "Requesting transaction details...", buildCommandLine(txIdxOrUUID), wallet713, "")  {}
+    TaskTransactionsById( MWC713 * wallet713, QString _txIdxOrUUID, bool _sendOnly, const AccountsInfo & _accInfo) :
+            Mwc713Task("Transactions", "Requesting transaction details...", buildCommandLine(_txIdxOrUUID), wallet713, ""),
+            txIdxOrUUID(_txIdxOrUUID), sendOnly(_sendOnly), accInfo(_accInfo) {}
 
     virtual ~TaskTransactionsById() override {}
 
@@ -86,6 +88,10 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return { WALLET_EVENTS::S_READY };}
 private:
     QString buildCommandLine(QString txIdxOrUUID) const;
+
+    QString txIdxOrUUID;
+    bool sendOnly;
+    AccountsInfo accInfo;
 };
 
 class TaskTransCancel : public Mwc713Task {

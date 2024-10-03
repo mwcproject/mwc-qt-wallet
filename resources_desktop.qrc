@@ -99,6 +99,11 @@
         <file>img/swap_yellow@2x.svg</file>
         <file>help/finalize.html</file>
         <file>help/swap.html</file>
+        <file>help/viewing_key_gen_in.html</file>
+        <file>help/viewing_key_gen_res.html</file>
+        <file>help/viewing_key_outputs.html</file>
+        <file>help/viewing_key_start.html</file>
+        <file>help/viewing_key_val.html</file>
         <file>img/Transactions_Unconfirmed_Yellow@2x.svg</file>
         <file>img/marketplace@2x.png</file>
     </qresource>

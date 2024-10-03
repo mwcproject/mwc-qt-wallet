@@ -146,17 +146,23 @@ bool TaskListeningStart::processTask(const QVector<WEvent> &events) {
     return true;
 }
 
-QString TaskListeningStart::calcCommand(bool startMq, bool startTor) const {
+QString TaskListeningStart::calcCommand(bool startMq, bool startTor, QString torBridgeLine, QString torClientOption) const {
     Q_ASSERT(startMq | startTor);
 
     // if tor, return listen -t
     if(startTor) {
+        QString cmd = "listen -t";
         if (mwc::isSwapActive()) {
-            return QString("listen -t -p"); // always starting libp2p
+            cmd += " -p"; // always starting libp2p
         }
-        else {
-            return QString("listen -t"); // non libp2p if no swaps
-        }
+
+        if (!torBridgeLine.isEmpty())
+            cmd += " --bridge_line " + util::toMwc713input(torBridgeLine);
+
+        if (!torClientOption.isEmpty())
+            cmd += " --client_option " + util::toMwc713input(torClientOption);
+
+        return cmd;
     }
 
     Q_ASSERT(startMq);

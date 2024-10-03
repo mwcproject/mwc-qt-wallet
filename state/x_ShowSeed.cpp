@@ -35,6 +35,9 @@ NextStateRespond ShowSeed::execute() {
 
     if ( state::getStateMachine()->getCurrentStateId() != STATE::SHOW_SEED) {
         QString walletPassword = context->appContext->pullCookie<QString>("password");
+        if (walletPassword.isEmpty())
+            return NextStateRespond(NextStateRespond::RESULT::DONE);
+
         core::getWndManager()->pageNewSeed(mwc::PAGE_X_SHOW_PASSPHRASE, QVector<QString>(), true);
         context->wallet->getSeed(walletPassword);
     }

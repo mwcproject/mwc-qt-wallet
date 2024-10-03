@@ -50,9 +50,10 @@ FileTransactionFinalize::FileTransactionFinalize(QWidget *parent,
 
     if (transInfo.amount_fee_not_defined) {
         ui->mwcLabel->setText("-");
-        // Requesting tranbsaction info form the wallet.
+        // Requesting transaction info form the wallet.
         // It is a normal case, compact slate doesn;t have all info
-        wallet->requestTransactionById( wallet->getCurrentAccountName(), transInfo.transactionId );
+        // Note, account can be any account, looking for send transaction type
+        wallet->requestTransactionById( "", transInfo.transactionId );
         ui->progress->show();
     }
     else {

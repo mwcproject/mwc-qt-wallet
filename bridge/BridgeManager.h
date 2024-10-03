@@ -38,6 +38,7 @@ class NewSeed;
 class WalletConfig;
 class CoreWindow;
 class SelectMode;
+class ViewOutputs;
 
 // Because many instances of bridges might exist, we need some place to map them.
 // Please use getBridgeManager to access a singletone.
@@ -118,6 +119,11 @@ public:
     void addSelectMode( bridge::SelectMode * b ) {selectMode += b;}
     void removeSelectMode( bridge::SelectMode * b ) {selectMode -= b;}
     const QSet<SelectMode*> & getSelectMode() const {return selectMode;}
+
+    void addViewAccounts( bridge::ViewOutputs * b ) { viewAccounts += b;}
+    void removeViewAccounts( bridge::ViewOutputs * b ) { viewAccounts -= b;}
+    const QSet<ViewOutputs*> & getViewAccounts() const {return viewAccounts;}
+
 private:
     QSet<ProgressWnd*>      progressWnd;
     QSet<InputPassword*>    inputPassword;
@@ -138,7 +144,7 @@ private:
     QSet<WalletConfig*>     walletConfig;
     QSet<CoreWindow*>       coreWindow;
     QSet<SelectMode*>       selectMode;
-
+    QSet<ViewOutputs*>     viewAccounts;
 };
 
 BridgeManager * getBridgeManager();

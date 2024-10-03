@@ -88,6 +88,7 @@ const QString PAGE_A_ACCOUNT_LOGIN  = "Login into Wallet";
 const QString PAGE_A_ACCOUNT_UNLOCK = "Unlock Wallet";
 const QString PAGE_A_FIRST_TIME     = "Create a new Instance";
 const QString PAGE_A_INIT_ACCOUNT   = "Init a new Wallet";
+const QString PAGE_A_SEED_LENGTH    = "Init a new Wallet";
 const QString PAGE_A_NEW_WALLET     = "Init a new Wallet";
 const QString PAGE_A_ENTER_SEED     = "Recover Wallet from a Passphrase";
 const QString PAGE_A_NEW_WALLET_PASSPHRASE= "Passphrase for a new Wallet";
@@ -120,6 +121,12 @@ const QString PAGE_S_MKT_OFFER_UPDATE  = "Offer update";
 const QString PAGE_S_MKT_TX_FEE     = "Integrity fee transactions";
 
 const QString PAGE_U_NODE_STATUS    = "MWC Node Status";
+
+const QString PAGE_V_VIEW_HASH      = "Viewing Key";
+const QString PAGE_V_VIEW_SCANNING  = "Scanning with Viewing Key";
+const QString PAGE_V_VIEW_OUTPUTS   = "View outputs";
+const QString PAGE_V_GEN_OWNERSHIP_PROOF = "Generate Ownership proof";
+const QString PAGE_V_VALID_OWNERSHIP_PROOF = "Validate Ownership proof";
 
 const QString PAGE_W_CONTACTS       = "Contacts";
 

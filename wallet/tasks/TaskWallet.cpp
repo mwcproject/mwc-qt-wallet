@@ -322,8 +322,12 @@ bool TaskSubmitFile::processTask(const QVector<WEvent> & events) {
 
 static bool TaskSyncShowProgress = false;
 
-void TaskSync::onStarted() {
+void taskSyncShowProgress(bool showProgress) {
     TaskSyncShowProgress = showProgress;
+}
+
+void TaskSync::onStarted() {
+    taskSyncShowProgress(showProgress);
 }
 
 bool TaskSync::processTask(const QVector<WEvent> & events) {
@@ -352,7 +356,7 @@ Scanning Complete
     }
 
     // restore back to 'true'
-    TaskSyncShowProgress  = true;
+    taskSyncShowProgress(true);
 
     wallet713->updateSyncAsDone();
 

@@ -17,6 +17,7 @@
 
 #include "../mwc713task.h"
 #include "../../util/stringutils.h"
+#include "../wallet.h"
 
 namespace wallet {
 
@@ -79,6 +80,26 @@ private:
     int64_t sendMwcNano;
 };
 
+class TaskSelfSendMwc : public QObject, public Mwc713Task {
+Q_OBJECT
+public:
+    const static int64_t TIMEOUT = 1000*30; // No transports are involved, might take longer because fo bad node connection
+
+    // coinNano == -1  - mean All
+    TaskSelfSendMwc( MWC713 *wallet713, const QString & accountTo, int64_t coinNano, const QStringList & outputs, bool fluff ) :
+            Mwc713Task("TaskSendMwc", "Sending coins to self...",
+                       buildCommand( accountTo, coinNano, outputs, fluff), wallet713, "") {}
+
+    virtual ~TaskSelfSendMwc() override {}
+
+    virtual bool processTask(const QVector<WEvent> &events) override;
+
+    virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
+private:
+    // coinNano == -1  - mean All
+    QString buildCommand(const QString & accountTo, int64_t coinNano, const QStringList & outputs, bool fluff) const;
+};
+
 
 class TaskSendFile : public Mwc713Task {
 public:
@@ -120,8 +141,9 @@ class TaskFinalizeFile : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*20;
 
-    TaskFinalizeFile( MWC713 *wallet713, QString fileTxResponse, bool fluff ) :
-            Mwc713Task("TaskReceiveFile", "Finalizing file transaction...", buildCommand(fileTxResponse, fluff), wallet713, "") {}
+    TaskFinalizeFile( MWC713 *wallet713, QString _fileTxResponse, bool _fluff, AccountsInfo _accounts ) :
+            Mwc713Task("TaskReceiveFile", "Finalizing file transaction...", buildCommand(_fileTxResponse, _fluff), wallet713, ""),
+            accounts(_accounts), fileTxResponse(_fileTxResponse), fluff(_fluff) {}
 
     virtual ~TaskFinalizeFile() override {}
 
@@ -130,6 +152,9 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
     QString buildCommand(QString filename, bool fluff) const;
+    AccountsInfo accounts;
+    QString fileTxResponse;
+    bool fluff;
 };
 
 class TaskSendSlatepack : public Mwc713Task {
@@ -178,9 +203,9 @@ class TaskFinalizeSlatepack : public Mwc713Task {
 public:
     const static int64_t TIMEOUT = 1000*20;
 
-    TaskFinalizeSlatepack( MWC713 *wallet713, QString slatepack, bool fluff, QString _tag ) :
-            Mwc713Task("TaskReceiveFile", "Finalizing slatepack transaction...", buildCommand(slatepack, fluff), wallet713, ""),
-            tag(_tag) {}
+    TaskFinalizeSlatepack( MWC713 *wallet713, QString _slatepack, bool _fluff, AccountsInfo _accounts ) :
+            Mwc713Task("TaskReceiveFile", "Finalizing slatepack transaction...", buildCommand(_slatepack, _fluff), wallet713, ""),
+            accounts(_accounts), slatepack(_slatepack), fluff(_fluff) {}
 
     virtual ~TaskFinalizeSlatepack() override {}
 
@@ -189,7 +214,9 @@ public:
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 private:
     QString buildCommand(QString slatepack, bool fluff) const;
-    QString tag;
+    AccountsInfo accounts;
+    QString slatepack;
+    bool fluff;
 };
 
 

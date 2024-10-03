@@ -113,6 +113,8 @@ public:
     // Write some text into the file
     Q_INVOKABLE bool writeTextFile(QString fileName, QStringList lines );
 
+    Q_INVOKABLE QStringList readTextFile(QString fileName);
+
     // Extract PubKey from address
     Q_INVOKABLE QString extractPubKeyFromAddress(QString address);
 
