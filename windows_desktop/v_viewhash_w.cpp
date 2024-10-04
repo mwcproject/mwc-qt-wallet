@@ -50,7 +50,9 @@ ViewHash::~ViewHash()
 void ViewHash::on_showWalletKeyButton_clicked()
 {
     wallet->getViewingKey();
-    ui->viewingKey->show();
+    ui->walletViewingKeyLable->show();
+    ui->walletViewingKey->show();
+    ui->walletViewingKey->setText("Retrieving Viewing Key, please wait...");
     ui->showWalletKeyButton->hide();
 }
 
