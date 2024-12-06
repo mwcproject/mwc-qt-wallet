@@ -27,9 +27,6 @@ QString toString(NODE_OUTPUT_EVENT event) {
         case NODE_OUTPUT_EVENT::MWC_NODE_STARTED:  return "MWC_NODE_STARTED";
         // Very first sync events. Archive processing
         case NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_HEADER:  return "MWC_NODE_RECEIVE_HEADER";
-        case NODE_OUTPUT_EVENT::ASK_FOR_TXHASHSET_ARCHIVE:  return "ASK_FOR_TXHASHSET_ARCHIVE";
-        case NODE_OUTPUT_EVENT::TXHASHSET_ARCHIVE_IN_PROGRESS:  return "TXHASHSET_ARCHIVE_IN_PROGRESS";
-        case NODE_OUTPUT_EVENT::HANDLE_TXHASHSET_ARCHIVE:  return "HANDLE_TXHASHSET_ARCHIVE";
         case NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_PIBD_BLOCK: return "MWC_NODE_RECEIVE_PIBD_BLOCK";
         case NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET:  return "VERIFY_RANGEPROOFS_FOR_TXHASHSET";
         case NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES:  return "VERIFY_KERNEL_SIGNATURES";
@@ -39,7 +36,6 @@ QString toString(NODE_OUTPUT_EVENT event) {
         // Normal Workflow
         case NODE_OUTPUT_EVENT::RECEIVE_BLOCK_LISTEN:  return "RECEIVE_BLOCK_LISTEN";
         // Errors
-        case NODE_OUTPUT_EVENT::NETWORK_ISSUES:  return "NETWORK_ISSUES";
         case NODE_OUTPUT_EVENT::ADDRESS_ALREADY_IN_USE:  return "ADDRESS_ALREADY_IN_USE";
     }
     return "UNKNOWN_NODE_OUTPUT_EVENT";
@@ -49,10 +45,10 @@ QString toString(NODE_OUTPUT_EVENT event) {
 NodeOutputParser::NodeOutputParser() {
 
     // let's init all tries that we have
-    // 20191011 17:33:27.495 WARN grin_servers::grin::server - MWC server started.
+    // 20241203 11:52:43.938 WARN mwc_servers::mwc::server - MWC server started.
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::MWC_NODE_STARTED,
                                                     QVector<BaseTrieSection *>{
-                                                            new TriePhraseSection("grin::server - MWC server started")
+                                                            new TriePhraseSection("mwc::server - MWC server started")
                                      }));
 
     // 20191011 19:13:56.842 INFO grin_servers::grin::sync::syncer - Waiting for the peers
@@ -61,56 +57,27 @@ NodeOutputParser::NodeOutputParser() {
                                                          new TriePhraseSection("sync::syncer - Waiting for the peers")
                                                  }));
 
-    // 20191011 22:43:38.969 INFO grin_chain::chain - init: sync_head: 365479725 @ 117749 [0099c40fb902]
+    // 20191011 22:43:38.969 INFO mwc_chain::chain - init: sync_head: 365479725 @ 117749 [0099c40fb902]
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::INITIAL_CHAIN_HEIGHT,
                                                  QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("grin_chain::chain - init: sync_head: "),
+                                                         new TriePhraseSection("mwc_chain::chain - init: sync_head: "),
                                                          new TrieAnySection(50, TrieAnySection::NOT_NEW_LINE, "","", 2) // 365479725 @ 117749 [0099c40fb902]
                                                  }));
 
 
-    // 20191011 17:58:38.254 INFO grin_servers::common::adapters - Received 32 block headers from 3.226.135.253:13414, height 117345
+    // 20241205 15:52:51.034 INFO mwc_servers::mwc::sync::header_sync - Received 512 block headers from tor://vstdjxrzh67udhm3fedanul2sy7fwudasjmwxy54pady6dxclty2zmqd.onion, height 1375233
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_HEADER,
                                                  QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("common::adapters - Received "),
+                                                         new TriePhraseSection("sync::header_sync - Received "),
                                                          new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 1),
                                                          new TriePhraseSection(" block headers from"),
                                                          new TrieAnySection(50, TrieAnySection::NOT_NEW_LINE, "","", 2) // 3.226.135.253:13414, height 31361
                                                  }));
 
-    // 20191011 17:59:10.411 INFO grin_p2p::peer - Asking 3.226.135.253:13414 for txhashset archive at 114586 0a78e3f9d6c5.
-    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::ASK_FOR_TXHASHSET_ARCHIVE,
-                                                 QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("peer - Asking "),
-                                                         new TrieAnySection(20, TrieAnySection::NOT_SPACES, "","", 1),
-                                                         new TriePhraseSection(" for txhashset archive at"),
-                                                         // at {}. size={}
-                                                         new TrieAnySection(70, TrieAnySection::NOT_NEW_LINE, "","", 2),
-                                                 }));
-
-    // grin_servers::grin::sync::state_sync - Downloading 624 MB chain state, done 6 MB
-    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::TXHASHSET_ARCHIVE_IN_PROGRESS,
-                                                 QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("state_sync - Downloading "),
-                                                         new TrieAnySection(20, TrieAnySection::NOT_SPACES, "","", 1),
-                                                         new TriePhraseSection(" MB chain state, done "),
-                                                         new TrieAnySection(20, TrieAnySection::NOT_SPACES, "","", 2),
-                                                         new TriePhraseSection(" MB"),
-                                                 }));
-
-    // 20191011 17:59:14.101 INFO grin_p2p::protocol - handle_payload: txhashset archive for 0a78e3f9d6c5 at 114586. size=128918334
-    // 20191012 10:27:49.337 INFO grin_p2p::protocol - handle_payload: txhashset archive for 0ec5c34c7784 at 115577, DONE. Data Ok: true
-    // Note: this event for Start and End of transactions handling
-    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::HANDLE_TXHASHSET_ARCHIVE,
-                                                 QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("handle_payload: txhashset archive for "),
-                                                         new TrieAnySection(70, TrieAnySection::NOT_NEW_LINE, "","", 2),
-                                                 }));
-
     // 20240909 20:36:09.141 INFO grin_chain::types - PIBD sync progress: 65536 from 4069364
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_PIBD_BLOCK,
                                                  QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("chain::types - PIBD sync progress: "),
+                                                         new TriePhraseSection("desegmenter - PIBD sync progress: "),
                                                          new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 1),
                                                          new TriePhraseSection(" from "),
                                                          new TrieAnySection(50, TrieAnySection::NUMBERS, "","", 2)
@@ -150,7 +117,7 @@ NodeOutputParser::NodeOutputParser() {
     // 20191011 18:15:44.002 INFO grin_servers::grin::sync::syncer - synchronized at 365444412 @ 117485 [0d4879faafaa]
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::SYNC_IS_DONE,
                                                  QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("sync::syncer - synchronized at "),
+                                                         new TriePhraseSection("body_sync - synchronized at "),
                                                          new TrieAnySection(200, TrieAnySection::NOT_NEW_LINE, "","", 2), // 365444412 @ 117485 [0d4879faafaa]
                                                  }));
 
@@ -163,15 +130,10 @@ NodeOutputParser::NodeOutputParser() {
                                                          new TrieAnySection(200, TrieAnySection::NOT_NEW_LINE, "","", 2)
                                                  }));
 
-    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::NETWORK_ISSUES,
-                                                 QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("sync::syncer - sync: no peers available, disabling sync")
-                                                 }));
-
     // ERROR grin_servers::grin::server - P2P server failed with erorr: Connection(Os { code: 48, kind: AddrInUse, message: "Address already in use" })
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::ADDRESS_ALREADY_IN_USE,
                                                  QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("Address already in use")
+                                                         new TriePhraseSection("P2P server failed with erorr")
                                                  }));
 
 

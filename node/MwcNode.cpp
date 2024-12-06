@@ -442,10 +442,13 @@ QString MwcNode::calcProgressStr( int initChainHeight , bool syncedBeforeHorizon
     Q_ASSERT( gettingBlocksShare >= 0.0 );
 
     double progressRes = 0.0;
-
+    bool suppressJiggerProgress = false;
     switch( syncState ) {
         case SYNC_STATE::GETTING_HEADERS: {
             //
+            if (value>initChainHeight) {
+                suppressJiggerProgress = true;
+            }
             progressRes = double(std::max(0, value - initChainHeight)) / double(std::max(1, peersMaxHeight - initChainHeight)) * getHeadersShare  + 0.0;
             break;
         }
@@ -470,6 +473,7 @@ QString MwcNode::calcProgressStr( int initChainHeight , bool syncedBeforeHorizon
                     (value/1000.0) * verifyKernelSignaturesShare;
             break;
         case SYNC_STATE::GETTING_BLOCKS:
+            suppressJiggerProgress = true;
             progressRes = getHeadersShare + getTxHashShare + verifyRangeProofsShare + verifyKernelSignaturesShare +
                     (value/1000.0) * gettingBlocksShare;
             break;
@@ -482,7 +486,7 @@ QString MwcNode::calcProgressStr( int initChainHeight , bool syncedBeforeHorizon
 
     // During some processes like block dounloads, the progress can jutter becasue of the nature of Node sync process.
     // We better to compensate it at this step.
-    if (progressRes<lastProgressRes && lastProgressRes-progressRes<0.005) {
+    if (progressRes<lastProgressRes && (suppressJiggerProgress || lastProgressRes-progressRes<0.005)) {
         progressRes = lastProgressRes;
     }
     lastProgressRes = progressRes;
@@ -550,60 +554,6 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
                 if (height > 0 && peersMaxHeight > 0)
                     nodeStatusString = calcProgressStr( initChainHeight , syncedBeforeHorizon, peersMaxHeight, SYNC_STATE::GETTING_HEADERS, height );
 
-                emit onMwcStatusUpdate(nodeStatusString);
-            }
-            break;
-        }
-        case tries::NODE_OUTPUT_EVENT::ASK_FOR_TXHASHSET_ARCHIVE: {
-            if (lastProcessedEvent < event) {
-                lastProcessedEvent = event;
-                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
-                                                  "Embedded mwc-node requesting transaction archive");
-            }
-            // archive can be large, let's wait extra
-            nextTimeLimit += int64_t( 3 * MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
-            nodeOutOfSyncCounter = 0;
-            syncedBeforeHorizon = true;
-
-            nodeStatusString = calcProgressStr( initChainHeight , syncedBeforeHorizon, peersMaxHeight, SYNC_STATE::TXHASHSET_REQUEST, 0 );
-            emit onMwcStatusUpdate(nodeStatusString);
-            break;
-        }
-        case tries::NODE_OUTPUT_EVENT::TXHASHSET_ARCHIVE_IN_PROGRESS: {
-            // archive can be large, let's wait extra
-            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
-            nodeOutOfSyncCounter = 0;
-            syncedBeforeHorizon = true;
-
-            // for progress need to parse the second element
-            QStringList params = message.split('|');
-            Q_ASSERT(params.size()==2);
-            if (params.size() >= 2) {
-                // Downloading 624 MB chain state, done 118 MB
-                // 624  118
-                int total = params[0].toInt();
-                int done = params[1].toInt();
-                if (total>0 && done<total) {
-                    nodeStatusString = calcProgressStr( initChainHeight , syncedBeforeHorizon, peersMaxHeight, SYNC_STATE::TXHASHSET_IN_PROGRESS, done * 100 / total );
-                    emit onMwcStatusUpdate(nodeStatusString);
-                }
-            }
-            break;
-        }
-        // expected no break
-        case tries::NODE_OUTPUT_EVENT::HANDLE_TXHASHSET_ARCHIVE: {
-            if (lastProcessedEvent < event) {
-                lastProcessedEvent = event;
-                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
-                                                  "Embedded mwc-node processing transaction archive");
-            }
-            // tx Hash really might take a while to process
-            nextTimeLimit += int64_t( 10 * MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
-            nodeOutOfSyncCounter = 0;
-            syncedBeforeHorizon = true;
-
-            if (! message.contains("DONE") ) {
-                nodeStatusString = calcProgressStr( initChainHeight , syncedBeforeHorizon, peersMaxHeight, SYNC_STATE::TXHASHSET_GET, 0 );
                 emit onMwcStatusUpdate(nodeStatusString);
             }
             break;
@@ -766,14 +716,6 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             }
             break;
         }
-        case tries::NODE_OUTPUT_EVENT::NETWORK_ISSUES:
-            notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::WARNING, "Embedded mwc-node experiencing network issues" );
-            nextTimeLimit += int64_t(NETWORK_ISSUES * config::getTimeoutMultiplier());
-
-            nodeStatusString = "Waiting for peers";
-            emit onMwcStatusUpdate(nodeStatusString);
-
-            break;
         case tries::NODE_OUTPUT_EVENT::ADDRESS_ALREADY_IN_USE:
             if (isFinalRun()) {
                 QString message = "Unable to start local mwc-node because of error:\n"
