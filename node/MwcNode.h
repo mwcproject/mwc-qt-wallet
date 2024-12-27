@@ -64,7 +64,7 @@ struct NodeStatus {
     int64_t updateTime  = 0;
 };
 
-enum class SYNC_STATE {GETTING_HEADERS, TXHASHSET_REQUEST, TXHASHSET_IN_PROGRESS, TXHASHSET_GET, GETTING_PIBD, VERIFY_RANGEPROOFS_FOR_TXHASHSET, VERIFY_KERNEL_SIGNATURES, GETTING_BLOCKS };
+enum class SYNC_STATE {GETTING_HEADERS, GETTING_PIBD, VERIFY_KERNELS_HISTORY, VERIFY_HEADERS, VERIFY_KERNEKLS_POS, VERIFY_RANGEPROOFS, VERIFY_KERNEL, GETTING_BLOCKS };
 
 // mwc-node lifecycle management
 class MwcNode : public QObject {
@@ -107,7 +107,7 @@ private:
 private:
     virtual void timerEvent(QTimerEvent *event) override;
 
-    QString calcProgressStr( int initChainHeight , bool syncedBeforeHorizon, int peersMaxHeight, SYNC_STATE syncState, int value );
+    QString calcProgressStr( bool pibdSync, SYNC_STATE syncState, int minVal, int cur, int max );
 
 private: signals:
     void onMwcOutputLine(QString line);
@@ -146,18 +146,13 @@ private:
     int nodeOutOfSyncCounter = 0;
     int nodeHeight = 0;
     int peersMaxHeight = 0;
-    int initChainHeight = 0;
 
     QNetworkAccessManager *nwManager;
 
-    tries::NODE_OUTPUT_EVENT lastProcessedEvent = tries::NODE_OUTPUT_EVENT::NONE;
-
     QString nonEmittedOutput;
 
-    QString nodeStatusString= "Waiting";
-    bool    syncedBeforeHorizon = false;
-    int     firstRecievedBlockIdx = -1;
-    int     maxBlockHeight = 0; // backing stopper for getted blocks.
+    QString nodeStatusString = "Waiting";
+    bool    pibdSyncPhase = false;
     bool    syncIsDone = false;
 
     // Last Many node output lines
@@ -171,8 +166,6 @@ private:
     bool lastTor = false;
 
     QString commandLine;
-
-    double lastProgressRes = -100.0;
 };
 
 }

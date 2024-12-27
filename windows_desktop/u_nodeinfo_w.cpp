@@ -154,7 +154,9 @@ void NodeInfo::onSgnSetNodeStatus( QString localNodeStatus,
             ui->connectionsInfo->setText( toBoldAndYellow("None") ); // Two offline is confusing and doesn't look good. Let's keep zero and highlight it.
 
             if (!config->isColdWallet()) {
-                if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD) {
+                if (! (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::CLOUD ||
+                        (connectionType == wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL && !config->getNoTorForEmbeddedNode() )))
+                {
                     warning = toBoldAndYellow(
                             "Please note. You can't run two MWC Nodes with same public IP.<br>That might be a reason why node unable to find any peers.");
                 }

@@ -77,7 +77,6 @@ void MwcNode::start(const QString & dataPath, const QString & network, bool tor 
     nodeSecret = "";
     nodeWorkDir = "";
     nonEmittedOutput = "";
-    lastProcessedEvent = tries::NODE_OUTPUT_EVENT::NONE;
     nodeStatusString = "Waiting";
 
     // Start the binary
@@ -94,11 +93,7 @@ void MwcNode::start(const QString & dataPath, const QString & network, bool tor 
     nodeOutOfSyncCounter = 0;
     nodeHeight = 0;
     peersMaxHeight = 0;
-    syncedBeforeHorizon = false;
-    firstRecievedBlockIdx = -1;
     syncIsDone = false;
-    maxBlockHeight = 0;
-    initChainHeight = 0;
 
     // Creating process and starting
     nodeProcess = initNodeProcess(dataPath, network, tor);
@@ -398,7 +393,7 @@ void MwcNode::mwcNodeReadyReadStandardOutput() {
                 if (!ln.isEmpty()) {
                     emit onMwcOutputLine(ln);
                     outputLines.push_front(ln);
-                    while( outputLines.size() > 10000 ) // List should be OK with that. It is optimized for head/tail ops.
+                    while( outputLines.size() > 100 ) // List under the Windows doesn't handle well 10000 elements. Let's use 100 instead, enough to see is something going on...
                         outputLines.pop_back();
 
                     ln = "";
@@ -413,69 +408,76 @@ void MwcNode::mwcNodeReadyReadStandardOutput() {
     }
 }
 
+static double calcStageProgress(int minVal, int cur, int maxVal) {
+    if (minVal>=maxVal)
+        return 0.0;
+    if (cur<=minVal)
+        return 0.0;
+    if (cur>=maxVal)
+        return 1.0;
+
+    return double(cur - minVal) / double(maxVal - minVal);
+}
+
+static double calcProgress(double base, double range, double localProgress) {
+    double res = base + range*localProgress;
+    Q_ASSERT(res>=0.0 && res<1.000001);
+    return res;
+}
+
 // return progress in the range [0-1.0]
-QString MwcNode::calcProgressStr( int initChainHeight , bool syncedBeforeHorizon, int peersMaxHeight, SYNC_STATE syncState, int value ) {
-    // timing:
-    // Headers: 11:00
-    // range proofs download & anpack: 0:34
-    // Verify ranges: 3:23
-    // Getting Blocks: 2:50
-    // Total time: 18:00
+QString MwcNode::calcProgressStr( bool pibdSync, SYNC_STATE syncState, int minVal, int cur, int maxVal ) {
+    int total_time = 20*60+4 - (04*60+19); // 945
+    int headers_time = 14*60+50-(04*60+19); // 631
+    int pibd_time = 17*60+26 - (14*60+50); // 156
+    int validation_headers =  18*60 - (17*60+26) - 10; // 34 - 10
+    int validation_kernels_pos = 10; // 10
+    int validation_rangefroofs = 18*60+10 - 18*60; // 10
+    int validation_kernwls = 18*60+40 - (18*60+10); // 30
+    int download_blocks_time = 20*60+4 - (18*60+40); // 84
 
-    const double getHeadersShare = 0.6;
-    // Calculating shares for operations. Note, txHash stage is optional.
-    double getTxHashShare, verifyRangeProofsShare, verifyKernelSignaturesShare;
-    if (syncedBeforeHorizon) {
-        getTxHashShare = 0.25;
-        double totalShare = (1.0 - getHeadersShare-getTxHashShare - 0.05); // 0.05 for getting blocks
-        Q_ASSERT(totalShare>0.0);
-        verifyRangeProofsShare = 0.6 * totalShare;
-        verifyKernelSignaturesShare = 0.4 * totalShare;
-    }
-    else {
-        getTxHashShare = 0.0;
-        verifyRangeProofsShare = 0.0;
-        verifyKernelSignaturesShare = 0.0;
-    }
+    const double getHeadersShare = double(headers_time) / double(total_time);
+    const double pibdShare = double(pibd_time) / double(total_time);
+    const double validationHeadersShare = double(validation_headers) / double(total_time);
+    const double validationKernelsPosShare = double(validation_kernels_pos) / double(total_time);
+    const double validationRangeProofsShare = double(validation_rangefroofs) / double(total_time);
+    const double validationKernelsShare = double(validation_kernwls) / double(total_time);
+    const double blocksShare = double(download_blocks_time) / double(total_time);
 
-    const double gettingBlocksShare = 1.0 - (getHeadersShare + getTxHashShare + verifyRangeProofsShare + verifyKernelSignaturesShare);
-    Q_ASSERT( gettingBlocksShare >= 0.0 );
+    Q_ASSERT( fabs(getHeadersShare + pibdShare + validationHeadersShare + validationKernelsPosShare + validationRangeProofsShare + validationKernelsShare + blocksShare - 1.0) < 0.0001 );
+
+    double stageProgress = calcStageProgress(minVal, cur, maxVal);
 
     double progressRes = 0.0;
-    bool suppressJiggerProgress = false;
     switch( syncState ) {
-        case SYNC_STATE::GETTING_HEADERS: {
-            //
-            if (value>initChainHeight) {
-                suppressJiggerProgress = true;
-            }
-            progressRes = double(std::max(0, value - initChainHeight)) / double(std::max(1, peersMaxHeight - initChainHeight)) * getHeadersShare  + 0.0;
-            break;
-        }
-        case SYNC_STATE::TXHASHSET_REQUEST:
-            progressRes = getHeadersShare;
-            break;
-        case SYNC_STATE::TXHASHSET_IN_PROGRESS:
-            progressRes = getHeadersShare + getTxHashShare * (value/100.0);
-            break;
-        case SYNC_STATE::TXHASHSET_GET:
-            progressRes = getHeadersShare + getTxHashShare;
+        case SYNC_STATE::GETTING_HEADERS:
+            progressRes = calcProgress(0.0, getHeadersShare, stageProgress);
             break;
         case SYNC_STATE::GETTING_PIBD:
-            progressRes = getHeadersShare + getTxHashShare * (value/1000.0);
+            progressRes = calcProgress(getHeadersShare, pibdShare, stageProgress);
             break;
-        case SYNC_STATE::VERIFY_RANGEPROOFS_FOR_TXHASHSET:
-            progressRes = getHeadersShare + getTxHashShare +
-                    (value/1000.0) * verifyRangeProofsShare;
+        case SYNC_STATE::VERIFY_KERNELS_HISTORY:
+            progressRes = calcProgress(getHeadersShare, pibdShare, 1.0);
             break;
-        case SYNC_STATE::VERIFY_KERNEL_SIGNATURES:
-            progressRes = getHeadersShare + getTxHashShare + verifyRangeProofsShare +
-                    (value/1000.0) * verifyKernelSignaturesShare;
+        case SYNC_STATE::VERIFY_HEADERS:
+            progressRes = calcProgress(getHeadersShare+pibdShare, validationHeadersShare, stageProgress);
+            break;
+        case SYNC_STATE::VERIFY_KERNEKLS_POS:
+            progressRes = calcProgress(getHeadersShare+pibdShare+validationHeadersShare, validationKernelsPosShare, stageProgress);
+            break;
+        case SYNC_STATE::VERIFY_RANGEPROOFS:
+            progressRes = calcProgress(getHeadersShare+pibdShare+validationHeadersShare+validationKernelsPosShare, validationRangeProofsShare, stageProgress);
+            break;
+        case SYNC_STATE::VERIFY_KERNEL:
+            progressRes = calcProgress(getHeadersShare+pibdShare+validationHeadersShare+validationKernelsPosShare+validationRangeProofsShare, validationKernelsShare, stageProgress);
             break;
         case SYNC_STATE::GETTING_BLOCKS:
-            suppressJiggerProgress = true;
-            progressRes = getHeadersShare + getTxHashShare + verifyRangeProofsShare + verifyKernelSignaturesShare +
-                    (value/1000.0) * gettingBlocksShare;
+            if (pibdSync) {
+                progressRes = calcProgress(getHeadersShare+pibdShare+validationHeadersShare+validationKernelsPosShare+validationRangeProofsShare + validationKernelsShare, blocksShare, stageProgress);
+            }
+            else {
+                progressRes = calcProgress(0.0, 1.0, stageProgress);
+            }
             break;
     }
 
@@ -484,14 +486,26 @@ QString MwcNode::calcProgressStr( int initChainHeight , bool syncedBeforeHorizon
     if (progressRes>1.0)
         progressRes = 1.0;
 
-    // During some processes like block dounloads, the progress can jutter becasue of the nature of Node sync process.
-    // We better to compensate it at this step.
-    if (progressRes<lastProgressRes && (suppressJiggerProgress || lastProgressRes-progressRes<0.005)) {
-        progressRes = lastProgressRes;
-    }
-    lastProgressRes = progressRes;
-
     return "Syncing " + QString::number( progressRes * 100.0, 'f', 1 ) + "%";
+}
+
+int extractValue(const QString& args, const QString& key, int notFoundValue ) {
+    int idx1 = args.indexOf(key);
+    if (idx1<0)
+        return notFoundValue;
+    int idx2 = args.indexOf(':', idx1+key.size());
+    if (idx2<0)
+        return notFoundValue;
+
+    QString val = args.mid(idx2+1).trimmed();
+    int idx3 = val.indexOf(' ');
+    if (idx3>0)
+        val = val.mid(0,idx3);
+    idx3 = val.indexOf(',');
+    if (idx3>0)
+        val = val.mid(0,idx3);
+
+    return val.toInt();
 }
 
 void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString message) {
@@ -502,218 +516,91 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
         case tries::NODE_OUTPUT_EVENT::MWC_NODE_STARTED:
             nextTimeLimit += int64_t(MWC_NODE_STARTED_TIMEOUT * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
-            lastProcessedEvent = event;
             notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, "Embedded mwc-node was started" );
             break;
-        case tries::NODE_OUTPUT_EVENT::WAITING_FOR_PEERS:
-            lastProcessedEvent = event;
-            nodeStatusString = "Waiting for peers";
-            emit onMwcStatusUpdate(nodeStatusString);
-            break;
-
-        case tries::NODE_OUTPUT_EVENT::INITIAL_CHAIN_HEIGHT: {
-            // update initial chain height
-
-            // message: 365479725 @ 117749 [0099c40fb902]
-            int idx1 = message.indexOf(" @ ");
-            int idx2 = message.indexOf("[", idx1);
-            Q_ASSERT(idx1>0 && idx2>0);
-            if (idx1>0 && idx2>0) {
-                idx1 += strlen(" @ ");
-                initChainHeight = message.mid(idx1, idx2-idx1).trimmed().toInt();
-            }
-            break;
-        }
-
-        case tries::NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_HEADER: {
-            if (lastProcessedEvent < event) {
-                lastProcessedEvent = event;
-                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
-                                                  "Embedded mwc-node requesting headers to sync up");
-            }
+        case tries::NODE_OUTPUT_EVENT::MWC_NODE_SYNC: {
             nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
 
-            // We are getting headers during all stages. But we want to display progress only for the step 1.
-            if (lastProcessedEvent <= event) {
-                // for progress need to parse the second element
-                QStringList params = message.split('|');
-                int height = 0;
-                if (params.size() >= 2) {
-                    // 3.226.135.253:13414, height 31361
-                    QString heightInfo = params[1].trimmed();
-                    int pos = heightInfo.lastIndexOf(' ');
-                    if (pos > 0) {
-                        height = heightInfo.mid(pos + 1).toInt();
+            QStringList params = message.split('|');
+            Q_ASSERT(params.size()>0 && params.size()<=2);
 
-                        initChainHeight = std::min(initChainHeight, height);
-                    }
+            if (params.size() > 0) {
+                QString syncStatus = params[0].trimmed();
+                QString args = "";
+
+                if (params.size() > 1) {
+                    args = params[1];
                 }
 
-                nodeStatusString = "Getting headers";
-                if (height > 0 && peersMaxHeight > 0)
-                    nodeStatusString = calcProgressStr( initChainHeight , syncedBeforeHorizon, peersMaxHeight, SYNC_STATE::GETTING_HEADERS, height );
+                if (syncStatus == "Initial") {
+                    nodeStatusString = "Starting";
+                    syncIsDone = false;
+                }
+                else if (syncStatus == "AwaitingPeers") {
+                    nodeStatusString = "Waiting for peers";
+                    syncIsDone = false;
+                }
+                else if (syncStatus == "HeaderHashSync") {
+                    syncIsDone = false;
+                    pibdSyncPhase = true;
+                    nodeStatusString = "Handshaking";
+                }
+                else if (syncStatus == "HeaderSync") {
+                    syncIsDone = false;
+                    pibdSyncPhase = true;
+                    nodeStatusString = calcProgressStr( pibdSyncPhase, SYNC_STATE::GETTING_HEADERS, 0, extractValue(args, "current_height", 0), extractValue(args, "archive_height", 0) );
+                }
+                else if (syncStatus == "TxHashsetPibd") {
+                    syncIsDone = false;
+                    pibdSyncPhase = true;
+                    nodeStatusString = calcProgressStr( pibdSyncPhase, SYNC_STATE::GETTING_PIBD, 0, extractValue(args, "recieved_segments", 0), extractValue(args, "total_segments", 0) );
+                }
+                else if (syncStatus == "ValidatingKernelsHistory") {
+                    syncIsDone = false;
+                    nodeStatusString = calcProgressStr( pibdSyncPhase, SYNC_STATE::VERIFY_KERNELS_HISTORY, 0, 0,1 );
+                }
+                else if (syncStatus == "TxHashsetHeadersValidation") {
+                    syncIsDone = false;
+                    nodeStatusString = calcProgressStr( pibdSyncPhase, SYNC_STATE::VERIFY_HEADERS, 0, extractValue(args, "headers",0), extractValue(args, "headers_total", 0) );
+                }
+                else if (syncStatus == "TxHashsetKernelsPosValidation") {
+                    syncIsDone = false;
+                    nodeStatusString = calcProgressStr( pibdSyncPhase, SYNC_STATE::VERIFY_KERNEKLS_POS, 0, extractValue(args, "kernel_pos",0), extractValue(args, "kernel_pos_total", 0) );
+                }
+                else if (syncStatus == "TxHashsetRangeProofsValidation") {
+                    syncIsDone = false;
+                    nodeStatusString = calcProgressStr( pibdSyncPhase, SYNC_STATE::VERIFY_RANGEPROOFS, 0, extractValue(args,"rproofs",0), extractValue(args, "rproofs_total",0) );
+                }
+                else if (syncStatus == "TxHashsetKernelsValidation") {
+                    syncIsDone = false;
+                    nodeStatusString = calcProgressStr( pibdSyncPhase, SYNC_STATE::VERIFY_KERNEL, 0, extractValue(args,"kernels",0), extractValue(args, "kernels_total",0) );
+                }
+                else if (syncStatus == "BodySync") {
+                    syncIsDone = false;
+                    nodeStatusString = calcProgressStr( pibdSyncPhase, SYNC_STATE::GETTING_BLOCKS, extractValue(args, "archive_height",0), extractValue(args, "current_height",0), extractValue(args, "highest_height",0));
+                }
+                else if (syncStatus == "NoSync") {
+                    syncIsDone = true;
+                    pibdSyncPhase = false;
+                    nodeHeight = peersMaxHeight; // Patch until next network status call will be made
+                    nodeStatusString = "Done";
+                }
+                else {
+                    break;
+                }
+            }
 
+            if (!syncIsDone) {
                 emit onMwcStatusUpdate(nodeStatusString);
             }
             break;
         }
-        case tries::NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_PIBD_BLOCK: {
-            if (lastProcessedEvent < event) {
-                lastProcessedEvent = event;
-                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
-                                                  "Embedded mwc-node requesting PIBD blocks to sync up");
-            }
-            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
-            nodeOutOfSyncCounter = 0;
-            syncedBeforeHorizon = true;
-
-            // We are getting headers during all stages. But we want to display progress only for the step 1.
-            if (lastProcessedEvent <= event) {
-                // for progress need to parse the second element
-                QStringList params = message.split('|');
-                if (params.size() >= 2) {
-                    int64_t received = params[0].toInt();
-                    int64_t total = params[1].toInt();
-
-                    nodeStatusString = "Getting PIBD blocks";
-                    if (received > 0 && total > 0 && received<total) {
-                        nodeStatusString = calcProgressStr(initChainHeight, syncedBeforeHorizon, peersMaxHeight,
-                                                           SYNC_STATE::GETTING_PIBD, int(received * 1000 / total));
-                    }
-                    else if (received==total) {
-                        nodeStatusString = "Processing";  // calcProgressStr(initChainHeight, txhashsetHeight, peersMaxHeight, SYNC_STATE::GETTING_PIBD, 1000); // done with pibd, processing might take longer then usual
-                        nextTimeLimit += int64_t(PIBD_IS_DONE * config::getTimeoutMultiplier());
-                        // Me might wait for a while, nodeOutOfSyncCounter needs to be negative for that
-                        nodeOutOfSyncCounter = -NODE_OUT_OF_SYNC_FAILURE_LIMIT*5;
-                    }
-                    emit onMwcStatusUpdate(nodeStatusString);
-                }
-            }
-            break;
-        }
-
-        // expected no break
-        case tries::NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET: {
-            if (lastProcessedEvent < event) {
-                lastProcessedEvent = event;
-                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
-                                                  "Embedded mwc-node validating range proofs");
-            }
-
-            // tx Hash really might take a while to process
-            nextTimeLimit += int64_t( 10 * MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
-            nodeOutOfSyncCounter = 0;
-            syncedBeforeHorizon = true;
-
-            QStringList params = message.split('|');
-            if (params.size() >= 2) {
-                int64_t received = params[0].toInt();
-                int64_t total = params[1].toInt();
-
-                if (received>0 && received<=total) {
-                    nodeStatusString = calcProgressStr( initChainHeight , syncedBeforeHorizon, peersMaxHeight, SYNC_STATE::VERIFY_RANGEPROOFS_FOR_TXHASHSET, received*1000/total );
-                    emit onMwcStatusUpdate(nodeStatusString);
-                }
-            }
-            break;
-        }
-        case tries::NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES: {
-            if (lastProcessedEvent < event) {
-                lastProcessedEvent = event;
-                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
-                                                  "Embedded mwc-node validating kernel signatures");
-            }
-
-            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
-            nodeOutOfSyncCounter = 0;
-            syncedBeforeHorizon = true;
-
-            QStringList params = message.split('|');
-            if (params.size() >= 2) {
-                int64_t received = params[0].toInt();
-                int64_t total = params[1].toInt();
-
-                if (received>0 && received<=total) {
-                    nodeStatusString = calcProgressStr(initChainHeight, syncedBeforeHorizon, peersMaxHeight,
-                                                       SYNC_STATE::VERIFY_KERNEL_SIGNATURES, received*1000/total);
-                    emit onMwcStatusUpdate(nodeStatusString);
-                }
-            }
-            break;
-        }
+        case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_LISTEN:
         case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_START: {
-            if (lastProcessedEvent < event) {
-                lastProcessedEvent = event;
-                notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
-                                                  "Embedded mwc-node processing blocks to sync up");
-            }
             // expected no break
             nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
-
-            if (!syncIsDone) { // Async process, order is not guaranteed
-                QStringList params = message.split('|');
-                if (params.size() >= 2) {
-                    int64_t received = params[0].toInt();
-                    int64_t total = params[1].toInt();
-
-                    if (received>=firstRecievedBlockIdx && received<=total) {
-                        if (firstRecievedBlockIdx<0)
-                            firstRecievedBlockIdx = received;
-
-                        if (received>maxBlockHeight)
-                            maxBlockHeight = received;
-
-                        if (total>firstRecievedBlockIdx) {
-                            nodeStatusString = calcProgressStr(initChainHeight, syncedBeforeHorizon, peersMaxHeight,
-                                                               SYNC_STATE::GETTING_BLOCKS, (received-firstRecievedBlockIdx)*1000 / (total-firstRecievedBlockIdx) );
-                            emit onMwcStatusUpdate(nodeStatusString);
-                        }
-                    }
-                }
-            }
-
-            break;
-        }
-        case tries::NODE_OUTPUT_EVENT::SYNC_IS_DONE:{
-            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
-            nodeOutOfSyncCounter = 0;
-
-            syncIsDone = true;
-
-            // message: 365444412 @ 117485 [0d4879faafaa]
-            int idx1 = message.indexOf(" @ ");
-            int idx2 = message.indexOf("[", idx1);
-            Q_ASSERT(idx1>0 && idx2>0);
-            if (idx1>0 && idx2>0) {
-                idx1 += strlen(" @ ");
-                int syncHeight = message.mid(idx1, idx2-idx1).trimmed().toInt();
-                maxBlockHeight = std::max( maxBlockHeight, syncHeight );
-            }
-
-            updateRunningStatus();
-            break;
-        }
-
-        case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_LISTEN: {
-            nextTimeLimit += int64_t(RECEIVE_BLOCK_LISTEN * config::getTimeoutMultiplier());
-            nodeOutOfSyncCounter = 0; // It is still normal syncronization, need to reset the counter
-
-            // message: 2a695957b396 at 102204 from 34.238.121.224:13414 [in/out/kern: 0/1/1] going to process.
-            int idx1 = message.indexOf("at ");
-            int idx2 = message.indexOf(" from ");
-            if (idx1 > 0 && idx2 > 0) {
-                idx1 += strlen("at ");
-                int handledH = message.mid(idx1, idx2 - idx1).toInt();
-                initChainHeight = std::min(initChainHeight, handledH);
-
-                if (handledH > maxBlockHeight) {
-                    maxBlockHeight = handledH;
-
-                    updateRunningStatus();
-                }
-            }
             break;
         }
         case tries::NODE_OUTPUT_EVENT::ADDRESS_ALREADY_IN_USE:
@@ -745,11 +632,11 @@ void MwcNode::updateRunningStatus() {
     QString newStatus;
 
     // tolerance - two blocks
-    if (maxBlockHeight > 0) {
-        if (maxBlockHeight >= peersMaxHeight - 2) {
+    if (nodeHeight > 0) {
+        if (nodeHeight >= peersMaxHeight - 2) {
             newStatus = "Ready";
         } else {
-            newStatus = "waiting for " + QString::number(peersMaxHeight - maxBlockHeight) + " top blocks...";
+            newStatus = "waiting for " + QString::number(peersMaxHeight - nodeHeight) + " top blocks...";
         }
     }
     else {

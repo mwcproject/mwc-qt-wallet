@@ -20,25 +20,17 @@
 
 namespace tries {
 
-enum class NODE_OUTPUT_EVENT {NONE, MWC_NODE_STARTED,
-        WAITING_FOR_PEERS,
-        INITIAL_CHAIN_HEIGHT,
-        // Very first sync events. Archive processing
-        MWC_NODE_RECEIVE_HEADER,
-        MWC_NODE_RECEIVE_PIBD_BLOCK,
-        VERIFY_RANGEPROOFS_FOR_TXHASHSET,
-        VERIFY_KERNEL_SIGNATURES,
-        // End of sync up (no archive)
-        RECEIVE_BLOCK_START,
-
-        // Finish with syncronization
-        SYNC_IS_DONE,
-
-        // Normal Workflow
-        RECEIVE_BLOCK_LISTEN,
-        // Errors
-        ADDRESS_ALREADY_IN_USE
-        };
+enum class NODE_OUTPUT_EVENT {
+    NONE,
+    MWC_NODE_STARTED,
+    // Sync process, all states are here
+    MWC_NODE_SYNC,
+    // Need for checking that mode is not dead
+    RECEIVE_BLOCK_START,
+    RECEIVE_BLOCK_LISTEN,
+    // Errors
+    ADDRESS_ALREADY_IN_USE
+};
 
 QString toString(NODE_OUTPUT_EVENT event);
 

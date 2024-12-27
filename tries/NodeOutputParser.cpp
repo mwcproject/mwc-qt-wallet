@@ -22,17 +22,11 @@ namespace tries {
 QString toString(NODE_OUTPUT_EVENT event) {
     switch (event) {
         case NODE_OUTPUT_EVENT::NONE: return "NONE";
-        case NODE_OUTPUT_EVENT::WAITING_FOR_PEERS: return "WAITING_FOR_PEERS";
-        case NODE_OUTPUT_EVENT::INITIAL_CHAIN_HEIGHT: return "INITIAL_CHAIN_HEIGHT";
         case NODE_OUTPUT_EVENT::MWC_NODE_STARTED:  return "MWC_NODE_STARTED";
+        case NODE_OUTPUT_EVENT::MWC_NODE_SYNC:  return "MWC_NODE_SYNC";
         // Very first sync events. Archive processing
-        case NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_HEADER:  return "MWC_NODE_RECEIVE_HEADER";
-        case NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_PIBD_BLOCK: return "MWC_NODE_RECEIVE_PIBD_BLOCK";
-        case NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET:  return "VERIFY_RANGEPROOFS_FOR_TXHASHSET";
-        case NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES:  return "VERIFY_KERNEL_SIGNATURES";
         // End of sync up (no archive)
         case NODE_OUTPUT_EVENT::RECEIVE_BLOCK_START:  return "RECEIVE_BLOCK_START";
-        case NODE_OUTPUT_EVENT::SYNC_IS_DONE: return "SYNC_IS_DONE";
         // Normal Workflow
         case NODE_OUTPUT_EVENT::RECEIVE_BLOCK_LISTEN:  return "RECEIVE_BLOCK_LISTEN";
         // Errors
@@ -51,58 +45,25 @@ NodeOutputParser::NodeOutputParser() {
                                                             new TriePhraseSection("mwc::server - MWC server started")
                                      }));
 
-    // 20191011 19:13:56.842 INFO grin_servers::grin::sync::syncer - Waiting for the peers
-    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::WAITING_FOR_PEERS,
+    // node Sync process tracking
+    // 20241226 10:32:01.802 INFO mwc_servers::mwc::sync::syncer - mwc-node sync status: NoSync
+    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::MWC_NODE_SYNC,
                                                  QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("sync::syncer - Waiting for the peers")
+                                                         new TriePhraseSection(" - mwc-node sync status: "),
+                                                         new TrieAnySection(50, TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE, "","", 1),
+                                                         new TrieNewLineSection(),
                                                  }));
 
-    // 20191011 22:43:38.969 INFO mwc_chain::chain - init: sync_head: 365479725 @ 117749 [0099c40fb902]
-    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::INITIAL_CHAIN_HEIGHT,
+    // node Sync process tracking
+    // 20241226 10:32:01.802 INFO mwc_servers::mwc::sync::syncer - mwc-node sync status: HeaderSync { current_height: 0, archive_height: 2664000 }
+    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::MWC_NODE_SYNC,
                                                  QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("mwc_chain::chain - init: sync_head: "),
-                                                         new TrieAnySection(50, TrieAnySection::NOT_NEW_LINE, "","", 2) // 365479725 @ 117749 [0099c40fb902]
+                                                         new TriePhraseSection(" - mwc-node sync status: "),
+                                                         new TrieAnySection(50, TrieAnySection::LOW_CASE | TrieAnySection::UPPER_CASE, "","{", 1), // Type of Sync,
+                                                         new TrieAnySection(200, TrieAnySection::NOT_NEW_LINE, "","", 2), // Data, should be in Json like form
+                                                         new TrieNewLineSection(),
                                                  }));
 
-
-    // 20241205 15:52:51.034 INFO mwc_servers::mwc::sync::header_sync - Received 512 block headers from tor://vstdjxrzh67udhm3fedanul2sy7fwudasjmwxy54pady6dxclty2zmqd.onion, height 1375233
-    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_HEADER,
-                                                 QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("sync::header_sync - Received "),
-                                                         new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 1),
-                                                         new TriePhraseSection(" block headers from"),
-                                                         new TrieAnySection(50, TrieAnySection::NOT_NEW_LINE, "","", 2) // 3.226.135.253:13414, height 31361
-                                                 }));
-
-    // 20240909 20:36:09.141 INFO grin_chain::types - PIBD sync progress: 65536 from 4069364
-    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::MWC_NODE_RECEIVE_PIBD_BLOCK,
-                                                 QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("desegmenter - PIBD sync progress: "),
-                                                         new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 1),
-                                                         new TriePhraseSection(" from "),
-                                                         new TrieAnySection(50, TrieAnySection::NUMBERS, "","", 2)
-                                                 }));
-
-
-    // 20240910 17:07:25.609 INFO grin_chain::txhashset::txhashset - txhashset: verify_rangeproofs: verified 29000 rangeproofs from 8734534576
-    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::VERIFY_RANGEPROOFS_FOR_TXHASHSET,
-                                                 QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("txhashset::txhashset - txhashset: verify_rangeproofs: verified "),
-                                                         new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 1),
-                                                         new TriePhraseSection(" rangeproofs from "),
-                                                         new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 2),
-                                                 }));
-
-    // 20191011 18:07:37.377 INFO grin_chain::txhashset::txhashset - txhashset: verify_kernel_signatures: verified 61000 signatures from 9483754384
-    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::VERIFY_KERNEL_SIGNATURES,
-                                                 QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("txhashset::txhashset - txhashset: verify_kernel_signatures: verified "),
-                                                         new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 1),
-                                                         new TriePhraseSection(" signatures from "),
-                                                         new TrieAnySection(20, TrieAnySection::NUMBERS, "","", 2)
-                                                 }));
-
-    // THose blocks come after archive
     // 20191011 18:09:52.536 INFO grin_servers::common::adapters - Received block 114601 of 45343587 hash 140e019e22d0 from 52.13.204.202:13414 [in/out/kern: 0/1/1] going to process.
     // Really don't case about details. Just need to be aware that block was received
     parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::RECEIVE_BLOCK_START,
@@ -113,13 +74,6 @@ NodeOutputParser::NodeOutputParser() {
                                                          new TrieAnySection(200, TrieAnySection::NUMBERS, "","", 2),
                                                  }));
 
-    // Sync is done
-    // 20191011 18:15:44.002 INFO grin_servers::grin::sync::syncer - synchronized at 365444412 @ 117485 [0d4879faafaa]
-    parser.appendLineParser( new TrieLineParser( (int)NODE_OUTPUT_EVENT::SYNC_IS_DONE,
-                                                 QVector<BaseTrieSection *>{
-                                                         new TriePhraseSection("body_sync - synchronized at "),
-                                                         new TrieAnySection(200, TrieAnySection::NOT_NEW_LINE, "","", 2), // 365444412 @ 117485 [0d4879faafaa]
-                                                 }));
 
 
     // common::hooks - Received block 2a695957b396 at 102204 from 34.238.121.224:13414 [in/out/kern: 0/1/1] going to process.
