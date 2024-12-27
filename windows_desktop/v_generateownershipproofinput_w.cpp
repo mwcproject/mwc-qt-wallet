@@ -63,18 +63,21 @@ void GenerateOwnershipProofInput::on_message2sign_textChanged()
 
 void GenerateOwnershipProofInput::on_select_viewing_key_stateChanged(int arg1)
 {
+    Q_UNUSED(arg1);
     updateGenerateBtn();
 }
 
 
 void GenerateOwnershipProofInput::on_select_tor_stateChanged(int arg1)
 {
+    Q_UNUSED(arg1);
     updateGenerateBtn();
 }
 
 
 void GenerateOwnershipProofInput::on_select_mqs_stateChanged(int arg1)
 {
+    Q_UNUSED(arg1);
     updateGenerateBtn();
 }
 

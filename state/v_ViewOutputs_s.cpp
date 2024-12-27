@@ -158,6 +158,11 @@ void ViewOutputs::validate_proof(QString proof) {
 }
 
 void ViewOutputs::onValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error) {
+    Q_UNUSED(network);
+    Q_UNUSED(message);
+    Q_UNUSED(torAddress);
+    Q_UNUSED(mqsAddress);
+    Q_UNUSED(error);
     if (!viewingKey.isEmpty() && viewingKey!="Not provided") {
         lastViewedViewingKey = viewingKey;
     }

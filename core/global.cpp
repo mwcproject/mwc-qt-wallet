@@ -95,6 +95,7 @@ bool isWalletLocked() {
 static int64_t lastErrorEvent = 0;
 bool last_no_gas_error = false;
 void reportSwapError(QString err, QString lastProcessError) {
+    Q_UNUSED(err);
     lastErrorEvent = QDateTime::currentMSecsSinceEpoch();
     if (lastProcessError.contains("Eth Wallet Balance is not enough"))
         last_no_gas_error = true;

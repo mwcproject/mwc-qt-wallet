@@ -33,6 +33,7 @@
 #include "MwcNodeConfig.h"
 #include <QTimer>
 #include <QCoreApplication>
+#include <math.h>
 
 namespace node {
 

@@ -29,6 +29,48 @@
 
 namespace state {
 
+/////////////////////////////////////////////////////////////
+
+QVector<SecCurrencyInfo> SwapCurrencyList()  {
+    QVector<SecCurrencyInfo> swap_currency_list = {
+        SecCurrencyInfo("BTC", 600, 3,  0.001, "satoshi per byte", -1.0, 1.0, 500.0, true),
+        SecCurrencyInfo("BCH", 600, 15,  0.001, "satoshi per byte", 3.0, 1.0, 50.0, true),
+        SecCurrencyInfo("LTC", 60 * 2 + 30, 12, 0.01, "litoshi per byte", 100.0, 1.0, 1000.0, true),
+        SecCurrencyInfo("ZCash", 75, 24, 0.01, "ZEC", 0.0001, 0.00005, 0.001, true),
+        SecCurrencyInfo("Dash", 60 * 2 + 39, 6, 0.01, "duff per byte", 26.0, 1.0, 1000.0, true),
+        SecCurrencyInfo("Doge", 60, 20, 100.0, "doge", 3.0, 0.1, 20.0, true),
+        SecCurrencyInfo("Ether", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false),
+    };
+
+    QString network = getStateContext()->wallet->getWalletConfig().getNetwork();
+    if (network == "Floonet") {
+        swap_currency_list.push_back(SecCurrencyInfo("Tst", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+    } else {
+        swap_currency_list.push_back(SecCurrencyInfo("Usdt", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        swap_currency_list.push_back(SecCurrencyInfo("Busd", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        swap_currency_list.push_back(SecCurrencyInfo("Bnb", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        swap_currency_list.push_back(SecCurrencyInfo("Usdc", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        swap_currency_list.push_back(SecCurrencyInfo("Link", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        swap_currency_list.push_back(SecCurrencyInfo("Trx", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        swap_currency_list.push_back(SecCurrencyInfo("Dai", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        swap_currency_list.push_back(SecCurrencyInfo("Tusd", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        swap_currency_list.push_back(SecCurrencyInfo("Usdp", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+        swap_currency_list.push_back(SecCurrencyInfo("Wbtc", 15, 20, 0.001, "gwei", 5500000, 1100000, 110000000, false));
+    }
+
+    return swap_currency_list;
+}
+
+SecCurrencyInfo getCurrencyInfo(const QString& currency) {
+    QVector<SecCurrencyInfo> swap_list = SwapCurrencyList();
+    for (const auto& wcl : swap_list) {
+        if (wcl.currency == currency)
+            return wcl;
+    }
+    Q_ASSERT(false); // NOT FOUND!!!
+    return swap_list[0];
+}
+
 
 /////////////////////////////////////////////////////////////
 

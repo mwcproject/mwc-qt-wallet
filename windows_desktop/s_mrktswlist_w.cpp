@@ -505,6 +505,7 @@ void MrktSwList::onBuyItemActivated(QString id) {
 }
 
 void MrktSwList::onSellItemActivated(QString id) {
+    Q_UNUSED(id);
     if (selectedTab == BTN_MKT_OFFERS) {
         Q_ASSERT(false); // fix me
     }

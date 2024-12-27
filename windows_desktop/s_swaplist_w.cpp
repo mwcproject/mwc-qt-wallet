@@ -701,6 +701,7 @@ void SwapList::on_swapBackupDir_textEdited(const QString &dir) {
 
 void SwapList::timerEvent(QTimerEvent *event)
 {
+    Q_UNUSED(event);
     swap->requestEthInfo();
 }
 

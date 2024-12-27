@@ -90,10 +90,10 @@ void IntegrityTransactions::updateData() {
         QDateTime txTime = QDateTime::fromString(txTimeStr, "HH:mm:ss dd-MM-yyyy");
         txTimeStr = txTime.toString("MMM d, yyyy / H:mmap");
         bool blocksPrinted = false;
-        if (trans.confirmed && nodeHeight > 0 && trans.height > 0) {
+        //if (trans.confirmed && nodeHeight > 0 && trans.height > 0) {
             // confirmations are 1 more than the difference between the node and transaction heights
-            int64_t confirmations = nodeHeight - trans.height + 1;
-        }
+        //    int64_t confirmations = nodeHeight - trans.height + 1;
+        //}
 
         control::RichItem *itm = control::createMarkedItem(QString::number(idx), ui->transactionTable,
                                                            trans.canBeCancelled(), "");
@@ -111,9 +111,6 @@ void IntegrityTransactions::updateData() {
         } // First line
 
         itm->addWidget(control::createHorzLine(itm));
-
-        control::RichButton *cancelBtn = nullptr;
-        control::RichButton *repostBtn = nullptr;
 
         // Line with amount
         {

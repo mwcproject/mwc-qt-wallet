@@ -127,6 +127,8 @@ void RichVBox::onHorzValueChanged(int value) {
 }
 
 void RichVBox::onHorzRangeChanged(int min, int max) {
+    Q_UNUSED(min);
+    Q_UNUSED(max);
     if (needSetValue) {
         needSetValue = false;
 
