@@ -600,7 +600,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
         case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_LISTEN:
         case tries::NODE_OUTPUT_EVENT::RECEIVE_BLOCK_START: {
             // expected no break
-            nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
+            nextTimeLimit += int64_t(RECEIVE_BLOCK_LISTEN * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
             break;
         }
