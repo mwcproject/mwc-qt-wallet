@@ -76,7 +76,7 @@ void NewSeed::updateSeedData( const QString & name, const QVector<QString> & see
 
     int maxWrdLen = 0;
     for (const auto & s : seed)
-        maxWrdLen = std::max(qsizetype(maxWrdLen), s.length());
+        maxWrdLen = std::max(size_t(maxWrdLen), size_t(s.length()));
 
     maxWrdLen += 3;
 

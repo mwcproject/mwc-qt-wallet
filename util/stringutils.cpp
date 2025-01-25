@@ -210,7 +210,7 @@ QString formatErrorMessages(QStringList messages) {
 
 // Get safely substring from the string. If indexes out of range, return emoty string
 QString getSubString(const QString & str, int idx1, int idx2) {
-    idx2 = std::min(qsizetype(idx2), str.length());
+    idx2 = std::min(size_t(idx2), size_t(str.length()));
 
     if (idx2<=idx1 || idx1>=str.length())
         return "";

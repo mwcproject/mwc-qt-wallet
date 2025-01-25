@@ -841,7 +841,7 @@ QPair<QVector<QString>, int> AppContext::getWalletInstances(bool hasSeed) const 
 
             int selectedIdx = -1;
             if (!paths.isEmpty()) {
-                selectedIdx = std::max(static_cast<qsizetype>(0), paths.indexOf(walletInstancePaths.value(currentWalletInstanceIdx, "")));
+                selectedIdx = std::max(static_cast<size_t>(0), static_cast<size_t>(paths.indexOf(walletInstancePaths.value(currentWalletInstanceIdx, ""))));
             }
 
             return QPair<QVector<QString>, int> (paths, selectedIdx);

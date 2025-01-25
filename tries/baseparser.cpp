@@ -69,7 +69,7 @@ LineResult TrieSectionContext::calcResult() const {
     if (accId<0)
         return prevParseResults;
 
-    return LineResult(prevParseResults, SectionResult(accStr.left( std::max(accStr.size()-1, qsizetype(0)) ) ,accId) );
+    return LineResult(prevParseResults, SectionResult(accStr.left( std::max( size_t(accStr.size()-1), size_t(0)) ) ,accId) );
 }
 
 
