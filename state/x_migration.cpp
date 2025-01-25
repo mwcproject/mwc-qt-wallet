@@ -22,6 +22,10 @@
 
 namespace state {
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#define endl Qt::endl
+#endif
+
 Migration::Migration( StateContext * _context) :
     State (_context, STATE::MIGRATION) {
     // only need to wait for signals if there is something to migrate

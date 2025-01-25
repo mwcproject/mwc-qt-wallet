@@ -458,7 +458,7 @@ void WalletOutput::setData(QString _outputCommitment,
 
 QString WalletOutput::toString() const {
     return  "Output(" + outputCommitment + ", MMR=" + MMRIndex + ", Height=" + blockHeight + ", Locked=" + lockedUntil + ", status=" +
-            status + ", coinbase=" + (coinbase?"true":"false") + ", confirms=" + numOfConfirms, ", value=" + QString::number(valueNano) + ", txIdx=" + txIdx + ")";
+            status + ", coinbase=" + (coinbase?"true":"false") + ", confirms=" + numOfConfirms, ", value=" + QString::number(valueNano) + ", txIdx=" + QString::number(txIdx) + ")";
 }
 
 QString WalletOutput::toJson() const {

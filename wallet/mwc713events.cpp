@@ -24,8 +24,11 @@
 
 namespace wallet {
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+QRecursiveMutex Mwc713EventManager::taskQMutex;
+#else
 QMutex Mwc713EventManager::taskQMutex(QMutex::Recursive);
-
+#endif
 
 QString toString(WALLET_EVENTS event) {
     switch (event) {

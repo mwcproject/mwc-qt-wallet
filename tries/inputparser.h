@@ -24,7 +24,7 @@ namespace tries {
 class TrieLineParser;
 
 struct ParsingResult {
-    const int parserId;
+    int parserId;
     LineResult result;
 
     ParsingResult() : parserId(0) {};
@@ -32,7 +32,7 @@ struct ParsingResult {
 
     ParsingResult(int parserId, const LineResult & result);
 
-    ParsingResult & operator=(const ParsingResult & other) = delete;
+    ParsingResult & operator=(const ParsingResult & other) = default;
 
 };
 

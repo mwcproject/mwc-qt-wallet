@@ -28,7 +28,11 @@
 #include "../bridge/wnd/swapmkt_b.h"
 #include <QPushButton>
 #include <QApplication>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+#include <QScreen>
+#else
 #include <QDesktopWidget>
+#endif
 #include <QScrollArea>
 #include <QStyle>
 #include "../core/global.h"
@@ -120,23 +124,33 @@ MainWindow::MainWindow(QWidget *parent) :
     // Update size by max screen size
     QSize wndSize = frameSize();
     QSize newSize = wndSize;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QRect screenRc(0,0,0,0);
+    if (screen) {
+        screenRc = screen->availableGeometry();
+    }
+#else
     QRect screenRc = QDesktopWidget().availableGeometry(this);
+#endif
 
-    const int DX = 10;
-    const int DY = 30;
+    if (screenRc.width()>0 && screenRc.height()>0) {
+        const int DX = 10;
+        const int DY = 30;
 
-    if (newSize.width() > screenRc.width() - DX )
-        newSize.setWidth( screenRc.width() - DX );
+        if (newSize.width() > screenRc.width() - DX )
+            newSize.setWidth( screenRc.width() - DX );
 
-    if (newSize.height() > screenRc.height() - DY )
-        newSize.setHeight( screenRc.height() - DY );
+        if (newSize.height() > screenRc.height() - DY )
+            newSize.setHeight( screenRc.height() - DY );
 
-    if ( newSize != wndSize ) {
-        QSize newSz = size() - ( wndSize - newSize );
+        if ( newSize != wndSize ) {
+            QSize newSz = size() - ( wndSize - newSize );
 
-        setGeometry( (screenRc.width() - newSize.width())/2,
-                     (screenRc.height() - newSize.height())/2,
-                     newSz.width(), newSz.height() );
+            setGeometry( (screenRc.width() - newSize.width())/2,
+                         (screenRc.height() - newSize.height())/2,
+                         newSz.width(), newSz.height() );
+        }
     }
 }
 

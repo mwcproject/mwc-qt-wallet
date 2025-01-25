@@ -22,6 +22,9 @@
 #include "../core/global.h"
 #include <QCoreApplication>
 #include "../core/WndManager.h"
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QRandomGenerator>
+#endif
 
 namespace node {
 
@@ -55,18 +58,29 @@ static void updateMwcNodeConfig(const QString & nodeDataPath, const QString & ne
     QString apiSecretFN = walletPath.second + "api_secret";
     if (!QFile::exists(apiSecretFN) ) {
         QString secret;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        int alphabet = 'z' - 'a' +1;
+        for ( int t=0;t<20; t++) {
+            int chIdx = QRandomGenerator::global()->generate() % (alphabet*2);
+            if (chIdx < alphabet)
+                secret.append( char('a' + chIdx) );
+            else
+                secret.append( char('A' + (chIdx-alphabet)) );
+        }
+#else
         // Since we are targeting 5.9, we can't use QRandomGenerator
         // Note: qsrand is not secure at All. For this case it is fine because Local node not expected to be secure,
         // in any case HTTP is used. Secret is mostly for preventing of node usage from wrong network.
-        qsrand( static_cast<quint64>( QTime::currentTime().msecsSinceStartOfDay() ) );
+        srand( static_cast<quint64>( QTime::currentTime().msecsSinceStartOfDay() ) );
         int alphabet = 'z' - 'a' +1;
         for ( int t=0;t<20; t++) {
-            int chIdx = qrand() % (alphabet*2);
+            int chIdx = rand() % (alphabet*2);
             if (chIdx < alphabet)
                 secret.append( 'a' + chIdx );
             else
                 secret.append( 'A' + (chIdx-alphabet) );
         }
+#endif
         util::writeTextFile(apiSecretFN, {secret} );
     }
 

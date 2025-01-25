@@ -28,6 +28,10 @@
 
 namespace util {
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#define endl Qt::endl
+#endif
+
 QStringList readTextFile( QString fileName, bool trimmed, bool cleanEMptyLines, std::function<void()> openOpenErrorCallback ) {
     QFile file(fileName);
     QStringList res;

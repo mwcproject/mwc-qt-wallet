@@ -14,6 +14,9 @@
 
 #include "Generator.h"
 #include <QTime>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QRandomGenerator>
+#endif
 
 namespace util {
 
@@ -21,11 +24,18 @@ static const QString Base58Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefgh
 
 // Generate a secret. Note, random number generator is not cryptography secure because of QT version
 QString generateSecret(int length) {
-    qsrand( static_cast<quint64>( QTime::currentTime().msecsSinceStartOfDay() ) );
     QString result;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     for ( int t=0;t<length; t++) {
-        result.append( Base58Alphabet[qrand()%Base58Alphabet.length()] );
+        result.append( Base58Alphabet[QRandomGenerator::global()->generate()%Base58Alphabet.length()] );
     }
+#else
+    srand( static_cast<quint64>( QTime::currentTime().msecsSinceStartOfDay() ) );
+    for ( int t=0;t<length; t++) {
+        result.append( Base58Alphabet[rand()%Base58Alphabet.length()] );
+    }
+#endif
+
 
     return result;
 }

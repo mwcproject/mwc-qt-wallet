@@ -24,7 +24,11 @@ MwcRadioButton::MwcRadioButton(const QString &text, QWidget *parent) :
 MwcRadioButton::~MwcRadioButton() {}
 
 // to handle hoover
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void MwcRadioButton::enterEvent(QEnterEvent * event) {
+#else
 void MwcRadioButton::enterEvent(QEvent * event) {
+#endif
     QRadioButton::enterEvent(event);
     if (isEnabled() && !hasFocus()) {
         QFont f = font();

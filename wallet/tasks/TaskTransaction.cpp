@@ -484,7 +484,7 @@ static void parseMessages(const QVector<WEvent> & events, // in
             if (strMessage.compare("None", Qt::CaseInsensitive)==0)
                 strMessage = "";
 
-            messages.resize( std::max(messages.length(), participant_id+1) );
+            messages.resize( std::max(messages.length(), qsizetype(participant_id+1)) );
             messages[participant_id] = strMessage;
         }
     }

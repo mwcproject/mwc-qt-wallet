@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "tries/baseparser.h"
+#include <algorithm>
 
 namespace tries {
 
@@ -68,7 +69,7 @@ LineResult TrieSectionContext::calcResult() const {
     if (accId<0)
         return prevParseResults;
 
-    return LineResult(prevParseResults, SectionResult(accStr.left( std::max(accStr.size()-1,0) ) ,accId) );
+    return LineResult(prevParseResults, SectionResult(accStr.left( std::max(accStr.size()-1, qsizetype(0)) ) ,accId) );
 }
 
 

@@ -61,6 +61,7 @@ struct ContactRecord {
     ContactRecord() = default;
     ContactRecord(const ContactRecord & other) = default;
     ContactRecord(const QString & n, const QString & a);
+    ContactRecord & operator = (const ContactRecord & other) = default;
 
     bool operator ==(const ContactRecord & o) {return name == o.name && address == o.address;}
 

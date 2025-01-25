@@ -1124,7 +1124,7 @@ void Swap::startTrading(const MySwapOffer & offer, QString wallet_tor_address) {
 
         QVector<MySwapOffer> expected = expectedOffers.value(wallet_tor_address);
         QString offerId = offer.offer.id;
-        std::remove_if( expected.begin(), expected.end(), [offerId](const MySwapOffer & off) {return off.offer.id == offerId;});
+        expected.erase(std::remove_if( expected.begin(), expected.end(), [offerId](const MySwapOffer & off) {return off.offer.id == offerId;}), expected.end());
         expected.push_back(offer);
         expectedOffers.insert(wallet_tor_address, expected);
     }
@@ -1135,7 +1135,7 @@ void Swap::startTrading(const MySwapOffer & offer, QString wallet_tor_address) {
 void Swap::acceptOffer(const MktSwapOffer & offer, QString wallet_tor_address, int running_num) {
     QVector<MktSwapOffer> accepted = acceptedOffers.value(wallet_tor_address);
     QString offerId = offer.id;
-    std::remove_if( accepted.begin(), accepted.end(), [offerId](const MktSwapOffer & off) {return off.id == offerId;});
+    accepted.erase(std::remove_if( accepted.begin(), accepted.end(), [offerId](const MktSwapOffer & off) {return off.id == offerId;}), accepted.end());
     accepted.push_back(offer);
 
     acceptedOffers.insert(wallet_tor_address, accepted);

@@ -136,10 +136,10 @@ static void dotest_calcOutputsToSpend() {
         const int testNum = 30;
 
         // To debug and reproduce - make the seed contant...
-        qsrand( static_cast<quint64>( QTime::currentTime().msecsSinceStartOfDay() ) );
+        srand( static_cast<quint64>( QTime::currentTime().msecsSinceStartOfDay() ) );
 
         for ( int i=0; i<outputNum; i++ ) {
-            int64_t amount = (qrand() % 1000) * 10000 + i;
+            int64_t amount = (rand() % 1000) * 10000 + i;
 
             outputs.push_back( WalletOutput::create( QString::number(amount), "", "", "", "Unspent", false, "", amount, 1L));
             outputs[i].weight = 1.0;
@@ -148,7 +148,7 @@ static void dotest_calcOutputsToSpend() {
 
         // Run 1 test
         for (int k=0;k<testNum;k++) {
-            int idx = qrand() % outputs.size();
+            int idx = rand() % outputs.size();
             const wallet::WalletOutput & o1 = outputs[idx];
             runForTestSet2( o1.valueNano, outputs, 0 );
             runForTestSet2( o1.valueNano-1, outputs, 1 );
@@ -157,7 +157,7 @@ static void dotest_calcOutputsToSpend() {
 
         // many outputs, solution should be close to optimal value
         for (int k=0;k<testNum;k++) {
-            int outNum = qrand() % (outputs.size()-2) + 2;
+            int outNum = rand() % (outputs.size()-2) + 2;
             QSet<int> hasOutputs;
 
             int64_t amount = 0;

@@ -46,6 +46,9 @@
 #include "../util/crypto.h"
 #include "../core/WndManager.h"
 #include "../bridge/notification_b.h"
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QRegularExpression>
+#endif
 
 namespace wallet {
 
@@ -2347,7 +2350,11 @@ void MWC713::mwc713readyReadStandardOutput() {
 
     // Let's filter out the possible prompt from the editor it can be located anywhere
     // To filter out:  'wallet713>'
-    auto lns = str.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    auto lns = str.split(QRegularExpression("[\r\n]"),Qt::SkipEmptyParts);
+#else
+    auto lns = str.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+#endif
 
     QString filteredStr;
     for (auto ln : lns) {

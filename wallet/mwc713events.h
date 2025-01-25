@@ -18,7 +18,11 @@
 #include <QString>
 #include <QVector>
 #include <QObject>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QRecursiveMutex>
+#else
 #include <QMutex>
+#endif
 
 namespace tries {
     class Mwc713InputParser;
@@ -182,7 +186,12 @@ private:
     // Example: checking for wallet become online/offline
     QVector< Mwc713Task* > listeners; // Owner of the tasks
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    static QRecursiveMutex taskQMutex;
+#else
     static QMutex taskQMutex; // recursive
+#endif
+
     QVector< taskInfo > taskQ; // Owner of the tasks
     int groupId = 0;
 

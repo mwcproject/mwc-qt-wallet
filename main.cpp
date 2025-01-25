@@ -54,7 +54,6 @@
 #include <QtGlobal>
 #include <QGuiApplication>
 #include <QScreen>
-#include <QDesktopWidget>
 #include <tgmath.h>
 #include "node/MwcNodeConfig.h"
 #include "node/MwcNode.h"
@@ -315,7 +314,9 @@ int main(int argc, char *argv[])
     {
         // QApplication instance is needed to show possible errors
    //     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);  Disabled because it looks badly on 4k Linux and Windows with Scale 200% (default for 4k)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
 
         Q_ASSERT(argc>=1);
         // Process arglist.

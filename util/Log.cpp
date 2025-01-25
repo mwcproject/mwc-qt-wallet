@@ -22,6 +22,9 @@
 #include <QProcess>
 #include "../core/Config.h"
 #include "../core/WndManager.h"
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QRegularExpression>
+#endif
 
 // 10 MB is a reasonable size limit.
 // Compressed will be around 1 MB.
@@ -211,7 +214,11 @@ void logMwc713out(QString str) {
         return;
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    auto lns = str.split(QRegularExpression("[\r\n]"),Qt::SkipEmptyParts);
+#else
     auto lns = str.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+#endif
     for (auto & l: lns) {
         logClient->doAppend2logs(true, "mwc713>>", l);
     }
@@ -225,7 +232,11 @@ void logMwc713in(QString str) {
 void logMwcNodeOut(QString str) {
     Q_ASSERT(logClient);
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    auto lns = str.split(QRegularExpression("[\r\n]"),Qt::SkipEmptyParts);
+#else
     auto lns = str.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+#endif
     for (auto & l: lns) {
         logClient->doAppend2logs(true, "mwc-node>>", l);
     }

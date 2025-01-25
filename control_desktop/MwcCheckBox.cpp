@@ -24,7 +24,11 @@ MwcCheckBox::MwcCheckBox(const QString &text, QWidget *parent) :
 MwcCheckBox::~MwcCheckBox() {}
 
 // to handle hoover
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void MwcCheckBox::enterEvent(QEnterEvent * event) {
+#else
 void MwcCheckBox::enterEvent(QEvent * event) {
+#endif
     QCheckBox::enterEvent(event);
     if (isEnabled() && !hasFocus()) {
         QFont f = font();

@@ -29,7 +29,11 @@ public:
 
 protected:
     // to handle hoover
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    virtual void enterEvent(QEnterEvent * event) override;
+#else
     virtual void enterEvent(QEvent * event) override;
+#endif
     virtual void leaveEvent(QEvent * event) override;
     // to handle focus
     virtual void focusInEvent(QFocusEvent * event) override;

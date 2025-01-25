@@ -15,6 +15,10 @@
 #include "../core/global.h"
 #include "stringutils.h"
 #include <QDateTime>
+#include <algorithm>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QRegularExpression>
+#endif
 
 namespace util {
 
@@ -206,7 +210,7 @@ QString formatErrorMessages(QStringList messages) {
 
 // Get safely substring from the string. If indexes out of range, return emoty string
 QString getSubString(const QString & str, int idx1, int idx2) {
-    idx2 = std::min(idx2, str.length());
+    idx2 = std::min(qsizetype(idx2), str.length());
 
     if (idx2<=idx1 || idx1>=str.length())
         return "";
@@ -453,7 +457,7 @@ QString urlEncode( QString str ) {
     // utf 8 fits isunreserved pretty well. Only 1 byte can be mapped to the symbol
     for (unsigned char ch : chars ) {
         if (isunreserved(ch)) {
-            result += ch;
+            result += (char)ch;
         }
         else {
             // Percent encoding is required
@@ -468,7 +472,11 @@ QString urlEncode( QString str ) {
 
 // Update Event list with lines
 void updateEventList( QList<QString> & events, QString str ) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    auto lns = str.split(QRegularExpression("[\r\n]"),Qt::SkipEmptyParts);
+#else
     auto lns = str.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+#endif
 
     for (auto ln : lns) {
         if (ln.isEmpty())
