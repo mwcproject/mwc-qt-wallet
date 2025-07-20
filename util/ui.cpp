@@ -443,9 +443,24 @@ uint64_t getTxnFee(const QString& accountName, int64_t amount, wallet::Wallet* w
     return txnFee;
 }
 
+// Function to determine the number of significant digits
+int getSignificantDigits(double value) {
+    if (value == 0.0) return 1; // Handle zero case
+
+    int digits = 0;
+    double absValue = std::abs(value);
+    while (absValue < 1.0 && absValue > 0.0) {
+        absValue *= 10.0;
+        digits++;
+        if (digits>20)
+          break;
+    }
+    return digits;
+}
+
 QString txnFeeToString(uint64_t nanoTxnFee) {
     double dTxnFee = (double)nanoTxnFee / (double)mwc::NANO_MWC;
-    QString fee = QString::number(dTxnFee);
+    QString fee = QString::number(dTxnFee, 'f', getSignificantDigits(dTxnFee));
     if (nanoTxnFee < mwc::BASE_TRANSACTION_FEE) {
         fee = "unknown";
     }

@@ -77,7 +77,7 @@ const QString BLOCK_EXPLORER_URL_MAINNET = "explorer.mwc.mw";
 const QString BLOCK_EXPLORER_URL_FLOONET = "explorer.floonet.mwc.mw";
 
 const uint64_t NANO_MWC = 1000000000;
-const uint64_t BASE_TRANSACTION_FEE = 1000000;   // one milli-mwc
+const uint64_t BASE_TRANSACTION_FEE = 1000000/1000;   // Jul 20 2025, one micro-mwc.  Changed form 1 mili
 
 const uint64_t MWC_MAX_OUTPUTS = 500;
 
