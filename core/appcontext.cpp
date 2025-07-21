@@ -839,10 +839,13 @@ QPair<QVector<QString>, int> AppContext::getWalletInstances(bool hasSeed) const 
                 }
             }
 
-            int selectedIdx = -1;
+            int selectedIdx = 0;
             if (!paths.isEmpty()) {
-                selectedIdx = std::max(static_cast<size_t>(0), static_cast<size_t>(paths.indexOf(walletInstancePaths.value(currentWalletInstanceIdx, ""))));
+                selectedIdx = paths.indexOf(walletInstancePaths.value(currentWalletInstanceIdx, ""));
+                if (selectedIdx<0)
+                    selectedIdx = 0;
             }
+            Q_ASSERT(selectedIdx>=0 && selectedIdx<paths.size());
 
             return QPair<QVector<QString>, int> (paths, selectedIdx);
         }
@@ -862,6 +865,9 @@ QPair<QVector<QString>, int> AppContext::getWalletInstances(bool hasSeed) const 
 QString AppContext::getCurrentWalletInstance(bool hasSeed) const {
     auto res = getWalletInstances(hasSeed);
     Q_ASSERT(!res.first.isEmpty());
+    if (res.first.isEmpty())
+      return "";
+
     return res.first[res.second];
 }
 
