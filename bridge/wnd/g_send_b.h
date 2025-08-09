@@ -21,7 +21,7 @@
 namespace bridge {
 
 enum SEND_SELECTED_METHOD {
-    ONLINE_ID = 1, FILE_ID = 2, SLATEPACK_ID = 3
+    ONLINE_ID = 1, SLATEPACK_ID = 2
 };
 
 class Send : public QObject {
@@ -49,7 +49,7 @@ public:
     // Handle whole workflow to send offline
     // apiSecret - is not needed. Pass empty String
     // return true if some long process was started.
-    Q_INVOKABLE bool sendMwcOffline( QString account, QString amountNano, QString message, bool isSlatepack, bool isLockLater, QString slatepackRecipientAddress);
+    Q_INVOKABLE bool sendMwcOffline( QString account, QString amountNano, QString message, bool isLockLater, QString slatepackRecipientAddress);
 
     // Handle whole workflow to send online
     // return true if some long process was started.

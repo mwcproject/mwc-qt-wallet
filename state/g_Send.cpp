@@ -168,9 +168,6 @@ int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod,
     if (sendSelectedMethod == bridge::SEND_SELECTED_METHOD::ONLINE_ID ) {
         core::getWndManager()->pageSendOnline(selectedAccount.accountName, mwcAmount.second);
     }
-    else if (sendSelectedMethod == bridge::SEND_SELECTED_METHOD::FILE_ID ) {
-        core::getWndManager()->pageSendFile(selectedAccount.accountName, mwcAmount.second);
-    }
     else if (sendSelectedMethod == bridge::SEND_SELECTED_METHOD::SLATEPACK_ID ) {
         core::getWndManager()->pageSendSlatepack(selectedAccount.accountName, mwcAmount.second);
     }
@@ -182,18 +179,16 @@ int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod,
 }
 
 // Handle whole workflow to send offline
-bool Send::sendMwcOffline( QString account, int64_t amount, QString message, bool isSlatepack, bool isLockLater, QString slatepackRecipientAddress) {
+bool Send::sendMwcOffline( QString account, int64_t amount, QString message, bool isLockLater, QString slatepackRecipientAddress) {
 
     core::SendCoinsParams sendParams = context->appContext->getSendCoinsParams();
 
     // !!!! NOTE.  For mobile HODL not a case, first case can be skipped, Directly can be called util->getTxnFee
     QStringList outputs;
     uint64_t txnFee = 0;
-    if (! util::getOutputsToSend( account, sendParams.changeOutputs, amount,
+    util::getOutputsToSend( account, sendParams.changeOutputs, amount,
                                   context->wallet, context->appContext,
-                                  outputs, &txnFee) )
-        return false; // User reject something
-
+                                  outputs, &txnFee);
     if (txnFee == 0 && outputs.size() == 0) {
         txnFee = util::getTxnFee(account, amount, context->wallet,
                                  context->appContext, sendParams.changeOutputs, outputs);
@@ -202,44 +197,31 @@ bool Send::sendMwcOffline( QString account, int64_t amount, QString message, boo
 
     QString hash = context->wallet->getPasswordHash();
     int ttl_blocks = 1440;
-    if ( core::WndManager::RETURN_CODE::BTN2 != core::getWndManager()->questionTextDlg("Confirm Send Request",
-                       "You are sending offline " + (amount < 0 ? "all" : util::nano2one(amount)) +
-                       " MWC from account: " + account + "\n\nTransaction fee: " + txnFeeStr +
-                       "\n\nYour initial transaction slate will be stored in a file.",
-                       "Decline", "Confirm",
-                       "Don't send, cancel this operation",
-                       "Everything is good, continue and send",
-                       false, true, 1.0,
-                       hash, core::WndManager::RETURN_CODE::BTN2, &ttl_blocks) )
-        return false;
+    if ( core::getWndManager()->sendConfirmationSlatepackDlg("Confirm Send Request",
+                            "You are sending offline " + (amount < 0 ? "all" : util::nano2one(amount)) +
+                           " MWC from account: " + account, 1.0,
+                           outputs.size(), &ttl_blocks, hash))  {
 
-    core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
+        core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
 
-    // Note, Send by file and slatepack responding with different signals
+        if (prms.changeOutputs != sendParams.changeOutputs) {
+            // Recalculating the outputs and fees. There is a chance that outputs will be different.
+            util::getOutputsToSend( account, sendParams.changeOutputs, amount,
+                              context->wallet, context->appContext,
+                              outputs, &txnFee);
+            if (outputs.size() == 0) {
+                util::getTxnFee(account, amount, context->wallet,
+                                         context->appContext, sendParams.changeOutputs, outputs);
+            }
+        }
 
-    if ( isSlatepack) {
-        // Init send transaction with file output
         // Check signal:  onSendSlatepack
         context->wallet->sendSlatepack( account, amount, message,
                                         prms.inputConfirmationNumber, prms.changeOutputs, outputs, ttl_blocks, context->appContext->getGenerateProof(),
                                         slatepackRecipientAddress, // optional. Encrypt SP if it is defined.
                                         isLockLater, "");
     }
-    else {
-#ifdef WALLET_DESKTOP
-        // send as a file
-        QString fileName = util::getSaveFileName("Create Initial Transaction Slate File", "fileGen",
-                                                 "MWC init transaction (*.tx)", ".tx");
-        if (fileName.isEmpty())
-            return false;
-#endif
-#ifdef WALLET_MOBILE
-        // We need tp open the file with Android API. Then copy it to temp location.
-        QString fileName = util::genTempFileName(".tx");
-#endif
-        context->wallet->sendFile(account, amount, message, fileName, prms.inputConfirmationNumber, prms.changeOutputs,
-                                  outputs, ttl_blocks, context->appContext->getGenerateProof());
-    }
+
 
     return true;
 }
@@ -376,11 +358,9 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
 
     QStringList outputs;
     uint64_t txnFee = 0;
-    if (! util::getOutputsToSend( account, sendParams.changeOutputs, amount,
+    util::getOutputsToSend( account, sendParams.changeOutputs, amount,
                                   context->wallet, context->appContext,
-                                  outputs, &txnFee ) )
-        return false; // User reject something
-
+                                  outputs, &txnFee );
     if (txnFee == 0 && outputs.size() == 0) {
         txnFee = util::getTxnFee( account, amount, context->wallet,
                                   context->appContext, sendParams.changeOutputs, outputs );
@@ -413,12 +393,26 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
     if ( core::getWndManager()->sendConfirmationDlg("Confirm Send Request",
                                         "You are sending " + (amount < 0 ? "all" : util::nano2one(amount)) + " MWC from account: " + account +
                                         "\n\nTo: " + address +
-                                        (respProofAddress.isEmpty() ? "" : "\n\nReceiver wallet proof address:\n" + respProofAddress) +
-                                        "\n\nTransaction fee: " + txnFeeStr,
-                                        1.0, hash ) ) {
+                                        (respProofAddress.isEmpty() ? "" : "\n\nReceiver wallet proof address:\n" + respProofAddress),
+                                        1.0,
+                                        outputs.size(),
+                                        hash ) ) {
+
+        core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
+
+        if (prms.changeOutputs != sendParams.changeOutputs) {
+            // Recalculating the outputs and fees. There is a chance that outputs will be different.
+            util::getOutputsToSend( account, sendParams.changeOutputs, amount,
+                              context->wallet, context->appContext,
+                              outputs, &txnFee);
+            if (outputs.size() == 0) {
+                util::getTxnFee(account, amount, context->wallet,
+                                         context->appContext, sendParams.changeOutputs, outputs);
+            }
+        }
 
         context->wallet->sendTo( account, amount, util::fullFormalAddress( addressRes.second, address), apiSecret, message,
-                                 sendParams.inputConfirmationNumber, sendParams.changeOutputs,
+                                 prms.inputConfirmationNumber, prms.changeOutputs,
                                  outputs, context->appContext->isFluffSet(), -1 /* Not used for online sends */,
                                  genProof, respProofAddress);
 

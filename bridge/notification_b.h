@@ -34,4 +34,6 @@ public:
 
 }
 
+Q_DECLARE_METATYPE(bridge::MESSAGE_LEVEL );
+
 #endif //MWC_QT_WALLET_NOTIFICATION_B_H

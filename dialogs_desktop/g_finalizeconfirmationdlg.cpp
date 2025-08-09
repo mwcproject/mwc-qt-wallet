@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "g_sendconfirmationdlg.h"
-#include "ui_g_sendconfirmationdlg.h"
+#include "g_finalizeconfirmationdlg.h"
+#include "ui_g_finalizeconfirmationdlg.h"
 #include <Qt>
 #include <QTextDocument>
 #include <QScreen>
@@ -25,20 +25,16 @@
 #include "../util_desktop/widgetutils.h"
 #include "../util/ui.h"
 #include "../util/crypto.h"
-#include "../control_desktop/messagebox.h"
 
 namespace dlg {
 
-SendConfirmationDlg::SendConfirmationDlg( QWidget *parent, QString title, QString message, double widthScale,
-                                         int _inputsNum, QString _passwordHash ) :
+FinalizeConfirmationDlg::FinalizeConfirmationDlg( QWidget *parent, QString title, QString message, double widthScale,
+                                         QString _passwordHash ) :
      MwcDialog(parent),
-    ui(new Ui::SendConfirmationDlg),
-    passwordHash(_passwordHash),
-    messageBody(message),
-    inputsNum(_inputsNum)
+    ui(new Ui::FinalizeConfirmationDlg),
+    passwordHash(_passwordHash)
 {
     ui->setupUi(this);
-    util = new bridge::Util(this);
     config = new bridge::Config(this);
 
     if (widthScale!=1.0) {
@@ -56,6 +52,7 @@ SendConfirmationDlg::SendConfirmationDlg( QWidget *parent, QString title, QStrin
     }
 
     ui->title->setText(title);
+    ui->text->setText(message);
 
     utils::resizeEditByContent(this, ui->text, false, message);
 
@@ -67,31 +64,18 @@ SendConfirmationDlg::SendConfirmationDlg( QWidget *parent, QString title, QStrin
     ui->confirmButton->adjustSize();
     ui->declineButton->adjustSize();
 
-    ui->outputsEdit->setText(QString::number( config->getChangeOutputs() ));
-
     adjustSize();
 
-    updateMessageText();
     checkPasswordStatus();
 }
 
-SendConfirmationDlg::~SendConfirmationDlg()
+FinalizeConfirmationDlg::~FinalizeConfirmationDlg()
 {
     delete ui;
 }
 
-void SendConfirmationDlg::updateMessageText() {
-    int outputs = ui->outputsEdit->text().toInt();
-    QString message = messageBody;
-    if (outputs>0 && outputs <= 10) {
-        uint64_t txnFee = util::calcTxnFee(inputsNum, outputs, 1);
-        QString txnFeeStr = util::txnFeeToString(txnFee);
-        message += "\n\nTransaction fee: " + txnFeeStr;
-    }
-    ui->text->setText(message);
-}
 
-void SendConfirmationDlg::checkPasswordStatus() {
+void FinalizeConfirmationDlg::checkPasswordStatus() {
     QThread::msleep(200); // Ok for human and will prevent brute force from UI attack (really crasy scenario, better to attack mwc713 if you already get the host).
     bool ok = crypto::calcHSA256Hash(ui->passwordEdit->text()) == passwordHash;
     ui->confirmButton->setEnabled(ok);
@@ -100,35 +84,21 @@ void SendConfirmationDlg::checkPasswordStatus() {
 }
 
 
-void SendConfirmationDlg::on_passwordEdit_textChanged(const QString &)
+void FinalizeConfirmationDlg::on_passwordEdit_textChanged(const QString &str)
 {
     checkPasswordStatus();
 }
 
-void SendConfirmationDlg::on_declineButton_clicked()
+void FinalizeConfirmationDlg::on_declineButton_clicked()
 {
     reject();
 }
 
-void SendConfirmationDlg::on_confirmButton_clicked()
+void FinalizeConfirmationDlg::on_confirmButton_clicked()
 {
-    int outs = ui->outputsEdit->text().toInt();
-    if (!(outs>0 && outs <= 10)) {
-        control::MessageBox::messageText(this, "Outputs value",
-                                         "Please specify outputs number from 1 to 10.");
-        return;
-    }
-    config->updateSendCoinsParams(config->getInputConfirmationNumber(), outs);
-
     config->setFluff(ui->fluffCheckBox->isChecked());
     accept();
 }
-
-void SendConfirmationDlg::on_outputsEdit_textChanged(const QString &)
-{
-    updateMessageText();
-}
-
 
 
 }

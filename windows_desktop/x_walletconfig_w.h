@@ -39,8 +39,6 @@ public:
 
 private slots:
     void on_confirmationNumberEdit_textChanged(const QString &arg1);
-    void on_changeOutputsEdit_textEdited(const QString &arg1);
-
     void on_mwcmqHost_textEdited(const QString &arg1);
     void on_logsEnableBtn_clicked();
 
@@ -65,8 +63,7 @@ private slots:
 
 private:
     void setValues(const QString & mwcmqHost,
-                   int inputConfirmationNumber,
-                   int changeOutputs);
+                   int inputConfirmationNumber);
     // return true if data is fine. In case of error will show message for the user
     //bool readInputValue( wallet::WalletConfig & newWalletConfig, core::SendCoinsParams & newSendParams );
 
@@ -109,7 +106,6 @@ private:
 
     QString mqsHost;
     int inputConfirmationsNumber = 1;
-    int changeOutputs = 1;
     QString walletInstanceName;
 };
 

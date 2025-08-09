@@ -455,9 +455,8 @@ static void parseMessages(const QVector<WEvent> & events, // in
 
             if (str.startsWith("--------------------"))
                 continue;
-
-            if (str.startsWith("=============="))
-                break; // multiple data types case, nned to handle without surprises
+            if (str.startsWith("==============") || str.startsWith("Payment Proof"))
+                break; // multiple data types case, need to handle without surprises
 
             QVector<QString> values = parseDataLine(str, messagesLayout);
             if (values.isEmpty())

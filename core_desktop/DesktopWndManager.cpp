@@ -69,6 +69,7 @@
 #include "../dialogs_desktop/s_swapbackupdlg.h"
 #include "../state/state.h"
 #include "../state/u_nodeinfo.h"
+#include "../dialogs_desktop/g_sendconfirmationspdlg.h"
 
 namespace core {
 
@@ -104,21 +105,14 @@ void DesktopWndManager::messageHtmlDlg( QString title, QString message, double w
 // Two button box
 WndManager::RETURN_CODE DesktopWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2,
         QString btn1Tooltip, QString btn2Tooltip,
-        bool default1, bool default2, double widthScale, int *ttl_blocks ) {
-    WndManager::RETURN_CODE ret = MessageBox::questionTextWithTTL(nullptr, title, message, btn1, btn2, btn1Tooltip, btn2Tooltip, default1, default2, widthScale, ttl_blocks);
+        bool default1, bool default2, double widthScale ) {
+    WndManager::RETURN_CODE ret = MessageBox::questionText(nullptr, title, message, btn1, btn2, btn1Tooltip, btn2Tooltip, default1, default2, widthScale );
     return ret;
 }
 WndManager::RETURN_CODE DesktopWndManager::questionHTMLDlg( QString title, QString message, QString btn1, QString btn2,
         QString btn1Tooltip, QString btn2Tooltip,
         bool default1, bool default2, double widthScale ) {
     return MessageBox::questionHTML(nullptr, title, message, btn1, btn2, btn1Tooltip, btn2Tooltip, default1, default2, widthScale);
-}
-
-WndManager::RETURN_CODE DesktopWndManager::questionTextDlg( QString title, QString message, QString btn1, QString btn2,
-        QString btn1Tooltip, QString btn2Tooltip,
-        bool default1, bool default2, double widthScale, QString & passwordHash, RETURN_CODE blockButton, int *ttl_blocks ) {
-    WndManager::RETURN_CODE ret = MessageBox::questionTextWithTTL(nullptr, title, message, btn1, btn2, btn1Tooltip, btn2Tooltip, default1, default2, widthScale, passwordHash, blockButton, ttl_blocks);
-    return ret;
 }
 
 // QFileDialog::getSaveFileName call
@@ -151,9 +145,19 @@ QString DesktopWndManager::getOpenFileName(const QString &caption, const QString
     return fileName;
 }
 
+bool DesktopWndManager::sendConfirmationSlatepackDlg( QString title, QString messageBody, double widthScale, int inputsNum, int * ttl, QString passwordHash ) {
+    dlg::SendConfirmationSlatePackDlg confirmDlg(nullptr, title, messageBody, widthScale, inputsNum, *ttl, passwordHash);
+    if (confirmDlg.exec() == QDialog::Accepted) {
+        *ttl = confirmDlg.getTTlBlocks();
+        return true;
+    }
+    return false;
+}
+
+
 // Ask for confirmation
-bool DesktopWndManager::sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) {
-    dlg::SendConfirmationDlg confirmDlg(nullptr, title, message, widthScale, passwordHash );
+bool DesktopWndManager::sendConfirmationDlg( QString title, QString message, double widthScale, int inputsNum, QString passwordHash ) {
+    dlg::SendConfirmationDlg confirmDlg(nullptr, title, message, widthScale, inputsNum, passwordHash );
     return confirmDlg.exec() == QDialog::Accepted;
 }
 
@@ -288,16 +292,10 @@ void DesktopWndManager::pageSendOnline( QString selectedAccount, int64_t amount 
                                      new wnd::SendOnline( windowManager->getInWndParent(), selectedAccount, amount ));
 }
 
-void DesktopWndManager::pageSendFile( QString selectedAccount, int64_t amount ) {
-    restoreLeftBarShownStatus();
-    windowManager->switchToWindowEx( mwc::PAGE_G_SEND_FILE,
-                                     new wnd::SendOffline( windowManager->getInWndParent(), selectedAccount, amount, false ));
-}
-
 void DesktopWndManager::pageSendSlatepack( QString selectedAccount, int64_t amount ) {
     restoreLeftBarShownStatus();
     windowManager->switchToWindowEx( mwc::PAGE_G_SEND_SLATEPACK,
-                                     new wnd::SendOffline( windowManager->getInWndParent(), selectedAccount, amount, true ));
+                                     new wnd::SendOffline( windowManager->getInWndParent(), selectedAccount, amount ));
 }
 
 void DesktopWndManager::pageTransactions() {

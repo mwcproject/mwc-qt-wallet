@@ -27,6 +27,8 @@ QStringList readTextFile(QString fileName, bool trimmed = true, bool cleanEMptyL
 // Write text lines into the file
 bool writeTextFile(QString fileName, const QStringList & lines );
 
+bool copyWithWinEol( const QString & srcFile, const QString &destPath);
+
 #ifdef WALLET_MOBILE
 
 // Clear all files in temp directory

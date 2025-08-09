@@ -12,56 +12,50 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SENDCONFIRMATIONDLG_H
-#define SENDCONFIRMATIONDLG_H
+#ifndef FINALIZECONFIRMATIONDLG_H
+#define FINALIZECONFIRMATIONDLG_H
 
 #include "../control_desktop/mwcdialog.h"
 
 namespace Ui {
-class SendConfirmationDlg;
+class FinalizeConfirmationDlg;
 }
 
 namespace bridge {
-class Util;
 class Config;
 }
 
 namespace dlg {
 
-// SendConfirmationDlg is based off of MessageBox but it is more specific and
+// FinalizeConfirmationDlg is based off of MessageBox but it is more specific and
 // intended to handle confirmations for sending or finalizing a transaction.
 // This dialog includes a checkbox which allows users to configure whether
 // the fluff-phase of the dandelion protocol should be used to sending
 // transactions.
 // This dialog is very specific about the use of Decline and Confirm buttons.
-class SendConfirmationDlg: public control::MwcDialog
+class FinalizeConfirmationDlg: public control::MwcDialog
 {
     Q_OBJECT
 public:
     // widthScale - Horizontal scale for the dialog. Sometimes we need it wider.
-    explicit SendConfirmationDlg(QWidget *parent, QString title, QString message, double widthScale,
-                int inputsNum, QString passwordHash );
-    ~SendConfirmationDlg();
+    explicit FinalizeConfirmationDlg(QWidget *parent, QString title, QString message, double widthScale,
+                QString passwordHash );
+    ~FinalizeConfirmationDlg();
+
 private slots:
     void on_passwordEdit_textChanged(const QString &str);
     void on_declineButton_clicked();
     void on_confirmButton_clicked();
 
-    void on_outputsEdit_textChanged(const QString &arg1);
-
 private:
-    void updateMessageText();
     void checkPasswordStatus();
 private:
-    Ui::SendConfirmationDlg *ui;
-    bridge::Util * util = nullptr;
+    Ui::FinalizeConfirmationDlg *ui;
     bridge::Config * config = nullptr;
 
     QString passwordHash;
-    QString messageBody;
-    int inputsNum;
 };
 
 }
 
-#endif // SENDCONFIRMATIONDLG_H
+#endif // FINALIZECONFIRMATIONDLG_H

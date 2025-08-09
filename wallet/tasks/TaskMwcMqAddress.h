@@ -49,7 +49,7 @@ public:
     // idx     - index for generated address (genNext is true)
     // genNext:false - get current address with associated index
     TaskFileProofAddress( MWC713 * wallet713) :
-            Mwc713Task("FileProofAddress", "Requesting Wallet Public address...", "address --provable-address" , wallet713,"") {}
+            Mwc713Task("FileProofAddress", "Requesting Slatepack address...", "address --provable-address" , wallet713,"") {}
 
     virtual ~TaskFileProofAddress() override {}
 

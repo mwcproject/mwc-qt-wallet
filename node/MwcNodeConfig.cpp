@@ -87,10 +87,12 @@ static void updateMwcNodeConfig(const QString & nodeDataPath, const QString & ne
     QString mwcServerTomlFN = walletPath.second + "mwc-server.toml";
     // Copy with every run because of the tor flag
     QFile::remove(mwcServerTomlFN); // QT doesn't eoverwite the file, that is why we need to delete it first
-    QFile::copy( network.toLower().contains("main") ?
+
+    util::copyWithWinEol( network.toLower().contains("main") ?
                      (tor ? mwc::MWC_NODE_CONFIG_TOR_MAIN : mwc::MWC_NODE_CONFIG_IP_MAIN ) :
                      (tor ? mwc::MWC_NODE_CONFIG_TOR_FLOO : mwc::MWC_NODE_CONFIG_IP_FLOO ),
              mwcServerTomlFN );
+
     QFile::setPermissions( mwcServerTomlFN, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup );
 }
 

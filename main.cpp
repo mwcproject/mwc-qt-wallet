@@ -42,6 +42,7 @@
 #include "core/Config.h"
 #include "core/HodlStatus.h"
 #include "util/ConfigReader.h"
+#include "util/Files.h"
 #include <QFileDevice>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -116,7 +117,7 @@ bool deployWalletFilesFromResources() {
     bool ok = true;
 
     if ( !QFile::exists(mwc713conf)) {
-        ok = ok && QFile::copy(mwc::MWC713_DEFAULT_CONFIG, mwc713conf);
+        ok = ok && util::copyWithWinEol(mwc::MWC713_DEFAULT_CONFIG, mwc713conf);
         if (ok)
             QFile::setPermissions(mwc713conf, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadGroup);
     }

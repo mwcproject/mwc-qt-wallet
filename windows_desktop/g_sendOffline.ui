@@ -65,7 +65,7 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,1,0,0">
         <property name="spacing">
          <number>20</number>
         </property>
@@ -139,7 +139,7 @@
               </rect>
              </property>
              <property name="text">
-              <string>Send to File or Slatepack</string>
+              <string>Send to Slatepack</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -195,32 +195,17 @@
          </layout>
         </item>
         <item>
-         <widget class="QTextEdit" name="descriptionEdit">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+         <spacer name="verticalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
-          <property name="minimumSize">
+          <property name="sizeHint" stdset="0">
            <size>
-            <width>200</width>
-            <height>0</height>
+            <width>20</width>
+            <height>40</height>
            </size>
           </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>12000</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Input message for this transaction.</string>
-          </property>
-          <property name="placeholderText">
-           <string>Description (optional)</string>
-          </property>
-         </widget>
+         </spacer>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -245,13 +230,13 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Recipient wallet address to encrypt the slate</string>
+             <string>Recipient slatepack address to encrypt the slate</string>
             </property>
             <property name="maxLength">
              <number>1024</number>
             </property>
             <property name="placeholderText">
-             <string>Recipient wallet address, to encrypt slatepack (optional)</string>
+             <string>Recipient slatepack address</string>
             </property>
            </widget>
           </item>
@@ -284,6 +269,34 @@
            </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="descriptionEdit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>60</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Input message for this transaction.</string>
+          </property>
+          <property name="placeholderText">
+           <string>Description (optional)</string>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_4">
@@ -528,7 +541,17 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
@@ -536,16 +559,6 @@
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control_desktop/MwcLineEdit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

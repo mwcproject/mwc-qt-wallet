@@ -16,13 +16,13 @@
 #include "g_filetransaction_finalize_w.h"
 #include "ui_g_filetransaction_finalize.h"
 #include "../control_desktop/messagebox.h"
-#include "../dialogs_desktop/g_sendconfirmationdlg.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/wnd/g_finalize_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/config_b.h"
 #include "../bridge/util_b.h"
 #include "../core/global.h"
+#include "../dialogs_desktop/g_finalizeconfirmationdlg.h"
 
 namespace wnd {
 
@@ -156,7 +156,7 @@ void FileTransactionFinalize::on_processButton_clicked()
     }
     QString walletPasswordHash = wallet->getPasswordHash();
     if (!walletPasswordHash.isEmpty()) {
-            dlg::SendConfirmationDlg confirmDlg(this, "Confirm Finalize Request",
+            dlg::FinalizeConfirmationDlg confirmDlg(this, "Confirm Finalize Request",
                                             "You are finalizing transaction for " + ui->mwcLabel->text(),
                                             1.0, walletPasswordHash );
             if (confirmDlg.exec() != QDialog::Accepted)

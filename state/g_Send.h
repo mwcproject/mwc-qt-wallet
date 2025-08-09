@@ -45,7 +45,7 @@ public:
 
     // Handle whole workflow to send offline
     // return true if some long process was started.
-    bool sendMwcOffline( QString account, int64_t amount, QString message, bool isSlatepack, bool isLockLater, QString slatepackRecipientAddress);
+    bool sendMwcOffline( QString account, int64_t amount, QString message, bool isLockLater, QString slatepackRecipientAddress);
 
     // Handle whole workflow to send online
     // return true if some long process was started.

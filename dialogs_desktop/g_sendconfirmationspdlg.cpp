@@ -1,4 +1,4 @@
-// Copyright 2019 The MWC Developers
+// Copyright 2025 The MWC Developers
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,34 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "g_sendconfirmationdlg.h"
-#include "ui_g_sendconfirmationdlg.h"
-#include <Qt>
-#include <QTextDocument>
-#include <QScreen>
-#include <QTextBlock>
-#include <QScrollBar>
+
+#include "g_sendconfirmationspdlg.h"
+
 #include <QThread>
-#include "../bridge/util_b.h"
-#include "../bridge/config_b.h"
-#include "../util_desktop/widgetutils.h"
+#include "ui_g_sendconfirmationspdlg.h"
 #include "../util/ui.h"
 #include "../util/crypto.h"
+#include "../util_desktop/widgetutils.h"
 #include "../control_desktop/messagebox.h"
+#include "../bridge/config_b.h"
 
 namespace dlg {
 
-SendConfirmationDlg::SendConfirmationDlg( QWidget *parent, QString title, QString message, double widthScale,
-                                         int _inputsNum, QString _passwordHash ) :
-     MwcDialog(parent),
-    ui(new Ui::SendConfirmationDlg),
+SendConfirmationSlatePackDlg::SendConfirmationSlatePackDlg(QWidget *parent, QString title, QString _messageBody, double widthScale,
+                                         int _inputsNum, int ttl, const QString & _passwordHash)
+    : MwcDialog(parent),
+    ui(new Ui::SendConfirmationSlatePackDlg),
+    ttl_blocks(-1),
     passwordHash(_passwordHash),
-    messageBody(message),
+    messageBody(_messageBody),
     inputsNum(_inputsNum)
 {
     ui->setupUi(this);
-    util = new bridge::Util(this);
     config = new bridge::Config(this);
+
+    ui->title->setText(title);
+    ui->TTLEdit->setText(QString::number(ttl));
+    ui->outputsEdit->setText(QString::number( config->getChangeOutputs() ));
 
     if (widthScale!=1.0) {
         // Let's ujust Width first
@@ -55,32 +55,16 @@ SendConfirmationDlg::SendConfirmationDlg( QWidget *parent, QString title, QStrin
         adjustSize();
     }
 
-    ui->title->setText(title);
-
-    utils::resizeEditByContent(this, ui->text, false, message);
-
-    ui->fluffCheckBox->setCheckState( config->isFluffSet() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
-
-    ui->declineButton->setFocus();
-    ui->confirmButton->setFocus();
-
-    ui->confirmButton->adjustSize();
-    ui->declineButton->adjustSize();
-
-    ui->outputsEdit->setText(QString::number( config->getChangeOutputs() ));
-
-    adjustSize();
-
     updateMessageText();
     checkPasswordStatus();
 }
 
-SendConfirmationDlg::~SendConfirmationDlg()
+SendConfirmationSlatePackDlg::~SendConfirmationSlatePackDlg()
 {
     delete ui;
 }
 
-void SendConfirmationDlg::updateMessageText() {
+void SendConfirmationSlatePackDlg::updateMessageText() {
     int outputs = ui->outputsEdit->text().toInt();
     QString message = messageBody;
     if (outputs>0 && outputs <= 10) {
@@ -91,45 +75,54 @@ void SendConfirmationDlg::updateMessageText() {
     ui->text->setText(message);
 }
 
-void SendConfirmationDlg::checkPasswordStatus() {
+void SendConfirmationSlatePackDlg::checkPasswordStatus() {
     QThread::msleep(200); // Ok for human and will prevent brute force from UI attack (really crasy scenario, better to attack mwc713 if you already get the host).
     bool ok = crypto::calcHSA256Hash(ui->passwordEdit->text()) == passwordHash;
-    ui->confirmButton->setEnabled(ok);
+    ui->confirmBtn->setEnabled(ok);
     if (ok)
-        ui->confirmButton->setFocus();
+        ui->confirmBtn->setFocus();
 }
 
-
-void SendConfirmationDlg::on_passwordEdit_textChanged(const QString &)
+void SendConfirmationSlatePackDlg::on_confirmBtn_clicked()
 {
-    checkPasswordStatus();
+    passwordHash = ui->passwordEdit->text();
+
+    int ttl = ui->TTLEdit->text().toInt();
+    if (ttl < 10) {
+            control::MessageBox::messageText(this, "TTL value",
+                                    "Please specify valid TTL value. Minimum valid TTL value is 10.");
+            return;
+    }
+    ttl_blocks = ttl;
+
+    int outs = ui->outputsEdit->text().toInt();
+    if (!(outs>0 && outs <= 10)) {
+        control::MessageBox::messageText(this, "Outputs value",
+                                "Please specify outputs number from 1 to 10.");
+        return;
+    }
+
+    config->updateSendCoinsParams(config->getInputConfirmationNumber(), outs);
+
+    accept();
 }
 
-void SendConfirmationDlg::on_declineButton_clicked()
+
+void SendConfirmationSlatePackDlg::on_declineBtn_clicked()
 {
     reject();
 }
 
-void SendConfirmationDlg::on_confirmButton_clicked()
-{
-    int outs = ui->outputsEdit->text().toInt();
-    if (!(outs>0 && outs <= 10)) {
-        control::MessageBox::messageText(this, "Outputs value",
-                                         "Please specify outputs number from 1 to 10.");
-        return;
-    }
-    config->updateSendCoinsParams(config->getInputConfirmationNumber(), outs);
 
-    config->setFluff(ui->fluffCheckBox->isChecked());
-    accept();
-}
-
-void SendConfirmationDlg::on_outputsEdit_textChanged(const QString &)
+void SendConfirmationSlatePackDlg::on_outputsEdit_textChanged(const QString &)
 {
     updateMessageText();
 }
 
 
-
+void SendConfirmationSlatePackDlg::on_passwordEdit_textChanged(const QString &)
+{
+    checkPasswordStatus();
 }
 
+}

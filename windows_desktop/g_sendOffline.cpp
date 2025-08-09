@@ -24,12 +24,11 @@
 
 namespace wnd {
 
-SendOffline::SendOffline(QWidget *parent, QString _selectedAccount, int64_t _amount, bool _slatepacks) :
+SendOffline::SendOffline(QWidget *parent, QString _selectedAccount, int64_t _amount) :
     core::NavWnd(parent),
     ui(new Ui::SendOffline),
     selectedAccount(_selectedAccount),
-    amount(_amount),
-    slatepacks(_slatepacks)
+    amount(_amount)
 {
     ui->setupUi(this);
 
@@ -44,16 +43,6 @@ SendOffline::SendOffline(QWidget *parent, QString _selectedAccount, int64_t _amo
 
     ui->fromAccount->setText("From account: " + selectedAccount );
     ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util->nano2one(QString::number(amount))) + " MWC" );
-
-    if (!slatepacks) {
-        ui->recipientAddress->hide();
-        ui->contactsButton->hide();
-
-        ui->sendTitleLabel->setText("Send to File");
-    }
-    else {
-        ui->sendTitleLabel->setText("Send to Slatepack");
-    }
 }
 
 SendOffline::~SendOffline()
@@ -76,14 +65,12 @@ void SendOffline::on_sendButton_clicked()
     util::TimeoutLockObject to("SendOffline");
 
     QString recipientWallet;
-    if (slatepacks) {
         recipientWallet = ui->recipientAddress->text();
         if ( !recipientWallet.isEmpty() && util->verifyAddress(recipientWallet) != "tor") {
             control::MessageBox::messageText(this, "Unable to send", "Please specify valid recipient wallet address");
             ui->recipientAddress->setFocus();
             return;
         }
-    }
 
     if ( !send->isNodeHealthy() ) {
         control::MessageBox::messageText(this, "Unable to send", "Your MWC Node, that wallet is connected to, is not ready.\n"
@@ -102,7 +89,7 @@ void SendOffline::on_sendButton_clicked()
         }
     }
 
-    if ( send->sendMwcOffline( selectedAccount, QString::number(amount), description, slatepacks, config->getSendLockOutput(), recipientWallet) )
+    if ( send->sendMwcOffline( selectedAccount, QString::number(amount), description, config->getSendLockOutput(), recipientWallet) )
         ui->progress->show();
 }
 

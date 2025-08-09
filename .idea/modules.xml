@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/mwcwallet.iml" filepath="$PROJECT_DIR$/.idea/mwcwallet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/mwc-qt-wallet.iml" filepath="$PROJECT_DIR$/.idea/mwc-qt-wallet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/mwc-qt-wallet2.iml" filepath="$PROJECT_DIR$/.idea/mwc-qt-wallet2.iml" />
     </modules>
   </component>
 </project>

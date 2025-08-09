@@ -21,50 +21,68 @@
 namespace dlg {
 
 // Parse the data and fill the structure.
-bool ProofInfo::parseProofText(const QString & proof) {
+bool ProofInfo::parseProofText(const QString & proof_str) {
 
     // this file proves that [0.100000000] MWCs was sent to [xmgEvZ4MCCGMJnRnNXKHBbHmSGWQchNr9uZpY5J1XXnsCFS45fsU] from [xmiuyC3sdhXpJnR7pvQ8xNgZLWQRQziZ1FxhEQd8urYWvSusuC69]
-    int idx0 = proof.indexOf("this file proves that");
+    int idx0 = proof_str.indexOf("this file proves that");
     if (idx0<0)
         return false;
 
-    int mwcIdx1 = proof.indexOf('[', idx0);
-    int mwcIdx2 = proof.indexOf(']', mwcIdx1);
+    QString streamText = proof_str;
+    QTextStream stream(&streamText);
 
-    int addrToIdx1 = proof.indexOf('[', mwcIdx2);
-    int addrToIdx2 = proof.indexOf(']', addrToIdx1);
-    int addrFromIdx1 = proof.indexOf('[', addrToIdx2);
-    int addrFromIdx2 = proof.indexOf(']', addrFromIdx1);
+    QString ln = stream.readLine();
 
-    int outputIdx0 = proof.indexOf( "outputs:", addrFromIdx2);
-    int outputIdx1 = proof.indexOf( ':', outputIdx0);
-    int outputIdx2 = proof.indexOf( ':', outputIdx1 + 1);
+    int mwcIdx1 = ln.indexOf('[', idx0);
+    int mwcIdx2 = ln.indexOf(']', mwcIdx1);
+    int addrToIdx1 = ln.indexOf('[', mwcIdx2);
+    int addrToIdx2 = ln.indexOf(']', addrToIdx1);
+    int addrFromIdx1 = ln.indexOf('[', addrToIdx2);
+    int addrFromIdx2 = ln.indexOf(']', addrFromIdx1);
 
-    int kernelIdx0 = proof.indexOf( "kernel:", outputIdx2);
-    int kernelIdx1 = proof.indexOf( ':', kernelIdx0);
-    int kernelIdx2 = proof.indexOf( ':', kernelIdx1 + 1);
-
-    if ( idx0<0 || mwcIdx1<0 || mwcIdx2<0 || addrToIdx1<0 || addrToIdx2<0 || addrFromIdx1<0 || addrFromIdx2<0 ||
-                 outputIdx0<0 || outputIdx1<0 || outputIdx2<0 ||
-                 kernelIdx0<0 || kernelIdx1<0 || kernelIdx2<0 )
+    if ( idx0<0 || mwcIdx1<0 || mwcIdx2<0 || addrToIdx1<0 || addrToIdx2<0 || addrFromIdx1<0 || addrFromIdx2<0)
         return false;
 
-    mwc = proof.mid(mwcIdx1+1, mwcIdx2-mwcIdx1-1 );
+    mwc = ln.mid(mwcIdx1+1, mwcIdx2-mwcIdx1-1 );
     while (mwc.size()>0 && mwc[mwc.size()-1]=='0')
         mwc.resize(mwc.size()-1);
 
     if (mwc.size()>0 && mwc[mwc.size()-1]=='.')
         mwc.resize(mwc.size()-1);
 
-    toAdress = proof.mid( addrToIdx1+1, addrToIdx2-addrToIdx1-1 );
-    fromAdress = proof.mid( addrFromIdx1+1, addrFromIdx2-addrFromIdx1-1 );
+    toAdress = ln.mid( addrToIdx1+1, addrToIdx2-addrToIdx1-1 );
+    fromAdress = ln.mid( addrFromIdx1+1, addrFromIdx2-addrFromIdx1-1 );
 
-    output = proof.mid( outputIdx1+1, outputIdx2-outputIdx1-1).trimmed();
-    kernel = proof.mid( kernelIdx1+1, kernelIdx2-kernelIdx1-1).trimmed();
+    while (!stream.atEnd()) {
+        ln = stream.readLine();
+        if (ln.startsWith("outputs:"))
+            break;
+    }
 
-    if ( mwc.isEmpty() || toAdress.isEmpty() || fromAdress.isEmpty() || output.isEmpty() || kernel.isEmpty() )
+    while (!stream.atEnd()) {
+        ln = stream.readLine();
+        if (ln.startsWith("kernel:"))
+            break;
+
+        int outputIdx1 = ln.indexOf( ':');
+        if (outputIdx1>0) {
+            QString output = ln.left(outputIdx1).trimmed();
+            outputs.push_back(output);
+        }
+    }
+
+    ln = stream.readLine();
+    int kernelIdx = ln.indexOf( ':');
+    if (kernelIdx<0)
         return false;
 
+    kernel = ln.left(kernelIdx).trimmed();
+
+    ln = stream.readLine();
+    if (!ln.startsWith("slate: "))
+        return false;
+
+    slate = ln.right( ln.length() - strlen("slate: ") ).trimmed();
     return true;
 }
 
@@ -88,8 +106,13 @@ ShowProofDlg::ShowProofDlg(QWidget *parent, const QString &fileName, const Proof
             "<p align=\"center\">this file proves that <b>" + proofInfo.mwc + " MWCs</b> was sent to<br /><b>" + proofInfo.toAdress +
             "</b> <br/>from<br/><b>" + proofInfo.fromAdress + "</br></p></body></html>");
 
-    ui->output->setText( proofInfo.output );
+    for (const QString & output : proofInfo.outputs ) {
+        ui->outputs->addItem(output);
+    }
+    ui->outputs->setCurrentIndex(0);
+
     ui->kernel->setText( proofInfo.kernel );
+    ui->slate->setText(proofInfo.slate);
 
     blockExplorerUrl = config->getBlockExplorerUrl(config->getNetwork());
 }
@@ -100,7 +123,10 @@ ShowProofDlg::~ShowProofDlg() {
 
 void ShowProofDlg::on_viewOutput_clicked()
 {
-    util->openUrlInBrowser( "https://"+blockExplorerUrl+"/#o" + proof.output );
+    int outIdx = ui->outputs->currentIndex();
+    if (outIdx>=0 && outIdx<proof.outputs.size()) {
+        util->openUrlInBrowser( "https://"+blockExplorerUrl+"/#o" + proof.outputs[outIdx] );
+    }
 }
 
 void ShowProofDlg::on_viewKernel_clicked()

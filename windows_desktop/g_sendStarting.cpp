@@ -40,12 +40,9 @@ SendStarting::SendStarting(QWidget *parent) :
     wallet->requestWalletBalanceUpdate();
 
     ui->onlineChecked->setId(bridge::SEND_SELECTED_METHOD::ONLINE_ID);
-    ui->fileChecked->setId(bridge::SEND_SELECTED_METHOD::FILE_ID);
     ui->slatepackChecked->setId(bridge::SEND_SELECTED_METHOD::SLATEPACK_ID);
 
     connect(ui->onlineChecked, &control::MwcCheckedFrame::onChecked, this, &SendStarting::onChecked,
-            Qt::QueuedConnection);
-    connect(ui->fileChecked, &control::MwcCheckedFrame::onChecked, this, &SendStarting::onChecked,
             Qt::QueuedConnection);
     connect(ui->slatepackChecked, &control::MwcCheckedFrame::onChecked, this, &SendStarting::onChecked,
             Qt::QueuedConnection);
@@ -53,10 +50,9 @@ SendStarting::SendStarting(QWidget *parent) :
     if (config->isColdWallet()) {
         // Hide 'online option to send'
         ui->onlineChecked->hide();
-        QRect rc = ui->fileChecked->frameGeometry();
-        ui->fileChecked->move( QPoint( (rc.right() - rc.width()), rc.top() ) );
-        rc = ui->slatepackChecked->frameGeometry();
-        ui->slatepackChecked->move( QPoint( rc.right() - rc.width()/2, rc.top() ) );
+        QSize parentSz = ui->slatepackChecked->parentWidget()->size();
+        QRect rc = ui->slatepackChecked->frameGeometry();
+        ui->slatepackChecked->move( QPoint( (parentSz.width() - rc.width())/2, rc.top() ) );
 
         onChecked(bridge::SEND_SELECTED_METHOD::SLATEPACK_ID);
     }
@@ -96,26 +92,15 @@ void SendStarting::onChecked(int id) {
     selectedSendMethod = id;
     if (id == bridge::SEND_SELECTED_METHOD::ONLINE_ID) {
         ui->onlineChecked->setChecked(true);
-        ui->fileChecked->setChecked(false);
         ui->slatepackChecked->setChecked(false);
         ui->onlineLabel->show();
-        ui->fileLabel->hide();
-        ui->slatepackLabel->hide();
-    } else if (id == bridge::SEND_SELECTED_METHOD::FILE_ID) {
-        ui->onlineChecked->setChecked(false);
-        ui->fileChecked->setChecked(true);
-        ui->slatepackChecked->setChecked(false);
-        ui->onlineLabel->hide();
-        ui->fileLabel->show();
         ui->slatepackLabel->hide();
     }
     else {
         selectedSendMethod = bridge::SEND_SELECTED_METHOD::SLATEPACK_ID;
         ui->onlineChecked->setChecked(false);
-        ui->fileChecked->setChecked(false);
         ui->slatepackChecked->setChecked(true);
         ui->onlineLabel->hide();
-        ui->fileLabel->hide();
         ui->slatepackLabel->show();
     }
 }

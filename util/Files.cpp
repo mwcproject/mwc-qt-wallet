@@ -74,6 +74,34 @@ bool writeTextFile(QString fileName, const QStringList & lines ) {
     return true;
 }
 
+
+bool copyWithWinEol( const QString & srcFile, const QString &destPath)
+{
+    // 1. Read the resource file
+    QFile res(srcFile);
+    if (!res.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+
+    QString content = QTextStream(&res).readAll();
+    res.close();
+
+#ifdef Q_OS_WIN
+    content.replace("\r\n", "\n");
+    content.replace("\r", "\n");
+    content.replace("\n",  "\r\n");
+#endif
+
+    QFile out(destPath);
+    if (!out.open(QIODevice::WriteOnly | QIODevice::Text))
+        return false;
+
+    QTextStream stream(&out);
+    stream << content;
+
+    out.close();
+    return true;
+}
+
 #ifdef WALLET_MOBILE
 
 // Clear all files in temp directory

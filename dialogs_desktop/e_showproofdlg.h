@@ -34,8 +34,10 @@ struct ProofInfo {
     QString toAdress;
     QString fromAdress;
 
-    QString output;
+    QStringList outputs;
     QString kernel;
+
+    QString slate;
 
     // Parse the data and fill the structure.
     bool parseProofText(const QString & proof);

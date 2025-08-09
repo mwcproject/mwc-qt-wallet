@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SendConfirmationDlg</class>
- <widget class="QDialog" name="SendConfirmationDlg">
+ <class>FinalizeConfirmationDlg</class>
+ <widget class="QDialog" name="FinalizeConfirmationDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>739</width>
-    <height>561</height>
+    <height>495</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -211,13 +211,13 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
        <property name="minimumSize">
         <size>
          <width>600</width>
-         <height>100</height>
+         <height>45</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>600</width>
-         <height>100</height>
+         <height>45</height>
         </size>
        </property>
        <property name="frameShape">
@@ -229,8 +229,8 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
        <widget class="control::MwcLabelNormal" name="inputPassLabel_2">
         <property name="geometry">
          <rect>
-          <x>8</x>
-          <y>64</y>
+          <x>14</x>
+          <y>12</y>
           <width>262</width>
           <height>22</height>
          </rect>
@@ -256,86 +256,11 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="control::MwcLineEditNormal" name="outputsEdit">
-        <property name="geometry">
-         <rect>
-          <x>278</x>
-          <y>4</y>
-          <width>300</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>300</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>300</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>18</pointsize>
-         </font>
-        </property>
-        <property name="inputMask">
-         <string/>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="maxLength">
-         <number>64</number>
-        </property>
-        <property name="echoMode">
-         <enum>QLineEdit::Normal</enum>
-        </property>
-        <property name="placeholderText">
-         <string>Outputs num.</string>
-        </property>
-        <property name="clearButtonEnabled">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelNormal" name="inputTTLBlocksLabel_2">
-        <property name="geometry">
-         <rect>
-          <x>8</x>
-          <y>14</y>
-          <width>133</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>15</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Change outputs:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
        <widget class="control::MwcLineEditNormal" name="passwordEdit">
         <property name="geometry">
          <rect>
-          <x>278</x>
-          <y>54</y>
+          <x>284</x>
+          <y>2</y>
           <width>300</width>
           <height>40</height>
          </rect>

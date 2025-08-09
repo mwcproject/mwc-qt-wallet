@@ -42,22 +42,18 @@ public:
     // Two button box
     virtual RETURN_CODE questionTextDlg( QString title, QString message, QString btn1, QString btn2,
                 QString btn1Tooltip, QString btn2Tooltip,
-                bool default1=false, bool default2=true, double widthScale = 1.0, int *ttl_blocks = 0) = 0;
+                bool default1=false, bool default2=true, double widthScale = 1.0) = 0;
     virtual RETURN_CODE questionHTMLDlg( QString title, QString message, QString btn1, QString btn2,
                 QString btn1Tooltip, QString btn2Tooltip,
                 bool default1=false, bool default2=true, double widthScale = 1.0 ) = 0;
-    // Password accepted as a HASH. Empty String mean that no password is set.
-    // After return, passwordHash value will have input raw Password value. So it can be user for wallet
-    virtual RETURN_CODE questionTextDlg( QString title, QString message, QString btn1, QString btn2,
-            QString btn1Tooltip, QString btn2Tooltip,
-            bool default1, bool default2, double widthScale, QString & passwordHash, RETURN_CODE blockButton, int *ttl_blocks ) = 0;
 
     // QFileDialog::getSaveFileName call
     virtual QString getSaveFileName(const QString &caption, const QString &dir, const QString &filter) = 0;
     virtual QString getOpenFileName(const QString &caption, const QString &dir, const QString &filter) = 0;
 
     // Ask for confirmation
-    virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, QString passwordHash ) = 0;
+    virtual bool sendConfirmationSlatepackDlg( QString title, QString messageBody, double widthScale, int inputsNum, int * ttl, QString passwordHash ) = 0;
+    virtual bool sendConfirmationDlg( QString title, QString message, double widthScale, int inputsNum, QString passwordHash ) = 0;
 
     // Stopping wallet message
     virtual void showWalletStoppingMessage(int taskTimeout) = 0;
@@ -84,7 +80,6 @@ public:
     virtual void pageFinalize() = 0;
     virtual void pageSendStarting() = 0;
     virtual void pageSendOnline( QString selectedAccount, int64_t amount ) = 0;
-    virtual void pageSendFile( QString selectedAccount, int64_t amount ) = 0;
     virtual void pageSendSlatepack( QString selectedAccount, int64_t amount ) = 0;
     virtual void pageTransactions() = 0;
     // slatepack - slatepack string value to show.

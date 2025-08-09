@@ -84,11 +84,11 @@ bool AccountTransfer::transferFunds(const QString & from,
             accFrom = a;
     }
 
-    core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
+    core::SendCoinsParams sendParams = context->appContext->getSendCoinsParams();
 
     if ( mwcAmount.second > accFrom.currentlySpendable ) {
 
-        QString msg2print = generateAmountErrorMsg( mwcAmount.second, accFrom, prms );
+        QString msg2print = generateAmountErrorMsg( mwcAmount.second, accFrom, sendParams );
 
         core::getWndManager()->messageTextDlg("Incorrect Input",
                                          msg2print );
@@ -111,26 +111,32 @@ bool AccountTransfer::transferFunds(const QString & from,
     QStringList outputs; // empty is valid value. Empty - mwc713 will use default algorithm.
     uint64_t txnFee = 0; // not used here yet
     // nanoCoins < 0  - All
-    if (! util::getOutputsToSend( accFrom.accountName, prms.changeOutputs, nanoCoins, context->wallet, context->appContext, outputs, &txnFee) ) {
-        for (auto b : bridge::getBridgeManager()->getAccountTransfer())
-            b->hideProgress();
-        return false; // User cancel transaction
-    }
+    util::getOutputsToSend( accFrom.accountName, sendParams.changeOutputs, nanoCoins, context->wallet, context->appContext, outputs, &txnFee);
 
     // Need to show confirmation dialog similar to what send has. Point to show the fees
     if (txnFee == 0 && outputs.size() == 0) {
         txnFee = util::getTxnFee( accFrom.accountName, nanoCoins, context->wallet,
-                                  context->appContext, prms.changeOutputs, outputs );
+                                  context->appContext, sendParams.changeOutputs, outputs );
     }
     QString txnFeeStr = util::txnFeeToString(txnFee);
 
     QString hash = context->wallet->getPasswordHash();
     if ( !core::getWndManager()->sendConfirmationDlg("Confirm Transfer Request",
                                                     "You are transferring " + (nanoCoins < 0 ? "all" : util::nano2one(nanoCoins)) +
-                                                    " MWC\nfrom account '" + from + "' to account '" + to + "'" +
-                                                    "\n\nTransaction fee: " + txnFeeStr,
-                                                    1.0, hash ) ) {
+                                                    " MWC\nfrom account '" + from + "' to account '" + to + "'",
+                                                    1.0, outputs.size(), hash ) ) {
         return false;
+    }
+
+    core::SendCoinsParams prms = context->appContext->getSendCoinsParams();
+
+    if (prms.changeOutputs != sendParams.changeOutputs) {
+        // Recalculating the outputs and fees. There is a chance that outputs will be different.
+        util::getOutputsToSend( accFrom.accountName, sendParams.changeOutputs, nanoCoins, context->wallet, context->appContext, outputs, &txnFee);
+        if (outputs.size() == 0) {
+            util::getTxnFee( accFrom.accountName, nanoCoins, context->wallet,
+                                  context->appContext, sendParams.changeOutputs, outputs );
+        }
     }
 
     // Expected that everything is fine, but will do operation step by step

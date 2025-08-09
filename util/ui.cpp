@@ -182,8 +182,7 @@ bool calcOutputsToSpend( int64_t nanoCoins, const QVector<wallet::WalletOutput> 
 
 // in: nanoCoins < 0 - ALL
 // out: resultOutputs - what we want include into transaction. If
-// return false if User cancel this action.
-bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins,
+void getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins,
         wallet::Wallet * wallet,
         core::AppContext * appContext,
         QStringList & resultOutputs, uint64_t* txnFee ) {
@@ -205,7 +204,6 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
     //QVector<wallet::WalletOutput> freeOuts;
     QMultiMap<int64_t, wallet::WalletOutput> freeOuts;
 
-    int64_t freeNanoCoins = 0;
     int64_t totalNanoCoins = 0;
 
     QStringList allOutputs;
@@ -227,13 +225,11 @@ bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t n
         totalNanoCoins += o.valueNano;
         o.weight = 1.0;
         freeOuts.insert(o.valueNano, o);  // inserts by value
-        freeNanoCoins += o.valueNano;
     }
 
     // nothing on this account is in HODL
     resultOutputs = allOutputs;
     *txnFee = getTxnFeeFromSpendableOutputs(nanoCoins, freeOuts, outputsNumber, totalNanoCoins, resultOutputs);
-    return true;
 }
 
 //
@@ -418,7 +414,7 @@ uint64_t getTxnFeeFromSpendableOutputs(int64_t amount, const QMultiMap<int64_t, 
 // used in mwc713 where smaller outputs are used first as the fee will
 // be reduced if more spendable outputs are used as transaction inputs.
 //
-// The minimum transaction fee is: 1000000 MWC nanocoin
+// The minimum transaction fee is: 1000000/1000 MWC nanocoin
 //
 // Parameters:
 //     amount        - amount to spend in MWC nanocoins

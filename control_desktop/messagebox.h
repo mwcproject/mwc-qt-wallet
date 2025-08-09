@@ -48,10 +48,6 @@ public:
             QString btn1, QString btn2,
             QString btn1Tooltip, QString btn2Tooltip,
             bool default1=false, bool default2=true, double widthScale = 1.0 );
-    static core::WndManager::RETURN_CODE questionTextWithTTL( QWidget *parent, QString title, QString message,
-            QString btn1, QString btn2,
-            QString btn1Tooltip, QString btn2Tooltip,
-            bool default1, bool default2, double widthScale, int *ttl_blocks );
 
     static core::WndManager::RETURN_CODE questionHTML( QWidget *parent, QString title, QString message,
             QString btn1, QString btn2,
@@ -63,9 +59,6 @@ public:
     static core::WndManager::RETURN_CODE questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2,
             QString btn1Tooltip, QString btn2Tooltip,
             bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE blockButton );
-    static core::WndManager::RETURN_CODE questionTextWithTTL( QWidget *parent, QString title, QString message, QString btn1, QString btn2,
-            QString btn1Tooltip, QString btn2Tooltip,
-            bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE blockButton, int *ttl_blocks );
 
 private slots:
     void on_passwordEdit_textChanged(const QString &str);

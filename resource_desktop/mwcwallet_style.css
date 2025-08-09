@@ -216,7 +216,7 @@ QTextEdit {
     selection-background-color: rgba(255, 255, 255, 0.3);
     selection-color: white;
 
-    font-size: 18px;
+    font-size: 15px;
     border-radius: 6px;
     padding: 10px 6px 10px 15px;
 }

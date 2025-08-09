@@ -193,41 +193,12 @@ core::WndManager::RETURN_CODE MessageBox::questionText( QWidget *parent, QString
     return res;
 }
 
-core::WndManager::RETURN_CODE MessageBox::questionTextWithTTL( QWidget *parent, QString title, QString message, QString btn1, QString btn2,
-                   QString btn1Tooltip, QString btn2Tooltip,
-                   bool default1, bool default2, double widthScale, QString & passwordHash, core::WndManager::RETURN_CODE blockButton, int *ttl_blocks ) {
-    MessageBox * msgBox = new MessageBox(parent, title, message, false, btn1, btn2, btn1Tooltip, btn2Tooltip,
-                                         default1, default2, widthScale, passwordHash, blockButton,
-                                         ttl_blocks == nullptr ? -1 : *ttl_blocks );
-    msgBox->exec();
-    if ( ttl_blocks != nullptr)
-        *ttl_blocks = msgBox->ttl_blocks;
-    core::WndManager::RETURN_CODE  res = msgBox->getRetCode();
-    delete msgBox;
-    return res;
-}
-
 core::WndManager::RETURN_CODE MessageBox::questionText( QWidget *parent, QString title, QString message, QString btn1, QString btn2,
         QString btn1Tooltip, QString btn2Tooltip,
         bool default1, bool default2, double widthScale) {
     QString hash;
     MessageBox * msgBox = new MessageBox(parent, title, message, false, btn1, btn2, btn1Tooltip, btn2Tooltip, default1, default2, widthScale, hash, core::WndManager::RETURN_CODE::BTN1, -1);
     msgBox->exec();
-    core::WndManager::RETURN_CODE  res = msgBox->getRetCode();
-    delete msgBox;
-    return res;
-}
-//questionTextWithTTL(QWidget*, QString, QString, QString, QString, QString, QString, bool, bool, double, int*)
-core::WndManager::RETURN_CODE MessageBox::questionTextWithTTL( QWidget *parent, QString title, QString message, QString btn1, QString btn2,
-        QString btn1Tooltip, QString btn2Tooltip,
-        bool default1, bool default2, double widthScale, int *ttl_blocks) {
-    QString hash;
-    MessageBox * msgBox = new MessageBox(parent, title, message, false, btn1, btn2, btn1Tooltip, btn2Tooltip,
-                                         default1, default2, widthScale, hash, core::WndManager::RETURN_CODE::BTN1,
-                                         ttl_blocks== nullptr ? -1 : *ttl_blocks);
-    msgBox->exec();
-    if ( ttl_blocks != nullptr )
-    	*ttl_blocks = msgBox->ttl_blocks;
     core::WndManager::RETURN_CODE  res = msgBox->getRetCode();
     delete msgBox;
     return res;

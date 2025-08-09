@@ -122,7 +122,7 @@ Unable to recognize slatepack content in the string.
 
 # Error: LibWallet Error, Slatepack decode error, Unable to decrypt, ring::error::Unspecified
 Error: LibWallet Error, Slatepack decode error, Unable to decrypt, (.*)
-Unable to decrypt the slatepack content, probably this slatepack was created for wallet with another public address.
+Unable to decrypt the slatepack content, probably this slatepack was created for another wallet.
 
 # Error: IO error, Unable to build slate from the content, Can't parse slate version, Unable to find slate version at {kdjsfhlkdasjhl fadkljdhsafklsdfjah, key must be a string at line 1 column 2
 Error: IO error, Unable to build slate from the content, Can't parse slate version, Unable to find slate version at (.*)

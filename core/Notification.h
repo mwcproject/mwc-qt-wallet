@@ -83,12 +83,7 @@ QVector<NotificationMessage> getNotificationMessages();
 
 
 void appendNotificationMessage( bridge::MESSAGE_LEVEL level, QString message );
-
-
-
 }
-
-Q_DECLARE_METATYPE(bridge::MESSAGE_LEVEL );
 
 
 #endif //MWC_QT_WALLET_NOTIFICATION_H

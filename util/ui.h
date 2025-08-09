@@ -30,8 +30,7 @@ namespace util {
     // in: nanoCoins < 0 - ALL
     // out: resultOutputs - what we want include into transaction.
     //      txnFee        - txn fee for send using these resultOutputs
-    // return false if User cancel this action.
-    bool getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins,
+    void getOutputsToSend( const QString & accountName, int outputsNumber, int64_t nanoCoins,
                            wallet::Wallet * wallet,
                            core::AppContext * appContext,
                            QStringList & resultOutputs, uint64_t* txnFee );

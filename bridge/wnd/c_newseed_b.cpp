@@ -35,7 +35,7 @@ void NewSeed::showSeedData(const QVector<QString> & seed) {
 }
 
 // Done looking at a new seed. Let's go forward
-void NewSeed::doneWithNewSeed() {
+Q_INVOKABLE void NewSeed::doneWithNewSeed() {
     getState()->doneWithNewSeed();
 }
 

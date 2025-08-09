@@ -80,7 +80,6 @@ public:
     virtual void pageFinalize() override;
     virtual void pageSendStarting() override;
     virtual void pageSendOnline( QString selectedAccount, int64_t amount ) override;
-    virtual void pageSendFile( QString selectedAccount, int64_t amount ) override;
     virtual void pageSendSlatepack( QString selectedAccount, int64_t amount ) override;
     virtual void pageTransactions() override;
     // slatepack - slatepack string value to show.

@@ -98,7 +98,6 @@ WalletConfig::WalletConfig(QWidget *parent) :
 
     mqsHost = walletConfig->getMqsHost();
     inputConfirmationsNumber = walletConfig->getInputConfirmationsNumber();
-    changeOutputs = walletConfig->getChangeOutputs();
 
 #ifdef Q_OS_WIN
     // Disable in windows because notification bring the whole QT wallet on the top of other windows.
@@ -106,7 +105,7 @@ WalletConfig::WalletConfig(QWidget *parent) :
     ui->notificationsEnabled->setEnabled(false);
 #endif
 
-    setValues(mqsHost, inputConfirmationsNumber, changeOutputs);
+    setValues(mqsHost, inputConfirmationsNumber);
     updateButtons();
 }
 
@@ -118,13 +117,10 @@ WalletConfig::~WalletConfig()
 
 void WalletConfig::setValues(
                              const QString & mwcmqHostNorm,
-                             int inputConfirmationNumber,
-                             int changeOutputs) {
+                             int inputConfirmationNumber) {
     ui->mwcmqHost->setText( mwcDomainConfig2InputStr( mwcmqHostNorm ) );
 
     ui->confirmationNumberEdit->setText( QString::number(inputConfirmationNumber) );
-    ui->changeOutputsEdit->setText( QString::number(changeOutputs) );
-
     setFocus();
 }
 
@@ -135,7 +131,6 @@ void WalletConfig::updateButtons() {
         walletLogsEnabled == ui->logsEnableBtn->isChecked() &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == mqsHost &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(inputConfirmationsNumber) &&
-        ui->changeOutputsEdit->text().trimmed() == QString::number(changeOutputs) &&
         autoStartMQSEnabled == ui->start_mqs->isChecked() &&
         autoStartTorEnabled == ui->start_tor->isChecked() &&
         notificationWindowsEnabled == ui->notificationsEnabled->isChecked() &&
@@ -152,7 +147,6 @@ void WalletConfig::updateButtons() {
         // ui->mwc713directoryEdit->text().trimmed() == defaultWalletConfig.getDataPath() &&
         mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == walletConfig->getDefaultMqsHost() &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(walletConfig->getDefaultInputConfirmationsNumber()) &&
-        ui->changeOutputsEdit->text().trimmed() == QString::number(walletConfig->getDefaultChangeOutputs()) &&
         ui->start_mqs->isChecked() == true &&
         ui->start_tor->isChecked() == true &&
         ui->logout_20->isChecked() == true &&
@@ -180,16 +174,10 @@ void WalletConfig::on_confirmationNumberEdit_textChanged(const QString &)
     updateButtons();
 }
 
-void WalletConfig::on_changeOutputsEdit_textEdited(const QString &)
-{
-    updateButtons();
-}
-
 void WalletConfig::on_restoreDefault_clicked()
 {
     setValues(walletConfig->getMqsHost(),
-              walletConfig->getDefaultInputConfirmationsNumber(),
-              walletConfig->getDefaultChangeOutputs());
+              walletConfig->getDefaultInputConfirmationsNumber());
 
     checkSizeButton( scale2Id(walletConfig->getInitGuiScale()) );
 
@@ -239,18 +227,9 @@ bool WalletConfig::applyChanges() {
         return false;
     }
 
-    int changeOutputs = ui->changeOutputsEdit->text().trimmed().toInt(&ok);
-    if (!ok || changeOutputs <= 0 || changeOutputs >= 100) {
-        control::MessageBox::messageText(this, "Input",
-                                         "Please input the change output number in the range from 1 to 100");
-        ui->changeOutputsEdit->setFocus();
-        return false;
-    }
-
-    if (!(confirmations == inputConfirmationsNumber && changeOutputs == this->changeOutputs)) {
-        walletConfig->setSendCoinsParams(confirmations, changeOutputs);
+    if (!(confirmations == inputConfirmationsNumber)) {
+        walletConfig->setSendCoinsParams(confirmations, walletConfig->getChangeOutputs());
         inputConfirmationsNumber = confirmations;
-        this->changeOutputs = changeOutputs;
     }
 
     bool need2updateLogEnabled = (walletLogsEnabled != ui->logsEnableBtn->isChecked());
