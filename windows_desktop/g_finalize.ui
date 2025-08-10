@@ -6,14 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>691</width>
-    <height>464</height>
+    <width>888</width>
+    <height>764</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,7,1">
+   <property name="topMargin">
+    <number>80</number>
+   </property>
    <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -28,9 +31,9 @@
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,7,1">
      <item>
-      <spacer name="horizontalSpacer">
+      <spacer name="horizontalSpacer_7">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -43,92 +46,189 @@
       </spacer>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>400</width>
-         <height>180</height>
-        </size>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>3</number>
        </property>
-       <property name="maximumSize">
-        <size>
-         <width>400</width>
-         <height>180</height>
-        </size>
-       </property>
-       <widget class="QLabel" name="label">
-        <property name="geometry">
-         <rect>
-          <x>78</x>
-          <y>6</y>
-          <width>52</width>
-          <height>61</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../resources_desktop.qrc">:/img/FinalizeL@2x.svg</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelLarge" name="label_2">
-        <property name="geometry">
-         <rect>
-          <x>165</x>
-          <y>33</y>
-          <width>201</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Finalize Transaction</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-        </property>
-       </widget>
-       <widget class="control::MwcPushButtonNormal" name="pasteSlatepackBtn">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>128</y>
-          <width>180</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Paste response slatepack for finalization</string>
-        </property>
-        <property name="text">
-         <string>Paste Slatepack</string>
-        </property>
-       </widget>
-      </widget>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QWidget" name="widget" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>400</width>
+             <height>120</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>400</width>
+             <height>120</height>
+            </size>
+           </property>
+           <widget class="QLabel" name="label">
+            <property name="geometry">
+             <rect>
+              <x>78</x>
+              <y>6</y>
+              <width>52</width>
+              <height>61</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="../resources_desktop.qrc">:/img/FinalizeL@2x.svg</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+           </widget>
+           <widget class="control::MwcLabelLarge" name="label_2">
+            <property name="geometry">
+             <rect>
+              <x>165</x>
+              <y>28</y>
+              <width>201</width>
+              <height>34</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Finalize Transaction</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+            </property>
+           </widget>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QTextEdit" name="slatepackEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>600</width>
+           <height>200</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>6000</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font-family: &quot;Courier&quot;</string>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="acceptRichText">
+          <bool>false</bool>
+         </property>
+         <property name="placeholderText">
+          <string>Please paste the slatepack content below</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>30</number>
+         </property>
+         <item>
+          <widget class="control::MwcLabelNormal" name="slatepack_status">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Encrypted, from XXXXXXXX</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="control::MwcPushButtonNormal" name="continueButton">
+           <property name="minimumSize">
+            <size>
+             <width>140</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>180</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="text">
+            <string>Continue</string>
+           </property>
+           <property name="default">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </item>
      <item>
-      <spacer name="horizontalSpacer_2">
+      <spacer name="horizontalSpacer_6">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -150,7 +250,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>132</height>
+       <height>69</height>
       </size>
      </property>
     </spacer>
@@ -165,6 +265,11 @@
   </customwidget>
   <customwidget>
    <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>

@@ -25,6 +25,7 @@ namespace bridge {
 class Config;
 class Finalize;
 class Util;
+class Wallet;
 }
 
 namespace wnd {
@@ -37,16 +38,28 @@ public:
     explicit Finalize(QWidget *parent);
     ~Finalize();
 
-private slots:
-    void on_uploadFileBtn_clicked();
+protected:
+    void updateButtons();
+    void initiateSlateVerification(const QString &slate2check);
 
-    void on_pasteSlatepackBtn_clicked();
+private slots:
+    void on_slatepackEdit_textChanged();
+    void on_continueButton_clicked();
+
+    void onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient);
 
 private:
     Ui::FinalizeUpload *ui;
     bridge::Config * config = nullptr;
     bridge::Finalize * finalize = nullptr;
     bridge::Util * util = nullptr;
+    bridge::Wallet  *wallet = nullptr;
+
+    QString slatepack; // The content
+    QString slateJson;
+    QString sender;
+    bool isSpValid = false;
+    QString spInProgress;
 };
 
 }
