@@ -66,7 +66,6 @@ enum WALLET_EVENTS {
     S_LISTENER_MQ_COLLISION = 30,  // ERROR: new login detected. mwcmqs listener will stop!
     S_LISTENER_MQ_FAILED_TO_START = 31, // ERROR: Failed to start mwcmqs subscriber. Error connecting to ....
 
-    S_LISTENER_HTTP_STARTING = 35, // Starting listener for Foreign API on [host:port]
     S_LISTENER_HTTP_FAILED   = 36, // thread 'foreign-api-gotham' panicked at XXXXXXXXX
 
     S_LISTENER_TOR_LOST_CONNECTION = 37, // WARNING: Tor is not responding. Will try to reconnect

@@ -122,15 +122,6 @@ private:
     QString dataPath;
 
 public:
-    QString mwcmqsDomainEx;// empty - default value
-
-    // Http listening params...
-    bool foreignApi = false; // Is foreign API is enabled
-    QString foreignApiAddress; // Example: 0.0.0.0:3416
-    // For https configuration.
-    QString tlsCertificateFile;
-    QString tlsCertificateKey;
-
     WalletConfig() : network("Mainnet"), dataPath("Undefined") {}
     WalletConfig(const WalletConfig & other) = default;
     WalletConfig &operator = (const WalletConfig & other) = default;
@@ -140,35 +131,13 @@ public:
     bool isDefined() const { return  dataPath!="Undefined"; }
 
     WalletConfig & setData(QString network,
-                QString dataPath,
-                QString mwcmqsDomain,
-                bool foreignApi,
-                QString foreignApiAddress,
-                QString tlsCertificateFile,
-                QString tlsCertificateKey);
-
-    WalletConfig & setForeignApi(bool foreignApi,
-                       QString foreignApiAddress,
-                       QString tlsCertificateFile, QString tlsCertificateKey);
-
-    WalletConfig & setDataWalletCfg(QString mwcmqsDomain);
+                QString dataPath);
 
     void updateDataPath(const QString & path) {dataPath=path;}
     void updateNetwork(const QString & mw) { Q_ASSERT(!mw.isEmpty()); network=mw; }
 
-    bool hasForeignApi() const { return foreignApi && !foreignApiAddress.isEmpty(); }
-
-
-    bool hasTls() const {return !tlsCertificateFile.isEmpty() && !tlsCertificateKey.isEmpty(); }
-
     const QString & getDataPath() const {return dataPath;}
     const QString & getNetwork() const {return network;}
-
-    // Get MQ/MQS host normalized name. Depend on current config
-    QString getMwcMqHostNorm() const;
-
-    // Get MQ/MQS host full name. Depend on current config
-    QString getMwcMqHostFull() const;
 
     // First [Network, Arch, InstanceName]
     static QVector<QString> readNetworkArchInstanceFromDataPath(QString configPath, core::AppContext * context); // local path as writen in config
@@ -601,15 +570,6 @@ public:
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
     virtual void nextBoxAddress()  = 0;
 
-    // Request http(s) listening status.
-    // bool - true is listening. Then next will be the address
-    // bool - false, not listening. Then next will be error or empty if listening is not active.
-    // Check signal: onHttpListeningStatus(bool listening, QString additionalInfo)
-    virtual QPair<bool, QString> getHttpListeningStatus() const = 0;
-
-    // Return true if Tls is setted up for the wallet for http connections.
-    virtual bool hasTls() const = 0;
-
     // -------------- Accounts
 
     // NOTE!!!:  It is child implemenation responsibility to process Outputs Locking correctly, so it looks
@@ -1016,9 +976,6 @@ signals:
     void onListenersStatus(bool mqsOnline, bool torOnline);
     // mwc713 get an error  ERROR: new login detected. mwcmqs listener will stop!
     void onListenerMqCollision();
-
-    // Http listener status
-    void onHttpListeningStatus(bool listening, QString additionalInfo);
 
     // Node info
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );

@@ -38,11 +38,6 @@ public:
     // Error message will be started with ' ' - space
     Q_INVOKABLE QString getAppDataPath(QString localPath = "");
 
-    // Update config with foreign API settings.
-    Q_INVOKABLE void saveForeignApiConfig(bool foreignApi,
-                                          QString foreignApiAddress,
-                                          QString tlsCertificateFile, QString tlsCertificateKey);
-
     // Request wallet instances.
     // hasSeed - true if needed initialized wallet instances.
     // Returns the data as:
@@ -64,14 +59,8 @@ public:
     Q_INVOKABLE bool isColdWallet();
 
     // ---------------- Wallet Config data -----------------
-    // if wallet using TLS for http connection
-    Q_INVOKABLE bool hasTls();
     // Wallet data Path as it is written in the configs
     Q_INVOKABLE QString getDataPath();
-    Q_INVOKABLE bool hasForeignApi();
-    Q_INVOKABLE QString getForeignApiAddress();
-    Q_INVOKABLE QString getTlsCertificateKey();
-    Q_INVOKABLE QString getTlsCertificateFile();
     // Get wallet network name
     Q_INVOKABLE QString getNetwork();
 

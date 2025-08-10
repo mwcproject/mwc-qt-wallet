@@ -137,7 +137,6 @@ Item {
     function updateListenerBtn() {
         const mqsStatus = wallet.getMqsListenerStatus()
         const torStatus = wallet.getTorListenerStatus()
-        const httpListenerStatus = wallet.getHttpListeningStatus()
 
         let listening = mqsStatus | torStatus
         let listenerNames = ""
@@ -148,15 +147,6 @@ Item {
             if (listenerNames !== "")
                 listenerNames += ", "
             listenerNames += "TOR"
-        }
-
-        if (httpListenerStatus === "true") {
-            listening = true
-            if (listenerNames !== "")
-                listenerNames += ", "
-            listenerNames += "Http"
-            if (config.hasTls())
-                listenerNames += "s"
         }
 
         setStatusButtonState(false, listening ? status_green : status_red, listening ? listenerNames : "Listeners")

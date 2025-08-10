@@ -61,9 +61,6 @@ Receive::Receive(QWidget *parent) :
         ui->mwcmqAddress->hide();
     }
 
-    if ( config->hasTls())
-        ui->httpLabel->setText("Https");
-
     wallet->requestFileProofAddress();
 
     updateStatus();
@@ -87,10 +84,6 @@ void Receive::updateStatus() {
     bool torOnline = wallet->getTorListenerStatus();
     ui->torStatusImg->setPixmap( QPixmap(torOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
     ui->torStatusLabel->setText( torOnline ? "Online" : "Offline" );
-
-    bool httpOnline = wallet->getHttpListeningStatus()=="true";
-    ui->httpStatusImg->setPixmap( QPixmap(httpOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg") );
-    ui->httpStatusLabel->setText( httpOnline ? "Online" : "Offline" );
 }
 
 

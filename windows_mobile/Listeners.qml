@@ -19,10 +19,6 @@ Item {
             updateStatuses()
         }
 
-        onSgnHttpListeningStatus: (listening, additionalInfo) => {
-            updateStatuses()
-        }
-
         onSgnMwcAddressWithIndex: (mwcAddress, idx) => {
             text_mqs_address.text = mwcAddress
             text_mqs_address_index.text = idx >= 0 ? "Address Index: " + Number(idx).toString() : ""

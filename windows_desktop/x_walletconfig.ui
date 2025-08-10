@@ -85,44 +85,7 @@
       <attribute name="title">
        <string>Main</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="5,6,6">
-       <item>
-        <widget class="QGroupBox" name="autoStart_2">
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <property name="title">
-          <string>MWC MQS domain</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <property name="leftMargin">
-           <number>20</number>
-          </property>
-          <property name="rightMargin">
-           <number>20</number>
-          </property>
-          <item>
-           <widget class="control::MwcLineEditNormal" name="mwcmqHost">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>200000</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="maxLength">
-             <number>512</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="6,6">
        <item>
         <widget class="QGroupBox" name="autoStart_3">
          <property name="styleSheet">
@@ -144,19 +107,6 @@
           <property name="verticalSpacing">
            <number>0</number>
           </property>
-          <item row="0" column="0">
-           <widget class="control::MwcLabelSmall" name="label_6">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>22</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Number of confirmations</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="0">
            <widget class="control::MwcLineEditNormal" name="confirmationNumberEdit">
             <property name="minimumSize">
@@ -173,6 +123,19 @@
             </property>
             <property name="maxLength">
              <number>2</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="control::MwcLabelSmall" name="label_6">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Number of confirmations</string>
             </property>
            </widget>
           </item>
@@ -983,14 +946,14 @@
    <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -1006,7 +969,6 @@
   <tabstop>notificationsEnabled</tabstop>
   <tabstop>outputLockingCheck</tabstop>
   <tabstop>logsEnableBtn</tabstop>
-  <tabstop>mwcmqHost</tabstop>
   <tabstop>confirmationNumberEdit</tabstop>
   <tabstop>walletInstanceNameEdit</tabstop>
   <tabstop>walletDataPath</tabstop>

@@ -126,15 +126,6 @@ public:
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
     virtual void nextBoxAddress()  override;
 
-    // Request http(s) listening status.
-    // bool - true is listening. Then next will be the address
-    // bool - false, not listening. Then next will be error or empty if listening is not active.
-    // Check signal: onHttpListeningStatus(bool listening, QString additionalInfo)
-    virtual QPair<bool, QString> getHttpListeningStatus() const override {return QPair<bool, QString>(false, "");}
-
-    // Return true if Tls is setted up for the wallet for http connections.
-    virtual bool hasTls() const override { return false; }
-
     // -------------- Accounts
 
     // Get all accounts with balances. Expected that Wallet allways maintain them in a cache.

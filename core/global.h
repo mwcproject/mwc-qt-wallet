@@ -69,9 +69,6 @@ const int NODE_HEIGHT_DIFF_LIMIT = 5;
 
 const int COIN_BASE_CONFIRM_NUMBER = 1440;
 
-// Default MQ servers
-const QString DEFAULT_HOST_MWC_MQS = "mqs.mwc.mw";
-
 // Block Explorer URLs
 const QString BLOCK_EXPLORER_URL_MAINNET = "explorer.mwc.mw";
 const QString BLOCK_EXPLORER_URL_FLOONET = "explorer.floonet.mwc.mw";

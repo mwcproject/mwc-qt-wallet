@@ -65,11 +65,6 @@ bool WalletConfig::getAutoStartMQSEnabled() {
     return getState()->getAutoStartMQSEnabled();
 }
 
-bool WalletConfig::getAutoStartKeybaseEnabled() {
-    Q_ASSERT(false); // Absolete
-    return false;
-}
-
 bool WalletConfig::getAutoStartTorEnabled() {
     return getState()->getAutoStartTorEnabled();
 }
@@ -89,14 +84,6 @@ bool WalletConfig::getNotificationWindowsEnabled() {
 QString WalletConfig::getDataPath() {
     return getWallet()->getWalletConfig().getDataPath();
 }
-QString WalletConfig::getKeybasePath() {
-    Q_ASSERT(false); // absolete code
-    return "ABSOLETE";
-}
-
-QString WalletConfig::getMqsHost() {
-    return getWallet()->getWalletConfig().mwcmqsDomainEx;
-}
 int WalletConfig::getInputConfirmationsNumber() {
     return getState()->getSendCoinsParams().inputConfirmationNumber;
 }
@@ -106,14 +93,7 @@ int WalletConfig::getChangeOutputs()  {
 double WalletConfig::getInitGuiScale() {
     return getState()->getInitGuiScale();
 }
-QString WalletConfig::getDefaultKeybasePath() {
-    Q_ASSERT(false); // // absolete code
-    return "ABSOLETE";
-}
 
-QString WalletConfig::getDefaultMqsHost() {
-    return getWallet()->getWalletConfig().mwcmqsDomainEx;
-}
 int WalletConfig::getDefaultInputConfirmationsNumber() {
     return core::SendCoinsParams().inputConfirmationNumber;
 }
@@ -134,11 +114,6 @@ void WalletConfig::updateGuiScale(double scale) {
 void WalletConfig::updateAutoStartMQSEnabled(bool enabled) {
     getState()->updateAutoStartMQSEnabled(enabled);
 }
-void WalletConfig::updateAutoStartKeybaseEnabled(bool enabled) {
-    Q_UNUSED(enabled);
-    Q_ASSERT(false); // absolete code
-}
-
 void WalletConfig::updateAutoStartTorEnabled(bool enabled) {
     getState()->updateAutoStartTorEnabled(enabled);
 }
@@ -154,15 +129,5 @@ void WalletConfig::setNotificationWindowsEnabled(bool enabled) {
 bool WalletConfig::updateTimeoutValue(int timeout) {
     return getState()->updateTimeoutValue(timeout);
 }
-
-bool WalletConfig::updateWalletConfig( QString mwcmqsDomain, QString _keyBasePath, bool need2updateGuiSize) {
-    Q_UNUSED(_keyBasePath)
-    Q_ASSERT(_keyBasePath.isEmpty()); // keybase is absolete
-
-    auto config = getWallet()->getWalletConfig();
-    config.setDataWalletCfg(mwcmqsDomain);
-    return getState()->setWalletConfig(config, need2updateGuiSize);
-}
-
 
 }

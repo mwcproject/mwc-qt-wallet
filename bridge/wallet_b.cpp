@@ -45,8 +45,6 @@ Wallet::Wallet(QObject *parent) : QObject(parent) {
                      this, &Wallet::onListeningStartResults, Qt::QueuedConnection);
     QObject::connect(wallet, &wallet::Wallet::onListeningStopResult,
                      this, &Wallet::onListeningStopResult, Qt::QueuedConnection);
-    QObject::connect(wallet, &wallet::Wallet::onHttpListeningStatus,
-                     this, &Wallet::onHttpListeningStatus, Qt::QueuedConnection);
 
     QObject::connect(wallet, &wallet::Wallet::onNodeStatus,
                      this, &Wallet::onUpdateNodeStatus, Qt::QueuedConnection);
@@ -133,10 +131,6 @@ void Wallet::onListeningStopResult(bool mqTry, bool tor,
 
 void Wallet::onUpdateListenerStatus(bool mqsOnline, bool torOnline) {
     emit sgnUpdateListenerStatus( mqsOnline, false, torOnline );
-}
-
-void Wallet::onHttpListeningStatus(bool listening, QString additionalInfo) {
-    emit sgnHttpListeningStatus(listening, additionalInfo);
 }
 
 void Wallet::onUpdateNodeStatus(bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty,
@@ -302,17 +296,6 @@ void Wallet::requestStopTorListener() {
 
 void Wallet::repost(QString account, int id, bool fluff) {
     getWallet()->repost(account, id, fluff);
-}
-
-// return values:
-// "true"  - listening
-// ""  - not listening, no errors
-// string  - not listening, error message
-QString Wallet::getHttpListeningStatus() {
-    QPair<bool, QString> res = getWallet()->getHttpListeningStatus();
-    if (res.first)
-        return "true";
-    return res.second;
 }
 
 // Return a password hash for that wallet

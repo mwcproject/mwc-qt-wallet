@@ -72,8 +72,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(wallet, &Wallet::sgnUpdateListenerStatus,
                      this, &MainWindow::onSgnUpdateListenerStatus, Qt::QueuedConnection);
-    QObject::connect(wallet, &Wallet::sgnHttpListeningStatus,
-                     this, &MainWindow::onSgnHttpListeningStatus, Qt::QueuedConnection);
 
     QObject::connect(wallet, &Wallet::sgnUpdateNodeStatus,
                      this, &MainWindow::onSgnUpdateNodeStatus, Qt::QueuedConnection);
@@ -346,12 +344,6 @@ void MainWindow::onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, b
     updateListenerBtn();
 }
 
-void MainWindow::onSgnHttpListeningStatus(bool listening, QString additionalInfo) {
-    Q_UNUSED(listening)
-    Q_UNUSED(additionalInfo)
-    updateListenerBtn();
-}
-
 // Node info
 void MainWindow::onSgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections ) {
     Q_UNUSED(errMsg)
@@ -408,9 +400,8 @@ void MainWindow::onApplicationStateChange(Qt::ApplicationState state) {
 void MainWindow::updateListenerBtn() {
     bool mqsStatus = wallet->getMqsListenerStatus();
     bool torStatus = wallet->getTorListenerStatus();
-    QString httpListenerStatus = wallet->getHttpListeningStatus();
 
-    qDebug() << "updateListenerBtn: mqsStatus=" << mqsStatus << " torStatus=" << torStatus << " httpListenerStatus=" << httpListenerStatus;
+    qDebug() << "updateListenerBtn: mqsStatus=" << mqsStatus << " torStatus=" << torStatus;
 
     bool listening = mqsStatus | torStatus;
     QString listenerNames;
@@ -421,15 +412,6 @@ void MainWindow::updateListenerBtn() {
         if (!listenerNames.isEmpty())
             listenerNames += ", ";
         listenerNames += "Tor";
-    }
-
-    if (httpListenerStatus == "true") {
-        listening = true;
-        if (!listenerNames.isEmpty())
-            listenerNames += ", ";
-        listenerNames += "Http";
-        if (config->hasTls())
-            listenerNames += "s";
     }
 
     setStatusButtonState( ui->listenerStatusButton,

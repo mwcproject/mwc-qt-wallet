@@ -128,15 +128,6 @@ public:
     virtual void nextBoxAddress()  override;
     // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
 
-    // Request http(s) listening status.
-    // bool - true is listening. Then next will be the address
-    // bool - false, not listening. Then next will be error or empty if listening is not active.
-    virtual QPair<bool, QString> getHttpListeningStatus() const override;
-    // Check signal: onHttpListeningStatus(bool listening, QString additionalInfo)
-
-    // Return true if Tls is setted up for the wallet for http connections.
-    virtual bool hasTls() const override;
-
     // -------------- Accounts
 
     // Get all accounts with balances. Expected that Wallet allways maintain them in a cache.
@@ -477,9 +468,6 @@ public:
     void setMwcMqListeningStatus(bool online, QString tid, bool startStopEvents); // Start stop event are major, they can change active tid
     void setTorListeningStatus(bool online);
 
-    // info: if online  - Address, offlone - Error message or empty.
-    void setHttpListeningStatus(bool online, QString info);
-
     void setRecoveryResults( bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages );
     void setRecoveryProgress( int64_t progress, int64_t limit );
 
@@ -683,10 +671,6 @@ private:
     bool torStarted = false;
     // MWC MQS will try to start forever.
     bool mwcMqStartRequested = false;
-
-    bool httpOnline = false;
-    QString httpInfo = "";
-    bool hasHttpTls = false;
 
     QString activeMwcMqsTid; // MQS can be managed by many thredas, but only last started is active
 

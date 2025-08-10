@@ -19,8 +19,6 @@
 #include "../control_desktop/inputdialog.h"
 #include <QDebug>
 #include "../util_desktop/timeoutlock.h"
-#include "../dialogs_desktop/e_httplistenerconfigdlg.h"
-#include "../dialogs_desktop/e_httplistenersimpleconfigdlg.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/config_b.h"
 
@@ -37,8 +35,6 @@ Listening::Listening(QWidget *parent) :
 
     QObject::connect( wallet, &bridge::Wallet::sgnUpdateListenerStatus,
                       this, &Listening::onSgnUpdateListenerStatus, Qt::QueuedConnection);
-    QObject::connect( wallet, &bridge::Wallet::sgnHttpListeningStatus,
-                      this, &Listening::onSgnHttpListeningStatus, Qt::QueuedConnection);
     QObject::connect( wallet, &bridge::Wallet::sgnMwcAddressWithIndex,
                       this, &Listening::onSgnMwcAddressWithIndex, Qt::QueuedConnection);
     QObject::connect( wallet, &bridge::Wallet::sgnListenerStartStop,
@@ -72,13 +68,6 @@ void Listening::onSgnUpdateListenerStatus(bool mwcOnline, bool _keybaseOnline, b
 
     updateStatuses();
 }
-void Listening::onSgnHttpListeningStatus(bool listening, QString additionalInfo) {
-    Q_UNUSED(listening);
-    Q_UNUSED(additionalInfo);
-
-    updateStatuses();
-}
-
 // _keybase is absolete
 void Listening::onSgnListenerStartStop(bool mqs, bool tor) {
     if (mqs)
@@ -154,38 +143,6 @@ void Listening::updateStatuses() {
 
     ui->torBridgeConection->setEnabled(!torStarted);
     ui->torClientOptions->setEnabled(!torStarted);
-
-    // "true"  - listening
-    // ""  - not listening, no errors
-    // string  - not listening, error message
-    QString httpStatus = wallet->getHttpListeningStatus();
-    bool httpOnline = (httpStatus=="true");
-
-    // -------------   HTTP(S)  ------------------
-    ui->httpStatusImg->setPixmap( QPixmap( httpOnline ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg" ) );
-    ui->httpStatusImg->setToolTip( httpOnline ? "Wallet http(s) foreign REST API is online" : "Wallet foreign REST API is offline");
-    ui->httpStatusTxt->setText( httpOnline ? "Online" : "Offline" );
-
-    QString foreignApiAddress = config->getForeignApiAddress();
-    bool hasTls = config->hasTls();
-    if (hasTls)
-        ui->label_http->setText("Https");
-
-    if (httpOnline) {
-        QString warningStr;
-
-        if (foreignApiAddress.startsWith("127.0.0.1:")) {
-            warningStr += "INFO: Accepting Tor and local connections";
-        }
-        else {
-            if (!hasTls)
-                warningStr += "WARNING: You are using non-secure HTTP connection.";
-        }
-
-        ui->http_warnings->setText(warningStr);
-    } else {
-        ui->http_warnings->setText(httpStatus); // String param will an error or nothing if it is disabled. That what we need.
-    }
 }
 
 void Listening::on_mwcMqTriggerButton_clicked()
@@ -266,17 +223,5 @@ void Listening::on_torTriggerButton_clicked()
         wallet->requestStartTorListener();
     }
 }
-
-
-void Listening::on_httpConfigButton_clicked()
-{
-    util::TimeoutLockObject to("Listening");
-
-    // Just start the config dialog. I will take case about itself
-//    dlg::HttpListenerConfigDlg optionDlg(this);
-    dlg::HttpListenerSimpleConfigDlg optionDlg(this);
-    optionDlg.exec();
-}
-
 
 }

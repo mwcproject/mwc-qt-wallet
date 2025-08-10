@@ -46,10 +46,6 @@ static double id2scale(int scale) {
     }
 }
 
-static QString calcMWCMW_DOMAIN_DEFAULT_STR() {
-    return "default MWC MQS Domain";
-}
-
 WalletConfig::WalletConfig(QWidget *parent) :
     core::NavWnd(parent),
     ui(new Ui::WalletConfig)
@@ -96,7 +92,6 @@ WalletConfig::WalletConfig(QWidget *parent) :
 
     ui->progress->initLoader(false);
 
-    mqsHost = walletConfig->getMqsHost();
     inputConfirmationsNumber = walletConfig->getInputConfirmationsNumber();
 
 #ifdef Q_OS_WIN
@@ -105,7 +100,7 @@ WalletConfig::WalletConfig(QWidget *parent) :
     ui->notificationsEnabled->setEnabled(false);
 #endif
 
-    setValues(mqsHost, inputConfirmationsNumber);
+    setValues(inputConfirmationsNumber);
     updateButtons();
 }
 
@@ -115,11 +110,7 @@ WalletConfig::~WalletConfig()
     delete ui;
 }
 
-void WalletConfig::setValues(
-                             const QString & mwcmqHostNorm,
-                             int inputConfirmationNumber) {
-    ui->mwcmqHost->setText( mwcDomainConfig2InputStr( mwcmqHostNorm ) );
-
+void WalletConfig::setValues(int inputConfirmationNumber) {
     ui->confirmationNumberEdit->setText( QString::number(inputConfirmationNumber) );
     setFocus();
 }
@@ -129,7 +120,6 @@ void WalletConfig::updateButtons() {
         ui->walletInstanceNameEdit->text().trimmed() == walletInstanceName &&
         getcheckedSizeButton() == uiScale &&
         walletLogsEnabled == ui->logsEnableBtn->isChecked() &&
-        mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == mqsHost &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(inputConfirmationsNumber) &&
         autoStartMQSEnabled == ui->start_mqs->isChecked() &&
         autoStartTorEnabled == ui->start_tor->isChecked() &&
@@ -145,7 +135,6 @@ void WalletConfig::updateButtons() {
         true == ui->logsEnableBtn->isChecked() &&
         // 713 directory is skipped intentionally. We don't want to reset it because user is expected to have many such directories
         // ui->mwc713directoryEdit->text().trimmed() == defaultWalletConfig.getDataPath() &&
-        mwcDomainInputStr2Config( ui->mwcmqHost->text().trimmed() ) == walletConfig->getDefaultMqsHost() &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(walletConfig->getDefaultInputConfirmationsNumber()) &&
         ui->start_mqs->isChecked() == true &&
         ui->start_tor->isChecked() == true &&
@@ -154,14 +143,6 @@ void WalletConfig::updateButtons() {
 
     ui->restoreDefault->setEnabled( !sameWithDefault );
     ui->applyButton->setEnabled( !sameWithCurrent );
-}
-
-QString WalletConfig::mwcDomainConfig2InputStr(QString mwcDomain) {
-    return mwcDomain.isEmpty() ? calcMWCMW_DOMAIN_DEFAULT_STR() : mwcDomain;
-}
-
-QString WalletConfig::mwcDomainInputStr2Config(QString mwcDomain) {
-    return mwcDomain == calcMWCMW_DOMAIN_DEFAULT_STR() ? "" : mwcDomain;
 }
 
 void WalletConfig::on_mwcmqHost_textEdited(const QString &)
@@ -176,8 +157,7 @@ void WalletConfig::on_confirmationNumberEdit_textChanged(const QString &)
 
 void WalletConfig::on_restoreDefault_clicked()
 {
-    setValues(walletConfig->getMqsHost(),
-              walletConfig->getDefaultInputConfirmationsNumber());
+    setValues(walletConfig->getDefaultInputConfirmationsNumber());
 
     checkSizeButton( scale2Id(walletConfig->getInitGuiScale()) );
 
@@ -204,18 +184,6 @@ bool WalletConfig::applyChanges() {
         control::MessageBox::messageText(this, "Input", "Please specify non empty wallet instance name");
         ui->walletInstanceNameEdit->setFocus();
         return false;
-    }
-
-    QString mwcmqHost = mwcDomainInputStr2Config(ui->mwcmqHost->text().trimmed());
-    if (!mwcmqHost.isEmpty()) {
-        // Checking the host
-        QHostInfo host = QHostInfo::fromName(mwcmqHost);
-        if (host.error() != QHostInfo::NoError) {
-            control::MessageBox::messageText(this, "Input",
-                                             "Host " + mwcmqHost + " is not reachable.\n" + host.errorString());
-            ui->mwcmqHost->setFocus();
-            return false;
-        }
     }
 
     bool ok = false;
@@ -267,46 +235,6 @@ bool WalletConfig::applyChanges() {
     }
     autoStartMQSEnabled = ui->start_mqs->isChecked();
 
-    // Check if Foreign API configured correctly
-    if ( ui->start_tor->isChecked() ) {
-        // Checking how foign API is doing
-        bool foreignIsOk = true;
-        bool resetForeignForTor = false;
-        if ( !config->hasForeignApi() ) {
-            foreignIsOk = false;
-            resetForeignForTor =
-                    core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(this, "Tor Configuration",
-                                "Tor requires Foreign API to be running. "
-                                "Do you want configure Foreign API to match Tor expectations?",
-                                "Disable Tor",
-                                "Configure API",
-                                "Don't change foreign API settings and disable the Tor",
-                                "Continue and change Foreign API settings, I want Tor to run",
-                                false, true);
-        }
-        else if ( config->hasTls() ) {
-            foreignIsOk = false;
-            resetForeignForTor =
-                    core::WndManager::RETURN_CODE::BTN2 == control::MessageBox::questionHTML(this, "Tor Configuration",
-                                "Tor requires Foreign API to be running without TLS. "
-                                "Do you want configure Foreign API to match Tor expectations?",
-                                "Disable Tor",
-                                "Configure API",
-                                "Don't change Foreign API settings and disable Tor",
-                                "Continue and change Foreign API settings. I want Tor to run",
-                                false, true);
-        }
-        if (resetForeignForTor) {
-            foreignIsOk = true;
-            need2updateGuiSize = true;
-            config->saveForeignApiConfig(true,
-                    "127.0.0.1:3415", "", "");
-        }
-        if (!foreignIsOk) {
-            ui->start_tor->setCheckState(Qt::Unchecked);
-        }
-    }
-
     bool need2updateAutoStartTorEnabled = (autoStartTorEnabled != ui->start_tor->isChecked());
     if (need2updateAutoStartTorEnabled) {
         walletConfig->updateAutoStartTorEnabled(ui->start_tor->isChecked());
@@ -339,13 +267,6 @@ bool WalletConfig::applyChanges() {
     if (newWalletInstanceName != walletInstanceName) {
         config->updateActiveInstanceName(newWalletInstanceName);
         walletInstanceName = newWalletInstanceName;
-    }
-
-    if (mwcmqHost != mqsHost) {
-        ui->progress->show();
-        if (walletConfig->updateWalletConfig( mwcmqHost, "", need2updateGuiSize)) {
-            return false;
-        }
     }
 
     if (need2updateGuiSize) {

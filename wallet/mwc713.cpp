@@ -207,9 +207,6 @@ void MWC713::resetData(STARTED_MODE _startedMode) {
     mwcMqStarted = mwcMqStartRequested = torStarted = false;
     torAddress = "";
     mwcAddress = "";
-    httpOnline = false;
-    httpInfo = "";
-    hasHttpTls = false;
     walletPasswordHash = "";
     outputsLines.clear();
     currentAccount = "default";
@@ -260,7 +257,6 @@ void MWC713::start() {
 
     // Need to check if Tls active
     const WalletConfig &config = getWalletConfig();
-    hasHttpTls = !config.tlsCertificateKey.isEmpty() && !config.tlsCertificateFile.isEmpty();
 
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
@@ -436,9 +432,6 @@ void MWC713::processStop(bool exitNicely) {
     mwcMqOnline = false;
     mwcMqStarted = mwcMqStartRequested = false;
 
-    httpOnline = false;
-    httpInfo = "";
-
     emit onMwcAddress("");
     emit onMwcAddressWithIndex("", 1);
     emit onTorAddress("");
@@ -593,19 +586,6 @@ void MWC713::changeMwcBoxAddress(int idx) {
 void MWC713::nextBoxAddress() {
     eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
                             {TSK(new TaskMwcMqAddress(this, true, -1), TaskMwcMqAddress::TIMEOUT)});
-}
-
-// Request http(s) listening status.
-// bool - true is listening. Then next will be the address
-// bool - false, not listening. Then next will be error or empty if listening is not active.
-// Check signal: onHttpListeningStatus(bool listening, QString additionalInfo)
-QPair<bool, QString> MWC713::getHttpListeningStatus() const {
-    return QPair<bool, QString>(httpOnline, httpInfo);
-}
-
-// Return true if Tls is setted up for the wallet for http connections.
-bool MWC713::hasTls() const {
-    return hasHttpTls;
 }
 
 QVector<AccountInfo> MWC713::getWalletBalance(bool filterDeleted) const {
@@ -1536,19 +1516,6 @@ void MWC713::setTorListeningStatus(bool online) {
     emit onListenersStatus(mwcMqOnline, torOnline);
 }
 
-// info: if online  - Address, offlone - Error message or empty.
-void MWC713::setHttpListeningStatus(bool online, QString info) {
-    if (online == httpOnline && info == httpInfo)
-        return;
-
-    httpOnline = online;
-    httpInfo = info;
-
-    logger::logEmit("MWC713", "onHttpListeningStatus", QString("online=") + QString::number(online) + " info=" + info);
-    emit onHttpListeningStatus(online, info);
-}
-
-
 void MWC713::setRecoveryResults(bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages) {
     logger::logEmit("MWC713", "onRecoverResult", QString("started=") + QString::number(started) +
                                                  " finishedWithSuccess=" + QString::number(finishedWithSuccess) +
@@ -2285,12 +2252,7 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
             "mwc713 process exited due some unexpected error.\nmwc713 exit code: " + QString::number(exitCode);
 
     // Checking if foreign API enable but it is not default fro the TOR
-    if (config.hasForeignApi() && !(appContext->isAutoStartTorEnabled() && config.hasForeignApi() &&
-                                    config.foreignApiAddress == "127.0.0.1:3415" && !config.hasTls())) {
-        errorMessage += "\n\nYou have activated foreign API and it might be a reason for this issue. Foreign API is deactivated, please try to restart the wallet";
-        config.foreignApi = false;
-        saveWalletConfig(config, nullptr, nullptr, false);
-    } else {
+
         if (QDateTime::currentMSecsSinceEpoch() - walletStartTime < 1000L * 15) {
             // Very likely that wallet wasn't be able to start. Lets update the message with mode details
 
@@ -2316,7 +2278,6 @@ void MWC713::mwc713finished(int exitCode, QProcess::ExitStatus exitStatus) {
                     "\n\n" + walletErrMsg + "\n" +
                     "You might use command line for troubleshooting:\n\n" + commandLine;
         }
-    }
 
     if (startedMode == STARTED_MODE::RECOVER) {
         // We are good, just a wrong passphrase. We need to report it correctly.
@@ -2399,15 +2360,6 @@ WalletConfig MWC713::readWalletConfig(QString source) {
 
     QString network = mwc713config.getString("chain");
     QString dataPath = mwc713config.getString("wallet713_data_path");
-    QString mwcmqsDomain = mwc713config.getString("mwcmqs_domain");
-
-    bool foreignApi = mwc713config.getString("foreign_api") == "true";
-    QString foreignApiAddress = mwc713config.getString("foreign_api_address");
-    QString tlsCertificateFile = mwc713config.getString("tls_certificate_file");
-    QString tlsCertificateKey = mwc713config.getString("tls_certificate_key");
-
-    if (foreignApiAddress.isEmpty())
-        foreignApi = false;
 
     if (dataPath.isEmpty()) {
         core::getWndManager()->messageTextDlg("Read failure",
@@ -2433,8 +2385,7 @@ WalletConfig MWC713::readWalletConfig(QString source) {
         mwc713config.updateConfig( "tor_log_file", "\""+torLogPath+"\"");
     }
 
-    return WalletConfig().setData(network, dataPath, mwcmqsDomain,
-                                  foreignApi, foreignApiAddress, tlsCertificateFile, tlsCertificateKey);
+    return WalletConfig().setData(network, dataPath);
 }
 
 QString MWC713::getTorLogFilename() {
@@ -2519,22 +2470,12 @@ bool MWC713::saveWalletConfig(const WalletConfig &config, core::AppContext *appC
     newConfLines.insert(appentIdx, "chain = \"" + config.getNetwork() + "\"");
     newConfLines.insert(appentIdx, "wallet713_data_path = \"" + config.getDataPath() + "\"");
 
-    if (!config.mwcmqsDomainEx.isEmpty())
-        newConfLines.insert(appentIdx, "mwcmqs_domain = \"" + config.mwcmqsDomainEx + "\"");
-
-    if (config.hasForeignApi() && !config.foreignApiAddress.isEmpty()) {
-        newConfLines.insert(appentIdx, "foreign_api = true");
-        newConfLines.insert(appentIdx, "foreign_api_address = \"" + config.foreignApiAddress + "\"");
-
-        if (!config.tlsCertificateFile.isEmpty() && !config.tlsCertificateKey.isEmpty()) {
-            newConfLines.insert(appentIdx, "tls_certificate_file = \"" + config.tlsCertificateFile + "\"");
-            newConfLines.insert(appentIdx, "tls_certificate_key = \"" + config.tlsCertificateKey + "\"");
-        }
-    }
+    // oreign API is allways enable as a local host so we could start Tor
+    newConfLines.insert(appentIdx, "foreign_api = true");
+    newConfLines.insert(appentIdx, "foreign_api_address = \"127.0.0.1:3415\"");
 
     if (!config::isOnlineWallet()) {
         newConfLines.insert(appentIdx, "grinbox_listener_auto_start = false");
-        newConfLines.insert(appentIdx, "keybase_listener_auto_start = false");
     }
 
     // Update connection node...
@@ -2597,22 +2538,6 @@ bool MWC713::saveWalletConfig(const WalletConfig &config, core::AppContext *appC
 //          and caller suppose listen for them
 bool MWC713::setWalletConfig(const WalletConfig &_config, bool canStartNode) {
     WalletConfig config = _config;
-
-    // Checking if Tor is active. Then we will activate Foreign API.  Or if Foreign API active wrong way, we will disable Tor
-    if (appContext->isAutoStartTorEnabled()) {
-        if (!config.hasForeignApi()) {
-            // Expected to do that silently. It is a migration case
-            config.setForeignApi(true, "127.0.0.1:3415", "", "");
-        } else {
-            // Check if Foreign API has HTTPS. Tor doesn't support it
-            if (config.hasTls()) {
-                core::getWndManager()->messageTextDlg("Unable to start Tor",
-                                                      "Your Foreign API is configured to use TLS certificated. Tor doesn't support HTTPS connection.\n\n"
-                                                      "Because of that Tor will not be started. You can review your configuration at Wallet Settings page.");
-                appContext->setAutoStartTorEnabled(false);
-            }
-        }
-    }
 
     if (!saveWalletConfig(config, appContext, mwcNode, canStartNode)) {
         core::getWndManager()->messageTextDlg("Update Config failure",

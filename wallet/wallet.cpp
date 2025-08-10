@@ -158,70 +158,23 @@ void MwcNodeConnection::setData(NODE_CONNECTION_TYPE _connectionType, const QStr
 //  WalletConfig
 
 bool WalletConfig::operator == (const WalletConfig & other) const {
-    bool ok = dataPath==other.dataPath &&
-              mwcmqsDomainEx==other.mwcmqsDomainEx &&
-              foreignApi==other.foreignApi;
-
-    if (!ok)
-        return ok;
-
-    ok = foreignApiAddress == other.foreignApiAddress &&
-            tlsCertificateFile == other.tlsCertificateFile && tlsCertificateKey == other.tlsCertificateKey;
-
+    bool ok = dataPath==other.dataPath;
     return ok;
 }
 
 
 WalletConfig & WalletConfig::setData(QString _network,
-                            QString _dataPath,
-                            QString _mwcmqsDomain,
-                            bool    _foreignApi,
-                            QString _foreignApiAddress,
-                            QString _tlsCertificateFile,
-                            QString _tlsCertificateKey) {
+                            QString _dataPath) {
     updateNetwork(_network);
     updateDataPath(_dataPath);
-    setDataWalletCfg(_mwcmqsDomain);
-
-    return setForeignApi(_foreignApi, _foreignApiAddress, _tlsCertificateFile, _tlsCertificateKey);
-}
-
-WalletConfig & WalletConfig::setForeignApi(bool _foreignApi,
-                             QString _foreignApiAddress,
-                             QString _tlsCertificateFile, QString _tlsCertificateKey) {
-    foreignApi = _foreignApi;
-    foreignApiAddress = _foreignApiAddress;
-    tlsCertificateFile = _tlsCertificateFile;
-    tlsCertificateKey = _tlsCertificateKey;
 
     return * this;
 }
 
 
-
-WalletConfig & WalletConfig::setDataWalletCfg( QString _mwcmqsDomain) {
-    mwcmqsDomainEx = _mwcmqsDomain;
-    return *this;
-}
-
 QString WalletConfig::toString() const {
     return "network=" + network + "\n" +
-            "dataPath=" + dataPath + "\n" +
-            "mwcmqsDomainEx=" + mwcmqsDomainEx;
-}
-
-// Get MQ/MQS host name. Depend on current config
-QString WalletConfig::getMwcMqHostNorm() const {
-    return mwcmqsDomainEx;
-}
-
-// Get MQ/MQS host full name. Depend on current config
-QString WalletConfig::getMwcMqHostFull() const {
-    QString definedHost = getMwcMqHostNorm();
-    if (!definedHost.isEmpty())
-        return definedHost;
-
-    return mwc::DEFAULT_HOST_MWC_MQS;
+            "dataPath=" + dataPath;
 }
 
 // Return empty if not found

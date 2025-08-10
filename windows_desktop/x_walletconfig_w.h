@@ -62,15 +62,12 @@ private slots:
     void on_lockLaterEnabled_clicked();
 
 private:
-    void setValues(const QString & mwcmqHost,
-                   int inputConfirmationNumber);
+    void setValues(int inputConfirmationNumber);
     // return true if data is fine. In case of error will show message for the user
     //bool readInputValue( wallet::WalletConfig & newWalletConfig, core::SendCoinsParams & newSendParams );
 
-    QString mwcDomainConfig2InputStr(QString mwcDomain);
-    QString mwcDomainInputStr2Config(QString mwcDomain);
 
-        // Update button state
+    // Update button state
     void updateButtons();
 
     void checkSizeButton(int szId); // Id match the control_desktop names: 1..4
@@ -104,7 +101,6 @@ private:
     int64_t logoutTimeout = 20 * 60;
     int64_t currentLogoutTimeout = 20 * 60;
 
-    QString mqsHost;
     int inputConfirmationsNumber = 1;
     QString walletInstanceName;
 };

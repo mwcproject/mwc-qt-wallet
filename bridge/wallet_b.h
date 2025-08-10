@@ -52,12 +52,6 @@ public:
     // Return: signal  sgnRepost(int id, QString err)
     Q_INVOKABLE void repost(QString account, int id, bool fluff);
 
-    // return values:
-    // "true"  - listening
-    // ""  - not listening, no errors
-    // string  - not listening, error message
-    Q_INVOKABLE QString getHttpListeningStatus();
-
     // Return a password hash for that wallet
     Q_INVOKABLE QString getPasswordHash();
 
@@ -165,7 +159,6 @@ signals:
     void sgnConfigUpdate();
     // keybaseOnline  is absolete, always false
     void sgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
-    void sgnHttpListeningStatus(bool listening, QString additionalInfo);
     void sgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, double totalDifficulty, int connections );
     void sgnUpdateSyncProgress(double progressPercent);
     void sgnWalletBalanceUpdated();
@@ -245,7 +238,6 @@ private slots:
     void onListeningStopResult(bool mqTry, bool tor,
                                QStringList errorMessages );
     void onUpdateListenerStatus(bool mqsOnline, bool torOnline);
-    void onHttpListeningStatus(bool listening, QString additionalInfo);
     void onUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
     void onUpdateSyncProgress(double progressPercent);
     void onWalletBalanceUpdated();

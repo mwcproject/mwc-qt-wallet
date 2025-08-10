@@ -46,8 +46,6 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
                      this, &InputPassword::onSgnLoginResult, Qt::QueuedConnection);
     QObject::connect(wallet, &bridge::Wallet::sgnUpdateListenerStatus,
                      this, &InputPassword::onSgnUpdateListenerStatus, Qt::QueuedConnection);
-    QObject::connect(wallet, &bridge::Wallet::sgnHttpListeningStatus,
-                     this, &InputPassword::onSgnHttpListeningStatus, Qt::QueuedConnection);
     QObject::connect(wallet, &bridge::Wallet::sgnStartingCommand,
                      this, &InputPassword::onSgnStartingCommand, Qt::QueuedConnection);
 
@@ -59,12 +57,6 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
         if (config->isOnlineWallet()) {
             updateMwcMqState(wallet->getMqsListenerStatus());
             updateTorState(wallet->getTorListenerStatus());
-
-            QString httpStatus = wallet->getHttpListeningStatus();
-            if (config->hasTls()) {
-                ui->label_http->setText("Https");
-            }
-            updateHttpState(httpStatus == "true");
         } else {
             ui->listeningStatusFrameHolder->hide();
         }
@@ -173,21 +165,9 @@ void InputPassword::updateTorState(bool online) {
     ui->torStatusTxt->setText(online ? "Online" : "Offline");
 }
 
-void InputPassword::updateHttpState(bool online) {
-    ui->httpStatusImg->setPixmap(QPixmap(online ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
-    ui->httpStatusImg->setToolTip(
-            online ? "Wallet http(s) foreign REST API is online" : "Wallet foreign REST API is offline");
-    ui->httpStatusTxt->setText(online ? "Online" : "Offline");
-}
-
 void InputPassword::onSgnUpdateListenerStatus(bool mwcOnline, bool tor) {
     updateMwcMqState(mwcOnline);
     updateTorState(tor);
-}
-
-void InputPassword::onSgnHttpListeningStatus(bool listening, QString additionalInfo) {
-    Q_UNUSED(additionalInfo);
-    updateHttpState(listening);
 }
 
 void InputPassword::onSgnUpdateSyncProgress(double progressPercent) {

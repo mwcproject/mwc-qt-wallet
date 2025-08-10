@@ -72,8 +72,7 @@ void Listening::onListeningStartResults( bool mqTry, bool torTry, // what we try
             msg += s + '\n';
 
         if (msg.contains("mwcmq") && msg.contains("already started") ) {
-            msg = "MWC MQS listener is running, but it lost connection and trying to reconnect in background to " +
-                    context->wallet->getWalletConfig().getMwcMqHostFull() +".\nPlease check your network connection";
+            msg = "MWC MQS listener is running, but it lost connection and trying to reconnect in background. Please check your network connection.";
         }
 
         core::getWndManager()->messageTextDlg("Start listener Error", msg);

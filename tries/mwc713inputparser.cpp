@@ -261,12 +261,6 @@ void Mwc713InputParser::initListening() {
                                                 }));
 
 
-    parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_HTTP_STARTING,
-                                                QVector<BaseTrieSection*>{
-                                                        new TriePhraseSection("Starting listener for Foreign API on ["),
-                                                        new TrieAnySection(100, TrieAnySection::NOT_NEW_LINE,"","]", 1), // addrees that is listening on...
-                                                }));
-
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_HTTP_FAILED,
                                                 QVector<BaseTrieSection*>{
                                                         new TriePhraseSection("thread 'foreign-api-gotham' panicked at '"),

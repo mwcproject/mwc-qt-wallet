@@ -222,12 +222,7 @@ const WalletConfig & MockWallet::getWalletConfig() {
     static WalletConfig config;
 
     config.setData("Floonet",
-            "mock_wallet_data",
-            "mwcmqsDomain",
-            false,
-            "127.0.0.1",
-            "",
-            "");
+            "mock_wallet_data");
     return config;
 }
 

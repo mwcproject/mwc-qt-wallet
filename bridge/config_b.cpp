@@ -55,22 +55,6 @@ QString Config::getAppDataPath(QString localPath) {
     return " " + res.second;
 }
 
-// Update config with foreign API settings.
-void Config::saveForeignApiConfig(bool foreignApi,
-                                      QString foreignApiAddress,
-                                      QString tlsCertificateFile, QString tlsCertificateKey) {
-
-    wallet::WalletConfig config = getWallet()->getWalletConfig();
-    config.setForeignApi(foreignApi,
-            foreignApiAddress,
-            tlsCertificateFile, tlsCertificateKey);
-
-
-    if (getWallet()->setWalletConfig(config, false)) {
-        state::getStateContext()->stateMachine->executeFrom( state::STATE::NONE );
-    }
-}
-
 // Request wallet instances. Returns the data as:
 // <selected path_id>, < <path_id>, <instance name>, <network> >, ...  >
 QVector<QString> Config::getWalletInstances(bool hasSeed) {
@@ -141,11 +125,6 @@ bool Config::isColdWallet() {
     return config::isColdWallet();
 }
 
-// if wallet using TLS for http connection
-bool Config::hasTls() {
-    return getWallet()->hasTls();
-}
-
 // Get wallet network name
 QString Config::getNetwork() {
     return getWallet()->getWalletConfig().getNetwork();
@@ -168,19 +147,6 @@ void Config::updateSendCoinsParams(int inputConfirmationNumber, int changeOutput
 QString Config::getDataPath() {
     return getWallet()->getWalletConfig().getDataPath();
 }
-bool Config::hasForeignApi() {
-    return getWallet()->getWalletConfig().hasForeignApi();
-}
-QString Config::getForeignApiAddress() {
-    return getWallet()->getWalletConfig().foreignApiAddress;
-}
-QString Config::getTlsCertificateKey() {
-    return getWallet()->getWalletConfig().tlsCertificateKey;
-}
-QString Config::getTlsCertificateFile() {
-    return getWallet()->getWalletConfig().tlsCertificateFile;
-}
-
 
 
 double Config::getTimeoutMultiplier() {

@@ -75,9 +75,6 @@ Item {
             }
 
             rect_progress.visible = false
-            if (config.hasTls()) {
-                text_http.text = qsTr("Https")
-            }
             updateAccountList()
             wallet.requestFileProofAddress()
             updateStatus()
@@ -104,7 +101,6 @@ Item {
 
     function updateStatus() {      
         image_mwcmqs.source = wallet.getMqsListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
-        image_http.source = wallet.getHttpListeningStatus() === "true" ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
         image_tor.source = wallet.getTorListenerStatus() ? "../img/CircGreen@2x.svg" : "../img/CircRed@2x.svg"
     }
 
@@ -172,38 +168,6 @@ Item {
             id: text_tor
             text: qsTr("TOR")
             anchors.left: image_tor.right
-            anchors.leftMargin: dp(10)
-            anchors.verticalCenter: parent.verticalCenter
-            font.pixelSize: dp(17)
-            color: "white"
-        }
-    }
-
-    Rectangle {
-        id: rect_http
-        width: dp(150)
-        height: dp(35)
-        anchors.verticalCenter: rect_mwcmqs.verticalCenter
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.horizontalCenterOffset: dp(100)
-        border.color: "white"
-        border.width: dp(2)
-        radius: dp(50)
-        color: "#00000000"
-
-        Image {
-            id: image_http
-            anchors.left: parent.left
-            anchors.leftMargin: dp(10)
-            anchors.verticalCenter: parent.verticalCenter
-            width: dp(17)
-            height: dp(17)
-        }
-
-        Text {
-            id: text_http
-            text: qsTr("HTTP")
-            anchors.left: image_http.right
             anchors.leftMargin: dp(10)
             anchors.verticalCenter: parent.verticalCenter
             font.pixelSize: dp(17)

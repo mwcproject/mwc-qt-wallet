@@ -71,7 +71,6 @@ private slots:
 
     // keybaseOnline is absolete
     void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
-    void onSgnHttpListeningStatus(bool listening, QString additionalInfo);
     void onSgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
     void onSgnStartingCommand(QString command);
 

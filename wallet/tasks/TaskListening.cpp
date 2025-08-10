@@ -101,16 +101,11 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
             wallet713->notifyMqFailedToStart();
             return true;
         }
-        case S_LISTENER_HTTP_STARTING: {
-            qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
-            QString address = evt.message;
-            wallet713->setHttpListeningStatus(true, address);
-            return true;
-        }
         case S_LISTENER_HTTP_FAILED: {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
             QString error = evt.message;
-            wallet713->setHttpListeningStatus(false, error);
+            notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::FATAL_ERROR,
+                                                      "Unbale to start listener. Probably another mwc wallet instance is running. Please stop another wallet instance or reboot operation system.\n\nError: " + error );
             return true;
         }
 
