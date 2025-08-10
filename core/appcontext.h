@@ -254,6 +254,8 @@ public:
     void setSwapMktSelling(int value);
     void setSwapMktCurrency(QString currency);
 
+    bool isShowCongratsForTx(const QString & txUUID) const {return transactionsWithCongrats.contains(txUUID);}
+    void setShowCongratsForTx(const QString & txUUID);
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -390,6 +392,8 @@ private:
     double mktPlaceMinFeeLevel = 0.0001;
     qint8  mktPlaceSelling = 2; // 0 - buy, 1 - sell, 2 - all
     QString mktPlaceCurrency = ""; // All
+
+    QSet<QString> transactionsWithCongrats;
 };
 
 template <class T>

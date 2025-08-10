@@ -256,11 +256,6 @@ void Wallet::onRepost(int txIdx, QString err) {
 bool Wallet::getMqsListenerStatus() {
     return getWallet()->getListenerStatus().mqs;
 }
-// return true is Keybase is online
-bool Wallet::getKeybaseListenerStatus()  {
-    Q_ASSERT(false); // Absolete functionality
-    return false;
-}
 // return true if Tor is online
 bool Wallet::getTorListenerStatus() {
     return getWallet()->getListenerStatus().tor;
@@ -269,11 +264,6 @@ bool Wallet::getTorListenerStatus() {
 // return true is MQS is started
 bool Wallet::isMqsListenerStarted() {
     return getWallet()->getListenerStartState().mqs;
-}
-// return true is Keybase is started
-bool Wallet::isKeybaseListenerStarted() {
-    Q_ASSERT(false); // Absolete functionality
-    return false;
 }
 
 bool Wallet::isTorListenerStarted() {

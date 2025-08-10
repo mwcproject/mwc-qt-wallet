@@ -389,6 +389,10 @@ bool AppContext::loadDataImpl() {
         in >> torClientOption;
     }
 
+    if (id>=0x47A7) {
+        in >> transactionsWithCongrats;
+    }
+
     return true;
 }
 
@@ -416,7 +420,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x47A6;
+    out << 0x47A7;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -523,6 +527,8 @@ void AppContext::saveData() const {
 
     out << torBridgeLine;
     out << torClientOption;
+
+    out << transactionsWithCongrats;
 }
 
 void AppContext::loadNotesData() {
@@ -1097,5 +1103,11 @@ void AppContext::setSwapMktSelling(int value) {
 void AppContext::setSwapMktCurrency(QString currency) {
     mktPlaceCurrency = currency;
 }
+
+void AppContext::setShowCongratsForTx(const QString & txUUID) {
+    transactionsWithCongrats.insert(txUUID);
+    saveData();
+}
+
 
 }

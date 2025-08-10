@@ -33,13 +33,11 @@ public:
 
     // return true if MQS is online
     Q_INVOKABLE bool getMqsListenerStatus();
-    Q_INVOKABLE bool getKeybaseListenerStatus(); // Absolete
     // return true if Tor is online
     Q_INVOKABLE bool getTorListenerStatus();
 
     // return true if MQS is started
     Q_INVOKABLE bool isMqsListenerStarted();
-    Q_INVOKABLE bool isKeybaseListenerStarted();  // Absolete
     // return true if Tor is started
     Q_INVOKABLE bool isTorListenerStarted();
 

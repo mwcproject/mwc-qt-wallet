@@ -1697,7 +1697,7 @@ void MWC713::reportSlateReceivedFrom(QString slate, QString mwc, QString fromAdd
     if ( fromAddr.startsWith("Integrity fee") || fromAddr=="Withdraw Integrity funds" )
         return; // We don't want to show that.
 
-    QString msg = "Congratulations! You received " + mwc + " MWC from " + fromAddr;
+    QString msg = "You received " + mwc + " MWC from " + fromAddr;
     if (!message.isEmpty()) {
         msg += " with message " + message + ".";
     }
@@ -1710,14 +1710,15 @@ void MWC713::reportSlateReceivedFrom(QString slate, QString mwc, QString fromAdd
 
     //if (!appContext->getNotificationWindowsEnabled())
     // From almost everybody get a feedback that Receive message does expected.
-    {
+    // That message need to show when coins are confirmed
+/*    {
         // only display the message dialog if notification windows are not enabled
         core::getWndManager()->messageHtmlDlg("Congratulations!",
                                               "You received <b>" + mwc + "</b> MWC<br>" +
                                               (message.isEmpty() ? "" : "Description: " + message + "<br>") +
                                               "<br>From: " + fromAddr +
                                               "<br>Slate: " + slate);
-    }
+    }*/
 }
 
 void MWC713::setSendFileResult(bool success, QStringList errors, QString fileName) {

@@ -278,13 +278,17 @@ void MainWindow::onSgnNewNotificationMessage(int level, QString message) {
         // status manager doesn't get created until first login
         statusMgr->handleStatusMessage(prefix, message);
     }
-    ui->statusBar->showMessage( prefix + message, (int)(timeout * config->getTimeoutMultiplier()) );
+    int msgTimeout = (int)(timeout * config->getTimeoutMultiplier());
+    ui->statusBar->showMessage( prefix + message, msgTimeout );
+    notyfyMsgTimeout = QDateTime().currentDateTime().toMSecsSinceEpoch() + msgTimeout;
 }
 
 void MainWindow::onSgnStartingCommand(QString command) {
     // We can print the current executing commnd into status line ONLY if normally we are using notification windows
     if (statusMgr != nullptr) {
-        ui->statusBar->showMessage( command );
+        if (QDateTime().currentDateTime().toMSecsSinceEpoch() > notyfyMsgTimeout ) {
+            ui->statusBar->showMessage( command );
+        }
     }
 }
 

@@ -130,6 +130,8 @@ private:
     bridge::SwapMarketplace * swapMarketplace = nullptr;
     bool leftBarShown = true;
     core::StatusWndMgr* statusMgr = nullptr;
+
+    qint64 notyfyMsgTimeout = 0;
 };
 
 }

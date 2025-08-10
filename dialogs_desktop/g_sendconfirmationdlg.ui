@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>739</width>
-    <height>561</height>
+    <width>735</width>
+    <height>557</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -85,7 +85,7 @@
      <property name="minimumSize">
       <size>
        <width>600</width>
-       <height>0</height>
+       <height>100</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -495,7 +495,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
@@ -505,7 +505,7 @@ Note: Ignores Dandelion relay protocol and reduces anonymity of transactions</st
    <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
+   <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
