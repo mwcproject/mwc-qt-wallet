@@ -51,7 +51,8 @@ MwcDialog::MwcDialog( QWidget * parent )// : QDialog( getParent(parent) )
 
     setWindowFlags(Qt::FramelessWindowHint);
     setModal(true);
-    setWindowModality(Qt::ApplicationModal);
+    // If uncomment - will show one Dlg at a time
+    //setWindowModality(Qt::ApplicationModal);
 }
 
 MwcDialog::~MwcDialog() {}

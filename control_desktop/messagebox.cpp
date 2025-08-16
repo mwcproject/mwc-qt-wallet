@@ -27,6 +27,9 @@
 
 namespace control {
 
+const int MESSAGE_BOX_STACK_LIMIT = 4;
+static int active_message_box_instances = 0;
+
 // Password accepted as a HASH. EMpty String mean that no password is set.
 // After return, passwordHash value will have input raw Password value. So it can be user for wallet
 MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool htmlMsg, QString btn1, QString btn2,
@@ -39,6 +42,8 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
     passBlockButton(_passBlockButton),
     ttl_blocks(ttl_bls)
 {
+    active_message_box_instances++;
+
     ui->setupUi(this);
 
     if (widthScale!=1.0) {
@@ -126,6 +131,7 @@ MessageBox::MessageBox( QWidget *parent, QString title, QString message, bool ht
 
 MessageBox::~MessageBox()
 {
+    active_message_box_instances--;
     delete ui;
 }
 
@@ -168,6 +174,8 @@ void MessageBox::processApplyButton(core::WndManager::RETURN_CODE rc) {
 // One button, OK box
 //static
 void MessageBox::messageText( QWidget *parent, QString title, QString message, double widthScale ) {
+    if (active_message_box_instances>=MESSAGE_BOX_STACK_LIMIT)
+        return;
     QString hash;
     MessageBox * msgBox = new MessageBox(parent, title, message, false, "OK", "", "","", true,false, widthScale, hash, core::WndManager::RETURN_CODE::BTN1, -1 );
     msgBox->exec();
@@ -175,6 +183,9 @@ void MessageBox::messageText( QWidget *parent, QString title, QString message, d
 }
 
 void MessageBox::messageHTML( QWidget *parent, QString title, QString message, double widthScale ) {
+    if (active_message_box_instances>=MESSAGE_BOX_STACK_LIMIT)
+        return;
+
     QString hash;
     MessageBox * msgBox = new MessageBox(parent, title, message, true, "OK", "", "","", true,false, widthScale, hash, core::WndManager::RETURN_CODE::BTN1, -1 );
     msgBox->exec();
