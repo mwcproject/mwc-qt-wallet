@@ -21,6 +21,8 @@
 #include <QDebug>
 #include <QFileInfo>
 
+#include "core/appcontext.h"
+
 namespace bridge {
 
 static wallet::Wallet * getWallet() {
@@ -485,5 +487,30 @@ void Wallet::getViewingKey() {
     getWallet()->viewRewindHash();
 }
 
+
+// Check if slatepack data does exist
+bool Wallet::hasSendSlatepack(QString txUUID) {
+    return state::getStateContext()->appContext->hasSendSlatepack(txUUID);
+}
+
+bool Wallet::hasReceiveSlatepack(QString txUUID) {
+    return state::getStateContext()->appContext->hasReceiveSlatepack(txUUID);
+}
+
+// Request to show the slatepack data
+void Wallet::viewSendSlatepack(QString txUUID) {
+    QString slatepack = state::getStateContext()->appContext->getSendSlatepack(txUUID);
+    if (slatepack.isEmpty())
+        return;
+
+    core::getWndManager()->pageShowSlatepack(slatepack, state::STATE::TRANSACTIONS, "send_init.slatepack", true);
+}
+
+void Wallet::viewReceiveSlatepack(QString txUUID) {
+    QString slatepack = state::getStateContext()->appContext->getReceiveSlatepack(txUUID);
+    if (slatepack.isEmpty())
+        return;
+    core::getWndManager()->pageShowSlatepack(slatepack, state::STATE::TRANSACTIONS, "send_response.slatepack", false);
+}
 
 }

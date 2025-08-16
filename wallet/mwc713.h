@@ -44,7 +44,7 @@ public:
     static WalletConfig readWalletConfig(QString source = "");
     // Save config into config::getMwc713conf()
     // !!! Note !!!! Also it start/stop local mwcNode if it is needed by setting. Stop can take for a while
-    static bool saveWalletConfig(const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode, bool canStartNode);
+    bool saveWalletConfig(const WalletConfig & config, core::AppContext * appContext, node::MwcNode * mwcNode, bool canStartNode);
 
 public:
     MWC713(QString mwc713path, QString mwc713configPath, core::AppContext * appContext, node::MwcNode * mwcNode);
@@ -494,8 +494,8 @@ public:
     void setFinalizeFile( bool success, bool txNotFoundError, QStringList errors, QString fileName, const AccountsInfo & accInfo, QString fileTxResponse, bool fluff );
     void setSubmitFile(bool success, QString message, QString fileName);
 
-    void setSendSlatepack( QString error, QString slatepack, QString tag );
-    void setReceiveSlatepack( QString error, QString slatepack, QString tag );
+    void setSendSlatepack( QString error, QString slatepack, QString txId, QString tag );
+    void setReceiveSlatepack( QString error, QString slatepack, QString txId, QString tag );
     void setFinalizedSlatepack( bool txNotFoundError, QString error, QString txUuid, const AccountsInfo & accInfo, QString slatepack, bool fluff );
 
     // Transactions
@@ -699,6 +699,7 @@ private:
 
     int torOfflineCounter = 0;
     bool restartingTor = false;
+    bool needWaitForLocalNodeStart = false;
 };
 
 }

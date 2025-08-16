@@ -544,11 +544,6 @@ int main(int argc, char *argv[])
 
         core::WalletApp::startExiting();
 
-        // Stopping embedded node first
-        if (mwcNode->isRunning()) {
-            mwcNode->stop();
-        }
-
         // Now we have to stop other object nicely.
         // Note, the order is different from creation.
         // mainWnd expected to be dead here.
@@ -557,6 +552,11 @@ int main(int argc, char *argv[])
 #ifdef WALLET_DESKTOP
         delete windowManager; windowManager=nullptr;
 #endif
+
+        // Stopping embedded node after the wallet. Otherwise wallet will report connect to the node errors
+        if (mwcNode->isRunning()) {
+            mwcNode->stop();
+        }
 
         delete mwcNode; mwcNode = nullptr;
 

@@ -283,7 +283,7 @@ void Send::sgnOnFileReady( int eventCode, QString fileUri ) {
 #endif
 
 
-void Send::respSendSlatepack( QString tagId, QString error, QString slatepack ) {
+void Send::respSendSlatepack( QString tagId, QString error, QString slatepack, QString txId ) {
     Q_UNUSED(tagId)
     if (!error.isEmpty()) {
         // show error...
@@ -293,6 +293,9 @@ void Send::respSendSlatepack( QString tagId, QString error, QString slatepack ) 
         }
         return;
     }
+
+    if (!txId.isEmpty() && !slatepack.isEmpty())
+        context->appContext->addSendSlatepack(txId, slatepack);
 
     // Let's show the slatepack and enable in place finalization
     core::getWndManager()->pageShowSlatepack( slatepack, STATE::SEND, ".tx", true );

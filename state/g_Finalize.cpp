@@ -187,8 +187,11 @@ void Finalize::onFinalizeSlatepack( QString tagId, QString error, QString txUuid
         p->hideProgress();
 
     if (error.isEmpty()) {
+        // Slatepack we don't want to keep any more. Doesn't make sense after finalize
+        context->appContext->deleteSendSlatepack(txUuid);
+
         if (!file2TransactionsInfo.contains(txUuid)) {
-            // Expected because we can finalzie from send, vew slatepack page as well.
+            // Expected because we can finalize from send, veiw slatepack page as well.
             return;
         }
 

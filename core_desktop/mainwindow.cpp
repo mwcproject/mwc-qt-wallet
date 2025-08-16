@@ -28,6 +28,7 @@
 #include "../bridge/wnd/swapmkt_b.h"
 #include <QPushButton>
 #include <QApplication>
+#include "core/Config.h"
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
 #include <QScreen>
 #else
@@ -356,7 +357,17 @@ void MainWindow::onSgnUpdateNodeStatus( bool online, QString errMsg, int nodeHei
         setStatusButtonState( ui->nodeStatusButton, STATUS::RED, "" );
     }
     else if (connections==0 || nodeHeight==0 || (peerHeight>0 && peerHeight-nodeHeight>5) ) {
-        setStatusButtonState( ui->nodeStatusButton, STATUS::YELLOW, "" );
+        if (config::isColdWallet()) {
+            if (nodeHeight==0) {
+                setStatusButtonState( ui->nodeStatusButton, STATUS::RED, "" );
+            }
+            else {
+                setStatusButtonState( ui->nodeStatusButton, STATUS::GREEN, "" );
+            }
+        }
+        else {
+            setStatusButtonState( ui->nodeStatusButton, STATUS::YELLOW, "" );
+        }
     }
     else {
         setStatusButtonState( ui->nodeStatusButton, STATUS::GREEN, "" );

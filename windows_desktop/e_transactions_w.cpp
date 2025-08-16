@@ -202,6 +202,21 @@ void Transactions::updateData(bool resetScroller) {
             itm->hbox().setContentsMargins(0, 0, 0, 0).setSpacing(4);
             itm->addWidget(control::createLabel(itm, false, true, trans.txid, control::FONT_SMALL));
             itm->addHSpacer();
+
+            if (trans.canBeCancelled()) {
+                if ( ((trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::RECEIVE) != 0) && wallet->hasReceiveSlatepack(trans.txid) ) {
+                    itm->addWidget(new control::RichButton(itm, "View Slatepack", 120, control::ROW_HEIGHT, "View response Slatepack"));
+                    control::RichButton * btn = (control::RichButton *) itm->getCurrentWidget();
+                    btn->setCallback(this, "SlatepackReceive:" + trans.txid);
+                }
+
+                if ( ((trans.transactionType & wallet::WalletTransaction::TRANSACTION_TYPE::SEND) != 0) && wallet->hasSendSlatepack(trans.txid) ) {
+                    itm->addWidget(new control::RichButton(itm, "View Slatepack", 120, control::ROW_HEIGHT, "View send init Slatepack"));
+                    control::RichButton * btn = (control::RichButton *) itm->getCurrentWidget();
+                    btn->setCallback(this, "SlatepackSend:" + trans.txid);
+                }
+            }
+
             if (trans.proof) {
                 itm->addWidget(new control::RichButton(itm, "Proof", 60, control::ROW_HEIGHT,
                                                        "Generate proof file for this transaction. Proof file can be validated by public at MWC Block Explorer"));
@@ -253,6 +268,16 @@ void Transactions::richButtonPressed(control::RichButton * button, QString coock
     }
 
     QString id = res[0];
+
+    if (id == "SlatepackReceive") {
+        wallet->viewReceiveSlatepack(res[1]);
+        return;
+    }
+    else if (id == "SlatepackSend") {
+        wallet->viewSendSlatepack(res[1]);
+        return;
+    }
+
     int idx = res[1].toInt();
 
     if (idx<0 || idx>=allTrans.size()) {

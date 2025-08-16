@@ -53,7 +53,7 @@ protected:
 private slots:
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
     void onReceiveFile( bool success, QStringList errors, QString inFileName );
-    void onReceiveSlatepack( QString tagId, QString error, QString slatepack );
+    void onReceiveSlatepack( QString tagId, QString error, QString slatepack, QString txId );
 
 #ifdef WALLET_MOBILE
     void sgnOnFileReady( int eventCode, QString fileUri );

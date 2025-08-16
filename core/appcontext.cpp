@@ -182,7 +182,7 @@ bool AppContext::loadDataImpl() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x47A6)
+    if (id<0x4783 || id>0x47A8)
          return false;
 
     QString mockStr;
@@ -393,6 +393,11 @@ bool AppContext::loadDataImpl() {
         in >> transactionsWithCongrats;
     }
 
+    if (id>=0x47A8) {
+        in >> sendSlatepacks;
+        in >> receiveSlatepacks;
+    }
+
     return true;
 }
 
@@ -420,7 +425,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x47A7;
+    out << 0x47A8;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -529,6 +534,9 @@ void AppContext::saveData() const {
     out << torClientOption;
 
     out << transactionsWithCongrats;
+
+    out << sendSlatepacks;
+    out << receiveSlatepacks;
 }
 
 void AppContext::loadNotesData() {
@@ -1106,6 +1114,33 @@ void AppContext::setSwapMktCurrency(QString currency) {
 
 void AppContext::setShowCongratsForTx(const QString & txUUID) {
     transactionsWithCongrats.insert(txUUID);
+    saveData();
+}
+
+void AppContext::addSendSlatepack(const QString & txUUID, QString slatepack) {
+    if (sendSlatepacks.contains(txUUID) && sendSlatepacks[txUUID]==slatepack)
+        return;
+    sendSlatepacks[txUUID]=slatepack;
+    saveData();
+}
+
+void AppContext::addReceiveSlatepack(const QString & txUUID, QString slatepack) {
+    if (receiveSlatepacks.contains(txUUID) && receiveSlatepacks[txUUID]==slatepack)
+        return;
+    receiveSlatepacks[txUUID]=slatepack;
+    saveData();
+}
+
+void AppContext::deleteSendSlatepack(const QString & txUUID) {
+    if (!sendSlatepacks.contains(txUUID))
+        return;
+    sendSlatepacks.remove(txUUID);
+    saveData();
+}
+void AppContext::deleteReceiveSlatepack(const QString & txUUID) {
+    if (!receiveSlatepacks.contains(txUUID))
+        return;
+    receiveSlatepacks.remove(txUUID);
     saveData();
 }
 

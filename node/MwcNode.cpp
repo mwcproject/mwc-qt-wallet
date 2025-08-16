@@ -216,6 +216,10 @@ QProcess * MwcNode::initNodeProcess(const QString & dataPath, const QString & ne
     // Running as server with stop_node API
     params.push_back("server");
     params.push_back("--allow_to_stop");
+
+    if (config::isColdWallet())
+        params.push_back("--offline");
+
     params.push_back("run");
 
     commandLine = nodeExecutablePath;
@@ -518,6 +522,7 @@ void MwcNode::nodeOutputGenericEvent( tries::NODE_OUTPUT_EVENT event, QString me
             nextTimeLimit += int64_t(MWC_NODE_STARTED_TIMEOUT * config::getTimeoutMultiplier());
             nodeOutOfSyncCounter = 0;
             notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::INFO, "Embedded mwc-node was started" );
+            emit onMwcNodeStarted();
             break;
         case tries::NODE_OUTPUT_EVENT::MWC_NODE_SYNC: {
             nextTimeLimit += int64_t(MWC_NODE_SYNC_MESSAGES * config::getTimeoutMultiplier());
@@ -777,6 +782,13 @@ void MwcNode::replyFinished(QNetworkReply* reply) {
                 emit onMwcStatusUpdate(nodeStatusString);
             }
         }
+        else {
+            if (config::isColdWallet() || config::isOnlineNode()) {
+                if (syncIsDone)
+                    updateRunningStatus();
+
+            }
+        }
 
     }
     else if (tag == "Status") {
@@ -809,7 +821,7 @@ void MwcNode::replyFinished(QNetworkReply* reply) {
 
 void MwcNode::reportNodeFatalError( QString message ) {
 
-    if ( config::isOnlineNode() ) {
+    if ( config::isOnlineNode() || config::isColdWallet() ) {
         core::getWndManager()->messageTextDlg("Embedded MWC-Node Error", message);
     }
     else

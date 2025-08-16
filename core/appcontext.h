@@ -256,6 +256,17 @@ public:
 
     bool isShowCongratsForTx(const QString & txUUID) const {return transactionsWithCongrats.contains(txUUID);}
     void setShowCongratsForTx(const QString & txUUID);
+
+    void addSendSlatepack(const QString & txUUID, QString slatepack);
+    void addReceiveSlatepack(const QString & txUUID, QString slatepack);
+    void deleteSendSlatepack(const QString & txUUID);
+    void deleteReceiveSlatepack(const QString & txUUID);
+
+    bool hasSendSlatepack(const QString & txUUID) const { return sendSlatepacks.contains(txUUID); }
+    bool hasReceiveSlatepack(const QString & txUUID) const { return receiveSlatepacks.contains(txUUID); }
+    QString getSendSlatepack(const QString & txUUID) const { return sendSlatepacks[txUUID]; }
+    QString getReceiveSlatepack(const QString & txUUID) const { return receiveSlatepacks[txUUID]; }
+
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -394,6 +405,9 @@ private:
     QString mktPlaceCurrency = ""; // All
 
     QSet<QString> transactionsWithCongrats;
+
+    QMap<QString,QString> sendSlatepacks;
+    QMap<QString,QString> receiveSlatepacks;
 };
 
 template <class T>

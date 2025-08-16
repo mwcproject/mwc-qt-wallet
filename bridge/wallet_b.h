@@ -147,6 +147,15 @@ public:
     // Request Vieing Key (rewind_hash)
     // Check Signal: sgnGetViewingKey
     Q_INVOKABLE void getViewingKey();
+
+    // Check if slatepack data does exist
+    Q_INVOKABLE bool hasSendSlatepack(QString txUUID);
+    Q_INVOKABLE bool hasReceiveSlatepack(QString txUUID);
+
+    // Request to show the slatepack data
+    Q_INVOKABLE void viewSendSlatepack(QString txUUID);
+    Q_INVOKABLE void viewReceiveSlatepack(QString txUUID);
+
 signals:
     // Wallet notification about what is the command that is starting.
     // Note, on idle it sends "empty" String. Not all commands sending an update

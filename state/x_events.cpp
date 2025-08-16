@@ -91,6 +91,8 @@ void Events::onNewNotificationMessage(bridge::MESSAGE_LEVEL  level, QString mess
                         ReceivedTxInfo txInfo = recievedTxs[uuid];
                         recievedTxs.remove(uuid);
                         context->appContext->setShowCongratsForTx(uuid);
+                        // Just in case it was a receive slatepack, let's clean it up. Otherwise delete will handle not exist data well.
+                        context->appContext->deleteReceiveSlatepack(uuid);
                         core::getWndManager()->messageHtmlDlg("Congratulations!",
                                               "You received <b>" + txInfo.mwc + "</b> MWC<br>" +
                                               (txInfo.message.isEmpty() ? "" : "Description: " + txInfo.message + "<br>") +

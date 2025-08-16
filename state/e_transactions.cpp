@@ -33,9 +33,8 @@ NextStateRespond Transactions::execute() {
     if (context->appContext->getActiveWndState() != STATE::TRANSACTIONS)
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if ( state::getStateMachine()->getCurrentStateId() != STATE::TRANSACTIONS ) {
-        core::getWndManager()->pageTransactions();
-    }
+    core::getWndManager()->pageTransactions();
+    
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 };
 

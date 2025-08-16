@@ -194,8 +194,12 @@ void Receive::sgnOnFileReady( int eventCode, QString fileUri ) {
 }
 #endif
 
-void Receive::onReceiveSlatepack( QString tagId, QString error, QString slatepack ) {
+void Receive::onReceiveSlatepack( QString tagId, QString error, QString slatepack, QString txId ) {
     Q_UNUSED(tagId)
+
+    if (!txId.isEmpty() && !slatepack.isEmpty())
+        context->appContext->addReceiveSlatepack(txId, slatepack);
+
     if (isActive()) {
         for (auto p: bridge::getBridgeManager()->getFileTransaction())
             p->hideProgress();

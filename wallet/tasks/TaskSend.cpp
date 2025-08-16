@@ -488,15 +488,24 @@ QString TaskSendSlatepack::buildCommand( int64_t coinNano, QString message, int 
 bool TaskSendSlatepack::processTask(const QVector<WEvent> &events) {
     QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
 
+    QString slatepack;
+    QString txId;
     for ( auto & ln : lns ) {
         if (ln.message.startsWith("Slatepack: ")) {
-            QString slatepack = ln.message.mid( strlen("Slatepack: ") ).trimmed();
-            wallet713->setSendSlatepack("", slatepack, tag);
-            return true;
+            slatepack = ln.message.mid( strlen("Slatepack: ") ).trimmed();
+        }
+        if (ln.message.startsWith("TxId: ")) {
+            txId = ln.message.mid( strlen("TxId: ") ).trimmed();
+            break;
         }
     }
 
-    wallet713->setSendSlatepack(getErrorMessage(events, "Unable to get a slate"), "", tag);
+    if (!slatepack.isEmpty() && !txId.isEmpty()) {
+        wallet713->setSendSlatepack("", slatepack, txId, tag);
+        return true;
+    }
+
+    wallet713->setSendSlatepack(getErrorMessage(events, "Unable to get a slate"), "", "", tag);
     return true;
 }
 
@@ -514,15 +523,24 @@ QString TaskReceiveSlatepack::buildCommand(QString slatepack, QString descriptio
 bool TaskReceiveSlatepack::processTask(const QVector<WEvent> &events) {
     QVector< WEvent > lns = filterEvents(events, WALLET_EVENTS::S_LINE );
 
+    QString slatepack;
+    QString txId;
     for ( auto & ln : lns ) {
         if (ln.message.startsWith("Slatepack: ")) {
-            QString slatepack = ln.message.mid( strlen("Slatepack: ") ).trimmed();
-            wallet713->setReceiveSlatepack("", slatepack, tag);
-            return true;
+            slatepack = ln.message.mid( strlen("Slatepack: ") ).trimmed();
+        }
+        if (ln.message.startsWith("TxId: ")) {
+            txId = ln.message.mid( strlen("TxId: ") ).trimmed();
+            break;
         }
     }
 
-    wallet713->setReceiveSlatepack(getErrorMessage(events, "Unable to get a slate"), "", tag);
+    if (!slatepack.isEmpty() && !txId.isEmpty()) {
+        wallet713->setReceiveSlatepack("", slatepack, txId, tag);
+        return true;
+    }
+
+    wallet713->setReceiveSlatepack(getErrorMessage(events, "Unable to get a slate"), "", "", tag);
     return true;
 }
 

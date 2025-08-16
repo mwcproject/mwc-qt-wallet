@@ -88,7 +88,7 @@ void ResultedSlatepack::on_saveQrImageBtn_clicked() {
 void ResultedSlatepack::on_saveSlatepackBtn_clicked() {
     QString fileName = util->getSaveFileName("Save Slatepack",
                                              "ResultedSlatepack",
-                                             "Slatepack tramsaction (*" + txExtension + ")", txExtension);
+                                             "Slatepack transaction (*" + txExtension + ")", txExtension);
 
     if (fileName.isEmpty())
         return;

@@ -947,8 +947,8 @@ signals:
     void onSendFile( bool success, QStringList errors, QString fileName );
     void onReceiveFile( bool success, QStringList errors, QString inFileName, QString outFn );
     void onFinalizeFile( bool success, QStringList errors, QString fileName );
-    void onSendSlatepack( QString tagId, QString error, QString slatepack );
-    void onReceiveSlatepack( QString tagId, QString error, QString slatepack );
+    void onSendSlatepack( QString tagId, QString error, QString slatepack, QString txId );
+    void onReceiveSlatepack( QString tagId, QString error, QString slatepack, QString txId );
     void onFinalizeSlatepack( QString tagId, QString error, QString txUuid );
     void onSubmitFile(bool success, QString message, QString fileName);
 

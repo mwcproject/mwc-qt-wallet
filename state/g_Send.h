@@ -63,7 +63,7 @@ private slots:
     void sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate );
 
     void respSendFile( bool success, QStringList errors, QString fileName );
-    void respSendSlatepack( QString tagId, QString error, QString slatepack );
+    void respSendSlatepack( QString tagId, QString error, QString slatepack, QString txId );
 
     void onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
 

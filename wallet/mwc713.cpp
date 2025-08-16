@@ -252,8 +252,18 @@ void MWC713::start() {
 
     QString path = appContext->getCurrentWalletInstance(true);
     qDebug() << "MWC713::start for path " << path;
+    needWaitForLocalNodeStart = false;
     if (!updateWalletConfig(path, true))
         return;
+
+    if (needWaitForLocalNodeStart) {
+        QEventLoop loop;
+        QObject::connect(mwcNode, &node::MwcNode::onMwcNodeStarted, &loop, &QEventLoop::quit,
+                         Qt::QueuedConnection);
+        loop.exec();
+    }
+
+    needWaitForLocalNodeStart = false;
 
     // Need to check if Tls active
     const WalletConfig &config = getWalletConfig();
@@ -1785,15 +1795,15 @@ void MWC713::setSubmitFile(bool success, QString message, QString fileName) {
     emit onSubmitFile(success, message, fileName);
 }
 
-void MWC713::setSendSlatepack(QString error, QString slatepack, QString tag) {
-    logger::logEmit("MWC713", "setSendSlatepack", +" tag=" + tag + " error=" + error + " Slatepack: " + slatepack);
-    emit onSendSlatepack(tag, error, slatepack);
+void MWC713::setSendSlatepack(QString error, QString slatepack, QString txId, QString tag) {
+    logger::logEmit("MWC713", "setSendSlatepack", +" tag=" + tag + " error=" + error + " Slatepack: " + slatepack + " TxId: " + txId);
+    emit onSendSlatepack(tag, error, slatepack, txId);
 
 }
 
-void MWC713::setReceiveSlatepack(QString error, QString slatepack, QString tag) {
-    logger::logEmit("MWC713", "setReceiveSlatepack", +" tag=" + tag + " error=" + error + " Slatepack: " + slatepack);
-    emit onReceiveSlatepack(tag, error, slatepack);
+void MWC713::setReceiveSlatepack(QString error, QString slatepack, QString txId, QString tag) {
+    logger::logEmit("MWC713", "setReceiveSlatepack", +" tag=" + tag + " error=" + error + " Slatepack: " + slatepack + " TxId: " + txId);
+    emit onReceiveSlatepack(tag, error, slatepack, txId);
 }
 
 void MWC713::setFinalizedSlatepack(bool txNotFoundError, QString error, QString txUuid, const AccountsInfo & accInfo, QString slatepack, bool fluff ) {
@@ -2520,6 +2530,8 @@ bool MWC713::saveWalletConfig(const WalletConfig &config, core::AppContext *appC
 
             if (!mwcNode->isRunning() && canStartNode) {
                 mwcNode->start(connection.localNodeDataPath, config.getNetwork(), appContext->useTorForNode());
+                // Let's wait for some time so the node will be able to start
+                needWaitForLocalNodeStart = true;
             }
         }
     }

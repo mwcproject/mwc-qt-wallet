@@ -111,6 +111,7 @@ private:
 private: signals:
     void onMwcOutputLine(QString line);
     void onMwcStatusUpdate(QString status);
+    void onMwcNodeStarted();
 
 private slots:
     void nodeErrorOccurred(QProcess::ProcessError error);
