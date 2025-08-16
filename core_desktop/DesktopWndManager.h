@@ -29,6 +29,10 @@ public:
 
     void init(WindowManager * wndMan, MainWindow * mainWnd);
 
+    // Current active non model window. Will be used as a parent for dialogs
+    QWidget * getCurrentWnd() const;
+    MainWindow * getMainWindow() const {return mainWindow;}
+
     //------------------  Message boxes ---------------
     //
     virtual void messageTextDlg( QString title, QString message, double widthScale = 1.0) override;

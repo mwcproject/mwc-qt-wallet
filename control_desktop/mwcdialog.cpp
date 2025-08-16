@@ -20,10 +20,21 @@
 #include <QDebug>
 #include <QApplication>
 #include "../core/Config.h"
+#include "../core/WndManager.h"
+#include "../core_desktop/DesktopWndManager.h"
+#include "../core_desktop/mainwindow.h"
 
 namespace control {
 
-MwcDialog::MwcDialog( QWidget * parent )
+static QWidget * getParent(QWidget * parent) {
+    if (parent==nullptr) {
+        core::DesktopWndManager * wndMan = (core::DesktopWndManager*) core::getWndManager();
+        return wndMan->getCurrentWnd();
+    }
+    return parent;
+}
+
+MwcDialog::MwcDialog( QWidget * parent )// : QDialog( getParent(parent) )
 {
     { // Apply style sheet
         QFile file(":/resource_desktop/dialogs_style.css");
@@ -38,8 +49,9 @@ MwcDialog::MwcDialog( QWidget * parent )
         }
     }
 
-     setWindowFlags(Qt::FramelessWindowHint);
-     setModal(true);
+    setWindowFlags(Qt::FramelessWindowHint);
+    setModal(true);
+    setWindowModality(Qt::ApplicationModal);
 }
 
 MwcDialog::~MwcDialog() {}
@@ -72,6 +84,22 @@ void MwcDialog::mouseMoveEvent(QMouseEvent *event)
     }
     else {
         cursor = QPoint(0,0);
+    }
+}
+
+void MwcDialog::showEvent(QShowEvent* event)  {
+    QDialog::showEvent(event);  // Call base implementation
+
+    core::DesktopWndManager * wndMan = (core::DesktopWndManager*) core::getWndManager();
+    core::MainWindow * mainMwn = wndMan->getMainWindow();
+
+    if (mainMwn && mainMwn->isVisible()) {
+        // Calculate center position
+        QRect mainGeo = mainMwn->frameGeometry();
+        QPoint centerPos = mainGeo.center() - QPoint(width()/2, height()/2);
+
+        // Move to center
+        move(centerPos);
     }
 }
 

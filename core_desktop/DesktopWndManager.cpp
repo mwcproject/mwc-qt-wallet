@@ -82,6 +82,14 @@ void DesktopWndManager::init(WindowManager * wndMan, MainWindow * mainWnd) {
     Q_ASSERT(mainWindow);
 }
 
+// Current active non model window. Will be used as a parent for dialogs
+QWidget * DesktopWndManager::getCurrentWnd() const {
+    if (windowManager==nullptr)
+        return nullptr;
+
+    return windowManager->getCurrentWnd();
+}
+
 
 void DesktopWndManager::messageTextDlg( QString title, QString message, double widthScale) {
     if (!WalletApp::isAppCreated()) {

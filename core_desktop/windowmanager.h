@@ -42,6 +42,7 @@ public:
     // Parent for windows it can show.
     QWidget * getInWndParent() const;
 
+    QWidget * getCurrentWnd() const {return currentWnd;}
 private:
     QString buildWalletTitle(const QString & pageName);
 

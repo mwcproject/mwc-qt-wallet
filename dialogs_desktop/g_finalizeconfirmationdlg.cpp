@@ -20,7 +20,6 @@
 #include <QTextBlock>
 #include <QScrollBar>
 #include <QThread>
-#include "../bridge/util_b.h"
 #include "../bridge/config_b.h"
 #include "../util_desktop/widgetutils.h"
 #include "../util/ui.h"
@@ -84,7 +83,7 @@ void FinalizeConfirmationDlg::checkPasswordStatus() {
 }
 
 
-void FinalizeConfirmationDlg::on_passwordEdit_textChanged(const QString &str)
+void FinalizeConfirmationDlg::on_passwordEdit_textChanged(const QString &)
 {
     checkPasswordStatus();
 }

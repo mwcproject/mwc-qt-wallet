@@ -31,6 +31,7 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
 
+    virtual void showEvent(QShowEvent* event) override;
 private:
     QPoint cursor;
 };
