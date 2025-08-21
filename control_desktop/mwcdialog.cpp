@@ -26,13 +26,14 @@
 
 namespace control {
 
-static QWidget * getParent(QWidget * parent) {
+//  Note, parent for modal doalog doesn't work. The dialog will not come up
+/*static QWidget * getParent(QWidget * parent) {
     if (parent==nullptr) {
         core::DesktopWndManager * wndMan = (core::DesktopWndManager*) core::getWndManager();
         return wndMan->getCurrentWnd();
     }
     return parent;
-}
+}*/
 
 MwcDialog::MwcDialog( QWidget * parent )// : QDialog( getParent(parent) )
 {

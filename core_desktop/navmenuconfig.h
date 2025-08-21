@@ -27,6 +27,7 @@ class NavMenuConfigColdWlt;
 namespace bridge {
 class Config;
 class StateMachine;
+class WalletConfig;
 }
 
 namespace core {
@@ -41,7 +42,7 @@ public:
 private slots:
     void on_walletConfigButton_clicked();
     void on_outputsButton_clicked();
-    void on_mwcmqButton_clicked();
+    void on_listenersButton_clicked();
     void on_resyncButton_clicked();
     void on_nodeOverviewButton_clicked();
     void on_selectRunningModeButton_clicked();
@@ -52,6 +53,7 @@ private:
     Ui::NavMenuConfigNode   *uiNode = nullptr;
     Ui::NavMenuConfigColdWlt *uiColdWallet = nullptr;
     bridge::Config * config;
+    bridge::WalletConfig * walletConfig;
     bridge::StateMachine * stateMachine;
 };
 

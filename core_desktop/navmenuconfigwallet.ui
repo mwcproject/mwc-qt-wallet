@@ -74,7 +74,7 @@
     <string>Outputs</string>
    </property>
   </widget>
-  <widget class="control::NavMenuButton" name="mwcmqButton">
+  <widget class="control::NavMenuButton" name="listenersButton">
    <property name="geometry">
     <rect>
      <x>9</x>

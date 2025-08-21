@@ -94,12 +94,12 @@ const QString PAGE_A_RECOVERY_FROM_PASSPHRASE = "Recovery from passphrase";
 
 const QString PAGE_E_TRANSACTION    = "Transactions";
 const QString PAGE_E_RECEIVE        = "Receive coins";
-const QString PAGE_E_LISTENING      = "Listeners";
+const QString PAGE_E_LISTENING_SLATEPACK_ONLY = "Slatepack Address";
+const QString PAGE_E_LISTENING_ONLINE_LISTERS = "Listeners";
 const QString PAGE_E_OUTPUTS        = "Outputs";
 
 const QString PAGE_G_SEND           = "Send coins";
 const QString PAGE_G_SEND_ONLINE    = "Send coins to address";
-const QString PAGE_G_SEND_FILE      = "Send coins with file";
 const QString PAGE_G_SEND_SLATEPACK = "Send coins with Slatepack";
 const QString PAGE_G_FINALIZE_UPLOAD= "Finalize Transaction";
 const QString PAGE_G_FINALIZE_TRANS = "Finalize Transaction";

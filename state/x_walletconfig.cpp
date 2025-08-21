@@ -136,22 +136,6 @@ void WalletConfig::updateWalletLogsEnabled(bool enabled, bool needCleanupLogs) {
 
 }
 
-bool WalletConfig::getAutoStartMQSEnabled() {
-    return context->appContext->isAutoStartMQSEnabled();
-}
-
-void WalletConfig::updateAutoStartMQSEnabled(bool enabled) {
-    context->appContext->setAutoStartMQSEnabled(enabled);
-}
-
-bool WalletConfig::getAutoStartTorEnabled() {
-    return context->appContext->isAutoStartTorEnabled();
-}
-
-void WalletConfig::updateAutoStartTorEnabled(bool enabled) {
-    context->appContext->setAutoStartTorEnabled(enabled);
-}
-
 bool WalletConfig::isOutputLockingEnabled() {
     return context->appContext->isLockOutputEnabled();
 }

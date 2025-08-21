@@ -537,6 +537,9 @@ public:
 
     //--------------- Listening
 
+    // Request restart for online services if needed (don't restart if offline), must be done in a background
+    virtual void requestRestart(bool restartMq, bool restartTor) = 0;
+
     // Checking if wallet is listening through services
     virtual ListenerStatus getListenerStatus()  = 0;
     virtual ListenerStatus getListenerStartState()  = 0;

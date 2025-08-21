@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>778</width>
-    <height>584</height>
+    <width>899</width>
+    <height>669</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="topMargin">
     <number>70</number>
    </property>
@@ -32,6 +32,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>1</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -55,13 +58,13 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>620</width>
+         <width>700</width>
          <height>480</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>620</width>
+         <width>700</width>
          <height>480</height>
         </size>
        </property>
@@ -74,425 +77,565 @@
        <property name="lineWidth">
         <number>0</number>
        </property>
-       <widget class="QLabel" name="mwcMqStatusImg">
-        <property name="geometry">
-         <rect>
-          <x>120</x>
-          <y>21</y>
-          <width>21</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>MWC MQS listener status</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../resources_desktop.qrc">:/img/StatusOk@2x.svg</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="control::MwcPushButtonNormal" name="mwcMqTriggerButton">
-        <property name="geometry">
-         <rect>
-          <x>446</x>
-          <y>10</y>
-          <width>175</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Start/Stop listening for messages at MWC MQS</string>
-        </property>
-        <property name="text">
-         <string>Start</string>
-        </property>
-       </widget>
-       <widget class="control::MwcLineEditNormal" name="mwcmqsAddress">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>70</y>
-          <width>620</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>You MWC MQS address</string>
-        </property>
-        <property name="maxLength">
-         <number>1024</number>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelNormal" name="mwcMQlable">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>10</y>
-          <width>94</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>MWC MQS</string>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelTiny" name="mwcMqStatusTxt">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>33</y>
-          <width>81</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Online</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="control::MwcPushButtonNormal" name="mwcMqToIndex">
-        <property name="geometry">
-         <rect>
-          <x>445</x>
-          <y>374</y>
-          <width>175</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Select a specific index for your TOR and MWC MQS address</string>
-        </property>
-        <property name="text">
-         <string>To index</string>
-        </property>
-       </widget>
-       <widget class="control::MwcPushButtonNormal" name="mwcMqNextAddress">
-        <property name="geometry">
-         <rect>
-          <x>4</x>
-          <y>374</y>
-          <width>175</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Use the next address for listening to TOR and MWC MQS messages</string>
-        </property>
-        <property name="text">
-         <string>Next Address</string>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelTiny" name="mwcmqsAddressIndexLabel">
-        <property name="geometry">
-         <rect>
-          <x>29</x>
-          <y>110</y>
-          <width>201</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255,255,255, 0.7)</string>
-        </property>
-        <property name="text">
-         <string>Address index: 4</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelTiny" name="torStatusTxt">
-        <property name="geometry">
-         <rect>
-          <x>30</x>
-          <y>165</y>
-          <width>81</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Online</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="QLabel" name="torStatusImg">
-        <property name="geometry">
-         <rect>
-          <x>120</x>
-          <y>150</y>
-          <width>21</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Tor listener status</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../resources_desktop.qrc">:/img/StatusOk@2x.svg</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelNormal" name="label_5">
-        <property name="geometry">
-         <rect>
-          <x>30</x>
-          <y>140</y>
-          <width>85</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Tor</string>
-        </property>
-       </widget>
-       <widget class="control::MwcPushButtonNormal" name="torTriggerButton">
-        <property name="geometry">
-         <rect>
-          <x>446</x>
-          <y>150</y>
-          <width>175</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Start/Stop Tor listener</string>
-        </property>
-        <property name="text">
-         <string>Start</string>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelTiny" name="torAddressIndexLabel">
-        <property name="geometry">
-         <rect>
-          <x>30</x>
-          <y>245</y>
-          <width>201</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255,255,255, 0.7)</string>
-        </property>
-        <property name="text">
-         <string>Address index: 4</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-       <widget class="control::MwcLineEditNormal" name="torAddress">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>205</y>
-          <width>620</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>You MWC MQS address</string>
-        </property>
-        <property name="maxLength">
-         <number>1024</number>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelSmall" name="label">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>346</y>
-          <width>537</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Please stop TOR and MWC MQS listeners in order to change the wallet addess</string>
-        </property>
-       </widget>
-       <widget class="control::MwcLineEditNormal" name="torBridgeConection">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>270</y>
-          <width>421</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Optional Tor bridge connection string.  Use it if Tor blocked by your firewall.</string>
-        </property>
-        <property name="maxLength">
-         <number>1024</number>
-        </property>
-        <property name="readOnly">
-         <bool>false</bool>
-        </property>
-        <property name="placeholderText">
-         <string>Optional Tor bridge connection</string>
-        </property>
-       </widget>
-       <widget class="control::MwcLineEditNormal" name="torClientOptions">
-        <property name="geometry">
-         <rect>
-          <x>450</x>
-          <y>270</y>
-          <width>170</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Tor client options. Might be requred for some bridge protocols.</string>
-        </property>
-        <property name="maxLength">
-         <number>1024</number>
-        </property>
-        <property name="readOnly">
-         <bool>false</bool>
-        </property>
-        <property name="placeholderText">
-         <string>Optional client options</string>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>30</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>3</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QFrame" name="MqsFrame">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>77</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>77</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <widget class="control::MwcLineEditNormal" name="mwcmqsAddress">
+           <property name="geometry">
+            <rect>
+             <x>136</x>
+             <y>6</y>
+             <width>563</width>
+             <height>40</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>You MWC MQS address</string>
+           </property>
+           <property name="maxLength">
+            <number>1024</number>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="control::MwcLabelNormal" name="mwcMQlable">
+           <property name="geometry">
+            <rect>
+             <x>2</x>
+             <y>4</y>
+             <width>75</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>MWC MQS</string>
+           </property>
+          </widget>
+          <widget class="control::MwcLabelTiny" name="mwcMqStatusTxt">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>28</y>
+             <width>81</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Online</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+          <widget class="QLabel" name="mwcMqStatusImg">
+           <property name="geometry">
+            <rect>
+             <x>84</x>
+             <y>15</y>
+             <width>21</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>MWC MQS listener status</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="../resources_desktop.qrc">:/img/StatusOk@2x.svg</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="control::MwcLabelTiny" name="mwcmqsAddressIndexLabel">
+           <property name="geometry">
+            <rect>
+             <x>170</x>
+             <y>48</y>
+             <width>201</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgba(255,255,255, 0.7)</string>
+           </property>
+           <property name="text">
+            <string>Address index: 4</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="torFrame">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>123</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>123</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <widget class="control::MwcLineEditNormal" name="torAddress">
+           <property name="geometry">
+            <rect>
+             <x>138</x>
+             <y>6</y>
+             <width>561</width>
+             <height>40</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>You MWC MQS address</string>
+           </property>
+           <property name="maxLength">
+            <number>1024</number>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="control::MwcLabelTiny" name="torStatusTxt">
+           <property name="geometry">
+            <rect>
+             <x>4</x>
+             <y>32</y>
+             <width>65</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Online</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+          <widget class="QLabel" name="torStatusImg">
+           <property name="geometry">
+            <rect>
+             <x>84</x>
+             <y>14</y>
+             <width>21</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>Tor listener status</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="../resources_desktop.qrc">:/img/StatusOk@2x.svg</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="control::MwcLabelTiny" name="torAddressIndexLabel">
+           <property name="geometry">
+            <rect>
+             <x>170</x>
+             <y>50</y>
+             <width>201</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgba(255,255,255, 0.7)</string>
+           </property>
+           <property name="text">
+            <string>Address index: 4</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+          <widget class="control::MwcLabelNormal" name="label_5">
+           <property name="geometry">
+            <rect>
+             <x>2</x>
+             <y>7</y>
+             <width>65</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Tor</string>
+           </property>
+          </widget>
+          <widget class="control::MwcLineEditNormal" name="torClientOptions">
+           <property name="geometry">
+            <rect>
+             <x>507</x>
+             <y>78</y>
+             <width>191</width>
+             <height>40</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Tor client options. Might be requred for some bridge protocols.</string>
+           </property>
+           <property name="maxLength">
+            <number>1024</number>
+           </property>
+           <property name="readOnly">
+            <bool>false</bool>
+           </property>
+           <property name="placeholderText">
+            <string>Optional client options</string>
+           </property>
+          </widget>
+          <widget class="control::MwcLineEditNormal" name="torBridgeConection">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>78</y>
+             <width>461</width>
+             <height>40</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Optional Tor bridge connection string.  Use it if Tor blocked by your firewall.</string>
+           </property>
+           <property name="maxLength">
+            <number>1024</number>
+           </property>
+           <property name="readOnly">
+            <bool>false</bool>
+           </property>
+           <property name="placeholderText">
+            <string>Optional Tor bridge connection</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="slatepackFrame">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>88</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>88</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <widget class="control::MwcLineEditNormal" name="slatepackAddress">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>24</y>
+             <width>699</width>
+             <height>40</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>8</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Tor (onion) address of your wallet</string>
+           </property>
+           <property name="maxLength">
+            <number>1024</number>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="control::MwcLabelTiny" name="slatepackAddressIndexLabel">
+           <property name="geometry">
+            <rect>
+             <x>26</x>
+             <y>65</y>
+             <width>201</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>8</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgba(255,255,255, 0.7)</string>
+           </property>
+           <property name="text">
+            <string>Address index: 4</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+          <widget class="control::MwcLabelSmall" name="label_33">
+           <property name="geometry">
+            <rect>
+             <x>2</x>
+             <y>3</y>
+             <width>605</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>8</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Slatepack address</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="buttonsFrame">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>44</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>44</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <widget class="control::MwcPushButtonNormal" name="mwcMqToIndex">
+           <property name="geometry">
+            <rect>
+             <x>378</x>
+             <y>2</y>
+             <width>175</width>
+             <height>40</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Select a specific index for your TOR and MWC MQS address</string>
+           </property>
+           <property name="text">
+            <string>To address index</string>
+           </property>
+          </widget>
+          <widget class="control::MwcPushButtonNormal" name="mwcMqNextAddress">
+           <property name="geometry">
+            <rect>
+             <x>148</x>
+             <y>2</y>
+             <width>175</width>
+             <height>40</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Use the next address for listening to TOR and MWC MQS messages</string>
+           </property>
+           <property name="text">
+            <string>Next Address</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>14</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </widget>
      </item>
      <item>
@@ -553,9 +696,7 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>mwcMqTriggerButton</tabstop>
   <tabstop>mwcmqsAddress</tabstop>
-  <tabstop>torTriggerButton</tabstop>
   <tabstop>torAddress</tabstop>
   <tabstop>mwcMqNextAddress</tabstop>
   <tabstop>mwcMqToIndex</tabstop>

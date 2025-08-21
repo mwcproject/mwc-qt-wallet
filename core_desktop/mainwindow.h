@@ -32,6 +32,7 @@ namespace bridge {
     class Util;
     class Swap;
     class SwapMarketplace;
+    class WalletConfig;
 }
 
 class QPushButton;
@@ -75,6 +76,8 @@ private slots:
     void onSgnStartingCommand(QString command);
 
     void onSgnUpdateSyncProgress(double progressPercent);
+
+    void onSgnWalletFeaturesChanged();
 
     // Internal UI
     void on_listenerStatusButton_clicked();
@@ -122,6 +125,7 @@ private:
 private:
     Ui::MainWindow *ui;
     bridge::Config * config = nullptr;
+    bridge::WalletConfig * walletConfig = nullptr;
     bridge::CoreWindow * coreWindow = nullptr;
     bridge::Wallet * wallet = nullptr;
     bridge::StateMachine * stateMachine = nullptr;

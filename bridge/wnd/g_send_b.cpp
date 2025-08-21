@@ -37,8 +37,16 @@ Send::~Send() {
 //   0 - ok
 //   1 - account error
 //   2 - amount error
-int Send::initialSendSelection( int sendSelectedMethod, QString account, QString sendAmount ) {
-    return getState()->initialSendSelection( bridge::SEND_SELECTED_METHOD(sendSelectedMethod), account, sendAmount);
+int Send::initialSendSelection( int sendSelectedMethod, QString account, QString sendAmount, bool gotoNextPage ) {
+    return getState()->initialSendSelection( bridge::SEND_SELECTED_METHOD(sendSelectedMethod), account, sendAmount, gotoNextPage);
+}
+
+int64_t Send::getTmpAmount() {
+    return getState()->getTmpAmount();
+}
+
+QString Send::getTmpAccountName() {
+    return getState()->getTmpAccountName();
 }
 
 

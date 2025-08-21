@@ -31,12 +31,13 @@ struct ReceivedTxInfo {
 
     ReceivedTxInfo() = default;
     ReceivedTxInfo(const ReceivedTxInfo &) = default;
-
     ReceivedTxInfo(const QString &_mwc, const QString &_fromAddr, const QString &_message)
         : mwc(_mwc),
           fromAddr(_fromAddr),
           message(_message) {
     }
+
+    ReceivedTxInfo& operator=(const ReceivedTxInfo&) = default;
 };
 
 class Events : public QObject, public State

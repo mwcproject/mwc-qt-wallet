@@ -62,10 +62,6 @@ WalletConfig::WalletConfig(QWidget *parent) :
     walletLogsEnabled = walletConfig->getWalletLogsEnabled();
     updateLogsStateUI(walletLogsEnabled);
 
-    autoStartMQSEnabled = walletConfig->getAutoStartMQSEnabled();
-    autoStartTorEnabled = walletConfig->getAutoStartTorEnabled();
-    updateAutoStartStateUI(autoStartMQSEnabled, autoStartTorEnabled);
-
     notificationWindowsEnabled = walletConfig->getNotificationWindowsEnabled();
     ui->notificationsEnabled->setChecked(notificationWindowsEnabled);
 
@@ -93,6 +89,7 @@ WalletConfig::WalletConfig(QWidget *parent) :
     ui->progress->initLoader(false);
 
     inputConfirmationsNumber = walletConfig->getInputConfirmationsNumber();
+    changeOutputs = walletConfig->getChangeOutputs();
 
 #ifdef Q_OS_WIN
     // Disable in windows because notification bring the whole QT wallet on the top of other windows.
@@ -100,7 +97,15 @@ WalletConfig::WalletConfig(QWidget *parent) :
     ui->notificationsEnabled->setEnabled(false);
 #endif
 
-    setValues(inputConfirmationsNumber);
+    setValues(inputConfirmationsNumber, changeOutputs);
+
+    featureSlatepack = walletConfig->isFeatureSlatepack();
+    featureMWCMQS = walletConfig->isFeatureMWCMQS();
+    featureTor = walletConfig->isFeatureTor();
+    ui->featureSlatepack->setCheckState( featureSlatepack ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
+    ui->featureMWCMQS->setCheckState( featureMWCMQS ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
+    ui->featureTor->setCheckState( featureTor ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
+
     updateButtons();
 }
 
@@ -110,8 +115,9 @@ WalletConfig::~WalletConfig()
     delete ui;
 }
 
-void WalletConfig::setValues(int inputConfirmationNumber) {
+void WalletConfig::setValues(int inputConfirmationNumber, int changeOutputs) {
     ui->confirmationNumberEdit->setText( QString::number(inputConfirmationNumber) );
+    ui->changeOutputsEdit->setText( QString::number(changeOutputs) );
     setFocus();
 }
 
@@ -121,10 +127,12 @@ void WalletConfig::updateButtons() {
         getcheckedSizeButton() == uiScale &&
         walletLogsEnabled == ui->logsEnableBtn->isChecked() &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(inputConfirmationsNumber) &&
-        autoStartMQSEnabled == ui->start_mqs->isChecked() &&
-        autoStartTorEnabled == ui->start_tor->isChecked() &&
+        ui->changeOutputsEdit->text().trimmed() == QString::number(changeOutputs) &&
         notificationWindowsEnabled == ui->notificationsEnabled->isChecked() &&
         lockLater == ui->lockLaterEnabled->isChecked() &&
+        featureSlatepack == ui->featureSlatepack->isChecked() &&
+        featureMWCMQS == ui->featureMWCMQS->isChecked() &&
+        featureTor == ui->featureTor->isChecked() &&
         logoutTimeout == currentLogoutTimeout &&
         outputLockingEnabled == ui->outputLockingCheck->isChecked();
 
@@ -136,18 +144,15 @@ void WalletConfig::updateButtons() {
         // 713 directory is skipped intentionally. We don't want to reset it because user is expected to have many such directories
         // ui->mwc713directoryEdit->text().trimmed() == defaultWalletConfig.getDataPath() &&
         ui->confirmationNumberEdit->text().trimmed() == QString::number(walletConfig->getDefaultInputConfirmationsNumber()) &&
-        ui->start_mqs->isChecked() == true &&
-        ui->start_tor->isChecked() == true &&
+        ui->changeOutputsEdit->text().trimmed() == QString::number(walletConfig->getDefaultChangeOutputs()) &&
+        ui->featureSlatepack->isChecked() == walletConfig->isDefaultFeatureSlatepack() &&
+        ui->featureMWCMQS->isChecked() == walletConfig->isDefaultFeatureMWCMQS() &&
+        ui->featureTor->isChecked() == walletConfig->isDefaultFeatureTor() &&
         ui->logout_20->isChecked() == true &&
         ui->outputLockingCheck->isChecked() == false;
 
     ui->restoreDefault->setEnabled( !sameWithDefault );
     ui->applyButton->setEnabled( !sameWithCurrent );
-}
-
-void WalletConfig::on_mwcmqHost_textEdited(const QString &)
-{
-    updateButtons();
 }
 
 void WalletConfig::on_confirmationNumberEdit_textChanged(const QString &)
@@ -157,18 +162,20 @@ void WalletConfig::on_confirmationNumberEdit_textChanged(const QString &)
 
 void WalletConfig::on_restoreDefault_clicked()
 {
-    setValues(walletConfig->getDefaultInputConfirmationsNumber());
+    setValues(walletConfig->getDefaultInputConfirmationsNumber(), walletConfig->getDefaultChangeOutputs());
 
     checkSizeButton( scale2Id(walletConfig->getInitGuiScale()) );
 
     updateLogsStateUI(true);
 
-    updateAutoStartStateUI(true, true);
-
     currentLogoutTimeout = 20 * 60;
     updateAutoLogoutStateUI(20 * 60);
 
     ui->outputLockingCheck->setChecked(false);
+
+    ui->featureSlatepack->setCheckState( walletConfig->isDefaultFeatureSlatepack() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
+    ui->featureMWCMQS->setCheckState( walletConfig->isDefaultFeatureMWCMQS() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
+    ui->featureTor->setCheckState( walletConfig->isDefaultFeatureTor() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
 
     updateButtons();
 }
@@ -195,9 +202,25 @@ bool WalletConfig::applyChanges() {
         return false;
     }
 
-    if (!(confirmations == inputConfirmationsNumber)) {
-        walletConfig->setSendCoinsParams(confirmations, walletConfig->getChangeOutputs());
+    int changeOutputs = ui->changeOutputsEdit->text().trimmed().toInt(&ok);
+    if (!ok || changeOutputs <= 0 || changeOutputs >= 100) {
+        control::MessageBox::messageText(this, "Input",
+                                         "Please input the change output number in the range from 1 to 100");
+        ui->changeOutputsEdit->setFocus();
+        return false;
+    }
+
+    if (!(ui->featureSlatepack->isChecked() || ui->featureMWCMQS->isChecked() || ui->featureTor->isChecked())) {
+        control::MessageBox::messageText(this, "Input",
+                                         "Select at least one wallet feature");
+        ui->featureSlatepack->setFocus();
+        return false;
+    }
+
+    if (!(confirmations == inputConfirmationsNumber && changeOutputs == this->changeOutputs)) {
+        walletConfig->setSendCoinsParams(confirmations, changeOutputs);
         inputConfirmationsNumber = confirmations;
+        this->changeOutputs = changeOutputs;
     }
 
     bool need2updateLogEnabled = (walletLogsEnabled != ui->logsEnableBtn->isChecked());
@@ -229,18 +252,6 @@ bool WalletConfig::applyChanges() {
         walletConfig->updateGuiScale(id2scale(getcheckedSizeButton()));
     }
 
-    bool need2updateAutoStartMQSEnabled = (autoStartMQSEnabled != ui->start_mqs->isChecked());
-    if (need2updateAutoStartMQSEnabled) {
-        walletConfig->updateAutoStartMQSEnabled(ui->start_mqs->isChecked());
-    }
-    autoStartMQSEnabled = ui->start_mqs->isChecked();
-
-    bool need2updateAutoStartTorEnabled = (autoStartTorEnabled != ui->start_tor->isChecked());
-    if (need2updateAutoStartTorEnabled) {
-        walletConfig->updateAutoStartTorEnabled(ui->start_tor->isChecked());
-    }
-    autoStartTorEnabled = ui->start_tor->isChecked();
-
     bool notificationsEnabled = ui->notificationsEnabled->isChecked();
     if (notificationsEnabled != notificationWindowsEnabled) {
         walletConfig->setNotificationWindowsEnabled(notificationsEnabled);
@@ -268,6 +279,13 @@ bool WalletConfig::applyChanges() {
         config->updateActiveInstanceName(newWalletInstanceName);
         walletInstanceName = newWalletInstanceName;
     }
+
+    featureSlatepack = ui->featureSlatepack->isChecked();
+    featureMWCMQS = ui->featureMWCMQS->isChecked();
+    featureTor = ui->featureTor->isChecked();
+    walletConfig->setFeatureMWCMQS(featureMWCMQS);
+    walletConfig->setFeatureTor(featureTor);
+    walletConfig->setFeatureSlatepack(featureSlatepack);
 
     if (need2updateGuiSize) {
         ui->progress->show();
@@ -376,24 +394,9 @@ void WalletConfig::on_logout_never_clicked()
     updateButtons();
 }
 
-void WalletConfig::on_start_mqs_clicked()
-{
-    updateButtons();
-}
-
-void WalletConfig::on_start_tor_clicked()
-{
-    updateButtons();
-}
-
 void WalletConfig::on_walletInstanceNameEdit_textChanged(const QString &)
 {
     updateButtons();
-}
-
-void WalletConfig::updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartTor) {
-    ui->start_mqs->setChecked(isAutoStartMQS);
-    ui->start_tor->setChecked(isAutoStartTor);
 }
 
 void WalletConfig::updateAutoLogoutStateUI(int64_t time) {
@@ -425,6 +428,29 @@ void WalletConfig::on_lockLaterEnabled_clicked()
 {
     updateButtons();
 }
+
+void WalletConfig::on_changeOutputsEdit_textEdited(const QString &)
+{
+    updateButtons();
+}
+
+void WalletConfig::on_featureSlatepack_stateChanged(int)
+{
+    updateButtons();
+}
+
+void WalletConfig::on_featureTor_stateChanged(int)
+{
+    updateButtons();
+}
+
+void WalletConfig::on_featureMWCMQS_stateChanged(int)
+{
+    updateButtons();
+}
+
+
+
 
 }
 

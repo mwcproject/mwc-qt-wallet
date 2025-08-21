@@ -121,7 +121,7 @@ void SendStarting::on_nextButton_clicked() {
 
     config->setSendMethod(selectedSendMethod);
 
-    int res = send->initialSendSelection( selectedSendMethod, account, sendAmount );
+    int res = send->initialSendSelection( selectedSendMethod, account, sendAmount, true );
     if (res==1)
         ui->accountComboBox->setFocus();
     else if (res==2)
@@ -150,7 +150,7 @@ void SendStarting::on_accountComboBox_currentIndexChanged(int index)
 
 static bool showGenProofWarning = false;
 
-void wnd::SendStarting::on_generatePoof_clicked(bool checked)
+void SendStarting::on_generatePoof_clicked(bool checked)
 {
     if ( checked && !showGenProofWarning ) {
         if ( core::WndManager::RETURN_CODE::BTN2 !=  control::MessageBox::questionText(this, "Warning", "Transaction proof generation requires receiver wallet version 1.0.23 or higher.\n\n"

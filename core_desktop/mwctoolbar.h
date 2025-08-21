@@ -25,6 +25,7 @@ class MwcToolbar;
 namespace bridge {
     class Config;
     class Wallet;
+    class WalletConfig;
     class StateMachine;
     class CoreWindow;
 }
@@ -51,6 +52,7 @@ private slots:
     void onWalletBalanceUpdated();
     void onLoginResult(bool ok);
     void onLogout();
+    void onWalletFeaturesChanged();
 
     // state: state::STATE
     void onUpdateButtonsState( int state );
@@ -68,6 +70,7 @@ private:
     Ui::MwcToolbar *ui;
     bridge::Config * config = nullptr;
     bridge::Wallet * wallet = nullptr;
+    bridge::WalletConfig * walletConfig = nullptr;
     bridge::StateMachine * stateMachine = nullptr;
     bridge::CoreWindow * coreWindow = nullptr;
 };

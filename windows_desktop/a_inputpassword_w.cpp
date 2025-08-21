@@ -23,6 +23,7 @@
 #include <QSet>
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/config_b.h"
+#include "../bridge/wnd/x_walletconfig_b.h"
 #include "../bridge/wnd/a_inputpassword_b.h"
 #include "../bridge/wnd/a_startwallet_b.h"
 #include "../bridge/wallet_b.h"
@@ -36,6 +37,7 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
     ui->setupUi(this);
 
     config = new bridge::Config(this);
+    walletConfig = new bridge::WalletConfig(this);
     inputPassword = new bridge::InputPassword(this);
     startWallet = new bridge::StartWallet(this);
     wallet = new bridge::Wallet(this);
@@ -57,6 +59,15 @@ InputPassword::InputPassword(QWidget *parent, bool lockMode) :
         if (config->isOnlineWallet()) {
             updateMwcMqState(wallet->getMqsListenerStatus());
             updateTorState(wallet->getTorListenerStatus());
+
+            if (!walletConfig->isFeatureMWCMQS()) {
+                ui->mqsFrame->hide();
+                ui->listeningStatusFrame->layout()->removeItem(ui->middleSpacer);
+            }
+            if (!walletConfig->isFeatureTor()) {
+                ui->torFrame->hide();
+                ui->listeningStatusFrame->layout()->removeItem(ui->middleSpacer);
+            }
         } else {
             ui->listeningStatusFrameHolder->hide();
         }

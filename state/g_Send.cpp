@@ -119,7 +119,7 @@ void Send::switchToStartingWindow() {
 //   0 - ok
 //   1 - account error
 //   2 - amount error
-int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod, QString account, QString sendAmount ) {
+int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod, QString account, QString sendAmount, bool gotoNextPage ) {
 
     QVector<wallet::AccountInfo> balance = context->wallet->getWalletBalance();
     wallet::AccountInfo selectedAccount;
@@ -162,6 +162,12 @@ int Send::initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod,
         core::getWndManager()->messageTextDlg("Incorrect Input", "Your account doesn't have enough MWC to send and cover the transaction fees.");
         return 2;
     }
+
+    tmpAccountName = selectedAccount.accountName;
+    tmpAmount = mwcAmount.second;
+
+    if (!gotoNextPage)
+        return 0;
 
     // Switching to some dependent windows.
     atSendInitialPage = false;
@@ -220,6 +226,9 @@ bool Send::sendMwcOffline( QString account, int64_t amount, QString message, boo
                                         prms.inputConfirmationNumber, prms.changeOutputs, outputs, ttl_blocks, context->appContext->getGenerateProof(),
                                         slatepackRecipientAddress, // optional. Encrypt SP if it is defined.
                                         isLockLater, "");
+    }
+    else {
+        return false;
     }
 
 
@@ -323,21 +332,34 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
         case util::ADDRESS_TYPE::MWC_MQ: {
             genProof = false; // for MQS we are getting proof legacy way. It will help with backward compability
             if (!listenerStart.mqs) {
-                core::getWndManager()->messageTextDlg("Listener is Offline",
-                                                      "MQS listener is not started. Please start MQS listener first." );
+                if (!context->appContext->isFeatureMWCMQS()) {
+                    core::getWndManager()->messageTextDlg("Listener is Offline",
+                            "You are trying to connect to another wallet with MWCMQS, but MWCMQS is disabled for your wallet. Please activate MWCMQS feature at wallet configuration page." );
+                }
+                else {
+                    core::getWndManager()->messageTextDlg("Listener is Offline",
+                            "MQS listener is not able to start. Please check your network and firewall." );
+                }
                 return false;
             }
             if (!listenerStatus.mqs) {
                 core::getWndManager()->messageTextDlg("Listener is Offline",
-                                                      "MQS listener is not online even it was started. Please check your network connection and firewall settings." );
+                             "MQS listener is not online even it was started. Please check your network connection and firewall settings." );
                 return false;
             }
             break;
         }
         case util::ADDRESS_TYPE::TOR: {
             if (!listenerStart.tor) {
-                core::getWndManager()->messageTextDlg("Listener is Offline",
-                                                      "Tor listener is not started. Please start Tor listener first." );
+
+                if (!context->appContext->isFeatureTor()) {
+                    core::getWndManager()->messageTextDlg("Listener is Offline",
+                                                          "You are trying to connect to another wallet with Tor, but Tor is disabled for your wallet. Please activate Tor feature at wallet configuration page." );
+                }
+                else {
+                    core::getWndManager()->messageTextDlg("Listener is Offline",
+                                                          "Tor listener is not able to start. Please check your network and firewall." );
+                }
                 return false;
             }
 

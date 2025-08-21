@@ -94,6 +94,8 @@ public:
     virtual QString getPasswordHash() override;
 
     //--------------- Listening
+    // Request restart for online services if needed (don't restart if offline), must be done in a background
+    virtual void requestRestart(bool restartMq, bool restartTor) override;
 
     // Checking if wallet is listening through services
     virtual ListenerStatus getListenerStatus() override;
@@ -642,6 +644,8 @@ private:
     QVector<AccountInfo> applyOutputLocksToBalance() const;
 
     static QString getTorLogFilename();
+
+    inline bool isListenerStatus(int stateFlag) const { return (listenersStatus & stateFlag)!=0; }
 private:
     core::AppContext * appContext = nullptr; // app context to store current account name
     node::MwcNode * mwcNode = nullptr;
@@ -665,12 +669,7 @@ private:
     QString torAddress; // Address from Tor listener
 
     // listening statuses
-    bool mwcMqOnline = false;
-    bool torOnline = false;
-    bool mwcMqStarted = false;
-    bool torStarted = false;
-    // MWC MQS will try to start forever.
-    bool mwcMqStartRequested = false;
+    int listenersStatus = 0; // see LSTATE_XXXXX flags
 
     QString activeMwcMqsTid; // MQS can be managed by many thredas, but only last started is active
 
@@ -698,7 +697,6 @@ private:
     QString commandLine;
 
     int torOfflineCounter = 0;
-    bool restartingTor = false;
     bool needWaitForLocalNodeStart = false;
 };
 

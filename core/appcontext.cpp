@@ -182,7 +182,7 @@ bool AppContext::loadDataImpl() {
     int id = 0;
     in >> id;
 
-    if (id<0x4783 || id>0x47A8)
+    if (id<0x4783 || id>0x47A9)
          return false;
 
     QString mockStr;
@@ -248,7 +248,8 @@ bool AppContext::loadDataImpl() {
     }
 
     if (id>=0x4790) {
-        in >> autoStartMQSEnabled;
+        bool b;
+        in >> b;
     }
 
     if (id>=0x4791) {
@@ -286,8 +287,10 @@ bool AppContext::loadDataImpl() {
         in >> currentAccountName;
     }
 
-    if (id>=0x4797)
-        in >> autoStartTorEnabled;
+    if (id>=0x4797) {
+        bool b;
+        in >> b;
+    }
 
     if (id>=0x4798) {
         int sz = 0;
@@ -398,6 +401,12 @@ bool AppContext::loadDataImpl() {
         in >> receiveSlatepacks;
     }
 
+    if (id>=0x47A9) {
+        in >> featureSlatepack;
+        in >> featureMWCMQS;
+        in >> featureTor;
+    }
+
     return true;
 }
 
@@ -425,7 +434,7 @@ void AppContext::saveData() const {
 
     QString mockStr;
 
-    out << 0x47A8;
+    out << 0x47A9;
     out << mockStr;
     out << mockStr;
     out << int(activeWndState);
@@ -454,7 +463,7 @@ void AppContext::saveData() const {
 
     out << hodlRegistrations;
 
-    out << autoStartMQSEnabled;
+    out << true;
     bool b = false; // legacy autoStartKeybaseEnabled
     out << b;
 
@@ -479,7 +488,7 @@ void AppContext::saveData() const {
     out << receiveAccount;
     out << currentAccountName;
 
-    out << autoStartTorEnabled;
+    out << true;
 
     int sz = nodeConnection.size();
     out << sz;
@@ -537,6 +546,10 @@ void AppContext::saveData() const {
 
     out << sendSlatepacks;
     out << receiveSlatepacks;
+
+    out << featureSlatepack;
+    out << featureMWCMQS;
+    out << featureTor;
 }
 
 void AppContext::loadNotesData() {
@@ -686,20 +699,6 @@ void AppContext::setLogsEnabled(bool enabled) {
     if (enabled == logsEnabled)
         return;
     logsEnabled = enabled;
-    saveData();
-}
-
-void AppContext::setAutoStartMQSEnabled(bool enabled) {
-    if (enabled == autoStartMQSEnabled)
-        return;
-    autoStartMQSEnabled = enabled;
-    saveData();
-}
-
-void AppContext::setAutoStartTorEnabled(bool enabled) {
-    if (enabled == autoStartTorEnabled)
-        return;
-    autoStartTorEnabled = enabled;
     saveData();
 }
 
@@ -1141,6 +1140,54 @@ void AppContext::deleteReceiveSlatepack(const QString & txUUID) {
     if (!receiveSlatepacks.contains(txUUID))
         return;
     receiveSlatepacks.remove(txUUID);
+    saveData();
+}
+
+bool AppContext::isFeatureSlatepack() const {
+    if (config::isOnlineWallet())
+        return featureSlatepack;
+    else
+        return true;
+}
+bool AppContext::isFeatureMWCMQS() const {
+    if (config::isOnlineWallet())
+        return featureMWCMQS;
+    else
+        return false;
+}
+bool AppContext::isFeatureTor() const {
+    if (config::isOnlineWallet())
+        return featureTor;
+    else
+        return false;
+}
+
+
+void AppContext::setFeatureSlatepack(bool val) {
+    if (!config::isOnlineWallet())
+        return;
+
+    if (featureSlatepack==val)
+        return;
+    featureSlatepack = val;
+    saveData();
+}
+void AppContext::setFeatureMWCMQS(bool val) {
+    if (!config::isOnlineWallet())
+        return;
+
+    if (featureMWCMQS==val)
+        return;
+    featureMWCMQS = val;
+    saveData();
+}
+void AppContext::setFeatureTor(bool val) {
+    if (!config::isOnlineWallet())
+        return;
+
+    if (featureTor==val)
+        return;
+    featureTor = val;
     saveData();
 }
 

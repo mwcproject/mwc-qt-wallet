@@ -61,14 +61,6 @@ bool WalletConfig::getWalletLogsEnabled() {
     return getState()->getWalletLogsEnabled();
 }
 
-bool WalletConfig::getAutoStartMQSEnabled() {
-    return getState()->getAutoStartMQSEnabled();
-}
-
-bool WalletConfig::getAutoStartTorEnabled() {
-    return getState()->getAutoStartTorEnabled();
-}
-
 int WalletConfig::getLogoutTimeMs() {
     return config::getLogoutTimeMs();
 }
@@ -111,13 +103,6 @@ void WalletConfig::updateWalletLogsEnabled(bool logsEnabled, bool needCleanupLog
 void WalletConfig::updateGuiScale(double scale) {
     getState()->updateGuiScale(scale);
 }
-void WalletConfig::updateAutoStartMQSEnabled(bool enabled) {
-    getState()->updateAutoStartMQSEnabled(enabled);
-}
-void WalletConfig::updateAutoStartTorEnabled(bool enabled) {
-    getState()->updateAutoStartTorEnabled(enabled);
-}
-
 void WalletConfig::setOutputLockingEnabled(bool enabled) {
     getState()->setOutputLockingEnabled(enabled);
 }
@@ -128,6 +113,77 @@ void WalletConfig::setNotificationWindowsEnabled(bool enabled) {
 
 bool WalletConfig::updateTimeoutValue(int timeout) {
     return getState()->updateTimeoutValue(timeout);
+}
+
+bool WalletConfig::isFeatureSlatepack() {
+    return getStateContext()->appContext->isFeatureSlatepack();
+}
+bool WalletConfig::isFeatureMWCMQS() {
+    return getStateContext()->appContext->isFeatureMWCMQS();
+}
+
+bool WalletConfig::isFeatureTor() {
+    return getStateContext()->appContext->isFeatureTor();
+}
+
+void WalletConfig::setFeatureSlatepack(bool val) {
+    bool changed = (val != isFeatureSlatepack());
+    getStateContext()->appContext->setFeatureSlatepack(val);
+    if (changed)
+        sendEmitWalletFeaturesChanged();
+}
+void WalletConfig::setFeatureMWCMQS(bool val) {
+    bool changed = (val != isFeatureMWCMQS());
+    wallet::ListenerStatus status = getWallet()->getListenerStatus();
+    if (val) {
+        if (!status.mqs)
+            getWallet()->listeningStart(true, false, false);
+    }
+    else {
+        if (status.mqs) {
+            getWallet()->listeningStop(true, false);
+        }
+    }
+    getStateContext()->appContext->setFeatureMWCMQS(val);
+    if (changed)
+        sendEmitWalletFeaturesChanged();
+}
+void WalletConfig::setFeatureTor(bool val) {
+    bool changed = (val != isFeatureTor());
+    wallet::ListenerStatus status = getWallet()->getListenerStatus();
+    if (val) {
+        if (!status.tor)
+            getWallet()->listeningStart(false, true, false);
+    }
+    else {
+        if (status.tor) {
+            getWallet()->listeningStop(false, true);
+        }
+    }
+    getStateContext()->appContext->setFeatureTor(val);
+    if (changed)
+        sendEmitWalletFeaturesChanged();
+}
+
+bool WalletConfig::isDefaultFeatureSlatepack() {
+    return true;
+}
+bool WalletConfig::isDefaultFeatureMWCMQS() {
+    return false;
+}
+bool WalletConfig::isDefaultFeatureTor() {
+    return false;
+}
+
+void WalletConfig::sendEmitWalletFeaturesChanged() {
+    for ( WalletConfig* cfg : getBridgeManager()->getWalletConfig() ) {
+        cfg->emitWalletFeaturesChanged();
+    }
+}
+
+
+void WalletConfig::emitWalletFeaturesChanged() {
+    emit sgnWalletFeaturesChanged();
 }
 
 }

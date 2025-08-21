@@ -19,6 +19,7 @@
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/config_b.h"
 #include "../bridge/wallet_b.h"
+#include "../bridge/wnd/x_walletconfig_b.h"
 #include "../bridge/util_b.h"
 #include "../bridge/wnd/e_receive_b.h"
 #include "../core/global.h"
@@ -33,6 +34,7 @@ Receive::Receive(QWidget *parent) :
     ui->setupUi(this);
 
     config  = new bridge::Config(this);
+    walletConfig = new bridge::WalletConfig(this);
     wallet  = new bridge::Wallet(this);
     receive = new bridge::Receive(this);
     util    = new bridge::Util(this);
@@ -56,9 +58,40 @@ Receive::Receive(QWidget *parent) :
 
     updateAccountList();
 
-    if (config->isColdWallet()) {
-        ui->frameQs->hide();
+    if (!walletConfig->isFeatureMWCMQS()) {
+        ui->frameMqs->hide();
+        ui->mqsTorHorizontalLayout->layout()->removeItem( ui->spacer_mqs_tor );
+        ui->label_mqs->hide();
         ui->mwcmqAddress->hide();
+
+        ui->frameReceive->layout()->removeItem( ui->verticalSpacer_10 );
+    }
+
+    bool hasTor = walletConfig->isFeatureTor();
+    if (!hasTor) {
+        // hiding indicator
+        ui->frameTor->hide();
+        ui->mqsTorHorizontalLayout->layout()->removeItem( ui->spacer_mqs_tor );
+    }
+    bool hasSp = walletConfig->isFeatureSlatepack();
+    if (!hasSp) {
+        ui->recieveSlatepackButton->hide();
+    }
+
+    if (hasTor && hasSp) {
+        // all good
+    }
+    else if (hasTor) {
+        // Tor only
+        ui->label_sp_tor->setText("TOR address");
+    }
+    else if (hasSp) {
+        ui->label_sp_tor->setText("Slatepack address");
+    }
+    else {
+        // no Tor and no SP
+        ui->label_sp_tor->hide();
+        ui->torAddress->hide();
     }
 
     wallet->requestFileProofAddress();
@@ -170,7 +203,7 @@ void Receive::onSgnTorAddress(QString tor) {
 }
 
 void Receive::onSgnFileProofAddress(QString proofAddress) {
-    ui->fileAddress->setText(proofAddress);
+    ui->torAddress->setText(proofAddress);
 }
 
 // keybaseOnline is absolete

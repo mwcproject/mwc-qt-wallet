@@ -21,6 +21,7 @@
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/config_b.h"
+#include "../bridge/wnd/x_walletconfig_b.h"
 
 namespace wnd {
 
@@ -32,6 +33,7 @@ Listening::Listening(QWidget *parent) :
 
     wallet = new bridge::Wallet(this);
     config = new bridge::Config(this);
+    walletConfig = new bridge::WalletConfig(this);
 
     QObject::connect( wallet, &bridge::Wallet::sgnUpdateListenerStatus,
                       this, &Listening::onSgnUpdateListenerStatus, Qt::QueuedConnection);
@@ -53,6 +55,16 @@ Listening::Listening(QWidget *parent) :
 
     ui->torClientOptions->setText(config->getTorClientOptions());
     ui->torClientOptions->setCursorPosition(0);
+
+    if (!walletConfig->isFeatureSlatepack()) {
+        ui->slatepackFrame->hide();
+    }
+    if (!walletConfig->isFeatureMWCMQS()) {
+        ui->MqsFrame->hide();
+    }
+    if (!walletConfig->isFeatureTor()) {
+        ui->torFrame->hide();
+    }
 }
 
 Listening::~Listening()
@@ -70,11 +82,8 @@ void Listening::onSgnUpdateListenerStatus(bool mwcOnline, bool _keybaseOnline, b
 }
 // _keybase is absolete
 void Listening::onSgnListenerStartStop(bool mqs, bool tor) {
-    if (mqs)
-        mqsInProgress = false;
-    if (tor)
-        torInProgress = false;
-
+    Q_UNUSED(mqs);
+    Q_UNUSED(tor);
     updateStatuses();
 }
 
@@ -82,21 +91,19 @@ void Listening::onSgnMwcAddressWithIndex(QString mwcAddress, int idx) {
     ui->mwcmqsAddress->setText( mwcAddress );
     ui->mwcmqsAddressIndexLabel->setText( idx>=0 ? ("Address Index: " + QString::number(idx)) : "" );
     ui->torAddressIndexLabel->setText( idx>=0 ? ("Address Index: " + QString::number(idx)) : "" );
+    ui->slatepackAddressIndexLabel->setText( idx>=0 ? ("Address Index: " + QString::number(idx)) : "" );
 }
 
 void Listening::onSgnFileProofAddress(QString proofAddress) // tor address
 {
     ui->torAddress->setText( "http://" + proofAddress + ".onion" );
+    ui->slatepackAddress->setText(proofAddress);
 }
-
 
 void Listening::updateStatuses() {
 
     bool mqsStatus = wallet->getMqsListenerStatus();
     bool torStatus = wallet->getTorListenerStatus();
-
-    bool mqsStarted = wallet->isMqsListenerStarted();
-    bool torStarted = wallet->isTorListenerStarted();
 
     // MWC MQ
     ui->mwcMqStatusImg->setPixmap(QPixmap(mqsStatus ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
@@ -104,61 +111,11 @@ void Listening::updateStatuses() {
             mqsStatus ? "Listener connected to mwcmqs" : "Listener diconnected from mwcmqs");
     ui->mwcMqStatusTxt->setText(mqsStatus ? "Online" : "Offline");
 
-    if (mqsStarted) {
-        if (mqsStatus) {
-            ui->mwcMqTriggerButton->setText( mqsInProgress ? "Stopping..." : "Stop" );
-            ui->mwcMqTriggerButton->setToolTip("Stop the MWC MQS Listener");
-        } else {
-            ui->mwcMqTriggerButton->setText("Stop to retry");
-            ui->mwcMqTriggerButton->setToolTip(
-                    "MWC MQS Listener already running and trying to reconnect. Click to restart the MWC MQS Listener.");
-        }
-    } else {
-        ui->mwcMqTriggerButton->setText(mqsInProgress ? "Starting..." : "Start");
-        ui->mwcMqTriggerButton->setToolTip("Start the MWC MQS Listener");
-    }
-    ui->mwcMqNextAddress->setEnabled(!mqsStarted && !torStarted);
-    ui->mwcMqToIndex->setEnabled(!mqsStarted && !torStarted);
-
     ui->torStatusImg->setPixmap(
             QPixmap(torStatus ? ":/img/StatusOk@2x.svg" : ":/img/StatusEmpty@2x.svg"));
     ui->torStatusImg->setToolTip(
             torStatus ? "Listener connected to Tor" : "Listener diconnected from TOR");
     ui->torStatusTxt->setText(torStatus ? "Online" : "Offline");
-
-    // TOR
-    if (torStarted) {
-        if (torStatus) {
-            ui->torTriggerButton->setText(torInProgress ? "Stopping..." : "Stop");
-            ui->torTriggerButton->setToolTip("Stop the Tor Listener");
-        } else {
-            ui->torTriggerButton->setText("Stop to retry");
-            ui->torTriggerButton->setToolTip(
-                    "Tor Listener is already running and trying to reconnect. Click to restart the Tor Listener");
-        }
-    } else {
-        ui->torTriggerButton->setText( torInProgress ? "Starting" : "Start");
-        ui->torTriggerButton->setToolTip("Start the Tor Listener");
-    }
-
-    ui->torBridgeConection->setEnabled(!torStarted);
-    ui->torClientOptions->setEnabled(!torStarted);
-}
-
-void Listening::on_mwcMqTriggerButton_clicked()
-{
-    if (mqsInProgress)
-        return;
-    mqsInProgress = true;
-
-    if (wallet->isMqsListenerStarted()) {
-        ui->mwcMqTriggerButton->setText("Stopping...");
-        wallet->requestStopMqsListener();
-    }
-    else {
-        ui->mwcMqTriggerButton->setText("Starting...");
-        wallet->requestStartMqsListener();
-    }
 }
 
 static bool warnMsgShown = false;
@@ -176,6 +133,7 @@ void Listening::on_mwcMqNextAddress_clicked()
         return;
 
     warnMsgShown = true;
+
     wallet->requestNextMqsAddress();
     wallet->requestFileProofAddress();
 }
@@ -203,25 +161,15 @@ void Listening::on_mwcMqToIndex_clicked()
     wallet->requestFileProofAddress();
 }
 
-void Listening::on_torTriggerButton_clicked()
+void Listening::on_torBridgeConection_textEdited(const QString &)
 {
-    if (torInProgress)
-        return;
-    torInProgress = true;
-
-    if (wallet->isTorListenerStarted()) {
-        ui->torTriggerButton->setText("Stopping...");
-        wallet->requestStopTorListener();
-    }
-    else {
-        ui->torBridgeConection->setEnabled(false);
-        ui->torClientOptions->setEnabled(false);
-
-        config->setTorBridgeConectionClientOptions(ui->torBridgeConection->text(), ui->torClientOptions->text());
-
-        ui->torTriggerButton->setText("Starting...");
-        wallet->requestStartTorListener();
-    }
+    config->setTorBridgeConectionClientOptions(ui->torBridgeConection->text(), ui->torClientOptions->text());
 }
+
+void Listening::on_torClientOptions_textEdited(const QString &)
+{
+    config->setTorBridgeConectionClientOptions(ui->torBridgeConection->text(), ui->torClientOptions->text());
+}
+
 
 }

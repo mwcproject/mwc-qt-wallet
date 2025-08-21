@@ -19,6 +19,7 @@
 #include <QDebug>
 #include "../bridge/config_b.h"
 #include "../bridge/wallet_b.h"
+#include "../bridge/wnd/x_walletconfig_b.h"
 #include "../bridge/statemachine_b.h"
 #include "../bridge/corewindow_b.h"
 #include "../core/global.h"
@@ -36,6 +37,7 @@ MwcToolbar::MwcToolbar(QWidget *parent) :
 
     config = new Config(this);
     wallet = new Wallet(this);
+    walletConfig = new WalletConfig(this);
     stateMachine = new StateMachine(this);
     coreWindow = new CoreWindow(this);
 
@@ -50,11 +52,14 @@ MwcToolbar::MwcToolbar(QWidget *parent) :
                       this, &MwcToolbar::onLoginResult, Qt::QueuedConnection );
     QObject::connect( wallet, &Wallet::sgnLogout,
                       this, &MwcToolbar::onLogout, Qt::QueuedConnection );
-
     QObject::connect( coreWindow, &CoreWindow::sgnUpdateActionStates,
                       this, &MwcToolbar::onUpdateButtonsState, Qt::QueuedConnection );
+    QObject::connect( walletConfig, &WalletConfig::sgnWalletFeaturesChanged,
+                      this, &MwcToolbar::onWalletFeaturesChanged, Qt::QueuedConnection );
 
     ui->mwcUnconfFrame->hide();
+
+    onWalletFeaturesChanged();
 
     startTimer(300);
 }
@@ -158,6 +163,18 @@ void MwcToolbar::timerEvent(QTimerEvent *event)
             lastNoGasErrorEvent = QDateTime::currentMSecsSinceEpoch();
         }
     }
+}
+
+void MwcToolbar::onWalletFeaturesChanged() {
+    if (walletConfig->isFeatureSlatepack()) {
+        // Finalize make sense for Slatepack only.
+        ui->finalizeToolButton->show();
+    }
+    else {
+        ui->finalizeToolButton->hide();
+    }
+
+
 }
 
 }

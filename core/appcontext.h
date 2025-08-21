@@ -74,8 +74,7 @@ struct ContactRecord {
 
 // State that applicable to all application.
 // Support signal for changes about Locked output
-class AppContext : public QObject
-{
+class AppContext : public QObject {
     Q_OBJECT
 public:
     AppContext();
@@ -136,9 +135,6 @@ public:
     bool isLogsEnabled() const {return logsEnabled;}
     void setLogsEnabled(bool enabled);
 
-    // ----- Auto Start MQS --------
-    bool isAutoStartMQSEnabled() const {return autoStartMQSEnabled;}
-    void setAutoStartMQSEnabled(bool enabled);
 
     //  Tor bridge configs
     QString getTorBridgeLine() const {return torBridgeLine;}
@@ -146,8 +142,6 @@ public:
     void setTorBridgeLineClientOption(const QString & line, const QString & client);
 
     // ----- Auto Start Tor ------
-    bool isAutoStartTorEnabled() const {return autoStartTorEnabled;}
-    void setAutoStartTorEnabled(bool enabled);
     // Not will be started with TOR if it is online node or Tor autostart enabled
     bool useTorForNode() const;
 
@@ -267,6 +261,12 @@ public:
     QString getSendSlatepack(const QString & txUUID) const { return sendSlatepacks[txUUID]; }
     QString getReceiveSlatepack(const QString & txUUID) const { return receiveSlatepacks[txUUID]; }
 
+    bool isFeatureSlatepack() const;
+    bool isFeatureMWCMQS() const;
+    bool isFeatureTor() const;
+    void setFeatureSlatepack(bool val);
+    void setFeatureMWCMQS(bool val);
+    void setFeatureTor(bool val);
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -303,9 +303,6 @@ private:
     double initScaleValue = 1.0; // default scale value
 
     bool logsEnabled = true;
-
-    bool autoStartMQSEnabled = true;
-    bool autoStartTorEnabled = true;
 
     QString torBridgeLine;
     QString torClientOption;
@@ -408,6 +405,11 @@ private:
 
     QMap<QString,QString> sendSlatepacks;
     QMap<QString,QString> receiveSlatepacks;
+
+    // Features
+    bool featureSlatepack = true;
+    bool featureMWCMQS = false;
+    bool featureTor = false;
 };
 
 template <class T>

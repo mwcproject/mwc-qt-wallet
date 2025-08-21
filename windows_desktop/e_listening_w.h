@@ -24,6 +24,7 @@ class Listening;
 namespace bridge {
 class Wallet;
 class Config;
+class WalletConfig;
 }
 
 namespace wnd {
@@ -43,10 +44,12 @@ private slots:
     void onSgnListenerStartStop(bool mqs, bool tor); // _keybase is absolete
     void onSgnFileProofAddress(QString proofAddress); // tor address
 
-    void on_mwcMqTriggerButton_clicked();
     void on_mwcMqNextAddress_clicked();
     void on_mwcMqToIndex_clicked();
-    void on_torTriggerButton_clicked();
+
+    void on_torBridgeConection_textEdited(const QString &arg1);
+
+    void on_torClientOptions_textEdited(const QString &arg1);
 
 private:
     void updateStatuses();
@@ -54,9 +57,7 @@ private:
     Ui::Listening *ui;
     bridge::Wallet * wallet = nullptr;
     bridge::Config * config = nullptr;
-
-    bool mqsInProgress = false;
-    bool torInProgress = false;
+    bridge::WalletConfig * walletConfig = nullptr;
 };
 
 }

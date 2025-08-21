@@ -132,8 +132,8 @@ void InputPassword::onLoginResult(bool ok) {
             // Starting listeners after balance to speed up the init process
             if ( config::isOnlineWallet() && context->wallet->hasPassword() ) {
                 // Start listening, no feedback interested
-                context->wallet->listeningStart(context->appContext->isAutoStartMQSEnabled(),
-                                                context->appContext->isAutoStartTorEnabled(),
+                context->wallet->listeningStart(context->appContext->isFeatureMWCMQS(),
+                                                context->appContext->isFeatureTor(),
                                                 true);
             }
 

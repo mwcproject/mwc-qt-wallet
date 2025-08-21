@@ -43,12 +43,6 @@ public:
     bool getWalletLogsEnabled();
     void updateWalletLogsEnabled(bool enabled, bool needCleanupLogs);
 
-    bool getAutoStartMQSEnabled();
-    void updateAutoStartMQSEnabled(bool enabled);
-
-    bool getAutoStartTorEnabled();
-    void updateAutoStartTorEnabled(bool enabled);
-
     bool isOutputLockingEnabled();
     void setOutputLockingEnabled(bool lockingEnabled);
 

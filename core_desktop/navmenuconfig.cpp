@@ -20,6 +20,7 @@
 #include "../control_desktop/messagebox.h"
 #include "../bridge/config_b.h"
 #include "../bridge/statemachine_b.h"
+#include "../bridge/wnd/x_walletconfig_b.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../dialogs_desktop/g_decodeslatepackdlg.h"
 
@@ -30,6 +31,7 @@ NavMenuConfig::NavMenuConfig(QWidget *parent) :
 
     config = new bridge::Config(this);
     stateMachine = new bridge::StateMachine(this);
+    walletConfig = new bridge::WalletConfig(this);
 
     if (config->isOnlineNode()) {
         uiNode = new Ui::NavMenuConfigNode;
@@ -43,6 +45,10 @@ NavMenuConfig::NavMenuConfig(QWidget *parent) :
         uiWallet = new Ui::NavMenuConfigWallet;
         uiWallet->setupUi(this);
 
+        if (walletConfig->isFeatureTor() || walletConfig->isFeatureMWCMQS())
+            uiWallet->listenersButton->setText("Listeners");
+        else
+            uiWallet->listenersButton->setText("Slatepack address");
     }
 }
 
@@ -66,7 +72,7 @@ void NavMenuConfig::on_outputsButton_clicked()
     close();
 }
 
-void NavMenuConfig::on_mwcmqButton_clicked()
+void NavMenuConfig::on_listenersButton_clicked()
 {
     stateMachine->setActionWindow( state::STATE::LISTENING );
     close();

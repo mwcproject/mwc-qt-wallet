@@ -126,6 +126,11 @@ void Events::onTransactionById( bool success, QString account, int64_t height, w
     if (!success)
         return;
 
+    Q_UNUSED(account);
+    Q_UNUSED(messages);
+    Q_UNUSED(outputs);
+    Q_UNUSED(height);
+
     QString uuid = transaction.txid.toLower();
     if (activeUUID.contains(uuid)) {
         activeUUID.remove(uuid);

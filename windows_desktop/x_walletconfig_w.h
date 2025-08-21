@@ -39,7 +39,6 @@ public:
 
 private slots:
     void on_confirmationNumberEdit_textChanged(const QString &arg1);
-    void on_mwcmqHost_textEdited(const QString &arg1);
     void on_logsEnableBtn_clicked();
 
     void on_fontSz1_clicked();
@@ -54,15 +53,19 @@ private slots:
     void on_logout_20_clicked();
     void on_logout_30_clicked();
     void on_logout_never_clicked();
-    void on_start_mqs_clicked();
     void on_outputLockingCheck_stateChanged(int arg1);
-    void on_start_tor_clicked();
     void on_walletInstanceNameEdit_textChanged(const QString &arg1);
     void on_notificationsEnabled_clicked();
     void on_lockLaterEnabled_clicked();
 
+    void on_changeOutputsEdit_textEdited(const QString &arg1);
+
+    void on_featureSlatepack_stateChanged(int arg1);
+    void on_featureTor_stateChanged(int arg1);
+    void on_featureMWCMQS_stateChanged(int arg1);
+
 private:
-    void setValues(int inputConfirmationNumber);
+    void setValues(int inputConfirmationNumber, int changeOutputs);
     // return true if data is fine. In case of error will show message for the user
     //bool readInputValue( wallet::WalletConfig & newWalletConfig, core::SendCoinsParams & newSendParams );
 
@@ -74,8 +77,6 @@ private:
     int getcheckedSizeButton() const;
 
     void updateLogsStateUI(bool enabled);
-
-    void updateAutoStartStateUI(bool isAutoStartMQS, bool isAutoStartTor);
 
     void updateAutoLogoutStateUI(int64_t time);
 
@@ -93,8 +94,6 @@ private:
     int uiScale = 2; // in the range [1..4]
 
     bool walletLogsEnabled = false;
-    bool autoStartMQSEnabled = true;
-    bool autoStartTorEnabled = true;
     bool outputLockingEnabled = false;
     bool notificationWindowsEnabled = true;
     bool lockLater = true;
@@ -102,7 +101,12 @@ private:
     int64_t currentLogoutTimeout = 20 * 60;
 
     int inputConfirmationsNumber = 1;
+    int changeOutputs = 1;
     QString walletInstanceName;
+
+    bool featureSlatepack = false;
+    bool featureMWCMQS = false;
+    bool featureTor = false;
 };
 
 }

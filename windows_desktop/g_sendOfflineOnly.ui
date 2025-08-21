@@ -1,0 +1,594 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SendOfflineOnly</class>
+ <widget class="QWidget" name="SendOfflineOnly">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>692</width>
+    <height>594</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,1">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>60</number>
+   </property>
+   <item>
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>77</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,5,1">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QFrame" name="frame_2">
+       <property name="minimumSize">
+        <size>
+         <width>550</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>550</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="control::MwcPushButtonNormal" name="allAmountButton">
+        <property name="geometry">
+         <rect>
+          <x>438</x>
+          <y>62</y>
+          <width>103</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Send all MWC in this account</string>
+        </property>
+        <property name="text">
+         <string>All</string>
+        </property>
+       </widget>
+       <widget class="control::MwcLineEditNormal" name="amountEdit">
+        <property name="geometry">
+         <rect>
+          <x>132</x>
+          <y>62</y>
+          <width>281</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Amount of MWC coins to send</string>
+        </property>
+        <property name="maxLength">
+         <number>32</number>
+        </property>
+        <property name="placeholderText">
+         <string>Amount</string>
+        </property>
+       </widget>
+       <widget class="control::MwcComboBox" name="accountComboBox">
+        <property name="geometry">
+         <rect>
+          <x>132</x>
+          <y>2</y>
+          <width>415</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+       </widget>
+       <widget class="control::MwcCheckBox" name="generatePoof">
+        <property name="geometry">
+         <rect>
+          <x>134</x>
+          <y>120</y>
+          <width>361</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="text">
+         <string>Generate Transaction Proof</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label">
+        <property name="geometry">
+         <rect>
+          <x>4</x>
+          <y>2</y>
+          <width>85</width>
+          <height>111</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../resources_desktop.qrc">:/img/File@2x.svg</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QWidget" name="widget_2" native="true">
+        <property name="geometry">
+         <rect>
+          <x>760</x>
+          <y>18</y>
+          <width>410</width>
+          <height>110</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>410</width>
+          <height>110</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>410</width>
+          <height>110</height>
+         </size>
+        </property>
+       </widget>
+       <widget class="control::MwcLineEditNormal" name="recipientAddress">
+        <property name="geometry">
+         <rect>
+          <x>1</x>
+          <y>235</y>
+          <width>403</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Recipient slatepack address to encrypt the slate</string>
+        </property>
+        <property name="maxLength">
+         <number>1024</number>
+        </property>
+        <property name="placeholderText">
+         <string>Recipient slatepack address</string>
+        </property>
+       </widget>
+       <widget class="control::MwcPushButtonNormal" name="contactsButton">
+        <property name="geometry">
+         <rect>
+          <x>426</x>
+          <y>236</y>
+          <width>120</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Choose a contact for wallet address</string>
+        </property>
+        <property name="text">
+         <string>Contacts</string>
+        </property>
+       </widget>
+       <widget class="control::MwcLineEditNormal" name="descriptionEdit">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>294</y>
+          <width>547</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Optional note that will be displayed to the recipient</string>
+        </property>
+        <property name="maxLength">
+         <number>1024</number>
+        </property>
+        <property name="placeholderText">
+         <string>Description (optional)</string>
+        </property>
+       </widget>
+       <widget class="control::MwcLabelSmall" name="label_4">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>172</y>
+          <width>547</width>
+          <height>43</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:138%;&quot;&gt;- Your funds might be locked until your transaction is confirmed on-chain.&lt;br /&gt;- You can cancel any unconfirmed transaction to unlock your funds at 'Transactions'.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="control::MwcPushButtonNormal" name="settingsBtn">
+        <property name="geometry">
+         <rect>
+          <x>55</x>
+          <y>358</y>
+          <width>180</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>180</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>180</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Click to change settings. Number of change outputs and required confirmations.</string>
+        </property>
+        <property name="text">
+         <string>Settings</string>
+        </property>
+       </widget>
+       <widget class="control::MwcPushButtonNormal" name="sendButton">
+        <property name="geometry">
+         <rect>
+          <x>313</x>
+          <y>358</y>
+          <width>180</width>
+          <height>40</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>180</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>180</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Send MWC</string>
+        </property>
+        <property name="text">
+         <string>Continue</string>
+        </property>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="control::MwcLabelProgress" name="progress">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>50</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>PROG</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>1</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>1</width>
+           <height>25</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>control::MwcPushButtonNormal</class>
+   <extends>QPushButton</extends>
+   <header>control_desktop/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>control_desktop/MwcCheckBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcComboBox</class>
+   <extends>QComboBox</extends>
+   <header>control_desktop/MwcComboBox.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>recipientAddress</tabstop>
+  <tabstop>contactsButton</tabstop>
+  <tabstop>settingsBtn</tabstop>
+  <tabstop>sendButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../resources_desktop.qrc"/>
+ </resources>
+ <connections/>
+</ui>

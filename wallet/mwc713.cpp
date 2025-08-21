@@ -50,6 +50,18 @@
 #include <QRegularExpression>
 #endif
 
+
+const int LSTATE_MQS_ONLINE     = 0x00001;
+const int LSTATE_MQS_STARTED    = 0x00002;
+const int LSTATE_TOR_ONLINE     = 0x00004;
+const int LSTATE_TOR_STARTED    = 0x00008;
+// MWC MQS will try to start forever.
+const int LSTATE_MQS_START_REQUESTED = 0x0010;
+const int LSTATE_TOR_RESTARTING = 0x0020;
+
+const int LSTATE_MQS_NEED_RESTART = 0x00100; // currently starting, when starting, will need to restart
+const int LSTATE_TOR_NEED_RESTART = 0x00400; // currently starting, when starting, will need to restart
+
 namespace wallet {
 
 static QPair<Mwc713Task *, int64_t> TSK(Mwc713Task *t, int64_t timeout) {
@@ -203,8 +215,7 @@ MWC713::initMwc713process(const QStringList &envVariables, const QStringList &pa
 void MWC713::resetData(STARTED_MODE _startedMode) {
     loggedIn = false;
     startedMode = _startedMode;
-    mwcMqOnline = torOnline = false;
-    mwcMqStarted = mwcMqStartRequested = torStarted = false;
+    listenersStatus = 0;
     torAddress = "";
     mwcAddress = "";
     walletPasswordHash = "";
@@ -264,9 +275,6 @@ void MWC713::start() {
     }
 
     needWaitForLocalNodeStart = false;
-
-    // Need to check if Tls active
-    const WalletConfig &config = getWalletConfig();
 
     // Start the binary
     Q_ASSERT(mwc713process == nullptr);
@@ -439,8 +447,7 @@ void MWC713::processStop(bool exitNicely) {
 
     emit onListenersStatus(false, false);
 
-    mwcMqOnline = false;
-    mwcMqStarted = mwcMqStartRequested = false;
+    listenersStatus = 0;
 
     emit onMwcAddress("");
     emit onMwcAddressWithIndex("", 1);
@@ -523,12 +530,30 @@ QString MWC713::getPasswordHash() {
 
 // Checking if wallet is listening through services
 ListenerStatus MWC713::getListenerStatus() {
-    return ListenerStatus(mwcMqOnline, torOnline);
+    return ListenerStatus( isListenerStatus(LSTATE_MQS_ONLINE), isListenerStatus(LSTATE_TOR_ONLINE));
 }
 
 ListenerStatus MWC713::getListenerStartState() {
-    return ListenerStatus(mwcMqStarted, torStarted);
+    return ListenerStatus( isListenerStatus(LSTATE_MQS_STARTED), isListenerStatus(LSTATE_TOR_STARTED));
 }
+
+// Request restart for online services if needed (don't restart if offline), must be done in a background
+void MWC713::requestRestart(bool restartMq, bool restartTor) {
+    if (restartMq) {
+        if (isListenerStatus(LSTATE_MQS_ONLINE | LSTATE_MQS_STARTED)) {
+            listenersStatus |= LSTATE_MQS_NEED_RESTART;
+            listeningStop(true, false);
+        }
+    }
+
+    if (restartTor) {
+        if (isListenerStatus(LSTATE_TOR_ONLINE | LSTATE_TOR_STARTED)) {
+            listenersStatus |= LSTATE_TOR_NEED_RESTART;
+            listeningStop(false, true);
+        }
+    }
+}
+
 
 // Check Signal: onListeningStartResults
 void MWC713::listeningStart(bool startMq, bool startTor, bool initialStart) {
@@ -543,16 +568,18 @@ void MWC713::listeningStart(bool startMq, bool startTor, bool initialStart) {
                                 {TSK(new TaskListeningStart(this, false, startTor, initialStart, appContext->getTorBridgeLine(), appContext->getTorClientOption() ),
                                      TaskListeningStart::TIMEOUT)});
 
-    if (startMq)
-        mwcMqStartRequested = true;
+    if (startMq) {
+        listenersStatus |= LSTATE_MQS_START_REQUESTED;
+    }
 }
 
 // Check signal: onListeningStopResult
 void MWC713::listeningStop(bool stopMq, bool stopTor) {
     qDebug() << "listeningStop: mq=" << stopMq << ",stopTor=" << stopTor;
 
-    if (stopMq)
-        mwcMqStartRequested = false;
+    if (stopMq) {
+        listenersStatus &= ~LSTATE_MQS_START_REQUESTED;
+    }
 
     if (stopMq)
         eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
@@ -587,6 +614,7 @@ void MWC713::getMwcBoxAddress() {
 // Change MWC box address to another from the chain. idx - index in the chain.
 // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
 void MWC713::changeMwcBoxAddress(int idx) {
+    requestRestart(true, true);
     eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
                             {TSK(new TaskMwcMqAddress(this, true, idx), TaskMwcMqAddress::TIMEOUT)});
 }
@@ -594,6 +622,7 @@ void MWC713::changeMwcBoxAddress(int idx) {
 // Generate next box address
 // Check signal: onMwcAddressWithIndex(QString mwcAddress, int idx);
 void MWC713::nextBoxAddress() {
+    requestRestart(true, true);
     eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
                             {TSK(new TaskMwcMqAddress(this, true, -1), TaskMwcMqAddress::TIMEOUT)});
 }
@@ -1452,10 +1481,18 @@ void MWC713::setListeningStartResults(bool mqTry, bool torTry, // what we try to
                                                          QString::number(errorMessages.size()) + " initStart=" +
                                                          (initialStart ? "True" : "False"));
 
-    if (mqTry)
-        mwcMqStarted = true;
-    if (torTry)
-        torStarted = true;
+    if (mqTry) {
+        listenersStatus |= LSTATE_MQS_STARTED;
+        if (isListenerStatus(LSTATE_MQS_NEED_RESTART)) {
+            listeningStop(true, false);
+        }
+    }
+    if (torTry) {
+        listenersStatus |= LSTATE_TOR_STARTED;
+        if (isListenerStatus(LSTATE_TOR_NEED_RESTART)) {
+            listeningStop(false, true);
+        }
+    }
 
     emit onListeningStartResults(mqTry, torTry, errorMessages, initialStart);
 }
@@ -1466,10 +1503,19 @@ void MWC713::setListeningStopResult(bool mqTry, bool torTry, // what we try to s
                                                        " torTry=" + QString::number(torTry) + " errorMessages size " +
                                                        QString::number(errorMessages.size()));
 
-    if (mqTry)
-        mwcMqStarted = false;
+    if (mqTry) {
+        listenersStatus &= ~LSTATE_MQS_STARTED;
+        if (isListenerStatus(LSTATE_MQS_NEED_RESTART)) {
+            listenersStatus &= ~LSTATE_MQS_NEED_RESTART;
+            listeningStart(true, false, false);
+        }
+    }
     if (torTry) {
-        torStarted = false;
+        listenersStatus &= ~LSTATE_TOR_STARTED;
+        if (isListenerStatus(LSTATE_TOR_NEED_RESTART)) {
+            listenersStatus &= ~LSTATE_TOR_NEED_RESTART;
+            listeningStart(false, true, false);
+        }
         setTorAddress("");
     }
 
@@ -1482,8 +1528,8 @@ void MWC713::setListeningStopResult(bool mqTry, bool torTry, // what we try to s
         setTorListeningStatus(false);
     }
 
-    if (torTry && restartingTor) {
-        restartingTor = false;
+    if (torTry && isListenerStatus(LSTATE_TOR_RESTARTING) ) {
+        listenersStatus &= ~LSTATE_TOR_RESTARTING;
         torOfflineCounter = 0;
         eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
                                 {TSK(new TaskListeningStart(this, false, true, false, appContext->getTorBridgeLine(), appContext->getTorClientOption()), TaskListeningStart::TIMEOUT)});
@@ -1494,7 +1540,7 @@ void MWC713::setMwcMqListeningStatus(bool online, QString tid, bool startStopEve
 
     qDebug() << "Call setMwcMqListeningStatus: online=" << online << " tid=" << tid << " startStopEvents="
              << startStopEvents <<
-             "  activeMwcMqsTid=" << activeMwcMqsTid << "  mwcMqOnline=" << mwcMqOnline;
+             "  activeMwcMqsTid=" << activeMwcMqsTid << "  mwcMqOnline=" << isListenerStatus(LSTATE_MQS_ONLINE);
 
     if (tid != activeMwcMqsTid) {
         if (!(startStopEvents && online))
@@ -1504,26 +1550,34 @@ void MWC713::setMwcMqListeningStatus(bool online, QString tid, bool startStopEve
     if (startStopEvents)
         activeMwcMqsTid = tid;
 
-    if (mwcMqOnline != online) {
+    if ( isListenerStatus(LSTATE_MQS_ONLINE) != online) {
         notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                                           (online ? "Start " : "Stop ") + QString("listening on MWC MQS"));
     }
-    mwcMqOnline = online;
-    logger::logEmit("MWC713", "onListenersStatus",
-                    QString(mwcMqOnline ? "true" : "false") + " " + QString(torOnline ? "true" : "false"));
-    emit onListenersStatus(mwcMqOnline, torOnline);
+    if (online)
+        listenersStatus |= LSTATE_MQS_ONLINE;
+    else
+        listenersStatus &= ~LSTATE_MQS_ONLINE;
 
+    logger::logEmit("MWC713", "onListenersStatus",
+                    QString(isListenerStatus(LSTATE_MQS_ONLINE) ? "true" : "false") + " " + QString(isListenerStatus(LSTATE_TOR_ONLINE) ? "true" : "false"));
+    emit onListenersStatus(isListenerStatus(LSTATE_MQS_ONLINE), isListenerStatus(LSTATE_TOR_ONLINE));
 }
 
 void MWC713::setTorListeningStatus(bool online) {
-    if (torOnline != online) {
+    if (isListenerStatus(LSTATE_TOR_ONLINE) != online) {
         notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::INFO,
                                           (online ? "Start " : "Stop ") + QString(" Tor listener"));
     }
-    torOnline = online;
+
+    if (online)
+        listenersStatus |= LSTATE_TOR_ONLINE;
+    else
+        listenersStatus &= ~LSTATE_TOR_ONLINE;
+
     logger::logEmit("MWC713", "onListenersStatus",
-                    QString(mwcMqOnline ? "true" : "false") + " " + QString(torOnline ? "true" : "false"));
-    emit onListenersStatus(mwcMqOnline, torOnline);
+                    QString(isListenerStatus(LSTATE_MQS_ONLINE) ? "true" : "false") + " " + QString(isListenerStatus(LSTATE_TOR_ONLINE) ? "true" : "false"));
+    emit onListenersStatus(isListenerStatus(LSTATE_MQS_ONLINE), isListenerStatus(LSTATE_TOR_ONLINE));
 }
 
 void MWC713::setRecoveryResults(bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages) {
@@ -1945,38 +1999,38 @@ void MWC713::setRootPublicKey(bool success, QString errMsg, QString rootPubKey, 
 
 
 void MWC713::notifyListenerMqCollision() {
-    if (!mwcMqOnline && !mwcMqStarted)
+    if (!isListenerStatus(LSTATE_MQS_ONLINE|LSTATE_MQS_STARTED))
         return;  // False alarm. Can happen with network problems. mwc MQS was already stopped, now we are restarting.
 
     logger::logEmit("MWC713", "onListenerMqCollision", "");
 
-    mwcMqStarted = false;
-    mwcMqStartRequested = false;
+    listenersStatus &= ~(LSTATE_MQS_STARTED | LSTATE_MQS_START_REQUESTED);
     emit onListenerMqCollision();
 
-    if (mwcMqOnline) {
-        mwcMqOnline = false;
+    if (isListenerStatus(LSTATE_MQS_ONLINE)) {
+        listenersStatus &= ~LSTATE_MQS_ONLINE;
+
         logger::logEmit("MWC713", "onListenersStatus",
-                        QString(mwcMqOnline ? "true" : "false") + " " + QString(torOnline ? "true" : "false"));
-        emit onListenersStatus(mwcMqOnline, torOnline);
+                        QString(isListenerStatus(LSTATE_MQS_ONLINE) ? "true" : "false") + " " + QString(isListenerStatus(LSTATE_TOR_ONLINE) ? "true" : "false"));
+        emit onListenersStatus(isListenerStatus(LSTATE_MQS_ONLINE), isListenerStatus(LSTATE_TOR_ONLINE));
     }
 }
 
 void MWC713::notifyMqFailedToStart() {
     logger::logInfo("MWC713", "notifyMqFailedToStart processed");
-    if (mwcMqStarted) {
-        mwcMqStarted = false;
+    if (isListenerStatus( LSTATE_MQS_STARTED )) {
+        listenersStatus &= ~(LSTATE_MQS_STARTED | LSTATE_MQS_NEED_RESTART);
         emit onListeningStopResult(true, false, {});
     }
 
-    if (mwcMqStartRequested) {
+    if (isListenerStatus(LSTATE_MQS_START_REQUESTED)) {
         // schedule the restart in 5 seconds
         QTimer::singleShot(1000 * 5, this, &MWC713::restartMQsListener);
     }
 }
 
 void MWC713::restartMQsListener() {
-    if (mwcMqStartRequested && !mwcMqStarted) {
+    if (isListenerStatus(LSTATE_MQS_START_REQUESTED) && !isListenerStatus(LSTATE_MQS_STARTED) ) {
         qDebug() << "Try to restart MQs Listener after failure";
         eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
                                 {TSK(new TaskListeningStart(this, true, false, false, "",""), TaskListeningStart::TIMEOUT)});
@@ -2613,7 +2667,7 @@ void MWC713::setWalletOutputs(const QString &account, const QVector<wallet::Wall
 void MWC713::timerEvent(QTimerEvent *event) {
     Q_UNUSED(event)
     if (isWalletRunningAndLoggedIn()) {
-        if (torStarted && torOnline) {
+        if ( isListenerStatus(LSTATE_TOR_STARTED) && isListenerStatus(LSTATE_TOR_ONLINE)) {
             // Checking tor connection
             eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
                                     {TSK(new TaskCheckTorConnection(this), TaskCheckTorConnection::TIMEOUT)});
@@ -2623,19 +2677,25 @@ void MWC713::timerEvent(QTimerEvent *event) {
 
 // response from TaskCheckTorConnection
 void MWC713::setTorConnectionStatus(bool online) {
-    if (torOnline != online) {
-        torOnline = online;
-        emit onListenersStatus(mwcMqOnline, torOnline);
+    if (isListenerStatus(LSTATE_TOR_ONLINE) != online) {
+        if (online)
+            listenersStatus |= LSTATE_TOR_ONLINE;
+        else
+            listenersStatus |= ~LSTATE_TOR_ONLINE;
+
+        logger::logEmit("MWC713", "onListenersStatus",
+                        QString(isListenerStatus(LSTATE_MQS_ONLINE) ? "true" : "false") + " " + QString(isListenerStatus(LSTATE_TOR_ONLINE) ? "true" : "false"));
+        emit onListenersStatus(isListenerStatus(LSTATE_MQS_ONLINE), isListenerStatus(LSTATE_TOR_ONLINE));
     }
 
     if (online) {
         torOfflineCounter = 0;
     } else {
-        if (torStarted) {
+        if ( isListenerStatus(LSTATE_TOR_STARTED)) {
             torOfflineCounter++;
             if (torOfflineCounter == 2) {
                 // Restarting TOR
-                restartingTor = true;
+                listenersStatus |= LSTATE_TOR_RESTARTING;
                 eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
                                         {TSK(new TaskListeningStop(this, false, true), TaskListeningStop::TIMEOUT)});
             }

@@ -20,6 +20,7 @@
 #include "../control_desktop/messagebox.h"
 #include "../dialogs_desktop/helpdlg.h"
 #include "../bridge/config_b.h"
+#include "../bridge/wnd/x_walletconfig_b.h"
 #include "../bridge/corewindow_b.h"
 #include "../bridge/wallet_b.h"
 #include "../bridge/statemachine_b.h"
@@ -52,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     config = new bridge::Config(this);
+    walletConfig = new bridge::WalletConfig(this);
     coreWindow = new bridge::CoreWindow(this);
     wallet = new bridge::Wallet(this);
     stateMachine = new bridge::StateMachine(this);
@@ -83,6 +85,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect( wallet, &Wallet::sgnStartingCommand,
                       this, &MainWindow::onSgnStartingCommand, Qt::QueuedConnection);
 
+    QObject::connect( walletConfig, &WalletConfig::sgnWalletFeaturesChanged,
+                      this, &MainWindow::onSgnWalletFeaturesChanged, Qt::QueuedConnection);
+
     updateListenerBtn();
     updateNetworkName();
     updateMenu();
@@ -105,6 +110,8 @@ MainWindow::MainWindow(QWidget *parent) :
     if (config->isColdWallet()) {
         ui->listenerStatusButton->hide();
     }
+
+    onSgnWalletFeaturesChanged();
 
     setStatusButtonState(ui->nodeStatusButton, STATUS::GREEN, "Waiting");
     setStatusButtonState(ui->listenerStatusButton, STATUS::RED, "Listeners");
@@ -696,6 +703,18 @@ void MainWindow::on_actionMWC_website_triggered()
 {
     util->openUrlInBrowser("https://www.mwc.mw/");
 }
+
+void MainWindow::onSgnWalletFeaturesChanged() {
+    if (config->isOnlineWallet()) {
+        if (walletConfig->isFeatureMWCMQS() || walletConfig->isFeatureTor()) {
+            ui->listenerStatusButton->show();
+        }
+        else {
+            ui->listenerStatusButton->hide();
+        }
+    }
+}
+
 
 }
 

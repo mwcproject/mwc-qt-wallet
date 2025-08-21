@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Receive</class>
- <widget class="QWidget" name="Receive">
+ <class>ReceiveSpOnly</class>
+ <widget class="QWidget" name="ReceiveSpOnly">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>861</width>
-    <height>676</height>
+    <width>775</width>
+    <height>736</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <number>80</number>
    </property>
    <item>
-    <spacer name="verticalSpacer">
+    <spacer name="verticalSpacer_4">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
@@ -34,207 +34,9 @@
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="mqsTorHorizontalLayout">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QFrame" name="frameMqs">
-       <property name="minimumSize">
-        <size>
-         <width>220</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>220</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <widget class="QLabel" name="mwcmqStatusImg">
-        <property name="geometry">
-         <rect>
-          <x>184</x>
-          <y>10</y>
-          <width>21</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>MWC MQS listener status</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../resources_desktop.qrc">:/img/StatusOk@2x.svg</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelTiny" name="mwcmqStatusLabel">
-        <property name="geometry">
-         <rect>
-          <x>66</x>
-          <y>28</y>
-          <width>103</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Online</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelLarge" name="label">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>1</y>
-          <width>179</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>MWC Message Queue</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item>
-      <spacer name="spacer_mqs_tor">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QFrame" name="frameTor">
-       <property name="minimumSize">
-        <size>
-         <width>150</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>150</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <widget class="control::MwcLabelLarge" name="label_8">
-        <property name="geometry">
-         <rect>
-          <x>7</x>
-          <y>3</y>
-          <width>66</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Tor</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="control::MwcLabelTiny" name="torStatusLabel">
-        <property name="geometry">
-         <rect>
-          <x>12</x>
-          <y>30</y>
-          <width>66</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Online</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="QLabel" name="torStatusImg">
-        <property name="geometry">
-         <rect>
-          <x>84</x>
-          <y>12</y>
-          <width>21</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Tor listener status</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../resources_desktop.qrc">:/img/StatusOk@2x.svg</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,0,1">
-     <property name="topMargin">
-      <number>20</number>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>4</number>
      </property>
      <item>
       <spacer name="horizontalSpacer_3">
@@ -250,17 +52,17 @@
       </spacer>
      </item>
      <item>
-      <widget class="QFrame" name="frameReceive">
+      <widget class="QFrame" name="frame_2">
        <property name="minimumSize">
         <size>
          <width>600</width>
-         <height>370</height>
+         <height>500</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>60000</width>
-         <height>370</height>
+         <height>500</height>
         </size>
        </property>
        <property name="frameShape">
@@ -315,7 +117,7 @@
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer_10">
+         <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
@@ -325,64 +127,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="control::MwcLabelSmall" name="label_mqs">
-          <property name="text">
-           <string>MWCMQ Address:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="control::MwcLineEditNormal" name="mwcmqAddress">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::StrongFocus</enum>
-          </property>
-          <property name="toolTip">
-           <string>MWC MQS address of your wallet</string>
-          </property>
-          <property name="maxLength">
-           <number>1024</number>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_11">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>20</height>
+            <height>5</height>
            </size>
           </property>
          </spacer>
@@ -390,7 +135,7 @@
         <item>
          <widget class="control::MwcLabelSmall" name="label_sp_tor">
           <property name="text">
-           <string>Slatepack/TOR address</string>
+           <string>Slatepack address</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -429,28 +174,88 @@
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer_12">
+         <spacer name="verticalSpacer_2">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Expanding</enum>
+           <enum>QSizePolicy::Fixed</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>12</height>
+            <height>10</height>
            </size>
           </property>
          </spacer>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <property name="spacing">
-           <number>5</number>
+         <widget class="QTextEdit" name="slatepackEdit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>6000</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font-family: &quot;Courier&quot;</string>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="acceptRichText">
+           <bool>false</bool>
+          </property>
+          <property name="placeholderText">
+           <string>Please paste the received slatepack content below</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="control::MwcLabelNormal" name="slatepack_status">
+          <property name="text">
+           <string>Encrypted, from XXXXXXXX</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>7</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <spacer name="horizontalSpacer_5">
+           <spacer name="horizontalSpacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -463,35 +268,32 @@
            </spacer>
           </item>
           <item>
-           <widget class="control::MwcPushButtonNormal" name="recieveSlatepackButton">
+           <widget class="control::MwcPushButtonNormal" name="continueButton">
             <property name="minimumSize">
              <size>
-              <width>250</width>
+              <width>140</width>
               <height>40</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>14000</width>
               <height>40</height>
              </size>
-            </property>
-            <property name="cursor">
-             <cursorShape>PointingHandCursor</cursorShape>
             </property>
             <property name="focusPolicy">
              <enum>Qt::StrongFocus</enum>
             </property>
-            <property name="toolTip">
-             <string>Sign income Slatepack Transaction</string>
-            </property>
             <property name="text">
-             <string>Receive MWC by Slatepack</string>
+             <string>Continue</string>
+            </property>
+            <property name="default">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_6">
+           <spacer name="horizontalSpacer_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -524,14 +326,14 @@
     </layout>
    </item>
    <item>
-    <spacer name="verticalSpacer_2">
+    <spacer name="verticalSpacer_5">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>17</height>
+       <height>18</height>
       </size>
      </property>
     </spacer>
@@ -605,14 +407,14 @@
     </layout>
    </item>
    <item>
-    <spacer name="verticalSpacer_3">
+    <spacer name="verticalSpacer_6">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>18</height>
+       <height>19</height>
       </size>
      </property>
     </spacer>
@@ -631,11 +433,6 @@
    <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
@@ -651,13 +448,11 @@
    <header>control_desktop/MwcComboBox.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelTiny</class>
+   <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources_desktop.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

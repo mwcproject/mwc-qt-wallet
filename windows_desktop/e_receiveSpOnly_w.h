@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef E_RECEIVE_W_H
-#define E_RECEIVE_W_H
+#ifndef E_RECEIVE_SP_ONLY_W_H
+#define E_RECEIVE_SP_ONLY_W_H
 
 #include "../core_desktop/navwnd.h"
 
 namespace Ui {
-class Receive;
+class ReceiveSpOnly;
 }
 
 namespace bridge {
@@ -26,22 +26,19 @@ class Config;
 class Wallet;
 class Receive;
 class Util;
-class WalletConfig;
 }
 
 namespace wnd {
 
-class Receive : public core::NavWnd {
+class ReceiveSpOnly : public core::NavWnd {
 Q_OBJECT
 
 public:
-    explicit Receive(QWidget *parent);
+    explicit ReceiveSpOnly(QWidget *parent);
 
-    virtual ~Receive() override ;
+    virtual ~ReceiveSpOnly() override ;
 
 private:
-    void updateStatus();
-
     void onTransactionActionIsFinished( bool success, QString message );
 
     void updateWalletBalance();
@@ -49,29 +46,32 @@ private slots:
     // respond from signTransaction
     void onSgnTransactionActionIsFinished( bool success, QString message );
     void onSgnWalletBalanceUpdated();
-    void onSgnMwcAddressWithIndex(QString mwcAddress, int idx);
-    void onSgnTorAddress(QString tor);
     void onSgnFileProofAddress(QString proofAddress);
-    void onSgnUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline); // keybaseOnline is absolete
 
     void on_accountComboBox_activated(int index);
-    void on_recieveFileButton_clicked();
-    void on_recieveSlatepackButton_clicked();
+
+    void on_slatepackEdit_textChanged();
+    void on_continueButton_clicked();
+    void onSgnDecodeSlatepack(QString tag, QString error, QString slatepack, QString slateJSon, QString content, QString sender, QString recipient);
 
 private:
     void updateAccountList();
-
+    void updateButtons();
+    void initiateSlateVerification(const QString &slate2check);
 private:
-    Ui::Receive *ui;
+    Ui::ReceiveSpOnly *ui;
     bridge::Config * config = nullptr;
     bridge::Wallet * wallet = nullptr;
-    bridge::WalletConfig * walletConfig = nullptr;
     bridge::Receive * receive = nullptr;
     bridge::Util * util = nullptr;
 
-    QString mwcAddress;
+    QString slatepack; // The content
+    QString slateJson;
+    QString sender;
+    bool isSpValid = false;
+    QString spInProgress;
 };
 
 }
 
-#endif // E_RECEIVE_W_H
+#endif // E_RECEIVE_SP_ONLY_W_H

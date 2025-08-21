@@ -23,6 +23,7 @@ class InputPassword;
 
 namespace bridge {
 class Config;
+class WalletConfig;
 class InputPassword;
 class Wallet;
 class StartWallet;
@@ -57,6 +58,7 @@ private:
 private:
     Ui::InputPassword *ui;
     bridge::Config * config = nullptr;
+    bridge::WalletConfig * walletConfig = nullptr;
     bridge::InputPassword * inputPassword = nullptr;
     bridge::StartWallet * startWallet = nullptr;
     bridge::Wallet * wallet = nullptr;

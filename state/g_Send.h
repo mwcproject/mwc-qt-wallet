@@ -41,7 +41,10 @@ public:
     //   0 - ok
     //   1 - account error
     //   2 - amount error
-    int initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod, QString account, QString sendAmount );
+    int initialSendSelection( bridge::SEND_SELECTED_METHOD sendSelectedMethod, QString account, QString sendAmount, bool gotoNextPage );
+    // Data that was collected by initialSendSelection. Can be used if gotoNextPage is false
+    int64_t getTmpAmount() const {return tmpAmount;}
+    QString getTmpAccountName() const {return tmpAccountName;}
 
     // Handle whole workflow to send offline
     // return true if some long process was started.
@@ -87,6 +90,10 @@ private:
     QString scrFileName;
     QtAndroidService * androidDevice = nullptr;
 #endif
+
+    // temp buffered data
+    int64_t tmpAmount = 0;
+    QString tmpAccountName;
 };
 
 }

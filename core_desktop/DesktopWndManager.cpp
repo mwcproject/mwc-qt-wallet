@@ -25,6 +25,7 @@
 #include "../windows_desktop/c_newseedtest_w.h"
 #include "../windows_desktop/c_enterseed.h"
 #include "../windows_desktop/e_receive_w.h"
+#include "../windows_desktop/e_receiveSpOnly_w.h"
 #include "../windows_desktop/e_outputs_w.h"
 #include "../windows_desktop/e_listening_w.h"
 #include "../windows_desktop/g_finalize_w.h"
@@ -33,6 +34,8 @@
 #include "../windows_desktop/g_sendStarting.h"
 #include "../windows_desktop/g_sendOnline.h"
 #include "../windows_desktop/g_sendOffline.h"
+#include "../windows_desktop/g_sendOnlineOnly.h"
+#include "../windows_desktop/g_sendOfflineOnly.h"
 #include "../windows_desktop/g_resultedslatepack_w.h"
 #include "../windows_desktop/e_transactions_w.h"
 #include "../dialogs_desktop/g_sendconfirmationdlg.h"
@@ -272,13 +275,24 @@ void DesktopWndManager::pageFileTransactionFinalize(QString pageTitle,
 
 void DesktopWndManager::pageRecieve() {
     restoreLeftBarShownStatus();
-    windowManager->switchToWindowEx( mwc::PAGE_E_RECEIVE,
+    if (state::getStateContext()->appContext->isFeatureMWCMQS() || state::getStateContext()->appContext->isFeatureTor()) {
+        // Receive UI for many
+        windowManager->switchToWindowEx( mwc::PAGE_E_RECEIVE,
                new wnd::Receive( windowManager->getInWndParent() ) );
+    }
+    else {
+        // UI for SP only
+        windowManager->switchToWindowEx( mwc::PAGE_E_RECEIVE,
+                new wnd::ReceiveSpOnly( windowManager->getInWndParent() ) );
+
+    }
 }
 
 void DesktopWndManager::pageListening() {
     restoreLeftBarShownStatus();
-    windowManager->switchToWindowEx( mwc::PAGE_E_LISTENING,
+    QString pageTitle = state::getStateContext()->appContext->isFeatureMWCMQS() || state::getStateContext()->appContext->isFeatureTor() ?
+                    mwc::PAGE_E_LISTENING_ONLINE_LISTERS : mwc::PAGE_E_LISTENING_SLATEPACK_ONLY;
+    windowManager->switchToWindowEx( pageTitle,
                  new wnd::Listening( windowManager->getInWndParent()));
 }
 
@@ -290,8 +304,29 @@ void DesktopWndManager::pageFinalize() {
 
 void DesktopWndManager::pageSendStarting() {
     restoreLeftBarShownStatus();
-    windowManager->switchToWindowEx( mwc::PAGE_G_SEND,
-              new wnd::SendStarting( windowManager->getInWndParent()));
+
+    core::AppContext * context = state::getStateContext()->appContext;
+
+    bool hasSlatepack = context->isFeatureSlatepack();
+    bool hasOnline = context->isFeatureMWCMQS() || context->isFeatureTor();
+
+    Q_ASSERT(hasSlatepack || hasOnline);
+
+    if (hasSlatepack && hasOnline) {
+        windowManager->switchToWindowEx( mwc::PAGE_G_SEND,
+                  new wnd::SendStarting( windowManager->getInWndParent()));
+    }
+    else if (hasOnline) {
+        windowManager->switchToWindowEx( mwc::PAGE_G_SEND_ONLINE,
+                  new wnd::SendOnlineOnly( windowManager->getInWndParent()));
+    }
+    else if (hasSlatepack) {
+        windowManager->switchToWindowEx( mwc::PAGE_G_SEND_SLATEPACK,
+                  new wnd::SendOfflineOnly( windowManager->getInWndParent()));
+    }
+    else {
+        Q_ASSERT(false);
+    }
 }
 
 void DesktopWndManager::pageSendOnline( QString selectedAccount, int64_t amount ) {

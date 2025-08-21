@@ -41,7 +41,11 @@ public:
     //   0 - ok
     //   1 - account error
     //   2 - amount error
-    Q_INVOKABLE int initialSendSelection( int sendSelectedMethod, QString account, QString sendAmount );
+    Q_INVOKABLE int initialSendSelection( int sendSelectedMethod, QString account, QString sendAmount, bool gotoNextPage );
+    // Data that was collected by initialSendSelection. Can be used if gotoNextPage is false
+    Q_INVOKABLE int64_t getTmpAmount();
+    Q_INVOKABLE QString getTmpAccountName();
+
 
     // Check if Node is healthy to do send.
     Q_INVOKABLE bool isNodeHealthy();

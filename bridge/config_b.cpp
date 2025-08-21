@@ -338,7 +338,6 @@ void Config::setNoTorForEmbeddedNode(bool noTor) {
 }
 
 // Slatepack format, selected value
-// Slatepack format, selected value
 int Config::getSendMethod() {
     return getAppContext()->getSendMethod();
 }
@@ -398,6 +397,7 @@ QString Config::getTorClientOptions() {
 
 void Config::setTorBridgeConectionClientOptions(QString bridge, QString client) {
     getAppContext()->setTorBridgeLineClientOption(bridge, client);
+    getWallet()->requestRestart(false, true);
 }
 
 }

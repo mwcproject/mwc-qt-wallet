@@ -36,9 +36,7 @@ public:
     // read current settings
     Q_INVOKABLE double getGuiScale();
     Q_INVOKABLE bool getWalletLogsEnabled();
-    Q_INVOKABLE bool getAutoStartMQSEnabled();
-    Q_INVOKABLE bool getAutoStartTorEnabled();
-    Q_INVOKABLE int getLogoutTimeMs();
+    Q_INVOKABLE int  getLogoutTimeMs();
     Q_INVOKABLE bool isOutputLockingEnabled();
     Q_INVOKABLE bool getNotificationWindowsEnabled();
 
@@ -54,12 +52,27 @@ public:
     Q_INVOKABLE void setSendCoinsParams(int inputConfirmationsNumber, int changeOutputs);
     Q_INVOKABLE void updateWalletLogsEnabled(bool logsEnabled, bool needCleanupLogs);
     Q_INVOKABLE void updateGuiScale(double scale);
-    Q_INVOKABLE void updateAutoStartMQSEnabled(bool enabled);
-    Q_INVOKABLE void updateAutoStartTorEnabled(bool enabled);
     Q_INVOKABLE void setOutputLockingEnabled(bool enabled);
     Q_INVOKABLE void setNotificationWindowsEnabled(bool enabled);
 
     Q_INVOKABLE bool updateTimeoutValue(int timeout);
+
+    Q_INVOKABLE bool isFeatureSlatepack();
+    Q_INVOKABLE bool isFeatureMWCMQS();
+    Q_INVOKABLE bool isFeatureTor();
+    Q_INVOKABLE void setFeatureSlatepack(bool val);
+    Q_INVOKABLE void setFeatureMWCMQS(bool val);
+    Q_INVOKABLE void setFeatureTor(bool val);
+    Q_INVOKABLE bool isDefaultFeatureSlatepack();
+    Q_INVOKABLE bool isDefaultFeatureMWCMQS();
+    Q_INVOKABLE bool isDefaultFeatureTor();
+public:
+    void emitWalletFeaturesChanged();
+signals:
+    void sgnWalletFeaturesChanged();
+
+private:
+    void sendEmitWalletFeaturesChanged();
 };
 
 }
