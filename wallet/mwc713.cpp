@@ -2683,7 +2683,7 @@ void MWC713::timerEvent(QTimerEvent *event) {
                                     {TSK(new TaskCheckTorConnection(this), TaskCheckTorConnection::TIMEOUT)});
         }
 
-        if (nextMqStartTime>0 && nextMqStartTime < QDateTime::currentDateTime().toSecsSinceEpoch()) {
+        if (nextMqStartTime>0 && nextMqStartTime < (uint64_t)QDateTime::currentDateTime().toSecsSinceEpoch()) {
             nextMqStartTime = 0;
             if (appContext->isFeatureMWCMQS()) {
                 eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
@@ -2692,7 +2692,7 @@ void MWC713::timerEvent(QTimerEvent *event) {
             }
         }
 
-        if (nextTorStartTime>0 && nextTorStartTime < QDateTime::currentDateTime().toSecsSinceEpoch()) {
+        if (nextTorStartTime>0 && nextTorStartTime < (uint64_t) QDateTime::currentDateTime().toSecsSinceEpoch()) {
             nextTorStartTime = 0;
             if (appContext->isFeatureTor()) {
                 eventCollector->addTask(TASK_PRIORITY::TASK_NORMAL,
