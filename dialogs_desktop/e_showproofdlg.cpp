@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <QTextStream>
 #include "e_showproofdlg.h"
 #include "ui_e_showproofdlg.h"
 #include "../bridge/config_b.h"

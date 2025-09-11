@@ -18,6 +18,8 @@
 #include "state.h"
 #include "../core/Notification.h"
 #include <QVector>
+#include <QMap>
+#include <QSet>
 
 #include "wallet/wallet.h"
 
