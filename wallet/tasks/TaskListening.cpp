@@ -49,7 +49,7 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
             // x prefix is for testnet
             // q - for mainnet
             if (address.size() > 0 && (address[0] == 'x' || address[0] == 'q')) {
-                wallet713->setMwcMqListeningStatus(true, prms.size() > 1 ? prms[1] : "", true);
+                wallet713->setMwcMqListeningStatus(true, true);
                 wallet713->setMwcAddress(prms[0]);
                 // last case for Tor it will be http://something.onion
             } else if (address.size() > 0 && (address[0] == 'h')) {
@@ -62,23 +62,25 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
 
             QStringList prms = evt.message.split('|');
-            if ( prms.size()==0 ) {
+            if ( prms.size()==0 || evt.message.isEmpty() ) {
                 // It is tor
                 wallet713->setTorListeningStatus(false);
             }
-            wallet713->setMwcMqListeningStatus(false, prms.size()>1 ? prms[1] : "" , true);
+            else {
+                wallet713->setMwcMqListeningStatus(false, true);
+            }
             return true;
         }
         case S_LISTENER_MQ_LOST_CONNECTION: {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
             QStringList prms = evt.message.split('|');
-            wallet713->setMwcMqListeningStatus(false, prms.size()>1 ? prms[1] : "", false );
+            wallet713->setMwcMqListeningStatus(false, false );
             return true;
         }
         case S_LISTENER_MQ_GET_CONNECTION: {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
             QStringList prms = evt.message.split('|');
-            wallet713->setMwcMqListeningStatus(true, prms.size()>1 ? prms[1] : "", false );
+            wallet713->setMwcMqListeningStatus(true, false );
             return true;
         }
         case S_LISTENER_TOR_LOST_CONNECTION: {
@@ -105,7 +107,7 @@ bool TaskListeningListener::processTask(const QVector<WEvent> &events) {
             qDebug() << "TaskListeningListener::processTask with events: " << printEvents(events);
             QString error = evt.message;
             notify::appendNotificationMessage(bridge::MESSAGE_LEVEL::FATAL_ERROR,
-                                                      "Unbale to start listener. Probably another mwc wallet instance is running. Please stop another wallet instance or reboot operation system.\n\nError: " + error );
+                                                      "Unable to start listener. Probably another mwc wallet instance is running. Please stop another wallet instance or reboot operation system." );
             return true;
         }
 
@@ -131,11 +133,17 @@ bool TaskListeningStart::processTask(const QVector<WEvent> &events) {
     for (const WEvent & l : filterEvents(events, WALLET_EVENTS::S_LINE ) ) {
         if (l.message.contains("Starting mwcmqs listener"))
             mqs = true;
+
+        if (l.message.contains("listener for mwcmqs already started!")) {
+            errorMessages.clear();
+            mqs = true;
+        }
+
         if (l.message.contains("Starting Tor listener"))
             tor = true;
     }
 
-    wallet713->setListeningStartResults( mqs, tor, // what we try to start
+    wallet713->setListeningStartResults(reqStartMq, reqStartTor, mqs, tor, // what we try to start
                                          errorMessages, initialStart );
 
     return true;
@@ -191,19 +199,20 @@ bool TaskListeningStop::processTask(const QVector<WEvent> &events) {
     bool mqs = false;
     bool tor = false;
     for (const WEvent & l : filterEvents(events, WALLET_EVENTS::S_LINE ) ) {
-        if (l.message.contains("Stopping mwcmqs listener"))
+        if (l.message.contains("Stopping mwcmqs listener") || l.message.contains("mwcmqs listener is closed! consider using `listen` first."))
             mqs = true;
-        if (l.message.contains("Stopping Tor listener", Qt::CaseInsensitive))
+        if (l.message.contains("Stopping Tor listener", Qt::CaseInsensitive) || l.message.contains("Tor listener is not running"))
             tor = true;
     }
 
-    wallet713->setListeningStopResult( mqs, tor, errorMessages );
+    wallet713->setListeningStopResult( reqStopMq && mqs, reqStopTor && tor, errorMessages );
 
     return true;
 }
 
 QString TaskListeningStop::calcCommand(bool stopMq, bool stopTor) const {
-    Q_ASSERT(stopMq | stopTor);
+    Q_ASSERT(stopMq || stopTor);
+    Q_ASSERT((stopMq && stopTor) == false);
 
     if(stopTor)
         return QString("stop -t");

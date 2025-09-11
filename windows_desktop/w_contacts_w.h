@@ -24,6 +24,7 @@ class Contacts;
 
 namespace bridge {
 class Config;
+class Util;
 }
 
 namespace wnd {
@@ -54,6 +55,7 @@ private:
 private:
     Ui::Contacts *ui;
     bridge::Config * config = nullptr;
+    bridge::Util * util = nullptr;
     QVector<core::ContactRecord> contacts; // Pair of values: [name, address]
 };
 

@@ -146,7 +146,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: #e00f00</string>
+    <string notr="true">#offerWarningLabel{color: #e00f00}</string>
    </property>
    <property name="text">
     <string>Warning info</string>

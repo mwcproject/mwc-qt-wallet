@@ -479,6 +479,12 @@ Your mnemonic phrase is the key to accessing your wallet and funds. The number o
        <property name="focusPolicy">
         <enum>Qt::StrongFocus</enum>
        </property>
+       <property name="toolTip">
+        <string>Continue with creation of a new wallet</string>
+       </property>
+       <property name="statusTip">
+        <string>Continue with creation of a new wallet</string>
+       </property>
        <property name="text">
         <string>Continue</string>
        </property>

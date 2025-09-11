@@ -206,6 +206,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <pointsize>18</pointsize>
          </font>
         </property>
+        <property name="toolTip">
+         <string>Time-To-Live (Blocks) defines how long (measured in blockchain blocks) a transaction remains valid before it expires</string>
+        </property>
         <property name="inputMask">
          <string/>
         </property>
@@ -281,6 +284,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <pointsize>18</pointsize>
          </font>
         </property>
+        <property name="toolTip">
+         <string>Input your wallet password to authorize transaction</string>
+        </property>
         <property name="inputMask">
          <string/>
         </property>
@@ -325,6 +331,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <font>
           <pointsize>18</pointsize>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Number of change outputs for your send transactions. Use 1 if you are not sure what number to use.</string>
         </property>
         <property name="inputMask">
          <string/>
@@ -424,6 +433,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <property name="focusPolicy">
         <enum>Qt::StrongFocus</enum>
        </property>
+       <property name="toolTip">
+        <string>Cancel this transaction</string>
+       </property>
        <property name="text">
         <string>Decline</string>
        </property>
@@ -462,6 +474,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <property name="focusPolicy">
         <enum>Qt::StrongFocus</enum>
        </property>
+       <property name="toolTip">
+        <string>Authorize this transaction</string>
+       </property>
        <property name="text">
         <string>Confirm</string>
        </property>
@@ -497,14 +512,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelLarge</class>

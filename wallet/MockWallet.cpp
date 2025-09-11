@@ -208,9 +208,7 @@ void MockWallet::renameAccount(const QString &oldName, const QString &newName) {
 // Check and repair the wallet. Will take a while
 // Check Signals: onRecoverProgress( int progress, int maxVal );
 // Check Signals: onCheckResult(bool ok, QString errors );
-void MockWallet::check(bool wait4listeners) {
-    Q_UNUSED(wait4listeners)
-
+void MockWallet::check() {
     emit onRecoverProgress( 1, 4 );
     emit onRecoverProgress( 3, 4 );
 

@@ -46,7 +46,7 @@ Accounts::Accounts(QWidget *parent) :
 
     ui->progress->initLoader(false);
 
-    ui->accountList->setHightlightColors(QColor(255,255,255,51), QColor(255,255,255,153) ); // Alpha: 0.2  - 0.6
+    //ui->accountList->setHightlightColors(QColor(255,255,255,51), QColor(255,255,255,153) ); // Alpha: 0.2  - 0.6
     // Alpha delta for row stripe coloring. Range 0-255
     ui->accountList->setStripeAlfaDelta( 5 ); // very small number
 
@@ -117,7 +117,7 @@ void Accounts::onSgnWalletBalanceUpdated()
         for (int w=0; w<rowSz; w++) {
             data.push_back( data2show[r+w] );
         }
-        ui->accountList->appendRow( data );
+        ui->accountList->appendRow( data, 1.0, false );
     }
 
     ui->transferButton->setEnabled( accounts.size()>1 );

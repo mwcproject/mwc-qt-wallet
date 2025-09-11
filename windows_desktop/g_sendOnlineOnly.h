@@ -26,6 +26,7 @@ class Util;
 class Config;
 class Send;
 class Wallet;
+class WalletConfig;
 }
 
 namespace wnd {
@@ -55,6 +56,7 @@ private:
     Ui::SendOnlineOnly *ui;
     bridge::Wallet * wallet = nullptr;
     bridge::Util * util = nullptr;
+    bridge::WalletConfig * walletConfig = nullptr;
     bridge::Config * config = nullptr;
     bridge::Send * send = nullptr;
 

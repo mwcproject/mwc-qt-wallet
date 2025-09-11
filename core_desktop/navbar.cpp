@@ -94,6 +94,7 @@ void NavBar::showNavMenu( NavMenu * menu ) {
     menu->move( navMenuPos );
     QObject::connect( menu, SIGNAL(closed()), this, SLOT(onMenuDestroy()));
     menu->show();
+    menu->setFocus();
 }
 
 

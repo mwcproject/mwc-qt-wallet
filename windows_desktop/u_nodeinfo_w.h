@@ -45,8 +45,6 @@ private:
     void updateNodeReadyButtons(bool nodeIsReady);
 
 private slots:
-    void onShowNodeConnectionError(QString errorMessage);
-
     void on_refreshButton_clicked();
     void on_changeNodeButton_clicked();
     void on_showLogsButton_clicked();
@@ -65,8 +63,6 @@ private slots:
     void on_resyncNodeData_clicked();
 
 private:
-signals:
-    void showNodeConnectionError(QString errorMessage);
 
 private:
     Ui::NodeInfo *ui;

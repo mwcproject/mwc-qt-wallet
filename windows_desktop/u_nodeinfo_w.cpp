@@ -27,9 +27,6 @@
 
 namespace wnd {
 
-//static
-QString NodeInfo::lastShownErrorMessage;
-
 static QString toBoldAndYellow(QString text) {
     if (text == "Ready")
         return text;
@@ -50,7 +47,6 @@ NodeInfo::NodeInfo(QWidget *parent) :
     util = new bridge::Util(this);
 
     // Need simulate post message. Using events for that
-    connect(this, &NodeInfo::showNodeConnectionError, this,  &NodeInfo::onShowNodeConnectionError, Qt::QueuedConnection );
     connect(nodeInfo, &bridge::NodeInfo::sgnSetNodeStatus, this, &NodeInfo::onSgnSetNodeStatus, Qt::QueuedConnection );
     connect(nodeInfo, &bridge::NodeInfo::sgnUpdateEmbeddedMwcNodeStatus, this, &NodeInfo::onSgnUpdateEmbeddedMwcNodeStatus, Qt::QueuedConnection );
     connect(nodeInfo, &bridge::NodeInfo::sgnHideProgress, this, &NodeInfo::onSgnHideProgress, Qt::QueuedConnection );
@@ -112,6 +108,7 @@ void NodeInfo::showWarning(QString warning) {
 void NodeInfo::onSgnSetNodeStatus( QString localNodeStatus,
                                  bool online,  QString errMsg, int nodeHeight, int peerHeight,
                                  QString totalDifficulty2show, int connections) {
+    Q_UNUSED(errMsg);
     QString warning;
 
     bool nodeIsReady = false;
@@ -127,16 +124,6 @@ void NodeInfo::onSgnSetNodeStatus( QString localNodeStatus,
         ui->connectionsInfo->setText("-");
         ui->heightInfo->setText("-");
         ui->difficultyInfo->setText("-");
-
-        // Don't show message for the local because starting local node might take a while. Error likely will be recoverable
-        if (connectionType != wallet::MwcNodeConnection::NODE_CONNECTION_TYPE::LOCAL ) {
-            if ( statusStr == "Offline" ) {
-                 if (lastShownErrorMessage != errMsg) {
-                     emit showNodeConnectionError(errMsg);
-                     lastShownErrorMessage = errMsg;
-                 }
-            }
-        }
     }
     else {
         if ( nodeHeight + mwc::NODE_HEIGHT_DIFF_LIMIT < peerHeight ) {
@@ -176,11 +163,6 @@ void NodeInfo::onSgnSetNodeStatus( QString localNodeStatus,
     updateNodeReadyButtons(nodeIsReady);
 
     showWarning(warning);
-}
-
-void NodeInfo::onShowNodeConnectionError(QString errorMessage) {
-    control::MessageBox::messageText(this, "MWC Node connection error",
-        "Unable to retrieve MWC Node status.\n" + errorMessage);
 }
 
 void NodeInfo::on_refreshButton_clicked() {

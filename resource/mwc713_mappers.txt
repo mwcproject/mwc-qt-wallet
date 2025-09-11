@@ -200,3 +200,87 @@ TOR process is already running. Probably your wallet wasn't closed nicely last t
 Unable to start Tor listener. Tor Process Error: Unable to start tor at (.*) Tor Reported Error [err] No, it's still there. Exiting.
 Unable to start TOR process at $1
 
+# Wallet error: LibWallet Error, Unable to deserialize slatepack, Slatepack decode error, Unable to decrypt, ring::error::Unspecified
+.*Unable to deserialize slatepack.*Unable to decrypt.*
+The slatepack is encrypted for another wallet address, you can't process it.
+
+# Wallet error: LibWallet Error, Unable to deserialize slatepack, Slatepack decode error, Invalid armored data, some data was corrupted
+.*Unable to deserialize slatepack.*
+Invalid Slatepack. The data appears to be corrupted or incomplete. Please double-check that you copied the entire Slatepack correctly.
+
+# Wallet error: Client Callback Error, Error calling get_tip: Request error: Cannot make request: error sending request for url (http://13.236.73.43:13413/v2/foreign)
+Wallet error: Client Callback Error, Error calling.*Cannot make request: error sending request for url.*
+Unable to reach MWC node. Please check your network connection.
+
+# failed finalizing slate!, Wallet error: Transaction Expired
+failed finalizing slate!, Wallet error: Transaction Expired
+This transaction can’t be finalized because it has expired.
+
+#failed finalizing slate!, Wallet error: Transaction a9d7e7c9-949a-44af-ba7d-7af35d6cde43 has been cancelled, expired or already finalized
+failed finalizing slate!, Wallet error: Transaction (.*) has been cancelled, expired or already finalized
+Transaction $1 has already been finalized, cancelled, or has expired.
+
+
+#mwcmqs listener [xmgkTgNyWrx6bu65ZTtm7rX6qQLEJKvo8h4TehUNRcdotm1xn9jz] lost connection. Will try to restore in the background. tid=[fKY3S4Q9a5AZnnCvcIB9U]
+mwcmqs listener .* lost connection. Will try to restore in the background.*
+MWCMQS listener is offline
+
+#mwcmqs listener [xmgkTgNyWrx6bu65ZTtm7rX6qQLEJKvo8h4TehUNRcdotm1xn9jz] reestablished connection. tid=[fKY3S4Q9a5AZnnCvcIB9U]
+mwcmqs listener .* reestablished connection.*
+MWCMQS listener is online
+
+# Unable to start Tor listener. Tor Process Error: Unable to start tor at /Users/bay/mwc-qt-wallet/gui_wallet713_data1/tor/listener/torrc, Waiting for tor respond timeout
+Unable to start Tor listener. Tor Process Error.*Waiting for tor respond timeout
+Tor is offline
+
+# Tor is offline, Adapter Callback Error, Performing version check (is recipient listening?): Request error: Cannot make request: error sending request for url (http://nc2hbknz2kwhw7er75iqylrdyb2nfzckxtcemjn2s7zqz3ptvhjk5bid.onion/v2/foreign)
+Tor is offline, Adapter Callback Error, Performing version check.*
+Tor is offline
+
+#Failed to start mwcmqs subscriber. Error connecting to mqs.mwc.mw:443
+Failed to start mwcmqs subscriber. Error connecting to.*
+MWCMQS listener is offline
+
+# listener for mwcmqs already started!
+listener for mwcmqs already started!
+MWCMQS listener is online
+
+#Error: Wallet error: MQS error: MQS unable to process slate 572bcfa8-36eb-46aa-839a-544c8b365ed5, timed out waiting on channel
+Wallet error: MQS error.*timed out waiting on channel
+Could not be sent, MQS timed out. Recipient wallet likely offline or network down.
+
+#Error: Wallet error: MQS error: MQS is not started, not able to send the slate cd22dee6-b058-4357-b086-3c25617c471f
+Wallet error: MQS error: MQS is not started.*
+Could not be sent, MQS is not running. Please start MQS and try again.
+
+# Wallet error: Adapter Callback Error, Performing version check (is recipient listening?): Request error: Cannot make request: error sending request for url (http://te2mwm77xhjvvyoy4hf2cup5p357vfi2agdnos5ukuebhwpu2g4l4did.onion/v2/foreign)
+Wallet error: Adapter Callback Error, Performing version check .* Request error: Cannot make request: error sending request for url.*
+Could not be sent, Tor timed out. Recipient wallet likely offline or network down.
+
+#Error: failed receiving slate!, Wallet error: Transaction f4d1454f-a2e4-40d5-ac66-a18ea3ed239e has already been received
+failed receiving slate!, Wallet error: Transaction (.*) has already been received
+This transaction $1 has already been accepted. No need to receive it again.
+
+# Error: Wallet error: Client Callback Error, Client error: {"Internal":"Failed to update pool, Tx Pool Invalid Tx Tx Invalid signature"}
+.*Failed to update pool, Tx Pool Invalid Tx Tx Invalid signature.*
+Transaction is not complete. Please finalize it first.
+
+# Error: Wallet error: IO error, Slate data had invalid length: 8 | min: 15, max: 1279262 |
+Wallet error: IO error, Slate data had invalid length:.*
+Invalid Slatepack format
+
+# View wallet check failed: Client Callback Error, Error calling get_unspent_outputs: Request error: Cannot make request: error sending request for url (https://mwc713.floonet.mwc.mw/v2/foreign)
+.*Client Callback Error, Error calling .*: Request error: Cannot make request: error sending request for url.*
+Unable to reach MWC node. Please check your network connection.
+
+# Error: Controller error: Invalid argument: Unable to decode proof from json, expected value at line 1 column 1
+Controller error: Invalid argument: Unable to decode proof from json.*
+Ownership proof record is invalid. Please double-check that you copied the Ownership proof correctly.
+
+#Error: Controller error: LibWallet Error, Invalid ownership proof: wallet root signature is invalid, secp: signature failed verification
+Controller error: LibWallet Error, Invalid ownership proof: wallet root signature is invalid, secp:.*
+Ownership proof record is forged! Proof signature is invalid!
+
+# Error: Controller error: LibWallet Error, Invalid ownership proof: This proof is generated for wrong network: mainnet
+Controller error: LibWallet Error, Invalid ownership proof: (.*)
+Ownership proof record is invalid. $1

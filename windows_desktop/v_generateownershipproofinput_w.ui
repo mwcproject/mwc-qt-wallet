@@ -119,7 +119,10 @@ p, li { white-space: pre-wrap; }
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Generate ownership proof for the message and selected items</string>
+         <string>Create ownership proof for the message and selected items</string>
+        </property>
+        <property name="statusTip">
+         <string>Create ownership proof for the message and selected items</string>
         </property>
         <property name="text">
          <string>Generate</string>
@@ -159,7 +162,10 @@ p, li { white-space: pre-wrap; }
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Return back to Viewing Key page</string>
+         <string>Back to Viewing Key page</string>
+        </property>
+        <property name="statusTip">
+         <string>Back to Viewing Key page</string>
         </property>
         <property name="text">
          <string>Back</string>
@@ -181,7 +187,7 @@ p, li { white-space: pre-wrap; }
          </size>
         </property>
         <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
+         <enum>Qt::NoFocus</enum>
         </property>
         <property name="styleSheet">
          <string notr="true"/>
@@ -203,7 +209,7 @@ p, li { white-space: pre-wrap; }
           <number>15</number>
          </property>
          <item>
-          <widget class="QCheckBox" name="select_viewing_key">
+          <widget class="control::MwcCheckBox" name="select_viewing_key">
            <property name="focusPolicy">
             <enum>Qt::StrongFocus</enum>
            </property>
@@ -216,7 +222,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="select_tor">
+          <widget class="control::MwcCheckBox" name="select_tor">
            <property name="focusPolicy">
             <enum>Qt::StrongFocus</enum>
            </property>
@@ -229,7 +235,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="select_mqs">
+          <widget class="control::MwcCheckBox" name="select_mqs">
            <property name="focusPolicy">
             <enum>Qt::StrongFocus</enum>
            </property>
@@ -272,7 +278,10 @@ p, li { white-space: pre-wrap; }
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string>Input yoru message to sign</string>
+         <string>Input your message to sign</string>
+        </property>
+        <property name="statusTip">
+         <string>Input your message to sign</string>
         </property>
         <property name="lineWidth">
          <number>0</number>
@@ -329,6 +338,11 @@ p, li { white-space: pre-wrap; }
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>control_desktop/MwcCheckBox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

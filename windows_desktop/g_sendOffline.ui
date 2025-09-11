@@ -65,9 +65,9 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,1,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
         <property name="spacing">
-         <number>20</number>
+         <number>1</number>
         </property>
         <property name="leftMargin">
          <number>0</number>
@@ -209,6 +209,9 @@
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="spacing">
+           <number>25</number>
+          </property>
           <item>
            <widget class="control::MwcLineEditNormal" name="recipientAddress">
             <property name="sizePolicy">
@@ -230,6 +233,9 @@
              </size>
             </property>
             <property name="toolTip">
+             <string>Recipient slatepack address to encrypt the slate</string>
+            </property>
+            <property name="statusTip">
              <string>Recipient slatepack address to encrypt the slate</string>
             </property>
             <property name="maxLength">
@@ -261,7 +267,10 @@
              <enum>Qt::StrongFocus</enum>
             </property>
             <property name="toolTip">
-             <string>Choose a contact for wallet address</string>
+             <string>Pick a contact to get the receiver's wallet address</string>
+            </property>
+            <property name="statusTip">
+             <string>Pick a contact to get the receiver's wallet address</string>
             </property>
             <property name="text">
              <string>Contacts</string>
@@ -269,6 +278,44 @@
            </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="control::MwcLabelSmall" name="contactNameLable">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>      Contact: </string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>25</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <widget class="QTextEdit" name="descriptionEdit">
@@ -291,7 +338,10 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>Input message for this transaction.</string>
+           <string>Optional note the recipient will see</string>
+          </property>
+          <property name="statusTip">
+           <string>Optional note the recipient will see</string>
           </property>
           <property name="placeholderText">
            <string>Description (optional)</string>
@@ -309,7 +359,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>1</height>
+            <height>40</height>
            </size>
           </property>
          </spacer>
@@ -324,50 +374,6 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="control::MwcPushButtonNormal" name="settingsBtn">
-            <property name="minimumSize">
-             <size>
-              <width>180</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>180</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="cursor">
-             <cursorShape>PointingHandCursor</cursorShape>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::StrongFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Click to change settings. Number of change outputs and required confirmations.</string>
-            </property>
-            <property name="text">
-             <string>Settings</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_7">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>50</width>
               <height>20</height>
              </size>
             </property>
@@ -394,6 +400,9 @@
              <enum>Qt::StrongFocus</enum>
             </property>
             <property name="toolTip">
+             <string>Send MWC</string>
+            </property>
+            <property name="statusTip">
              <string>Send MWC</string>
             </property>
             <property name="text">
@@ -551,21 +560,20 @@
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelSmall</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>descriptionEdit</tabstop>
   <tabstop>recipientAddress</tabstop>
   <tabstop>contactsButton</tabstop>
-  <tabstop>settingsBtn</tabstop>
+  <tabstop>descriptionEdit</tabstop>
   <tabstop>sendButton</tabstop>
  </tabstops>
  <resources>

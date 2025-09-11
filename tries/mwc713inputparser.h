@@ -22,10 +22,8 @@
 
 namespace tries {
 
-// Receive signals
-class Mwc713InputGetter {
 
-};
+QString mapMwc713Message(const QString & message);
 
 class Mwc713InputParser : public QObject
 {
@@ -68,8 +66,6 @@ signals:
 
 protected:
     InputParser parser; // Work horse that is parsing all inputs
-    notify::MessageMapper msgMapper;
-
 };
 
 }

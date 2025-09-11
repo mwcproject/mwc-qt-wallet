@@ -94,7 +94,7 @@ void ListWithColumns::clearData()
     setRowCount(0);
 }
 
-void ListWithColumns::appendRow( const QVector<QString> & rowData, double selection ) {
+void ListWithColumns::appendRow( const QVector<QString> & rowData, double selection, bool highlight ) {
     Q_ASSERT(rowData.size() == columnCount() );
 
     int rowIdx = rowCount();
@@ -130,6 +130,13 @@ void ListWithColumns::appendRow( const QVector<QString> & rowData, double select
 
         itm->setBackground( QBrush(c2set) );
         itm->setTextAlignment( textAlignment );
+
+        if (highlight) {
+            QFont f = itm->font();
+            f.setBold(true);
+            itm->setFont(f);
+        }
+
         setItem(rowIdx , i, itm );
 
      /*   if (multilineColumns.contains(i)) {

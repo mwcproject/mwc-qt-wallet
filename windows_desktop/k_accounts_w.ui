@@ -57,9 +57,6 @@
           <property name="text">
            <string>SPENDABLE</string>
           </property>
-          <property name="textAlignment">
-           <set>AlignCenter</set>
-          </property>
          </column>
          <column>
           <property name="text">
@@ -69,9 +66,6 @@
            <font>
             <kerning>true</kerning>
            </font>
-          </property>
-          <property name="textAlignment">
-           <set>AlignCenter</set>
           </property>
          </column>
          <column>
@@ -170,13 +164,16 @@
             <cursorShape>PointingHandCursor</cursorShape>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
             <string>Rename account</string>
            </property>
+           <property name="statusTip">
+            <string>Rename account</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">border:none</string>
+            <string notr="true">#renameButton{border:none;}</string>
            </property>
            <property name="text">
             <string/>
@@ -217,13 +214,16 @@
             <cursorShape>PointingHandCursor</cursorShape>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
             <string>Transfer MWC between accounts</string>
            </property>
+           <property name="statusTip">
+            <string>Transfer MWC between accounts</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">border:none</string>
+            <string notr="true">#transferButton{border:none;}</string>
            </property>
            <property name="text">
             <string/>
@@ -280,13 +280,16 @@
             <cursorShape>PointingHandCursor</cursorShape>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
             <string>Refresh account list</string>
            </property>
+           <property name="statusTip">
+            <string>Refresh account list</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">border:none</string>
+            <string notr="true">#refreshButton{border:none;}</string>
            </property>
            <property name="text">
             <string/>
@@ -327,13 +330,16 @@
             <cursorShape>PointingHandCursor</cursorShape>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
             <string>Create new account</string>
            </property>
+           <property name="statusTip">
+            <string>Create new account</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">border:none</string>
+            <string notr="true">#addButton{border:none;}</string>
            </property>
            <property name="text">
             <string/>
@@ -374,13 +380,16 @@
             <cursorShape>PointingHandCursor</cursorShape>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
             <string>Remove empty account from the list</string>
            </property>
+           <property name="statusTip">
+            <string>Remove empty account from the list</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">border:none</string>
+            <string notr="true">#deleteButton{border:none;}</string>
            </property>
            <property name="text">
             <string/>

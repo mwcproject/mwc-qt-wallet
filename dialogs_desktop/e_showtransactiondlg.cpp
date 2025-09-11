@@ -64,24 +64,13 @@ ShowTransactionDlg::ShowTransactionDlg(QWidget *parent,
 
     ui->commitsComboBox->clear();
     for (int i=0; i<outputs.size(); i++) {
-        QString commitType;
-        if (i<transaction.numInputs) {
-            commitType = "Input " + QString::number(i+1) + ": ";
-        }
-        else {
-            commitType = "Output " + QString::number(i-transaction.numInputs+1) + ": ";
-        }
-
-        ui->commitsComboBox->addItem( commitType + outputs[i].outputCommitment, QVariant(i));
+        ui->commitsComboBox->addItem( outputs[i].outputCommitment, QVariant(i));
     }
 
     // Selecting first output
-    if (transaction.numInputs < outputs.size()) {
-        ui->commitsComboBox->setCurrentIndex(transaction.numInputs);
+    if (outputs.size()>0) {
+        ui->commitsComboBox->setCurrentIndex(0);
         updateOutputData();
-    }
-    else {
-        ui->commitsComboBox->setCurrentIndex(-1);
     }
 
     txUuid = transaction.txid;

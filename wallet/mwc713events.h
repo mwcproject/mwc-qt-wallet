@@ -200,6 +200,8 @@ private:
     volatile qint64 taskExecutionTimeLimit = 0; // Timeout value for the task
 
     QString lastWalletProgressCommand;
+
+    bool exiting = false;
 };
 
 }

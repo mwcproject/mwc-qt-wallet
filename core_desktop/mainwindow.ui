@@ -139,8 +139,11 @@
              <property name="toolTip">
               <string>Click for help</string>
              </property>
+             <property name="statusTip">
+              <string>Click for help</string>
+             </property>
              <property name="styleSheet">
-              <string notr="true">border: none;</string>
+              <string notr="true">#helpButton{border: none;}</string>
              </property>
              <property name="text">
               <string/>
@@ -200,7 +203,10 @@
               <enum>Qt::NoFocus</enum>
              </property>
              <property name="toolTip">
-              <string>Click here to view MWC node status.</string>
+              <string>View MWC node status</string>
+             </property>
+             <property name="statusTip">
+              <string>View MWC node status</string>
              </property>
              <property name="text">
               <string>Floonet</string>
@@ -242,7 +248,10 @@
               <enum>Qt::NoFocus</enum>
              </property>
              <property name="toolTip">
-              <string>Click here to view Listener settings.</string>
+              <string>View listener settings and status</string>
+             </property>
+             <property name="statusTip">
+              <string>View listener settings and status</string>
              </property>
              <property name="text">
               <string>TOR</string>
@@ -489,6 +498,9 @@
     <string>Atomic Swap</string>
    </property>
    <property name="toolTip">
+    <string>Peer to peer atomic Swap</string>
+   </property>
+   <property name="statusTip">
     <string>Peer to peer atomic Swap</string>
    </property>
   </action>

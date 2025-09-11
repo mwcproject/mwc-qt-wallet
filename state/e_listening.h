@@ -39,22 +39,8 @@ protected:
     virtual QString getHelpDocName() override {return "listener.html";}
 
 private slots:
-    // Listening, you will not be able to get a results
-    void onListeningStartResults( bool mqTry, bool torTry, // what we try to start
-                                   QStringList errorMessages, bool initialStart ); // error messages, if get some
-
-    void onListeningStopResult(bool mqTry, bool torTry, // what we try to stop
-                                QStringList errorMessages );
-
     // Login from anotehr wallet happens
     void onListenerMqCollision();
-
-
-    // Looking for "Failed to start mwcmqs subscriber. Error connecting to ..."
-    void onNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message);
-
-private:
-    QString lastShownErrorMessage;
 };
 
 }

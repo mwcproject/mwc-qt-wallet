@@ -99,7 +99,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Finalize transaction</string>
+        </property>
+        <property name="statusTip">
+         <string>Finalize transaction</string>
         </property>
         <property name="text">
          <string>Finalize</string>
@@ -280,7 +283,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Don't finalize now, your transaction will not be cancelled</string>
+        </property>
+        <property name="statusTip">
+         <string>Don't finalize now, your transaction will not be cancelled</string>
         </property>
         <property name="text">
          <string>Cancel</string>
@@ -320,7 +326,10 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>File name of the transaction ready to publish with Online Node</string>
+          <string>Filename of the transaction ready to publish via an Online Node</string>
+         </property>
+         <property name="statusTip">
+          <string>Filename of the transaction ready to publish via an Online Node</string>
          </property>
          <property name="text">
           <string>Select</string>
@@ -630,19 +639,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLineEditNormal</class>
@@ -656,6 +655,16 @@
   </customwidget>
   <customwidget>
    <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>

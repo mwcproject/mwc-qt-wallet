@@ -42,8 +42,8 @@ ValidateOwnershipProofResult::~ValidateOwnershipProofResult() {
 
 void ValidateOwnershipProofResult::sgnValidateOwnershipProof(QString network, QString message, QString viewingKey, QString torAddress, QString mqsAddress, QString error) {
     if (!error.isEmpty()) {
-        control::MessageBox::messageText(this, "Error", "Unable to validate ownership proof.\n\nError:" + error);
-        viewAcounts->back();
+        control::MessageBox::messageText(this, "Error", "Unable to validate ownership proof.\n\n" + error);
+        viewAcounts->validateOwnershipProofStart();
     }
 
     ui->network->setText(network);

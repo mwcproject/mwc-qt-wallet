@@ -41,7 +41,7 @@
     </size>
    </property>
    <property name="styleSheet">
-    <string notr="true">font-family: &quot;Courier&quot;</string>
+    <string notr="true">#slatepackEdit{font-family: &quot;Courier&quot;}</string>
    </property>
    <property name="horizontalScrollBarPolicy">
     <enum>Qt::ScrollBarAlwaysOff</enum>

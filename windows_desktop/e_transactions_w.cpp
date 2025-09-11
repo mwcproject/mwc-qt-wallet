@@ -468,6 +468,7 @@ void Transactions::on_exportButton_clicked() {
 
     TransactionData & td = allTrans[0];
     Q_ASSERT(td.trans.isValid());
+    requestedTxIdx = td.trans.txIdx;
     wallet->requestTransactionById(account, QString::number(td.trans.txIdx));
     td.tx_note = config->getTxNote(td.trans.txid);
     // Now waiting for transaction requests response at onSgnTransactionById
@@ -484,6 +485,7 @@ void Transactions::onItemActivated(QString itemId) {
     const wallet::WalletTransaction & selected = allTrans[idx].trans;
 
     // respond will come at updateTransactionById
+    requestedTxIdx = selected.txIdx;
     wallet->requestTransactionById(account, QString::number(selected.txIdx) );
 
     ui->progressFrame->show();
@@ -517,6 +519,9 @@ void Transactions::onSgnTransactionById(bool success, QString account, QString h
         ui->progressFrame->hide();
         ui->transactionTable->show();
 
+        if (requestedTxIdx<0)
+            return; // it is not ours request
+
         util::TimeoutLockObject to("Transactions");
 
         if (!success) {
@@ -526,6 +531,13 @@ void Transactions::onSgnTransactionById(bool success, QString account, QString h
         }
 
         wallet::WalletTransaction transaction = wallet::WalletTransaction::fromJson(transactionJson);
+
+        if (requestedTxIdx == transaction.txIdx) {
+            requestedTxIdx = -1;
+        }
+        else {
+            return; // not our call
+        }
 
         QVector<wallet::WalletOutput> outputs;
         for (auto &json : outputsJson)

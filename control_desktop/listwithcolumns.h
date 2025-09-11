@@ -54,7 +54,7 @@ public:
     // selection - highlighting level.
     // <=0 - nothing
     // >=1 - highlight a lot
-    void appendRow( const QVector<QString> & rowData, double selection = -1.0 );
+    void appendRow( const QVector<QString> & rowData, double selection, bool highlight );
 
     void setItemText(int row, int column, QString text);
 protected:

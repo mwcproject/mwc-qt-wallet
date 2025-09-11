@@ -53,6 +53,7 @@ NextStateRespond InputPassword::execute() {
 
         // As a node we can exit because no password is expected
         if (config::isOnlineNode()) {
+            core::getWndManager()->pageNodeInfo();
             // Starting the wallet normally for the node
             context->wallet->start();
             return NextStateRespond( NextStateRespond::RESULT::DONE );

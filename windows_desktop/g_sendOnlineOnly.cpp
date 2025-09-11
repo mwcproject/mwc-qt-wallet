@@ -22,6 +22,7 @@
 #include "../bridge/util_b.h"
 #include "../bridge/config_b.h"
 #include "../bridge/wnd/g_send_b.h"
+#include "../bridge/wnd/x_walletconfig_b.h"
 
 namespace wnd {
 
@@ -34,6 +35,7 @@ SendOnlineOnly::SendOnlineOnly(QWidget *parent) :
     wallet = new bridge::Wallet(this);
     util = new bridge::Util(this);
     config = new bridge::Config(this);
+    walletConfig = new bridge::WalletConfig(this);
     send = new bridge::Send(this);
 
     QObject::connect(wallet, &bridge::Wallet::sgnWalletBalanceUpdated,
@@ -48,6 +50,16 @@ SendOnlineOnly::SendOnlineOnly(QWidget *parent) :
     ui->generatePoof->setCheckState( config->getGenerateProof() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
     ui->contactNameLable->setText("");
     ui->contactNameLable->hide();
+
+    QString formatStr = "FORMATS: ";
+    if (walletConfig->isFeatureMWCMQS()) {
+        formatStr += "   [mwcmqs://]<mqs_address>";
+    }
+    if (walletConfig->isFeatureTor()) {
+        formatStr += "   [http://]<tor_address>[.onion]";
+    }
+    formatStr += "   http(s)://<host>:<port>";
+    ui->formatsLable->setText(formatStr);
 }
 
 SendOnlineOnly::~SendOnlineOnly()
@@ -126,7 +138,7 @@ void SendOnlineOnly::on_contactsButton_clicked()
 
     // Get the contacts
 
-    dlg::SelectContact dlg(this, true, true, true);
+    dlg::SelectContact dlg(this, walletConfig->isFeatureTor(), walletConfig->isFeatureMWCMQS(), true);
     if (dlg.exec() == QDialog::Accepted) {
         core::ContactRecord selectedContact = dlg.getSelectedContact();
         ui->sendEdit->setText( selectedContact.address );

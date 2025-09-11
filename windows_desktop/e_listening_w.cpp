@@ -73,9 +73,8 @@ Listening::~Listening()
 }
 
 // _keybaseOnline is absolete
-void Listening::onSgnUpdateListenerStatus(bool mwcOnline, bool _keybaseOnline, bool tor) {
+void Listening::onSgnUpdateListenerStatus(bool mwcOnline, bool tor) {
     Q_UNUSED(mwcOnline);
-    Q_UNUSED(_keybaseOnline);
     Q_UNUSED(tor);
 
     updateStatuses();

@@ -290,6 +290,9 @@
         <property name="focusPolicy">
          <enum>Qt::ClickFocus</enum>
         </property>
+        <property name="toolTip">
+         <string>Transaction kernel - uniquely identifies this transaction on-chain.</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -1113,8 +1116,8 @@
   <widget class="control::MwcPushButtonNormal" name="okButton">
    <property name="geometry">
     <rect>
-     <x>465</x>
-     <y>735</y>
+     <x>366</x>
+     <y>738</y>
      <width>140</width>
      <height>40</height>
     </rect>
@@ -1400,6 +1403,12 @@
           <height>40</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Transaction outputs created by this wallet</string>
+        </property>
        </widget>
       </item>
      </layout>
@@ -1460,40 +1469,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="control::MwcPushButtonNormal" name="cancelButton">
-   <property name="geometry">
-    <rect>
-     <x>265</x>
-     <y>735</y>
-     <width>140</width>
-     <height>40</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>140</width>
-     <height>40</height>
-    </size>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>140</width>
-     <height>40</height>
-    </size>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::StrongFocus</enum>
-   </property>
-   <property name="text">
-    <string>Cancel</string>
-   </property>
-   <property name="autoDefault">
-    <bool>false</bool>
-   </property>
-   <property name="default">
-    <bool>false</bool>
-   </property>
-  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1502,9 +1477,9 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcComboBox</class>
-   <extends>QComboBox</extends>
-   <header>control_desktop/MwcComboBox.h</header>
+   <class>control::MwcLineEditNormal</class>
+   <extends>QLineEdit</extends>
+   <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelLarge</class>
@@ -1512,19 +1487,14 @@
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLineEditNormal</class>
-   <extends>QLineEdit</extends>
-   <header>control_desktop/MwcLineEdit.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLineEditDlg</class>
-   <extends>QLineEdit</extends>
-   <header>control_desktop/MwcLineEditDlg.h</header>
+   <class>control::MwcComboBox</class>
+   <extends>QComboBox</extends>
+   <header>control_desktop/MwcComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLine</class>
@@ -1532,13 +1502,17 @@
    <header>control_desktop/MwcFrameWithBorder.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>control::MwcLineEditDlg</class>
+   <extends>QLineEdit</extends>
+   <header>control_desktop/MwcLineEditDlg.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>transactionNote</tabstop>
   <tabstop>viewKernel</tabstop>
   <tabstop>commitsComboBox</tabstop>
   <tabstop>viewCommit</tabstop>
-  <tabstop>cancelButton</tabstop>
   <tabstop>okButton</tabstop>
  </tabstops>
  <resources/>

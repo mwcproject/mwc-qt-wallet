@@ -148,7 +148,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>You MWC MQS address</string>
+            <string>Your current MWC MQS address</string>
+           </property>
+           <property name="statusTip">
+            <string>Your current MWC MQS address</string>
            </property>
            <property name="maxLength">
             <number>1024</number>
@@ -198,6 +201,9 @@
            <property name="toolTip">
             <string>MWC MQS listener status</string>
            </property>
+           <property name="statusTip">
+            <string>MWC MQS listener status</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -217,8 +223,14 @@
              <height>20</height>
             </rect>
            </property>
+           <property name="toolTip">
+            <string>Use 'Next Address' or 'To Index' to pick a different address.</string>
+           </property>
+           <property name="statusTip">
+            <string>Use 'Next Address' or 'To Index' to pick a different address.</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">color: rgba(255,255,255, 0.7)</string>
+            <string notr="true">#mwcmqsAddressIndexLabel{color: rgba(255,255,255, 0.7)}</string>
            </property>
            <property name="text">
             <string>Address index: 4</string>
@@ -271,7 +283,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>You MWC MQS address</string>
+            <string>Your current Tor address</string>
+           </property>
+           <property name="statusTip">
+            <string>Your current Tor address</string>
            </property>
            <property name="maxLength">
             <number>1024</number>
@@ -308,6 +323,9 @@
            <property name="toolTip">
             <string>Tor listener status</string>
            </property>
+           <property name="statusTip">
+            <string>Tor listener status</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -327,8 +345,14 @@
              <height>20</height>
             </rect>
            </property>
+           <property name="toolTip">
+            <string>Use 'Next Address' or 'To Index' to pick a different address.</string>
+           </property>
+           <property name="statusTip">
+            <string>Use 'Next Address' or 'To Index' to pick a different address.</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">color: rgba(255,255,255, 0.7)</string>
+            <string notr="true">#torAddressIndexLabel{color: rgba(255,255,255, 0.7)}</string>
            </property>
            <property name="text">
             <string>Address index: 4</string>
@@ -374,6 +398,9 @@
            <property name="toolTip">
             <string>Tor client options. Might be requred for some bridge protocols.</string>
            </property>
+           <property name="statusTip">
+            <string>Tor client options. Might be requred for some bridge protocols.</string>
+           </property>
            <property name="maxLength">
             <number>1024</number>
            </property>
@@ -406,7 +433,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Optional Tor bridge connection string.  Use it if Tor blocked by your firewall.</string>
+            <string>Optional Tor bridge connection string - use it only if Tor blocked by firewall.</string>
+           </property>
+           <property name="statusTip">
+            <string>Optional Tor bridge connection string - use it only if Tor blocked by firewall.</string>
            </property>
            <property name="maxLength">
             <number>1024</number>
@@ -471,7 +501,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Tor (onion) address of your wallet</string>
+            <string>Your current Slatepack address</string>
+           </property>
+           <property name="statusTip">
+            <string>Your current Slatepack address</string>
            </property>
            <property name="maxLength">
             <number>1024</number>
@@ -498,8 +531,14 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="toolTip">
+            <string>Use 'Next Address' or 'To Index' to pick a different address</string>
+           </property>
+           <property name="statusTip">
+            <string>Use 'Next Address' or 'To Index' to pick a different address</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">color: rgba(255,255,255, 0.7)</string>
+            <string notr="true">#slatepackAddressIndexLabel{color: rgba(255,255,255, 0.7);}</string>
            </property>
            <property name="text">
             <string>Address index: 4</string>
@@ -580,7 +619,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Select a specific index for your TOR and MWC MQS address</string>
+            <string>Select a specific index for your TOR/Slatepack and MWC MQS address.</string>
+           </property>
+           <property name="statusTip">
+            <string>Select a specific index for your TOR/Slatepack and MWC MQS address.</string>
            </property>
            <property name="text">
             <string>To address index</string>
@@ -614,7 +656,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Use the next address for listening to TOR and MWC MQS messages</string>
+            <string>Select next address for TOR/Slatepack and MWC MQS messages.</string>
+           </property>
+           <property name="statusTip">
+            <string>Select next next address for TOR/Slatepack and MWC MQS messages.</string>
            </property>
            <property name="text">
             <string>Next Address</string>
@@ -698,6 +743,9 @@
  <tabstops>
   <tabstop>mwcmqsAddress</tabstop>
   <tabstop>torAddress</tabstop>
+  <tabstop>torBridgeConection</tabstop>
+  <tabstop>torClientOptions</tabstop>
+  <tabstop>slatepackAddress</tabstop>
   <tabstop>mwcMqNextAddress</tabstop>
   <tabstop>mwcMqToIndex</tabstop>
  </tabstops>

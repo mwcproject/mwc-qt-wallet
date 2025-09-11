@@ -41,6 +41,7 @@
 #include "../core/WalletApp.h"
 #include "../core_desktop/statuswndmgr.h"
 #include <QSettings>
+#include "../core_desktop/DesktopWndManager.h"
 
 namespace core {
 
@@ -162,6 +163,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    core::DesktopWndManager * wndMan = (core::DesktopWndManager*) core::getWndManager();
+    if (wndMan) {
+        wndMan->resetMainWnd();
+    }
+
     delete ui;
     delete statusMgr;
 }
@@ -349,9 +355,8 @@ void MainWindow::on_helpButton_clicked()
 }
 
 // keybaseOnline is absolete
-void MainWindow::onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor) {
+void MainWindow::onSgnUpdateListenerStatus(bool mwcOnline, bool tor) {
     Q_UNUSED(mwcOnline)
-    Q_UNUSED(keybaseOnline)
     Q_UNUSED(tor);
     updateListenerBtn();
 }

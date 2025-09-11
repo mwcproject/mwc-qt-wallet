@@ -155,7 +155,7 @@ bool AccountTransfer::transferFunds(const QString & from,
     transferState=1;
 
     bool fluff = context->appContext->isFluffSet();
-    context->wallet->selfSend( trAccountFrom, trAccountTo, trNanoCoins, outputs2use, fluff );
+    context->wallet->selfSend( trAccountFrom, trAccountTo, trNanoCoins, prms.changeOutputs, outputs2use, fluff );
 
     return true;
 }

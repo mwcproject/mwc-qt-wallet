@@ -33,6 +33,7 @@ InitFirstTime::InitFirstTime(QWidget *parent) :
     ui->setupUi(this);
 
     startWallet = new bridge::StartWallet(this);
+    ui->newInstanceButton->setFocus();
 }
 
 InitFirstTime::~InitFirstTime()
@@ -80,7 +81,7 @@ void InitFirstTime::on_helpButton_clicked()
     control::MessageBox::messageText(this, "Help", "'Open Wallet' - Open the wallet form external location like USB stick or another drive.\n\n"
                                                    "'New Instance' - Create a new wallet instance.\n\n"
                                                    "'Restore Instance' - Restore a new wallet instance from the mnemonic passphrase.\n\n"
-                                                   "'Cold Wallet Node' - This configuraiton is needed if you are using the cold wallet. Online Node needed for exportign the blockchina data to the Cold Wallet and for publishing finalized transacitons.");
+                                                   "'Cold Wallet Node' - This configuraiton is needed if you are using the cold wallet. Online Node needed for exportign the blockchina data to the Cold Wallet and for publishing finalized transactions.");
 }
 
 }

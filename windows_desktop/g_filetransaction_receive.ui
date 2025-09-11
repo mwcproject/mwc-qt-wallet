@@ -99,7 +99,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Accept payment and generate the reply Slate</string>
+        </property>
+        <property name="statusTip">
+         <string>Accept payment and generate the reply Slate</string>
         </property>
         <property name="text">
          <string>Generate Response</string>
@@ -280,7 +283,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Cancel receiving and decline this payment</string>
+        </property>
+        <property name="statusTip">
+         <string>Cancel receiving and decline this payment</string>
         </property>
         <property name="text">
          <string>Cancel</string>
@@ -314,7 +320,10 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>You can type message here for sender</string>
+         <string>Optional message for the sender</string>
+        </property>
+        <property name="statusTip">
+         <string>Optional message for the sender</string>
         </property>
         <property name="readOnly">
          <bool>false</bool>
@@ -539,14 +548,14 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelProgress</class>
@@ -554,7 +563,7 @@ p, li { white-space: pre-wrap; }
    <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>

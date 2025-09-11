@@ -132,7 +132,7 @@ void Wallet::onListeningStopResult(bool mqTry, bool tor,
 
 
 void Wallet::onUpdateListenerStatus(bool mqsOnline, bool torOnline) {
-    emit sgnUpdateListenerStatus( mqsOnline, false, torOnline );
+    emit sgnUpdateListenerStatus( mqsOnline, torOnline );
 }
 
 void Wallet::onUpdateNodeStatus(bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty,
@@ -261,15 +261,6 @@ bool Wallet::getMqsListenerStatus() {
 // return true if Tor is online
 bool Wallet::getTorListenerStatus() {
     return getWallet()->getListenerStatus().tor;
-}
-
-// return true is MQS is started
-bool Wallet::isMqsListenerStarted() {
-    return getWallet()->getListenerStartState().mqs;
-}
-
-bool Wallet::isTorListenerStarted() {
-    return getWallet()->getListenerStartState().tor;
 }
 
 // Request start/stop listeners. Feedback should come with sgnUpdateListenerStatus
@@ -503,14 +494,14 @@ void Wallet::viewSendSlatepack(QString txUUID) {
     if (slatepack.isEmpty())
         return;
 
-    core::getWndManager()->pageShowSlatepack(slatepack, state::STATE::TRANSACTIONS, "send_init.slatepack", true);
+    core::getWndManager()->pageShowSlatepack(slatepack, state::STATE::TRANSACTIONS, ".send_init.slatepack", true);
 }
 
 void Wallet::viewReceiveSlatepack(QString txUUID) {
     QString slatepack = state::getStateContext()->appContext->getReceiveSlatepack(txUUID);
     if (slatepack.isEmpty())
         return;
-    core::getWndManager()->pageShowSlatepack(slatepack, state::STATE::TRANSACTIONS, "send_response.slatepack", false);
+    core::getWndManager()->pageShowSlatepack(slatepack, state::STATE::TRANSACTIONS, ".send_response.slatepack", false);
 }
 
 }

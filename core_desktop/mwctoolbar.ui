@@ -119,18 +119,18 @@
         </sizepolicy>
        </property>
        <property name="toolTip">
-        <string>This is the total MWC in all of your accounts, some might be locked or not confirmed</string>
+        <string>Total MWC across all accounts (some may be locked or unconfirmed)</string>
+       </property>
+       <property name="statusTip">
+        <string>Total MWC across all accounts (some may be locked or unconfirmed)</string>
        </property>
        <property name="styleSheet">
-        <string notr="true">font-family: Open Sans;
+        <string notr="true">#totalMwc {font-family: Open Sans;
 font-style: normal;
 font-weight: bold;
 font-size: 22px;
 line-height: 35px;
-/* identical to box height */
-
-
-color: #FFFFFF;</string>
+color: #FFFFFF;}</string>
        </property>
        <property name="text">
         <string>MWC</string>
@@ -263,18 +263,18 @@ color: #FFFFFF;</string>
            </sizepolicy>
           </property>
           <property name="toolTip">
-           <string>This is unconfirmed MWC in all of your accounts</string>
+           <string>Unconfirmed MWC across all accounts</string>
+          </property>
+          <property name="statusTip">
+           <string>Unconfirmed MWC across all accounts</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">font-family: Open Sans;
+           <string notr="true">#nonConfMwcValue {font-family: Open Sans;
 font-style: normal;
 font-weight: bold;
 font-size: 15px;
 line-height: 25px;
-/* identical to box height */
-
-
-color: #CCFF33;</string>
+color: #CCFF33;}</string>
           </property>
           <property name="text">
            <string>MWC</string>
@@ -350,9 +350,12 @@ color: #CCFF33;</string>
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
+        <string>Send MWC</string>
+       </property>
+       <property name="statusTip">
         <string>Send MWC</string>
        </property>
        <property name="text">
@@ -397,9 +400,12 @@ color: #CCFF33;</string>
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
+        <string>Receive MWC</string>
+       </property>
+       <property name="statusTip">
         <string>Receive MWC</string>
        </property>
        <property name="text">
@@ -444,10 +450,13 @@ color: #CCFF33;</string>
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Finalize File Transaction</string>
+        <string>Finalize Slatepack Transaction</string>
+       </property>
+       <property name="statusTip">
+        <string>Finalize Slatepack Transaction</string>
        </property>
        <property name="text">
         <string notr="true">Finalize</string>
@@ -491,10 +500,13 @@ color: #CCFF33;</string>
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Click here to view your transactions</string>
+        <string>View transactions</string>
+       </property>
+       <property name="statusTip">
+        <string>View transactions</string>
        </property>
        <property name="text">
         <string notr="true">Transactions</string>
@@ -538,9 +550,12 @@ color: #CCFF33;</string>
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
+        <string>Peer to peer Atomic Swaps</string>
+       </property>
+       <property name="statusTip">
         <string>Peer to peer Atomic Swaps</string>
        </property>
        <property name="text">
@@ -586,10 +601,13 @@ color: #CCFF33;</string>
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Peer to peer Atomic Swaps</string>
+        <string>Peer to peer Marketplace</string>
+       </property>
+       <property name="statusTip">
+        <string>Peer to peer Marketplace</string>
        </property>
        <property name="text">
         <string notr="true">Marketplace</string>

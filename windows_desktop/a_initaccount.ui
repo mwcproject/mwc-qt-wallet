@@ -196,6 +196,12 @@
            <property name="acceptDrops">
             <bool>false</bool>
            </property>
+           <property name="toolTip">
+            <string>Password to unlock your wallet instance.</string>
+           </property>
+           <property name="statusTip">
+            <string>Password to unlock your wallet instance.</string>
+           </property>
            <property name="inputMask">
             <string notr="true"/>
            </property>
@@ -254,6 +260,9 @@
            <property name="toolTip">
             <string>Name of your new wallet instance</string>
            </property>
+           <property name="statusTip">
+            <string>Name of your new wallet instance</string>
+           </property>
            <property name="inputMask">
             <string notr="true"/>
            </property>
@@ -302,11 +311,11 @@
             </rect>
            </property>
            <property name="styleSheet">
-            <string notr="true">color: rgba(255,255,255, 0.7)</string>
+            <string notr="true">#createdDirLabel{color: rgba(255,255,255, 0.7)}</string>
            </property>
            <property name="text">
             <string>You are saving your data to:
-/home/bay/mwc-qt-wallet/fffffff</string>
+/home/xxxx/mwc-qt-wallet/xxxxx</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
@@ -326,6 +335,12 @@
              <width>126</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="toolTip">
+            <string>Choose alternative location for your wallet data. You might keep the wallet data on USB drive.</string>
+           </property>
+           <property name="statusTip">
+            <string>Choose alternative location for your wallet data. You might keep the wallet data on USB drive.</string>
            </property>
            <property name="layoutDirection">
             <enum>Qt::LeftToRight</enum>
@@ -452,6 +467,12 @@
              <height>40</height>
             </size>
            </property>
+           <property name="toolTip">
+            <string>Confirm password. Type the same password.</string>
+           </property>
+           <property name="statusTip">
+            <string>Confirm password. Type the same password.</string>
+           </property>
            <property name="maxLength">
             <number>64</number>
            </property>
@@ -496,6 +517,12 @@
            <property name="focusPolicy">
             <enum>Qt::StrongFocus</enum>
            </property>
+           <property name="toolTip">
+            <string>Select MWC network for your wallet. Floonet is a test network.</string>
+           </property>
+           <property name="statusTip">
+            <string>Select MWC network for your wallet. Floonet is a test network.</string>
+           </property>
            <property name="text">
             <string>Mainnet </string>
            </property>
@@ -514,6 +541,12 @@
            </property>
            <property name="focusPolicy">
             <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Select MWC network for your wallet. Floonet is a test network.</string>
+           </property>
+           <property name="statusTip">
+            <string>Select MWC network for your wallet. Floonet is a test network.</string>
            </property>
            <property name="text">
             <string>Floonet</string>
@@ -604,7 +637,10 @@
         <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Continue with creation of a new wallet</string>
+        <string>Cancel creation of a new wallet</string>
+       </property>
+       <property name="statusTip">
+        <string>Cancel creation of a new wallet</string>
        </property>
        <property name="text">
         <string>Cancel</string>
@@ -635,6 +671,9 @@
         <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
+        <string>Continue with creation of a new wallet</string>
+       </property>
+       <property name="statusTip">
         <string>Continue with creation of a new wallet</string>
        </property>
        <property name="text">

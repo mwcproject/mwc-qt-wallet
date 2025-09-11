@@ -28,6 +28,7 @@ NavMenuAccount::NavMenuAccount(QWidget *parent) :
     ui->setupUi(this);
     stateMachine = new bridge::StateMachine(this);
     wallet = new bridge::Wallet(this);
+    ui->accountsButton->setFocus();
 }
 
 NavMenuAccount::~NavMenuAccount() {

@@ -148,6 +148,9 @@ void ResultedSlatepack::onSgnDecodeSlatepack(QString tag, QString error, QString
     Q_UNUSED(recipient)
     Q_UNUSED(sender)
 
+    if ( !(tag == FINALIZE_TAG || tag == INIT_TAG))
+        return;
+
     spInProgress = "";
     ui->finalizeSlatepackBtn->setEnabled(false);
 

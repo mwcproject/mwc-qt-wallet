@@ -106,6 +106,8 @@ private:
 
     int64_t nodeHeight    = 0;
     QString exportingFileName;
+
+    int64_t    requestedTxIdx = -1;
 };
 
 }

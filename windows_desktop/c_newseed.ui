@@ -188,21 +188,27 @@ WARNING:&lt;br/&gt;
       <widget class="control::MwcPushButtonNormal" name="submitButton">
        <property name="minimumSize">
         <size>
-         <width>120</width>
+         <width>180</width>
          <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>120</width>
+         <width>180</width>
          <height>40</height>
         </size>
        </property>
        <property name="focusPolicy">
         <enum>Qt::StrongFocus</enum>
        </property>
+       <property name="toolTip">
+        <string>Continue with creation of a new wallet</string>
+       </property>
+       <property name="statusTip">
+        <string>Continue with creation of a new wallet</string>
+       </property>
        <property name="text">
-        <string>OK</string>
+        <string>Continue</string>
        </property>
        <property name="autoDefault">
         <bool>true</bool>

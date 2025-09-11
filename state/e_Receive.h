@@ -47,7 +47,7 @@ public:
 protected:
     virtual NextStateRespond execute() override;
     virtual bool mobileBack() override;
-    virtual QString getHelpDocName() override {return "receive.html";}
+    virtual QString getHelpDocName() override;
 
     bool isActive() const;
 private slots:

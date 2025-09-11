@@ -107,6 +107,9 @@
         <property name="toolTip">
          <string>Account to trade MWC from</string>
         </property>
+        <property name="statusTip">
+         <string>Account to trade MWC from</string>
+        </property>
        </widget>
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
@@ -157,6 +160,9 @@
            <property name="toolTip">
             <string>Cancel and return back</string>
            </property>
+           <property name="statusTip">
+            <string>Cancel and return back</string>
+           </property>
            <property name="text">
             <string>Cancel</string>
            </property>
@@ -196,6 +202,9 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
+            <string>Create and start publishing this atomic swap offer</string>
+           </property>
+           <property name="statusTip">
             <string>Create and start publishing this atomic swap offer</string>
            </property>
            <property name="text">
@@ -257,6 +266,9 @@
            <property name="toolTip">
             <string>Address to receive the coins</string>
            </property>
+           <property name="statusTip">
+            <string>Address to receive the coins</string>
+           </property>
            <property name="placeholderText">
             <string>XXXX</string>
            </property>
@@ -286,6 +298,9 @@
            <property name="toolTip">
             <string>Secondary currency transaction fee</string>
            </property>
+           <property name="statusTip">
+            <string>Secondary currency transaction fee</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -311,8 +326,11 @@
            <property name="toolTip">
             <string>Click for help</string>
            </property>
+           <property name="statusTip">
+            <string>Click for help</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">border: none;</string>
+            <string notr="true">#swapRateHelpBtn{border: none;}</string>
            </property>
            <property name="text">
             <string/>
@@ -349,8 +367,11 @@
            <property name="toolTip">
             <string>Click for help</string>
            </property>
+           <property name="statusTip">
+            <string>Click for help</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">border: none;</string>
+            <string notr="true">#secTransFeeHelpButton{border: none;}</string>
            </property>
            <property name="text">
             <string/>
@@ -387,8 +408,11 @@
            <property name="toolTip">
             <string>Click for help</string>
            </property>
+           <property name="statusTip">
+            <string>Click for help</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">border: none;</string>
+            <string notr="true">#secAddressHelpBtn{border: none;}</string>
            </property>
            <property name="text">
             <string/>
@@ -436,6 +460,9 @@
             </size>
            </property>
            <property name="toolTip">
+            <string>This trade exchange rate</string>
+           </property>
+           <property name="statusTip">
             <string>This trade exchange rate</string>
            </property>
            <property name="text">
@@ -766,8 +793,11 @@
          <property name="toolTip">
           <string>Click for help</string>
          </property>
+         <property name="statusTip">
+          <string>Click for help</string>
+         </property>
          <property name="styleSheet">
-          <string notr="true">border: none;</string>
+          <string notr="true">#confNumberHelpButton{border: none;}</string>
          </property>
          <property name="text">
           <string/>
@@ -821,7 +851,10 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>Number of confirmations for MWC coin</string>
+          <string>Number of confirmations for MWC</string>
+         </property>
+         <property name="statusTip">
+          <string>Number of confirmations for MWC</string>
          </property>
          <property name="text">
           <string/>
@@ -865,6 +898,9 @@
           </size>
          </property>
          <property name="toolTip">
+          <string>Number of confirmations for secondary currency</string>
+         </property>
+         <property name="statusTip">
           <string>Number of confirmations for secondary currency</string>
          </property>
          <property name="text">
@@ -933,6 +969,9 @@
            <property name="toolTip">
             <string>Buy or Sell trade</string>
            </property>
+           <property name="statusTip">
+            <string>Buy or Sell trade</string>
+           </property>
            <item>
             <property name="text">
              <string>Buy</string>
@@ -973,6 +1012,9 @@
             </size>
            </property>
            <property name="toolTip">
+            <string>Amount of MWC coins to trade</string>
+           </property>
+           <property name="statusTip">
             <string>Amount of MWC coins to trade</string>
            </property>
            <property name="maxLength">
@@ -1016,6 +1058,9 @@
            <property name="toolTip">
             <string>Currency that you want to swap with</string>
            </property>
+           <property name="statusTip">
+            <string>Currency that you want to swap with</string>
+           </property>
           </widget>
          </item>
          <item>
@@ -1039,6 +1084,9 @@
             </size>
            </property>
            <property name="toolTip">
+            <string>Amount of coins to get</string>
+           </property>
+           <property name="statusTip">
             <string>Amount of coins to get</string>
            </property>
            <property name="maxLength">
@@ -1073,6 +1121,9 @@
          </size>
         </property>
         <property name="toolTip">
+         <string>Note for this swap trade</string>
+        </property>
+        <property name="statusTip">
          <string>Note for this swap trade</string>
         </property>
         <property name="text">

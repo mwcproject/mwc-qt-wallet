@@ -71,7 +71,7 @@ private slots:
     void onApplicationStateChange(Qt::ApplicationState state);
 
     // keybaseOnline is absolete
-    void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
+    void onSgnUpdateListenerStatus(bool mwcOnline, bool tor);
     void onSgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, int64_t totalDifficulty, int connections );
     void onSgnStartingCommand(QString command);
 

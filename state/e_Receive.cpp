@@ -59,10 +59,7 @@ NextStateRespond Receive::execute() {
     if ( context->appContext->getActiveWndState() != STATE::RECEIVE_COINS  )
         return NextStateRespond(NextStateRespond::RESULT::DONE);
 
-    if ( state::getStateMachine()->getCurrentStateId() != STATE::RECEIVE_COINS ) {
-        ftBack();
-    }
-
+    ftBack();
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
@@ -165,14 +162,14 @@ void Receive::onReceiveFile( bool success, QStringList errors, QString inFileNam
             QString dstFile = scrFileName.mid( scrFileName.lastIndexOf('/') );
             androidDevice->createFile( pickerInitialUri, "*/*", dstFile, 300 );
 #else
-            core::getWndManager()->messageTextDlg("Receive File Transaction",
-                                         "Transaction file was successfully signed. Resulting transaction located at " +
+            core::getWndManager()->messageTextDlg("Receive Slatepack Transaction",
+                                         "Transaction was successfully signed. Resulting transaction located at " +
                                          inFileName + ".response");
             ftBack();
 #endif
         } else {
             core::getWndManager()->messageTextDlg("Failure",
-                                         "Unable to receive file transaction.\n\n" + util::formatErrorMessages(errors));
+                                         "Unable to receive slatepack transaction.\n\n" + util::formatErrorMessages(errors));
         }
     }
 }
@@ -239,6 +236,15 @@ bool Receive::mobileBack() {
     else {
         ftBack();
         return true;
+    }
+}
+
+QString Receive::getHelpDocName() {
+    if (context->appContext->isFeatureMWCMQS() || context->appContext->isFeatureTor()) {
+        return "receive_online.html";
+    }
+    else {
+        return "receive_sp_only.html";
     }
 }
 

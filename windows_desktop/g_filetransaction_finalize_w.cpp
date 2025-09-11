@@ -156,11 +156,18 @@ void FileTransactionFinalize::on_processButton_clicked()
     }
     QString walletPasswordHash = wallet->getPasswordHash();
     if (!walletPasswordHash.isEmpty()) {
-            dlg::FinalizeConfirmationDlg confirmDlg(this, "Confirm Finalize Request",
-                                            "You are finalizing transaction for " + ui->mwcLabel->text(),
+        QString amount = ui->mwcLabel->text();
+        QString message;
+        if (amount!="-")
+            message = "You are finalizing transaction for " + ui->mwcLabel->text();
+        else
+            message = "You are finalizing transaction " + ui->transactionIdLabel->text();
+
+        dlg::FinalizeConfirmationDlg confirmDlg(this, "Confirm Finalize Request",
+                                            message,
                                             1.0, walletPasswordHash );
-            if (confirmDlg.exec() != QDialog::Accepted)
-                return;
+        if (confirmDlg.exec() != QDialog::Accepted)
+            return;
     }
     ui->progress->show();
 

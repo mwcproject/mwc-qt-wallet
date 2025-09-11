@@ -40,7 +40,10 @@ StatusWnd::StatusWnd(MainWindow* _mainWindow, bool _mainWindowDisplay) :
     if (mainWindowDisplay) {
         this->setParent(mainWindow);
 
-#if defined(Q_OS_MAC) || defined(Q_OS_WIN)
+    // MacOS ARM with QT v6 requres Qt::Tool flag, Qt::SubWindow doesn't work well
+#if (defined(Q_OS_MAC) && QT_VERSION >= 0x060000)
+        flags |= Qt::ToolTip;
+#elif defined(Q_OS_MAC) || defined(Q_OS_WIN)
         // Qt::Tool seems to pause when wallet loses focus on Mac
         // Qt::Tool on Windows causes some pop-ups to not appear on-screen but only in the task bar
         // Qt::SubWindow seems to keep running and stays with wallet and

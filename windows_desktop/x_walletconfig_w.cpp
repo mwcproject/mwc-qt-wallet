@@ -106,6 +106,11 @@ WalletConfig::WalletConfig(QWidget *parent) :
     ui->featureMWCMQS->setCheckState( featureMWCMQS ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
     ui->featureTor->setCheckState( featureTor ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
 
+    if (!config->isOnlineWallet()) {
+        ui->featureMWCMQS->hide();
+        ui->featureTor->hide();
+    }
+
     updateButtons();
 }
 
@@ -149,7 +154,10 @@ void WalletConfig::updateButtons() {
         ui->featureMWCMQS->isChecked() == walletConfig->isDefaultFeatureMWCMQS() &&
         ui->featureTor->isChecked() == walletConfig->isDefaultFeatureTor() &&
         ui->logout_20->isChecked() == true &&
-        ui->outputLockingCheck->isChecked() == false;
+        ui->outputLockingCheck->isChecked() == false &&
+        ui->notificationsEnabled->isChecked() == true &&
+        ui->lockLaterEnabled->isChecked() == true;
+
 
     ui->restoreDefault->setEnabled( !sameWithDefault );
     ui->applyButton->setEnabled( !sameWithCurrent );
@@ -177,6 +185,9 @@ void WalletConfig::on_restoreDefault_clicked()
     ui->featureMWCMQS->setCheckState( walletConfig->isDefaultFeatureMWCMQS() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
     ui->featureTor->setCheckState( walletConfig->isDefaultFeatureTor() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked );
 
+    ui->notificationsEnabled->setChecked(true);
+    ui->lockLaterEnabled->setChecked(true);
+
     updateButtons();
 }
 
@@ -203,9 +214,9 @@ bool WalletConfig::applyChanges() {
     }
 
     int changeOutputs = ui->changeOutputsEdit->text().trimmed().toInt(&ok);
-    if (!ok || changeOutputs <= 0 || changeOutputs >= 100) {
+    if (!ok || changeOutputs <= 0 || changeOutputs > 15) {
         control::MessageBox::messageText(this, "Input",
-                                         "Please input the change output number in the range from 1 to 100");
+                                         "Please input the change output number in the range from 1 to 15");
         ui->changeOutputsEdit->setFocus();
         return false;
     }

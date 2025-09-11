@@ -215,6 +215,9 @@
        <property name="toolTip">
         <string>Send MWC</string>
        </property>
+       <property name="statusTip">
+        <string>Send MWC</string>
+       </property>
        <property name="text">
         <string>Back</string>
        </property>
@@ -254,6 +257,9 @@
         <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
+        <string>Send MWC</string>
+       </property>
+       <property name="statusTip">
         <string>Send MWC</string>
        </property>
        <property name="text">

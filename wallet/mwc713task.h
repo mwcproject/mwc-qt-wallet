@@ -39,6 +39,8 @@ public:
 
     virtual void onStarted() {}
 
+    virtual bool isExitTask() {return false;}
+
     // Will be called from 'Ready' for normal tasks
     // Or in order as events coming for filtering tasks
     // Return true if data was processed. In this case processed evenets will be dropped

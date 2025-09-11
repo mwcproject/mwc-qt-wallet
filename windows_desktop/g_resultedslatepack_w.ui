@@ -48,6 +48,15 @@
        <pointsize>13</pointsize>
       </font>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
+     </property>
+     <property name="toolTip">
+      <string>Return back to starting point</string>
+     </property>
+     <property name="statusTip">
+      <string>Return back to starting point</string>
+     </property>
      <property name="styleSheet">
       <string notr="true"/>
      </property>
@@ -93,8 +102,11 @@
          <property name="toolTip">
           <string>Resulting slatepack. Please copy this string and send it to your recipient</string>
          </property>
+         <property name="statusTip">
+          <string>Resulting slatepack. Please copy this string and send it to your recipient</string>
+         </property>
          <property name="styleSheet">
-          <string notr="true">font-family: &quot;Courier&quot;</string>
+          <string notr="true">#slatepackContent{font-family: &quot;Courier&quot;}</string>
          </property>
          <property name="readOnly">
           <bool>true</bool>
@@ -153,7 +165,10 @@ p, li { white-space: pre-wrap; }
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Copy slatepack into the clipboard.</string>
+            <string>Copy slatepack into the clipboard</string>
+           </property>
+           <property name="statusTip">
+            <string>Copy slatepack into the clipboard</string>
            </property>
            <property name="text">
             <string>Copy to Clipboard</string>
@@ -199,6 +214,9 @@ p, li { white-space: pre-wrap; }
            <property name="toolTip">
             <string>Save the latepack in the file for your records</string>
            </property>
+           <property name="statusTip">
+            <string>Save the latepack in the file for your records</string>
+           </property>
            <property name="text">
             <string>Save Slatepack</string>
            </property>
@@ -240,10 +258,13 @@ p, li { white-space: pre-wrap; }
           </size>
          </property>
          <property name="toolTip">
-          <string>Replay slatepack to finalize this transaction.</string>
+          <string>Send the Slatepack back to the sender to finalize this transaction</string>
+         </property>
+         <property name="statusTip">
+          <string>Send the Slatepack back to the sender to finalize this transaction</string>
          </property>
          <property name="styleSheet">
-          <string notr="true">font-family: &quot;Courier&quot;</string>
+          <string notr="true">#finalizeSlatepack{font-family: &quot;Courier&quot;}</string>
          </property>
          <property name="readOnly">
           <bool>false</bool>
@@ -299,7 +320,10 @@ p, li { white-space: pre-wrap; }
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>return back to starting point</string>
+            <string>Return back to starting point</string>
+           </property>
+           <property name="statusTip">
+            <string>Return back to starting point</string>
            </property>
            <property name="text">
             <string>Back</string>
@@ -343,6 +367,9 @@ p, li { white-space: pre-wrap; }
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
+            <string>Finalize transaction</string>
+           </property>
+           <property name="statusTip">
             <string>Finalize transaction</string>
            </property>
            <property name="text">
@@ -475,6 +502,9 @@ p, li { white-space: pre-wrap; }
              <property name="toolTip">
               <string>Copy QR code into the clipboard.</string>
              </property>
+             <property name="statusTip">
+              <string>Copy QR code into the clipboard.</string>
+             </property>
              <property name="text">
               <string>Copy to Clipboard</string>
              </property>
@@ -501,7 +531,10 @@ p, li { white-space: pre-wrap; }
               <enum>Qt::StrongFocus</enum>
              </property>
              <property name="toolTip">
-              <string/>
+              <string>Save QR code image as png file</string>
+             </property>
+             <property name="statusTip">
+              <string>Save QR code image as png file</string>
              </property>
              <property name="text">
               <string>Save QR image</string>
@@ -527,9 +560,6 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="focusPolicy">
               <enum>Qt::StrongFocus</enum>
-             </property>
-             <property name="toolTip">
-              <string/>
              </property>
              <property name="text">
               <string>Back</string>

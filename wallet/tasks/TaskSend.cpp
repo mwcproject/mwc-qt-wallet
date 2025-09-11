@@ -247,11 +247,14 @@ bool TaskSelfSendMwc::processTask(const QVector<WEvent> &events) {
     return true;
 }
 
-QString TaskSelfSendMwc::buildCommand(const QString & accountTo, int64_t coinNano, const QStringList & outputs, bool fluff) const {
+QString TaskSelfSendMwc::buildCommand(const QString & accountTo, int64_t coinNano, int changeOutputs, const QStringList & outputs, bool fluff) const {
 
     QString cmd = "send --self ";// + util::nano2one(coinNano);
     if (coinNano>0)
         cmd += util::nano2one(coinNano);
+
+    if (changeOutputs > 0)
+        cmd += " --change-outputs " + QString::number(changeOutputs);
 
     if (!outputs.isEmpty()) {
         cmd += " --confirmations 1 --strategy custom --outputs " + outputs.join(",");

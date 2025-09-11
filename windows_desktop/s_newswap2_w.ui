@@ -110,6 +110,9 @@
          <property name="toolTip">
           <string>Message exchange and offer expiration time</string>
          </property>
+         <property name="statusTip">
+          <string>Message exchange and offer expiration time</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -129,8 +132,11 @@
          <property name="toolTip">
           <string>Click for help</string>
          </property>
+         <property name="statusTip">
+          <string>Click for help</string>
+         </property>
          <property name="styleSheet">
-          <string notr="true">border: none;</string>
+          <string notr="true">#offerEpirationHelpButton{border: none;}</string>
          </property>
          <property name="text">
           <string/>
@@ -224,6 +230,9 @@
          <property name="toolTip">
           <string>Time reserved to redeem the coins</string>
          </property>
+         <property name="statusTip">
+          <string>Time reserved to redeem the coins</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -243,8 +252,11 @@
          <property name="toolTip">
           <string>Click for help</string>
          </property>
+         <property name="statusTip">
+          <string>Click for help</string>
+         </property>
          <property name="styleSheet">
-          <string notr="true">border: none;</string>
+          <string notr="true">#secRedeemHelpButton{border: none;}</string>
          </property>
          <property name="text">
           <string/>
@@ -346,6 +358,9 @@
          <property name="toolTip">
           <string>Secondary currency transaction fee</string>
          </property>
+         <property name="statusTip">
+          <string>Secondary currency transaction fee</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -378,8 +393,11 @@
          <property name="toolTip">
           <string>Click for help</string>
          </property>
+         <property name="statusTip">
+          <string>Click for help</string>
+         </property>
          <property name="styleSheet">
-          <string notr="true">border: none;</string>
+          <string notr="true">#secTransFeeHelpButton{border: none;}</string>
          </property>
          <property name="text">
           <string/>
@@ -470,8 +488,11 @@
             <property name="toolTip">
              <string>Click for help</string>
             </property>
+            <property name="statusTip">
+             <string>Click for help</string>
+            </property>
             <property name="styleSheet">
-             <string notr="true">border: none;</string>
+             <string notr="true">#confNumberHelpButton{border: none;}</string>
             </property>
             <property name="text">
              <string/>
@@ -515,6 +536,9 @@
             <property name="toolTip">
              <string>Number of confirmations for MWC coin</string>
             </property>
+            <property name="statusTip">
+             <string>Number of confirmations for MWC coin</string>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -545,6 +569,9 @@
              </size>
             </property>
             <property name="toolTip">
+             <string>Number of confirmations for secondary currency</string>
+            </property>
+            <property name="statusTip">
              <string>Number of confirmations for secondary currency</string>
             </property>
             <property name="text">
@@ -755,7 +782,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Private ElectrumX hosp and port to connect</string>
+            <string>Private ElectrumX host and port to connect</string>
+           </property>
+           <property name="statusTip">
+            <string>Private ElectrumX host and port to connect</string>
            </property>
            <property name="text">
             <string/>
@@ -785,8 +815,11 @@
            <property name="toolTip">
             <string>Click for help</string>
            </property>
+           <property name="statusTip">
+            <string>Click for help</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">border: none;</string>
+            <string notr="true">#electrumXHelpButton{border: none;}</string>
            </property>
            <property name="text">
             <string/>
@@ -944,6 +977,9 @@
          <property name="toolTip">
           <string>Return back to first step</string>
          </property>
+         <property name="statusTip">
+          <string>Return back to first step</string>
+         </property>
          <property name="text">
           <string>Back</string>
          </property>
@@ -983,6 +1019,9 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
+          <string>Continue and review your trade parameters</string>
+         </property>
+         <property name="statusTip">
           <string>Continue and review your trade parameters</string>
          </property>
          <property name="text">

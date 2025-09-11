@@ -542,7 +542,6 @@ public:
 
     // Checking if wallet is listening through services
     virtual ListenerStatus getListenerStatus()  = 0;
-    virtual ListenerStatus getListenerStartState()  = 0;
 
     // Start listening through services
     virtual void listeningStart(bool startMq, bool startTor, bool initialStart)  = 0;
@@ -610,7 +609,7 @@ public:
     // Check and repair the wallet. Will take a while
     // Check Signals: onRecoverProgress( int progress, int maxVal );
     // Check Signals: onCheckResult(bool ok, QString errors );
-    virtual void check(bool wait4listeners)  = 0;
+    virtual void check()  = 0;
 
     // Get current configuration of the wallet.
     virtual const WalletConfig & getWalletConfig()  = 0;
@@ -687,7 +686,7 @@ public:
 
     // Self seld for accounts transfres
     // Check signal:  onSend
-    virtual void selfSend( const QString &accountFrom, const QString &accountTo, int64_t coinNano, const QStringList & outputs, bool fluff )  = 0;
+    virtual void selfSend( const QString &accountFrom, const QString &accountTo, int64_t coinNano, int changeOutputs, const QStringList & outputs, bool fluff )  = 0;
 
 
     // Airdrop special. Generating the next Public key for transaction

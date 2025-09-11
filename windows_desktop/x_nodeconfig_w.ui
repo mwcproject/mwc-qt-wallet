@@ -100,7 +100,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Apply those chages. Some changes might require login.</string>
+         <string>Apply changes (some may require login)</string>
+        </property>
+        <property name="statusTip">
+         <string>Apply changes (some may require login)</string>
         </property>
         <property name="text">
          <string>Apply</string>

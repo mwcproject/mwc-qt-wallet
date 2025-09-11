@@ -103,7 +103,7 @@ const QString PAGE_G_SEND_ONLINE    = "Send coins to address";
 const QString PAGE_G_SEND_SLATEPACK = "Send coins with Slatepack";
 const QString PAGE_G_FINALIZE_UPLOAD= "Finalize Transaction";
 const QString PAGE_G_FINALIZE_TRANS = "Finalize Transaction";
-const QString PAGE_G_RECEIVE_TRANS  = "Receive File Transaction";
+const QString PAGE_G_RECEIVE_TRANS  = "Receive Slatepack Transaction";
 const QString PAGE_G_SLATEPACK      = "Resulting Slatepack";
 
 const QString PAGE_K_ACCOUNTS       = "Accounts";
@@ -129,7 +129,7 @@ const QString PAGE_W_CONTACTS       = "Contacts";
 
 const QString PAGE_X_EVENTS         = "Notifications";
 const QString PAGE_X_SHOW_PASSPHRASE= "Wallet mnemonic passphrase";
-const QString PAGE_X_WALLET_CONFIG  = "Wallet Config";
+const QString PAGE_X_WALLET_CONFIG  = "Wallet Configuration";
 const QString PAGE_X_NODE_CONFIG    = "Node Config";
 const QString PAGE_X_RESYNC         = "Re-sync wallet with MWC Node";
 

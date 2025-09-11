@@ -83,6 +83,12 @@ To make sure that you have properly saved your passphrase, please retype here:</
          <height>40</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>You should backup your mnemonic phrase. Type mneminic word here and press Enter</string>
+       </property>
+       <property name="statusTip">
+        <string>You should backup your mnemonic phrase. Type mneminic word here and press Enter</string>
+       </property>
        <property name="maxLength">
         <number>64</number>
        </property>
@@ -135,7 +141,7 @@ To make sure that you have properly saved your passphrase, please retype here:</
       <widget class="control::MwcPushButtonNormal" name="submitButton">
        <property name="minimumSize">
         <size>
-         <width>120</width>
+         <width>180</width>
          <height>40</height>
         </size>
        </property>
@@ -147,6 +153,12 @@ To make sure that you have properly saved your passphrase, please retype here:</
        </property>
        <property name="focusPolicy">
         <enum>Qt::StrongFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Submit mnemonic word for verification</string>
+       </property>
+       <property name="statusTip">
+        <string>Submit mnemonic word for verification</string>
        </property>
        <property name="text">
         <string>Submit</string>
@@ -193,14 +205,14 @@ To make sure that you have properly saved your passphrase, please retype here:</
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelNormal</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

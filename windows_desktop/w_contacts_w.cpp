@@ -18,6 +18,7 @@
 #include "../control_desktop/messagebox.h"
 #include "../util_desktop/timeoutlock.h"
 #include "../bridge/config_b.h"
+#include "../bridge/util_b.h"
 
 namespace wnd {
 
@@ -28,6 +29,7 @@ Contacts::Contacts(QWidget *parent) :
     ui->setupUi(this);
 
     config = new bridge::Config(this);
+    util = new bridge::Util(this);
 
     initTableHeaders();
     updateContactTable();
@@ -56,10 +58,10 @@ void Contacts::initTableHeaders() {
     // Disabling to show the grid
     // Creatign columns
     QVector<int> widths = config->getColumnsWidhts("ContactsTblWidth");
-    if ( widths.size() != 3 ) {
-        widths = QVector<int>{30,100,500};
+    if ( widths.size() != 4 ) {
+        widths = QVector<int>{30,100,60,450};
     }
-    Q_ASSERT( widths.size() == 3 );
+    Q_ASSERT( widths.size() == 4 );
     ui->contactsTable->setColumnWidths( widths );
 }
 
@@ -81,8 +83,9 @@ void Contacts::updateContactTable() {
         ui->contactsTable->appendRow( QVector<QString>{
                                           QString::number(++idx),
                                           cont.name,
+                                            util->verifyAddress(cont.address),
                                           cont.address
-                                      } );
+                                      }, -1.0, false );
     }
 }
 

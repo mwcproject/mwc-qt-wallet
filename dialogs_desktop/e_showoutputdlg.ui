@@ -669,34 +669,6 @@
       </spacer>
      </item>
      <item>
-      <widget class="control::MwcPushButtonNormal" name="cancelButton">
-       <property name="minimumSize">
-        <size>
-         <width>140</width>
-         <height>40</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>140</width>
-         <height>40</height>
-        </size>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::StrongFocus</enum>
-       </property>
-       <property name="text">
-        <string>Cancel</string>
-       </property>
-       <property name="autoDefault">
-        <bool>false</bool>
-       </property>
-       <property name="default">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="control::MwcPushButtonNormal" name="okButton">
        <property name="minimumSize">
         <size>
@@ -745,14 +717,14 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelSmall</class>
@@ -768,7 +740,6 @@
  <tabstops>
   <tabstop>viewOutput</tabstop>
   <tabstop>outputNote</tabstop>
-  <tabstop>cancelButton</tabstop>
   <tabstop>okButton</tabstop>
  </tabstops>
  <resources/>

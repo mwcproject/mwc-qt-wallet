@@ -32,6 +32,7 @@ public:
     // Current active non model window. Will be used as a parent for dialogs
     QWidget * getCurrentWnd() const;
     MainWindow * getMainWindow() const {return mainWindow;}
+    void resetMainWnd() {mainWindow = nullptr;}
 
     //------------------  Message boxes ---------------
     //

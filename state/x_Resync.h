@@ -43,7 +43,6 @@ private slots:
 
 private:
     int prevState = STATE::TRANSACTIONS;
-    wallet::ListenerStatus  prevListeningStatus;
     int maxProgrVal = 100;
     // Need to recalibrate ther progress..
     // First few respond might be too fast

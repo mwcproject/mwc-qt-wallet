@@ -323,43 +323,28 @@ bool Send::sendMwcOnline( QString account, int64_t amount, QString address, QStr
         return false;
     }
 
-    const wallet::ListenerStatus listenerStart = context->wallet->getListenerStartState();
     const wallet::ListenerStatus listenerStatus = context->wallet->getListenerStatus();
 
     bool genProof = context->appContext->getGenerateProof();
 
     switch (addressRes.second) {
         case util::ADDRESS_TYPE::MWC_MQ: {
-            genProof = false; // for MQS we are getting proof legacy way. It will help with backward compability
-            if (!listenerStart.mqs) {
-                if (!context->appContext->isFeatureMWCMQS()) {
-                    core::getWndManager()->messageTextDlg("Listener is Offline",
-                            "You are trying to connect to another wallet with MWCMQS, but MWCMQS is disabled for your wallet. Please activate MWCMQS feature at wallet configuration page." );
-                }
-                else {
-                    core::getWndManager()->messageTextDlg("Listener is Offline",
-                            "MQS listener is not able to start. Please check your network and firewall." );
-                }
+            if (!context->appContext->isFeatureMWCMQS()) {
+                core::getWndManager()->messageTextDlg("Listener is Offline",
+                        "You are trying to connect to another wallet with MWCMQS, but MWCMQS is disabled for your wallet. Please activate MWCMQS feature at wallet configuration page." );
                 return false;
             }
             if (!listenerStatus.mqs) {
                 core::getWndManager()->messageTextDlg("Listener is Offline",
-                             "MQS listener is not online even it was started. Please check your network connection and firewall settings." );
+                             "MQS listener is offline. Please check your network connection and firewall settings." );
                 return false;
             }
             break;
         }
         case util::ADDRESS_TYPE::TOR: {
-            if (!listenerStart.tor) {
-
-                if (!context->appContext->isFeatureTor()) {
+            if (!context->appContext->isFeatureTor()) {
                     core::getWndManager()->messageTextDlg("Listener is Offline",
                                                           "You are trying to connect to another wallet with Tor, but Tor is disabled for your wallet. Please activate Tor feature at wallet configuration page." );
-                }
-                else {
-                    core::getWndManager()->messageTextDlg("Listener is Offline",
-                                                          "Tor listener is not able to start. Please check your network and firewall." );
-                }
                 return false;
             }
 
@@ -487,6 +472,17 @@ void Send::onNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHe
                     ((config::isColdWallet() || connections > 0) && totalDifficulty > 0 && nodeHeight > peerHeight - 5);
 }
 
+QString Send::getHelpDocName() {
+    bool isSp = context->appContext->isFeatureSlatepack();
+    bool isOnline = context->appContext->isFeatureMWCMQS() || context->appContext->isFeatureTor();
+
+    if (isSp & isOnline)
+        return "send_sp_online.html";
+    else if (isSp)
+        return "send_sp.html";
+    else
+        return "send_online.html";
+}
 
 }
 

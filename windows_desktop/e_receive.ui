@@ -78,7 +78,10 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>MWC MQS listener status</string>
+         <string>MWC MQS connection status</string>
+        </property>
+        <property name="statusTip">
+         <string>MWC MQS connection status</string>
         </property>
         <property name="text">
          <string/>
@@ -202,7 +205,10 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Tor listener status</string>
+         <string>Tor connection status</string>
+        </property>
+        <property name="statusTip">
+         <string>Tor connection status</string>
         </property>
         <property name="text">
          <string/>
@@ -309,8 +315,14 @@
             <height>40</height>
            </size>
           </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
           <property name="toolTip">
-           <string/>
+           <string>Choose the account that will receive the coins.</string>
+          </property>
+          <property name="statusTip">
+           <string>Choose the account that will receive the coins.</string>
           </property>
          </widget>
         </item>
@@ -358,6 +370,9 @@
            <enum>Qt::StrongFocus</enum>
           </property>
           <property name="toolTip">
+           <string>MWC MQS address of your wallet</string>
+          </property>
+          <property name="statusTip">
            <string>MWC MQS address of your wallet</string>
           </property>
           <property name="maxLength">
@@ -415,6 +430,9 @@
            <enum>Qt::StrongFocus</enum>
           </property>
           <property name="toolTip">
+           <string>Tor (onion) address of your wallet</string>
+          </property>
+          <property name="statusTip">
            <string>Tor (onion) address of your wallet</string>
           </property>
           <property name="maxLength">
@@ -483,6 +501,9 @@
              <enum>Qt::StrongFocus</enum>
             </property>
             <property name="toolTip">
+             <string>Sign income Slatepack Transaction</string>
+            </property>
+            <property name="statusTip">
              <string>Sign income Slatepack Transaction</string>
             </property>
             <property name="text">
@@ -631,12 +652,12 @@
    <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
+   <class>control::MwcLabelSmall</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelSmall</class>
+   <class>control::MwcLabelTiny</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
@@ -651,7 +672,7 @@
    <header>control_desktop/MwcComboBox.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelTiny</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>

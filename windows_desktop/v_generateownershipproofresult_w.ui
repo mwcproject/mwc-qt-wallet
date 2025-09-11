@@ -120,7 +120,10 @@ Please share this proof with the other party, allowing your peer to validate and
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Generate ownership proof for the message and selected items</string>
+         <string>Save ownership proof to file</string>
+        </property>
+        <property name="statusTip">
+         <string>Save ownership proof to file</string>
         </property>
         <property name="text">
          <string>Save to file</string>
@@ -157,7 +160,10 @@ Please share this proof with the other party, allowing your peer to validate and
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Return back to Viewing Key page</string>
+         <string>Back to Viewing Key page</string>
+        </property>
+        <property name="statusTip">
+         <string>Back to Viewing Key page</string>
         </property>
         <property name="text">
          <string>Back</string>
@@ -178,9 +184,6 @@ Please share this proof with the other party, allowing your peer to validate and
         <property name="acceptDrops">
          <bool>false</bool>
         </property>
-        <property name="toolTip">
-         <string/>
-        </property>
         <property name="lineWidth">
          <number>0</number>
         </property>
@@ -194,7 +197,7 @@ Please share this proof with the other party, allowing your peer to validate and
          <bool>false</bool>
         </property>
         <property name="placeholderText">
-         <string>Input your message used for signature</string>
+         <string>Enter the message to sign</string>
         </property>
        </widget>
       </widget>

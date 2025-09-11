@@ -43,6 +43,8 @@ AccountTransfer::AccountTransfer(QWidget *parent) :
     ui->progress->initLoader(false);
 
     onSgnUpdateAccounts();
+
+    ui->accountFromCB->setFocus();
 }
 
 AccountTransfer::~AccountTransfer()

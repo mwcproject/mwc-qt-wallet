@@ -198,7 +198,10 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Select MWC network that you new wallet will be connected to</string>
+         <string>Choose the MWC network to connect your new wallet.</string>
+        </property>
+        <property name="statusTip">
+         <string>Choose the MWC network to connect your new wallet.</string>
         </property>
         <property name="text">
          <string>MWC network</string>
@@ -264,7 +267,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Continue with new wallet provision</string>
+         <string>Continue setting up your new wallet.</string>
+        </property>
+        <property name="statusTip">
+         <string>Continue setting up your new wallet.</string>
         </property>
         <property name="text">
          <string>Submit</string>

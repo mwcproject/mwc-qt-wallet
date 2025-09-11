@@ -39,7 +39,7 @@ public:
 
 private slots:
     // keybaseOnline is absolete, keeping for compatibility
-    void onSgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
+    void onSgnUpdateListenerStatus(bool mwcOnline, bool tor);
     void onSgnMwcAddressWithIndex(QString mwcAddress, int idx);
     void onSgnListenerStartStop(bool mqs, bool tor); // _keybase is absolete
     void onSgnFileProofAddress(QString proofAddress); // tor address

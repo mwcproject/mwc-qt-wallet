@@ -99,7 +99,6 @@ public:
 
     // Checking if wallet is listening through services
     virtual ListenerStatus getListenerStatus() override;
-    virtual ListenerStatus getListenerStartState() override;
 
     // Start listening through services
     virtual void listeningStart(bool startMq, bool startTor, bool initialStart)  override;
@@ -163,7 +162,7 @@ public:
     // Check and repair the wallet. Will take a while
     // Check Signals: onRecoverProgress( int progress, int maxVal );
     // Check Signals: onCheckResult(bool ok, QString errors );
-    virtual void check(bool wait4listeners)  override;
+    virtual void check()  override;
 
     // Get current configuration of the wallet. will read from wallet713.toml file
     virtual const WalletConfig & getWalletConfig()  override;
@@ -252,7 +251,7 @@ public:
 
     // Self seld for accounts transfres
     // Check signal:  onSend
-    virtual void selfSend( const QString &accountFrom, const QString &accountTo, int64_t coinNano, const QStringList & outputs, bool fluff ) override;
+    virtual void selfSend( const QString &accountFrom, const QString &accountTo, int64_t coinNano, int changeOutputs, const QStringList & outputs, bool fluff ) override;
 
     // Show outputs for the wallet
     // Check Signal: onOutputs( QString account, int64_t height, QVector<WalletOutput> outputs)
@@ -460,14 +459,14 @@ public:
 
     void setGettedSeed( QVector<QString> seed );
 
-    void setListeningStartResults( bool mqTry, bool torTry, // what we try to start
+    void setListeningStartResults(  bool mqReq, bool torReq, bool mqTry, bool torTry, // what we try to start
             QStringList errorMessages, bool initialStart );
 
     void setListeningStopResult(bool mqTry, bool torTry, // what we try to stop
                                 QStringList errorMessages );
 
     // tid - thread ID that is responsible for listening. mwc713 can do start/stop async. tid will be used to find who is listening...
-    void setMwcMqListeningStatus(bool online, QString tid, bool startStopEvents); // Start stop event are major, they can change active tid
+    void setMwcMqListeningStatus(bool online, bool startStopEvents); // Start stop event are major, they can change active tid
     void setTorListeningStatus(bool online);
 
     void setRecoveryResults( bool started, bool finishedWithSuccess, QString newAddress, QStringList errorMessages );
@@ -669,9 +668,9 @@ private:
     QString torAddress; // Address from Tor listener
 
     // listening statuses
-    int listenersStatus = 0; // see LSTATE_XXXXX flags
-
-    QString activeMwcMqsTid; // MQS can be managed by many thredas, but only last started is active
+    uint32_t listenersStatus = 0; // see LSTATE_XXXXX flags
+    uint64_t nextMqStartTime = 0;
+    uint64_t nextTorStartTime = 0;
 
     // Connections to mwc713process
     QVector< QMetaObject::Connection > mwc713connections; // open connection to mwc713

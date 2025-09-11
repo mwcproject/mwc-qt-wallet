@@ -75,9 +75,9 @@ QString Util::verifyAddress(QString address) {
         return "unknown";
 
     switch (res.second) {
-        case util::ADDRESS_TYPE::HTTPS: return "https";
-        case util::ADDRESS_TYPE::TOR: return "tor";
-        case util::ADDRESS_TYPE::MWC_MQ: return "mwcmqs";
+        case util::ADDRESS_TYPE::HTTPS: return "HTTP(S)";
+        case util::ADDRESS_TYPE::TOR: return "SP/Tor";
+        case util::ADDRESS_TYPE::MWC_MQ: return "MQS";
         default: return "unknown";
     }
 }

@@ -61,6 +61,7 @@ private:
 
     void updateButtons();
 
+    bool isAddressMatchRequested(const QString & address) const;
 private:
     Ui::SelectContact *ui;
     bridge::Config * config = nullptr;

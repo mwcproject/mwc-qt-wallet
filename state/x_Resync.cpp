@@ -47,9 +47,7 @@ NextStateRespond Resync::execute() {
         prevState = STATE::TRANSACTIONS;
 
     // Starting recovery process
-    prevListeningStatus = context->wallet->getListenerStartState();
-
-    context->wallet->listeningStop(prevListeningStatus.mqs, prevListeningStatus.tor);
+    context->wallet->listeningStop(true, true);
 
     core::getWndManager()->pageProgressWnd(mwc::PAGE_X_RESYNC, RESYNC_CALLER_ID,
             "Re-sync with full node", "Preparing to re-sync", "", false);
@@ -62,7 +60,7 @@ NextStateRespond Resync::execute() {
     // We can't really be blocked form resync. Result will be looping with locking screen
     context->stateMachine->blockLogout("Resync");
 
-    context->wallet->check( prevListeningStatus.mqs || prevListeningStatus.tor );
+    context->wallet->check();
     // Check does full resync, no needs to 'sync'
     context->wallet->updateWalletBalance(false,false);
 
@@ -108,9 +106,7 @@ void Resync::onRecoverProgress( int progress, int maxVal ) {
 }
 
 void Resync::onCheckResult(bool ok, QString errors ) {
-
-    context->wallet->listeningStart(prevListeningStatus.mqs, prevListeningStatus.tor,true);
-    prevListeningStatus = wallet::ListenerStatus(); // reset status to all false.
+    context->wallet->listeningStart( context->appContext->isFeatureMWCMQS(), context->appContext->isFeatureTor(), true);
 
     for (auto b: bridge::getBridgeManager()->getProgressWnd()) {
         if (b->getCallerId() == RESYNC_CALLER_ID) {

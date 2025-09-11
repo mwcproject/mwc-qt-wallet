@@ -43,7 +43,7 @@ public:
     // Start one listen per request. mwc713 doesn't support both
     TaskListeningStart(MWC713 *wallet713, bool startMq, bool startTor, bool _initialStart, QString torBridgeLine, QString torClientOption ) :
             Mwc713Task("TaskListeningStart", calcProgressStr(startMq, startTor), calcCommand(startMq, startTor, torBridgeLine, torClientOption), wallet713,""),
-            initialStart(_initialStart)
+            reqStartMq(startMq), reqStartTor(startTor), initialStart(_initialStart)
     {}
 
     virtual ~TaskListeningStart() override {}
@@ -55,6 +55,8 @@ private:
     QString calcCommand(bool startMq, bool startTor, QString torBridgeLine, QString torClientOption) const;
     QString calcProgressStr(bool startMq, bool startTor) const;
 
+    bool reqStartMq;
+    bool reqStartTor;
     bool initialStart;
 };
 
@@ -66,7 +68,8 @@ public:
 
     // Start one listen per request. mwc713 doesn't support both
     TaskListeningStop(MWC713 *wallet713, bool stopMq, bool stopTor) :
-            Mwc713Task("TaskListeningStop", calcProgressStr(stopMq, stopTor), calcCommand(stopMq, stopTor), wallet713,"") {}
+            Mwc713Task("TaskListeningStop", calcProgressStr(stopMq, stopTor), calcCommand(stopMq, stopTor), wallet713,""),
+            reqStopMq(stopMq), reqStopTor(stopTor) {}
 
     virtual ~TaskListeningStop() override {}
 
@@ -76,6 +79,9 @@ public:
 private:
     QString calcCommand(bool stopMq, bool stopTor) const;
     QString calcProgressStr(bool startMq, bool startTor) const;
+
+    bool reqStopMq;
+    bool reqStopTor;
 };
 
 

@@ -93,7 +93,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Send MWC online with MWC MQS, HTTP(S) or TOR</string>
+         <string>Send MWC online with MWC MQS, TOR</string>
+        </property>
+        <property name="statusTip">
+         <string>Send MWC online with MWC MQS, TOR</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -212,6 +215,15 @@
           <height>40</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Choose the account to send MWC from</string>
+        </property>
+        <property name="statusTip">
+         <string>Choose the account to send MWC from</string>
+        </property>
        </widget>
        <widget class="control::MwcLineEditNormal" name="amountEdit">
         <property name="geometry">
@@ -241,6 +253,9 @@
          </size>
         </property>
         <property name="toolTip">
+         <string>Amount of MWC coins to send</string>
+        </property>
+        <property name="statusTip">
          <string>Amount of MWC coins to send</string>
         </property>
         <property name="maxLength">
@@ -278,7 +293,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Send all MWC in this account</string>
+         <string>Send entire MWC balance from this account</string>
+        </property>
+        <property name="statusTip">
+         <string>Send entire MWC balance from this account</string>
         </property>
         <property name="text">
          <string>All</string>
@@ -312,6 +330,9 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
+         <string>Send MWC. Continue with a next step.</string>
+        </property>
+        <property name="statusTip">
          <string>Send MWC. Continue with a next step.</string>
         </property>
         <property name="text">
@@ -359,6 +380,12 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
+        <property name="toolTip">
+         <string>The proof contains the full transaction and can be viewed by anyone. Keep it if you might need to resolve a dispute; skip it if privacy matters more.</string>
+        </property>
+        <property name="statusTip">
+         <string>The proof contains the full transaction and can be viewed by anyone. Keep it if you might need to resolve a dispute; skip it if privacy matters more.</string>
+        </property>
         <property name="text">
          <string>Generate Transaction Proof</string>
         </property>
@@ -379,7 +406,10 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Send MWC with Slatepack</string>
+         <string>Send MWC via Slatepack</string>
+        </property>
+        <property name="statusTip">
+         <string>Send MWC via Slatepack</string>
         </property>
         <property name="styleSheet">
          <string notr="true"/>

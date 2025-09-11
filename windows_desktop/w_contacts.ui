@@ -43,6 +43,12 @@
      </property>
      <item>
       <widget class="ListWithColumns" name="contactsTable">
+       <property name="toolTip">
+        <string>Your contacts</string>
+       </property>
+       <property name="statusTip">
+        <string>Your contacts</string>
+       </property>
        <column>
         <property name="text">
          <string>#</string>
@@ -51,6 +57,11 @@
        <column>
         <property name="text">
          <string>Name</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Type</string>
         </property>
        </column>
        <column>
@@ -99,13 +110,16 @@
           <cursorShape>PointingHandCursor</cursorShape>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Add new contact</string>
+          <string>Add contact</string>
+         </property>
+         <property name="statusTip">
+          <string>Add contact</string>
          </property>
          <property name="styleSheet">
-          <string notr="true">border:none</string>
+          <string notr="true">#addButton{border:none}</string>
          </property>
          <property name="text">
           <string/>
@@ -146,13 +160,16 @@
           <cursorShape>PointingHandCursor</cursorShape>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
           <string>Delete seleted contact</string>
          </property>
+         <property name="statusTip">
+          <string>Delete seleted contact</string>
+         </property>
          <property name="styleSheet">
-          <string notr="true">border:none</string>
+          <string notr="true">#deleteButton{border:none}</string>
          </property>
          <property name="text">
           <string/>
@@ -193,13 +210,16 @@
           <cursorShape>PointingHandCursor</cursorShape>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
           <string>Update selected contact</string>
          </property>
+         <property name="statusTip">
+          <string>Update selected contact</string>
+         </property>
          <property name="styleSheet">
-          <string notr="true">border:none</string>
+          <string notr="true">#editButton{border:none}</string>
          </property>
          <property name="text">
           <string/>

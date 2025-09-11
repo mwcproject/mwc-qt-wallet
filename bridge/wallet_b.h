@@ -36,11 +36,6 @@ public:
     // return true if Tor is online
     Q_INVOKABLE bool getTorListenerStatus();
 
-    // return true if MQS is started
-    Q_INVOKABLE bool isMqsListenerStarted();
-    // return true if Tor is started
-    Q_INVOKABLE bool isTorListenerStarted();
-
     // Request start/stop listeners. Feedback should come with sgnUpdateListenerStatus
     Q_INVOKABLE void requestStartMqsListener();
     Q_INVOKABLE void requestStopMqsListener();
@@ -165,7 +160,7 @@ signals:
     void sgnNewNotificationMessage(int level, QString message); // level: bridge::MESSAGE_LEVEL values
     void sgnConfigUpdate();
     // keybaseOnline  is absolete, always false
-    void sgnUpdateListenerStatus(bool mwcOnline, bool keybaseOnline, bool tor);
+    void sgnUpdateListenerStatus(bool mwcOnline, bool tor);
     void sgnUpdateNodeStatus( bool online, QString errMsg, int nodeHeight, int peerHeight, double totalDifficulty, int connections );
     void sgnUpdateSyncProgress(double progressPercent);
     void sgnWalletBalanceUpdated();

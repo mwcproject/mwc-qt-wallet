@@ -15,6 +15,7 @@
 #include "TaskRewindHash.h"
 #include "TaskWallet.h"
 #include "../mwc713.h"
+#include "tries/mwc713inputparser.h"
 
 namespace wallet {
 
@@ -62,6 +63,9 @@ bool TasksScanRewindHash::processTask(const QVector<WEvent> & events) {
 
         QString ln = evt.message;
         if (ln.contains("Error", Qt::CaseInsensitive)) {
+            ln = tries::mapMwc713Message(ln);
+            if (errors.contains(ln))
+                continue;
             if (errors.isEmpty())
                 errors += "\n";
             errors += ln;

@@ -35,6 +35,8 @@
 #include <QCoreApplication>
 #include <math.h>
 
+#include "util/Files.h"
+
 namespace node {
 
 
@@ -348,6 +350,10 @@ void MwcNode::nodeProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
             // Last try. Let's clean the data
             QDir dir(nodeWorkDir);
             dir.removeRecursively();
+            // Need to restore the secret, so the wallet will be able to connect to it
+            QDir().mkpath(nodeWorkDir);
+            util::writeTextFile(nodeWorkDir + "api_secret", QStringList{ nodeSecret} );
+
             notify::appendNotificationMessage( bridge::MESSAGE_LEVEL::CRITICAL, "Embedded mwc-node data was cleaned, probably it was corrupted");
         }
         // restart the node in 20 seconds. Stopping takes time

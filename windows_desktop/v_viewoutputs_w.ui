@@ -58,6 +58,9 @@
        <property name="toolTip">
         <string>Wallet viewing key</string>
        </property>
+       <property name="statusTip">
+        <string>Wallet viewing key</string>
+       </property>
        <property name="maxLength">
         <number>1024</number>
        </property>
@@ -105,7 +108,10 @@
           <enum>Qt::StrongFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Back to Viewing Keys</string>
+          <string>Back to Viewing Key page</string>
+         </property>
+         <property name="statusTip">
+          <string>Back to Viewing Key page</string>
          </property>
          <property name="text">
           <string>Back</string>

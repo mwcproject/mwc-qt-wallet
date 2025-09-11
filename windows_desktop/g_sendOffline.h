@@ -44,6 +44,8 @@ private slots:
     void on_contactsButton_clicked();
 
     void onSgnShowSendResult( bool success, QString message );
+    void on_recipientAddress_textEdited(const QString &arg1);
+
 private:
     Ui::SendOffline * ui;
     bridge::Util * util = nullptr;

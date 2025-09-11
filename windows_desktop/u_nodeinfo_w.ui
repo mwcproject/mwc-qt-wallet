@@ -491,8 +491,14 @@
            <height>40</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="toolTip">
-          <string>Re-sync your wallet with a full node. Please note, resync process will take time.</string>
+          <string>Re-sync your wallet with a full node. Resync process will take time.</string>
+         </property>
+         <property name="statusTip">
+          <string>Re-sync your wallet with a full node. Resync process will take time.</string>
          </property>
          <property name="text">
           <string>Re-sync with node</string>
@@ -519,7 +525,13 @@
            <height>40</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="toolTip">
+          <string>Change MWC Node that your wallet is connected to</string>
+         </property>
+         <property name="statusTip">
           <string>Change MWC Node that your wallet is connected to</string>
          </property>
          <property name="text">
@@ -547,8 +559,14 @@
            <height>40</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="toolTip">
-          <string>View this local MWC node Logs</string>
+          <string>View embedded MWC node Logs</string>
+         </property>
+         <property name="statusTip">
+          <string>View embedded MWC node Logs</string>
          </property>
          <property name="text">
           <string>Status Details</string>
@@ -591,8 +609,14 @@
            <height>40</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="toolTip">
-          <string>View this local MWC node Logs</string>
+          <string>View embedded MWC node Logs</string>
+         </property>
+         <property name="statusTip">
+          <string>View embedded MWC node Logs</string>
          </property>
          <property name="text">
           <string>Status Details</string>
@@ -619,7 +643,13 @@
            <height>40</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="toolTip">
+          <string>Export Blockchain data for Cold Wallet</string>
+         </property>
+         <property name="statusTip">
           <string>Export Blockchain data for Cold Wallet</string>
          </property>
          <property name="text">
@@ -647,7 +677,13 @@
            <height>40</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="toolTip">
+          <string>Publish Transaction from Cold Wallet</string>
+         </property>
+         <property name="statusTip">
           <string>Publish Transaction from Cold Wallet</string>
          </property>
          <property name="text">
@@ -675,7 +711,13 @@
            <height>40</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="toolTip">
+          <string>Resync Node data from the scratch. </string>
+         </property>
+         <property name="statusTip">
           <string>Resync Node data from the scratch. </string>
          </property>
          <property name="text">
@@ -719,8 +761,14 @@
            <height>40</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="toolTip">
-          <string>View this local MWC node Logs</string>
+          <string>View embedded MWC node Logs</string>
+         </property>
+         <property name="statusTip">
+          <string>View embedded MWC node Logs</string>
          </property>
          <property name="text">
           <string>Status Details</string>
@@ -747,7 +795,13 @@
            <height>40</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
          <property name="toolTip">
+          <string>Import blockchain data from Online Node</string>
+         </property>
+         <property name="statusTip">
           <string>Import blockchain data from Online Node</string>
          </property>
          <property name="text">
@@ -886,29 +940,17 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>control::MwcFrameWithBorder</class>
-   <extends>QFrame</extends>
-   <header>control_desktop/MwcFrameWithBorder.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>control::MwcPushButtonNormal</class>
    <extends>QPushButton</extends>
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
+   <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLine</class>
-   <extends>QFrame</extends>
-   <header>control_desktop/MwcFrameWithBorder.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelNormal</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
@@ -917,15 +959,29 @@
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
+  <customwidget>
+   <class>control::MwcLine</class>
+   <extends>QFrame</extends>
+   <header>control_desktop/MwcFrameWithBorder.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcFrameWithBorder</class>
+   <extends>QFrame</extends>
+   <header>control_desktop/MwcFrameWithBorder.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>showLogsButton_5</tabstop>
-  <tabstop>resyncNodeData</tabstop>
-  <tabstop>saveBlockchianData</tabstop>
-  <tabstop>publishTransaction</tabstop>
   <tabstop>showLogsButton</tabstop>
+  <tabstop>showLogsButton_9</tabstop>
+  <tabstop>resyncNodeData</tabstop>
   <tabstop>changeNodeButton</tabstop>
+  <tabstop>saveBlockchianData</tabstop>
   <tabstop>refreshButton</tabstop>
+  <tabstop>publishTransaction</tabstop>
+  <tabstop>loadBlockchainData_2</tabstop>
  </tabstops>
  <resources>
   <include location="../resources_desktop.qrc"/>

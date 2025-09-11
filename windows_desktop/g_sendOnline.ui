@@ -168,6 +168,12 @@
           <height>40</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>Recipient wallet address. Note, your peer wallet needs to be online to accept the payment.</string>
+        </property>
+        <property name="statusTip">
+         <string>Recipient wallet address. Note, your peer wallet needs to be online to accept the payment.</string>
+        </property>
         <property name="maxLength">
          <number>1024</number>
         </property>
@@ -203,7 +209,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Choose a contact to send to</string>
+         <string>Pick a contact to get the receiver’s wallet address</string>
+        </property>
+        <property name="statusTip">
+         <string>Pick a contact to get the receiver’s wallet address</string>
         </property>
         <property name="text">
          <string>Contacts</string>
@@ -237,45 +246,11 @@
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
-       <widget class="control::MwcPushButtonNormal" name="settingsBtn">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>387</y>
-          <width>214</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Click to change settings. Number of change outputs and required confirmations.</string>
-        </property>
-        <property name="text">
-         <string>Settings</string>
-        </property>
-       </widget>
        <widget class="control::MwcPushButtonNormal" name="sendButton">
         <property name="geometry">
          <rect>
-          <x>285</x>
-          <y>387</y>
+          <x>142</x>
+          <y>386</y>
           <width>214</width>
           <height>40</height>
          </rect>
@@ -301,6 +276,9 @@
         <property name="toolTip">
          <string>Send MWC</string>
         </property>
+        <property name="statusTip">
+         <string>Send MWC</string>
+        </property>
         <property name="text">
          <string>Send</string>
         </property>
@@ -309,9 +287,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>225</y>
+          <y>252</y>
           <width>500</width>
-          <height>100</height>
+          <height>60</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -323,13 +301,13 @@
         <property name="minimumSize">
          <size>
           <width>500</width>
-          <height>100</height>
+          <height>60</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>500</width>
-          <height>100</height>
+          <height>60</height>
          </size>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -365,11 +343,14 @@
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>150</height>
+             <height>120</height>
             </size>
            </property>
            <property name="toolTip">
-            <string>Input message for this transaction.</string>
+            <string>Optional note the recipient will see</string>
+           </property>
+           <property name="statusTip">
+            <string>Optional note the recipient will see</string>
            </property>
            <property name="placeholderText">
             <string>Description (optional)</string>
@@ -394,10 +375,10 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgba(255,255,255, 0.7)</string>
+         <string notr="true">#formatsLable{color: rgba(255,255,255, 0.7)}</string>
         </property>
         <property name="text">
-         <string>FORMATS:    [mwcmqs://]&lt;mqs_address&gt;  http(s)://&lt;host&gt;:&lt;port&gt;   [http://]&lt;tor_address&gt;[.onion]</string>
+         <string>FORMATS:    [mwcmqs://]&lt;mqs_address&gt;  [http://]&lt;tor_address&gt;[.onion]   http(s)://&lt;host&gt;:&lt;port&gt;</string>
         </property>
         <property name="textFormat">
          <enum>Qt::PlainText</enum>
@@ -539,17 +520,12 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelSmall</class>
+   <class>control::MwcLabelLarge</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
@@ -557,6 +533,11 @@
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelSmall</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcLabelTiny</class>
@@ -568,7 +549,6 @@
   <tabstop>sendEdit</tabstop>
   <tabstop>contactsButton</tabstop>
   <tabstop>descriptionEdit</tabstop>
-  <tabstop>settingsBtn</tabstop>
   <tabstop>sendButton</tabstop>
  </tabstops>
  <resources>

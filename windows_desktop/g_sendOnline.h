@@ -24,6 +24,7 @@ class SendOnline;
 namespace bridge {
 class Util;
 class Config;
+class WalletConfig;
 class Send;
 }
 
@@ -49,6 +50,7 @@ private:
     Ui::SendOnline *ui;
     bridge::Util * util = nullptr;
     bridge::Config * config = nullptr;
+    bridge::WalletConfig * walletConfig = nullptr;
     bridge::Send * send = nullptr;
 
     QString account;

@@ -336,6 +336,8 @@ void NodeInfo::onSubmitFile(bool success, QString message, QString fileName) {
 void NodeInfo::resetEmbeddedNodeData() {
     notify::notificationStateSet( notify::NOTIFICATION_STATES::ONLINE_NODE_IMPORT_EXPORT_DATA );
 
+    currentNodeConnection = getNodeConnection();
+
     Q_ASSERT(currentNodeConnection.isLocalNode());
     QString network = context->mwcNode->getCurrentNetwork();
     QPair<bool,QString> nodePath = node::getMwcNodePath(currentNodeConnection.localNodeDataPath, network);

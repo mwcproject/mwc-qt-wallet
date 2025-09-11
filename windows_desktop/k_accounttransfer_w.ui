@@ -77,6 +77,15 @@
            <height>40</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Choose the account to send MWC from</string>
+         </property>
+         <property name="statusTip">
+          <string>Choose the account to send MWC from</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -125,6 +134,15 @@
            <height>40</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Destination account for the coins</string>
+         </property>
+         <property name="statusTip">
+          <string>Destination account for the coins</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -158,6 +176,12 @@
              <width>16777215</width>
              <height>40</height>
             </size>
+           </property>
+           <property name="toolTip">
+            <string>Amount of MWC to send</string>
+           </property>
+           <property name="statusTip">
+            <string>Amount of MWC to send</string>
            </property>
            <property name="maxLength">
             <number>32</number>
@@ -200,8 +224,14 @@
            <property name="cursor">
             <cursorShape>PointingHandCursor</cursorShape>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
            <property name="toolTip">
-            <string>Send all MWC in this account</string>
+            <string>Send entire MWC balance from this account</string>
+           </property>
+           <property name="statusTip">
+            <string>Send entire MWC balance from this account</string>
            </property>
            <property name="text">
             <string>All</string>
@@ -248,7 +278,13 @@
            <property name="cursor">
             <cursorShape>PointingHandCursor</cursorShape>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
            <property name="toolTip">
+            <string>Return back to Account page</string>
+           </property>
+           <property name="statusTip">
             <string>Return back to Account page</string>
            </property>
            <property name="text">
@@ -270,31 +306,6 @@
           </spacer>
          </item>
          <item>
-          <widget class="control::MwcPushButtonNormal" name="settingsBtn">
-           <property name="minimumSize">
-            <size>
-             <width>150</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>150</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
-           <property name="toolTip">
-            <string>Click to change settings. Number of change outputs and required confirmations.</string>
-           </property>
-           <property name="text">
-            <string>Settings</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="control::MwcPushButtonNormal" name="transferButton">
            <property name="minimumSize">
             <size>
@@ -311,7 +322,13 @@
            <property name="cursor">
             <cursorShape>PointingHandCursor</cursorShape>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
            <property name="toolTip">
+            <string>Transfer MWC</string>
+           </property>
+           <property name="statusTip">
             <string>Transfer MWC</string>
            </property>
            <property name="text">
@@ -447,11 +464,6 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelProgress</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabelProgress.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
@@ -460,6 +472,11 @@
    <class>control::MwcLabelNormal</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelProgress</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
    <class>control::MwcComboBox</class>

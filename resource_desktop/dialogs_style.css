@@ -110,7 +110,7 @@ QPushButton:enabled:!focus::hover
 }
 
 QPushButton:focus {
-    background: #9E00E7;
+    background: #B468DE;
     color: white;
     border: 2px solid #9E00E7;
 }
@@ -121,7 +121,7 @@ QPushButton:disabled {
 }
 
 QPushButton:pressed {
-    background: #8500c3;
+    background: #AF4FE3;
 }
 
 control--MwcPushButtonRound {
@@ -197,6 +197,7 @@ QHeaderView::section {
 /* ---------  QToolTip   ------- */
 QToolTip {
     color: #6F00D6;
+    font-size: 13px;
 
     border: 1px solid #9759d0;
     border-radius: 3px;

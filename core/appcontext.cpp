@@ -858,7 +858,8 @@ QPair<QVector<QString>, int> AppContext::getWalletInstances(bool hasSeed) const 
                 if (selectedIdx<0)
                     selectedIdx = 0;
             }
-            Q_ASSERT(selectedIdx>=0 && selectedIdx<paths.size());
+            // On very forst run paths.size() is 0
+            Q_ASSERT(selectedIdx==0 || (selectedIdx>=0 && selectedIdx<paths.size()));
 
             return QPair<QVector<QString>, int> (paths, selectedIdx);
         }

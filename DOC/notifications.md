@@ -67,7 +67,7 @@ With support for notification windows, the following pop-ups no longer occur:
 
 # Disabling Notification Windows
 
-If you prefer to not have notification windows appear for your wallet, you can disable notification windows. In the Wallet Config settings screen, uncheck the checkbox next to Enable Notification Windows.
+If you prefer to not have notification windows appear for your wallet, you can disable notification windows. In the Wallet Configuration settings screen, uncheck the checkbox next to Enable Notification Windows.
 
 <img src="status_windows_images/image_10.png" max-width="300" height="300"/>
 

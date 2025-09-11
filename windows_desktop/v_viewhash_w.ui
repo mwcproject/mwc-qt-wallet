@@ -99,6 +99,9 @@
         <property name="toolTip">
          <string>Wallet viewing key</string>
         </property>
+        <property name="statusTip">
+         <string>Wallet viewing key</string>
+        </property>
         <property name="maxLength">
          <number>1024</number>
         </property>
@@ -176,7 +179,10 @@ p, li { white-space: pre-wrap; }
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Show this wallet viewing key</string>
+         <string>Reveal this wallet's viewing key</string>
+        </property>
+        <property name="statusTip">
+         <string>Reveal this wallet's viewing key</string>
         </property>
         <property name="text">
          <string>Show My Viewing Key</string>
@@ -204,7 +210,10 @@ p, li { white-space: pre-wrap; }
          </size>
         </property>
         <property name="toolTip">
-         <string>Input viewing key to see the balance</string>
+         <string>Enter viewing key to check balance</string>
+        </property>
+        <property name="statusTip">
+         <string>Enter viewing key to check balance</string>
         </property>
         <property name="maxLength">
          <number>1024</number>
@@ -257,7 +266,10 @@ p, li { white-space: pre-wrap; }
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Start skanning for outputs based on viewing key</string>
+         <string>Scan for outputs with this viewing key</string>
+        </property>
+        <property name="statusTip">
+         <string>Scan for outputs with this viewing key</string>
         </property>
         <property name="text">
          <string>Start scanning</string>
@@ -307,7 +319,10 @@ p, li { white-space: pre-wrap; }
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Generate ownership proof for this wallet Viewing Key, Tor and MWCMQS addresses</string>
+         <string>Create ownership proof for this wallet's viewing key, Tor, and MWC MQS addresses</string>
+        </property>
+        <property name="statusTip">
+         <string>Create ownership proof for this wallet's viewing key, Tor, and MWC MQS addresses</string>
         </property>
         <property name="text">
          <string>Generate ownership proof</string>
@@ -341,7 +356,10 @@ p, li { white-space: pre-wrap; }
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>View and validate other wallets ownership proof</string>
+         <string>View and verify ownership proofs from other wallets</string>
+        </property>
+        <property name="statusTip">
+         <string>View and verify ownership proofs from other wallets</string>
         </property>
         <property name="text">
          <string>View ownership proof</string>

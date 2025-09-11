@@ -88,6 +88,14 @@ void ValidateOwnershipProofInput::on_load_from_file_clicked()
 void ValidateOwnershipProofInput::on_validate_clicked()
 {
     QString proof = ui->proof_text->toPlainText();
+
+    auto valRes = util::validateMwc713Str(proof, true);
+    if (!valRes.first) {
+        control::MessageBox::messageText(this, "Incorrect Input", valRes.second);
+        ui->proof_text->setFocus();
+        return;
+    }
+
     if (!proof.isEmpty())
         viewAcounts->validate_proof(proof);
 }

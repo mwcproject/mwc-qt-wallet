@@ -137,6 +137,9 @@ bool Mwc713EventManager::hasTask(Mwc713Task * task) {
 //   idx == -1 - push_back, otherwise will insert into the index position
 // Return: true if task was added.  False - was ignored
 void Mwc713EventManager::addTask( TASK_PRIORITY priority, QVector< QPair<Mwc713Task*, int64_t>> tasks, int idx ) {
+    if (exiting)
+        return;
+
     QMutexLocker l( &taskQMutex );
 
     // timeout multiplier will be applied to the task because we want apply this value as late as possible.
@@ -198,6 +201,9 @@ int Mwc713EventManager::cancelTasksInQueue() {
 // Process next task
 void Mwc713EventManager::processNextTask() {
     QMutexLocker l( &taskQMutex );
+
+    if (exiting)
+        return;
 
     if (taskQ.empty()) {
         if (!lastWalletProgressCommand.isEmpty()) {
@@ -334,6 +340,9 @@ void Mwc713EventManager::executeTask(taskInfo task) {
     events.clear();
 
     task.task->processTask(evts);
+    if (task.task->isExitTask())
+        exiting = true;
+
     delete task.task;
 
     processNextTask();

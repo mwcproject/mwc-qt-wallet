@@ -22,8 +22,13 @@
 
 namespace tries {
 
-Mwc713InputParser::Mwc713InputParser() :
-        msgMapper(":/resource/mwc713_mappers.txt")
+QString mapMwc713Message(const QString & message) {
+     static notify::MessageMapper mapper(":/resource/mwc713_mappers.txt");
+     return mapper.processMessage(message);
+}
+
+
+Mwc713InputParser::Mwc713InputParser()
 {
     initWalletReady();
     initWelcome();
@@ -64,7 +69,7 @@ void Mwc713InputParser::processInput(QString message) {
         wallet::WALLET_EVENTS evt = (wallet::WALLET_EVENTS) res.parserId;
 
         if (evt == wallet::WALLET_EVENTS::S_GENERIC_ERROR || evt == wallet::WALLET_EVENTS::S_GENERIC_WARNING || evt == wallet::WALLET_EVENTS::S_GENERIC_INFO) {
-            QString m = msgMapper.processMessage(message);
+            QString m = mapMwc713Message(message);
             if (m != message) {
                 qDebug() << "Message is updated to " << m;
                 message = m;
@@ -215,7 +220,7 @@ void Mwc713InputParser::initListening() {
     // Stopping Tor listener...
     parser.appendLineParser( new TrieLineParser(wallet::WALLET_EVENTS::S_LISTENER_OFF,
                                                     QVector<BaseTrieSection*>{
-                                                            new TriePhraseSection("Stopping Tor listener")
+                                                            new TriePhraseSection("Tor listener has stopped.")
                                                     }));
 
     /////////////////  Listeners

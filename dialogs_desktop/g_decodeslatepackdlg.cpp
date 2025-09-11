@@ -57,6 +57,12 @@ void DecodeSlatepackDlg::decodeSlate(const QString &slatepack) {
         return;
     }
 
+    QPair <bool, QString> res = util::validateMwc713Str(slatepack, true);
+    if (!res.first) {
+        ui->slateDetailsLabel->setText(res.second);
+        return;
+    }
+
     spInProgress = slatepack;
     wallet->decodeSlatepack(slatepack, "DecodeSlatepackDlg");
 }

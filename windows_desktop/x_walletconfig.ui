@@ -64,6 +64,9 @@
        <pointsize>13</pointsize>
       </font>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
+     </property>
      <property name="styleSheet">
       <string notr="true"/>
      </property>
@@ -114,21 +117,48 @@
            <number>15</number>
           </property>
           <item>
-           <widget class="QCheckBox" name="featureSlatepack">
+           <widget class="control::MwcCheckBox" name="featureSlatepack">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Send, receive, or finalize MWC with Slatepacks - fully offline. Exchanges use Slatepacks for deposits and withdrawals.</string>
+            </property>
+            <property name="statusTip">
+             <string>Send, receive, or finalize MWC with Slatepacks - fully offline. Exchanges use Slatepacks for deposits and withdrawals.</string>
+            </property>
             <property name="text">
              <string>Slatepack</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="featureTor">
+           <widget class="control::MwcCheckBox" name="featureTor">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Send or receive MWC online via Tor - use when the other wallet has a Tor address.</string>
+            </property>
+            <property name="statusTip">
+             <string>Send or receive MWC online via Tor - use when the other wallet has a Tor address.</string>
+            </property>
             <property name="text">
              <string>Tor</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="featureMWCMQS">
+           <widget class="control::MwcCheckBox" name="featureMWCMQS">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Send or receive MWC online via MWC MQS - use when the other wallet has an MQS address.</string>
+            </property>
+            <property name="statusTip">
+             <string>Send or receive MWC online via MWC MQS - use when the other wallet has an MQS address.</string>
+            </property>
             <property name="text">
              <string>MWCMQS</string>
             </property>
@@ -231,6 +261,12 @@
                     <height>40</height>
                    </size>
                   </property>
+                  <property name="toolTip">
+                   <string>Change outputs per send transaction (set to 1 if unsure)</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Change outputs per send transaction (set to 1 if unsure)</string>
+                  </property>
                   <property name="maxLength">
                    <number>2</number>
                   </property>
@@ -264,6 +300,12 @@
                   <width>16777215</width>
                   <height>40</height>
                  </size>
+                </property>
+                <property name="toolTip">
+                 <string>Minimum confirmations needed to spend outputs</string>
+                </property>
+                <property name="statusTip">
+                 <string>Minimum confirmations needed to spend outputs</string>
                 </property>
                 <property name="maxLength">
                  <number>2</number>
@@ -342,6 +384,12 @@
                     <height>40</height>
                    </size>
                   </property>
+                  <property name="toolTip">
+                   <string>Wallet instance name - edit here</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Wallet instance name - edit here</string>
+                  </property>
                   <property name="maxLength">
                    <number>64</number>
                   </property>
@@ -375,6 +423,12 @@
                   <width>16777215</width>
                   <height>40</height>
                  </size>
+                </property>
+                <property name="toolTip">
+                 <string>Wallet data folder - back it up to preserve transaction history</string>
+                </property>
+                <property name="statusTip">
+                 <string>Wallet data folder - back it up to preserve transaction history</string>
                 </property>
                 <property name="readOnly">
                  <bool>true</bool>
@@ -436,12 +490,15 @@
                <number>20</number>
               </property>
               <item>
-               <widget class="QCheckBox" name="notificationsEnabled">
+               <widget class="control::MwcCheckBox" name="notificationsEnabled">
+                <property name="focusPolicy">
+                 <enum>Qt::StrongFocus</enum>
+                </property>
                 <property name="toolTip">
-                 <string/>
+                 <string>Critical alerts appear in the bottom-right corner of the wallet window</string>
                 </property>
                 <property name="statusTip">
-                 <string>Enable the display of status messages using windows in the lower right of the wallet.</string>
+                 <string>Critical alerts appear in the bottom-right corner of the wallet window</string>
                 </property>
                 <property name="text">
                  <string>Enable notification windows</string>
@@ -470,12 +527,15 @@
                <number>20</number>
               </property>
               <item>
-               <widget class="QCheckBox" name="lockLaterEnabled">
+               <widget class="control::MwcCheckBox" name="lockLaterEnabled">
+                <property name="focusPolicy">
+                 <enum>Qt::StrongFocus</enum>
+                </property>
                 <property name="toolTip">
-                 <string/>
+                 <string>Slatepack outputs lock at Send or Finalize - locked outputs can't be spent elsewhere</string>
                 </property>
                 <property name="statusTip">
-                 <string>Enable the display of status messages using windows in the lower right of the wallet.</string>
+                 <string>Slatepack outputs lock at Send or Finalize - locked outputs can't be spent elsewhere</string>
                 </property>
                 <property name="text">
                  <string>Lock outputs at finalization</string>
@@ -533,12 +593,21 @@
                <number>13</number>
               </property>
               <item row="1" column="1">
-               <widget class="QRadioButton" name="logout_30">
+               <widget class="control::MwcRadioButton" name="logout_30">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
                   <height>22</height>
                  </size>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>Auto-lock wallet after 30 min idle</string>
+                </property>
+                <property name="statusTip">
+                 <string>Auto-lock wallet after 30 min idle</string>
                 </property>
                 <property name="text">
                  <string>30 minutes</string>
@@ -546,12 +615,21 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QRadioButton" name="logout_20">
+               <widget class="control::MwcRadioButton" name="logout_20">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
                   <height>22</height>
                  </size>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>Auto-lock wallet after 20 min idle</string>
+                </property>
+                <property name="statusTip">
+                 <string>Auto-lock wallet after 20 min idle</string>
                 </property>
                 <property name="text">
                  <string>20 minutes</string>
@@ -559,12 +637,21 @@
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QRadioButton" name="logout_never">
+               <widget class="control::MwcRadioButton" name="logout_never">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
                   <height>22</height>
                  </size>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>Keep wallet unlocked</string>
+                </property>
+                <property name="statusTip">
+                 <string>Keep wallet unlocked</string>
                 </property>
                 <property name="text">
                  <string>Never</string>
@@ -572,12 +659,21 @@
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QRadioButton" name="logout_3">
+               <widget class="control::MwcRadioButton" name="logout_3">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
                   <height>22</height>
                  </size>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>Auto-lock wallet after 3 min idle</string>
+                </property>
+                <property name="statusTip">
+                 <string>Auto-lock wallet after 3 min idle</string>
                 </property>
                 <property name="text">
                  <string>3 minutes</string>
@@ -588,12 +684,21 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QRadioButton" name="logout_5">
+               <widget class="control::MwcRadioButton" name="logout_5">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
                   <height>22</height>
                  </size>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>Auto-lock wallet after 5 min idle</string>
+                </property>
+                <property name="statusTip">
+                 <string>Auto-lock wallet after 5 min idle</string>
                 </property>
                 <property name="text">
                  <string>5 minutes</string>
@@ -604,12 +709,21 @@
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QRadioButton" name="logout_10">
+               <widget class="control::MwcRadioButton" name="logout_10">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
                   <height>22</height>
                  </size>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>Auto-lock wallet after 10 min idle</string>
+                </property>
+                <property name="statusTip">
+                 <string>Auto-lock wallet after 10 min idle</string>
                 </property>
                 <property name="text">
                  <string>10 minutes</string>
@@ -656,7 +770,16 @@
              <number>10</number>
             </property>
             <item>
-             <widget class="QCheckBox" name="outputLockingCheck">
+             <widget class="control::MwcCheckBox" name="outputLockingCheck">
+              <property name="focusPolicy">
+               <enum>Qt::StrongFocus</enum>
+              </property>
+              <property name="toolTip">
+               <string>On the Outputs page you can manually lock outputs to prevent them from being spent</string>
+              </property>
+              <property name="statusTip">
+               <string>On the Outputs page you can manually lock outputs to prevent them from being spent</string>
+              </property>
               <property name="text">
                <string>Enable manual output locking</string>
               </property>
@@ -687,7 +810,16 @@
              <number>12</number>
             </property>
             <item>
-             <widget class="QCheckBox" name="logsEnableBtn">
+             <widget class="control::MwcCheckBox" name="logsEnableBtn">
+              <property name="focusPolicy">
+               <enum>Qt::StrongFocus</enum>
+              </property>
+              <property name="toolTip">
+               <string>Wallet logs are saved to ~/mwc-qt-wallet/logs/mwcwallet.log. They're useful for troubleshooting but may contain private data—disable if privacy is a concern.</string>
+              </property>
+              <property name="statusTip">
+               <string>Wallet logs are saved to ~/mwc-qt-wallet/logs/mwcwallet.log. They're useful for troubleshooting but may contain private data—disable if privacy is a concern.</string>
+              </property>
               <property name="text">
                <string>Enable MWC wallet logs</string>
               </property>
@@ -755,7 +887,13 @@
                  </size>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::ClickFocus</enum>
+                 <enum>Qt::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>UI font scale (restart required)</string>
+                </property>
+                <property name="statusTip">
+                 <string>UI font scale (restart required)</string>
                 </property>
                 <property name="text">
                  <string>...</string>
@@ -790,7 +928,13 @@
                  </size>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::ClickFocus</enum>
+                 <enum>Qt::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>UI font scale (restart required)</string>
+                </property>
+                <property name="statusTip">
+                 <string>UI font scale (restart required)</string>
                 </property>
                 <property name="text">
                  <string>...</string>
@@ -825,7 +969,13 @@
                  </size>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::ClickFocus</enum>
+                 <enum>Qt::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>UI font scale (restart required)</string>
+                </property>
+                <property name="statusTip">
+                 <string>UI font scale (restart required)</string>
                 </property>
                 <property name="text">
                  <string>...</string>
@@ -860,7 +1010,13 @@
                  </size>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::ClickFocus</enum>
+                 <enum>Qt::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>UI font scale (restart required)</string>
+                </property>
+                <property name="statusTip">
+                 <string>UI font scale (restart required)</string>
                 </property>
                 <property name="text">
                  <string>...</string>
@@ -1017,7 +1173,10 @@
         <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Restore default settings for the wallet.</string>
+        <string>Reset to default settings</string>
+       </property>
+       <property name="statusTip">
+        <string>Reset to default settings</string>
        </property>
        <property name="text">
         <string>Reset</string>
@@ -1045,7 +1204,10 @@
         <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Apply those chages. Some changes might require login.</string>
+        <string>Apply changes (some may require login)</string>
+       </property>
+       <property name="statusTip">
+        <string>Apply changes (some may require login)</string>
        </property>
        <property name="text">
         <string>Apply</string>
@@ -1108,6 +1270,16 @@
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcRadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>control_desktop/MwcRadioButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>control_desktop/MwcCheckBox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

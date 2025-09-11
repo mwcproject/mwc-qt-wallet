@@ -207,9 +207,8 @@ void Receive::onSgnFileProofAddress(QString proofAddress) {
 }
 
 // keybaseOnline is absolete
-void Receive::onSgnUpdateListenerStatus(bool mqsOnline, bool keybaseOnline, bool torOnline) {
+void Receive::onSgnUpdateListenerStatus(bool mqsOnline, bool torOnline) {
     Q_UNUSED(mqsOnline)
-    Q_UNUSED(keybaseOnline)
     Q_UNUSED(torOnline)
     updateStatus();
 }

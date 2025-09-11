@@ -2,22 +2,39 @@
 <html><body style="font-family:'Open Sans'; font-size:medium; font-weight:normal; font-style:normal; color:#5300CF; background-color:transparent;">
 <p align="center" style="font-size:small;"><br/></p>
 <p align="center" style="line-height:150%; font-size:xx-large;">Wallet Configuration</p>
-<p style="line-height:150%;">This page allows the user to set specific parameters for the wallet. The parameters are as follows:</p>
-<ol style="-qt-list-indent: 1; margin: 10pt">
-    <li style="line-height:150%;">Wallet folder name - This parameter is the folder where all of the configuration and logging is stored.
-        You can have multiple folders which store alternate instances of the MWC QT Wallet. Change this value to create a new folder.
-        <br/>Note: that if you change this option you will be logged out and need to log in again.</li>
-    <li style="line-height:150%;">MWCMQ Domain - This is the MWCMQ domain to connect to. By default, the mwcmq domain is <u>mq.mwc.mw</u>.
-        We operate this mwcmq, but anyone can operate an mwcmq instance and host a separate domain.
-        Since there is federation, you can send to another domain. You just need to specify this in the send tab address field.
-        For instance, if you wanted to send to example.com, you'd specify &lt;address&gt;@example.com. It might look like this:
-        q5i6TWUBnX1jWBxYdi8ByHGm17mSFJH5gAUWsboWo5kcMbr9vsAN@example.com. Generally most users will use the default settings here.</li>
-    <li style="line-height:150%;">Number of confirmations - this is the number of confirmations before funds are available.
-        By default, this will be set to 10 confirmations (note: the confirmation time is 1 minute, as opposed to Bitcoin which has 10 minute confirmations).
-        This can be set to as low as 1 confirmation if desired.</li>
-    <li style="line-height:150%;">Change outputs - this is the number of change outputs. This feature is primarily used for
-        debugging by developers, but generally a single change address is used, but more than one may be specified here.<br>Note: higher transaction fees will apply.</li>
-</ol>
+<p style="line-height:150%;">This page allows you to set key parameters for your wallet. The available options are:</p>
+
+<p style="line-height:150%;"><strong>Active features</strong> – Select the sending methods you want to use.<br>
+    - Exchanges typically use <strong>Slatepacks</strong>.<br>
+    - To send MWC directly to peers online, you may use <strong>Tor</strong> or <strong>MWCMQS</strong>.<br>
+    <em>Note: Online methods require both the sender and receiver wallets to be online.</em></p>
+
+<p style="line-height:150%;"><strong>Number of confirmations</strong> – The number of confirmations required before funds are spendable.<br>
+    - Default: <strong>10 confirmations</strong> (about 1 minute each, compared to Bitcoin’s 10 minutes).<br>
+    - You can reduce this to <strong>1 confirmation</strong> if desired, but more confirmations increase security.</p>
+
+<p style="line-height:150%;"><strong>Change outputs</strong> – The number of change outputs created in a transaction.<br>
+    - Normally, <strong>1 change output</strong> is sufficient.<br>
+    - Developers may specify more for debugging.<br>
+    <em>Note: More outputs result in higher transaction fees.</em></p>
+
+<p style="line-height:150%;"><strong>Wallet instance name</strong> – The name this wallet instance. Specify any name that you like.</p>
+
+<p style="line-height:150%;"><strong>Wallet data path</strong> – Data location for your wallet. You can backup this data, so your transaction history will be safe.</p>
+
+<p style="line-height:150%;"><strong>Enable notification windows</strong> – Turn on popup notifications in the bottom-right corner of the wallet.</p>
+
+<p style="line-height:150%;"><strong>Lock outputs at finalization</strong> – Choose when funds are locked during a send:<br>
+    - At <strong>initiation</strong> (default), or<br>
+    - At <strong>finalization</strong>, keeping funds available until the transaction is finalized.<br>
+    <em>Locked funds can't be used for another send transaction. To unlock the funds, you can cancel transaction.</em></p>
+
+<p style="line-height:150%;"><strong>Auto-Logout</strong> – Automatically locks the wallet after a set period of inactivity.</p>
+
+<p style="line-height:150%;"><strong>Logs</strong> – Diagnostic logs are stored at  ~/mwc-qt-wallet/logs/mwcwallet.log<br>
+    - Useful for troubleshooting.<br>
+    - May contain private information, so disable logging if privacy is more important than debugging.</p>
+
 
 <div align="center" style="font-size:small; font-weight:normal; font-style:normal; color:#9a55d9; background-color:transparent;">
 <p>Any Questions</p>

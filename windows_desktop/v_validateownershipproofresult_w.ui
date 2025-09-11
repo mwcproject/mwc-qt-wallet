@@ -93,7 +93,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Return back to Viewing Key page</string>
+         <string>Back to Viewing Key page</string>
+        </property>
+        <property name="statusTip">
+         <string>Back to Viewing Key page</string>
         </property>
         <property name="text">
          <string>Back</string>
@@ -140,7 +143,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Name of the network for this proof</string>
+         <string>Blockchain network for this proof</string>
+        </property>
+        <property name="statusTip">
+         <string>Blockchain network for this proof</string>
         </property>
         <property name="maxLength">
          <number>1024</number>
@@ -209,7 +215,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Viewing key, can be user to view funds on this account</string>
+         <string>Viewing key - share it to let others see this account's balance</string>
+        </property>
+        <property name="statusTip">
+         <string>Viewing key - share it to let others see this account's balance</string>
         </property>
         <property name="maxLength">
          <number>1024</number>
@@ -262,6 +271,9 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
+         <string>Tor address</string>
+        </property>
+        <property name="statusTip">
          <string>Tor address</string>
         </property>
         <property name="maxLength">
@@ -317,6 +329,9 @@
         <property name="toolTip">
          <string>MWC MQS address</string>
         </property>
+        <property name="statusTip">
+         <string>MWC MQS address</string>
+        </property>
         <property name="maxLength">
          <number>1024</number>
         </property>
@@ -343,7 +358,10 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string>Proof message used to generate signature</string>
+         <string>Message that was signed to create this proof</string>
+        </property>
+        <property name="statusTip">
+         <string>Message that was signed to create this proof</string>
         </property>
         <property name="lineWidth">
          <number>0</number>

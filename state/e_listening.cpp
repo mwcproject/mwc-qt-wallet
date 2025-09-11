@@ -30,18 +30,8 @@ Listening::Listening(StateContext * context) :
     State(context, STATE::LISTENING )
 {
     // Let's establish connectoins at the beginning
-
-    QObject::connect(context->wallet, &wallet::Wallet::onListeningStartResults,
-                                         this, &Listening::onListeningStartResults, Qt::QueuedConnection);
-
-    QObject::connect(context->wallet, &wallet::Wallet::onListeningStopResult,
-                                         this, &Listening::onListeningStopResult, Qt::QueuedConnection);
-
     QObject::connect(context->wallet, &wallet::Wallet::onListenerMqCollision,
-                     this, &Listening::onListenerMqCollision, Qt::QueuedConnection);
-
-    QObject::connect(notify::Notification::getObject2Notify(), &notify::Notification::onNewNotificationMessage,
-                     this, &Listening::onNewNotificationMessage, Qt::QueuedConnection);
+                 this, &Listening::onListenerMqCollision, Qt::QueuedConnection);
 }
 
 Listening::~Listening() {
@@ -58,57 +48,10 @@ NextStateRespond Listening::execute() {
     return NextStateRespond( NextStateRespond::RESULT::WAIT_FOR_ACTION );
 }
 
-
-// Listening, you will not be able to get a results
-void Listening::onListeningStartResults( bool mqTry, bool torTry, // what we try to start
-                               QStringList errorMessages, bool initialStart ) // error messages, if get some
-{
-    Q_UNUSED(mqTry)
-    Q_UNUSED(torTry)
-
-    if ( !errorMessages.empty() && !initialStart ) {
-        QString msg;
-        for (auto & s : errorMessages)
-            msg += s + '\n';
-
-        if (msg.contains("mwcmq") && msg.contains("already started") ) {
-            msg = "MWC MQS listener is running, but it lost connection and trying to reconnect in background. Please check your network connection.";
-        }
-
-        core::getWndManager()->messageTextDlg("Start listener Error", msg);
-    }
-}
-
-void Listening::onListeningStopResult(bool mqTry, bool torTry, // what we try to stop
-                            QStringList errorMessages ) {
-    Q_UNUSED(mqTry)
-    Q_UNUSED(torTry)
-
-    if (!errorMessages.empty()) {
-        QString msg;
-        for (auto & s : errorMessages)
-            msg += s + "\n";
-
-        core::getWndManager()->messageTextDlg("Stop listener Error", msg);
-    }
-}
-
 void Listening::onListenerMqCollision() {
     core::getWndManager()->messageTextDlg("MWC MQS new login detected",
             "New login to MWC MQS detected. Only one instance of your wallet can be connected to MWC MQS.\n"
-            "Listener is stopped. You can activate listener from 'Listening' page.");
-}
-
-// Looking for "Failed to start mwcmqs subscriber. Error connecting to mqs.mwc.mw:443"
-void Listening::onNewNotificationMessage(bridge::MESSAGE_LEVEL level, QString message) {
-    Q_UNUSED(level);
-    // We are not relying to the window, but checking if it is active
-    if ( message.contains("Failed to start mwcmqs subscriber") ) {
-        if (lastShownErrorMessage!=message) {
-            core::getWndManager()->messageTextDlg("Start listening Error", message);
-            lastShownErrorMessage=message;
-        }
-    }
+            "Listener is stopped. Please close your other instance and restart this wallet to start use MWCMQS.");
 }
 
 

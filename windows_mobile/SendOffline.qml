@@ -235,7 +235,7 @@ Item {
             let recipientWallet
             if (isSlatepack) {
                 recipientWallet = textfield_address.text
-                if (recipientWallet !== "" && util.verifyAddress(recipientWallet) !== "tor") {
+                if (recipientWallet !== "" && util.verifyAddress(recipientWallet) !== "SP/Tor") {
                     messagebox.open(qsTr("Unable to send"), qsTr("Please specify valid recipient wallet address"))
                     textfield_address.focus = true
                     return

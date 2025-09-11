@@ -22,8 +22,14 @@
      <height>38</height>
     </rect>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
    <property name="toolTip">
-    <string>History of wallet events</string>
+    <string>View wallet events</string>
+   </property>
+   <property name="statusTip">
+    <string>View wallet events</string>
    </property>
    <property name="text">
     <string>...</string>
@@ -57,7 +63,13 @@
      <height>38</height>
     </rect>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
    <property name="toolTip">
+    <string>Wallet settings</string>
+   </property>
+   <property name="statusTip">
     <string>Wallet settings</string>
    </property>
    <property name="text">
@@ -92,7 +104,13 @@
      <height>38</height>
     </rect>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
    <property name="toolTip">
+    <string>Account options</string>
+   </property>
+   <property name="statusTip">
     <string>Account options</string>
    </property>
    <property name="text">

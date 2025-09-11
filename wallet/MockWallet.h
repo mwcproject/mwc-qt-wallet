@@ -99,8 +99,6 @@ public:
     // Checking if wallet is listening through services
     virtual ListenerStatus getListenerStatus() override { return ListenerStatus(listener_mwcmqs, listener_tor); }
 
-    virtual ListenerStatus getListenerStartState() override { return ListenerStatus(listener_mwcmqs, listener_tor); }
-
     // Start listening through services
     // Check Signal: onStartListening
     virtual void listeningStart(bool startMq, bool startTor, bool initialStart)  override;
@@ -159,7 +157,7 @@ public:
     // Check and repair the wallet. Will take a while
     // Check Signals: onRecoverProgress( int progress, int maxVal );
     // Check Signals: onCheckResult(bool ok, QString errors );
-    virtual void check(bool wait4listeners)  override;
+    virtual void check()  override;
 
     // Get current configuration of the wallet. will read from wallet713.toml file
     virtual const WalletConfig & getWalletConfig() override;

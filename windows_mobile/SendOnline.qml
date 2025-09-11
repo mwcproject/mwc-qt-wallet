@@ -147,7 +147,7 @@ Item {
         }
         onTextChanged: {
 //            const addrType = util.verifyAddress(textfield_send_to.text)
-//            if ( addrType === "https" || addrType ==="tor" )
+//            if ( addrType === "HTTP(S)" || addrType ==="SP/Tor" )
 //                textfield_api_secret.visible = true
 //            else
 //                textfield_api_secret.visible = false

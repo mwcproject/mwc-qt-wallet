@@ -50,6 +50,7 @@ ReceiveSpOnly::ReceiveSpOnly(QWidget *parent) :
 
     ui->progress->initLoader(false);
     ui->slatepack_status->hide();
+    ui->continueButton->setEnabled(false);
 
     updateAccountList();
 

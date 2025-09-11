@@ -52,6 +52,12 @@ void SelectContact::updateButtons() {
     ui->addButton->setEnabled(true);
     ui->editButton->setEnabled(idx>=0);
     ui->deleteButton->setEnabled(idx>=0);
+
+    bool canSelect = false;
+    if (idx>=0) {
+        canSelect = isAddressMatchRequested(contacts[idx].address);
+    }
+    ui->selectButton->setEnabled(canSelect);
 }
 
 
@@ -65,10 +71,10 @@ void SelectContact::initTableHeaders() {
     // Disabling to show the grid
     // Creatign columns
     QVector<int> widths = config->getColumnsWidhts("ContactsTable");
-    if ( widths.size() != 3 ) {
-        widths = QVector<int>{35,150,600};
+    if ( widths.size() != 4 ) {
+        widths = QVector<int>{35,150,70,550};
     }
-    Q_ASSERT( widths.size() == 3 );
+    Q_ASSERT( widths.size() == 4 );
     ui->contactsTable->setColumnWidths( widths );
 }
 
@@ -90,18 +96,16 @@ void SelectContact::updateContactTable(const QString & searchStr) {
         QString name = contactPairs[k-1];
         QString address = contactPairs[k];
 
-        QString addressType = util->verifyAddress(address);
-        if ((addressType=="tor" && showTor) ||
-                (addressType=="mwcmqs" && showMQS) ||
-                (addressType=="https" && showHttp) ) {
-            if (searchStr.isEmpty() || name.contains(searchStr)) {
-                ui->contactsTable->appendRow(QVector<QString>{
-                        QString::number(contacts.size() + 1),
-                        name,
-                        address
-                });
-                contacts.push_back(core::ContactRecord(name, address));
-            }
+        bool highlight = isAddressMatchRequested(address);
+
+        if (searchStr.isEmpty() || name.toLower().contains(searchStr.toLower())) {
+            ui->contactsTable->appendRow(QVector<QString>{
+                    QString::number(contacts.size() + 1),
+                    name,
+                       util->verifyAddress(address),
+                    address
+            }, -1.0, highlight);
+            contacts.push_back(core::ContactRecord(name, address));
         }
     }
 }
@@ -129,6 +133,26 @@ void SelectContact::on_selectButton_clicked()
 
     if ( idx<0 || idx>=contacts.size() ) {
         control::MessageBox::messageText(this, "Need info", "Please select a contact that you are going to use");
+        return;
+    }
+
+    bool canSelect = isAddressMatchRequested(contacts[idx].address);
+    if (!canSelect) {
+        QString types = "";
+        if (showHttp)
+            types += "HTTP(S)";
+        if (showTor) {
+            if (!types.isEmpty())
+                types += ", ";
+            types += "SP/Tor";
+        }
+        if (showMQS) {
+            if (!types.isEmpty())
+                types += ", ";
+            types += "MQS";
+        }
+
+        control::MessageBox::messageText(this, "Invalid address type", "Please select a contact with " + types + " address type." );
         return;
     }
 
@@ -219,6 +243,14 @@ void SelectContact::on_editButton_clicked()
 void SelectContact::on_contactsTable_itemSelectionChanged()
 {
     updateButtons();
+}
+
+bool SelectContact::isAddressMatchRequested(const QString & address) const {
+    QString addressType = util->verifyAddress(address);
+
+    return (addressType=="SP/Tor" && showTor) ||
+            (addressType=="MQS" && showMQS) ||
+            (addressType=="HTTP(S)" && showHttp);
 }
 
 }

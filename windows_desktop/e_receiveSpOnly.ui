@@ -111,8 +111,14 @@
             <height>40</height>
            </size>
           </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
           <property name="toolTip">
-           <string/>
+           <string>Choose the account that will receive the coins.</string>
+          </property>
+          <property name="statusTip">
+           <string>Choose the account that will receive the coins.</string>
           </property>
          </widget>
         </item>
@@ -160,6 +166,9 @@
            <enum>Qt::StrongFocus</enum>
           </property>
           <property name="toolTip">
+           <string>Tor (onion) address of your wallet</string>
+          </property>
+          <property name="statusTip">
            <string>Tor (onion) address of your wallet</string>
           </property>
           <property name="maxLength">
@@ -210,7 +219,7 @@
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">font-family: &quot;Courier&quot;</string>
+           <string notr="true">#slatepackEdit{font-family: &quot;Courier&quot;}</string>
           </property>
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -438,6 +447,11 @@
    <header>control_desktop/MwcLabel.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelNormal</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>control::MwcLabelProgress</class>
    <extends>QLabel</extends>
    <header>control_desktop/MwcLabelProgress.h</header>
@@ -446,11 +460,6 @@
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
    <header>control_desktop/MwcComboBox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>control::MwcLabelNormal</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -20,6 +20,7 @@
 #include "../../core/appcontext.h"
 #include "../../util/address.h"
 #include "../../core/MessageMapper.h"
+#include "tries/mwc713inputparser.h"
 
 namespace bridge {
 
@@ -27,11 +28,6 @@ static wallet::Wallet * getWallet() { return state::getStateContext()->wallet; }
 static core::AppContext * getAppContext() { return state::getStateContext()->appContext; }
 static state::Swap * getSwap() {return (state::Swap *) state::getState(state::STATE::SWAP); }
 //static state::NodeInfo * getNodeInfo() {return (state::NodeInfo *) state::getState(state::STATE::NODE_INFO); }
-
-static QString mapMwc713Message(const QString & message) {
-    static notify::MessageMapper mapper(":/resource/mwc713_mappers.txt");
-    return mapper.processMessage(message);
-}
 
 Swap::Swap(QObject *parent) : QObject(parent) {
     wallet::Wallet *wallet = state::getStateContext()->wallet;
@@ -107,7 +103,7 @@ void Swap::onRequestSwapTrades(QString cookie, QVector<wallet::SwapInfo> swapTra
         trades.push_back(QString::number(st.startTime));
         trades.push_back(QString::number(st.expiration));
         trades.push_back(st.secondaryAddress);
-        trades.push_back( mapMwc713Message(st.lastProcessError) );
+        trades.push_back( tries::mapMwc713Message(st.lastProcessError) );
         trades.push_back( st.tag );
     }
 
@@ -214,7 +210,7 @@ void Swap::onRequestTradeDetails( wallet::SwapTradeInfo swap,
     }
 
     for (auto & tj : tradeJournal) {
-        tj.message = mapMwc713Message(tj.message);
+        tj.message = tries::mapMwc713Message(tj.message);
     }
 
     // [1] - Description in HTML format. Role can be calculated form here as "Selling ..." or "Buying ..."
@@ -346,10 +342,10 @@ void Swap::onSwapTradeStatusUpdated(QString swapId, QString stateCmd, QString cu
     }
 
     for (auto & tj : tradeJournal) {
-        tj.message = mapMwc713Message(tj.message);
+        tj.message = tries::mapMwc713Message(tj.message);
     }
 
-    emit sgnSwapTradeStatusUpdated( swapId, stateCmd, currentAction, currentState, expirationTime, mapMwc713Message(lastProcessError),
+    emit sgnSwapTradeStatusUpdated( swapId, stateCmd, currentAction, currentState, expirationTime, tries::mapMwc713Message(lastProcessError),
             convertExecutionPlan(executionPlan),
             convertTradeJournal(tradeJournal));
 }
@@ -411,11 +407,11 @@ void Swap::applyNewTrade1Params(QString account, QString secCurrency, QString mw
 
         switch (addressRes.second) {
             case util::ADDRESS_TYPE::MWC_MQ: {
-                addrType = "mwcmqs";
+                addrType = "MWCMQS";
                 break;
             }
             case util::ADDRESS_TYPE::TOR: {
-                addrType = "tor";
+                addrType = "SP/Tor";
                 break;
             }
             default: {

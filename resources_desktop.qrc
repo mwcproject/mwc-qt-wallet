@@ -49,9 +49,12 @@
         <file>help/listener.html</file>
         <file>help/node_overview.html</file>
         <file>help/outputs.html</file>
-        <file>help/receive.html</file>
+        <file>help/receive_online.html</file>
+        <file>help/receive_sp_only.html</file>
         <file>help/seed.html</file>
-        <file>help/send.html</file>
+        <file>help/send_sp_online.html</file>
+        <file>help/send_sp.html</file>
+        <file>help/send_online.html</file>
         <file>help/wallet_configuration.html</file>
         <file>help/default.html</file>
         <file>help/airdrop.html</file>

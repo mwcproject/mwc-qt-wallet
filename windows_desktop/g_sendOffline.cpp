@@ -41,6 +41,9 @@ SendOffline::SendOffline(QWidget *parent, QString _selectedAccount, int64_t _amo
 
     ui->progress->initLoader(false);
 
+    ui->contactNameLable->setText("");
+    ui->contactNameLable->hide();
+
     ui->fromAccount->setText("From account: " + selectedAccount );
     ui->amount2send->setText( "Amount to send: " + (amount<0 ? "All" : util->nano2one(QString::number(amount))) + " MWC" );
 }
@@ -66,8 +69,8 @@ void SendOffline::on_sendButton_clicked()
 
     QString recipientWallet;
         recipientWallet = ui->recipientAddress->text();
-        if ( !recipientWallet.isEmpty() && util->verifyAddress(recipientWallet) != "tor") {
-            control::MessageBox::messageText(this, "Unable to send", "Please specify valid recipient wallet address");
+        if ( !recipientWallet.isEmpty() && util->verifyAddress(recipientWallet) != "SP/Tor") {
+            control::MessageBox::messageText(this, "Unable to send", "Please specify valid recipient wallet Slatepack address");
             ui->recipientAddress->setFocus();
             return;
         }
@@ -106,8 +109,17 @@ void SendOffline::on_contactsButton_clicked()
     if (dlg.exec() == QDialog::Accepted) {
         QString address = dlg.getSelectedContact().pub_key;
         ui->recipientAddress->setText(address);
+        ui->contactNameLable->setText("     Contact: " + dlg.getSelectedContact().name );
+        ui->contactNameLable->show();
     }
 }
+
+void SendOffline::on_recipientAddress_textEdited(const QString &)
+{
+    ui->contactNameLable->setText("");
+    ui->contactNameLable->hide();
+}
+
 
 
 }

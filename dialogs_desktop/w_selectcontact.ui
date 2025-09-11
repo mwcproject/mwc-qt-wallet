@@ -68,6 +68,9 @@
        <height>40</height>
       </size>
      </property>
+     <property name="toolTip">
+      <string>Start typing name for search</string>
+     </property>
      <property name="maxLength">
       <number>32</number>
      </property>
@@ -78,6 +81,9 @@
    </item>
    <item>
     <widget class="ListWithColumns" name="contactsTable">
+     <property name="toolTip">
+      <string>List of contacts</string>
+     </property>
      <column>
       <property name="text">
        <string>#</string>
@@ -86,6 +92,11 @@
      <column>
       <property name="text">
        <string>Name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Type</string>
       </property>
      </column>
      <column>
@@ -115,13 +126,13 @@
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Delete seleted contact</string>
+        <string>Delete selected contact</string>
        </property>
        <property name="styleSheet">
-        <string notr="true">border:none</string>
+        <string notr="true">#deleteButton{border:none{</string>
        </property>
        <property name="text">
         <string/>
@@ -162,13 +173,13 @@
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
         <string>Add new contact</string>
        </property>
        <property name="styleSheet">
-        <string notr="true">border:none</string>
+        <string notr="true">#addButton{border:none}</string>
        </property>
        <property name="text">
         <string/>
@@ -209,13 +220,13 @@
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="toolTip">
         <string>Update selected contact</string>
        </property>
        <property name="styleSheet">
-        <string notr="true">border:none</string>
+        <string notr="true">#editButton{border:none}</string>
        </property>
        <property name="text">
         <string/>
@@ -268,6 +279,9 @@
        <property name="focusPolicy">
         <enum>Qt::StrongFocus</enum>
        </property>
+       <property name="toolTip">
+        <string>Close contacts, nothing will be selected</string>
+       </property>
        <property name="text">
         <string>Cancel</string>
        </property>
@@ -293,6 +307,9 @@
        <property name="focusPolicy">
         <enum>Qt::StrongFocus</enum>
        </property>
+       <property name="toolTip">
+        <string>Choose selected contact</string>
+       </property>
        <property name="text">
         <string>Select</string>
        </property>
@@ -309,11 +326,6 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
@@ -324,12 +336,22 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
+  </customwidget>
+  <customwidget>
    <class>ListWithColumns</class>
    <extends>QTableWidget</extends>
    <header>control_desktop/listwithcolumns.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>searchStr</tabstop>
+  <tabstop>contactsTable</tabstop>
+  <tabstop>deleteButton</tabstop>
+  <tabstop>addButton</tabstop>
+  <tabstop>editButton</tabstop>
   <tabstop>cancelButton</tabstop>
   <tabstop>selectButton</tabstop>
  </tabstops>

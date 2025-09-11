@@ -15,6 +15,7 @@
 #include "TasksOwnership.h"
 #include "TaskWallet.h"
 #include "../mwc713.h"
+#include "tries/mwc713inputparser.h"
 
 namespace wallet {
 
@@ -34,7 +35,7 @@ bool TasksGenerateOwnership::processTask(const QVector<WEvent> &events) {
         if (ln.contains("Error", Qt::CaseInsensitive)) {
             if (errors.isEmpty())
                 errors += "\n";
-            errors += ln;
+            errors += tries::mapMwc713Message(ln);
         }
 
         if (ln.startsWith("Ownership Proof:")) {
@@ -65,7 +66,7 @@ bool TasksValidateOwnership::processTask(const QVector<WEvent> & events) {
         if (ln.contains("Error", Qt::CaseInsensitive)) {
             if (errors.isEmpty())
                 errors += "\n";
-            errors += ln;
+            errors += tries::mapMwc713Message(ln);
         }
 
         if (ln.startsWith("Network:"))

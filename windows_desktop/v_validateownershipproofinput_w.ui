@@ -93,7 +93,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Generate ownership proof for the message and selected items</string>
+         <string>Load ownership proof from the file</string>
+        </property>
+        <property name="statusTip">
+         <string>Load ownership proof from the file</string>
         </property>
         <property name="text">
          <string>Load from file</string>
@@ -130,7 +133,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Return back to Viewing Key page</string>
+         <string>Back to Viewing Key page</string>
+        </property>
+        <property name="statusTip">
+         <string>Back to Viewing Key page</string>
         </property>
         <property name="text">
          <string>Back</string>
@@ -151,9 +157,6 @@
         <property name="acceptDrops">
          <bool>false</bool>
         </property>
-        <property name="toolTip">
-         <string/>
-        </property>
         <property name="lineWidth">
          <number>0</number>
         </property>
@@ -167,7 +170,7 @@
          <bool>false</bool>
         </property>
         <property name="placeholderText">
-         <string>Paste proof to validate</string>
+         <string>Paste proof to verify</string>
         </property>
        </widget>
        <widget class="control::MwcPushButtonNormal" name="validate">
@@ -198,7 +201,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Generate ownership proof for the message and selected items</string>
+         <string>Verify ownership proof</string>
+        </property>
+        <property name="statusTip">
+         <string>Verify ownership proof</string>
         </property>
         <property name="text">
          <string>Validate</string>

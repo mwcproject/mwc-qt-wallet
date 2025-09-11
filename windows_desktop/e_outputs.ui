@@ -53,6 +53,15 @@
              <height>40</height>
             </size>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Choose an account to see its outputs.</string>
+           </property>
+           <property name="statusTip">
+            <string>Choose an account to see its outputs.</string>
+           </property>
           </widget>
          </item>
         </layout>
@@ -101,10 +110,13 @@
                </size>
               </property>
               <property name="focusPolicy">
-               <enum>Qt::NoFocus</enum>
+               <enum>Qt::StrongFocus</enum>
               </property>
               <property name="toolTip">
-               <string>Trigger show spent outputs state</string>
+               <string>Show/hide already-spent outputs</string>
+              </property>
+              <property name="statusTip">
+               <string>Show/hide already-spent outputs</string>
               </property>
               <property name="text">
                <string>Show Spent: Yes</string>
@@ -145,10 +157,13 @@
                </size>
               </property>
               <property name="focusPolicy">
-               <enum>Qt::NoFocus</enum>
+               <enum>Qt::StrongFocus</enum>
               </property>
               <property name="toolTip">
-               <string>Refresh outputs data</string>
+               <string>Update outputs status</string>
+              </property>
+              <property name="statusTip">
+               <string>Update outputs status</string>
               </property>
               <property name="text">
                <string>Refresh</string>

@@ -90,20 +90,19 @@ public:
     const static int64_t TIMEOUT = 3600*1000*5; // 5 hours should be enough
 
     // Expected that listening is already stopped
-    TaskCheck( MWC713 *wallet713, bool wait4listeners ) :
-            Mwc713Task("TaskRecover","", "check", wallet713, ""), sleepBeforeStart(wait4listeners) {}
+    TaskCheck( MWC713 *wallet713 ) :
+            Mwc713Task("TaskRecover","", "check", wallet713, "") {}
 
     virtual ~TaskCheck() override {}
 
     // Wait 3 seconds fro listeners to stop. Expected that stopping in the progress
-    virtual void onStarted() override { if (sleepBeforeStart) { QThread::msleep(3000); } }
+    virtual void onStarted() override { }
 
     virtual bool processTask(const QVector<WEvent> &events) override;
 
     virtual QSet<WALLET_EVENTS> getReadyEvents() override {return QSet<WALLET_EVENTS>{ WALLET_EVENTS::S_READY };}
 
 private:
-    bool sleepBeforeStart;
 };
 
 

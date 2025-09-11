@@ -62,7 +62,10 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>Show accepted swap trades</string>
+        <string>Show Marketplace offers</string>
+       </property>
+       <property name="statusTip">
+        <string>Show Marketplace offers</string>
        </property>
        <property name="text">
         <string>Marketplace Offers</string>
@@ -106,7 +109,10 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>Show accepted swap trades</string>
+        <string>Show my offers</string>
+       </property>
+       <property name="statusTip">
+        <string>Show my offers</string>
        </property>
        <property name="text">
         <string>My Offers</string>
@@ -150,7 +156,10 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>Show accepted swap trades</string>
+        <string>Show fees</string>
+       </property>
+       <property name="statusTip">
+        <string>Show fees</string>
        </property>
        <property name="text">
         <string>Fees</string>
@@ -330,11 +339,8 @@
            <property name="focusPolicy">
             <enum>Qt::NoFocus</enum>
            </property>
-           <property name="toolTip">
-            <string>Click for help</string>
-           </property>
            <property name="styleSheet">
-            <string notr="true">border: none;</string>
+            <string notr="true">#feeLevelHelpBtn{border: none;}</string>
            </property>
            <property name="text">
             <string/>
@@ -397,7 +403,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>How much fee you agree to pay for your offers.  Please press Help button for more details</string>
+            <string>How much fee you agree to pay for your offers. Use Help for more details</string>
+           </property>
+           <property name="statusTip">
+            <string>How much fee you agree to pay for your offers. Use Help for more details</string>
            </property>
           </widget>
           <widget class="QPushButton" name="depositAccountHelpBtn">
@@ -421,11 +430,8 @@
            <property name="focusPolicy">
             <enum>Qt::NoFocus</enum>
            </property>
-           <property name="toolTip">
-            <string>Click for help</string>
-           </property>
            <property name="styleSheet">
-            <string notr="true">border: none;</string>
+            <string notr="true">#depositAccountHelpBtn{border: none;}</string>
            </property>
            <property name="text">
             <string/>
@@ -488,7 +494,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Source account for paying the fees</string>
+            <string>Account to pay the fees</string>
+           </property>
+           <property name="statusTip">
+            <string>Account to pay the fees</string>
            </property>
           </widget>
           <widget class="QPushButton" name="reservedAmountHelpBtn">
@@ -512,11 +521,8 @@
            <property name="focusPolicy">
             <enum>Qt::NoFocus</enum>
            </property>
-           <property name="toolTip">
-            <string>Click for help</string>
-           </property>
            <property name="styleSheet">
-            <string notr="true">border: none;</string>
+            <string notr="true">#reservedAmountHelpBtn{border: none;}</string>
            </property>
            <property name="text">
             <string/>
@@ -557,7 +563,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>How much reserve for fee payments</string>
+            <string>Amount to reserve for fee payments</string>
+           </property>
+           <property name="statusTip">
+            <string>Amount to reserve for fee payments</string>
            </property>
            <property name="text">
             <string/>
@@ -613,11 +622,8 @@
            <property name="focusPolicy">
             <enum>Qt::NoFocus</enum>
            </property>
-           <property name="toolTip">
-            <string>Click for help</string>
-           </property>
            <property name="styleSheet">
-            <string notr="true">border: none;</string>
+            <string notr="true">#activeFeesHelpBtn{border: none;}</string>
            </property>
            <property name="text">
             <string/>
@@ -677,7 +683,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Information about paid fees</string>
+            <string>Paid fees</string>
+           </property>
+           <property name="statusTip">
+            <string>Paid fees</string>
            </property>
            <property name="undoRedoEnabled">
             <bool>false</bool>
@@ -723,6 +732,9 @@ p, li { white-space: pre-wrap; }
            <property name="toolTip">
             <string>Move reserved MWC back to your account</string>
            </property>
+           <property name="statusTip">
+            <string>Move reserved MWC back to your account</string>
+           </property>
            <property name="text">
             <string>Withdraw XX MWC</string>
            </property>
@@ -751,8 +763,11 @@ p, li { white-space: pre-wrap; }
            <property name="toolTip">
             <string>Click for help</string>
            </property>
+           <property name="statusTip">
+            <string>Click for help</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">border: none;</string>
+            <string notr="true">#withdrawHelpBtn{border: none;}</string>
            </property>
            <property name="text">
             <string/>
@@ -791,9 +806,6 @@ p, li { white-space: pre-wrap; }
              <width>250</width>
              <height>40</height>
             </size>
-           </property>
-           <property name="toolTip">
-            <string>Move reserved MWC back to your account</string>
            </property>
            <property name="text">
             <string>View Integrity Transactions</string>
@@ -887,6 +899,9 @@ p, li { white-space: pre-wrap; }
         <property name="toolTip">
          <string>Currency that you want to swap with</string>
         </property>
+        <property name="statusTip">
+         <string>Currency that you want to swap with</string>
+        </property>
         <item>
          <property name="text">
           <string>Buy</string>
@@ -937,6 +952,9 @@ p, li { white-space: pre-wrap; }
         <property name="toolTip">
          <string>Currency that you want to swap with</string>
         </property>
+        <property name="statusTip">
+         <string>Currency that you want to swap with</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -968,9 +986,6 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Time reserved to redeem the coins</string>
         </property>
        </widget>
       </item>
@@ -1068,8 +1083,11 @@ p, li { white-space: pre-wrap; }
         <property name="toolTip">
          <string>Create new offer</string>
         </property>
+        <property name="statusTip">
+         <string>Create new offer</string>
+        </property>
         <property name="styleSheet">
-         <string notr="true">border:none</string>
+         <string notr="true">#newOfferButton{border:none;}</string>
         </property>
         <property name="text">
          <string/>

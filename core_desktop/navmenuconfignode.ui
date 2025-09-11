@@ -41,6 +41,9 @@
      <height>38</height>
     </rect>
    </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
    <property name="text">
     <string>Configuration</string>
    </property>
@@ -53,6 +56,9 @@
      <width>170</width>
      <height>38</height>
     </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
    </property>
    <property name="text">
     <string>Node overview</string>
@@ -82,6 +88,9 @@
      <width>170</width>
      <height>38</height>
     </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
    </property>
    <property name="text">
     <string>Select Running Mode</string>

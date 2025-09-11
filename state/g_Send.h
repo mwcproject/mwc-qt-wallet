@@ -60,7 +60,7 @@ public:
 protected:
     virtual NextStateRespond execute() override;
     virtual bool mobileBack() override;
-    virtual QString getHelpDocName() override {return "send.html";}
+    virtual QString getHelpDocName() override;
 
 private slots:
     void sendRespond( bool success, QStringList errors, QString address, int64_t txid, QString slate );

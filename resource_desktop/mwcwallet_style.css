@@ -77,6 +77,11 @@ QToolButton:enabled:!checked::hover
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+QToolButton:focus {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
 /* --------------------------------- */
 control--MwcToolButtonUnderscore {
     background-color: transparent;
@@ -373,7 +378,19 @@ control--MwcPushButtonRound {
     font-size: 15px;
     border-radius: 18px;
     border: none;
+    color: white;
 }
+
+control--MwcPushButtonRound:enabled:!focus::hover
+{
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+control--MwcPushButtonRound:focus {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
 
 control--MwcPushButtonStatusLine {
     border: 1px solid #FFFFFF;
@@ -750,8 +767,13 @@ QTabBar::tab:last{
     border:none;
 }
 
-QTabBar::tab:hover{
-    font-weight:bold;
+QTabBar::tab:!focus:hover{
+    font-weight:medium;
+}
+
+QTabBar::tab:focus {
+    font-weight:medium;
+    text-decoration: underline;
 }
 
 QTabBar::tab:selected{

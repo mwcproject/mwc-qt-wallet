@@ -59,6 +59,9 @@
        <height>40</height>
       </size>
      </property>
+     <property name="toolTip">
+      <string>Contact name</string>
+     </property>
      <property name="maxLength">
       <number>32</number>
      </property>
@@ -74,6 +77,9 @@
        <width>0</width>
        <height>40</height>
       </size>
+     </property>
+     <property name="toolTip">
+      <string>MWCMQS or Tor address</string>
      </property>
      <property name="maxLength">
       <number>256</number>
@@ -169,14 +175,14 @@
    <header>control_desktop/MwcPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcLabelLarge</class>
-   <extends>QLabel</extends>
-   <header>control_desktop/MwcLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcLineEditNormal</class>
    <extends>QLineEdit</extends>
    <header>control_desktop/MwcLineEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>control::MwcLabelLarge</class>
+   <extends>QLabel</extends>
+   <header>control_desktop/MwcLabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

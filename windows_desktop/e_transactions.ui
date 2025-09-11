@@ -53,6 +53,15 @@
              <height>40</height>
             </size>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Choose an account to view its transactions</string>
+           </property>
+           <property name="statusTip">
+            <string>Choose an account to view its transactions</string>
+           </property>
           </widget>
          </item>
         </layout>
@@ -220,7 +229,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Allows you to validate a proof file that is generated from any wallet. Proves a transaction occurred.</string>
+            <string>Upload any wallet-generated proof file to verify that a transaction happened</string>
+           </property>
+           <property name="statusTip">
+            <string>Upload any wallet-generated proof file to verify that a transaction happened</string>
            </property>
            <property name="text">
             <string>Validate Proof File</string>
@@ -267,7 +279,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Allows you to export all of the transactions to a .CSV file.</string>
+            <string>Export all transactions to a .CSV file.</string>
+           </property>
+           <property name="statusTip">
+            <string>Export all transactions to a .CSV file.</string>
            </property>
            <property name="text">
             <string>Export .CSV</string>
@@ -311,7 +326,10 @@
             <enum>Qt::StrongFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Refresh transaction list</string>
+            <string>Refresh transactions status</string>
+           </property>
+           <property name="statusTip">
+            <string>Refresh transactions status</string>
            </property>
            <property name="text">
             <string>Refresh</string>

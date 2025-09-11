@@ -96,7 +96,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Send all MWC in this account</string>
+         <string>Send entire MWC balance from this account</string>
+        </property>
+        <property name="statusTip">
+         <string>Send entire MWC balance from this account</string>
         </property>
         <property name="text">
          <string>All</string>
@@ -130,6 +133,9 @@
          </size>
         </property>
         <property name="toolTip">
+         <string>Amount of MWC coins to send</string>
+        </property>
+        <property name="statusTip">
          <string>Amount of MWC coins to send</string>
         </property>
         <property name="maxLength">
@@ -166,6 +172,15 @@
           <height>40</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Select account to send MWC coins from</string>
+        </property>
+        <property name="statusTip">
+         <string>Select account to send MWC coins from</string>
+        </property>
        </widget>
        <widget class="control::MwcCheckBox" name="generatePoof">
         <property name="geometry">
@@ -184,6 +199,12 @@
         </property>
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>The proof contains the full transaction and can be viewed by anyone. Keep it if you might need to resolve a dispute; skip it if privacy matters more.</string>
+        </property>
+        <property name="statusTip">
+         <string>The proof contains the full transaction and can be viewed by anyone. Keep it if you might need to resolve a dispute; skip it if privacy matters more.</string>
         </property>
         <property name="text">
          <string>Generate Transaction Proof</string>
@@ -261,7 +282,10 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Recipient slatepack address to encrypt the slate</string>
+         <string>Recipient's Slatepack address for slate encryption</string>
+        </property>
+        <property name="statusTip">
+         <string>Recipient's Slatepack address for slate encryption</string>
         </property>
         <property name="maxLength">
          <number>1024</number>
@@ -298,7 +322,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Choose a contact for wallet address</string>
+         <string>Pick a contact to get the receiver's wallet address</string>
+        </property>
+        <property name="statusTip">
+         <string>Pick a contact to get the receiver's wallet address</string>
         </property>
         <property name="text">
          <string>Contacts</string>
@@ -308,7 +335,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>294</y>
+          <y>296</y>
           <width>547</width>
           <height>40</height>
          </rect>
@@ -332,7 +359,10 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Optional note that will be displayed to the recipient</string>
+         <string>Optional note the recipient will see</string>
+        </property>
+        <property name="statusTip">
+         <string>Optional note the recipient will see</string>
         </property>
         <property name="maxLength">
          <number>1024</number>
@@ -364,45 +394,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="control::MwcPushButtonNormal" name="settingsBtn">
-        <property name="geometry">
-         <rect>
-          <x>55</x>
-          <y>358</y>
-          <width>180</width>
-          <height>40</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>180</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>180</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Click to change settings. Number of change outputs and required confirmations.</string>
-        </property>
-        <property name="text">
-         <string>Settings</string>
-        </property>
-       </widget>
        <widget class="control::MwcPushButtonNormal" name="sendButton">
         <property name="geometry">
          <rect>
-          <x>313</x>
-          <y>358</y>
+          <x>182</x>
+          <y>356</y>
           <width>180</width>
           <height>40</height>
          </rect>
@@ -428,8 +424,39 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <property name="toolTip">
          <string>Send MWC</string>
         </property>
+        <property name="statusTip">
+         <string>Send MWC</string>
+        </property>
         <property name="text">
          <string>Continue</string>
+        </property>
+       </widget>
+       <widget class="control::MwcLabelSmall" name="contactNameLable">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>274</y>
+          <width>543</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>      Contact: </string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </widget>
@@ -571,20 +598,24 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <header>control_desktop/MwcLabelProgress.h</header>
   </customwidget>
   <customwidget>
-   <class>control::MwcCheckBox</class>
-   <extends>QCheckBox</extends>
-   <header>control_desktop/MwcCheckBox.h</header>
-  </customwidget>
-  <customwidget>
    <class>control::MwcComboBox</class>
    <extends>QComboBox</extends>
    <header>control_desktop/MwcComboBox.h</header>
   </customwidget>
+  <customwidget>
+   <class>control::MwcCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>control_desktop/MwcCheckBox.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>accountComboBox</tabstop>
+  <tabstop>amountEdit</tabstop>
+  <tabstop>allAmountButton</tabstop>
+  <tabstop>generatePoof</tabstop>
   <tabstop>recipientAddress</tabstop>
   <tabstop>contactsButton</tabstop>
-  <tabstop>settingsBtn</tabstop>
+  <tabstop>descriptionEdit</tabstop>
   <tabstop>sendButton</tabstop>
  </tabstops>
  <resources>
