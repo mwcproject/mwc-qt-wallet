@@ -20,6 +20,8 @@
 #include "../core/WndManager.h"
 #include "../bridge/BridgeManager.h"
 #include "../bridge/wnd/x_events_b.h"
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 
 namespace state {
 
