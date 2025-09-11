@@ -120,7 +120,7 @@ Press 'Continue'
 
 ## Check mnemonic words
 
-You should see
+You should see<br>
 <img src="testing_scenario/check_mnemonic.png" alt="img" width="400">
 
 Check tooltips. 
