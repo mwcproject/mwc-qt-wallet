@@ -8,9 +8,9 @@ Last Updated: October 23, 2020
 
 # OVERVIEW
 
-Currently we have some modals which are displayed when events occur that require the user to click on the modal to get rid of the window. This can be annoying to users as they have to stop what they are doing to get rid of the window that has now popped up on top of what they are doing whether they are using the wallet or not. To replace this type of modal, we’d like to briefly display a message in a window which appears in the lower right hand corner of the wallet.
+Currently we have some modals which are displayed when events occur that require the user to click on the modal to get rid of the window. This can be annoying to users as they have to stop what they are doing to get rid of the window that has now popped up on top of what they are doing whether they are using the wallet or not. To replace this type of modal, we'd like to briefly display a message in a window which appears in the lower right hand corner of the wallet.
 
-Another issue is that the main window has a status bar, but it is difficult to read the messages as they appear in the status bar. The status bar messages can appear and disappear very quickly or the message will be cut off. So we’d like to use the new status windows to also display the status messages from the main window’s status bar.
+Another issue is that the main window has a status bar, but it is difficult to read the messages as they appear in the status bar. The status bar messages can appear and disappear very quickly or the message will be cut off. So we'd like to use the new status windows to also display the status messages from the main window's status bar.
 
 The remainder of this document describes the new feature to display status messages, for a brief period of time, in windows which appear in the lower right hand corner of the wallet.
 
@@ -40,7 +40,7 @@ The following describes the general behavior of the status windows:
 
 # Status Window Content
 
-The status windows display the notification messages which are stored in the Notifications. There is a signal which triggers when messages come into Qt Wallet which the main window and the Notifications both listen for. The status windows are tied into the main window’s handling of status bar messages but does not replace the current use of the status bar. So there are 3 places where you can see the same notification message:
+The status windows display the notification messages which are stored in the Notifications. There is a signal which triggers when messages come into Qt Wallet which the main window and the Notifications both listen for. The status windows are tied into the main window's handling of status bar messages but does not replace the current use of the status bar. So there are 3 places where you can see the same notification message:
 
 1. Main window status bar
 
@@ -51,7 +51,7 @@ The status windows display the notification messages which are stored in the Not
 <img src="status_windows_images/image_7.png" max-width="300" height="300"/>
 
 
-For displaying in the status window, each notification message is parsed looking for a summary message to display for the notification. When the notification message is less than 50 characters, the summary message will be the same as the notification message. If the notification message is greater than 50 characters, the first sentence of the notification message is used as the summary. For example, if you look at the previous image, line 3 of the Event Log says: "Unable to start Tor listener. Tor Process Error: …" and the status window displays the first sentence “Unable to start Tor listener”. When a notification message is just one long string, the first 50 characters of the message are displayed followed by “...”. For some specific long messages, a hard-coded summary is used as what the message is really about is deeply embedded into the message.
+For displaying in the status window, each notification message is parsed looking for a summary message to display for the notification. When the notification message is less than 50 characters, the summary message will be the same as the notification message. If the notification message is greater than 50 characters, the first sentence of the notification message is used as the summary. For example, if you look at the previous image, line 3 of the Event Log says: "Unable to start Tor listener. Tor Process Error: …" and the status window displays the first sentence "Unable to start Tor listener". When a notification message is just one long string, the first 50 characters of the message are displayed followed by "...". For some specific long messages, a hard-coded summary is used as what the message is really about is deeply embedded into the message.
 
 Note: To support finding a status summary, some messages in mwc713 wallet were slightly modified (e.g. changed commas and colons to periods to end a sentence). In some cases, this modification also needed to be picked up in Qt Wallet as there are places in Qt Wallet which are looking for certain strings in the messages.
 
@@ -75,9 +75,9 @@ When Qt Wallet is locked, individual status messages are not displayed. Instead 
 
 <img src="status_windows_images/image_6.png" max-width="300" height="300"/>
 
-When the wallet is locked, you must unlock the wallet to see the notifications appear in the status windows. Clicking on the "Notifications Waiting To Be Read" status window makes the “Notifications Waiting” message disappear.
+When the wallet is locked, you must unlock the wallet to see the notifications appear in the status windows. Clicking on the "Notifications Waiting To Be Read" status window makes the "Notifications Waiting" message disappear.
 
-When the wallet is iconified, individual status messages are also not displayed and the same "Notifications Waiting" status window will be displayed as new notifications come in. When the wallet is iconified clicking on the “Notifications Waiting To Be Read” status window will restore the Qt Wallet to the screen. If the wallet is unlocked, the pending status messages will be displayed. If the wallet is locked, the pending status messages will be displayed once you unlock the wallet.
+When the wallet is iconified, individual status messages are also not displayed and the same "Notifications Waiting" status window will be displayed as new notifications come in. When the wallet is iconified clicking on the "Notifications Waiting To Be Read" status window will restore the Qt Wallet to the screen. If the wallet is unlocked, the pending status messages will be displayed. If the wallet is locked, the pending status messages will be displayed once you unlock the wallet.
 
 # Qt Wallet Main Window Resize and Movement
 
@@ -91,7 +91,7 @@ When you start up the wallet on one screen and then switch to working on another
 
 When working on a laptop which allows you to swipe between screens (e.g. MacBook), if the wallet is running on one screen and you swipe to another screen, the notifications continue to appear and disappear while you are working on the other screen. To see the notifications you have missed, you will need to check the event log.
 
-When the wallet is iconified, the "Notifications Waiting To Be Read" status window appears on the screen the user is actively using but in the lower right hand corner of the “available” window geometry. The available window geometry does not include the task bar.  So the status window will appear above the task bar. 
+When the wallet is iconified, the "Notifications Waiting To Be Read" status window appears on the screen the user is actively using but in the lower right hand corner of the "available" window geometry. The available window geometry does not include the task bar.  So the status window will appear above the task bar. 
 
 # Modals Which No Longer Appear
 
@@ -105,9 +105,9 @@ To test you will need to build both mwc713 and mwc-qt-wallet. Some changes were 
 
 I have tested on a MacBook Pro with a 15 inch Retina Display running Catalina and an older MacBook Pro (late 2011) with a 13 inch (non-Retina) display running High Sierra.
 
-I have started up a cold wallet and saw the status windows being displayed as I’d expect. A sanity check of clicking on the status windows, iconifying the wallet, moving the wallet, resizing the wallet all appear to work as expected.
+I have started up a cold wallet and saw the status windows being displayed as I'd expect. A sanity check of clicking on the status windows, iconifying the wallet, moving the wallet, resizing the wallet all appear to work as expected.
 
 # QA Focus
 
-To QA this feature, I think it would help if QA focused on testing on Windows and Linux as I haven’t done any testing on those platforms.
+To QA this feature, I think it would help if QA focused on testing on Windows and Linux as I haven't done any testing on those platforms.
 

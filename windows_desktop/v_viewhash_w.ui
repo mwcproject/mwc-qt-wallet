@@ -125,11 +125,8 @@
          </size>
         </property>
         <property name="text">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot;line-height:138%;&quot;&gt;
-&lt;p&gt;A viewing key allows others to scan the blockchain and view your wallet's outputs.  Sharing this key makes your MWC wallet’s transactions visible,  compromising the privacy of your funds.&lt;br /&gt;&lt;b&gt;Be cautious when sharing your viewing key - once it’s shared,  your wallet loses its privacy, and all your transactions become transparent to anyone with the key.&lt;/b&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>A viewing key allows others to scan the blockchain and view your wallet's outputs.  Sharing this key makes your MWC wallet's transactions visible,  compromising the privacy of your funds.
+Be cautious when sharing your viewing key - once it's shared,  your wallet loses its privacy, and all your transactions become transparent to anyone with the key.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

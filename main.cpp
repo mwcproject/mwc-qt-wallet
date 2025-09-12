@@ -383,7 +383,7 @@ int main(int argc, char *argv[])
 
 #ifdef WALLET_DESKTOP
         // Update scale if screen resolution is low...
-        // Unfortunatelly we can't do that before QApplication inited because Scree res API doesn't work
+        // Unfortunatelly we can't do that before QApplication inited because Screen res API doesn't work
         // That is why update now is pretty costly, we will need to testart the all because of that.
         {
             int minWidth = 10000;

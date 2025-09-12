@@ -43,7 +43,7 @@ Open **Terminal** and `cd` to the folder where you downloaded the files (usually
 ```bash
 shasum -a 256 -c mwc-qt-wallet_*-macos-*.tar.gz.sha256sum
 ```
-If the file is valid you’ll see:
+If the file is valid you'll see:
 ```
 mwc-qt-wallet_1.2.14-macos-*.tar.gz: OK
 ```
@@ -174,7 +174,7 @@ Open **Terminal** and `cd` to the folder where you downloaded the files (usually
 ```bash
 shasum -a 256 -c mwc-qt-wallet_*-linux64-*.sha256sum
 ```
-If the file is valid you’ll see:
+If the file is valid you'll see:
 ```
 mwc-qt-wallet_1.2.14-linux64-standardcpu.deb: OK
 ```
@@ -218,6 +218,6 @@ cd mwc-qt-wallet
 
 ## 5. Launch the App
 
-For .deb or .rpm installs you can launch the app from your system’s app menu.
+For .deb or .rpm installs you can launch the app from your system's app menu.
 
 

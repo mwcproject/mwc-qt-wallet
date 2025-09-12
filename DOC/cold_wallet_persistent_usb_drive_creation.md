@@ -19,7 +19,7 @@
 
 A cold wallet is intended to keep your MWC safe by storing your MWC funds in offline storage. Once set up, your cold wallet should never be connected to the internet. This will prevent hackers from being able to access your wallet and steal your funds.
 
-With Ubuntu it is now possible to create a live USB device with persistent storage. Therefore you can create a USB device which can be booted and also contains your cold wallet. Persistence doesn’t work with every Linux distribution but it is known to work with versions of Ubuntu 18.04 LTS or later. I’ve tested the following procedure using the latest version of Ubuntu available at the time of this writing (20.04.1).
+With Ubuntu it is now possible to create a live USB device with persistent storage. Therefore you can create a USB device which can be booted and also contains your cold wallet. Persistence doesn't work with every Linux distribution but it is known to work with versions of Ubuntu 18.04 LTS or later. I've tested the following procedure using the latest version of Ubuntu available at the time of this writing (20.04.1).
 
 This document describes the procedure where you can create a USB device running Ubuntu and which supports persistent storage. This USB device can then be used to install and set up an MWC cold wallet. Your MWC cold wallet will then run on a single USB device which you boot to whenever you want to access your cold wallet. 
 
@@ -33,7 +33,7 @@ The procedure to set up an MWC cold wallet, after the software has been installe
 
 *   [Create/Manage Cold Wallet](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet.md)
 
-Once you have your MWC cold wallet set up on a USB stick you’ve created following this procedure, you will just need to boot using your cold wallet USB stick inorder to access your cold wallet.
+Once you have your MWC cold wallet set up on a USB stick you've created following this procedure, you will just need to boot using your cold wallet USB stick inorder to access your cold wallet.
 
 # Prerequisites
 *   A USB device with at least 64GB of memory. 128GB is probably better.
@@ -84,7 +84,7 @@ Once you have Ubuntu running on your computer, you can now create a second USB d
 
 The following procedure has been extracted from [https://www.howtogeek.com/howto/14912/create-a-persistent-bootable-ubuntu-usb-flash-drive/](https://www.howtogeek.com/howto/14912/create-a-persistent-bootable-ubuntu-usb-flash-drive/)
 
-and doesn’t contain the full explanation of each step to make it faster to follow. If you’d like to understand each step of the process, please refer to the article at the link above.
+and doesn't contain the full explanation of each step to make it faster to follow. If you'd like to understand each step of the process, please refer to the article at the link above.
 
 
 ## Procedure
@@ -109,7 +109,7 @@ The tool we are going to use to create our persistent USB device is called mkusb
 
 ### Identify Empty USB Device
 
-After running the commands above, and before inserting a new empty USB device, you want to clearly identify the devices currently on your system. This will help to make sure you don’t mistakenly wipe-out a different device.
+After running the commands above, and before inserting a new empty USB device, you want to clearly identify the devices currently on your system. This will help to make sure you don't mistakenly wipe-out a different device.
 
 Run the following command and examine the output:
 
@@ -142,7 +142,7 @@ Now you can launch _mkusb_.
 
 When the _Run mkusb dus _dialog appears and asks: _Run mkusb version dus?_
 
-*   Click ‘Yes’.
+*   Click ‘Yes'.
 
 <img src="cold_wallet_persistent_usb_images/image4.png" max-width="300" height="300"/>
 
@@ -157,22 +157,22 @@ When the Do USB Stuff Dialog appears:
 In the next window select:
 
 *   Install (make a boot device)
-*   Click ‘OK’
+*   Click ‘OK'
 
 <img src="cold_wallet_persistent_usb_images/image6.png" max-width="300" height="300"/>
 
 
 Then in the next window select:
 
-*   ‘Persistent live’ - only Debian and Ubuntu
-*   Click ‘OK’
+*   ‘Persistent live' - only Debian and Ubuntu
+*   Click ‘OK'
 
 <img src="cold_wallet_persistent_usb_images/image7.png" max-width="300" height="300"/>
 
 
 You may see the following _Select source device_ window appear, if mkusb determines that it can create a bootable device from your existing Ubuntu operating system. We want to create a bootable USB device for just our cold wallet and do not want any extra features on our device, which may get loaded if you use the current operating system. If this window appears:
 
-*   Click ‘No’
+*   Click ‘No'
 
 <img src="cold_wallet_persistent_usb_images/image8.png" max-width="300" height="300"/>
 
@@ -180,19 +180,19 @@ You may see the following _Select source device_ window appear, if mkusb determi
 A file browser now appears. Browse to find the Ubuntu Desktop ISO file you previously downloaded.
 
 *   Select the Ubuntu Desktop ISO file
-*   Click ‘OK’
+*   Click ‘OK'
 
 
 The _Select Target Device_ window allows you to select the USB device to use.
 
 *   Select the USB device you identified earlier using lsblk
-*   Click ‘OK’
+*   Click ‘OK'
 
 <img src="cold_wallet_persistent_usb_images/image9.png" max-width="300" height="250"/>
 
 When the warning dialog _Please check again_ appears asking you to verify that you want to overwriting the USB device appears:
 
-*   Click ‘Yes’
+*   Click ‘Yes'
 
 <img src="cold_wallet_persistent_usb_images/image5.png" max-width="300" height="200"/>
 
@@ -200,45 +200,45 @@ When the warning dialog _Please check again_ appears asking you to verify that y
 In the next window select:
 
 *   upefi  usb-pack-efi  (default grub from ISO file)
-*   Click ‘OK’
+*   Click ‘OK'
 
 <img src="cold_wallet_persistent_usb_images/image10.png" max-width="300" height="250"/>
 
 
-Now select the percentage of the storage space on the USB device you want to use for persistence vs data. Since you won’t be using the USB device for anything other than your cold wallet, you won’t need that much space for persistence. But you will need to download and install some software such as mwc-qt-wallet and Qt5 which is required to run a cold wallet. If uncertain, just keep the default setting of 50%.
+Now select the percentage of the storage space on the USB device you want to use for persistence vs data. Since you won't be using the USB device for anything other than your cold wallet, you won't need that much space for persistence. But you will need to download and install some software such as mwc-qt-wallet and Qt5 which is required to run a cold wallet. If uncertain, just keep the default setting of 50%.
 
 *   Select persistence percentage
-*   Click ‘OK’
+*   Click ‘OK'
 
 <img src="cold_wallet_persistent_usb_images/image11.png" max-width="300" height="200"/>
 
 
 At the _Final checkpoint_ confirmation screen:
 
-*   Select the ‘Go’ radio button
-*   Click ‘Go’
+*   Select the ‘Go' radio button
+*   Click ‘Go'
 
 <img src="cold_wallet_persistent_usb_images/image12.png" max-width="300" height="280"/>
 
 
-Now the USB device with Ubuntu will be created. It takes a little while. You will see a dialog with “Work done” highlighted in green when everything is finished.
+Now the USB device with Ubuntu will be created. It takes a little while. You will see a dialog with "Work done" highlighted in green when everything is finished.
 
-*   Click ‘OK’
-*   Click ‘Quit’ for any dialogs which appear afterward.
+*   Click ‘OK'
+*   Click ‘Quit' for any dialogs which appear afterward.
 
 <img src="cold_wallet_persistent_usb_images/image13.png" max-width="300" height="220"/>
 
 
-At the terminal window which appeared when mkusb was launched, you will be prompted to press ‘Enter’:
+At the terminal window which appeared when mkusb was launched, you will be prompted to press ‘Enter':
 
-*   Press ‘Enter’
+*   Press ‘Enter'
 
 <img src="cold_wallet_persistent_usb_images/image14.png" max-width="300" height="300"/>
 
 
 You can now eject your new bootable live Ubuntu USB with persistent storage and label it.
 
-Then power off your computer and remove the USB device, without persistent storage, that you had previously booted with. Place this device somewhere so you don’t mix it up with your new persistent USB device.
+Then power off your computer and remove the USB device, without persistent storage, that you had previously booted with. Place this device somewhere so you don't mix it up with your new persistent USB device.
 
 
 # MWC Cold Wallet Software Installation

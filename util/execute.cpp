@@ -21,6 +21,8 @@
 #include <QtGlobal>
 #include <QDesktopServices>
 #include <QUrl>
+#include "../state/state.h"
+#include "../core/appcontext.h"
 
 namespace util {
 
@@ -39,7 +41,10 @@ void setMwcQtWalletPath( QString path ) {mwcQtWalletPath = path;}
 static bool restartRequested = false;
 
 // Request to restart mwc qt wallet on exit of this app
-void requestRestartMwcQtWallet() {restartRequested=true;}
+void requestRestartMwcQtWallet() {
+    state::getStateContext()->appContext->saveData();
+    restartRequested=true;
+}
 
 
 // Point of restart only with a gui

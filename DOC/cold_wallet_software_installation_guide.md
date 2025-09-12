@@ -155,7 +155,7 @@ Every time you boot up Ubuntu from your USB device, you should first verify that
 Now that we have booted from our Ubuntu USB device and ensured that we are not connected to the network, we can prepare to install MWC Qt Wallet and its dependent software.
 *   Insert your file transfer USB device into the newly booted Ubuntu system.
 *   Open a terminal window by typing: ctrl-alt-t
-*   Transfer the files from your file transfer USB device to the Ubuntu system’s local file system.
+*   Transfer the files from your file transfer USB device to the Ubuntu system's local file system.
     *   cp /media/ubuntu/&lt;USB device name>/mwc-qt-wallet_&lt;version>-linux64-standardcpu.deb .
 
 Where &lt;version> is replaced with the actual version information from the name of the mwc-qt-wallet installation file.
@@ -269,14 +269,14 @@ To uninstall the mwc-qt-wallet package, follow these steps:
 
 ## Install Latest MWC Qt Wallet Software
 
-Now it’s time to install the latest version of MWC Qt Wallet from the .deb installation file on your other USB device.
+Now it's time to install the latest version of MWC Qt Wallet from the .deb installation file on your other USB device.
 *   Insert the USB device with the MWC Qt Wallet .deb installation file into the computer booted from your cold wallet USB device.
 *   Open a terminal window by pressing ctrl-alt-t
 *   Type the command:
     *   cp /media/ubuntu/&lt;USB device name>/mwc-qt-wallet_&lt;version>-linux64-standardcpu.deb .
 *   Type the command:
     *   sudo apt install ./mwc-qt-wallet_&lt;version>-linux64-standardcpu.deb
-*   Enter ‘Y’ when prompted.
+*   Enter ‘Y' when prompted.
 
 Where &lt;version> is replaced with the actual version information from the name of the installation file.
 

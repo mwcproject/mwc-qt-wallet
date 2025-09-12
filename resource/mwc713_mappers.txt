@@ -214,7 +214,7 @@ Unable to reach MWC node. Please check your network connection.
 
 # failed finalizing slate!, Wallet error: Transaction Expired
 failed finalizing slate!, Wallet error: Transaction Expired
-This transaction can’t be finalized because it has expired.
+This transaction can't be finalized because it has expired.
 
 #failed finalizing slate!, Wallet error: Transaction a9d7e7c9-949a-44af-ba7d-7af35d6cde43 has been cancelled, expired or already finalized
 failed finalizing slate!, Wallet error: Transaction (.*) has been cancelled, expired or already finalized

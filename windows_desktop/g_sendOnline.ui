@@ -209,10 +209,10 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="toolTip">
-         <string>Pick a contact to get the receiver’s wallet address</string>
+         <string>Pick a contact to get the receiver's wallet address</string>
         </property>
         <property name="statusTip">
-         <string>Pick a contact to get the receiver’s wallet address</string>
+         <string>Pick a contact to get the receiver's wallet address</string>
         </property>
         <property name="text">
          <string>Contacts</string>

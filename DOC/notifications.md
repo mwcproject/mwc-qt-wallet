@@ -56,7 +56,7 @@ When your wallet is iconified, individual status messages are also not displayed
 
 <img src="status_windows_images/image_9.png" max-width="300" height="300"/>
 
-When your wallet is iconified clicking on the “Notifications Waiting To Be Read” window will restore your MWC Qt Wallet to the screen. If your wallet is unlocked, any pending notification messages will then be displayed. If your wallet is locked, the pending notification messages will be displayed once you unlock your wallet.
+When your wallet is iconified clicking on the "Notifications Waiting To Be Read" window will restore your MWC Qt Wallet to the screen. If your wallet is unlocked, any pending notification messages will then be displayed. If your wallet is locked, the pending notification messages will be displayed once you unlock your wallet.
 
 # Pop-Ups Which No Longer Appear
 

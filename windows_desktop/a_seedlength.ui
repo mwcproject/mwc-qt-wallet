@@ -388,12 +388,7 @@
         </size>
        </property>
        <property name="text">
-        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot;line-height:138%;&quot;&gt;
-&lt;p&gt;
-Your mnemonic phrase is the key to accessing your wallet and funds. The number of words in your mnemonic phrase directly affects your wallet’s security:&lt;br /&gt;&lt;br /&gt;- &lt;span style=&quot; font-weight:600;&quot;&gt;12 words&lt;/span&gt;: Provides basic security. Suitable for most users but more vulnerable to advanced attacks.&lt;br /&gt;- &lt;span style=&quot; font-weight:600;&quot;&gt;18 words:&lt;/span&gt; Offers stronger security. A good balance between convenience and enhanced protection.&lt;br /&gt;- &lt;span style=&quot; font-weight:600;&quot;&gt;24 words:&lt;/span&gt; Provides maximum security. Recommended for protecting significant amounts or long-term holdings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>Your mnemonic phrase is the key to accessing your wallet and funds. The number of words in your mnemonic phrase directly affects your wallet's security:&lt;br /&gt;&lt;br /&gt;- &lt;span style=&quot; font-weight:600;&quot;&gt;12 words&lt;/span&gt;: Provides basic security. Suitable for most users but more vulnerable to advanced attacks.&lt;br /&gt;- &lt;span style=&quot; font-weight:600;&quot;&gt;18 words:&lt;/span&gt; Offers stronger security. A good balance between convenience and enhanced protection.&lt;br /&gt;- &lt;span style=&quot; font-weight:600;&quot;&gt;24 words:&lt;/span&gt; Provides maximum security. Recommended for protecting significant amounts or long-term holdings.</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>

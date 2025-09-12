@@ -267,6 +267,9 @@ public:
     void setFeatureSlatepack(bool val);
     void setFeatureMWCMQS(bool val);
     void setFeatureTor(bool val);
+public:
+    void saveData() const;
+
 private:
 signals:
     void onOutputLockChanged(QString commit);
@@ -274,8 +277,6 @@ signals:
 private:
     bool loadData();
     bool loadDataImpl();
-
-    void saveData() const;
 
     void loadNotesData();
     void saveNotesData() const;
