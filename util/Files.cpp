@@ -88,7 +88,6 @@ bool copyWithWinEol( const QString & srcFile, const QString &destPath)
 #ifdef Q_OS_WIN
     content.replace("\r\n", "\n");
     content.replace("\r", "\n");
-    content.replace("\n",  "\r\n");
 #endif
 
     QFile out(destPath);

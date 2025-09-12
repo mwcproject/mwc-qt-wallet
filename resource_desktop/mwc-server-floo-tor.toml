@@ -9,6 +9,8 @@
 # -[user home]/.mwc
 #
 
+config_file_version = 2
+
 #########################################
 ### SERVER CONFIGURATION              ###
 #########################################
@@ -119,9 +121,6 @@ bits = 31
 ### MEMPOOL CONFIGURATION             ###
 #########################################
 [server.pool_config]
-
-#base fee that's accepted into the pool
-accept_fee_base = 1000000
 
 #maximum number of transactions allowed in the pool
 max_pool_size = 50000
