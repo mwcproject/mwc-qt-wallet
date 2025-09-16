@@ -93,13 +93,7 @@ Please note, this online host will never have access to your wallet passphrase o
 
    <img src="cold_wallet_images/cold_wallet_node_overview.png" max-width="300" height="300"/>
 
-   You should see that the node is not able to sync.
    The first time you run your cold wallet, it will have 0 blocks.
-
-   Important! If your node is syncing, you are connected to the network. Shutdown MWC Qt Wallet immediately and review the steps for ensuring you are disconnected from the network in the section _Disable All Network Connections_ in:<br/>
-
-   [MWC Cold Wallet Software Installation Guide](https://github.com/mwcproject/mwc-qt-wallet/blob/master/DOC/cold_wallet_software_installation_guide.md)
-
 
 ### Online Node Setup
 
@@ -201,7 +195,6 @@ Perform the following steps on the machine running your _cold wallet_ to import 
 2) In the MWC Node Status screen:
 
     <img src="cold_wallet_images/load_chain_data.png" max-width="300" height="300"/>
-
    *  Click _Load Blockchain Data_
    *  Select the file, on your file transfer USB device, with the exported blockchain data from your _online node_.
    *  Click _Open_ at the top of the file selection screen.
@@ -226,25 +219,23 @@ The initial transaction file should have the extension '.tx'.
 
    * Click on the _Receive_ icon in the left hand menu bar of MWC Qt Wallet.
 
-   * Click _Receive MWC by file_ to sign the incoming transaction.
-
        <img src="cold_wallet_images/receive_mwc.png" max-width="300" height="300"/>
 
-   * Select the transaction file with the .tx file extension on your file transfer USB device.
-     
-     The signed transaction file will be created in the same path as your transaction file. New file extention will be '.response'.
-
+   * Paste the Receive slate and press _Continue_.
+   * Review Receive Transaction details. If everything looks good, press _Generate Response button_.
+   * Generated respose save on USB stick by clicking _Save Slatepack_ button.
    * Eject your file transfer USB device from your _cold wallet host_ computer.
 
 3) On your _online node host_ computer:
 
    * Insert the file transfer USB device.
+   * Send Slatepack to your peer for finalization.
+   * Wait when your peer conform that transaction is finalized.
+   * Check the block explorer at https://explorer.mwc.mw to see that the finalized transaction was mined in the block. 
 
-   * Send the signed transaction file back to the MWC coin sender for finalization. This is by whatever means you have agreed upon for exchanging files with the sender.
-
-   * Check the block explorer at https://explorer.mwc.mw to see that the transaction has been finalized. 
-
-4) To verify that your transaction has been finalized, use the 'Transfer Online Node Blockchain Data' procedure to export blockchain data from your online node to your cold wallet. Continue to the next step once your cold wallet has been updated with the blockchain data.
+4) To verify that your transaction has been finalized, use the 'Transfer Online Node Blockchain Data' procedure to export 
+blockchain data from your online node to your cold wallet. Continue to the next step once your cold wallet has been 
+updated with the blockchain data.
 
    * On your _cold wallet host_ computer:
 
@@ -253,7 +244,9 @@ The initial transaction file should have the extension '.tx'.
 
 Congratulations, you received the MWC in your offline wallet.
 
-Note: You will not be able to send coins you have received using your cold wallet until the transactions with the coins have been fully confirmed. The only way your cold wallet will know if the transactions are confirmed is if you import blockchain data which shows that the transactions are confirmed.
+Note: You will not be able to send coins you have received using your cold wallet until the transactions with the coins 
+have been fully confirmed. The only way your cold wallet will know if the transactions are confirmed is if you import 
+blockchain data which shows that the transactions are confirmed.
 
 ### Send MWC
 
@@ -262,16 +255,13 @@ Note: You will not be able to send coins you have received using your cold walle
    * Click the _Send_ icon in the left hand menu bar of MWC Qt Wallet.
 
      <img src="cold_wallet_images/send_cold_wallet.png" max-width="300" height="300"/>
-
+     
    * In the _Send coins_ screen:
 
       * Enter the amount of MWC you would like to send.
-      * Click _Next_
-
-   * In the _Send to File_ screen:
-
+      * Specify recipient slatepack address, so your slatepack data will be encrypted for that wallet.
       * Optionally enter a note for the transaction.
-      * Click _Send_
+      * Click _Continue_
 
    * In the _Confirm Send Request_ screen:
 
@@ -279,9 +269,7 @@ Note: You will not be able to send coins you have received using your cold walle
       * Click _Confirm_
 
    * In the file window that appears:
-
-      * Select the file transfer USB device as where to store the transaction file.
-      * Enter a name for your file. The file will be saved with a .tx extenstion.
+      * Press _Save slatepack_ and specify the file located at your USB device. 
       * Click _Save_
 
    * Eject the file transfer USB device.
@@ -289,19 +277,19 @@ Note: You will not be able to send coins you have received using your cold walle
 2) On your _online node host_ computer:
 
    * Insert the file transfer USB device.
-   * Send the transaction file to the person whom you want to send MWC. This is by whatever means you have agreed upon for exchanging files with the receiver.
-   * Wait for the signed transaction file to be returned from the receiver.
-      * Save the signed transaction file to the file transfer USB device.
+   * Send the Slatepack content to the person whom you want to send MWC. This is by whatever means you have agreed upon 
+for exchanging files with the receiver.
+   * Wait for the signed Slatepack to be returned from the receiver.
+      * Save the response Slatepack to the file transfer USB device.
       * Eject the file transfer USB device
 
 3) On your _cold wallet host_ computer:
 
    * Insert the file transfer USB device
    * Select the _Finalize_ icon in the left hand menu bar of the cold wallet.
-   * Click _Upload a File_
+   * Copy paste the response Slatepack that is stored on your USB drive.
 
      <img src="cold_wallet_images/finalize1.png" max-width="300" height="300"/>
-
    * In the _Finalize Transaction_ screen that appears:
       * Note the location of the file in the _Result location_. This is the file that contains the slate that needs to be broadcast to the network so it can be recorded in the blockchain.
       * Click _Finalize_
@@ -324,7 +312,6 @@ Note: You will not be able to send coins you have received using your cold walle
     You should see a success message when your slate is published. If you see an error message:
     * Check that the transaction has not already been published.
     * Check that the transaction does not contain an output that was already used in another transaction. If so, cancel the transaction. Ensure you have a recent blockchain imported on your cold wallet, and start over.
-
       
     * Wait for some time until the transaction is accepted by the network and a few blocks have been mined.
 
