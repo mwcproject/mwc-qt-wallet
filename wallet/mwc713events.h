@@ -41,7 +41,7 @@ enum TASK_PRIORITY {
 
 // Wallet event codes
 enum WALLET_EVENTS {
-    S_READY=1, // Wallet ready and waiting for intoput
+    S_READY=1, // Wallet ready and waiting for input
     S_WELCOME=2, // Welcome string.                         Message: version
     S_INIT=3,    // Init choice request. Wallet need seed
     S_PASSWORD_ERROR=4, // Incorrect password error
